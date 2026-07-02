@@ -24,6 +24,7 @@ fn default_count() -> u16 {
 
 /// List projects in the moderation queue.  
 #[utoipa::path(
+	context_path = "/moderation",
 	tag = "v2 moderation",
     get,
     operation_id = "getModerationProjects",
@@ -80,16 +81,3 @@ pub async fn get_projects(
         Err(response) => Ok(response),
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(get_projects,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/moderation", api = RouteDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

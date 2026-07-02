@@ -559,8 +559,3 @@ pub async fn close_socket(
 
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(ws_init,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

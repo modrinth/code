@@ -30,6 +30,7 @@ struct VerifyResponse {
 
 /// Verify Medal credentials.  
 #[utoipa::path(
+	context_path = "/medal",
 	tag = "medal",
 	responses((status = OK, body = VerifyResponse))
 )]
@@ -57,6 +58,7 @@ pub async fn verify(
 
 /// Redeem Medal credit.  
 #[utoipa::path(
+	context_path = "/medal",
 	tag = "medal",
 	responses((status = ACCEPTED), (status = CREATED))
 )]
@@ -117,8 +119,3 @@ pub async fn redeem(
         Ok(HttpResponse::Created().finish())
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(verify, redeem,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

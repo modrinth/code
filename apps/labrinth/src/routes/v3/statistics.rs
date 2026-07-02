@@ -16,7 +16,7 @@ pub struct V3Stats {
 
 #[utoipa::path(tag = "statistics", responses((status = OK)))]
 #[get("/statistics")]
-async fn get_stats_route(
+pub async fn get_stats_route(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     get_stats(pool).await
@@ -100,8 +100,3 @@ pub async fn get_stats(
 
     Ok(HttpResponse::Ok().json(v3_stats))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(get_stats_route,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

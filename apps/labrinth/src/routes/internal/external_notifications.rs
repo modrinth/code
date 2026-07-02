@@ -363,8 +363,3 @@ async fn broadcast_notifications(
         }
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(create, create_email_sync, remove, send_custom_email,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

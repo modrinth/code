@@ -16,7 +16,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 	responses((status = OK, body = serde_json::Value))
 )]
 #[get("/mural/bank-details")]
-async fn get_bank_details(
+pub async fn get_bank_details(
     payouts_queue: web::Data<PayoutsQueue>,
 ) -> Result<web::Json<muralpay::BankDetailsResponse>, ApiError> {
     let mural = payouts_queue.muralpay.load();
@@ -31,8 +31,3 @@ async fn get_bank_details(
         .wrap_internal_err("failed to fetch bank details")?;
     Ok(web::Json(details))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(get_bank_details,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

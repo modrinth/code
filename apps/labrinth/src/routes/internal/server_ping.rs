@@ -24,6 +24,7 @@ pub struct PingRequest {
 
 /// Ping Minecraft server.  
 #[utoipa::path(
+	context_path = "/server-ping",
 	tag = "server ping",
 	responses((status = NO_CONTENT))
 )]
@@ -51,8 +52,3 @@ pub async fn ping_minecraft_java(
 
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(ping_minecraft_java,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

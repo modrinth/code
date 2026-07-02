@@ -31,6 +31,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 /// Get the current user.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     get,
     operation_id = "getUserFromAuth",
@@ -108,6 +109,7 @@ pub async fn users_get(
 
 /// Get a user by ID or username.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     get,
     operation_id = "getUser",
@@ -144,6 +146,7 @@ pub async fn user_get(
 
 /// Get a user's projects.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     get,
     operation_id = "getUserProjects",
@@ -210,6 +213,7 @@ pub struct EditUser {
 
 /// Update a user.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     patch,
     operation_id = "modifyUser",
@@ -265,6 +269,7 @@ pub struct Extension {
 
 /// Change a user's avatar.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     patch,
     operation_id = "changeUserIcon",
@@ -325,6 +330,7 @@ pub async fn user_icon_edit(
 
 /// Remove a user's avatar.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     delete,
     operation_id = "deleteUserIcon",
@@ -363,6 +369,7 @@ pub async fn user_icon_delete(
 
 /// Delete a user by ID or username.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     delete,
     operation_id = "deleteUser",
@@ -397,6 +404,7 @@ pub async fn user_delete(
 
 /// Get projects followed by a user.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     get,
     operation_id = "getFollowedProjects",
@@ -445,6 +453,7 @@ pub async fn user_follows(
 
 /// Get notifications for a user.  
 #[utoipa::path(
+	context_path = "/user",
 	tag = "users",
     get,
     operation_id = "getUserNotifications",
@@ -484,48 +493,5 @@ pub async fn user_notifications(
             Ok(HttpResponse::Ok().json(legacy_notifications))
         }
         Err(response) => Ok(response),
-    }
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    user_auth_get,
-    users_get,
-    user_get,
-    projects_list,
-    user_edit,
-    user_icon_edit,
-    user_icon_delete,
-    user_delete,
-    user_follows,
-    user_notifications,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(users_get,))]
-pub(crate) struct RootRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    user_auth_get,
-    user_get,
-    projects_list,
-    user_edit,
-    user_icon_edit,
-    user_icon_delete,
-    user_delete,
-    user_follows,
-    user_notifications,
-))]
-pub(crate) struct UserRoutesDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let openapi = RootRoutesDoc::openapi();
-        openapi.nest("/user", UserRoutesDoc::openapi())
     }
 }

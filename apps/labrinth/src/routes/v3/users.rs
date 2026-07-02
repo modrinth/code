@@ -256,7 +256,7 @@ pub async fn admin_user_email(
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
 #[get("/user/{user_id}/projects")]
-async fn projects_list_route(
+pub async fn projects_list_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -305,7 +305,7 @@ pub async fn projects_list(
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
 #[get("/user")]
-async fn user_auth_get_route(
+pub async fn user_auth_get_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -375,7 +375,7 @@ pub async fn users_search(
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
 #[get("/users")]
-async fn users_get_route(
+pub async fn users_get_route(
     req: HttpRequest,
     ids: web::Query<UserIds>,
     pool: web::Data<PgPool>,
@@ -435,7 +435,7 @@ pub async fn users_get(
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
 #[get("/user/{id}")]
-async fn user_get_route(
+pub async fn user_get_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -715,7 +715,7 @@ pub struct EditUser {
 
 #[utoipa::path(tag = "users", responses((status = NO_CONTENT)))]
 #[patch("/user/{id}")]
-async fn user_edit_route(
+pub async fn user_edit_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     new_user: web::Json<EditUser>,
@@ -897,7 +897,7 @@ pub struct Extension {
 #[allow(clippy::too_many_arguments)]
 #[utoipa::path(tag = "users", responses((status = NO_CONTENT)))]
 #[patch("/user/{id}/icon")]
-async fn user_icon_edit_route(
+pub async fn user_icon_edit_route(
     ext: web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -998,7 +998,7 @@ pub async fn user_icon_edit(
 
 #[utoipa::path(tag = "users", responses((status = NO_CONTENT)))]
 #[delete("/user/{id}/icon")]
-async fn user_icon_delete_route(
+pub async fn user_icon_delete_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1065,7 +1065,7 @@ pub async fn user_icon_delete(
 
 #[utoipa::path(tag = "users", responses((status = NO_CONTENT)))]
 #[delete("/user/{id}")]
-async fn user_delete_route(
+pub async fn user_delete_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1125,7 +1125,7 @@ pub async fn user_delete(
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
 #[get("/user/{id}/follows")]
-async fn user_follows_route(
+pub async fn user_follows_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1179,7 +1179,7 @@ pub async fn user_follows(
 
 #[utoipa::path(tag = "users", responses((status = OK)))]
 #[get("/user/{id}/notifications")]
-async fn user_notifications_route(
+pub async fn user_notifications_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1229,25 +1229,3 @@ pub async fn user_notifications(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    all_projects,
-    admin_user_email,
-    projects_list_route,
-    user_auth_get_route,
-    users_search,
-    users_get_route,
-    user_get_route,
-    user_notes_edit,
-    collections_list,
-    orgs_list,
-    user_edit_route,
-    user_icon_edit_route,
-    user_icon_delete_route,
-    user_delete_route,
-    user_follows_route,
-    user_notifications_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

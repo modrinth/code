@@ -298,6 +298,7 @@ pub async fn projects_get(
 
 /// Get a project by ID or slug.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     get,
     operation_id = "getProject",
@@ -348,6 +349,7 @@ pub async fn project_get(
 //checks the validity of a project id or slug
 /// Check that a project ID or slug exists.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     get,
     operation_id = "checkProjectValidity",
@@ -380,6 +382,7 @@ struct DependencyInfo {
 
 /// Get dependency projects and versions for a project.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
 	tag = "projects",
     get,
     operation_id = "getDependencies",
@@ -541,6 +544,7 @@ pub struct EditProject {
 
 /// Update a project.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     patch,
     operation_id = "modifyProject",
@@ -927,6 +931,7 @@ pub struct Extension {
 
 /// Change a project's icon.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     patch,
     operation_id = "changeProjectIcon",
@@ -985,6 +990,7 @@ pub async fn project_icon_edit(
 
 /// Delete a project's icon.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     delete,
     operation_id = "deleteProjectIcon",
@@ -1035,6 +1041,7 @@ pub struct GalleryCreateQuery {
 
 /// Add a gallery image to a project.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     post,
     operation_id = "addGalleryImage",
@@ -1150,6 +1157,7 @@ pub struct GalleryEditQuery {
 
 /// Update a gallery image.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     patch,
     operation_id = "modifyGalleryImage",
@@ -1225,6 +1233,7 @@ pub struct GalleryDeleteQuery {
 
 /// Delete a gallery image.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     delete,
     operation_id = "deleteGalleryImage",
@@ -1268,6 +1277,7 @@ pub async fn delete_gallery_item(
 
 /// Delete a project by ID or slug.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     delete,
     operation_id = "deleteProject",
@@ -1307,6 +1317,7 @@ pub async fn project_delete(
 
 /// Follow a project.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     post,
     operation_id = "followProject",
@@ -1337,6 +1348,7 @@ pub async fn project_follow(
 
 /// Unfollow a project.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
     delete,
     operation_id = "unfollowProject",
@@ -1369,66 +1381,4 @@ pub async fn project_unfollow(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    project_search,
-    random_projects_get,
-    projects_get,
-    project_get,
-    project_get_check,
-    dependency_list,
-    project_edit,
-    projects_edit,
-    project_icon_edit,
-    delete_project_icon,
-    add_gallery_item,
-    edit_gallery_item,
-    delete_gallery_item,
-    project_delete,
-    project_follow,
-    project_unfollow,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    project_search,
-    random_projects_get,
-    projects_get,
-    projects_edit,
-))]
-pub(crate) struct RootRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    project_get,
-    project_get_check,
-    project_edit,
-    project_icon_edit,
-    delete_project_icon,
-    add_gallery_item,
-    edit_gallery_item,
-    delete_gallery_item,
-    project_delete,
-    project_follow,
-    project_unfollow,
-))]
-pub(crate) struct ProjectRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(dependency_list,))]
-pub(crate) struct ProjectIdRoutesDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let openapi = RootRoutesDoc::openapi();
-        openapi
-            .nest("/project", ProjectRoutesDoc::openapi())
-            .nest("/project/{project_id}", ProjectIdRoutesDoc::openapi())
-    }
 }

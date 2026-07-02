@@ -135,8 +135,3 @@ pub async fn forge_updates(
 
     Ok(HttpResponse::Ok().json(response))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(forge_updates,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

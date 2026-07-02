@@ -27,8 +27,10 @@ use std::sync::Arc;
 use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
-use utoipa::openapi::extensions::ExtensionsBuilder;
-use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
+use utoipa::PartialSchema;
+use utoipa::openapi::Content;
+use utoipa::openapi::response::Response;
+use utoipa::openapi::schema::Components;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -226,13 +228,12 @@ async fn app() -> std::io::Result<()> {
     info!("Starting Actix HTTP server!");
 
     HttpServer::new(move || {
-        let docs_v2 = DocsV2::openapi()
-            .merge_from(labrinth::routes::v2::ApiDoc::openapi());
-        let docs_v3 = DocsV3::openapi()
-            .merge_from(labrinth::routes::PublicApiDoc::openapi())
-            .merge_from(labrinth::routes::v3::ApiDoc::openapi());
-        let docs_internal = DocsInternal::openapi()
-            .merge_from(labrinth::routes::internal::ApiDoc::openapi());
+        let mut docs_v2 = labrinth::routes::v2::ApiDoc::openapi();
+        let mut docs_v3 = labrinth::routes::v3::ApiDoc::openapi();
+        let mut docs_internal = labrinth::routes::internal::ApiDoc::openapi();
+        document_error_responses(&mut docs_v2);
+        document_error_responses(&mut docs_v3);
+        document_error_responses(&mut docs_internal);
 
         let app = App::new()
             .wrap(TracingLogger::default())
@@ -347,43 +348,6 @@ async fn app() -> std::io::Result<()> {
     .await
 }
 
-#[derive(utoipa::OpenApi)]
-#[openapi(
-    info(title = "Modrinth API v2", version = "2.0.0"),
-    modifiers(&SecurityAddon, &V2DescriptionAddon)
-)]
-struct DocsV2;
-
-const API_V2_DESCRIPTION: &str = include_str!("api_v2_description.md");
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-    info(
-        title = "API v3 (UNSTABLE - DO NOT USE)",
-        version = "3.0.0"
-    ),
-    modifiers(&SecurityAddon)
-)]
-struct DocsV3;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-    info(
-        title = "Internal API - HIGHLY UNSTABLE - DO NOT USE",
-        version = "internal"
-    ),
-    modifiers(&SecurityAddon)
-)]
-struct DocsInternal;
-
-struct V2DescriptionAddon;
-
-impl utoipa::Modify for V2DescriptionAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        openapi.info.description = Some(API_V2_DESCRIPTION.to_string());
-    }
-}
-
 fn openapi_json_service(
     path: &'static str,
     openapi: utoipa::openapi::OpenApi,
@@ -406,29 +370,65 @@ fn openapi_json(openapi: utoipa::openapi::OpenApi) -> HttpResponse {
     }
 }
 
-struct SecurityAddon;
+fn document_error_responses(openapi: &mut utoipa::openapi::OpenApi) {
+    let components = openapi.components.get_or_insert_with(Components::new);
+    components.schemas.insert(
+        "ApiError".to_string(),
+        labrinth::models::error::ApiError::schema(),
+    );
 
-impl utoipa::Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        let components = openapi.components.as_mut().unwrap();
-        let mut bearer_auth = HttpBuilder::new()
-			.scheme(HttpAuthScheme::Bearer)
-			.description(Some(
-				"Use a personal access token. Example: `mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic`.",
-			))
-			.build();
-        bearer_auth.extensions = Some(
-			ExtensionsBuilder::new()
-				.add(
-					"x-example",
-					"mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic",
-				)
-				.build(),
-		);
+    for path_item in openapi.paths.paths.values_mut() {
+        add_default_error_response(&mut path_item.get);
+        add_default_error_response(&mut path_item.put);
+        add_default_error_response(&mut path_item.post);
+        add_default_error_response(&mut path_item.delete);
+        add_default_error_response(&mut path_item.options);
+        add_default_error_response(&mut path_item.head);
+        add_default_error_response(&mut path_item.patch);
+        add_default_error_response(&mut path_item.trace);
+    }
+}
 
-        components.add_security_scheme(
-            "bearer_auth",
-            SecurityScheme::Http(bearer_auth),
+fn add_default_error_response(
+    operation: &mut Option<utoipa::openapi::path::Operation>,
+) {
+    if let Some(operation) = operation {
+        for (status, response) in operation.responses.responses.iter_mut() {
+            if !is_error_response_status(status) {
+                continue;
+            }
+
+            if let utoipa::openapi::RefOr::T(response) = response {
+                add_error_content(response);
+            }
+        }
+
+        operation
+            .responses
+            .responses
+            .entry("default".to_string())
+            .or_insert_with(|| error_response().into());
+    }
+}
+
+fn is_error_response_status(status: &str) -> bool {
+    matches!(status.as_bytes().first(), Some(b'4' | b'5'))
+        || status == "default"
+}
+
+fn error_response() -> Response {
+    let mut response = Response::new("Error response");
+    add_error_content(&mut response);
+    response
+}
+
+fn add_error_content(response: &mut Response) {
+    if response.content.is_empty() {
+        response.content.insert(
+            "application/json".to_string(),
+            Content::new(Some(utoipa::openapi::Ref::from_schema_name(
+                "ApiError",
+            ))),
         );
     }
 }

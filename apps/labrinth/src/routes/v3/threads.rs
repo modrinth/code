@@ -264,7 +264,7 @@ pub async fn filter_authorized_threads(
 
 #[utoipa::path(tag = "threads", responses((status = OK, body = Thread)))]
 #[get("/thread/{id}")]
-async fn thread_get_route(
+pub async fn thread_get_route(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
@@ -333,7 +333,7 @@ pub struct ThreadIds {
 
 #[utoipa::path(tag = "threads", responses((status = OK, body = Vec<Thread>)))]
 #[get("/threads")]
-async fn threads_get_route(
+pub async fn threads_get_route(
     req: HttpRequest,
     ids: web::Query<ThreadIds>,
     pool: web::Data<PgPool>,
@@ -382,7 +382,7 @@ pub struct NewThreadMessage {
 
 #[utoipa::path(tag = "threads", responses((status = NO_CONTENT)))]
 #[post("/thread/{id}")]
-async fn thread_send_message_route(
+pub async fn thread_send_message_route(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
@@ -626,7 +626,7 @@ pub async fn thread_send_message_internal(
 
 #[utoipa::path(tag = "threads", responses((status = NO_CONTENT)))]
 #[delete("/message/{id}")]
-async fn message_delete_route(
+pub async fn message_delete_route(
     req: HttpRequest,
     info: web::Path<(ThreadMessageId,)>,
     pool: web::Data<PgPool>,
@@ -704,13 +704,3 @@ pub async fn message_delete(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    thread_get_route,
-    threads_get_route,
-    thread_send_message_route,
-    message_delete_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

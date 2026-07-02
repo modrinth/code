@@ -65,6 +65,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 /// List products.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -107,6 +108,7 @@ struct SubscriptionsQuery {
 
 /// List subscriptions.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -169,6 +171,7 @@ pub struct ChargeRefund {
 
 /// Refund a charge.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = NO_CONTENT))
 )]
@@ -437,6 +440,7 @@ pub async fn refund_charge(
 
 /// Reprocess tax for a charge.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = NO_CONTENT))
 )]
@@ -625,6 +629,7 @@ pub struct SubscriptionEditQuery {
 
 /// Update a subscription.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses(
 		(status = OK, body = serde_json::Value),
@@ -1123,6 +1128,7 @@ pub async fn edit_subscription(
 
 /// Get the current customer.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -1166,6 +1172,7 @@ pub struct ChargesQuery {
 
 /// List payments.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -1230,6 +1237,7 @@ pub async fn charges(
 
 /// Start a payment method flow.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -1288,6 +1296,7 @@ pub struct EditPaymentMethod {
 
 /// Update a payment method.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = NO_CONTENT))
 )]
@@ -1357,6 +1366,7 @@ pub async fn edit_payment_method(
 
 /// Remove a payment method.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = NO_CONTENT))
 )]
@@ -1445,6 +1455,7 @@ pub async fn remove_payment_method(
 
 /// List payment methods.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses(
 		(status = OK, body = serde_json::Value),
@@ -1507,6 +1518,7 @@ struct ActiveServerResponse {
 
 /// List active servers.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = inline(Vec<ActiveServerResponse>)))
 )]
@@ -1619,6 +1631,7 @@ pub struct PaymentRequest {
 
 /// Initiate a payment.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -1688,6 +1701,7 @@ pub async fn initiate_payment(
 
 /// Receive a Stripe webhook.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = NO_CONTENT))
 )]
@@ -2609,6 +2623,7 @@ pub enum CreditTarget {
 
 /// Credit subscriptions.  
 #[utoipa::path(
+	context_path = "/billing",
 	tag = "billing",
 	responses((status = NO_CONTENT))
 )]
@@ -2735,24 +2750,3 @@ pub async fn credit(
 }
 
 pub mod payments;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    products,
-    subscriptions,
-    refund_charge,
-    reprocess_charge_tax,
-    edit_subscription,
-    user_customer,
-    charges,
-    add_payment_method_flow,
-    edit_payment_method,
-    remove_payment_method,
-    payment_methods,
-    active_servers,
-    initiate_payment,
-    stripe_webhook,
-    credit,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

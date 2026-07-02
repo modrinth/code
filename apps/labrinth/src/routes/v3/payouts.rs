@@ -51,6 +51,7 @@ pub struct RequestForm {
 
 /// Submit a compliance form.  
 #[utoipa::path(
+	context_path = "/payout",
 	tag = "payouts",
 	responses((status = OK, body = serde_json::Value)),
 )]
@@ -432,6 +433,7 @@ pub struct WithdrawalFees {
 
 /// Calculate payout fees.  
 #[utoipa::path(
+	context_path = "/payout",
 	tag = "payouts",
 	responses((status = OK, body = WithdrawalFees)),
 )]
@@ -468,7 +470,10 @@ pub async fn calculate_fees(
 }
 
 /// Create a payout.  
-#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/payout",
+	tag = "payouts", responses((status = NO_CONTENT))
+)]
 #[post("")]
 pub async fn create_payout(
     req: HttpRequest,
@@ -683,7 +688,10 @@ pub enum PayoutSource {
 
 /// Get transaction history.  
 /// the user withdrew their payouts.
-#[utoipa::path(tag = "payouts", responses((status = OK, body = Vec<TransactionItem>)))]
+#[utoipa::path(
+	context_path = "/payout",
+	tag = "payouts", responses((status = OK, body = Vec<TransactionItem>))
+)]
 #[get("/history")]
 pub async fn transaction_history(
     req: HttpRequest,
@@ -766,7 +774,10 @@ pub async fn transaction_history(
 }
 
 /// Cancel a payout.  
-#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/payout",
+	tag = "payouts", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
 pub async fn cancel_payout(
     info: web::Path<(PayoutId,)>,
@@ -887,6 +898,7 @@ pub enum FormCompletionStatus {
 
 /// List payment methods.  
 #[utoipa::path(
+	context_path = "/payout",
 	tag = "payouts",
 	params(("country" = Option<String>, Query)),
 	responses((status = OK, body = Vec<PayoutMethod>)),
@@ -933,6 +945,7 @@ pub struct BalanceResponse {
 
 /// Get account balance.  
 #[utoipa::path(
+	context_path = "/payout",
 	tag = "payouts",
 	responses((status = OK, body = BalanceResponse)),
 )]
@@ -1160,6 +1173,7 @@ pub struct RevenueData {
 
 /// Get platform revenue.  
 #[utoipa::path(
+	context_path = "/payout",
 	tag = "payouts",
 	params(
 		("start" = Option<String>, Query),
@@ -1226,36 +1240,3 @@ pub async fn platform_revenue(
 
     Ok(HttpResponse::Ok().json(res))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    post_compliance_form,
-    paypal_webhook,
-    tremendous_webhook,
-    calculate_fees,
-    create_payout,
-    transaction_history,
-    cancel_payout,
-    payment_methods,
-    get_balance,
-    platform_revenue,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    post_compliance_form,
-    calculate_fees,
-    create_payout,
-    transaction_history,
-    cancel_payout,
-    payment_methods,
-    get_balance,
-    platform_revenue,
-))]
-pub(crate) struct PayoutRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(paypal_webhook, tremendous_webhook,))]
-pub(crate) struct WebhookRoutesDoc;

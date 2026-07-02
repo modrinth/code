@@ -8,6 +8,10 @@ use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 use serde_json::json;
+use utoipa::openapi::extensions::ExtensionsBuilder;
+use utoipa::openapi::security::{
+	HttpAuthScheme, HttpBuilder, SecurityScheme,
+};
 
 pub mod debug;
 pub mod internal;
@@ -22,6 +26,59 @@ mod not_found;
 mod updates;
 
 pub use self::not_found::not_found;
+
+pub(crate) fn prefix_openapi_paths(
+	openapi: &mut utoipa::openapi::OpenApi,
+	prefix: &str,
+	should_skip: impl Fn(&str) -> bool,
+) {
+	let paths = std::mem::take(&mut openapi.paths.paths);
+	openapi.paths.paths = paths
+		.into_iter()
+		.map(|(path, item)| {
+			if should_skip(&path) || path.starts_with(prefix) {
+				(path, item)
+			} else {
+				(format!("{prefix}{}", normalize_openapi_path(&path)), item)
+			}
+		})
+		.collect();
+}
+
+fn normalize_openapi_path(path: &str) -> String {
+	if path.starts_with('/') {
+		path.to_string()
+	} else {
+		format!("/{path}")
+	}
+}
+
+pub(crate) struct SecurityAddon;
+
+impl utoipa::Modify for SecurityAddon {
+	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+		let components = openapi.components.as_mut().unwrap();
+		let mut bearer_auth = HttpBuilder::new()
+			.scheme(HttpAuthScheme::Bearer)
+			.description(Some(
+				"Use a personal access token. Example: `mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic`.",
+			))
+			.build();
+		bearer_auth.extensions = Some(
+			ExtensionsBuilder::new()
+				.add(
+					"x-example",
+					"mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic",
+				)
+				.build(),
+		);
+
+		components.add_security_scheme(
+			"bearer_auth",
+			SecurityScheme::Http(bearer_auth),
+		);
+	}
+}
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -81,16 +138,6 @@ pub fn public_config(cfg: &mut web::ServiceConfig) {
             .configure(analytics::config),
     );
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-    nest(
-        (path = "/maven", api = maven::RouteDoc),
-        (path = "/updates", api = updates::RouteDoc),
-        (path = "/analytics", api = analytics::RouteDoc),
-    )
-)]
-pub struct PublicApiDoc;
 
 /// Error when calling an HTTP endpoint.
 #[derive(thiserror::Error, Debug)]

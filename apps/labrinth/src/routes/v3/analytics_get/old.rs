@@ -50,6 +50,7 @@ pub struct GetData {
 
 /// Get playtime data.  
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	params(
 		("project_ids" = Option<String>, Query),
@@ -131,6 +132,7 @@ pub async fn playtimes_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	params(
 		("project_ids" = Option<String>, Query),
@@ -212,6 +214,7 @@ pub async fn views_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	params(
 		("project_ids" = Option<String>, Query),
@@ -294,6 +297,7 @@ pub async fn downloads_get(
 ///}
 /// ONLY project IDs can be used. Unauthorized projects will be filtered out.
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	params(
 		("project_ids" = Option<String>, Query),
@@ -445,6 +449,7 @@ pub async fn revenue_get(
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	params(
 		("project_ids" = Option<String>, Query),
@@ -530,6 +535,7 @@ pub async fn countries_downloads_get(
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	params(
 		("project_ids" = Option<String>, Query),
@@ -721,15 +727,3 @@ async fn filter_allowed_ids(
     // Only one of project_ids or version_ids will be Some
     Ok(project_ids)
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    playtimes_get,
-    views_get,
-    downloads_get,
-    revenue_get,
-    countries_downloads_get,
-    countries_views_get,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

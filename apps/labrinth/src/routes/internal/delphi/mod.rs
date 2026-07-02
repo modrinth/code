@@ -143,11 +143,12 @@ pub struct DelphiRunParameters {
 
 /// Ingest a Delphi report.  
 #[utoipa::path(
+	context_path = "/delphi",
 	tag = "delphi",
 	responses((status = NO_CONTENT))
 )]
 #[post("/ingest", guard = "admin_key_guard")]
-async fn ingest_report(
+pub async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     web::Json(report): web::Json<serde_json::Value>,
@@ -473,11 +474,12 @@ pub async fn send_tech_review_exit_file_deleted_message_if_exited(
 
 /// Run Delphi.  
 #[utoipa::path(
+	context_path = "/delphi",
 	tag = "delphi",
 	responses((status = NO_CONTENT))
 )]
 #[post("/run")]
-async fn _run(
+pub async fn _run(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -499,11 +501,12 @@ async fn _run(
 
 /// Get the Delphi version.  
 #[utoipa::path(
+	context_path = "/delphi",
 	tag = "delphi",
 	responses((status = OK, body = inline(Option<i32>)))
 )]
 #[get("/version")]
-async fn version(
+pub async fn version(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -527,11 +530,12 @@ async fn version(
 
 /// Get the Delphi issue type schema.  
 #[utoipa::path(
+	context_path = "/delphi",
 	tag = "delphi",
 	responses((status = OK, body = serde_json::Value))
 )]
 #[get("/issue_type/schema")]
-async fn issue_type_schema(
+pub async fn issue_type_schema(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -576,8 +580,3 @@ async fn issue_type_schema(
         )),
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(ingest_report, _run, version, issue_type_schema,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

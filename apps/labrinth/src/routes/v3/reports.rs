@@ -48,7 +48,7 @@ pub struct CreateReport {
 
 #[utoipa::path(tag = "reports", responses((status = OK)))]
 #[post("/report")]
-async fn report_create_route(
+pub async fn report_create_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     body: web::Payload,
@@ -261,7 +261,7 @@ fn default_all() -> bool {
 
 #[utoipa::path(tag = "reports", responses((status = OK)))]
 #[get("/report")]
-async fn reports_route(
+pub async fn reports_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -348,7 +348,7 @@ pub struct ReportIds {
 
 #[utoipa::path(tag = "reports", responses((status = OK)))]
 #[get("/reports")]
-async fn reports_get_route(
+pub async fn reports_get_route(
     req: HttpRequest,
     ids: web::Query<ReportIds>,
     pool: web::Data<PgPool>,
@@ -399,7 +399,7 @@ pub async fn reports_get(
 
 #[utoipa::path(tag = "reports", responses((status = OK)))]
 #[get("/report/{id}")]
-async fn report_get_route(
+pub async fn report_get_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -452,7 +452,7 @@ pub struct EditReport {
 
 #[utoipa::path(tag = "reports", responses((status = NO_CONTENT)))]
 #[patch("/report/{id}")]
-async fn report_edit_route(
+pub async fn report_edit_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -574,7 +574,7 @@ pub async fn report_edit(
 
 #[utoipa::path(tag = "reports", responses((status = NO_CONTENT)))]
 #[delete("/report/{id}")]
-async fn report_delete_route(
+pub async fn report_delete_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     info: web::Path<(crate::models::ids::ReportId,)>,
@@ -628,15 +628,3 @@ pub async fn report_delete(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    report_create_route,
-    reports_route,
-    reports_get_route,
-    report_get_route,
-    report_edit_route,
-    report_delete_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

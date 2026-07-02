@@ -16,7 +16,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[utoipa::path(tag = "limits", responses((status = OK)))]
 #[get("/limits/projects")]
-async fn get_project_limits(
+pub async fn get_project_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -37,7 +37,7 @@ async fn get_project_limits(
 
 #[utoipa::path(tag = "limits", responses((status = OK)))]
 #[get("/limits/organizations")]
-async fn get_organization_limits(
+pub async fn get_organization_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -58,7 +58,7 @@ async fn get_organization_limits(
 
 #[utoipa::path(tag = "limits", responses((status = OK)))]
 #[get("/limits/collections")]
-async fn get_collection_limits(
+pub async fn get_collection_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -76,12 +76,3 @@ async fn get_collection_limits(
     let limits = UserLimits::get_for_collections(&user, &pool).await?;
     Ok(web::Json(limits))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_project_limits,
-    get_organization_limits,
-    get_collection_limits,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

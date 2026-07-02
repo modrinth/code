@@ -618,18 +618,3 @@ pub async fn shared_instance_version_download(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    shared_instance_create,
-    shared_instance_list,
-    shared_instance_get,
-    shared_instance_edit,
-    shared_instance_delete,
-    shared_instance_version_list,
-    shared_instance_version_get,
-    shared_instance_version_delete,
-    shared_instance_version_download,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

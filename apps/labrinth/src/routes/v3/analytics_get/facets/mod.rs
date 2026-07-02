@@ -60,6 +60,7 @@ pub struct ProjectPlaytimeFacets {
 
 /// Get analytics facets.  
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
 	responses((status = OK, body = inline(FacetsResponse))),
 )]
@@ -84,8 +85,3 @@ pub async fn fetch_facets(
 
     Ok(web::Json(FacetsResponse { facets }))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(fetch_facets,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

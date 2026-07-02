@@ -26,7 +26,7 @@ pub struct NotificationIds {
 
 #[utoipa::path(tag = "notifications", responses((status = OK)))]
 #[get("/notifications")]
-async fn notifications_get_route(
+pub async fn notifications_get_route(
     req: HttpRequest,
     ids: web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
@@ -80,7 +80,7 @@ pub async fn notifications_get(
 
 #[utoipa::path(tag = "notifications", responses((status = OK)))]
 #[get("/notification/{id}")]
-async fn notification_get_route(
+pub async fn notification_get_route(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
@@ -129,7 +129,7 @@ pub async fn notification_get(
 
 #[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
 #[patch("/notification/{id}")]
-async fn notification_read_route(
+pub async fn notification_read_route(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
@@ -191,7 +191,7 @@ pub async fn notification_read(
 
 #[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
 #[delete("/notification/{id}")]
-async fn notification_delete_route(
+pub async fn notification_delete_route(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
@@ -254,7 +254,7 @@ pub async fn notification_delete(
 
 #[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
 #[patch("/notifications")]
-async fn notifications_read_route(
+pub async fn notifications_read_route(
     req: HttpRequest,
     ids: web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
@@ -319,7 +319,7 @@ pub async fn notifications_read(
 
 #[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
 #[delete("/notifications")]
-async fn notifications_delete_route(
+pub async fn notifications_delete_route(
     req: HttpRequest,
     ids: web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
@@ -381,15 +381,3 @@ pub async fn notifications_delete(
 
     Ok(HttpResponse::NoContent().body(""))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    notifications_get_route,
-    notification_get_route,
-    notification_read_route,
-    notification_delete_route,
-    notifications_read_route,
-    notifications_delete_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

@@ -38,7 +38,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 	responses((status = OK, body = serde_json::Value)),
 )]
 #[post("/content/resolve")]
-async fn resolve_content(
+pub async fn resolve_content(
     req: HttpRequest,
     request: web::Json<ResolveContentRequest>,
     pool: web::Data<PgPool>,
@@ -648,8 +648,3 @@ fn resolve_error_to_api(error: ResolveError) -> ApiError {
         }
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(resolve_content,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

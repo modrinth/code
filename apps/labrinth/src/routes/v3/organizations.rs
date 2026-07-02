@@ -1383,20 +1383,3 @@ pub async fn delete_organization_icon(
 
     Ok(HttpResponse::NoContent().body(""))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    organization_projects_get,
-    organization_create,
-    organization_get,
-    organization_notes_edit,
-    organizations_get,
-    organizations_edit,
-    organization_delete,
-    organization_projects_add,
-    organization_projects_remove,
-    organization_icon_edit,
-    delete_organization_icon,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

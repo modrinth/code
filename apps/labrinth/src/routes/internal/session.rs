@@ -135,6 +135,7 @@ pub async fn issue_session(
 
 /// List sessions.  
 #[utoipa::path(
+	context_path = "/session",
 	tag = "sessions",
     get,
 	operation_id = "listSessions",
@@ -182,6 +183,7 @@ pub async fn list(
 
 /// Delete a session.  
 #[utoipa::path(
+	context_path = "/session",
 	tag = "sessions",
     delete,
     operation_id = "deleteSession",
@@ -234,6 +236,7 @@ pub async fn delete(
 
 /// Refresh a session.  
 #[utoipa::path(
+	context_path = "/session",
 	tag = "sessions",
     post,
 	operation_id = "refreshSession",
@@ -316,16 +319,3 @@ pub async fn refresh(
         ))
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(list, delete, refresh,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/session", api = RouteDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

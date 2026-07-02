@@ -54,7 +54,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     );
 }
 
-#[utoipa::path(tag = "oauth clients", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = OK))
+)]
 #[get("/user/{id}/oauth_apps")]
 pub async fn get_user_clients(
     req: HttpRequest,
@@ -101,6 +104,7 @@ pub async fn get_user_clients(
 
 /// Get an OAuth client.  
 #[utoipa::path(
+	context_path = "/oauth",
 	tag = "oauth clients",
 	responses((status = OK, body = models::oauth_clients::OAuthClient)),
 )]
@@ -119,6 +123,7 @@ pub async fn get_client(
 
 /// List OAuth clients.  
 #[utoipa::path(
+	context_path = "/oauth",
 	tag = "oauth clients",
 	responses((status = OK, body = Vec<models::oauth_clients::OAuthClient>)),
 )]
@@ -165,6 +170,7 @@ pub struct NewOAuthApp {
 
 /// Create an OAuth client.  
 #[utoipa::path(
+	context_path = "/oauth",
 	tag = "oauth clients",
 	responses((status = OK, body = OAuthClientCreationResult)),
 )]
@@ -230,7 +236,10 @@ pub async fn oauth_client_create(
 }
 
 /// Delete an OAuth client.  
-#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = NO_CONTENT))
+)]
 #[delete("/app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
@@ -288,7 +297,10 @@ pub struct OAuthClientEdit {
 }
 
 /// Update an OAuth client.  
-#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = NO_CONTENT))
+)]
 #[patch("/app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
@@ -365,7 +377,10 @@ pub struct Extension {
 }
 
 /// Update an OAuth client icon.  
-#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = NO_CONTENT))
+)]
 #[patch("/app/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn oauth_client_icon_edit(
@@ -439,7 +454,10 @@ pub async fn oauth_client_icon_edit(
 }
 
 /// Delete an OAuth client icon.  
-#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = NO_CONTENT))
+)]
 #[delete("/app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
@@ -492,6 +510,7 @@ pub async fn oauth_client_icon_delete(
 
 /// List OAuth authorizations.  
 #[utoipa::path(
+	context_path = "/oauth",
 	tag = "oauth clients",
 	responses((status = OK, body = Vec<models::oauth_clients::OAuthClientAuthorization>)),
 )]
@@ -525,7 +544,10 @@ pub async fn get_user_oauth_authorizations(
 }
 
 /// Revoke OAuth authorization.  
-#[utoipa::path(tag = "oauth clients", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = NO_CONTENT))
+)]
 #[delete("/authorizations")]
 pub async fn revoke_oauth_authorization(
     req: HttpRequest,
@@ -621,28 +643,3 @@ pub async fn get_clients_inner(
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_user_clients,
-    get_client,
-    get_clients,
-    oauth_client_create,
-    oauth_client_delete,
-    oauth_client_edit,
-    oauth_client_icon_edit,
-    oauth_client_icon_delete,
-    get_user_oauth_authorizations,
-    revoke_oauth_authorization,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/oauth", api = RouteDoc),
-		(path = "/oauth", api = crate::auth::oauth::RouteDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

@@ -7,9 +7,9 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
-mod facets;
+pub mod facets;
 mod metrics;
-mod old;
+pub mod old;
 
 use std::{
     collections::{HashMap, HashSet},
@@ -174,6 +174,7 @@ pub enum ProjectAnalyticsEventKind {
 
 /// Fetch analytics data.  
 #[utoipa::path(
+	context_path = "/analytics",
 	tag = "analytics",
     responses((status = OK, body = inline(GetResponse))),
 )]
@@ -1070,21 +1071,5 @@ mod tests {
         });
 
         assert_eq!(serde_json::to_value(src).unwrap(), target);
-    }
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(fetch_analytics,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let mut openapi = RouteDoc::openapi();
-        openapi.merge(facets::RouteDoc::openapi());
-        openapi.merge(old::RouteDoc::openapi());
-        openapi
     }
 }

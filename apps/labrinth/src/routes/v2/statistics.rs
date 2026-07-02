@@ -51,8 +51,3 @@ pub async fn get_stats(
         Err(response) => Ok(response),
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(get_stats,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

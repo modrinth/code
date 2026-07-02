@@ -214,8 +214,3 @@ async fn shared_instance_version_create_inner(
     let version: SharedInstanceVersion = new_version.into();
     Ok(HttpResponse::Created().json(version))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(shared_instance_version_create,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

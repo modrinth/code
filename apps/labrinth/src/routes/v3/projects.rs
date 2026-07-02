@@ -99,7 +99,7 @@ pub struct RandomProjects {
 
 #[utoipa::path(tag = "projects", responses((status = OK)))]
 #[get("/projects_random")]
-async fn random_projects_get_route(
+pub async fn random_projects_get_route(
     count: web::Query<RandomProjects>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -160,7 +160,7 @@ pub struct ProjectCheckResponse {
 
 #[utoipa::path(tag = "projects", responses((status = OK)))]
 #[get("/projects")]
-async fn projects_get_route(
+pub async fn projects_get_route(
     req: HttpRequest,
     ids: web::Query<ProjectIds>,
     pool: web::Data<PgPool>,
@@ -200,9 +200,12 @@ pub async fn projects_get(
 }
 
 /// Get a project.  
-#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = Project))
+)]
 #[get("/{id}")]
-async fn project_get(
+pub async fn project_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -332,9 +335,12 @@ pub struct EditProject {
 
 #[allow(clippy::too_many_arguments)]
 /// Update a project.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[patch("/{id}")]
-async fn project_edit(
+pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1335,9 +1341,12 @@ pub async fn project_search_post(
 
 //checks the validity of a project id or slug
 /// Check project availability.  
-#[utoipa::path(tag = "projects", responses((status = OK, body = ProjectCheckResponse)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = ProjectCheckResponse))
+)]
 #[get("/{id}/check")]
-async fn project_get_check(
+pub async fn project_get_check(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1371,7 +1380,10 @@ pub struct DependencyInfo {
 }
 
 /// List project dependencies.  
-#[utoipa::path(tag = "projects", responses((status = OK, body = DependencyInfo)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = DependencyInfo))
+)]
 #[get("/{project_id}/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
@@ -1517,7 +1529,7 @@ pub struct BulkEditProject {
 
 #[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
 #[patch("/projects")]
-async fn projects_edit_route(
+pub async fn projects_edit_route(
     req: HttpRequest,
     ids: web::Query<ProjectIds>,
     pool: web::Data<PgPool>,
@@ -1842,12 +1854,13 @@ pub struct Extension {
 #[allow(clippy::too_many_arguments)]
 /// Update a project icon.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
 	params(("ext" = String, Query)),
 	responses((status = NO_CONTENT))
 )]
 #[patch("/{id}/icon")]
-async fn project_icon_edit(
+pub async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1990,9 +2003,12 @@ pub async fn project_icon_edit_internal(
 }
 
 /// Delete a project icon.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}/icon")]
-async fn delete_project_icon(
+pub async fn delete_project_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2118,6 +2134,7 @@ pub struct GalleryCreateQuery {
 #[allow(clippy::too_many_arguments)]
 /// Add a gallery item.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
 	params(
 		("ext" = String, Query),
@@ -2327,6 +2344,7 @@ pub struct GalleryEditQuery {
 
 /// Update a gallery item.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
 	params(
 		("url" = String, Query),
@@ -2338,7 +2356,7 @@ pub struct GalleryEditQuery {
 	responses((status = NO_CONTENT))
 )]
 #[patch("/{id}/gallery")]
-async fn edit_gallery_item(
+pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
@@ -2527,12 +2545,13 @@ pub struct GalleryDeleteQuery {
 
 /// Delete a gallery item.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "projects",
 	params(("url" = String, Query)),
 	responses((status = NO_CONTENT))
 )]
 #[delete("/{id}/gallery")]
-async fn delete_gallery_item(
+pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
@@ -2666,9 +2685,12 @@ pub async fn delete_gallery_item_internal(
 }
 
 /// Delete a project.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
-async fn project_delete(
+pub async fn project_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2825,9 +2847,12 @@ pub async fn project_delete_internal(
 }
 
 /// Follow a project.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[post("/{id}/follow")]
-async fn project_follow(
+pub async fn project_follow(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2918,9 +2943,12 @@ pub async fn project_follow_internal(
 }
 
 /// Unfollow a project.  
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}/follow")]
-async fn project_unfollow(
+pub async fn project_unfollow(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -3007,7 +3035,10 @@ pub async fn project_unfollow_internal(
 }
 
 /// Get a project's organization.  
-#[utoipa::path(tag = "projects", responses((status = OK, body = models::organizations::Organization)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = models::organizations::Organization))
+)]
 #[get("/{id}/organization")]
 pub async fn project_get_organization(
     req: HttpRequest,
@@ -3101,55 +3132,3 @@ pub async fn project_get_organization(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    random_projects_get_route,
-    projects_get_route,
-    project_get,
-    project_edit,
-    project_search,
-    project_search_post,
-    project_get_check,
-    dependency_list,
-    projects_edit_route,
-    project_icon_edit,
-    delete_project_icon,
-    add_gallery_item,
-    edit_gallery_item,
-    delete_gallery_item,
-    project_delete,
-    project_follow,
-    project_unfollow,
-    project_get_organization,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    project_search,
-    project_search_post,
-    projects_get_route,
-    projects_edit_route,
-    random_projects_get_route,
-))]
-pub(crate) struct RootRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    project_get,
-    project_get_check,
-    project_delete,
-    project_edit,
-    project_icon_edit,
-    delete_project_icon,
-    add_gallery_item,
-    edit_gallery_item,
-    delete_gallery_item,
-    project_follow,
-    project_unfollow,
-    project_get_organization,
-    dependency_list,
-))]
-pub(crate) struct ProjectRoutesDoc;

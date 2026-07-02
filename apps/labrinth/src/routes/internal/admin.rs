@@ -132,6 +132,7 @@ async fn resolve_download_attribution_version(
 // This is an internal route, cannot be used without key
 /// Count a download.  
 #[utoipa::path(
+	context_path = "/admin",
 	tag = "v2 admin",
     patch,
     operation_id = "countDownload",
@@ -312,6 +313,7 @@ pub async fn count_download(
 
 /// Reindex all projects.  
 #[utoipa::path(
+	context_path = "/admin",
 	tag = "v2 admin",
     post,
     operation_id = "forceReindex",
@@ -336,6 +338,7 @@ pub async fn force_reindex(
 
 /// Reindex a project.  
 #[utoipa::path(
+	context_path = "/admin",
 	tag = "v2 admin",
     post,
     operation_id = "forceReindexProject",
@@ -365,16 +368,3 @@ pub async fn force_reindex_project(
 
     Ok(HttpResponse::NoContent().finish())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(count_download, force_reindex, force_reindex_project,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/admin", api = RouteDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

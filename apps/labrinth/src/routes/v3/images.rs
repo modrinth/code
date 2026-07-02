@@ -255,8 +255,3 @@ pub async fn images_add(
 
     Ok(HttpResponse::Ok().json(image))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(images_add,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

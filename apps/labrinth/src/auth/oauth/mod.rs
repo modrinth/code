@@ -57,7 +57,10 @@ pub struct OAuthClientAccessRequest {
     pub requested_scopes: Scopes,
 }
 
-#[utoipa::path(path = "/authorize", tag = "oauth", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/authorize", tag = "oauth", responses((status = OK))
+)]
 #[get("authorize")]
 pub async fn init_oauth(
     req: HttpRequest,
@@ -171,7 +174,10 @@ pub struct RespondToOAuthClientScopes {
     pub flow: String,
 }
 
-#[utoipa::path(path = "/accept", tag = "oauth", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/accept", tag = "oauth", responses((status = OK))
+)]
 #[post("accept")]
 pub async fn accept_client_scopes(
     req: HttpRequest,
@@ -191,7 +197,10 @@ pub async fn accept_client_scopes(
     .await
 }
 
-#[utoipa::path(path = "/reject", tag = "oauth", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/reject", tag = "oauth", responses((status = OK))
+)]
 #[post("reject")]
 pub async fn reject_client_scopes(
     req: HttpRequest,
@@ -219,7 +228,10 @@ pub struct TokenResponse {
     pub expires_in: i64,
 }
 
-#[utoipa::path(path = "/token", tag = "oauth", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/token", tag = "oauth", responses((status = OK))
+)]
 #[post("token")]
 /// Params should be in the urlencoded request body
 /// And client secret should be in the HTTP basic authorization header
@@ -468,13 +480,3 @@ fn append_params_to_uri(uri: &str, params: &[impl AsRef<str>]) -> String {
 
     uri
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    init_oauth,
-    accept_client_scopes,
-    reject_client_scopes,
-    request_token,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

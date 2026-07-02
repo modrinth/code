@@ -83,6 +83,7 @@ pub async fn notifications_get(
 
 /// Get a notification by ID.  
 #[utoipa::path(
+	context_path = "/notification",
 	tag = "notifications",
     get,
     operation_id = "getNotification",
@@ -128,6 +129,7 @@ pub async fn notification_get(
 
 /// Mark a notification as read.  
 #[utoipa::path(
+	context_path = "/notification",
 	tag = "notifications",
     patch,
     operation_id = "readNotification",
@@ -161,6 +163,7 @@ pub async fn notification_read(
 
 /// Delete a notification by ID.  
 #[utoipa::path(
+	context_path = "/notification",
 	tag = "notifications",
     delete,
     operation_id = "deleteNotification",
@@ -286,33 +289,4 @@ pub async fn notifications_delete(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    notifications_get,
-    notification_get,
-    notification_read,
-    notification_delete,
-    notifications_read,
-    notifications_delete,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(notifications_get, notifications_read, notifications_delete,))]
-pub(crate) struct RootRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(notification_get, notification_read, notification_delete,))]
-pub(crate) struct NotificationRoutesDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let openapi = RootRoutesDoc::openapi();
-        openapi.nest("/notification", NotificationRoutesDoc::openapi())
-    }
 }

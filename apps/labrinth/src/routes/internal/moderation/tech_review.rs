@@ -195,12 +195,13 @@ pub enum FlagReason {
 
 /// Get a Delphi report issue.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(FileIssue)))
 )]
 #[get("/issue/{issue_id}")]
-async fn get_issue(
+pub async fn get_issue(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -255,12 +256,13 @@ async fn get_issue(
 
 /// Get a project technical report.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(FileReport)))
 )]
 #[get("/report/{id}")]
-async fn get_report(
+pub async fn get_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -666,12 +668,13 @@ async fn fetch_project_reports(
 
 /// Search projects awaiting technical review.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
 	responses((status = OK, body = SearchResponse))
 )]
 #[post("/search")]
-async fn search_projects(
+pub async fn search_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -877,12 +880,13 @@ async fn search_projects(
 
 /// Get a project technical review report.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(ProjectReportResponse)))
 )]
 #[get("/project/{id}")]
-async fn get_project_report(
+pub async fn get_project_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -974,12 +978,13 @@ pub struct SubmitReport {
 /// [`ApiError::TechReviewIssuesWithNoVerdict`], providing the issue IDs which
 /// are still unmarked.
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
 #[post("/submit/{project_id}")]
-async fn submit_report(
+pub async fn submit_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1173,12 +1178,13 @@ pub struct UpdateIssue {
 /// This will not automatically reject the project for malware, but just flag
 /// this issue with a verdict.
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
 #[patch("/issue-detail")]
-async fn update_issue_details(
+pub async fn update_issue_details(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1282,11 +1288,12 @@ pub struct AddReport {
 /// Add a technical review report.  
 /// does not already exist for it.
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
 	tag = "moderation",
 	responses((status = OK, body = DelphiReportId))
 )]
 #[put("/report")]
-async fn add_report(
+pub async fn add_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1346,16 +1353,3 @@ async fn add_report(
 
     Ok(web::Json(report_id))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_issue,
-    get_report,
-    search_projects,
-    get_project_report,
-    submit_report,
-    update_issue_details,
-    add_report,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

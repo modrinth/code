@@ -358,12 +358,3 @@ async fn minecraft_server_play_ingest(
 
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    page_view_ingest,
-    playtime_ingest,
-    minecraft_server_play_ingest,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

@@ -46,6 +46,7 @@ fn default_true() -> bool {
 
 /// List versions for a project.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
 	tag = "versions",
     get,
     operation_id = "getProjectVersions",
@@ -187,6 +188,7 @@ pub async fn version_list(
 // Given a project ID/slug and a version slug
 /// Get a project version by ID or version number.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
 	tag = "versions",
     get,
     operation_id = "getVersionFromIdOrNumber",
@@ -301,6 +303,7 @@ pub async fn versions_get(
 
 /// Get a version by ID.  
 #[utoipa::path(
+	context_path = "/version",
 	tag = "versions",
     get,
     operation_id = "getVersion",
@@ -381,6 +384,7 @@ pub struct EditVersionFileType {
 
 /// Update an existing version.  
 #[utoipa::path(
+	context_path = "/version",
 	tag = "versions",
     patch,
     operation_id = "modifyVersion",
@@ -497,6 +501,7 @@ pub async fn version_edit(
 
 /// Delete a version by ID.  
 #[utoipa::path(
+	context_path = "/version",
 	tag = "versions",
     delete,
     operation_id = "deleteVersion",
@@ -536,44 +541,4 @@ pub async fn version_delete(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    version_list,
-    version_project_get,
-    versions_get,
-    version_get,
-    version_edit,
-    version_delete,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(versions_get,))]
-pub(crate) struct RootRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(version_get, version_edit, version_delete,))]
-pub(crate) struct VersionRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(version_list, version_project_get,))]
-pub(crate) struct ProjectRoutesDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let mut openapi = RootRoutesDoc::openapi();
-        openapi.merge(super::version_creation::RootRoutesDoc::openapi());
-        openapi
-            .nest("/version", VersionRoutesDoc::openapi())
-            .nest("/project/{project_id}", ProjectRoutesDoc::openapi())
-            .nest(
-                "/version",
-                super::version_creation::VersionRoutesDoc::openapi(),
-            )
-    }
 }

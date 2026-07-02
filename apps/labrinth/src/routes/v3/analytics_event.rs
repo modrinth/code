@@ -38,7 +38,10 @@ pub struct AnalyticsEventUpsert {
 }
 
 /// List analytics events.  
-#[utoipa::path(tag = "v3 analytics", responses((status = OK, body = Vec<AnalyticsEvent>)))]
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = OK, body = Vec<AnalyticsEvent>))
+)]
 #[get("")]
 pub async fn analytics_events_get(
     pool: web::Data<PgPool>,
@@ -55,7 +58,10 @@ pub async fn analytics_events_get(
 }
 
 /// Create an analytics event.  
-#[utoipa::path(tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent)))]
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent))
+)]
 #[post("")]
 pub async fn analytics_event_create(
     req: HttpRequest,
@@ -111,7 +117,10 @@ pub async fn analytics_event_create(
 }
 
 /// Update an analytics event.  
-#[utoipa::path(tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent)))]
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = OK, body = AnalyticsEvent))
+)]
 #[patch("/{id}")]
 pub async fn analytics_event_edit(
     req: HttpRequest,
@@ -159,7 +168,10 @@ pub async fn analytics_event_edit(
 }
 
 /// Delete an analytics event.  
-#[utoipa::path(tag = "v3 analytics", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/v3/analytics-event",
+	tag = "v3 analytics", responses((status = NO_CONTENT))
+)]
 #[delete("/{id}")]
 pub async fn analytics_event_delete(
     req: HttpRequest,
@@ -199,13 +211,3 @@ pub async fn analytics_event_delete(
 
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    analytics_events_get,
-    analytics_event_create,
-    analytics_event_edit,
-    analytics_event_delete,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

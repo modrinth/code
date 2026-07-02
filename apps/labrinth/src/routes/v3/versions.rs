@@ -49,6 +49,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 // Given a project ID/slug and a version slug
 /// Get a project version.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "versions",
 	responses(
 		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
@@ -177,7 +178,7 @@ fn default_true() -> bool {
 	responses((status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>))
 )]
 #[get("/versions")]
-async fn versions_get_route(
+pub async fn versions_get_route(
     req: HttpRequest,
     ids: web::Query<VersionIds>,
     pool: web::Data<PgPool>,
@@ -251,7 +252,7 @@ pub async fn versions_get(
 	)
 )]
 #[get("/version/{id}")]
-async fn version_get_route(
+pub async fn version_get_route(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
@@ -400,7 +401,7 @@ pub struct EditVersionFileType {
 	security(("bearer_auth" = ["VERSION_WRITE"]))
 )]
 #[patch("/version/{id}")]
-async fn version_edit_route(
+pub async fn version_edit_route(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
@@ -891,6 +892,7 @@ pub struct VersionListFilters {
 
 /// List project versions.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "versions",
 	params(
 		("loaders" = Option<String>, Query),
@@ -910,7 +912,7 @@ pub struct VersionListFilters {
 	)
 )]
 #[get("/{project_id}/version")]
-async fn version_list(
+pub async fn version_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
@@ -1119,7 +1121,7 @@ pub async fn version_list_internal(
 	security(("bearer_auth" = ["VERSION_DELETE"]))
 )]
 #[delete("/version/{id}")]
-async fn version_delete_route(
+pub async fn version_delete_route(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
@@ -1265,28 +1267,3 @@ pub async fn version_delete(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    version_project_get,
-    versions_get_route,
-    version_get_route,
-    version_edit_route,
-    version_list,
-    version_delete_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(version_project_get, version_list,))]
-pub(crate) struct ProjectRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    versions_get_route,
-    version_get_route,
-    version_edit_route,
-    version_delete_route,
-))]
-pub(crate) struct RootRoutesDoc;

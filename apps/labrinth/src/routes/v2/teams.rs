@@ -32,6 +32,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 // They can be differentiated by the "organization_permissions" field being null or not
 /// Get a project's team members.  
 #[utoipa::path(
+	context_path = "/project",
 	tag = "teams",
     get,
     operation_id = "getProjectTeamMembers",
@@ -77,6 +78,7 @@ pub async fn team_members_get_project(
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
 /// Get a team's members.  
 #[utoipa::path(
+	context_path = "/team",
 	tag = "teams",
     get,
     operation_id = "getTeamMembers",
@@ -159,6 +161,7 @@ pub async fn teams_get(
 
 /// Join a team with a pending invite.  
 #[utoipa::path(
+	context_path = "/team",
 	tag = "teams",
     post,
     operation_id = "joinTeam",
@@ -216,6 +219,7 @@ pub struct NewTeamMember {
 
 /// Add a member to a team.  
 #[utoipa::path(
+	context_path = "/team",
 	tag = "teams",
     post,
     operation_id = "addTeamMember",
@@ -274,6 +278,7 @@ pub struct EditTeamMember {
 
 /// Update a team member.  
 #[utoipa::path(
+	context_path = "/team",
 	tag = "teams",
     patch,
     operation_id = "modifyTeamMember",
@@ -334,6 +339,7 @@ pub struct TransferOwnership {
 
 /// Transfer team ownership.  
 #[utoipa::path(
+	context_path = "/team",
 	tag = "teams",
     patch,
     operation_id = "transferTeamOwnership",
@@ -378,6 +384,7 @@ pub async fn transfer_ownership(
 
 /// Remove a member from a team.  
 #[utoipa::path(
+	context_path = "/team",
 	tag = "teams",
     delete,
     operation_id = "deleteTeamMember",
@@ -414,48 +421,4 @@ pub async fn remove_team_member(
     v3::teams::remove_team_member(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    team_members_get_project,
-    team_members_get,
-    teams_get,
-    join_team,
-    add_team_member,
-    edit_team_member,
-    transfer_ownership,
-    remove_team_member,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(teams_get,))]
-pub(crate) struct RootRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(team_members_get_project,))]
-pub(crate) struct ProjectRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    team_members_get,
-    join_team,
-    add_team_member,
-    edit_team_member,
-    transfer_ownership,
-    remove_team_member,
-))]
-pub(crate) struct TeamRoutesDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let openapi = RootRoutesDoc::openapi();
-        openapi
-            .nest("/project", ProjectRoutesDoc::openapi())
-            .nest("/team", TeamRoutesDoc::openapi())
-    }
 }

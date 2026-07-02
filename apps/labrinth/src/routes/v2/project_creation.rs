@@ -305,8 +305,3 @@ pub async fn project_create(
         Err(response) => Ok(response),
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(project_create,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

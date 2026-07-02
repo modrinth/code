@@ -44,7 +44,7 @@ use std::collections::HashMap;
 use thiserror::Error;
 use validator::Validate;
 
-mod new;
+pub mod new;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create)
@@ -284,7 +284,10 @@ pub async fn undo_uploads(
 }
 
 /// Create a project.  
-#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = Project))
+)]
 #[post("")]
 pub async fn project_create(
     req: HttpRequest,
@@ -365,7 +368,10 @@ pub async fn project_create_internal(
 /// Create a project with a specific ID.  
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path(tag = "projects", responses((status = OK, body = Project)))]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects", responses((status = OK, body = Project))
+)]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,
@@ -1177,19 +1183,4 @@ async fn process_icon_upload(
         upload_result.raw_url,
         upload_result.color,
     ))
-}
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(project_create, project_create_with_id,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-pub(crate) struct ApiDoc;
-
-impl utoipa::OpenApi for ApiDoc {
-    fn openapi() -> utoipa::openapi::OpenApi {
-        let mut openapi = RouteDoc::openapi();
-        openapi.merge(new::RouteDoc::openapi());
-        openapi
-    }
 }

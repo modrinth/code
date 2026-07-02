@@ -238,8 +238,3 @@ impl header::Header for ModrinthPaymentId {
             .map(|id| Self(PayoutId(id)))
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(success_callback, error_callback,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

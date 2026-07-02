@@ -1067,7 +1067,10 @@ pub struct Authorization {
 
 // Init link takes us to GitHub API and calls back to callback endpoint with a code and state
 // http://localhost:8000/auth/init?url=https://modrinth.com
-#[utoipa::path(tag = "auth", responses((status = TEMPORARY_REDIRECT), (status = OK)))]
+#[utoipa::path(
+	context_path = "/auth",
+	tag = "auth", responses((status = TEMPORARY_REDIRECT), (status = OK))
+)]
 #[get("/init")]
 pub async fn init(
     req: HttpRequest,
@@ -1158,7 +1161,10 @@ pub async fn init(
         .json(serde_json::json!({ "url": url })))
 }
 
-#[utoipa::path(tag = "auth", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/auth",
+	tag = "auth", responses((status = OK))
+)]
 #[get("/callback")]
 pub async fn auth_callback(
     req: HttpRequest,
@@ -1429,6 +1435,7 @@ struct NewOAuthAccount {
 
 /// Create account with OAuth.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "createOAuthAccount",
@@ -1438,7 +1445,7 @@ struct NewOAuthAccount {
 	)
 )]
 #[post("/create/oauth")]
-async fn create_oauth_account(
+pub async fn create_oauth_account(
     req: HttpRequest,
     db: Data<PgPool>,
     file_host: Data<dyn FileHost>,
@@ -1515,6 +1522,7 @@ struct DiscordCommunityHandoffPayload {
 
 /// Link Discord community.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     operation_id = "discordCommunityLink",
     responses(
@@ -1591,6 +1599,7 @@ pub async fn discord_community_link(
 
 /// Remove an auth provider.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     delete,
     operation_id = "deleteAuthProvider",
@@ -1933,6 +1942,7 @@ impl ReadyAccountRegisterFlow {
 
 /// Validate password account creation.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "validateCreateAccountWithPassword",
@@ -1960,6 +1970,7 @@ pub async fn validate_create_account_with_password(
 
 /// Create account with a password.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "createAccountPassword",
@@ -2008,6 +2019,7 @@ pub struct Login {
 
 /// Log in with a password.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "loginPassword",
@@ -2168,6 +2180,7 @@ async fn validate_2fa_code(
 
 /// Complete login with 2FA.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "login2fa",
@@ -2227,6 +2240,7 @@ pub async fn login_2fa(
 
 /// Start 2FA setup.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "begin2faFlow",
@@ -2277,6 +2291,7 @@ pub async fn begin_2fa_flow(
 
 /// Finish 2FA setup.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "finish2faFlow",
@@ -2411,6 +2426,7 @@ pub struct Remove2FA {
 
 /// Remove 2FA.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     delete,
     operation_id = "remove2fa",
@@ -2510,6 +2526,7 @@ pub struct ResetPassword {
 
 /// Start password reset.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "resetPasswordBegin",
@@ -2615,6 +2632,7 @@ pub struct ChangePassword {
 
 /// Change password.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     patch,
     operation_id = "changePassword",
@@ -2780,6 +2798,7 @@ pub struct SetEmail {
 
 /// Set email address.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     patch,
     operation_id = "setEmail",
@@ -2901,6 +2920,7 @@ pub async fn set_email(
 
 /// Resend verification email.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "resendVerifyEmail",
@@ -2975,6 +2995,7 @@ pub struct VerifyEmail {
 
 /// Verify email address.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "verifyEmail",
@@ -3040,6 +3061,7 @@ pub async fn verify_email(
 
 /// Subscribe to the newsletter.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "subscribeNewsletter",
@@ -3088,6 +3110,7 @@ pub async fn subscribe_newsletter(
 
 /// Get newsletter subscription status.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     get,
 	operation_id = "getNewsletterSubscriptionStatus",
@@ -3137,6 +3160,7 @@ pub struct RegisterPasskeyResponse {
 
 /// Start passkey registration.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "registerPasskeyStart",
@@ -3236,6 +3260,7 @@ pub struct PasskeyResponse {
 
 /// Finish passkey registration.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "registerPasskeyFinish",
@@ -3344,6 +3369,7 @@ pub struct AuthenticatePasskeyResponse {
 
 /// Start passkey authentication.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
     operation_id = "authenticatePasskeyStart",
@@ -3386,6 +3412,7 @@ pub struct AuthenticatePasskeyFinish {
 
 /// Finish passkey authentication.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     post,
 	operation_id = "authenticatePasskeyFinish",
@@ -3502,6 +3529,7 @@ pub async fn authenticate_passkey_finish(
 
 /// List passkeys.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     get,
     operation_id = "listPasskeys",
@@ -3551,6 +3579,7 @@ pub struct RenamePasskey {
 
 /// Rename a passkey.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     patch,
     operation_id = "renamePasskey",
@@ -3605,6 +3634,7 @@ pub async fn rename_passkey(
 
 /// Delete a passkey.  
 #[utoipa::path(
+	context_path = "/auth",
 	tag = "auth",
     delete,
     operation_id = "deletePasskey",
@@ -3650,43 +3680,3 @@ pub async fn delete_passkey(
     transaction.commit().await?;
     Ok(HttpResponse::NoContent().finish())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    init,
-    auth_callback,
-    create_oauth_account,
-    discord_community_link,
-    delete_auth_provider,
-    validate_create_account_with_password,
-    create_account_with_password,
-    login_password,
-    login_2fa,
-    begin_2fa_flow,
-    finish_2fa_flow,
-    remove_2fa,
-    reset_password_begin,
-    change_password,
-    set_email,
-    resend_verify_email,
-    verify_email,
-    subscribe_newsletter,
-    get_newsletter_subscription_status,
-    register_passkey_start,
-    register_passkey_finish,
-    authenticate_passkey_start,
-    authenticate_passkey_finish,
-    list_passkeys,
-    rename_passkey,
-    delete_passkey,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/auth", api = RouteDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

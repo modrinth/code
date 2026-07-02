@@ -2,23 +2,14 @@ use std::collections::BTreeSet;
 
 use utoipa::OpenApi;
 
-#[derive(OpenApi)]
-struct DocsV3;
-
-#[derive(OpenApi)]
-struct DocsInternal;
-
 fn collect_v3_paths() -> BTreeSet<String> {
-    let docs = DocsV3::openapi()
-        .merge_from(labrinth::routes::PublicApiDoc::openapi())
-        .merge_from(labrinth::routes::v3::ApiDoc::openapi());
+    let docs = labrinth::routes::v3::ApiDoc::openapi();
 
     docs.paths.paths.keys().cloned().collect()
 }
 
 fn collect_internal_paths() -> BTreeSet<String> {
-    let docs = DocsInternal::openapi()
-        .merge_from(labrinth::routes::internal::ApiDoc::openapi());
+    let docs = labrinth::routes::internal::ApiDoc::openapi();
 
     docs.paths.paths.keys().cloned().collect()
 }
@@ -44,12 +35,6 @@ fn v3_openapi_includes_configured_routes() {
     assert_paths(
         &paths,
         &[
-            "/analytics/minecraft-server-play",
-            "/analytics/playtime",
-            "/analytics/view",
-            "/maven/maven/modrinth/{id}/maven-metadata.xml",
-            "/maven/maven/modrinth/{id}/{versionnum}/{file}",
-            "/updates/{id}/forge_updates.json",
             "/v3/analytics",
             "/v3/analytics/facets",
             "/v3/collection",

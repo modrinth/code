@@ -592,16 +592,3 @@ fn can_modify_collection(
 ) -> bool {
     collection.user_id == user.id.into() || user.role.is_mod()
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    collection_create,
-    collections_get,
-    collection_get,
-    collection_edit,
-    collection_icon_edit,
-    delete_collection_icon,
-    collection_delete,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

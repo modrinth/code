@@ -33,6 +33,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 // under /api/v1/version_file/{hash}
 /// Get version metadata by file hash.  
 #[utoipa::path(
+	context_path = "/version_file",
 	tag = "version file",
     get,
     operation_id = "versionFromHash",
@@ -94,6 +95,7 @@ pub async fn get_version_from_hash(
 // under /api/v1/version_file/{hash}/download
 /// Download a file by hash.  
 #[utoipa::path(
+	context_path = "/version_file",
 	tag = "version file",
     get,
     operation_id = "downloadVersionFromHash",
@@ -147,6 +149,7 @@ pub async fn download_version(
 // under /api/v1/version_file/{hash}
 /// Delete a file by hash.  
 #[utoipa::path(
+	context_path = "/version_file",
 	tag = "version file",
     delete,
     operation_id = "deleteFileFromHash",
@@ -211,6 +214,7 @@ pub struct UpdateData {
 
 /// Get the latest compatible version from a file hash.  
 #[utoipa::path(
+	context_path = "/version_file",
 	tag = "version file",
     post,
     operation_id = "getLatestVersionFromHash",
@@ -298,6 +302,7 @@ pub struct FileHashes {
 // under /api/v2/version_files
 /// Get versions from file hashes.  
 #[utoipa::path(
+	context_path = "/version_files",
 	tag = "version file",
     post,
     operation_id = "versionsFromHashes",
@@ -350,6 +355,7 @@ pub async fn get_versions_from_hashes(
 
 /// Get projects from file hashes.  
 #[utoipa::path(
+	context_path = "/version_file",
 	tag = "version file",
     post,
     operation_id = "projectsFromHashes",
@@ -428,6 +434,7 @@ pub struct ManyUpdateData {
 
 /// Get latest compatible versions for multiple hashes.  
 #[utoipa::path(
+	context_path = "/version_files",
 	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashes",
@@ -478,6 +485,7 @@ pub async fn update_files(
 
 /// Get all latest compatible versions for multiple hashes.  
 #[utoipa::path(
+	context_path = "/version_files",
 	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashesMany",
@@ -545,6 +553,7 @@ pub struct ManyFileUpdateData {
 
 /// Get latest versions with per-hash filters.  
 #[utoipa::path(
+	context_path = "/version_files",
 	tag = "version file",
     post,
     operation_id = "getLatestVersionsFromHashesIndividual",
@@ -615,46 +624,3 @@ pub async fn update_individual_files(
         Err(response) => Ok(response),
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_version_from_hash,
-    download_version,
-    delete_file,
-    get_update_from_hash,
-    get_versions_from_hashes,
-    get_projects_from_hashes,
-    update_files,
-    update_files_many,
-    update_individual_files,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_version_from_hash,
-    download_version,
-    delete_file,
-    get_update_from_hash,
-    get_projects_from_hashes,
-))]
-pub(crate) struct VersionFileRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_versions_from_hashes,
-    update_files,
-    update_files_many,
-    update_individual_files,
-))]
-pub(crate) struct VersionFilesRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/version_file", api = VersionFileRoutesDoc),
-		(path = "/version_files", api = VersionFilesRoutesDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

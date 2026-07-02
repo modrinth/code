@@ -37,6 +37,7 @@ pub struct CategoryData {
 
 /// List project categories.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "categoryList",
@@ -84,6 +85,7 @@ pub struct LoaderData {
 
 /// List loaders.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "loaderList",
@@ -159,6 +161,7 @@ pub struct GameVersionQuery {
 
 /// List game versions.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "versionList",
@@ -244,6 +247,7 @@ pub struct License {
 
 /// List SPDX license identifiers and names.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "licenseList",
@@ -284,6 +288,7 @@ pub struct LicenseText {
 
 /// Get full license text by SPDX ID.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "licenseText",
@@ -332,6 +337,7 @@ pub struct DonationPlatformQueryData {
 
 /// List donation platforms.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "donationPlatformList",
@@ -391,6 +397,7 @@ pub async fn donation_platform_list(
 
 /// List valid report types.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "reportTypeList",
@@ -415,6 +422,7 @@ pub async fn report_type_list(
 
 /// List valid project types.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "projectTypeList",
@@ -439,6 +447,7 @@ pub async fn project_type_list(
 
 /// List valid side-type values.  
 #[utoipa::path(
+	context_path = "/tag",
 	tag = "tags",
     get,
     operation_id = "sideTypeList",
@@ -463,26 +472,3 @@ pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
     let side_types = side_types.iter().map(|s| s.to_string()).collect_vec();
     Ok(HttpResponse::Ok().json(side_types))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    category_list,
-    loader_list,
-    game_version_list,
-    license_list,
-    license_text,
-    donation_platform_list,
-    report_type_list,
-    project_type_list,
-    side_type_list,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(
-	nest(
-		(path = "/tag", api = RouteDoc),
-	)
-)]
-pub(crate) struct ApiDoc;

@@ -11,6 +11,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 /// List search tasks.  
 #[utoipa::path(
+	context_path = "/search-management",
 	tag = "search",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -23,6 +24,7 @@ pub async fn tasks(
 
 /// Cancel search tasks.  
 #[utoipa::path(
+	context_path = "/search-management",
 	tag = "search",
 	responses((status = NO_CONTENT))
 )]
@@ -37,8 +39,3 @@ pub async fn tasks_cancel(
         .map_err(ApiError::Internal)?;
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(tasks, tasks_cancel,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

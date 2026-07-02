@@ -34,10 +34,13 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-/// Get a project's team members.  
-#[utoipa::path(tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>)))]
+/// Get a project's team members.
+#[utoipa::path(
+	context_path = "/project",
+	tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>))
+)]
 #[get("/{project_id}/members")]
-async fn team_members_get_project(
+pub async fn team_members_get_project(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -212,7 +215,7 @@ pub async fn team_members_get_organization(
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
 #[utoipa::path(tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>)))]
 #[get("/team/{id}/members")]
-async fn team_members_get_route(
+pub async fn team_members_get_route(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
@@ -289,7 +292,7 @@ pub struct TeamIds {
 
 #[utoipa::path(tag = "teams", responses((status = OK)))]
 #[get("/teams")]
-async fn teams_get_route(
+pub async fn teams_get_route(
     req: HttpRequest,
     ids: web::Query<TeamIds>,
     pool: web::Data<PgPool>,
@@ -371,7 +374,7 @@ pub async fn teams_get(
 
 #[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
 #[post("/team/{id}/join")]
-async fn join_team_route(
+pub async fn join_team_route(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
@@ -468,7 +471,7 @@ pub struct NewTeamMember {
 
 #[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
 #[post("/team/{id}/members")]
-async fn add_team_member_route(
+pub async fn add_team_member_route(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
@@ -735,7 +738,7 @@ pub struct EditTeamMember {
 
 #[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
 #[patch("/team/{id}/members/{user_id}")]
-async fn edit_team_member_route(
+pub async fn edit_team_member_route(
     req: HttpRequest,
     info: web::Path<(TeamId, String)>,
     pool: web::Data<PgPool>,
@@ -948,7 +951,7 @@ pub struct TransferOwnership {
 
 #[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
 #[patch("/team/{id}/owner")]
-async fn transfer_ownership_route(
+pub async fn transfer_ownership_route(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
@@ -1146,7 +1149,7 @@ pub async fn transfer_ownership(
 
 #[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
 #[delete("/team/{id}/members/{user_id}")]
-async fn remove_team_member_route(
+pub async fn remove_team_member_route(
     req: HttpRequest,
     info: web::Path<(TeamId, UserId)>,
     pool: web::Data<PgPool>,
@@ -1309,35 +1312,3 @@ pub async fn remove_team_member(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    team_members_get_project,
-    team_members_get_organization,
-    team_members_get_route,
-    teams_get_route,
-    join_team_route,
-    add_team_member_route,
-    edit_team_member_route,
-    transfer_ownership_route,
-    remove_team_member_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(team_members_get_project,))]
-pub(crate) struct ProjectRoutesDoc;
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    team_members_get_organization,
-    team_members_get_route,
-    teams_get_route,
-    join_team_route,
-    add_team_member_route,
-    edit_team_member_route,
-    transfer_ownership_route,
-    remove_team_member_route,
-))]
-pub(crate) struct RootRoutesDoc;

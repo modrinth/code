@@ -145,6 +145,7 @@ impl CampaignDonation {
 
 /// Receive a Tiltify webhook.  
 #[utoipa::path(
+	context_path = "/campaign",
 	tag = "campaigns",
 	responses((status = NO_CONTENT))
 )]
@@ -307,6 +308,7 @@ fn verify_tiltify_webhook_signature(
 
 /// Get Pride campaign data.  
 #[utoipa::path(
+	context_path = "/campaign",
 	tag = "campaigns",
 	responses((status = OK, body = CampaignInfo))
 )]
@@ -480,8 +482,3 @@ async fn amount_raised_usd(
 
     Ok(amount.value / usd_to_currency)
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(tiltify_webhook, pride_26,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

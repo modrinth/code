@@ -1194,8 +1194,3 @@ pub fn try_create_version_fields(
     }
     Ok(version_fields)
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(version_create_route, upload_file_to_version_route,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

@@ -455,13 +455,3 @@ pub async fn version_file_sha512(
             |hash_str| HttpResponse::Ok().body(hash_str.clone()),
         ))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    maven_metadata,
-    version_file,
-    version_file_sha1,
-    version_file_sha512,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

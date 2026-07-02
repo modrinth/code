@@ -91,6 +91,7 @@ pub fn tax_compliance_payout_threshold_for_year(
 
 /// Get backend globals.  
 #[utoipa::path(
+	context_path = "/globals",
 	tag = "globals",
 	responses((status = OK, body = Globals))
 )]
@@ -121,8 +122,3 @@ mod tests {
         assert_eq!(second, Some(Decimal::from(2000_u64)));
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(get_globals,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

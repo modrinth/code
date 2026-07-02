@@ -206,8 +206,3 @@ pub async fn friends(
 
     Ok(HttpResponse::Ok().json(friends))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(add_friend, remove_friend, friends,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

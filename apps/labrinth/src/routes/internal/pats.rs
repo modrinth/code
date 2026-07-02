@@ -353,8 +353,3 @@ pub async fn delete_pat(
 
     Ok(HttpResponse::NoContent().finish())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(get_pats, create_pat, edit_pat, delete_pat,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

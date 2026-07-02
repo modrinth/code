@@ -8,6 +8,8 @@ const BODY_EXTRACTORS = ['json', 'form', 'payload', 'bytes', 'multipart', 'text'
 const AUTH_HEADERS = {
 	authorization: 'Bearer mra_admin',
 	'modrinth-admin': 'feedbeef',
+	'external-notification-key': 'beeffeed',
+	'x-medal-access-key': '',
 }
 const IGNORED_PROBE_OPERATIONS = new Set([
 	'POST /v2/admin/_force_reindex',
@@ -30,7 +32,11 @@ interface Args {
 
 interface OpenApiSpec {
 	paths?: Record<string, Record<string, OpenApiOperation>>
-	components?: unknown
+	components?: OpenApiComponents
+}
+
+interface OpenApiComponents {
+	schemas?: Record<string, OpenApiSchema>
 }
 
 interface OpenApiOperation {
@@ -57,9 +63,22 @@ interface OpenApiSchema {
 	type?: string | string[]
 	format?: string
 	$ref?: string
+	pattern?: string
+	minLength?: number
+	maxLength?: number
+	nullable?: boolean
+	properties?: Record<string, OpenApiSchema>
+	items?: OpenApiSchema
+	required?: string[]
+	enum?: unknown[]
+	additionalProperties?: boolean | OpenApiSchema
 	oneOf?: OpenApiSchema[]
 	anyOf?: OpenApiSchema[]
 	allOf?: OpenApiSchema[]
+}
+
+interface OpenApiResponse {
+	content?: Record<string, { schema?: OpenApiSchema }>
 }
 
 interface Operation {
@@ -200,8 +219,12 @@ async function main() {
 	const issues: Issue[] = []
 
 	if (args.probe) {
-		issues.push(...(await probeOperations(args.baseUrl, operations, args.includeMutatingProbes)))
+		issues.push(
+			...(await probeOperations(args.baseUrl, spec, operations, args.includeMutatingProbes)),
+		)
 	}
+
+	issues.push(...compareIdSchemas(spec))
 
 	if (args.staticCheck) {
 		const source = collectSourceExpectations(args.sourceDir)
@@ -262,10 +285,11 @@ function resolveSource(source: string, baseSource: string): string {
 }
 
 function mergeSpecs(specs: OpenApiSpec[]): OpenApiSpec {
-	const merged: OpenApiSpec = { paths: {} }
+	const merged: OpenApiSpec = { paths: {}, components: { schemas: {} } }
 
 	for (const spec of specs) {
 		Object.assign(merged.paths ?? {}, spec.paths ?? {})
+		Object.assign(merged.components?.schemas ?? {}, spec.components?.schemas ?? {})
 	}
 
 	return merged
@@ -334,6 +358,7 @@ function collectOperations(spec: OpenApiSpec): Operation[] {
 
 async function probeOperations(
 	baseUrl: string,
+	spec: OpenApiSpec,
 	operations: Operation[],
 	includeMutatingProbes: boolean,
 ): Promise<Issue[]> {
@@ -385,9 +410,96 @@ async function probeOperations(
 				message: `${operation.method.toUpperCase()} ${operation.path} is in OpenAPI but the running backend returned the fallback 404`,
 			})
 		}
+
+		compareResponse(operation, spec, response, text, issues)
 	}
 
 	return issues
+}
+
+function compareResponse(
+	operation: Operation,
+	spec: OpenApiSpec,
+	response: Response,
+	text: string,
+	issues: Issue[],
+) {
+	const documentedResponse = getDocumentedResponse(operation, response.status)
+	if (!documentedResponse) return
+
+	const content = documentedResponse.content ?? {}
+	const documentedContentTypes = Object.keys(content)
+	const actualContentType = response.headers.get('content-type')?.split(';')[0].trim() ?? ''
+	const hasBody = text.length > 0
+
+	if (!documentedContentTypes.length) {
+		if (hasBody) {
+			issues.push({
+				severity: 'error',
+				code: 'response_body_mismatch',
+				operation: formatOperation(operation),
+				message: `${operation.method.toUpperCase()} ${operation.path} returned HTTP ${response.status} with a response body, but OpenAPI documents no response content`,
+			})
+		}
+		return
+	}
+
+	if (!hasBody) {
+		issues.push({
+			severity: 'error',
+			code: 'response_body_mismatch',
+			operation: formatOperation(operation),
+			message: `${operation.method.toUpperCase()} ${operation.path} returned HTTP ${response.status} with no body, but OpenAPI documents response content types ${documentedContentTypes.join(', ')}`,
+		})
+		return
+	}
+
+	const schema = content[actualContentType]?.schema
+	if (!schema) {
+		issues.push({
+			severity: 'error',
+			code: 'response_content_type_mismatch',
+			operation: formatOperation(operation),
+			message: `${operation.method.toUpperCase()} ${operation.path} returned content type ${actualContentType || '<none>'}, but OpenAPI documents ${documentedContentTypes.join(', ')}`,
+		})
+		return
+	}
+
+	if (actualContentType === 'application/json') {
+		let parsed: unknown
+		try {
+			parsed = JSON.parse(text)
+		} catch (error) {
+			issues.push({
+				severity: 'error',
+				code: 'response_json_mismatch',
+				operation: formatOperation(operation),
+				message: `${operation.method.toUpperCase()} ${operation.path} returned invalid JSON for documented application/json response: ${String(error)}`,
+			})
+			return
+		}
+
+		const mismatch = validateSchemaValue(schema, parsed, spec, '$')
+		if (mismatch) {
+			issues.push({
+				severity: 'error',
+				code: 'response_schema_mismatch',
+				operation: formatOperation(operation),
+				message: `${operation.method.toUpperCase()} ${operation.path} returned HTTP ${response.status} JSON that does not match OpenAPI: ${mismatch}`,
+			})
+		}
+	}
+}
+
+function getDocumentedResponse(operation: Operation, status: number): OpenApiResponse | null {
+	const responses = operation.operation.responses
+	if (!responses || typeof responses !== 'object') return null
+
+	const byStatus = responses as Record<string, OpenApiResponse | { $ref: string }>
+	const response =
+		byStatus[String(status)] ?? byStatus[`${Math.floor(status / 100)}XX`] ?? byStatus.default
+	if (!response || '$ref' in response) return null
+	return response
 }
 
 function renderProbePath(operation: Operation): string {
@@ -440,6 +552,168 @@ function isActixMissingRoute(response: Response, text: string): boolean {
 	} catch {
 		return false
 	}
+}
+
+function compareIdSchemas(spec: OpenApiSpec): Issue[] {
+	const issues: Issue[] = []
+	const schemas = spec.components?.schemas ?? {}
+
+	for (const [name, schema] of Object.entries(schemas)) {
+		if (!name.endsWith('Id')) continue
+		if (NON_BASE62_ID_SCHEMAS.has(name)) continue
+
+		if (!isBase62IdSchema(schema)) {
+			issues.push({
+				severity: 'error',
+				code: 'id_schema_mismatch',
+				message: `schema ${name} ends with Id, but is not documented as an 8-character base62 string with pattern ${BASE62_PATTERN}`,
+			})
+		}
+	}
+
+	return issues
+}
+
+const BASE62_PATTERN = '^[A-Za-z0-9]{8}$'
+const NON_BASE62_ID_SCHEMAS = new Set([
+	'DelphiReportId',
+	'DelphiReportIssueDetailsId',
+	'DelphiReportIssueId',
+	'LicenseId',
+])
+
+function isBase62IdSchema(schema: OpenApiSchema): boolean {
+	return (
+		schema.type === 'string' &&
+		schema.pattern === BASE62_PATTERN &&
+		schema.minLength === 8 &&
+		schema.maxLength === 8
+	)
+}
+
+function validateSchemaValue(
+	schema: OpenApiSchema,
+	value: unknown,
+	spec: OpenApiSpec,
+	path: string,
+): string | null {
+	const resolved = resolveSchema(schema, spec)
+
+	if (resolved.nullable && value === null) return null
+	if (resolved.oneOf?.some((candidate) => !validateSchemaValue(candidate, value, spec, path))) {
+		return null
+	}
+	if (resolved.anyOf?.some((candidate) => !validateSchemaValue(candidate, value, spec, path))) {
+		return null
+	}
+	if (resolved.allOf) {
+		for (const candidate of resolved.allOf) {
+			const mismatch = validateSchemaValue(candidate, value, spec, path)
+			if (mismatch) return mismatch
+		}
+	}
+	if (resolved.enum && !resolved.enum.some((candidate) => candidate === value)) {
+		return `${path} is ${formatJsonType(value)}, but expected one of ${resolved.enum.map(String).join(', ')}`
+	}
+
+	const types = schemaTypes(resolved)
+	if (!types.length) return null
+
+	for (const type of types) {
+		if (typeMatches(type, resolved, value, spec, path)) return null
+	}
+
+	return `${path} is ${formatJsonType(value)}, but expected ${types.join(' or ')}`
+}
+
+function typeMatches(
+	type: string,
+	schema: OpenApiSchema,
+	value: unknown,
+	spec: OpenApiSpec,
+	path: string,
+): boolean {
+	switch (type) {
+		case 'null':
+			return value === null
+		case 'boolean':
+			return typeof value === 'boolean'
+		case 'integer':
+			return typeof value === 'number' && Number.isInteger(value)
+		case 'number':
+			return typeof value === 'number'
+		case 'string':
+			return typeof value === 'string' && stringConstraintsMatch(schema, value)
+		case 'array':
+			if (!Array.isArray(value)) return false
+			if (!schema.items) return true
+			return !value.some((item, index) =>
+				validateSchemaValue(schema.items as OpenApiSchema, item, spec, `${path}[${index}]`),
+			)
+		case 'object':
+			return objectMatches(schema, value, spec, path)
+		default:
+			return true
+	}
+}
+
+function objectMatches(
+	schema: OpenApiSchema,
+	value: unknown,
+	spec: OpenApiSpec,
+	path: string,
+): boolean {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+
+	const record = value as Record<string, unknown>
+	for (const required of schema.required ?? []) {
+		if (!(required in record)) return false
+	}
+
+	for (const [property, propertySchema] of Object.entries(schema.properties ?? {})) {
+		if (!(property in record)) continue
+		if (validateSchemaValue(propertySchema, record[property], spec, `${path}.${property}`))
+			return false
+	}
+
+	if (schema.additionalProperties && typeof schema.additionalProperties === 'object') {
+		for (const [property, propertyValue] of Object.entries(record)) {
+			if (property in (schema.properties ?? {})) continue
+			if (
+				validateSchemaValue(schema.additionalProperties, propertyValue, spec, `${path}.${property}`)
+			) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+function resolveSchema(schema: OpenApiSchema, spec: OpenApiSpec): OpenApiSchema {
+	const refName = schema.$ref?.match(/^#\/components\/schemas\/(.+)$/)?.[1]
+	return refName ? (spec.components?.schemas?.[refName] ?? schema) : schema
+}
+
+function schemaTypes(schema: OpenApiSchema): string[] {
+	if (Array.isArray(schema.type)) return schema.type
+	if (schema.type) return [schema.type]
+	if (schema.properties || schema.additionalProperties) return ['object']
+	if (schema.items) return ['array']
+	return []
+}
+
+function stringConstraintsMatch(schema: OpenApiSchema, value: string): boolean {
+	if (schema.minLength !== undefined && value.length < schema.minLength) return false
+	if (schema.maxLength !== undefined && value.length > schema.maxLength) return false
+	if (schema.pattern && !new RegExp(schema.pattern).test(value)) return false
+	return true
+}
+
+function formatJsonType(value: unknown): string {
+	if (value === null) return 'null'
+	if (Array.isArray(value)) return 'array'
+	return typeof value
 }
 
 function collectSourceExpectations(sourceDir: string): SourceExpectations {

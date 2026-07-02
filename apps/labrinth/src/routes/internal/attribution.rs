@@ -91,11 +91,12 @@ struct ScanResponse {
 
 /// Queue an attribution scan.  
 #[utoipa::path(
+	context_path = "/attribution",
 	tag = "attribution",
 	responses((status = OK, body = ScanResponse))
 )]
 #[post("/scan")]
-async fn scan(
+pub async fn scan(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -207,12 +208,13 @@ async fn scan(
 
 /// List project attribution groups.  
 #[utoipa::path(
+	context_path = "/attribution",
 	tag = "attribution",
 	params(("project_id" = ProjectId, Path)),
 	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
 )]
 #[get("/{project_id}")]
-async fn list(
+pub async fn list(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -462,11 +464,12 @@ struct UpdateGroupBody {
 
 /// Update an attribution group.  
 #[utoipa::path(
+	context_path = "/attribution",
 	tag = "attribution",
 	responses((status = NO_CONTENT))
 )]
 #[patch("/group/{group_id}")]
-async fn update_group(
+pub async fn update_group(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -547,11 +550,12 @@ struct AssignBody {
 
 /// Move a file to an attribution group.  
 #[utoipa::path(
+	context_path = "/attribution",
 	tag = "attribution",
 	responses((status = NO_CONTENT))
 )]
 #[post("/assign")]
-async fn assign(
+pub async fn assign(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -707,11 +711,12 @@ struct SplitBody {
 
 /// Split a file into a new attribution group.  
 #[utoipa::path(
+	context_path = "/attribution",
 	tag = "attribution",
 	responses((status = NO_CONTENT))
 )]
 #[post("/split")]
-async fn split(
+pub async fn split(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -987,8 +992,3 @@ fn hex_to_bytes(hex: &str) -> Option<Vec<u8>> {
         .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
         .collect()
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(scan, list, update_group, assign, split,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

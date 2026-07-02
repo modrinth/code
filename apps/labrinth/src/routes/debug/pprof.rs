@@ -112,8 +112,3 @@ pub fn register_and_set_metrics(registry: &Registry) -> eyre::Result<()> {
 
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(heap, flame_graph,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

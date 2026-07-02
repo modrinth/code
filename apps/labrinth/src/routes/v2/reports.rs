@@ -315,15 +315,3 @@ pub async fn report_delete(
         .await
         .or_else(v2_reroute::flatten_404_error)
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    report_create,
-    reports,
-    reports_get,
-    report_get,
-    report_edit,
-    report_delete,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

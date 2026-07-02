@@ -12,6 +12,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 /// Export GDPR data.  
 #[utoipa::path(
+	context_path = "/gdpr",
 	tag = "GDPR",
 	responses((status = OK, body = serde_json::Value))
 )]
@@ -219,8 +220,3 @@ pub async fn export(
         "subscriptions": subscriptions,
     })))
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(export,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

@@ -42,11 +42,12 @@ pub struct IngestClick {
 
 /// Ingest an affiliate click.  
 #[utoipa::path(
+	context_path = "/affiliate",
 	tag = "affiliates",
 	responses((status = NO_CONTENT))
 )]
 #[post("/ingest-click")]
-async fn ingest_click(
+pub async fn ingest_click(
     req: HttpRequest,
     web::Json(ingest_click): web::Json<IngestClick>,
     pool: web::Data<PgPool>,
@@ -142,11 +143,12 @@ async fn ingest_click(
 
 /// List affiliate codes.  
 #[utoipa::path(
+	context_path = "/affiliate",
 	tag = "affiliates",
     responses((status = OK, body = inline(Vec<AffiliateCode>)))
 )]
 #[get("")]
-async fn get_all(
+pub async fn get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -195,11 +197,12 @@ pub struct CreateRequest {
 
 /// Create an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
 	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[put("")]
-async fn create(
+pub async fn create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -273,11 +276,12 @@ async fn create(
 
 /// Get an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
 	tag = "affiliates",
     responses((status = OK, body = inline(AffiliateCode)))
 )]
 #[get("/{id}")]
-async fn get(
+pub async fn get(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -314,11 +318,12 @@ async fn get(
 
 /// Delete an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
 	tag = "affiliates",
 	responses((status = NO_CONTENT))
 )]
 #[delete("/{id}")]
-async fn delete(
+pub async fn delete(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -366,11 +371,12 @@ pub struct PatchRequest {
 
 /// Update an affiliate code.  
 #[utoipa::path(
+	context_path = "/affiliate",
 	tag = "affiliates",
 	responses((status = NO_CONTENT))
 )]
 #[patch("/{id}")]
-async fn patch(
+pub async fn patch(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -417,8 +423,3 @@ async fn patch(
 
     Ok(())
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(ingest_click, get_all, create, get, delete, patch,))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;

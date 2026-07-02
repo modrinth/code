@@ -30,27 +30,15 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(get_versions_from_hashes_route);
 }
 
-/// Get version metadata by file hash.  
+/// Get version metadata by file hash.
 #[utoipa::path(
 	tag = "version files",
     get,
     operation_id = "v3VersionFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<VersionId>,
-            Query,
-            description = "Optional version ID when hash maps to multiple files"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = models::projects::Version),
@@ -61,7 +49,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     )
 )]
 #[get("/version_file/{version_id}")]
-async fn get_version_from_hash_route(
+pub async fn get_version_from_hash_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -158,7 +146,7 @@ pub struct UpdateData {
     pub loader_fields: Option<HashMap<String, Vec<serde_json::Value>>>,
 }
 
-/// Get the latest matching version by file hash.  
+/// Get the latest matching version by file hash.
 #[utoipa::path(
 	tag = "version files",
     post,
@@ -190,7 +178,7 @@ pub struct UpdateData {
     )
 )]
 #[post("/version_file/{version_id}/update")]
-async fn get_update_from_hash_route(
+pub async fn get_update_from_hash_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<ReadOnlyPgPool>,
@@ -302,7 +290,7 @@ pub struct FileHashes {
     pub hashes: Vec<String>,
 }
 
-/// Get versions by file hashes.  
+/// Get versions by file hashes.
 #[utoipa::path(
 	tag = "version files",
     post,
@@ -317,7 +305,7 @@ pub struct FileHashes {
     )
 )]
 #[post("/version_files")]
-async fn get_versions_from_hashes_route(
+pub async fn get_versions_from_hashes_route(
     req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -382,7 +370,7 @@ pub async fn get_versions_from_hashes(
     Ok(HttpResponse::Ok().json(response))
 }
 
-/// Get projects by file hashes.  
+/// Get projects by file hashes.
 #[utoipa::path(
 	tag = "version files",
     post,
@@ -397,7 +385,7 @@ pub async fn get_versions_from_hashes(
     )
 )]
 #[post("/version_file/project")]
-async fn get_projects_from_hashes_route(
+pub async fn get_projects_from_hashes_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -474,7 +462,7 @@ pub struct ManyUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-/// Get latest matching versions by file hashes.  
+/// Get latest matching versions by file hashes.
 #[utoipa::path(
 	tag = "version files",
     post,
@@ -485,7 +473,7 @@ pub struct ManyUpdateData {
     )
 )]
 #[post("/version_files/update_many")]
-async fn update_files_many_route(
+pub async fn update_files_many_route(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
@@ -526,7 +514,7 @@ pub async fn update_files_many(
 // This endpoint is kept for backwards compat, since it still works in 99% of
 // cases where H only maps to a single version, and for older clients. This
 // endpoint will only take the first version for each file hash.
-/// Get the latest matching version by file hash.  
+/// Get the latest matching version by file hash.
 #[utoipa::path(
 	tag = "version files",
     post,
@@ -537,7 +525,7 @@ pub async fn update_files_many(
     )
 )]
 #[post("/version_files/update")]
-async fn update_files_route(
+pub async fn update_files_route(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
@@ -659,7 +647,7 @@ pub struct ManyFileUpdateData {
     pub hashes: Vec<FileUpdateData>,
 }
 
-/// Get latest matching versions by individual file filters.  
+/// Get latest matching versions by individual file filters.
 #[utoipa::path(
 	tag = "version files",
     post,
@@ -670,7 +658,7 @@ pub struct ManyFileUpdateData {
     )
 )]
 #[post("/version_files/update_individual")]
-async fn update_individual_files_route(
+pub async fn update_individual_files_route(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -801,7 +789,7 @@ pub async fn update_individual_files(
 }
 
 // under /api/v1/version_file/{hash}
-/// Delete a file by hash.  
+/// Delete a file by hash.
 #[utoipa::path(
 	tag = "version files",
     delete,
@@ -836,7 +824,7 @@ pub async fn update_individual_files(
     )
 )]
 #[delete("/version_file/{version_id}")]
-async fn delete_file_route(
+pub async fn delete_file_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -990,7 +978,7 @@ pub struct DownloadRedirect {
 }
 
 // under /api/v1/version_file/{hash}/download
-/// Download a file by hash.  
+/// Download a file by hash.
 #[utoipa::path(
 	tag = "version files",
     get,
@@ -1021,7 +1009,7 @@ pub struct DownloadRedirect {
     )
 )]
 #[get("/version_file/{version_id}/download")]
-async fn download_version_route(
+pub async fn download_version_route(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1086,18 +1074,3 @@ pub async fn download_version(
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(utoipa::OpenApi)]
-#[openapi(paths(
-    get_version_from_hash_route,
-    get_update_from_hash_route,
-    get_versions_from_hashes_route,
-    get_projects_from_hashes_route,
-    update_files_many_route,
-    update_files_route,
-    update_individual_files_route,
-    delete_file_route,
-    download_version_route,
-))]
-#[allow(dead_code)]
-pub(crate) struct RouteDoc;
