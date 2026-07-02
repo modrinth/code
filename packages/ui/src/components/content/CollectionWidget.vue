@@ -73,7 +73,7 @@ const messages = defineMessages({
 
 <template>
 	<div
-		class="rounded-2xl border border-solid border-surface-4 bg-surface-3 overflow-hidden grid grid-cols-[2fr_4fr]"
+		class="rounded-2xl border border-solid border-surface-4 bg-surface-3 overflow-hidden grid grid-cols-1 md:grid-cols-[2fr_4fr]"
 	>
 		<div class="flex flex-col gap-2 p-4">
 			<template v-if="isLoadingCollection">
