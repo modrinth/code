@@ -11,9 +11,9 @@
 			:no-options-message="formatMessage(messages.noGameVersionsFound)"
 			trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
 			dropdown-class="!rounded-xl"
-			@update:model-value="emit('selectGameVersion', $event)"
-			@search-input="emit('update:versionFilter', $event)"
-			@close="emit('update:versionFilter', '')"
+			@update:model-value="selectGameVersion"
+			@search-input="versionFilter = $event"
+			@close="versionFilter = ''"
 		>
 			<template #option="{ item, isSelected }">
 				<div
@@ -37,7 +37,10 @@
 				</div>
 			</template>
 			<template #dropdown-footer>
-				<div v-if="showVersionsCheckbox" class="border-0 border-t border-solid border-surface-5 p-3">
+				<div
+					v-if="showVersionsCheckbox"
+					class="border-0 border-t border-solid border-surface-5 p-3"
+				>
 					<Checkbox
 						v-model="showAllVersionsModel"
 						:label="formatMessage(messages.showAllVersions)"
@@ -54,7 +57,7 @@
 			:placeholder="formatMessage(messages.selectPlatform)"
 			trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
 			dropdown-class="!rounded-xl"
-			@update:model-value="emit('selectPlatform', $event)"
+			@update:model-value="selectPlatform"
 		>
 			<template #option="{ item, isSelected }">
 				<div
@@ -111,13 +114,30 @@
 			</a>
 		</ButtonStyled>
 	</div>
+	<p v-else-if="currentPlatform && currentGameVersion && !versionsLoading && versions.length > 0">
+		{{
+			formatMessage(messages.noVersionsAvailable, {
+				gameVersion: currentGameVersion,
+				platform: currentPlatformText,
+			})
+		}}
+	</p>
 </template>
 
 <script setup>
 import { DownloadIcon } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, Combobox, defineMessages, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Checkbox,
+	Combobox,
+	defineMessages,
+	getTagMessage,
+	useDebugLogger,
+	useVIntl,
+} from '@modrinth/ui'
 import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
-import { computed } from 'vue'
+import dayjs from 'dayjs'
+import { computed, ref, watch } from 'vue'
 
 defineOptions({
 	name: 'DownloadProject',
@@ -128,77 +148,261 @@ const props = defineProps({
 		type: Object,
 		required: true,
 	},
-	gameVersionOptions: {
+	versions: {
 		type: Array,
 		default: () => [],
 	},
-	currentGameVersion: {
-		type: [String, Boolean],
-		default: null,
-	},
-	possibleGameVersions: {
-		type: Array,
-		default: () => [],
-	},
-	currentPlatformText: {
-		type: String,
-		default: null,
-	},
-	showVersionsCheckbox: {
+	versionsLoading: {
 		type: Boolean,
 		default: false,
 	},
-	showAllVersions: {
-		type: Boolean,
-		default: false,
+	tags: {
+		type: Object,
+		required: true,
 	},
-	versionFilter: {
+	downloadReason: {
 		type: String,
-		default: '',
+		default: 'standalone',
 	},
-	currentPlatform: {
-		type: [String, Boolean],
-		default: null,
-	},
-	platformOptions: {
-		type: Array,
-		default: () => [],
-	},
-	possiblePlatforms: {
-		type: Array,
-		default: () => [],
-	},
-	selectedVersion: {
-		type: Object,
-		default: null,
-	},
-	selectedPrimaryFile: {
-		type: Object,
-		default: null,
-	},
-	selectedPrimaryFileDownloadUrl: {
+	initialGameVersion: {
 		type: String,
 		default: null,
+	},
+	initialPlatform: {
+		type: String,
+		default: null,
+	},
+	resetKey: {
+		type: Number,
+		default: 0,
 	},
 })
 
-const emit = defineEmits([
-	'download',
-	'selectGameVersion',
-	'selectPlatform',
-	'update:showAllVersions',
-	'update:versionFilter',
-])
+const emit = defineEmits(['download', 'selectGameVersion', 'selectPlatform', 'update:selection'])
 const { formatMessage } = useVIntl()
+const { createProjectDownloadUrl } = useCdnDownloadContext()
+const debug = useDebugLogger('DownloadProject')
+
+const userSelectedGameVersion = ref(props.initialGameVersion)
+const userSelectedPlatform = ref(props.initialPlatform)
+const showAllVersions = ref(defaultShowAllVersions())
+const versionFilter = ref('')
 
 const showAllVersionsModel = computed({
 	get() {
-		return props.showAllVersions
+		return showAllVersions.value
 	},
 	set(value) {
-		emit('update:showAllVersions', value)
+		showAllVersions.value = value
 	},
 })
+
+const currentGameVersion = computed(() => {
+	return (
+		userSelectedGameVersion.value ||
+		(props.project.game_versions.length === 1 && props.project.game_versions[0])
+	)
+})
+
+const possibleGameVersions = computed(() => {
+	return props.versions
+		.filter((x) => !currentPlatform.value || x.loaders.includes(currentPlatform.value))
+		.flatMap((x) => x.game_versions)
+})
+
+const possiblePlatforms = computed(() => {
+	return props.versions
+		.filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
+		.flatMap((x) => x.loaders)
+})
+
+const currentPlatform = computed(() => {
+	return (
+		userSelectedPlatform.value || (props.project.loaders.length === 1 && props.project.loaders[0])
+	)
+})
+
+const currentPlatformText = computed(() => {
+	if (!currentPlatform.value) return null
+	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
+})
+
+const releaseVersions = computed(() => {
+	const set = new Set()
+	for (const gameVersion of props.tags.gameVersions || []) {
+		if (gameVersion?.version && gameVersion.version_type === 'release') {
+			set.add(gameVersion.version)
+		}
+	}
+	return set
+})
+
+const nonReleaseVersions = computed(() => {
+	const set = new Set()
+	for (const gameVersion of props.tags.gameVersions || []) {
+		if (gameVersion?.version && gameVersion.version_type !== 'release') {
+			set.add(gameVersion.version)
+		}
+	}
+	return set
+})
+
+const showVersionsCheckbox = computed(() => {
+	let hasRelease = false
+	let hasNonRelease = false
+
+	for (const version of props.project.game_versions) {
+		if (isReleaseGameVersion(version)) {
+			hasRelease = true
+		} else {
+			hasNonRelease = true
+		}
+
+		if (hasRelease && hasNonRelease) return true
+	}
+
+	return false
+})
+
+const filteredGameVersions = computed(() => {
+	return props.project.game_versions
+		.filter(
+			(x) =>
+				(versionFilter.value && x.includes(versionFilter.value)) ||
+				(!versionFilter.value && (showAllVersions.value || isReleaseGameVersion(x))),
+		)
+		.slice()
+		.reverse()
+})
+
+const gameVersionOptions = computed(() => {
+	return filteredGameVersions.value.map((gameVersion) => ({
+		value: gameVersion,
+		label: gameVersion,
+	}))
+})
+
+const platformOptions = computed(() => {
+	return props.project.loaders
+		.slice()
+		.reverse()
+		.map((platform) => ({
+			value: platform,
+			label: formatMessage(getTagMessage(platform, 'loader')),
+		}))
+})
+
+const filteredVersions = computed(() => {
+	const result = props.versions.filter(
+		(x) =>
+			x.game_versions?.includes(currentGameVersion.value) &&
+			(x.loaders?.includes(currentPlatform.value) || props.project.project_type === 'resourcepack'),
+	)
+	debug('filteredVersions', {
+		total: props.versions.length,
+		filtered: result.length,
+		currentGameVersion: currentGameVersion.value,
+		currentPlatform: currentPlatform.value,
+		sampleLoaders: props.versions.slice(0, 3).map((v) => v.loaders),
+	})
+	return result
+})
+
+const filteredRelease = computed(() => {
+	return filteredVersions.value.find((x) => x.version_type === 'release')
+})
+
+const filteredBeta = computed(() => {
+	return filteredVersions.value.find(
+		(x) =>
+			x.version_type === 'beta' &&
+			(!filteredRelease.value ||
+				dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))),
+	)
+})
+
+const filteredAlpha = computed(() => {
+	return filteredVersions.value.find(
+		(x) =>
+			x.version_type === 'alpha' &&
+			(!filteredRelease.value ||
+				dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))) &&
+			(!filteredBeta.value ||
+				dayjs(x.date_published).isAfter(dayjs(filteredBeta.value.date_published))),
+	)
+})
+
+const selectedVersion = computed(() => {
+	return filteredRelease.value || filteredBeta.value || filteredAlpha.value
+})
+
+const selectedPrimaryFile = computed(() => {
+	return (
+		selectedVersion.value?.files?.find((file) => file.primary) || selectedVersion.value?.files?.[0]
+	)
+})
+
+const selectedPrimaryFileDownloadUrl = computed(() => {
+	if (!selectedPrimaryFile.value) return null
+	return getDownloadUrl(selectedPrimaryFile.value.url)
+})
+
+watch(
+	[currentGameVersion, currentPlatform, selectedVersion, selectedPrimaryFile],
+	() => {
+		emit('update:selection', {
+			currentGameVersion: currentGameVersion.value,
+			currentPlatform: currentPlatform.value,
+			selectedVersion: selectedVersion.value,
+			selectedPrimaryFile: selectedPrimaryFile.value,
+		})
+	},
+	{ immediate: true },
+)
+
+watch(
+	() => props.resetKey,
+	() => {
+		userSelectedGameVersion.value = null
+		userSelectedPlatform.value = null
+		showAllVersions.value = defaultShowAllVersions()
+		versionFilter.value = ''
+	},
+)
+
+function selectGameVersion(gameVersion) {
+	userSelectedGameVersion.value = gameVersion
+	emit('selectGameVersion', gameVersion)
+}
+
+function selectPlatform(platform) {
+	userSelectedPlatform.value = platform
+	emit('selectPlatform', platform)
+}
+
+function getDownloadUrl(url) {
+	return createProjectDownloadUrl(url, {
+		reason: props.downloadReason,
+		gameVersion: currentGameVersion.value ?? undefined,
+		loader: currentPlatform.value ?? undefined,
+	})
+}
+
+function isReleaseGameVersion(version) {
+	if (releaseVersions.value.has(version)) return true
+	if (nonReleaseVersions.value.has(version)) return false
+	return true
+}
+
+function defaultShowAllVersions() {
+	return (
+		props.project.game_versions.length > 0 &&
+		props.project.game_versions.every((projectVersion) => {
+			const gameVersion = props.tags.gameVersions?.find((x) => x.version === projectVersion)
+			return gameVersion?.version_type && gameVersion.version_type !== 'release'
+		})
+	)
+}
 
 const messages = defineMessages({
 	gameVersionUnsupportedTooltip: {
@@ -212,6 +416,10 @@ const messages = defineMessages({
 	noGameVersionsFound: {
 		id: 'project.download.no-game-versions-found',
 		defaultMessage: 'No game versions found',
+	},
+	noVersionsAvailable: {
+		id: 'project.download.no-versions-available',
+		defaultMessage: 'No versions available for {gameVersion} and {platform}.',
 	},
 	platformUnsupportedTooltip: {
 		id: 'project.download.platform-unsupported-tooltip',
