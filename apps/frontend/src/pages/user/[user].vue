@@ -338,11 +338,10 @@
 					>
 						<ProjectCard
 							v-for="project in (route.params.projectType !== undefined
-								? projects.filter(
-										(x) =>
-											x.project_type ===
-											route.params.projectType.substr(0, route.params.projectType.length - 1),
-									)
+								? projects.filter((x) => {
+									const type = route.params.projectType.substr(0, route.params.projectType.length - 1)
+									return projectMatchesType(x, type)
+								})
 								: projects
 							)
 								.slice()
@@ -846,20 +845,61 @@ useSeoMeta({
 	ogImage: () => user.value?.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
 })
 
+function getProjectTypesForProject(project) {
+	const types = new Set()
+
+ 	if (!project) return []
+
+ 	if (project.project_type === 'minecraft_java_server') {
+ 		types.add('server')
+ 	}
+
+ 	if (project.project_type && project.project_type !== 'project') {
+ 		types.add(project.project_type)
+ 	}
+
+ 	const tagsState = tags.value
+ 	const categories = [
+ 		...(project.categories ?? []),
+ 		...(project.loaders ?? []),
+ 		...(project.additional_categories ?? []),
+ 	]
+
+ 	if (tagsState && tagsState.loaderData) {
+ 		const ld = tagsState.loaderData
+
+ 		if (categories.some((c) => ld.dataPackLoaders?.includes(c))) types.add('datapack')
+ 		if (categories.some((c) => ld.allPluginLoaders?.includes(c))) types.add('plugin')
+ 		if (categories.some((c) => ld.modLoaders?.includes(c))) types.add('mod')
+ 	} else {
+ 		if (project.project_type === 'mod') types.add('mod')
+ 	}
+
+ 	return Array.from(types)
+}
+
+function projectMatchesType(project, type) {
+ 	if (!project) return false
+ 	if (!type) return true
+ 	return getProjectTypesForProject(project).includes(type)
+}
+
 const projectTypes = computed(() => {
-	const obj = {}
+ 	const obj = {}
 
-	if (collections.value?.length > 0) {
-		obj.collection = true
-	}
+ 	if (collections.value?.length > 0) {
+ 		obj.collection = true
+ 	}
 
-	for (const project of projects.value ?? []) {
-		obj[project.project_type] = true
-	}
+ 	for (const project of projects.value ?? []) {
+ 		for (const t of getProjectTypesForProject(project)) {
+ 			obj[t] = true
+ 		}
+ 	}
 
-	delete obj.project
+ 	delete obj.project
 
-	return Object.keys(obj)
+ 	return Object.keys(obj)
 })
 const sumDownloads = computed(() => {
 	let sum = 0
