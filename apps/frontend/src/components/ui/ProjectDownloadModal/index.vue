@@ -15,6 +15,8 @@
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
+					:incompatible-game-versions="showOptions.incompatibleGameVersions"
+					:incompatible-loaders="showOptions.incompatibleLoaders"
 					:reset-key="downloadProjectResetKey"
 					@select-game-version="selectGameVersion"
 					@select-platform="selectPlatform"
@@ -89,7 +91,7 @@ import {
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -114,6 +116,18 @@ type ProjectDownloadSelection = {
 type NewModalRef = {
 	show: (event?: MouseEvent) => void
 	hide: () => void
+}
+
+type ProjectDownloadModalShowOptions = {
+	projectId?: string
+	incompatibleGameVersions?: string[]
+	incompatibleLoaders?: string[]
+}
+
+type ResolvedProjectDownloadModalShowOptions = {
+	projectId?: string
+	incompatibleGameVersions: string[]
+	incompatibleLoaders: string[]
 }
 
 const props = withDefaults(
@@ -143,8 +157,11 @@ const debug = useDebugLogger('DownloadModal')
 const modal = ref<NewModalRef | null>(null)
 const modalOpen = ref(false)
 const showProjectId = ref<string | null>(null)
+const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
 const downloadProjectResetKey = ref(0)
 const projectDownloadSelection = ref<ProjectDownloadSelection>(getDefaultProjectDownloadSelection())
+const MODAL_CLOSE_STATE_RESET_MS = 350
+let closeStateResetTimeout: ReturnType<typeof setTimeout> | null = null
 
 const routeProjectId = computed(() => showProjectId.value ?? props.projectId ?? null)
 
@@ -320,6 +337,7 @@ function selectPlatform(platform: string) {
 }
 
 function onShow() {
+	clearCloseStateResetTimeout()
 	modalOpen.value = true
 	debug('on-show fired')
 	versionsEnabled.value = true
@@ -331,17 +349,30 @@ function onShow() {
 function onHide() {
 	const hadShowProjectId = !!showProjectId.value
 	modalOpen.value = false
-	showProjectId.value = null
+	clearCloseStateResetTimeout()
+	closeStateResetTimeout = setTimeout(() => {
+		showProjectId.value = null
+		showOptions.value = getDefaultShowOptions()
+		closeStateResetTimeout = null
+	}, MODAL_CLOSE_STATE_RESET_MS)
 	if (props.useRouteHash && !hadShowProjectId) {
 		navigateTo({ query: route.query, hash: '' }, { replace: true })
 	}
 }
 
-async function show(event?: MouseEvent, projectId?: string): Promise<void> {
+async function show(
+	event?: MouseEvent,
+	options: ProjectDownloadModalShowOptions = {},
+): Promise<void> {
 	if (!modal.value || modalOpen.value) return
-	showProjectId.value = projectId ?? null
+	clearCloseStateResetTimeout()
+	showOptions.value = {
+		...getDefaultShowOptions(),
+		...options,
+	}
+	showProjectId.value = showOptions.value.projectId ?? null
 	await nextTick()
-	if (!(await loadProjectForModal(!!projectId))) return
+	if (!(await loadProjectForModal(!!showOptions.value.projectId))) return
 	modalOpen.value = true
 	modal.value.show(event)
 }
@@ -364,6 +395,20 @@ function getDefaultProjectDownloadSelection(): ProjectDownloadSelection {
 		selectedVersion: null,
 		selectedPrimaryFile: null,
 	}
+}
+
+function getDefaultShowOptions(): ResolvedProjectDownloadModalShowOptions {
+	return {
+		projectId: undefined,
+		incompatibleGameVersions: [],
+		incompatibleLoaders: [],
+	}
+}
+
+function clearCloseStateResetTimeout() {
+	if (!closeStateResetTimeout) return
+	clearTimeout(closeStateResetTimeout)
+	closeStateResetTimeout = null
 }
 
 async function loadProjectForModal(forceRefetch: boolean) {
@@ -410,6 +455,8 @@ watch(routeProjectId, () => {
 	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
 	downloadProjectResetKey.value += 1
 })
+
+onUnmounted(clearCloseStateResetTimeout)
 
 defineExpose({ show, hide })
 </script>

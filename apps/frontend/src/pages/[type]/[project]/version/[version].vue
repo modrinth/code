@@ -374,7 +374,7 @@
 								v-else-if="dependency.project"
 								v-tooltip="formatMessage(messages.downloadProject)"
 								:aria-label="formatMessage(messages.downloadProject)"
-								@click="openDependencyDownloadModal(dependency.project.id, $event)"
+								@click="openDependencyDownloadModal(dependency.project, $event)"
 							>
 								<DownloadIcon />
 							</button>
@@ -804,8 +804,20 @@ function handleOpenEditVersionModal(versionId: string, projectId: string, stageI
 	editModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 
-function openDependencyDownloadModal(projectId: string, event: MouseEvent) {
-	dependencyDownloadModal.value?.show(event, projectId)
+function openDependencyDownloadModal(
+	dependencyProject: Labrinth.Projects.v2.Project,
+	event: MouseEvent,
+) {
+	const baseGameVersions = new Set(version.value?.game_versions ?? [])
+	const baseLoaders = new Set(dependencyResolutionLoaders.value)
+
+	dependencyDownloadModal.value?.show(event, {
+		projectId: dependencyProject.id,
+		incompatibleGameVersions: dependencyProject.game_versions.filter(
+			(gameVersion) => !baseGameVersions.has(gameVersion),
+		),
+		incompatibleLoaders: dependencyProject.loaders.filter((loader) => !baseLoaders.has(loader)),
+	})
 }
 
 const deleteVersionMutation = useMutation({

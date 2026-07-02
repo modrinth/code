@@ -17,20 +17,12 @@
 		>
 			<template #option="{ item, isSelected }">
 				<div
-					v-tooltip="
-						!possibleGameVersions.includes(item.value)
-							? formatMessage(messages.gameVersionUnsupportedTooltip, {
-									title: project.title,
-									gameVersion: item.value,
-									platform: currentPlatformText,
-								})
-							: null
-					"
+					v-tooltip="gameVersionOptionTooltip(item.value)"
 					class="flex w-full items-center justify-between gap-2"
 					:class="{
-						'text-brand-red opacity-40': !possibleGameVersions.includes(item.value),
+						'text-brand-red opacity-40': isGameVersionUnavailable(item.value),
 						'text-green': isSelected,
-						'text-primary': possibleGameVersions.includes(item.value) && !isSelected,
+						'text-primary': !isGameVersionUnavailable(item.value) && !isSelected,
 					}"
 				>
 					<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
@@ -61,20 +53,12 @@
 		>
 			<template #option="{ item, isSelected }">
 				<div
-					v-tooltip="
-						!possiblePlatforms.includes(item.value)
-							? formatMessage(messages.platformUnsupportedTooltip, {
-									title: project.title,
-									platform: item.label,
-									gameVersion: currentGameVersion,
-								})
-							: null
-					"
+					v-tooltip="platformOptionTooltip(item.value, item.label)"
 					class="flex w-full items-center justify-between gap-2"
 					:class="{
-						'text-brand-red opacity-40': !possiblePlatforms.includes(item.value),
+						'text-brand-red opacity-40': isPlatformUnavailable(item.value),
 						'text-green': isSelected,
-						'text-primary': possiblePlatforms.includes(item.value) && !isSelected,
+						'text-primary': !isPlatformUnavailable(item.value) && !isSelected,
 					}"
 				>
 					<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
@@ -166,6 +150,8 @@ const props = withDefaults(
 		downloadReason?: CdnDownloadReason
 		initialGameVersion?: string | null
 		initialPlatform?: string | null
+		incompatibleGameVersions?: string[]
+		incompatibleLoaders?: string[]
 		resetKey?: number
 	}>(),
 	{
@@ -173,6 +159,8 @@ const props = withDefaults(
 		downloadReason: 'standalone',
 		initialGameVersion: null,
 		initialPlatform: null,
+		incompatibleGameVersions: () => [],
+		incompatibleLoaders: () => [],
 		resetKey: 0,
 	},
 )
@@ -192,6 +180,9 @@ const userSelectedGameVersion = ref<string | null>(props.initialGameVersion)
 const userSelectedPlatform = ref<string | null>(props.initialPlatform)
 const showAllVersions = ref(defaultShowAllVersions())
 const versionFilter = ref('')
+
+const incompatibleGameVersionsSet = computed(() => new Set(props.incompatibleGameVersions))
+const incompatibleLoadersSet = computed(() => new Set(props.incompatibleLoaders))
 
 const showAllVersionsModel = computed({
 	get() {
@@ -419,7 +410,58 @@ function defaultShowAllVersions() {
 	)
 }
 
+function isGameVersionUnavailable(gameVersion: string) {
+	return (
+		incompatibleGameVersionsSet.value.has(gameVersion) ||
+		!possibleGameVersions.value.includes(gameVersion)
+	)
+}
+
+function isPlatformUnavailable(platform: string) {
+	return incompatibleLoadersSet.value.has(platform) || !possiblePlatforms.value.includes(platform)
+}
+
+function gameVersionOptionTooltip(gameVersion: string) {
+	if (incompatibleGameVersionsSet.value.has(gameVersion)) {
+		return formatMessage(messages.baseGameVersionIncompatibleTooltip)
+	}
+
+	if (!possibleGameVersions.value.includes(gameVersion)) {
+		return formatMessage(messages.gameVersionUnsupportedTooltip, {
+			title: props.project.title,
+			gameVersion,
+			platform: currentPlatformText.value,
+		})
+	}
+
+	return null
+}
+
+function platformOptionTooltip(platform: string, platformLabel: string) {
+	if (incompatibleLoadersSet.value.has(platform)) {
+		return formatMessage(messages.baseLoaderIncompatibleTooltip)
+	}
+
+	if (!possiblePlatforms.value.includes(platform)) {
+		return formatMessage(messages.platformUnsupportedTooltip, {
+			title: props.project.title,
+			platform: platformLabel,
+			gameVersion: currentGameVersion.value,
+		})
+	}
+
+	return null
+}
+
 const messages = defineMessages({
+	baseGameVersionIncompatibleTooltip: {
+		id: 'project.download.base-game-version-incompatible-tooltip',
+		defaultMessage: 'This game version is incompatible with the base project.',
+	},
+	baseLoaderIncompatibleTooltip: {
+		id: 'project.download.base-loader-incompatible-tooltip',
+		defaultMessage: 'This loader is incompatible with the base project.',
+	},
 	gameVersionUnsupportedTooltip: {
 		id: 'project.download.game-version-unsupported-tooltip',
 		defaultMessage: '{title} does not support {gameVersion} for {platform}',
