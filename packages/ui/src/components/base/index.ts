@@ -99,4 +99,5 @@ export type {
 export { default as TimeFramePicker } from './TimeFramePicker.vue'
 export { default as Timeline } from './Timeline.vue'
 export { default as Toggle } from './Toggle.vue'
+export { default as TwoFactorAuthCodeInput } from './TwoFactorAuthCodeInput.vue'
 export { default as UnsavedChangesPopup } from './UnsavedChangesPopup.vue'
