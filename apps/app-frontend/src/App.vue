@@ -94,7 +94,11 @@ import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
-import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
+import {
+	install_create_modpack_instance,
+	install_get_modpack_preview,
+	install_shared_instance,
+} from '@/helpers/install'
 import { list, run } from '@/helpers/instance'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
@@ -251,6 +255,7 @@ const {
 const news = ref([])
 const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
+const displayedSharedInstanceInviteNotifications = new Set()
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -820,31 +825,111 @@ function openServerInviteInviterProfile(inviterName) {
 	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
 }
 
+function getSharedInstanceInvite(notification) {
+	const sharedInstanceId = notification.body?.shared_instance_id
+	if (typeof sharedInstanceId !== 'string') {
+		throw new Error('Missing shared instance ID for invite notification.')
+	}
+
+	const invitedById = notification.body?.invited_by
+	const invitedByUsername =
+		typeof notification.body?.invited_by_username === 'string'
+			? notification.body.invited_by_username
+			: typeof notification.body?.inviter_username === 'string'
+				? notification.body.inviter_username
+				: null
+	const sharedInstanceName =
+		typeof notification.body.shared_instance_name === 'string'
+			? notification.body.shared_instance_name
+			: 'Shared instance'
+
+	return {
+		sharedInstanceId,
+		sharedInstanceName,
+		invitedById: typeof invitedById === 'string' ? invitedById : null,
+		invitedByUsername,
+	}
+}
+
+async function acceptSharedInstanceInviteNotification(notification) {
+	try {
+		const { sharedInstanceId, sharedInstanceName } = getSharedInstanceInvite(notification)
+		await install_shared_instance(sharedInstanceId, sharedInstanceName)
+		await markLiveNotificationRead(notification)
+		queryClient.invalidateQueries({ queryKey: ['instances'] })
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+async function declineSharedInstanceInviteNotification(notification) {
+	try {
+		getSharedInstanceInvite(notification)
+		await markLiveNotificationRead(notification)
+	} catch (error) {
+		handleError(error)
+	}
+}
+
 async function handleLiveNotification(notification) {
-	if (notification?.body?.type !== 'server_invite' || notification.read) return
-	if (displayedServerInviteNotifications.has(notification.id)) return
+	if (!notification?.body || notification.read) return
 
-	displayedServerInviteNotifications.add(notification.id)
+	if (notification.body.type === 'server_invite') {
+		if (displayedServerInviteNotifications.has(notification.id)) return
 
-	const serverName =
-		typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
-	const inviterId = notification.body.invited_by
-	const invitedBy =
-		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+		displayedServerInviteNotifications.add(notification.id)
 
-	addPopupNotification({
-		title: serverName,
-		autoCloseMs: null,
-		toast: {
-			type: 'server-invite',
-			actorName: invitedBy?.username ?? null,
-			actorAvatarUrl: invitedBy?.avatar_url ?? null,
-			entityName: serverName,
-			onAccept: () => acceptServerInviteNotification(notification),
-			onDecline: () => declineServerInviteNotification(notification),
-			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
-		},
-	})
+		const serverName =
+			typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
+		const inviterId = notification.body.invited_by
+		const invitedBy =
+			typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+
+		addPopupNotification({
+			title: serverName,
+			autoCloseMs: null,
+			toast: {
+				type: 'server-invite',
+				actorName: invitedBy?.username ?? null,
+				actorAvatarUrl: invitedBy?.avatar_url ?? null,
+				entityName: serverName,
+				onAccept: () => acceptServerInviteNotification(notification),
+				onDecline: () => declineServerInviteNotification(notification),
+				onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
+			},
+		})
+	}
+
+	if (notification.body.type === 'shared_instance_invite') {
+		if (displayedSharedInstanceInviteNotifications.has(notification.id)) return
+
+		let sharedInstanceInvite
+		try {
+			sharedInstanceInvite = getSharedInstanceInvite(notification)
+		} catch (error) {
+			handleError(error)
+			return
+		}
+		displayedSharedInstanceInviteNotifications.add(notification.id)
+		const invitedBy = sharedInstanceInvite.invitedById
+			? await get_user(sharedInstanceInvite.invitedById, 'bypass').catch(() => null)
+			: null
+		const invitedByUsername = sharedInstanceInvite.invitedByUsername ?? invitedBy?.username ?? null
+
+		addPopupNotification({
+			title: sharedInstanceInvite.sharedInstanceName,
+			autoCloseMs: null,
+			toast: {
+				type: 'instance-invite',
+				actorName: invitedByUsername,
+				actorAvatarUrl: invitedBy?.avatar_url ?? null,
+				entityName: sharedInstanceInvite.sharedInstanceName,
+				onAccept: () => acceptSharedInstanceInviteNotification(notification),
+				onDecline: () => declineSharedInstanceInviteNotification(notification),
+				onOpenActor: () => openServerInviteInviterProfile(invitedByUsername),
+			},
+		})
+	}
 }
 
 async function handleCommand(e) {

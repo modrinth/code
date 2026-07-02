@@ -1,9 +1,13 @@
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
+use crate::install::{
+    InstallJobSnapshot, SharedInstanceExternalFileData,
+    SharedInstanceInstallData, SharedInstanceInstallModpack,
+};
 use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
 use crate::state::{
-    ContentSetSyncStatus, ModrinthCredentials, ProjectType,
-    SharedInstanceRole, State,
+    CacheBehaviour, CachedEntry, ContentSetSyncStatus, ModLoader,
+    ModrinthCredentials, ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
 use reqwest::Method;
@@ -39,8 +43,18 @@ struct CreateInstanceResponse {
 #[derive(Clone, Debug, Deserialize)]
 struct InstanceVersionResponse {
     version: i32,
+    #[serde(default)]
+    modrinth_ids: Vec<String>,
     ready: bool,
+    #[serde(default)]
     external_files: Vec<ExternalFileResponse>,
+    modpack_id: Option<String>,
+    #[serde(default)]
+    game_version: String,
+    #[serde(default)]
+    loader: String,
+    #[serde(default)]
+    loader_version: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -180,6 +194,64 @@ pub async fn publish_shared_instance(
         })
 }
 
+#[tracing::instrument]
+pub async fn install_shared_instance(
+    shared_instance_id: &str,
+    name: String,
+) -> crate::Result<InstallJobSnapshot> {
+    let state = State::get().await?;
+    let version = get_latest_remote_version(shared_instance_id, &state).await?;
+
+    if !version.ready {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance version is not ready to install".to_string(),
+        )
+        .into());
+    }
+
+    let name = match name.trim() {
+        "" => "Shared instance".to_string(),
+        name => name.to_string(),
+    };
+    let modpack = match version.modpack_id.as_deref() {
+        Some(version_id) => {
+            Some(shared_instance_modpack(version_id, &name, &state).await?)
+        }
+        None => None,
+    };
+    if modpack.is_none() && version.game_version.trim().is_empty() {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance version is missing Minecraft metadata".to_string(),
+        )
+        .into());
+    }
+    let loader_version = match version.loader_version.trim() {
+        "" => None,
+        _ => Some(version.loader_version.clone()),
+    };
+
+    crate::install::create_shared_instance(SharedInstanceInstallData {
+        shared_instance_id: shared_instance_id.to_string(),
+        name,
+        version: version.version,
+        modrinth_ids: version.modrinth_ids,
+        external_files: version
+            .external_files
+            .into_iter()
+            .map(|file| SharedInstanceExternalFileData {
+                file_name: file.file_name,
+                file_type: file.file_type,
+                url: file.url,
+            })
+            .collect(),
+        modpack,
+        game_version: version.game_version,
+        loader: ModLoader::from_string(&version.loader),
+        loader_version,
+    })
+    .await
+}
+
 pub(crate) async fn mark_shared_instance_stale(
     instance_id: &str,
     state: &State,
@@ -269,7 +341,8 @@ async fn publish_current_content(
     ensure_shareable_link(&metadata.link)?;
     let modpack_id = shared_modpack_id(&metadata.link);
     let (modrinth_ids, external_files) =
-        collect_publish_content(instance_id, state).await?;
+        collect_publish_content(instance_id, modpack_id.is_some(), state)
+            .await?;
     tracing::debug!(
         instance_id,
         shared_instance_id,
@@ -336,10 +409,27 @@ async fn publish_current_content(
 
 async fn collect_publish_content(
     instance_id: &str,
+    exclude_linked_modpack_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, Vec<ExternalFileCandidate>)> {
     let items = crate::state::list_content(instance_id, None, None, state)
         .await?;
+    let linked_modpack_items = if exclude_linked_modpack_content {
+        crate::state::list_linked_modpack_content(instance_id, None, None, state)
+            .await?
+    } else {
+        Vec::new()
+    };
+    let linked_modpack_version_ids = linked_modpack_items
+        .iter()
+        .filter_map(|item| {
+            item.version.as_ref().map(|version| version.id.clone())
+        })
+        .collect::<HashSet<_>>();
+    let linked_modpack_file_paths = linked_modpack_items
+        .iter()
+        .map(|item| item.file_path.clone())
+        .collect::<HashSet<_>>();
 
     let mut modrinth_ids = Vec::new();
     let mut seen_modrinth_ids = HashSet::new();
@@ -352,6 +442,9 @@ async fn collect_publish_content(
         }
 
         if let Some(version) = item.version {
+            if linked_modpack_version_ids.contains(&version.id) {
+                continue;
+            }
             if seen_modrinth_ids.insert(version.id.clone()) {
                 modrinth_ids.push(version.id);
             }
@@ -359,6 +452,9 @@ async fn collect_publish_content(
         }
 
         if item.file_path.is_empty() {
+            continue;
+        }
+        if linked_modpack_file_paths.contains(&item.file_path) {
             continue;
         }
 
@@ -508,6 +604,46 @@ async fn get_remote_users(
         state,
     )
     .await
+}
+
+async fn get_latest_remote_version(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<InstanceVersionResponse> {
+    request_json(
+        "get_latest_instance_version",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/latest"),
+        None,
+        state,
+    )
+    .await
+}
+
+async fn shared_instance_modpack(
+    version_id: &str,
+    title: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceInstallModpack> {
+    let version = CachedEntry::get_version(
+        version_id,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Shared instance modpack version could not be found".to_string(),
+        )
+    })?;
+
+    Ok(SharedInstanceInstallModpack {
+        project_id: version.project_id,
+        version_id: version_id.to_string(),
+        title: title.to_string(),
+        icon_url: None,
+    })
 }
 
 async fn add_remote_users(

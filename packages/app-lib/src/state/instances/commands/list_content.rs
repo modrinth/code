@@ -1348,12 +1348,7 @@ async fn get_modpack_identifiers(
 }
 
 fn project_type_from_api_name(project_type: &str) -> ProjectType {
-    match project_type {
-        "resourcepack" => ProjectType::ResourcePack,
-        "shader" => ProjectType::ShaderPack,
-        "datapack" => ProjectType::DataPack,
-        _ => ProjectType::Mod,
-    }
+    ProjectType::from_name(project_type).unwrap_or(ProjectType::Mod)
 }
 
 fn sort_content_items(items: &mut [ContentItem]) {

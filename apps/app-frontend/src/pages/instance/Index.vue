@@ -551,34 +551,50 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
+const showShareTab = computed(() => {
+	const linkType = instance.value?.link?.type
 
-const tabs = computed(() => [
-	{
-		label: 'Content',
-		href: `${basePath.value}`,
-		icon: BoxesIcon,
-	},
-	{
-		label: 'Files',
-		href: `${basePath.value}/files`,
-		icon: FolderOpenIcon,
-	},
-	{
-		label: 'Worlds',
-		href: `${basePath.value}/worlds`,
-		icon: GlobeIcon,
-	},
-	{
-		label: 'Logs',
-		href: `${basePath.value}/logs`,
-		icon: TerminalSquareIcon,
-	},
-	{
-		label: 'Share',
-		href: `${basePath.value}/share`,
-		icon: UserPlusIcon,
-	},
-])
+	return (
+		instance.value?.shared_instance?.role !== 'member' &&
+		linkType !== 'server_project' &&
+		linkType !== 'server_project_modpack'
+	)
+})
+
+const tabs = computed(() => {
+	const instanceTabs = [
+		{
+			label: 'Content',
+			href: `${basePath.value}`,
+			icon: BoxesIcon,
+		},
+		{
+			label: 'Files',
+			href: `${basePath.value}/files`,
+			icon: FolderOpenIcon,
+		},
+		{
+			label: 'Worlds',
+			href: `${basePath.value}/worlds`,
+			icon: GlobeIcon,
+		},
+		{
+			label: 'Logs',
+			href: `${basePath.value}/logs`,
+			icon: TerminalSquareIcon,
+		},
+	]
+
+	if (showShareTab.value) {
+		instanceTabs.push({
+			label: 'Share',
+			href: `${basePath.value}/share`,
+			icon: UserPlusIcon,
+		})
+	}
+
+	return instanceTabs
+})
 
 if (instance.value) {
 	breadcrumbs.setName(

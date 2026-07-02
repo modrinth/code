@@ -91,6 +91,7 @@ export interface InstallJobSnapshot {
 	kind:
 		| 'create_instance'
 		| 'create_modpack_instance'
+		| 'create_shared_instance'
 		| 'import_instance'
 		| 'duplicate_instance'
 		| 'install_existing_instance'
@@ -137,6 +138,13 @@ export async function install_create_modpack_instance(
 	return await invoke<InstallJobSnapshot>('plugin:install|install_create_modpack_instance', {
 		location,
 		postInstallEdit,
+	})
+}
+
+export async function install_shared_instance(sharedInstanceId: string, name: string) {
+	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
+		sharedInstanceId,
+		name,
 	})
 }
 

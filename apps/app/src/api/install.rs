@@ -16,6 +16,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_get_modpack_preview,
             install_create_instance,
             install_create_modpack_instance,
+            install_shared_instance,
             install_import_instance,
             install_duplicate_instance,
             install_existing_instance,
@@ -98,6 +99,15 @@ pub async fn install_create_modpack_instance(
         post_install_edit.map(|edit| edit.into_core()).transpose()?,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn install_shared_instance(
+    shared_instance_id: String,
+    name: String,
+) -> Result<InstallJobSnapshot> {
+    Ok(theseus::instance::install_shared_instance(&shared_instance_id, name)
+        .await?)
 }
 
 #[tauri::command]

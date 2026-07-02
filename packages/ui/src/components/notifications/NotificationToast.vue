@@ -35,20 +35,8 @@
 								>.
 							</template>
 							<template v-else>
-								<span class="inline-flex max-w-full items-center gap-[5px] align-[-4px]">
-									<Avatar
-										:src="entityIconUrl"
-										:alt="entityLabel"
-										size="24px"
-										no-shadow
-										raised
-										:tint-by="entityLabel"
-										class="!rounded-[7px]"
-									/>
-									<span class="min-w-0 truncate font-semibold text-contrast">{{
-										entityLabel
-									}}</span> </span
-								>.
+								<span class="font-semibold text-contrast">{{ entityLabel }}</span>
+								<span> instance.</span>
 							</template>
 						</template>
 					</p>
@@ -247,7 +235,7 @@ const inviteActionText = computed(() => {
 		return 'invited you to manage the server'
 	}
 
-	return 'invited you to play the instance'
+	return 'invited you to'
 })
 
 const resolvedStatusText = computed(() => {

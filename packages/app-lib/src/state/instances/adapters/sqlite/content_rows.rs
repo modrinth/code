@@ -1121,16 +1121,12 @@ pub(crate) async fn upsert_content_update_check(
 }
 
 fn project_type_from_str(value: &str) -> crate::Result<ProjectType> {
-    match value {
-        "mod" => Ok(ProjectType::Mod),
-        "datapack" => Ok(ProjectType::DataPack),
-        "resourcepack" => Ok(ProjectType::ResourcePack),
-        "shader" | "shaderpack" => Ok(ProjectType::ShaderPack),
-        other => Err(crate::ErrorKind::InputError(format!(
-            "Unknown content project type {other}"
+    ProjectType::from_name(value).ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Unknown content project type {value}"
         ))
-        .into()),
-    }
+        .into()
+    })
 }
 
 fn timestamp(value: i64) -> DateTime<Utc> {

@@ -3,7 +3,8 @@ use super::model::{
     InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobSnapshot,
     InstallJobState, InstallJobStatus, InstallPhaseDetails, InstallPhaseId,
     InstallPostInstallEdit, InstallRequest, InstallRollbackState,
-    InstallTarget,
+    InstallTarget, SharedInstanceExternalFileData,
+    SharedInstanceInstallData, SharedInstanceInstallModpack,
 };
 use super::{recovery, store};
 use crate::ErrorKind;
@@ -16,9 +17,10 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
-    ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
+    ContentSetSyncStatus, ContentSourceKind, InstanceInstallStage,
+    InstanceLink, ModLoader, ProjectType, SharedInstanceRole, State,
 };
-use crate::util::fetch::DownloadReason;
+use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use std::collections::HashSet;
 use std::path::PathBuf;
 use uuid::Uuid;
@@ -51,6 +53,12 @@ pub async fn create_modpack_instance(
         post_install_edit,
     })
     .await
+}
+
+pub async fn create_shared_instance(
+    data: SharedInstanceInstallData,
+) -> crate::Result<InstallJobSnapshot> {
+    start(InstallRequest::CreateSharedInstance { data }).await
 }
 
 pub async fn import_instance(
@@ -252,6 +260,48 @@ async fn prepare_initial_instance(
                 preview.loader_version,
                 icon_path,
                 link,
+            )
+            .await?;
+            set_display(
+                job_state,
+                metadata.instance.name,
+                metadata.instance.icon_path,
+            );
+            set_instance_id(job_state, metadata.instance.id);
+        }
+        InstallRequest::CreateSharedInstance { data } => {
+            let (game_version, loader, loader_version, icon_path) =
+                if let Some(modpack) = data.modpack.clone() {
+                    let preview =
+                        get_instance_from_pack(shared_instance_pack_location(
+                            modpack,
+                        ))
+                        .await?;
+                    (
+                        preview.game_version,
+                        preview.modloader,
+                        preview.loader_version,
+                        preview
+                            .icon
+                            .as_ref()
+                            .map(|path| path.to_string_lossy().to_string())
+                            .or_else(|| preview.icon_url.clone()),
+                    )
+                } else {
+                    (
+                        data.game_version.clone(),
+                        data.loader,
+                        data.loader_version.clone(),
+                        None,
+                    )
+                };
+            let metadata = crate::api::instance::create(
+                data.name,
+                game_version,
+                loader,
+                loader_version,
+                icon_path,
+                InstanceLink::SharedInstance,
             )
             .await?;
             set_display(
@@ -469,6 +519,121 @@ async fn run_request(
             )
             .await?;
             apply_post_install_edit(&instance_id, post_install_edit).await?;
+            Ok(Some(instance_id))
+        }
+        InstallRequest::CreateSharedInstance { data } => {
+            let Some(instance_id) = current_instance_id(job_state) else {
+                return Err(crate::ErrorKind::InputError(
+                    "Install job is missing its instance id".to_string(),
+                )
+                .into());
+            };
+            update_progress(
+                job_id,
+                job_state,
+                state,
+                InstallPhaseId::PreparingInstance,
+                InstallPhaseDetails::Instance {
+                    name: data.name.clone(),
+                },
+            )
+            .await?;
+
+            if let Some(modpack) = data.modpack.clone() {
+                let location = shared_instance_pack_location(modpack);
+                update_progress(
+                    job_id,
+                    job_state,
+                    state,
+                    InstallPhaseId::ResolvingPack,
+                    modpack_details(&location),
+                )
+                .await?;
+                install_pack(
+                    job_id,
+                    job_state,
+                    location,
+                    instance_id.clone(),
+                    DownloadReason::Modpack,
+                )
+                .await?;
+            } else {
+                update_progress(
+                    job_id,
+                    job_state,
+                    state,
+                    InstallPhaseId::DownloadingMinecraft,
+                    InstallPhaseDetails::Minecraft {
+                        game_version: data.game_version.clone(),
+                        loader: data.loader,
+                    },
+                )
+                .await?;
+                let context =
+                    crate::state::instances::commands::get_instance_launch_context(
+                        &instance_id,
+                        &state.pool,
+                    )
+                    .await?
+                    .ok_or_else(|| {
+                        crate::ErrorKind::InputError(
+                            "Unknown instance".to_string(),
+                        )
+                    })?;
+                crate::launcher::install_minecraft_with_reporter(
+                    &context,
+                    false,
+                    Some(InstallProgressReporter::new(
+                        job_id,
+                        job_state.clone(),
+                    )),
+                )
+                .await?;
+            }
+
+            if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {
+                update_progress(
+                    job_id,
+                    job_state,
+                    state,
+                    InstallPhaseId::DownloadingContent,
+                    InstallPhaseDetails::Empty,
+                )
+                .await?;
+                for version_id in &data.modrinth_ids {
+                    crate::state::instances::commands::add_project_from_version(
+                        &instance_id,
+                        version_id,
+                        DownloadReason::Standalone,
+                        None,
+                        ContentSourceKind::SharedInstance,
+                        state,
+                    )
+                    .await?;
+                }
+
+                for file in &data.external_files {
+                    install_shared_instance_external_file(
+                        &instance_id,
+                        file,
+                        state,
+                    )
+                    .await?;
+                }
+            }
+
+            crate::state::attach_shared_instance(
+                &instance_id,
+                &data.shared_instance_id,
+                SharedInstanceRole::Member,
+                ContentSetSyncStatus::UpToDate,
+                Some(data.version),
+                Some(data.version),
+                &state.pool,
+            )
+            .await?;
+            emit_instance(&instance_id, InstancePayloadType::Edited).await?;
+
             Ok(Some(instance_id))
         }
         InstallRequest::ImportInstance {
@@ -977,4 +1142,52 @@ fn modpack_details(location: &CreatePackLocation) -> InstallPhaseDetails {
             title: None,
         },
     }
+}
+
+fn shared_instance_pack_location(
+    modpack: SharedInstanceInstallModpack,
+) -> CreatePackLocation {
+    CreatePackLocation::FromVersionId {
+        project_id: modpack.project_id,
+        version_id: modpack.version_id,
+        title: modpack.title,
+        icon_url: modpack.icon_url,
+    }
+}
+
+async fn install_shared_instance_external_file(
+    instance_id: &str,
+    file: &SharedInstanceExternalFileData,
+    state: &State,
+) -> crate::Result<()> {
+    let project_type = ProjectType::from_name(&file.file_type).ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Unknown shared instance file type {}",
+            file.file_type
+        ))
+    })?;
+    let response = REQWEST_CLIENT.get(&file.url).send().await?;
+
+    if !response.status().is_success() {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance external file download failed with status {}",
+            response.status()
+        ))
+        .into());
+    }
+
+    crate::state::instances::commands::add_project_bytes(
+        instance_id,
+        &file.file_name,
+        response.bytes().await?,
+        None,
+        Some(project_type),
+        ContentSourceKind::SharedInstance,
+        None,
+        None,
+        state,
+    )
+    .await?;
+
+    Ok(())
 }

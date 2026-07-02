@@ -64,6 +64,9 @@ pub enum InstallRequest {
         #[serde(default)]
         post_install_edit: Option<InstallPostInstallEdit>,
     },
+    CreateSharedInstance {
+        data: SharedInstanceInstallData,
+    },
     ImportInstance {
         launcher_type: ImportLauncherType,
         base_path: PathBuf,
@@ -96,12 +99,44 @@ pub struct InstallPostInstallEdit {
     pub link: Option<InstanceLink>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceInstallData {
+    pub shared_instance_id: String,
+    pub name: String,
+    pub version: i32,
+    pub modrinth_ids: Vec<String>,
+    #[serde(default)]
+    pub external_files: Vec<SharedInstanceExternalFileData>,
+    pub modpack: Option<SharedInstanceInstallModpack>,
+    pub game_version: String,
+    pub loader: ModLoader,
+    pub loader_version: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceExternalFileData {
+    pub file_name: String,
+    pub file_type: String,
+    pub url: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SharedInstanceInstallModpack {
+    pub project_id: String,
+    pub version_id: String,
+    pub title: String,
+    pub icon_url: Option<String>,
+}
+
 impl InstallRequest {
     pub fn kind(&self) -> InstallJobKind {
         match self {
             Self::CreateInstance { .. } => InstallJobKind::CreateInstance,
             Self::CreateModpackInstance { .. } => {
                 InstallJobKind::CreateModpackInstance
+            }
+            Self::CreateSharedInstance { .. } => {
+                InstallJobKind::CreateSharedInstance
             }
             Self::ImportInstance { .. } => InstallJobKind::ImportInstance,
             Self::DuplicateInstance { .. } => InstallJobKind::DuplicateInstance,
@@ -144,6 +179,7 @@ impl InstallRequest {
 pub enum InstallJobKind {
     CreateInstance,
     CreateModpackInstance,
+    CreateSharedInstance,
     ImportInstance,
     DuplicateInstance,
     InstallExistingInstance,
@@ -155,6 +191,7 @@ impl InstallJobKind {
         match self {
             Self::CreateInstance => "create_instance",
             Self::CreateModpackInstance => "create_modpack_instance",
+            Self::CreateSharedInstance => "create_shared_instance",
             Self::ImportInstance => "import_instance",
             Self::DuplicateInstance => "duplicate_instance",
             Self::InstallExistingInstance => "install_existing_instance",
@@ -167,6 +204,7 @@ impl InstallJobKind {
     pub fn from_stored_str(value: &str) -> Self {
         match value {
             "create_modpack_instance" => Self::CreateModpackInstance,
+            "create_shared_instance" => Self::CreateSharedInstance,
             "import_instance" => Self::ImportInstance,
             "duplicate_instance" => Self::DuplicateInstance,
             "install_existing_instance" => Self::InstallExistingInstance,

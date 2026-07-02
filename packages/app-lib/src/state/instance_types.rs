@@ -186,6 +186,20 @@ impl ProjectType {
         }
     }
 
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "mod" | "mods" => Some(ProjectType::Mod),
+            "datapack" | "datapacks" => Some(ProjectType::DataPack),
+            "resourcepack" | "resourcepacks" => {
+                Some(ProjectType::ResourcePack)
+            }
+            "shader" | "shaderpack" | "shaderpacks" => {
+                Some(ProjectType::ShaderPack)
+            }
+            _ => None,
+        }
+    }
+
     pub fn get_folder(&self) -> &'static str {
         match self {
             ProjectType::Mod => "mods",

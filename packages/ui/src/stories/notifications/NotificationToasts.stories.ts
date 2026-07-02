@@ -60,7 +60,6 @@ export const FigmaExamples: Story = {
 					actor-name="Fetch"
 					:actor-avatar-url="avatarUrl"
 					entity-name="New Creation"
-					:entity-icon-url="instanceIconUrl"
 					@accept="noop"
 					@decline="noop"
 					@dismiss="noop"
