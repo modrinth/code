@@ -3,8 +3,8 @@ use super::model::{
     InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobSnapshot,
     InstallJobState, InstallJobStatus, InstallPhaseDetails, InstallPhaseId,
     InstallPostInstallEdit, InstallRequest, InstallRollbackState,
-    InstallTarget, SharedInstanceExternalFileData,
-    SharedInstanceInstallData, SharedInstanceInstallModpack,
+    InstallTarget, SharedInstanceExternalFileData, SharedInstanceInstallData,
+    SharedInstanceInstallModpack,
 };
 use super::{recovery, store};
 use crate::ErrorKind;
@@ -272,11 +272,10 @@ async fn prepare_initial_instance(
         InstallRequest::CreateSharedInstance { data } => {
             let (game_version, loader, loader_version, icon_path) =
                 if let Some(modpack) = data.modpack.clone() {
-                    let preview =
-                        get_instance_from_pack(shared_instance_pack_location(
-                            modpack,
-                        ))
-                        .await?;
+                    let preview = get_instance_from_pack(
+                        shared_instance_pack_location(modpack),
+                    )
+                    .await?;
                     (
                         preview.game_version,
                         preview.modloader,
@@ -591,7 +590,8 @@ async fn run_request(
                 .await?;
             }
 
-            if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {
+            if !data.modrinth_ids.is_empty() || !data.external_files.is_empty()
+            {
                 update_progress(
                     job_id,
                     job_state,
@@ -1160,12 +1160,13 @@ async fn install_shared_instance_external_file(
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<()> {
-    let project_type = ProjectType::from_name(&file.file_type).ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unknown shared instance file type {}",
-            file.file_type
-        ))
-    })?;
+    let project_type =
+        ProjectType::from_name(&file.file_type).ok_or_else(|| {
+            crate::ErrorKind::InputError(format!(
+                "Unknown shared instance file type {}",
+                file.file_type
+            ))
+        })?;
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
 
     if !response.status().is_success() {

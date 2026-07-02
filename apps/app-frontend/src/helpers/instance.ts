@@ -337,9 +337,7 @@ export type SharedInstanceUsers = {
 	user_ids: string[]
 }
 
-export async function get_shared_instance_users(
-	instanceId: string,
-): Promise<SharedInstanceUsers> {
+export async function get_shared_instance_users(instanceId: string): Promise<SharedInstanceUsers> {
 	return await invoke('plugin:instance|instance_share_get_users', { instanceId })
 }
 

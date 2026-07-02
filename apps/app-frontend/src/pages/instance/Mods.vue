@@ -46,9 +46,7 @@
 					:is-app="true"
 					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
 					:project-icon-url="
-						updatingModpack
-							? displayedModpackProject?.icon_url
-							: updatingProject?.project?.icon_url
+						updatingModpack ? displayedModpackProject?.icon_url : updatingProject?.project?.icon_url
 					"
 					:project-name="
 						updatingModpack

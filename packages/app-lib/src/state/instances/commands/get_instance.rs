@@ -1,7 +1,6 @@
 use crate::state::instances::{
     ContentSet, Instance, InstanceLaunchOverrides, InstanceLink,
-    SharedInstanceAttachment,
-    adapters::sqlite::instance_rows,
+    SharedInstanceAttachment, adapters::sqlite::instance_rows,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;

@@ -93,7 +93,14 @@ export type InstanceLink = InstanceLinkIdentity &
 export type SharedInstanceAttachment = {
 	id: string
 	role: 'owner' | 'member'
-	status: 'unknown' | 'up_to_date' | 'update_available' | 'applying' | 'stale' | 'not_ready' | 'error'
+	status:
+		| 'unknown'
+		| 'up_to_date'
+		| 'update_available'
+		| 'applying'
+		| 'stale'
+		| 'not_ready'
+		| 'error'
 	applied_version?: number | null
 	latest_version?: number | null
 }

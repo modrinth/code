@@ -1,9 +1,8 @@
 #![allow(dead_code)]
 
 use crate::state::instances::{
-    ContentSetSyncStatus,
-    ContentSet, ContentSetStatus, ContentSourceKind, Instance,
-    InstanceLaunchContext, InstanceLaunchOverrides,
+    ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
+    Instance, InstanceLaunchContext, InstanceLaunchOverrides,
     InstanceLaunchOverridesData, InstanceLink, SharedInstanceAttachment,
     SharedInstanceRole, playtime_to_storage,
 };
@@ -1377,10 +1376,8 @@ fn optional_i32(
     value
         .map(|value| {
             value.parse().map_err(|err| {
-                crate::ErrorKind::InputError(format!(
-                    "Invalid {column}: {err}"
-                ))
-                .into()
+                crate::ErrorKind::InputError(format!("Invalid {column}: {err}"))
+                    .into()
             })
         })
         .transpose()

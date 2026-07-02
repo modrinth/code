@@ -106,9 +106,7 @@ const admonitionHeaderMessage = computed(() =>
 		: messages.admonitionHeader,
 )
 const admonitionBodyMessage = computed(() =>
-	props.mode === 'share-instance'
-		? messages.shareInstanceAdmonitionBody
-		: messages.admonitionBody,
+	props.mode === 'share-instance' ? messages.shareInstanceAdmonitionBody : messages.admonitionBody,
 )
 const actionMessage = computed(() =>
 	props.server && props.mode !== 'share-instance' ? messages.header : messages.unlinkButton,

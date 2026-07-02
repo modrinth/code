@@ -1,6 +1,4 @@
-use crate::state::instances::adapters::sqlite::{
-    content_rows, instance_rows,
-};
+use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{
     ContentSetRemoteRef, ContentSetRemoteRefType, ContentSetSyncProvider,
     ContentSetSyncState, ContentSetSyncStatus, SharedInstanceAttachment,
@@ -18,11 +16,12 @@ pub(crate) async fn attach_shared_instance(
     latest_version: Option<i32>,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let metadata = instance_rows::get_instance_metadata_by_id(instance_id, pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+    let metadata =
+        instance_rows::get_instance_metadata_by_id(instance_id, pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError("Unknown instance".to_string())
+            })?;
     let content_set_id = metadata.applied_content_set.id;
     let attachment = SharedInstanceAttachment {
         id: shared_instance_id.to_string(),
@@ -90,11 +89,12 @@ pub(crate) async fn set_shared_instance_sync_status(
     latest_version: Option<i32>,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    let metadata = instance_rows::get_instance_metadata_by_id(instance_id, pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-        })?;
+    let metadata =
+        instance_rows::get_instance_metadata_by_id(instance_id, pool)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError("Unknown instance".to_string())
+            })?;
     let Some(mut attachment) = metadata.shared_instance else {
         return Ok(());
     };
@@ -149,12 +149,12 @@ fn shared_sync_state(
     ContentSetSyncState {
         content_set_id: content_set_id.to_string(),
         provider: ContentSetSyncProvider::SharedInstance,
-        applied_update_id: attachment.applied_version.map(|value| {
-            value.to_string()
-        }),
-        latest_available_update_id: attachment.latest_version.map(|value| {
-            value.to_string()
-        }),
+        applied_update_id: attachment
+            .applied_version
+            .map(|value| value.to_string()),
+        latest_available_update_id: attachment
+            .latest_version
+            .map(|value| value.to_string()),
         checked_at,
         status: attachment.status,
     }

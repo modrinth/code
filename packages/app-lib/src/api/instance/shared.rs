@@ -69,9 +69,10 @@ pub async fn get_shared_instance_users(
     instance_id: &str,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
-    let Some(attachment) = shared_attachment(instance_id, &state).await?
-    else {
-        return Ok(SharedInstanceUsers { user_ids: Vec::new() });
+    let Some(attachment) = shared_attachment(instance_id, &state).await? else {
+        return Ok(SharedInstanceUsers {
+            user_ids: Vec::new(),
+        });
     };
 
     get_remote_users(&attachment.id, &state).await
@@ -155,9 +156,10 @@ pub async fn remove_shared_instance_users(
     user_ids: Vec<String>,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
-    let Some(attachment) = shared_attachment(instance_id, &state).await?
-    else {
-        return Ok(SharedInstanceUsers { user_ids: Vec::new() });
+    let Some(attachment) = shared_attachment(instance_id, &state).await? else {
+        return Ok(SharedInstanceUsers {
+            user_ids: Vec::new(),
+        });
     };
     ensure_owner(&attachment)?;
 
@@ -263,13 +265,14 @@ async fn publish_shared_instance_inner(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    let attachment = shared_attachment(instance_id, state)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Instance is not attached to a shared instance".to_string(),
-            )
-        })?;
+    let attachment =
+        shared_attachment(instance_id, state)
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(
+                    "Instance is not attached to a shared instance".to_string(),
+                )
+            })?;
     ensure_owner(&attachment)?;
     tracing::info!(
         instance_id,
@@ -288,7 +291,8 @@ async fn publish_shared_instance_inner(
     )
     .await?;
 
-    let result = publish_current_content(instance_id, &attachment.id, state).await;
+    let result =
+        publish_current_content(instance_id, &attachment.id, state).await;
 
     match result {
         Ok(version) => {
@@ -412,11 +416,16 @@ async fn collect_publish_content(
     exclude_linked_modpack_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, Vec<ExternalFileCandidate>)> {
-    let items = crate::state::list_content(instance_id, None, None, state)
-        .await?;
+    let items =
+        crate::state::list_content(instance_id, None, None, state).await?;
     let linked_modpack_items = if exclude_linked_modpack_content {
-        crate::state::list_linked_modpack_content(instance_id, None, None, state)
-            .await?
+        crate::state::list_linked_modpack_content(
+            instance_id,
+            None,
+            None,
+            state,
+        )
+        .await?
     } else {
         Vec::new()
     };
@@ -478,8 +487,7 @@ fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
             Some(version_id.clone())
         }
         InstanceLink::ServerProjectModpack {
-            content_version_id,
-            ..
+            content_version_id, ..
         } => Some(content_version_id.clone()),
         _ => None,
     }
@@ -533,7 +541,8 @@ async fn upload_external_files(
             .join(instance_path)
             .join(&candidate.file_path);
         let bytes = crate::util::io::read(path).await?;
-        let response = REQWEST_CLIENT.put(&upload.url).body(bytes).send().await?;
+        let response =
+            REQWEST_CLIENT.put(&upload.url).body(bytes).send().await?;
 
         if !response.status().is_success() {
             return Err(crate::ErrorKind::OtherError(format!(

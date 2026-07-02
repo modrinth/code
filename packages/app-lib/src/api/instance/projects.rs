@@ -124,12 +124,11 @@ pub async fn install_project_with_dependencies(
         .await
         {
             Ok(()) => {
-                if let Err(error) =
-                    super::shared::mark_shared_instance_stale(
-                        &instance_id,
-                        &state,
-                    )
-                    .await
+                if let Err(error) = super::shared::mark_shared_instance_stale(
+                    &instance_id,
+                    &state,
+                )
+                .await
                 {
                     tracing::error!(
                         "Failed to mark shared instance stale after content install: {error}"
@@ -219,13 +218,14 @@ pub async fn add_project_from_path(
     project_type: Option<ProjectType>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    let project_path = crate::state::instances::commands::add_project_from_path(
-        instance_id,
-        path,
-        project_type,
-        &state,
-    )
-    .await?;
+    let project_path =
+        crate::state::instances::commands::add_project_from_path(
+            instance_id,
+            path,
+            project_type,
+            &state,
+        )
+        .await?;
     super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 

@@ -190,9 +190,7 @@ impl ProjectType {
         match name {
             "mod" | "mods" => Some(ProjectType::Mod),
             "datapack" | "datapacks" => Some(ProjectType::DataPack),
-            "resourcepack" | "resourcepacks" => {
-                Some(ProjectType::ResourcePack)
-            }
+            "resourcepack" | "resourcepacks" => Some(ProjectType::ResourcePack),
             "shader" | "shaderpack" | "shaderpacks" => {
                 Some(ProjectType::ShaderPack)
             }

@@ -32,8 +32,8 @@ import {
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
-	StackedAdmonitions,
 	type StackedAdmonitionItem,
+	StackedAdmonitions,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'

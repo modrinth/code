@@ -269,6 +269,18 @@
   "app.install.phase.running_loader_processors": {
     "message": "Running loader processors"
   },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Your local instance is ahead of the users you've shared it with."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Your changes haven't been shared yet"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Push update"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Pushing..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
   },

@@ -762,11 +762,10 @@ pub async fn instance_share_invite_users(
     instance_id: &str,
     user_ids: Vec<String>,
 ) -> Result<theseus::instance::SharedInstanceUsers> {
-    Ok(theseus::instance::invite_shared_instance_users(
-        instance_id,
-        user_ids,
+    Ok(
+        theseus::instance::invite_shared_instance_users(instance_id, user_ids)
+            .await?,
     )
-    .await?)
 }
 
 #[tauri::command]
@@ -774,11 +773,10 @@ pub async fn instance_share_remove_users(
     instance_id: &str,
     user_ids: Vec<String>,
 ) -> Result<theseus::instance::SharedInstanceUsers> {
-    Ok(theseus::instance::remove_shared_instance_users(
-        instance_id,
-        user_ids,
+    Ok(
+        theseus::instance::remove_shared_instance_users(instance_id, user_ids)
+            .await?,
     )
-    .await?)
 }
 
 #[tauri::command]

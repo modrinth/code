@@ -241,6 +241,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
+import { get_user_many } from '@/helpers/cache.js'
 import { friend_listener } from '@/helpers/events.js'
 import {
 	add_friend,
@@ -251,7 +252,6 @@ import {
 	getFriendUserId,
 	upsertCachedFriend,
 } from '@/helpers/friends.ts'
-import { get_user_many } from '@/helpers/cache.js'
 import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
 	edit,

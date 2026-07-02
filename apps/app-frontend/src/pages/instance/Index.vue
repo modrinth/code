@@ -25,7 +25,7 @@
 				<template #title>
 					{{ instance.name }}
 				</template>
-				<template #title-suffix v-if="instance.shared_instance">
+				<template v-if="instance.shared_instance" #title-suffix>
 					<div
 						class="inline-flex h-7 items-center gap-1 rounded-full border border-solid border-blue bg-highlight-blue px-2.5 !text-base !font-normal leading-none text-blue"
 					>

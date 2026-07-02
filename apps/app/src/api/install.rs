@@ -106,8 +106,10 @@ pub async fn install_shared_instance(
     shared_instance_id: String,
     name: String,
 ) -> Result<InstallJobSnapshot> {
-    Ok(theseus::instance::install_shared_instance(&shared_instance_id, name)
-        .await?)
+    Ok(
+        theseus::instance::install_shared_instance(&shared_instance_id, name)
+            .await?,
+    )
 }
 
 #[tauri::command]
