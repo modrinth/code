@@ -112,6 +112,8 @@ export const configuredXss = new FilterXSS({
 					'wsrv.nl',
 					'cf.way2muchnoise.eu',
 					'bstats.org',
+					'cdn.serilum.com',
+					'workflow.serilum.com'
 				]
 
 				const allowedHostnameSuffixes = ['.github.io']
