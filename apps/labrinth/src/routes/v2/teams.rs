@@ -36,7 +36,9 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 	tag = "teams",
     get,
     operation_id = "getProjectTeamMembers",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyTeamMember>),
         (
@@ -82,7 +84,9 @@ pub async fn team_members_get_project(
 	tag = "teams",
     get,
     operation_id = "getTeamMembers",
-    params(("id" = TeamId, Path, description = "The ID of the team")),
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team")
+    ),
 	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyTeamMember>)),
     security(("bearer_auth" = ["PROJECT_READ"]))
 )]
@@ -121,7 +125,9 @@ pub struct TeamIds {
 	tag = "teams",
     get,
     operation_id = "getTeams",
-    params(("ids" = String, Query, description = "The JSON array of team IDs")),
+    params(
+        ("ids" = String, Query, description = "The JSON array of team IDs")
+    ),
 	responses((status = 200, description = "Expected response to a valid request", body = Vec<Vec<LegacyTeamMember>>))
 )]
 #[get("/teams")]
@@ -165,7 +171,9 @@ pub async fn teams_get(
 	tag = "teams",
     post,
     operation_id = "joinTeam",
-    params(("id" = TeamId, Path, description = "The ID of the team")),
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -223,7 +231,9 @@ pub struct NewTeamMember {
 	tag = "teams",
     post,
     operation_id = "addTeamMember",
-    params(("id" = TeamId, Path, description = "The ID of the team")),
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team")
+    ),
     request_body = NewTeamMember,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -284,11 +294,7 @@ pub struct EditTeamMember {
     operation_id = "modifyTeamMember",
     params(
         ("id" = TeamId, Path, description = "The ID of the team"),
-        (
-            "user_id" = UserId,
-            Path,
-            description = "The ID of the user to modify"
-        )
+        ("user_id" = UserId, Path, description = "The ID of the user to modify")
     ),
     request_body = EditTeamMember,
     responses(
@@ -343,7 +349,9 @@ pub struct TransferOwnership {
 	tag = "teams",
     patch,
     operation_id = "transferTeamOwnership",
-    params(("id" = TeamId, Path, description = "The ID of the team")),
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team")
+    ),
     request_body = TransferOwnership,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -390,11 +398,7 @@ pub async fn transfer_ownership(
     operation_id = "deleteTeamMember",
     params(
         ("id" = TeamId, Path, description = "The ID of the team"),
-        (
-            "user_id" = UserId,
-            Path,
-            description = "The ID of the user to remove"
-        )
+        ("user_id" = UserId, Path, description = "The ID of the user to remove")
     ),
     responses(
         (status = 204, description = "Expected response to a valid request"),

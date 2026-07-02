@@ -81,7 +81,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		super::internal::pats::create_pat,
 		super::internal::pats::edit_pat,
 		super::internal::pats::delete_pat,
-		moderation::get_projects,
 		notifications::notifications_get,
 		notifications::notifications_read,
 		notifications::notifications_delete,

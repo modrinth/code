@@ -9,6 +9,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::routes::FileHash;
 use crate::routes::internal::delphi;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
@@ -152,21 +153,9 @@ pub struct UpdateData {
     post,
     operation_id = "v3UpdateFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<VersionId>,
-            Query,
-            description = "Optional version ID when hash maps to multiple files"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     request_body = UpdateData,
     responses(
@@ -286,7 +275,9 @@ pub async fn get_update_from_hash(
 // Requests above with multiple versions below
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileHashes {
+    /// Hash algorithm to use (sha1 or sha512)
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,
 }
 
@@ -795,21 +786,9 @@ pub async fn update_individual_files(
     delete,
     operation_id = "v3DeleteFileFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<VersionId>,
-            Query,
-            description = "Optional version ID to delete from"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID to delete from")
     ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
@@ -984,21 +963,9 @@ pub struct DownloadRedirect {
     get,
     operation_id = "v3DownloadVersionFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<VersionId>,
-            Query,
-            description = "Optional version ID when hash maps to multiple files"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     responses(
         (status = 302, description = "Temporary redirect to file URL", body = DownloadRedirect),

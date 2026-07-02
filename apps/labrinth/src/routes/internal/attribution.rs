@@ -210,7 +210,9 @@ pub async fn scan(
 #[utoipa::path(
 	context_path = "/attribution",
 	tag = "attribution",
-	params(("project_id" = ProjectId, Path)),
+	params(
+		("project_id" = ProjectId, Path)
+	),
 	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
 )]
 #[get("/{project_id}")]

@@ -194,7 +194,9 @@ pub struct ModifyPersonalAccessToken {
 	tag = "personal access tokens",
     patch,
     operation_id = "editPat",
-    params(("id" = String, Path, description = "The PAT ID")),
+    params(
+        ("id" = String, Path, description = "The PAT ID")
+    ),
     responses(
         (status = 204, description = "PAT updated"),
         (status = 400, description = "Invalid input"),
@@ -304,7 +306,9 @@ pub async fn edit_pat(
 	tag = "personal access tokens",
     delete,
     operation_id = "deletePat",
-    params(("id" = String, Path, description = "The PAT ID")),
+    params(
+        ("id" = String, Path, description = "The PAT ID")
+    ),
     responses(
         (status = 204, description = "PAT deleted"),
         (status = 401, description = "Unauthorized")

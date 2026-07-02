@@ -1251,46 +1251,14 @@ pub async fn edit_project_categories(
     get,
     operation_id = "v3SearchProjects",
     params(
-        (
-            "query" = Option<String>,
-            Query,
-            description = "The query to search for"
-        ),
-        (
-            "facets" = Option<String>,
-            Query,
-            description = "Search facets JSON"
-        ),
-        (
-            "filters" = Option<String>,
-            Query,
-            description = "Search filters JSON"
-        ),
-        (
-            "new_filters" = Option<String>,
-            Query,
-            description = "Search filters JSON"
-        ),
-        (
-            "index" = Option<String>,
-            Query,
-            description = "Search index to use"
-        ),
-        (
-            "offset" = Option<String>,
-            Query,
-            description = "Search result offset"
-        ),
-        (
-            "limit" = Option<String>,
-            Query,
-            description = "Maximum number of search results"
-        ),
-        (
-            "version" = Option<String>,
-            Query,
-            description = "Game version to filter for"
-        )
+        ("query" = Option<String>, Query, description = "The query to search for"),
+        ("facets" = Option<String>, Query, description = "Search facets JSON"),
+        ("filters" = Option<String>, Query, description = "Search filters JSON"),
+        ("new_filters" = Option<String>, Query, description = "Search filters JSON"),
+        ("index" = Option<String>, Query, description = "Search index to use"),
+        ("offset" = Option<String>, Query, description = "Search result offset"),
+        ("limit" = Option<String>, Query, description = "Maximum number of search results"),
+        ("version" = Option<String>, Query, description = "Game version to filter for")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = SearchResults),
@@ -1856,7 +1824,9 @@ pub struct Extension {
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
-	params(("ext" = String, Query)),
+	params(
+		("ext" = String, Query)
+	),
 	responses((status = NO_CONTENT))
 )]
 #[patch("/{id}/icon")]
@@ -2547,7 +2517,9 @@ pub struct GalleryDeleteQuery {
 #[utoipa::path(
 	context_path = "/project",
 	tag = "projects",
-	params(("url" = String, Query)),
+	params(
+		("url" = String, Query)
+	),
 	responses((status = NO_CONTENT))
 )]
 #[delete("/{id}/gallery")]

@@ -169,11 +169,7 @@ fn default_true() -> bool {
 	get,
 	params(
 		("ids" = String, Query, description = "The JSON array of version IDs"),
-		(
-			"include_changelog" = Option<bool>,
-			Query,
-			description = "Whether to include changelog fields"
-		)
+		("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
 	),
 	responses((status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>))
 )]
@@ -242,7 +238,9 @@ pub async fn versions_get(
 #[utoipa::path(
 	tag = "versions",
 	get,
-	params(("id" = VersionId, Path, description = "The ID of the version")),
+	params(
+		("id" = VersionId, Path, description = "The ID of the version")
+	),
 	responses(
 		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
 		(
@@ -386,7 +384,9 @@ pub struct EditVersionFileType {
 #[utoipa::path(
 	tag = "versions",
 	patch,
-	params(("id" = VersionId, Path, description = "The ID of the version")),
+	params(
+		("id" = VersionId, Path, description = "The ID of the version")
+	),
 	responses(
 		(status = NO_CONTENT, description = "Expected response to a valid request"),
 		(
@@ -1106,7 +1106,9 @@ pub async fn version_list_internal(
 #[utoipa::path(
 	tag = "versions",
 	delete,
-	params(("id" = VersionId, Path, description = "The ID of the version")),
+	params(
+		("id" = VersionId, Path, description = "The ID of the version")
+	),
 	responses(
 		(status = NO_CONTENT, description = "Expected response to a valid request"),
 		(

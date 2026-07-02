@@ -594,7 +594,9 @@ async fn version_create_inner(
 #[utoipa::path(
 	tag = "versions",
 	post,
-	params(("version_id" = VersionId, Path, description = "The ID of the version")),
+	params(
+		("version_id" = VersionId, Path, description = "The ID of the version")
+	),
 	request_body(
 		content(("multipart/form-data")),
 		description = "Multipart payload containing files to upload"

@@ -76,11 +76,7 @@ fn default_all() -> bool {
     get,
     operation_id = "getOpenReports",
     params(
-        (
-            "count" = Option<u16>,
-            Query,
-            description = "Maximum number of reports to return"
-        )
+        ("count" = Option<u16>, Query, description = "Maximum number of reports to return")
     ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
@@ -139,11 +135,7 @@ pub struct ReportIds {
     get,
     operation_id = "getReports",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of report IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of report IDs")
     ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
@@ -192,7 +184,9 @@ pub async fn reports_get(
 	tag = "reports",
     get,
     operation_id = "getReport",
-    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    params(
+        ("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = LegacyReport),
         (
@@ -241,7 +235,9 @@ pub struct EditReport {
 	tag = "reports",
     patch,
     operation_id = "modifyReport",
-    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    params(
+        ("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")
+    ),
     request_body = EditReport,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -288,7 +284,9 @@ pub async fn report_edit(
 	tag = "reports",
     delete,
     operation_id = "deleteReport",
-    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    params(
+        ("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (

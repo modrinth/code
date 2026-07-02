@@ -166,16 +166,8 @@ pub struct GameVersionQuery {
     get,
     operation_id = "versionList",
     params(
-        (
-            "type" = Option<String>,
-            Query,
-            description = "Optional game version type filter"
-        ),
-        (
-            "major" = Option<bool>,
-            Query,
-            description = "Whether to return only major versions"
-        )
+        ("type" = Option<String>, Query, description = "Optional game version type filter"),
+        ("major" = Option<bool>, Query, description = "Whether to return only major versions")
     ),
     responses(
         (
@@ -292,7 +284,9 @@ pub struct LicenseText {
 	tag = "tags",
     get,
     operation_id = "licenseText",
-    params(("id" = String, Path, description = "The license ID to get the text for")),
+    params(
+        ("id" = String, Path, description = "The license ID to get the text for")
+    ),
     responses(
         (
             status = 200,

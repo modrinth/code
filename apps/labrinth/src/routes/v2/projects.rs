@@ -54,56 +54,16 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     get,
     operation_id = "searchProjects",
     params(
-        (
-            "query" = Option<String>,
-            Query,
-            description = "The query to search for"
-        ),
-        (
-            "facets" = Option<String>,
-            Query,
-            description = "Search facets JSON"
-        ),
-        (
-            "index" = Option<String>,
-            Query,
-            description = "Search index to use"
-        ),
-        (
-            "offset" = Option<String>,
-            Query,
-            description = "Search result offset"
-        ),
-        (
-            "limit" = Option<String>,
-            Query,
-            description = "Maximum number of search results"
-        ),
-        (
-            "show_metadata" = Option<bool>,
-            Query,
-            description = "Whether to include search metadata"
-        ),
-        (
-            "typesense_config" = Option<String>,
-            Query,
-            description = "Typesense request configuration"
-        ),
-        (
-            "new_filters" = Option<String>,
-            Query,
-            description = "Search filters"
-        ),
-        (
-            "filters" = Option<String>,
-            Query,
-            description = "Legacy search filters"
-        ),
-        (
-            "version" = Option<String>,
-            Query,
-            description = "Legacy search version"
-        )
+        ("query" = Option<String>, Query, description = "The query to search for"),
+        ("facets" = Option<String>, Query, description = "Search facets JSON"),
+        ("index" = Option<String>, Query, description = "Search index to use"),
+        ("offset" = Option<String>, Query, description = "Search result offset"),
+        ("limit" = Option<String>, Query, description = "Maximum number of search results"),
+        ("show_metadata" = Option<bool>, Query, description = "Whether to include search metadata"),
+        ("typesense_config" = Option<String>, Query, description = "Typesense request configuration"),
+        ("new_filters" = Option<String>, Query, description = "Search filters"),
+        ("filters" = Option<String>, Query, description = "Legacy search filters"),
+        ("version" = Option<String>, Query, description = "Legacy search version")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = LegacySearchResults),
@@ -213,11 +173,7 @@ pub struct RandomProjects {
     get,
     operation_id = "randomProjects",
     params(
-        (
-            "count" = u32,
-            Query,
-            description = "Number of projects to return"
-        )
+        ("count" = u32, Query, description = "Number of projects to return")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
@@ -257,11 +213,7 @@ pub async fn random_projects_get(
     get,
     operation_id = "getProjects",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of project IDs or slugs"
-        )
+        ("ids" = String, Query, description = "The JSON array of project IDs or slugs")
     ),
     responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>))
 )]
@@ -302,7 +254,9 @@ pub async fn projects_get(
 	tag = "projects",
     get,
     operation_id = "getProject",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = LegacyProject),
         (
@@ -353,7 +307,9 @@ pub async fn project_get(
 	tag = "projects",
     get,
     operation_id = "checkProjectValidity",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = v3::projects::ProjectCheckResponse),
         (
@@ -386,7 +342,9 @@ struct DependencyInfo {
 	tag = "projects",
     get,
     operation_id = "getDependencies",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = DependencyInfo),
         (
@@ -548,7 +506,9 @@ pub struct EditProject {
 	tag = "projects",
     patch,
     operation_id = "modifyProject",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     request_body = EditProject,
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
@@ -808,11 +768,7 @@ pub struct BulkEditProject {
     patch,
     operation_id = "patchProjects",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of project IDs or slugs"
-        )
+        ("ids" = String, Query, description = "The JSON array of project IDs or slugs")
     ),
     request_body = BulkEditProject,
     responses(
@@ -937,11 +893,7 @@ pub struct Extension {
     operation_id = "changeProjectIcon",
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
-        (
-            "ext" = String,
-            Query,
-            description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"
-        )
+        ("ext" = String, Query, description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)")
     ),
     request_body(
         content(
@@ -994,7 +946,9 @@ pub async fn project_icon_edit(
 	tag = "projects",
     delete,
     operation_id = "deleteProjectIcon",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
@@ -1047,31 +1001,11 @@ pub struct GalleryCreateQuery {
     operation_id = "addGalleryImage",
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
-        (
-            "ext" = String,
-            Query,
-            description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"
-        ),
-        (
-            "featured" = bool,
-            Query,
-            description = "Whether this image is featured"
-        ),
-        (
-            "title" = Option<String>,
-            Query,
-            description = "Image title"
-        ),
-        (
-            "description" = Option<String>,
-            Query,
-            description = "Image description"
-        ),
-        (
-            "ordering" = Option<i64>,
-            Query,
-            description = "Image ordering"
-        )
+        ("ext" = String, Query, description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"),
+        ("featured" = bool, Query, description = "Whether this image is featured"),
+        ("title" = Option<String>, Query, description = "Image title"),
+        ("description" = Option<String>, Query, description = "Image description"),
+        ("ordering" = Option<i64>, Query, description = "Image ordering")
     ),
     request_body(
         content(
@@ -1164,26 +1098,10 @@ pub struct GalleryEditQuery {
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
         ("url" = String, Query, description = "URL of the image to edit"),
-        (
-            "featured" = Option<bool>,
-            Query,
-            description = "Whether this image is featured"
-        ),
-        (
-            "title" = Option<Option<String>>,
-            Query,
-            description = "Image title"
-        ),
-        (
-            "description" = Option<Option<String>>,
-            Query,
-            description = "Image description"
-        ),
-        (
-            "ordering" = Option<i64>,
-            Query,
-            description = "Image ordering"
-        )
+        ("featured" = Option<bool>, Query, description = "Whether this image is featured"),
+        ("title" = Option<Option<String>>, Query, description = "Image title"),
+        ("description" = Option<Option<String>>, Query, description = "Image description"),
+        ("ordering" = Option<i64>, Query, description = "Image ordering")
     ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
@@ -1281,7 +1199,9 @@ pub async fn delete_gallery_item(
 	tag = "projects",
     delete,
     operation_id = "deleteProject",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
@@ -1321,7 +1241,9 @@ pub async fn project_delete(
 	tag = "projects",
     post,
     operation_id = "followProject",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
@@ -1352,7 +1274,9 @@ pub async fn project_follow(
 	tag = "projects",
     delete,
     operation_id = "unfollowProject",
-    params(("id" = String, Path, description = "The ID or slug of the project")),
+    params(
+        ("id" = String, Path, description = "The ID or slug of the project")
+    ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),

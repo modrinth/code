@@ -900,7 +900,9 @@ pub enum FormCompletionStatus {
 #[utoipa::path(
 	context_path = "/payout",
 	tag = "payouts",
-	params(("country" = Option<String>, Query)),
+	params(
+		("country" = Option<String>, Query)
+	),
 	responses((status = OK, body = Vec<PayoutMethod>)),
 )]
 #[get("/methods")]

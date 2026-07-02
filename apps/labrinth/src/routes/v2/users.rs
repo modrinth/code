@@ -75,7 +75,9 @@ pub struct UserIds {
 	tag = "users",
     get,
     operation_id = "getUsers",
-    params(("ids" = String, Query, description = "The JSON array of user IDs")),
+    params(
+        ("ids" = String, Query, description = "The JSON array of user IDs")
+    ),
 	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyUser>))
 )]
 #[get("/users")]
@@ -113,7 +115,9 @@ pub async fn users_get(
 	tag = "users",
     get,
     operation_id = "getUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
@@ -150,7 +154,9 @@ pub async fn user_get(
 	tag = "users",
     get,
     operation_id = "getUserProjects",
-    params(("user_id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("user_id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
@@ -217,7 +223,9 @@ pub struct EditUser {
 	tag = "users",
     patch,
     operation_id = "modifyUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     request_body = EditUser,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -275,11 +283,7 @@ pub struct Extension {
     operation_id = "changeUserIcon",
     params(
         ("id" = String, Path, description = "The ID or username of the user"),
-        (
-            "ext" = String,
-            Query,
-            description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"
-        )
+        ("ext" = String, Query, description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)")
     ),
     request_body(
         content(
@@ -334,7 +338,9 @@ pub async fn user_icon_edit(
 	tag = "users",
     delete,
     operation_id = "deleteUserIcon",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
@@ -373,7 +379,9 @@ pub async fn user_icon_delete(
 	tag = "users",
     delete,
     operation_id = "deleteUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -408,7 +416,9 @@ pub async fn user_delete(
 	tag = "users",
     get,
     operation_id = "getFollowedProjects",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
@@ -457,7 +467,9 @@ pub async fn user_follows(
 	tag = "users",
     get,
     operation_id = "getUserNotifications",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
         (

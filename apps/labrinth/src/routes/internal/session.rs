@@ -187,7 +187,9 @@ pub async fn list(
 	tag = "sessions",
     delete,
     operation_id = "deleteSession",
-    params(("id" = String, Path, description = "The session ID")),
+    params(
+        ("id" = String, Path, description = "The session ID")
+    ),
     responses(
         (status = 204, description = "Session deleted"),
         (status = 401, description = "Unauthorized")

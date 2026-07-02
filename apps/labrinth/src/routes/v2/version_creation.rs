@@ -311,7 +311,9 @@ async fn get_example_version_fields(
 	tag = "version creation",
     post,
     operation_id = "addFilesToVersion",
-    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = VersionId, Path, description = "The ID of the version")
+    ),
     request_body(
         content(("multipart/form-data")),
         description = "Multipart payload containing files to upload"

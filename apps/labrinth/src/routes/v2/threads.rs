@@ -25,7 +25,9 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 	tag = "threads",
     get,
     operation_id = "getThread",
-    params(("id" = ThreadId, Path, description = "The ID of the thread")),
+    params(
+        ("id" = ThreadId, Path, description = "The ID of the thread")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Thread),
         (
@@ -58,7 +60,9 @@ pub struct ThreadIds {
 	tag = "threads",
     get,
     operation_id = "getThreads",
-    params(("ids" = String, Query, description = "The JSON array of thread IDs")),
+    params(
+        ("ids" = String, Query, description = "The JSON array of thread IDs")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyThread>),
         (
@@ -110,7 +114,9 @@ pub struct NewThreadMessage {
 	tag = "threads",
     post,
     operation_id = "sendThreadMessage",
-    params(("id" = ThreadId, Path, description = "The ID of the thread")),
+    params(
+        ("id" = ThreadId, Path, description = "The ID of the thread")
+    ),
     request_body = NewThreadMessage,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -153,7 +159,9 @@ pub async fn thread_send_message(
 	tag = "threads",
     delete,
     operation_id = "deleteThreadMessage",
-    params(("id" = ThreadMessageId, Path, description = "The ID of the message")),
+    params(
+        ("id" = ThreadMessageId, Path, description = "The ID of the message")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (

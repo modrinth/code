@@ -51,46 +51,14 @@ fn default_true() -> bool {
     get,
     operation_id = "getProjectVersions",
     params(
-        (
-            "project_id" = String,
-            Path,
-            description = "The ID or slug of the project"
-        ),
-        (
-            "loaders" = Option<String>,
-            Query,
-            description = "JSON array of loaders to filter by"
-        ),
-        (
-            "game_versions" = Option<String>,
-            Query,
-            description = "JSON array of game versions to filter by"
-        ),
-        (
-            "featured" = Option<bool>,
-            Query,
-            description = "Filter by featured status"
-        ),
-        (
-            "version_type" = Option<VersionType>,
-            Query,
-            description = "Filter by version type"
-        ),
-        (
-            "limit" = Option<usize>,
-            Query,
-            description = "Maximum number of versions"
-        ),
-        (
-            "offset" = Option<usize>,
-            Query,
-            description = "Version offset"
-        ),
-        (
-            "include_changelog" = Option<bool>,
-            Query,
-            description = "Whether to include changelog fields"
-        )
+        ("project_id" = String, Path, description = "The ID or slug of the project"),
+        ("loaders" = Option<String>, Query, description = "JSON array of loaders to filter by"),
+        ("game_versions" = Option<String>, Query, description = "JSON array of game versions to filter by"),
+        ("featured" = Option<bool>, Query, description = "Filter by featured status"),
+        ("version_type" = Option<VersionType>, Query, description = "Filter by version type"),
+        ("limit" = Option<usize>, Query, description = "Maximum number of versions"),
+        ("offset" = Option<usize>, Query, description = "Version offset"),
+        ("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>),
@@ -193,16 +161,8 @@ pub async fn version_list(
     get,
     operation_id = "getVersionFromIdOrNumber",
     params(
-        (
-            "project_id" = String,
-            Path,
-            description = "The ID or slug of the project"
-        ),
-        (
-            "slug" = String,
-            Path,
-            description = "The version ID or version number"
-        )
+        ("project_id" = String, Path, description = "The ID or slug of the project"),
+        ("slug" = String, Path, description = "The version ID or version number")
     ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
@@ -255,13 +215,9 @@ pub struct VersionIds {
     get,
     operation_id = "getVersions",
     params(
-		("ids" = String, Query, description = "The JSON array of version IDs"),
-		(
-			"include_changelog" = Option<bool>,
-			Query,
-			description = "Whether to include changelog fields"
-		)
-	),
+        ("ids" = String, Query, description = "The JSON array of version IDs"),
+        ("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
+    ),
     responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>))
 )]
 #[get("/versions")]
@@ -307,7 +263,9 @@ pub async fn versions_get(
 	tag = "versions",
     get,
     operation_id = "getVersion",
-    params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = models::ids::VersionId, Path, description = "The ID of the version")
+    ),
     responses(
         (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
@@ -388,7 +346,9 @@ pub struct EditVersionFileType {
 	tag = "versions",
     patch,
     operation_id = "modifyVersion",
-    params(("id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("id" = VersionId, Path, description = "The ID of the version")
+    ),
     request_body = EditVersion,
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
@@ -505,7 +465,9 @@ pub async fn version_edit(
 	tag = "versions",
     delete,
     operation_id = "deleteVersion",
-    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = VersionId, Path, description = "The ID of the version")
+    ),
     responses(
         (status = NO_CONTENT, description = "Expected response to a valid request"),
         (

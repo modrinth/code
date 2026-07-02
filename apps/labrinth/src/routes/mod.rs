@@ -9,9 +9,7 @@ use actix_web::{HttpResponse, web};
 use futures::FutureExt;
 use serde_json::json;
 use utoipa::openapi::extensions::ExtensionsBuilder;
-use utoipa::openapi::security::{
-	HttpAuthScheme, HttpBuilder, SecurityScheme,
-};
+use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 
 pub mod debug;
 pub mod internal;
@@ -27,44 +25,65 @@ mod updates;
 
 pub use self::not_found::not_found;
 
+/// A sha1 or sha512 hash.
+pub struct FileHash(pub String);
+
+impl utoipa::PartialSchema for FileHash {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .schema_type(utoipa::openapi::schema::Type::String)
+            .min_length(Some(40))
+            .max_length(Some(128))
+            .pattern(Some("^([A-Fa-f0-9]{40}|[A-Fa-f0-9]{128})$"))
+            .examples([serde_json::json!(
+                "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"
+            )])
+            .description(Some("A sha1 or sha512 hash."))
+            .build()
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for FileHash {}
+
 pub(crate) fn prefix_openapi_paths(
-	openapi: &mut utoipa::openapi::OpenApi,
-	prefix: &str,
-	should_skip: impl Fn(&str) -> bool,
+    openapi: &mut utoipa::openapi::OpenApi,
+    prefix: &str,
+    should_skip: impl Fn(&str) -> bool,
 ) {
-	let paths = std::mem::take(&mut openapi.paths.paths);
-	openapi.paths.paths = paths
-		.into_iter()
-		.map(|(path, item)| {
-			if should_skip(&path) || path.starts_with(prefix) {
-				(path, item)
-			} else {
-				(format!("{prefix}{}", normalize_openapi_path(&path)), item)
-			}
-		})
-		.collect();
+    let paths = std::mem::take(&mut openapi.paths.paths);
+    openapi.paths.paths = paths
+        .into_iter()
+        .map(|(path, item)| {
+            if should_skip(&path) || path.starts_with(prefix) {
+                (path, item)
+            } else {
+                (format!("{prefix}{}", normalize_openapi_path(&path)), item)
+            }
+        })
+        .collect();
 }
 
 fn normalize_openapi_path(path: &str) -> String {
-	if path.starts_with('/') {
-		path.to_string()
-	} else {
-		format!("/{path}")
-	}
+    if path.starts_with('/') {
+        path.to_string()
+    } else {
+        format!("/{path}")
+    }
 }
 
 pub(crate) struct SecurityAddon;
 
 impl utoipa::Modify for SecurityAddon {
-	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-		let components = openapi.components.as_mut().unwrap();
-		let mut bearer_auth = HttpBuilder::new()
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let components = openapi.components.as_mut().unwrap();
+        let mut bearer_auth = HttpBuilder::new()
 			.scheme(HttpAuthScheme::Bearer)
 			.description(Some(
 				"Use a personal access token. Example: `mrp_RNtLRSPmGj2pd1v1ubi52nX7TJJM9sznrmwhAuj511oe4t1jAqAQ3D6Wc8Ic`.",
 			))
 			.build();
-		bearer_auth.extensions = Some(
+        bearer_auth.extensions = Some(
 			ExtensionsBuilder::new()
 				.add(
 					"x-example",
@@ -73,11 +92,11 @@ impl utoipa::Modify for SecurityAddon {
 				.build(),
 		);
 
-		components.add_security_scheme(
-			"bearer_auth",
-			SecurityScheme::Http(bearer_auth),
-		);
-	}
+        components.add_security_scheme(
+            "bearer_auth",
+            SecurityScheme::Http(bearer_auth),
+        );
+    }
 }
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {

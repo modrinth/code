@@ -29,11 +29,7 @@ fn default_count() -> u16 {
     get,
     operation_id = "getModerationProjects",
     params(
-        (
-            "count" = Option<u16>,
-            Query,
-            description = "Maximum number of projects to return"
-        )
+        ("count" = Option<u16>, Query, description = "Maximum number of projects to return")
     ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),

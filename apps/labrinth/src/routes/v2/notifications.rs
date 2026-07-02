@@ -33,11 +33,7 @@ pub struct NotificationIds {
     get,
     operation_id = "getNotifications",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of notification IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of notification IDs")
     ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
@@ -87,7 +83,9 @@ pub async fn notifications_get(
 	tag = "notifications",
     get,
     operation_id = "getNotification",
-    params(("id" = NotificationId, Path, description = "The ID of the notification")),
+    params(
+        ("id" = NotificationId, Path, description = "The ID of the notification")
+    ),
     responses(
 		(status = 200, description = "Expected response to a valid request", body = LegacyNotification),
         (
@@ -133,7 +131,9 @@ pub async fn notification_get(
 	tag = "notifications",
     patch,
     operation_id = "readNotification",
-    params(("id" = NotificationId, Path, description = "The ID of the notification")),
+    params(
+        ("id" = NotificationId, Path, description = "The ID of the notification")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -167,7 +167,9 @@ pub async fn notification_read(
 	tag = "notifications",
     delete,
     operation_id = "deleteNotification",
-    params(("id" = NotificationId, Path, description = "The ID of the notification")),
+    params(
+        ("id" = NotificationId, Path, description = "The ID of the notification")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -207,11 +209,7 @@ pub async fn notification_delete(
     patch,
     operation_id = "readNotifications",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of notification IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of notification IDs")
     ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -252,11 +250,7 @@ pub async fn notifications_read(
     delete,
     operation_id = "deleteNotifications",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of notification IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of notification IDs")
     ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
