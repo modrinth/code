@@ -60,6 +60,23 @@ export interface SharedInstanceExternalFilePreview {
 	fileType: string
 }
 
+export interface SharedInstanceUpdatePreview {
+	sharedInstanceId: string
+	currentVersion?: number | null
+	latestVersion: number
+	updateAvailable: boolean
+	diffs: SharedInstanceUpdateDiff[]
+}
+
+export interface SharedInstanceUpdateDiff {
+	type: 'added' | 'removed' | 'updated'
+	projectId?: string | null
+	projectName?: string | null
+	fileName?: string | null
+	currentVersionName?: string | null
+	newVersionName?: string | null
+}
+
 export type InstallJobStatus =
 	| 'queued'
 	| 'running'
@@ -108,6 +125,7 @@ export interface InstallJobSnapshot {
 		| 'create_instance'
 		| 'create_modpack_instance'
 		| 'create_shared_instance'
+		| 'update_shared_instance'
 		| 'import_instance'
 		| 'duplicate_instance'
 		| 'install_existing_instance'
@@ -167,10 +185,25 @@ export async function install_get_shared_instance_preview(sharedInstanceId: stri
 	)
 }
 
+export async function install_get_shared_instance_update_preview(instanceId: string) {
+	return await invoke<SharedInstanceUpdatePreview | null>(
+		'plugin:install|install_get_shared_instance_update_preview',
+		{
+			instanceId,
+		},
+	)
+}
+
 export async function install_shared_instance(sharedInstanceId: string, name: string) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
 		name,
+	})
+}
+
+export async function install_update_shared_instance(instanceId: string) {
+	return await invoke<InstallJobSnapshot>('plugin:install|install_update_shared_instance', {
+		instanceId,
 	})
 }
 

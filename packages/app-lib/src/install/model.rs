@@ -85,6 +85,10 @@ pub enum InstallRequest {
         #[serde(default)]
         post_install_edit: Option<InstallPostInstallEdit>,
     },
+    UpdateSharedInstance {
+        instance_id: String,
+        data: SharedInstanceInstallData,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -146,13 +150,17 @@ impl InstallRequest {
             Self::InstallPackToExistingInstance { .. } => {
                 InstallJobKind::InstallPackToExistingInstance
             }
+            Self::UpdateSharedInstance { .. } => {
+                InstallJobKind::UpdateSharedInstance
+            }
         }
     }
 
     pub fn target(&self) -> InstallTarget {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
-            | Self::InstallPackToExistingInstance { instance_id, .. } => {
+            | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallTarget::ExistingInstance {
                     instance_id: instance_id.clone(),
                 }
@@ -164,7 +172,8 @@ impl InstallRequest {
     pub fn cleanup(&self) -> InstallCleanup {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
-            | Self::InstallPackToExistingInstance { instance_id, .. } => {
+            | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallCleanup::RestoreExistingInstance {
                     instance_id: instance_id.clone(),
                 }
@@ -184,6 +193,7 @@ pub enum InstallJobKind {
     DuplicateInstance,
     InstallExistingInstance,
     InstallPackToExistingInstance,
+    UpdateSharedInstance,
 }
 
 impl InstallJobKind {
@@ -198,6 +208,7 @@ impl InstallJobKind {
             Self::InstallPackToExistingInstance => {
                 "install_pack_to_existing_instance"
             }
+            Self::UpdateSharedInstance => "update_shared_instance",
         }
     }
 
@@ -211,6 +222,7 @@ impl InstallJobKind {
             "install_pack_to_existing_instance" => {
                 Self::InstallPackToExistingInstance
             }
+            "update_shared_instance" => Self::UpdateSharedInstance,
             _ => Self::CreateInstance,
         }
     }

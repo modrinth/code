@@ -6,7 +6,9 @@ use theseus::data::ModLoader;
 use theseus::install::{
     InstallJobSnapshot, InstallModpackPreview, InstallPostInstallEdit,
 };
-use theseus::instance::SharedInstanceInstallPreview;
+use theseus::instance::{
+    SharedInstanceInstallPreview, SharedInstanceUpdatePreview,
+};
 use theseus::pack::import::ImportLauncherType;
 use theseus::pack::install_from::CreatePackLocation;
 use uuid::Uuid;
@@ -18,7 +20,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_create_instance,
             install_create_modpack_instance,
             install_get_shared_instance_preview,
+            install_get_shared_instance_update_preview,
             install_shared_instance,
+            install_update_shared_instance,
             install_import_instance,
             install_duplicate_instance,
             install_existing_instance,
@@ -116,6 +120,16 @@ pub async fn install_get_shared_instance_preview(
 }
 
 #[tauri::command]
+pub async fn install_get_shared_instance_update_preview(
+    instance_id: String,
+) -> Result<Option<SharedInstanceUpdatePreview>> {
+    Ok(
+        theseus::instance::get_shared_instance_update_preview(&instance_id)
+            .await?,
+    )
+}
+
+#[tauri::command]
 pub async fn install_shared_instance(
     shared_instance_id: String,
     name: String,
@@ -124,6 +138,13 @@ pub async fn install_shared_instance(
         theseus::instance::install_shared_instance(&shared_instance_id, name)
             .await?,
     )
+}
+
+#[tauri::command]
+pub async fn install_update_shared_instance(
+    instance_id: String,
+) -> Result<InstallJobSnapshot> {
+    Ok(theseus::instance::update_shared_instance(&instance_id).await?)
 }
 
 #[tauri::command]

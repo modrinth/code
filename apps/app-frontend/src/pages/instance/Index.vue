@@ -354,7 +354,11 @@ import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
-import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
+import {
+	install_existing_instance,
+	install_get_shared_instance_update_preview,
+	install_pack_to_existing_instance,
+} from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
@@ -612,13 +616,7 @@ if (instance.value) {
 
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
-const startInstance = async (context: string) => {
-	if (!instance.value) return
-	if (updateToPlayModal.value?.hasUpdate) {
-		updateToPlayModal.value.show(instance.value)
-		return
-	}
-
+const launchInstance = async (context: string) => {
 	loading.value = true
 	try {
 		await run(route.params.id as string)
@@ -628,11 +626,40 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
+	if (!instance.value) return
 	trackEvent('InstanceStart', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
 	})
+}
+
+const startInstance = async (context: string) => {
+	if (!instance.value) return
+	if (instance.value.shared_instance?.role === 'member') {
+		let preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
+		try {
+			preview = await install_get_shared_instance_update_preview(instance.value.id)
+		} catch (error) {
+			handleError(error as Error)
+			return
+		}
+
+		if (preview?.updateAvailable) {
+			updateToPlayModal.value?.showSharedInstance(instance.value, preview, async () => {
+				await fetchInstance()
+				await launchInstance(context)
+			})
+			return
+		}
+	}
+
+	if (updateToPlayModal.value?.hasUpdate) {
+		updateToPlayModal.value.show(instance.value)
+		return
+	}
+
+	await launchInstance(context)
 }
 
 const stopInstance = async (context: string) => {

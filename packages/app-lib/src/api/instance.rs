@@ -36,8 +36,10 @@ pub use self::run::{
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceUsers, get_shared_instance_install_preview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUsers,
+    get_shared_instance_install_preview, get_shared_instance_update_preview,
     get_shared_instance_users, install_shared_instance,
     invite_shared_instance_users, publish_shared_instance,
-    remove_shared_instance_users,
+    remove_shared_instance_users, update_shared_instance,
 };
