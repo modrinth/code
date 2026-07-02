@@ -254,50 +254,20 @@
   "auth.reset-password.title.long": {
     "message": "Nulstil din adgangskode"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Indtast en to-faktor-kode for at fortsætte."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Indtast to-faktor-kode"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Indtast kode..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Glemt adgangskode?</forgot-password-link> • <create-account-link>Opret en konto</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Log ind med"
   },
   "auth.sign-in.title": {
     "message": "Log ind"
   },
-  "auth.sign-in.use-password": {
-    "message": "Eller brug en adgangskode"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Opret konto"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ved at oprette en konto, accepterer du Modrinth's <terms-link>Vilkår</terms-link> og <privacy-policy-link>Privatlivspolitik</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Adgangskoderne er ikke ens!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du allerede en konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Abonner på opdateringer om Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Tilmeld"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Eller opret en konto selv"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Tilmeld dig med"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoindstillinger"
@@ -328,21 +298,6 @@
   },
   "auth.verify-email.title": {
     "message": "Bekræft E-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Abonner på opdateringer om Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Du er nu en del af det awesome fællesskab og skabere og udforskere der allerede bygger, downloader, og forbliver opdateret med fantastiske mods."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Ved at oprette en konto, accepterer du Modrinth's <terms-link>Vilkår</terms-link> og <privacy-policy-link>Privatlivspolitik</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Velkommen til Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Velkommen"
   },
   "collection.button.edit-icon": {
     "message": "Rediger ikon"
@@ -946,9 +901,6 @@
   },
   "frog.title": {
     "message": "Frø"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Tilgængelig i Nord Amerika, Europa, og Sydøst Asien for bred dækning."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Betal hvert måned"

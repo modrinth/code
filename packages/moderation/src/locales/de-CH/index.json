@@ -65,6 +65,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Gallerie-Seite besuchen"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Dein(e) {type} verwendet eine Lizenz, die es erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede weitere Version einen Quellcode-Link oder eine Quelldatei an, oder ziehe in Betracht, eine andere Lizenz zu verwenden."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
   },
@@ -72,7 +75,7 @@
     "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem richtigen Linktyp eingegeben werden."
   },
   "nags.identical-links.title": {
-    "defaultMessage": "Doppelte Links löschen"
+    "defaultMessage": "Identische Links bereinigen"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Deine Beschreibung sollte genügend normalen Text und Alt-Text für Bilder enthalten, damit es für Benutzer mit Bildschirmleseprogrammen oder langsamem Internet verfügbar ist."
@@ -137,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Stelle sicher, dass du einen Nachweis über deine Berechtigung zur Verbreitung externer Inhalte in deinem Modpack hinterlegt hast."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Externe Berechtigungen überprüfen"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Wähle, welche Versionen dein Server unterstützt, wähle ein Modpack, oder lade dein eigenes hoch."
   },
@@ -154,6 +163,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Wähle eine Sprache aus"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Wähle die Lizenz aus, unter der dein(e) {type} verbreitet wird."
   },
   "nags.select-license.title": {
     "defaultMessage": "Wähle eine Lizenz aus"
@@ -175,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Link-Einstellungen ansehen"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Berechtigung-Dashboard besuchen"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Tag-Einstellungen ansehen"
@@ -217,6 +232,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wähle akkurate Tags aus"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Es wird mindestens ein Galeriebild benötigt, um den Inhalt deines/deiner {type} zu präsentieren."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "Resource Pack, ausgenommen Audio- oder Lokalisierungs-Packs. Wenn dies auf dein Pack zutrifft, wähle bitte das entsprechende Tag aus"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Lade ein Galeriebild hoch"

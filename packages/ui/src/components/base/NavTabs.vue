@@ -300,8 +300,6 @@ watch(
 watch(
 	() => props.links,
 	async () => {
-		sliderReady.value = false
-		transitionsEnabled.value = false
 		await nextTick()
 		updateActiveTab()
 	},

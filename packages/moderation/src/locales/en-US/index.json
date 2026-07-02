@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Add a Java address"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Add a valid URL and name or SPDX identifier for your custom license."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Add license details"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite."
   },
@@ -140,6 +146,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Make sure you have provided proof of your permission to distribute any external content in your Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Review external permissions"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Select what versions your server supports, choose a Modpack, or upload your own."
   },
@@ -181,6 +193,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Visit links settings"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visit permissions dashboard"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Visit tag settings"

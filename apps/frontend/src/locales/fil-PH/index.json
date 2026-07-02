@@ -80,6 +80,9 @@
   "analytics.chart.controls.ratio": {
     "message": "Ratio"
   },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Naka-pin"
+  },
   "analytics.chart.tooltip.total": {
     "message": "Kabuoan"
   },
@@ -91,6 +94,9 @@
   },
   "analytics.chart.view.line": {
     "message": "Line"
+  },
+  "analytics.download-reason.update": {
+    "message": "Pag-update"
   },
   "analytics.filter.game-version-type.all": {
     "message": "Lahat"
@@ -119,6 +125,9 @@
   "analytics.project-status.draft": {
     "message": "Burador"
   },
+  "analytics.project-status.other": {
+    "message": "Iba pa"
+  },
   "analytics.stat.unavailable": {
     "message": "N/A"
   },
@@ -127,6 +136,9 @@
   },
   "analytics.value.none": {
     "message": "Wala"
+  },
+  "analytics.value.other": {
+    "message": "Iba pa"
   },
   "app-marketing.download.description": {
     "message": "Magagamit ang aming desktop app sa iba’t-ibang plataporma, piliin ang iyong gugustohing bersiyon."
@@ -374,50 +386,20 @@
   "auth.reset-password.title.long": {
     "message": "Baguhin ang iyong password"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Pakilagay ng two-factor code upang makapagpatuloy."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Ilagay ang two-factor code"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Ilagay ang code..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Lumikha ng account</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Mag-sign in gamit ang"
   },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
   },
-  "auth.sign-in.use-password": {
-    "message": "O gamitin ang password"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Lumikha ng account"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Sa paggawa ng account, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hindi magkatugma ang mga password!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Mayroon ka nang account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Mag-subscribe ukol sa mga update sa Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Mag-sign Up"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "O sariling lumkiha account"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Mag-sign up gamit ang"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
@@ -448,21 +430,6 @@
   },
   "auth.verify-email.title": {
     "message": "Patunayan ang Email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Mag-subscribe ukol sa mga update ng Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Sa paggawa ng account, sumang-ayon ka na sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Maligayang pagdating sa Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Maligayang Pagdating"
   },
   "collection.button.edit-icon": {
     "message": "Baguhin ang ikono"
@@ -523,6 +490,9 @@
   },
   "collection.title": {
     "message": "{name} - Koleksiyon"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Tanggihan"
   },
   "conversation-thread.action.reply": {
     "message": "Tugunan"
@@ -1004,6 +974,9 @@
   "dashboard.notifications.link.view-history": {
     "message": "Tingnan ang kasaysayan ng notipikasyon"
   },
+  "dashboard.notifications.link.view-more": {
+    "message": "Tingnan ang {extraNotifs} pang {extraNotifs, plural, other {notipikasyon}}"
+  },
   "dashboard.organizations.button.create": {
     "message": "Lumikha ng organisasyon"
   },
@@ -1024,18 +997,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Pakisuri sa metadata sa environment"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Pangalan"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Estado"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Uri"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikono"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -1315,9 +1276,6 @@
   },
   "frog.title": {
     "message": "Palaka"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Magagamit sa Hilagang Amerika, Yuropa, at Timog-Silangang Asya para sa malawakang abot."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Buwanang pagbayad"
@@ -1708,6 +1666,9 @@
   },
   "layout.banner.build-fail.description": {
     "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estado galing sa API. Maaaring dahil ito sa isang kawalan o kamalian sa kumpigurasyon. Muling magpatayo kapag magagamit na muli ang API. Mga code ng kamalian: {errors}; Ang kasalukuyang URL ng API ay: {url}"
+  },
+  "layout.banner.build-fail.ignore": {
+    "message": "Baliwalain"
   },
   "layout.banner.build-fail.title": {
     "message": "Error sa pagbubuo ng estado galing sa API habang nagpapatayo."
@@ -2599,9 +2560,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Kung magsasama ka ng mga kontentong hindi naka-host sa Modrinth, kailangan niyong ipaalam sa amin sa pinanggalingan nito at matiyak na pinahintulutang mapakalat ang mga file. Tingnan ang <link>aming gabay</link> upang matuto kung papaano ito magawa nang maayos!"
   },
   "project.settings.title": {
     "message": "Mga Setting"

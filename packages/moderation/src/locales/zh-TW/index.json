@@ -29,11 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "你選擇了全部 {totalAvailableTags, plural, other {# 個可用標籤}}。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "您的描述目前長度為 {length, plural, one {# 個可閱讀字元} other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, one {# 個字元} other {# 個字元}}，以建立清晰且資訊完整的描述。"
+    "defaultMessage": "你的描述目前長度為 {length, plural, other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, other {# 個字元}}，以建立清晰且資訊完整的描述。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -62,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "前往圖庫頁面"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "你的{type}使用的授權條款要求必須提供原始碼。請為每個額外版本提供原始碼連結或原始碼檔案，或是考慮使用不同的授權條款。"
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
   "nags.identical-links.description": {
     "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應輸入一次，並選擇正確的連結類型。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "清理重複連結"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
@@ -93,7 +102,7 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# 個標題} other {# 個標題}} 在您的描述中長度過長。標題應簡潔扼要，作為章節的標題即可，不應使用完整句子。"
+    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}字數過多。標題的作用是作為章節標題，應保持簡潔，避免使用完整的長句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "標題請簡短扼要"
@@ -125,8 +134,17 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "檢查回饋"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "你選擇了 {count, plural, other {# 個解析度標籤}} ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "請確保你提供了證據證明你有權在模組包中發布任何外部內容。"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "審查外部內容授權"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "選擇你的伺服器支援的版本、挑選一個模組包，或是上傳你自己的檔案。"
@@ -145,6 +163,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "選擇語言"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "請選擇你的{type}採用的授權條款。"
   },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
@@ -166,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "前往連結設定"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "前往授權資訊主頁"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "前往標籤設定"
@@ -197,11 +221,23 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請減少到 {maxTagCount} 個或更少，以確保你的伺服器出現在相關的搜尋結果中。"
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "選擇精確的標籤"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請考慮減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "你的{type}至少需要一張圖庫圖片，以展示其內容。"
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "資源包（音效包或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"
@@ -225,3 +261,4 @@
     "defaultMessage": "前往連結設定"
   }
 }
+

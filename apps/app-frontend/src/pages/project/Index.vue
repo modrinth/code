@@ -304,21 +304,20 @@ import {
 	get_version_many,
 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
-import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
 	get_projects as getInstanceProjects,
 	kill,
 	list as listInstances,
-} from '@/helpers/profile'
+} from '@/helpers/instance'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
+import { getServerAddress, getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -406,6 +405,20 @@ function buildProjectHref(path, extraQuery = {}) {
 	return qs ? `${path}?${qs}` : path
 }
 
+function buildBrowseHref(path) {
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(route.query)) {
+		if (key === 'b') continue
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${path}?${qs}` : path
+}
+
 const projectDescriptionHref = computed(() => buildProjectHref(`/project/${route.params.id}`))
 const versionsHref = computed(() =>
 	buildProjectHref(`/project/${route.params.id}/versions`, instanceFilters.value),
@@ -416,7 +429,7 @@ const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b
 	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
 	const type = data.value?.project_type ? `${data.value.project_type}` : 'mod'
-	return `/browse/${type}`
+	return buildBrowseHref(`/browse/${type}`)
 })
 
 const projectInstallContext = computed(() => {
@@ -515,10 +528,10 @@ async function handleClickPlay() {
 async function updateServerPlayState() {
 	if (!isServerProject.value || !data.value) return
 	const packs = await listInstances()
-	const inst = packs.find((p) => p.linked_data?.project_id === data.value.id)
+	const inst = packs.find((p) => p.link?.project_id === data.value.id)
 	if (inst) {
-		serverInstancePath.value = inst.path
-		const processes = await get_by_profile_path(inst.path).catch(() => [])
+		serverInstancePath.value = inst.id
+		const processes = await get_by_instance_id(inst.id).catch(() => [])
 		serverPlaying.value = Array.isArray(processes) && processes.length > 0
 	} else {
 		serverInstancePath.value = null
@@ -648,7 +661,7 @@ process_listener((e) => {
 	if (
 		e.event === 'finished' &&
 		serverInstancePath.value &&
-		e.profile_path_id === serverInstancePath.value
+		e.instance_id === serverInstancePath.value
 	) {
 		serverPlaying.value = false
 	}
@@ -723,12 +736,13 @@ async function install(version) {
 	await installVersion(
 		data.value.id,
 		version,
-		instance.value ? instance.value.path : null,
+		instance.value ? instance.value.id : null,
 		'ProjectPage',
-		(version) => {
+		(version, installedProjectIds) => {
 			installing.value = false
 
-			if (instance.value && version) {
+			const installedIds = installedProjectIds ?? [data.value.id]
+			if (instance.value && version && installedIds.includes(data.value.id)) {
 				installed.value = true
 				installedVersion.value = version
 			}

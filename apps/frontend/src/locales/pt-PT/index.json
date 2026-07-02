@@ -254,50 +254,20 @@
   "auth.reset-password.title.long": {
     "message": "Redefine a tua palavra-passe"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Insere um código de dois fatores para continuar."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Autenticação de dois fatores"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Inserir código..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Esqueceste-te da palavra-passe?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Iniciar sessão com"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sessão"
   },
-  "auth.sign-in.use-password": {
-    "message": "Ou utiliza uma palavra-passe"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Criar conta"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ao criares uma conta, concordas com os <terms-link>Termos</terms-link> e com a <privacy-policy-link>Política de Privacidade </privacy-policy-link> do Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "As palavras-passe não coincidem!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Já tens uma conta?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Receber novidades sobre o Modrinth por e-mail"
-  },
   "auth.sign-up.title": {
     "message": "Criar conta"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Ou cria uma conta tu mesmo"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Criar conta com"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Definições de conta"
@@ -328,21 +298,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar E-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Receber novidades sobre o Modrinth por e-mail"
-  },
-  "auth.welcome.description": {
-    "message": "Agora fazes parte da incrível comunidade de criadores e exploradores que criam, transferem e se mantêm atualizados com mods fantásticos."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Ao criares uma conta, concordas com os <terms-link>Termos</terms-link> e com a <privacy-policy-link>Política de Privacidade </privacy-policy-link> do Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Bem-vindo(a) ao Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Boas-vindas"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
@@ -430,6 +385,9 @@
   },
   "create.collection.title": {
     "message": "Criar uma coleção"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Estás prestes a atingir o limite de {typePlural}, por favor contacta o suporte se precisas de mais do que {max} {typePlural}."
   },
   "create.limit-alert.contact-support": {
     "message": "Contacta o suporte"
@@ -863,18 +821,6 @@
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página da Wiki"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nome"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ícone"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
@@ -1150,9 +1096,6 @@
   },
   "frog.title": {
     "message": "Sapo"
-  },
-  "hosting-marketing.available-locations": {
-    "message": "Disponível na América do Norte, Europa e Ásia Sudeste para uma cobertura extensa."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Pagar mensalmente"

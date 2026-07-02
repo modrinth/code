@@ -47,7 +47,7 @@ async fn main() -> theseus::Result<()> {
     for world in worlds {
         println!(
             "World: {:?}/{:?} played at {:?}: {:#?}",
-            world.profile,
+            world.instance_id,
             world.world.name,
             world.world.last_played,
             world.world.details

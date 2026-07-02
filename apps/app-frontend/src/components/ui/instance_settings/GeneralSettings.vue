@@ -4,12 +4,14 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	Chips,
 	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
@@ -17,7 +19,8 @@ import { useRouter } from 'vue-router'
 
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
+import { install_duplicate_instance } from '@/helpers/install'
+import { edit, edit_icon, list, remove } from '@/helpers/instance'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 import type { GameInstance } from '../../../helpers/types'
@@ -25,21 +28,29 @@ import type { GameInstance } from '../../../helpers/types'
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
+const queryClient = useQueryClient()
 
 const deleteConfirmModal = ref()
 
 const { instance } = injectInstanceSettings()
+type ReleaseChannel = GameInstance['update_channel']
+const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
 const groups = ref([...instance.value.groups])
+const savingReleaseChannel = ref(false)
+const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
+const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
+	savingReleaseChannel.value ? [...releaseChannelOptions] : [],
+)
 
 const newCategoryInput = ref('')
 
 const installing = computed(() => instance.value.install_stage !== 'installed')
 
-async function duplicateProfile() {
-	await duplicate(instance.value.path).catch(handleError)
+async function duplicateInstance() {
+	await install_duplicate_instance(instance.value.id).catch(handleError)
 	trackEvent('InstanceDuplicate', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
@@ -51,9 +62,55 @@ const availableGroups = computed(() => [
 	...new Set([...allInstances.value.flatMap((instance) => instance.groups), ...groups.value]),
 ])
 
+function formatReleaseChannelLabel(channel: ReleaseChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelRelease)
+		case 'beta':
+			return formatMessage(messages.updateChannelBeta)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlpha)
+	}
+}
+
+function formatReleaseChannelDescription(channel: ReleaseChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelReleaseDescription)
+		case 'beta':
+			return formatMessage(messages.updateChannelBetaDescription)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlphaDescription)
+	}
+}
+
+watch(
+	() => [instance.value.id, instance.value.update_channel] as const,
+	() => {
+		if (!savingReleaseChannel.value) {
+			selectedReleaseChannel.value = instance.value.update_channel
+		}
+	},
+)
+
+watch(selectedReleaseChannel, async (channel, previousChannel) => {
+	const previousReleaseChannel = previousChannel ?? instance.value.update_channel
+	if (channel === instance.value.update_channel) return
+
+	savingReleaseChannel.value = true
+	const instanceId = instance.value.id
+	await edit(instanceId, { update_channel: channel })
+		.then(() => queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instanceId] }))
+		.catch((error) => {
+			selectedReleaseChannel.value = previousReleaseChannel
+			handleError(error)
+		})
+	savingReleaseChannel.value = false
+})
+
 async function resetIcon() {
 	icon.value = undefined
-	await edit_icon(instance.value.path, null).catch(handleError)
+	await edit_icon(instance.value.id, null).catch(handleError)
 	trackEvent('InstanceRemoveIcon')
 }
 
@@ -71,12 +128,12 @@ async function setIcon() {
 	if (!value) return
 
 	icon.value = value
-	await edit_icon(instance.value.path, icon.value).catch(handleError)
+	await edit_icon(instance.value.id, icon.value).catch(handleError)
 
 	trackEvent('InstanceSetIcon')
 }
 
-const editProfileObject = computed(() => ({
+const editInstanceObject = computed(() => ({
 	name: title.value.trim().substring(0, 32) ?? 'Instance',
 	groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
 }))
@@ -102,15 +159,15 @@ watch(
 	[title, groups, groups],
 	async () => {
 		if (removing.value) return
-		await edit(instance.value.path, editProfileObject.value).catch(handleError)
+		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
 
 const removing = ref(false)
-async function removeProfile() {
+async function removeInstance() {
 	removing.value = true
-	const path = instance.value.path
+	const path = instance.value.id
 
 	trackEvent('InstanceRemove', {
 		loader: instance.value.loader,
@@ -175,6 +232,38 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.general.duplicate-button',
 		defaultMessage: 'Duplicate',
 	},
+	updateChannel: {
+		id: 'instance.settings.tabs.general.update-channel',
+		defaultMessage: 'Update channel',
+	},
+	updateChannelReleaseDescription: {
+		id: 'instance.settings.tabs.general.update-channel.release.description',
+		defaultMessage: 'Only release versions will be shown as available updates.',
+	},
+	updateChannelBetaDescription: {
+		id: 'instance.settings.tabs.general.update-channel.beta.description',
+		defaultMessage: 'Release and beta versions will be shown as available updates.',
+	},
+	updateChannelAlphaDescription: {
+		id: 'instance.settings.tabs.general.update-channel.alpha.description',
+		defaultMessage: 'Release, beta, and alpha versions will be shown as available updates.',
+	},
+	updateChannelRelease: {
+		id: 'instance.settings.tabs.general.update-channel.release',
+		defaultMessage: 'Release',
+	},
+	updateChannelBeta: {
+		id: 'instance.settings.tabs.general.update-channel.beta',
+		defaultMessage: 'Beta',
+	},
+	updateChannelAlpha: {
+		id: 'instance.settings.tabs.general.update-channel.alpha',
+		defaultMessage: 'Alpha',
+	},
+	selectUpdateChannelAriaLabel: {
+		id: 'instance.settings.tabs.general.update-channel.select',
+		defaultMessage: 'Select update channel',
+	},
 	deleteInstance: {
 		id: 'instance.settings.tabs.general.delete',
 		defaultMessage: 'Delete instance',
@@ -196,7 +285,7 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeProfile" />
+	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeInstance" />
 	<div class="block">
 		<div class="float-end ml-10 relative group w-fit">
 			<div class="flex flex-col gap-1">
@@ -222,7 +311,7 @@ const messages = defineMessages({
 							:src="icon ? convertFileSrc(icon) : icon"
 							size="108px"
 							class="transition-[filter] group-hover:brightness-75"
-							:tint-by="instance.path"
+							:tint-by="instance.id"
 							no-shadow
 						/>
 						<div
@@ -262,7 +351,7 @@ const messages = defineMessages({
 						aria-labelledby="duplicate-instance-label"
 						:disabled="installing"
 						class="w-max !shadow-none"
-						@click="duplicateProfile"
+						@click="duplicateInstance"
 					>
 						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
 					</button>
@@ -301,6 +390,23 @@ const messages = defineMessages({
 			</div>
 			<p class="m-0">
 				{{ formatMessage(messages.libraryGroupsDescription) }}
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.updateChannel) }}
+			</h2>
+			<Chips
+				v-model="selectedReleaseChannel"
+				:items="releaseChannelOptions"
+				:format-label="formatReleaseChannelLabel"
+				:capitalize="false"
+				:disabled-items="releaseChannelDisabledItems"
+				:aria-label="formatMessage(messages.selectUpdateChannelAriaLabel)"
+			/>
+			<p class="m-0">
+				{{ formatReleaseChannelDescription(selectedReleaseChannel) }}
 			</p>
 		</div>
 

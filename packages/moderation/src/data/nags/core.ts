@@ -38,7 +38,7 @@ export const coreNags: Nag[] = [
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			context.versions.length < 1 && !context.projectV3?.minecraft_server,
+			context.projectV3?.versions?.length < 1 && !context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({
@@ -192,7 +192,10 @@ export const coreNags: Nag[] = [
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			context.project.license.id === 'LicenseRef-Unknown' && !context.projectV3?.minecraft_server,
+			(context.project.license.id === 'LicenseRef-Unknown' ||
+				context.project.license.id === 'NOASSERTION' ||
+				context.project.license.id === 'LicenseRef-NOASSERTION') &&
+			!context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/license',
 			title: defineMessage({
@@ -200,6 +203,70 @@ export const coreNags: Nag[] = [
 				defaultMessage: 'Visit license settings',
 			}),
 			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
+		},
+	},
+	{
+		id: 'add-custom-license-details',
+		title: defineMessage({
+			id: 'nags.add-license-details.title',
+			defaultMessage: 'Add license details',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.add-license-details.description',
+					defaultMessage: 'Add a valid URL and name or SPDX identifier for your custom license.',
+				}),
+				{
+					type: formatProjectTypeSentence(formatMessage, context.project.project_type),
+				},
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) =>
+			!context.projectV3?.minecraft_server &&
+			(context.project.license.id === 'LicenseRef-' ||
+				(context.project.license.id.search('LicenseRef-') === 0 &&
+					(!context.project.license.url || context.project.license.url === '') &&
+					context.project.license.id !== 'LicenseRef-Unknown' &&
+					context.project.license.id !== 'LicenseRef-All-Rights-Reserved')),
+		link: {
+			path: 'settings/license',
+			title: defineMessage({
+				id: 'nags.settings.license.title',
+				defaultMessage: 'Visit license settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-license',
+		},
+	},
+	{
+		id: 'review-permissions',
+		title: defineMessage({
+			id: 'nags.review-permissions.title',
+			defaultMessage: 'Review external permissions',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			return formatMessage(
+				defineMessage({
+					id: 'nags.review-permissions.description',
+					defaultMessage:
+						'Make sure you have provided proof of your permission to distribute any external content in your Modpack.',
+				}),
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) =>
+			context.versions.some((version) => (version.files_missing_attribution?.length ?? 0) >= 1),
+		link: {
+			path: 'settings/permissions',
+			title: defineMessage({
+				id: 'nags.settings.permissions.title',
+				defaultMessage: 'Visit permissions dashboard',
+			}),
+			shouldShow: (context: NagContext) =>
+				context.currentRoute !== 'type-project-settings-permissions',
 		},
 	},
 ]

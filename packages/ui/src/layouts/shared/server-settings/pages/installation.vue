@@ -390,6 +390,22 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	return loader as Archon.Content.v1.Modloader
 }
 
+async function uploadLocalModpackWithSoftOverride() {
+	const picked = await filePicker.pickModpackFile()
+	if (!picked?.file) return false
+
+	const handle = client.kyros.content_v1.uploadModpackFile(
+		worldId.value!,
+		picked.file,
+		{ known: {} },
+		{ softOverride: true },
+	)
+	await uploadProgressModal.value!.track(handle)
+	emit('reinstall')
+	await invalidateServerState()
+	return true
+}
+
 provideInstallationSettings({
 	closeSettings: serverSettings.closeModal,
 	onGameVersionHover: handleGameVersionHover,
@@ -612,18 +628,8 @@ provideInstallationSettings({
 		if (!modpack.value) return
 		if (modpack.value.spec.platform === 'local_file') {
 			debug('reinstallModpack: local file, opening file picker')
-			const picked = await filePicker.pickModpackFile()
-			if (!picked?.file) return
 			try {
-				const handle = client.kyros.content_v1.uploadModpackFile(
-					worldId.value!,
-					picked.file,
-					{ known: {} },
-					{ softOverride: true },
-				)
-				await uploadProgressModal.value!.track(handle)
-				emit('reinstall')
-				invalidateServerState()
+				await uploadLocalModpackWithSoftOverride()
 			} catch (err) {
 				emit('reinstall-failed')
 				addNotification({
@@ -660,6 +666,21 @@ provideInstallationSettings({
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
+			})
+		}
+	},
+
+	async swapModpack() {
+		if (setupActionDisabled.value) return
+		if (modpack.value?.spec.platform !== 'local_file') return
+		debug('swapModpack: local file, opening file picker')
+		try {
+			await uploadLocalModpackWithSoftOverride()
+		} catch (err) {
+			emit('reinstall-failed')
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
 			})
 		}
 	},

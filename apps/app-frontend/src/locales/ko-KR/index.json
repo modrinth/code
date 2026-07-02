@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} 다운로드 중"
   },
+  "app.action-bar.downloading-update": {
+    "message": "업데이트 다운로드중"
+  },
   "app.action-bar.downloads": {
     "message": "다운로드"
   },
@@ -86,6 +89,12 @@
   "app.appearance-settings.select-option": {
     "message": "옵션 선택"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "인스턴스의 플레이 시간을 표시합니다."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "플레이 시간 표시"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "사이드바를 접거나 펼칠 수 있는 기능을 활성화합니다."
   },
@@ -143,11 +152,8 @@
   "app.browse.server.installing": {
     "message": "설치 중"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "모드팩 설치중..."
+  "app.content-install.no-compatible-versions": {
+    "message": "{compatibilityLabel} 버전과 일치하는 버전이 없습니다. 설치할 버전을 선택하세요. 종속성은 자동으로 설치되지 않습니다."
   },
   "app.export-modal.description-placeholder": {
     "message": "모드팩 설명 입력..."
@@ -158,17 +164,11 @@
   "app.export-modal.header": {
     "message": "모드팩 내보내기"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "\"{file}\"(을)를 포함할까요?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "모드팩 이름"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "모드팩 이름"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "내보내기에 어느 파일이 포함될지 구성"
   },
   "app.export-modal.version-number-label": {
     "message": "버전 구분"
@@ -224,12 +224,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "서버 탐색하기"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}'이(가) **영구적으로 삭제**되며, 복구할 수 없습니다."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "정말로 이 세계를 영구적으로 삭제하시겠습니까?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "수정됨"
   },
@@ -248,20 +242,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "추가된 서버 또는 세계 없음"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}'이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address})이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "정말로 {name}을(를) 제거하시겠습니까?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count}개의 세계 검색..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "이 서버"
   },
   "app.modal.install-to-play.content-required": {
     "message": "콘텐츠 설치 필요"
@@ -431,6 +413,15 @@
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth 프라이드"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "프라이드 월간 동안 Modrinth 프라이드 모금 행사에 기부하여 이 스킨들을 받았습니다."
+  },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
   },
@@ -455,14 +446,14 @@
   "app.skins.sign-in.description": {
     "message": "Modrinth 앱의 스킨 관리 기능을 사용하려면 Minecraft 계정에 로그인하세요."
   },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Excited Modrinth Bot"
+  },
   "app.skins.sign-in.title": {
     "message": "로그인하세요"
   },
   "app.skins.title": {
     "message": "스킨 선택"
-  },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version}을 설치할 준비가 완료되었습니다! 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
@@ -482,9 +473,6 @@
   "app.update-popup.download-complete": {
     "message": "다운로드 완료"
   },
-  "app.update-popup.reload": {
-    "message": "새로고침"
-  },
   "app.update-popup.title": {
     "message": "업데이트 가능"
   },
@@ -493,15 +481,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "{version} 버전이 성공적으로 설치되었습니다!"
-  },
-  "app.update.download-update": {
-    "message": "업데이트 다운로드"
-  },
-  "app.update.downloading-update": {
-    "message": "업데이트 다운로드 중 ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "새로고침하여 업데이트 설치"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -523,6 +502,9 @@
   },
   "friends.action.add-friend": {
     "message": "친구 추가"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count}건의 친구 요청"
   },
   "friends.add-friend.submit": {
     "message": "친구 요청 보내기"

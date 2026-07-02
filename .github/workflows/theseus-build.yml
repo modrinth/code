@@ -30,6 +30,10 @@ on:
           - prod-with-staging-archon
         default: prod
         required: false
+      app-version-override:
+        description: Temporary app version override for updater testing
+        type: string
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -80,6 +84,10 @@ jobs:
           rustflags: ''
           target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
 
+      - name: Setup mold
+        if: contains(matrix.platform, 'ubuntu')
+        uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
+
       - name: Setup sccache
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
@@ -126,7 +134,10 @@ jobs:
       - name: Set application version and environment
         shell: bash
         run: |
-          APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
+          APP_VERSION="${{ inputs.app-version-override }}"
+          if [ -z "$APP_VERSION" ]; then
+            APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
+          fi
           BUILD_ENVIRONMENT="${{ inputs.environment || 'prod' }}"
           echo "Setting application version to $APP_VERSION"
           echo "Using environment $BUILD_ENVIRONMENT"
@@ -153,7 +164,7 @@ jobs:
           fi
 
       - name: Build macOS app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
         if: contains(matrix.platform, 'macos')
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
@@ -168,7 +179,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Build Linux app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
         if: contains(matrix.platform, 'ubuntu')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -179,7 +190,7 @@ jobs:
           [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
-          ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
+          ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
         if: contains(matrix.platform, 'windows')
         env:

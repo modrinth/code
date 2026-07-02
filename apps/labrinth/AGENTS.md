@@ -6,7 +6,7 @@
   - `ApiError::Request` instead of `ApiError::InvalidInput`
   - `ApiError::Auth` instead of `ApiError::CustomAuthentication`
   - `ApiError::Internal` for database errors, 3rd party service errors, anything else internal
-  - Use `eyre!` to construct a value for `Internal` and `Request` variants
+  - Use `eyre!` to construct a value for `Internal`, `Request`, and `Auth` variants
 - Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
   - lowercase message
   - no trailing punctuation
@@ -24,3 +24,12 @@
   - `Authorization: Bearer mra_user` for a regular user
   - `Modrinth-Admin: feedbeef` as admin key
 - If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version
+- When using `sqlx::query` etc. always use the macro form like `sqlx::query!` or `sqlx::query_scalar!` - never the plain function form. Avoid using `query_as!`.
+- Do not use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `eyre::Report`.
+- Do not run `cargo test`, even for a single specific test, unless explicitly prompted to by the user, since it takes a long time to run.
+- You can force a search reindex by:
+  - Running `cd apps/labrinth && cargo run -p labrinth -- --run-background-task index-search` (prefer this if backend is running locally)
+  - Hitting the force reindex admin endpoint
+- To seed the database locally: `psql postgresql://labrinth:labrinth@localhost/labrinth -f apps/labrinth/fixtures/labrinth-seed-data-202508052143.sql`
+- When writing `sqlx` queries, prefer `r#` raw strings over escaping quotes
+- When interacting with the Postgres database, prefer using a `ro_pool: ReadOnlyPgPool` when performing read-only operations

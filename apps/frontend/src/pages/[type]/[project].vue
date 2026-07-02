@@ -881,7 +881,9 @@
 						class="card flex-card"
 					/>
 					<ProjectSidebarCompatibility
-						v-if="projectV3Loaded && !isServerProject"
+						v-if="
+							projectV3Loaded && !isServerProject && route.name !== 'type-project-version-version'
+						"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"
@@ -1015,7 +1017,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
+					<div class="mb-3 overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-1" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -1112,7 +1114,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { nextTick, readonly, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
@@ -1123,11 +1125,12 @@ import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
+import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import {
 	loadChecklistOpenState,
 	saveChecklistOpenState,
@@ -1703,6 +1706,16 @@ const project = computed(() => {
 // Use actual project ID for dependent queries (ensures cache consistency)
 const projectId = computed(() => projectRaw.value?.id)
 
+const sharedProjectId = injectCurrentProjectId(null)
+if (sharedProjectId) {
+	watchEffect(() => {
+		sharedProjectId.value = projectId.value ?? undefined
+	})
+	onScopeDispose(() => {
+		sharedProjectId.value = undefined
+	})
+}
+
 // V3 Project
 const {
 	data: projectV3,
@@ -1898,6 +1911,7 @@ const versions = computed(() => {
 
 // Versions loading state
 const versionsLoading = computed(() => versionsV3Loading.value)
+const versionsLoaded = computed(() => versionsV3.value !== undefined || !!_versionsV3Error.value)
 
 // Load versions on demand (client-side only)
 function loadVersions() {
@@ -2741,6 +2755,7 @@ provideProjectPageContext({
 	// Lazy version loading
 	versions,
 	versionsLoading,
+	versionsLoaded,
 	// Lazy dependencies loading
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
@@ -2928,6 +2943,10 @@ provideProjectPageContext({
 	> div {
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>
 

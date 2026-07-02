@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "添加外部链接"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "你已选择全部 {totalAvailableTags, plural, other {# 个可用标签}}。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，让描述详尽清晰。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"
@@ -59,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "前往图库页"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "你的{type}使用了一个需要公开源代码的许可证。请为每个附加版本提供源代码链接或源代码文件，或者考虑使用不同的许可证。"
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
   },
   "nags.identical-links.description": {
     "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "清除重复的链接"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
@@ -88,6 +100,9 @@
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "不要使用短链接"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "描述中有 {count, plural, other {# 个标题}}过长。标题应简洁，用作章节名，不应是完整的句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "缩短标题"
@@ -119,8 +134,17 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "检查反馈"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}} ({tags})。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "请确保您已提供授权证明，证明您有权在您的整合包中分发任何外部内容。"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "核查外部授权"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "选择你的服务器支持的版本；挑一个整合包，或者自行上传。"
@@ -139,6 +163,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "选择一个语言"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "选择你的 {type} 分发所使用的许可证。"
   },
   "nags.select-license.title": {
     "defaultMessage": "选择一个许可证"
@@ -161,6 +188,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "访问链接设置"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "前往权限管理面板"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "访问标签设置"
   },
@@ -179,6 +209,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "清除简介"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "你的简介包含 {length, plural, other {# 个字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，来让简介既丰富又引人入胜。"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "扩充你的简介"
   },
@@ -188,11 +221,23 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名称"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保你的服务器能正常出现在相关搜索结果中。"
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "选择准确的标签"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能正常出现在相关搜索结果中。"
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "选择准确的标签"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "至少需要一个图像来展示你的 {type}的内容。"
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "资源包，但不包括音频包或本地化包。如果你的内容符合这一描述，请选择相应的标签"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上传图片至项目图库"
@@ -216,3 +261,4 @@
     "defaultMessage": "访问链接设置"
   }
 }
+

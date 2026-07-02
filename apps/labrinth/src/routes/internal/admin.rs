@@ -2,21 +2,24 @@ use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, DownloadReason};
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchBackend;
+use crate::search::incremental::consume::reindex_project;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use crate::util::tags::valid_download_tags;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
+use ariadne::ids::base62_impl::parse_base62;
 use eyre::eyre;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
+use std::str::FromStr;
 use std::sync::Arc;
 use tracing::trace;
 
@@ -24,7 +27,8 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
         utoipa_actix_web::scope("/admin")
             .service(count_download)
-            .service(force_reindex),
+            .service(force_reindex)
+            .service(force_reindex_project),
     );
 }
 
@@ -45,9 +49,85 @@ pub struct DownloadMeta {
     pub reason: Option<DownloadReason>,
     pub game_version: Option<String>,
     pub loader: Option<String>,
+    pub dependent_on: Option<VersionId>,
 }
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
+
+fn parse_download_meta_version(
+    version_id: &str,
+    field: &str,
+) -> Result<VersionId, ApiError> {
+    parse_base62(version_id)
+        .map(VersionId)
+        .wrap_request_err_with(|| {
+            eyre!("invalid `{field}` version id '{version_id}'")
+        })
+}
+
+fn parse_download_meta_from_query(
+    url: &url::Url,
+) -> Result<Option<DownloadMeta>, ApiError> {
+    let mut meta = DownloadMeta {
+        reason: None,
+        game_version: None,
+        loader: None,
+        dependent_on: None,
+    };
+
+    for (key, value) in url.query_pairs() {
+        match key.as_ref() {
+            "mr_download_reason" => {
+                meta.reason =
+                    Some(DownloadReason::from_str(&value).map_err(|_| {
+                        ApiError::Request(eyre!(
+                            "invalid download reason specified"
+                        ))
+                    })?);
+            }
+            "mr_game_version" => {
+                meta.game_version = Some(value.into_owned());
+            }
+            "mr_loader" => {
+                meta.loader = Some(value.into_owned());
+            }
+            "mr_dependent_on" => {
+                meta.dependent_on =
+                    Some(parse_download_meta_version(&value, "dependent_on")?);
+            }
+            _ => {}
+        }
+    }
+
+    Ok((meta.reason.is_some()
+        || meta.game_version.is_some()
+        || meta.loader.is_some()
+        || meta.dependent_on.is_some())
+    .then_some(meta))
+}
+
+async fn resolve_download_attribution_version(
+    pool: &PgPool,
+    redis: &RedisPool,
+    version_id: Option<VersionId>,
+    field: &str,
+) -> Result<u64, ApiError> {
+    let Some(version_id) = version_id else {
+        return Ok(0);
+    };
+
+    let version_id =
+        crate::database::models::ids::DBVersionId::from(version_id);
+
+    crate::database::models::DBVersion::get(version_id, pool, redis)
+        .await
+        .wrap_internal_err("failed to fetch download attribution version")?
+        .ok_or_else(|| {
+            ApiError::Request(eyre!("invalid `{field}` version specified"))
+        })?;
+
+    Ok(version_id.0 as u64)
+}
 
 // This is an internal route, cannot be used without key
 #[utoipa::path(
@@ -89,10 +169,9 @@ pub async fn count_download(
     let project_id: crate::database::models::ids::DBProjectId =
         download_body.project_id.into();
 
-    let id_option =
-        ariadne::ids::base62_impl::parse_base62(&download_body.version_name)
-            .ok()
-            .map(|x| x as i64);
+    let id_option = parse_base62(&download_body.version_name)
+        .ok()
+        .map(|x| x as i64);
 
     let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "
@@ -138,7 +217,7 @@ pub async fn count_download(
                 .map(Some)
                 .wrap_request_err("invalid download meta")?
         } else {
-            None
+            parse_download_meta_from_query(&url)?
         };
 
     if let Some(meta) = &meta {
@@ -161,6 +240,14 @@ pub async fn count_download(
             )));
         }
     }
+
+    let dependent_on_version_id = resolve_download_attribution_version(
+        &pool,
+        &redis,
+        meta.as_ref().and_then(|m| m.dependent_on),
+        "dependent_on",
+    )
+    .await?;
 
     let download = Download {
         recorded: get_current_tenths_of_ms(),
@@ -212,6 +299,7 @@ pub async fn count_download(
             .and_then(|m| m.loader.as_ref())
             .map(|s| s.to_string())
             .unwrap_or_default(),
+        dependent_on_version_id,
     };
     trace!("added download {download:#?}");
 
@@ -239,5 +327,35 @@ pub async fn force_reindex(
         .index_projects(pool.as_ref().clone(), redis.clone())
         .await
         .wrap_internal_err("failed to index projects")?;
+    Ok(HttpResponse::NoContent().finish())
+}
+
+#[utoipa::path(
+    post,
+    operation_id = "forceReindexProject",
+    responses(
+        (status = 204, description = "Project search documents rebuilt successfully"),
+        (status = 401, description = "Unauthorized")
+    )
+)]
+#[post("/_force_reindex/{project_id}", guard = "admin_key_guard")]
+pub async fn force_reindex_project(
+    path: web::Path<(ProjectId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    search_backend: web::Data<dyn SearchBackend>,
+) -> Result<HttpResponse, ApiError> {
+    let (project_id,) = path.into_inner();
+    reindex_project(
+        pool.as_ref(),
+        redis.as_ref(),
+        search_backend.as_ref(),
+        project_id,
+    )
+    .await
+    .wrap_internal_err_with(|| {
+        eyre!("failed to reindex project `{project_id}`")
+    })?;
+
     Ok(HttpResponse::NoContent().finish())
 }

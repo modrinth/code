@@ -36,6 +36,7 @@ pub enum NotificationType {
     TeamInvite,
     OrganizationInvite,
     ServerInvite,
+    SharedInstanceInvite,
     StatusChange,
     ModeratorMessage,
     LegacyMarkdown,
@@ -59,6 +60,7 @@ pub enum NotificationType {
     ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
+    DiscordRoleCreatorClub,
     Custom,
     Unknown,
 }
@@ -70,6 +72,7 @@ impl NotificationType {
             NotificationType::TeamInvite => "team_invite",
             NotificationType::OrganizationInvite => "organization_invite",
             NotificationType::ServerInvite => "server_invite",
+            NotificationType::SharedInstanceInvite => "shared_instance_invite",
             NotificationType::StatusChange => "status_change",
             NotificationType::ModeratorMessage => "moderator_message",
             NotificationType::LegacyMarkdown => "legacy_markdown",
@@ -98,6 +101,9 @@ impl NotificationType {
             NotificationType::Custom => "custom",
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
+            NotificationType::DiscordRoleCreatorClub => {
+                "discord_role_creator_club"
+            }
             NotificationType::Unknown => "unknown",
         }
     }
@@ -108,6 +114,7 @@ impl NotificationType {
             "team_invite" => NotificationType::TeamInvite,
             "organization_invite" => NotificationType::OrganizationInvite,
             "server_invite" => NotificationType::ServerInvite,
+            "shared_instance_invite" => NotificationType::SharedInstanceInvite,
             "status_change" => NotificationType::StatusChange,
             "moderator_message" => NotificationType::ModeratorMessage,
             "legacy_markdown" => NotificationType::LegacyMarkdown,
@@ -134,6 +141,9 @@ impl NotificationType {
             }
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
+            "discord_role_creator_club" => {
+                NotificationType::DiscordRoleCreatorClub
+            }
             "custom" => NotificationType::Custom,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
@@ -165,6 +175,10 @@ pub enum NotificationBody {
         server_name: String,
         invited_by: UserId,
         role: String,
+    },
+    SharedInstanceInvite {
+        shared_instance_id: String,
+        shared_instance_name: String,
     },
     StatusChange {
         project_id: ProjectId,
@@ -259,6 +273,7 @@ pub enum NotificationBody {
         date_available: DateTime<Utc>,
         amount: u64,
     },
+    DiscordRoleCreatorClub,
     Custom {
         key: String,
         title: String,
@@ -279,6 +294,9 @@ impl NotificationBody {
             }
             NotificationBody::ServerInvite { .. } => {
                 NotificationType::ServerInvite
+            }
+            NotificationBody::SharedInstanceInvite { .. } => {
+                NotificationType::SharedInstanceInvite
             }
             NotificationBody::StatusChange { .. } => {
                 NotificationType::StatusChange
@@ -346,6 +364,9 @@ impl NotificationBody {
             }
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
+            }
+            NotificationBody::DiscordRoleCreatorClub => {
+                NotificationType::DiscordRoleCreatorClub
             }
             NotificationBody::Custom { .. } => NotificationType::Custom,
             NotificationBody::Unknown => NotificationType::Unknown,
@@ -440,6 +461,32 @@ impl From<DBNotification> for Notification {
                     "You have been invited to join a server!".to_string(),
                     format!(
                         "An invite has been sent for you to be {role} of {server_name}"
+                    ),
+                    "#".to_string(),
+                    vec![
+                        NotificationAction {
+                            name: "Accept".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                String::new(),
+                            ),
+                        },
+                        NotificationAction {
+                            name: "Deny".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                String::new(),
+                            ),
+                        },
+                    ],
+                ),
+                NotificationBody::SharedInstanceInvite {
+                    shared_instance_name,
+                    ..
+                } => (
+                    "You have been invited to a shared instance!".to_string(),
+                    format!(
+                        "An invite has been sent for you to join {shared_instance_name}"
                     ),
                     "#".to_string(),
                     vec![
@@ -618,6 +665,12 @@ impl From<DBNotification> for Notification {
                     "Payout available".to_string(),
                     "A payout is available!".to_string(),
                     "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::DiscordRoleCreatorClub => (
+                    "Join the Creator Club".to_string(),
+                    "Link your Discord account to claim your creator community role.".to_string(),
+                    "/discord/link".to_string(),
                     vec![],
                 ),
 				NotificationBody::ModerationMessageReceived { .. } => (

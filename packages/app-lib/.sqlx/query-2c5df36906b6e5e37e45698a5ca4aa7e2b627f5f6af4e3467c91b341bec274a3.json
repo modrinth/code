@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT OR REPLACE INTO instance_launch_overrides (\n            instance_id,\n            overrides\n        )\n        VALUES (?, jsonb(?))\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "2c5df36906b6e5e37e45698a5ca4aa7e2b627f5f6af4e3467c91b341bec274a3"
+}

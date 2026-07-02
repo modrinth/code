@@ -2,7 +2,6 @@ import type { RawRenderResult } from '../rendering/batch-skin-renderer'
 
 interface StoredPreview {
 	forwards: Blob
-	backwards: Blob
 	timestamp: number
 }
 
@@ -38,7 +37,6 @@ export class SkinPreviewStorage {
 
 		const storedPreview: StoredPreview = {
 			forwards: result.forwards,
-			backwards: result.backwards,
 			timestamp: Date.now(),
 		}
 
@@ -67,7 +65,7 @@ export class SkinPreviewStorage {
 					return
 				}
 
-				resolve({ forwards: result.forwards, backwards: result.backwards })
+				resolve({ forwards: result.forwards })
 			}
 			request.onerror = () => reject(request.error)
 		})
@@ -95,7 +93,7 @@ export class SkinPreviewStorage {
 					const result = request.result as StoredPreview | undefined
 
 					if (result) {
-						results[key] = { forwards: result.forwards, backwards: result.backwards }
+						results[key] = { forwards: result.forwards }
 					} else {
 						results[key] = null
 					}
@@ -173,7 +171,7 @@ export class SkinPreviewStorage {
 					const key = cursor.primaryKey as string
 					const value = cursor.value as StoredPreview
 
-					const entrySize = value.forwards.size + value.backwards.size
+					const entrySize = value.forwards.size
 					totalSize += entrySize
 					count++
 

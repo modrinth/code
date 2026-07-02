@@ -65,11 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Odwiedź stronę galerii"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Twój {type} używa licencji, która wymaga dostępności kodu źródłowego. Podaj link do kodu źródłowego lub plik ze źródłami dla każdej dodatkowej wersji albo rozważ użycie innej licencji."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Podaj kod źródłowy"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Niektóre z Twoich linków zewnętrznych są identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Usuń identyczne linki"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Twój opis powinien zawierać wystarczająco zwykłego tekstu lub tekstu alternatywnego obrazów, aby był przystępny dla osób korzystających z czytników ekranu lub mających wolne połączenie z internetem."
@@ -94,6 +100,9 @@
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Nie używaj skracaczy linków"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# nagłówek} few {# nagłówki} other {# nagłówków}} w twoim opisie {count, plural, one {jest za długi} few {są za długie} other {jest za długich}}. Nagłówki powinny być zwięzłe i pełnić funkcję tytułów sekcji, a nie pełnych zdań."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Skróć nagłówki"
@@ -125,8 +134,17 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Przejrzyj informacje zwrotne"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Wybrano {count, plural, one {# tag rozdzielczości} few {# tagi rozdzielczości} other {# tagów rozdzielczości}} ({tags}). Paczki zasobów zwykle powinny mieć tylko jeden tag rozdzielczości opisujący ich główną rozdzielczość."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Upewnij się, że zewnętrzna zawartość w Twojej paczce modów ma podany dowód na to, że możesz ją rozpowszechniać."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Sprawdź zewnętrzną zawartość"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Wybierz wersje gry, które wspiera Twój serwer, wybierz istniejącą paczkę modów lub prześlij własną."
@@ -145,6 +163,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Wybierz język"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Wybierz licencję, pod którą Twój {type} jest dystrybuowany."
   },
   "nags.select-license.title": {
     "defaultMessage": "Wybierz licencję"
@@ -166,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Odwiedź ustawienia linków"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Odwiedź pulpit uprawnień"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Odwiedź ustawienia etykiet"
@@ -197,11 +221,23 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Oczyść nazwę"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój serwer był łatwiejszy do znalezienia."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój projekt był łatwiejszy do znalezienia."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Przynajmniej jeden z obrazów w galerii musi pokazywać zawartość {type}."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "paczki zasobów, z wyjątkiem paczek zasobów z dźwiękami bądź tłumaczeniami. Jeżeli opisuje to Twoją paczkę zasobów, wybierz odpowiedni tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Prześlij obraz do galerii"
@@ -225,3 +261,4 @@
     "defaultMessage": "Odwiedź ustawienia linków"
   }
 }
+

@@ -69,6 +69,8 @@
 					<FileUploadDragAndDrop
 						ref="fileUploadRef"
 						class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+						:disabled="isBusy"
+						@drop-error="handleDropError"
 						@files-dropped="handleDroppedFiles"
 					>
 						<FileTableHeader
@@ -220,6 +222,7 @@ import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
+import { injectFilePicker } from '#ui/providers/file-picker'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 import { getFileExtension } from '#ui/utils/file-extensions'
@@ -293,6 +296,7 @@ defineProps<{
 
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+const filePicker = injectFilePicker(null)
 
 const editorComponent = shallowRef<Component | null>(null)
 import('vue3-ace-editor').then(async (mod) => {
@@ -591,8 +595,32 @@ function handleDroppedFiles(files: File[]) {
 	ctx.uploadFiles(files)
 }
 
-function initiateFileUpload() {
+function handleDropError(error: unknown) {
+	addNotification({
+		title: formatMessage(commonMessages.uploadFailedLabel),
+		text: error instanceof Error ? error.message : undefined,
+		type: 'error',
+	})
+}
+
+async function initiateFileUpload() {
 	if (isBusy.value) return
+	if (filePicker?.pickFiles) {
+		try {
+			const picked = await filePicker.pickFiles({ multiple: true })
+			if (picked.length > 0) {
+				ctx.uploadFiles(picked.map((item) => item.file))
+			}
+		} catch (error) {
+			addNotification({
+				title: formatMessage(commonMessages.uploadFailedLabel),
+				text: error instanceof Error ? error.message : undefined,
+				type: 'error',
+			})
+		}
+		return
+	}
+
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true

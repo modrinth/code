@@ -16,6 +16,7 @@ use crate::{
         },
         redis::RedisPool,
     },
+    file_hosting::FileHost,
     models::{
         exp::{self, ProjectComponentKind, component::ComponentRelationError},
         ids::ProjectId,
@@ -29,6 +30,7 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::ApiError,
+    search::SearchState,
     util::{
         error::Context, http::HttpClient, validate::validation_errors_to_string,
     },
@@ -101,6 +103,7 @@ impl ResponseError for CreateError {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct ProjectCreate {
+    #[validate(nested)]
     pub base: exp::base::Project,
     #[serde(flatten)]
     #[validate(nested)]
@@ -117,8 +120,10 @@ pub async fn create(
     req: HttpRequest,
     db: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
+    search_state: web::Data<SearchState>,
     web::Json(create): web::Json<ProjectCreate>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
@@ -305,13 +310,13 @@ pub async fn create(
     };
 
     project_builder
-        .insert(&mut txn, &http)
+        .insert(&mut txn, &redis, &**file_host, &http)
         .await
         .wrap_internal_err("failed to insert project")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
-            .insert(&mut txn, &http)
+            .insert(&mut txn, &redis, &**file_host, &http)
             .await
             .wrap_internal_err("failed to insert initial version")?;
     }
@@ -336,5 +341,70 @@ pub async fn create(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
+    super::super::projects::clear_project_cache_and_queue_search(
+        &redis,
+        &search_state,
+        project_id.into(),
+        Some(slug),
+        None,
+    )
+    .await?;
+
     Ok(web::Json(project_id))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::projects::ProjectStatus;
+
+    fn project_create_with_slug(slug: &str) -> ProjectCreate {
+        ProjectCreate {
+            base: exp::base::Project {
+                name: "test project".into(),
+                slug: slug.into(),
+                summary: "test summary".into(),
+                description: String::new(),
+                requested_status: ProjectStatus::Approved,
+                organization_id: None,
+            },
+            components: exp::ProjectEdit {
+                minecraft_mod: None,
+                minecraft_server: None,
+                minecraft_java_server: None,
+                minecraft_bedrock_server: None,
+            },
+        }
+    }
+
+    fn assert_project_slug_validation(slug: &str, expected_valid: bool) {
+        let result = project_create_with_slug(slug).validate();
+
+        assert_eq!(
+            result.is_ok(),
+            expected_valid,
+            "unexpected validation result for slug `{slug}`"
+        );
+    }
+
+    #[test]
+    fn project_create_accepts_url_safe_base_slugs() {
+        for slug in ["valid-slug", "valid_slug", "valid.slug", "valid123"] {
+            assert_project_slug_validation(slug, true);
+        }
+    }
+
+    #[test]
+    fn project_create_rejects_unsafe_base_slugs() {
+        for slug in [
+            "invalid/slug",
+            "../invalid",
+            r#"invalid"slug"#,
+            "invalid$slug",
+            "invalid slug",
+            "invalid#slug",
+        ] {
+            assert_project_slug_validation(slug, false);
+        }
+    }
 }

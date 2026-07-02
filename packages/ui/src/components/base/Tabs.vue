@@ -9,7 +9,7 @@
 			:key="tab.value"
 			ref="tabButtons"
 			type="button"
-			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg border border-solid px-2.5 h-full text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow"
+			class="flex min-h-6 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-solid px-2.5 h-full text-sm font-medium outline-none transition-all active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-brand-shadow"
 			:class="
 				tab.value === value
 					? 'border-green bg-highlight-green text-green'

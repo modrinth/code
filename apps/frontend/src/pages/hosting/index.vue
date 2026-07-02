@@ -21,7 +21,6 @@
 			:server-name="`${auth?.user?.username}'s server`"
 			:out-of-stock-url="outOfStockUrl"
 			:fetch-capacity-statuses="fetchCapacityStatuses"
-			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
@@ -1233,81 +1232,16 @@ const planQuery = async () => {
 }
 
 const regions = ref([])
-const regionPings = ref([])
-
-function pingRegions() {
+function fetchRegions() {
 	client.archon.servers_v1.getRegions().then((res) => {
 		regions.value = res
-		regions.value.forEach((region) => {
-			runPingTest(region)
-		})
 	})
-}
-
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-const initialIndex = {
-	'eu-lim': 31,
-}
-
-function runPingTest(region, index = initialIndex[region.shortcode] ?? 1) {
-	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
-		regionPings.value.push({
-			region: region.shortcode,
-			ping: -1,
-		})
-		return
-	}
-
-	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
-	try {
-		const socket = new WebSocket(wsUrl)
-		const pings = []
-
-		socket.onopen = () => {
-			for (let i = 0; i < PING_COUNT; i++) {
-				setTimeout(() => {
-					socket.send(performance.now())
-				}, i * PING_INTERVAL)
-			}
-			setTimeout(
-				() => {
-					socket.close()
-
-					const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
-					if (median) {
-						regionPings.value.push({
-							region: region.shortcode,
-							ping: median,
-						})
-					}
-				},
-				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-			)
-		}
-
-		socket.onmessage = (event) => {
-			pings.push(performance.now() - event.data)
-		}
-
-		socket.onerror = (event) => {
-			console.error(
-				`Failed to connect pingtest WebSocket with ${wsUrl}, trying index ${index + 1}:`,
-				event,
-			)
-			runPingTest(region, index + 1)
-		}
-	} catch (error) {
-		console.error(`Failed to connect pingtest WebSocket with ${wsUrl}:`, error)
-	}
 }
 
 onMounted(() => {
 	startTyping()
 	planQuery()
-	pingRegions()
+	fetchRegions()
 })
 
 watch(customer, (newCustomer) => {

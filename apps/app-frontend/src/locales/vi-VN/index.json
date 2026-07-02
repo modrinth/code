@@ -2,6 +2,9 @@
   "app.action-bar.downloading-java": {
     "message": "Đang tải xuống Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Đang tải xuống bản cập nhật"
+  },
   "app.action-bar.downloads": {
     "message": "Tải xuống"
   },
@@ -20,11 +23,17 @@
   "app.action-bar.primary-instance": {
     "message": "Bản instance chính"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Tải lại để cập nhật"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Hiện thêm các phiên bản đang chạy"
   },
   "app.action-bar.stop-instance": {
     "message": "Dừng instance"
+  },
+  "app.action-bar.update": {
+    "message": "Cập nhật"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Xem các lượt tải xuống"
@@ -86,6 +95,12 @@
   "app.appearance-settings.select-option": {
     "message": "Chọn một tuỳ chọn"
   },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Hiện thời gian chơi"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Bật tính năng ẩn hiển thị thanh menu bên."
   },
@@ -143,11 +158,8 @@
   "app.browse.server.installing": {
     "message": "Đang cài đặt"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Đang cài đặt modpack..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
   },
   "app.export-modal.description-placeholder": {
     "message": "Thêm miêu tả cho gói modpack..."
@@ -158,17 +170,11 @@
   "app.export-modal.header": {
     "message": "Xuất modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Bao gồm \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Tên modpack"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Tên modpack"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Cấu hình các tệp nào được bao gồm trong quá trình xuất phiên bản này"
   },
   "app.export-modal.version-number-label": {
     "message": "Phiên bản"
@@ -224,12 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Tìm kiếm máy chủ"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' sẽ bị **xóa vĩnh viễn** và không có cách nào khôi phục lại."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Bạn có chắc cắn rằng bạn muốn xoá vĩnh viễn thế giới này không?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
   },
@@ -248,20 +248,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Không có máy chủ hay thế giới nào đã được thêm"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' sẽ bị xóa khỏi danh sách của bạn, kể cả trong game, và bạn sẽ không có cách nào để khôi phục lại."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) sẽ bị xóa khỏi danh sách của bạn, kể cả trong game, và bạn sẽ không có cách nào để khôi phục lại."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Bạn có chắc chắn rằng bạn muốn xoá {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Tìm kiếm {count} world..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "Máy chủ này"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Nội dung bắt buộc"
@@ -273,7 +261,7 @@
     "message": "Tải xuống"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {# mod} other {# mods}}"
+    "message": "{count, plural, other {# mod}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Yêu cầu modpack"
@@ -419,6 +407,12 @@
   "app.skins.rate-limit.title": {
     "message": "Bình tĩnh lại!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Không thể lưu thứ tự skin của bạn."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Sắp xếp lại skin thất bại"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
@@ -438,7 +432,7 @@
     "message": "Modrinth Pride"
   },
   "app.skins.section.modrinth-pride.tooltip": {
-    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng Lẩu Gà Bình Thuận thế giới."
+    "message": "Bạn đã được tặng những skin này sau khi quyên góp cho Modrinth trong tháng tự hào LGBT thế giới."
   },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
@@ -462,7 +456,7 @@
     "message": "Đăng nhập"
   },
   "app.skins.sign-in.description": {
-    "message": "Đặng nhập vào mội tài khoản Minecraft để sử dụng trình sửa Skin trong ứng dụng này."
+    "message": "Đặng nhập vào mội tài khoản Minecraft để đổi skin Skin trong ứng dụng này."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Bot phấn khích"
@@ -471,10 +465,7 @@
     "message": "Đăng nhập đã"
   },
   "app.skins.title": {
-    "message": "Trình sửa skin"
-  },
-  "app.update-popup.body": {
-    "message": "Phiên bản v{version} của Modrinth đã được chuẩn bị để cài đặt! Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc cập nhật tự động khi bạn đóng Modrinth."
+    "message": "Đổi skin"
   },
   "app.update-popup.body.download-complete": {
     "message": "Phiên bản v{version} của Modrinth đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Modrinth."
@@ -495,7 +486,7 @@
     "message": "Cài đặt thành công"
   },
   "app.update-popup.reload": {
-    "message": "Khởi động lại"
+    "message": "Tải lại để cập nhật"
   },
   "app.update-popup.title": {
     "message": "Cập nhật mới hiện đang khả dụng"
@@ -505,15 +496,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Phiên bản {version} đã được cài đặt thành công!"
-  },
-  "app.update.download-update": {
-    "message": "Tải về bản cập nhật"
-  },
-  "app.update.downloading-update": {
-    "message": "Đang tải xuống bản cập nhật ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Hãy khởi động lại để cài đặt bản cập nhật"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -537,7 +519,7 @@
     "message": "Thêm một người bạn"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} yêu cầu kết bạn {count, plural, one {request} other {requests}}"
+    "message": "{count} {count, plural, other {yêu cầu kết bạn}}"
   },
   "friends.add-friend.submit": {
     "message": "Gửi yêu cầu kết bạn"
@@ -703,6 +685,30 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Tên"
+  },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Kênh cập nhật"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Sơ khai"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Các phiên bản chính thức, thử nghiệm và sơ khai sẽ hiển thị trong danh sách cập nhật có sẵn."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Thử nghiệm"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Các phiên bản chính thức và thử nghiệm sẽ hiển thị trong danh sách cập nhật có sẵn."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Chính thức"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Chỉ phiên bản chính thức sẽ hiển thị trong danh sách cập nhật có sẵn."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Chọn kênh cập nhật"
   },
   "instance.settings.tabs.hooks": {
     "message": "Khởi chạy Hooks"

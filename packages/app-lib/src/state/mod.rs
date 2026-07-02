@@ -4,17 +4,17 @@ use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use tokio::sync::{OnceCell, Semaphore};
 
-use crate::state::fs_watcher::FileWatcher;
+use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
 
 // Submodules
 mod dirs;
 pub use self::dirs::*;
 
-mod profiles;
-pub use self::profiles::*;
+mod instance_types;
+pub use self::instance_types::*;
 
-mod instances;
+pub(crate) mod instances;
 pub use self::instances::*;
 
 mod settings;
@@ -44,7 +44,7 @@ mod tunnel;
 pub use self::tunnel::*;
 
 pub mod db;
-pub mod fs_watcher;
+pub(crate) mod db_backup;
 mod mr_auth;
 
 pub use self::mr_auth::*;
@@ -97,16 +97,23 @@ impl State {
             .get_or_try_init(move || Self::initialize_state(app_identifier))
             .await?;
 
+        if let Err(e) =
+            crate::install::recovery::recover_interrupted_jobs(state).await
+        {
+            tracing::error!("Error recovering interrupted install jobs: {e}");
+        }
+
         tokio::task::spawn(async move {
-            fs_watcher::watch_profiles_init(
+            instances::watcher::watch_instances_init(
                 &state.file_watcher,
                 &state.directories,
+                &state.pool,
             )
             .await;
 
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
-                Profile::refresh_all(),
+                instances::refresh_all_instances(),
                 Settings::migrate(&state.pool),
                 ModrinthCredentials::refresh_all(),
             );
@@ -187,7 +194,7 @@ impl State {
         let discord_rpc = DiscordGuard::init()?;
 
         tracing::info!("Initializing file watcher");
-        let file_watcher = fs_watcher::init_watcher().await?;
+        let file_watcher = instances::watcher::init_watcher().await?;
 
         let process_manager = ProcessManager::new();
 

@@ -2,11 +2,41 @@
   "app.action-bar.downloading-java": {
     "message": "Java {version} indiriliyor"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Güncelleme indiriliyor"
+  },
   "app.action-bar.downloads": {
     "message": "İndirmeler"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Diğer çalışan kurulumları gizle"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Reddet"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Yükleme yapılamadı"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Yükleme uygulama kapandığından yapılamadı."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Yükleme ağ hatasından dolayı yapılamadı."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Yükleme bilinmeyen bir hatadan yapılamadı."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Kurulumu aç"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Yeniden Dene"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Bilinmeyen kurulum"
+  },
+  "app.action-bar.installs": {
+    "message": "Yüklenenler"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Birincil kurulum yap"
@@ -20,11 +50,17 @@
   "app.action-bar.primary-instance": {
     "message": "Birincil kurulum"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Güncellemek için yeniden yükle"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Daha fazla çalışan kurulum göster"
   },
   "app.action-bar.stop-instance": {
     "message": "Kurulumu durdur"
+  },
+  "app.action-bar.update": {
+    "message": "Güncelleme"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Şu anda indirilienleri göster"
@@ -45,7 +81,7 @@
     "message": "Modrinth App için tercih ettiğiniz temayı seçin."
   },
   "app.appearance-settings.color-theme.title": {
-    "message": "Tema"
+    "message": "Tema Rengi"
   },
   "app.appearance-settings.default-landing-page.description": {
     "message": "Launcher açıldığında varsayılan olarak açılacak sayfayı seçin."
@@ -85,6 +121,18 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Bir seçenek seçin"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Bir oyun oturumunda ne kadar zaman geçirdiğinizi gösterir."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Oynama Süresini Göster"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Mükerrer mod paketi kurulumları, normal içerik silme, toplu güncellemeler, mod paketi bağlantısını kesme ve onarım uyarıları gibi düşük riskli onayları otomatik olarak atlar. Tehlikeli uyarılar gösterilmeye devam edecektir."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Gerekli olmayan uyarıları atla"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Kenar çubuğunu ayarlama özelliğini aktifleştirir."
@@ -129,7 +177,7 @@
     "message": "İçerik keşfet"
   },
   "app.browse.discover-servers": {
-    "message": "Sunucu keşfet"
+    "message": "Sunucuları keşfet"
   },
   "app.browse.hide-added-servers": {
     "message": "Zaten eklenmiş sunucuları gizle"
@@ -143,11 +191,8 @@
   "app.browse.server.installing": {
     "message": "Yükleniyor"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Mod paketi indiriliyor..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
   },
   "app.export-modal.description-placeholder": {
     "message": "Mod paketi açıklaması girin..."
@@ -158,23 +203,71 @@
   "app.export-modal.header": {
     "message": "Mod paketini dışa aktar"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "\"{file}\" dahil mi?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Mod Paketi Adı"
   },
   "app.export-modal.modpack-name-placeholder": {
-    "message": "Modpaketi adı"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Bu dışa aktarmaya hangi dosyaların dahil edileceğini yapılandırma"
+    "message": "Mod paketi adı"
   },
   "app.export-modal.version-number-label": {
     "message": "Sürüm numarası"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "İçerik indiriliyor"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Minecraft yükleniyor"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Paket dosyaları yükleniyor"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Geçersiz kılmalar ayıklanıyor"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Tamamlanıyor"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Kurulum hazırlanıyor"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Java Hazırlanıyor"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Java {version} İndiriliyor"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Java {version} ayıklanıyor"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Java {version} getiriliyor"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Java {version} Hazırlanıyor"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Java {version} doğrulanıyor"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Paket manifesti okunuyor"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Yükleyici çözümleniyor"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Minecraft çözümleniyor"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "İçerik çözümleniyor"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Değişiklikler geri alınıyor"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Yükleyici işlemcileri çalıştırılıyor"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Dünyalarınız, yapılandırmalarınız ve yüklü tüm içerikler ve tüm veriler kalıcı olarak silinecek."
@@ -183,10 +276,10 @@
     "message": "Bu eylem geri alınamaz"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Kurulumu sil"
+    "message": "Oturumu sil"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Kurulumu sil"
+    "message": "Oturumu sil"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Bu mod paketi zaten <bold>{instanceName}</bold> kurulumunda yüklü. Kopyalamak istediğinizden emin misiniz?"
@@ -199,6 +292,15 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Kurulum"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "{current, number}/{total, number} proje indiriliyor..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Güncelleme tamamlanıyor..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Sürümler çözümleniyor..."
   },
   "app.instance.mods.content-type-project": {
     "message": "proje"
@@ -224,11 +326,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "Sunucuları Keşfet"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' **kalıcı olarak silinecek** ve geri getirilmesi mümkün olmayacaktır."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Dünya Sil"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Bu dünyayı kalıcı olarak silmek istediğinizden emin misiniz?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Dünyayı sil"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Bu dünya, bu profilden kalıcı olarak silinecek. Bu işlem geri alınamaz."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "{name} Siliniyor"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Modlu"
@@ -248,20 +356,20 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Eklenmiş sunucu veya dünya yok"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' oyun içi dahil olmak üzere listenizden kaldırılacak ve geri getirilmesi mümkün olmayacaktır."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Sunucuyu kaldır"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) oyun içi dahil olmak üzere listenizden kaldırılacak ve geri getirilmesi mümkün olmayacaktır."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Sunucuyu kaldır"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "{name}'i kaldırmak istediğinizden emin misiniz?"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Bu sunucu, sunucu listenizden ve oyun içi sunucu listesinden kaldırılacaktır. Adresini biliyorsanız daha sonra tekrar ekleyebilirsiniz."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "{name} kaldırılıyor"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "bu sunucu"
   },
   "app.modal.install-to-play.content-required": {
     "message": "İçerik gerekli"
@@ -273,7 +381,7 @@
     "message": "Yükle"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural,one {#mod}other {#modlar}}"
+    "message": "{count, plural, one {#mod} other {#mods}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Gerekli mod paketi"
@@ -336,7 +444,7 @@
     "message": "Skin ekle"
   },
   "app.skins.add-button.drag-and-drop": {
-    "message": "Sürükle bırak"
+    "message": "Sürükle ve bırak"
   },
   "app.skins.apply-button": {
     "message": "Uygula"
@@ -419,11 +527,17 @@
   "app.skins.rate-limit.title": {
     "message": "Yavaşla!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Skinini kaydedemedik."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Skinler sıralanamadı"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "İnşaatçılar & Biyomlar"
   },
   "app.skins.section.chase-the-skies": {
-    "message": "Chase the Skies"
+    "message": "Gökyüzünü kovala"
   },
   "app.skins.section.default-skins": {
     "message": "Varsayılan skinler"
@@ -431,23 +545,32 @@
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Modrinth Onuru"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Bu skinleri, Onur Ayı boyunca Modrinth'in düzenlediği bir bağış kampanyasına yaptığınız bağış karşılığında aldınız."
+  },
   "app.skins.section.mounts-of-mayhem": {
-    "message": "Mounts of Mayhem"
+    "message": "Kaos Dağları"
   },
   "app.skins.section.saved-skins": {
     "message": "Kaydedilen Skinler"
   },
   "app.skins.section.striding-hero": {
-    "message": "Striding Hero"
+    "message": "Yürüyen Kahraman"
   },
   "app.skins.section.the-copper-age": {
-    "message": "The Copper Age"
+    "message": "Bakır Çağı"
   },
   "app.skins.section.the-garden-awakens": {
-    "message": "The Garden Awakens"
+    "message": "Bahçe Uyanıyor"
   },
   "app.skins.section.tiny-takeover": {
-    "message": "Tiny Takeover"
+    "message": "Küçük Devralma"
   },
   "app.skins.sign-in.button": {
     "message": "Giriş Yap"
@@ -464,11 +587,8 @@
   "app.skins.title": {
     "message": "Skin seçici"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} güncellemesi indirilmeye hazır! Hemen güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecek."
-  },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecek."
+    "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
   },
   "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} yayımlandı. En yeni özellikler ve hata düzeltmeleri için paket yöneticin üzerinden güncelle!"
@@ -486,25 +606,16 @@
     "message": "İndirme tamamlandı"
   },
   "app.update-popup.reload": {
-    "message": "Yeniden başlat"
+    "message": "Güncellemek için yeniden yükle"
   },
   "app.update-popup.title": {
     "message": "Güncelleme mevcut"
   },
   "app.update.complete-toast.text": {
-    "message": "Değişiklikleri görüntülemek için buraya tıklayın."
+    "message": "Yama notlarını görüntülemek için buraya tıklayın."
   },
   "app.update.complete-toast.title": {
     "message": "{version} sürümü başarıyla kuruldu!"
-  },
-  "app.update.download-update": {
-    "message": "Güncellemeyi indir"
-  },
-  "app.update.downloading-update": {
-    "message": "Güncelleme indiriliyor (%{percent})"
-  },
-  "app.update.reload-to-update": {
-    "message": "Güncellemeyi kurmak için yeniden başlatın"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -519,13 +630,16 @@
     "message": "Henüz oynanmadı"
   },
   "app.world.world-item.offline": {
-    "message": "Çevrim dışı"
+    "message": "Çevrimdışı"
   },
   "app.world.world-item.players-online": {
     "message": "{count} çevrimiçi"
   },
   "friends.action.add-friend": {
     "message": "Bir arkadaş ekle"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} arkadaşlık isteği"
   },
   "friends.add-friend.submit": {
     "message": "Arkadaşlık isteği gönder"
@@ -555,16 +669,16 @@
     "message": "Arkadaşlık isteği gönderildi"
   },
   "friends.friend.view-profile": {
-    "message": "Profili gör"
+    "message": "Profili görüntüle"
   },
   "friends.heading": {
     "message": "Arkadaşlar"
   },
   "friends.heading.active": {
-    "message": "Aktif"
+    "message": "Çevrimiçi"
   },
   "friends.heading.offline": {
-    "message": "Çevrim dışı"
+    "message": "Çevrimdışı"
   },
   "friends.heading.online": {
     "message": "Çevrim içi"
@@ -630,7 +744,7 @@
     "message": "Adres"
   },
   "instance.server-modal.name": {
-    "message": "Ad"
+    "message": "Sunucu Adı"
   },
   "instance.server-modal.placeholder-name": {
     "message": "Minecraft Sunucusu"
@@ -657,7 +771,7 @@
     "message": "Çoğalt"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "İndirilirken çoğaltılamaz."
+    "message": "Kurulurken çoğaltılamaz."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Profili çoğalt"
@@ -692,11 +806,35 @@
   "instance.settings.tabs.general.name": {
     "message": "Ad"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Güncelleme kanalı"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release, beta ve alpha versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release ve beta versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Yayın"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Yalnızca release versiyonları mevcut güncellemeler olarak gösterilecek."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Güncelleme kanalını seç"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Başlatma kancaları"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Özel başlatma kancası"
+    "message": "Özel başlatma kancaları"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Kancalar gelişmiş kullanıcıların oyunu başlattıktan önce ve sonra belirli sistem komutları çalıştırmasını sağlar."
@@ -723,13 +861,13 @@
     "message": "Oyun başlatma kancaları"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Sarmalayıcı"
+    "message": "Paketleyici"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Minecraft'ı başlatmak için sarmalayıcı komutu."
+    "message": "Minecraft'ı başlatmak için paketleyici komutu."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Sarmalayıcı komutu girin..."
+    "message": "Paketleyici komutu girin..."
   },
   "instance.settings.tabs.installation": {
     "message": "Kurulum"
@@ -815,6 +953,9 @@
   "instance.worlds.copy_address": {
     "message": "Adresi kopyala"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "Kısayol yap"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "Ana sayfada gösterme"
   },
@@ -837,7 +978,7 @@
     "message": "Yalnızca Minecraft Alpha 1.0.5 veya daha yüksek sunuculara hızlıca girebilirsin"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Yalnızca Minecraft 1.20 veya daha yüksek sürümlerde tek oyunculu dünyalara doğrudan girebilirsin"
+    "message": "Yalnızca Minecraft 1.20+ sürümlerde tek oyunculu dünyalara doğrudan girebilirsin"
   },
   "instance.worlds.play_instance": {
     "message": "Kurulumu oyna"

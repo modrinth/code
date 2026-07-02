@@ -2,11 +2,41 @@
   "app.action-bar.downloading-java": {
     "message": "Pobieranie Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Pobieranie aktualizacji"
+  },
   "app.action-bar.downloads": {
     "message": "Pobrania"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Ukryj włączone instancje"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Odrzuć"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Instalacja nie powiodła się"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Instalacja nie powiodła się z powodu zamknięcia aplikacji."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Instalacja nie powiodła się z powodu problemów z połączeniem."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Instalacja nie powiodła się z nieznanych przyczyn."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Otwórz instancję"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Spróbuj ponownie"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Nieznana instancja"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalacje"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Ustaw jako główną instancję"
@@ -20,11 +50,17 @@
   "app.action-bar.primary-instance": {
     "message": "Główna instancja"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Załaduj ponownie, by zaktualizować"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Pokaż więcej włączonych instancji"
   },
   "app.action-bar.stop-instance": {
     "message": "Zatrzymaj instancję"
+  },
+  "app.action-bar.update": {
+    "message": "Zaktualizuj"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Pokaż aktualnie pobierane"
@@ -42,7 +78,7 @@
     "message": "Zaawansowane renderowanie"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Wybierz preferowany motyw w Modrinth App."
+    "message": "Wybierz preferowany motyw w Modrinth app."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Motyw"
@@ -85,6 +121,18 @@
   },
   "app.appearance-settings.select-option": {
     "message": "Wybierz opcję"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Pokazuje czas gry spędzony w danej instancji."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Pokaż czas gry"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Automatycznie pomija mało znaczące potwierdzenia takie jak duplikaty instalacji paczek modów, usuwanie zwykłej zawartości, masowe aktualizacje, odłączanie paczek modów i naprawianie. Ostrzeżenia o potencjalnie niebezpiecznych akcjach będą nadal pokazywane."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Pomiń mało znaczące ostrzeżenia"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Umożliwia przełączenie paska bocznego."
@@ -143,11 +191,8 @@
   "app.browse.server.installing": {
     "message": "Instalowanie"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Instalowanie paczki modów..."
+  "app.content-install.no-compatible-versions": {
+    "message": "Nie znaleziono żadnych wersji pasujących do {compatibilityLabel}. Wybierz wersję, by zainstalować ją mimo tego. Zależności nie zostaną zainstalowane automatycznie."
   },
   "app.export-modal.description-placeholder": {
     "message": "Wprowadź opis paczki modów..."
@@ -158,23 +203,71 @@
   "app.export-modal.header": {
     "message": "Eksportuj paczkę modów"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Dołączyć \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nazwa paczki modów"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Skonfiguruje jakie pliki zostaną załączone w tym eksporcie"
-  },
   "app.export-modal.version-number-label": {
     "message": "Numer wersji"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Pobieranie zawartości"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Pobieranie Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Pobieranie pliku paczki"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Wyodrębnianie nadpisań"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizowanie"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Przygotowywanie instancji"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Przygotowywanie środowiska Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Pobieranie Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Wypakowywanie Javy {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Pobieranie Javy {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Przygotowywanie Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Sprawdzanie Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Ustalanie manifestu paczki"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Ustalanie programu ładującego"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Ustalanie wersji Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Ustalanie treści"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Przywracanie"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Uruchamianie procesorów programu ładującego"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
@@ -200,6 +293,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instalacja"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Pobieranie {current, number}/{total, number} projektów..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Kończenie aktualizacji..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Sprawdzanie wersji..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
@@ -221,11 +323,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "Szukaj serwerów"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' zostanie **permanentnie usunięty** i nie ma możliwości go odzyskać."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Usuń świat"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Czy na pewno chcesz trwale usunąć ten świat?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Usuń świat"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Ten świat zostanie trwale usunięty z tej instancji. Tej akcji nie będzie można cofnąć."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Usuwanie {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Zmodowany"
@@ -245,29 +353,32 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nie dodano żadnych światów ani serwerów"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' zostanie usunięty z twojej listy, również z gry, i nie będzie możliwości go odzyskać."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Usuń serwer"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) zostanie usunięty z twojej listy, również z gry, i nie będzie możliwości go odzyskać."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Usuń serwer"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Czy jesteś pewny, że chcesz usunąć {name}?"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Ten serwer zostanie trwale usunięty z tej instancji. Tej akcji nie będzie można cofnąć."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Usuwanie {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Szukaj wśród {count} światów..."
   },
-  "app.instance.worlds.this-server": {
-    "message": "ten serwer"
-  },
   "app.modal.install-to-play.content-required": {
-    "message": "Wymagane treści"
+    "message": "Wymagana zawartość"
   },
   "app.modal.install-to-play.header": {
     "message": "Zainstaluj, aby grać"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Zainstaluj"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Wymagana paczka modów"
@@ -327,13 +438,28 @@
     "message": "Zarządzanie zasobami"
   },
   "app.skins.add-button": {
-    "message": "Dodaj skina"
+    "message": "Dodaj skórkę"
+  },
+  "app.skins.add-button.drag-and-drop": {
+    "message": "Przeciągnij i upuść"
   },
   "app.skins.apply-button": {
     "message": "Zastosuj"
   },
   "app.skins.delete-button": {
-    "message": "Usuń skina"
+    "message": "Usuń skórkę"
+  },
+  "app.skins.delete-modal.description": {
+    "message": "To trwale usunie wybraną skórkę. Tej akcji nie można odwrócić."
+  },
+  "app.skins.delete-modal.title": {
+    "message": "Czy na pewno chcesz usunąć tę skórkę?"
+  },
+  "app.skins.dropped-file-error.text": {
+    "message": "Nie udało się odczytać wybranego pliku."
+  },
+  "app.skins.dropped-file-error.title": {
+    "message": "Błąd podczas przetwarzania pliku"
   },
   "app.skins.edit-button": {
     "message": "Edytuj skina"
@@ -344,20 +470,35 @@
   "app.skins.modal.add-title": {
     "message": "Dodawanie skina"
   },
+  "app.skins.modal.arm-style-section": {
+    "message": "Styl ramion"
+  },
+  "app.skins.modal.arm-style-slim": {
+    "message": "Smukły"
+  },
+  "app.skins.modal.arm-style-wide": {
+    "message": "Szeroki"
+  },
   "app.skins.modal.cape-fallback-name": {
     "message": "Peleryna"
   },
   "app.skins.modal.cape-section": {
-    "message": "Pelerynki"
+    "message": "Peleryny"
   },
   "app.skins.modal.edit-title": {
     "message": "Edytuj skina"
+  },
+  "app.skins.modal.make-edit-first-tooltip": {
+    "message": "Wpierw zmień jakoś skórkę!"
   },
   "app.skins.modal.no-cape-tooltip": {
     "message": "Brak peleryny"
   },
   "app.skins.modal.none-cape-option": {
-    "message": "Nic"
+    "message": "Brak"
+  },
+  "app.skins.modal.replace-texture-button": {
+    "message": "Zamień teksturę"
   },
   "app.skins.modal.save-skin-button": {
     "message": "Zapisz skina"
@@ -368,29 +509,80 @@
   "app.skins.modal.texture-section": {
     "message": "Tekstura"
   },
+  "app.skins.modal.upload-skin-first-tooltip": {
+    "message": "Wpierw prześlij skórkę!"
+  },
   "app.skins.preview.edit-button": {
-    "message": "Edytuj skina"
+    "message": "Edytuj skórkę"
+  },
+  "app.skins.previewing-badge": {
+    "message": "Podgląd"
+  },
+  "app.skins.rate-limit.text": {
+    "message": "Zbyt często zmieniasz swoją skórkę. Serwery Mojang tymczasowo zablokowały dalsze żądania. Odczekaj chwilę i spróbuj ponownie."
   },
   "app.skins.rate-limit.title": {
     "message": "Zwolnij!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Nie udało się zapisać kolejności skórek."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Nie udało się zmienić kolejności skórek"
+  },
+  "app.skins.section.builders-and-biomes": {
+    "message": "Builders & Biomes"
+  },
+  "app.skins.section.chase-the-skies": {
+    "message": "Chase the Skies"
+  },
   "app.skins.section.default-skins": {
-    "message": "Domyślne skiny"
+    "message": "Domyślne skórki"
   },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
+  "app.skins.section.modrinth": {
+    "message": "Modrinth"
+  },
+  "app.skins.section.modrinth-pride": {
+    "message": "Duma Modrinth"
+  },
+  "app.skins.section.modrinth-pride.tooltip": {
+    "message": "Zdobyłeś te skórki poprzez dotację na zbiórkę Dumy Modrinth w okresie Miesiąca Dumy."
+  },
+  "app.skins.section.mounts-of-mayhem": {
+    "message": "Mounts of Mayhem"
+  },
+  "app.skins.section.saved-skins": {
+    "message": "Zapisane skórki"
+  },
+  "app.skins.section.striding-hero": {
+    "message": "Striding Hero"
+  },
+  "app.skins.section.the-copper-age": {
+    "message": "The Copper Age"
+  },
+  "app.skins.section.the-garden-awakens": {
+    "message": "The Garden Awakens"
+  },
+  "app.skins.section.tiny-takeover": {
+    "message": "Tiny Takeover"
+  },
   "app.skins.sign-in.button": {
-    "message": "Zaloguj Się"
+    "message": "Zaloguj się"
+  },
+  "app.skins.sign-in.description": {
+    "message": "Zaloguj się na konto Minecraft, by móc zarządzać skórkami poprzez Modrinth App."
+  },
+  "app.skins.sign-in.rinthbot-alt": {
+    "message": "Podekscytowany Modrinth Bot"
   },
   "app.skins.sign-in.title": {
-    "message": "Proszę zaloguj się"
+    "message": "Zaloguj się"
   },
   "app.skins.title": {
-    "message": "Wybierz skina"
-  },
-  "app.update-popup.body": {
-    "message": "Wersja Modrinth App v{version} jest gotowa do zainstalowania! Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+    "message": "Wybierz skórkę"
   },
   "app.update-popup.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
@@ -411,7 +603,7 @@
     "message": "Pobieranie ukończone"
   },
   "app.update-popup.reload": {
-    "message": "Załaduj ponownie"
+    "message": "Załaduj ponownie, by zaktualizować"
   },
   "app.update-popup.title": {
     "message": "Dostępna aktualizacja"
@@ -421,15 +613,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Wersja {version} została pomyślnie zainstalowana!"
-  },
-  "app.update.download-update": {
-    "message": "Pobierz aktualizację"
-  },
-  "app.update.downloading-update": {
-    "message": "Pobieranie aktualizacji ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Załaduj ponownie, aby zainstalować aktualizację"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -451,6 +634,9 @@
   },
   "friends.action.add-friend": {
     "message": "Dodaj znajomego"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {zaproszenie} few {zaproszenia} other {zaproszeń}} do znajomych"
   },
   "friends.add-friend.submit": {
     "message": "Wyślij zaproszenie"
@@ -617,6 +803,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Nazwa"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Kanał aktualizacji"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alfa"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Wersje stabilne, beta i alfa będą pokazane jako dostępne aktualizacje."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Tylko wersje stabilne i wersje beta będą pokazane jako dostępne aktualizacje."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Stabilny"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Tylko wersje stabilne będą pokazane jako dostępne aktualizacje."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Wybierz kanał aktualizacji"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Haczyki startowe"
   },
@@ -739,6 +949,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Kopiuj adres"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Utwórz skrót"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nie pokazuj na stronie głównej"

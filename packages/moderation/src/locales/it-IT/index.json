@@ -29,8 +29,14 @@
   "nags.add-links.title": {
     "defaultMessage": "Aggiungi link esterni"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Hai selezionato {totalAvailableTags, plural, one {l'unico tag disponibile} =8 {tutti gli # tag disponibili} =11 {tutti gli # tag disponibili} other {tutti i # tag disponibili}}. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "La tua descrizione è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia chiara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Espandi la descrizione"
@@ -125,8 +131,17 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Feedback revisione"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona la risoluzione corretta"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Assicurati di aver fornito la prova del permesso di distribuzione dei contenuti esterni del tuo pacchetto di mod."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Ricontrolla i permessi esterni"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Seleziona le versioni supportate dal tuo server, scegli un pacchetto di mod, o caricane il tuo."
@@ -167,6 +182,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Vedi impostazioni dei collegamenti"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visita bacheca dei permessi"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Vedi impostazioni dei tag"
   },
@@ -185,6 +203,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Rivedi la sintesi"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "La tua sintesi è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia allettante e informativa."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Espandi la sintesi"
   },
@@ -194,8 +215,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rivedi il nome"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Hai selezionato {tagCount} tag. Scegline al massimo {maxTagCount} cosicché il tuo server appaia in ricerche rilevanti."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Seleziona i tag pertinenti"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Hai selezionato {tagCount} tag. Dovresti tenerne al massimo {maxTagCount} per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona i tag pertinenti"

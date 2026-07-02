@@ -2,6 +2,57 @@ import type { RawDecimal } from '../../utils/types'
 import type { ISO3166 } from '../iso3166/types'
 
 export namespace Labrinth {
+	export namespace Content {
+		export namespace v3 {
+			export type ContentType =
+				| 'mod'
+				| 'plugin'
+				| 'datapack'
+				| 'resourcepack'
+				| 'shader'
+				| 'modpack'
+
+			export type ResolutionPreferences = {
+				game_versions?: string[]
+				loaders?: string[]
+			}
+
+			export type ResolveContentRequest = {
+				project_id: string
+				version_id?: string | null
+				content_type: ContentType
+				selected?: ResolutionPreferences
+				target?: ResolutionPreferences
+				existing_project_ids?: string[]
+			}
+
+			export type ResolveContentPlan = {
+				primary: ResolvedContent
+				dependencies: ResolvedContent[]
+				skipped: SkippedContent[]
+			}
+
+			export type ResolvedContent = {
+				project_id: string
+				version_id: string
+				dependent_on_version_id?: string | null
+			}
+
+			export type SkippedContent = {
+				project_id: string
+				version_id?: string | null
+				dependent_on_version_id?: string | null
+				reason:
+					| 'already_installed'
+					| 'duplicate_project'
+					| 'conflicting_dependency'
+					| 'no_compatible_version'
+					| 'missing_version'
+					| 'quilt_fabric_api'
+			}
+		}
+	}
+
 	export namespace Campaign {
 		export namespace Internal {
 			export type CampaignInfo = {
@@ -249,6 +300,144 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Attribution {
+		export namespace Internal {
+			export type AttributionPermissionKind =
+				| 'license'
+				| 'my_project'
+				| 'special_permissions'
+				| 'globally_allowed'
+				| 'no_permission'
+			export type AttributionResolutionKind = AttributionPermissionKind
+
+			export type AttributionLicense = string | { name: string }
+
+			export type AttributionModerationStatusKind = 'not_allowed' | 'approved' | 'bad_proof'
+
+			export type AttributionModerationStatus = {
+				kind: AttributionModerationStatusKind
+				reason: string
+				moderated_at?: string
+				moderated_by?: string
+			}
+
+			export type AttributionResolutionBase = {
+				notes: string
+				image_urls: string[]
+				moderation_status?: AttributionModerationStatus | null
+				updated_by_moderator: boolean
+			}
+
+			export type AttributionResolution =
+				| (AttributionResolutionBase & {
+						kind: 'license'
+						license: AttributionLicense
+						link_to_work: string
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'my_project'
+						license: AttributionLicense
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'special_permissions'
+						link_to_work: string
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'globally_allowed'
+						link_to_work: string
+				  })
+				| (AttributionResolutionBase & {
+						kind: 'no_permission'
+						link_to_work?: string
+				  })
+
+			export type FlameProject = {
+				id: number
+				title: string
+				url: string
+				icon_url: string
+			}
+
+			export type AttributionFile = {
+				name: string
+				sha1: string
+				versions: string[]
+				moderation_external_license_id?: number
+				moderation_external_license?: ExternalProjects.Internal.ExternalProject
+			}
+
+			export type AttributionVersionInfo = {
+				id: string
+				name: string
+				version_number: string
+				date_created: string
+			}
+
+			export type AttributionGroup = {
+				id: string
+				flame_project: FlameProject | null
+				attribution: AttributionResolution | null
+				attributed_at: string | null
+				attributed_by: string | null
+				files: AttributionFile[]
+				versions: AttributionVersionInfo[]
+			}
+
+			export type UpdateGroupRequest = {
+				attribution: AttributionResolution
+			}
+
+			export type AssignRequest = {
+				sha1: string
+				target_group_id: number
+				project_id: string
+			}
+
+			export type SplitRequest = {
+				sha1: string
+				project_id: string
+			}
+		}
+	}
+
+	export namespace Images {
+		export namespace v3 {
+			/** Extensions accepted by POST /v3/image (Labrinth image pipeline). */
+			export type ImageExtension = 'bmp' | 'gif' | 'jpeg' | 'jpg' | 'png' | 'webp'
+
+			/** `context` query values accepted by POST /v3/image. */
+			export type ImageUploadContext = 'project' | 'version' | 'thread_message' | 'report'
+
+			export type UploadedImage = {
+				id: string
+				url: string
+				size: number
+				created: string
+				owner_id: string
+			} & (
+				| { context: 'project'; project_id: string }
+				| { context: 'version'; version_id: string }
+				| { context: 'thread_message'; thread_message_id: string }
+				| { context: 'report'; report_id: string }
+			)
+
+			export type UploadedImageFor<C extends ImageUploadContext> = Extract<
+				UploadedImage,
+				{ context: C }
+			>
+
+			/**
+			 * Target for POST /v3/image (per-context id query params, plus `context`).
+			 * `ext` is passed as a separate argument on the client module.
+			 */
+			export type UploadImageParams =
+				| { context: 'project'; project_id: string }
+				| { context: 'version'; version_id: string }
+				| { context: 'thread_message'; thread_message_id: string }
+				| { context: 'report'; report_id: string }
+		}
+	}
+
 	export namespace Analytics {
 		export namespace v3 {
 			export type AnalyticsEventId = number
@@ -313,6 +502,7 @@ export namespace Labrinth {
 			export type ProjectDownloadsField =
 				| 'project_id'
 				| 'version_id'
+				| 'dependent_project_id'
 				| 'user_agent'
 				| 'domain'
 				| 'country'
@@ -328,7 +518,7 @@ export namespace Labrinth {
 				| 'game_version'
 				| 'country'
 
-			export type ProjectRevenueField = 'project_id'
+			export type ProjectRevenueField = 'project_id' | 'user_id'
 
 			export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
@@ -347,6 +537,7 @@ export namespace Labrinth {
 
 			export type ProjectDownloadsFilters = {
 				version_id?: string[]
+				dependent_project_id?: string[]
 				domain?: string[]
 				user_agent?: string[]
 				monetized?: boolean[]
@@ -363,7 +554,9 @@ export namespace Labrinth {
 				country?: string[]
 			}
 
-			export type ProjectRevenueFilters = Record<string, never>
+			export type ProjectRevenueFilters = {
+				user_id?: string[]
+			}
 
 			export type AffiliateCodeClicksFilters = {
 				affiliate_code_id?: string[]
@@ -379,6 +572,8 @@ export namespace Labrinth {
 
 			export type FetchResponse = {
 				metrics: TimeSlice[]
+				projects: Record<string, Projects.v3.Project>
+				users: Record<string, Users.v3.User>
 				project_events: ProjectAnalyticsEvent[]
 			}
 
@@ -462,6 +657,7 @@ export namespace Labrinth {
 				user_agent?: string
 				domain?: string
 				version_id?: string
+				dependent_project_id?: string
 				country?: string
 				monetized?: boolean
 				reason?: DownloadReason
@@ -479,6 +675,7 @@ export namespace Labrinth {
 			}
 
 			export type ProjectRevenue = {
+				user_id?: string
 				revenue: string
 			}
 
@@ -509,6 +706,10 @@ export namespace Labrinth {
 		export namespace Internal {
 			export type SubscriptionStatus = {
 				subscribed: boolean
+			}
+
+			export type DiscordCommunityLinkResponse = {
+				url: string
 			}
 		}
 
@@ -545,6 +746,23 @@ export namespace Labrinth {
 				session: string
 			}
 
+			export type ValidateCreateAccountRequest = {
+				username: string
+				password: string
+				email: string
+			}
+
+			export type CreateOAuthAccountRequest = {
+				username: string
+				state: string
+				challenge: string
+				sign_up_newsletter: boolean
+			}
+
+			export type CreateOAuthAccountResponse = {
+				session: string
+			}
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
@@ -554,6 +772,38 @@ export namespace Labrinth {
 				flow?: string
 				old_password?: string
 				new_password?: string
+			}
+
+			export type Passkey = {
+				id: string
+				name: string
+				created_at: string
+				last_used: string | null
+			}
+
+			export type PasskeyRegisterStartResponse = {
+				options: Record<string, unknown>
+				flow: string
+			}
+
+			export type PasskeyRegisterFinishRequest = {
+				flow: string
+				name: string
+				credential: unknown
+			}
+
+			export type PasskeyAuthenticateStartResponse = {
+				options: Record<string, unknown>
+				flow: string
+			}
+
+			export type PasskeyAuthenticateFinishRequest = {
+				flow: string
+				credential: unknown
+			}
+
+			export type PasskeyRenameRequest = {
+				name: string
 			}
 		}
 	}
@@ -1135,11 +1385,47 @@ export namespace Labrinth {
 
 		// TODO: consolidate duplicated types between v2 and v3 versions
 		export namespace v3 {
+			export type FlameProject = {
+				id: number
+				title: string
+				url: string
+				icon_url: string
+			}
+
+			export type DependencyAttribution = {
+				flame_project?: FlameProject
+				resolution?: DependencyAttributionResolution
+			}
+
+			export type DependencyAttributionResolution =
+				| {
+						kind: 'license'
+						license: Labrinth.Attribution.Internal.AttributionLicense
+						link_to_work: string
+				  }
+				| {
+						kind: 'globally_allowed'
+						link_to_work: string
+				  }
+				| {
+						kind: 'my_project'
+						license: Labrinth.Attribution.Internal.AttributionLicense
+				  }
+				| {
+						kind: 'special_permissions'
+						link_to_work: string
+				  }
+				| {
+						kind: 'no_permission'
+						link_to_work?: string
+				  }
+
 			export interface Dependency {
 				dependency_type: Labrinth.Versions.v2.DependencyType
 				project_id?: string
 				file_name?: string
 				version_id?: string
+				attribution?: DependencyAttribution
 			}
 
 			export interface GetProjectVersionsParams {
@@ -1162,12 +1448,12 @@ export namespace Labrinth {
 				| 'signature'
 				| 'unknown'
 
-			export interface VersionFileHash {
-				sha512: string
-				sha1: string
+			export type FileHashType = 'sha512' | 'sha1'
+			export type VersionFileHash = {
+				[key in FileHashType]: string
 			}
 
-			interface VersionFile {
+			export interface VersionFile {
 				hashes: VersionFileHash
 				url: string
 				filename: string
@@ -1199,6 +1485,7 @@ export namespace Labrinth {
 				date_published: string
 				downloads: number
 				files: VersionFile[]
+				files_missing_attribution?: string[]
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
 
@@ -1646,6 +1933,28 @@ export namespace Labrinth {
 			export type ReleaseLockResponse = {
 				success: boolean
 			}
+
+			export type ProjectJudgementStatus = ExternalProjects.Internal.ExternalLicenseStatus
+
+			export type FlameJudgement = {
+				type: 'flame'
+				id: number
+				status: ProjectJudgementStatus
+				link: string
+				title: string
+			}
+
+			export type UnknownJudgement = {
+				type: 'unknown'
+				status: ProjectJudgementStatus
+				proof?: string
+				link?: string
+				title?: string
+			}
+
+			export type ProjectJudgement = FlameJudgement | UnknownJudgement
+
+			export type ProjectJudgements = Record<string, ProjectJudgement>
 		}
 	}
 
@@ -1807,7 +2116,7 @@ export namespace Labrinth {
 				inserted_by: number | null
 				updated_at: string | null
 				updated_by: number | null
-				linked_files: LinkedFile[]
+				linked_files?: LinkedFile[]
 			}
 
 			export type SearchRequest = {
@@ -1822,6 +2131,11 @@ export namespace Labrinth {
 				exceptions?: string
 				proof?: string
 				flame_project_id?: number
+			}
+
+			export type AddFileRequest = {
+				hashes: string[]
+				license_id: number
 			}
 		}
 	}

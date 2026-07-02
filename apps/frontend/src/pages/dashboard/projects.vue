@@ -157,181 +157,215 @@
 			</div>
 		</NewModal>
 		<ModalCreation ref="modal_creation" />
-		<section class="universal-card">
-			<div class="header__row">
-				<h2 class="header__title text-2xl">{{ formatMessage(messages.headTitle) }}</h2>
-				<div class="input-group">
-					<ButtonStyled color="brand">
-						<button @click="$refs.modal_creation.show($event)">
-							<PlusIcon />
-							{{ formatMessage(commonMessages.createAProjectButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-			<p v-if="projects.length < 1">
-				{{ formatMessage(messages.noProjectsYet) }}
-			</p>
-			<template v-else>
-				<p>{{ formatMessage(messages.bulkEditHint) }}</p>
-				<div class="input-group">
-					<ButtonStyled>
-						<button :disabled="selectedProjects.length === 0" @click="$refs.editLinksModal.show()">
-							<EditIcon />
-							{{ formatMessage(messages.editLinksButton) }}
-						</button>
-					</ButtonStyled>
-					<div class="push-right">
-						<div class="labeled-control-row">
-							{{ formatMessage(commonMessages.sortByLabel) }}
-							<Combobox
-								v-model="sortBy"
-								:searchable="false"
-								class="small-select"
-								:options="sortOptions"
-								@update:model-value="projects = updateSort(projects, sortBy, descending)"
-							/>
-							<ButtonStyled circular>
-								<button
-									v-tooltip="formatMessage(descending ? messages.descending : messages.ascending)"
-									@click="updateDescending()"
-								>
-									<SortDescIcon v-if="descending" />
-									<SortAscIcon v-else />
+		<section class="relative overflow-hidden rounded-2xl">
+			<Table
+				v-model:sort-column="sortColumn"
+				v-model:sort-direction="sortDirection"
+				:columns="projectTableColumns"
+				:data="sortedProjects"
+				row-key="id"
+				table-min-width="50rem"
+				table-layout="auto"
+			>
+				<template #header>
+					<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+						<h2 class="m-0 text-2xl font-semibold text-contrast">
+							{{ formatMessage(messages.headTitle) }}
+						</h2>
+						<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
+							<ButtonStyled color="brand">
+								<button @click="$refs.modal_creation.show($event)">
+									<PlusIcon />
+									{{ formatMessage(commonMessages.createAProjectButton) }}
 								</button>
 							</ButtonStyled>
 						</div>
 					</div>
-				</div>
-				<div class="grid-table">
-					<div class="grid-table__row grid-table__header">
-						<div>
-							<Checkbox
-								:model-value="allBulkEditableProjectsSelected"
-								@update:model-value="toggleAllBulkEditableProjects()"
-							/>
-						</div>
-						<div>{{ formatMessage(messages.iconHeader) }}</div>
-						<div>{{ formatMessage(messages.nameHeader) }}</div>
-						<div>{{ formatMessage(messages.idHeader) }}</div>
-						<div>{{ formatMessage(messages.typeHeader) }}</div>
-						<div>{{ formatMessage(messages.statusHeader) }}</div>
-						<div />
+				</template>
+				<template #empty-state>
+					<div class="flex h-64 items-center justify-center text-secondary">
+						{{ formatMessage(messages.noProjectsYet) }}
 					</div>
-					<div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
-						<div>
-							<Checkbox
-								v-tooltip="getBulkEditDisabledTooltip(project)"
-								:disabled="isProjectBulkEditDisabled(project)"
-								:model-value="selectedProjects.includes(project)"
-								@update:model-value="toggleProjectSelection(project)"
+				</template>
+				<template #header-select>
+					<div v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)">
+						<Checkbox
+							:model-value="allBulkEditableProjectsSelected"
+							@update:model-value="toggleAllBulkEditableProjects()"
+						/>
+					</div>
+				</template>
+				<template #cell-select="{ row: project }">
+					<div>
+						<Checkbox
+							v-tooltip="getBulkEditDisabledTooltip(project)"
+							:disabled="isProjectBulkEditDisabled(project)"
+							:model-value="isProjectSelected(project)"
+							@update:model-value="toggleProjectSelection(project)"
+						/>
+					</div>
+				</template>
+				<template #cell-name="{ row: project }">
+					<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
+						<span
+							v-tooltip="project.title"
+							class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded text-primary"
+						>
+							<img
+								v-if="project.icon_url"
+								:src="project.icon_url"
+								:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
+								class="h-6 w-6 rounded object-cover"
 							/>
-						</div>
-						<div>
-							<nuxt-link
-								tabindex="-1"
-								:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-									project.slug ? project.slug : project.id
-								}`"
-							>
-								<Avatar
-									:src="project.icon_url"
-									aria-hidden="true"
-									:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
-									no-shadow
-								/>
-							</nuxt-link>
-						</div>
+							<BoxIcon v-else class="h-full w-full" />
+						</span>
+						<span class="project-title">
+							<IssuesIcon
+								v-if="project.moderator_message"
+								:aria-label="formatMessage(messages.projectModeratorMessageAriaLabel)"
+							/>
 
-						<div>
-							<span class="project-title">
-								<IssuesIcon
-									v-if="project.moderator_message"
-									:aria-label="formatMessage(messages.projectModeratorMessageAriaLabel)"
-								/>
-
-								<nuxt-link
-									class="hover-link wrap-as-needed"
-									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-										project.slug ? project.slug : project.id
-									}`"
-								>
-									{{ project.title }}
-								</nuxt-link>
+							<span class="project-title-link wrap-as-needed">
+								{{ project.title }}
 							</span>
-						</div>
-
-						<div>
-							<CopyCode :text="project.id" />
-						</div>
-
-						<div>
-							{{ formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders)) }}
-						</div>
-
-						<div>
-							<ProjectStatusBadge v-if="project.status" :status="project.status" />
-						</div>
-
-						<div class="flex !flex-row items-center !justify-end gap-2">
-							<ButtonStyled
-								v-if="projectsWithMigrationWarning.includes(project.id)"
-								circular
-								color="orange"
+						</span>
+					</nuxt-link>
+				</template>
+				<template #cell-id="{ row: project }">
+					<div class="flex items-center">
+						<CopyCode :text="project.id" />
+					</div>
+				</template>
+				<template #cell-type="{ row: project }">
+					<div class="flex items-center">
+						{{ getProjectDisplayType(project) }}
+					</div>
+				</template>
+				<template #cell-status="{ row: project }">
+					<div class="flex items-center">
+						<ProjectStatusBadge v-if="project.status" :status="project.status" />
+					</div>
+				</template>
+				<template #cell-actions="{ row: project }">
+					<div class="flex !flex-row items-center !justify-end gap-2">
+						<ButtonStyled
+							v-if="projectsWithMigrationWarning.includes(project.id)"
+							circular
+							color="orange"
+						>
+							<nuxt-link
+								v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
+								:to="`${getProjectUrl(project)}?showEnvironmentMigrationWarning=true`"
 							>
-								<nuxt-link
-									v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
-									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-										project.slug ? project.slug : project.id
-									}?showEnvironmentMigrationWarning=true`"
-								>
-									<TriangleAlertIcon />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled circular>
-								<nuxt-link
-									v-tooltip="formatMessage(commonMessages.settingsLabel)"
-									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
-										project.slug ? project.slug : project.id
-									}/settings`"
-								>
-									<SettingsIcon />
-								</nuxt-link>
-							</ButtonStyled>
-						</div>
+								<TriangleAlertIcon />
+							</nuxt-link>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<nuxt-link
+								v-tooltip="formatMessage(commonMessages.settingsLabel)"
+								:to="`${getProjectUrl(project)}/settings`"
+							>
+								<SettingsIcon />
+							</nuxt-link>
+						</ButtonStyled>
+					</div>
+				</template>
+			</Table>
+		</section>
+		<FloatingActionBar
+			:shown="selectedProjects.length > 0"
+			:aria-label="formatMessage(messages.selectionActionBarAriaLabel)"
+			hide-when-modal-open
+		>
+			<div class="flex items-center gap-0.5">
+				<div
+					class="relative h-8 shrink-0"
+					:style="{ width: `${selectedProjectIconStackWidth}px` }"
+					aria-hidden="true"
+				>
+					<div
+						v-for="(project, index) in visibleSelectedProjects"
+						:key="project.id"
+						v-tooltip="project.title"
+						class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
+						:style="{
+							left: `${index * SELECTED_PROJECT_ICON_STACK_OFFSET}px`,
+							zIndex: visibleSelectedProjects.length - index,
+						}"
+					>
+						<img
+							v-if="project.icon_url"
+							:src="project.icon_url"
+							:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
+							class="h-full w-full rounded-lg object-cover"
+						/>
+						<BoxIcon v-else class="h-full w-full text-primary" />
+					</div>
+					<div
+						v-if="selectedProjectOverflowCount > 0"
+						class="absolute top-0 flex h-8 w-8 items-center justify-center rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4 text-xs font-bold text-contrast"
+						:style="{
+							left: `${visibleSelectedProjects.length * SELECTED_PROJECT_ICON_STACK_OFFSET}px`,
+							zIndex: 0,
+						}"
+					>
+						+{{ selectedProjectOverflowCount }}
 					</div>
 				</div>
-			</template>
-		</section>
+
+				<span class="px-3 py-2 text-base font-semibold tabular-nums text-contrast">
+					{{ formatMessage(messages.selectedProjectsCount, { count: selectedProjects.length }) }}
+				</span>
+				<div class="mx-0.5 h-6 w-px bg-surface-5" />
+				<ButtonStyled type="transparent">
+					<button
+						v-tooltip="formatMessage(commonMessages.clearButton)"
+						class="!text-primary"
+						@click="clearProjectSelection()"
+					>
+						<XIcon class="cq-show-icon hidden" />
+						<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+					</button>
+				</ButtonStyled>
+			</div>
+
+			<div class="ml-auto flex items-center gap-0.5">
+				<ButtonStyled color="brand">
+					<button v-tooltip="formatMessage(messages.editLinksButton)" @click="showEditLinksModal()">
+						<EditIcon />
+						<span class="bar-label">{{ formatMessage(messages.editLinksButton) }}</span>
+					</button>
+				</ButtonStyled>
+			</div>
+		</FloatingActionBar>
 	</div>
 </template>
 
 <script setup>
 import {
+	BoxIcon,
 	EditIcon,
 	IssuesIcon,
 	PlusIcon,
 	SaveIcon,
 	SettingsIcon,
-	SortAscIcon,
-	SortDescIcon,
 	TrashIcon,
 	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Avatar,
 	ButtonStyled,
 	Checkbox,
-	Combobox,
 	commonMessages,
 	CopyCode,
 	defineMessages,
+	FloatingActionBar,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
 	ProjectStatusBadge,
 	StyledInput,
+	Table,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
@@ -359,6 +393,14 @@ const messages = defineMessages({
 	editLinksButton: {
 		id: 'dashboard.projects.links.button.edit',
 		defaultMessage: 'Edit links',
+	},
+	selectedProjectsCount: {
+		id: 'dashboard.projects.selection-bar.selected-count',
+		defaultMessage: '{count, plural, one {# project selected} other {# projects selected}}',
+	},
+	selectionActionBarAriaLabel: {
+		id: 'dashboard.projects.selection-bar.aria-label',
+		defaultMessage: 'Selected projects actions',
 	},
 	editLinksHeader: {
 		id: 'dashboard.projects.links.header.edit',
@@ -434,34 +476,6 @@ const messages = defineMessages({
 		id: 'dashboard.projects.empty',
 		defaultMessage: "You don't have any projects yet. Click the green button above to begin.",
 	},
-	bulkEditHint: {
-		id: 'dashboard.projects.bulk-edit-hint',
-		defaultMessage: 'You can edit multiple projects at once by selecting them below.',
-	},
-	ascending: {
-		id: 'dashboard.projects.sort.ascending',
-		defaultMessage: 'Ascending',
-	},
-	descending: {
-		id: 'dashboard.projects.sort.descending',
-		defaultMessage: 'Descending',
-	},
-	sortOptionName: {
-		id: 'dashboard.projects.sort.option.name',
-		defaultMessage: 'Name',
-	},
-	sortOptionStatus: {
-		id: 'dashboard.projects.sort.option.status',
-		defaultMessage: 'Status',
-	},
-	sortOptionType: {
-		id: 'dashboard.projects.sort.option.type',
-		defaultMessage: 'Type',
-	},
-	iconHeader: {
-		id: 'dashboard.projects.table.icon',
-		defaultMessage: 'Icon',
-	},
 	nameHeader: {
 		id: 'dashboard.projects.table.name',
 		defaultMessage: 'Name',
@@ -477,6 +491,10 @@ const messages = defineMessages({
 	statusHeader: {
 		id: 'dashboard.projects.table.status',
 		defaultMessage: 'Status',
+	},
+	selectAllBulkEditableProjects: {
+		id: 'dashboard.projects.table.select-all-bulk-editable',
+		defaultMessage: 'Select all projects that support bulk editing',
 	},
 	projectIconAlt: {
 		id: 'dashboard.projects.project.icon-alt',
@@ -505,14 +523,9 @@ useHead({ title: () => `${formatMessage(messages.headTitle)} - Modrinth` })
 const user = await useUser()
 const projects = ref([])
 const projectsWithMigrationWarning = ref([])
-const selectedProjects = ref([])
-const sortBy = ref('Name')
-const sortOptions = computed(() => [
-	{ value: 'Name', label: formatMessage(messages.sortOptionName) },
-	{ value: 'Status', label: formatMessage(messages.sortOptionStatus) },
-	{ value: 'Type', label: formatMessage(messages.sortOptionType) },
-])
-const descending = ref(false)
+const selectedProjectIds = ref([])
+const sortColumn = ref('name')
+const sortDirection = ref('asc')
 const editLinks = reactive({
 	showAffected: false,
 	source: { val: '', clear: false },
@@ -522,7 +535,62 @@ const editLinks = reactive({
 })
 
 const editLinksModal = ref(null)
-const modal_creation = ref(null)
+const sortCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+const SELECTED_PROJECT_ICON_STACK_OFFSET = 24
+
+const projectTableColumns = computed(() => [
+	{
+		key: 'select',
+		width: '3rem',
+		headerClass: '!text-center',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'name',
+		label: formatMessage(messages.nameHeader),
+		enableSorting: true,
+		defaultSortDirection: 'asc',
+		width: '22rem',
+	},
+	{
+		key: 'id',
+		label: formatMessage(messages.idHeader),
+		width: '13rem',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'type',
+		label: formatMessage(messages.typeHeader),
+		enableSorting: true,
+		width: '11rem',
+	},
+	{
+		key: 'status',
+		label: formatMessage(messages.statusHeader),
+		enableSorting: true,
+		width: '10rem',
+		cellClass: '!overflow-visible',
+	},
+	{
+		key: 'actions',
+		width: '6rem',
+		align: 'right',
+		cellClass: '!overflow-visible',
+	},
+])
+
+const sortedProjects = computed(() => {
+	const direction = sortDirection.value === 'desc' ? -1 : 1
+
+	return projects.value.slice().sort((left, right) => {
+		const result = sortCollator.compare(
+			getProjectSortValue(left, sortColumn.value),
+			getProjectSortValue(right, sortColumn.value),
+		)
+
+		return result * direction
+	})
+})
 
 function getLinkInputPlaceholder(clearLink, isDiscord = false) {
 	if (clearLink) {
@@ -545,16 +613,35 @@ const bulkEditableProjects = computed(() =>
 	projects.value.filter((project) => !isProjectBulkEditDisabled(project)),
 )
 
+const selectedProjects = computed(() =>
+	projects.value.filter((project) => selectedProjectIds.value.includes(project.id)),
+)
+const visibleSelectedProjects = computed(() => selectedProjects.value.slice(0, 3))
+const selectedProjectOverflowCount = computed(() => Math.max(0, selectedProjects.value.length - 3))
+const selectedProjectIconStackWidth = computed(() => {
+	if (selectedProjects.value.length === 0) return 0
+
+	return (
+		32 +
+		(visibleSelectedProjects.value.length - 1 + (selectedProjectOverflowCount.value > 0 ? 1 : 0)) *
+			SELECTED_PROJECT_ICON_STACK_OFFSET
+	)
+})
+
 const allBulkEditableProjectsSelected = computed(
 	() =>
 		bulkEditableProjects.value.length > 0 &&
-		bulkEditableProjects.value.every((project) => selectedProjects.value.includes(project)),
+		bulkEditableProjects.value.every((project) => selectedProjectIds.value.includes(project.id)),
 )
 
 function toggleAllBulkEditableProjects() {
-	selectedProjects.value = allBulkEditableProjectsSelected.value
+	selectedProjectIds.value = allBulkEditableProjectsSelected.value
 		? []
-		: bulkEditableProjects.value.slice()
+		: bulkEditableProjects.value.map((project) => project.id)
+}
+
+function isProjectSelected(project) {
+	return selectedProjectIds.value.includes(project.id)
 }
 
 function toggleProjectSelection(project) {
@@ -562,12 +649,24 @@ function toggleProjectSelection(project) {
 		return
 	}
 
-	if (selectedProjects.value.includes(project)) {
-		selectedProjects.value = selectedProjects.value.filter((it) => it !== project)
+	if (isProjectSelected(project)) {
+		selectedProjectIds.value = selectedProjectIds.value.filter((id) => id !== project.id)
 		return
 	}
 
-	selectedProjects.value = [...selectedProjects.value, project]
+	selectedProjectIds.value = [...selectedProjectIds.value, project.id]
+}
+
+function clearProjectSelection() {
+	selectedProjectIds.value = []
+}
+
+function showEditLinksModal() {
+	if (selectedProjects.value.length === 0) {
+		return
+	}
+
+	editLinksModal.value?.show()
 }
 
 function getBulkEditDisabledTooltip(project) {
@@ -578,40 +677,28 @@ function getBulkEditDisabledTooltip(project) {
 	return ''
 }
 
-function updateSort(list, sort, desc) {
-	let sortedArray = list
-	switch (sort) {
-		case 'Name':
-			sortedArray = list.slice().sort((a, b) => a.title.localeCompare(b.title))
-			break
-		case 'Status':
-			sortedArray = list.slice().sort((a, b) => {
-				if (a.status < b.status) return -1
-				if (a.status > b.status) return 1
-				return 0
-			})
-			break
-		case 'Type':
-			sortedArray = list.slice().sort((a, b) => {
-				if (a.project_type < b.project_type) return -1
-				if (a.project_type > b.project_type) return 1
-				return 0
-			})
-			break
+function getProjectUrlType(project) {
+	return getProjectTypeForUrl(project.project_type, project.loaders)
+}
+
+function getProjectDisplayType(project) {
+	return formatProjectType(getProjectUrlType(project))
+}
+
+function getProjectUrl(project) {
+	return `/${getProjectUrlType(project)}/${project.slug ? project.slug : project.id}`
+}
+
+function getProjectSortValue(project, column) {
+	switch (column) {
+		case 'type':
+			return getProjectDisplayType(project)
+		case 'status':
+			return project.status ?? ''
+		case 'name':
 		default:
-			break
+			return project.title ?? ''
 	}
-	if (desc) sortedArray = sortedArray.reverse()
-	return sortedArray
-}
-
-function resort() {
-	projects.value = updateSort(projects.value, sortBy.value, descending.value)
-}
-
-function updateDescending() {
-	descending.value = !descending.value
-	resort()
 }
 
 async function bulkEditLinks() {
@@ -635,7 +722,7 @@ async function bulkEditLinks() {
 			text: formatMessage(messages.bulkEditSuccessText),
 			type: 'success',
 		})
-		selectedProjects.value = []
+		selectedProjectIds.value = []
 
 		editLinks.issues.val = ''
 		editLinks.source.val = ''
@@ -656,7 +743,7 @@ async function bulkEditLinks() {
 
 await initUserProjects()
 if (user.value?.projects) {
-	projects.value = updateSort(user.value.projects, 'Name', false)
+	projects.value = user.value.projects.slice()
 
 	// minecraft_java_server type determined from component on projectV3
 	projects.value = projects.value.map((project) => {
@@ -677,126 +764,20 @@ if (user.value?.projects) {
 }
 </script>
 <style lang="scss" scoped>
-.grid-table {
-	display: grid;
-	grid-template-columns:
-		min-content min-content minmax(min-content, 2fr)
-		minmax(min-content, 1fr) minmax(min-content, 1fr) minmax(min-content, 1fr) min-content;
-	border-radius: var(--size-rounded-sm);
-	overflow: hidden;
-	margin-top: var(--spacing-card-md);
-	outline: 1px solid transparent;
-
-	.grid-table__row {
-		display: contents;
-
-		> div {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			padding: var(--spacing-card-sm);
-
-			// Left edge of table
-			&:first-child {
-				padding-left: var(--spacing-card-bg);
-			}
-
-			// Right edge of table
-			&:last-child {
-				padding-right: var(--spacing-card-bg);
-			}
-		}
-
-		&:nth-child(2n + 1) > div {
-			background-color: var(--color-table-alternate-row);
-		}
-
-		&.grid-table__header > div {
-			background-color: var(--color-bg);
-			font-weight: bold;
-			color: var(--color-text-dark);
-			padding-top: var(--spacing-card-bg);
-			padding-bottom: var(--spacing-card-bg);
-		}
-	}
-
-	@media screen and (max-width: 750px) {
-		display: flex;
-		flex-direction: column;
-
-		.grid-table__row {
-			display: grid;
-			grid-template: 'checkbox icon name type settings' 'checkbox icon id status settings';
-			grid-template-columns:
-				min-content min-content minmax(min-content, 2fr)
-				minmax(min-content, 1fr) min-content;
-
-			:nth-child(1) {
-				grid-area: checkbox;
-			}
-
-			:nth-child(2) {
-				grid-area: icon;
-			}
-
-			:nth-child(3) {
-				grid-area: name;
-			}
-
-			:nth-child(4) {
-				grid-area: id;
-				padding-top: 0;
-			}
-
-			:nth-child(5) {
-				grid-area: type;
-			}
-
-			:nth-child(6) {
-				grid-area: status;
-				padding-top: 0;
-			}
-
-			:nth-child(7) {
-				grid-area: settings;
-			}
-		}
-
-		.grid-table__header {
-			grid-template: 'checkbox settings';
-			grid-template-columns: min-content minmax(min-content, 1fr);
-
-			:nth-child(2),
-			:nth-child(3),
-			:nth-child(4),
-			:nth-child(5),
-			:nth-child(6) {
-				display: none;
-			}
-		}
-	}
-
-	@media screen and (max-width: 560px) {
-		.grid-table__row {
-			display: grid;
-			grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
-			grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
-
-			:nth-child(5) {
-				padding-top: 0;
-			}
-		}
-
-		.grid-table__header {
-			grid-template: 'checkbox settings';
-			grid-template-columns: min-content minmax(min-content, 1fr);
-		}
-	}
+.project-name-cell {
+	display: flex;
+	min-width: 0;
+	min-height: 3.5rem;
+	align-items: center;
+	gap: var(--spacing-card-sm);
+	color: inherit;
+	text-decoration: none;
 }
 
 .project-title {
 	display: flex;
 	flex-direction: row;
+	min-width: 0;
 	gap: var(--spacing-card-xs);
 
 	svg {
@@ -804,27 +785,9 @@ if (user.value?.projects) {
 	}
 }
 
-.status {
-	margin-top: var(--spacing-card-xs);
-}
-
-.hover-link:hover {
+.project-name-cell:hover .project-title-link,
+.project-name-cell:focus-visible .project-title-link {
 	text-decoration: underline;
-}
-
-.labeled-control-row {
-	flex: 1;
-	display: flex;
-	flex-direction: row;
-	min-width: 0;
-	align-items: center;
-	gap: var(--spacing-card-md);
-	white-space: nowrap;
-}
-
-.small-select {
-	width: -moz-fit-content;
-	width: fit-content;
 }
 
 .label-button[data-active='true'] {

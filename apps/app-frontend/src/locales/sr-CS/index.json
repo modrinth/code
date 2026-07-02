@@ -1,4 +1,10 @@
 {
+  "app.action-bar.install.failed": {
+    "message": "Neuspešna instalacija"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Neuspešna instalacija zbog zatvaranja aplikacije."
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft serveri za autentifikaciju su možda trenutno nedostupni. Molimo vas da proverite vašu internet vezu i pokušajte ponovo kasnije."
   },
@@ -92,12 +98,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "Pretraži servere"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' će biti **trajno izbrisan**, i neće biti načina da se vrati."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Da li ste sigurni da hoćete da trajno izbrišete ovaj svet?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "Modifikovano"
   },
@@ -116,20 +116,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nema dodatih servera niti svetova"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' će biti izbrisan sa vaše liste, uključujući i unutar igre, i neće biti načina da se oporavi."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) će biti izbrisan sa vaše liste, uključujući i unutar igre, i neće biti načina da se oporavi."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Da li ste sigurni da hoćete da izbrišete {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pretraži {count} svetova..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "ovaj server"
   },
   "app.settings.tabs.appearance": {
     "message": "Izgled"
@@ -174,10 +162,13 @@
     "message": "Minecraft svet"
   },
   "instance.edit-world.title": {
-    "message": "Izmeni svet"
+    "message": "Promeni svet"
   },
   "instance.server-modal.placeholder-name": {
     "message": "Minecraft Server"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generalno"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Brisanje..."

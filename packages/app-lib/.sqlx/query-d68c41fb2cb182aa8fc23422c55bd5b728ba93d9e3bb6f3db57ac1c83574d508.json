@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE custom_minecraft_skins SET display_order = ? WHERE minecraft_user_uuid = ? AND texture_key = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "d68c41fb2cb182aa8fc23422c55bd5b728ba93d9e3bb6f3db57ac1c83574d508"
+}

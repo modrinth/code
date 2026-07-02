@@ -133,7 +133,7 @@
 						<span class="flex items-center gap-2">
 							{{ user.username }}
 							<BadgeCheckIcon
-								v-if="isModrinthUser"
+								v-if="isOfficialAccount"
 								v-tooltip="formatMessage(messages.officialAccount)"
 								class="size-5 text-brand"
 								fill="var(--color-brand-highlight)"
@@ -264,6 +264,15 @@
 										shown: auth.user && isStaff(auth.user),
 									},
 									{
+										id: 'open-analytics',
+										action: () =>
+											navigateTo({
+												path: '/dashboard/analytics',
+												query: { user: user.username || user.id },
+											}),
+										shown: auth.user && isAdmin(auth.user),
+									},
+									{
 										id: 'edit-role',
 										action: () => openRoleEditModal(),
 										shown: auth.user && isAdmin(auth.user),
@@ -296,6 +305,10 @@
 								<template #open-info>
 									<InfoIcon aria-hidden="true" />
 									{{ formatMessage(messages.infoButton) }}
+								</template>
+								<template #open-analytics>
+									<ChartIcon aria-hidden="true" />
+									{{ formatMessage(messages.analyticsButton) }}
 								</template>
 								<template #toggle-affiliate>
 									<AffiliateIcon aria-hidden="true" />
@@ -333,7 +346,7 @@
 								: projects
 							)
 								.slice()
-								.sort((a, b) => b.downloads - a.downloads)"
+								.sort(projectUserSorting)"
 							:key="project.id"
 							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
 							:title="project.title"
@@ -464,7 +477,7 @@
 					v-if="organizations?.length > 0"
 					class="mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 pt-3"
 				>
-					<h2 class="m-0 mb-2 text-lg text-contrast">
+					<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
@@ -500,6 +513,7 @@ import {
 	BadgeCheckIcon,
 	BoxIcon,
 	CalendarIcon,
+	ChartIcon,
 	CheckIcon,
 	ClipboardCopyIcon,
 	CurrencyIcon,
@@ -547,7 +561,8 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
+import { projectUserSorting } from '~/utils/projects.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
 import { hasActiveMidas, hasPride26Badge } from '~/utils/user-membership.ts'
 
@@ -692,6 +707,10 @@ const messages = defineMessages({
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
 	},
+	analyticsButton: {
+		id: 'profile.button.analytics',
+		defaultMessage: 'View user analytics',
+	},
 	setAffiliateButton: {
 		id: 'profile.button.set-affiliate',
 		defaultMessage: 'Set as affiliate',
@@ -791,6 +810,10 @@ const sortedOrgs = computed(() =>
 )
 
 const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
+const isAutoMod = computed(() => user.value?.id === '')
+const isOfficialAccount = computed(
+	() => isModrinthUser.value || isAutoMod.value || user.value?.id === 'GVFjtWTf',
+)
 
 const sortedCollections = computed(() => {
 	const list = collections.value
@@ -1016,5 +1039,9 @@ export default defineNuxtComponent({
 			}
 		}
 	}
+}
+
+.new-page {
+	column-gap: 1.5rem;
 }
 </style>

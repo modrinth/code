@@ -2,12 +2,15 @@ use crate::data::{Dependency, ProjectType, User, Version};
 use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
+use crate::state::instances::{
+    InstanceLaunchOverrides, InstanceLaunchOverridesData, playtime_to_storage,
+};
 use crate::state::{
     CacheValue, CachedEntry, CachedFile, CachedFileHash, CachedFileUpdate,
     Credentials, DefaultPage, DependencyType, DeviceToken, DeviceTokenKey,
-    DeviceTokenPair, FileType, Hooks, LauncherFeatureVersion, LinkedData,
-    MemorySettings, ModrinthCredentials, Profile, ProfileInstallStage,
-    TeamMember, Theme, VersionFile, WindowSize,
+    DeviceTokenPair, FileType, Hooks, InstanceInstallStage,
+    LauncherFeatureVersion, MemorySettings, ModrinthCredentials,
+    ReleaseChannel, TeamMember, Theme, VersionFile, WindowSize,
 };
 use crate::util::fetch::{IoSemaphore, read_json};
 use chrono::{DateTime, Utc};
@@ -161,23 +164,25 @@ where
 
         let mut cached_entries = vec![];
 
-        if let Ok(profiles_dir) = std::fs::read_dir(
+        if let Ok(legacy_instances_dir) = std::fs::read_dir(
             legacy_settings
                 .loaded_config_dir
                 .clone()
                 .unwrap_or_else(|| old_launcher_root.clone())
                 .join("profiles"),
         ) {
-            for entry in profiles_dir.flatten() {
+            for entry in legacy_instances_dir.flatten() {
                 if !entry.path().is_dir() {
                     continue;
                 }
 
-                let profile_path = entry.path().join("profile.json");
+                let legacy_config_path = entry.path().join("profile.json");
 
-                let Ok(profile) =
-                    read_json::<LegacyProfile>(&profile_path, &io_semaphore)
-                        .await
+                let Ok(profile) = read_json::<LegacyInstanceConfig>(
+                    &legacy_config_path,
+                    &io_semaphore,
+                )
+                .await
                 else {
                     continue;
                 };
@@ -225,6 +230,10 @@ where
                                         ProjectType::get_from_parent_folder(
                                             &full_path,
                                         ),
+                                    project_id: Some(
+                                        version.project_id.clone(),
+                                    ),
+                                    version_id: Some(version.id.clone()),
                                 },
                             ));
                         }
@@ -248,6 +257,9 @@ where
                                     loaders: vec![
                                         mod_loader.as_str().to_string(),
                                     ],
+                                    channel_policy: ReleaseChannel::Alpha
+                                        .key()
+                                        .to_string(),
                                     update_version_id: update_version
                                         .id
                                         .clone(),
@@ -292,84 +304,72 @@ where
                     }
                 }
 
-                Profile {
-                    path: profile.path,
-                    install_stage: match profile.install_stage {
-                        LegacyProfileInstallStage::Installed => {
-                            ProfileInstallStage::Installed
-                        }
-                        LegacyProfileInstallStage::Installing => {
-                            ProfileInstallStage::MinecraftInstalling
-                        }
-                        LegacyProfileInstallStage::PackInstalling => {
-                            ProfileInstallStage::PackInstalling
-                        }
-                        LegacyProfileInstallStage::NotInstalled => {
-                            ProfileInstallStage::NotInstalled
-                        }
-                    },
-                    launcher_feature_version: LauncherFeatureVersion::None,
-                    name: profile.metadata.name,
-                    icon_path: profile.metadata.icon,
-                    game_version: profile.metadata.game_version,
-                    protocol_version: None,
-                    loader: profile.metadata.loader.into(),
-                    loader_version: profile
-                        .metadata
-                        .loader_version
-                        .map(|x| x.id),
-                    groups: profile.metadata.groups,
-                    linked_data: profile.metadata.linked_data.and_then(|x| {
-                        if let Some(project_id) = x.project_id
-                            && let Some(version_id) = x.version_id
-                            && let Some(locked) = x.locked
-                        {
-                            return Some(LinkedData {
-                                project_id,
-                                version_id,
-                                locked,
-                            });
-                        }
-
-                        None
-                    }),
-                    created: profile.metadata.date_created,
-                    modified: profile.metadata.date_modified,
-                    last_played: profile.metadata.last_played,
-                    submitted_time_played: profile
-                        .metadata
-                        .submitted_time_played,
-                    recent_time_played: profile.metadata.recent_time_played,
-                    java_path: profile.java.as_ref().and_then(|x| {
-                        x.override_version.clone().map(|x| x.path)
-                    }),
-                    extra_launch_args: profile
-                        .java
-                        .as_ref()
-                        .and_then(|x| x.extra_arguments.clone()),
-                    custom_env_vars: profile
-                        .java
-                        .and_then(|x| x.custom_env_args),
-                    memory: profile
-                        .memory
-                        .map(|x| MemorySettings { maximum: x.maximum }),
-                    force_fullscreen: profile.fullscreen,
-                    game_resolution: profile
-                        .resolution
-                        .map(|x| WindowSize(x.0, x.1)),
-                    hooks: Hooks {
-                        pre_launch: profile
-                            .hooks
+                upsert_legacy_instance(
+                    exec,
+                    LegacyInstanceUpsert {
+                        path: profile.path,
+                        install_stage: match profile.install_stage {
+                            LegacyInstanceInstallStage::Installed => {
+                                InstanceInstallStage::Installed
+                            }
+                            LegacyInstanceInstallStage::Installing => {
+                                InstanceInstallStage::MinecraftInstalling
+                            }
+                            LegacyInstanceInstallStage::PackInstalling => {
+                                InstanceInstallStage::PackInstalling
+                            }
+                            LegacyInstanceInstallStage::NotInstalled => {
+                                InstanceInstallStage::NotInstalled
+                            }
+                        },
+                        launcher_feature_version: LauncherFeatureVersion::None,
+                        name: profile.metadata.name,
+                        icon_path: profile.metadata.icon,
+                        game_version: profile.metadata.game_version,
+                        loader: profile.metadata.loader.into(),
+                        loader_version: profile
+                            .metadata
+                            .loader_version
+                            .map(|x| x.id),
+                        groups: profile.metadata.groups,
+                        linked_data: profile.metadata.linked_data,
+                        created: profile.metadata.date_created,
+                        modified: profile.metadata.date_modified,
+                        last_played: profile.metadata.last_played,
+                        submitted_time_played: profile
+                            .metadata
+                            .submitted_time_played,
+                        recent_time_played: profile.metadata.recent_time_played,
+                        java_path: profile.java.as_ref().and_then(|x| {
+                            x.override_version.clone().map(|x| x.path)
+                        }),
+                        extra_launch_args: profile
+                            .java
                             .as_ref()
-                            .and_then(|x| x.pre_launch.clone()),
-                        wrapper: profile
-                            .hooks
-                            .as_ref()
-                            .and_then(|x| x.wrapper.clone()),
-                        post_exit: profile.hooks.and_then(|x| x.post_exit),
+                            .and_then(|x| x.extra_arguments.clone()),
+                        custom_env_vars: profile
+                            .java
+                            .and_then(|x| x.custom_env_args),
+                        memory: profile
+                            .memory
+                            .map(|x| MemorySettings { maximum: x.maximum }),
+                        force_fullscreen: profile.fullscreen,
+                        game_resolution: profile
+                            .resolution
+                            .map(|x| WindowSize(x.0, x.1)),
+                        hooks: Hooks {
+                            pre_launch: profile
+                                .hooks
+                                .as_ref()
+                                .and_then(|x| x.pre_launch.clone()),
+                            wrapper: profile
+                                .hooks
+                                .as_ref()
+                                .and_then(|x| x.wrapper.clone()),
+                            post_exit: profile.hooks.and_then(|x| x.post_exit),
+                        },
                     },
-                }
-                .upsert(exec)
+                )
                 .await?;
             }
         }
@@ -391,6 +391,238 @@ where
         settings.migrated = true;
         settings.update(exec).await?;
     }
+
+    Ok(())
+}
+
+struct LegacyInstanceUpsert {
+    path: String,
+    install_stage: InstanceInstallStage,
+    launcher_feature_version: LauncherFeatureVersion,
+    name: String,
+    icon_path: Option<String>,
+    game_version: String,
+    loader: ModLoader,
+    loader_version: Option<String>,
+    groups: Vec<String>,
+    linked_data: Option<LegacyLinkedData>,
+    created: DateTime<Utc>,
+    modified: DateTime<Utc>,
+    last_played: Option<DateTime<Utc>>,
+    submitted_time_played: u64,
+    recent_time_played: u64,
+    java_path: Option<String>,
+    extra_launch_args: Option<Vec<String>>,
+    custom_env_vars: Option<Vec<(String, String)>>,
+    memory: Option<MemorySettings>,
+    force_fullscreen: Option<bool>,
+    game_resolution: Option<WindowSize>,
+    hooks: Hooks,
+}
+
+async fn upsert_legacy_instance<'a, E>(
+    exec: E,
+    input: LegacyInstanceUpsert,
+) -> crate::Result<()>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Sqlite> + Copy,
+{
+    let instance_id = format!("local:{}", Uuid::new_v4());
+    let content_set_id = format!("content-set:{}", Uuid::new_v4());
+    let instance_id_str = instance_id.as_str();
+    let content_set_id_str = content_set_id.as_str();
+    let path = input.path.as_str();
+    let install_stage = input.install_stage.as_str();
+    let launcher_feature_version = input.launcher_feature_version.as_str();
+    let update_channel = ReleaseChannel::Release.key();
+    let name = input.name.as_str();
+    let icon_path = input.icon_path.as_deref();
+    let game_version = input.game_version.as_str();
+    let loader = input.loader.as_str();
+    let loader_version = input.loader_version.as_deref();
+    let created = input.created.timestamp();
+    let modified = input.modified.timestamp();
+    let last_played = input.last_played.map(|value| value.timestamp());
+    let submitted_time_played = playtime_to_storage(
+        input.submitted_time_played,
+        "submitted_time_played",
+    )?;
+    let recent_time_played =
+        playtime_to_storage(input.recent_time_played, "recent_time_played")?;
+
+    sqlx::query!(
+        "
+        INSERT OR REPLACE INTO instances (
+            id,
+            path,
+            applied_content_set_id,
+            install_stage,
+            launcher_feature_version,
+            update_channel,
+            name,
+            icon_path,
+            created,
+            modified,
+            last_played,
+            submitted_time_played,
+            recent_time_played
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ",
+        instance_id_str,
+        path,
+        content_set_id_str,
+        install_stage,
+        launcher_feature_version,
+        update_channel,
+        name,
+        icon_path,
+        created,
+        modified,
+        last_played,
+        submitted_time_played,
+        recent_time_played,
+    )
+    .execute(exec)
+    .await?;
+
+    let (
+        source_kind,
+        link_kind,
+        modrinth_project_id,
+        modrinth_version_id,
+        server_project_id,
+    ) = match input.linked_data {
+        Some(linked_data) => {
+            match (linked_data.project_id, linked_data.version_id) {
+                (Some(project_id), Some(version_id))
+                    if version_id.is_empty() =>
+                {
+                    (
+                        "server_project",
+                        "server_project",
+                        None,
+                        None,
+                        Some(project_id),
+                    )
+                }
+                (Some(project_id), Some(version_id)) => (
+                    "modrinth_modpack",
+                    "modrinth_modpack",
+                    Some(project_id),
+                    Some(version_id),
+                    None,
+                ),
+                _ => ("local", "unmanaged", None, None, None),
+            }
+        }
+        None => ("local", "unmanaged", None, None, None),
+    };
+
+    sqlx::query!(
+        "
+        INSERT OR REPLACE INTO instance_content_sets (
+            id,
+            instance_id,
+            name,
+            source_kind,
+            status,
+            game_version,
+            protocol_version,
+            loader,
+            loader_version,
+            created,
+            modified
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ",
+        content_set_id_str,
+        instance_id_str,
+        "Default",
+        source_kind,
+        "available",
+        game_version,
+        None::<i64>,
+        loader,
+        loader_version,
+        created,
+        modified,
+    )
+    .execute(exec)
+    .await?;
+
+    sqlx::query!(
+        "
+        INSERT OR REPLACE INTO instance_links (
+            instance_id,
+            link_kind,
+            modrinth_project_id,
+            modrinth_version_id,
+            server_project_id,
+            content_project_id,
+            content_version_id,
+            hosting_server_id,
+            hosting_instance_ids,
+            hosting_active_instance_id,
+            shared_instance_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, jsonb(?), ?, ?)
+        ",
+        instance_id_str,
+        link_kind,
+        modrinth_project_id,
+        modrinth_version_id,
+        server_project_id,
+        None::<&str>,
+        None::<&str>,
+        None::<&str>,
+        "[]",
+        None::<&str>,
+        None::<&str>,
+    )
+    .execute(exec)
+    .await?;
+
+    for group in input.groups {
+        sqlx::query!(
+            "
+            INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
+            VALUES (?, ?)
+            ",
+            instance_id_str,
+            group,
+        )
+        .execute(exec)
+        .await?;
+    }
+
+    let launch_overrides = InstanceLaunchOverrides {
+        instance_id: instance_id.clone(),
+        java_path: input.java_path,
+        extra_launch_args: input.extra_launch_args,
+        custom_env_vars: input.custom_env_vars,
+        memory: input.memory,
+        force_fullscreen: input.force_fullscreen,
+        game_resolution: input.game_resolution,
+        hooks: input.hooks,
+    };
+    let launch_overrides_data = serde_json::to_string(
+        &InstanceLaunchOverridesData::from(&launch_overrides),
+    )?;
+
+    sqlx::query!(
+        "
+        INSERT OR REPLACE INTO instance_launch_overrides (
+            instance_id,
+            overrides
+        )
+        VALUES (?, jsonb(?))
+        ",
+        instance_id_str,
+        launch_overrides_data,
+    )
+    .execute(exec)
+    .await?;
 
     Ok(())
 }
@@ -526,12 +758,12 @@ struct LegacyDeviceToken {
 }
 
 #[derive(Deserialize, Clone, Debug)]
-struct LegacyProfile {
+struct LegacyInstanceConfig {
     #[serde(default)]
-    pub install_stage: LegacyProfileInstallStage,
+    pub install_stage: LegacyInstanceInstallStage,
     #[serde(default)]
     pub path: String,
-    pub metadata: LegacyProfileMetadata,
+    pub metadata: LegacyInstanceMetadata,
     pub java: Option<LegacyJavaSettings>,
     pub memory: Option<LegacyMemorySettings>,
     pub resolution: Option<LegacyWindowSize>,
@@ -729,7 +961,7 @@ enum LegacyFileType {
 }
 
 #[derive(Deserialize, Clone, Debug)]
-struct LegacyProfileMetadata {
+struct LegacyInstanceMetadata {
     pub name: String,
     pub icon: Option<String>,
     #[serde(default)]
@@ -780,13 +1012,6 @@ impl From<LegacyModLoader> for ModLoader {
 struct LegacyLinkedData {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
-
-    #[serde(default = "default_locked")]
-    pub locked: Option<bool>,
-}
-
-fn default_locked() -> Option<bool> {
-    Some(true)
 }
 
 #[derive(Deserialize, Clone, Debug)]
@@ -803,7 +1028,7 @@ struct LegacyLoaderVersion {
 
 #[derive(Deserialize, Clone, Copy, Debug, Default, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
-enum LegacyProfileInstallStage {
+enum LegacyInstanceInstallStage {
     Installed,
     Installing,
     PackInstalling,

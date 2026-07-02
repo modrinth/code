@@ -95,6 +95,7 @@ export interface ModpackContentModalState {
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const scrollContainer = ref<HTMLElement | null>(null)
+const isOpen = ref(false)
 const items = ref<ContentItem[]>([])
 const disabledIds = ref(new Set<string>())
 const loading = ref(false)
@@ -312,12 +313,13 @@ function bulkDisable() {
 }
 
 function show(contentItems: ContentItem[]) {
-	items.value = contentItems
+	items.value = contentItems.map((item) => ({ ...item }))
 	searchQuery.value = ''
 	selectedFilters.value = []
 	selectedIds.value = []
 	disabledIds.value = new Set()
 	loading.value = false
+	showModal()
 }
 
 function showLoading() {
@@ -326,14 +328,22 @@ function showLoading() {
 	selectedFilters.value = []
 	selectedIds.value = []
 	loading.value = true
-	modal.value?.show()
+	showModal()
+}
+
+function showModal() {
+	if (isOpen.value || !modal.value) return
+	isOpen.value = true
+	modal.value.show()
 }
 
 function hide() {
+	isOpen.value = false
 	modal.value?.hide()
 }
 
 function handleHide() {
+	isOpen.value = false
 	emit('hide')
 }
 
@@ -348,11 +358,11 @@ function getState(): ModpackContentModalState | null {
 }
 
 async function restore(state: ModpackContentModalState) {
-	items.value = state.items
+	items.value = state.items.map((item) => ({ ...item }))
 	searchQuery.value = state.searchQuery
 	selectedFilters.value = state.selectedFilters
 	loading.value = false
-	modal.value?.show()
+	showModal()
 	await nextTick()
 	if (scrollContainer.value) {
 		scrollContainer.value.scrollTop = state.scrollTop
@@ -371,16 +381,15 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 	}
 	const { disabled: _, ...itemUpdates } = updates
 	if (Object.keys(itemUpdates).length > 0) {
-		const index = items.value.findIndex((i) => i.file_name === fileName)
-		if (index !== -1) {
-			items.value[index] = { ...items.value[index], ...itemUpdates }
-		}
+		items.value = items.value.map((item) =>
+			item.file_name === fileName ? { ...item, ...itemUpdates } : item,
+		)
 	}
 }
 
 function setItems(contentItems: ContentItem[]) {
 	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
-	items.value = contentItems
+	items.value = contentItems.map((item) => ({ ...item }))
 	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
 	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
 	loading.value = false

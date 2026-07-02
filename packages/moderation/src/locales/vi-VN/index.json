@@ -102,7 +102,7 @@
     "defaultMessage": "Không sử dụng trình rút gọn liên kết"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# tiêu đề} other {# tiêu đề}} trong phần mô tả của bạn {count, plural, one {quá dài} other {quá dài}}. Tiêu đề nên ngắn gọn và đóng vai trò là tiêu đề mục, không phải là câu hoàn chỉnh."
+    "defaultMessage": "{count, plural,  other {# tiêu đề}} trong phần mô tả của bạn {count, plural,  other {quá dài}}. Tiêu đề nên ngắn gọn và đóng vai trò là tiêu đề mục, không phải là câu hoàn chỉnh."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Rút gọn tiêu đề"
@@ -135,7 +135,7 @@
     "defaultMessage": "Xem phản hồi"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Bạn đã chọn {count, plural, one {# thẻ độ phân giải} other {# thẻ độ phân giải}} ({tags}). Gói tài nguyên thường chỉ nên có một thẻ độ phân giải phù hợp với độ phân giải chính của nó."
+    "defaultMessage": "Bạn đã chọn {count, plural,  other {# thẻ độ phân giải}} ({tags}). Gói tài nguyên thường chỉ nên có một thẻ độ phân giải phù hợp với độ phân giải chính của nó."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Chọn độ phân giải đúng"

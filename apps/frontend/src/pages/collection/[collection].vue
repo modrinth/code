@@ -18,6 +18,7 @@
 					<div class="group relative float-end ml-4">
 						<OverflowMenu
 							v-tooltip="formatMessage(messages.editIconButton)"
+							:dropdown-id="`${baseId}-edit-icon`"
 							class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
 							:options="[
 								{
@@ -138,7 +139,7 @@
 		</NewModal>
 		<NormalPage :sidebar="cosmetics.leftContentLayout ? 'left' : 'right'">
 			<template #header>
-				<div class="flex flex-col gap-6">
+				<div class="flex flex-col gap-4">
 					<ClientOnly>
 						<nuxt-link
 							v-if="returnLink"
@@ -201,19 +202,32 @@
 								</span>
 							</div>
 						</div>
-						<div class="col-span-2 flex gap-2 sm:col-span-1">
+						<div class="col-span-2 flex items-center gap-2 sm:col-span-1">
 							<template v-if="canEdit">
-								<ButtonStyled>
+								<ButtonStyled size="large">
 									<button @click="openEditModal">
 										<EditIcon aria-hidden="true" />
 										{{ formatMessage(commonMessages.editButton) }}
 									</button>
 								</ButtonStyled>
-								<ButtonStyled color="red" color-fill="text">
-									<button @click="() => $refs.deleteModal.show()">
-										<TrashIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.deleteLabel) }}
-									</button>
+								<ButtonStyled size="large" circular type="transparent">
+									<OverflowMenu
+										:dropdown-id="`${baseId}-more-options`"
+										:options="[
+											{
+												id: 'delete',
+												color: 'red',
+												action: () => deleteModal?.show(),
+											},
+										]"
+										:aria-label="formatMessage(commonMessages.moreOptionsButton)"
+									>
+										<MoreVerticalIcon aria-hidden="true" />
+										<template #delete>
+											<TrashIcon aria-hidden="true" />
+											{{ formatMessage(commonMessages.deleteLabel) }}
+										</template>
+									</OverflowMenu>
 								</ButtonStyled>
 							</template>
 						</div>
@@ -226,7 +240,12 @@
 					v-if="collection.description"
 					:title="formatMessage(commonMessages.descriptionLabel)"
 				>
-					<p class="m-0 break-words">{{ collection.description }}</p>
+					<div
+						v-if="supportsMarkdown"
+						class="description-body"
+						v-html="renderString(collection.description)"
+					/>
+					<p v-else class="m-0 break-words">{{ collection.description }}</p>
 				</SidebarCard>
 				<SidebarCard
 					v-if="collection.id !== 'following'"
@@ -238,9 +257,7 @@
 					>
 						<Avatar :src="creator.avatar_url" :alt="creator.username" size="32px" circle />
 						<div class="flex flex-col">
-							<span
-								class="grid w-full grid-cols-[1fr_auto] flex-nowrap items-center gap-1 group-hover:underline"
-							>
+							<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
 								<span class="min-w-0 overflow-hidden truncate">{{ creator.username }}</span>
 							</span>
 						</div>
@@ -373,6 +390,7 @@ import {
 	HeartMinusIcon,
 	LinkIcon,
 	LockIcon,
+	MoreVerticalIcon,
 	SaveIcon,
 	SpinnerIcon,
 	TrashIcon,
@@ -411,9 +429,10 @@ import {
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { isAdmin, renderString } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
+import { onServerPrefetch } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 
@@ -431,6 +450,32 @@ const route = useNativeRoute()
 const router = useRouter()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
+const queryClient = useQueryClient()
+const baseId = useId()
+
+async function fetchProjectsByIds(projectIds) {
+	const segmentSize = 800
+	const segments = []
+	for (let i = 0; i < projectIds.length; i += segmentSize) {
+		segments.push(projectIds.slice(i, i + segmentSize))
+	}
+	const results = await Promise.all(
+		segments.map((ids) => api.labrinth.projects_v2.getMultiple(ids)),
+	)
+	const projects = results.flat()
+	for (const project of projects) {
+		project.categories = project.categories.concat(project.loaders)
+	}
+	return projects
+}
+
+async function fetchFollowedProjects(userId) {
+	const projects = await api.labrinth.users_v2.getFollowedProjects(userId)
+	for (const project of projects) {
+		project.categories = project.categories.concat(project.loaders)
+	}
+	return projects
+}
 
 const messages = defineMessages({
 	collectionDescription: {
@@ -595,6 +640,8 @@ const creator = computed(() =>
 	isFollowingCollection.value ? auth.value.user : fetchedCreator.value,
 )
 
+const supportsMarkdown = computed(() => creator.value?.id === '2REoufqX')
+
 // Query for followed projects
 const {
 	data: followedProjects,
@@ -602,13 +649,7 @@ const {
 	isFetching: followedProjectsIsFetching,
 } = useQuery({
 	queryKey: computed(() => ['user', auth.value.user?.id, 'follows']),
-	queryFn: async () => {
-		const projects = await api.labrinth.users_v2.getFollowedProjects(auth.value.user.id)
-		for (const project of projects) {
-			project.categories = project.categories.concat(project.loaders)
-		}
-		return projects
-	},
+	queryFn: async () => fetchFollowedProjects(auth.value.user.id),
 	enabled: computed(() => isFollowingCollection.value && !!auth.value.user?.id),
 	placeholderData: [],
 })
@@ -620,22 +661,7 @@ const {
 	isFetching: collectionProjectsIsFetching,
 } = useQuery({
 	queryKey: computed(() => ['projects', collection.value?.projects]),
-	queryFn: async () => {
-		const projectIds = collection.value.projects
-		const segmentSize = 800
-		const segments = []
-		for (let i = 0; i < projectIds.length; i += segmentSize) {
-			segments.push(projectIds.slice(i, i + segmentSize))
-		}
-		const results = await Promise.all(
-			segments.map((ids) => api.labrinth.projects_v2.getMultiple(ids)),
-		)
-		const projects = results.flat()
-		for (const project of projects) {
-			project.categories = project.categories.concat(project.loaders)
-		}
-		return projects
-	},
+	queryFn: () => fetchProjectsByIds(collection.value.projects),
 	enabled: computed(() => !isFollowingCollection.value && !!collection.value?.projects?.length),
 	placeholderData: [],
 })
@@ -647,10 +673,46 @@ const projects = computed(() =>
 
 // Loading state
 const isLoading = computed(() => {
+	if (!import.meta.client) return false
+
 	if (isFollowingCollection.value) {
 		return followedProjectsIsFetching.value
 	}
 	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
+})
+
+onServerPrefetch(async () => {
+	if (isFollowingCollection.value) {
+		const userId = auth.value.user?.id
+		if (!userId) return
+
+		await queryClient.ensureQueryData({
+			queryKey: ['user', userId, 'follows'],
+			queryFn: () => fetchFollowedProjects(userId),
+		})
+		return
+	}
+
+	if (!collectionId) return
+
+	const collectionData = await queryClient.ensureQueryData({
+		queryKey: ['collection', collectionId],
+		queryFn: () => api.labrinth.collections.get(collectionId),
+	})
+
+	if (collectionData?.user) {
+		await queryClient.ensureQueryData({
+			queryKey: ['user', collectionData.user],
+			queryFn: () => api.labrinth.users_v2.get(collectionData.user),
+		})
+	}
+
+	if (collectionData?.projects?.length) {
+		await queryClient.ensureQueryData({
+			queryKey: ['projects', collectionData.projects],
+			queryFn: () => fetchProjectsByIds(collectionData.projects),
+		})
+	}
 })
 
 watch(
@@ -716,6 +778,7 @@ const showUpdatedDate = computed(() => {
 })
 
 const editModal = ref(null)
+const deleteModal = ref(null)
 const iconInputRef = ref(null)
 const icon = ref(null)
 const deletedIcon = ref(false)
@@ -880,5 +943,20 @@ function openEditModal(event) {
 .animated-dropdown {
 	// Omorphia's dropdowns are harcoded in width, so we need to override that
 	width: 100% !important;
+}
+
+:deep(.description-body) {
+	p {
+		margin: 0;
+	}
+
+	a {
+		color: var(--color-brand);
+		font-weight: 600;
+	}
+
+	a:hover {
+		text-decoration: underline;
+	}
 }
 </style>

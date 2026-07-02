@@ -5,6 +5,10 @@
 	<div class="pointer-events-none absolute inset-0 z-[-1]">
 		<div id="absolute-background-teleport" class="relative"></div>
 	</div>
+	<div
+		class="pride-backdrop pointer-events-none absolute inset-0 z-[-1]"
+		:class="{ shown: showPrideBackdrop }"
+	></div>
 	<div class="pointer-events-none absolute inset-0 z-50">
 		<div
 			class="over-the-top-random-animation"
@@ -383,6 +387,12 @@
 								action: (event) => $refs.modal_batch_credit.show(event),
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'analytics-events',
+								color: 'primary',
+								link: '/admin/analytics/events',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -416,6 +426,9 @@
 						</template>
 						<template #servers-nodes>
 							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
+						<template #analytics-events>
+							<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analyticsEvents) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -790,8 +803,9 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { errors as generatedStateErrors } from '~/generated/state.json'
+import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
 
@@ -856,6 +870,32 @@ const showTinMismatchBanner = computed(() => {
 	if (!bal) return false
 	const status = bal.form_completion_status ?? 'unknown'
 	return !!auth.value.user && status === 'tin-mismatch'
+})
+
+const PRIDE_COLLECTION_ID = 'M4c3ITvd'
+const PRIDE_ARTICLE_SLUGS = ['pride-campaign-2025', 'pride-campaign-2026', 'proud-of-you-2026']
+const PRIDE_CACHE_TIME = 1000 * 60 * 60 * 24
+
+const { data: prideCollection } = useQuery({
+	queryKey: computed(() => ['collection', PRIDE_COLLECTION_ID]),
+	queryFn: () => client.labrinth.collections.get(PRIDE_COLLECTION_ID),
+	staleTime: PRIDE_CACHE_TIME,
+	gcTime: PRIDE_CACHE_TIME,
+})
+
+const prideProjectIds = computed(() => new Set(prideCollection.value?.projects ?? []))
+
+const currentProjectId = ref()
+provideCurrentProjectId(currentProjectId)
+
+const showPrideBackdrop = computed(() => {
+	if (PRIDE_ARTICLE_SLUGS.includes(route.params.slug)) {
+		return true
+	}
+	if (route.params.collection === PRIDE_COLLECTION_ID) {
+		return true
+	}
+	return !!currentProjectId.value && prideProjectIds.value.has(currentProjectId.value)
 })
 
 const basePopoutId = useId()
@@ -953,6 +993,10 @@ const messages = defineMessages({
 	manageAffiliates: {
 		id: 'layout.action.manage-affiliates',
 		defaultMessage: 'Manage affiliate links',
+	},
+	analyticsEvents: {
+		id: 'layout.action.analytics-events',
+		defaultMessage: 'Analytics events',
 	},
 	newProject: {
 		id: 'layout.action.new-project',
@@ -1681,5 +1725,22 @@ const { cycle: changeTheme } = useTheme()
 	100% {
 		transform: translateY(0);
 	}
+}
+
+.pride-backdrop {
+	background-image: linear-gradient(to right, #c20732, #f57203, #ffd632, #21ca8b, #2f9ff2, #e420fc);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0) 80%);
+	height: 30rem;
+	opacity: 0;
+	transition: opacity 1s ease;
+}
+
+.pride-backdrop.shown {
+	opacity: 0.08;
+}
+
+.light-mode .pride-backdrop.shown,
+.light .pride-backdrop.shown {
+	opacity: 0.15;
 }
 </style>

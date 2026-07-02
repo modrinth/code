@@ -10,7 +10,6 @@
 		:payment-methods="paymentMethods"
 		:currency="selectedCurrency"
 		:return-url="checkoutReturnUrl"
-		:pings="regionPings"
 		:regions="regionsData"
 		:refresh-payment-methods="fetchPaymentData"
 		:fetch-stock="fetchStock"
@@ -62,13 +61,6 @@ const customer = ref<any>(null)
 const paymentMethods = ref<any[]>([])
 const selectedCurrency = ref<string>('USD')
 
-const regionPings = ref<
-	{
-		region: string
-		ping: number
-	}[]
->([])
-
 const pyroProducts = (props.products as Labrinth.Billing.Internal.Product[])
 	.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
 	.sort((a, b) => {
@@ -96,14 +88,6 @@ const { data: regionsData } = useQuery({
 	queryFn: () => archon.servers_v1.getRegions(),
 })
 
-const PING_COUNT = 20
-const PING_INTERVAL = 200
-const MAX_PING_TIME = 1000
-
-const initialIndex = {
-	'eu-lim': 31,
-}
-
 watch(
 	customerData,
 	(newCustomer) => {
@@ -120,18 +104,6 @@ watch(
 	{ immediate: true },
 )
 
-watch(
-	regionsData,
-	(newRegions) => {
-		if (newRegions) {
-			newRegions.forEach((region) => {
-				runPingTest(region)
-			})
-		}
-	},
-	{ immediate: true },
-)
-
 async function fetchPaymentData() {
 	await refetchPaymentMethods()
 }
@@ -142,57 +114,6 @@ async function fetchStock(
 ): Promise<number> {
 	const result = await archon.servers_v0.checkStock(region.shortcode, request)
 	return result.available
-}
-
-function runPingTest(
-	region: Archon.Servers.v1.Region,
-	index = initialIndex[region.shortcode] ?? 1,
-) {
-	if (index > (initialIndex[region.shortcode] ?? 1) + 10) {
-		regionPings.value.push({
-			region: region.shortcode,
-			ping: -1,
-		})
-		return
-	}
-
-	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
-	try {
-		const socket = new WebSocket(wsUrl)
-		const pings: number[] = []
-
-		socket.onopen = () => {
-			for (let i = 0; i < PING_COUNT; i++) {
-				setTimeout(() => {
-					socket.send(String(performance.now()))
-				}, i * PING_INTERVAL)
-			}
-			setTimeout(
-				() => {
-					socket.close()
-					const median = Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
-					if (median) {
-						regionPings.value.push({
-							region: region.shortcode,
-							ping: median,
-						})
-					}
-				},
-				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
-			)
-		}
-
-		socket.onmessage = (event) => {
-			const start = Number(event.data)
-			pings.push(performance.now() - start)
-		}
-
-		socket.onerror = () => {
-			runPingTest(region, index + 1)
-		}
-	} catch {
-		// ignore
-	}
 }
 
 const subscription = ref<Labrinth.Billing.Internal.UserSubscription | null>(null)

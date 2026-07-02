@@ -414,9 +414,11 @@ export type DropdownFilterBarCategory = {
 	options: DropdownFilterBarItem[]
 	syntheticOptions?: DropdownFilterBarOption[]
 	searchable?: boolean
+	disableLocalOptionsFilter?: boolean
 	searchPlaceholder?: string
 	emptyOptionsLabel?: string
 	emptySearchLabel?: string
+	onSearchQueryChange?: (query: string) => void
 	submenuClass?: string
 	previewDropdownWidth?: string | number
 	previewDropdownMinWidth?: string | number
@@ -618,7 +620,7 @@ const filteredActiveCategoryOptions = computed(() => {
 		return []
 	}
 
-	if (!activeCategory.value.searchable) {
+	if (!activeCategory.value.searchable || activeCategory.value.disableLocalOptionsFilter) {
 		return activeCategory.value.options
 	}
 
@@ -1808,6 +1810,7 @@ watch(isAddMenuOpen, (isOpen) => {
 })
 
 watch(categorySearchQuery, () => {
+	activeCategory.value?.onSearchQueryChange?.(categorySearchQuery.value)
 	resetActiveCategoryOptionsScrollState()
 	initializeActiveCategoryOptionsOverlayScrollbars()
 	scheduleSubmenuPositionUpdate()
@@ -1816,6 +1819,7 @@ watch(categorySearchQuery, () => {
 watch(activeCategoryKey, (categoryKey) => {
 	resetActiveCategoryOptionsScrollState()
 	if (categoryKey) {
+		activeCategory.value?.onSearchQueryChange?.(categorySearchQuery.value)
 		initializeActiveCategoryOptionsOverlayScrollbars()
 	} else {
 		destroyActiveCategoryOptionsOverlayScrollbars()
@@ -1874,9 +1878,9 @@ onBeforeUnmount(() => {
 }
 
 .dropdown-filter-bar-options-scrollbar :deep(.os-theme-modrinth) {
-	--os-size: 10px;
-	--os-padding-perpendicular: 2px;
-	--os-padding-axis: 2px;
+	--os-size: 8px;
+	--os-padding-perpendicular: 0px;
+	--os-padding-axis: 0px;
 	--os-track-bg: transparent;
 	--os-track-bg-hover: transparent;
 	--os-track-bg-active: transparent;

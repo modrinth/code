@@ -1,10 +1,7 @@
 <template>
 	<section class="overflow-visible">
 		<!-- Loading state -->
-		<div
-			v-if="versionsLoading && !versions?.length"
-			class="flex items-center justify-center gap-2 py-8"
-		>
+		<div v-if="showVersionsLoadingState" class="flex items-center justify-center gap-2 py-8">
 			<SpinnerIcon class="animate-spin" />
 			<span>Loading versions...</span>
 		</div>
@@ -30,6 +27,7 @@
 				:project="project"
 				:versions="versions"
 				:show-files="flags.showVersionFilesInTable"
+				:show-environment-column="flags.showVersionEnvironmentColumn"
 				:current-member="!!currentMember"
 				:loaders="tags.loaders"
 				:game-versions="tags.gameVersions"
@@ -272,7 +270,7 @@ import {
 import { onMounted, useTemplateRef, watch } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { getSignInRouteObj } from '~/composables/auth.js'
+import { getSignInRouteObj } from '~/composables/auth.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
@@ -291,9 +289,17 @@ const {
 	invalidate,
 	versions,
 	versionsLoading,
+	versionsLoaded,
 	loadVersions,
 	cdnDownloadReason,
 } = injectProjectPageContext()
+
+const showVersionsLoadingState = computed(
+	() =>
+		!versions.value?.length &&
+		(versionsLoading.value ||
+			(!versionsLoaded.value && (project.value?.versions?.length ?? 0) > 0)),
+)
 
 // Load versions on mount (client-side)
 onMounted(() => {

@@ -8,17 +8,19 @@ export { default as ConfirmModpackUpdateModal } from './components/modals/Confir
 export { default as ConfirmReinstallModal } from './components/modals/ConfirmReinstallModal.vue'
 export { default as ConfirmRepairModal } from './components/modals/ConfirmRepairModal.vue'
 export { default as ConfirmUnlinkModal } from './components/modals/ConfirmUnlinkModal.vue'
+export { default as ContentUpdaterModal } from './components/modals/content-updater-modal/index.vue'
+export { default as ContentDependencyWarningModal } from './components/modals/ContentDependencyWarningModal.vue'
 export type {
 	ContentInstallInstance,
 	ContentInstallProjectInfo,
 	ContentInstallProjectOwner,
 } from './components/modals/ContentInstallModal.vue'
 export { default as ContentInstallModal } from './components/modals/ContentInstallModal.vue'
-export { default as ContentUpdaterModal } from './components/modals/ContentUpdaterModal.vue'
 export type { ModpackContentModalState } from './components/modals/ModpackContentModal.vue'
 export { default as ModpackContentModal } from './components/modals/ModpackContentModal.vue'
 export { default as ContentCardLayout } from './layout.vue'
 export { default as ContentPageLayout } from './layout.vue'
 export * from './providers'
 export * from './types'
+export * from './utils/update-channels'
 export { default as ConfirmLeaveModal } from '#ui/components/modal/ConfirmLeaveModal.vue'

@@ -756,16 +756,16 @@ svg.inline-svg {
 	padding: var(--gap-16);
 
 	h2 {
+		@apply font-semibold;
 		font-size: var(--text-18);
-		font-weight: var(--weight-extrabold);
 		color: var(--color-contrast);
 		line-height: initial;
 		margin: 0;
 	}
 
 	h3 {
+		@apply font-semibold;
 		font-size: var(--text-16);
-		font-weight: var(--weight-bold);
 		color: var(--color-base);
 		margin: 0;
 	}
@@ -812,6 +812,7 @@ svg.inline-svg {
 }
 
 .details-list__item {
+	@apply font-normal;
 	@extend .iconified-list-item;
 
 	.details-list__item__text--style-secondary {

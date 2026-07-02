@@ -1,7 +1,11 @@
 //! Downloader for Minecraft data
 
+use crate::install::{
+    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallProgressReporter,
+};
+use crate::instance::QuickPlayType;
 use crate::launcher::parse_rules;
-use crate::profile::QuickPlayType;
 use crate::{
     event::{
         LoadingBarId,
@@ -21,21 +25,386 @@ use daedalus::{
 };
 use futures::prelude::*;
 use reqwest::Method;
+use std::{
+    future::Future,
+    pin::Pin,
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
+};
 use tokio::sync::OnceCell;
+
+const MINECRAFT_DOWNLOAD_PROGRESS_MIN_BYTES: u64 = 256 * 1024;
+
+#[derive(Clone, Debug)]
+pub struct MinecraftDownloadProgress {
+    reporter: InstallProgressReporter,
+    details: InstallPhaseDetails,
+    current: Arc<AtomicU64>,
+    total: Arc<AtomicU64>,
+    last_reported: Arc<AtomicU64>,
+}
+
+impl MinecraftDownloadProgress {
+    async fn new(
+        reporter: InstallProgressReporter,
+        details: InstallPhaseDetails,
+        total: u64,
+    ) -> crate::Result<Self> {
+        let progress = Self {
+            reporter,
+            details,
+            current: Arc::new(AtomicU64::new(0)),
+            total: Arc::new(AtomicU64::new(total)),
+            last_reported: Arc::new(AtomicU64::new(0)),
+        };
+
+        if total > 0 {
+            progress.emit_progress(0, total).await?;
+        }
+
+        Ok(progress)
+    }
+
+    async fn add_total(&self, total: u64) -> crate::Result<()> {
+        if total == 0 {
+            return Ok(());
+        }
+
+        let total = self.total.fetch_add(total, Ordering::Relaxed) + total;
+        self.emit_if_needed(self.current.load(Ordering::Relaxed), total, true)
+            .await
+    }
+
+    async fn add_bytes(&self, bytes: u64) -> crate::Result<()> {
+        if bytes == 0 {
+            return Ok(());
+        }
+
+        let current = self.current.fetch_add(bytes, Ordering::Relaxed) + bytes;
+        let total = self.total.load(Ordering::Relaxed);
+        self.emit_if_needed(current, total, false).await
+    }
+
+    async fn emit_if_needed(
+        &self,
+        current: u64,
+        total: u64,
+        force: bool,
+    ) -> crate::Result<()> {
+        if total == 0 {
+            return Ok(());
+        }
+
+        let min_delta =
+            (total / 200).max(MINECRAFT_DOWNLOAD_PROGRESS_MIN_BYTES);
+        let last_reported = self.last_reported.load(Ordering::Relaxed);
+        if !force
+            && current < total
+            && current.saturating_sub(last_reported) < min_delta
+        {
+            return Ok(());
+        }
+
+        self.last_reported.store(current, Ordering::Relaxed);
+        self.emit_progress(current, total).await
+    }
+
+    async fn emit_progress(
+        &self,
+        current: u64,
+        total: u64,
+    ) -> crate::Result<()> {
+        self.reporter
+            .update(
+                InstallPhaseId::DownloadingMinecraft,
+                Some(InstallProgress {
+                    current: current.min(total),
+                    total,
+                    secondary: None,
+                }),
+                self.details.clone(),
+            )
+            .await
+    }
+}
+
+async fn fetch_minecraft_file(
+    st: &State,
+    url: &str,
+    sha1: Option<&str>,
+    expected_size: Option<u64>,
+    progress: Option<MinecraftDownloadProgress>,
+) -> crate::Result<bytes::Bytes> {
+    let Some(progress) = progress else {
+        return fetch(url, sha1, None, None, &st.fetch_semaphore, &st.pool)
+            .await;
+    };
+
+    let last_downloaded = Arc::new(AtomicU64::new(0));
+    let mut progress_fn = {
+        let progress = progress.clone();
+        let last_downloaded = last_downloaded.clone();
+        move |downloaded: u64,
+              _total: u64|
+              -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send>> {
+            let previous =
+                last_downloaded.swap(downloaded, Ordering::Relaxed);
+            let delta = downloaded.saturating_sub(previous);
+            let progress = progress.clone();
+            Box::pin(async move { progress.add_bytes(delta).await })
+        }
+    };
+
+    let bytes = fetch_advanced_with_progress(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        None,
+        None,
+        None,
+        &st.fetch_semaphore,
+        &st.pool,
+        Some(&mut progress_fn as &mut FetchProgressFn<'_>),
+    )
+    .await?;
+
+    if let Some(expected_size) = expected_size {
+        let downloaded = last_downloaded.load(Ordering::Relaxed);
+        progress
+            .add_bytes(expected_size.saturating_sub(downloaded))
+            .await?;
+    }
+
+    Ok(bytes)
+}
+
+fn should_download(path_exists: bool, force: bool) -> bool {
+    !path_exists || force
+}
+
+fn missing_client_bytes(
+    st: &State,
+    version: &GameVersionInfo,
+    force: bool,
+) -> crate::Result<u64> {
+    let client_download = version
+        .downloads
+        .get(&d::minecraft::DownloadType::Client)
+        .ok_or(
+            crate::ErrorKind::LauncherError(format!(
+                "No client downloads exist for version {}",
+                version.id
+            ))
+            .as_error(),
+        )?;
+    let path = st
+        .directories
+        .version_dir(&version.id)
+        .join(format!("{}.jar", version.id));
+
+    Ok(if should_download(path.exists(), force) {
+        client_download.size as u64
+    } else {
+        0
+    })
+}
+
+fn missing_assets_index_bytes(
+    st: &State,
+    version: &GameVersionInfo,
+    force: bool,
+) -> u64 {
+    let path = st
+        .directories
+        .assets_index_dir()
+        .join(format!("{}.json", &version.asset_index.id));
+
+    if should_download(path.exists(), force) {
+        version.asset_index.size as u64
+    } else {
+        0
+    }
+}
+
+fn missing_log_config_bytes(
+    st: &State,
+    version: &GameVersionInfo,
+    force: bool,
+) -> u64 {
+    let log_download = version
+        .logging
+        .as_ref()
+        .and_then(|x| x.get(&LoggingSide::Client));
+    let Some(LoggingConfiguration::Log4j2Xml {
+        file: log_download, ..
+    }) = log_download
+    else {
+        return 0;
+    };
+
+    let path = st.directories.log_configs_dir().join(&log_download.id);
+    if should_download(path.exists(), force) {
+        log_download.size as u64
+    } else {
+        0
+    }
+}
+
+fn missing_asset_bytes(
+    st: &State,
+    with_legacy: bool,
+    index: &AssetsIndex,
+    force: bool,
+) -> u64 {
+    index
+        .objects
+        .iter()
+        .filter_map(|(name, asset)| {
+            let hash = &asset.hash;
+            let object_path = st.directories.object_dir(hash);
+            let legacy_path = st.directories.legacy_assets_dir().join(
+                name.replace('/', &String::from(std::path::MAIN_SEPARATOR)),
+            );
+            let should_fetch_object =
+                should_download(object_path.exists(), force);
+            let should_fetch_legacy =
+                (with_legacy && !legacy_path.exists()) || force;
+
+            (should_fetch_object || should_fetch_legacy)
+                .then_some(asset.size as u64)
+        })
+        .sum()
+}
+
+fn missing_library_bytes(
+    st: &State,
+    libraries: &[Library],
+    java_arch: &str,
+    force: bool,
+    minecraft_updated: bool,
+) -> crate::Result<u64> {
+    let mut total = 0;
+
+    for library in libraries {
+        if let Some(rules) = &library.rules
+            && !parse_rules(
+                rules,
+                java_arch,
+                &QuickPlayType::None,
+                minecraft_updated,
+            )
+        {
+            continue;
+        }
+
+        if !library.downloadable {
+            continue;
+        }
+
+        if let Some((os_key, classifiers)) =
+            library.natives_os_key_and_classifiers(java_arch)
+        {
+            let parsed_key =
+                os_key.replace("${arch}", crate::util::platform::ARCH_WIDTH);
+
+            if let Some(native) = classifiers.get(&parsed_key) {
+                total += native.size as u64;
+            }
+        } else {
+            let artifact_path = d::get_path_from_artifact(&library.name)?;
+            let path = st.directories.libraries_dir().join(&artifact_path);
+
+            if path.exists() && !force {
+                continue;
+            }
+
+            if let Some(artifact) = library
+                .downloads
+                .as_ref()
+                .and_then(|downloads| downloads.artifact.as_ref())
+                && !artifact.url.is_empty()
+            {
+                total += artifact.size as u64;
+            }
+        }
+    }
+
+    Ok(total)
+}
+
+fn missing_initial_minecraft_bytes(
+    st: &State,
+    version: &GameVersionInfo,
+    java_arch: &str,
+    force: bool,
+    minecraft_updated: bool,
+) -> crate::Result<u64> {
+    Ok(missing_client_bytes(st, version, force)?
+        + missing_assets_index_bytes(st, version, force)
+        + missing_log_config_bytes(st, version, force)
+        + missing_library_bytes(
+            st,
+            version.libraries.as_slice(),
+            java_arch,
+            force,
+            minecraft_updated,
+        )?)
+}
 
 #[tracing::instrument(skip(st, version))]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
-    loading_bar: &LoadingBarId,
+    loading_bar: Option<&LoadingBarId>,
     java_arch: &str,
     force: bool,
     minecraft_updated: bool,
+    reporter: Option<InstallProgressReporter>,
+    phase_details: InstallPhaseDetails,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
+    let progress = if let Some(reporter) = reporter {
+        Some(
+            MinecraftDownloadProgress::new(
+                reporter,
+                phase_details,
+                missing_initial_minecraft_bytes(
+                    st,
+                    version,
+                    java_arch,
+                    force,
+                    minecraft_updated,
+                )?,
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
+
     // 5
-    let assets_index =
-        download_assets_index(st, version, Some(loading_bar), force).await?;
+    let assets_index = download_assets_index(
+        st,
+        version,
+        loading_bar,
+        force,
+        progress.clone(),
+    )
+    .await?;
+    if let Some(progress) = &progress {
+        progress
+            .add_total(missing_asset_bytes(
+                st,
+                version.assets == "legacy",
+                &assets_index,
+                force,
+            ))
+            .await?;
+    }
 
     let amount = if version.processors.as_ref().is_some_and(|x| !x.is_empty()) {
         25.0
@@ -45,10 +414,10 @@ pub async fn download_minecraft(
 
     tokio::try_join! {
         // Total loading sums to 90/60
-        download_client(st, version, Some(loading_bar), force), // 9
-        download_log_config(st, version, Some(loading_bar), force),
-        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount, force), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force, minecraft_updated) // 40
+        download_client(st, version, loading_bar, force, progress.clone()), // 9
+        download_log_config(st, version, loading_bar, force, progress.clone()),
+        download_assets(st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone()), // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone()) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -88,6 +457,7 @@ pub async fn download_version_info(
             &version.url,
             None,
             None,
+            None,
             &st.api_semaphore,
             &st.pool,
         )
@@ -97,6 +467,7 @@ pub async fn download_version_info(
             let partial: d::modded::PartialVersionInfo = fetch_json(
                 Method::GET,
                 &loader.url,
+                None,
                 None,
                 None,
                 &st.api_semaphore,
@@ -127,6 +498,7 @@ pub async fn download_client(
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
     force: bool,
+    progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<()> {
     let version = &version_info.id;
     tracing::debug!("Locating client for version {version}");
@@ -145,12 +517,12 @@ pub async fn download_client(
         .join(format!("{version}.jar"));
 
     if !path.exists() || force {
-        let bytes = fetch(
+        let bytes = fetch_minecraft_file(
+            st,
             &client_download.url,
             Some(&client_download.sha1),
-            None,
-            &st.fetch_semaphore,
-            &st.pool,
+            Some(client_download.size as u64),
+            progress,
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -171,6 +543,7 @@ pub async fn download_assets_index(
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
     force: bool,
+    progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<AssetsIndex> {
     tracing::debug!("Loading assets index");
     let path = st
@@ -184,15 +557,15 @@ pub async fn download_assets_index(
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        let index = fetch_json(
-            Method::GET,
+        let index = fetch_minecraft_file(
+            st,
             &version.asset_index.url,
             None,
-            None,
-            &st.fetch_semaphore,
-            &st.pool,
+            Some(version.asset_index.size as u64),
+            progress,
         )
         .await?;
+        let index = serde_json::from_slice(&index)?;
         write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore).await?;
         tracing::info!("Fetched assets index");
         Ok(index)
@@ -214,6 +587,7 @@ pub async fn download_assets(
     loading_bar: Option<&LoadingBarId>,
     loading_amount: f64,
     force: bool,
+    progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<()> {
     tracing::debug!("Loading assets");
     let num_futs = index.objects.len();
@@ -226,9 +600,22 @@ pub async fn download_assets(
             loading_amount,
             num_futs,
             None,
-            |(name, asset)| async move {
+            |(name, asset)| {
+                let progress = progress.clone();
+                async move {
                 let hash = &asset.hash;
                 let resource_path = st.directories.object_dir(hash);
+                let legacy_resource_path = st.directories.legacy_assets_dir().join(
+                    name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
+                );
+                let should_fetch_object = !resource_path.exists() || force;
+                let should_fetch_legacy =
+                    (with_legacy && !legacy_resource_path.exists()) || force;
+                let fetch_progress = if should_fetch_object || should_fetch_legacy {
+                    progress.clone()
+                } else {
+                    None
+                };
                 let url = format!(
                     "https://resources.download.minecraft.net/{sub_hash}/{hash}",
                     sub_hash = &hash[..2]
@@ -237,9 +624,15 @@ pub async fn download_assets(
                 let fetch_cell = OnceCell::<bytes::Bytes>::new();
                 tokio::try_join! {
                     async {
-                        if !resource_path.exists() || force {
+                        if should_fetch_object {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), None, &st.fetch_semaphore, &st.pool))
+                                .get_or_try_init(|| fetch_minecraft_file(
+                                    st,
+                                    &url,
+                                    Some(hash),
+                                    Some(asset.size as u64),
+                                    fetch_progress.clone(),
+                                ))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched asset with hash {hash}");
@@ -247,15 +640,17 @@ pub async fn download_assets(
                         Ok::<_, crate::Error>(())
                     },
                     async {
-                        let resource_path = st.directories.legacy_assets_dir().join(
-                            name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
-                        );
-
-                        if with_legacy && !resource_path.exists() || force {
+                        if should_fetch_legacy {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), None, &st.fetch_semaphore, &st.pool))
+                                .get_or_try_init(|| fetch_minecraft_file(
+                                    st,
+                                    &url,
+                                    Some(hash),
+                                    Some(asset.size as u64),
+                                    fetch_progress.clone(),
+                                ))
                                 .await?;
-                            write(&resource_path, resource, &st.io_semaphore).await?;
+                            write(&legacy_resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched legacy asset with hash {hash}");
                         }
                         Ok::<_, crate::Error>(())
@@ -264,6 +659,7 @@ pub async fn download_assets(
 
                 tracing::trace!("Loaded asset with hash {hash}");
                 Ok(())
+                }
             }).await?;
     tracing::debug!("Done loading assets!");
     Ok(())
@@ -280,6 +676,7 @@ pub async fn download_libraries(
     java_arch: &str,
     force: bool,
     minecraft_updated: bool,
+    progress: Option<MinecraftDownloadProgress>,
 ) -> crate::Result<()> {
     tracing::debug!("Loading libraries");
 
@@ -295,7 +692,9 @@ pub async fn download_libraries(
         loading_amount,
         num_files,
         None,
-        |library| async move {
+        |library| {
+            let progress = progress.clone();
+            async move {
             if let Some(rules) = &library.rules
                 && !parse_rules(
                     rules,
@@ -324,12 +723,12 @@ pub async fn download_libraries(
                     .replace("${arch}", crate::util::platform::ARCH_WIDTH);
 
                 if let Some(native) = classifiers.get(&parsed_key) {
-                    let data = fetch(
+                    let data = fetch_minecraft_file(
+                        st,
                         &native.url,
                         Some(&native.sha1),
-                        None,
-                        &st.fetch_semaphore,
-                        &st.pool,
+                        Some(native.size as u64),
+                        progress.clone(),
                     )
                     .await?;
 
@@ -369,12 +768,12 @@ pub async fn download_libraries(
                 }) = library.downloads
                     && !artifact.url.is_empty()
                 {
-                    let bytes = fetch(
+                    let bytes = fetch_minecraft_file(
+                        st,
                         &artifact.url,
                         Some(&artifact.sha1),
-                        None,
-                        &st.fetch_semaphore,
-                        &st.pool,
+                        Some(artifact.size as u64),
+                        progress.clone(),
                     )
                     .await?;
                     write(&path, &bytes, &st.io_semaphore).await?;
@@ -409,8 +808,15 @@ pub async fn download_libraries(
                     // failed download here is not a fatal condition.
                     //
                     // See DEV-479.
-                    match fetch(&url, None, None, &st.fetch_semaphore, &st.pool)
-                        .await
+                    match fetch(
+                        &url,
+                        None,
+                        None,
+                        None,
+                        &st.fetch_semaphore,
+                        &st.pool,
+                    )
+                    .await
                     {
                         Ok(bytes) => {
                             write(&path, &bytes, &st.io_semaphore).await?;
@@ -434,6 +840,7 @@ pub async fn download_libraries(
 
             tracing::debug!("Loaded library {}", library.name);
             Ok(())
+            }
         },
     )
     .await?;
@@ -448,7 +855,8 @@ pub async fn download_log_config(
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
     force: bool,
-) -> crate::Result<()> {
+    progress: Option<MinecraftDownloadProgress>,
+) -> crate::Result<bool> {
     let log_download = version_info
         .logging
         .as_ref()
@@ -460,18 +868,18 @@ pub async fn download_log_config(
         if let Some(loading_bar) = loading_bar {
             emit_loading(loading_bar, 1.0, None)?;
         }
-        return Ok(());
+        return Ok(false);
     };
 
     let path = st.directories.log_configs_dir().join(&log_download.id);
 
     if !path.exists() || force {
-        let bytes = fetch(
+        let bytes = fetch_minecraft_file(
+            st,
             &log_download.url,
             Some(&log_download.sha1),
-            None,
-            &st.fetch_semaphore,
-            &st.pool,
+            Some(log_download.size as u64),
+            progress,
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -482,5 +890,5 @@ pub async fn download_log_config(
     }
 
     tracing::debug!("Log config {} loaded", log_download.id);
-    Ok(())
+    Ok(true)
 }

@@ -14,9 +14,11 @@ import { article as design_refresh } from "./design_refresh";
 import { article as download_adjustment } from "./download_adjustment";
 import { article as free_server_medal } from "./free_server_medal";
 import { article as introducing_server_projects } from "./introducing_server_projects";
+import { article as joining_spark_universe } from "./joining_spark_universe";
 import { article as knossos_v2_1_0 } from "./knossos_v2_1_0";
 import { article as licensing_guide } from "./licensing_guide";
 import { article as modpack_changes } from "./modpack_changes";
+import { article as modpack_permissions } from "./modpack_permissions";
 import { article as modpacks_alpha } from "./modpacks_alpha";
 import { article as modrinth_app_beta } from "./modrinth_app_beta";
 import { article as modrinth_beta } from "./modrinth_beta";
@@ -28,6 +30,7 @@ import { article as new_site_beta } from "./new_site_beta";
 import { article as plugins_resource_packs } from "./plugins_resource_packs";
 import { article as pride_campaign_2025 } from "./pride_campaign_2025";
 import { article as pride_campaign_2026 } from "./pride_campaign_2026";
+import { article as proud_of_you_2026 } from "./proud_of_you_2026";
 import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
 import { article as server_access } from "./server_access";
@@ -56,9 +59,11 @@ export const articles = [
   download_adjustment,
   free_server_medal,
   introducing_server_projects,
+  joining_spark_universe,
   knossos_v2_1_0,
   licensing_guide,
   modpack_changes,
+  modpack_permissions,
   modpacks_alpha,
   modrinth_app_beta,
   modrinth_beta,
@@ -70,6 +75,7 @@ export const articles = [
   plugins_resource_packs,
   pride_campaign_2025,
   pride_campaign_2026,
+  proud_of_you_2026,
   redesign,
   russian_censorship,
   server_access,

@@ -2,11 +2,41 @@
   "app.action-bar.downloading-java": {
     "message": "Downloading Java {version}"
   },
+  "app.action-bar.downloading-update": {
+    "message": "Downloading update"
+  },
   "app.action-bar.downloads": {
     "message": "Downloads"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Hide more running instances"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Dismiss"
+  },
+  "app.action-bar.install.failed": {
+    "message": "Install failed"
+  },
+  "app.action-bar.install.failed-app-closed": {
+    "message": "Installation failed due to app closing."
+  },
+  "app.action-bar.install.failed-network": {
+    "message": "Installation failed due to a network error."
+  },
+  "app.action-bar.install.failed-unknown": {
+    "message": "Installation failed due to an unknown error."
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Open instance"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Retry"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Unknown instance"
+  },
+  "app.action-bar.installs": {
+    "message": "Installs"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Make primary instance"
@@ -20,11 +50,17 @@
   "app.action-bar.primary-instance": {
     "message": "Primary instance"
   },
+  "app.action-bar.reload-to-update": {
+    "message": "Reload to update"
+  },
   "app.action-bar.show-more-running-instances": {
     "message": "Show more running instances"
   },
   "app.action-bar.stop-instance": {
     "message": "Stop instance"
+  },
+  "app.action-bar.update": {
+    "message": "Update"
   },
   "app.action-bar.view-active-downloads": {
     "message": "View active downloads"
@@ -92,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Show play time"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Automatically skips low-risk confirmations like duplicate modpack installs, normal content deletion, bulk updates, unlinking modpacks, and repair prompts. Dangerous warnings will still be shown."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Skip non-essential warnings"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Enables the ability to toggle the sidebar."
   },
@@ -152,12 +194,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Installing modpack..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
   },
@@ -167,23 +203,71 @@
   "app.export-modal.header": {
     "message": "Export modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Include \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpack Name"
+    "message": "Modpack name"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack name"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Configure which files are included in this export"
   },
   "app.export-modal.version-number-label": {
     "message": "Version number"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Downloading content"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Downloading Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Downloading pack file"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extracting overrides"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizing"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Preparing instance"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Preparing Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Downloading Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Extracting Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Fetching Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Preparing Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validating Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Reading pack manifest"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Resolving loader"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Resolving Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Resolving content"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Rolling back"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Running loader processors"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
@@ -209,6 +293,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Downloading {current, number}/{total, number} projects..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Finishing update..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Resolving versions..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
@@ -233,11 +326,17 @@
   "app.instance.worlds.browse-servers": {
     "message": "Browse servers"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' will be **permanently deleted**, and there will be no way to recover it."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Delete world"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Are you sure you want to permanently delete this world?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Delete world"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "This world will be permanently deleted from this instance. This action cannot be undone."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Deleting {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
@@ -257,20 +356,20 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "No servers or worlds added"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' will be removed from your list, including in-game, and there will be no way to recover it."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Remove server"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Remove server"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Are you sure you want to remove {name}?"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "This server will be removed from your server list and from the in-game server list. You can add it again later if you know the address."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Removing {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "this server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content required"
@@ -428,8 +527,17 @@
   "app.skins.rate-limit.title": {
     "message": "Slow down!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "Your skin order could not be saved."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Failed to reorder skins"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -482,9 +590,6 @@
   "app.skins.title": {
     "message": "Skin selector"
   },
-  "app.update-popup.body": {
-    "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
-  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
@@ -504,7 +609,7 @@
     "message": "Download complete"
   },
   "app.update-popup.reload": {
-    "message": "Reload"
+    "message": "Reload to update"
   },
   "app.update-popup.title": {
     "message": "Update available"
@@ -514,15 +619,6 @@
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
-  },
-  "app.update.download-update": {
-    "message": "Download update"
-  },
-  "app.update.downloading-update": {
-    "message": "Downloading update ({percent}%)"
-  },
-  "app.update.reload-to-update": {
-    "message": "Reload to install update"
   },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
@@ -713,6 +809,30 @@
   "instance.settings.tabs.general.name": {
     "message": "Name"
   },
+  "instance.settings.tabs.general.update-channel": {
+    "message": "Update channel"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.alpha.description": {
+    "message": "Release, beta, and alpha versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
+  },
+  "instance.settings.tabs.general.update-channel.beta.description": {
+    "message": "Release and beta versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "Release"
+  },
+  "instance.settings.tabs.general.update-channel.release.description": {
+    "message": "Only release versions will be shown as available updates."
+  },
+  "instance.settings.tabs.general.update-channel.select": {
+    "message": "Select update channel"
+  },
   "instance.settings.tabs.hooks": {
     "message": "Launch hooks"
   },
@@ -835,6 +955,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Copy address"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Create shortcut"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Don't show on Home"

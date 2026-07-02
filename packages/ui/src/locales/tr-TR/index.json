@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Bu işlemi yapma izniniz yok."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Ortaklık bağlantısı oluştur"
   },
@@ -53,6 +56,9 @@
   "billing.resubscribe-modal.cpus": {
     "defaultMessage": "{sharedCpus} Paylaşılan CPUlar"
   },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Şu anda <server-name>{serverName}</server-name> için yeniden abonelik işlemini başlatıyorsunuz. Aboneliğiniz tekrar etkinleştirilecek ve sunucunuz kesintisiz olarak çalışmaya devam edecektir."
+  },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Yeniden abone olunamıyor, abonelik ayrıntıları yüklenemedi."
   },
@@ -61,6 +67,9 @@
   },
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Abonelik detayları yüklenemedi."
+  },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}"
   },
   "billing.resubscribe-modal.next-charge": {
     "defaultMessage": "Bir sonraki ücretlendirmeniz <charge-date>{date}</charge-date> tarihinde yapılacaktır."
@@ -89,11 +98,20 @@
   "browse.offline": {
     "defaultMessage": "Şu anda çevrimdışısınız. Modrinth'de gezinmek için internet'e bağlanın!"
   },
+  "browse.search.placeholder": {
+    "defaultMessage": "{projectType} araştır..."
+  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Seçili projeler"
   },
   "browse.selected-projects-floating-bar.install": {
     "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} indir"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# project selected} other {# projects selected}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "{count, plural, one {# project} other {# projects}} seçimi tamamlandı. Şimdi kurun veya kurulumu yapmadan geri dönün."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Seçili projeler hala indirilmemiş"
@@ -216,7 +234,7 @@
     "defaultMessage": "Mod paketini yeniden kur"
   },
   "button.remove": {
-    "defaultMessage": "Kaldır"
+    "defaultMessage": "Giriş anahtarını sil"
   },
   "button.remove-image": {
     "defaultMessage": "Görseli kaldır"
@@ -299,6 +317,12 @@
   "collections.label.private": {
     "defaultMessage": "Gizli"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "içerik"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {item} other {items}}"
+  },
   "content.card.select-project": {
     "defaultMessage": "{project} seçin"
   },
@@ -314,11 +338,20 @@
   "content.confirm-bulk-update.shift-click-hint": {
     "defaultMessage": "Gelecekte bu onayı atlamak için \"Hepsini güncelle\" seçeneğine tıklarken Shift tuşuna basılı tutun."
   },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "{count} projeyi güncelle"
+  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Mod kaldırmak dünyanızı kalıcı şekilde etkileyebilir ve eksik içerik ve beklenmedik sorunlar yaşayabilirsiniz."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Kaldırma uyarısı"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "{count, number} adetlik {itemType} öğesini silin"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "{itemType} öğesini sil"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
@@ -340,6 +373,21 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Bağlantıyı kopar/kes"
+  },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Bu içerik diğer içerikler için gereklidir"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "sunucu"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Yinede Sil"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Siliniyor"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Ne olur?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
@@ -392,8 +440,17 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Yedek oluştur"
   },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "oturum"
+  },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Doğrulamayı atlamak için tıklarken Shift basılı tutun."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Herhangi bir sorun durumunda {type} inizi geri yükleyebilmeniz için, devam etmeden önce mutlaka bir yedekleme oluşturmanızı öneririz."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "dünya"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Mod paketinizin içeriği artık burada bulunabilir!"
@@ -436,6 +493,9 @@
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Lütfen bekleyin"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "{count, number} türündeki içerikleri arayın..."
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Dosya adları"
@@ -499,6 +559,9 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} güncelleniyor..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} seçildi"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} seçildi"
@@ -773,6 +836,162 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Sunucu kurun"
   },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Dosyalar yüklenemedi"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Aradığın sonuçla ilgili bir dosya yok."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Dosya ara…"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Dosya ekle..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Dosyalar eklenemedi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "İçerik izin verilmedi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Kanıt reddedildi"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Tamamlananlar"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "İzin yok"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Beklenenler"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Diğer"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Tüm hakları saklıdır/Lisans verilmemiştir"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Lisans"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Notlar"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Eğer ki yüklediğin fotoğraflarla yalan söylediğin veya manipüle edildiğin tespit edilirse, projen veya hesabın devre dışı bırakılabilir."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth çalışanları senin kanıtını doğrulayabilir"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Kaynak gösterme bilgisini sakla"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Lisans Seçiniz..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "İzin sebebi"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Lütfen lisansınızda bir linke yer verin. Eğer yoksa, Tüm haklar saklıdır/Lisans yoktur seçeneğini seçmelisiniz"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Lütfen bir açıklama sağlayın veya bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Lütfen bir bağlantı sağlayın."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Lütfen bir not sağlayın veya bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Lütfen bir PNG, JPEG, GIF, WebP, or BMP fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Lütfen en az bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Kısa bir açıklama veya kanıt fotoğrafları gerekli."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Açıklama"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Kaynak gösterme grubu {id}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Dahil edilen dosyalar:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "En son {date} {user} tarafından güncellendi"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Bilinmeyen"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Lisanslı:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Çalışması için bağlantı:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Sebep"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Moderasyon incelemesi kaydedilemedi"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Bu dosyalar şuanda hiçbir versiyon tarafından kullanılmıyor."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Notlar:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Hiçbiri"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Orijinal proje"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Kanıt ekran görüntüsü {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Kanıt fotoğrafları:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Otomatik olarak kaynak gösterildi"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Bu dosyayı daha önce gördük ve sizin için bir kaynak gösterdik. Bir şey yanlış görünürse, lütfen Modrinth Desteğinden üzerinden Yardım Merkezine ulaşın"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Lisans"
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Lisansla alakalı destekleyici döküman yükleyin."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Projem"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Orijinal iş senin tarafından yapıldı."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Yetki yok"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Bu dosyayı daha önce gördük ve lisansı normal olarak yeniden dağıtıma izin vermez."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "Senin bu işi kullanmaya yetkin yok."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Özel yetki"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Moderatör"
+  },
   "external-project-license-status.no": {
     "defaultMessage": "Hayır"
   },
@@ -797,6 +1016,9 @@
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Üzerine yaz"
   },
+  "files.conflict-modal.overwrite-file-label": {
+    "defaultMessage": "<file-path>{path}</file-path> dosyasının üzerine yazılacaktır"
+  },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Ayıklama işlemine devam ederseniz 100'den fazla dosyanın üzerine yazılacak; işte bunlardan bazıları."
   },
@@ -809,6 +1031,12 @@
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Dosyaların üzerine yazılacak"
   },
+  "files.create-modal.create-button": {
+    "defaultMessage": "{type} oluştur"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Bir {type} oluştur"
+  },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "örneğin: klasörüm"
   },
@@ -820,6 +1048,12 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Dosyayı sil"
+  },
+  "files.delete-modal.warning.file": {
+    "defaultMessage": "Bu dosya kalıcı olarak silinecektir. Bu işlem geri alınamaz."
+  },
+  "files.delete-modal.warning.folder": {
+    "defaultMessage": "Bu klasör ve içindeki tüm veriler kalıcı olarak silinecektir. Bu işlem geri alınamaz."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Dosya içeriği yüklenemedi."
@@ -908,6 +1142,18 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Uzaklaştır"
   },
+  "files.item-type.file": {
+    "defaultMessage": "dosya"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "dosyalar"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "klasör"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "klasörler"
+  },
   "files.layout.busy-warning": {
     "defaultMessage": "İşlem devam ederken dosya işlemleri devre dışı bırakılır."
   },
@@ -946,6 +1192,9 @@
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "Örn. /klasorum"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type} türündeki öğeyi taşı"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Ana sayfaya dön"
@@ -997,6 +1246,12 @@
   },
   "files.operations.extracting": {
     "defaultMessage": "{source} çıkarılıyor"
+  },
+  "files.operations.extracting-completed": {
+    "defaultMessage": "{source}tan veri çekme işlemi tamamlandı."
+  },
+  "files.operations.extracting-failed": {
+    "defaultMessage": "{source}'dan veri çekme işlemi başarısız oldu."
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "URL'den mod paketi"
@@ -1060,6 +1315,9 @@
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": "- {count} kaldı"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "{type} dosyasını buraya yüklemek için ekleyin"
   },
   "files.validation.name-invalid-directory": {
     "defaultMessage": "Ad yalnızca alfanümerik karakterler, tireler, alt çizgiler veya boşluklar içerebilir."
@@ -1331,6 +1589,9 @@
   "hosting.loader.reset-to-onboarding-success-description": {
     "defaultMessage": "Sunucu ilk katılım akışına geri döndürüldü."
   },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
+  },
   "hosting.loader.support-options-title": {
     "defaultMessage": "Destek seçenekleri"
   },
@@ -1430,11 +1691,23 @@
   "installation-settings.incompatible-content.loader-change-title": {
     "defaultMessage": "Yükleyici değiştirmek tehlikelidir"
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Bağlı {projectType}"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "mod paketi"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "sunucu projesi"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} sürümü"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Yükleyici değiştirmek için sunucunuzu sıfırlamalısınız."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Mod pakını yeniden yüklemek, {type} içeriğini orijinal haline döndürür ve eklediğiniz tüm modları veya içeriği kaldırır."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Mod paketini yeniden kur"
@@ -1463,8 +1736,23 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Oyun sürümü ara..."
   },
+  "installation-settings.type.instance": {
+    "defaultMessage": "oturum"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "oturumun"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "sunucu"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "sunucunun"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Bağlantıyı kopar"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Sürekli olarak bağlantıyı kesmek, bu {type} öğesini {projectType} projesinden kalıcı olarak ayırır ve yükleyiciyi ve Minecraft sürümünü değiştirmene olanak tanır, ancak gelecekteki güncellemeleri alamazsın."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Doğrulanıyor..."
@@ -1481,8 +1769,23 @@
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Mod paketini yeniden kur"
   },
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "Onarım işlemi, içeriğinizi silmeden yükleyiciyi ve Minecraft bağımlılıklarını yeniden yükler. Bu, oyununuzun başlatıcıyla ilgili hatalar nedeniyle başlatılamaması durumunda sorunları çözebilir."
+  },
+  "instance.confirm-repair.body.server": {
+    "defaultMessage": "Onarım işlemi, içeriğinizi silmeden yükleyiciyi ve Minecraft bağımlılıklarını yeniden yükler. Bu, sunucunuz doğru şekilde başlatılmıyorsa sorunları çözebilir."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "{type}'i onar"
+  },
+  "instance.confirm-repair.instance-label": {
+    "defaultMessage": "oturum"
+  },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Tamir et"
+  },
+  "instance.confirm-repair.server-label": {
+    "defaultMessage": "sunucu"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Macera modu"
@@ -1499,6 +1802,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} uyumlu kurulum"
+  },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Var olan kurulum"
   },
@@ -1507,6 +1813,9 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Proje kur"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "Bu örnek, bu projede desteklenen farklı bir yükleyici veya oyun sürümünü kullanmaktadır."
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Yükle"
@@ -1580,6 +1889,12 @@
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Uyumsuz olanları gizle"
   },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "Bu sürüm, bu örnekle uyumlu olarak işaretlenmemiştir. Bağımlılıklar otomatik olarak yüklenmeyecektir."
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Versiyonu seçin"
+  },
   "instances.updater-modal.incompatible-update.description": {
     "defaultMessage": "{version} bu kurulumla uyumlu olarak işaretlenmemiş. Başlatılamayabilir veya beklenmedik şekilde davranabilir."
   },
@@ -1588,6 +1903,9 @@
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Yine de güncelle"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Yine de yükle"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Değişiklikler yükleniyor..."
@@ -2231,6 +2549,9 @@
   "payment-method.amex": {
     "defaultMessage": "American Express"
   },
+  "payment-method.card_display": {
+    "defaultMessage": ""
+  },
   "payment-method.cashapp": {
     "defaultMessage": "Cash App"
   },
@@ -2258,6 +2579,9 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
+  "payment-method.mastercard": {
+    "defaultMessage": "Mastercard"
+  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -2282,6 +2606,9 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "profile.label.badges": {
+    "defaultMessage": "Rozetler"
+  },
   "project-card.date.published.tooltip": {
     "defaultMessage": "{date} tarihinde yayınlandı"
   },
@@ -2303,17 +2630,41 @@
   "project-type.all": {
     "defaultMessage": "Tümü"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "Veri Paketi"
+  },
   "project-type.datapack.category": {
     "defaultMessage": "Veri Paketleri"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "veri paketi"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "Mod"
   },
   "project-type.mod.category": {
     "defaultMessage": "Modlar"
   },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "mod"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "Mod Paketi"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Mod Paketleri"
   },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "mod paketi"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "Plugin"
+  },
   "project-type.plugin.category": {
     "defaultMessage": "Pluginler"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "plugin"
   },
   "project-type.project.capital": {
     "defaultMessage": "{count, plural,one {Proje} other {Projeler}}"
@@ -2321,11 +2672,29 @@
   "project-type.project.category": {
     "defaultMessage": "Projeler"
   },
+  "project-type.project.lowercase": {
+    "defaultMessage": "proje"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "Kaynak Paketi"
+  },
   "project-type.resourcepack.category": {
     "defaultMessage": "Kaynak Paketleri"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "kaynak paketi"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "Sunucu"
+  },
   "project-type.server.category": {
     "defaultMessage": "Sunucular"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "sunucu"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "Shader"
   },
   "project-type.shader.category": {
     "defaultMessage": "Shaderlar"
@@ -2456,6 +2825,9 @@
   "project.about.tags.title": {
     "defaultMessage": "Etiketler"
   },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} indirme"
+  },
   "project.environment.client-and-server.description": {
     "defaultMessage": "Hem istemci hem de sunucu tarafında gereklidir."
   },
@@ -2522,8 +2894,20 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Bilinmeyen ortam"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} takipçi"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} çevrim içi"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} çevrim içi oyuncu"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} oynama"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "Modrinth'den son 2 haftada {count} oynama"
   },
   "project.server.customModpackTooltip": {
     "defaultMessage": "Bu proje özel bir mod paketi kullanmaktadır"
@@ -2957,6 +3341,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Kadro tarafından liste dışı"
   },
+  "report.item-type.content": {
+    "defaultMessage": "içerik"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "proje"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "kullanıcı"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "sürüm"
+  },
   "s.bg": {
     "defaultMessage": "Arka plan görevi çalışıyor"
   },
@@ -3047,8 +3443,557 @@
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilya"
   },
+  "servers.access-page.activity-log-filter.action-group.backups": {
+    "defaultMessage": "Yedeklemeler"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "İçerik ve mod pakı"
+  },
+  "servers.access-page.activity-log-filter.action-group.files": {
+    "defaultMessage": "Dosyalar ve SFTP"
+  },
+  "servers.access-page.activity-log-filter.action-group.power-console": {
+    "defaultMessage": "Güç kaynağı ve kontrol paneli"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "servers.access-page.activity-log-filter.action-group.settings": {
+    "defaultMessage": "Ayarlar ve çalışma zamanı"
+  },
+  "servers.access-page.activity-log-filter.action-group.users": {
+    "defaultMessage": "Kullanıcılar ve davetler"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "Eylemler"
+  },
+  "servers.access-page.activity-log-filter.action-types-search": {
+    "defaultMessage": "Arama eylemleri..."
+  },
+  "servers.access-page.activity-log-filter.action.addon-added": {
+    "defaultMessage": "Eklenen içerik"
+  },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Silinmiş içerik"
+  },
+  "servers.access-page.activity-log-filter.action.addon-disabled": {
+    "defaultMessage": "Erişilemeyen içerik"
+  },
+  "servers.access-page.activity-log-filter.action.addon-enabled": {
+    "defaultMessage": "Etkin içerik"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Güncellenmiş içerik"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Yüklenen içerik"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Yedek oluşturuldu"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Yedek silindi"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Yeniden adlandırılmış yedekleme"
+  },
+  "servers.access-page.activity-log-filter.action.backup-restored": {
+    "defaultMessage": "Yeniden kurtarılan yedek"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Sunucu adı değiştirildi"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Sunucu alt alan adı değiştirildi"
+  },
+  "servers.access-page.activity-log-filter.action.console-cleared": {
+    "defaultMessage": "Temizlenen konsol"
+  },
+  "servers.access-page.activity-log-filter.action.console-command-executed": {
+    "defaultMessage": "Konsol komutunu çalıştır"
+  },
+  "servers.access-page.activity-log-filter.action.file-deleted": {
+    "defaultMessage": "Silinen dosya"
+  },
+  "servers.access-page.activity-log-filter.action.file-edited": {
+    "defaultMessage": "Düzenlenmiş dosya"
+  },
+  "servers.access-page.activity-log-filter.action.file-renamed": {
+    "defaultMessage": "Yeniden adlandırılmış dosya"
+  },
+  "servers.access-page.activity-log-filter.action.file-uploaded": {
+    "defaultMessage": "Yüklenen dosya"
+  },
+  "servers.access-page.activity-log-filter.action.game-version-edited": {
+    "defaultMessage": "Minecraft sürümü değiştirildi"
+  },
+  "servers.access-page.activity-log-filter.action.java-runtime-modified": {
+    "defaultMessage": "Java çalışma zamanı değiştirildi"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "Java sürümünü değiştirdim"
+  },
+  "servers.access-page.activity-log-filter.action.loader-version-edited": {
+    "defaultMessage": "Yükleyici sürümü değiştirildi"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Değiştirilmiş mod pakı"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Bağlantısız mod pakı"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "Port tahsisi eklendi"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Port tahsisi kaldırıldı"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "Sunucu oluşturuldu"
+  },
+  "servers.access-page.activity-log-filter.action.server-killed": {
+    "defaultMessage": "Sunucu kapatıldı"
+  },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "Değiştirilmiş plan"
+  },
+  "servers.access-page.activity-log-filter.action.server-properties-modified": {
+    "defaultMessage": "Değiştirilmiş sunucu özellikleri"
+  },
+  "servers.access-page.activity-log-filter.action.server-reallocated": {
+    "defaultMessage": "Yeniden tahsis edilen sunucu"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Onarılmış sunucu"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "Sunucu yeniden başlat"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Sunucu yeniden başlatıldı"
+  },
+  "servers.access-page.activity-log-filter.action.server-started": {
+    "defaultMessage": "Sunucu başlatıldı"
+  },
+  "servers.access-page.activity-log-filter.action.server-stopped": {
+    "defaultMessage": "Sunucu durduruldu"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-login": {
+    "defaultMessage": "SFTP üzerinden giriş yapıldı"
+  },
+  "servers.access-page.activity-log-filter.action.startup-command-modified": {
+    "defaultMessage": "Değiştirilen başlangıç komutu"
+  },
+  "servers.access-page.activity-log-filter.action.user-invite-revoked": {
+    "defaultMessage": "Kullanıcı davetinin iptal edildi"
+  },
+  "servers.access-page.activity-log-filter.action.user-invited": {
+    "defaultMessage": "Davet edilen kullanıcı"
+  },
+  "servers.access-page.activity-log-filter.action.user-permission-modified": {
+    "defaultMessage": "Kullanıcı izinleri değiştirildi"
+  },
+  "servers.access-page.activity-log-filter.action.user-removed": {
+    "defaultMessage": "Erişim iptal edildi"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "Filtre ekle"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "Açık filtreler"
+  },
+  "servers.access-page.activity-log-filter.empty-options": {
+    "defaultMessage": "Hiçbir seçenek mevcut değil."
+  },
+  "servers.access-page.activity-log-filter.empty-search": {
+    "defaultMessage": "Hiçbir seçenek bulunamadı."
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Örnekler"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Sunucu"
+  },
+  "servers.access-page.activity-log-filter.support-actor": {
+    "defaultMessage": "Destek"
+  },
+  "servers.access-page.activity-log-filter.users": {
+    "defaultMessage": "Kullanıcı"
+  },
+  "servers.access-page.activity-log-title": {
+    "defaultMessage": "Etkinlik günlüğü"
+  },
+  "servers.access-page.invite-friends": {
+    "defaultMessage": "Kullanıcıyı ekle"
+  },
+  "servers.access-page.notification.friend-request-failed.title": {
+    "defaultMessage": "Arkadaşlık isteği gönderilemedi"
+  },
+  "servers.access-page.notification.invite-cancelled.text": {
+    "defaultMessage": "{target} için daveti iptal edildi."
+  },
+  "servers.access-page.notification.invite-cancelled.title": {
+    "defaultMessage": "Davet geri çekildi"
+  },
+  "servers.access-page.notification.invite-failed.title": {
+    "defaultMessage": "Davet gönderilemedi"
+  },
+  "servers.access-page.notification.invite-resent.text": {
+    "defaultMessage": "{target} kişisine tekrar bir davet gönderdim."
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Davet reddedildi"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "{target} davet edildi, rolü: {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Davet gönderildi"
+  },
+  "servers.access-page.notification.load-failed.text": {
+    "defaultMessage": "Sayfayı yenileyerek tekrar deneyin."
+  },
+  "servers.access-page.notification.load-failed.title": {
+    "defaultMessage": "Erişim yüklenemedi"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "{target} için erişim yetkisi iptal edildi."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Erişim iptal edildi"
+  },
+  "servers.access-page.notification.remove-failed.title": {
+    "defaultMessage": "Erişim kaldırılamadı"
+  },
+  "servers.access-page.notification.role-update-failed.title": {
+    "defaultMessage": "Rol güncellenemedi"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Tüm"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Rol: {role}"
+  },
+  "servers.access-page.role.editor": {
+    "defaultMessage": "Editör"
+  },
+  "servers.access-page.role.editor-description": {
+    "defaultMessage": "İnstance içeriğini, dosyaları, yedeklemeleri ve diğer ayarları yönetin."
+  },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Mülk sahibi"
+  },
+  "servers.access-page.role.owner-description": {
+    "defaultMessage": "Hesaplama, üye bilgileri ve yıkıcı işlemler dahil olmak üzere tüm erişim."
+  },
+  "servers.access-page.role.viewer": {
+    "defaultMessage": "Sınırlı"
+  },
+  "servers.access-page.role.viewer-description": {
+    "defaultMessage": "Sunucuyu başlatın, durdurun ve değiştirmeden görüntüleyin."
+  },
+  "servers.access-page.search-users-placeholder": {
+    "defaultMessage": "{count} {count, plural, one {user} other {users}} sonuç bulundu..."
+  },
+  "servers.access-role.editor": {
+    "defaultMessage": "Editör"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Mülk sahibi"
+  },
+  "servers.access-role.viewer": {
+    "defaultMessage": "Sınırlı"
+  },
+  "servers.access-table.action.cancel-invite": {
+    "defaultMessage": "Daveti iptal et"
+  },
+  "servers.access-table.action.remove-user": {
+    "defaultMessage": "Erişi iptal et"
+  },
+  "servers.access-table.action.resend-invite": {
+    "defaultMessage": "Daveti yeniden gönder"
+  },
+  "servers.access-table.action.resend-invite-cooldown": {
+    "defaultMessage": "{seconds} içinde yeniden gönder"
+  },
+  "servers.access-table.column.actions": {
+    "defaultMessage": "Eylemler"
+  },
+  "servers.access-table.column.joined": {
+    "defaultMessage": "Katıldı"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Rol"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Kullanıcı"
+  },
+  "servers.access-table.empty": {
+    "defaultMessage": "Belirtilen kriterlere uyan kullanıcı bulunamadı."
+  },
+  "servers.access-table.member-actions-label": {
+    "defaultMessage": "{username} için eylemler"
+  },
+  "servers.access-table.pending": {
+    "defaultMessage": "Bekleyen"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
+  },
+  "servers.access-table.user-avatar-alt": {
+    "defaultMessage": "{username} nın avatarı"
+  },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Arka plan görevi çalışıyor"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Destek"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Eylemler"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Zaman"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Kullanıcı"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Örnek"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "Sunucu örnekleri, kendi yüklü içeriğine ve dünya dosyalarına sahip, bağımsız ortamlardır."
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Yakında!"
+  },
+  "servers.audit-log.empty": {
+    "defaultMessage": "Belirtilen filtrelerle eşleşen herhangi bir aktivite bulunamadı."
+  },
+  "servers.audit-log.empty.no-activity": {
+    "defaultMessage": "Sunucunuzda bir işlem gerçekleştirin ve burada sonuçları göreceksiniz!"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "Eklenen içerik <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Değiştirilen içerik <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Silinmiş içerik <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Silinmiş içerik"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Erişilemeyen içerik <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Etkin içerik <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Güncellenmiş içerik <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "Yüklenen <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Yedekleme değiştirildi <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Yedekleme değiştirildi"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Yedek oluşturuldu <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Yedek oluşturuldu"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Yedek silindi <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Yedek silindi"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "<from></from> yedekleme adını <renamed-backup></renamed-backup> olarak değiştirdi"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Yeniden adlandırılmış yedekleme"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Yeniden kurtarılan yedek <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Yeniden kurtarılan yedek"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Sunucu yapılandırması değiştirildi"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Temizlenen konsol"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "<command></command> komutunu çalıştırdı"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Değiştirilen dosya <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Silinen dosya <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Düzenlenmiş dosya <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "<from></from> 'u <to></to> olarak yeniden adlandırdım"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Yüklenen dosya <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Minecraft sürümünü <version></version> olarak değiştirdim"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Java çalışma zamanını <vendor></vendor> olarak değiştirdim"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Java sürümünü <java-version></java-version> olarak değiştirdim"
+  },
+  "servers.audit-log.event.loader-and-version-changed": {
+    "defaultMessage": "Yükleyiciyi <loader></loader> ve <version></version> olarak değiştirdim"
+  },
+  "servers.audit-log.event.loader-changed": {
+    "defaultMessage": "Yükleyiciyi <loader></loader> olarak değiştirdim"
+  },
+  "servers.audit-log.event.loader-version-changed": {
+    "defaultMessage": "Yükleyici sürümünü <version></version> olarak değiştirdim."
+  },
+  "servers.audit-log.event.loader-version-cleared": {
+    "defaultMessage": "Temizlenmiş yükleyici sürümü"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Değiştirilmiş mod pakı"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Mod pakını <modpack></modpack> şeklinde değiştirdim"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "Mod pakını <version></version> sürümüne güncelledim"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Bağlantısız mod pakı"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Bağlantısız mod pakı <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Bağlantısız mod pakı sürümü <version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "Port tahsisi eklendi <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Port tahsisi kaldırıldı <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Sunucu oluşturuldu"
+  },
+  "servers.audit-log.event.server-killed": {
+    "defaultMessage": "Sunucu kapatıldı"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Sunucu meta verisi değiştirildi"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Sunucu adını <name></name> olarak değiştirdim"
+  },
+  "servers.audit-log.event.server-plan-changed": {
+    "defaultMessage": "Planı <specs></specs> olarak değiştirdim"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# CPU} other {# CPUs}}"
+  },
+  "servers.audit-log.event.server-plan.new-plan": {
+    "defaultMessage": "yeni plan"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB RAM"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB RAM"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB depolama alanı"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB depolama alanı"
+  },
+  "servers.audit-log.event.server-properties-modified": {
+    "defaultMessage": "Değiştirilmiş sunucu özellikleri <properties></properties>"
+  },
+  "servers.audit-log.event.server-properties-modified-label": {
+    "defaultMessage": "Değiştirilmiş sunucu özellikleri"
+  },
+  "servers.audit-log.event.server-reallocated": {
+    "defaultMessage": "Atanan sunucu"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Onarılmış sunucu"
+  },
+  "servers.audit-log.event.server-reset": {
+    "defaultMessage": "Sunucu yeniden başlat"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Sunucu yeniden başlatıldı"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Sunucu başlatıldı"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Sunucu durduruldu"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Sunucu alt alan adını <subdomain></subdomain> olarak değiştirdim"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "SFTP üzerinden giriş yapıldı"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Başlangıç komutunu <command></command> olarak değiştirdim"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Bilinmeyen etkinlik"
+  },
+  "servers.audit-log.event.unknown-basic": {
+    "defaultMessage": "Kaydedilen sunucu aktivitesi"
+  },
+  "servers.audit-log.event.user-invite-revoked": {
+    "defaultMessage": "<target-user></target-user> için gönderilen davet geri çekildi"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "<target-user></target-user> davet edildi"
+  },
+  "servers.audit-log.event.user-invited-with-permissions": {
+    "defaultMessage": "<target-user></target-user> kullanıcısını <permission-label>{permissions}</permission-label> izniyle davet etti"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "<target-user></target-user> için izinleri değiştirildi"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Için izinleri <target-user></target-user> olarak değiştirildi<permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.event.user-removed": {
+    "defaultMessage": "ait erişim yetkisi iptal edildi <target-user></target-user>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "servers.audit-log.user-avatar-alt": {
+    "defaultMessage": "{username} ın avatarı"
   },
   "servers.backups.admonition.backup-cancelled.description": {
     "defaultMessage": "Yedekleme {backupName} iptal edildi."
@@ -3074,6 +4019,9 @@
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "Yedekleme sırada"
   },
+  "servers.backups.admonition.backup-timed-out.description": {
+    "defaultMessage": "{backupName} oluşturma işlemi zaman aşımına uğradı. Tekrar deneyebilirsiniz veya sorun devam ederse destek ekibiyle iletişime geçebilirsiniz."
+  },
   "servers.backups.admonition.backup-timed-out.title": {
     "defaultMessage": "Yedekleme zaman aşımına uğradı"
   },
@@ -3085,6 +4033,9 @@
   },
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Yedeğiniz"
+  },
+  "servers.backups.admonition.restore-cancelled.description": {
+    "defaultMessage": "Yedisinden kurtarma işlemi iptal edildi. {backupName}."
   },
   "servers.backups.admonition.restore-cancelled.title": {
     "defaultMessage": "Geri yükleme iptal edildi"
@@ -3106,6 +4057,9 @@
   },
   "servers.backups.admonition.restore-successful.title": {
     "defaultMessage": "Geri yükleme başarıyla sonuçlandı"
+  },
+  "servers.backups.admonition.restore-timed-out.description": {
+    "defaultMessage": "Yedisinden kurtarma işlemi zaman aşımına uğradı. Tekrar denemeyi deneyebilir veya sorun devam ederse destek ekibiyle iletişime geçebilirsiniz. {backupName}."
   },
   "servers.backups.admonition.restore-timed-out.title": {
     "defaultMessage": "Geri yükleme zaman aşımına uğradı"
@@ -3155,6 +4109,12 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Yedekleme zamanları"
   },
+  "servers.backups.item.creator-avatar-alt": {
+    "defaultMessage": "{username} nın avatarı"
+  },
+  "servers.backups.item.creator.support": {
+    "defaultMessage": "Destek"
+  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel yedekleme"
   },
@@ -3163,6 +4123,9 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Geri yükle"
+  },
+  "servers.backups.select-backup-aria": {
+    "defaultMessage": "{name} yedek dosyasını seçin"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Yedek oluştur"
@@ -3188,11 +4151,65 @@
   "servers.busy.syncing-content": {
     "defaultMessage": "İçerik eşlemesi sürüyor"
   },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Ayrıca bir arkadaş isteği gönderin"
+  },
+  "servers.grant-access-modal.already-member-tooltip": {
+    "defaultMessage": "Bu kullanıcıya zaten davet gönderildi"
+  },
+  "servers.grant-access-modal.cancel": {
+    "defaultMessage": "İptal et"
+  },
+  "servers.grant-access-modal.header": {
+    "defaultMessage": "Kullanıcıyı ekle"
+  },
+  "servers.grant-access-modal.invite": {
+    "defaultMessage": "Davet"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Her rol için izinlerin tam listesini <link>burada</link> görüntüleyin."
+  },
+  "servers.grant-access-modal.role.editor": {
+    "defaultMessage": "Editör"
+  },
+  "servers.grant-access-modal.role.editor-description": {
+    "defaultMessage": "İnstance içeriğini, dosyaları, yedeklemeleri ve diğer ayarları yönetin."
+  },
+  "servers.grant-access-modal.role.label": {
+    "defaultMessage": "Rolü seçin"
+  },
+  "servers.grant-access-modal.role.viewer": {
+    "defaultMessage": "Sınırlı"
+  },
+  "servers.grant-access-modal.role.viewer-description": {
+    "defaultMessage": "Sunucuyu başlatın, durdurun ve değiştirmeden görüntüleyin."
+  },
+  "servers.grant-access-modal.suggestion-avatar-alt": {
+    "defaultMessage": "{username} ın avatarı"
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Onların Minecraft kullanıcı adlarını kullanmayın."
+  },
+  "servers.grant-access-modal.target.label": {
+    "defaultMessage": "Modrinth kullanıcı adı"
+  },
+  "servers.grant-access-modal.target.no-suggestions": {
+    "defaultMessage": "Eşleşen kullanıcı bulunamadı."
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Modrinth kullanıcı adınızı girin"
+  },
+  "servers.grant-access-modal.target.searching": {
+    "defaultMessage": "Arama yapılıyor..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Kurulum başarısız oldu"
   },
   "servers.installing-banner.error.internal-platform": {
     "defaultMessage": "Platform yüklenirken dahili bir hata oluştu. Lütfen tekrar deneyin."
+  },
+  "servers.installing-banner.error.invalid-loader-version": {
+    "defaultMessage": "Belirtilen yükleyici veya Minecraft sürümü kurulamazdı. Belki de geçersiz veya desteklenmeyen bir sürüm olabilir."
   },
   "servers.installing-banner.error.modpack-install-failed": {
     "defaultMessage": "Mod paketi yüklenemedi. Bozuk veya uyumsuz olabilir."
@@ -3251,6 +4268,9 @@
   "servers.list-empty.no-servers-title": {
     "defaultMessage": "Daha sunucu yok"
   },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Beğendiğiniz modları seçin ve biz geri kalan işi hallederiz."
+  },
   "servers.list-empty.one-click-mod-installs-title": {
     "defaultMessage": "Tek-tıklamada mod kurma"
   },
@@ -3290,11 +4310,17 @@
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Dosyalarınız iptal işleminden sonra 30 gün boyunca saklanacaktır."
   },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Sunucunuz, moderasyon nedeniyle askıya alınmıştır."
+  },
   "servers.listing.notice.provisioning": {
     "defaultMessage": "Sunucunuzu kurarken lütfen bekleyin. Bu işlem 10 dakika kadar sürebilir."
   },
   "servers.listing.notice.subscription-cancelled": {
     "defaultMessage": "Aboneliğiniz iptal edildi."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "Aboneliğiniz <date>{formattedDate}</date> tarihinde iptal edildi."
   },
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Aboneliğiniz ödeme hatası nedeniyle iptal edildi."
@@ -3314,6 +4340,12 @@
   "servers.listing.notice.upgrading": {
     "defaultMessage": "Sunucunuzun donanımı şu anda yükseltilmektedir ve kısa süre içinde tekrar çevrimiçi olacaktır."
   },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username} nın avatarı"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "{username} tarafından Sahibi"
+  },
   "servers.listing.resubscribe-label": {
     "defaultMessage": "Yeniden abone ol"
   },
@@ -3322,6 +4354,9 @@
   },
   "servers.listing.support-label": {
     "defaultMessage": "Destek"
+  },
+  "servers.listing.using-project-label": {
+    "defaultMessage": "{projectTitle} kullanılıyor"
   },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Yeni sunucular kontrol ediliyor..."
@@ -3359,8 +4394,14 @@
   "servers.manage.new-server-button": {
     "defaultMessage": "Yeni sunucu"
   },
+  "servers.manage.no-owned-servers-found": {
+    "defaultMessage": "Sizin sahip olduğunuz sunuculardan hiçbiri aramanıza uymuyor."
+  },
   "servers.manage.no-servers-found": {
     "defaultMessage": "Sunucular bulunamadı."
+  },
+  "servers.manage.no-shared-servers-found": {
+    "defaultMessage": "Arama sonuçlarına uyan ortak sunucular bulunamadı."
   },
   "servers.manage.purchase-unavailable.text": {
     "defaultMessage": "Ödeme bilgileri hala yükleniyor. Hazır olur olmaz ödeme açılacak."
@@ -3389,6 +4430,9 @@
   "servers.manage.resubscribe-success.title": {
     "defaultMessage": "Başarılı"
   },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "{count} {count, plural, one {server} other {servers}} sonuç bulundu..."
+  },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
@@ -3400,6 +4444,12 @@
   },
   "servers.manage.settings-hint.title": {
     "defaultMessage": "Sunucu ayarlarınız taşındı"
+  },
+  "servers.manage.shared-servers-title": {
+    "defaultMessage": "Paylaşımlı sunucular"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Sunucularınız"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {gün} other {saat}} <hours-count>{hours}</hours-count> {hours, plural, one {saat} other {saat}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {dakika} other {dakika}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {saniye} other {saniye}} kaldı..."
@@ -3419,11 +4469,20 @@
   "servers.medal-listing.notice.upgrading": {
     "defaultMessage": "Sunucunuzun donanımı şu anda yükseltilmektedir ve kısa süre içinde tekrar çevrimiçi olacaktır."
   },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username} nın avatarı"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "tarafından Sahibi {username}"
+  },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Sunucu ikonu"
   },
   "servers.medal-listing.upgrade-button": {
     "defaultMessage": "Yükselt"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "kullanmak {projectTitle}"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"
@@ -3466,6 +4525,9 @@
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Ödeme yöntemi"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
   "servers.purchase.step.plan.billing-subtitle": {
     "defaultMessage": "Kuzey Amerika, Avrupa ve Güneydoğu Asya'da mevcut."
@@ -3515,6 +4577,9 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "İnceleme"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Avustralya"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Merkez Avrupa"
   },
@@ -3544,6 +4609,54 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Batı Avrupa"
+  },
+  "servers.remove-access-modal.added-label": {
+    "defaultMessage": "{time} eklendi"
+  },
+  "servers.remove-access-modal.cancel-button": {
+    "defaultMessage": "Daveti iptal et"
+  },
+  "servers.remove-access-modal.cancel-effect-access": {
+    "defaultMessage": "Bunlar bu sunucuya eklenmeyecektir"
+  },
+  "servers.remove-access-modal.cancel-effect-invite": {
+    "defaultMessage": "Buna ek olarak, daha sonra onlara başka bir davet gönderebilirsiniz"
+  },
+  "servers.remove-access-modal.cancel-header": {
+    "defaultMessage": "Daveti iptal et"
+  },
+  "servers.remove-access-modal.cancel-warning-body": {
+    "defaultMessage": "Bu daveti geri alırsanız, {username} bu sunucuya katılabilmek için yeni bir davete ihtiyaç duyacaktır."
+  },
+  "servers.remove-access-modal.header": {
+    "defaultMessage": "Erişi iptal et"
+  },
+  "servers.remove-access-modal.invited-label": {
+    "defaultMessage": "Davet edildi ({time})"
+  },
+  "servers.remove-access-modal.pending-invite-label": {
+    "defaultMessage": "Bekleyen davet"
+  },
+  "servers.remove-access-modal.remove-button": {
+    "defaultMessage": "Erişi iptal et"
+  },
+  "servers.remove-access-modal.remove-effect-access": {
+    "defaultMessage": "Onlar anında sunucu paneline erişimlerini kaybedecek ve artık içeriği düzenleyemeyecekler."
+  },
+  "servers.remove-access-modal.remove-effect-join": {
+    "defaultMessage": "Onlar hala sunucuya katılabilir ve oyunu oynayabilirler, ancak siz ayrı değişiklikler yapmadığınız sürece."
+  },
+  "servers.remove-access-modal.unknown-added-label": {
+    "defaultMessage": "Tarih bilinmiyor"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username} ın avatarı"
+  },
+  "servers.remove-access-modal.warning-body": {
+    "defaultMessage": "Eğer bir kullanıcının sunucunuza erişimini iptal ederseniz, erişimi geri sağlamak için onlara tekrar davet etmeniz gerekecektir."
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "Ne olur?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Kurulum sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
@@ -4115,6 +5228,90 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Başvuru yapın"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "İptal et"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Açık"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": "Özel, belirli bir tarih aralığı..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": "Zaman aralığını azaltın"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": "Hiçbir tarih aralığı seçilmedi."
+  },
+  "time-frame-picker.end-date": {
+    "defaultMessage": "Bitiş tarihi"
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": "Zaman aralığını artırın"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "Sonunda"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Tüm zaman"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Son 14 gün"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Son 180 gün"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Son 30 gün"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Son 7 gün"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Son 90 gün"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Bugün"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": "Yılın başından bu yana"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Dün"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Zaman aralığını seçin"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Seçilmiş"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Seçim yapma"
+  },
+  "time-frame-picker.start-date": {
+    "defaultMessage": "Başlangıç tarihi"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Zaman aralığı tutarı"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Zaman dilimi birimi"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "günler"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "saatler"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "aylar"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "Haftalar"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Kaydedilmemiş değişikliklerin var."
   },
@@ -4138,5 +5335,104 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Tümünü görmezden gel"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Bu kullanıcı, Modrinth Alpha'nın başladığı tarihten beri aktif durumda; bu dönem Kasım 2020 itibarıyla sona ermiştir."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alfa Test Kullanıcısı"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Bu kullanıcı, Şubat 2022'de sona eren Modrinth Beta sürümünden beri aktif durumda."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Modrinth Beta'nın lansmanı hakkında bilgi edinmek için tıklayın."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Deneme Kullanıcısı"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Bu kullanıcının projeleri toplamda {download_sum} indirme sağlamıştır."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} İndirme"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Bu kullanıcı, Ocak 2023'te yayınlamadan önce Modrinth üzerinde Data Pack projelerini test etmemize yardımcı oldu."
+  },
+  "user.profile.badge.early-datapack-adopter.name": {
+    "defaultMessage": "Erken Veri Paketı Kullanıcısı"
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Bu kullanıcı, Mayıs 2022'de yayınlamadan önce Modrinth üzerinde Modpack projelerini test etmemize yardımcı oldu."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "Erken Mod Paket Kullanıcısı"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Bu kullanıcı, modları Ağustos 2022'de yayınlamadan önce Modrinth üzerinde Plugin projelerini test etmemize yardımcı oldu."
+  },
+  "user.profile.badge.early-plugin-adopter.name": {
+    "defaultMessage": "Erken Dönemde Eklenti Kullanıcısı"
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": ""
+  },
+  "user.profile.badge.early-resourcepack-adopter.name": {
+    "defaultMessage": ""
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Bu kullanıcı, sunucu projelerini Mart 2026'da yayınlamadan önce Modrinth üzerinde test etmemize yardımcı oldu."
+  },
+  "user.profile.badge.early-server-adopter.name": {
+    "defaultMessage": "Erken Sunucu Benimseyen"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Bu kullanıcı, modları Ocak 2023'te yayınlamadan önce Shader projelerini Modrinth üzerinde test etmemize yardımcı oldu."
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "Erken Shader Kullanıcısı"
+  },
+  "user.profile.badge.hosting-alpha.about.1": {
+    "defaultMessage": "Bu kullanıcı, Modrinth Hosting'in Kasım 2024'te yayınlanacak beta sürümünü piyasaya sürmeden önce gerçekleştirdiğimiz kapalı alfa testine katılmıştır."
+  },
+  "user.profile.badge.hosting-alpha.name": {
+    "defaultMessage": "Modrinth Barındırma Alfa Testi"
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Bu kullanıcı, Modrinth için içerik moderatörü olarak çalışmaktadır."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Modrinth'daki içerik denetleyicileri, projeleri inceler, raporları işler ve Modrinth'in güvenliğini sağlamaya yardımcı olur."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "İçerik Moderatörü"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Bu kullanıcı, Modrinth ve platformdaki yaratıcıları desteklemek için elinden geleni yapmaktadır."
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Üyeliğe nasıl katılabileceğiniz hakkında daha fazla bilgi edinmek için tıklayın."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ Üyesi"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Bu kullanıcı, Modrinth'in LGBTQ+ topluluğu için düzenlediği en az bir Pride bağış kampanyasına katılmıştır."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "En son Onur Ayı bağış kampanyamızı ziyaret etmek için tıklayın."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Onur Ayı Bağış Toplama Etkinliği Destekçisi"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Bu kullanıcı Modrinth'te çalışıyor."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth Ekibi"
+  },
+  "version.content.name": {
+    "defaultMessage": "İsim"
   }
 }

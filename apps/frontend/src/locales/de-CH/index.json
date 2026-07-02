@@ -23,26 +23,38 @@
   "analytics.breakdown.country": {
     "message": "Land"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Abhängig von"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Abhängiges Projekt"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Abhängiger Projekttyp"
+  },
   "analytics.breakdown.download-reason": {
-    "message": "Downloadgrund"
+    "message": "Download-Grund"
   },
   "analytics.breakdown.download-source": {
-    "message": "Downloadquelle"
+    "message": "Download-Quelle"
   },
   "analytics.breakdown.game-version": {
     "message": "Spielversion"
   },
   "analytics.breakdown.generic": {
-    "message": "Auswertung"
+    "message": "Aufschlüsselung"
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Mitglied"
   },
   "analytics.breakdown.monetization": {
     "message": "Monetarisierung"
   },
   "analytics.breakdown.none.selected": {
-    "message": "Keine Auswertung"
+    "message": "Keine Aufschlüsselung"
   },
   "analytics.breakdown.project": {
     "message": "Projekt"
@@ -54,13 +66,13 @@
     "message": "Projektversion"
   },
   "analytics.breakdown.selected": {
-    "message": "Auswertung nach {breakdown}"
+    "message": "Aufschlüsselung nach {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "Alle anzeigen"
   },
   "analytics.chart.action.show-limited": {
-    "message": "Zeige limitierte"
+    "message": "Begrenzt anzeigen"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Top 8 anzeigen"
@@ -74,29 +86,41 @@
   "analytics.chart.controls.annotations": {
     "message": "Anmerkungen"
   },
+  "analytics.chart.controls.aria": {
+    "message": "Analytics-Diagramm-Steuerung, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Steuerung"
+  },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Analyse Graph Kontrolle"
+    "message": "Analytics-Diagramm-Steuerung"
   },
   "analytics.chart.controls.display": {
     "message": "Anzeige"
   },
   "analytics.chart.controls.modrinth-events": {
-    "message": "Modrinth Ereignisse"
+    "message": "Modrinth-Ereignisse"
   },
   "analytics.chart.controls.no-modrinth-events": {
-    "message": "Keine Modrinth Ereignisse im Graph."
+    "message": "Keine Modrinth-Ereignisse im Diagramm."
   },
   "analytics.chart.controls.no-project-events": {
-    "message": "Keine Projektereignisse im Graph."
+    "message": "Keine Projekt-Ereignisse im Diagramm."
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Vorheriger Zeitraum"
   },
   "analytics.chart.controls.project-events": {
-    "message": "Projektereignisse"
+    "message": "Projekt-Ereignisse"
   },
   "analytics.chart.controls.ratio": {
     "message": "Verhältnis"
   },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Wähle Elemente aus der Tabelle unten, um deine Daten zu visualisieren."
+  },
   "analytics.chart.events.count-aria": {
-    "message": "{count, plural, one {# Analyseereignis} other {# Analyseereignisse}}"
+    "message": "{count, plural, one {# Analytics-Ereignis} other {# Analytics-Ereignisse}}"
   },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
@@ -105,25 +129,40 @@
     "message": "Ankündigung ansehen"
   },
   "analytics.chart.legend.monetization-details.aria": {
-    "message": "Zeige monetarisierte Analyse Details"
+    "message": "Details zur monetarisierten Analytics ansehen"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Nur Aufrufe und Downloads über Modrinth zählen für die Monetarisierung, und für Downloads müssen Benutzer angemeldet sein."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Details zur monetarisierten Analytics"
   },
   "analytics.chart.legend.previous-period-suffix": {
-    "message": "{name} (Vorherige)"
+    "message": "{name} (Vorh.)"
   },
   "analytics.chart.render-limit.description": {
-    "message": "Anzeigen aller ausgewählten Zeilen von der Liste könnte die Performance beeinflussen."
+    "message": "Die Anzeige aller ausgewählten Linien aus der Tabelle kann die Seitenleistung beeinträchtigen."
   },
   "analytics.chart.render-limit.header": {
-    "message": "Alle {count} Zeilen im Graph anzeigen?"
+    "message": "Alle {count} Linien im Diagramm anzeigen?"
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "Zeige alle {itemType, select, project {{count, plural, one {Projekt} other {Projekte}}} country {{count, plural, one {Land} other {Länder}}} monetization {{count, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{count, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{count, plural, one {Downloadgrund} other {Downloadgründe}}} member {{count, plural, one {Mitglied} other {Mitglieder}}} projectVersion {{count, plural, one {Projektversion} other {Projektversionen}}} loader {{count, plural, one {Loader} other {Loader}}} gameVersion {{count, plural, one {Spielversion} other {Spielversionen}}} other {{count, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
   },
   "analytics.chart.table-selection.count": {
-    "message": "Zeige {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} der Liste"
+    "message": "Zeige {count} {itemType, select, project {{count, plural, one {Projekt} other {Projekte}}} country {{count, plural, one {Land} other {Länder}}} monetization {{count, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{count, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{count, plural, one {Downloadgrund} other {Downloadgründe}}} member {{count, plural, one {Mitglied} other {Mitglieder}}} projectVersion {{count, plural, one {Projektversion} other {Projektversionen}}} loader {{count, plural, one {Loader} other {Loader}}} gameVersion {{count, plural, one {Spielversion} other {Spielversionen}}} other {{count, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
   },
   "analytics.chart.table-selection.limited": {
-    "message": "Zeige {limit} {itemType, select, project {{limit, plural, one {project} other {projects}}} country {{limit, plural, one {country} other {countries}}} monetization {{limit, plural, one {monetization value} other {monetization values}}} downloadSource {{limit, plural, one {download source} other {download sources}}} downloadReason {{limit, plural, one {download reason} other {download reasons}}} projectVersion {{limit, plural, one {project version} other {project versions}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {game version} other {game versions}}} other {{limit, plural, one {item} other {items}}}} der Liste"
+    "message": "Zeige {limit} {itemType, select, project {{limit, plural, one {Projekt} other {Projekte}}} country {{limit, plural, one {Land} other {Länder}}} monetization {{limit, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{limit, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{limit, plural, one {Downloadgrund} other {Downloadgründe}}} member {{limit, plural, one {Mitglied} other {Mitglieder}}} projectVersion {{limit, plural, one {Projektversion} other {Projektversionen}}} loader {{limit, plural, one {Loader} other {Loader}}} gameVersion {{limit, plural, one {Spielversion} other {Spielversionen}}} other {{limit, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
   },
   "analytics.chart.table-selection.top": {
-    "message": "Zeige top {count} {itemType, select, project {{count, plural, one {project} other {projects}}} country {{count, plural, one {country} other {countries}}} monetization {{count, plural, one {monetization value} other {monetization values}}} downloadSource {{count, plural, one {download source} other {download sources}}} downloadReason {{count, plural, one {download reason} other {download reasons}}} projectVersion {{count, plural, one {project version} other {project versions}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {game version} other {game versions}}} other {{count, plural, one {item} other {items}}}} von der Liste"
+    "message": "Zeige die top {count} {itemType, select, project {{count, plural, one {Projekt} other {Projekte}}} country {{count, plural, one {Land} other {Länder}}} monetization {{count, plural, one {Monetarisierungswert} other {Monetarisierungswerte}}} downloadSource {{count, plural, one {Downloadquelle} other {Downloadquellen}}} downloadReason {{count, plural, one {Downloadgrund} other {Downloadgründe}}} member {{count, plural, one {Mitglied} other {Mitglieder}}} projectVersion {{count, plural, one {Projektversion} other {Projektversionen}}} loader {{count, plural, one {Loader} other {Loader}}} gameVersion {{count, plural, one {Spielversion} other {Spielversionen}}} other {{count, plural, one {Artikel} other {Artikel}}}} aus der Tabelle"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Abhängig von {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} abhängig von {dependencyProject}, {version}"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# Tag} other {# Tage}}"
@@ -137,14 +176,20 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "{name} im Diagramm ausblenden"
   },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Diagramm-Tooltip angeheftet"
+  },
   "analytics.chart.tooltip.pinned-aria": {
-    "message": "Angepinnt"
+    "message": "Angeheftet"
   },
   "analytics.chart.tooltip.previous-period-short": {
-    "message": "(Vorherige)"
+    "message": "(vorh.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "{name} im Diagramm anzeigen"
   },
   "analytics.chart.tooltip.total": {
-    "message": "Gesamt"
+    "message": "Total"
   },
   "analytics.chart.view.area": {
     "message": "Fläche"
@@ -162,10 +207,10 @@
     "message": "Modpack"
   },
   "analytics.download-reason.standalone": {
-    "message": "Eigenständig"
+    "message": "Standalone"
   },
   "analytics.download-reason.update": {
-    "message": "Aktualisierung"
+    "message": "Update"
   },
   "analytics.download-source.app": {
     "message": "Modrinth App"
@@ -174,55 +219,61 @@
     "message": "Modrinth Website"
   },
   "analytics.downloads.suffix": {
-    "message": "Downloads"
+    "message": "downloads"
   },
   "analytics.empty.no-data": {
     "message": "Keine Daten verfügbar"
   },
   "analytics.empty.no-data-for-analytics": {
-    "message": "Keine Daten verfügbar für diese Analysen"
+    "message": "Keine Daten für Analytics verfügbar"
   },
   "analytics.empty.no-projects": {
     "message": "Keine Projekte verfügbar"
   },
   "analytics.empty.no-projects-for-analytics": {
-    "message": "Keine Projekte für die Analyse verfügbar"
+    "message": "Keine Projekte für Analytics verfügbar"
   },
   "analytics.empty.select-project": {
-    "message": "Wähle mindestens ein Projekt aus um Daten anzuzeigen"
+    "message": "Wähle mindestens ein Projekt aus, um Daten anzuzeigen"
   },
   "analytics.filter.game-version-type": {
-    "message": "Spiel Version wählen"
+    "message": "Spielversionstyp"
   },
   "analytics.filter.game-version-type.all": {
     "message": "Alle"
   },
   "analytics.filter.game-version-type.release": {
-    "message": "Veröffentlichung"
+    "message": "Release"
   },
   "analytics.filter.search.countries": {
-    "message": "Länder durchsuchen..."
+    "message": "Länder suchen..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Projekte durchsuchen..."
   },
   "analytics.filter.search.download-sources": {
-    "message": "Download-Quellen durchsuchen..."
+    "message": "Download-Quellen suchen..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Mitglieder durchsuchen..."
   },
   "analytics.filter.search.project-versions": {
-    "message": "Projektversionen durchsuchen..."
+    "message": "Projektversionen suchen..."
   },
   "analytics.filter.search.versions": {
-    "message": "Versionen durchsuchen..."
+    "message": "Versionen suchen..."
   },
   "analytics.graph.title.downloads": {
-    "message": "Downloads im Laufe der Zeit"
+    "message": "Downloads im Zeitverlauf"
   },
   "analytics.graph.title.playtime": {
-    "message": "Spielzeit im Laufe der Zeit"
+    "message": "Spielzeit im Zeitverlauf"
   },
   "analytics.graph.title.revenue": {
-    "message": "Einnahmen im Laufe der Zeit"
+    "message": "Einnahmen im Zeitverlauf"
   },
   "analytics.graph.title.views": {
-    "message": "Ansichten im Laufe der Zeit"
+    "message": "Aufrufe im Zeitverlauf"
   },
   "analytics.group-by.1h": {
     "message": "1 Std."
@@ -267,19 +318,19 @@
     "message": "Ergebnisse werden abgerufen..."
   },
   "analytics.options.loading": {
-    "message": "Wird geladen..."
+    "message": "Lädt..."
   },
   "analytics.project-event.project-approved": {
-    "message": "Projekt angenommen"
+    "message": "Projekt genehmigt"
   },
   "analytics.project-event.project-private": {
-    "message": "Projekt auf Privat gestellt"
+    "message": "Projekt auf privat gesetzt"
   },
   "analytics.project-event.project-status-changed": {
     "message": "Projektstatus geändert"
   },
   "analytics.project-event.project-unlisted": {
-    "message": "Projekt entlistet"
+    "message": "Projekt nicht gelistet"
   },
   "analytics.project-event.version-released": {
     "message": "{version} veröffentlicht"
@@ -288,7 +339,7 @@
     "message": "Version hochgeladen"
   },
   "analytics.project-status.approved": {
-    "message": "Angenommen"
+    "message": "Genehmigt"
   },
   "analytics.project-status.archived": {
     "message": "Archiviert"
@@ -318,16 +369,22 @@
     "message": "{count, plural, one {# Projekt} other {# Projekte}}"
   },
   "analytics.project.icon-alt": {
-    "message": "{name} Icon"
+    "message": "{name} Symbol"
   },
   "analytics.project.select": {
     "message": "Projekte auswählen"
+  },
+  "analytics.project.user": {
+    "message": "Projekte von {username}"
+  },
+  "analytics.project.your": {
+    "message": "Deine Projekte"
   },
   "analytics.query.filter.add": {
     "message": "Filter hinzufügen"
   },
   "analytics.query.label.breakdown": {
-    "message": "Auswertung:"
+    "message": "Aufschlüsselung:"
   },
   "analytics.query.label.grouped-by": {
     "message": "Gruppiert nach"
@@ -336,10 +393,19 @@
     "message": "Projekt:"
   },
   "analytics.query.label.timeframe": {
-    "message": "Zeitfenster:"
+    "message": "Zeitraum:"
   },
   "analytics.stat.downloads": {
     "message": "Downloads"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Nur Aufrufe und Downloads, die über Modrinth erfolgen, sind monetarisierbar und müssen die Filter zur Betrugsprävention bestehen. Für Downloads über die Modrinth App muss der Nutzer zudem angemeldet sein. Da alle Projekte einen ähnlichen Anteil an monetarisierten Downloads aufweisen, würden sich deine Einnahmen nicht wesentlich ändern, wenn alle Downloads gezählt würden."
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Mehr erfahren"
+  },
+  "analytics.stat.monetization-banner.title": {
+    "message": "Wie funktioniert die Monetarisierung?"
   },
   "analytics.stat.playtime": {
     "message": "Spielzeit"
@@ -348,10 +414,10 @@
     "message": "{hours} Std."
   },
   "analytics.stat.previous-period-comparison": {
-    "message": "im Vergleich zum vorherigen Zeitraum"
+    "message": "vs. vorh. Zeitraum"
   },
   "analytics.stat.previous-period-comparison-short": {
-    "message": "im Vergleich zum vorherigen"
+    "message": "vs. vorh."
   },
   "analytics.stat.revenue": {
     "message": "Einnahmen"
@@ -363,16 +429,22 @@
     "message": "N/A"
   },
   "analytics.stat.unavailable-tooltip": {
-    "message": "Statistik nicht verfügbar für aktuellen Filter"
+    "message": "Statistik für aktuelle Abfrage nicht verfügbar"
   },
   "analytics.stat.views": {
-    "message": "Ansichten"
+    "message": "Aufrufe"
   },
   "analytics.table.csv.date-range": {
     "message": "{start} bis {end}"
   },
+  "analytics.table.csv.filename": {
+    "message": "Modrinth Analytics {breakdown} Aufschlüsselung - {dateRange}"
+  },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Spielzeit (Sekunden)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Ausgewählter Bereich"
   },
   "analytics.table.duration.days": {
     "message": "{count, plural, one {# Tag} other {# Tage}}"
@@ -382,6 +454,9 @@
   },
   "analytics.table.duration.minutes": {
     "message": "{count, plural, one {# Minute} other {# Minuten}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "Keine übereinstimmenden Analytics-Zeilen"
   },
   "analytics.table.export-csv": {
     "message": "CSV exportieren"
@@ -393,19 +468,19 @@
     "message": "Gruppiert nach {groupBy}"
   },
   "analytics.table.pagination.summary": {
-    "message": "{start} bis {end} von {total} werden angezeigt"
+    "message": "Zeige {start} bis {end} von {total}"
   },
   "analytics.table.search.placeholder": {
-    "message": "Suchen..."
+    "message": "Suche..."
   },
   "analytics.threshold.countries-above": {
     "message": "Länder über"
   },
   "analytics.threshold.country-downloads-aria": {
-    "message": "Schwellenwert für Downloads nach Land"
+    "message": "Schwellenwert für Länder-Downloads"
   },
   "analytics.threshold.game-version-downloads-aria": {
-    "message": "Schwellenwert für Downloads von Spielversionen"
+    "message": "Schwellenwert für Spielversion-Downloads"
   },
   "analytics.threshold.game-versions-above": {
     "message": "Spielversionen über"
@@ -423,10 +498,16 @@
     "message": "Projekte über"
   },
   "analytics.title": {
-    "message": "Analysen"
+    "message": "Analytics"
   },
   "analytics.value.monetized": {
     "message": "Monetarisiert"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Keine"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Aus anderen Gründen als einer Abhängigkeit heruntergeladen"
   },
   "analytics.value.none": {
     "message": "Keine"
@@ -650,11 +731,71 @@
   "auth.authorize.authorize-app-name": {
     "message": "{appName} autorisieren"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Erforderliche Abfrageparameter für OAuth fehlen."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "Keine Weiterleitungsziel in Antwort gefunden"
   },
+  "auth.authorize.errro-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
   "auth.authorize.redirect-url": {
     "message": "Du wirst zu <redirect-url>{url}</redirect-url> weitergeleitet"
+  },
+  "auth.continue-with-provider": {
+    "message": "Weiter mit {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Mindestalter"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Registrierung abschließen"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Bitte gib ein gültiges Geburtsdatum ein. Das Jahr darf nicht 0000 sein."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Ungültiges Geburtsdatum"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Geburtsdatum"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Wähle dein Geburtsdatum"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Bitte gib dein Geburtsdatum ein, bevor du fortfährst."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Geburtsdatum erforderlich"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Du erfüllst das Mindestalter für die Erstellung eines Kontos bei Modrinth nicht."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Relevanter Quellcode"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Wir speichern dein Geburtsdatum nicht. Wir verwenden es ausschließlich bei der Registrierung, um die Einhaltung der COPPA-Vorschriften sicherzustellen."
+  },
+  "auth.create-account.page-title": {
+    "message": "Konto erstellen"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Sicherheitscheck"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Haltet mich per E-Mail über coole Dinge auf dem Laufenden, an denen Modrinth gerade arbeitet"
+  },
+  "auth.create-account.title": {
+    "message": "Ein Konto erstellen"
+  },
+  "auth.create-account.username.label": {
+    "message": "Benutzername"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Benutzername eingeben"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Wiederherstellungs-E-Mail senden"
@@ -690,52 +831,67 @@
     "message": "Dein Passwort zurücksetzen"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Bitte gib einen Zwei-Faktor-Code ein, um fortzufahren."
+    "message": "Gib den 6-stelligen Code aus deiner Authentifikator-App oder einen deiner Backup-Codes ein."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Zwei-Faktor-Code eingeben"
+    "message": "Zwei-Faktor-Authentifizierung"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Code eingeben..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Passwort vergessen?</forgot-password-link> • <create-account-link>Konto erstellen</create-account-link>"
+  "auth.sign-in.continue-with-email": {
+    "message": "Weiter mit E-Mail"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Weiter mit Passkey"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Registrieren"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Passwort vergessen"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Zuletzt benutzt"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Kein Account?"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Anmelden mit"
+    "message": "Einloggen"
   },
   "auth.sign-in.title": {
     "message": "Anmelden"
   },
-  "auth.sign-in.use-password": {
-    "message": "Oder verwende ein Passwort"
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Mindestalter"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "Konto erstellen"
+  "auth.sign-up.continue-with-email": {
+    "message": "Mit E-Mail fortfahren"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "Durch das erstellen eines Kontos stimmst du den <terms-link>Nutzungsbedingungen</terms-link> und <privacy-policy-link>Datenschutzrichtlinien</privacy-policy-link> von Modrinth zu."
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Passwörter stimmen nicht überein!"
+  "auth.sign-up.show-fewer-options": {
+    "message": "Weniger Optionen anzeigen"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Andere Optionen anzeigen"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Du hast bereits ein Konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Folge den Updates über Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrieren"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "Oder erstelle selbst ein Konto"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Registrieren mit"
+    "message": "Account erstellen"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoeinstellungen"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Mods entdecken"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Deine E-Mail ist bereits verifiziert!"
@@ -755,6 +911,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "E-Mail-Veifizierung fehlgeschlagen"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Eine E-Mail an {email} wurde zur Verifikation deines Accounts geschickt."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "E-Mail gesendet"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Deine E-Mail-Adresse wurde erfolgreich verifiziert!"
   },
@@ -763,21 +928,6 @@
   },
   "auth.verify-email.title": {
     "message": "E-Mail verifizieren"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Folge updates über Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Du bist nun teil der grossartigen Community von Entwicklern und Entdeckern, welche bereits tolle Projekte erstellen, herunterladen und auf den neusten Stand halten."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Durch das erstellen eines Kontos hast du den <terms-link>Nutzungsbedingungen</terms-link> und <privacy-policy-link>Datenschutzrichtlinien</privacy-policy-link> von Modrinth zugestimmt."
-  },
-  "auth.welcome.long-title": {
-    "message": "Willkommen bei Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Willkommen"
   },
   "collection.button.edit-icon": {
     "message": "Icon bearbeiten"
@@ -843,61 +993,112 @@
     "message": "Private Notiz hinzufügen"
   },
   "conversation-thread.action.approve": {
-    "message": "Annehmen"
+    "message": "Genehmigen"
   },
   "conversation-thread.action.approve-with-reply": {
-    "message": "Mit Antwort annehmen"
+    "message": "Genehmigen mit Antwort"
   },
   "conversation-thread.action.close-thread": {
-    "message": ""
+    "message": "Thread schliessen"
   },
   "conversation-thread.action.close-with-reply": {
-    "message": "Mit Antwort schließen"
+    "message": "Schliessen mit Antwort"
   },
   "conversation-thread.action.reject": {
     "message": "Ablehnen"
   },
   "conversation-thread.action.reject-with-reply": {
-    "message": "Mit Antwort ablehnen"
+    "message": "Ablehnen mit Antwort"
   },
   "conversation-thread.action.reopen-thread": {
-    "message": "Öffne den Thread wieder"
+    "message": "Thread wieder öffnen"
   },
   "conversation-thread.action.reply": {
     "message": "Antworten"
   },
   "conversation-thread.action.reply-to-thread": {
-    "message": "Antworte dem Thread"
+    "message": "Auf Thread antworten"
   },
   "conversation-thread.action.resubmit-for-review": {
     "message": "Erneut zur Überprüfung einreichen"
+  },
+  "conversation-thread.action.resubmit-for-review-with-reply": {
+    "message": "Erneut zur Überprüfung einreichen mit Antwort"
   },
   "conversation-thread.action.send": {
     "message": "Senden"
   },
   "conversation-thread.action.send-to-review": {
-    "message": "Absenden zur Überprüfung"
+    "message": "Zur Überprüfung senden"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Zur Überprüfung senden mit Antwort"
+  },
+  "conversation-thread.action.set-to-draft": {
+    "message": "Als Entwurf festlegen"
+  },
+  "conversation-thread.action.set-to-draft-with-reply": {
+    "message": "Als Entwurf festlegen mit Antwort"
   },
   "conversation-thread.action.withhold": {
     "message": "Zurückhalten"
   },
   "conversation-thread.action.withhold-with-reply": {
-    "message": "Mit Antwort zurückhalten"
+    "message": "Zurückhalten mit Antwort"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Dieser Thread ist geschlossen und es können keine neuen Nachrichten gesendet werden."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Fehler beim Schliessen der Meldung"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Fehler beim erneuten Öffnen der Meldung"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Fehler beim Senden der Nachricht"
+  },
+  "conversation-thread.reply-editor.placeholder.reply": {
+    "message": "Auf Thread antworten..."
   },
   "conversation-thread.reply-editor.placeholder.send": {
-    "message": "Sende eine Nachricht..."
+    "message": "Eine Nachricht senden..."
+  },
+  "conversation-thread.reply-modal.confirmation.description": {
+    "message": "Bestätigen, dass Moderatoren dies nicht aktiv überwachen"
   },
   "conversation-thread.reply-modal.confirmation.label": {
-    "message": "Mir ist bewusst, dass dieser Thread nicht aktiv von den Moderatoren überwacht wird."
+    "message": "Ich nehme zur Kenntnis, dass die Moderatoren den Thread nicht aktiv überwachen."
+  },
+  "conversation-thread.reply-modal.description": {
+    "message": "Dein Projekt ist bereits genehmigt. Daher überwacht das Moderationsteam diesen Thread nicht aktiv. Sie können deine Nachricht jedoch trotzdem sehen, falls ein Problem mit deinem Projekt vorliegt."
+  },
+  "conversation-thread.reply-modal.header": {
+    "message": "Auf Thread antworten"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Wenn du mit dem Moderationsteam in Kontakt treten musst, verwende bitte das <help-center-link>Hilfezentrum von Modrinth</help-center-link> und klicke auf die blaue Sprechblase unten rechts, um den Support zu kontaktieren."
+  },
+  "conversation-thread.resubmit-modal.confirmation.description": {
+    "message": "Bestätigen, dass ich auf die Nachrichten der Moderatoren eingegangen bin"
+  },
+  "conversation-thread.resubmit-modal.confirmation.label": {
+    "message": "Ich bestätige, dass ich die Kommentare der Moderatoren ordnungsgemäss bearbeitet habe."
   },
   "conversation-thread.resubmit-modal.description": {
-    "message": "Du schickst <project-title>{projectTitle}</project-title> zur Wiederprüfung."
+    "message": "Du reichst <project-title>{projectTitle}</project-title> ein, um es erneut von den Moderatoren überprüfen zu lassen."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Erneut zur Überprüfung einreichen"
   },
   "conversation-thread.resubmit-modal.header.submitting": {
-    "message": "Erneut zur Überprüfung einreichen"
+    "message": "Zur Überprüfung einreichen"
+  },
+  "conversation-thread.resubmit-modal.reminder": {
+    "message": "Stelle sicher, dass du auf alle Kommentare des Moderationsteams eingegangen bist."
+  },
+  "conversation-thread.resubmit-modal.warning": {
+    "message": "Wiederholte Einreichungen ohne Berücksichtigung der Kommentare der Moderatoren können zur Sperrung deines Kontos führen."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ergänzende Dateien dienen zur unterstützung von Ressourcen wie Quellcode, nicht für alternative Versionen oder Varianten."
@@ -1347,7 +1548,7 @@
     "message": "Unverifizierte E-Mail"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "Die Zustellungs-E-Mail die du eingegeben hast ist nicht mit deinem Modrinth-Konto verbunden. Belohnungen, welche an eine falsche E-Mail-Adresse gesendet werden können von Modrinth nicht wiederhergestellt werden."
+    "message": "Die Zustellungs-E-Mail, die du eingegeben hast, ist nicht mit deinem Modrinth-Konto verbunden. Belohnungen, welche an eine falsche E-Mail-Adresse gesendet werden, können von Modrinth nicht wiederhergestellt werden."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
     "message": "Weniger Gebühren verfügbar"
@@ -1363,6 +1564,24 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Du hast dein Auszahlungslimit von <b>{withdrawLimit}</b> aufgebraucht. Du musst ein Steuerformular ausfüllen, um merh abzuheben."
+  },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Du bist berechtigt für {roles}. Verknüpfe dein Discord-Konto über Modrinth und wir synchronisieren sie automatisch."
+  },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discord verknüpfen"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Beanspruche deine Discord-Rollen"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1 Mio.+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Creator"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
   },
   "dashboard.head-title": {
     "message": "Dashboard"
@@ -1398,13 +1617,13 @@
     "message": "Alle als gelesen markieren"
   },
   "dashboard.overview.notifications.button.view-history": {
-    "message": "Verlauf ansehen"
+    "message": "Verlauf anzeigen"
   },
   "dashboard.overview.notifications.empty.no-unread": {
     "message": "Du hast keine ungelesenen Benachrichtigungen."
   },
   "dashboard.overview.notifications.error.loading": {
-    "message": "Fehler beim Laden von Benachrichtigungen:"
+    "message": "Fehler beim Laden der Benachrichtigungen:"
   },
   "dashboard.overview.notifications.history.label": {
     "message": "Verlauf"
@@ -1414,9 +1633,6 @@
   },
   "dashboard.overview.notifications.loading": {
     "message": "Benachrichtigungen werden geladen..."
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Du kannst mehrere Projekte gleichzeitig bearbeiten, indem du sie unden auswählst."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverprojekte understützen Massenbearbeitung nicht"
@@ -1475,6 +1691,9 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Quellcode"
   },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Eine Seite mit Informationen, Dokumentation und Hilfe zum Projekt"
+  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Wikiseite"
   },
@@ -1489,24 +1708,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Bitte überprüfe die Umgebungsmetadaten"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Aufsteigend"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Absteigend"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Name"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Art"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -1736,14 +1937,20 @@
   "discover.install.error.no-server-world": {
     "message": "Keine Serverwelt ist zur installation verfügbar."
   },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Dieser Inhaltstyp kann nicht über Entdecken auf einem Server installiert werden."
+  },
   "discover.install.heading.reset-modpack": {
     "message": "Modpack zum installieren nach dem Reset auswählen"
   },
+  "discover.seo.description": {
+    "message": "Durchsuche und durchstöbere Tausende von Minecraft-{projectType} auf Modrinth mit sofortigen, präzisen Suchergebnissen. Unsere Filter helfen dir, schnell die besten Minecraft-{projectType} zu finden."
+  },
   "discover.seo.title": {
-    "message": "Durchsuche {projectType}"
+    "message": "{projectType} durchsuchen"
   },
   "discover.seo.title-with-query": {
-    "message": "Durchsuche {projectType} {query}"
+    "message": "{projectType} durchsuchen | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Du hast eventuell die Kollektions-URL falsch geschrieben."
@@ -1848,7 +2055,7 @@
     "message": "Frosch"
   },
   "hosting-marketing.available-locations": {
-    "message": "Verfügbar in Nordamerika, Europa und Südostasien für eine breite Abdeckung."
+    "message": "Verfügbar in Nordamerika, Europa, Südostasien und Australien für eine breite Abdeckung."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Monatlich zahlen"
@@ -1909,6 +2116,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Wo befinden sich Server von Modrinth Hosting? Kann ich eine Region auswählen?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Wir haben derzeit Server in Nordamerika, Europa, Südostasien und Australien, die du beim Kauf auswählen kannst. Weitere Regionen folgen in der Zukunft! Wenn du deine Region wechseln möchtest, wende dich bitte an den Support."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Welche Minecraft-Versionen und Loader können verwendet werden?"
@@ -2183,6 +2393,9 @@
   "landing.subheading": {
     "message": "Entdecke, Spiele und teile Minecraft-Inhalte durch unsere quelloffene Platform, welche für die Community entwickelt wird."
   },
+  "layout.action.analytics-events": {
+    "message": "Analytics-Ergebnisse"
+  },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
   },
@@ -2251,6 +2464,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "Fehler beim generieren des Status von der API beim erstellen."
+  },
+  "layout.banner.preview.description": {
+    "message": "Falls du die offizielle Modrinth-Website aufrufen wolltest, besuche {url}. Diese Preview-Bereitstellung wird von Modrinth-Mitarbeitern zu Testzwecken verwendet. Sie wurde mit {ref} erstellt."
   },
   "layout.banner.preview.title": {
     "message": "Dies ist eine Vorschauversion der Modrinth-Webseite."
@@ -2726,11 +2942,17 @@
   "muralpay.warning.wallet-address": {
     "message": "Überprüfe deine Wallet-Adresse. An eine falsche Adresse gesendete Gelder können nicht wiederhergestellt werden."
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Die Änderungen werden auf {count, plural, one {# Projekt} other {# Projekte}} angewendet."
+  },
   "profile.bio.fallback.creator": {
     "message": "Ein Modrinth Ersteller."
   },
   "profile.bio.fallback.user": {
     "message": "Ein Modrinth Benutzer."
+  },
+  "profile.button.analytics": {
+    "message": "Nutzungsstatistik anzeigen"
   },
   "profile.button.billing": {
     "message": "Nutzer Zahlungen verwalten"
@@ -2749,6 +2971,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Als Partner setzen"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# Projekt} other {# Projekte}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Authentifizierungsanbieter"
@@ -2818,6 +3043,12 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Lade {username}'s Projekte auf Modrinth herunter"
+  },
+  "profile.official-account": {
+    "message": "Offizielles Modrinth-Konto"
+  },
+  "profile.official-account.bio": {
+    "message": "Das offizielle Benutzerkonto von Modrinth. Erhalte Support unter <support-link></support-link> oder per E-Mail an <email></email>"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat>} other {<stat>{count}</stat>}} Projekt-Follower"
@@ -3015,7 +3246,7 @@
     "message": "Platform: {platform}"
   },
   "project.download.platform-error": {
-    "message": "Fehler: Keine Platform gefunden"
+    "message": "Fehler: Keine Plattform gefunden"
   },
   "project.download.platform-tooltip": {
     "message": "{title} ist nur für {platform} verfügbar"
@@ -3083,41 +3314,74 @@
   "project.moderation.admonition.approved.body.private": {
     "message": "Dein Projekt ist privat, was bedeutet, dass nur du und von dir eingeladene Personen darauf zugreifen können."
   },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Dein Projekt ist veröffentlicht und auf Modrinth auffindbar."
+  },
+  "project.moderation.admonition.approved.body.unlisted": {
+    "message": "Dein Projekt ist nicht gelistet, was bedeutet, dass man nur über einen direkten Link darauf zugreifen kann und es auf Modrinth nicht auffindbar ist."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Du kannst die Sichtbarkeit deines Projekts in den <visibility-settings-link>Sichtbarkeitseinstellungen</visibility-settings-link> deines Projekts ändern."
+  },
   "project.moderation.admonition.approved.header": {
-    "message": "Projekt angenommen"
+    "message": "Projekt genehmigt"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Dies ist ein Entwurfsprojekt, das für andere erst sichtbar ist, nachdem es zur Überprüfung eingereicht und vom Modrinth-Moderationsteam genehmigt wurde."
   },
   "project.moderation.admonition.draft.header": {
-    "message": "Projektentwurf"
+    "message": "Entwurfsprojekt"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Sobald du alle erforderlichen Schritte abgeschlossen und sichergestellt hast, dass dein Projekt den <rules-link>Inhaltsregeln</rules-link> von Modrinth entspricht, kannst du dein Projekt zur Überprüfung einreichen."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Bitte gehe auf alle Moderationsanliegen ein, einschliesslich aller Probleme, die in den unten aufgeführten Nachrichten genannt werden, bevor du dieses Projekt erneut einreichst."
   },
   "project.moderation.admonition.rejected.header": {
-    "message": "Änderungen angefragt"
+    "message": "Änderungen angefordert"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Das wiederholte Einreichen deines Projekts, ohne zuvor alle Moderationsanliegen zu klären, kann zur Sperrung deines Kontos führen."
   },
   "project.moderation.admonition.under-review.body.1": {
-    "message": "Dein Projekt ist in der Warteschlange, um von Modrinths Moderationsteam überprüft zu werden."
+    "message": "Dein Projekt befindet sich in der Warteschlange und wird vom Modrinth-Moderationsteam überprüft."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Dein Projekt wird gescannt und anschliessend von menschlichen Moderatoren überprüft, um sicherzustellen, dass es den <rules-link>Inhaltsregeln</rules-link> und <terms-link>Nutzungsbedingungen</terms-link> von Modrinth entspricht."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Du kannst dein Projekt weiterhin ändern, dies hat keinen Einfluss auf deine Position in der Warteschlange."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "Wir streben an, Einreichungen innerhalb von 24 bis 48 Stunden zu überprüfen, aber bei einigen Projekten kann es zu Verzögerungen kommen. Dies deutet nicht auf ein Problem mit deiner Einreichung hin."
   },
   "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Wir bedanken uns für ihre Geduld während unsere Moderatoren hart dafür arbeiten Modrinth sicher zu halten und wir freuen und ihnen zu helfen ihre Kreationen zu teilen! 💚</emphasis>"
+    "message": "<emphasis>Wir schätzen deine Geduld, während unsere Moderatoren hart daran arbeiten, Modrinth sicher zu halten, und freuen uns darauf, dir dabei zu helfen, deine Inhalte zu teilen! 💚</emphasis>"
   },
   "project.moderation.admonition.under-review.header": {
     "message": "Projekt wird überprüft"
   },
   "project.moderation.admonition.withheld.body": {
-    "message": "Ihr Projekt wird nicht öffentlich anzeigt und kann nur per Direkt Link angezeigt werden.{requestedStatus, select, unlisted { Laut deiner <visibility-settings-link>Anzeige Einstellung</visibility-settings-link>, Ist keine Aktion nötig.} other { Bitte behebe alle Moderationsprobleme, einschließlich aller in den folgenden Nachrichten genannten Punkte, bevor du dieses Projekt erneut einreichst.}}"
+    "message": "Dein Projekt wird nicht öffentlich erscheinen und kann nur über einen direkten Link aufgerufen werden. {requestedStatus, select, unlisted { Basierend auf deinen ausgewählten <visibility-settings-link>Sichtbarkeitseinstellungen</visibility-settings-link> ist höchstwahrscheinlich keine Aktion erforderlich.} other { Bitte gehe auf alle Moderationsanliegen ein, einschliesslich aller Probleme, die in den unten aufgeführten Nachrichten genannt werden, bevor du dieses Projekt erneut einreichst.}}"
   },
   "project.moderation.admonition.withheld.header": {
-    "message": "Von Mitarbeitern entlistet"
+    "message": "Durch Mitarbeiter nicht gelistet"
   },
   "project.moderation.error.unauthorized": {
     "message": "Nicht autorisiert"
   },
-  "project.moderation.thread.help-center-note.2": {
-    "message": "Falls du Hilfe brauchst oder du hast andere Anfragen, besuche bitte das <help-center-link>Modrinth Hilfe Center</help-center-link> und klicke auf die blaue Sprechblase um den Kundensupport zu kontaktieren."
+  "project.moderation.thread.approved-warning": {
+    "message": "Dieser Thread wird nicht aktiv überwacht, kann aber bei Bedarf zur Information über dein Projekt überprüft werden."
   },
-  "project.moderation.thread.moderator-see-user-ui-toggle": {
-    "message": "Zeige Benutzer UI"
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Inhaltsmoderatoren können bei den meisten Problemen keinen Support leisten, und Nachrichten in diesem Thread benachrichtigen keine Mitarbeiter."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Wenn du Hilfe benötigst oder weitere Fragen hast, besuche bitte das <help-center-link>Hilfezentrum von Modrinth</help-center-link> und klicke auf die blaue Sprechblase, um den Support zu kontaktieren."
   },
   "project.moderation.thread.private-description": {
-    "message": "Dies ist eine private Konversation mit den Modrinth Moderatoren. Sie könnten dich bezüglich Problemen im Zusammenhang mit diesem Projekt kontaktieren."
+    "message": "Dies ist ein privater Unterhaltungsthread mit den Modrinth-Moderatoren. Sie können dich bei Problemen bezüglich dieses Projekts kontaktieren."
   },
   "project.moderation.thread.title": {
     "message": "Moderationsnachrichten"
@@ -3186,43 +3450,76 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung fgolgender Dateien hast; alle zurückgehaltenen Versionen werden automatisch veröffentlicht."
+    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung folgender Dateien hast. Danach werden die zurückgehaltenen Versionen automatisch veröffentlicht."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung fgolgender Dateien hast, bevor du dein Projekt zur überprüfung einreichen kannst."
+    "message": "Bitte lege Nachweise vor, dass du die Erlaubnis zur Weiterverbreitung aller folgenden Dateien hast, bevor du dein Projekt zur Überprüfung einreichst."
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "Unbekannter eingebetteter Inhalt"
+    "message": "Unbekannter externer Inhalt"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Das Moderationsteam von Modrinth hat die von dir für einige externe Inhalte vorgelegten Berechtigungsnachweise abgelehnt. Bitte überprüfe die unten aufgeführten abgelehnten Einträge und lege zulässige Nachweise vor oder entfernen die Inhalte."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Manche Beweise wurden abgelehnt"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Alle minimieren"
   },
   "project.settings.permissions.completed.description": {
-    "message": "Alle externen Inhalte haben Quellenangaben."
+    "message": "Alle externen Inhalte sind mit Erlaubnisangaben versehen, und die Quellenangaben wurden angegeben."
   },
   "project.settings.permissions.completed.title": {
-    "message": "Zuordnungen abgschlossen!"
+    "message": "Genehmigungen abgeschlossen!"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "Keine deiner Versionen enrhalten externe Inhalte, also musst du dir keine Sorgen über die Einholung von Berechtigungen machen."
+    "message": "Keine der Versionen deines Projekts enthält externe Inhalte, weshalb du dir keine Gedanken über die Einholung von Genehmigungen machen musst."
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "Du bist startklar!"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "Alle anzeigen"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "Du hast keine Berechtigung, einige der von dir hinzugefügten externen Inhalte weiterzuverbreiten. Um auf Modrinth veröffentlichen zu können, entferne bitte die urheberrechtswidrigen Inhalte."
+    "message": "Möglicherweise verfügst du nicht über die erforderliche Genehmigung zur Weitergabe einiger externer Inhalte in deinem Projekt. Um dein Projekt auf Modrinth zu veröffentlichen, entferne bitte diese Inhalte oder lege einen Nachweis vor, dass du über die erforderliche Genehmigung zur Nutzung verfügst."
   },
   "project.settings.permissions.fail.title": {
     "message": "Einige Inhalte können nicht enthalten sein"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "Wenn du Inhalte einbindest, welche nicht auf Modrinth gehostet werden, musst du uns deren Quelle mitteilen und bestätigen, dass du die Berechtigung zur Verbreitung der Dateien hast. In <link>unserer Anleitung (Englisch)</link> lernst du, wie du dies am besten machst!"
+    "message": "Wenn du Inhalte einbindest, welche nicht auf Modrinth gehostet werden, musst du uns deren Quelle mitteilen und bestätigen, dass du die Berechtigung zur Verbreitung der Dateien hast. Schau dir <link>unsere Ankündigung zu diesem neuen System</link> an, um mehr zu erfahren!"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Lerne wie Zuschreibungen funktionieren"
+    "message": "Erfahre mehr über die Rechte zur Verbreitung"
   },
   "project.settings.permissions.learn-more": {
     "message": "Mehr erfahren"
   },
+  "project.settings.permissions.no-results": {
+    "message": "Keine externen Dateien übereinstimmen deiner Suche."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Einige der enthaltenen externen Inhalte dürfen auf Modrinth nicht verbreitet werden, da sie gegen unsere Inhaltsrichtlinien verstoßen und daher entfernt werden müssen."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Keine Quellenangaben müssen genehmigt werden} one {# Quellenangabe muss genehmigt werden} other {# Quellenangaben müssen genehmigt werden}}"
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "Durchsuche {count} {count, plural, one {externes Projekt} other {externe Projekte}}..."
+    "message": "Durchsuche {count} {count, plural, one {Projekt} other {Projekten}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Meiste Dateien"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Letztens bearbeitet"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Abgelehnt"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
   },
   "project.settings.title": {
     "message": "Einstellungen"
@@ -3233,6 +3530,9 @@
   "project.stats.downloads-label": {
     "message": "{count, plural, one {Download} other {Downloads}}"
   },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {Follower} other {Follower}}"
+  },
   "project.status.archived.message": {
     "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheided sich, das Projekt zu Dearchivieren."
   },
@@ -3242,14 +3542,14 @@
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Diese Version ist} other {Diese Versionen sind}} derzeit zurückgehalten und nicht öffentlich gelistet. Bitte stelle einen Nachweis bereit, dass du die Erlaubnis hast, bestimmte Dateien weiterzuverbreiten, die in {count, plural, one {der Modpack-Version} other {den Modpack-Versionen}} enthalten sind."
   },
-  "project.versions.withheld-versions-warning.resolve-button": {
-    "message": "Beheben"
-  },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Version {version_name}} other {Versionen}} zurückgehalten aufgrund von unbekannten eingebetteten Inhalten"
   },
   "report.already-reported": {
     "message": "Du hast bereits {title} gemeldet"
+  },
+  "report.already-reported-description": {
+    "message": "Du hast bereits eine offene Meldung für dieses {item}. Du kannst deinem Bericht weitere Details hinzufügen, falls du weitere Informationen hast."
   },
   "report.back-to-item": {
     "message": "Zurück zu {item}"
@@ -3264,7 +3564,7 @@
     "message": "Überprüfe {item}..."
   },
   "report.could-not-find": {
-    "message": "Konnte {item} nicht finden"
+    "message": "{item} konnte nicht gefunden werden"
   },
   "report.for.violation": {
     "message": "Verstoss gegen Modrinth's <rules-link>Regeln</rules-link> oder <terms-link>Nutzungsbedingungen</terms-link>"
@@ -3306,13 +3606,13 @@
     "message": "Bitte melde:"
   },
   "report.question.content-id": {
-    "message": "Was ist die ID von dem {item}?"
+    "message": "Wie lautet die ID von {item}?"
   },
   "report.question.content-type": {
     "message": "Welche Art an Inhalt meldest du?"
   },
   "report.question.report-reason": {
-    "message": "Gegen welche von Modrinths Regeln verstößt dieses {item}?"
+    "message": "Gegen welche von Modrinths Regeln verstösst dieses {item}?"
   },
   "report.report-content": {
     "message": "Inhalt an Moderatoren melden"
@@ -3426,25 +3726,25 @@
     "message": "Schreibzugriff Organisationen"
   },
   "scopes.patCreate.description": {
-    "message": "Persönliche Zugriffstoken erstellen"
+    "message": "Persönliche Zugriffs-Tokens erstellen"
   },
   "scopes.patCreate.label": {
     "message": "PATs erstellen"
   },
   "scopes.patDelete.description": {
-    "message": "Deine persönlichen Zugriffstoken löschen"
+    "message": "Deine persönlichen Zugriffs-Tokens löschen"
   },
   "scopes.patDelete.label": {
     "message": "PATs löschen"
   },
   "scopes.patRead.description": {
-    "message": "Erstellte persönliche Zugriffstoken ansehen"
+    "message": "Erstellte persönliche Zugriffs-Tokens anzeigen"
   },
   "scopes.patRead.label": {
     "message": "Lesezugriff PATs"
   },
   "scopes.patWrite.description": {
-    "message": "Persönliche Zugriffstoken bearbeiten"
+    "message": "Persönliche Zugriffs-Tokens bearbeiten"
   },
   "scopes.patWrite.label": {
     "message": "Schreibzugriff PATs"
@@ -3653,6 +3953,9 @@
   "servers.plan.small.description": {
     "message": "Perfekt für 1 - 5 Freunde mit ein par leichten Mods."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "abgerechnet {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Einrichtung abschliessen"
   },
@@ -3775,6 +4078,48 @@
   },
   "settings.account.security.email.title": {
     "message": "E-Mail"
+  },
+  "settings.account.security.passkey.add": {
+    "message": "Passkey hinzufügen"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Stell sicher, dass du etwas nimmst, was du dir gut merken kannst, damit du den Passkey später identifizieren kannst."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Name"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Mein Passkey"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Verwalte deine gespeicherten Passkeys oder füge einen neuen hinzu."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Hinzugefügt {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Zuletzt benutzt {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Passkeys laden..."
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Nie benutzt"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Du hast keine registrierten Passkeys."
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Dadurch wird der Passkey „{name}“ endgültig gelöscht. Du kannst dich mit ihm nicht mehr anmelden."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Möchtest du diesen Passkey wirklich löschen?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Passkey umbenennen"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Passkeys verwalten"
   },
   "settings.account.security.password.action.add": {
     "message": "Passwort hinzufügen"
@@ -4154,8 +4499,17 @@
   "settings.billing.subscription.title": {
     "message": "Abonnements"
   },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Wechsel zu {interval, select, monthly {monthly} yearly {yearly} other {{interval}}}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Zu {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} wechseln"
+  },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Monatliche Abrechnung kostet dich zusätzliche {amount} pro Jahr"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Wechselt am {date} zur {interval, select, monthly {monthly} yearly {yearly} other {{interval}}} Abrechnung"
   },
   "settings.billing.update-method": {
     "message": "Methode aktualisieren"
@@ -4379,6 +4733,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "Abonniere den Modrinth Newsletter"
   },
+  "version.all-versions": {
+    "message": "Alle Versionen"
+  },
+  "version.confirm-delete.description": {
+    "message": "Diese Version wird endgültig gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Version löschen"
+  },
+  "version.confirm-delete.title": {
+    "message": "Willst du diese Version wirklich löschen?"
+  },
+  "version.dependency.view-project": {
+    "message": "Projekt anzeigen"
+  },
+  "version.dependency.view-version": {
+    "message": "Version anzeigen"
+  },
+  "version.download.download-dependency": {
+    "message": "Abhängigkeit herunterladen"
+  },
+  "version.download.no-primary-file": {
+    "message": "Fehler: Keine primäre Datei gefunden"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Optionales Ressourcenpaket"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Erforderliches Ressourcenpaket"
+  },
+  "version.edit.button": {
+    "message": "Bearbeiten"
+  },
+  "version.edit.details": {
+    "message": "Details bearbeiten"
+  },
+  "version.edit.files": {
+    "message": "Dateien bearbeiten"
+  },
+  "version.edit.metadata": {
+    "message": "Metadaten bearbeiten"
+  },
   "version.environment.none.description": {
     "message": "Die Umgebung für diese Version wurde nicht angegeben."
   },
@@ -4390,5 +4786,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Unbekannte Umgebung"
+  },
+  "version.package-as-mod.button": {
+    "message": "Als Mod verpacken"
+  },
+  "version.package-as-mod.description": {
+    "message": "Dadurch wird eine neue Version mit Unterstützung für die ausgewählten Mod-Loader erstellt. Du wirst zur neuen Version weitergeleitet und kannst diese nach deinen Wünschen bearbeiten."
+  },
+  "version.package-as-mod.header": {
+    "message": "Datenpaket als Mod packen"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Modloader"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Die Modloader, für die du dein Datenpaket packen möchtest."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Modloader auswählen..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Datenpaket packen"
+  },
+  "version.section.content.dev-info": {
+    "message": "Informationen für Entwickler"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven-Koordinaten:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projekte auf Modrinth sind automatisch über ein Maven-Repository für die Verwendung mit JVM-Build-Tools wie <gradle-link>Gradle</gradle-link> verfügbar. Um mehr über die Maven-API von Modrinth zu erfahren, <article-link>klicke hier</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Hinweis: Falls verfügbar, solltest du stattdessen das Maven-Repository des Entwicklers verwenden, da dieses Informationen zu transitiven Abhängigkeiten enthält, die in der Maven-API von Modrinth fehlen. Außerdem kann es zu doppelten Abhängigkeiten kommen, wenn du für deine Abhängigkeiten sowohl Modrinth- als auch andere Maven-Repositorys verwendest, da die Gruppen-ID bei der Bereitstellung über die Maven-API von Modrinth abweicht."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Versions-ID:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "SHA-1 kopieren"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "SHA-512 kopieren"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Diese Version wird derzeit zurückgehalten und ist nicht öffentlich gelistet. Bitte lege Nachweise vor, dass du zur Verbreitung bestimmter darin enthaltener Dateien berechtigt bist."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Wegen unbekannten eingebetteten Inhalten zurückgehalten"
   }
 }

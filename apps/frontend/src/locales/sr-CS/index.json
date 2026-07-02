@@ -8,6 +8,27 @@
   "admin.billing.error.not-found": {
     "message": "Korisnik nije pronađen"
   },
+  "analytics.action.add": {
+    "message": "Dodaj"
+  },
+  "analytics.action.cancel": {
+    "message": "Otkaži"
+  },
+  "analytics.action.refresh": {
+    "message": "Osveži"
+  },
+  "analytics.action.reset": {
+    "message": "Resetiraj"
+  },
+  "analytics.breakdown.country": {
+    "message": "Država"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} sati"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktivnih"
+  },
   "app-marketing.download.description": {
     "message": "Naša desktop aplikacija je dostupna na svim platformama, izaberite željenu verziju."
   },
@@ -60,7 +81,7 @@
     "message": "Deli"
   },
   "app-marketing.hero.download-button": {
-    "message": "Preuzmite aplikaciju Modrint"
+    "message": "Preuzmite aplikaciju Modrinth"
   },
   "auth.authorize.action.authorize": {
     "message": "Odobri"
@@ -113,50 +134,20 @@
   "auth.reset-password.title.long": {
     "message": "Resetujte svoju lozinku"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Unesite kod za dvofaktorsku autentifikaciju da biste nastavili."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Unesite kod za dvofaktorsku autentifikaciju"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Unesite kod..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Zaboravili ste lozinku?</forgot-password-link> • <create-account-link>Kreirajte nalog</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Prijavi se sa"
   },
   "auth.sign-in.title": {
     "message": "Prijavi se"
   },
-  "auth.sign-in.use-password": {
-    "message": "Ili koristite lozinku"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Kreirajte nalog"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Kreiranjem naloga prihvatate <terms-link>Uslove</terms-link> i <privacy-policy-link>Pravila privatnosti</privacy-policy-link> Modrintha."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Lozinke se ne poklapaju!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Već imate nalog?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Pretplatite se za novosti o Modrinthu"
-  },
   "auth.sign-up.title": {
     "message": "Registracija"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Ili kreirajte nalog sami"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Prijavite se sa"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Podešavanja naloga"
@@ -187,18 +178,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifikujte email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Pretplatite se za novosti o Modrinthu"
-  },
-  "auth.welcome.label.tos": {
-    "message": "Kreiranjem naloga pristali ste na <terms-link>Uslove</terms-link> i <privacy-policy-link>Pravila privatnosti</privacy-policy-link> Modrintha."
-  },
-  "auth.welcome.long-title": {
-    "message": "Dobrodošli na Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Dobrodošli"
   },
   "collection.button.edit-icon": {
     "message": "Ikona za izmenu"
@@ -514,6 +493,9 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Preuzmite projekte korisnika {username} na Modrinthu"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> pratilac projekta} few {<stat>{count}</stat> pratioca projekta} other {<stat>{count}</stat> pratilaca projekta}}"
   },
   "profile.user-id": {
     "message": "ID korisnika: {id}"
@@ -1162,5 +1144,38 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Nepoznata platforma"
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Spakiraj data pack"
+  },
+  "version.section.content.dev-info": {
+    "message": "Informacije sa programere"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "sastavi sa gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven koordinate:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projekti na Modrinthu su automatski dostupni putem Maven spremišta za korišćenje sa JVM alatima za izgradnju, kao što je <gradle-link>Gradle</gradle-link>. Da biste saznali više o Modrinth Maven API-ju, <article-link>kliknite ovde</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Napomena: Kada je dostupan, trebalo bi da koristite Maven repozitorijum autora umesto njega, jer će on imati informacije o tranzitivnim zavisnostima koje Modrinth Maven API nema. Takođe možete završiti sa dupliranim zavisnostima ako koristite kombinaciju Modrinth i ne-Modrinth Maven repozitorijuma za vaše zavisnosti, jer će identifikator grupe biti drugačiji kada se služi preko Modrinth Maven API-ja."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "ID verzije:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Kopiraj SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Kopiraj SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Ova verzija je trenutno zadržana i nije javno objavljena. Molimo vas da dostavite dokaz da imate dozvolu za redistribuciju određenih uključenih datoteka."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Zadržan sadržaj zbog nepoznatog ugrađenog sadržaja"
   }
 }

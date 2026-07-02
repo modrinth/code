@@ -74,6 +74,7 @@ itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
+modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
@@ -83,6 +84,7 @@ prometheus = { workspace = true }
 quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
+rdkafka = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
@@ -128,8 +130,13 @@ urlencoding = { workspace = true }
 utoipa = { workspace = true, features = ["url"] }
 utoipa-actix-web = { workspace = true }
 utoipa-scalar = { workspace = true, features = ["actix-web"] }
-uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
+uuid = { workspace = true, features = ["fast-rng", "serde", "v4", "v7"] }
 validator = { workspace = true, features = ["derive"] }
+webauthn-rs = { workspace = true, features = [
+  "conditional-ui",
+  "danger-allow-state-serialisation"
+] }
+webauthn-rs-proto = { workspace = true }
 webp = { workspace = true }
 woothee = { workspace = true }
 yaserde = { workspace = true, features = ["derive"] }
