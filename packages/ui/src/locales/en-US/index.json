@@ -237,7 +237,7 @@
     "defaultMessage": "Re-install modpack"
   },
   "button.remove": {
-    "defaultMessage": "Delete passkey"
+    "defaultMessage": "Remove"
   },
   "button.remove-image": {
     "defaultMessage": "Remove image"
