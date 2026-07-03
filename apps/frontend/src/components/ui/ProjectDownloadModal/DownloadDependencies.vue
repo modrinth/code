@@ -1,8 +1,14 @@
 <template>
 	<div v-if="downloadRows.length > 0" class="flex flex-col gap-1">
 		<div v-if="showTitle" class="flex flex-wrap items-center justify-between gap-2">
-			<h3 class="m-0 text-base font-semibold text-contrast">
+			<h3 class="m-0 flex items-center gap-1.5 text-base font-semibold text-contrast">
 				{{ sectionTitle }}
+				<InfoIcon
+					v-if="visibleDependencyRows.length > 0"
+					v-tooltip="formatMessage(messages.duplicateDependenciesHidden)"
+					aria-hidden="true"
+					class="size-4 text-secondary"
+				/>
 			</h3>
 		</div>
 		<div class="flex flex-col gap-2">
@@ -18,7 +24,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { FileIcon } from '@modrinth/assets'
+import { FileIcon, InfoIcon } from '@modrinth/assets'
 import {
 	type CdnDownloadReason,
 	defineMessages,
@@ -242,6 +248,10 @@ const dependencyRows = computed<DownloadDependencyRow[]>(
 	() => props.dependencies || resolvedDependencyRows.value,
 )
 
+const visibleDependencyRows = computed<DownloadDependencyRow[]>(() =>
+	dedupeDependencyRows(dependencyRows.value),
+)
+
 const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
 	props.additionalFiles.map((file) => ({
 		key: `additional-file-${additionalFileKey(file)}`,
@@ -256,18 +266,20 @@ const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
 )
 
 const downloadRows = computed<DownloadDependencyRow[]>(() => [
-	...dependencyRows.value,
+	...visibleDependencyRows.value,
 	...additionalFileRows.value,
 ])
 
 const sectionTitle = computed(() =>
 	formatMessage(
-		dependencyRows.value.length > 0 ? messages.dependenciesTitle : messages.additionalFilesTitle,
+		visibleDependencyRows.value.length > 0
+			? messages.dependenciesTitle
+			: messages.additionalFilesTitle,
 	),
 )
 
 const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
-	collectDownloadableDependencyFiles(dependencyRows.value),
+	collectDownloadableDependencyFiles(visibleDependencyRows.value),
 )
 
 watch(
@@ -283,7 +295,9 @@ function primaryFileForVersion(version?: Labrinth.Versions.v3.Version) {
 }
 
 function shouldShowDependency(dependency: ResolvedContent) {
-	return !('reason' in dependency && dependency.reason === 'quilt_fabric_api')
+	return !(
+		'reason' in dependency && ['duplicate_project', 'quilt_fabric_api'].includes(dependency.reason)
+	)
 }
 
 function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow | null {
@@ -356,6 +370,29 @@ function additionalFileKey(file: Labrinth.Versions.v3.VersionFile) {
 	return file.hashes?.sha1 ?? file.filename
 }
 
+function dedupeDependencyRows(
+	rows: DownloadDependencyRow[],
+	seenDependencies = new Set<string>(),
+): DownloadDependencyRow[] {
+	return rows.flatMap((row) => {
+		const identity = dependencyRowIdentity(row)
+		if (seenDependencies.has(identity)) return []
+
+		seenDependencies.add(identity)
+
+		return [
+			{
+				...row,
+				dependencies: dedupeDependencyRows(row.dependencies, seenDependencies),
+			},
+		]
+	})
+}
+
+function dependencyRowIdentity(row: DownloadDependencyRow) {
+	return row.projectHref ?? row.downloadHref ?? row.key
+}
+
 function collectDownloadableDependencyFiles(
 	rows: DownloadDependencyRow[],
 	seenHrefs = new Set<string>(),
@@ -391,6 +428,10 @@ const messages = defineMessages({
 	dependenciesTitle: {
 		id: 'project.download.dependencies-title',
 		defaultMessage: 'Dependencies',
+	},
+	duplicateDependenciesHidden: {
+		id: 'project.download.duplicate-dependencies-hidden',
+		defaultMessage: 'Duplicate dependencies are hidden',
 	},
 	additionalFilesTitle: {
 		id: 'project.download.additional-files-title',
