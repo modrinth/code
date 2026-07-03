@@ -70,7 +70,7 @@
 			:key="childDependency.key"
 			class="group/dependency relative pl-10"
 		>
-			<DownloadDependency :dependency="childDependency" @download="emit('download')" class="z-1" />
+			<DownloadDependency :dependency="childDependency" class="z-1" @download="emit('download')" />
 			<div
 				aria-hidden="true"
 				class="absolute -top-2 left-6 z-0 h-[calc(100%+1rem)] w-0.5 bg-surface-5 group-first/dependency:-top-2 group-first/dependency:h-20 group-last/dependency:h-7"
@@ -91,7 +91,7 @@ import {
 	useFormatBytes,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, type Component, ref } from 'vue'
+import { type Component, computed, ref } from 'vue'
 
 defineOptions({
 	name: 'DownloadDependency',

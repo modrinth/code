@@ -3278,6 +3278,9 @@
   "project.download.download-version": {
     "message": "Download {version}"
   },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Duplicate dependencies are hidden"
+  },
   "project.download.file-unavailable": {
     "message": "This file cannot be downloaded"
   },
