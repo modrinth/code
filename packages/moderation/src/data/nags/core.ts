@@ -192,7 +192,10 @@ export const coreNags: Nag[] = [
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			context.project.license.id === 'LicenseRef-Unknown' && !context.projectV3?.minecraft_server,
+			(context.project.license.id === 'LicenseRef-Unknown' ||
+				context.project.license.id === 'NOASSERTION' ||
+				context.project.license.id === 'LicenseRef-NOASSERTION') &&
+			!context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/license',
 			title: defineMessage({
@@ -222,10 +225,12 @@ export const coreNags: Nag[] = [
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			context.project.license.id === 'LicenseRef-' ||
-			((!context.project.license.url || context.project.license.url === '') &&
-				!context.projectV3?.minecraft_server &&
-				context.project.license.id !== 'LicenseRef-Unknown'),
+			!context.projectV3?.minecraft_server &&
+			(context.project.license.id === 'LicenseRef-' ||
+				(context.project.license.id.search('LicenseRef-') === 0 &&
+					(!context.project.license.url || context.project.license.url === '') &&
+					context.project.license.id !== 'LicenseRef-Unknown' &&
+					context.project.license.id !== 'LicenseRef-All-Rights-Reserved')),
 		link: {
 			path: 'settings/license',
 			title: defineMessage({
