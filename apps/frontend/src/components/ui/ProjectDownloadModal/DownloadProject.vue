@@ -70,16 +70,28 @@
 
 	<div
 		v-if="selectedVersion"
-		class="grid grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-surface-2 px-3 py-3"
+		class="grid grid-cols-[1fr_min-content] items-center gap-3 rounded-2xl bg-surface-2 px-3 py-3"
 	>
 		<div class="flex min-w-0 flex-col gap-1">
 			<div class="flex min-w-0 items-center gap-2">
-				<span class="truncate font-semibold text-contrast">
+				<nuxt-link
+					v-tooltip="selectedVersion.version_number"
+					:to="`/${project.project_type}/${project.slug || project.id}/version/${selectedVersion.id}`"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="block min-w-0 truncate font-semibold text-contrast no-underline hover:underline"
+				>
 					{{ selectedVersion.version_number }}
-				</span>
-				<VersionChannelTag :channel="selectedVersion.version_type" class="!py-0.5" />
+				</nuxt-link>
+				<VersionChannelTag
+					:channel="selectedVersion.version_type"
+					class="relative -top-px !py-0.5"
+				/>
 			</div>
-			<p class="m-0 truncate text-sm text-secondary">
+			<p
+				v-tooltip="selectedVersion.name"
+				class="m-0 w-fit max-w-full truncate text-sm text-secondary"
+			>
 				{{ selectedVersion.name }}
 			</p>
 		</div>
@@ -210,8 +222,7 @@ const compatiblePlatforms = computed<string[]>(() => {
 			props.versions.some(
 				(version) =>
 					version.loaders.includes(platform) &&
-					(!selectedGameVersion.value ||
-						version.game_versions.includes(selectedGameVersion.value)),
+					(!selectedGameVersion.value || version.game_versions.includes(selectedGameVersion.value)),
 			) && !incompatibleLoadersSet.value.has(platform),
 	)
 })
