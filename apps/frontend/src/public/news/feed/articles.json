@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Proud of you all",
+			"summary": "Over 2,400 of you came together to raise more than $40,000 for charity this Pride month!",
+			"thumbnail": "https://modrinth.com/news/article/proud-of-you-2026/thumbnail.webp",
+			"date": "2026-07-02T01:00:00.000Z",
+			"link": "https://modrinth.com/news/article/proud-of-you-2026"
+		},
+		{
 			"title": "Improving Modpack review delays",
 			"summary": "Reducing the back-and-forth needed to get your modpack approved.",
 			"thumbnail": "https://modrinth.com/news/article/modpack-permissions/thumbnail.webp",

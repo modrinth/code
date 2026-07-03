@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tdelete from attributions_exemptions\n\t\twhere version_id = $1\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5ed1e727901573ee92683f206f3321fa4e192c75caa5a62a2790b5136e9a7dde"
+}
