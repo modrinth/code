@@ -75,13 +75,15 @@
 		<div class="flex min-w-0 flex-col gap-1">
 			<div class="flex min-w-0 items-center gap-2">
 				<nuxt-link
-					v-tooltip="selectedVersion.version_number"
+					v-tooltip="truncatedTooltip(versionNumberRef, selectedVersion.version_number)"
 					:to="`/${project.project_type}/${project.slug || project.id}/version/${selectedVersion.id}`"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="block min-w-0 truncate font-semibold text-contrast no-underline hover:underline"
+					class="block min-w-0 text-contrast no-underline hover:underline"
 				>
-					{{ selectedVersion.version_number }}
+					<span ref="versionNumberRef" class="block truncate font-semibold">
+						{{ selectedVersion.version_number }}
+					</span>
 				</nuxt-link>
 				<VersionChannelTag
 					:channel="selectedVersion.version_type"
@@ -89,7 +91,8 @@
 				/>
 			</div>
 			<p
-				v-tooltip="selectedVersion.name"
+				ref="versionNameRef"
+				v-tooltip="truncatedTooltip(versionNameRef, selectedVersion.name)"
 				class="m-0 w-fit max-w-full truncate text-sm text-secondary"
 			>
 				{{ selectedVersion.name }}
@@ -132,6 +135,7 @@ import {
 	type ComboboxOption,
 	defineMessages,
 	getTagMessage,
+	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
@@ -193,6 +197,8 @@ const userSelectedGameVersion = ref<string | null>(props.initialGameVersion)
 const userSelectedPlatform = ref<string | null>(props.initialPlatform)
 const showAllVersions = ref(defaultShowAllVersions())
 const versionFilter = ref('')
+const versionNumberRef = ref<HTMLElement | null>(null)
+const versionNameRef = ref<HTMLElement | null>(null)
 
 const incompatibleGameVersionsSet = computed(() => new Set(props.incompatibleGameVersions))
 const incompatibleLoadersSet = computed(() => new Set(props.incompatibleLoaders))

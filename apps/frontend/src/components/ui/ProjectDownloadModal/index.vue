@@ -3,10 +3,11 @@
 		<template v-if="project" #title>
 			<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
 			<div
+				ref="downloadTitleRef"
 				class="truncate text-lg font-extrabold text-contrast"
-				v-tooltip="formatMessage(messages.downloadTitle, { title: project.title })"
+				v-tooltip="truncatedTooltip(downloadTitleRef, downloadTitle)"
 			>
-				{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
+				{{ downloadTitle }}
 			</div>
 		</template>
 		<template #default>
@@ -89,6 +90,7 @@ import {
 	injectModrinthClient,
 	NewModal,
 	ServersPromo,
+	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
@@ -160,6 +162,7 @@ const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
 const modal = ref<NewModalRef | null>(null)
+const downloadTitleRef = ref<HTMLElement | null>(null)
 const modalOpen = ref(false)
 const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
@@ -191,6 +194,11 @@ const project = computed<DownloadModalProject | null>(() => {
 		actualProjectType: projectRaw.value.project_type,
 		project_type: getProjectTypeForUrl(projectRaw.value.project_type, projectRaw.value.loaders),
 	}
+})
+
+const downloadTitle = computed(() => {
+	if (!project.value) return ''
+	return formatMessage(messages.downloadTitle, { title: project.value.title })
 })
 
 const versionsEnabled = ref(false)

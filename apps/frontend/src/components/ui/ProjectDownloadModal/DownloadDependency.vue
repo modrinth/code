@@ -19,6 +19,8 @@
 				</span>
 				<a
 					v-if="dependency.projectHref"
+					ref="dependencyNameRef"
+					v-tooltip="truncatedTooltip(dependencyNameRef, dependency.name)"
 					:href="dependency.projectHref"
 					target="_blank"
 					rel="noopener noreferrer"
@@ -26,7 +28,12 @@
 				>
 					{{ dependency.name }}
 				</a>
-				<span v-else class="min-w-0 truncate text-base font-semibold text-contrast">
+				<span
+					v-else
+					ref="dependencyNameRef"
+					v-tooltip="truncatedTooltip(dependencyNameRef, dependency.name)"
+					class="min-w-0 truncate text-base font-semibold text-contrast"
+				>
 					{{ dependency.name }}
 				</span>
 				<TagItem class="shrink-0 border !border-solid border-surface-5 !px-3 !py-1 text-base">
@@ -71,7 +78,8 @@
 
 <script setup lang="ts">
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
+import { Avatar, ButtonStyled, TagItem, truncatedTooltip } from '@modrinth/ui'
+import { ref } from 'vue'
 
 defineOptions({
 	name: 'DownloadDependency',
@@ -96,4 +104,6 @@ defineProps<{
 const emit = defineEmits<{
 	download: []
 }>()
+
+const dependencyNameRef = ref<HTMLElement | null>(null)
 </script>
