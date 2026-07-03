@@ -25,8 +25,9 @@ mod updates;
 
 pub use self::not_found::not_found;
 
+// utoipa-specific struct to use a value_type for docs.
 /// A sha1 or sha512 hash.
-pub struct FileHash(pub String);
+pub struct FileHash;
 
 impl utoipa::PartialSchema for FileHash {
     fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
@@ -45,6 +46,26 @@ impl utoipa::PartialSchema for FileHash {
 }
 
 impl utoipa::ToSchema for FileHash {}
+
+// utoipa-specific struct to use a value_type for docs.
+/// A hashing algorithm (sha1 or sha256)
+pub struct HashAlgorithm;
+
+impl utoipa::PartialSchema for HashAlgorithm {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .enum_values(Some([
+                serde_json::json!("sha1"),
+                serde_json::json!("sha512"),
+            ]))
+            .examples([serde_json::json!("sha1")])
+            .description(Some("A supported hashing algorithm."))
+            .build()
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for HashAlgorithm {}
 
 pub(crate) fn prefix_openapi_paths(
     openapi: &mut utoipa::openapi::OpenApi,

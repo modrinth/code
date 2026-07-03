@@ -252,7 +252,8 @@ struct V3PathModifier;
 impl utoipa::Modify for V3PathModifier {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
         super::prefix_openapi_paths(openapi, "/v3", |path| {
-            path.starts_with("/maven/")
+            path.starts_with("/analytics/")
+                || path.starts_with("/maven/")
                 || path.starts_with("/updates/")
                 || path.starts_with("/debug/")
         });

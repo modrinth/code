@@ -5,6 +5,7 @@ use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
+use crate::routes::HashAlgorithm;
 use crate::routes::v3::version_file::{DownloadRedirect, HashQuery};
 use crate::routes::{FileHash, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
@@ -39,7 +40,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     operation_id = "versionFromHash",
     params(
         ("version_id" = String, Path, description = "The hexadecimal file hash"),
-        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
         ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     responses(
@@ -89,7 +90,7 @@ pub async fn get_version_from_hash(
     operation_id = "downloadVersionFromHash",
     params(
         ("version_id" = String, Path, description = "The hexadecimal file hash"),
-        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
         ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     responses(
@@ -131,7 +132,7 @@ pub async fn download_version(
     operation_id = "deleteFileFromHash",
     params(
         ("version_id" = String, Path, description = "The hexadecimal file hash"),
-        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
         ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID to delete from")
     ),
     responses(
@@ -184,7 +185,7 @@ pub struct UpdateData {
     operation_id = "getLatestVersionFromHash",
     params(
         ("version_id" = String, Path, description = "The hexadecimal file hash"),
-        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
         ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     request_body = UpdateData,
@@ -248,6 +249,7 @@ pub async fn get_update_from_hash(
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileHashes {
     /// Hash algorithm to use (sha1 or sha512)
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>,
     #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,
@@ -380,6 +382,7 @@ pub async fn get_projects_from_hashes(
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyUpdateData {
     /// Hash algorithm to use (sha1 or sha512)
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,
@@ -503,6 +506,7 @@ pub struct FileUpdateData {
 
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyFileUpdateData {
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<FileUpdateData>,
 }
@@ -515,7 +519,7 @@ pub struct ManyFileUpdateData {
     operation_id = "getLatestVersionsFromHashesIndividual",
     request_body = ManyFileUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<FileHash, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]

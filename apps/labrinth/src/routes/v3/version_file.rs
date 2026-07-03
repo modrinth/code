@@ -9,8 +9,8 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
-use crate::routes::FileHash;
 use crate::routes::internal::delphi;
+use crate::routes::{FileHash, HashAlgorithm};
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use dashmap::DashMap;
@@ -276,6 +276,7 @@ pub async fn get_update_from_hash(
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileHashes {
     /// Hash algorithm to use (sha1 or sha512)
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,

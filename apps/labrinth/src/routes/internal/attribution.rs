@@ -92,7 +92,7 @@ struct ScanResponse {
     queued_files: u64,
 }
 
-/// Queue an attribution scan.  
+/// Queue an attribution scan.
 #[utoipa::path(
 	context_path = "/attribution",
 	tag = "attribution",
@@ -541,7 +541,7 @@ struct UpdateGroupBody {
     attribution: AttributionResolution,
 }
 
-/// Update an attribution group.  
+/// Update an attribution group.
 #[utoipa::path(
 	context_path = "/attribution",
 	tag = "attribution",
@@ -627,7 +627,7 @@ struct AssignBody {
     project_id: ProjectId,
 }
 
-/// Move a file to an attribution group.  
+/// Move a file to an attribution group.
 #[utoipa::path(
 	context_path = "/attribution",
 	tag = "attribution",
@@ -788,7 +788,7 @@ struct SplitBody {
     project_id: ProjectId,
 }
 
-/// Split a file into a new attribution group.  
+/// Split a file into a new attribution group.
 #[utoipa::path(
 	context_path = "/attribution",
 	tag = "attribution",

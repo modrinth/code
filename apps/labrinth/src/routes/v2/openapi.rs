@@ -102,11 +102,12 @@ use utoipa::openapi::{RefOr, Response};
 pub struct ApiDoc;
 
 const FILE_HASH_EXAMPLE: &str = "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed";
-const FILE_HASH_MAP_RESPONSE_OPERATION_IDS: [&str; 4] = [
+const FILE_HASH_MAP_RESPONSE_OPERATION_IDS: [&str; 5] = [
     "versionsFromHashes",
     "projectsFromHashes",
     "getLatestVersionsFromHashes",
     "getLatestVersionsFromHashesMany",
+    "getLatestVersionsFromHashesIndividual",
 ];
 
 struct V2PathModifier;

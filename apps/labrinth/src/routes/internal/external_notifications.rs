@@ -79,7 +79,7 @@ where
     error.as_api_error().serialize(serializer)
 }
 
-/// Create external notifications.  
+/// Create external notifications.
 #[utoipa::path(
 	tag = "external notifications",
 	responses((status = ACCEPTED))
@@ -93,6 +93,46 @@ pub async fn create(
 ) -> Result<(web::Json<HashMap<UserId, EmailFailure>>, StatusCode), ApiError> {
     create_impl(pool, redis, email_queue, create_notification.into_inner())
         .await
+}
+
+/// Create notifications and send emails.
+///
+/// Responds with the user IDs that could not be emailed:
+/// - `200` if every recipient was emailed (empty list)
+/// - `207` if some recipients could not be emailed (list of failed IDs)
+/// Create email sync.
+#[utoipa::path(
+	tag = "external notifications",
+	responses(
+		(status = OK, body = inline(Vec<UserId>)),
+		(status = 207, body = inline(Vec<UserId>)),
+	)
+)]
+#[post(
+    "external_notifications/email-sync",
+    guard = "external_notification_key_guard"
+)]
+pub async fn create_email_sync(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    email_queue: web::Data<EmailQueue>,
+    data: web::Json<CreateNotification>,
+) -> Result<(web::Json<Vec<UserId>>, StatusCode), ApiError> {
+    let data = data.into_inner();
+    create_impl(
+        pool,
+        redis,
+        email_queue,
+        CreateNotification {
+            body: data.body,
+            user_ids: data.user_ids,
+            email: EmailStrategy::Sync,
+        },
+    )
+    .await
+    .map(|(res, code)| {
+        (web::Json(res.into_inner().into_keys().collect()), code)
+    })
 }
 
 async fn create_impl(
@@ -230,54 +270,6 @@ async fn create_impl(
     Ok((web::Json(HashMap::new()), StatusCode::ACCEPTED))
 }
 
-/// Inserts notifications for all users and tries to send emails immediately.
-///
-/// Responds with the user IDs that could not be emailed:
-/// - `200` if every recipient was emailed (empty list)
-/// - `207` if some recipients could not be emailed (list of failed IDs)
-#[utoipa::path(
-	tag = "external notifications",
-	responses(
-		(status = OK, body = inline(Vec<UserId>)),
-		(status = 207, body = inline(Vec<UserId>)),
-	)
-)]
-#[post(
-    "/external_notifications/email-sync",
-    guard = "external_notification_key_guard"
-)]
-pub async fn create_email_sync(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    email_queue: web::Data<EmailQueue>,
-    data: web::Json<CreateNotification>,
-) -> Result<(web::Json<Vec<UserId>>, StatusCode), ApiError> {
-    let data = data.into_inner();
-    create_impl(
-        pool,
-        redis,
-        email_queue,
-        CreateNotification {
-            body: data.body,
-            user_ids: data.user_ids,
-            email: EmailStrategy::Sync,
-        },
-    )
-    .await
-    .map(|(res, code)| {
-        let failed = res.into_inner().into_keys().collect::<Vec<_>>();
-        let status = if code.is_server_error() {
-            code
-        } else if failed.is_empty() {
-            StatusCode::OK
-        } else {
-            StatusCode::MULTI_STATUS
-        };
-
-        (web::Json(failed), status)
-    })
-}
-
 #[derive(Deserialize, utoipa::ToSchema)]
 struct NotificationFilter {
     pub user_ids: Vec<UserId>,
@@ -285,7 +277,7 @@ struct NotificationFilter {
     pub body: serde_json::Map<String, serde_json::Value>,
 }
 
-/// Remove external notifications.  
+/// Remove external notifications.
 #[utoipa::path(
 	tag = "external notifications",
 	responses((status = NO_CONTENT))
@@ -338,7 +330,7 @@ struct SendEmail {
     pub title: String,
 }
 
-/// Send a custom email.  
+/// Send a custom email.
 #[utoipa::path(
 	tag = "external notifications",
 	responses((status = ACCEPTED))

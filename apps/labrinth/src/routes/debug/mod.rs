@@ -5,6 +5,7 @@ use eyre::Context;
 use eyre::eyre;
 use prometheus::IntGauge;
 
+#[cfg(target_os = "linux")]
 use super::SecurityAddon;
 use crate::util::cors::default_cors;
 

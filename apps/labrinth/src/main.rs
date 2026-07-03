@@ -408,7 +408,7 @@ fn add_default_error_response(
         operation
             .responses
             .responses
-            .entry("default".to_string())
+            .entry("500".to_string())
             .or_insert_with(|| error_response().into());
     }
 }
