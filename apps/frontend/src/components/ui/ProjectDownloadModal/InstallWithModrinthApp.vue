@@ -96,7 +96,11 @@ function installWithApp() {
 
 <style lang="scss" scoped>
 .modrinth-app-install-card {
-	background: radial-gradient(circle at 50% 300%, #0d2f17 0%, var(--surface-1) 72%);
+	background: radial-gradient(
+		ellipse 90% 250% at 50% 200%,
+		color-mix(in srgb, var(--color-brand-shadow) 50%, var(--surface-1)) -30%,
+		var(--surface-1) 72%
+	);
 }
 
 @media (hover: none) and (max-width: 767px) {
