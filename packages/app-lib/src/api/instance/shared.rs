@@ -146,13 +146,17 @@ pub async fn invite_shared_instance_users(
             attachment
         }
         None => {
-            ensure_shareable_instance(instance_id, &state).await?;
+            let metadata = ensure_shareable_instance(instance_id, &state).await?;
             tracing::info!(
                 instance_id,
                 user_count = user_ids.len(),
                 "Creating shared instance before first invite"
             );
-            let remote = create_remote_instance(&state).await?;
+            let remote = create_remote_instance(
+                shared_instance_name(metadata.instance.name),
+                &state,
+            )
+            .await?;
             tracing::info!(
                 instance_id,
                 shared_instance_id = %remote.id,
@@ -954,13 +958,14 @@ fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
 async fn ensure_shareable_instance(
     instance_id: &str,
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<crate::state::InstanceMetadata> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
-    ensure_shareable_link(&metadata.link)
+    ensure_shareable_link(&metadata.link)?;
+    Ok(metadata)
 }
 
 fn ensure_shareable_link(link: &InstanceLink) -> crate::Result<()> {
@@ -1039,10 +1044,17 @@ fn file_type(project_type: ProjectType) -> String {
 }
 
 async fn create_remote_instance(
+    name: String,
     state: &State,
 ) -> crate::Result<CreateInstanceResponse> {
-    request_json("create_instance", Method::POST, "/instances", None, state)
-        .await
+    request_json(
+        "create_instance",
+        Method::POST,
+        "/instances",
+        Some(json!({ "name": name })),
+        state,
+    )
+    .await
 }
 
 async fn delete_remote_instance(
