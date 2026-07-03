@@ -485,8 +485,8 @@ watch(
 watch(
 	() => props.resetKey,
 	() => {
-		userSelectedGameVersion.value = null
-		userSelectedPlatform.value = null
+		userSelectedGameVersion.value = props.initialGameVersion
+		userSelectedPlatform.value = props.initialPlatform
 		showAllVersions.value = defaultShowAllVersions()
 		versionFilter.value = ''
 	},

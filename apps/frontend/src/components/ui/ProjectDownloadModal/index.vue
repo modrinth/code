@@ -1,14 +1,16 @@
 <template>
 	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px">
-		<template v-if="project" #title>
-			<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-			<div
-				ref="downloadTitleRef"
-				v-tooltip="truncatedTooltip(downloadTitleRef, downloadTitle)"
-				class="truncate text-lg font-extrabold text-contrast"
-			>
-				{{ downloadTitle }}
-			</div>
+		<template #title>
+			<template v-if="project">
+				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
+				<div
+					ref="downloadTitleRef"
+					v-tooltip="truncatedTooltip(downloadTitleRef, downloadTitle)"
+					class="truncate text-lg font-extrabold text-contrast"
+				>
+					{{ downloadTitle }}
+				</div>
+			</template>
 		</template>
 		<template #default>
 			<div v-if="project" class="mx-auto flex w-full flex-col gap-4">
@@ -336,7 +338,8 @@ async function show(
 	options: ProjectDownloadModalShowOptions = {},
 ): Promise<void> {
 	if (!modal.value || modalOpen.value) return
-	clearCloseStateResetTimeout()
+	await waitForCloseStateReset()
+	if (!modal.value || modalOpen.value) return
 	showOptions.value = {
 		...getDefaultShowOptions(),
 		...options,
@@ -344,15 +347,14 @@ async function show(
 	showProjectId.value = showOptions.value.projectId ?? null
 	await nextTick()
 	if (!(await loadProjectForModal(!!showOptions.value.projectId))) return
+	resetDownloadState()
 	modalOpen.value = true
 	modal.value.show(event)
 }
 
-async function hide() {
+function hide() {
 	if (!modal.value || !modalOpen.value) return
 	modal.value?.hide()
-	await nextTick()
-	downloadProjectResetKey.value += 1
 }
 
 function onDownload() {
@@ -382,12 +384,23 @@ function clearCloseStateResetTimeout() {
 	closeStateResetTimeout = null
 }
 
+async function waitForCloseStateReset() {
+	if (!closeStateResetTimeout) return
+	await new Promise((resolve) => setTimeout(resolve, MODAL_CLOSE_STATE_RESET_MS))
+}
+
 async function loadProjectForModal(forceRefetch: boolean) {
 	if (!routeProjectId.value) return false
 	if (!forceRefetch && projectRaw.value) return true
 
 	const { data } = await refetchProject()
 	return !!data
+}
+
+function resetDownloadState() {
+	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
+	dependencyDownloadFiles.value = []
+	downloadProjectResetKey.value += 1
 }
 
 function openFromHash() {
