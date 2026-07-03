@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-03T15:16:21+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project license URL being required when not using a custom license.`,
+	},
+	{
 		date: `2026-07-02T00:44:14+00:00`,
 		product: 'web',
 		body: `## Changed
