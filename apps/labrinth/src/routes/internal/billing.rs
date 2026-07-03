@@ -174,6 +174,7 @@ pub struct ChargeRefund {
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
+	request_body = ChargeRefund,
 	responses((status = NO_CONTENT))
 )]
 #[post("/charge/{id}/refund")]
@@ -1707,6 +1708,7 @@ pub async fn initiate_payment(
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
+	request_body(content = String, content_type = "text/plain"),
 	responses((status = NO_CONTENT))
 )]
 #[post("/_stripe")]

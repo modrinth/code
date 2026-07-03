@@ -147,6 +147,7 @@ impl CampaignDonation {
 #[utoipa::path(
 	context_path = "/campaign",
 	tag = "campaigns",
+	request_body(content = String, content_type = "text/plain"),
 	responses((status = NO_CONTENT))
 )]
 #[post("/webhook")]

@@ -870,7 +870,9 @@ function extractHandlers(content: string, file: string, sourceDir: string): Hand
 
 		if (jsonTypes.length) bodyExtractors.add('json')
 		if (formTypes.length) bodyExtractors.add('form')
-		if (/\b(?:web::)?Payload\b/.test(params)) bodyExtractors.add('payload')
+		if (/\b(?:web::)?Payload\b/.test(params) && !/\bstatus\s*=\s*101\b/.test(attrText)) {
+			bodyExtractors.add('payload')
+		}
 		if (/\b(?:web::)?Bytes\b/.test(params)) bodyExtractors.add('bytes')
 		if (/\bMultipart\b/.test(params)) bodyExtractors.add('multipart')
 		if (/(?:^|,)\s*(?:[A-Za-z_][A-Za-z0-9_]*\s*:\s*)?String\s*(?:,|$)/.test(params)) {

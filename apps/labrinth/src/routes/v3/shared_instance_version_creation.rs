@@ -40,6 +40,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 	params(
 		("id" = SharedInstanceId, Path, description = "The ID of the shared instance")
 	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
 	responses(
 		(status = 201, description = "Expected response to a valid request", body = SharedInstanceVersion),
 		(status = 400, description = "Request was invalid, see given error"),

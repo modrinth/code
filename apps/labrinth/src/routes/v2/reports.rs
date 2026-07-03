@@ -22,6 +22,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 	tag = "reports",
     post,
     operation_id = "submitReport",
+    request_body = v3::reports::CreateReport,
     responses(
 		(status = 200, description = "Expected response to a valid request", body = LegacyReport),
         (status = 400, description = "Request was invalid, see given error"),

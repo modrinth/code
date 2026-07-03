@@ -390,6 +390,7 @@ pub struct Extension {
 		("id" = OAuthClientId, Path),
 		("ext" = String, Query)
 	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
 	responses((status = NO_CONTENT))
 )]
 #[patch("/app/{id}/icon")]

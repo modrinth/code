@@ -1196,6 +1196,7 @@ pub struct Extension {
 #[utoipa::path(
 	tag = "organizations",
 	params(("ext" = String, Query)),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
 	responses((status = NO_CONTENT))
 )]
 #[patch("/organization/{id}/icon")]

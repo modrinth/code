@@ -1839,6 +1839,7 @@ pub struct Extension {
 	params(
 		("ext" = String, Query)
 	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
 	responses((status = NO_CONTENT))
 )]
 #[patch("/{id}/icon")]
@@ -2125,6 +2126,7 @@ pub struct GalleryCreateQuery {
 		("description" = Option<String>, Query),
 		("ordering" = Option<i64>, Query)
 	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
 	responses((status = NO_CONTENT))
 )]
 #[post("/{id}/gallery")]

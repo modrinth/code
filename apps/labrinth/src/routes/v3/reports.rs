@@ -34,7 +34,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(report_delete_route);
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct CreateReport {
     pub report_type: String,
     pub item_id: String,
@@ -46,7 +46,11 @@ pub struct CreateReport {
     pub uploaded_images: Vec<ImageId>,
 }
 
-#[utoipa::path(tag = "reports", responses((status = OK)))]
+#[utoipa::path(
+	tag = "reports",
+	request_body = CreateReport,
+	responses((status = OK))
+)]
 #[post("/report")]
 pub async fn report_create_route(
     req: HttpRequest,

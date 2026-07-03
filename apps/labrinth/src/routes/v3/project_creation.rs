@@ -286,7 +286,12 @@ pub async fn undo_uploads(
 /// Create a project.  
 #[utoipa::path(
 	context_path = "/project",
-	tag = "projects", responses((status = OK, body = Project))
+	tag = "projects",
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing project metadata and files"
+	),
+	responses((status = OK, body = Project))
 )]
 #[post("")]
 pub async fn project_create(
@@ -370,7 +375,12 @@ pub async fn project_create_internal(
 /// This is a testing endpoint only accessible behind an admin key.
 #[utoipa::path(
 	context_path = "/project",
-	tag = "projects", responses((status = OK, body = Project))
+	tag = "projects",
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing project metadata and files"
+	),
+	responses((status = OK, body = Project))
 )]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(

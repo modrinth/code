@@ -154,7 +154,11 @@ pub async fn post_compliance_form(
 }
 
 /// Receive PayPal webhook.
-#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "payouts",
+	request_body(content = String, content_type = "text/plain"),
+	responses((status = NO_CONTENT))
+)]
 #[post("/_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
@@ -313,7 +317,11 @@ pub async fn paypal_webhook(
 }
 
 /// Receive Tremendous webhook.
-#[utoipa::path(tag = "payouts", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "payouts",
+	request_body(content = String, content_type = "text/plain"),
+	responses((status = NO_CONTENT))
+)]
 #[post("/_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,

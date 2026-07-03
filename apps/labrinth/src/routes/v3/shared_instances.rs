@@ -36,7 +36,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(shared_instance_version_download);
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct CreateSharedInstance {
     #[validate(
         length(min = 3, max = 64),
@@ -47,7 +47,11 @@ pub struct CreateSharedInstance {
     pub public: bool,
 }
 
-#[utoipa::path(tag = "shared instances", responses((status = OK)))]
+#[utoipa::path(
+	tag = "shared instances",
+	request_body = CreateSharedInstance,
+	responses((status = OK))
+)]
 #[post("/shared-instance")]
 pub async fn shared_instance_create(
     req: HttpRequest,
@@ -206,7 +210,7 @@ fn can_access_instance_privately(
         || users.iter().any(|x| x.user_id == user.id.into())
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditSharedInstance {
     #[validate(
         length(min = 3, max = 64),
@@ -216,7 +220,11 @@ pub struct EditSharedInstance {
     pub public: Option<bool>,
 }
 
-#[utoipa::path(tag = "shared instances", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "shared instances",
+	request_body = EditSharedInstance,
+	responses((status = NO_CONTENT))
+)]
 #[patch("/shared-instance/{id}")]
 pub async fn shared_instance_edit(
     req: HttpRequest,
