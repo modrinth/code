@@ -94,6 +94,10 @@
 							downloadingSelectedVersion
 								? messages.downloadingSelectedVersion
 								: messages.downloadAllSelectedVersion,
+							{
+								current: selectedVersionDownloadProgress.current,
+								total: selectedVersionDownloadProgress.total,
+							},
 						)
 					}}
 				</button>
@@ -241,6 +245,10 @@ const versionFilter = ref('')
 const versionNumberRef = ref<HTMLElement | null>(null)
 const versionNameRef = ref<HTMLElement | null>(null)
 const downloadingSelectedVersion = ref(false)
+const selectedVersionDownloadProgress = ref({
+	current: 0,
+	total: 0,
+})
 
 const incompatibleGameVersionsSet = computed(() => new Set(props.incompatibleGameVersions))
 const incompatibleLoadersSet = computed(() => new Set(props.incompatibleLoaders))
@@ -517,22 +525,29 @@ async function downloadSelectedVersionFiles() {
 	if (downloadingSelectedVersion.value || downloadAllFiles.value.length <= 1) return
 
 	downloadingSelectedVersion.value = true
+	const files = [...downloadAllFiles.value]
+	selectedVersionDownloadProgress.value = {
+		current: 0,
+		total: files.length,
+	}
 
 	try {
 		const zip = new JSZip()
 		const usedFilenames = new Set<string>()
 
-		await Promise.all(
-			downloadAllFiles.value.map(async (file) => {
-				const response = await fetch(file.href)
+		for (const [index, file] of files.entries()) {
+			selectedVersionDownloadProgress.value = {
+				current: index + 1,
+				total: files.length,
+			}
+			const response = await fetch(file.href)
 
-				if (!response.ok) {
-					throw new Error(`Failed to download ${file.filename}`)
-				}
+			if (!response.ok) {
+				throw new Error(`Failed to download ${file.filename}`)
+			}
 
-				zip.file(uniqueFilename(file.filename, usedFilenames), await response.blob())
-			}),
-		)
+			zip.file(uniqueFilename(file.filename, usedFilenames), await response.blob())
+		}
 
 		downloadBlob(
 			await zip.generateAsync({
@@ -551,6 +566,10 @@ async function downloadSelectedVersionFiles() {
 		})
 	} finally {
 		downloadingSelectedVersion.value = false
+		selectedVersionDownloadProgress.value = {
+			current: 0,
+			total: 0,
+		}
 	}
 }
 
@@ -701,7 +720,7 @@ const messages = defineMessages({
 	},
 	downloadingSelectedVersion: {
 		id: 'project.download.selected-version-downloading',
-		defaultMessage: 'Downloading...',
+		defaultMessage: 'Downloading... ({current}/{total})',
 	},
 	downloadSelectedVersionFailedTitle: {
 		id: 'project.download.selected-version-failed-title',
