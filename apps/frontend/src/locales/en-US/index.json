@@ -3242,6 +3242,18 @@
   "project.download.base-loader-incompatible-tooltip": {
     "message": "This loader is incompatible with the base project."
   },
+  "project.download.dependencies-download-all": {
+    "message": "Download all"
+  },
+  "project.download.dependencies-downloading": {
+    "message": "Downloading..."
+  },
+  "project.download.dependencies-failed-text": {
+    "message": "One or more dependency files could not be downloaded. Please try again."
+  },
+  "project.download.dependencies-failed-title": {
+    "message": "Could not download dependencies"
+  },
   "project.download.dependencies-title": {
     "message": "Dependencies"
   },

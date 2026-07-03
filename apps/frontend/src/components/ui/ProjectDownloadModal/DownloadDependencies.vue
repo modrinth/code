@@ -39,8 +39,8 @@ import {
 	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
-	injectNotificationManager,
 	injectModrinthClient,
+	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
