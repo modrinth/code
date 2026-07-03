@@ -1,5 +1,5 @@
 <template>
-	<div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+	<div class="flex w-full gap-2">
 		<Combobox
 			:model-value="currentGameVersion || undefined"
 			class="w-full"

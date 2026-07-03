@@ -119,6 +119,7 @@ const dependencyVersionIds = computed<string[]>(() => {
 	return [
 		...new Set(
 			visibleResolvedDependencies.value
+				.filter((dependency) => !('reason' in dependency))
 				.map((dependency) => dependency.version_id)
 				.filter((versionId): versionId is string => !!versionId),
 		),
@@ -186,14 +187,41 @@ const dependenciesByParentVersionId = computed(() => {
 	return map
 })
 
+const dependenciesLoaded = computed(() => {
+	if (!shouldResolveDependencies.value) return false
+	if (!dependencyResolution.value) return false
+	if (
+		dependencyResolution.value.primary.version_id &&
+		dependencyResolution.value.primary.version_id !== props.selectedVersion?.id
+	) {
+		return false
+	}
+	if (
+		!dependencyVersionIds.value.every((versionId) => dependencyVersionById.value.has(versionId))
+	) {
+		return false
+	}
+	if (
+		!dependencyProjectIds.value.every((projectId) => dependencyProjectById.value.has(projectId))
+	) {
+		return false
+	}
+	return true
+})
+
 const resolvedDependencyRows = computed<DownloadDependencyRow[]>(() => {
+	if (!dependenciesLoaded.value) return []
+
 	const primaryVersionId =
 		dependencyResolution.value?.primary.version_id || props.selectedVersion?.id
 	if (!primaryVersionId) return []
 
 	const dependencies = dependenciesByParentVersionId.value.get(primaryVersionId) || []
 
-	return dependencies.map((dependency) => createDependencyRow(dependency))
+	return dependencies.flatMap((dependency) => {
+		const row = createDependencyRow(dependency)
+		return row ? [row] : []
+	})
 })
 
 const dependencyRows = computed<DownloadDependencyRow[]>(
@@ -208,25 +236,26 @@ function shouldShowDependency(dependency: ResolvedContent) {
 	return !('reason' in dependency && dependency.reason === 'quilt_fabric_api')
 }
 
-function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow {
+function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow | null {
 	const versionId = dependency.version_id ?? undefined
 	const version = versionId ? dependencyVersionById.value.get(versionId) : undefined
 	const project = dependencyProjectById.value.get(dependency.project_id)
+	if (!project) return null
+
 	const primaryFile = primaryFileForVersion(version)
 	const unavailableTooltip =
 		'reason' in dependency && dependency.reason
 			? skippedReasonLabel(dependency.reason)
 			: formatMessage(messages.unavailableDependency)
-	const name =
-		project?.title || version?.name || version?.version_number || versionId || dependency.project_id
+	const name = project.title
 
 	return {
 		key: `${dependency.project_id}-${versionId ?? 'unresolved'}-${
 			'reason' in dependency ? dependency.reason : 'resolved'
 		}`,
 		name,
-		icon: project?.icon_url,
-		projectHref: project ? `/${project.project_type}/${project.slug || project.id}` : undefined,
+		icon: project.icon_url ?? undefined,
+		projectHref: `/${project.project_type}/${project.slug || project.id}`,
 		downloadHref:
 			'reason' in dependency || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
 		filename: primaryFile?.filename,
@@ -235,7 +264,10 @@ function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow
 		dependencies: (versionId && dependenciesByParentVersionId.value.get(versionId)
 			? dependenciesByParentVersionId.value.get(versionId)!
 			: []
-		).map((subDependency) => createDependencyRow(subDependency)),
+		).flatMap((subDependency) => {
+			const row = createDependencyRow(subDependency)
+			return row ? [row] : []
+		}),
 	}
 }
 

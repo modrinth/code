@@ -993,7 +993,7 @@ const messages = defineMessages({
 	},
 	downloadProject: {
 		id: 'version.download.download-dependency',
-		defaultMessage: 'Select a dependency to download',
+		defaultMessage: 'Select a version to download',
 	},
 	requiredResourcePack: {
 		id: 'version.download.required-resource-pack',

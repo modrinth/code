@@ -4788,7 +4788,7 @@
     "message": "View version"
   },
   "version.download.download-dependency": {
-    "message": "Select a dependency to download"
+    "message": "Select a version to download"
   },
   "version.download.no-primary-file": {
     "message": "Error: No primary file found"
