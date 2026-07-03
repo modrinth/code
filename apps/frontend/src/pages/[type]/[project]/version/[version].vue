@@ -986,7 +986,7 @@ const messages = defineMessages({
 	},
 	downloadProject: {
 		id: 'version.download.download-dependency',
-		defaultMessage: 'Download dependency',
+		defaultMessage: 'Select a dependency to download',
 	},
 	requiredResourcePack: {
 		id: 'version.download.required-resource-pack',
