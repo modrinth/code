@@ -37,31 +37,44 @@
 						@download="onDownload"
 					/>
 					<div v-if="additionalFiles.length > 0" class="flex flex-col gap-2">
-						<h3 class="m-0 text-sm font-bold text-contrast">
+						<h3 class="m-0 text-base font-semibold text-contrast">
 							{{ formatMessage(messages.additionalFilesTitle) }}
 						</h3>
 						<div class="flex flex-col gap-2">
-							<a
+							<div
 								v-for="file in additionalFiles"
-								:key="file.hashes?.sha1 ?? file.filename"
-								:href="getDownloadUrl(file.url)"
-								:download="file.filename"
-								class="grid min-h-9 grid-cols-[minmax(0,1fr)_min-content] items-center gap-2 rounded-xl bg-button-bg px-3 py-2 text-primary no-underline"
-								@click="onDownload"
+								:key="additionalFileKey(file)"
+								class="grid min-h-10 grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-xl bg-button-bg py-0 pl-3.5 pr-2 text-primary"
 							>
-								<span class="flex min-w-0 items-center gap-2">
+								<span class="flex min-w-0 items-center gap-3">
 									<FileIcon aria-hidden="true" class="size-5 flex-shrink-0 text-secondary" />
-									<span class="min-w-0 truncate font-semibold text-contrast">
+									<span
+										:ref="(element) => setAdditionalFileNameRef(file, element)"
+										v-tooltip="
+											truncatedTooltip(additionalFileNameRefs[additionalFileKey(file)], file.filename)
+										"
+										class="min-w-0 truncate text-base font-semibold text-contrast"
+									>
 										{{ file.filename }}
 									</span>
-									<span
-										class="rounded-full bg-button-bgSelected px-2 py-0.5 text-xs text-secondary"
+									<TagItem
+										class="shrink-0 border !border-solid border-surface-5 !px-3 !py-1 text-base"
 									>
 										{{ fileTypeLabel(file.file_type) }}
-									</span>
+									</TagItem>
 								</span>
-								<DownloadIcon aria-hidden="true" class="size-5 text-secondary" />
-							</a>
+								<ButtonStyled circular type="transparent">
+									<a
+										v-tooltip="'Download'"
+										:href="getDownloadUrl(file.url)"
+										:download="file.filename"
+										:aria-label="`Download ${file.filename}`"
+										@click="onDownload"
+									>
+										<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
+									</a>
+								</ButtonStyled>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -85,18 +98,21 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, FileIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
+	fileTypeMessages,
 	injectModrinthClient,
 	NewModal,
 	ServersPromo,
+	TagItem,
 	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { type ComponentPublicInstance, computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -163,6 +179,7 @@ const debug = useDebugLogger('DownloadModal')
 
 const modal = ref<NewModalRef | null>(null)
 const downloadTitleRef = ref<HTMLElement | null>(null)
+const additionalFileNameRefs = ref<Record<string, HTMLElement | null>>({})
 const modalOpen = ref(false)
 const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
@@ -274,14 +291,20 @@ const messages = defineMessages({
 	},
 })
 
-const fileTypeLabels: Partial<Record<Labrinth.Versions.v3.FileType, string>> = {
-	'required-resource-pack': 'Resourcepack',
-	'optional-resource-pack': 'Resourcepack',
-	unknown: 'File',
+function fileTypeLabel(type?: Labrinth.Versions.v3.FileType | null) {
+	return formatMessage(fileTypeMessages[type ?? 'unknown'] ?? fileTypeMessages.unknown)
 }
 
-function fileTypeLabel(type?: Labrinth.Versions.v3.FileType) {
-	return fileTypeLabels[type ?? 'unknown'] || 'File'
+function additionalFileKey(file: Labrinth.Versions.v3.VersionFile) {
+	return file.hashes?.sha1 ?? file.filename
+}
+
+function setAdditionalFileNameRef(
+	file: Labrinth.Versions.v3.VersionFile,
+	element: Element | ComponentPublicInstance | null,
+) {
+	additionalFileNameRefs.value[additionalFileKey(file)] =
+		element instanceof HTMLElement ? element : null
 }
 
 function getProjectTypeForUrl(
