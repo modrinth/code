@@ -1,8 +1,26 @@
 <template>
-	<div v-if="dependencyRows.length > 0" class="flex flex-col gap-2">
-		<h3 v-if="showTitle" class="m-0 text-base font-semibold text-contrast">
-			{{ formatMessage(messages.dependenciesTitle) }}
-		</h3>
+	<div v-if="dependencyRows.length > 0" class="flex flex-col gap-1">
+		<div
+			v-if="showTitle || downloadableDependencyFiles.length > 0"
+			class="flex flex-wrap items-center justify-between gap-2"
+		>
+			<h3 v-if="showTitle" class="m-0 text-base font-semibold text-contrast">
+				{{ formatMessage(messages.dependenciesTitle) }}
+			</h3>
+			<ButtonStyled v-if="downloadableDependencyFiles.length > 0" type="transparent">
+				<button :disabled="downloadingDependencies" @click="downloadAllDependencies">
+					<SpinnerIcon v-if="downloadingDependencies" aria-hidden="true" class="animate-spin" />
+					<DownloadIcon v-else aria-hidden="true" />
+					{{
+						formatMessage(
+							downloadingDependencies
+								? messages.downloadingDependencies
+								: messages.downloadAllDependencies,
+						)
+					}}
+				</button>
+			</ButtonStyled>
+		</div>
 		<div class="flex flex-col gap-2">
 			<DownloadDependency
 				v-for="dependency in dependencyRows"
@@ -16,15 +34,19 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
+	injectNotificationManager,
 	injectModrinthClient,
 	useVIntl,
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import JSZip from 'jszip'
+import { computed, ref } from 'vue'
 
 import DownloadDependency from './DownloadDependency.vue'
 
@@ -49,6 +71,12 @@ interface DownloadDependencyRow {
 	typeLabel: string
 	unavailableTooltip: string
 	dependencies: DownloadDependencyRow[]
+}
+
+interface DownloadableDependencyFile {
+	href: string
+	filename: string
+	name: string
 }
 
 const props = withDefaults(
@@ -77,7 +105,9 @@ const emit = defineEmits<{
 }>()
 const client = injectModrinthClient()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
+const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const downloadingDependencies = ref(false)
 
 const shouldResolveDependencies = computed(
 	() => !props.dependencies && !!props.project && !!props.selectedVersion,
@@ -228,6 +258,14 @@ const dependencyRows = computed<DownloadDependencyRow[]>(
 	() => props.dependencies || resolvedDependencyRows.value,
 )
 
+const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
+	collectDownloadableDependencyFiles(dependencyRows.value),
+)
+
+const dependencyZipFilename = computed(
+	() => `${sanitizeFilename(props.project?.title || 'Project')} dependencies.zip`,
+)
+
 function primaryFileForVersion(version?: Labrinth.Versions.v3.Version) {
 	return version?.files?.find((file) => file.primary) || version?.files?.[0]
 }
@@ -298,10 +336,143 @@ function getDownloadUrl(url: string) {
 	})
 }
 
+function collectDownloadableDependencyFiles(
+	rows: DownloadDependencyRow[],
+	seenHrefs = new Set<string>(),
+): DownloadableDependencyFile[] {
+	const files: DownloadableDependencyFile[] = []
+
+	for (const row of rows) {
+		if (row.downloadHref && !seenHrefs.has(row.downloadHref)) {
+			seenHrefs.add(row.downloadHref)
+			files.push({
+				href: row.downloadHref,
+				filename: row.filename || filenameFromUrl(row.downloadHref),
+				name: row.name,
+			})
+		}
+
+		files.push(...collectDownloadableDependencyFiles(row.dependencies, seenHrefs))
+	}
+
+	return files
+}
+
+async function downloadAllDependencies() {
+	if (downloadingDependencies.value || downloadableDependencyFiles.value.length === 0) return
+
+	downloadingDependencies.value = true
+
+	try {
+		const zip = new JSZip()
+		const usedFilenames = new Set<string>()
+
+		await Promise.all(
+			downloadableDependencyFiles.value.map(async (file) => {
+				const response = await fetch(file.href)
+
+				if (!response.ok) {
+					throw new Error(`Failed to download ${file.name}`)
+				}
+
+				zip.file(uniqueFilename(file.filename, usedFilenames), await response.blob())
+			}),
+		)
+
+		downloadBlob(
+			await zip.generateAsync({
+				type: 'blob',
+				mimeType: 'application/zip',
+			}),
+			dependencyZipFilename.value,
+		)
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download dependencies:', error)
+		addNotification({
+			title: formatMessage(messages.downloadDependenciesFailedTitle),
+			text: formatMessage(messages.downloadDependenciesFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingDependencies.value = false
+	}
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+	const url = URL.createObjectURL(blob)
+	const link = document.createElement('a')
+
+	link.href = url
+	link.download = filename
+	document.body.appendChild(link)
+	link.click()
+	link.remove()
+	window.setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+function filenameFromUrl(url: string) {
+	try {
+		const filename = new URL(url).pathname.split('/').pop()
+		return filename ? decodeURIComponent(filename) : 'dependency.jar'
+	} catch {
+		return 'dependency.jar'
+	}
+}
+
+function sanitizeFilename(value: string) {
+	const sanitized = value
+		.replace(/[<>:"/\\|?*]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim()
+
+	return sanitized || 'dependencies'
+}
+
+function uniqueFilename(filename: string, usedFilenames: Set<string>) {
+	const sanitizedFilename = sanitizeFilename(filename)
+
+	if (!usedFilenames.has(sanitizedFilename)) {
+		usedFilenames.add(sanitizedFilename)
+		return sanitizedFilename
+	}
+
+	const extensionIndex = sanitizedFilename.lastIndexOf('.')
+	const basename =
+		extensionIndex > 0 ? sanitizedFilename.slice(0, extensionIndex) : sanitizedFilename
+	const extension = extensionIndex > 0 ? sanitizedFilename.slice(extensionIndex) : ''
+	let index = 2
+	let candidate = `${basename} (${index})${extension}`
+
+	while (usedFilenames.has(candidate)) {
+		index += 1
+		candidate = `${basename} (${index})${extension}`
+	}
+
+	usedFilenames.add(candidate)
+	return candidate
+}
+
 const messages = defineMessages({
 	dependenciesTitle: {
 		id: 'project.download.dependencies-title',
 		defaultMessage: 'Dependencies',
+	},
+	downloadAllDependencies: {
+		id: 'project.download.dependencies-download-all',
+		defaultMessage: 'Download all',
+	},
+	downloadingDependencies: {
+		id: 'project.download.dependencies-downloading',
+		defaultMessage: 'Downloading...',
+	},
+	downloadDependenciesFailedTitle: {
+		id: 'project.download.dependencies-failed-title',
+		defaultMessage: 'Could not download dependencies',
+	},
+	downloadDependenciesFailedText: {
+		id: 'project.download.dependencies-failed-text',
+		defaultMessage: 'One or more dependency files could not be downloaded. Please try again.',
 	},
 	alreadyInstalledDependency: {
 		id: 'project.download.dependency-already-installed',
