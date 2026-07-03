@@ -2408,23 +2408,14 @@
   "project.details.licensed": {
     "message": "Lisensiyang"
   },
-  "project.download.game-version": {
-    "message": "Bersiyon ng laro: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "Hindi masuporta ng {title} ang {gameVersion} para sa {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "I-install gamit ang Modrinth App"
   },
   "project.download.no-app": {
     "message": "Wala kang Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Walang bersiyong magagamit para sa {gameVersion} at {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plataporma: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "Hindi masuport ng {title} ang {platform} para sa {gameVersion}"

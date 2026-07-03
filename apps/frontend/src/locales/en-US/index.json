@@ -3236,20 +3236,41 @@
   "project.download.additional-files-title": {
     "message": "Additional files"
   },
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "This game version is incompatible with the base project."
+  },
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "This loader is incompatible with the base project."
+  },
   "project.download.dependencies-title": {
     "message": "Dependencies"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "This dependency is already installed"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "This dependency conflicts with another dependency"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "This dependency is already included"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "This dependency version is unavailable"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "No compatible version is available for this dependency"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Fabric API is skipped for Quilt"
+  },
+  "project.download.dependency-unavailable": {
+    "message": "This dependency cannot be downloaded"
   },
   "project.download.download-version": {
     "message": "Download {version}"
   },
-  "project.download.game-version": {
-    "message": "Game version: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} does not support {gameVersion} for {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Install with Modrinth App"
   },
   "project.download.install-with-app-description": {
     "message": "Automatically install the correct version and dependencies."
@@ -3265,9 +3286,6 @@
   },
   "project.download.no-versions-available": {
     "message": "No versions available for {gameVersion} and {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
@@ -3286,6 +3304,9 @@
   },
   "project.download.title": {
     "message": "Download {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Unknown loader"
   },
   "project.environment.migration-no-permission.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
@@ -4777,6 +4798,9 @@
   },
   "version.download.required-resource-pack": {
     "message": "Required resource pack"
+  },
+  "version.download.version": {
+    "message": "Download {version} ({size})"
   },
   "version.edit.button": {
     "message": "Edit"

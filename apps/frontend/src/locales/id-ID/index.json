@@ -2423,23 +2423,14 @@
   "project.details.licensed": {
     "message": "Berlisensi"
   },
-  "project.download.game-version": {
-    "message": "Versi permainan: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak mendukung {gameVersion} untuk {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Pasang dengan Modrinth App"
   },
   "project.download.no-app": {
     "message": "Tidak memiliki Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Tidak ada versi tersedia untuk {gameVersion} dan {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak mendukung {platform} untuk {gameVersion}"

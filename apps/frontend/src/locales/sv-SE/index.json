@@ -2804,23 +2804,14 @@
   "project.details.licensed": {
     "message": "Licensierad"
   },
-  "project.download.game-version": {
-    "message": "Spelversion: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installera med Modrinth App"
   },
   "project.download.no-app": {
     "message": "Har du inte Modrinth appen?"
   },
   "project.download.no-versions-available": {
     "message": "Inga versioner finns tillgängliga för {gameVersion} och {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plattform: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"

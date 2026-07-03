@@ -3221,23 +3221,14 @@
   "project.details.licensed": {
     "message": "授權條款"
   },
-  "project.download.game-version": {
-    "message": "遊戲版本：{version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"
-  },
-  "project.download.install-with-app": {
-    "message": "使用 Modrinth App 安裝"
   },
   "project.download.no-app": {
     "message": "還沒有 Modrinth App 嗎？"
   },
   "project.download.no-versions-available": {
     "message": "{platform} {gameVersion} 沒有可用的版本。"
-  },
-  "project.download.platform": {
-    "message": "平臺：{platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"

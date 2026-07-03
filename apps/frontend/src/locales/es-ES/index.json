@@ -3101,23 +3101,14 @@
   "project.details.licensed": {
     "message": "Con licencia"
   },
-  "project.download.game-version": {
-    "message": "Versión del juego: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} no está soportado para la versión {gameVersion} de {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Instalar con la aplicación Modrinth"
   },
   "project.download.no-app": {
     "message": "¿No tienes la aplicación Modrinth?"
   },
   "project.download.no-versions-available": {
     "message": "No hay versiones disponibles para {gameVersion} y {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plataforma: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} no está soportado para {platform} en la {gameVersion}"

@@ -2543,23 +2543,14 @@
   "project.details.licensed": {
     "message": "라이선스"
   },
-  "project.download.game-version": {
-    "message": "게임 버전: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}은(는) {platform}용 {gameVersion}을(를) 지원하지 않습니다"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth App으로 설치"
   },
   "project.download.no-app": {
     "message": "Modrinth 앱을 설치하지 않으셨나요?"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion} 및 {platform}용 버전이 없습니다."
-  },
-  "project.download.platform": {
-    "message": "플랫폼: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 은(는) {gameVersion} 용 {platform} 을(를) 지원하지 않습니다."

@@ -2918,23 +2918,14 @@
   "project.details.licensed": {
     "message": "Berlesen"
   },
-  "project.download.game-version": {
-    "message": "Versi permainan: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Pasang dengan Modrinth App"
   },
   "project.download.no-app": {
     "message": "Tidak ada Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Tiada versi tersedia untuk {gameVersion} dan {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak menyokong {platform} untuk {gameVersion}"

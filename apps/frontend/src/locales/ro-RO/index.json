@@ -1415,23 +1415,14 @@
   "project.details.licensed": {
     "message": "Licență"
   },
-  "project.download.game-version": {
-    "message": "Versiunea jocului: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {gameVersion} pentru {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Instalează cu Modrinth App"
   },
   "project.download.no-app": {
     "message": "Nu ai Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Nu există versiuni disponibile pentru {gameVersion} și {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platformă: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {platform} pentru {gameVersion}"

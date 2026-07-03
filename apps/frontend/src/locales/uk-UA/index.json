@@ -2849,23 +2849,14 @@
   "project.details.licensed": {
     "message": "Ліцензія:"
   },
-  "project.download.game-version": {
-    "message": "Версія гри: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "«{title}» не підтримує {gameVersion} для {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Установити через Modrinth App"
   },
   "project.download.no-app": {
     "message": "Не маєте Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Немає доступних версій для {gameVersion} та {platform}."
-  },
-  "project.download.platform": {
-    "message": "Платформа: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не підтримує {platform} для {gameVersion}"

@@ -3161,23 +3161,14 @@
   "project.details.licensed": {
     "message": "Lisans:"
   },
-  "project.download.game-version": {
-    "message": "Oyun sürümü: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}, {platform} için {gameVersion} sürümünü desteklemiyor"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth App ile yükle"
   },
   "project.download.no-app": {
     "message": "Modrinth App Yok Mu?"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion} ve {platform} için sürüm mevcut değil."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}, {gameVersion} sürümünde {platform} desteklemiyor"

@@ -2729,23 +2729,14 @@
   "project.details.licensed": {
     "message": "ライセンス"
   },
-  "project.download.game-version": {
-    "message": "ゲームバージョン: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}は{platform}の{gameVersion}に対応していません"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth Appでインストール"
   },
   "project.download.no-app": {
     "message": "Modrinth Appをお持ちでないですか？"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion}および{platform}向けのバージョンは利用できません。"
-  },
-  "project.download.platform": {
-    "message": "プラットフォーム: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"

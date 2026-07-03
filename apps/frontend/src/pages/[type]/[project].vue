@@ -777,7 +777,7 @@ import { capitalizeString, formatProjectType, renderString } from '@modrinth/uti
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
-import { nextTick, onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
+import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'

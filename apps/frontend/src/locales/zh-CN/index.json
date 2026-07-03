@@ -3215,23 +3215,14 @@
   "project.details.licensed": {
     "message": "许可证"
   },
-  "project.download.game-version": {
-    "message": "游戏版本：{version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支持 {platform} {gameVersion}"
-  },
-  "project.download.install-with-app": {
-    "message": "使用 Modrinth App 安装"
   },
   "project.download.no-app": {
     "message": "还没有 Modrinth App 吗？"
   },
   "project.download.no-versions-available": {
     "message": "没有支持 {platform} {gameVersion} 的版本。"
-  },
-  "project.download.platform": {
-    "message": "平台：{platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支持 {gameVersion} 的 {platform}"

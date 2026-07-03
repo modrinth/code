@@ -3065,23 +3065,14 @@
   "project.details.licensed": {
     "message": "Giấy phép"
   },
-  "project.download.game-version": {
-    "message": "Phiên bản game: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {gameVersion} cho {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Cài đặt bằng Ứng dụng Modrinth"
   },
   "project.download.no-app": {
     "message": "Chưa có Ứng dụng Modrinth?"
   },
   "project.download.no-versions-available": {
     "message": "Không có phiên bản khả dụng cho {gameVersion} và {platform}."
-  },
-  "project.download.platform": {
-    "message": "Nền tảng: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {platform} cho {gameVersion}"

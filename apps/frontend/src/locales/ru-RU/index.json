@@ -3215,23 +3215,14 @@
   "project.details.licensed": {
     "message": "Лицензия"
   },
-  "project.download.game-version": {
-    "message": "Версия игры: {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} не поддерживает {gameVersion} для {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Скачать в Modrinth App"
   },
   "project.download.no-app": {
     "message": "У вас нет Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Нет версий, доступных для {gameVersion} и {platform}."
-  },
-  "project.download.platform": {
-    "message": "Платформа: {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не поддерживает {platform} для {gameVersion}"
