@@ -14,6 +14,69 @@ pub const CURRENT_QUILT_FORMAT_VERSION: usize = 1;
 /// The latest version of the format the neoforge model structs deserialize to
 pub const CURRENT_NEOFORGE_FORMAT_VERSION: usize = 0;
 
+/// Metadata for locating and caching a loader manifest.
+#[derive(Debug, Clone)]
+pub struct LoaderManifestMetadata {
+    /// The canonical loader name used in launcher-meta paths.
+    pub loader: String,
+    /// The latest manifest format version for this loader.
+    pub format_version: usize,
+    /// The cache key that includes the loader format version.
+    pub cache_key: String,
+    /// The launcher-meta path to the manifest.
+    pub path: String,
+}
+
+/// Returns metadata for the latest manifest format for the provided loader.
+pub fn loader_manifest_metadata(loader: &str) -> LoaderManifestMetadata {
+    let format_version = current_loader_manifest_format_version(loader);
+    let cache_key = format!("{loader}-v{format_version}");
+    let path = format!("{loader}/v{format_version}/manifest.json");
+
+    LoaderManifestMetadata {
+        loader: loader.to_string(),
+        format_version,
+        cache_key,
+        path,
+    }
+}
+
+/// Returns loader manifest metadata from a versioned cache key.
+pub fn loader_manifest_metadata_from_cache_key(
+    cache_key: &str,
+) -> LoaderManifestMetadata {
+    if let Some((loader, format_version)) =
+        cache_key.rsplit_once("-v").and_then(|(loader, version)| {
+            version
+                .parse::<usize>()
+                .ok()
+                .map(|version| (loader, version))
+        })
+    {
+        let cache_key = format!("{loader}-v{format_version}");
+        let path = format!("{loader}/v{format_version}/manifest.json");
+
+        LoaderManifestMetadata {
+            loader: loader.to_string(),
+            format_version,
+            cache_key,
+            path,
+        }
+    } else {
+        loader_manifest_metadata(cache_key)
+    }
+}
+
+fn current_loader_manifest_format_version(loader: &str) -> usize {
+    match loader {
+        "fabric" => CURRENT_FABRIC_FORMAT_VERSION,
+        "forge" => CURRENT_FORGE_FORMAT_VERSION,
+        "quilt" => CURRENT_QUILT_FORMAT_VERSION,
+        "neo" => CURRENT_NEOFORGE_FORMAT_VERSION,
+        _ => 0,
+    }
+}
+
 /// The dummy replace string library names, inheritsFrom, and version names should be replaced with
 pub const DUMMY_REPLACE_STRING: &str = "${modrinth.gameVersion}";
 

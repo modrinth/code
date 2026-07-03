@@ -1,6 +1,7 @@
 use crate::util::{
     REQWEST_CLIENT, format_url, upload_file_to_bucket,
-    upload_url_to_bucket_mirrors,
+    upload_url_to_bucket_mirrors, write_file_to_local_output,
+    write_url_to_local_output_mirrors,
 };
 use daedalus::get_path_from_artifact;
 use dashmap::{DashMap, DashSet};
@@ -76,36 +77,67 @@ async fn main() -> Result<()> {
         mirror_artifacts,
     } = fetch_result;
 
-    futures::future::try_join_all(upload_files.iter().map(|entry| {
-        upload_file_to_bucket(
-            entry.key().clone(),
-            entry.value().file.clone(),
-            entry.value().content_type.clone(),
-            &semaphore,
-        )
-    }))
-    .await?;
+    if dotenvy::var("LOCAL_OUTPUT_DIR").is_ok() {
+        futures::future::try_join_all(upload_files.iter().map(|entry| {
+            let path = entry.key().clone();
+            let file = entry.value().file.clone();
 
-    futures::future::try_join_all(mirror_artifacts.iter().map(|entry| {
-        upload_url_to_bucket_mirrors(
-            format!("maven/{}", entry.key()),
-            entry
-                .value()
-                .mirrors
-                .iter()
-                .map(|mirror| {
-                    if mirror.entire_url {
-                        mirror.path.clone()
-                    } else {
-                        format!("{}{}", mirror.path, entry.key())
-                    }
-                })
-                .collect(),
-            entry.value().sha1.clone(),
-            &semaphore,
-        )
-    }))
-    .await?;
+            async move { write_file_to_local_output(&path, file).await }
+        }))
+        .await?;
+
+        futures::future::try_join_all(mirror_artifacts.iter().map(|entry| {
+            write_url_to_local_output_mirrors(
+                format!("maven/{}", entry.key()),
+                entry
+                    .value()
+                    .mirrors
+                    .iter()
+                    .map(|mirror| {
+                        if mirror.entire_url {
+                            mirror.path.clone()
+                        } else {
+                            format!("{}{}", mirror.path, entry.key())
+                        }
+                    })
+                    .collect(),
+                entry.value().sha1.clone(),
+                &semaphore,
+            )
+        }))
+        .await?;
+    } else {
+        futures::future::try_join_all(upload_files.iter().map(|entry| {
+            upload_file_to_bucket(
+                entry.key().clone(),
+                entry.value().file.clone(),
+                entry.value().content_type.clone(),
+                &semaphore,
+            )
+        }))
+        .await?;
+
+        futures::future::try_join_all(mirror_artifacts.iter().map(|entry| {
+            upload_url_to_bucket_mirrors(
+                format!("maven/{}", entry.key()),
+                entry
+                    .value()
+                    .mirrors
+                    .iter()
+                    .map(|mirror| {
+                        if mirror.entire_url {
+                            mirror.path.clone()
+                        } else {
+                            format!("{}{}", mirror.path, entry.key())
+                        }
+                    })
+                    .collect(),
+                entry.value().sha1.clone(),
+                &semaphore,
+            )
+        }))
+        .await?;
+    }
 
     if dotenvy::var("CLOUDFLARE_INTEGRATION")
         .ok()
@@ -249,11 +281,13 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("BASE_URL");
 
-    failed |= check_var::<String>("S3_ACCESS_TOKEN");
-    failed |= check_var::<String>("S3_SECRET");
-    failed |= check_var::<String>("S3_URL");
-    failed |= check_var::<String>("S3_REGION");
-    failed |= check_var::<String>("S3_BUCKET_NAME");
+    if dotenvy::var("LOCAL_OUTPUT_DIR").is_err() {
+        failed |= check_var::<String>("S3_ACCESS_TOKEN");
+        failed |= check_var::<String>("S3_SECRET");
+        failed |= check_var::<String>("S3_URL");
+        failed |= check_var::<String>("S3_REGION");
+        failed |= check_var::<String>("S3_BUCKET_NAME");
+    }
 
     if dotenvy::var("CLOUDFLARE_INTEGRATION")
         .ok()
