@@ -1112,10 +1112,7 @@ function getOnlyCompatibleDependencyVersion(
 				version.loaders.some((loader) => loaders.includes(loader)),
 		)
 		.slice()
-		.sort(
-			(a, b) =>
-				new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
-		)
+		.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime())
 	const targetKeys = new Set(
 		compatibleVersions.flatMap((version) =>
 			version.game_versions.flatMap((gameVersion) =>

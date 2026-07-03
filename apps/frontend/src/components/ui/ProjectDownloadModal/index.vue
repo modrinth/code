@@ -4,8 +4,8 @@
 			<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
 			<div
 				ref="downloadTitleRef"
-				class="truncate text-lg font-extrabold text-contrast"
 				v-tooltip="truncatedTooltip(downloadTitleRef, downloadTitle)"
+				class="truncate text-lg font-extrabold text-contrast"
 			>
 				{{ downloadTitle }}
 			</div>

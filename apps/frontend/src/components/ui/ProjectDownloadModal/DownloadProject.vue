@@ -11,10 +11,10 @@
 			:no-options-message="formatMessage(messages.noGameVersionsFound)"
 			trigger-class="!rounded-xl !bg-button-bg !px-3 !py-2"
 			dropdown-class="!rounded-xl"
+			select-search-text-on-focus
 			@update:model-value="selectGameVersion"
 			@search-input="versionFilter = $event"
 			@close="versionFilter = ''"
-			select-search-text-on-focus
 		>
 			<template #option="{ item, isSelected }">
 				<div
