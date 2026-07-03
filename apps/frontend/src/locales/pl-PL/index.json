@@ -2948,6 +2948,12 @@
   "profile.bio.fallback.user": {
     "message": "Użytkownik Modrinth."
   },
+  "profile.bio.expand": {
+	"message": "Rozwiń"
+  },
+  "profile.bio.collapse": {
+	"message": "Zwiń"
+  },
   "profile.button.analytics": {
     "message": "Pokaż dane analityczne użytkownika"
   },

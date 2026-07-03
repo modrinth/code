@@ -62,6 +62,7 @@
 				</span>
 			</label>
 			<StyledInput id="username-field" v-model="current.username" />
+			<div id="bio-character-limit" class="inline-block pl-2" v-if="current.username.length>=30" :class="{'text-red': current.username.length>39}">{{current.username.length}}/{{39}}</div>
 			<label for="bio-field">
 				<span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
 				<span class="label__description">
@@ -69,6 +70,7 @@
 				</span>
 			</label>
 			<StyledInput id="bio-field" v-model="current.bio" multiline />
+			<div id="bio-character-limit" class="pt-2" :class="{'text-red': current.bio.length>160}">{{current.bio.length}}/{{160}}</div>
 			<div class="input-group mt-4">
 				<ButtonStyled>
 					<NuxtLink :to="`/user/${auth.user.username}`">
