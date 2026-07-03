@@ -16,6 +16,7 @@
 				<DownloadProject
 					:project="project"
 					:versions="versions"
+					:dependency-download-files="dependencyDownloadFiles"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -35,6 +36,7 @@
 						:current-platform="currentPlatform"
 						:download-reason="downloadReason"
 						:additional-files="additionalFiles"
+						@update:downloadable-files="dependencyDownloadFiles = $event"
 						@download="onDownload"
 					/>
 				</div>
@@ -90,6 +92,11 @@ type ProjectDownloadSelection = {
 	selectedPrimaryFile: Labrinth.Versions.v3.VersionFile | null
 }
 
+type DownloadableFile = {
+	href: string
+	filename: string
+}
+
 type NewModalRef = {
 	show: (event?: MouseEvent) => void
 	hide: () => void
@@ -139,6 +146,7 @@ const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
 const downloadProjectResetKey = ref(0)
 const projectDownloadSelection = ref<ProjectDownloadSelection>(getDefaultProjectDownloadSelection())
+const dependencyDownloadFiles = ref<DownloadableFile[]>([])
 const MODAL_CLOSE_STATE_RESET_MS = 350
 let closeStateResetTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -416,6 +424,7 @@ watch(modal, openFromHash)
 watch(() => route.hash, openFromHash)
 watch(routeProjectId, () => {
 	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
+	dependencyDownloadFiles.value = []
 	downloadProjectResetKey.value += 1
 })
 

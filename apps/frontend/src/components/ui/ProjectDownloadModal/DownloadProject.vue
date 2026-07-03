@@ -80,51 +80,70 @@
 		</Combobox>
 	</div>
 
-	<div
-		v-if="selectedVersion"
-		class="grid grid-cols-[1fr_min-content] items-center gap-3 rounded-2xl bg-surface-2 px-3 py-3"
-	>
-		<div class="flex min-w-0 flex-col gap-1">
-			<div class="flex min-w-0 items-center gap-2">
-				<nuxt-link
-					v-tooltip="truncatedTooltip(versionNumberRef, selectedVersion.version_number)"
-					:to="`/${project.project_type}/${project.slug || project.id}/version/${selectedVersion.id}`"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="block min-w-0 text-contrast no-underline hover:underline"
-				>
-					<span ref="versionNumberRef" class="block truncate font-semibold">
-						{{ selectedVersion.version_number }}
-					</span>
-				</nuxt-link>
-				<VersionChannelTag
-					:channel="selectedVersion.version_type"
-					class="relative -top-px !py-0.5"
-				/>
-			</div>
-			<p
-				ref="versionNameRef"
-				v-tooltip="truncatedTooltip(versionNameRef, selectedVersion.name)"
-				class="m-0 w-fit max-w-full truncate text-sm text-secondary"
-			>
-				{{ selectedVersion.name }}
-			</p>
+	<div v-if="selectedVersion" class="flex flex-col gap-1">
+		<div class="flex flex-wrap items-center justify-between gap-2">
+			<h3 class="relative top-0.5 m-0 text-base font-semibold text-contrast">
+				{{ formatMessage(messages.compatibleVersionTitle) }}
+			</h3>
+			<ButtonStyled v-if="downloadAllFiles.length > 1" type="transparent">
+				<button :disabled="downloadingSelectedVersion" @click="downloadSelectedVersionFiles">
+					<SpinnerIcon v-if="downloadingSelectedVersion" aria-hidden="true" class="animate-spin" />
+					<DownloadIcon v-else aria-hidden="true" />
+					{{
+						formatMessage(
+							downloadingSelectedVersion
+								? messages.downloadingSelectedVersion
+								: messages.downloadAllSelectedVersion,
+						)
+					}}
+				</button>
+			</ButtonStyled>
 		</div>
-		<ButtonStyled v-if="selectedPrimaryFile" color="brand" circular>
-			<a
-				v-tooltip="'Download'"
-				:href="selectedPrimaryFileDownloadUrl"
-				:download="selectedPrimaryFile.filename"
-				:aria-label="
-					formatMessage(messages.downloadVersion, {
-						version: selectedVersion.version_number,
-					})
-				"
-				@click="emit('download')"
-			>
-				<DownloadIcon aria-hidden="true" />
-			</a>
-		</ButtonStyled>
+		<div
+			class="grid grid-cols-[1fr_min-content] items-center gap-3 rounded-2xl bg-surface-2 px-3 py-3"
+		>
+			<div class="flex min-w-0 flex-col gap-1">
+				<div class="flex min-w-0 items-center gap-2">
+					<nuxt-link
+						v-tooltip="truncatedTooltip(versionNumberRef, selectedVersion.version_number)"
+						:to="`/${project.project_type}/${project.slug || project.id}/version/${selectedVersion.id}`"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="block min-w-0 text-contrast no-underline hover:underline"
+					>
+						<span ref="versionNumberRef" class="block truncate font-semibold">
+							{{ selectedVersion.version_number }}
+						</span>
+					</nuxt-link>
+					<VersionChannelTag
+						:channel="selectedVersion.version_type"
+						class="relative -top-px !py-0.5"
+					/>
+				</div>
+				<p
+					ref="versionNameRef"
+					v-tooltip="truncatedTooltip(versionNameRef, selectedVersion.name)"
+					class="m-0 w-fit max-w-full truncate text-sm text-secondary"
+				>
+					{{ selectedVersion.name }}
+				</p>
+			</div>
+			<ButtonStyled v-if="selectedPrimaryFile" color="brand" circular>
+				<a
+					v-tooltip="'Download'"
+					:href="selectedPrimaryFileDownloadUrl"
+					:download="selectedPrimaryFile.filename"
+					:aria-label="
+						formatMessage(messages.downloadVersion, {
+							version: selectedVersion.version_number,
+						})
+					"
+					@click="emit('download')"
+				>
+					<DownloadIcon aria-hidden="true" />
+				</a>
+			</ButtonStyled>
+		</div>
 	</div>
 	<p v-else-if="currentPlatform && currentGameVersion && versions.length > 0">
 		{{
@@ -138,7 +157,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { DownloadIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	type CdnDownloadReason,
@@ -147,6 +166,7 @@ import {
 	type ComboboxOption,
 	defineMessages,
 	getTagMessage,
+	injectNotificationManager,
 	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
@@ -154,6 +174,7 @@ import {
 import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
 import type { DisplayProjectType } from '@modrinth/utils'
 import dayjs from 'dayjs'
+import JSZip from 'jszip'
 import { computed, ref, watch } from 'vue'
 
 defineOptions({
@@ -172,10 +193,16 @@ type ProjectDownloadSelection = {
 	selectedPrimaryFile: Labrinth.Versions.v3.VersionFile | null
 }
 
+type DownloadableFile = {
+	href: string
+	filename: string
+}
+
 const props = withDefaults(
 	defineProps<{
 		project: DownloadModalProject
 		versions?: Labrinth.Versions.v3.Version[]
+		dependencyDownloadFiles?: DownloadableFile[]
 		downloadReason?: CdnDownloadReason
 		initialGameVersion?: string | null
 		initialPlatform?: string | null
@@ -185,6 +212,7 @@ const props = withDefaults(
 	}>(),
 	{
 		versions: () => [],
+		dependencyDownloadFiles: () => [],
 		downloadReason: 'standalone',
 		initialGameVersion: null,
 		initialPlatform: null,
@@ -202,6 +230,7 @@ const emit = defineEmits<{
 }>()
 const { formatMessage } = useVIntl()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
+const { addNotification } = injectNotificationManager()
 const debug = useDebugLogger('DownloadProject')
 const tags = useGeneratedState()
 
@@ -211,6 +240,7 @@ const showAllVersions = ref(defaultShowAllVersions())
 const versionFilter = ref('')
 const versionNumberRef = ref<HTMLElement | null>(null)
 const versionNameRef = ref<HTMLElement | null>(null)
+const downloadingSelectedVersion = ref(false)
 
 const incompatibleGameVersionsSet = computed(() => new Set(props.incompatibleGameVersions))
 const incompatibleLoadersSet = computed(() => new Set(props.incompatibleLoaders))
@@ -409,6 +439,36 @@ const selectedPrimaryFileDownloadUrl = computed(() => {
 	return getDownloadUrl(selectedPrimaryFile.value.url)
 })
 
+const selectedVersionDownloadFiles = computed(() => {
+	if (!selectedVersion.value) return []
+
+	return selectedVersion.value.files.map((file) => ({
+		href: getDownloadUrl(file.url),
+		filename: file.filename,
+	}))
+})
+
+const downloadAllFiles = computed(() => {
+	const files: DownloadableFile[] = []
+	const hrefs = new Set<string>()
+
+	for (const file of [...selectedVersionDownloadFiles.value, ...props.dependencyDownloadFiles]) {
+		if (hrefs.has(file.href)) continue
+		hrefs.add(file.href)
+		files.push(file)
+	}
+
+	return files
+})
+
+const selectedVersionZipFilename = computed(() => {
+	if (!selectedVersion.value) return `${sanitizeFilename(props.project.title)}.zip`
+
+	return `${sanitizeFilename(props.project.title)} ${sanitizeFilename(
+		selectedVersion.value.version_number,
+	)}.zip`
+})
+
 watch(
 	[currentGameVersion, currentPlatform, selectedVersion, selectedPrimaryFile],
 	() => {
@@ -451,6 +511,92 @@ function getDownloadUrl(url: string) {
 		gameVersion: currentGameVersion.value ?? undefined,
 		loader: currentPlatform.value ?? undefined,
 	})
+}
+
+async function downloadSelectedVersionFiles() {
+	if (downloadingSelectedVersion.value || downloadAllFiles.value.length <= 1) return
+
+	downloadingSelectedVersion.value = true
+
+	try {
+		const zip = new JSZip()
+		const usedFilenames = new Set<string>()
+
+		await Promise.all(
+			downloadAllFiles.value.map(async (file) => {
+				const response = await fetch(file.href)
+
+				if (!response.ok) {
+					throw new Error(`Failed to download ${file.filename}`)
+				}
+
+				zip.file(uniqueFilename(file.filename, usedFilenames), await response.blob())
+			}),
+		)
+
+		downloadBlob(
+			await zip.generateAsync({
+				type: 'blob',
+				mimeType: 'application/zip',
+			}),
+			selectedVersionZipFilename.value,
+		)
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadSelectedVersionFailedTitle),
+			text: formatMessage(messages.downloadSelectedVersionFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingSelectedVersion.value = false
+	}
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+	const url = URL.createObjectURL(blob)
+	const link = document.createElement('a')
+
+	link.href = url
+	link.download = filename
+	document.body.appendChild(link)
+	link.click()
+	link.remove()
+	window.setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+function sanitizeFilename(value: string) {
+	const sanitized = value
+		.replace(/[<>:"/\\|?*]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim()
+
+	return sanitized || 'download'
+}
+
+function uniqueFilename(filename: string, usedFilenames: Set<string>) {
+	const sanitizedFilename = sanitizeFilename(filename)
+
+	if (!usedFilenames.has(sanitizedFilename)) {
+		usedFilenames.add(sanitizedFilename)
+		return sanitizedFilename
+	}
+
+	const extensionIndex = sanitizedFilename.lastIndexOf('.')
+	const basename =
+		extensionIndex > 0 ? sanitizedFilename.slice(0, extensionIndex) : sanitizedFilename
+	const extension = extensionIndex > 0 ? sanitizedFilename.slice(extensionIndex) : ''
+	let index = 2
+	let candidate = `${basename} (${index})${extension}`
+
+	while (usedFilenames.has(candidate)) {
+		index += 1
+		candidate = `${basename} (${index})${extension}`
+	}
+
+	usedFilenames.add(candidate)
+	return candidate
 }
 
 function loaderLabel(loader: string) {
@@ -544,6 +690,26 @@ const messages = defineMessages({
 	downloadVersion: {
 		id: 'project.download.download-version',
 		defaultMessage: 'Download {version}',
+	},
+	compatibleVersionTitle: {
+		id: 'project.download.compatible-version-title',
+		defaultMessage: 'Compatible version',
+	},
+	downloadAllSelectedVersion: {
+		id: 'project.download.selected-version-download-all',
+		defaultMessage: 'Download all (.zip)',
+	},
+	downloadingSelectedVersion: {
+		id: 'project.download.selected-version-downloading',
+		defaultMessage: 'Downloading...',
+	},
+	downloadSelectedVersionFailedTitle: {
+		id: 'project.download.selected-version-failed-title',
+		defaultMessage: 'Could not download version',
+	},
+	downloadSelectedVersionFailedText: {
+		id: 'project.download.selected-version-failed-text',
+		defaultMessage: 'One or more version files could not be downloaded. Please try again.',
 	},
 	noGameVersionsFound: {
 		id: 'project.download.no-game-versions-found',

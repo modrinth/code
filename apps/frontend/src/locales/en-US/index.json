@@ -3242,17 +3242,8 @@
   "project.download.base-loader-incompatible-tooltip": {
     "message": "This loader is incompatible with the base project."
   },
-  "project.download.dependencies-download-all": {
-    "message": "Download all"
-  },
-  "project.download.dependencies-downloading": {
-    "message": "Downloading..."
-  },
-  "project.download.dependencies-failed-text": {
-    "message": "One or more dependency files could not be downloaded. Please try again."
-  },
-  "project.download.dependencies-failed-title": {
-    "message": "Could not download dependencies"
+  "project.download.compatible-version-title": {
+    "message": "Compatible version"
   },
   "project.download.dependencies-title": {
     "message": "Dependencies"
@@ -3280,6 +3271,9 @@
   },
   "project.download.download-version": {
     "message": "Download {version}"
+  },
+  "project.download.file-unavailable": {
+    "message": "This file cannot be downloaded"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} does not support {gameVersion} for {platform}"
@@ -3310,6 +3304,18 @@
   },
   "project.download.select-platform": {
     "message": "Select platform"
+  },
+  "project.download.selected-version-download-all": {
+    "message": "Download all (.zip)"
+  },
+  "project.download.selected-version-downloading": {
+    "message": "Downloading..."
+  },
+  "project.download.selected-version-failed-text": {
+    "message": "One or more version files could not be downloaded. Please try again."
+  },
+  "project.download.selected-version-failed-title": {
+    "message": "Could not download version"
   },
   "project.download.show-all-versions": {
     "message": "Show all versions"
