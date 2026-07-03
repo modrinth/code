@@ -130,22 +130,23 @@ pub async fn ws_init(
         )?)
         .await;
 
-    let unread_launcher_invites = DBNotification::get_many_user_exposed_on_site(
-        user_id.into(),
-        &**pool,
-        &redis,
-    )
-    .await?
-    .into_iter()
-    .filter(|notification| {
-        !notification.read
-            && matches!(
-                &notification.body,
-                NotificationBody::ServerInvite { .. }
-                    | NotificationBody::SharedInstanceInvite { .. }
-            )
-    })
-    .map(Notification::from);
+    let unread_launcher_invites =
+        DBNotification::get_many_user_exposed_on_site(
+            user_id.into(),
+            &**pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .filter(|notification| {
+            !notification.read
+                && matches!(
+                    &notification.body,
+                    NotificationBody::ServerInvite { .. }
+                        | NotificationBody::SharedInstanceInvite { .. }
+                )
+        })
+        .map(Notification::from);
 
     for notification in unread_launcher_invites {
         let _ = session.text(serde_json::to_string(&notification)?).await;
