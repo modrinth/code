@@ -376,12 +376,17 @@ function getLoaderVersionsForGameVersion(
 	}
 
 	const manifest = manifestQuery.data.value?.gameVersions
+	const versionGroups = manifestQuery.data.value?.versionGroups
 	if (!manifest) return []
 
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) return placeholder.loaders
 
 	const entry = manifest.find((x) => x.id === gameVersion)
+	if (entry?.versionGroup) {
+		return versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
+	}
+
 	return entry?.loaders ?? []
 }
 
@@ -505,7 +510,9 @@ provideInstallationSettings({
 					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 					if (!hasPlaceholder) {
 						const supportedVersions = new Set(
-							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
+							manifest
+								.filter((x) => x.loaders.length > 0 || !!x.versionGroup)
+								.map((x) => x.id),
 						)
 						return versions
 							.filter((v) => supportedVersions.has(v.version))
@@ -547,7 +554,9 @@ provideInstallationSettings({
 		if (hasPlaceholder) {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
 		}
-		const supportedVersions = new Set(manifest.filter((x) => x.loaders.length > 0).map((x) => x.id))
+		const supportedVersions = new Set(
+			manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
+		)
 		const supported = tags.gameVersions.value.filter((v) => supportedVersions.has(v.version))
 		return supported.some((v) => v.version_type !== 'release')
 	},
