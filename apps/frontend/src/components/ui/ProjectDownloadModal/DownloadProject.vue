@@ -23,10 +23,16 @@
 					:class="{
 						'text-brand-red opacity-40': isGameVersionUnavailable(item.value),
 						'text-green': isSelected,
+						'!opacity-100': isSelected,
 						'text-primary': !isGameVersionUnavailable(item.value) && !isSelected,
 					}"
 				>
 					<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
+					<TriangleAlertIcon
+						v-if="isSelected && isGameVersionUnavailable(item.value)"
+						aria-hidden="true"
+						class="size-5 shrink-0 text-orange"
+					/>
 				</div>
 			</template>
 			<template #dropdown-footer>
@@ -59,10 +65,16 @@
 					:class="{
 						'text-brand-red opacity-40': isPlatformUnavailable(item.value),
 						'text-green': isSelected,
+						'!opacity-100': isSelected,
 						'text-primary': !isPlatformUnavailable(item.value) && !isSelected,
 					}"
 				>
 					<span class="min-w-0 truncate font-semibold leading-tight">{{ item.label }}</span>
+					<TriangleAlertIcon
+						v-if="isSelected && isPlatformUnavailable(item.value)"
+						aria-hidden="true"
+						class="size-5 shrink-0 text-orange"
+					/>
 				</div>
 			</template>
 		</Combobox>
@@ -126,7 +138,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	type CdnDownloadReason,
