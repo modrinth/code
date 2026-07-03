@@ -290,12 +290,12 @@ async fn app() -> std::io::Result<()> {
                     "default": true
                 },
                 {
-                    "title": "API v3 (UNSTABLE - DO NOT USE)",
+                    "title": "API v3 (UNSTABLE)",
                     "slug": "v3",
                     "url": "/openapi/v3.json"
                 },
                 {
-                    "title": "Internal API - HIGHLY UNSTABLE - DO NOT USE",
+                    "title": "Internal API (HIGHLY UNSTABLE)",
                     "slug": "internal",
                     "url": "/openapi/internal.json"
                 }
