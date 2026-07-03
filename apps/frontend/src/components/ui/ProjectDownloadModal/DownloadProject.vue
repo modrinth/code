@@ -19,7 +19,7 @@
 			<template #option="{ item, isSelected }">
 				<div
 					v-tooltip="gameVersionOptionTooltip(item.value)"
-					class="flex w-full items-center justify-between gap-2"
+					class="flex w-full items-center justify-between gap-2 px-4 py-2"
 					:class="{
 						'text-brand-red opacity-40': isGameVersionUnavailable(item.value),
 						'text-green': isSelected,
@@ -55,7 +55,7 @@
 			<template #option="{ item, isSelected }">
 				<div
 					v-tooltip="platformOptionTooltip(item.value, item.label)"
-					class="flex w-full items-center justify-between gap-2"
+					class="flex w-full items-center justify-between gap-2 px-4 py-2"
 					:class="{
 						'text-brand-red opacity-40': isPlatformUnavailable(item.value),
 						'text-green': isSelected,
@@ -273,6 +273,7 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	return filteredGameVersions.value.map((gameVersion) => ({
 		value: gameVersion,
 		label: gameVersion,
+		class: '!px-0 !py-1',
 	}))
 })
 
@@ -283,6 +284,7 @@ const platformOptions = computed<ComboboxOption<string>[]>(() => {
 		.map((platform) => ({
 			value: platform,
 			label: loaderLabel(platform),
+			class: '!px-0 !py-1',
 		}))
 })
 
