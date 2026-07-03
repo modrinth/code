@@ -954,5 +954,9 @@ function openEditModal(event) {
 		color: var(--color-brand);
 		font-weight: 600;
 	}
+
+	a:hover {
+		text-decoration: underline;
+	}
 }
 </style>

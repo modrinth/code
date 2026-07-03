@@ -691,7 +691,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
+					<div class="mb-3 overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-1" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -777,7 +777,7 @@ import { capitalizeString, formatProjectType, renderString } from '@modrinth/uti
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
-import { readonly, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -792,6 +792,7 @@ import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
+import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import {
 	loadChecklistOpenState,
 	saveChecklistOpenState,
@@ -1164,6 +1165,16 @@ const project = computed(() => {
 
 // Use actual project ID for dependent queries (ensures cache consistency)
 const projectId = computed(() => projectRaw.value?.id)
+
+const sharedProjectId = injectCurrentProjectId(null)
+if (sharedProjectId) {
+	watchEffect(() => {
+		sharedProjectId.value = projectId.value ?? undefined
+	})
+	onScopeDispose(() => {
+		sharedProjectId.value = undefined
+	})
+}
 
 // V3 Project
 const {

@@ -248,17 +248,8 @@
   "auth.reset-password.title.long": {
     "message": "Resetează-ți parola"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Te rugăm să introduci codul de autorizare în doi pași (2FA) pentru a continua."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Introduceți codul 2FA"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Introdu codul..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Conectează-te cu"
   },
   "auth.sign-in.title": {
     "message": "Conectare"
@@ -271,9 +262,6 @@
   },
   "auth.sign-up.title": {
     "message": "Înregistrare"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Înregistrare cu"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Setările contului"

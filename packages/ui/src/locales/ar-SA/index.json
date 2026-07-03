@@ -164,9 +164,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "إعادة تثبيت حزمة التعديل"
   },
-  "button.remove": {
-    "defaultMessage": "إزالة"
-  },
   "button.remove-image": {
     "defaultMessage": "إزالة الصورة"
   },

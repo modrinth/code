@@ -250,9 +250,15 @@ impl Logs {
             output: if clear_contents.unwrap_or(false) {
                 None
             } else {
+                let state = State::get().await?;
                 Some(
-                    get_output_by_filename(instance_path, log_type, &filename)
-                        .await?,
+                    get_output_by_filename_from_path(
+                        &state,
+                        instance_path,
+                        log_type,
+                        &filename,
+                    )
+                    .await?,
                 )
             },
             filename,
@@ -358,14 +364,12 @@ pub async fn get_logs_by_filename(
     Logs::build(log_type, age, &instance_path, filename, Some(true)).await
 }
 
-#[tracing::instrument]
-pub async fn get_output_by_filename(
+async fn get_output_by_filename_from_path(
+    state: &State,
     instance_path: &str,
     log_type: LogType,
     file_name: &str,
 ) -> crate::Result<CensoredString> {
-    let state = State::get().await?;
-
     let logs_folder = match log_type {
         LogType::InfoLog => state.directories.instance_logs_dir(instance_path),
         LogType::CrashReport => {
@@ -407,6 +411,23 @@ pub async fn get_output_by_filename(
         path.display()
     ))
     .into())
+}
+
+#[tracing::instrument]
+pub async fn get_output_by_filename(
+    instance_id: &str,
+    log_type: LogType,
+    file_name: &str,
+) -> crate::Result<CensoredString> {
+    let state = State::get().await?;
+    let instance_path = resolve_instance_path(instance_id, &state).await?;
+    get_output_by_filename_from_path(
+        &state,
+        &instance_path,
+        log_type,
+        file_name,
+    )
+    .await
 }
 
 #[tracing::instrument]

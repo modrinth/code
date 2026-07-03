@@ -446,17 +446,8 @@
   "auth.reset-password.title.long": {
     "message": "ตั้งรหัสผ่านของคุณใหม่"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "โปรดป้อนรหัสการยืนยันตัวตนแบบ 2 ชั้นเพื่อดำเนินการต่อ"
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "ป้อนรหัสการยืนยันตัวตนแบบ 2 ชั้น"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "ป้อนรหัส"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "ลงชื่อเข้าใช้ด้วย"
   },
   "auth.sign-in.title": {
     "message": "ลงชื่อเข้าใช้"
@@ -469,9 +460,6 @@
   },
   "auth.sign-up.title": {
     "message": "ลงทะเบียน"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "สมัครใช้งานด้วย"
   },
   "auth.verify-email.action.account-settings": {
     "message": "ตั้งค่าบัญชี"

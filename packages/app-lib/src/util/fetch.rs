@@ -5,6 +5,7 @@ use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
+use eyre::{Context, eyre};
 use parking_lot::Mutex;
 use rand::Rng;
 use reqwest::Method;
@@ -445,7 +446,7 @@ async fn fetch_advanced_with_client_and_progress(
         }
 
         if let Some((name, value)) = &download_meta_header {
-            tracing::info!("Sending download analytics: {value}");
+            tracing::debug!("Sending download analytics: {value}");
             req = req.header(name.as_str(), value.as_str());
         }
 
@@ -472,38 +473,55 @@ async fn fetch_advanced_with_client_and_progress(
                     return Err(backup_error.into());
                 }
 
-                let bytes = if loading_bar.is_some() || progress.is_some() {
+                let bytes: eyre::Result<Bytes> = if loading_bar.is_some()
+                    || progress.is_some()
+                {
                     let length = resp.content_length();
                     if let Some(total_size) = length {
                         use futures::StreamExt;
                         let mut stream = resp.bytes_stream();
-                        let mut bytes = Vec::new();
-                        let mut downloaded = 0_u64;
-                        while let Some(item) = stream.next().await {
-                            let chunk = item.or(Err(ErrorKind::NoValueFor(
-                                "fetch bytes".to_string(),
-                            )))?;
-                            downloaded += chunk.len() as u64;
-                            bytes.append(&mut chunk.to_vec());
-                            if let Some((bar, total)) = &loading_bar {
-                                emit_loading(
-                                    bar,
-                                    (chunk.len() as f64 / total_size as f64)
-                                        * total,
-                                    None,
-                                )?;
-                            }
-                            if let Some(progress) = progress.as_mut() {
-                                progress(downloaded, total_size).await?;
-                            }
-                        }
 
-                        Ok(bytes::Bytes::from(bytes))
+                        async {
+                            let mut bytes = Vec::new();
+                            let mut downloaded = 0_u64;
+
+                            while let Some(item) = stream.next().await {
+                                let chunk = item.wrap_err_with(|| {
+                                    eyre!(
+                                        "failed to read response body from {url}"
+                                    )
+                                })?;
+
+                                downloaded += chunk.len() as u64;
+                                bytes.extend_from_slice(&chunk);
+
+                                if let Some((bar, total)) = &loading_bar {
+                                    emit_loading(
+                                        bar,
+                                        (chunk.len() as f64
+                                            / total_size as f64)
+                                            * total,
+                                        None,
+                                    )?;
+                                }
+
+                                if let Some(progress) = progress.as_mut() {
+                                    progress(downloaded, total_size).await?;
+                                }
+                            }
+
+                            Ok(Bytes::from(bytes))
+                        }
+                        .await
                     } else {
-                        resp.bytes().await
+                        resp.bytes().await.wrap_err_with(|| {
+                            eyre!("failed to read response body from {url}")
+                        })
                     }
                 } else {
-                    resp.bytes().await
+                    resp.bytes().await.wrap_err_with(|| {
+                        eyre!("failed to read response body from {url}")
+                    })
                 };
 
                 if let Ok(bytes) = bytes {

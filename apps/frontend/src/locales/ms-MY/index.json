@@ -656,17 +656,8 @@
   "auth.reset-password.title.long": {
     "message": "Tetap semula kata laluan anda"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Sila masukkan kod dua faktor untuk meneruskan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Masukkan kod dua faktor"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Masukkan kod..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Daftar masuk dengan"
   },
   "auth.sign-in.title": {
     "message": "Daftar Masuk"
@@ -679,9 +670,6 @@
   },
   "auth.sign-up.title": {
     "message": "Daftar"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Daftar dengan"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tetapan akaun"
@@ -1379,9 +1367,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Anda boleh menyunting berbilang projek sekaligus dengan memilihnya di bawah."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Projek pelayan tidak menyokong penyuntingan pukal"
   },
@@ -1450,24 +1435,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Sila semak metadata persekitaran"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Menaik"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Menurun"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nama"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Jenis"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3164,44 +3131,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut dan sebarang versi yang ditahan akan diterbitkan secara automatik."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut sebelum anda boleh menghantar projek anda untuk semakan."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Kandungan terbenam yang tidak diketahui"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Semua kandungan luaran mempunyai atribusi yang disediakan."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Atribusi selesai!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Tiada satu pun versi anda mengandungi kandungan luaran, jadi anda tidak perlu risau tentang mendapatkan kebenaran."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Semuanya sudah siap!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "Anda tidak mempunyai kebenaran untuk mengedarkan semula beberapa kandungan luaran yang ditambahkan. Untuk menerbitkan projek ini di Modrinth, sila buang kandungan yang melanggar hak."
   },
   "project.settings.permissions.fail.title": {
     "message": "Sesetengah kandungan tidak boleh disertakan"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Jika anda memasukkan kandungan yang tidak dihoskan di Modrinth, anda perlu memberitahu kami dari mana ia berasal dan mengesahkan bahawa anda mempunyai kebenaran untuk mengedarkan fail tersebut. Lihat <link>panduan kami</link> untuk mengetahui cara untuk melakukannya dengan betul!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Ketahui cara atribusi berfungsi"
-  },
   "project.settings.permissions.learn-more": {
     "message": "Ketahui lebih lanjut"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Cari {count} {count, plural, other {projek luaran}}..."
   },
   "project.settings.title": {
     "message": "Tetapan"

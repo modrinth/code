@@ -126,7 +126,7 @@
 					<div
 						v-if="$slots.actions"
 						:class="{ 'pt-4 border-0 border-t border-solid border-surface-5': actionsDivider }"
-						class="p-4 pt-0"
+						class="p-4"
 					>
 						<slot name="actions" />
 					</div>
@@ -292,10 +292,22 @@ function hide() {
 	}, 300)
 }
 
+async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
+	await nextTick()
+	if (!scrollContainer.value) return
+
+	scrollContainer.value.scrollTo({
+		top: scrollContainer.value.scrollHeight,
+		behavior,
+	})
+	requestAnimationFrame(checkScrollState)
+}
+
 defineExpose({
 	show,
 	hide,
 	checkScrollState,
+	scrollToBottom,
 })
 
 const mouseX = ref(0)

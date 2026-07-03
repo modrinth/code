@@ -281,12 +281,31 @@ async fn plan_bulk_update(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<BulkUpdatePlan> {
+    let updateable_paths =
+        bulk_updateable_project_paths(instance_id, state).await?;
+    if updateable_paths.is_empty() {
+        return Ok(BulkUpdatePlan {
+            project_updates: Vec::new(),
+            dependency_additions: Vec::new(),
+        });
+    }
+
     let updates = check_content_updates(
         instance_id,
         Some(CacheBehaviour::MustRevalidate),
         state,
     )
-    .await?;
+    .await?
+    .into_iter()
+    .filter(|update| updateable_paths.contains(&update.relative_path))
+    .collect::<Vec<_>>();
+    if updates.is_empty() {
+        return Ok(BulkUpdatePlan {
+            project_updates: Vec::new(),
+            dependency_additions: Vec::new(),
+        });
+    }
+
     let content_set =
         content_rows::get_applied_content_set(instance_id, &state.pool)
             .await?
@@ -320,6 +339,7 @@ async fn plan_bulk_update(
         .collect::<HashMap<_, _>>();
     let version_ids = installed
         .iter()
+        .filter(|project| updateable_paths.contains(&project.relative_path))
         .filter_map(|project| project.version_id.clone())
         .chain(
             updates
@@ -343,6 +363,7 @@ async fn plan_bulk_update(
     let planned_versions = installed
         .iter()
         .filter(|project| project.enabled)
+        .filter(|project| updateable_paths.contains(&project.relative_path))
         .filter_map(|project| {
             let target_version_id = updates_by_path
                 .get(&project.relative_path)
@@ -377,6 +398,21 @@ async fn plan_bulk_update(
         project_updates,
         dependency_additions,
     })
+}
+
+async fn bulk_updateable_project_paths(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<HashSet<String>> {
+    let items = super::list_content::list_content(
+        instance_id,
+        None,
+        Some(CacheBehaviour::MustRevalidate),
+        state,
+    )
+    .await?;
+
+    Ok(items.into_iter().map(|item| item.file_path).collect())
 }
 
 async fn installed_projects(

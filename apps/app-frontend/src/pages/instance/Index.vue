@@ -676,7 +676,7 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 			break
 		case 'copy_path': {
 			if (instance.value) {
-				const fullPath = await get_full_path(instance.value?.path)
+				const fullPath = await get_full_path(instance.value.id)
 				await navigator.clipboard.writeText(fullPath)
 			}
 			break

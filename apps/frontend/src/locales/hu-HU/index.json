@@ -38,6 +38,9 @@
   "analytics.breakdown.loader": {
     "message": "Betöltő"
   },
+  "analytics.breakdown.members": {
+    "message": "Tag"
+  },
   "analytics.breakdown.monetization": {
     "message": "Bevételszerzés"
   },
@@ -220,6 +223,9 @@
   },
   "analytics.filter.search.download-sources": {
     "message": "Letöltési források keresése..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Tagok keresése... "
   },
   "analytics.filter.search.project-versions": {
     "message": "Projektverziók keresése..."
@@ -680,17 +686,8 @@
   "auth.reset-password.title.long": {
     "message": "Jelszavad visszaállítása"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Kérlek írd be a kétlépcsős hitelesítés kódját a folytatáshoz."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Írd be a kétlépcsős hitelesítés kódját"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Kód beírása..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Bejelentkezés ezzel"
   },
   "auth.sign-in.title": {
     "message": "Bejelentkezés"
@@ -703,9 +700,6 @@
   },
   "auth.sign-up.title": {
     "message": "Regisztráció"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Regisztráció ezzel"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Fiókbeállítások"
@@ -1388,9 +1382,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Értesítések betöltése..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Több projektet is szerkeszthetsz egyszerre, ha kiválasztod őket alább."
-  },
   "dashboard.projects.empty": {
     "message": "Még nincsenek projektjeid. Kattints a fenti zöld gombra a kezdéshez."
   },
@@ -1450,24 +1441,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Kérlek ellenőrizd a környezeti metaadatokat"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Növekvő"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Csökkenő"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Név"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Állapot"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Típus"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "Azonosító"
@@ -3113,17 +3086,11 @@
   "project.settings.general.url.title": {
     "message": "Link"
   },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Egyik verziód sem tartalmaz külső tartalmat, így nem kell aggódnod a jogosultságok beszerzése miatt."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Kész is van!"
   },
   "project.settings.permissions.learn-more": {
     "message": "További információ"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Keresés {count} külső projekt között..."
   },
   "project.settings.title": {
     "message": "Beállítások"

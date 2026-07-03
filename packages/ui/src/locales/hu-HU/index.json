@@ -227,9 +227,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Modcsomag újratelepítése"
   },
-  "button.remove": {
-    "defaultMessage": "Eltávolítás"
-  },
   "button.remove-image": {
     "defaultMessage": "Kép törlése"
   },
@@ -1320,7 +1317,7 @@
     "defaultMessage": "Ikon kiválasztása"
   },
   "input.search-version.placeholder": {
-    "defaultMessage": "Verzió keresése"
+    "defaultMessage": "Verzió keresése..."
   },
   "input.search.placeholder": {
     "defaultMessage": "Keresés..."
@@ -1419,7 +1416,7 @@
     "defaultMessage": "Mentés..."
   },
   "installation-settings.search-game-version": {
-    "defaultMessage": "Játékverzió keresése"
+    "defaultMessage": "Játékverzió keresése..."
   },
   "installation-settings.type.instance": {
     "defaultMessage": "profil"
@@ -3231,7 +3228,7 @@
     "defaultMessage": "Indítás, leállítás, és szerver megtekintése módosítások mentése nélkül."
   },
   "servers.access-page.search-users-placeholder": {
-    "defaultMessage": "Keresés {count} {count,plural,one {felhasználó} other {felhasználók}} között... "
+    "defaultMessage": "Keresés {count} felhasználó között..."
   },
   "servers.access-role.editor": {
     "defaultMessage": "Szerkesztő"
@@ -4414,5 +4411,11 @@
   },
   "user.profile.badge.downloads.name": {
     "defaultMessage": "{download_sum} letöltés"
+  },
+  "user.profile.badge.plus.link": {
+    "defaultMessage": "Kattints ide, ha többet szeretnél megtudni arról, hogy hogyan válhatsz taggá."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ tag"
   }
 }
