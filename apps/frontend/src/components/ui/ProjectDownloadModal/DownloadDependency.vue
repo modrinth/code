@@ -1,13 +1,19 @@
 <template>
 	<div class="flex min-w-0 flex-col gap-2">
 		<div
-			class="grid min-h-[3.75rem] grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-button-bg px-4 py-3 text-primary"
+			class="grid min-h-10 grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-xl bg-button-bg py-0 pl-3.5 pr-2 text-primary"
 		>
 			<span class="flex min-w-0 items-center gap-3">
-				<Avatar v-if="dependency.icon" :src="dependency.icon" :alt="dependency.name" size="32px" />
+				<Avatar
+					v-if="dependency.icon"
+					:src="dependency.icon"
+					:alt="dependency.name"
+					size="24px"
+					class="!rounded-lg !shadow-none"
+				/>
 				<span
 					v-else
-					class="flex size-8 flex-shrink-0 items-center justify-center rounded-xl border border-solid border-surface-5 text-secondary"
+					class="flex size-4 flex-shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 text-secondary"
 				>
 					<PackageIcon aria-hidden="true" class="size-5" />
 				</span>
@@ -16,11 +22,11 @@
 					:href="dependency.projectHref"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="min-w-0 truncate text-lg font-bold text-contrast no-underline hover:underline"
+					class="min-w-0 truncate text-base font-semibold text-contrast no-underline hover:underline"
 				>
 					{{ dependency.name }}
 				</a>
-				<span v-else class="min-w-0 truncate text-lg font-bold text-contrast">
+				<span v-else class="min-w-0 truncate text-base font-semibold text-contrast">
 					{{ dependency.name }}
 				</span>
 				<TagItem class="shrink-0 border !border-solid border-surface-5 !px-3 !py-1 text-base">
@@ -55,9 +61,9 @@
 		>
 			<div
 				aria-hidden="true"
-				class="absolute -top-2 left-6 h-20 w-0.5 bg-surface-5 group-last/dependency:h-10"
+				class="absolute -top-2 left-6 h-16 w-0.5 bg-surface-5 group-last/dependency:h-7"
 			/>
-			<div aria-hidden="true" class="absolute left-6 top-[1.875rem] h-0.5 w-4 bg-surface-5" />
+			<div aria-hidden="true" class="absolute left-6 top-5 h-0.5 w-4 bg-surface-5" />
 			<DownloadDependency :dependency="childDependency" @download="emit('download')" />
 		</div>
 	</div>

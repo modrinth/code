@@ -2,7 +2,10 @@
 	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px">
 		<template v-if="project" #title>
 			<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-			<div class="truncate text-lg font-extrabold text-contrast">
+			<div
+				class="truncate text-lg font-extrabold text-contrast"
+				v-tooltip="formatMessage(messages.downloadTitle, { title: project.title })"
+			>
 				{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
 			</div>
 		</template>

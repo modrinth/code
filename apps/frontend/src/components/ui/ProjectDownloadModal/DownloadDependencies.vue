@@ -1,6 +1,6 @@
 <template>
 	<div v-if="dependencyRows.length > 0" class="flex flex-col gap-2">
-		<h3 v-if="showTitle" class="m-0 text-sm font-bold text-contrast">
+		<h3 v-if="showTitle" class="m-0 text-base font-semibold text-contrast">
 			{{ formatMessage(messages.dependenciesTitle) }}
 		</h3>
 		<div class="flex flex-col gap-2">

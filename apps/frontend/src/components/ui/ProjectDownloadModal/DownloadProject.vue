@@ -14,6 +14,7 @@
 			@update:model-value="selectGameVersion"
 			@search-input="versionFilter = $event"
 			@close="versionFilter = ''"
+			select-search-text-on-focus
 		>
 			<template #option="{ item, isSelected }">
 				<div
@@ -69,11 +70,11 @@
 
 	<div
 		v-if="selectedVersion"
-		class="grid grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-bg px-3 py-3"
+		class="grid grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-2xl bg-surface-2 px-3 py-3"
 	>
 		<div class="flex min-w-0 flex-col gap-1">
 			<div class="flex min-w-0 items-center gap-2">
-				<span class="truncate font-bold text-contrast">
+				<span class="truncate font-semibold text-contrast">
 					{{ selectedVersion.version_number }}
 				</span>
 				<VersionChannelTag :channel="selectedVersion.version_type" class="!py-0.5" />
