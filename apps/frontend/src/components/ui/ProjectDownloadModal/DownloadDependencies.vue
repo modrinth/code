@@ -85,7 +85,7 @@ const shouldResolveDependencies = computed(
 
 const dependencyResolutionPreferences = computed<Labrinth.Content.v3.ResolutionPreferences>(() => ({
 	game_versions: props.selectedVersion?.game_versions || [],
-	loaders: props.selectedVersion?.loaders || [],
+	loaders: props.currentPlatform ? [props.currentPlatform] : props.selectedVersion?.loaders || [],
 }))
 
 const { data: dependencyResolution } = useQuery({
@@ -108,13 +108,17 @@ const { data: dependencyResolution } = useQuery({
 	enabled: shouldResolveDependencies,
 })
 
+const visibleResolvedDependencies = computed<ResolvedContent[]>(() => {
+	return [
+		...(dependencyResolution.value?.dependencies || []),
+		...(dependencyResolution.value?.skipped || []),
+	].filter(shouldShowDependency)
+})
+
 const dependencyVersionIds = computed<string[]>(() => {
 	return [
 		...new Set(
-			[
-				...(dependencyResolution.value?.dependencies || []),
-				...(dependencyResolution.value?.skipped || []),
-			]
+			visibleResolvedDependencies.value
 				.map((dependency) => dependency.version_id)
 				.filter((versionId): versionId is string => !!versionId),
 		),
@@ -143,10 +147,7 @@ const dependencyVersionById = computed(() => {
 const dependencyProjectIds = computed<string[]>(() => {
 	return [
 		...new Set(
-			[
-				...(dependencyResolution.value?.dependencies || []),
-				...(dependencyResolution.value?.skipped || []),
-			]
+			visibleResolvedDependencies.value
 				.map((dependency) => dependency.project_id)
 				.filter((projectId): projectId is string => !!projectId),
 		),
@@ -174,10 +175,7 @@ const dependencyProjectById = computed(() => {
 const dependenciesByParentVersionId = computed(() => {
 	const map = new Map<string, ResolvedContent[]>()
 
-	for (const dependency of [
-		...(dependencyResolution.value?.dependencies || []),
-		...(dependencyResolution.value?.skipped || []),
-	]) {
+	for (const dependency of visibleResolvedDependencies.value) {
 		if (!dependency.dependent_on_version_id) continue
 
 		const dependencies = map.get(dependency.dependent_on_version_id) || []
@@ -204,6 +202,10 @@ const dependencyRows = computed<DownloadDependencyRow[]>(
 
 function primaryFileForVersion(version?: Labrinth.Versions.v3.Version) {
 	return version?.files?.find((file) => file.primary) || version?.files?.[0]
+}
+
+function shouldShowDependency(dependency: ResolvedContent) {
+	return !('reason' in dependency && dependency.reason === 'quilt_fabric_api')
 }
 
 function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow {
