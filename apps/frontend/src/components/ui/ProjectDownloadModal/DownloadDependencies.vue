@@ -57,6 +57,7 @@ interface DownloadDependencyRow {
 	projectHref?: string
 	downloadHref?: string
 	filename?: string
+	fileSize?: number
 	typeLabel: string
 	unavailableTooltip: string
 	dependencies: DownloadDependencyRow[]
@@ -259,6 +260,7 @@ const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
 		fallbackIcon: FileIcon,
 		downloadHref: getDownloadUrl(file.url),
 		filename: file.filename,
+		fileSize: file.size,
 		typeLabel: fileTypeLabel(file.file_type),
 		unavailableTooltip: formatMessage(messages.unavailableFile),
 		dependencies: [],
@@ -323,6 +325,7 @@ function createDependencyRow(dependency: ResolvedContent): DownloadDependencyRow
 		downloadHref:
 			'reason' in dependency || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
 		filename: primaryFile?.filename,
+		fileSize: primaryFile?.size,
 		typeLabel: 'Required',
 		unavailableTooltip,
 		dependencies: (versionId && dependenciesByParentVersionId.value.get(versionId)

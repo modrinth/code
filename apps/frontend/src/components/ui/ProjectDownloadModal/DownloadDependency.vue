@@ -46,10 +46,10 @@
 			</span>
 			<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
 				<a
-					v-tooltip="'Download'"
+					v-tooltip="downloadTooltip"
 					:href="dependency.downloadHref"
 					:download="dependency.filename"
-					:aria-label="`Download ${dependency.name}`"
+					:aria-label="downloadTooltip"
 					@click="emit('download')"
 				>
 					<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
@@ -82,8 +82,16 @@
 
 <script setup lang="ts">
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, TagItem, truncatedTooltip } from '@modrinth/ui'
-import { type Component, ref } from 'vue'
+import {
+	Avatar,
+	ButtonStyled,
+	defineMessages,
+	TagItem,
+	truncatedTooltip,
+	useFormatBytes,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, type Component, ref } from 'vue'
 
 defineOptions({
 	name: 'DownloadDependency',
@@ -97,12 +105,13 @@ interface DownloadDependencyRow {
 	projectHref?: string
 	downloadHref?: string
 	filename?: string
+	fileSize?: number
 	typeLabel: string
 	unavailableTooltip: string
 	dependencies: DownloadDependencyRow[]
 }
 
-defineProps<{
+const props = defineProps<{
 	dependency: DownloadDependencyRow
 }>()
 
@@ -110,5 +119,31 @@ const emit = defineEmits<{
 	download: []
 }>()
 
+const { formatMessage } = useVIntl()
+const formatBytes = useFormatBytes()
 const dependencyNameRef = ref<HTMLElement | null>(null)
+
+const downloadTooltip = computed(() => {
+	const filename = props.dependency.filename || props.dependency.name
+
+	if (typeof props.dependency.fileSize === 'number') {
+		return formatMessage(messages.downloadFileWithSize, {
+			filename,
+			size: formatBytes(props.dependency.fileSize, 1),
+		})
+	}
+
+	return formatMessage(messages.downloadFile, { filename })
+})
+
+const messages = defineMessages({
+	downloadFile: {
+		id: 'project.download.dependency-download-file',
+		defaultMessage: 'Download {filename}',
+	},
+	downloadFileWithSize: {
+		id: 'project.download.dependency-download-file-with-size',
+		defaultMessage: 'Download {filename} ({size})',
+	},
+})
 </script>

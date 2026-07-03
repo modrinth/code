@@ -3254,6 +3254,12 @@
   "project.download.dependency-conflicting": {
     "message": "This dependency conflicts with another dependency"
   },
+  "project.download.dependency-download-file": {
+    "message": "Download {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Download {filename} ({size})"
+  },
   "project.download.dependency-duplicate": {
     "message": "This dependency is already included"
   },
