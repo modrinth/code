@@ -24,7 +24,7 @@
 							class="size-4 flex-shrink-0 text-contrast transition-colors"
 						/>
 					</div>
-					<span class="truncate text-base text-secondary">
+					<span class="truncate text-base text-contrast opacity-80">
 						{{ formatMessage(messages.installWithModrinthAppDescription) }}
 					</span>
 				</span>
