@@ -5,8 +5,8 @@ use eyre::Context;
 use eyre::eyre;
 use prometheus::IntGauge;
 
-use crate::util::cors::default_cors;
 use super::SecurityAddon;
+use crate::util::cors::default_cors;
 
 #[cfg(target_os = "linux")]
 pub(crate) mod pprof;

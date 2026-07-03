@@ -395,7 +395,7 @@ fn add_default_error_response(
     operation: &mut Option<utoipa::openapi::path::Operation>,
 ) {
     if let Some(operation) = operation {
-        for (status, response) in operation.responses.responses.iter_mut() {
+        for (status, response) in &mut operation.responses.responses {
             if !is_error_response_status(status) {
                 continue;
             }
