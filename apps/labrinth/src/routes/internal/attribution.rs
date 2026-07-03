@@ -209,17 +209,6 @@ pub async fn scan(
     }))
 }
 
-<<<<<<< HEAD
-/// List project attribution groups.  
-#[utoipa::path(
-	context_path = "/attribution",
-	tag = "attribution",
-	params(
-		("project_id" = ProjectId, Path)
-	),
-	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
-)]
-=======
 #[utoipa::path]
 #[post("/file/{file_id}/scan")]
 async fn force_scan_file(
@@ -294,8 +283,15 @@ async fn force_scan_file(
     Ok(web::Json(scan_summary))
 }
 
-#[utoipa::path]
->>>>>>> main
+/// List project attribution groups.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	params(
+		("project_id" = ProjectId, Path)
+	),
+	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
+)]
 #[get("/{project_id}")]
 pub async fn list(
     req: HttpRequest,
