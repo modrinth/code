@@ -1,11 +1,11 @@
 <template>
-	<div v-if="dependencyRows.length > 0" class="flex flex-col gap-1">
+	<div v-if="downloadRows.length > 0" class="flex flex-col gap-1">
 		<div
 			v-if="showTitle || downloadableDependencyFiles.length > 0"
 			class="flex flex-wrap items-center justify-between gap-2"
 		>
 			<h3 v-if="showTitle" class="m-0 text-base font-semibold text-contrast">
-				{{ formatMessage(messages.dependenciesTitle) }}
+				{{ sectionTitle }}
 			</h3>
 			<ButtonStyled v-if="downloadableDependencyFiles.length > 0" type="transparent">
 				<button :disabled="downloadingDependencies" @click="downloadAllDependencies">
@@ -23,7 +23,7 @@
 		</div>
 		<div class="flex flex-col gap-2">
 			<DownloadDependency
-				v-for="dependency in dependencyRows"
+				v-for="dependency in downloadRows"
 				:key="dependency.key"
 				:dependency="dependency"
 				@download="emit('download')"
@@ -34,11 +34,12 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { DownloadIcon, FileIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
+	fileTypeMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	useVIntl,
@@ -46,7 +47,7 @@ import {
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import JSZip from 'jszip'
-import { computed, ref } from 'vue'
+import { type Component, computed, ref } from 'vue'
 
 import DownloadDependency from './DownloadDependency.vue'
 
@@ -65,6 +66,7 @@ interface DownloadDependencyRow {
 	key: string
 	name: string
 	icon?: string
+	fallbackIcon?: Component
 	projectHref?: string
 	downloadHref?: string
 	filename?: string
@@ -87,6 +89,7 @@ const props = withDefaults(
 		currentGameVersion?: string | null
 		currentPlatform?: string | null
 		downloadReason?: CdnDownloadReason
+		additionalFiles?: Labrinth.Versions.v3.VersionFile[]
 		showTitle?: boolean
 	}>(),
 	{
@@ -96,6 +99,7 @@ const props = withDefaults(
 		currentGameVersion: null,
 		currentPlatform: null,
 		downloadReason: 'standalone',
+		additionalFiles: () => [],
 		showTitle: true,
 	},
 )
@@ -258,8 +262,34 @@ const dependencyRows = computed<DownloadDependencyRow[]>(
 	() => props.dependencies || resolvedDependencyRows.value,
 )
 
+const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
+	props.additionalFiles.map((file) => ({
+		key: `additional-file-${additionalFileKey(file)}`,
+		name: file.filename,
+		fallbackIcon: FileIcon,
+		downloadHref: getDownloadUrl(file.url),
+		filename: file.filename,
+		typeLabel: fileTypeLabel(file.file_type),
+		unavailableTooltip: formatMessage(messages.unavailableFile),
+		dependencies: [],
+	})),
+)
+
+const downloadRows = computed<DownloadDependencyRow[]>(() => [
+	...dependencyRows.value,
+	...additionalFileRows.value,
+])
+
+const sectionTitle = computed(() =>
+	formatMessage(
+		dependencyRows.value.length > 0
+			? messages.dependenciesTitle
+			: messages.additionalFilesTitle,
+	),
+)
+
 const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
-	collectDownloadableDependencyFiles(dependencyRows.value),
+	collectDownloadableDependencyFiles(downloadRows.value),
 )
 
 const dependencyZipFilename = computed(
@@ -334,6 +364,14 @@ function getDownloadUrl(url: string) {
 		gameVersion: props.currentGameVersion ?? undefined,
 		loader: props.currentPlatform ?? undefined,
 	})
+}
+
+function fileTypeLabel(type?: Labrinth.Versions.v3.FileType | null) {
+	return formatMessage(fileTypeMessages[type ?? 'unknown'] ?? fileTypeMessages.unknown)
+}
+
+function additionalFileKey(file: Labrinth.Versions.v3.VersionFile) {
+	return file.hashes?.sha1 ?? file.filename
 }
 
 function collectDownloadableDependencyFiles(
@@ -458,6 +496,10 @@ const messages = defineMessages({
 		id: 'project.download.dependencies-title',
 		defaultMessage: 'Dependencies',
 	},
+	additionalFilesTitle: {
+		id: 'project.download.additional-files-title',
+		defaultMessage: 'Additional files',
+	},
 	downloadAllDependencies: {
 		id: 'project.download.dependencies-download-all',
 		defaultMessage: 'Download all',
@@ -501,6 +543,10 @@ const messages = defineMessages({
 	unavailableDependency: {
 		id: 'project.download.dependency-unavailable',
 		defaultMessage: 'This dependency cannot be downloaded',
+	},
+	unavailableFile: {
+		id: 'project.download.file-unavailable',
+		defaultMessage: 'This file cannot be downloaded',
 	},
 })
 </script>

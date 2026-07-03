@@ -34,49 +34,9 @@
 						:current-game-version="currentGameVersion"
 						:current-platform="currentPlatform"
 						:download-reason="downloadReason"
+						:additional-files="additionalFiles"
 						@download="onDownload"
 					/>
-					<div v-if="additionalFiles.length > 0" class="flex flex-col gap-2">
-						<h3 class="m-0 text-base font-semibold text-contrast">
-							{{ formatMessage(messages.additionalFilesTitle) }}
-						</h3>
-						<div class="flex flex-col gap-2">
-							<div
-								v-for="file in additionalFiles"
-								:key="additionalFileKey(file)"
-								class="grid min-h-10 grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-xl bg-button-bg py-0 pl-3.5 pr-2 text-primary"
-							>
-								<span class="flex min-w-0 items-center gap-3">
-									<FileIcon aria-hidden="true" class="size-5 flex-shrink-0 text-secondary" />
-									<span
-										:ref="(element) => setAdditionalFileNameRef(file, element)"
-										v-tooltip="
-											truncatedTooltip(additionalFileNameRefs[additionalFileKey(file)], file.filename)
-										"
-										class="min-w-0 truncate text-base font-semibold text-contrast"
-									>
-										{{ file.filename }}
-									</span>
-									<TagItem
-										class="shrink-0 border !border-solid border-surface-5 !px-3 !py-1 text-base"
-									>
-										{{ fileTypeLabel(file.file_type) }}
-									</TagItem>
-								</span>
-								<ButtonStyled circular type="transparent">
-									<a
-										v-tooltip="'Download'"
-										:href="getDownloadUrl(file.url)"
-										:download="file.filename"
-										:aria-label="`Download ${file.filename}`"
-										@click="onDownload"
-									>
-										<DownloadIcon aria-hidden="true" class="size-6 text-secondary" />
-									</a>
-								</ButtonStyled>
-							</div>
-						</div>
-					</div>
 				</div>
 				<ServersPromo
 					v-if="flags.showProjectPageDownloadModalServersPromo"
@@ -95,24 +55,20 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, FileIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
-	fileTypeMessages,
 	injectModrinthClient,
 	NewModal,
 	ServersPromo,
-	TagItem,
 	truncatedTooltip,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { type ComponentPublicInstance, computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -173,13 +129,11 @@ const route = useRoute()
 const flags = useFeatureFlags()
 const tags = useGeneratedState()
 const client = injectModrinthClient()
-const { createProjectDownloadUrl } = useCdnDownloadContext()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
 const modal = ref<NewModalRef | null>(null)
 const downloadTitleRef = ref<HTMLElement | null>(null)
-const additionalFileNameRefs = ref<Record<string, HTMLElement | null>>({})
 const modalOpen = ref(false)
 const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
@@ -285,27 +239,7 @@ const messages = defineMessages({
 		id: 'project.download.title',
 		defaultMessage: 'Download {title}',
 	},
-	additionalFilesTitle: {
-		id: 'project.download.additional-files-title',
-		defaultMessage: 'Additional files',
-	},
 })
-
-function fileTypeLabel(type?: Labrinth.Versions.v3.FileType | null) {
-	return formatMessage(fileTypeMessages[type ?? 'unknown'] ?? fileTypeMessages.unknown)
-}
-
-function additionalFileKey(file: Labrinth.Versions.v3.VersionFile) {
-	return file.hashes?.sha1 ?? file.filename
-}
-
-function setAdditionalFileNameRef(
-	file: Labrinth.Versions.v3.VersionFile,
-	element: Element | ComponentPublicInstance | null,
-) {
-	additionalFileNameRefs.value[additionalFileKey(file)] =
-		element instanceof HTMLElement ? element : null
-}
 
 function getProjectTypeForUrl(
 	type: Labrinth.Projects.v2.ProjectType,
@@ -324,14 +258,6 @@ function getProjectTypeForUrl(
 	if (isMod) return 'mod'
 
 	return 'mod'
-}
-
-function getDownloadUrl(url: string) {
-	return createProjectDownloadUrl(url, {
-		reason: props.downloadReason,
-		gameVersion: currentGameVersion.value ?? undefined,
-		loader: currentPlatform.value ?? undefined,
-	})
 }
 
 function updateDownloadQuery({

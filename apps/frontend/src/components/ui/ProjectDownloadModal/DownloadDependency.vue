@@ -15,7 +15,11 @@
 					v-else
 					class="flex size-4 flex-shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 text-secondary"
 				>
-					<PackageIcon aria-hidden="true" class="size-5" />
+					<component
+						:is="dependency.fallbackIcon ?? PackageIcon"
+						aria-hidden="true"
+						class="size-5"
+					/>
 				</span>
 				<a
 					v-if="dependency.projectHref"
@@ -79,7 +83,7 @@
 <script setup lang="ts">
 import { DownloadIcon, PackageIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, TagItem, truncatedTooltip } from '@modrinth/ui'
-import { ref } from 'vue'
+import { type Component, ref } from 'vue'
 
 defineOptions({
 	name: 'DownloadDependency',
@@ -89,6 +93,7 @@ interface DownloadDependencyRow {
 	key: string
 	name: string
 	icon?: string
+	fallbackIcon?: Component
 	projectHref?: string
 	downloadHref?: string
 	filename?: string
