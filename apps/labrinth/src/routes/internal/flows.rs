@@ -1069,7 +1069,14 @@ pub struct Authorization {
 // http://localhost:8000/auth/init?url=https://modrinth.com
 #[utoipa::path(
 	context_path = "/auth",
-	tag = "auth", responses((status = TEMPORARY_REDIRECT), (status = OK))
+	tag = "auth",
+	params(
+		("url" = Url, Query),
+		("provider" = Option<AuthProvider>, Query),
+		("token" = Option<String>, Query),
+		("auth_token" = Option<String>, Query)
+	),
+	responses((status = TEMPORARY_REDIRECT), (status = OK))
 )]
 #[get("/init")]
 pub async fn init(

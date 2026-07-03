@@ -6,9 +6,28 @@ use eyre::eyre;
 use prometheus::IntGauge;
 
 use crate::util::cors::default_cors;
+use super::SecurityAddon;
 
 #[cfg(target_os = "linux")]
-mod pprof;
+pub(crate) mod pprof;
+
+#[cfg(target_os = "linux")]
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	paths(pprof::heap, pprof::flame_graph),
+	modifiers(&DebugPathModifier, &SecurityAddon)
+)]
+pub struct ApiDoc;
+
+#[cfg(target_os = "linux")]
+struct DebugPathModifier;
+
+#[cfg(target_os = "linux")]
+impl utoipa::Modify for DebugPathModifier {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        super::prefix_openapi_paths(openapi, "/debug", |_| false);
+    }
+}
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(web::scope("/debug").wrap(default_cors()).configure({

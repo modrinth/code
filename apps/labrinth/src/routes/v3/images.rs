@@ -36,7 +36,18 @@ pub struct ImageUpload {
     pub report_id: Option<ReportId>,
 }
 
-#[utoipa::path(tag = "images", responses((status = OK)))]
+#[utoipa::path(
+	tag = "images",
+	params(
+		("ext" = String, Query),
+		("context" = String, Query),
+		("project_id" = Option<String>, Query),
+		("version_id" = Option<VersionId>, Query),
+		("thread_message_id" = Option<ThreadMessageId>, Query),
+		("report_id" = Option<ReportId>, Query)
+	),
+	responses((status = OK))
+)]
 #[post("/image")]
 pub async fn images_add(
     req: HttpRequest,

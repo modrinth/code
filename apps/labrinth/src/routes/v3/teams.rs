@@ -290,7 +290,11 @@ pub struct TeamIds {
     pub ids: String,
 }
 
-#[utoipa::path(tag = "teams", responses((status = OK)))]
+#[utoipa::path(
+	tag = "teams",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/teams")]
 pub async fn teams_get_route(
     req: HttpRequest,

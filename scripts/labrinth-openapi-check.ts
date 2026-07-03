@@ -515,10 +515,15 @@ function samplePathValue(name: string, operation: Operation): string {
 	const schema = param?.schema
 	const ref = schema?.$ref?.split('/').at(-1)?.toLowerCase() ?? ''
 	const type = Array.isArray(schema?.type) ? schema?.type.join('|') : schema?.type
+	const lowerName = name.toLowerCase()
+	const lowerPath = operation.path.toLowerCase()
 
-	if (name.toLowerCase().includes('sha1')) return '0000000000000000000000000000000000000000'
+	if (lowerName.includes('sha1')) return '0000000000000000000000000000000000000000'
 	if (schema?.format === 'uuid') return '00000000-0000-0000-0000-000000000000'
-	if (type === 'integer' || ref.endsWith('id') || name.toLowerCase().endsWith('id')) return '1'
+	if (type === 'integer') return '1'
+	if (lowerPath.includes('payment_method')) return 'pm_openapi_check'
+	if (type === 'string' || type?.includes('string')) return 'test'
+	if (ref.endsWith('id') || lowerName.endsWith('id')) return '1'
 	return 'test'
 }
 
@@ -1143,7 +1148,11 @@ function comparePath(handler: HandlerInfo, operation: Operation, issues: Issue[]
 	}
 
 	for (const routeParam of handler.routePathParams) {
-		if (!operation.pathParams.has(routeParam)) {
+		const pathParameter = (operation.operation.parameters ?? []).find(
+			(param) => param.in === 'path' && param.name === routeParam,
+		)
+
+		if (!pathParameter) {
 			issues.push({
 				severity: 'error',
 				code: 'path_parameter_name_mismatch',
@@ -1151,6 +1160,15 @@ function comparePath(handler: HandlerInfo, operation: Operation, issues: Issue[]
 				line: handler.line,
 				operation: formatOperation(operation),
 				message: `${handler.functionName} route macro uses path parameter ${routeParam}, but OpenAPI path parameters are ${formatSet(operation.pathParams)}`,
+			})
+		} else if (pathParameter.required !== true) {
+			issues.push({
+				severity: 'error',
+				code: 'path_parameter_not_required',
+				file: handler.file,
+				line: handler.line,
+				operation: formatOperation(operation),
+				message: `${handler.functionName} route macro uses path parameter ${routeParam}, but OpenAPI does not mark it as required`,
 			})
 		}
 	}

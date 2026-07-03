@@ -97,7 +97,11 @@ pub struct RandomProjects {
     pub count: u32,
 }
 
-#[utoipa::path(tag = "projects", responses((status = OK)))]
+#[utoipa::path(
+	tag = "projects",
+	params(("count" = u32, Query)),
+	responses((status = OK))
+)]
 #[get("/projects_random")]
 pub async fn random_projects_get_route(
     count: web::Query<RandomProjects>,
@@ -158,7 +162,11 @@ pub struct ProjectCheckResponse {
     pub id: ProjectId,
 }
 
-#[utoipa::path(tag = "projects", responses((status = OK)))]
+#[utoipa::path(
+	tag = "projects",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/projects")]
 pub async fn projects_get_route(
     req: HttpRequest,
@@ -1495,7 +1503,11 @@ pub struct BulkEditProject {
     pub link_urls: Option<HashMap<String, Option<String>>>,
 }
 
-#[utoipa::path(tag = "projects", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "projects",
+	params(("ids" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/projects")]
 pub async fn projects_edit_route(
     req: HttpRequest,

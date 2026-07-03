@@ -231,6 +231,8 @@ async fn app() -> std::io::Result<()> {
         let mut docs_v2 = labrinth::routes::v2::ApiDoc::openapi();
         let mut docs_v3 = labrinth::routes::v3::ApiDoc::openapi();
         let mut docs_internal = labrinth::routes::internal::ApiDoc::openapi();
+        #[cfg(target_os = "linux")]
+        docs_v3.merge(labrinth::routes::debug::ApiDoc::openapi());
         document_error_responses(&mut docs_v2);
         document_error_responses(&mut docs_v3);
         document_error_responses(&mut docs_internal);

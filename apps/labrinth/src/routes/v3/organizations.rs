@@ -378,7 +378,11 @@ pub struct OrganizationIds {
     pub ids: String,
 }
 
-#[utoipa::path(tag = "organizations", responses((status = OK)))]
+#[utoipa::path(
+	tag = "organizations",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/organizations")]
 pub async fn organizations_get(
     req: HttpRequest,
@@ -1189,7 +1193,11 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "organizations",
+	params(("ext" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/organization/{id}/icon")]
 pub async fn organization_icon_edit(
     web::Query(ext): web::Query<Extension>,

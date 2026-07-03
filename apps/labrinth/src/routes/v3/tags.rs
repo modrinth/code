@@ -155,7 +155,14 @@ pub struct LoaderFieldsEnumQuery {
 }
 
 // Provides the variants for any enumerable loader field.
-#[utoipa::path(tag = "tags", responses((status = OK)))]
+#[utoipa::path(
+	tag = "tags",
+	params(
+		("loader_field" = String, Query),
+		("filters" = Option<HashMap<String, Value>>, Query)
+	),
+	responses((status = OK))
+)]
 #[get("/loader_field")]
 pub async fn loader_fields_list_route(
     pool: web::Data<PgPool>,

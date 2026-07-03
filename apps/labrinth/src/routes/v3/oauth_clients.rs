@@ -106,6 +106,7 @@ pub async fn get_user_clients(
 #[utoipa::path(
 	context_path = "/oauth",
 	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
 	responses((status = OK, body = models::oauth_clients::OAuthClient)),
 )]
 #[get("/app/{id}")]
@@ -125,6 +126,7 @@ pub async fn get_client(
 #[utoipa::path(
 	context_path = "/oauth",
 	tag = "oauth clients",
+	params(("ids" = Vec<String>, Query)),
 	responses((status = OK, body = Vec<models::oauth_clients::OAuthClient>)),
 )]
 #[get("/apps")]
@@ -238,7 +240,9 @@ pub async fn oauth_client_create(
 /// Delete an OAuth client.  
 #[utoipa::path(
 	context_path = "/oauth",
-	tag = "oauth clients", responses((status = NO_CONTENT))
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
 )]
 #[delete("/app/{id}")]
 pub async fn oauth_client_delete(
@@ -299,7 +303,9 @@ pub struct OAuthClientEdit {
 /// Update an OAuth client.  
 #[utoipa::path(
 	context_path = "/oauth",
-	tag = "oauth clients", responses((status = NO_CONTENT))
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
 )]
 #[patch("/app/{id}")]
 pub async fn oauth_client_edit(
@@ -379,7 +385,12 @@ pub struct Extension {
 /// Update an OAuth client icon.  
 #[utoipa::path(
 	context_path = "/oauth",
-	tag = "oauth clients", responses((status = NO_CONTENT))
+	tag = "oauth clients",
+	params(
+		("id" = OAuthClientId, Path),
+		("ext" = String, Query)
+	),
+	responses((status = NO_CONTENT))
 )]
 #[patch("/app/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
@@ -456,7 +467,9 @@ pub async fn oauth_client_icon_edit(
 /// Delete an OAuth client icon.  
 #[utoipa::path(
 	context_path = "/oauth",
-	tag = "oauth clients", responses((status = NO_CONTENT))
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
 )]
 #[delete("/app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
@@ -546,7 +559,9 @@ pub async fn get_user_oauth_authorizations(
 /// Revoke OAuth authorization.  
 #[utoipa::path(
 	context_path = "/oauth",
-	tag = "oauth clients", responses((status = NO_CONTENT))
+	tag = "oauth clients",
+	params(("client_id" = OAuthClientId, Query)),
+	responses((status = NO_CONTENT))
 )]
 #[delete("/authorizations")]
 pub async fn revoke_oauth_authorization(

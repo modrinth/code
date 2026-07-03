@@ -259,7 +259,15 @@ fn default_all() -> bool {
     true
 }
 
-#[utoipa::path(tag = "reports", responses((status = OK)))]
+#[utoipa::path(
+	tag = "reports",
+	params(
+		("count" = Option<u16>, Query),
+		("offset" = Option<u32>, Query),
+		("all" = Option<bool>, Query)
+	),
+	responses((status = OK))
+)]
 #[get("/report")]
 pub async fn reports_route(
     req: HttpRequest,
@@ -346,7 +354,11 @@ pub struct ReportIds {
     pub ids: String,
 }
 
-#[utoipa::path(tag = "reports", responses((status = OK)))]
+#[utoipa::path(
+	tag = "reports",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/reports")]
 pub async fn reports_get_route(
     req: HttpRequest,

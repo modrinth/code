@@ -24,7 +24,11 @@ pub struct NotificationIds {
     pub ids: String,
 }
 
-#[utoipa::path(tag = "notifications", responses((status = OK)))]
+#[utoipa::path(
+	tag = "notifications",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/notifications")]
 pub async fn notifications_get_route(
     req: HttpRequest,
@@ -252,7 +256,11 @@ pub async fn notification_delete(
     }
 }
 
-#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "notifications",
+	params(("ids" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/notifications")]
 pub async fn notifications_read_route(
     req: HttpRequest,
@@ -317,7 +325,11 @@ pub async fn notifications_read(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[utoipa::path(tag = "notifications", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "notifications",
+	params(("ids" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[delete("/notifications")]
 pub async fn notifications_delete_route(
     req: HttpRequest,

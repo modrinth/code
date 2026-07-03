@@ -72,6 +72,7 @@ pub struct MavenPom {
 
 #[utoipa::path(
 	tag = "maven",
+	params(("id" = String, Path)),
 	responses((status = OK, body = String, content_type = "text/xml"))
 )]
 #[get("/maven/modrinth/{id}/maven-metadata.xml")]
@@ -285,6 +286,11 @@ fn find_file<'a>(
 
 #[utoipa::path(
 	tag = "maven",
+	params(
+		("id" = String, Path),
+		("versionnum" = String, Path),
+		("file" = String, Path)
+	),
 	responses(
 		(status = OK, body = String, content_type = "text/xml"),
 		(status = TEMPORARY_REDIRECT)
@@ -360,7 +366,15 @@ pub async fn version_file(
     Err(ApiError::NotFound)
 }
 
-#[utoipa::path(tag = "maven", responses((status = OK, body = String)))]
+#[utoipa::path(
+	tag = "maven",
+	params(
+		("id" = String, Path),
+		("versionnum" = String, Path),
+		("file" = String, Path)
+	),
+	responses((status = OK, body = String))
+)]
 #[get("/maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
@@ -408,7 +422,15 @@ pub async fn version_file_sha1(
         ))
 }
 
-#[utoipa::path(tag = "maven", responses((status = OK, body = String)))]
+#[utoipa::path(
+	tag = "maven",
+	params(
+		("id" = String, Path),
+		("versionnum" = String, Path),
+		("file" = String, Path)
+	),
+	responses((status = OK, body = String))
+)]
 #[get("/maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,

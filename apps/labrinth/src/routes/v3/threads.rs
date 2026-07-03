@@ -331,7 +331,11 @@ pub struct ThreadIds {
     pub ids: String,
 }
 
-#[utoipa::path(tag = "threads", responses((status = OK, body = Vec<Thread>)))]
+#[utoipa::path(
+	tag = "threads",
+	params(("ids" = String, Query)),
+	responses((status = OK, body = Vec<Thread>))
+)]
 #[get("/threads")]
 pub async fn threads_get_route(
     req: HttpRequest,

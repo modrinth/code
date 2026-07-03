@@ -476,6 +476,7 @@ pub async fn send_tech_review_exit_file_deleted_message_if_exited(
 #[utoipa::path(
 	context_path = "/delphi",
 	tag = "delphi",
+	params(("file_id" = crate::models::ids::FileId, Query)),
 	responses((status = NO_CONTENT))
 )]
 #[post("/run")]

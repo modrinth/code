@@ -58,9 +58,14 @@ pub struct UrlInput {
 }
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
-#[utoipa::path(tag = "analytics", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = UrlInput,
+	responses((status = NO_CONTENT))
+)]
 #[post("/view")]
-async fn page_view_ingest(
+pub async fn page_view_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -180,9 +185,14 @@ pub struct PlaytimeInput {
     parent: Option<crate::models::ids::VersionId>,
 }
 
-#[utoipa::path(tag = "analytics", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = serde_json::Value,
+	responses((status = NO_CONTENT))
+)]
 #[post("/playtime")]
-async fn playtime_ingest(
+pub async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -260,9 +270,14 @@ pub struct MinecraftJavaServerPlayInput {
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
-#[utoipa::path(tag = "analytics", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = MinecraftJavaServerPlayInput,
+	responses((status = NO_CONTENT))
+)]
 #[post("/minecraft-server-play")]
-async fn minecraft_server_play_ingest(
+pub async fn minecraft_server_play_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,

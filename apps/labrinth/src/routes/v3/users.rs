@@ -198,7 +198,11 @@ pub async fn all_projects(
     }))
 }
 
-#[utoipa::path(tag = "users", responses((status = OK)))]
+#[utoipa::path(
+	tag = "users",
+	params(("email" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/user_email")]
 pub async fn admin_user_email(
     req: HttpRequest,
@@ -356,7 +360,11 @@ pub struct UserSearchQuery {
     pub query: String,
 }
 
-#[utoipa::path(tag = "users", responses((status = OK)))]
+#[utoipa::path(
+	tag = "users",
+	params(("query" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/users/search")]
 pub async fn users_search(
     web::Query(query): web::Query<UserSearchQuery>,
@@ -373,7 +381,11 @@ pub async fn users_search(
     Ok(web::Json(users))
 }
 
-#[utoipa::path(tag = "users", responses((status = OK)))]
+#[utoipa::path(
+	tag = "users",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/users")]
 pub async fn users_get_route(
     req: HttpRequest,
@@ -895,7 +907,11 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[utoipa::path(tag = "users", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "users",
+	params(("ext" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/user/{id}/icon")]
 pub async fn user_icon_edit_route(
     ext: web::Query<Extension>,

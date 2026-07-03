@@ -161,6 +161,14 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		organizations::delete_organization_icon,
 		payouts::paypal_webhook,
 		payouts::tremendous_webhook,
+		super::analytics::page_view_ingest,
+		super::analytics::playtime_ingest,
+		super::analytics::minecraft_server_play_ingest,
+		super::maven::maven_metadata,
+		super::maven::version_file,
+		super::maven::version_file_sha1,
+		super::maven::version_file_sha512,
+		super::updates::forge_updates,
 		projects::project_search,
 		projects::project_search_post,
 		projects::projects_get_route,
@@ -248,7 +256,12 @@ struct V3PathModifier;
 
 impl utoipa::Modify for V3PathModifier {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        super::prefix_openapi_paths(openapi, "/v3", |_| false);
+        super::prefix_openapi_paths(openapi, "/v3", |path| {
+            path.starts_with("/analytics/")
+                || path.starts_with("/maven/")
+                || path.starts_with("/updates/")
+                || path.starts_with("/debug/")
+        });
     }
 }
 

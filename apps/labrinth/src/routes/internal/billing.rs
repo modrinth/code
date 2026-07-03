@@ -110,6 +110,7 @@ struct SubscriptionsQuery {
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
+	params(("user_id" = Option<ariadne::ids::UserId>, Query)),
 	responses((status = OK, body = serde_json::Value))
 )]
 #[get("/subscriptions")]
@@ -631,6 +632,7 @@ pub struct SubscriptionEditQuery {
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
+	params(("dry" = Option<bool>, Query)),
 	responses(
 		(status = OK, body = serde_json::Value),
 		(status = NO_CONTENT),
@@ -1174,6 +1176,7 @@ pub struct ChargesQuery {
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
+	params(("user_id" = Option<ariadne::ids::UserId>, Query)),
 	responses((status = OK, body = serde_json::Value))
 )]
 #[get("/payments")]
@@ -1520,6 +1523,7 @@ struct ActiveServerResponse {
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
+	params(("subscription_status" = Option<String>, Query)),
 	responses((status = OK, body = inline(Vec<ActiveServerResponse>)))
 )]
 #[get("/active_servers")]

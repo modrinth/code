@@ -1,8 +1,9 @@
 use crate::routes::SecurityAddon;
 use crate::routes::prefix_openapi_paths;
 use crate::routes::v2::{
-    notifications, project_creation, projects, reports, statistics, tags,
-    teams, threads, users, version_creation, version_file, versions,
+    moderation, notifications, project_creation, projects, reports,
+    statistics, tags, teams, threads, users, version_creation, version_file,
+    versions,
 };
 
 use utoipa::openapi::extensions::{Extensions, ExtensionsBuilder};
@@ -25,6 +26,7 @@ use utoipa::openapi::{RefOr, Response};
 		notifications::notification_read,
 		notifications::notification_delete,
 		project_creation::project_create,
+		moderation::get_projects,
 		projects::project_search,
 		projects::random_projects_get,
 		projects::projects_get,
@@ -95,6 +97,7 @@ use utoipa::openapi::{RefOr, Response};
 		versions::version_delete,
 		versions::version_list,
 		versions::version_project_get,
+		version_creation::upload_file_to_version,
 	),
 	modifiers(&V2PathModifier, &SecurityAddon, &V2Modifier)
 )]

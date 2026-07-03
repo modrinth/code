@@ -140,7 +140,11 @@ pub async fn collection_create(
 pub struct CollectionIds {
     pub ids: String,
 }
-#[utoipa::path(tag = "collections", responses((status = OK)))]
+#[utoipa::path(
+	tag = "collections",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
 #[get("/collections")]
 pub async fn collections_get(
     req: HttpRequest,
@@ -388,7 +392,11 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[utoipa::path(tag = "collections", responses((status = NO_CONTENT)))]
+#[utoipa::path(
+	tag = "collections",
+	params(("ext" = String, Query)),
+	responses((status = NO_CONTENT))
+)]
 #[patch("/collection/{id}/icon")]
 pub async fn collection_icon_edit(
     web::Query(ext): web::Query<Extension>,

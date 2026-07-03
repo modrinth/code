@@ -59,7 +59,15 @@ pub struct OAuthClientAccessRequest {
 
 #[utoipa::path(
 	context_path = "/oauth",
-	path = "/authorize", tag = "oauth", responses((status = OK))
+	path = "/authorize",
+	tag = "oauth",
+	params(
+		("client_id" = OAuthClientId, Query),
+		("redirect_uri" = Option<String>, Query),
+		("scope" = Option<String>, Query),
+		("state" = Option<String>, Query)
+	),
+	responses((status = OK))
 )]
 #[get("authorize")]
 pub async fn init_oauth(

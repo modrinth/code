@@ -31,7 +31,15 @@ fn default_neoforge() -> String {
     "none".into()
 }
 
-#[utoipa::path(tag = "updates", responses((status = OK)))]
+#[utoipa::path(
+	context_path = "/updates",
+	tag = "updates",
+	params(
+		("id" = String, Path),
+		("neoforge" = Option<String>, Query)
+	),
+	responses((status = OK))
+)]
 #[get("/{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,
