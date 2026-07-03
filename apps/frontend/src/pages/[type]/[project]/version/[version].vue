@@ -727,13 +727,20 @@ const { data: projectOnlyDependencyVersions } = useQuery({
 						game_versions: currentVersion.game_versions,
 						loaders: dependencyResolutionLoaders.value,
 						include_changelog: false,
-						limit: 1,
+						limit: 100,
 					})
 				} catch {
 					return [projectId, undefined] as const
 				}
 
-				return [projectId, versions[0]] as const
+				return [
+					projectId,
+					getOnlyCompatibleDependencyVersion(
+						versions,
+						currentVersion.game_versions,
+						dependencyResolutionLoaders.value,
+					),
+				] as const
 			}),
 		)
 
@@ -1090,11 +1097,38 @@ function getDependencyVersion(dependency: Labrinth.Versions.v3.Dependency) {
 		return undefined
 	}
 
-	return (
-		(Object.keys(projectOnlyDependencyVersions.value || {}).length === 1 &&
-			projectOnlyDependencyVersions.value?.[dependency.project_id]) ||
-		undefined
+	return projectOnlyDependencyVersions.value?.[dependency.project_id]
+}
+
+function getOnlyCompatibleDependencyVersion(
+	versions: Labrinth.Versions.v2.Version[],
+	gameVersions: string[],
+	loaders: string[],
+) {
+	const compatibleVersions = versions
+		.filter(
+			(version) =>
+				version.game_versions.some((gameVersion) => gameVersions.includes(gameVersion)) &&
+				version.loaders.some((loader) => loaders.includes(loader)),
+		)
+		.slice()
+		.sort(
+			(a, b) =>
+				new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+		)
+	const targetKeys = new Set(
+		compatibleVersions.flatMap((version) =>
+			version.game_versions.flatMap((gameVersion) =>
+				gameVersions.includes(gameVersion)
+					? version.loaders
+							.filter((loader) => loaders.includes(loader))
+							.map((loader) => `${gameVersion}:${loader}`)
+					: [],
+			),
+		),
 	)
+
+	return targetKeys.size === 1 ? compatibleVersions[0] : undefined
 }
 
 function getDependencyPrimaryFile(version?: Labrinth.Versions.v2.Version) {

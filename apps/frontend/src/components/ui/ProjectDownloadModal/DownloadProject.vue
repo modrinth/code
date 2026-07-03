@@ -194,9 +194,31 @@ const showAllVersionsModel = computed({
 	},
 })
 
-const currentGameVersion = computed<string | null>(() => {
+const selectedPlatform = computed<string | null>(() => {
+	if (userSelectedPlatform.value) return userSelectedPlatform.value
+	return props.project.loaders.length === 1 ? props.project.loaders[0] : null
+})
+
+const selectedGameVersion = computed<string | null>(() => {
 	if (userSelectedGameVersion.value) return userSelectedGameVersion.value
 	return props.project.game_versions.length === 1 ? props.project.game_versions[0] : null
+})
+
+const compatiblePlatforms = computed<string[]>(() => {
+	return props.project.loaders.filter(
+		(platform) =>
+			props.versions.some(
+				(version) =>
+					version.loaders.includes(platform) &&
+					(!selectedGameVersion.value ||
+						version.game_versions.includes(selectedGameVersion.value)),
+			) && !incompatibleLoadersSet.value.has(platform),
+	)
+})
+
+const currentPlatform = computed<string | null>(() => {
+	if (selectedPlatform.value) return selectedPlatform.value
+	return compatiblePlatforms.value.length === 1 ? compatiblePlatforms.value[0] : null
 })
 
 const possibleGameVersions = computed<string[]>(() => {
@@ -205,15 +227,23 @@ const possibleGameVersions = computed<string[]>(() => {
 		.flatMap((x) => x.game_versions)
 })
 
+const compatibleGameVersions = computed<string[]>(() => {
+	return props.project.game_versions.filter(
+		(gameVersion) =>
+			possibleGameVersions.value.includes(gameVersion) &&
+			!incompatibleGameVersionsSet.value.has(gameVersion),
+	)
+})
+
+const currentGameVersion = computed<string | null>(() => {
+	if (selectedGameVersion.value) return selectedGameVersion.value
+	return compatibleGameVersions.value.length === 1 ? compatibleGameVersions.value[0] : null
+})
+
 const possiblePlatforms = computed<string[]>(() => {
 	return props.versions
 		.filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
 		.flatMap((x) => x.loaders)
-})
-
-const currentPlatform = computed<string | null>(() => {
-	if (userSelectedPlatform.value) return userSelectedPlatform.value
-	return props.project.loaders.length === 1 ? props.project.loaders[0] : null
 })
 
 const currentPlatformText = computed(() => {
