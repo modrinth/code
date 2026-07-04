@@ -36,6 +36,7 @@ pub enum NotificationType {
     TeamInvite,
     OrganizationInvite,
     ServerInvite,
+    SharedInstanceInvite,
     StatusChange,
     ModeratorMessage,
     LegacyMarkdown,
@@ -71,6 +72,7 @@ impl NotificationType {
             NotificationType::TeamInvite => "team_invite",
             NotificationType::OrganizationInvite => "organization_invite",
             NotificationType::ServerInvite => "server_invite",
+            NotificationType::SharedInstanceInvite => "shared_instance_invite",
             NotificationType::StatusChange => "status_change",
             NotificationType::ModeratorMessage => "moderator_message",
             NotificationType::LegacyMarkdown => "legacy_markdown",
@@ -112,6 +114,7 @@ impl NotificationType {
             "team_invite" => NotificationType::TeamInvite,
             "organization_invite" => NotificationType::OrganizationInvite,
             "server_invite" => NotificationType::ServerInvite,
+            "shared_instance_invite" => NotificationType::SharedInstanceInvite,
             "status_change" => NotificationType::StatusChange,
             "moderator_message" => NotificationType::ModeratorMessage,
             "legacy_markdown" => NotificationType::LegacyMarkdown,
@@ -172,6 +175,10 @@ pub enum NotificationBody {
         server_name: String,
         invited_by: UserId,
         role: String,
+    },
+    SharedInstanceInvite {
+        shared_instance_id: String,
+        shared_instance_name: String,
     },
     StatusChange {
         project_id: ProjectId,
@@ -287,6 +294,9 @@ impl NotificationBody {
             }
             NotificationBody::ServerInvite { .. } => {
                 NotificationType::ServerInvite
+            }
+            NotificationBody::SharedInstanceInvite { .. } => {
+                NotificationType::SharedInstanceInvite
             }
             NotificationBody::StatusChange { .. } => {
                 NotificationType::StatusChange
@@ -451,6 +461,32 @@ impl From<DBNotification> for Notification {
                     "You have been invited to join a server!".to_string(),
                     format!(
                         "An invite has been sent for you to be {role} of {server_name}"
+                    ),
+                    "#".to_string(),
+                    vec![
+                        NotificationAction {
+                            name: "Accept".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                String::new(),
+                            ),
+                        },
+                        NotificationAction {
+                            name: "Deny".to_string(),
+                            action_route: (
+                                "POST".to_string(),
+                                String::new(),
+                            ),
+                        },
+                    ],
+                ),
+                NotificationBody::SharedInstanceInvite {
+                    shared_instance_name,
+                    ..
+                } => (
+                    "You have been invited to a shared instance!".to_string(),
+                    format!(
+                        "An invite has been sent for you to join {shared_instance_name}"
                     ),
                     "#".to_string(),
                     vec![
@@ -670,7 +706,7 @@ impl From<DBNotification> for Notification {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NotificationAction {
     pub name: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route

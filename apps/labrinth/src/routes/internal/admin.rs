@@ -23,9 +23,9 @@ use std::str::FromStr;
 use std::sync::Arc;
 use tracing::trace;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/admin")
+        web::scope("/admin")
             .service(count_download)
             .service(force_reindex)
             .service(force_reindex_project),
@@ -130,7 +130,10 @@ async fn resolve_download_attribution_version(
 }
 
 // This is an internal route, cannot be used without key
+/// Count a download.  
 #[utoipa::path(
+	context_path = "/admin",
+	tag = "v2 admin",
     patch,
     operation_id = "countDownload",
     responses(
@@ -308,7 +311,10 @@ pub async fn count_download(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+/// Reindex all projects.  
 #[utoipa::path(
+	context_path = "/admin",
+	tag = "v2 admin",
     post,
     operation_id = "forceReindex",
     responses(
@@ -330,7 +336,10 @@ pub async fn force_reindex(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Reindex a project.  
 #[utoipa::path(
+	context_path = "/admin",
+	tag = "v2 admin",
     post,
     operation_id = "forceReindexProject",
     responses(

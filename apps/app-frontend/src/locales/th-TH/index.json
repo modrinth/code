@@ -170,17 +170,11 @@
   "app.export-modal.header": {
     "message": "ส่งออกแพ็กม็อด"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "รวมถึง \"{file}\" ใช่หรือไม่"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "ชื่อแพ็กม็อด"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "ชื่อแพ็กม็อด"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "กำหนดไฟล์ที่ต้องการจะส่งออก"
   },
   "app.export-modal.version-number-label": {
     "message": "หมายเลขเวอร์ชัน"

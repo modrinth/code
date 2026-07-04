@@ -164,17 +164,11 @@
   "app.export-modal.header": {
     "message": "모드팩 내보내기"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "\"{file}\"(을)를 포함할까요?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "모드팩 이름"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "모드팩 이름"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "내보내기에 어느 파일이 포함될지 구성"
   },
   "app.export-modal.version-number-label": {
     "message": "버전 구분"

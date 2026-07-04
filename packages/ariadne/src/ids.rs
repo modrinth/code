@@ -59,6 +59,21 @@ const MULTIPLES: [u64; 12] = [
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Base62Id(pub u64);
 
+impl utoipa::PartialSchema for Base62Id {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .schema_type(utoipa::openapi::schema::Type::String)
+            .min_length(Some(8))
+            .max_length(Some(8))
+            .pattern(Some("^[A-Za-z0-9]{8}$"))
+            .examples([serde_json::json!("ABcd1234")])
+            .build()
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for Base62Id {}
+
 /// An error decoding a number from base62.
 #[derive(Error, Debug)]
 pub enum DecodingError {
@@ -94,11 +109,19 @@ macro_rules! base62_id {
             serde::Deserialize,
             Debug,
             Hash,
-            utoipa::ToSchema,
         )]
         #[serde(from = "ariadne::ids::Base62Id")]
         #[serde(into = "ariadne::ids::Base62Id")]
         pub struct $struct(pub u64);
+
+        impl utoipa::PartialSchema for $struct {
+            fn schema()
+            -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+                <$crate::ids::Base62Id as utoipa::PartialSchema>::schema()
+            }
+        }
+
+        impl utoipa::ToSchema for $struct {}
 
         $crate::ids::impl_base62_display!($struct);
 

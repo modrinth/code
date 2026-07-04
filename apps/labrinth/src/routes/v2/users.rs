@@ -13,11 +13,11 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get);
     cfg.service(users_get);
     cfg.service(
-        utoipa_actix_web::scope("/user")
+        web::scope("/user")
             .service(user_get)
             .service(projects_list)
             .service(user_delete)
@@ -29,12 +29,14 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 }
 
-/// Get the current user from the authorization header.
+/// Get the current user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUserFromAuth",
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -68,12 +70,15 @@ pub struct UserIds {
     pub ids: String,
 }
 
-/// Get multiple users by ID.
+/// Get multiple users by ID.  
 #[utoipa::path(
+	tag = "users",
     get,
     operation_id = "getUsers",
-    params(("ids" = String, Query, description = "The JSON array of user IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+    params(
+        ("ids" = String, Query, description = "The JSON array of user IDs")
+    ),
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyUser>))
 )]
 #[get("/users")]
 pub async fn users_get(
@@ -104,13 +109,17 @@ pub async fn users_get(
     }
 }
 
-/// Get a user by ID or username.
+/// Get a user by ID or username.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyUser),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -139,13 +148,17 @@ pub async fn user_get(
     }
 }
 
-/// Get a user's projects.
+/// Get a user's projects.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUserProjects",
-    params(("user_id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("user_id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -204,11 +217,15 @@ pub struct EditUser {
     pub allow_friend_requests: Option<bool>,
 }
 
-/// Modify a user.
+/// Update a user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     patch,
     operation_id = "modifyUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     request_body = EditUser,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -258,17 +275,15 @@ pub struct Extension {
     pub ext: String,
 }
 
-/// Change a user's avatar.
+/// Change a user's avatar.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     patch,
     operation_id = "changeUserIcon",
     params(
         ("id" = String, Path, description = "The ID or username of the user"),
-        (
-            "ext" = String,
-            Query,
-            description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"
-        )
+        ("ext" = String, Query, description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)")
     ),
     request_body(
         content(
@@ -317,11 +332,15 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Remove a user's avatar.
+/// Remove a user's avatar.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     delete,
     operation_id = "deleteUserIcon",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (status = 400, description = "Request was invalid, see given error"),
@@ -354,11 +373,15 @@ pub async fn user_icon_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a user by ID or username.
+/// Delete a user by ID or username.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     delete,
     operation_id = "deleteUser",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
@@ -387,13 +410,17 @@ pub async fn user_delete(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Get projects followed by a user.
+/// Get projects followed by a user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getFollowedProjects",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -434,13 +461,17 @@ pub async fn user_follows(
     }
 }
 
-/// Get notifications for a user.
+/// Get notifications for a user.  
 #[utoipa::path(
+	context_path = "/user",
+	tag = "users",
     get,
     operation_id = "getUserNotifications",
-    params(("id" = String, Path, description = "The ID or username of the user")),
+    params(
+        ("id" = String, Path, description = "The ID or username of the user")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

@@ -8,7 +8,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(reports_get);
     cfg.service(reports);
     cfg.service(report_create);
@@ -17,12 +17,14 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(report_get);
 }
 
-/// Create a report for a project, version, or user.
+/// Create a report for a project, version, or user.  
 #[utoipa::path(
+	tag = "reports",
     post,
     operation_id = "submitReport",
+    request_body = v3::reports::CreateReport,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyReport),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -69,19 +71,16 @@ fn default_all() -> bool {
     true
 }
 
-/// Get open reports for the current user.
+/// Get open reports for the current user.  
 #[utoipa::path(
+	tag = "reports",
     get,
     operation_id = "getOpenReports",
     params(
-        (
-            "count" = Option<u16>,
-            Query,
-            description = "Maximum number of reports to return"
-        )
+        ("count" = Option<u16>, Query, description = "Maximum number of reports to return")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -131,19 +130,16 @@ pub struct ReportIds {
     pub ids: String,
 }
 
-/// Get multiple reports by ID.
+/// Get multiple reports by ID.  
 #[utoipa::path(
+	tag = "reports",
     get,
     operation_id = "getReports",
     params(
-        (
-            "ids" = String,
-            Query,
-            description = "The JSON array of report IDs"
-        )
+        ("ids" = String, Query, description = "The JSON array of report IDs")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -184,13 +180,16 @@ pub async fn reports_get(
     }
 }
 
-/// Get a report by ID.
+/// Get a report by ID.  
 #[utoipa::path(
+	tag = "reports",
     get,
     operation_id = "getReport",
-    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    params(
+        ("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = LegacyReport),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -232,11 +231,14 @@ pub struct EditReport {
     pub closed: Option<bool>,
 }
 
-/// Modify a report.
+/// Update a report.  
 #[utoipa::path(
+	tag = "reports",
     patch,
     operation_id = "modifyReport",
-    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    params(
+        ("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")
+    ),
     request_body = EditReport,
     responses(
         (status = 204, description = "Expected response to a valid request"),
@@ -278,11 +280,14 @@ pub async fn report_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-/// Delete a report by ID.
+/// Delete a report by ID.  
 #[utoipa::path(
+	tag = "reports",
     delete,
     operation_id = "deleteReport",
-    params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
+    params(
+        ("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")
+    ),
     responses(
         (status = 204, description = "Expected response to a valid request"),
         (
