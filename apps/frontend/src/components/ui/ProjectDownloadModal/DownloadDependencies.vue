@@ -4,7 +4,7 @@
 			<h3 class="m-0 flex items-center gap-1.5 text-base font-semibold text-contrast">
 				{{ sectionTitle }}
 				<InfoIcon
-					v-if="visibleDependencyRows.length > 0"
+					v-if="duplicateDependencyRowsHidden"
 					v-tooltip="formatMessage(messages.duplicateDependenciesHidden)"
 					aria-hidden="true"
 					class="size-4 text-secondary"
@@ -253,6 +253,10 @@ const visibleDependencyRows = computed<DownloadDependencyRow[]>(() =>
 	dedupeDependencyRows(dependencyRows.value),
 )
 
+const duplicateDependencyRowsHidden = computed(() =>
+	hasDuplicateDependencyRows(dependencyRows.value),
+)
+
 const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
 	props.additionalFiles.map((file) => ({
 		key: `additional-file-${additionalFileKey(file)}`,
@@ -394,6 +398,20 @@ function dedupeDependencyRows(
 
 function dependencyRowIdentity(row: DownloadDependencyRow) {
 	return row.projectHref ?? row.downloadHref ?? row.key
+}
+
+function hasDuplicateDependencyRows(
+	rows: DownloadDependencyRow[],
+	seenDependencies = new Set<string>(),
+): boolean {
+	for (const row of rows) {
+		const rowId = dependencyRowIdentity(row)
+		if (seenDependencies.has(rowId)) return true
+		seenDependencies.add(rowId)
+		if (hasDuplicateDependencyRows(row.dependencies, seenDependencies)) return true
+	}
+
+	return false
 }
 
 function collectDownloadableDependencyFiles(
