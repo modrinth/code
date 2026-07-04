@@ -23,9 +23,8 @@ use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
     VersionType,
 };
-use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
+use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
 use crate::util::http::HttpClient;
@@ -156,7 +155,6 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     http: web::Data<HttpClient>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
@@ -172,7 +170,6 @@ pub async fn version_create(
         &mut uploaded_files,
         &client,
         &session_queue,
-        &moderation_queue,
         &http,
     )
     .await;
@@ -214,7 +211,6 @@ async fn version_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     session_queue: &AuthQueue,
-    moderation_queue: &AutomatedModerationQueue,
     http: &reqwest::Client,
 ) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_version_data = None;
@@ -572,19 +568,6 @@ async fn version_create_inner(
                 "Image {image_id} does not exist"
             )));
         }
-    }
-
-    let project_status = sqlx::query!(
-        "SELECT status FROM mods WHERE id = $1",
-        project_id as models::DBProjectId,
-    )
-    .fetch_optional(pool)
-    .await?;
-
-    if let Some(project_status) = project_status
-        && project_status.status == ProjectStatus::Processing.as_str()
-    {
-        moderation_queue.projects.insert(project_id.into());
     }
 
     Ok((HttpResponse::Ok().json(response), project_id))

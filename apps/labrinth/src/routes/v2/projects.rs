@@ -10,7 +10,6 @@ use crate::models::v2::projects::{
     DonationLink, LegacyProject, LegacySideType, LegacyVersion,
 };
 use crate::models::v2::search::LegacySearchResults;
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
@@ -532,7 +531,6 @@ pub async fn project_edit(
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let v2_new_project = new_project.into_inner();
@@ -646,7 +644,6 @@ pub async fn project_edit(
         web::Json(new_project),
         redis.clone(),
         session_queue.clone(),
-        moderation_queue,
         search_state.clone(),
     )
     .await

@@ -20,7 +20,6 @@ use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
@@ -68,7 +67,6 @@ pub struct LabrinthConfig {
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<ActiveSockets>,
-    pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
     pub anrok_client: anrok::Client,
@@ -97,21 +95,6 @@ pub fn app_setup(
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!("Starting labrinth on {}", &ENV.BIND_ADDR);
-
-    let automated_moderation_queue =
-        web::Data::new(AutomatedModerationQueue::default());
-
-    {
-        let automated_moderation_queue_ref = automated_moderation_queue.clone();
-        let pool_ref = pool.clone();
-        let ro_pool_ref = ro_pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        actix_rt::spawn(async move {
-            automated_moderation_queue_ref
-                .task(pool_ref, ro_pool_ref, redis_pool_ref)
-                .await;
-        });
-    }
 
     let scheduler = scheduler::Scheduler::new();
 
@@ -341,7 +324,6 @@ pub fn app_setup(
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
         active_sockets,
-        automated_moderation_queue,
         rate_limiter: limiter,
         stripe_client,
         anrok_client,
@@ -399,7 +381,6 @@ pub fn app_data_config(
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
     .app_data(labrinth_config.active_sockets.clone())
-    .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))

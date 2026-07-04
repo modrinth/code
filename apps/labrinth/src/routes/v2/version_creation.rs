@@ -8,7 +8,6 @@ use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionStatus, VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
@@ -103,7 +102,6 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    moderation_queue: Data<AutomatedModerationQueue>,
     http: Data<HttpClient>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
@@ -263,7 +261,6 @@ pub async fn version_create(
         redis.clone(),
         file_host,
         session_queue,
-        moderation_queue,
         http,
         search_state,
     )
