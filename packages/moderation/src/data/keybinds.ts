@@ -34,6 +34,12 @@ const keybinds: KeybindListener[] = [
 		action: (ctx) => ctx.actions.tryResetProgress(),
 	},
 	{
+		id: 'reset-progress-alt',
+		keybind: 'Alt+R',
+		description: 'Reset moderation progress',
+		action: (ctx) => ctx.actions.tryResetProgress(),
+	},
+	{
 		id: 'skip-project',
 		keybind: 'Ctrl+Shift+S',
 		description: 'Skip to next project',
