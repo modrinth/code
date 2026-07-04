@@ -4,7 +4,13 @@ import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
-import type { FilterType, FilterValue, ProjectType, SortType } from '#ui/utils/search'
+import type {
+	EnvironmentSearchOverride,
+	FilterType,
+	FilterValue,
+	ProjectType,
+	SortType,
+} from '#ui/utils/search'
 import { LOADER_FILTER_TYPES, useSearch } from '#ui/utils/search'
 import { useServerSearch } from '#ui/utils/server-search'
 
@@ -18,6 +24,7 @@ export interface UseBrowseSearchOptions {
 		categories: Labrinth.Tags.v2.Category[]
 	}>
 	providedFilters?: ComputedRef<FilterValue[]>
+	environmentOverride?: ComputedRef<EnvironmentSearchOverride | undefined>
 	search: (params: string) => Promise<BrowseSearchResponse>
 	persistentQueryParams: string[]
 	getExtraQueryParams?: () => Record<string, string | undefined>
@@ -82,7 +89,12 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		sortTypes,
 		requestParams,
 		createPageParams,
-	} = useSearch(projectTypes, options.tags, options.providedFilters ?? computed(() => []))
+	} = useSearch(
+		projectTypes,
+		options.tags,
+		options.providedFilters ?? computed(() => []),
+		options.environmentOverride ?? computed(() => undefined),
+	)
 
 	const {
 		serverCurrentSortType,
