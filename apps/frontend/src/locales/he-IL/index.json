@@ -2027,20 +2027,8 @@
   "project.details.licensed": {
     "message": "ברישיון"
   },
-  "project.download.game-version": {
-    "message": "גרסת המשחק: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "שגיאה: לא נמצאו גרסאות משחק"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} זמין עבור {version} בלבד"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{gameVersion} עבור {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "התקן באמצעות Modrinth App"
   },
   "project.download.no-app": {
     "message": "אין לכם את אפליקציית Modrinth?"
@@ -2048,22 +2036,10 @@
   "project.download.no-versions-available": {
     "message": "אין גרסאות זמינות עבור {gameVersion} ו-{platform}."
   },
-  "project.download.platform": {
-    "message": "פלטפורמה: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "שגיאה: לא נמצאו פלטפורמות"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} זמין עבור {platform} בלבד"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{platform} עבור {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "חיפוש גרסאות משחק..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "חיפוש גרסאות משחק..."
   },
   "project.download.select-game-version": {
