@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'app',
+		version: '0.15.6',
+		body: `## Fixed
+- Fixed the functionality of the server environment filter in Discover.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the functionality of the server environment filter in Discover.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Replaced the environment filters in the panel with a toggle for server-side only content that appears at the top of the filters.`,
+	},
+	{
 		date: `2026-07-04T22:59:54+00:00`,
 		product: 'app',
 		version: '0.15.5',
