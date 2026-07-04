@@ -1,6 +1,6 @@
 import type mitt from 'mitt'
 
-import type { Archon } from '../modules/archon/types'
+import type { Archon } from '../modules/archon/types.js'
 
 export type WebSocketEventHandler<
 	E extends Archon.Websocket.v0.WSEvent = Archon.Websocket.v0.WSEvent,

@@ -1,7 +1,7 @@
-import { AbstractModule } from '../../core/abstract-module'
-import type { Purpur } from './types'
+import { AbstractModule } from '../../core/abstract-module.js'
+import type { Purpur } from './types.js'
 
-export type { Purpur } from './types'
+export type { Purpur } from './types.js'
 
 const PURPUR_BASE_URL = 'https://api.purpurmc.org'
 

@@ -5,9 +5,9 @@ import {
 	type SyncConnection,
 	type SyncConnectOptions,
 	type SyncEmitterEvents,
-} from '../core/abstract-sync'
-import type { Archon } from '../modules/archon/types'
-import { type ParsedSseItem, parseSyncEventData, SseParser } from '../utils/sse'
+} from '../core/abstract-sync.js'
+import type { Archon } from '../modules/archon/types.js'
+import { type ParsedSseItem, parseSyncEventData, SseParser } from '../utils/sse.js'
 
 type StreamReadResult = 'closed' | 'protocol-reconnect'
 

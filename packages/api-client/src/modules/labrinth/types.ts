@@ -1,5 +1,5 @@
-import type { RawDecimal } from '../../utils/types'
-import type { ISO3166 } from '../iso3166/types'
+import type { RawDecimal } from '../../utils/types.js'
+import type { ISO3166 } from '../iso3166/types.js'
 
 export namespace Labrinth {
 	export namespace Content {

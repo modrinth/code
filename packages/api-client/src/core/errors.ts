@@ -1,5 +1,5 @@
-import type { ApiErrorData, ModrinthErrorResponse } from '../types/errors'
-import { isModrinthErrorResponse } from '../types/errors'
+import type { ApiErrorData, ModrinthErrorResponse } from '../types/errors.js'
+import { isModrinthErrorResponse } from '../types/errors.js'
 
 /**
  * Base error class for all Modrinth API errors

@@ -1,4 +1,4 @@
-import { ModrinthApiError } from '../core/errors'
+import { ModrinthApiError } from '../core/errors.js'
 
 /**
  * Wrap a function with JWT retry logic.

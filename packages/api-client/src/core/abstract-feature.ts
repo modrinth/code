@@ -1,4 +1,4 @@
-import type { RequestContext } from '../types/request'
+import type { RequestContext } from '../types/request.js'
 
 /**
  * Base configuration for features

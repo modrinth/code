@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module'
-import type { Override, RawDecimal } from '../../../utils/types'
-import type { Labrinth } from '../types'
+import { AbstractModule } from '../../../core/abstract-module.js'
+import type { Override, RawDecimal } from '../../../utils/types.js'
+import type { Labrinth } from '../types.js'
 
 type RawPayoutBalance = Override<
 	Labrinth.Payout.v3.PayoutBalance,

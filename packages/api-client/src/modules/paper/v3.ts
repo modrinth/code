@@ -1,7 +1,7 @@
-import { AbstractModule } from '../../core/abstract-module'
-import type { Paper } from './types'
+import { AbstractModule } from '../../core/abstract-module.js'
+import type { Paper } from './types.js'
 
-export type { Paper } from './types'
+export type { Paper } from './types.js'
 
 const PAPER_BASE_URL = 'https://fill.papermc.io'
 

@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module'
-import type { UploadHandle } from '../../../types/upload'
-import type { Labrinth } from '../types'
+import { AbstractModule } from '../../../core/abstract-module.js'
+import type { UploadHandle } from '../../../types/upload.js'
+import type { Labrinth } from '../types.js'
 
 export class LabrinthOAuthInternalModule extends AbstractModule {
 	public getModuleID(): string {

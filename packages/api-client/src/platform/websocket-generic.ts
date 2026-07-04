@@ -1,8 +1,8 @@
 import mitt from 'mitt'
 
-import { AbstractWebSocketClient, type WebSocketConnection } from '../core/abstract-websocket'
-import type { Archon } from '../modules/archon/types'
-import { getNodeWebSocketUrl } from '../utils/node-url'
+import { AbstractWebSocketClient, type WebSocketConnection } from '../core/abstract-websocket.js'
+import type { Archon } from '../modules/archon/types.js'
+import { getNodeWebSocketUrl } from '../utils/node-url.js'
 
 type WSEventMap = {
 	[K in Archon.Websocket.v0.WSEvent as `${string}:${K['event']}`]: K

@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module'
-import type { UploadHandle, UploadProgress } from '../../../types/upload'
-import type { Archon } from '../../archon/types'
+import { AbstractModule } from '../../../core/abstract-module.js'
+import type { UploadHandle, UploadProgress } from '../../../types/upload.js'
+import type { Archon } from '../../archon/types.js'
 
 export class KyrosContentV1Module extends AbstractModule {
 	public getModuleID(): string {

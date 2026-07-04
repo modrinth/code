@@ -1,4 +1,4 @@
-import type { Labrinth } from '../labrinth/types'
+import type { Labrinth } from '../labrinth/types.js'
 
 export namespace Archon {
 	export namespace Nodes {

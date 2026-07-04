@@ -1,4 +1,4 @@
-import type { RequestOptions } from './request'
+import type { RequestOptions } from './request.js'
 
 /**
  * Progress information for file uploads

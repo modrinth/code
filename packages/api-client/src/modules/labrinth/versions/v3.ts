@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module'
-import type { UploadHandle } from '../../../types/upload'
-import type { Labrinth } from '../types'
+import { AbstractModule } from '../../../core/abstract-module.js'
+import type { UploadHandle } from '../../../types/upload.js'
+import type { Labrinth } from '../types.js'
 
 const VERSION_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000
 

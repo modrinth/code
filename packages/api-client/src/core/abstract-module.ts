@@ -1,4 +1,4 @@
-import type { AbstractModrinthClient } from './abstract-client'
+import type { AbstractModrinthClient } from './abstract-client.js'
 
 export abstract class AbstractModule {
 	protected client: AbstractModrinthClient

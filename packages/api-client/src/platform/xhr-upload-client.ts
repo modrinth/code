@@ -1,12 +1,12 @@
-import { AbstractModrinthClient } from '../core/abstract-client'
-import { ModrinthApiError } from '../core/errors'
-import type { RequestContext } from '../types/request'
+import { AbstractModrinthClient } from '../core/abstract-client.js'
+import { ModrinthApiError } from '../core/errors.js'
+import type { RequestContext } from '../types/request.js'
 import type {
 	UploadHandle,
 	UploadMetadata,
 	UploadProgress,
 	UploadRequestOptions,
-} from '../types/upload'
+} from '../types/upload.js'
 
 /**
  * Abstract client with XHR-based upload implementation

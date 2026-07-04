@@ -1,9 +1,9 @@
 import { $fetch } from 'ofetch'
 
-import { AbstractModule } from '../../core/abstract-module'
-import type { ISO3166 } from './types'
+import { AbstractModule } from '../../core/abstract-module.js'
+import type { ISO3166 } from './types.js'
 
-export type { ISO3166 } from './types'
+export type { ISO3166 } from './types.js'
 
 const ISO3166_REPO = 'https://raw.githubusercontent.com/ipregistry/iso3166/master'
 

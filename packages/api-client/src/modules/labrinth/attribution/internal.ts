@@ -1,5 +1,5 @@
-import { AbstractModule } from '../../../core/abstract-module'
-import type { Labrinth } from '../types'
+import { AbstractModule } from '../../../core/abstract-module.js'
+import type { Labrinth } from '../types.js'
 
 const BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 

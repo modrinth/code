@@ -1,5 +1,5 @@
-import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature'
-import type { RequestContext } from '../types/request'
+import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature.js'
+import type { RequestContext } from '../types/request.js'
 
 /**
  * Authentication feature configuration

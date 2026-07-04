@@ -1,5 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module.js'
-import type { Labrinth } from '../types'
+import type { Labrinth } from '../types.js'
 
 export class LabrinthPayoutsV3Module extends AbstractModule {
 	public getModuleID(): string {

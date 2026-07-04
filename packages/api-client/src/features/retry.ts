@@ -1,6 +1,6 @@
-import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature'
-import { ModrinthApiError } from '../core/errors'
-import type { RequestContext } from '../types/request'
+import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature.js'
+import { ModrinthApiError } from '../core/errors.js'
+import type { RequestContext } from '../types/request.js'
 
 /**
  * Backoff strategy for retries
