@@ -143,10 +143,22 @@ pub(crate) async fn fetch(
     let uses = |field| metrics.bucket_by.contains(&field);
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
-        ("use_domain", uses(F::Domain)),
-        ("use_site_path", uses(F::SitePath)),
-        ("use_monetized", uses(F::Monetized)),
-        ("use_country", uses(F::Country)),
+        (
+            "use_domain",
+            uses(F::Domain) || !metrics.filter_by.domain.is_empty(),
+        ),
+        (
+            "use_site_path",
+            uses(F::SitePath) || !metrics.filter_by.site_path.is_empty(),
+        ),
+        (
+            "use_monetized",
+            uses(F::Monetized) || !metrics.filter_by.monetized.is_empty(),
+        ),
+        (
+            "use_country",
+            uses(F::Country) || !metrics.filter_by.country.is_empty(),
+        ),
     ];
     let uses_column = |name| {
         use_columns

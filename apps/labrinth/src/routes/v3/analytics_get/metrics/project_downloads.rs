@@ -376,18 +376,39 @@ pub(crate) async fn fetch(
 
     let use_columns = &[
         ("use_project_id", uses(F::ProjectId)),
-        ("use_domain", uses(F::Domain)),
+        (
+            "use_domain",
+            uses(F::Domain) || !metrics.filter_by.domain.is_empty(),
+        ),
         (
             "use_user_agent",
             uses(F::UserAgent) || !metrics.filter_by.user_agent.is_empty(),
         ),
-        ("use_version_id", uses(F::VersionId)),
+        (
+            "use_version_id",
+            uses(F::VersionId) || !metrics.filter_by.version_id.is_empty(),
+        ),
         ("use_dependent_project_id", uses(F::DependentProjectId)),
-        ("use_monetized", uses(F::Monetized)),
-        ("use_country", uses(F::Country)),
-        ("use_reason", uses(F::Reason)),
-        ("use_game_version", uses(F::GameVersion)),
-        ("use_loader", uses(F::Loader)),
+        (
+            "use_monetized",
+            uses(F::Monetized) || !metrics.filter_by.monetized.is_empty(),
+        ),
+        (
+            "use_country",
+            uses(F::Country) || !metrics.filter_by.country.is_empty(),
+        ),
+        (
+            "use_reason",
+            uses(F::Reason) || !metrics.filter_by.reason.is_empty(),
+        ),
+        (
+            "use_game_version",
+            uses(F::GameVersion) || !metrics.filter_by.game_version.is_empty(),
+        ),
+        (
+            "use_loader",
+            uses(F::Loader) || !metrics.filter_by.loader.is_empty(),
+        ),
     ];
 
     let mut query = cx
@@ -453,7 +474,7 @@ pub(crate) async fn fetch(
             bucket: row.bucket,
             project_id: row.project_id,
             domain: uses_column("use_domain").then(|| row.domain.clone()),
-            user_agent: uses(F::UserAgent)
+            user_agent: uses_column("use_user_agent")
                 .then_some(normalized_source)
                 .flatten(),
             version_id: uses_column("use_version_id").then_some(row.version_id),
