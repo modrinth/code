@@ -130,7 +130,6 @@ pub async fn version_create_route(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     http: web::Data<HttpClient>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
@@ -141,7 +140,6 @@ pub async fn version_create_route(
         redis,
         file_host,
         session_queue,
-        moderation_queue,
         http,
         search_state,
     )
