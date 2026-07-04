@@ -112,6 +112,7 @@ export const configuredXss = new FilterXSS({
 					'wsrv.nl',
 					'cf.way2muchnoise.eu',
 					'bstats.org',
+					'modfolio.creeperkatze.dev',
 				]
 
 				const allowedHostnameSuffixes = ['.github.io']

@@ -12,7 +12,7 @@ use crate::{
     util::error::Context,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ping_minecraft_java);
 }
 
@@ -22,7 +22,12 @@ pub struct PingRequest {
     pub timeout_ms: Option<u64>,
 }
 
-#[utoipa::path]
+/// Ping Minecraft server.  
+#[utoipa::path(
+	context_path = "/server-ping",
+	tag = "server ping",
+	responses((status = NO_CONTENT))
+)]
 #[post("/minecraft-java")]
 pub async fn ping_minecraft_java(
     req: HttpRequest,

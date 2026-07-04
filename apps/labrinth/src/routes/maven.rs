@@ -18,7 +18,7 @@ use quick_xml::escape::escape;
 use std::collections::HashSet;
 use yaserde::YaSerialize;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(maven_metadata);
     cfg.service(version_file_sha512);
     cfg.service(version_file_sha1);
@@ -70,7 +70,12 @@ pub struct MavenPom {
     description: String,
 }
 
-#[get("maven/modrinth/{id}/maven-metadata.xml")]
+#[utoipa::path(
+	tag = "maven",
+	params(("id" = String, Path)),
+	responses((status = OK, body = String, content_type = "text/xml"))
+)]
+#[get("/maven/modrinth/{id}/maven-metadata.xml")]
 pub async fn maven_metadata(
     req: HttpRequest,
     params: web::Path<(String,)>,
@@ -279,8 +284,20 @@ fn find_file<'a>(
     None
 }
 
+#[utoipa::path(
+	tag = "maven",
+	params(
+		("id" = String, Path),
+		("versionnum" = String, Path),
+		("file" = String, Path)
+	),
+	responses(
+		(status = OK, body = String, content_type = "text/xml"),
+		(status = TEMPORARY_REDIRECT)
+	)
+)]
 #[route(
-    "maven/modrinth/{id}/{versionnum}/{file}",
+    "/maven/modrinth/{id}/{versionnum}/{file}",
     method = "GET",
     method = "HEAD"
 )]
@@ -349,7 +366,16 @@ pub async fn version_file(
     Err(ApiError::NotFound)
 }
 
-#[get("maven/modrinth/{id}/{versionnum}/{file}.sha1")]
+#[utoipa::path(
+	tag = "maven",
+	params(
+		("id" = String, Path),
+		("versionnum" = String, Path),
+		("file" = String, Path)
+	),
+	responses((status = OK, body = String))
+)]
+#[get("/maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
@@ -396,7 +422,16 @@ pub async fn version_file_sha1(
         ))
 }
 
-#[get("maven/modrinth/{id}/{versionnum}/{file}.sha512")]
+#[utoipa::path(
+	tag = "maven",
+	params(
+		("id" = String, Path),
+		("versionnum" = String, Path),
+		("file" = String, Path)
+	),
+	responses((status = OK, body = String))
+)]
+#[get("/maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,

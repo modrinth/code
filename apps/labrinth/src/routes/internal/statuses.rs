@@ -35,7 +35,7 @@ use std::sync::atomic::Ordering;
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::time::{Duration, sleep};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(ws_init);
 }
 
@@ -45,7 +45,12 @@ struct LauncherHeartbeatInit {
 }
 
 // TODO: Move launcher-specific tunnel traffic to a proper launcher websocket endpoint.
-#[get("launcher_socket")]
+/// Start launcher socket.  
+#[utoipa::path(
+	tag = "statuses",
+	responses((status = 101))
+)]
+#[get("/launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
     pool: Data<PgPool>,
