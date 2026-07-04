@@ -8,7 +8,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use std::collections::HashSet;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 use crate::{
@@ -388,7 +388,7 @@ pub async fn pride_26(
         Ok(campaign_info) => Ok(web::Json(campaign_info)),
         Err(error) => {
             if let Some(cached) = cached {
-                warn!(
+                debug!(
                     "Failed to refresh campaign info from Tiltify: {error:?}"
                 );
                 Ok(web::Json(cached))

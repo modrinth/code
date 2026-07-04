@@ -1631,9 +1631,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "加载通知…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "你可以通过下方复选框选择多个项目来一次性编辑。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "服务器项目不支持批量编辑"
   },
@@ -1708,24 +1705,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "请复核运行环境元数据"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "正序"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "降序"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名称"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "状态"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "类型"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "图标"
   },
   "dashboard.projects.table.id": {
     "message": "ID"

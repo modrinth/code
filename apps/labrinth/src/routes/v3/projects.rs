@@ -25,7 +25,6 @@ use crate::models::projects::{
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
 use crate::models::{self, exp};
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
@@ -315,7 +314,6 @@ async fn project_edit(
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     project_edit_internal(
@@ -325,7 +323,6 @@ async fn project_edit(
         web::Json(new_project),
         redis,
         session_queue,
-        moderation_queue,
         search_state,
     )
     .await
@@ -338,7 +335,6 @@ pub async fn project_edit_internal(
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -480,10 +476,6 @@ pub async fn project_edit_internal(
             )
             .execute(&mut transaction)
             .await?;
-
-            moderation_queue
-                .projects
-                .insert(project_item.inner.id.into());
         }
 
         if status.is_approved() && !project_item.inner.status.is_approved() {

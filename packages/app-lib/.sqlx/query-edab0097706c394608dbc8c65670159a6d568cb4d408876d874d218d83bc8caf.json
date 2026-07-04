@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\t\t\tDELETE FROM instance_content_entries\n\t\t\t\tWHERE id IN (\n\t\t\t\t\tSELECT target_entry.id\n\t\t\t\t\tFROM instance_content_entries target_entry\n\t\t\t\t\tWHERE target_entry.instance_id = ?\n\t\t\t\t\t\tAND target_entry.file_id = ?\n\t\t\t\t\t\tAND EXISTS (\n\t\t\t\t\t\t\tSELECT 1\n\t\t\t\t\t\t\tFROM instance_content_entries source_entry\n\t\t\t\t\t\t\tWHERE source_entry.instance_id = target_entry.instance_id\n\t\t\t\t\t\t\t\tAND source_entry.content_set_id = target_entry.content_set_id\n\t\t\t\t\t\t\t\tAND source_entry.file_id = ?\n\t\t\t\t\t\t)\n\t\t\t\t)\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "edab0097706c394608dbc8c65670159a6d568cb4d408876d874d218d83bc8caf"
+}

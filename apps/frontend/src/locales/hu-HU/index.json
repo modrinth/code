@@ -1382,9 +1382,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Értesítések betöltése..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Több projektet is szerkeszthetsz egyszerre, ha kiválasztod őket alább."
-  },
   "dashboard.projects.empty": {
     "message": "Még nincsenek projektjeid. Kattints a fenti zöld gombra a kezdéshez."
   },
@@ -1444,24 +1441,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Kérlek ellenőrizd a környezeti metaadatokat"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Növekvő"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Csökkenő"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Név"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Állapot"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Típus"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "Azonosító"

@@ -1514,24 +1514,6 @@
   "dashboard.projects.project.icon-alt": {
     "message": "Ikon för {title}"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "Stigande"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Fallande"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Namn"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Typ"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
