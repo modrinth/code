@@ -21,37 +21,29 @@ use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("organizations", web::get().to(organizations_get));
-    cfg.service(
-        web::scope("organization")
-            .route("", web::post().to(organization_create))
-            .route("{id}/projects", web::get().to(organization_projects_get))
-            .route("{id}/notes", web::patch().to(organization_notes_edit))
-            .route("{id}", web::get().to(organization_get))
-            .route("{id}", web::patch().to(organizations_edit))
-            .route("{id}", web::delete().to(organization_delete))
-            .route("{id}/projects", web::post().to(organization_projects_add))
-            .route(
-                "{id}/projects/{project_id}",
-                web::delete().to(organization_projects_remove),
-            )
-            .route("{id}/icon", web::patch().to(organization_icon_edit))
-            .route("{id}/icon", web::delete().to(delete_organization_icon))
-            .route(
-                "{id}/members",
-                web::get().to(super::teams::team_members_get_organization),
-            ),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(organizations_get)
+        .service(organization_create)
+        .service(organization_projects_get)
+        .service(organization_notes_edit)
+        .service(organization_get)
+        .service(organizations_edit)
+        .service(organization_delete)
+        .service(organization_projects_add)
+        .service(organization_projects_remove)
+        .service(organization_icon_edit)
+        .service(delete_organization_icon);
 }
 
+#[utoipa::path(tag = "organizations", responses((status = OK)))]
+#[get("/organization/{id}/projects")]
 pub async fn organization_projects_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -106,7 +98,7 @@ pub async fn organization_projects_get(
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewOrganization {
     #[validate(
         length(min = 3, max = 64),
@@ -120,6 +112,8 @@ pub struct NewOrganization {
     pub description: String,
 }
 
+#[utoipa::path(tag = "organizations", responses((status = OK)))]
+#[post("/organization")]
 pub async fn organization_create(
     req: HttpRequest,
     new_organization: web::Json<NewOrganization>,
@@ -222,6 +216,8 @@ pub async fn organization_create(
     Ok(HttpResponse::Ok().json(organization))
 }
 
+#[utoipa::path(tag = "organizations", responses((status = OK)))]
+#[get("/organization/{id}")]
 pub async fn organization_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -300,6 +296,8 @@ pub async fn organization_get(
     Err(ApiError::NotFound)
 }
 
+#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[patch("/organization/{id}/notes")]
 pub async fn organization_notes_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -380,6 +378,12 @@ pub struct OrganizationIds {
     pub ids: String,
 }
 
+#[utoipa::path(
+	tag = "organizations",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
+#[get("/organizations")]
 pub async fn organizations_get(
     req: HttpRequest,
     web::Query(ids): web::Query<OrganizationIds>,
@@ -484,7 +488,7 @@ pub async fn organizations_get(
     Ok(HttpResponse::Ok().json(organizations))
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct OrganizationEdit {
     #[validate(length(min = 3, max = 256))]
     pub description: Option<String>,
@@ -497,6 +501,8 @@ pub struct OrganizationEdit {
     pub name: Option<String>,
 }
 
+#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[patch("/organization/{id}")]
 pub async fn organizations_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -658,6 +664,8 @@ pub async fn organizations_edit(
     }
 }
 
+#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[delete("/organization/{id}")]
 pub async fn organization_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -823,10 +831,12 @@ pub async fn organization_delete(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct OrganizationProjectAdd {
     pub project_id: String, // Also allow name/slug
 }
+#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[post("/organization/{id}/projects")]
 pub async fn organization_projects_add(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -985,13 +995,15 @@ pub async fn organization_projects_add(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct OrganizationProjectRemoval {
     // A new owner must be supplied for the project.
     // That user must be a member of the organization, but not necessarily a member of the project.
     pub new_owner: UserId,
 }
 
+#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[delete("/organization/{id}/projects/{project_id}")]
 pub async fn organization_projects_remove(
     req: HttpRequest,
     info: web::Path<(String, String)>,
@@ -1181,6 +1193,13 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[utoipa::path(
+	tag = "organizations",
+	params(("ext" = String, Query)),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/organization/{id}/icon")]
 pub async fn organization_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
@@ -1288,6 +1307,8 @@ pub async fn organization_icon_edit(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[utoipa::path(tag = "organizations", responses((status = NO_CONTENT)))]
+#[delete("/organization/{id}/icon")]
 pub async fn delete_organization_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,

@@ -38,7 +38,7 @@ impl SharedInstance {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SharedInstanceVersion {
     pub id: SharedInstanceVersionId,
     pub shared_instance: SharedInstanceId,

@@ -76,8 +76,14 @@
 					v-if="showIconInSelected && selectedOption?.icon"
 					class="h-5 w-5 shrink-0"
 				/>
-				<span class="min-w-0 truncate text-primary font-semibold leading-tight">
-					<slot name="selected" :label="triggerText">{{ triggerText }}</slot>
+				<span
+					v-if="selectedOption"
+					class="min-w-0 truncate text-primary font-semibold leading-tight"
+				>
+					<slot name="selected" :label="selectedTriggerText">{{ selectedTriggerText }}</slot>
+				</span>
+				<span v-else class="min-w-0 truncate text-secondary opacity-70 font-medium leading-tight">
+					{{ placeholderText }}
 				</span>
 			</div>
 			<div class="flex shrink-0 items-center gap-1">
@@ -391,9 +397,13 @@ const searchableInputClass = computed(() => {
 	return parts.join(' ')
 })
 
-const triggerText = computed(() => {
+const selectedTriggerText = computed(() => {
 	if (props.displayValue !== undefined) return props.displayValue
-	if (selectedOption.value) return selectedOption.value.label
+	return selectedOption.value?.label ?? ''
+})
+
+const placeholderText = computed(() => {
+	if (props.displayValue !== undefined) return props.displayValue
 	return props.placeholder
 })
 

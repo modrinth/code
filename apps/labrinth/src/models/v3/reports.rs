@@ -17,7 +17,7 @@ pub struct Report {
     pub thread_id: ThreadId,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(rename_all = "kebab-case")]
 pub enum ItemType {
     Project,

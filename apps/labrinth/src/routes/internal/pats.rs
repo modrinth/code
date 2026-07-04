@@ -22,20 +22,22 @@ use crate::util::validate::validation_errors_to_string;
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_pats);
     cfg.service(create_pat);
     cfg.service(edit_pat);
     cfg.service(delete_pat);
 }
 
+/// List personal access tokens.  
 #[utoipa::path(
+	tag = "personal access tokens",
     get,
-    operation_id = "getPats",
-    responses(
-        (status = 200, description = "List of PATs"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "getPats",
+	responses(
+		(status = 200, description = "List of PATs", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = ["PAT_READ"]))
 )]
 #[get("/pat")]
@@ -82,14 +84,16 @@ pub struct NewPersonalAccessToken {
     pub expires: DateTime<Utc>,
 }
 
+/// Create a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     post,
-    operation_id = "createPat",
-    responses(
-        (status = 200, description = "PAT created"),
-        (status = 400, description = "Invalid input"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "createPat",
+	responses(
+		(status = 200, description = "PAT created", body = serde_json::Value),
+		(status = 400, description = "Invalid input"),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = ["PAT_CREATE"]))
 )]
 #[post("/pat")]
@@ -185,10 +189,14 @@ pub struct ModifyPersonalAccessToken {
     pub expires: Option<DateTime<Utc>>,
 }
 
+/// Update a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     patch,
     operation_id = "editPat",
-    params(("id" = String, Path, description = "The PAT ID")),
+    params(
+        ("id" = String, Path, description = "The PAT ID")
+    ),
     responses(
         (status = 204, description = "PAT updated"),
         (status = 400, description = "Invalid input"),
@@ -293,10 +301,14 @@ pub async fn edit_pat(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Delete a personal access token.  
 #[utoipa::path(
+	tag = "personal access tokens",
     delete,
     operation_id = "deletePat",
-    params(("id" = String, Path, description = "The PAT ID")),
+    params(
+        ("id" = String, Path, description = "The PAT ID")
+    ),
     responses(
         (status = 204, description = "PAT deleted"),
         (status = 401, description = "Unauthorized")

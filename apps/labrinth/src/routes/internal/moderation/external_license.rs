@@ -13,7 +13,7 @@ use crate::queue::moderation::ApprovalType;
 use crate::routes::ApiError;
 use crate::{auth::check_is_moderator_from_headers, queue::session::AuthQueue};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search)
         .service(get_by_sha1)
         .service(get_by_sha1_bulk)
@@ -329,9 +329,14 @@ async fn fetch_by_flame_ids(
     Ok(results)
 }
 
-#[utoipa::path]
+/// Search external licenses.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = inline(Vec<ExternalProject>)))
+)]
 #[post("/search")]
-async fn search(
+pub async fn search(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -393,9 +398,14 @@ async fn search(
     Ok(web::Json(results))
 }
 
-#[utoipa::path]
+/// Look up external license metadata.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = ExternalLicenseLookupResponse))
+)]
 #[post("/lookup")]
-async fn lookup(
+pub async fn lookup(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -422,9 +432,14 @@ async fn lookup(
     }))
 }
 
-#[utoipa::path]
+/// Get external license by SHA-1.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[get("/by-sha1/{sha1}")]
-async fn get_by_sha1(
+pub async fn get_by_sha1(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -448,9 +463,14 @@ async fn get_by_sha1(
     Ok(web::Json(result))
 }
 
-#[utoipa::path]
+/// Get external licenses by SHA-1.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = inline(HashMap<String, ExternalProject>)))
+)]
 #[post("/by-sha1")]
-async fn get_by_sha1_bulk(
+pub async fn get_by_sha1_bulk(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -472,9 +492,14 @@ async fn get_by_sha1_bulk(
     Ok(web::Json(results))
 }
 
-#[utoipa::path]
+/// Add an external license file.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[post("/file")]
-async fn add_file(
+pub async fn add_file(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -484,9 +509,14 @@ async fn add_file(
     upsert_file_license(req, pool, redis, session_queue, body).await
 }
 
-#[utoipa::path]
+/// Reassign an external license file.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[post("/file/reassign")]
-async fn reassign_file(
+pub async fn reassign_file(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -584,9 +614,14 @@ async fn upsert_file_license(
     ))
 }
 
-#[utoipa::path]
+/// Update an external license.  
+#[utoipa::path(
+	context_path = "/moderation/external-license",
+	tag = "moderation",
+	responses((status = OK, body = ExternalProject))
+)]
 #[patch("/{id}")]
-async fn update_license(
+pub async fn update_license(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

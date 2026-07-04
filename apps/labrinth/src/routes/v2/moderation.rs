@@ -8,8 +8,8 @@ use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::Deserialize;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(utoipa_actix_web::scope("/moderation").service(get_projects));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(web::scope("/moderation").service(get_projects));
 }
 
 #[derive(Deserialize)]
@@ -22,19 +22,17 @@ fn default_count() -> u16 {
     100
 }
 
-/// Get projects in the moderation queue.
+/// List projects in the moderation queue.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "v2 moderation",
     get,
     operation_id = "getModerationProjects",
     params(
-        (
-            "count" = Option<u16>,
-            Query,
-            description = "Maximum number of projects to return"
-        )
+        ("count" = Option<u16>, Query, description = "Maximum number of projects to return")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+		(status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

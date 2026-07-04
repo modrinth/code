@@ -114,6 +114,7 @@ export const configuredXss = new FilterXSS({
 					'bstats.org',
 					'cdn.serilum.com',
 					'workflow.serilum.com'
+					'modfolio.creeperkatze.dev',
 				]
 
 				const allowedHostnameSuffixes = ['.github.io']

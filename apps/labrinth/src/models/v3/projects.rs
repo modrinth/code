@@ -8,6 +8,7 @@ use crate::models::exp;
 use crate::models::ids::{
     FileId, OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
+use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
@@ -970,6 +971,7 @@ pub struct VersionFile {
     pub id: Option<FileId>,
     /// A map of hashes of the file.  The key is the hashing algorithm
     /// and the value is the string version of the hash.
+    #[schema(value_type = std::collections::HashMap<HashAlgorithm, FileHash>)]
     pub hashes: std::collections::HashMap<String, String>,
     /// A direct link to the file for downloading it.
     pub url: String,
