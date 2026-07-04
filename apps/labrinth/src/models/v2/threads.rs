@@ -7,7 +7,7 @@ use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LegacyThread {
     pub id: ThreadId,
     #[serde(rename = "type")]
@@ -18,7 +18,7 @@ pub struct LegacyThread {
     pub members: Vec<User>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LegacyThreadMessage {
     pub id: ThreadMessageId,
     pub author_id: Option<UserId>,
@@ -26,7 +26,7 @@ pub struct LegacyThreadMessage {
     pub created: DateTime<Utc>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyMessageBody {
     Text {
@@ -49,7 +49,9 @@ pub enum LegacyMessageBody {
     },
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone)]
+#[derive(
+    Serialize, Deserialize, Eq, PartialEq, Copy, Clone, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum LegacyThreadType {
     Report,

@@ -21,11 +21,11 @@ use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-mod external_license;
+pub mod external_license;
 mod ownership;
-mod tech_review;
+pub mod tech_review;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_projects)
         .service(get_project_meta)
         .service(set_project_meta)
@@ -35,13 +35,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
+        .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
-            utoipa_actix_web::scope("/tech-review")
-                .configure(tech_review::config),
-        )
-        .service(
-            utoipa_actix_web::scope("/external-license")
-                .configure(external_license::config),
+            web::scope("/external-license").configure(external_license::config),
         );
 }
 
@@ -162,12 +158,19 @@ pub struct DeleteAllLocksResponse {
     pub deleted_count: u64,
 }
 
-/// Fetch all projects which are in the moderation queue.
+/// List projects in the moderation queue.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
+	params(
+		("count" = Option<u16>, Query),
+		("offset" = Option<u32>, Query),
+		("has_external_dependencies" = Option<bool>, Query)
+	),
     responses((status = OK, body = inline(Vec<FetchedProject>)))
 )]
 #[get("/projects")]
-async fn get_projects(
+pub async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -291,12 +294,14 @@ pub async fn get_projects_internal(
     Ok(web::Json(projects))
 }
 
-/// Fetch moderation metadata for a specific project.
+/// Get project moderation metadata.  
 #[utoipa::path(
-    responses((status = OK, body = inline(Vec<Project>)))
+	context_path = "/moderation",
+	tag = "moderation",
+	responses((status = OK, body = MissingMetadata))
 )]
 #[get("/project/{id}")]
-async fn get_project_meta(
+pub async fn get_project_meta(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -447,10 +452,14 @@ pub enum Judgement {
     },
 }
 
-/// Update moderation judgements for projects in the review queue.
-#[utoipa::path]
+/// Update project moderation judgements.  
+#[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
+	responses((status = NO_CONTENT))
+)]
 #[post("/project")]
-async fn set_project_meta(
+pub async fn set_project_meta(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -536,16 +545,18 @@ async fn set_project_meta(
     Ok(())
 }
 
-/// Acquire or refresh a moderation lock on a project.
+/// Acquire a moderation lock.  
 /// Returns success if acquired, or info about who holds the lock if blocked.
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockAcquireResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[post("/lock/{project_id}")]
-async fn acquire_lock(
+pub async fn acquire_lock(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -594,15 +605,17 @@ async fn acquire_lock(
     }
 }
 
-/// Force-acquire a moderation lock on a project (moderator override).
+/// Override a moderation lock.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockAcquireResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[post("/lock/{project_id}/override")]
-async fn override_lock(
+pub async fn override_lock(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -639,15 +652,17 @@ async fn override_lock(
     }))
 }
 
-/// Check the lock status for a project
+/// Get moderation lock status.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockStatusResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[get("/lock/{project_id}")]
-async fn get_lock_status(
+pub async fn get_lock_status(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -699,15 +714,17 @@ async fn get_lock_status(
     }
 }
 
-/// Release a moderation lock on a project
+/// Release a moderation lock.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockReleaseResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[delete("/lock/{project_id}")]
-async fn release_lock(
+pub async fn release_lock(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -740,12 +757,14 @@ async fn release_lock(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Release a moderation lock using credentials in the request body.
+/// Release a moderation lock by beacon.  
 ///
 /// For use with `navigator.sendBeacon`, which cannot set `Authorization` or send `DELETE`.
 /// The body must be `text/plain` containing the same token value as the `Authorization` header
 /// (optional `Bearer ` prefix). This avoids a CORS preflight compared to `application/json`.
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     request_body(
         content = String,
         description = "Token value (same as Authorization header)",
@@ -757,7 +776,7 @@ async fn release_lock(
     )
 )]
 #[post("/lock/{project_id}/release")]
-async fn release_lock_beacon(
+pub async fn release_lock_beacon(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -811,15 +830,17 @@ async fn release_lock_beacon(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Delete all moderation locks (admin only)
+/// Delete all moderation locks.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = DeleteAllLocksResponse),
         (status = UNAUTHORIZED, description = "Not an admin")
     )
 )]
 #[delete("/locks")]
-async fn delete_all_locks(
+pub async fn delete_all_locks(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

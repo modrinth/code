@@ -242,7 +242,7 @@ impl Role {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserFriend {
     // The user who accepted the friend request
     pub id: UserId,

@@ -79,6 +79,7 @@ jobs:
       SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      RUST_MIN_STACK: '16777216'
     steps:
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

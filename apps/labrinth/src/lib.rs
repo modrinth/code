@@ -344,6 +344,14 @@ pub fn app_config(
     cfg: &mut web::ServiceConfig,
     labrinth_config: LabrinthConfig,
 ) {
+    app_data_config(cfg, labrinth_config);
+    app_fallback_config(cfg);
+}
+
+pub fn app_data_config(
+    cfg: &mut web::ServiceConfig,
+    labrinth_config: LabrinthConfig,
+) {
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
         routes::ApiError::Validation(err.to_string()).into()
     }))
@@ -379,16 +387,17 @@ pub fn app_config(
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(labrinth_config.kafka_client.clone())
     .app_data(labrinth_config.search_state.clone())
-    .app_data(labrinth_config.webauthn.clone())
-    .configure(routes::v3::config)
-    .configure(routes::internal::config)
-    .configure(routes::root_config)
-    .default_service(web::get().wrap(default_cors()).to(routes::not_found));
+    .app_data(labrinth_config.webauthn.clone());
 }
 
-pub fn utoipa_app_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-    _labrinth_config: LabrinthConfig,
+pub fn app_fallback_config(cfg: &mut web::ServiceConfig) {
+    cfg.configure(routes::root_config)
+        .default_service(web::get().to(routes::not_found).wrap(default_cors()));
+}
+
+pub fn app_routes_config(
+    cfg: &mut web::ServiceConfig,
+    labrinth_config: LabrinthConfig,
 ) {
     cfg.configure({
         #[cfg(target_os = "linux")]
@@ -400,7 +409,29 @@ pub fn utoipa_app_config(
             |_cfg| ()
         }
     })
-    .configure(routes::v2::utoipa_config)
-    .configure(routes::v3::utoipa_config)
-    .configure(routes::internal::utoipa_config);
+    .configure(|cfg| app_routes_config_v2(cfg, labrinth_config.clone()))
+    .configure(|cfg| app_routes_config_v3(cfg, labrinth_config.clone()))
+    .configure(|cfg| app_routes_config_internal(cfg, labrinth_config));
+}
+
+pub fn app_routes_config_v2(
+    cfg: &mut web::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::v2::config);
+}
+
+pub fn app_routes_config_v3(
+    cfg: &mut web::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::public_config)
+        .configure(routes::v3::config);
+}
+
+pub fn app_routes_config_internal(
+    cfg: &mut web::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::internal::config);
 }

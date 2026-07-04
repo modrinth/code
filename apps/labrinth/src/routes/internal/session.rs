@@ -19,9 +19,9 @@ use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use woothee::parser::Parser;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/session")
+        web::scope("/session")
             .service(list)
             .service(delete)
             .service(refresh),
@@ -133,13 +133,16 @@ pub async fn issue_session(
     Ok(session)
 }
 
+/// List sessions.  
 #[utoipa::path(
+	context_path = "/session",
+	tag = "sessions",
     get,
-    operation_id = "listSessions",
-    responses(
-        (status = 200, description = "List of active sessions"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "listSessions",
+	responses(
+		(status = 200, description = "List of active sessions", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = ["SESSION_READ"]))
 )]
 #[get("/list")]
@@ -178,10 +181,15 @@ pub async fn list(
     Ok(HttpResponse::Ok().json(sessions))
 }
 
+/// Delete a session.  
 #[utoipa::path(
+	context_path = "/session",
+	tag = "sessions",
     delete,
     operation_id = "deleteSession",
-    params(("id" = String, Path, description = "The session ID")),
+    params(
+        ("id" = String, Path, description = "The session ID")
+    ),
     responses(
         (status = 204, description = "Session deleted"),
         (status = 401, description = "Unauthorized")
@@ -228,13 +236,16 @@ pub async fn delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+/// Refresh a session.  
 #[utoipa::path(
+	context_path = "/session",
+	tag = "sessions",
     post,
-    operation_id = "refreshSession",
-    responses(
-        (status = 200, description = "Session refreshed"),
-        (status = 401, description = "Unauthorized")
-    )
+	operation_id = "refreshSession",
+	responses(
+		(status = 200, description = "Session refreshed", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	)
 )]
 #[post("/refresh")]
 pub async fn refresh(

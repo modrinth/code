@@ -35,7 +35,7 @@ use crate::{
 
 pub mod rescan;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/delphi")
             .service(ingest_report)
@@ -141,8 +141,14 @@ pub struct DelphiRunParameters {
     pub file_id: crate::models::ids::FileId,
 }
 
-#[post("ingest", guard = "admin_key_guard")]
-async fn ingest_report(
+/// Ingest a Delphi report.  
+#[utoipa::path(
+	context_path = "/delphi",
+	tag = "delphi",
+	responses((status = NO_CONTENT))
+)]
+#[post("/ingest", guard = "admin_key_guard")]
+pub async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     web::Json(report): web::Json<serde_json::Value>,
@@ -466,8 +472,15 @@ pub async fn send_tech_review_exit_file_deleted_message_if_exited(
     Ok(())
 }
 
-#[post("run")]
-async fn _run(
+/// Run Delphi.  
+#[utoipa::path(
+	context_path = "/delphi",
+	tag = "delphi",
+	params(("file_id" = crate::models::ids::FileId, Query)),
+	responses((status = NO_CONTENT))
+)]
+#[post("/run")]
+pub async fn _run(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -487,8 +500,14 @@ async fn _run(
     run(&**pool, run_parameters.into_inner(), &http).await
 }
 
-#[get("version")]
-async fn version(
+/// Get the Delphi version.  
+#[utoipa::path(
+	context_path = "/delphi",
+	tag = "delphi",
+	responses((status = OK, body = inline(Option<i32>)))
+)]
+#[get("/version")]
+pub async fn version(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -510,8 +529,14 @@ async fn version(
     ))
 }
 
-#[get("issue_type/schema")]
-async fn issue_type_schema(
+/// Get the Delphi issue type schema.  
+#[utoipa::path(
+	context_path = "/delphi",
+	tag = "delphi",
+	responses((status = OK, body = serde_json::Value))
+)]
+#[get("/issue_type/schema")]
+pub async fn issue_type_schema(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

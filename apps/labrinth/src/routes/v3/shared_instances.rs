@@ -19,33 +19,24 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_typed_from_payload;
 use actix_web::web::{Data, Redirect};
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use futures_util::future::try_join_all;
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("shared-instance", web::post().to(shared_instance_create));
-    cfg.route("shared-instance", web::get().to(shared_instance_list));
-    cfg.service(
-        web::scope("shared-instance")
-            .route("{id}", web::get().to(shared_instance_get))
-            .route("{id}", web::patch().to(shared_instance_edit))
-            .route("{id}", web::delete().to(shared_instance_delete))
-            .route("{id}/version", web::get().to(shared_instance_version_list)),
-    );
-    cfg.service(
-        web::scope("shared-instance-version")
-            .route("{id}", web::get().to(shared_instance_version_get))
-            .route("{id}", web::delete().to(shared_instance_version_delete))
-            .route(
-                "{id}/download",
-                web::get().to(shared_instance_version_download),
-            ),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(shared_instance_create)
+        .service(shared_instance_list)
+        .service(shared_instance_get)
+        .service(shared_instance_edit)
+        .service(shared_instance_delete)
+        .service(shared_instance_version_list)
+        .service(shared_instance_version_get)
+        .service(shared_instance_version_delete)
+        .service(shared_instance_version_download);
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct CreateSharedInstance {
     #[validate(
         length(min = 3, max = 64),
@@ -56,6 +47,12 @@ pub struct CreateSharedInstance {
     pub public: bool,
 }
 
+#[utoipa::path(
+	tag = "shared instances",
+	request_body = CreateSharedInstance,
+	responses((status = OK))
+)]
+#[post("/shared-instance")]
 pub async fn shared_instance_create(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -101,6 +98,8 @@ pub async fn shared_instance_create(
     }))
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = OK)))]
+#[get("/shared-instance")]
 pub async fn shared_instance_list(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -148,6 +147,8 @@ pub async fn shared_instance_list(
     Ok(HttpResponse::Ok().json(instances))
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = OK)))]
+#[get("/shared-instance/{id}")]
 pub async fn shared_instance_get(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -209,7 +210,7 @@ fn can_access_instance_privately(
         || users.iter().any(|x| x.user_id == user.id.into())
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditSharedInstance {
     #[validate(
         length(min = 3, max = 64),
@@ -219,6 +220,12 @@ pub struct EditSharedInstance {
     pub public: Option<bool>,
 }
 
+#[utoipa::path(
+	tag = "shared instances",
+	request_body = EditSharedInstance,
+	responses((status = NO_CONTENT))
+)]
+#[patch("/shared-instance/{id}")]
 pub async fn shared_instance_edit(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -299,6 +306,8 @@ pub async fn shared_instance_edit(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = NO_CONTENT)))]
+#[delete("/shared-instance/{id}")]
 pub async fn shared_instance_delete(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -355,6 +364,8 @@ pub async fn shared_instance_delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = OK)))]
+#[get("/shared-instance/{id}/version")]
 pub async fn shared_instance_version_list(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -401,6 +412,8 @@ pub async fn shared_instance_version_list(
     }
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = OK)))]
+#[get("/shared-instance-version/{id}")]
 pub async fn shared_instance_version_get(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -461,6 +474,8 @@ async fn can_access_instance_as_maybe_user(
     }))
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = NO_CONTENT)))]
+#[delete("/shared-instance-version/{id}")]
 pub async fn shared_instance_version_delete(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -560,6 +575,8 @@ async fn delete_instance_version(
     Ok(())
 }
 
+#[utoipa::path(tag = "shared instances", responses((status = TEMPORARY_REDIRECT)))]
+#[get("/shared-instance-version/{id}/download")]
 pub async fn shared_instance_version_download(
     req: HttpRequest,
     pool: Data<PgPool>,

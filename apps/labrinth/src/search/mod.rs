@@ -285,7 +285,7 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct SearchProjectDependency {
     pub project_id: String,
     pub dependency_type: DependencyType,
@@ -294,7 +294,7 @@ pub struct SearchProjectDependency {
     pub icon_url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct SearchResults {
     pub hits: Vec<ResultSearchProject>,
     pub page: usize,
@@ -302,7 +302,7 @@ pub struct SearchResults {
     pub total_hits: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
     pub version_id: String,
     pub project_id: String,
