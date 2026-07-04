@@ -113,7 +113,7 @@ export const configuredXss = new FilterXSS({
 					'cf.way2muchnoise.eu',
 					'bstats.org',
 					'cdn.serilum.com',
-					'workflow.serilum.com'
+					'workflow.serilum.com',
 					'modfolio.creeperkatze.dev',
 				]
 
