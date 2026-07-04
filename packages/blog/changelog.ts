@@ -11,6 +11,29 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-04T22:59:54+00:00`,
+		product: 'app',
+		version: '0.15.5',
+		body: `## Changed
+- Added cdn.serilum.com and workflow.serilum.com as domains that can bypass the image proxy.
+- Allow modfolio.creeperkatze.dev to bypass image proxy.
+
+## Fixed
+- Fixed the update app button width being fixed width, causing issues with non-English translations.`,
+	},
+	{
+		date: `2026-07-04T22:59:54+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added cdn.serilum.com and workflow.serilum.com as domains that can bypass the image proxy.
+- Refreshed project download modal UI.
+- Allow modfolio.creeperkatze.dev to bypass image proxy.
+- Added a guard to prevent \`.mrpacks\` to be uploaded as supplementary files.
+
+## Fixed
+- Fixed version page table's platform tag overflow issues.`,
+	},
+	{
 		date: `2026-07-03T15:16:21+00:00`,
 		product: 'web',
 		body: `## Fixed
