@@ -410,11 +410,26 @@
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Switch version"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Install content to instance"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Already installed"
+  },
+  "app.project.versions.install": {
+    "message": "Install"
+  },
+  "app.project.versions.open-in-browser": {
+    "message": "Open in browser"
+  },
+  "app.project.versions.swap-version": {
+    "message": "Switch to version"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
