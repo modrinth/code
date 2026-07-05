@@ -274,9 +274,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 		const extraParams = options.getExtraQueryParams?.() ?? {}
 		for (const [key, value] of Object.entries(extraParams)) {
-			if (value !== undefined) {
-				persistentParams[key] = value
-			}
+			persistentParams[key] = value
 		}
 
 		const params = {

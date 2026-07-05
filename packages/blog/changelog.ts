@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-05T01:48:48+00:00`,
+		product: 'app',
+		version: '0.15.7',
+		body: `## Fixed
+- Fixed environment filters showing in server panel's browse page.`,
+	},
+	{
+		date: `2026-07-05T01:48:48+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed environment filters showing in server panel's browse page.
+- Fixed server-specific filter options not being removed from the URL when toggled off.`,
+	},
+	{
 		date: `2026-07-04T23:15:47+00:00`,
 		product: 'app',
 		version: '0.15.6',
