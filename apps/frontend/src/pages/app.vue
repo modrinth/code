@@ -2366,11 +2366,11 @@ useSeoMeta({
 }
 
 .dark-icon {
-	display: block;
+	display: block !important;
 }
 
 .light-icon {
-	display: none;
+	display: none !important;
 }
 
 .light-mode {
@@ -2384,11 +2384,11 @@ useSeoMeta({
 	}
 
 	.dark-icon {
-		display: none;
+		display: none !important;
 	}
 
 	.light-icon {
-		display: block;
+		display: block !important;
 	}
 
 	.feature {
