@@ -9,10 +9,18 @@
 			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent" color="green">
+				<ButtonStyled
+					circular
+					type="transparent"
+					:color="installed && version.id === installedVersion ? 'standard' : 'green'"
+				>
 					<button
 						v-tooltip="
-							!installed ? 'Install' : version.id !== installedVersion ? 'Swap version' : ''
+							!installed
+								? formatMessage(messages.install)
+								: version.id !== installedVersion
+									? formatMessage(messages.swapVersion)
+									: formatMessage(messages.alreadyInstalled)
 						"
 						:disabled="installing || (installed && version.id === installedVersion)"
 						@click.stop="() => install(version.id)"
@@ -49,7 +57,7 @@
 					</OverflowMenu>
 					<a
 						v-else
-						v-tooltip="`Open in browser`"
+						v-tooltip="formatMessage(messages.openInBrowser)"
 						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
 						target="_blank"
 					>
@@ -65,9 +73,11 @@
 import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	ProjectPageVersions,
+	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -76,7 +86,27 @@ import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { useTheming } from '@/store/theme.ts'
 
+const { formatMessage } = useVIntl()
 const themeStore = useTheming()
+
+const messages = defineMessages({
+	install: {
+		id: 'app.project.versions.install',
+		defaultMessage: 'Install',
+	},
+	swapVersion: {
+		id: 'app.project.versions.swap-version',
+		defaultMessage: 'Switch to version',
+	},
+	alreadyInstalled: {
+		id: 'app.project.versions.already-installed',
+		defaultMessage: 'Already installed',
+	},
+	openInBrowser: {
+		id: 'app.project.versions.open-in-browser',
+		defaultMessage: 'Open in browser',
+	},
+})
 
 defineProps({
 	project: {
