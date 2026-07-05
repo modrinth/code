@@ -1031,6 +1031,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "Länk krävs."
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Installera"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Installation misslyckades"
   },
@@ -1387,6 +1390,12 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Installera projekt"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Installera"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Installerad"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Instanstyp"
@@ -3573,3 +3582,4 @@
     "defaultMessage": "Du har osparade ändringar."
   }
 }
+

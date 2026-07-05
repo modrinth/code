@@ -1163,6 +1163,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "URLは必須です。"
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "インストール"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "インストールに失敗"
   },
@@ -1591,6 +1594,12 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "プロジェクトをインストール"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "インストール"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "インストール済み"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "インスタンスの種類"

@@ -8,6 +8,9 @@
   "app.modal.install-to-play.header": {
     "message": "Installer for å spille"
   },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installer"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {# mods}}"
   },

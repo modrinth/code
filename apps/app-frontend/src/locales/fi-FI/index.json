@@ -188,6 +188,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Sisällön lisääminen voi rikkoa yhteensopivuuden palvelimelle liittyessä. Kaikki lisätty sisältö katoaa myös kun päivität palvelin instanssin sisällön."
   },
+  "app.browse.server.installing": {
+    "message": "Asennetaan"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Yhtään versiota ei ole saatavilla yhteensopivuudella {compatibilityLabel}. Valitse asennettava versio siitä huolimatta. Riippuvuuksia ei asenneta automaattisesti."
   },
@@ -373,6 +376,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Asenna pelataksesi"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Asenna"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modia}}"

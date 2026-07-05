@@ -1496,6 +1496,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "链接是必填项。"
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "安装"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "安装失败"
   },
@@ -1954,6 +1957,12 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "该实例所使用的加载器或游戏版本，与此项目支持的配置不一致。"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "安装"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "已安装"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "实例类型"
@@ -5682,3 +5691,4 @@
     "defaultMessage": "类型"
   }
 }
+

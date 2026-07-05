@@ -1226,6 +1226,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "Bắt buộc có đường dẫn."
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Cài đặt"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Cài đặt thất bại"
   },
@@ -1684,6 +1687,12 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Cấu hình này dùng trình tải hoặc phiên bản khác mà nội dung này hỗ trợ."
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Cài đặt"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Đã cài đặt"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Loại phiên chơi"
@@ -5088,3 +5097,4 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
+

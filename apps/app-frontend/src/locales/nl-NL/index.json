@@ -155,6 +155,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Het toevoegen van content kan de compatibiliteit verbreken bij het verbinden met de server. Alle toegevoegde inhoud gaat ook verloren wanneer u de content van de serverinstantie bijwerkt."
   },
+  "app.browse.server.installing": {
+    "message": "Installeren"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Er zijn geen beschikbare versies die overeenkomen met {compatibilityLabel}. Selecteer toch een versie om te installeren. Afhankelijkheden worden niet automatisch geïnstalleerd."
   },
@@ -253,6 +256,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Installeer om te spelen"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installeer"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"

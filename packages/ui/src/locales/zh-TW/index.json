@@ -1496,6 +1496,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "網址為必填項目"
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "安裝"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "安裝失敗"
   },
@@ -1954,6 +1957,12 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "這個專案支援的載入器或遊戲版本與這個實例所使用的不同。"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "安裝"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "已安裝"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "實例類型"
@@ -5682,3 +5691,4 @@
     "defaultMessage": "類型"
   }
 }
+

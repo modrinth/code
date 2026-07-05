@@ -188,6 +188,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Ajouter du contenu peut briser la comptabilité en rejoignant le serveur. Tout contenu en plus sera également perdu lorsque vous mettrez à jour le contenu de l'instance du serveur."
   },
+  "app.browse.server.installing": {
+    "message": "Installation en cours"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Aucune version disponible ne correspond à {compatibilityLabel}. Sélectionnez une version pour l'installer malgré tout. Les dépendances ne seront pas installées automatiquement."
   },
@@ -373,6 +376,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Installer pour jouer"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installer"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"

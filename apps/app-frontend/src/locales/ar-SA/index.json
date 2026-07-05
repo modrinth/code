@@ -104,6 +104,9 @@
   "app.browse.hide-added-servers": {
     "message": "إخفاء الخوادم المضافة مسبقًا"
   },
+  "app.browse.server.installing": {
+    "message": "جاري التثبيت"
+  },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."
   },
@@ -199,6 +202,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "نزل للعب"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "تثبيت"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# تعديل} other {# تعديلات}}"

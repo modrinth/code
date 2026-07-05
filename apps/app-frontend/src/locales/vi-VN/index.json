@@ -155,6 +155,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Thêm nội dung có thể gây lỗi tương thích khi tham gia máy chủ. Bất kỳ nội dung nào được thêm vào cũng sẽ bị mất khi bạn cập nhật nội dung của phiên bản máy chủ."
   },
+  "app.browse.server.installing": {
+    "message": "Đang cài đặt"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Không có phiên bản nào phù hợp với {compatibilityLabel}. Nếu vẫn chọn một phiên bản để cài đặt, các gói phụ thuộc sẽ không được tải tự động."
   },
@@ -253,6 +256,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Tải xuống để chơi"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Tải xuống"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"

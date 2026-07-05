@@ -188,6 +188,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Att lägga till innehåll kan bryta kompatibiliteten när du ansluter dig till servern. Allt tillagt innehåll kommer att förloras när du uppdaterar serverinstansen."
   },
+  "app.browse.server.installing": {
+    "message": "Installerar"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tillgänglig version matchar {compatibilityLabel}. Välj en version att installera ändå. Beroenden kommer inte installeras automatiskt."
   },
@@ -361,6 +364,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Installera för att spela"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installera"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# moddar}}"

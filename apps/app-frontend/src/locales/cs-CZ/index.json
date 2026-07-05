@@ -188,6 +188,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Přidání obsahu může narušit kompatibilitu při připojení k serveru. Veškerý přidaný obsah se navíc ztratí při aktualizaci obsahu instance serveru."
   },
+  "app.browse.server.installing": {
+    "message": "Instalování"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Žádné dostupné verze se neshodují s {compatibilityLabel}. Vyberte verzi, kterou chcete přesto nainstalovat. Závislosti nebudou nainstalovány automaticky."
   },
@@ -373,6 +376,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Nainstaluj pro hraní"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalovat"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mód} few {# módy} other {# módů}}"

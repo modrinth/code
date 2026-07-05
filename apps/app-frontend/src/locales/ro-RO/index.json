@@ -11,6 +11,9 @@
   "app.modal.install-to-play.header": {
     "message": "Instalați pentru a juca"
   },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalează"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {#mod} other {# moduri}}"
   },

@@ -152,6 +152,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "Maaaring makasisira sa pagkakatugma sa pagsasali ng server ang pagdaragdag ng kontento. Ang anumang kontento ay mawawala sa pag-update ng kontento ng instansiyang pang-server."
   },
+  "app.browse.server.installing": {
+    "message": "Ini-install"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Ilagay ang paglalarawan ng modpack..."
   },
@@ -247,6 +250,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Mag-install upang malaro"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "I-install"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# na mod}}"

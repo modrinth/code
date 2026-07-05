@@ -197,6 +197,9 @@
   "app.modal.install-to-play.header": {
     "message": "Instala para jogar"
   },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalar"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {mod} other {mods}}"
   },

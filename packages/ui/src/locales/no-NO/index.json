@@ -533,6 +533,12 @@
   "instances.content-install.header": {
     "defaultMessage": "Installer prosjekt"
   },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Installer"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Installert"
+  },
   "instances.content-install.instance-type": {
     "defaultMessage": "Instansetype"
   },
@@ -2127,3 +2133,4 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
+

@@ -1487,6 +1487,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "URL jest wymagany."
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Zainstaluj"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Instalacja nie powiodła się"
   },
@@ -1945,6 +1948,12 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Ta instancja używa innego loadera lub innej wersji gry, niż wspiera ten projekt."
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Zainstaluj"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Zainstalowany"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Typ instancji"

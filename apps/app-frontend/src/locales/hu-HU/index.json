@@ -161,6 +161,9 @@
   "app.browse.server-instance-content-warning": {
     "message": "A tartalom hozzáadása ronthatja a kompatibilitást a szerverhez való csatlakozáskor. A hozzáadott tartalom elveszik, ha frissíted a szerverprofil tartalmát."
   },
+  "app.browse.server.installing": {
+    "message": "Letöltés..."
+  },
   "app.content-install.no-compatible-versions": {
     "message": "Nincs a(z) {compatibilityLabel} verziónak megfelelő elérhető verzió. Válassz ki egy verziót, ha mégis telepíteni szeretnéd. A függőségek nem települnek automatikusan."
   },
@@ -262,6 +265,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Telepítés a játékhoz"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Telepítés"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"

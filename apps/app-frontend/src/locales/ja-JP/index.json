@@ -137,6 +137,9 @@
   "app.browse.project-type.modpacks": {
     "message": "Modパック"
   },
+  "app.browse.server.installing": {
+    "message": "インストール中"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },
@@ -232,6 +235,9 @@
   },
   "app.modal.install-to-play.header": {
     "message": "インストールしてプレイ"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "インストール"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {#個のMod}}"

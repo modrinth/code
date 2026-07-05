@@ -1082,6 +1082,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "A link megadása kötelező."
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Telepítés"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "A telepítés sikertelen volt"
   },
@@ -1480,6 +1483,12 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Projekt letöltése"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Letöltés"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Letöltve"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Profiltípus"

@@ -146,6 +146,9 @@
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
   },
+  "app.modal.install-to-play.install-button": {
+    "message": "התקנה"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },

@@ -1154,6 +1154,9 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "Посилання є обов’язковим."
   },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Установити"
+  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Не вдалося встановити"
   },
@@ -1612,6 +1615,12 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Цей профіль використовує інший завантажувач або версію гри, ніж вимагає цей проєкт."
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Установити"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Установлено"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Тип профіля"
