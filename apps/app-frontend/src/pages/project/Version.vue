@@ -1,259 +1,164 @@
 <template>
-	<div>
-		<Card>
-			<Breadcrumbs
-				:current-title="version.name"
-				:link-stack="[
-					{
-						href: buildProjectHref(`/project/${route.params.id}/versions`),
-						label: 'Versions',
-					},
-				]"
-			/>
-			<div class="version-title">
-				<h2>{{ version.name }}</h2>
-			</div>
-			<div class="button-group">
+	<div class="flex flex-col">
+		<router-link
+			class="mb-4 flex w-fit items-center gap-2 rounded-lg px-2 py-0.5 pl-0 text-link"
+			:to="buildProjectHref(`/project/${route.params.id}/versions`)"
+		>
+			<ChevronLeftIcon class="shrink-0" /> {{ formatMessage(messages.allVersions) }}
+		</router-link>
+		<VersionPage
+			v-if="version"
+			:version="version"
+			:enrichment="enrichment"
+			:enrichment-loading="enrichmentLoading"
+			:members="members"
+			:dependency-link-creator="createDependencyLink"
+		>
+			<template #headerActions>
 				<ButtonStyled color="brand">
 					<button
 						:disabled="installing || (installed && installedVersion === version.id)"
-						@click="() => install(version.id)"
+						@click="() => version && install(version.id)"
 					>
 						<DownloadIcon v-if="!installed" />
 						<SwapIcon v-else-if="installedVersion !== version.id" />
 						<CheckIcon v-else />
 						{{
 							installing
-								? 'Installing...'
+								? formatMessage(messages.installing)
 								: installed && installedVersion === version.id
-									? 'Installed'
-									: 'Install'
+									? formatMessage(messages.installed)
+									: installed
+										? formatMessage(messages.switchToVersion)
+										: formatMessage(messages.install)
 						}}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled>
-					<button>
-						<ReportIcon />
-						Report
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a
-						:href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
-						rel="external"
+				<ButtonStyled type="outlined" circular>
+					<OverflowMenu
+						v-tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:options="[
+							{
+								id: 'open-in-browser',
+								link: `https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`,
+								external: true,
+							},
+							{
+								id: 'report',
+								color: 'red',
+								hoverFilled: true,
+								link: `https://modrinth.com/report?item=version&itemID=${version.id}`,
+								external: true,
+							},
+						]"
+						aria-label="More options"
 					>
-						Modrinth website
-						<ExternalIcon />
+						<MoreVerticalIcon aria-hidden="true" />
+						<template #open-in-browser>
+							<ExternalIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.openInBrowserButton) }}
+						</template>
+						<template #report>
+							<ReportIcon aria-hidden="true" /> {{ formatMessage(commonMessages.reportButton) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
+			</template>
+			<template #supplementaryResourceActions="{ file }">
+				<ButtonStyled>
+					<a :href="file.url" :download="file.filename" target="_blank">
+						<DownloadIcon aria-hidden="true" />
+						{{ formatMessage(messages.downloadInBrowser) }}
 					</a>
 				</ButtonStyled>
-			</div>
-		</Card>
-		<div class="version-container">
-			<div class="description-cards">
-				<Card>
-					<h3 class="card-title">Changelog</h3>
-					<div class="markdown-body" v-html="renderString(version.changelog ?? '')" />
-				</Card>
-				<Card>
-					<h3 class="card-title">Files</h3>
-					<Card
-						v-for="file in version.files"
-						:key="file.id"
-						:class="{ primary: file.primary }"
-						class="file"
-					>
-						<span class="label">
-							<FileIcon />
-							<span>
-								<span class="title">
-									{{ file.filename }}
-								</span>
-								({{ formatBytes(file.size) }})
-								<span v-if="file.primary" class="primary-label"> Primary </span>
-							</span>
-						</span>
-						<ButtonStyled v-if="project.project_type !== 'modpack' || file.primary" color="brand">
-							<button class="download" :disabled="installed" @click="() => install(version.id)">
-								<DownloadIcon v-if="!installed" />
-								<CheckIcon v-else />
-								{{ installed ? 'Installed' : 'Install' }}
-							</button>
-						</ButtonStyled>
-					</Card>
-				</Card>
-				<Card v-if="displayDependencies.length > 0">
-					<h2>Dependencies</h2>
-					<div v-for="dependency in displayDependencies" :key="dependency.title">
-						<router-link v-if="dependency.link" class="btn dependency" :to="dependency.link">
-							<Avatar size="sm" :src="dependency.icon" />
-							<div>
-								<span class="title"> {{ dependency.title }} </span> <br />
-								<span> {{ dependency.subtitle }} </span>
-							</div>
-						</router-link>
-						<div v-else class="dependency disabled" disabled="">
-							<Avatar size="sm" :src="dependency.icon" />
-							<div class="text">
-								<div class="title">{{ dependency.title }}</div>
-								<div>{{ dependency.subtitle }}</div>
-							</div>
-						</div>
-					</div>
-				</Card>
-			</div>
-			<Card class="metadata-card">
-				<h3 class="card-title">Metadata</h3>
-				<div class="metadata">
-					<div class="metadata-item">
-						<span class="metadata-label">Release Channel</span>
-						<span class="metadata-value"
-							><Badge
-								:color="releaseColor(version.version_type)"
-								:type="
-									version.version_type.charAt(0).toUpperCase() + version.version_type.slice(1)
-								"
-						/></span>
-					</div>
-					<div class="metadata-item">
-						<span class="metadata-label">Version Number</span>
-						<span class="metadata-value">{{ version.version_number }}</span>
-					</div>
-					<div class="metadata-item">
-						<span class="metadata-label">Loaders</span>
-						<span class="metadata-value">{{
-							version.loaders
-								.map((loader) => loader.charAt(0).toUpperCase() + loader.slice(1))
-								.join(', ')
-						}}</span>
-					</div>
-					<div class="metadata-item">
-						<span class="metadata-label">Game Versions</span>
-						<span class="metadata-value"> {{ version.game_versions.join(', ') }} </span>
-					</div>
-					<div class="metadata-item">
-						<span class="metadata-label">Downloads</span>
-						<span class="metadata-value">{{ version.downloads }}</span>
-					</div>
-					<div class="metadata-item">
-						<span class="metadata-label">Publication Date</span>
-						<span class="metadata-value">
-							{{ formatDateTime(version.date_published) }}
-						</span>
-					</div>
-					<div v-if="author" class="metadata-item">
-						<span class="metadata-label">Author</span>
-						<a
-							:href="`https://modrinth.com/user/${author.user.username}`"
-							rel="external"
-							class="metadata-value btn author"
-						>
-							<Avatar size="sm" :src="author.user.avatar_url" circle />
-							<span>
-								<strong>
-									{{ author.user.username }}
-								</strong>
-								<br />
-								{{ author.role }}
-							</span>
-						</a>
-					</div>
-					<div class="metadata-item">
-						<span class="metadata-label">Version ID</span>
-						<span class="metadata-value"><CopyCode class="copycode" :text="version.id" /></span>
-					</div>
-				</div>
-			</Card>
-		</div>
+			</template>
+		</VersionPage>
 	</div>
 </template>
 
-<script setup>
-import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
-	Avatar,
-	Badge,
-	Breadcrumbs,
+	CheckIcon,
+	ChevronLeftIcon,
+	DownloadIcon,
+	ExternalIcon,
+	MoreVerticalIcon,
+	ReportIcon,
+} from '@modrinth/assets'
+import {
 	ButtonStyled,
-	Card,
-	CopyCode,
-	useFormatBytes,
-	useFormatDateTime,
+	commonMessages,
+	defineMessages,
+	type DependencyContext,
+	OverflowMenu,
+	useVIntl,
+	VersionPage,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons'
 import { get_project_many, get_version_many } from '@/helpers/cache.js'
-import { releaseColor } from '@/helpers/utils'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
-const formatDateTime = useFormatDateTime({
-	timeStyle: 'short',
-	dateStyle: 'long',
-})
-const formatBytes = useFormatBytes()
+const { formatMessage } = useVIntl()
 
-const breadcrumbs = useBreadcrumbs()
-
-const route = useRoute()
-
-const props = defineProps({
-	project: {
-		type: Object,
-		required: true,
-	},
-	versions: {
-		type: Array,
-		required: true,
-	},
-	members: {
-		type: Array,
-		required: true,
+const messages = defineMessages({
+	allVersions: {
+		id: 'app.project.version.all-versions',
+		defaultMessage: 'All versions',
 	},
 	install: {
-		type: Function,
-		required: true,
-	},
-	installed: {
-		type: Boolean,
-		required: true,
+		id: 'app.project.version.install',
+		defaultMessage: 'Install',
 	},
 	installing: {
-		type: Boolean,
-		required: true,
+		id: 'app.project.version.installing',
+		defaultMessage: 'Installing...',
 	},
-	installedVersion: {
-		type: String,
-		required: true,
+	installed: {
+		id: 'app.project.version.installed',
+		defaultMessage: 'Installed',
+	},
+	switchToVersion: {
+		id: 'app.project.version.switch-to-version',
+		defaultMessage: 'Switch to version',
+	},
+	downloadInBrowser: {
+		id: 'app.project.version.download-in-browser',
+		defaultMessage: 'Download in browser',
 	},
 })
 
+const breadcrumbs = useBreadcrumbs()
+const route = useRoute()
+
+const props = defineProps<{
+	project: Labrinth.Projects.v2.Project
+	versions: Labrinth.Versions.v3.Version[]
+	members: Labrinth.Projects.v3.TeamMember[]
+	install: (version: string | null) => void
+	installed: boolean
+	installing: boolean
+	installedVersion: string
+}>()
+
 const version = ref(props.versions.find((version) => version.id === route.params.version))
-breadcrumbs.setName('Version', version.value.name)
+if (version.value) {
+	breadcrumbs.setName('Version', version.value.name)
+}
 
-watch(
-	() => props.versions,
-	async () => {
-		if (route.params.version) {
-			version.value = props.versions.find((version) => version.id === route.params.version)
-			await refreshDisplayDependencies()
-			breadcrumbs.setName('Version', version.value.name)
-		}
-	},
-)
+const enrichment = ref<Labrinth.Projects.v2.DependencyInfo | undefined>(undefined)
+const enrichmentLoading = ref(false)
 
-const author = computed(() =>
-	props.members ? props.members.find((member) => member.user.id === version.value.author_id) : null,
-)
-
-const displayDependencies = ref({})
-
-function buildProjectHref(path) {
+function buildProjectHref(path: string): string {
 	const params = new URLSearchParams()
 	for (const [key, val] of Object.entries(route.query)) {
 		if (Array.isArray(val)) {
-			for (const v of val) params.append(key, v)
+			for (const v of val) {
+				if (v != null) params.append(key, v)
+			}
 		} else if (val) {
 			params.append(key, String(val))
 		}
@@ -262,222 +167,65 @@ function buildProjectHref(path) {
 	return qs ? `${path}?${qs}` : path
 }
 
-async function refreshDisplayDependencies() {
-	const projectIds = new Set()
-	const versionIds = new Set()
-	if (version.value.dependencies) {
-		for (const dependency of version.value.dependencies) {
-			if (dependency.project_id) {
-				projectIds.add(dependency.project_id)
-			}
-			if (dependency.version_id) {
-				versionIds.add(dependency.version_id)
-			}
-		}
+function createDependencyLink(context: DependencyContext): string | undefined {
+	if (context.version) {
+		return buildProjectHref(`/project/${context.version.project_id}/version/${context.version.id}`)
 	}
-	const [projectDeps, versionDeps] = await Promise.all([
-		get_project_many([...projectIds]),
-		get_version_many([...versionIds]),
-	])
-
-	const dependencies = {
-		projects: projectDeps,
-		versions: versionDeps,
+	if (context.project) {
+		return buildProjectHref(`/project/${context.project.id}`)
 	}
-
-	displayDependencies.value = version.value.dependencies.map((dependency) => {
-		const version = dependencies.versions.find((obj) => obj.id === dependency.version_id)
-		if (version) {
-			const project = dependencies.projects.find(
-				(obj) => obj.id === version.project_id || obj.id === dependency.project_id,
-			)
-			return {
-				icon: project?.icon_url,
-				title: project?.title || project?.name,
-				subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
-				link: buildProjectHref(`/project/${project.slug}/version/${version.id}`),
-			}
-		} else {
-			const project = dependencies.projects.find((obj) => obj.id === dependency.project_id)
-
-			if (project) {
-				return {
-					icon: project?.icon_url,
-					title: project?.title || project?.name,
-					subtitle: `${dependency.dependency_type}`,
-					link: buildProjectHref(`/project/${project.slug}`),
-				}
-			} else {
-				return {
-					icon: null,
-					title: dependency.file_name,
-					subtitle: `Added via overrides`,
-					link: null,
-				}
-			}
-		}
-	})
+	return undefined
 }
-await refreshDisplayDependencies()
+
+async function refreshEnrichment() {
+	if (!version.value) return
+
+	const projectIds = new Set<string>()
+	const versionIds = new Set<string>()
+	for (const dependency of version.value.dependencies ?? []) {
+		if (dependency.project_id) {
+			projectIds.add(dependency.project_id)
+		}
+		if (dependency.version_id) {
+			versionIds.add(dependency.version_id)
+		}
+	}
+
+	if (projectIds.size === 0 && versionIds.size === 0) {
+		enrichment.value = { projects: [], versions: [] }
+		return
+	}
+
+	enrichmentLoading.value = true
+	try {
+		const versionResults = versionIds.size > 0 ? await get_version_many([...versionIds]) : []
+		for (const dependencyVersion of versionResults ?? []) {
+			if (dependencyVersion.project_id) {
+				projectIds.add(dependencyVersion.project_id)
+			}
+		}
+		const projectResults = projectIds.size > 0 ? await get_project_many([...projectIds]) : []
+		enrichment.value = {
+			projects: projectResults ?? [],
+			versions: versionResults ?? [],
+		}
+	} finally {
+		enrichmentLoading.value = false
+	}
+}
+
+watch(
+	() => props.versions,
+	async () => {
+		if (route.params.version) {
+			version.value = props.versions.find((v) => v.id === route.params.version)
+			if (version.value) {
+				breadcrumbs.setName('Version', version.value.name)
+			}
+			await refreshEnrichment()
+		}
+	},
+)
+
+await refreshEnrichment()
 </script>
-
-<style scoped lang="scss">
-.version-container {
-	display: flex;
-	flex-direction: row;
-	gap: 1rem;
-}
-
-.version-title {
-	margin-bottom: 1rem;
-	h2 {
-		font-size: var(--font-size-2xl);
-		font-weight: 700;
-		color: var(--color-contrast);
-		margin: 0;
-	}
-}
-
-.dependency {
-	display: flex;
-	padding: 0.5rem 1rem 0.5rem 0.5rem;
-	gap: 0.5rem;
-	background: var(--color-raised-bg);
-	color: var(--color-base);
-	width: 100%;
-
-	.title {
-		font-weight: bolder;
-	}
-
-	:deep(svg) {
-		margin-right: 0 !important;
-	}
-}
-
-.file {
-	display: flex;
-	flex-direction: row;
-	gap: 0.5rem;
-	background: var(--color-button-bg);
-	color: var(--color-base);
-	padding: 0.5rem 1rem;
-
-	.download {
-		margin-left: auto;
-		background-color: var(--color-raised-bg);
-	}
-
-	.label {
-		display: flex;
-		margin: auto 0 auto;
-		gap: 0.5rem;
-
-		.title {
-			font-weight: bolder;
-			word-break: break-all;
-		}
-
-		svg {
-			min-width: 1.1rem;
-			min-height: 1.1rem;
-			width: 1.1rem;
-			height: 1.1rem;
-			margin: auto 0;
-		}
-
-		.primary-label {
-			font-style: italic;
-		}
-	}
-}
-
-.primary {
-	background: var(--color-brand-highlight);
-	color: var(--color-contrast);
-}
-
-.button-group {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
-	gap: 0.5rem;
-}
-
-.card-title {
-	font-size: var(--font-size-lg);
-	color: var(--color-contrast);
-	margin: 0 0 0.5rem;
-}
-
-.description-cards {
-	width: 100%;
-}
-
-.metadata-card {
-	width: 20rem;
-	height: min-content;
-}
-
-.metadata {
-	display: flex;
-	flex-direction: column;
-	flex-wrap: wrap;
-	gap: 1rem;
-
-	.metadata-item {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-
-		.metadata-label {
-			font-weight: bold;
-		}
-	}
-}
-
-.author {
-	display: flex;
-	flex-direction: row;
-	gap: 0.5rem;
-	align-items: center;
-	text-decoration: none;
-	color: var(--color-base);
-	background: var(--color-raised-bg);
-	padding: 0.5rem;
-	width: 100%;
-	box-shadow: none;
-}
-
-.markdown-body {
-	:deep(hr),
-	:deep(h1),
-	:deep(h2),
-	img {
-		max-width: max(60rem, 90%) !important;
-	}
-
-	:deep(ul),
-	:deep(ol) {
-		margin-left: 2rem;
-	}
-}
-
-.copycode {
-	border: 0;
-	color: var(--color-contrast);
-}
-
-.disabled {
-	display: flex;
-	flex-direction: row;
-	vertical-align: center;
-	align-items: center;
-	cursor: not-allowed;
-	border-radius: var(--radius-lg);
-
-	.text {
-		filter: brightness(0.5);
-	}
-}
-</style>

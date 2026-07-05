@@ -53,11 +53,13 @@
 							<DownloadIcon aria-hidden="true" />
 							Add to another instance
 						</template>
-						<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+						<template #open-in-browser>
+							<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+						</template>
 					</OverflowMenu>
 					<a
 						v-else
-						v-tooltip="formatMessage(messages.openInBrowser)"
+						v-tooltip="formatMessage(commonMessages.openInBrowserButton)"
 						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
 						target="_blank"
 					>
@@ -73,6 +75,7 @@
 import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
@@ -101,10 +104,6 @@ const messages = defineMessages({
 	alreadyInstalled: {
 		id: 'app.project.versions.already-installed',
 		defaultMessage: 'Already installed',
-	},
-	openInBrowser: {
-		id: 'app.project.versions.open-in-browser',
-		defaultMessage: 'Open in browser',
 	},
 })
 

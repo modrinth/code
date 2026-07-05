@@ -116,7 +116,9 @@
 								aria-label="More options"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #open-in-browser>
+									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+								</template>
 								<template #report> <ReportIcon /> Report </template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -183,7 +185,9 @@
 								aria-label="More options"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #open-in-browser>
+									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+								</template>
 								<template #follow> <HeartIcon /> Follow </template>
 								<template #save> <BookmarkIcon /> Save </template>
 								<template #report> <ReportIcon /> Report </template>

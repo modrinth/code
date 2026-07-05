@@ -207,6 +207,10 @@ export const commonMessages = defineMessages({
 		id: 'button.open-folder',
 		defaultMessage: 'Open folder',
 	},
+	openInBrowserButton: {
+		id: 'button.open-in-browser',
+		defaultMessage: 'Open in browser',
+	},
 	openInModrinthButton: {
 		id: 'button.open-in-modrinth',
 		defaultMessage: 'Open in Modrinth',

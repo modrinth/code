@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Open folder"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Open in browser"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Open in folder"
   },
