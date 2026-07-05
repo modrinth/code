@@ -208,6 +208,7 @@ import {
 	formatCategoryHeader,
 	formatLoader,
 	HorizontalRule,
+	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	ProjectCard,
@@ -231,6 +232,7 @@ import { useBreadcrumbs } from '@/store/breadcrumbs.js'
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
+const auth = injectAuth()
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 const { install } = injectContentInstall()
@@ -272,6 +274,10 @@ const messages = defineMessages({
 		id: 'app.collection.label.not-found',
 		defaultMessage: 'Collection not found',
 	},
+	followingDescription: {
+		id: 'app.collection.following-description',
+		defaultMessage: "Auto-generated collection of all the projects you're following.",
+	},
 	gameVersionFilterLabel: {
 		id: 'search.filter_type.game_version',
 		defaultMessage: 'Game version',
@@ -287,16 +293,33 @@ const messages = defineMessages({
 })
 
 const collectionId = computed(() => route.params.id)
+const isFollowing = computed(() => collectionId.value === 'following')
+
+const followingCollection = computed(() =>
+	isFollowing.value
+		? {
+				id: 'following',
+				user: auth.user.value?.id,
+				name: formatMessage(commonMessages.followedProjectsLabel),
+				description: formatMessage(messages.followingDescription),
+				icon_url: 'https://cdn.modrinth.com/follow-collection.png',
+				status: 'private',
+				projects: [],
+			}
+		: null,
+)
 
 const {
-	data: collection,
+	data: fetchedCollection,
 	isPending: collectionIsPending,
 	error: collectionError,
 } = useQuery({
 	queryKey: computed(() => ['collection', collectionId.value]),
 	queryFn: () => client.labrinth.collections.get(collectionId.value),
-	enabled: computed(() => !!collectionId.value),
+	enabled: computed(() => !!collectionId.value && !isFollowing.value),
 })
+
+const collection = computed(() => followingCollection.value ?? fetchedCollection.value)
 
 watch(collectionError, (error) => {
 	if (error) handleError(error)
@@ -305,20 +328,28 @@ watch(collectionError, (error) => {
 const { data: creator } = useQuery({
 	queryKey: computed(() => ['user', collection.value?.user]),
 	queryFn: () => get_user(collection.value.user),
-	enabled: computed(() => !!collection.value?.user),
+	enabled: computed(() => !isFollowing.value && !!collection.value?.user),
 })
 
 const { data: projects, isFetching: projectsIsFetching } = useQuery({
-	queryKey: computed(() => ['collection-projects', collection.value?.projects]),
+	queryKey: computed(() =>
+		isFollowing.value
+			? ['followed-projects', auth.user.value?.id]
+			: ['collection-projects', collection.value?.projects],
+	),
 	queryFn: async () => {
-		const fetched = await get_project_many(collection.value.projects)
+		const fetched = isFollowing.value
+			? await client.labrinth.users_v2.getFollowedProjects(auth.user.value.id)
+			: await get_project_many(collection.value.projects)
 		const result = (fetched ?? []).filter((project) => !!project)
 		for (const project of result) {
 			project.categories = (project.categories ?? []).concat(project.loaders ?? [])
 		}
 		return result
 	},
-	enabled: computed(() => !!collection.value?.projects?.length),
+	enabled: computed(() =>
+		isFollowing.value ? !!auth.user.value?.id : !!collection.value?.projects?.length,
+	),
 	placeholderData: [],
 })
 
@@ -334,7 +365,9 @@ const { data: tags } = useQuery({
 	},
 })
 
-const isLoading = computed(() => collectionIsPending.value || projectsIsFetching.value)
+const isLoading = computed(
+	() => (!isFollowing.value && collectionIsPending.value) || projectsIsFetching.value,
+)
 
 watch(
 	collection,

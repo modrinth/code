@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ExternalIcon, GlobeIcon, LinkIcon, LockIcon, LogInIcon } from '@modrinth/assets'
+import {
+	ExternalIcon,
+	GlobeIcon,
+	HeartIcon,
+	LinkIcon,
+	LockIcon,
+	LogInIcon,
+	SearchIcon,
+} from '@modrinth/assets'
 import {
 	Avatar,
 	ButtonStyled,
+	commonMessages,
 	defineMessages,
 	EmptyState,
 	injectAuth,
@@ -16,7 +25,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { parseCollectionId } from '@/helpers/collections'
+import { isCollectionLink, parseCollectionId } from '@/helpers/collections'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -33,21 +42,17 @@ const messages = defineMessages({
 		id: 'app.collections.sign-in-button',
 		defaultMessage: 'Sign in',
 	},
-	noCollections: {
-		id: 'app.collections.empty',
-		defaultMessage: "You don't have any collections yet",
-	},
-	noCollectionsHint: {
-		id: 'app.collections.empty-hint',
-		defaultMessage: 'Create collections on modrinth.com and view them here',
+	followingCardHint: {
+		id: 'app.collections.following-card-hint',
+		defaultMessage: 'Projects you follow',
 	},
 	projectsCount: {
 		id: 'app.collections.projects-count',
 		defaultMessage: '{count, plural, =0 {No projects} one {# project} other {# projects}}',
 	},
-	openCollectionPlaceholder: {
-		id: 'app.collections.open-collection-placeholder',
-		defaultMessage: 'Paste a collection link or ID to open any collection...',
+	searchPlaceholder: {
+		id: 'app.collections.search-placeholder',
+		defaultMessage: 'Search your collections, or paste a link to open another...',
 	},
 	openCollectionButton: {
 		id: 'app.collections.open-collection-button',
@@ -71,10 +76,24 @@ const { data: collections, isPending } = useQuery({
 	enabled: computed(() => !!userId.value),
 })
 
-const openCollectionInput = ref('')
+const query = ref('')
+const showOpen = computed(() => isCollectionLink(query.value))
+
+const filteredCollections = computed(() => {
+	const q = query.value.trim().toLowerCase()
+	if (!q) return collections.value ?? []
+	return (collections.value ?? []).filter((c) => c.name.toLowerCase().includes(q))
+})
+
+const showFollowingCard = computed(() => {
+	const q = query.value.trim().toLowerCase()
+	return (
+		!q || formatMessage(commonMessages.followedProjectsLabel).toLowerCase().includes(q)
+	)
+})
 
 function openCollection() {
-	const id = parseCollectionId(openCollectionInput.value)
+	const id = parseCollectionId(query.value)
 	if (!id) {
 		addNotification({
 			type: 'error',
@@ -83,7 +102,7 @@ function openCollection() {
 		})
 		return
 	}
-	openCollectionInput.value = ''
+	query.value = ''
 	router.push(`/collection/${id}`)
 }
 
@@ -103,17 +122,18 @@ function statusIcon(collection: Labrinth.Collections.Collection) {
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-wrap items-center gap-2">
 			<StyledInput
-				v-model="openCollectionInput"
-				:icon="LinkIcon"
+				v-model="query"
+				:icon="SearchIcon"
 				type="text"
 				autocomplete="off"
 				:spellcheck="false"
-				:placeholder="formatMessage(messages.openCollectionPlaceholder)"
+				clearable
+				:placeholder="formatMessage(messages.searchPlaceholder)"
 				wrapper-class="w-full flex-grow sm:w-auto"
-				@keydown.enter="openCollection"
+				@keydown.enter="showOpen && openCollection()"
 			/>
-			<ButtonStyled>
-				<button :disabled="!openCollectionInput.trim()" @click="openCollection">
+			<ButtonStyled v-if="showOpen">
+				<button @click="openCollection">
 					<ExternalIcon aria-hidden="true" />
 					{{ formatMessage(messages.openCollectionButton) }}
 				</button>
@@ -134,12 +154,25 @@ function statusIcon(collection: Labrinth.Collections.Collection) {
 		<div v-else-if="isPending" class="flex flex-col gap-3">
 			<div v-for="i in 3" :key="i" class="h-20 animate-pulse rounded-2xl bg-surface-3" />
 		</div>
-		<div
-			v-else-if="collections && collections.length > 0"
-			class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-		>
+		<div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 			<router-link
-				v-for="collection in collections"
+				v-if="showFollowingCard"
+				to="/collection/following"
+				class="flex items-center gap-3 rounded-2xl bg-surface-3 p-4 text-primary transition-all hover:bg-surface-4 hover:brightness-105 active:scale-[0.98]"
+			>
+				<Avatar src="https://cdn.modrinth.com/follow-collection.png" size="48px" />
+				<div class="flex min-w-0 flex-col gap-1">
+					<span class="truncate font-semibold text-contrast">
+						{{ formatMessage(commonMessages.followedProjectsLabel) }}
+					</span>
+					<span class="flex items-center gap-1.5 text-sm text-secondary">
+						<HeartIcon class="size-4 shrink-0" aria-hidden="true" />
+						{{ formatMessage(messages.followingCardHint) }}
+					</span>
+				</div>
+			</router-link>
+			<router-link
+				v-for="collection in filteredCollections"
 				:key="collection.id"
 				:to="`/collection/${collection.id}`"
 				class="flex items-center gap-3 rounded-2xl bg-surface-3 p-4 text-primary transition-all hover:bg-surface-4 hover:brightness-105 active:scale-[0.98]"
@@ -154,9 +187,5 @@ function statusIcon(collection: Labrinth.Collections.Collection) {
 				</div>
 			</router-link>
 		</div>
-		<EmptyState v-else type="empty-inbox">
-			<template #heading>{{ formatMessage(messages.noCollections) }}</template>
-			<template #description>{{ formatMessage(messages.noCollectionsHint) }}</template>
-		</EmptyState>
 	</div>
 </template>

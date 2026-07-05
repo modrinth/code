@@ -13,3 +13,10 @@ export function parseCollectionId(input: string): string | null {
 
 	return null
 }
+
+/**
+ * Determines when url is pasted
+ */
+export function isCollectionLink(input: string): boolean {
+	return /collection\/[a-zA-Z0-9]+/.test(input.trim())
+}
