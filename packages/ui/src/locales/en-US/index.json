@@ -509,6 +509,12 @@
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Don't show again"
   },
+  "content.page-layout.add-content": {
+    "defaultMessage": "Add content"
+  },
+  "content.page-layout.add-from-collection": {
+    "defaultMessage": "Add from collection"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
   },

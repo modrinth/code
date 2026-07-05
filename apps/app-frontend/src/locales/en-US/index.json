@@ -191,6 +191,162 @@
   "app.browse.server.installing": {
     "message": "Installing"
   },
+  "app.collection-install.already-installed": {
+    "message": "Installed"
+  },
+  "app.collection-install.deselect-all": {
+    "message": "Deselect all"
+  },
+  "app.collection-install.existing-tab": {
+    "message": "Existing instance"
+  },
+  "app.collection-install.failed": {
+    "message": "Failed to install collection"
+  },
+  "app.collection-install.game-version-placeholder": {
+    "message": "Select game version"
+  },
+  "app.collection-install.header": {
+    "message": "Install collection"
+  },
+  "app.collection-install.header-named": {
+    "message": "Install {name}"
+  },
+  "app.collection-install.incompatible": {
+    "message": "Incompatible"
+  },
+  "app.collection-install.incompatible-tooltip": {
+    "message": "This project has no version compatible with the selected loader and game version."
+  },
+  "app.collection-install.install-button": {
+    "message": "Install {count, plural, one {# project} other {# projects}}"
+  },
+  "app.collection-install.installing-progress": {
+    "message": "Installing {current, number} of {total, number}..."
+  },
+  "app.collection-install.instance-type": {
+    "message": "Instance type"
+  },
+  "app.collection-install.loader-label": {
+    "message": "Loader"
+  },
+  "app.collection-install.name-label": {
+    "message": "Name"
+  },
+  "app.collection-install.name-placeholder": {
+    "message": "Enter instance name"
+  },
+  "app.collection-install.new-tab": {
+    "message": "New instance"
+  },
+  "app.collection-install.no-instances": {
+    "message": "No instances found. Create a new instance instead."
+  },
+  "app.collection-install.partial-text": {
+    "message": "{count, plural, one {# project} other {# projects}} added to {instance}, {failed} failed."
+  },
+  "app.collection-install.projects-label": {
+    "message": "{selected} of {total} projects selected"
+  },
+  "app.collection-install.select-all": {
+    "message": "Select all"
+  },
+  "app.collection-install.select-instance": {
+    "message": "Instance"
+  },
+  "app.collection-install.select-instance-placeholder": {
+    "message": "Select an instance"
+  },
+  "app.collection-install.success": {
+    "message": "Collection installed"
+  },
+  "app.collection-install.success-text": {
+    "message": "{count, plural, one {# project} other {# projects}} added to {instance}. Missing dependencies were installed automatically."
+  },
+  "app.collection-install.unsupported": {
+    "message": "Not supported"
+  },
+  "app.collection-picker.empty": {
+    "message": "You don't have any collections yet"
+  },
+  "app.collection-picker.header": {
+    "message": "Add from collection"
+  },
+  "app.collection-picker.invalid-collection-link": {
+    "message": "Invalid collection link"
+  },
+  "app.collection-picker.invalid-collection-link-text": {
+    "message": "Paste a modrinth.com collection URL or a collection ID."
+  },
+  "app.collection-picker.open-button": {
+    "message": "Open"
+  },
+  "app.collection-picker.other-collection-placeholder": {
+    "message": "Paste a collection link or ID..."
+  },
+  "app.collection-picker.projects-count": {
+    "message": "{count, plural, =0 {No projects} one {# project} other {# projects}}"
+  },
+  "app.collection-picker.sign-in-button": {
+    "message": "Sign in"
+  },
+  "app.collection-picker.sign-in-prompt": {
+    "message": "Sign in to view your collections"
+  },
+  "app.collection.button.clear-filters": {
+    "message": "Clear filters"
+  },
+  "app.collection.button.install-all": {
+    "message": "Install all ({count})"
+  },
+  "app.collection.button.install-filtered": {
+    "message": "Install filtered ({count})"
+  },
+  "app.collection.label.curated-by": {
+    "message": "Curated by"
+  },
+  "app.collection.label.no-projects": {
+    "message": "No projects in collection yet"
+  },
+  "app.collection.label.no-results": {
+    "message": "No projects match your search"
+  },
+  "app.collection.label.not-found": {
+    "message": "Collection not found"
+  },
+  "app.collection.label.projects-count": {
+    "message": "{count, plural, =0 {No projects} one {# project} other {# projects}}"
+  },
+  "app.collection.search.placeholder": {
+    "message": "Search collection..."
+  },
+  "app.collections.empty": {
+    "message": "You don't have any collections yet"
+  },
+  "app.collections.empty-hint": {
+    "message": "Create collections on modrinth.com and view them here"
+  },
+  "app.collections.invalid-collection-link": {
+    "message": "Invalid collection link"
+  },
+  "app.collections.invalid-collection-link-text": {
+    "message": "Paste a modrinth.com collection URL or a collection ID."
+  },
+  "app.collections.open-collection-button": {
+    "message": "Open"
+  },
+  "app.collections.open-collection-placeholder": {
+    "message": "Paste a collection link or ID to open any collection..."
+  },
+  "app.collections.projects-count": {
+    "message": "{count, plural, =0 {No projects} one {# project} other {# projects}}"
+  },
+  "app.collections.sign-in-button": {
+    "message": "Sign in"
+  },
+  "app.collections.sign-in-prompt": {
+    "message": "Sign in to view your collections"
+  },
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
@@ -1033,6 +1189,15 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "search.filter_type.game_version": {
+    "message": "Game version"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "message": "Show all versions"
+  },
+  "search.filter_type.mod_loader": {
+    "message": "Loader"
   },
   "unknown-pack-warning-modal.body": {
     "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."

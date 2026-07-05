@@ -61,6 +61,9 @@ export interface ContentManagerContext {
 	browse: () => void
 	uploadFiles: () => void
 
+	// Add from collection (optional — when undefined, the option is hidden)
+	addFromCollection?: () => void
+
 	// Bulk actions (optional — when provided, used instead of one-by-one loops)
 	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
 	bulkEnableItems?: (items: ContentItem[]) => Promise<void>

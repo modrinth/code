@@ -133,7 +133,25 @@ export default new createRouter({
 					name: 'Custom',
 					component: Library.Custom,
 				},
+				{
+					path: 'collections',
+					name: 'Collections',
+					component: Library.Collections,
+				},
 			],
+		},
+		{
+			path: '/collection/:id',
+			name: 'Collection',
+			component: Pages.Collection,
+			props: true,
+			meta: {
+				useContext: true,
+				breadcrumb: [
+					{ name: 'Collections', link: '/library/collections' },
+					{ name: '?Collection' },
+				],
+			},
 		},
 		{
 			path: '/:projectType(mod|plugin|datapack|resourcepack|shader|modpack)/:id/:rest(.*)*',

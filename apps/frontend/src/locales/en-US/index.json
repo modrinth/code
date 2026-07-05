@@ -932,6 +932,9 @@
   "auth.verify-email.title": {
     "message": "Verify Email"
   },
+  "collection.button.clear-filters": {
+    "message": "Clear filters"
+  },
   "collection.button.edit-icon": {
     "message": "Edit icon"
   },
@@ -977,6 +980,9 @@
   "collection.label.no-projects": {
     "message": "No projects in collection yet"
   },
+  "collection.label.no-results": {
+    "message": "No projects match your search"
+  },
   "collection.label.projects-count": {
     "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
   },
@@ -988,6 +994,9 @@
   },
   "collection.return-link.user": {
     "message": "{user}'s profile"
+  },
+  "collection.search.placeholder": {
+    "message": "Search collection..."
   },
   "collection.title": {
     "message": "{name} - Collection"
@@ -3976,6 +3985,15 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
+  },
+  "search.filter_type.game_version": {
+    "message": "Game version"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "message": "Show all versions"
+  },
+  "search.filter_type.mod_loader": {
+    "message": "Loader"
   },
   "servers.manage.content.title": {
     "message": "Content - {serverName} - Modrinth"

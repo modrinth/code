@@ -5,6 +5,7 @@ import {
 	ClockArrowDownIcon,
 	ClockArrowUpIcon,
 	CodeIcon,
+	CollectionIcon,
 	CompassIcon,
 	DownloadIcon,
 	DropdownIcon,
@@ -12,6 +13,7 @@ import {
 	FilterIcon,
 	FolderOpenIcon,
 	LinkIcon,
+	PlusIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
@@ -83,6 +85,14 @@ const messages = defineMessages({
 	uploadFiles: {
 		id: 'content.page-layout.upload-files',
 		defaultMessage: 'Upload files',
+	},
+	addFromCollection: {
+		id: 'content.page-layout.add-from-collection',
+		defaultMessage: 'Add from collection',
+	},
+	addContent: {
+		id: 'content.page-layout.add-content',
+		defaultMessage: 'Add content',
 	},
 	sortAlphabetical: {
 		id: 'content.page-layout.sort.alphabetical',
@@ -750,7 +760,39 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										<span>{{ formatMessage(messages.browseContent) }}</span>
 									</button>
 								</ButtonStyled>
-								<ButtonStyled type="outlined">
+								<ButtonStyled v-if="ctx.addFromCollection" type="outlined">
+									<OverflowMenu
+										v-tooltip="
+											ctx.busyMessage?.value ??
+											(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										"
+										:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+										class="!h-10"
+										:options="[
+											{
+												id: 'upload-files',
+												action: () => ctx.uploadFiles(),
+											},
+											{
+												id: 'add-from-collection',
+												action: () => ctx.addFromCollection!(),
+											},
+										]"
+									>
+										<PlusIcon class="size-5" />
+										{{ formatMessage(messages.addContent) }}
+										<DropdownIcon />
+										<template #upload-files>
+											<FolderOpenIcon />
+											{{ formatMessage(messages.uploadFiles) }}
+										</template>
+										<template #add-from-collection>
+											<CollectionIcon />
+											{{ formatMessage(messages.addFromCollection) }}
+										</template>
+									</OverflowMenu>
+								</ButtonStyled>
+								<ButtonStyled v-else type="outlined">
 									<button
 										v-tooltip="
 											ctx.busyMessage?.value ??
@@ -911,6 +953,20 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							>
 								<FolderOpenIcon class="size-5" />
 								{{ formatMessage(messages.uploadFiles) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-if="ctx.addFromCollection" type="outlined">
+							<button
+								v-tooltip="
+									ctx.busyMessage?.value ??
+									(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+								"
+								:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
+								class="!h-10"
+								@click="ctx.addFromCollection"
+							>
+								<CollectionIcon class="size-5" />
+								{{ formatMessage(messages.addFromCollection) }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled color="brand">

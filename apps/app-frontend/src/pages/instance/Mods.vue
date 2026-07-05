@@ -32,6 +32,16 @@
 					@cancel="handleModpackUpdateCancel"
 				/>
 				<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+				<CollectionPickerModal
+					v-if="!props.isServerInstance"
+					ref="collectionPickerModal"
+					@select="handleCollectionSelected"
+				/>
+				<CollectionInstallModal
+					v-if="!props.isServerInstance"
+					ref="collectionInstallModal"
+					@installed="() => refreshContentState('must_revalidate')"
+				/>
 				<ContentUpdaterModal
 					v-if="updatingProject || updatingModpack"
 					ref="contentUpdaterModal"
@@ -99,6 +109,8 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import CollectionInstallModal from '@/components/ui/CollectionInstallModal.vue'
+import CollectionPickerModal from '@/components/ui/CollectionPickerModal.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
@@ -281,6 +293,22 @@ const isPackLocked = computed(
 
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
+const collectionPickerModal = ref<InstanceType<typeof CollectionPickerModal> | null>()
+const collectionInstallModal = ref<InstanceType<typeof CollectionInstallModal> | null>()
+
+function handleAddFromCollection() {
+	collectionPickerModal.value?.show()
+}
+
+function handleCollectionSelected(
+	collection: Labrinth.Collections.Collection,
+	collectionProjects: Labrinth.Projects.v2.Project[],
+) {
+	collectionInstallModal.value?.show(collectionProjects, {
+		instance: props.instance,
+		collectionName: collection.name,
+	})
+}
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
@@ -1329,6 +1357,7 @@ provideContentManager({
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
+	addFromCollection: props.isServerInstance ? undefined : handleAddFromCollection,
 	hasUpdateSupport: true,
 	updateItem: handleUpdate,
 	bulkUpdateAll: bulkUpdateAllProjects,

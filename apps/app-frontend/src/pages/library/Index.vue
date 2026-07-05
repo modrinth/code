@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
-import { inject, onUnmounted, ref, shallowRef } from 'vue'
+import { computed, inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
@@ -17,6 +17,8 @@ const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
 const instances = shallowRef(await list().catch(handleError))
+
+const isCollectionsTab = computed(() => route.path.startsWith('/library/collections'))
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -43,12 +45,13 @@ onUnmounted(() => {
 				{ label: 'Modpacks', href: `/library/modpacks` },
 				{ label: 'Servers', href: `/library/servers` },
 				{ label: 'Custom', href: `/library/custom` },
+				{ label: 'Collections', href: `/library/collections` },
 				{ label: 'Shared with me', href: `/library/shared`, shown: false },
 				{ label: 'Saved', href: `/library/saved`, shown: false },
 			]"
 		/>
-		<template v-if="instances && instances.length > 0">
-			<RouterView v-if="route.path.startsWith('/library')" :instances="instances" />
+		<template v-if="(instances && instances.length > 0) || isCollectionsTab">
+			<RouterView v-if="route.path.startsWith('/library')" :instances="instances ?? []" />
 		</template>
 		<div v-else class="no-instance">
 			<div class="icon">
