@@ -477,7 +477,7 @@ provideBrowseManager({
 	serverOnly: serverContentServerOnly,
 	showServerOnly: showServerOnlyToggle,
 	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
-	hiddenFilterTypeIds: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
+	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,
