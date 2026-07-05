@@ -188,9 +188,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Yeni bir içerik eklemek sunucuya girerkenki uyumluluğu bozabilir. Herhangi eklenmiş içerik ise sunucu kurulumunu güncellemeye çalıştığınızda kaybolacaktır."
   },
-  "app.browse.server.installing": {
-    "message": "Yükleniyor"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Kullanılabilir sürümler {compatibilityLabel} ile eşleşmiyor. Yine de kurulacak bir sürüm seçin. Bağımlılıklar otomatik olarak yüklenmeyecektir."
   },
@@ -376,9 +373,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Oynamak için yükleyin"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Yükle"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {#mods}}"

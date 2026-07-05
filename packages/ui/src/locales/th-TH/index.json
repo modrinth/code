@@ -146,9 +146,6 @@
   "files.editor.failed-to-open-text": {
     "defaultMessage": "ไม่สามารถโหลดไฟล์เนื้อหา"
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "ติดตั้ง"
-  },
   "form.label.address-line-2": {
     "defaultMessage": "ที่อยู่บรรทัดที่ 2 (ไม่จำเป็น)"
   },
@@ -271,12 +268,6 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "ติดตั้งโปรเจกต์"
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "ติดตั้ง"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "ติดตั้งแล้ว"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "ประเถทอินสแตนซ์"
@@ -648,4 +639,3 @@
     "defaultMessage": "โปรไฟล์สาธารณะ"
   }
 }
-

@@ -1394,9 +1394,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "Укажите ссылку."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Установить"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Установка не удалась"
   },
@@ -1852,12 +1849,6 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "В этой сборке используется другой загрузчик или версия игры, не поддерживаемая данным проектом."
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Установить"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Установлено"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Тип сборки"

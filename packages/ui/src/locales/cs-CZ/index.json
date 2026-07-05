@@ -1403,9 +1403,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "URL adresa je povinná."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Nainstalovat"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Instalace selhala"
   },
@@ -1795,12 +1792,6 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Instalace projektu"
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Nainstalovat"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Nainstalováno"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Typ instance"
@@ -4557,4 +4548,3 @@
     "defaultMessage": "Typ"
   }
 }
-

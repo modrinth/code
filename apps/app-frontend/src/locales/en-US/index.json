@@ -425,26 +425,11 @@
   "app.project.version.download-in-browser": {
     "message": "Download in browser"
   },
-  "app.project.version.install": {
-    "message": "Install"
-  },
-  "app.project.version.installed": {
-    "message": "Installed"
-  },
   "app.project.version.installing": {
-    "message": "Installing..."
-  },
-  "app.project.version.switch-to-version": {
-    "message": "Switch to version"
+    "message": "Installing"
   },
   "app.project.versions.already-installed": {
     "message": "Already installed"
-  },
-  "app.project.versions.install": {
-    "message": "Install"
-  },
-  "app.project.versions.swap-version": {
-    "message": "Switch to version"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."

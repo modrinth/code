@@ -549,6 +549,10 @@ export const commonMessages = defineMessages({
 		id: 'button.copy-link',
 		defaultMessage: 'Copy link',
 	},
+	switchToVersionButton: {
+		id: 'button.switch-to-version',
+		defaultMessage: 'Switch to version',
+	},
 	switchVersionButton: {
 		id: 'button.switch-version',
 		defaultMessage: 'Switch version',

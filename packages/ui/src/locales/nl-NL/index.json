@@ -818,9 +818,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "Een URL is vereist."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Installeren"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Het installeren is mislukt"
   },
@@ -1216,12 +1213,6 @@
   },
   "instances.content-install.header": {
     "defaultMessage": "Project installeren"
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Installeren"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Geïnstalleerd"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Type instantie"

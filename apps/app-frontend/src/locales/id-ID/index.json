@@ -155,9 +155,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Menambah konten dapat merusak kompatibilitas saat bergabung ke server. Konten tambahan apa pun akan hilang ketika Anda memperbarui konten instans server."
   },
-  "app.browse.server.installing": {
-    "message": "Memasang"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Tidak ada versi tersedia yang cocok untuk {compatibilityLabel}. Anda tetap dapat memilih versi yang akan dipasang. Dependensi tidak akan dipasang secara otomatis."
   },
@@ -256,9 +253,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk memainkan"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Pasang"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"

@@ -188,9 +188,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Das hinzufügen von Inhalten kann Kompatibilitätsprobleme beim beitreten eines Servers verursachen. Sämtliche hinzugefügte Inhalten gehen ausserdem beim aktualisieren der Server Instanz-Inhalte verloren."
   },
-  "app.browse.server.installing": {
-    "message": "Wird installiert"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Keine verfügbaren Versionen stimmen mit {compatibilityLabel} überein. Wähle eine Version aus, um sie trotzdem zu installieren. Abhängigkeiten werden nicht automatisch installiert."
   },
@@ -376,9 +373,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Installieren zum Spielen"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installieren"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# Mod} other {# Mods}}"

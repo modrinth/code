@@ -1142,9 +1142,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "URL diperlukan."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Pasang"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Pemasangan gagal"
   },
@@ -1597,12 +1594,6 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Pemasangan ini menggunakan pemuat atau versi permainan yang berbeza daripada yang disokong oleh projek ini."
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Pasang"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Dipasang"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Jenis pemasangan"
@@ -4764,4 +4755,3 @@
     "defaultMessage": "Pasukan Modrinth"
   }
 }
-

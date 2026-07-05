@@ -1379,9 +1379,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "Une URL est requise."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Installer"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Échec de l'installation"
   },
@@ -1840,12 +1837,6 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Cette instance utilise un loader ou une version du jeu différente de celle prise en charge par ce projet."
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Installer"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Installé"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Type d'instance"

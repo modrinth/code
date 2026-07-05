@@ -27,10 +27,10 @@
 							installing
 								? formatMessage(messages.installing)
 								: installed && installedVersion === version.id
-									? formatMessage(messages.installed)
+									? formatMessage(commonMessages.installedLabel)
 									: installed
-										? formatMessage(messages.switchToVersion)
-										: formatMessage(messages.install)
+										? formatMessage(commonMessages.switchToVersionButton)
+										: formatMessage(commonMessages.installButton)
 						}}
 					</button>
 				</ButtonStyled>
@@ -109,21 +109,9 @@ const messages = defineMessages({
 		id: 'app.project.version.all-versions',
 		defaultMessage: 'All versions',
 	},
-	install: {
-		id: 'app.project.version.install',
-		defaultMessage: 'Install',
-	},
 	installing: {
 		id: 'app.project.version.installing',
-		defaultMessage: 'Installing...',
-	},
-	installed: {
-		id: 'app.project.version.installed',
-		defaultMessage: 'Installed',
-	},
-	switchToVersion: {
-		id: 'app.project.version.switch-to-version',
-		defaultMessage: 'Switch to version',
+		defaultMessage: 'Installing',
 	},
 	downloadInBrowser: {
 		id: 'app.project.version.download-in-browser',

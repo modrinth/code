@@ -188,9 +188,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Добавление контента может сломать совместимость при подключении к серверу. Весь добавленный контент также будет удалён при обновлении сервера."
   },
-  "app.browse.server.installing": {
-    "message": "Установка"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Не найдено доступных версий, совместимых с {compatibilityLabel}. Выберите версию для установки вручную. Зависимости не будут установлены автоматически."
   },
@@ -367,9 +364,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Установка перед запуском"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Установить"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"

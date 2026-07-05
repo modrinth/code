@@ -1496,9 +1496,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "La URL es requerida."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Instalar"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Error en la instalación"
   },
@@ -1957,12 +1954,6 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Está instancia usa un loader o una versión de juego que este proyecto no soporta."
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Instalar"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Instalado"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Tipo de instancia"
@@ -5691,4 +5682,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

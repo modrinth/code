@@ -17,9 +17,9 @@
 					<button
 						v-tooltip="
 							!installed
-								? formatMessage(messages.install)
+								? formatMessage(commonMessages.installButton)
 								: version.id !== installedVersion
-									? formatMessage(messages.swapVersion)
+									? formatMessage(commonMessages.switchToVersionButton)
 									: formatMessage(messages.alreadyInstalled)
 						"
 						:disabled="installing || (installed && version.id === installedVersion)"
@@ -93,14 +93,6 @@ const { formatMessage } = useVIntl()
 const themeStore = useTheming()
 
 const messages = defineMessages({
-	install: {
-		id: 'app.project.versions.install',
-		defaultMessage: 'Install',
-	},
-	swapVersion: {
-		id: 'app.project.versions.swap-version',
-		defaultMessage: 'Switch to version',
-	},
 	alreadyInstalled: {
 		id: 'app.project.versions.already-installed',
 		defaultMessage: 'Already installed',

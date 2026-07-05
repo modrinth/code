@@ -167,9 +167,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Añadir contenido puede comprometer la compatibilidad a la hora de unirse a un servidor. Cualquier contenido añadido se perderá cuando actualices la instancia del servidor."
   },
-  "app.browse.server.installing": {
-    "message": "Instalando"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "No hay versiones disponibles que coincidan con {compatibilityLabel}. Selecciona una versión para instalarla de todas formas. Las dependencias no se instalarán automáticamente."
   },
@@ -268,9 +265,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Instala para jugar"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Instalar"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"

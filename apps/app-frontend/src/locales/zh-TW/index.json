@@ -188,9 +188,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "加入內容可能會導致加入伺服器時發生相容性問題。當你更新伺服器實例內容時，任何新增的內容也會遺失。"
   },
-  "app.browse.server.installing": {
-    "message": "安裝中"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
   },
@@ -376,9 +373,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "安裝以遊玩"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "安裝"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# 個模組}}"

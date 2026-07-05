@@ -155,9 +155,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "การเพิ่มเนื้อหาอาจทำให้ใช้งานร่วมกันไม่ได้เมื่อเข้าร่วมเซิร์ฟเวอร์ เนื้อหาที่เพิ่มเข้ามาจะหายไปเมื่อคุณอัปเดตอินสแตนซ์ของเซิร์ฟเวอร์"
   },
-  "app.browse.server.installing": {
-    "message": "กำลังติดตั้ง"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "ไม่มีเวอร์ชันที่เข้ากันได้ {compatibilityLabel} โปรดเลือกเวอร์ชันที่จะติดตั้ง ไฟล์ที่จำเป็นจะไม่ถูกติดตั้งโดยอัตโนมัติ"
   },
@@ -256,9 +253,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "ติดตั้งเพื่อเล่น"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "ติดตั้ง"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# ม็อด}}"

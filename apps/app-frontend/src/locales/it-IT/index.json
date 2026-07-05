@@ -188,9 +188,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Aggiungere dei contenuti potrebbe causare problemi entrando nel server. Inoltre, qualsiasi contenuto aggiunto sarà perso quando aggiorni i contenuti dell'istanza."
   },
-  "app.browse.server.installing": {
-    "message": "Installazione"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nessuna versione disponibile soddisfa {compatibilityLabel}. Puoi selezionare una versione da installare comunque. Le dipendenze non verranno scaricate automaticamente."
   },
@@ -373,9 +370,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Installa per continuare"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installa"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"

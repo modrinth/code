@@ -4164,7 +4164,7 @@
     "message": "Last used {ago}"
   },
   "settings.account.security.passkey.modal.loading": {
-    "message": "Loading passkeys…"
+    "message": "Loading passkeys..."
   },
   "settings.account.security.passkey.modal.never-used": {
     "message": "Never used"

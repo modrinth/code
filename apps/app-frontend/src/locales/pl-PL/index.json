@@ -188,9 +188,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Dodawanie zawartości może zepsuć kompatybilność podczas dołączania na serwer. Jakakolwiek dodana zawartość zostanie stracona, gdy zaktualizujesz zawartość instancji serwera."
   },
-  "app.browse.server.installing": {
-    "message": "Instalowanie"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nie znaleziono żadnych wersji pasujących do {compatibilityLabel}. Wybierz wersję, by zainstalować ją mimo tego. Zależności nie zostaną zainstalowane automatycznie."
   },
@@ -373,9 +370,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Zainstaluj, aby grać"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Zainstaluj"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"

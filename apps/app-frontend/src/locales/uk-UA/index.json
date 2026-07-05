@@ -155,9 +155,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Додавання вмісту може порушити сумісність при приєднанні до сервера. Усі додані матеріали також будуть утрачені під час оновлення вмісту профілю сервера."
   },
-  "app.browse.server.installing": {
-    "message": "Установлення"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Жодна доступна версія не сумісна з {compatibilityLabel}. Виберіть версію, щоб усе одно її встановити. Залежності не встановлюватимуться автоматично."
   },
@@ -256,9 +253,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Установлення для гри"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Установити"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"

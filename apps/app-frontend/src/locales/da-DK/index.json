@@ -149,9 +149,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Ved at tilføje indhold kan der opstå kompatibilitetsproblemer, når du tilslutter dig serveren. Alt tilføjet indhold går desuden tabt, når du opdaterer indholdet på din server instance."
   },
-  "app.browse.server.installing": {
-    "message": "Installere"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
   },
@@ -250,9 +247,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Installer for at spille"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Installer"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"

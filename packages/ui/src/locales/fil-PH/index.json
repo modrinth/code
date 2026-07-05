@@ -422,9 +422,6 @@
   "files.validation.name-label": {
     "defaultMessage": "Pangalan"
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "I-install"
-  },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Isang di-kilalang error na naganap"
   },
@@ -634,9 +631,6 @@
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} magkatugmang {count, plural, one {instansiya} other {instansiya}}"
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "I-install"
   },
   "instances.content-install.loader-label": {
     "defaultMessage": "Loader"
@@ -2739,4 +2733,3 @@
     "defaultMessage": "Koponan ng Modrinth"
   }
 }
-

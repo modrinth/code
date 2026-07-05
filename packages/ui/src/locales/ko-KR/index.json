@@ -1184,9 +1184,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "URL을 입력해야 합니다."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "설치"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "설치 실패"
   },
@@ -1645,12 +1642,6 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "이 인스턴스는 이 프로젝트에서 지원하는 로더나 게임 버전과 다른 것을 사용하고 있습니다."
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "설치"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "설치됨"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "인스턴스 종류"

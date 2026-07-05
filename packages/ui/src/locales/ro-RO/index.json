@@ -686,9 +686,6 @@
   "files.zip-url-modal.error-url-required": {
     "defaultMessage": "URL este obligatoriu."
   },
-  "files.zip-url-modal.install-button": {
-    "defaultMessage": "Instalează"
-  },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Instalarea a eșuat"
   },
@@ -991,12 +988,6 @@
   },
   "instances.content-install.incompatible-tooltip": {
     "defaultMessage": "Aceasta instanță folosește un loader diferit sau o versiune de joc diferită față de ce suportă proiectul."
-  },
-  "instances.content-install.install-button": {
-    "defaultMessage": "Instalează"
-  },
-  "instances.content-install.installed-badge": {
-    "defaultMessage": "Instalat"
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Tip de instanță"

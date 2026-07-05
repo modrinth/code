@@ -140,9 +140,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Menambah kandungan boleh merosakkan keserasian apabila menyertai pelayan. Sebarang kandungan yang ditambah juga akan hilang apabila anda mengemas kini kandungan pemasangan pelayan."
   },
-  "app.browse.server.installing": {
-    "message": "Sedang memasang"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Tiada versi tersedia yang sepadan dengan {compatibilityLabel}. Pilih versi untuk dipasang juga. Kebergantungan tidak akan dipasang secara automatik."
   },
@@ -241,9 +238,6 @@
   },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk mainkan"
-  },
-  "app.modal.install-to-play.install-button": {
-    "message": "Pasang"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
