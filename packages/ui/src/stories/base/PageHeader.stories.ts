@@ -19,6 +19,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import AutoLink from '../../components/base/AutoLink.vue'
+import Avatar from '../../components/base/Avatar.vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import FormattedTag from '../../components/base/FormattedTag.vue'
 import JoinedButtons from '../../components/base/JoinedButtons.vue'
@@ -30,8 +31,6 @@ import PageHeaderMetadataTagsItem from '../../components/base/page-header/metada
 import PageHeaderMetadataTimeItem from '../../components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '../../components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '../../components/base/page-header/page-header-badge-item.vue'
-import PageHeaderObjectAvatarLeading from '../../components/base/page-header/page-header-object-avatar-leading.vue'
-import PageHeaderUserAvatarLeading from '../../components/base/page-header/page-header-user-avatar-leading.vue'
 import TagItem from '../../components/base/TagItem.vue'
 import TeleportOverflowMenu from '../../components/base/TeleportOverflowMenu.vue'
 import LoaderIcon from '../../components/servers/icons/LoaderIcon.vue'
@@ -87,6 +86,7 @@ const pageHeaderIcons = {
 
 const pageHeaderComponents = {
 	AutoLink,
+	Avatar,
 	ButtonStyled,
 	FormattedTag,
 	JoinedButtons,
@@ -98,8 +98,6 @@ const pageHeaderComponents = {
 	PageHeaderMetadataNumberItem,
 	PageHeaderMetadataTagsItem,
 	PageHeaderMetadataTimeItem,
-	PageHeaderObjectAvatarLeading,
-	PageHeaderUserAvatarLeading,
 	TagItem,
 	TeleportOverflowMenu,
 	...pageHeaderIcons,
@@ -136,7 +134,7 @@ export const ProjectHeader: Story = {
 		template: `
 			<PageHeader title="Fabric API" summary="Lightweight and modular API providing common hooks and intercompatibility measures for Fabric mods.">
 				<template #leading>
-					<PageHeaderObjectAvatarLeading src="" alt="Fabric API" size="96px" tint-by="fabric-api" />
+					<Avatar src="" alt="Fabric API" size="96px" tint-by="fabric-api" />
 				</template>
 
 				<template #badges>
@@ -190,7 +188,7 @@ export const CreatorHeader: Story = {
 		template: `
 			<PageHeader title="Prospector" summary="A Modrinth creator with a handful of popular projects.">
 				<template #leading>
-					<PageHeaderUserAvatarLeading src="" username="Prospector" />
+					<Avatar src="" alt="Prospector" size="96px" tint-by="Prospector" circle />
 				</template>
 
 				<template #badges>
@@ -239,7 +237,7 @@ export const AppInstanceHeader: Story = {
 		template: `
 			<PageHeader title="Create: Astral">
 				<template #leading>
-					<PageHeaderObjectAvatarLeading src="" alt="Create: Astral" size="64px" tint-by="create-astral" />
+					<Avatar src="" alt="Create: Astral" size="64px" tint-by="create-astral" />
 				</template>
 
 				<template #metadata>
@@ -298,7 +296,7 @@ export const BrowseHeader: Story = {
 							<LeftArrowIcon />
 						</button>
 					</ButtonStyled>
-					<PageHeaderObjectAvatarLeading src="" alt="Survival SMP" size="48px" tint-by="survival-smp" />
+					<Avatar src="" alt="Survival SMP" size="48px" tint-by="survival-smp" />
 				</template>
 
 				<template #metadata>
@@ -435,7 +433,7 @@ export const CustomMetadata: Story = {
 				summary="Custom metadata stays in markup so page-specific components can be composed without expanding PageHeader itself."
 			>
 				<template #leading>
-					<PageHeaderObjectAvatarLeading src="" alt="Custom Metadata Project" size="96px" tint-by="custom-metadata-project" />
+					<Avatar src="" alt="Custom Metadata Project" size="96px" tint-by="custom-metadata-project" />
 				</template>
 
 				<template #metadata>

@@ -133,15 +133,6 @@
 					:is-staff="!!(auth.user && isStaff(auth.user))"
 					:projects-count="projects?.length || 0"
 					:downloads="sumDownloads"
-					:project-count-label="
-						formatMessage(messages.profileProjectCountLabel, { count: projects?.length || 0 })
-					"
-					:downloads-label="
-						formatMessage(messages.profileDownloadCountLabel, { count: sumDownloads })
-					"
-					:downloads-tooltip="formatNumber(sumDownloads)"
-					:joined-tooltip="formatDateTime(user.created)"
-					:labels="profileHeaderLabels"
 					@manage-projects="navigateTo('/dashboard/projects')"
 					@report="reportProfileFromHeader"
 					@copy-id="copyId"
@@ -388,8 +379,6 @@ import {
 	NewModal,
 	ProjectCard,
 	ProjectCardList,
-	useFormatDateTime,
-	useFormatNumber,
 	UserBadges,
 	useVIntl,
 } from '@modrinth/ui'
@@ -416,30 +405,13 @@ const config = useRuntimeConfig()
 const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
-const formatNumber = useFormatNumber()
-const formatDateTime = useFormatDateTime({
-	timeStyle: 'short',
-	dateStyle: 'long',
-})
 
 const { addNotification } = injectNotificationManager()
 
 const messages = defineMessages({
-	profileProjectCountLabel: {
-		id: 'profile.label.project-count',
-		defaultMessage: '{count, plural, one {project} other {projects}}',
-	},
-	profileDownloadCountLabel: {
-		id: 'profile.label.download-count',
-		defaultMessage: '{count, plural, one {download} other {downloads}}',
-	},
 	collectionProjectsCount: {
 		id: 'profile.collection.projects-count',
 		defaultMessage: '{count, plural, one {# project} other {# projects}}',
-	},
-	profileJoinedLabel: {
-		id: 'profile.label.joined',
-		defaultMessage: 'Joined',
 	},
 	savingLabel: {
 		id: 'profile.label.saving',
@@ -506,10 +478,6 @@ const messages = defineMessages({
 		id: 'profile.label.badges',
 		defaultMessage: 'Badges',
 	},
-	profileManageProjectsButton: {
-		id: 'profile.button.manage-projects',
-		defaultMessage: 'Manage projects',
-	},
 	profileMetaDescription: {
 		id: 'profile.meta.description',
 		defaultMessage: "Download {username}'s projects on Modrinth",
@@ -536,41 +504,9 @@ const messages = defineMessages({
 		defaultMessage:
 			"You don't have any collections.\nWould you like to <create-link>create one</create-link>?",
 	},
-	billingButton: {
-		id: 'profile.button.billing',
-		defaultMessage: 'Manage user billing',
-	},
-	infoButton: {
-		id: 'profile.button.info',
-		defaultMessage: 'View user details',
-	},
-	analyticsButton: {
-		id: 'profile.button.analytics',
-		defaultMessage: 'View user analytics',
-	},
-	setAffiliateButton: {
-		id: 'profile.button.set-affiliate',
-		defaultMessage: 'Set as affiliate',
-	},
-	removeAffiliateButton: {
-		id: 'profile.button.remove-affiliate',
-		defaultMessage: 'Remove as affiliate',
-	},
-	affiliateLabel: {
-		id: 'profile.label.affiliate',
-		defaultMessage: 'Affiliate',
-	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
-	},
 	userNotFoundError: {
 		id: 'profile.error.not-found',
 		defaultMessage: 'User not found',
-	},
-	officialAccount: {
-		id: 'profile.official-account',
-		defaultMessage: 'Official Modrinth account',
 	},
 	officialAccountBio: {
 		id: 'profile.official-account.bio',
@@ -753,24 +689,6 @@ const profileHeaderSummary = computed(() =>
 			? formatMessage(messages.bioFallbackUser)
 			: formatMessage(messages.bioFallbackCreator),
 )
-
-const profileHeaderLabels = computed(() => ({
-	affiliate: formatMessage(messages.affiliateLabel),
-	analytics: formatMessage(messages.analyticsButton),
-	billing: formatMessage(messages.billingButton),
-	copyId: formatMessage(commonMessages.copyIdButton),
-	copyPermalink: formatMessage(commonMessages.copyPermalinkButton),
-	edit: formatMessage(commonMessages.editButton),
-	editRole: formatMessage(messages.editRoleButton),
-	info: formatMessage(messages.infoButton),
-	joined: formatMessage(messages.profileJoinedLabel),
-	manageProjects: formatMessage(messages.profileManageProjectsButton),
-	moreOptions: 'More options',
-	officialAccount: formatMessage(messages.officialAccount),
-	removeAffiliate: formatMessage(messages.removeAffiliateButton),
-	report: formatMessage(commonMessages.reportButton),
-	setAffiliate: formatMessage(messages.setAffiliateButton),
-}))
 
 const navLinks = computed(() => [
 	{

@@ -5,7 +5,7 @@
 		@contextmenu.prevent.stop="emit('contextmenu', $event)"
 	>
 		<template #leading>
-			<PageHeaderObjectAvatarLeading :src="project.icon_url" :alt="project.title" size="96px" />
+			<Avatar :src="project.icon_url" :alt="project.title" :tint-by="project.id" size="96px" />
 		</template>
 
 		<template v-if="project.status !== 'approved'" #badges>
@@ -27,14 +27,14 @@
 						:icon="DownloadIcon"
 						:value="project.downloads"
 						label="downloads"
-						:tooltip="downloadsTooltip"
+						:tooltip="formatNumber(project.downloads)"
 						class="cursor-help"
 					/>
 					<PageHeaderMetadataNumberItem
 						:icon="HeartIcon"
 						:value="project.followers"
 						label="followers"
-						:tooltip="followersTooltip"
+						:tooltip="formatNumber(project.followers)"
 						class="cursor-help"
 					/>
 				</template>
@@ -61,14 +61,20 @@
 						>
 							<StopCircleIcon v-if="serverPlaying" />
 							<PlayIcon v-else />
-							{{ serverPlaying ? stopLabel : serverPlayLabel }}
+							{{
+								serverPlaying
+									? formatMessage(commonMessages.stopButton)
+									: serverInstallLoading
+										? formatMessage(commonMessages.installingLabel)
+										: formatMessage(commonMessages.playButton)
+							}}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled circular size="large">
 						<button
-							v-tooltip="addServerToInstanceLabel"
+							v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
 							type="button"
-							:aria-label="addServerToInstanceLabel"
+							:aria-label="formatMessage(commonMessages.addServerToInstanceButton)"
 							@click="emit('addServerToInstance')"
 						>
 							<PlusIcon />
@@ -87,13 +93,25 @@
 				<template v-else>
 					<ButtonStyled color="brand" size="large">
 						<button
-							v-tooltip="installButtonTooltip"
+							v-tooltip="
+								installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
+							"
 							type="button"
 							:disabled="installButtonDisabled"
 							@click="emit('install')"
 						>
 							<component :is="installButtonIcon" :class="installButtonIconClass" />
-							{{ installButtonLabel }}
+							{{
+								installButtonInstalled
+									? formatMessage(commonMessages.installedLabel)
+									: installButtonValidating
+										? formatMessage(commonMessages.validatingLabel)
+										: installButtonLoading
+											? formatMessage(commonMessages.installingLabel)
+											: serverProjectSelected
+												? formatMessage(commonMessages.selectedLabel)
+												: formatMessage(commonMessages.installButton)
+							}}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled circular size="large" type="transparent">
@@ -111,7 +129,8 @@
 	</PageHeader>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BookmarkIcon,
 	CheckIcon,
@@ -126,117 +145,82 @@ import {
 	StopCircleIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	FormattedTag,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
 	PageHeaderMetadataTagsItem,
-	PageHeaderObjectAvatarLeading,
 	ProjectStatusBadge,
 	ServerDetails,
 	TagItem,
 	TeleportOverflowMenu,
+	type TeleportOverflowMenuItem,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
 import { computed } from 'vue'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		required: true,
-	},
-	projectV3: {
-		type: Object,
-		default: null,
-	},
-	isServerProject: {
-		type: Boolean,
-		default: false,
-	},
-	installButtonLabel: {
-		type: String,
-		default: '',
-	},
-	installButtonTooltip: {
-		type: String,
-		default: null,
-	},
-	installButtonDisabled: {
-		type: Boolean,
-		default: false,
-	},
-	installButtonLoading: {
-		type: Boolean,
-		default: false,
-	},
-	installButtonInstalled: {
-		type: Boolean,
-		default: false,
-	},
-	serverProjectSelected: {
-		type: Boolean,
-		default: false,
-	},
-	serverPlaying: {
-		type: Boolean,
-		default: false,
-	},
-	serverInstallLoading: {
-		type: Boolean,
-		default: false,
-	},
-	stopLabel: {
-		type: String,
-		required: true,
-	},
-	playLabel: {
-		type: String,
-		required: true,
-	},
-	installingLabel: {
-		type: String,
-		required: true,
-	},
-	addServerToInstanceLabel: {
-		type: String,
-		required: true,
+type HeaderProject = Pick<
+	Labrinth.Projects.v2.Project,
+	'id' | 'title' | 'description' | 'status' | 'downloads' | 'followers' | 'categories'
+> & {
+	icon_url?: string | null
+}
+
+type HeaderProjectV3 = Pick<
+	Labrinth.Projects.v3.Project,
+	'status' | 'minecraft_java_server'
+>
+
+const props = withDefaults(defineProps<{
+	project: HeaderProject
+	projectV3?: HeaderProjectV3 | null
+	isServerProject?: boolean
+	installButtonDisabled?: boolean
+	installButtonValidating?: boolean
+	installButtonLoading?: boolean
+	installButtonInstalled?: boolean
+	serverProjectSelected?: boolean
+	serverPlaying?: boolean
+	serverInstallLoading?: boolean
+}>(), {
+	projectV3: null,
+	isServerProject: false,
+	installButtonDisabled: false,
+	installButtonValidating: false,
+	installButtonLoading: false,
+	installButtonInstalled: false,
+	serverProjectSelected: false,
+	serverPlaying: false,
+	serverInstallLoading: false,
+})
+
+const emit = defineEmits<{
+	contextmenu: [event: MouseEvent]
+	category: [category: string]
+	install: []
+	playServer: []
+	stopServer: []
+	addServerToInstance: []
+	openBrowser: []
+	report: []
+}>()
+
+const messages = defineMessages({
+	alreadyInstalled: {
+		id: 'app.project.install-button.already-installed',
+		defaultMessage: 'This project is already installed',
 	},
 })
 
-const emit = defineEmits([
-	'contextmenu',
-	'category',
-	'install',
-	'playServer',
-	'stopServer',
-	'addServerToInstance',
-	'openBrowser',
-	'report',
-])
-
 const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
 
-const downloadsTooltip = computed(() =>
-	capitalizeString(
-		formatMessage(commonMessages.projectDownloads, {
-			count: props.project.downloads,
-		}),
-	),
-)
-const followersTooltip = computed(() =>
-	capitalizeString(
-		formatMessage(commonMessages.projectFollowers, {
-			count: props.project.followers,
-		}),
-	),
-)
-const serverPlayLabel = computed(() =>
-	props.serverInstallLoading ? props.installingLabel : props.playLabel,
-)
 const installButtonIcon = computed(() => {
 	if (props.installButtonLoading && !props.installButtonInstalled) return SpinnerIcon
 	if (!props.installButtonInstalled && !props.serverProjectSelected) return DownloadIcon
@@ -245,10 +229,10 @@ const installButtonIcon = computed(() => {
 const installButtonIconClass = computed(() =>
 	props.installButtonLoading && !props.installButtonInstalled ? 'animate-spin' : undefined,
 )
-const serverMoreActions = computed(() => [
+const serverMoreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'open-in-browser',
-		label: 'Open in browser',
+		label: formatMessage(commonMessages.openInModrinthButton),
 		icon: ExternalIcon,
 		action: () => emit('openBrowser'),
 	},
@@ -257,16 +241,16 @@ const serverMoreActions = computed(() => [
 	},
 	{
 		id: 'report',
-		label: 'Report',
+		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		color: 'red',
 		action: () => emit('report'),
 	},
 ])
-const projectMoreActions = computed(() => [
+const projectMoreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'follow',
-		label: 'Follow',
+		label: formatMessage(commonMessages.followButton),
 		icon: HeartIcon,
 		disabled: true,
 		tooltip: 'Coming soon',
@@ -274,7 +258,7 @@ const projectMoreActions = computed(() => [
 	},
 	{
 		id: 'save',
-		label: 'Save',
+		label: formatMessage(commonMessages.saveButton),
 		icon: BookmarkIcon,
 		disabled: true,
 		tooltip: 'Coming soon',
@@ -282,7 +266,7 @@ const projectMoreActions = computed(() => [
 	},
 	{
 		id: 'open-in-browser',
-		label: 'Open in browser',
+		label: formatMessage(commonMessages.openInModrinthButton),
 		icon: ExternalIcon,
 		action: () => emit('openBrowser'),
 	},
@@ -291,7 +275,7 @@ const projectMoreActions = computed(() => [
 	},
 	{
 		id: 'report',
-		label: 'Report',
+		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		color: 'red',
 		action: () => emit('report'),

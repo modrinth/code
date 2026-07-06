@@ -136,8 +136,6 @@
 						:sign-in-route="signInRouteObj"
 						:collections="collections"
 						:base-id="baseId"
-						:no-collections-label="formatMessage(messages.noCollectionsFound)"
-						:create-new-collection-label="formatMessage(messages.createNewCollection)"
 						:collect-project="onUserCollectProject"
 						:create-collection="(event) => modalCollection?.show(event)"
 						:is-server-project="isServerProject"
@@ -148,13 +146,11 @@
 						:can-create-server="canCreateServerFrom"
 						:show-quick-server-button="flags.showProjectPageQuickServerButton"
 						:show-create-server-prompt="flags.showProjectPageCreateServersTooltip"
-						:create-server-prompt-footer="projectHeaderCreateServerPromptFooter"
 						:following="following"
 						:saved="collections.some((x) => x.projects.includes(project.id))"
 						:is-member="isMember"
 						:is-staff="!!(auth.user && tags.staffRoles.includes(auth.user.role))"
 						:show-moderation-checklist="showModerationChecklist"
-						:labels="projectHeaderLabels"
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 						@primary="handleProjectHeaderPrimary"
 						@create-server="dismissProjectHeaderCreateServerPrompt"
@@ -432,7 +428,6 @@ import {
 	provideProjectPageContext,
 	useDebugLogger,
 	useFormatDateTime,
-	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -504,7 +499,6 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { formatMessage } = useVIntl()
-const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -577,29 +571,13 @@ const messages = defineMessages({
 		id: 'project.navigation.changelog',
 		defaultMessage: 'Changelog',
 	},
-	createNewCollection: {
-		id: 'project.collections.create-new',
-		defaultMessage: 'Create new collection',
-	},
 	createServer: {
 		id: 'project.actions.create-server',
-		defaultMessage: 'Create a server',
-	},
-	createServerTooltip: {
-		id: 'project.actions.create-server-tooltip',
 		defaultMessage: 'Create a server',
 	},
 	descriptionTab: {
 		id: 'project.description.title',
 		defaultMessage: 'Description',
-	},
-	dontShowAgain: {
-		id: 'project.actions.dont-show-again',
-		defaultMessage: "Don't show again",
-	},
-	downloadsStat: {
-		id: 'project.stats.downloads-label',
-		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
 	errorLoadingProject: {
 		id: 'project.error.loading',
@@ -627,10 +605,6 @@ const messages = defineMessages({
 		id: 'project.environment.migration.learn-more',
 		defaultMessage: 'Learn more about this change',
 	},
-	followersStat: {
-		id: 'project.stats.followers-label',
-		defaultMessage: '{count, plural, one {follower} other {followers}}',
-	},
 	galleryTab: {
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
@@ -654,10 +628,6 @@ const messages = defineMessages({
 	moderationTab: {
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
-	},
-	noCollectionsFound: {
-		id: 'project.collections.none-found',
-		defaultMessage: 'No collections found.',
 	},
 	pageNotFound: {
 		id: 'project.error.page-not-found',
@@ -686,22 +656,6 @@ const messages = defineMessages({
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
-	},
-	reviewProject: {
-		id: 'project.actions.review-project',
-		defaultMessage: 'Review project',
-	},
-	serversPromoDescription: {
-		id: 'project.actions.servers-promo.description',
-		defaultMessage: 'Modrinth Hosting is the easiest way to play with your friends without hassle!',
-	},
-	serversPromoPricing: {
-		id: 'project.actions.servers-promo.pricing',
-		defaultMessage: 'Starting at {price}<small> / month</small>',
-	},
-	serversPromoTitle: {
-		id: 'project.actions.servers-promo.title',
-		defaultMessage: 'Create a server',
 	},
 	settingsTitle: {
 		id: 'project.settings.title',
@@ -1495,37 +1449,6 @@ const canCreateServerFrom = computed(() => {
 const projectSearchUrl = computed(
 	() => `/discover/${isServerProject.value ? 'servers' : `${project.value?.project_type}s`}`,
 )
-
-const projectHeaderCreateServerPromptFooter = computed(() =>
-	formatMessage(messages.serversPromoPricing, {
-		price: formatPrice(500, 'USD', true),
-		small: (children) => (Array.isArray(children) ? children.join('') : children),
-	}),
-)
-
-const projectHeaderLabels = computed(() => ({
-	analyticsButton: formatMessage(commonMessages.analyticsButton),
-	copyIdButton: formatMessage(commonMessages.copyIdButton),
-	copyPermalinkButton: formatMessage(commonMessages.copyPermalinkButton),
-	createServer: formatMessage(messages.serversPromoTitle),
-	createServerTooltip: formatMessage(messages.createServerTooltip),
-	dontShowAgain: formatMessage(messages.dontShowAgain),
-	downloadButton: formatMessage(commonMessages.downloadButton),
-	downloadsStat: messages.downloadsStat,
-	editProject: 'Edit project',
-	followButton: formatMessage(commonMessages.followButton),
-	followersStat: messages.followersStat,
-	moreOptions: formatMessage(commonMessages.moreOptionsButton),
-	newBadge: formatMessage(commonMessages.newBadge),
-	playButton: 'Play',
-	reportButton: formatMessage(commonMessages.reportButton),
-	reviewProject: formatMessage(messages.reviewProject),
-	saveButton: formatMessage(commonMessages.saveButton),
-	serversPromoDescription: formatMessage(messages.serversPromoDescription),
-	serversPromoTitle: formatMessage(messages.serversPromoTitle),
-	techReview: 'Tech review',
-	unfollowButton: formatMessage(commonMessages.unfollowButton),
-}))
 
 const createCanonicalUrl = () =>
 	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined

@@ -72,8 +72,6 @@ export { default as PageHeaderMetadataTagsItem } from './page-header/metadata/pa
 export { default as PageHeaderMetadataTimeItem } from './page-header/metadata/page-header-metadata-time-item.vue'
 export { default as PageHeaderActions } from './page-header/page-header-actions.vue'
 export { default as PageHeaderBadgeItem } from './page-header/page-header-badge-item.vue'
-export { default as PageHeaderObjectAvatarLeading } from './page-header/page-header-object-avatar-leading.vue'
-export { default as PageHeaderUserAvatarLeading } from './page-header/page-header-user-avatar-leading.vue'
 export type {
 	PageHeaderClass,
 	PageHeaderClickHandler,

@@ -17,10 +17,8 @@
 				:instance="instance"
 				:icon-src="icon"
 				:is-server-instance="isServerInstance"
-				:loader-display-name="loaderDisplayName"
-				:loader-label="loaderLabel"
 				:show-instance-play-time="showInstancePlayTime"
-				:playtime-label="playtimeLabel"
+				:time-played="timePlayed"
 				:playing="playing"
 				:loading="loading"
 				:stopping="stopping"
@@ -112,16 +110,13 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	formatLoaderLabel,
 	injectNotificationManager,
 	NavTabs,
-	type ServerLoader,
 	useLoadingBarToken,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -146,7 +141,6 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
 
-dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
@@ -538,36 +532,6 @@ const timePlayed = computed(() => {
 		? instance.value.recent_time_played + instance.value.submitted_time_played
 		: 0
 })
-
-const timePlayedHumanized = computed(() => {
-	const duration = dayjs.duration(timePlayed.value, 'seconds')
-	const hours = Math.floor(duration.asHours())
-	if (hours >= 1) {
-		return hours + ' hour' + (hours > 1 ? 's' : '')
-	}
-
-	const minutes = Math.floor(duration.asMinutes())
-	if (minutes >= 1) {
-		return minutes + ' minute' + (minutes > 1 ? 's' : '')
-	}
-
-	const seconds = Math.floor(duration.asSeconds())
-	return seconds + ' second' + (seconds > 1 ? 's' : '')
-})
-
-const loaderDisplayName = computed(() =>
-	instance.value ? (formatLoaderLabel(instance.value.loader) as ServerLoader) : null,
-)
-
-const loaderLabel = computed(() =>
-	instance.value && loaderDisplayName.value
-		? [loaderDisplayName.value, instance.value.loader_version].filter(Boolean).join(' ')
-		: '',
-)
-
-const playtimeLabel = computed(() =>
-	timePlayed.value > 0 ? timePlayedHumanized.value : 'Never played',
-)
 
 onUnmounted(() => {
 	unlistenProcesses()

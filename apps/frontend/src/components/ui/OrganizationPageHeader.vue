@@ -1,16 +1,17 @@
 <template>
 	<PageHeader :title="organization.name" :summary="organization.description">
 		<template #leading>
-			<PageHeaderObjectAvatarLeading
+			<Avatar
 				:src="organization.icon_url"
 				:alt="organization.name"
+				:tint-by="organization.id"
 				size="96px"
 			/>
 		</template>
 
 		<template #badges>
 			<PageHeaderBadgeItem :icon="OrganizationIcon" class="px-0 text-primary">
-				{{ labels.organization }}
+				{{ formatMessage(messages.organizationLabel) }}
 			</PageHeaderBadgeItem>
 		</template>
 
@@ -19,18 +20,18 @@
 				<PageHeaderMetadataNumberItem
 					:icon="UsersIcon"
 					:value="membersCount"
-					:label="labels.members"
+					:label="formatMessage(messages.membersLabel)"
 				/>
 				<PageHeaderMetadataNumberItem
 					:icon="BoxIcon"
 					:value="projectsCount"
-					:label="labels.projects"
+					:label="formatMessage(messages.projectsLabel)"
 				/>
 				<PageHeaderMetadataNumberItem
 					:icon="DownloadIcon"
 					:value="downloads"
-					:label="labels.downloads"
-					:tooltip="downloadsTooltip"
+					:label="formatMessage(messages.downloadsLabel)"
+					:tooltip="formatNumber(downloads)"
 				/>
 			</PageHeaderMetadata>
 		</template>
@@ -40,14 +41,14 @@
 				<ButtonStyled v-if="canManage" size="large">
 					<nuxt-link :to="`/organization/${organization.slug}/settings`">
 						<SettingsIcon />
-						{{ labels.manage }}
+						{{ formatMessage(messages.manage) }}
 					</nuxt-link>
 				</ButtonStyled>
 				<ButtonStyled circular size="large" type="transparent">
 					<TeleportOverflowMenu
 						:options="moreActions"
-						:tooltip="labels.moreOptions"
-						:aria-label="labels.moreOptions"
+						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
 					>
 						<MoreVerticalIcon />
 					</TeleportOverflowMenu>
@@ -68,17 +69,48 @@ import {
 	UsersIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	ButtonStyled,
+	commonMessages,
+	defineMessages,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
-	PageHeaderObjectAvatarLeading,
 	TeleportOverflowMenu,
 	type TeleportOverflowMenuItem,
+	useFormatNumber,
+	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
+
+const messages = defineMessages({
+	downloadsLabel: {
+		id: 'organization.label.downloads',
+		defaultMessage: 'downloads',
+	},
+	manage: {
+		id: 'organization.button.manage',
+		defaultMessage: 'Manage',
+	},
+	manageProjects: {
+		id: 'organization.button.manage-projects',
+		defaultMessage: 'Manage projects',
+	},
+	membersLabel: {
+		id: 'organization.label.members',
+		defaultMessage: 'members',
+	},
+	organizationLabel: {
+		id: 'organization.label.organization',
+		defaultMessage: 'Organization',
+	},
+	projectsLabel: {
+		id: 'organization.label.projects',
+		defaultMessage: 'projects',
+	},
+})
 
 const props = defineProps<{
 	organization: {
@@ -91,19 +123,7 @@ const props = defineProps<{
 	membersCount: number
 	projectsCount: number
 	downloads: number
-	downloadsTooltip?: string
 	canManage?: boolean
-	labels: {
-		organization: string
-		members: string
-		projects: string
-		downloads: string
-		manage: string
-		manageProjects: string
-		moreOptions: string
-		copyId: string
-		copyPermalink: string
-	}
 }>()
 
 const emit = defineEmits<{
@@ -112,10 +132,13 @@ const emit = defineEmits<{
 	copyPermalink: []
 }>()
 
+const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
+
 const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'manage-projects',
-		label: props.labels.manageProjects,
+		label: formatMessage(messages.manageProjects),
 		icon: BoxIcon,
 		action: () => emit('manageProjects'),
 		shown: props.canManage,
@@ -126,13 +149,13 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	},
 	{
 		id: 'copy-id',
-		label: props.labels.copyId,
+		label: formatMessage(commonMessages.copyIdButton),
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyId'),
 	},
 	{
 		id: 'copy-permalink',
-		label: props.labels.copyPermalink,
+		label: formatMessage(commonMessages.copyPermalinkButton),
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyPermalink'),
 	},

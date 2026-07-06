@@ -1,7 +1,7 @@
 <template>
 	<PageHeader :title="instance.name">
 		<template #leading>
-			<PageHeaderObjectAvatarLeading
+			<Avatar
 				:src="iconSrc"
 				:alt="instance.name"
 				size="64px"
@@ -41,18 +41,22 @@
 		<template #actions>
 			<PageHeaderActions>
 				<ButtonStyled v-if="isInstalling" color="brand" size="large">
-					<button type="button" disabled>Installing...</button>
+					<button type="button" disabled>{{ formatMessage(commonMessages.installingLabel) }}</button>
 				</ButtonStyled>
 				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
 					<button type="button" @click="emit('repair')">
 						<DownloadIcon />
-						Repair
+						{{ formatMessage(messages.repair) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else-if="playing" color="red" size="large">
 					<button type="button" :disabled="stopping" @click="emit('stop')">
 						<StopCircleIcon />
-						{{ stopping ? 'Stopping...' : 'Stop' }}
+						{{
+							stopping
+								? formatMessage(messages.stopping)
+								: formatMessage(commonMessages.stopButton)
+						}}
 					</button>
 				</ButtonStyled>
 				<JoinedButtons
@@ -64,18 +68,18 @@
 				<ButtonStyled v-else-if="!loading" color="brand" size="large">
 					<button type="button" @click="emit('play')">
 						<PlayIcon />
-						Play
+						{{ formatMessage(commonMessages.playButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else color="brand" size="large">
-					<button type="button" disabled>Starting...</button>
+					<button type="button" disabled>{{ formatMessage(messages.starting) }}</button>
 				</ButtonStyled>
 
 				<ButtonStyled circular size="large">
 					<button
-						v-tooltip="'Instance settings'"
+						v-tooltip="formatMessage(messages.instanceSettings)"
 						type="button"
-						aria-label="Instance settings"
+						:aria-label="formatMessage(messages.instanceSettings)"
 						@click="emit('settings')"
 					>
 						<SettingsIcon />
@@ -84,8 +88,8 @@
 				<ButtonStyled circular size="large" type="transparent">
 					<TeleportOverflowMenu
 						:options="moreActions"
-						tooltip="More actions"
-						aria-label="More actions"
+						:tooltip="formatMessage(messages.moreActions)"
+						:aria-label="formatMessage(messages.moreActions)"
 					>
 						<MoreVerticalIcon />
 					</TeleportOverflowMenu>
@@ -110,18 +114,22 @@ import {
 	TimerIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	formatLoaderLabel,
 	JoinedButtons,
 	LoaderIcon as ServerLoaderIcon,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
-	PageHeaderObjectAvatarLeading,
 	TeleportOverflowMenu,
 	type JoinedButtonAction,
 	type ServerLoader,
 	type TeleportOverflowMenuItem,
+	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -129,15 +137,56 @@ import type { GameInstance } from '@/helpers/types'
 
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
 
+const messages = defineMessages({
+	createShortcut: {
+		id: 'instance.action.create-shortcut',
+		defaultMessage: 'Create shortcut',
+	},
+	exportModpack: {
+		id: 'instance.action.export-modpack',
+		defaultMessage: 'Export modpack',
+	},
+	instanceSettings: {
+		id: 'instance.action.settings',
+		defaultMessage: 'Instance settings',
+	},
+	launchInstance: {
+		id: 'instance.action.launch-instance',
+		defaultMessage: 'Launch instance',
+	},
+	moreActions: {
+		id: 'instance.action.more-actions',
+		defaultMessage: 'More actions',
+	},
+	neverPlayed: {
+		id: 'instance.playtime.never-played',
+		defaultMessage: 'Never played',
+	},
+	openFolder: {
+		id: 'instance.action.open-folder',
+		defaultMessage: 'Open folder',
+	},
+	repair: {
+		id: 'instance.action.repair',
+		defaultMessage: 'Repair',
+	},
+	starting: {
+		id: 'instance.action.starting',
+		defaultMessage: 'Starting...',
+	},
+	stopping: {
+		id: 'instance.action.stopping',
+		defaultMessage: 'Stopping...',
+	},
+})
+
 const props = withDefaults(
 	defineProps<{
 		instance: GameInstance
 		iconSrc?: string | null
 		isServerInstance?: boolean
-		loaderDisplayName?: ServerLoader | null
-		loaderLabel?: string
 		showInstancePlayTime?: boolean
-		playtimeLabel?: string
+		timePlayed?: number
 		playing?: boolean
 		loading?: boolean
 		stopping?: boolean
@@ -152,10 +201,8 @@ const props = withDefaults(
 	{
 		iconSrc: null,
 		isServerInstance: false,
-		loaderDisplayName: null,
-		loaderLabel: '',
 		showInstancePlayTime: false,
-		playtimeLabel: '',
+		timePlayed: 0,
 		playing: false,
 		loading: false,
 		stopping: false,
@@ -188,17 +235,39 @@ const installingStages = [
 	'minecraft_installing',
 ]
 
+const { formatMessage } = useVIntl()
+
 const isInstalling = computed(() => installingStages.includes(props.instance.install_stage))
+const loaderDisplayName = computed(() => formatLoaderLabel(props.instance.loader) as ServerLoader)
+const loaderLabel = computed(() =>
+	[loaderDisplayName.value, props.instance.loader_version].filter(Boolean).join(' '),
+)
+const playtimeLabel = computed(() => {
+	if (props.timePlayed <= 0) return formatMessage(messages.neverPlayed)
+
+	const hours = Math.floor(props.timePlayed / 3600)
+	if (hours >= 1) {
+		return `${hours} hour${hours > 1 ? 's' : ''}`
+	}
+
+	const minutes = Math.floor(props.timePlayed / 60)
+	if (minutes >= 1) {
+		return `${minutes} minute${minutes > 1 ? 's' : ''}`
+	}
+
+	const seconds = Math.floor(props.timePlayed)
+	return `${seconds} second${seconds > 1 ? 's' : ''}`
+})
 const serverPlayActions = computed<JoinedButtonAction[]>(() => [
 	{
 		id: 'join_server',
-		label: 'Play',
+		label: formatMessage(commonMessages.playButton),
 		icon: PlayIcon,
 		action: () => emit('playServer'),
 	},
 	{
 		id: 'launch_instance',
-		label: 'Launch instance',
+		label: formatMessage(messages.launchInstance),
 		icon: PlayIcon,
 		action: () => emit('play'),
 	},
@@ -206,19 +275,19 @@ const serverPlayActions = computed<JoinedButtonAction[]>(() => [
 const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'open-folder',
-		label: 'Open folder',
+		label: formatMessage(messages.openFolder),
 		icon: FolderOpenIcon,
 		action: () => emit('openFolder'),
 	},
 	{
 		id: 'export-mrpack',
-		label: 'Export modpack',
+		label: formatMessage(messages.exportModpack),
 		icon: PackageIcon,
 		action: () => emit('export'),
 	},
 	{
 		id: 'create-shortcut',
-		label: 'Create shortcut',
+		label: formatMessage(messages.createShortcut),
 		icon: ExternalIcon,
 		action: () => emit('createShortcut'),
 	},

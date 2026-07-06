@@ -1,10 +1,12 @@
 <template>
 	<PageHeader :title="user.username" :summary="summary">
 		<template #leading>
-			<PageHeaderUserAvatarLeading
+			<Avatar
 				:src="user.avatar_url"
-				:username="user.username"
+				:alt="user.username"
 				:size="isModrinthUser ? '64px' : '96px'"
+				:tint-by="user.username"
+				circle
 			/>
 		</template>
 
@@ -13,17 +15,17 @@
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
 				:icon-props="{ fill: 'var(--color-brand-highlight)' }"
-				:tooltip="labels.officialAccount"
+				:tooltip="formatMessage(messages.officialAccount)"
 				class="border-brand-highlight bg-brand-highlight text-brand"
 			>
-				{{ labels.officialAccount }}
+				{{ formatMessage(messages.officialAccount) }}
 			</PageHeaderBadgeItem>
 			<PageHeaderBadgeItem
 				v-if="showAffiliateBadge"
 				:icon="AffiliateIcon"
 				class="border-brand-highlight bg-brand-highlight text-brand"
 			>
-				{{ labels.affiliate }}
+				{{ formatMessage(messages.affiliateLabel) }}
 			</PageHeaderBadgeItem>
 		</template>
 
@@ -36,18 +38,18 @@
 				<PageHeaderMetadataNumberItem
 					:icon="BoxIcon"
 					:value="projectsCount"
-					:label="projectCountLabel"
+					:label="formatMessage(messages.profileProjectCountLabel, { count: projectsCount })"
 				/>
 				<PageHeaderMetadataNumberItem
 					:icon="DownloadIcon"
 					:value="downloads"
-					:label="downloadsLabel"
+					:label="formatMessage(messages.profileDownloadCountLabel, { count: downloads })"
 					:tooltip="downloadsTooltip"
 				/>
 				<PageHeaderMetadataTimeItem
 					:icon="CalendarIcon"
 					:date="user.created"
-					:label="labels.joined"
+					:label="formatMessage(messages.profileJoinedLabel)"
 					:tooltip="joinedTooltip"
 				/>
 			</PageHeaderMetadata>
@@ -58,14 +60,14 @@
 				<ButtonStyled v-if="isSelf" size="large">
 					<nuxt-link to="/settings/profile">
 						<EditIcon />
-						{{ labels.edit }}
+						{{ formatMessage(commonMessages.editButton) }}
 					</nuxt-link>
 				</ButtonStyled>
 				<ButtonStyled circular size="large" type="transparent">
 					<TeleportOverflowMenu
 						:options="moreActions"
-						:tooltip="labels.moreOptions"
-						:aria-label="labels.moreOptions"
+						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
 					>
 						<MoreVerticalIcon />
 					</TeleportOverflowMenu>
@@ -75,7 +77,8 @@
 	</PageHeader>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	AffiliateIcon,
 	BadgeCheckIcon,
@@ -91,105 +94,131 @@ import {
 	ReportIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	ButtonStyled,
+	commonMessages,
+	defineMessages,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
 	PageHeaderMetadataTimeItem,
-	PageHeaderUserAvatarLeading,
 	TeleportOverflowMenu,
+	type TeleportOverflowMenuItem,
+	useFormatDateTime,
+	useFormatNumber,
+	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-const props = defineProps({
-	user: {
-		type: Object,
-		required: true,
+const messages = defineMessages({
+	affiliateLabel: {
+		id: 'profile.label.affiliate',
+		defaultMessage: 'Affiliate',
 	},
-	summary: {
-		type: String,
-		default: null,
+	analyticsButton: {
+		id: 'profile.button.analytics',
+		defaultMessage: 'View user analytics',
 	},
-	authUser: {
-		type: Object,
-		default: null,
+	billingButton: {
+		id: 'profile.button.billing',
+		defaultMessage: 'Manage user billing',
 	},
-	isModrinthUser: {
-		type: Boolean,
-		default: false,
+	editRoleButton: {
+		id: 'profile.button.edit-role',
+		defaultMessage: 'Edit role',
 	},
-	isOfficialAccount: {
-		type: Boolean,
-		default: false,
+	infoButton: {
+		id: 'profile.button.info',
+		defaultMessage: 'View user details',
 	},
-	showAffiliateBadge: {
-		type: Boolean,
-		default: false,
+	officialAccount: {
+		id: 'profile.official-account',
+		defaultMessage: 'Official Modrinth account',
 	},
-	isAffiliate: {
-		type: Boolean,
-		default: false,
+	profileJoinedLabel: {
+		id: 'profile.label.joined',
+		defaultMessage: 'Joined',
 	},
-	isSelf: {
-		type: Boolean,
-		default: false,
+	profileProjectCountLabel: {
+		id: 'profile.label.project-count',
+		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
-	isAdmin: {
-		type: Boolean,
-		default: false,
+	profileDownloadCountLabel: {
+		id: 'profile.label.download-count',
+		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
-	isStaff: {
-		type: Boolean,
-		default: false,
+	profileManageProjectsButton: {
+		id: 'profile.button.manage-projects',
+		defaultMessage: 'Manage projects',
 	},
-	projectsCount: {
-		type: Number,
-		default: 0,
+	removeAffiliateButton: {
+		id: 'profile.button.remove-affiliate',
+		defaultMessage: 'Remove as affiliate',
 	},
-	downloads: {
-		type: Number,
-		default: 0,
-	},
-	projectCountLabel: {
-		type: String,
-		required: true,
-	},
-	downloadsLabel: {
-		type: String,
-		required: true,
-	},
-	downloadsTooltip: {
-		type: String,
-		default: undefined,
-	},
-	joinedTooltip: {
-		type: String,
-		default: undefined,
-	},
-	labels: {
-		type: Object,
-		required: true,
+	setAffiliateButton: {
+		id: 'profile.button.set-affiliate',
+		defaultMessage: 'Set as affiliate',
 	},
 })
 
-const emit = defineEmits([
-	'manageProjects',
-	'report',
-	'copyId',
-	'copyPermalink',
-	'openBilling',
-	'toggleAffiliate',
-	'openInfo',
-	'openAnalytics',
-	'editRole',
-])
+const props = withDefaults(
+	defineProps<{
+		user: Labrinth.Users.v3.User
+		summary?: string | null
+		authUser?: Labrinth.Users.v3.User | null
+		isModrinthUser?: boolean
+		isOfficialAccount?: boolean
+		showAffiliateBadge?: boolean
+		isAffiliate?: boolean
+		isSelf?: boolean
+		isAdmin?: boolean
+		isStaff?: boolean
+		projectsCount?: number
+		downloads?: number
+	}>(),
+	{
+		summary: null,
+		authUser: null,
+		isModrinthUser: false,
+		isOfficialAccount: false,
+		showAffiliateBadge: false,
+		isAffiliate: false,
+		isSelf: false,
+		isAdmin: false,
+		isStaff: false,
+		projectsCount: 0,
+		downloads: 0,
+	},
+)
 
-const moreActions = computed(() => [
+const emit = defineEmits<{
+	manageProjects: []
+	report: []
+	copyId: []
+	copyPermalink: []
+	openBilling: []
+	toggleAffiliate: []
+	openInfo: []
+	openAnalytics: []
+	editRole: []
+}>()
+
+const { formatMessage } = useVIntl()
+
+const formatNumber = useFormatNumber()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const downloadsTooltip = computed(() => formatNumber(props.downloads))
+const joinedTooltip = computed(() => formatDateTime(props.user.created))
+
+const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'manage-projects',
-		label: props.labels.manageProjects,
+		label: formatMessage(messages.profileManageProjectsButton),
 		icon: BoxIcon,
 		action: () => emit('manageProjects'),
 		shown: props.isSelf,
@@ -200,7 +229,7 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'report',
-		label: props.labels.report,
+		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		action: () => emit('report'),
 		color: 'red',
@@ -208,13 +237,13 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'copy-id',
-		label: props.labels.copyId,
+		label: formatMessage(commonMessages.copyIdButton),
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyId'),
 	},
 	{
 		id: 'copy-permalink',
-		label: props.labels.copyPermalink,
+		label: formatMessage(commonMessages.copyPermalinkButton),
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyPermalink'),
 	},
@@ -224,14 +253,16 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'open-billing',
-		label: props.labels.billing,
+		label: formatMessage(messages.billingButton),
 		icon: CurrencyIcon,
 		action: () => emit('openBilling'),
 		shown: props.isStaff,
 	},
 	{
 		id: 'toggle-affiliate',
-		label: props.isAffiliate ? props.labels.removeAffiliate : props.labels.setAffiliate,
+		label: props.isAffiliate
+			? formatMessage(messages.removeAffiliateButton)
+			: formatMessage(messages.setAffiliateButton),
 		icon: AffiliateIcon,
 		action: () => emit('toggleAffiliate'),
 		shown: props.isAdmin,
@@ -240,21 +271,21 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'open-info',
-		label: props.labels.info,
+		label: formatMessage(messages.infoButton),
 		icon: InfoIcon,
 		action: () => emit('openInfo'),
 		shown: props.isStaff,
 	},
 	{
 		id: 'open-analytics',
-		label: props.labels.analytics,
+		label: formatMessage(messages.analyticsButton),
 		icon: ChartIcon,
 		action: () => emit('openAnalytics'),
 		shown: props.isAdmin,
 	},
 	{
 		id: 'edit-role',
-		label: props.labels.editRole,
+		label: formatMessage(messages.editRoleButton),
 		icon: EditIcon,
 		action: () => emit('editRole'),
 		shown: props.isAdmin,

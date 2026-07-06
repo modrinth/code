@@ -67,9 +67,7 @@
 					:members-count="acceptedMembers?.length || 0"
 					:projects-count="projects?.length || 0"
 					:downloads="sumDownloads"
-					:downloads-tooltip="formatNumber(sumDownloads)"
 					:can-manage="!!(auth.user && currentMember)"
-					:labels="organizationHeaderLabels"
 					@manage-projects="router.push(`/organization/${organization.slug}/settings/projects`)"
 					@copy-id="copyId"
 					@copy-permalink="copyPermalink"
@@ -242,7 +240,6 @@ import {
 	ProjectCardList,
 	SidebarCard,
 	useCompactNumber,
-	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
@@ -269,7 +266,6 @@ type ProjectV3 = Labrinth.Projects.v3.Project & {
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatNumber = useFormatNumber()
 const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
@@ -467,18 +463,6 @@ const { currentMember } = organizationContext
 provideOrganizationContext(organizationContext)
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
-
-const organizationHeaderLabels = computed(() => ({
-	copyId: formatMessage(commonMessages.copyIdButton),
-	copyPermalink: formatMessage(commonMessages.copyPermalinkButton),
-	downloads: 'downloads',
-	manage: 'Manage',
-	manageProjects: 'Manage projects',
-	members: 'members',
-	moreOptions: 'More options',
-	organization: 'Organization',
-	projects: 'projects',
-}))
 
 watch(
 	[routeHasSettings, acceptedMembers, currentMember],

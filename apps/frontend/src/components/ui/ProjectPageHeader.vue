@@ -1,7 +1,7 @@
 <template>
 	<PageHeader :title="project.title" :summary="project.description">
 		<template #leading>
-			<PageHeaderObjectAvatarLeading :src="project.icon_url" :alt="project.title" size="96px" />
+			<Avatar :src="project.icon_url" :alt="project.title" :tint-by="project.id" size="96px" />
 		</template>
 
 		<template v-if="showStatusBadge" #badges>
@@ -22,15 +22,15 @@
 					<PageHeaderMetadataNumberItem
 						:icon="DownloadIcon"
 						:value="project.downloads"
-						:label="downloadsLabel"
-						:tooltip="downloadsTooltip"
+						:label="formatMessage(messages.downloadsStat, { count: project.downloads })"
+						:tooltip="formatNumber(project.downloads)"
 						class="cursor-help"
 					/>
 					<PageHeaderMetadataNumberItem
 						:icon="HeartIcon"
 						:value="project.followers"
-						:label="followersLabel"
-						:tooltip="followersTooltip"
+						:label="formatMessage(messages.followersStat, { count: project.followers })"
+						:tooltip="formatNumber(project.followers)"
 						class="cursor-help"
 					/>
 				</template>
@@ -51,20 +51,36 @@
 				<ButtonStyled v-if="showEditProject" color="brand" size="large">
 					<nuxt-link :to="`${projectPath}/settings`">
 						<SettingsIcon />
-						{{ editProjectLabel }}
+						{{ formatMessage(messages.editProject) }}
 					</nuxt-link>
 				</ButtonStyled>
 
 				<ButtonStyled :color="primaryColor" :circular="primaryLabelHidden" size="large">
 					<button
-						v-tooltip="primaryTooltip"
+						v-tooltip="
+							primaryLabelHidden
+								? isServerProject
+									? formatMessage(commonMessages.playButton)
+									: formatMessage(commonMessages.downloadButton)
+								: undefined
+						"
 						type="button"
-						:aria-label="primaryLabel"
+						:aria-label="
+							isServerProject
+								? formatMessage(commonMessages.playButton)
+								: formatMessage(commonMessages.downloadButton)
+						"
 						@click="emit('primary', $event)"
 					>
 						<PlayIcon v-if="isServerProject" />
 						<DownloadIcon v-else />
-						<span v-if="!primaryLabelHidden">{{ primaryLabel }}</span>
+						<span v-if="!primaryLabelHidden">
+							{{
+								isServerProject
+									? formatMessage(commonMessages.playButton)
+									: formatMessage(commonMessages.downloadButton)
+							}}
+						</span>
 					</button>
 				</ButtonStyled>
 
@@ -79,9 +95,9 @@
 				>
 					<ButtonStyled circular size="large">
 						<nuxt-link
-							v-tooltip="createServerTooltip"
+							v-tooltip="formatMessage(messages.createServerTooltip)"
 							:to="createServerTo"
-							:aria-label="createServerLabel"
+							:aria-label="formatMessage(messages.serversPromoTitle)"
 							@click="emit('createServer')"
 						>
 							<ServerPlusIcon />
@@ -91,36 +107,43 @@
 						<div class="grid max-w-[18rem] gap-2">
 							<div class="flex items-center justify-between gap-4">
 								<div class="flex items-center gap-2">
-									<h3 class="m-0 text-base font-bold text-contrast">{{ createServerPromptTitle }}</h3>
-									<span
-										v-if="createServerPromptBadge"
-										class="rounded-full bg-brand-highlight px-2 py-0.5 text-xs font-bold text-brand"
-									>
-										{{ createServerPromptBadge }}
+									<h3 class="m-0 text-base font-bold text-contrast">
+										{{ formatMessage(messages.serversPromoTitle) }}
+									</h3>
+									<span class="rounded-full bg-brand-highlight px-2 py-0.5 text-xs font-bold text-brand">
+										{{ formatMessage(commonMessages.newBadge) }}
 									</span>
 								</div>
 								<ButtonStyled size="small" circular>
-									<button v-tooltip="createServerDismissLabel" @click="emit('dismissCreateServer')">
+									<button
+										v-tooltip="formatMessage(messages.dontShowAgain)"
+										@click="emit('dismissCreateServer')"
+									>
 										<XIcon aria-hidden="true" />
 									</button>
 								</ButtonStyled>
 							</div>
 							<p class="m-0 text-sm font-medium leading-tight text-secondary">
-								{{ createServerPromptDescription }}
+								{{ formatMessage(messages.serversPromoDescription) }}
 							</p>
-							<p
-								v-if="createServerPromptFooter"
-								class="m-0 text-sm font-semibold text-contrast"
-								v-html="createServerPromptFooter"
-							/>
+							<p class="m-0 text-sm font-semibold text-contrast">
+								<IntlFormatted
+									:message-id="messages.serversPromoPricing"
+									:values="{ price: formatPrice(500, 'USD', true) }"
+								>
+									<template #small="{ children }">
+										<small><component :is="() => children" /></small>
+									</template>
+								</IntlFormatted>
+							</p>
 						</div>
 					</template>
 				</Tooltip>
 				<ButtonStyled v-else-if="showCreateServerAction" circular size="large">
 					<nuxt-link
-						v-tooltip="createServerTooltip"
+						v-tooltip="formatMessage(messages.createServerTooltip)"
 						:to="createServerTo"
-						:aria-label="createServerLabel"
+						:aria-label="formatMessage(messages.serversPromoTitle)"
 						@click="emit('createServer')"
 					>
 						<ServerPlusIcon />
@@ -130,18 +153,34 @@
 				<ButtonStyled circular size="large">
 					<button
 						v-if="authUser"
-						v-tooltip="followTooltip"
+						v-tooltip="
+							following
+								? formatMessage(commonMessages.unfollowButton)
+								: formatMessage(commonMessages.followButton)
+						"
 						type="button"
-						:aria-label="followLabel"
+						:aria-label="
+							following
+								? formatMessage(commonMessages.unfollowButton)
+								: formatMessage(commonMessages.followButton)
+						"
 						@click="emit('follow')"
 					>
 						<HeartIcon :fill="following ? 'currentColor' : 'none'" />
 					</button>
 					<nuxt-link
 						v-else
-						v-tooltip="followTooltip"
+						v-tooltip="
+							following
+								? formatMessage(commonMessages.unfollowButton)
+								: formatMessage(commonMessages.followButton)
+						"
 						:to="signInRoute"
-						:aria-label="followLabel"
+						:aria-label="
+							following
+								? formatMessage(commonMessages.unfollowButton)
+								: formatMessage(commonMessages.followButton)
+						"
 					>
 						<HeartIcon :fill="following ? 'currentColor' : 'none'" />
 					</nuxt-link>
@@ -154,8 +193,8 @@
 					:collections="collections"
 					:saved="saved"
 					:base-id="baseId"
-					:no-collections-label="noCollectionsLabel"
-					:create-new-collection-label="createNewCollectionLabel"
+					:no-collections-label="formatMessage(messages.noCollectionsFound)"
+					:create-new-collection-label="formatMessage(messages.createNewCollection)"
 					:collect-project="collectProject"
 					:create-collection="createCollection"
 				/>
@@ -163,8 +202,8 @@
 				<ButtonStyled circular size="large" type="transparent">
 					<TeleportOverflowMenu
 						:options="moreActions"
-						:tooltip="moreOptionsLabel"
-						:aria-label="moreOptionsLabel"
+						:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+						:aria-label="formatMessage(commonMessages.moreOptionsButton)"
 					>
 						<MoreVerticalIcon />
 					</TeleportOverflowMenu>
@@ -174,7 +213,8 @@
 	</PageHeader>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ChartIcon,
 	ClipboardCopyIcon,
@@ -190,197 +230,175 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	FormattedTag,
+	IntlFormatted,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderMetadata,
 	PageHeaderMetadataNumberItem,
 	PageHeaderMetadataTagsItem,
-	PageHeaderObjectAvatarLeading,
 	ProjectStatusBadge,
 	ServerDetails,
 	TagItem,
 	TeleportOverflowMenu,
+	type TeleportOverflowMenuItem,
+	useFormatNumber,
+	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
 import { Tooltip } from 'floating-vue'
 import { computed } from 'vue'
 
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		required: true,
+type HeaderProject = Pick<
+	Labrinth.Projects.v2.Project,
+	| 'id'
+	| 'slug'
+	| 'project_type'
+	| 'title'
+	| 'description'
+	| 'status'
+	| 'downloads'
+	| 'followers'
+	| 'categories'
+> & {
+	icon_url?: string | null
+}
+
+type HeaderProjectV3 = Pick<
+	Labrinth.Projects.v3.Project,
+	'status' | 'minecraft_java_server'
+>
+
+type HeaderCollection = {
+	projects: string[]
+	[key: string]: unknown
+}
+
+type SignInRoute = string | Record<string, unknown>
+
+const props = withDefaults(defineProps<{
+	project: HeaderProject
+	projectV3?: HeaderProjectV3 | null
+	authUser?: Labrinth.Users.v3.User | null
+	signInRoute: SignInRoute
+	collections?: HeaderCollection[]
+	baseId: string
+	collectProject: (...args: unknown[]) => unknown
+	createCollection: (...args: unknown[]) => unknown
+	isServerProject?: boolean
+	showStatusBadge?: boolean
+	showEditProject?: boolean
+	primaryMuted?: boolean
+	primaryLabelHidden?: boolean
+	canCreateServer?: boolean
+	showQuickServerButton?: boolean
+	showCreateServerPrompt?: boolean
+	following?: boolean
+	saved?: boolean
+	isMember?: boolean
+	isStaff?: boolean
+	showModerationChecklist?: boolean
+}>(), {
+	projectV3: null,
+	authUser: null,
+	collections: () => [],
+	isServerProject: false,
+	showStatusBadge: false,
+	showEditProject: false,
+	primaryMuted: false,
+	primaryLabelHidden: false,
+	canCreateServer: false,
+	showQuickServerButton: false,
+	showCreateServerPrompt: false,
+	following: false,
+	saved: false,
+	isMember: false,
+	isStaff: false,
+	showModerationChecklist: false,
+})
+
+const emit = defineEmits<{
+	category: [category: string]
+	primary: [event: MouseEvent]
+	createServer: []
+	dismissCreateServer: []
+	follow: []
+	analytics: []
+	moderationChecklist: []
+	techReview: []
+	report: []
+	copyId: []
+	copyPermalink: []
+}>()
+
+const messages = defineMessages({
+	createServerTooltip: {
+		id: 'project.actions.create-server-tooltip',
+		defaultMessage: 'Create a server',
 	},
-	projectV3: {
-		type: Object,
-		default: null,
+	createNewCollection: {
+		id: 'project.collections.create-new',
+		defaultMessage: 'Create new collection',
 	},
-	authUser: {
-		type: Object,
-		default: null,
+	dontShowAgain: {
+		id: 'project.actions.dont-show-again',
+		defaultMessage: "Don't show again",
 	},
-	signInRoute: {
-		type: [Object, String],
-		required: true,
+	downloadsStat: {
+		id: 'project.stats.downloads-label',
+		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
-	collections: {
-		type: Array,
-		default: () => [],
+	editProject: {
+		id: 'project.actions.edit-project',
+		defaultMessage: 'Edit project',
 	},
-	baseId: {
-		type: String,
-		required: true,
+	followersStat: {
+		id: 'project.stats.followers-label',
+		defaultMessage: '{count, plural, one {follower} other {followers}}',
 	},
-	noCollectionsLabel: {
-		type: String,
-		required: true,
+	noCollectionsFound: {
+		id: 'project.collections.none-found',
+		defaultMessage: 'No collections found.',
 	},
-	createNewCollectionLabel: {
-		type: String,
-		required: true,
+	reviewProject: {
+		id: 'project.actions.review-project',
+		defaultMessage: 'Review project',
 	},
-	collectProject: {
-		type: Function,
-		required: true,
+	serversPromoDescription: {
+		id: 'project.actions.servers-promo.description',
+		defaultMessage: 'Modrinth Hosting is the easiest way to play with your friends without hassle!',
 	},
-	createCollection: {
-		type: Function,
-		required: true,
+	serversPromoPricing: {
+		id: 'project.actions.servers-promo.pricing',
+		defaultMessage: 'Starting at {price}<small> / month</small>',
 	},
-	isServerProject: {
-		type: Boolean,
-		default: false,
-	},
-	showStatusBadge: {
-		type: Boolean,
-		default: false,
-	},
-	showEditProject: {
-		type: Boolean,
-		default: false,
-	},
-	primaryMuted: {
-		type: Boolean,
-		default: false,
-	},
-	primaryLabelHidden: {
-		type: Boolean,
-		default: false,
-	},
-	canCreateServer: {
-		type: Boolean,
-		default: false,
-	},
-	showQuickServerButton: {
-		type: Boolean,
-		default: false,
-	},
-	showCreateServerPrompt: {
-		type: Boolean,
-		default: false,
-	},
-	following: {
-		type: Boolean,
-		default: false,
-	},
-	saved: {
-		type: Boolean,
-		default: false,
-	},
-	isMember: {
-		type: Boolean,
-		default: false,
-	},
-	isStaff: {
-		type: Boolean,
-		default: false,
-	},
-	showModerationChecklist: {
-		type: Boolean,
-		default: false,
-	},
-	createServerPromptFooter: {
-		type: String,
-		default: '',
-	},
-	labels: {
-		type: Object,
-		required: true,
+	serversPromoTitle: {
+		id: 'project.actions.servers-promo.title',
+		defaultMessage: 'Create a server',
 	},
 })
 
-const emit = defineEmits([
-	'category',
-	'primary',
-	'createServer',
-	'dismissCreateServer',
-	'follow',
-	'analytics',
-	'moderationChecklist',
-	'techReview',
-	'report',
-	'copyId',
-	'copyPermalink',
-])
-
 const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
+const formatPrice = useFormatPrice()
 
-const downloadsLabel = computed(() =>
-	formatMessage(props.labels.downloadsStat, {
-		count: props.project.downloads,
-	}),
-)
-const followersLabel = computed(() =>
-	formatMessage(props.labels.followersStat, {
-		count: props.project.followers,
-	}),
-)
-const downloadsTooltip = computed(() =>
-	capitalizeString(
-		formatMessage(commonMessages.projectDownloads, {
-			count: props.project.downloads,
-		}),
-	),
-)
-const followersTooltip = computed(() =>
-	capitalizeString(
-		formatMessage(commonMessages.projectFollowers, {
-			count: props.project.followers,
-		}),
-	),
-)
 const projectPath = computed(
 	() => `/${props.project.project_type}/${props.project.slug ? props.project.slug : props.project.id}`,
 )
-const primaryLabel = computed(() =>
-	props.isServerProject ? props.labels.playButton : props.labels.downloadButton,
-)
 const primaryColor = computed(() => (props.primaryMuted ? 'standard' : 'brand'))
-const primaryTooltip = computed(() => (props.primaryLabelHidden ? primaryLabel.value : undefined))
 const showCreateServerAction = computed(() => props.canCreateServer && props.showQuickServerButton)
 const createServerTo = computed(() => `/hosting?project=${props.project.id}#plan`)
-const createServerLabel = computed(() => props.labels.createServer)
-const createServerTooltip = computed(() => props.labels.createServerTooltip)
-const createServerPromptTitle = computed(() => props.labels.serversPromoTitle)
-const createServerPromptDescription = computed(() => props.labels.serversPromoDescription)
-const createServerPromptBadge = computed(() => props.labels.newBadge)
-const createServerDismissLabel = computed(() => props.labels.dontShowAgain)
-const followLabel = computed(() =>
-	props.following ? props.labels.unfollowButton : props.labels.followButton,
-)
-const followTooltip = computed(() => followLabel.value)
-const editProjectLabel = computed(() => props.labels.editProject)
-const moreOptionsLabel = computed(() => props.labels.moreOptions)
 
-const moreActions = computed(() => [
+const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	{
 		id: 'analytics',
-		label: props.labels.analyticsButton,
+		label: formatMessage(commonMessages.analyticsButton),
 		icon: ChartIcon,
 		link: `${projectPath.value}/settings/analytics`,
 		shown: !!props.authUser && props.showEditProject,
@@ -391,7 +409,7 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'moderation-checklist',
-		label: props.labels.reviewProject,
+		label: formatMessage(messages.reviewProject),
 		icon: ScaleIcon,
 		action: () => emit('moderationChecklist'),
 		color: 'orange',
@@ -403,7 +421,7 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'tech-review',
-		label: props.labels.techReview,
+		label: 'Tech review',
 		icon: ScanEyeIcon,
 		link: `/moderation/technical-review/${props.project.id}`,
 		color: 'orange',
@@ -415,7 +433,7 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'report',
-		label: props.labels.reportButton,
+		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		action: () => emit('report'),
 		color: 'red',
@@ -423,13 +441,13 @@ const moreActions = computed(() => [
 	},
 	{
 		id: 'copy-id',
-		label: props.labels.copyIdButton,
+		label: formatMessage(commonMessages.copyIdButton),
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyId'),
 	},
 	{
 		id: 'copy-permalink',
-		label: props.labels.copyPermalinkButton,
+		label: formatMessage(commonMessages.copyPermalinkButton),
 		icon: ClipboardCopyIcon,
 		action: () => emit('copyPermalink'),
 	},

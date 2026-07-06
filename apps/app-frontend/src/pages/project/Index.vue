@@ -64,18 +64,13 @@
 					:project="data"
 					:project-v3="projectV3"
 					:is-server-project="isServerProject"
-					:install-button-label="installButtonLabel"
-					:install-button-tooltip="installButtonTooltip"
 					:install-button-disabled="installButtonDisabled"
+					:install-button-validating="installButtonValidating"
 					:install-button-loading="installButtonLoading"
 					:install-button-installed="installButtonInstalled"
 					:server-project-selected="serverProjectSelected"
 					:server-playing="serverPlaying"
 					:server-install-loading="!!(data && installingServerProjects.includes(data.id))"
-					:stop-label="formatMessage(commonMessages.stopButton)"
-					:play-label="formatMessage(commonMessages.playButton)"
-					:installing-label="formatMessage(commonMessages.installingLabel)"
-					:add-server-to-instance-label="formatMessage(commonMessages.addServerToInstanceButton)"
 					@contextmenu="handleRightClick"
 					@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					@install="() => install(null)"
@@ -228,10 +223,6 @@ const messages = defineMessages({
 	installContentToInstance: {
 		id: 'app.project.install-context.install-content-to-instance',
 		defaultMessage: 'Install content to instance',
-	},
-	alreadyInstalled: {
-		id: 'app.project.install-button.already-installed',
-		defaultMessage: 'This project is already installed',
 	},
 })
 
@@ -392,18 +383,6 @@ const installButtonInstalled = computed(() =>
 const installButtonDisabled = computed(
 	() => installButtonInstalled.value || installButtonLoading.value,
 )
-const installButtonLabel = computed(() => {
-	if (installButtonInstalled.value) return formatMessage(commonMessages.installedLabel)
-	if (installButtonValidating.value) return formatMessage(commonMessages.validatingLabel)
-	if (installButtonLoading.value) return formatMessage(commonMessages.installingLabel)
-	if (serverProjectSelected.value) return formatMessage(commonMessages.selectedLabel)
-	return formatMessage(commonMessages.installButton)
-})
-const installButtonTooltip = computed(() => {
-	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
-	return null
-})
-
 const projectSearchUrl = computed(
 	() => `/browse/${isServerProject.value ? 'server' : data.value?.project_type}`,
 )
