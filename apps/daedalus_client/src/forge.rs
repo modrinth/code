@@ -268,7 +268,9 @@ async fn fetch(
                         .fetch_add(1, Ordering::Relaxed)
                         + 1;
 
-                    if downloaded.is_multiple_of(100) || downloaded == total_installers {
+                    if downloaded.is_multiple_of(100)
+                        || downloaded == total_installers
+                    {
                         tracing::info!(
                             mod_loader,
                             downloaded_files = downloaded,
