@@ -78,6 +78,7 @@ pub enum LegacyNotificationBody {
     SharedInstanceInvite {
         shared_instance_id: String,
         shared_instance_name: String,
+        invited_by: UserId,
     },
     StatusChange {
         project_id: ProjectId,
@@ -306,9 +307,11 @@ impl LegacyNotification {
             NotificationBody::SharedInstanceInvite {
                 shared_instance_id,
                 shared_instance_name,
+                invited_by,
             } => LegacyNotificationBody::SharedInstanceInvite {
                 shared_instance_id,
                 shared_instance_name,
+                invited_by,
             },
             NotificationBody::StatusChange {
                 project_id,
