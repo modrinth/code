@@ -320,10 +320,6 @@ const messages = defineMessages({
 		id: 'app.project.install-button.already-installed',
 		defaultMessage: 'This project is already installed',
 	},
-	installContentToInstance: {
-		id: 'app.project.install-context.install-content-to-instance',
-		defaultMessage: 'Install content to instance',
-	},
 	switchVersion: {
 		id: 'app.project.install-button.switch-version',
 		defaultMessage: 'Switch version',
@@ -450,7 +446,7 @@ const projectInstallContext = computed(() => {
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: projectBrowseBackUrl.value,
 			backLabel: formatMessage(messages.backToBrowse),
-			heading: formatMessage(messages.installContentToInstance),
+			heading: formatMessage(commonMessages.installingContentLabel),
 		}
 	}
 
