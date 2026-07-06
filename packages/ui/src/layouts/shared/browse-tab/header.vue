@@ -89,7 +89,7 @@ const metadataItems = computed(() => {
 	if (context.gameVersion) {
 		items.push({
 			id: 'game-version',
-			label: context.gameVersion,
+			label: `Minecraft ${context.gameVersion}`,
 			icon: Gamepad2Icon,
 			class: '!text-primary',
 		})

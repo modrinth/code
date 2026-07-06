@@ -590,7 +590,7 @@ const instanceHeaderMetadata = computed(() => {
 	return [
 		{
 			id: 'game-version',
-			label: instance.value.game_version,
+			label: `Minecraft ${instance.value.game_version}`,
 			icon: Gamepad2Icon,
 		},
 		{
