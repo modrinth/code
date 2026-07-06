@@ -101,6 +101,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		pats::edit_pat,
 		pats::delete_pat,
 		moderation::get_projects,
+		moderation::get_project_ids,
 		moderation::get_project_meta,
 		moderation::set_project_meta,
 		moderation::acquire_lock,

@@ -1,4 +1,3 @@
-pub(crate) mod moderation;
 mod notifications;
 mod openapi;
 pub(crate) mod project_creation;
@@ -26,7 +25,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(super::internal::flows::config)
             .configure(super::internal::pats::config)
             .configure(super::internal::admin::config)
-            .configure(moderation::config)
             .configure(notifications::config)
             .configure(project_creation::config)
             .configure(projects::config)

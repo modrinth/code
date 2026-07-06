@@ -1914,6 +1914,57 @@ export namespace Labrinth {
 
 	export namespace Moderation {
 		export namespace Internal {
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url: string | null
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url: string | null
+				  }
+
+			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+
+			export type ProjectsRequest = {
+				count?: number
+				offset?: number
+				has_external_dependencies?: boolean
+				exclude_technical_review?: boolean
+				query?: string
+				project_type?: string
+				sort?: ProjectsSort
+			}
+
+			export type QueueProject = {
+				id: string
+				slug: string | null
+				name: string
+				summary: string
+				icon_url: string | null
+				status: Projects.v2.ProjectStatus
+				requested_status: Projects.v2.ProjectStatus | null
+				queued: string | null
+				published: string
+				updated: string
+				project_types: string[]
+				ownership: Ownership
+				external_dependencies_count: number
+			}
+
+			export type ProjectsResponse = {
+				total: number
+				projects: QueueProject[]
+			}
+
+			export type ProjectIdsResponse = {
+				ids: string[]
+			}
+
 			export type LockedByUser = {
 				id: string
 				username: string
