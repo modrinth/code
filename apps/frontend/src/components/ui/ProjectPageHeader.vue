@@ -219,6 +219,7 @@ import {
 	ChartIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
+	FolderSearchIcon,
 	HeartIcon,
 	MoreVerticalIcon,
 	PlayIcon,
@@ -304,6 +305,7 @@ const props = withDefaults(defineProps<{
 	isMember?: boolean
 	isStaff?: boolean
 	showModerationChecklist?: boolean
+	showModerationModpackRescan?: boolean
 }>(), {
 	projectV3: null,
 	authUser: null,
@@ -321,6 +323,7 @@ const props = withDefaults(defineProps<{
 	isMember: false,
 	isStaff: false,
 	showModerationChecklist: false,
+	showModerationModpackRescan: false,
 })
 
 const emit = defineEmits<{
@@ -331,6 +334,7 @@ const emit = defineEmits<{
 	follow: []
 	analytics: []
 	moderationChecklist: []
+	moderationModpackRescan: []
 	techReview: []
 	report: []
 	copyId: []
@@ -369,6 +373,10 @@ const messages = defineMessages({
 	reviewProject: {
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',
+	},
+	rescanModpack: {
+		id: 'project.actions.rescan-modpack',
+		defaultMessage: 'Rescan modpack',
 	},
 	serversPromoDescription: {
 		id: 'project.actions.servers-promo.description',
@@ -426,6 +434,14 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		link: `/moderation/technical-review/${props.project.id}`,
 		color: 'orange',
 		shown: !!props.authUser && props.isStaff,
+	},
+	{
+		id: 'moderation-modpack-rescan',
+		label: formatMessage(messages.rescanModpack),
+		icon: FolderSearchIcon,
+		action: () => emit('moderationModpackRescan'),
+		color: 'orange',
+		shown: !!props.authUser && props.isStaff && props.showModerationModpackRescan,
 	},
 	{
 		divider: true,

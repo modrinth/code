@@ -403,7 +403,6 @@ import {
 	ChevronRightIcon,
 	DownloadIcon,
 	ExternalIcon,
-	FolderSearchIcon,
 	HeartIcon,
 	ListIcon,
 	ScaleIcon,
