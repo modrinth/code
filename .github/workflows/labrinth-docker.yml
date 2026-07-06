@@ -94,7 +94,7 @@ jobs:
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
       - name: Install build dependencies
-        run: sudo apt-get update && apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
         #uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
         #with:
         #  packages: cmake libcurl4-openssl-dev
