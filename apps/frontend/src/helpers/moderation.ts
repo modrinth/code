@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import type { ExtendedReport, OwnershipTarget } from '@modrinth/moderation'
 import type {
 	Organization,
@@ -197,14 +198,10 @@ export interface ModerationOwnershipOrganization {
 
 export type ModerationOwnership = ModerationOwnershipUser | ModerationOwnershipOrganization
 
-export interface ProjectWithOwnership {
-	ownership: ModerationOwnership
-	external_dependencies_count: number
-	[key: string]: any
-}
+export type ProjectWithOwnership = Labrinth.Moderation.Internal.QueueProject
 
 export interface ModerationProject {
-	project: any
+	project: Omit<ProjectWithOwnership, 'ownership' | 'external_dependencies_count'>
 	ownership: ModerationOwnership | null
 	external_dependencies_count: number
 }

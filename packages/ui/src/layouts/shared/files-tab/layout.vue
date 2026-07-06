@@ -225,7 +225,7 @@ import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { injectFilePicker } from '#ui/providers/file-picker'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
-import { getFileExtension } from '#ui/utils/file-extensions'
+import { canOpenInFileEditor, getFileExtension } from '#ui/utils/file-extensions'
 
 import FileEditor from './components/editor/FileEditor.vue'
 import FileContextMenu from './components/FileContextMenu.vue'
@@ -650,7 +650,7 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 				: `${currentPath}/${item.name}`
 			ctx.prefetchDirectory?.(navPath)
 		}, 150)
-	} else {
+	} else if (canOpenInFileEditor(item.name)) {
 		prefetchTimeout = setTimeout(() => {
 			ctx.prefetchFile?.(item.path)
 		}, 150)

@@ -95,6 +95,8 @@
 				@download="triggerDownloadAnimation"
 			/>
 			<CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
+			<ModpackScanModal ref="scanModal" :project_id="project.id" />
+
 			<div
 				class="new-page sidebar"
 				:class="{
@@ -425,18 +427,21 @@
 												!showModerationChecklist,
 										},
 										{
-											divider: true,
-											shown:
-												auth.user &&
-												tags.staffRoles.includes(auth.user.role) &&
-												!showModerationChecklist,
-										},
-										{
 											id: 'tech-review',
 											link: `/moderation/technical-review/${project.id}`,
 											color: 'orange',
 											hoverOnly: true,
 											shown: auth.user && tags.staffRoles.includes(auth.user.role),
+										},
+										{
+											id: 'moderation-modpack-rescan',
+											action: () => scanModal.show(),
+											color: 'orange',
+											hoverOnly: true,
+											shown:
+												auth.user &&
+												tags.staffRoles.includes(auth.user.role) &&
+												project.actualProjectType === 'modpack',
 										},
 										{
 											divider: true,
@@ -469,6 +474,9 @@
 										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
 									</template>
 									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
+									<template #moderation-modpack-rescan>
+										<FolderSearchIcon aria-hidden="true" /> Rescan modpack
+									</template>
 									<template #report>
 										<ReportIcon aria-hidden="true" />
 										{{ formatMessage(commonMessages.reportButton) }}
@@ -726,6 +734,7 @@ import {
 	ClipboardCopyIcon,
 	DownloadIcon,
 	ExternalIcon,
+	FolderSearchIcon,
 	HeartIcon,
 	ListIcon,
 	MoreVerticalIcon,
@@ -785,6 +794,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
+import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
@@ -852,6 +862,7 @@ const debug = useDebugLogger('DownloadModal')
 const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
+const scanModal = ref()
 
 const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
