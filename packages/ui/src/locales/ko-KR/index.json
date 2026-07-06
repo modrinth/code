@@ -233,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "모드팩 재설치"
   },
-  "button.remove": {
-    "defaultMessage": "제거"
-  },
   "button.remove-image": {
     "defaultMessage": "이미지 제거"
   },

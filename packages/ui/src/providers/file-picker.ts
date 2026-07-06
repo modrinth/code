@@ -10,7 +10,7 @@ export interface PickedFile {
 }
 
 export interface PickedModpackFile extends Omit<PickedFile, 'file'> {
-	/** Only present for upload flows; native imports avoid copying huge packs into the webview heap. */
+	/** Only present for upload flows; native imports avoid copying huge packs into the browser heap. */
 	file?: File
 }
 
@@ -22,6 +22,8 @@ export interface PickModpackFileOptions {
 export interface FilePickerProvider {
 	/** Pick an image file (for icons) */
 	pickImage: () => Promise<PickedFile | null>
+	/** Pick one or more generic files */
+	pickFiles?: (options?: { multiple?: boolean }) => Promise<PickedFile[]>
 	/** Pick a .mrpack modpack file */
 	pickModpackFile: (options?: PickModpackFileOptions) => Promise<PickedModpackFile | null>
 }

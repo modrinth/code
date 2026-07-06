@@ -35,6 +35,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Visa statistik"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Kunde inte ladda in server inställningar"
+  },
   "badge.alpha": {
     "defaultMessage": "Alfa"
   },
@@ -47,11 +50,17 @@
   "badge.new": {
     "defaultMessage": "Ny"
   },
+  "badge.release": {
+    "defaultMessage": "Utgåva"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Avbryt"
   },
   "billing.resubscribe-modal.cpus": {
     "defaultMessage": "{sharedCpus} Delade CPUs"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Du är på väg att återprenumerera till <server-name>{serverName}</server-name>. Din prenumeration kommer återaktiveras och din server kommer fortsätta köra utan avbrott."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Kunde inte prenumerera igen, misslyckades att ladda prenumerationsdetaljer."
@@ -62,17 +71,32 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Misslyckades att ladda prenumerationsdetaljer."
   },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 dagar} monthly {/månad} quarterly {/kvartalsvis} yearly {/år} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Din nästa betalning är <charge-date>{date}</charge-date>."
+  },
   "billing.resubscribe-modal.plan-label": {
     "defaultMessage": "Plan"
   },
   "billing.resubscribe-modal.ram": {
     "defaultMessage": "{ramGb} GB RAM"
   },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Återprenumerera"
+  },
   "billing.resubscribe-modal.storage": {
     "defaultMessage": "{storageGb} GB lagring"
   },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Återprenumerera till Server"
+  },
   "browse.filter-results": {
     "defaultMessage": "Filtrera resultat..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Inga resultat hittades för din sökning!"
   },
   "browse.offline": {
     "defaultMessage": "Du är för nuvarande offline. Koppla upp dig till internet för att bläddra bland Modrinth!"
@@ -94,6 +118,15 @@
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Valda projekt är inte installerade än"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Kasta"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Valda projekt är inte installerade än"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Visa:"
   },
   "button.accept": {
     "defaultMessage": "Acceptera"
@@ -127,6 +160,9 @@
   },
   "button.copy-filename": {
     "defaultMessage": "Kopiera filnamn"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Kopiera hela sökvägen"
   },
   "button.copy-id": {
     "defaultMessage": "Kopiera ID"
@@ -199,9 +235,6 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Ominstallera modpaket"
-  },
-  "button.remove": {
-    "defaultMessage": "Ta bort"
   },
   "button.remove-image": {
     "defaultMessage": "Ta bort bild"
@@ -287,6 +320,12 @@
   "content-type.content.lowercase": {
     "defaultMessage": "innehåll"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural,one {# föremål} other {# föremål}}"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Välj {project}"
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Är du säker på att du vill uppdatera {count, plural, one {# projekt} other {# projekt}} till deras senaste kompatibla version? Det är rekommenderat att uppdatera innehållet individuellt."
   },
@@ -296,6 +335,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Uppdatera projekt"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Håll in Shift och klicka \"Uppdatera allt\" för att skippa denna bekräftelsen i framtiden."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Uppdatera {count} projekt"
   },
@@ -304,6 +346,9 @@
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Raderingsvarning"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Ta bort {count, number} {itemType}"
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Radera {itemType}"
@@ -332,14 +377,32 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Avlänka"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "Detta innehåll krävs av ett annat innehåll"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {Påverkat projekt} other {Påverkade projekt}}"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "Några valda projekt är installerade som krav till annat. Om dem tas bort kan {context} sluta fungera eller så att det inte kan ladda in korrekt."
+  },
   "content.dependency-warning.context.instance": {
     "defaultMessage": "instans"
   },
   "content.dependency-warning.context.server": {
     "defaultMessage": "server"
   },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Radera ändå"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Radera {count,  number} {itemType} ändå"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "Raderar"
+  },
   "content.dependency-warning.what-happens-label": {
-    "defaultMessage": "Vad hände?"
+    "defaultMessage": "Vad händer?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} tillagd"
@@ -491,11 +554,17 @@
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Raderar {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "Raderar {count,  number} {contentType}"
+  },
   "content.selection-bar.bulk.deleting-waiting": {
     "defaultMessage": "Raderar {contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
     "defaultMessage": "Inaktiverar {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "Stänger av {count, number} {contentType}"
   },
   "content.selection-bar.bulk.disabling-waiting": {
     "defaultMessage": "Inaktiverar {contentType}..."
@@ -503,11 +572,17 @@
   "content.selection-bar.bulk.enabling": {
     "defaultMessage": "Aktiverar {progress}/{total} {contentType}..."
   },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "Sätter på {count, number} {contentType}"
+  },
   "content.selection-bar.bulk.enabling-waiting": {
     "defaultMessage": "Aktiverar {contentType}..."
   },
   "content.selection-bar.bulk.updating": {
     "defaultMessage": "Uppdaterar {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "Uppdaterar {count, number} {contentType}"
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Uppdaterar {contentType}..."
@@ -532,6 +607,9 @@
   },
   "creation-flow.button.import-instances": {
     "defaultMessage": "Importera {count, plural, one {# instans} other {# instanser}}"
+  },
+  "creation-flow.button.setup-server": {
+    "defaultMessage": "Initiera server"
   },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Välj spelversion"
@@ -2824,6 +2902,18 @@
   },
   "servers.access-page.activity-log-filter.action-group.server": {
     "defaultMessage": "Server"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Avlänkat modpaket"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Avlänkat modpaket"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Avlänkat modpaket <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Avlänkat modpaket version <version></version>"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Något gick fel när säkerhetskopian {backupName} skapades. Vänligen försök igen eller kontakta support om felet återkommer."

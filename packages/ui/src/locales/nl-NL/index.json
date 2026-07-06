@@ -209,9 +209,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Herinstalleer modpack"
   },
-  "button.remove": {
-    "defaultMessage": "Verwijder"
-  },
   "button.remove-image": {
     "defaultMessage": "Verwijder afbeelding"
   },

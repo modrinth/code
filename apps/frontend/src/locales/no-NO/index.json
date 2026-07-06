@@ -254,50 +254,20 @@
   "auth.reset-password.title.long": {
     "message": "Tilbakestill passordet dit"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Vennligst skriv inn en tofaktor-kode for å fortsette."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Skriv inn tofaktor-kode"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Skriv inn kode..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Glemt passord?</forgot-password-link> • <create-account-link>Opprett en konto</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Logg inn med"
   },
   "auth.sign-in.title": {
     "message": "Logg inn"
   },
-  "auth.sign-in.use-password": {
-    "message": "Eller bruk et passord"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Opprett konto"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ved å opprette en konto godtar du Modrinths <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Passordene stemmer ikke overens!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du allerede en konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Abonner på oppdateringer om Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrer deg"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Eller lag en konko selv"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Registrer deg med"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoinstillinger"
@@ -328,21 +298,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifiser Email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Abonner på oppdateringer om Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Nå er du med i det fantastiske fellesskapet av skapere og utforskere som bygger, laster ned og holder seg oppdatert på fantastiske mods."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Ved å opprette en konto godtar du Modrinths <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Velkommen til Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Velkommen"
   },
   "collection.button.edit-icon": {
     "message": "Rediger ikon"
@@ -895,9 +850,6 @@
   },
   "dashboard.organizations.title": {
     "message": "Organiseringer"
-  },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Du kan redigere flere prosjekt samtidig ved å velge dem nedafor."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverprosjekt støtter ikke massredigering"
@@ -2297,20 +2249,8 @@
   "project.details.licensed": {
     "message": "Lisensert"
   },
-  "project.download.game-version": {
-    "message": "Spillversjon: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Error: ingen spillversjon funnet"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} er bare tilgjengelig for {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} støtter ikke {gameVersion} for {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installer med Modrinth App"
   },
   "project.download.no-app": {
     "message": "Har du ikke en Modrinth App?"
@@ -2318,22 +2258,10 @@
   "project.download.no-versions-available": {
     "message": "Ingen versjoner tilgjengelige for {gameVersion} og {platform}."
   },
-  "project.download.platform": {
-    "message": "Plattform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: Ingen plattformer funnet"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} er bare tilgjengelig for {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} støtter ikke {platform} for {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Søk opp spillversjoner..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Søk opp spillversjoner..."
   },
   "project.download.select-game-version": {

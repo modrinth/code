@@ -36,6 +36,7 @@ export interface BrowseInstallContext {
 	onBack?: () => boolean | void | Promise<boolean | void>
 	selectedProjects?: BrowseSelectedProject[]
 	isInstallingSelected?: boolean
+	skipNonEssentialWarnings?: boolean
 	installProgress?: {
 		completed: number
 		total: number

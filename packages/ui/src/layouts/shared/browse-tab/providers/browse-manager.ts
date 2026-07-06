@@ -69,6 +69,10 @@ export interface BrowseManagerContext {
 	hideSelected?: Ref<boolean>
 	showHideSelected?: ComputedRef<boolean>
 	hideSelectedLabel?: ComputedRef<string>
+	serverOnly?: Ref<boolean>
+	showServerOnly?: ComputedRef<boolean>
+	serverOnlyLabel?: ComputedRef<string>
+	hiddenFilterTypes?: ComputedRef<string[]>
 	onInstalled?: (projectId: string) => void
 
 	displayMode?: Ref<'list' | 'grid' | 'gallery'> | ComputedRef<'list' | 'grid' | 'gallery'>

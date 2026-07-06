@@ -194,8 +194,14 @@
   "analytics.filter.search.countries": {
     "message": "Sök länder..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Sök efter projekt..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Sök nedladdningskällor..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Sök efter medlemmar..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Sök projektversioner..."
@@ -271,6 +277,9 @@
   },
   "analytics.project-event.project-unlisted": {
     "message": "Projekt är avlistat"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} släpptes"
   },
   "analytics.project-status.approved": {
     "message": "Godkänd"
@@ -397,6 +406,9 @@
   },
   "analytics.title": {
     "message": "Statistik"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Ingen"
   },
   "analytics.value.none": {
     "message": "Ingen"
@@ -623,6 +635,18 @@
   "auth.authorize.redirect-url": {
     "message": "Du kommer bli flyttad till <redirect-url>{url}</redirect-url>"
   },
+  "auth.create-account.page-title": {
+    "message": "Skapa konto"
+  },
+  "auth.create-account.title": {
+    "message": "Skapa ett konto"
+  },
+  "auth.create-account.username.label": {
+    "message": "Användarnamn"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Ange användarnamn"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Skicka återställningsmejl"
   },
@@ -657,52 +681,67 @@
     "message": "Återställ ditt lösenord"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Ange din tvåfaktorskod för att fortsätta."
+    "message": "Ange 6-siffriga koden från din autentiseringsapp, eller en av dina reservkoder."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Ange tvåfaktorskod"
+    "message": "Tvåfaktorsautentisering"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Ange kod..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Har du glömt lösenordet?</forgot-password-link> • <create-account-link>Skapa ett konto</create-account-link>"
+  "auth.sign-in.continue-with-email": {
+    "message": "Fortsätt med e-post"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Fortsätt med passkey"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Registrera"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Glömt lösenord"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Användes senast"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Har du inget konto?"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Logga in med"
+    "message": "Logga in på Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Logga in"
   },
-  "auth.sign-in.use-password": {
-    "message": "Eller använd ett lösenord"
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Ålderskrav"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "Skapa konto"
+  "auth.sign-up.continue-with-email": {
+    "message": "Fortsätt med e-post"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "Genom att skapa ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Lösenorden stämmer inte överens!"
+  "auth.sign-up.show-fewer-options": {
+    "message": "Visa färre inloggningsmetoder"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Visa andra inloggningsmetoder"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du redan ett konto?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Jag vill få uppdateringar om Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Registrera dig"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "Eller skapa ett konto själv"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Registrera dig med"
+    "message": "Skapa ett konto"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoinställningar"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Upptäck moddar"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Din e-post är redan verifierad!"
@@ -722,6 +761,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "Verifiering av e-post misslyckades"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Ett e-postmeddelande med en verifieringslänk har skickats till {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "E-postmeddelande skickat"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Ett fel inträffade"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Din e-postadress har verifierats!"
   },
@@ -730,21 +778,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifiera e-post"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Prenumerera för uppdateringar om Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Du är nu en del av ett grymt community av skapare och utforskare som redan bygger, laddar ner och håller sig uppdaterade med fantastiska moddar."
-  },
-  "auth.welcome.label.tos": {
-    "message": "När du skapar ett konto godkänner du Modrinths <terms-link>villkor</terms-link> och <privacy-policy-link>sekretesspolicy</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "Välkommen till Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Välkommen"
   },
   "collection.button.edit-icon": {
     "message": "Redigera-ikon"
@@ -860,6 +893,18 @@
   "conversation-thread.action.withhold": {
     "message": "Tillhandahåll"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tillbakahåll med svar"
+  },
+  "conversation-thread.closed-thread.description": {
+    "message": "Den här tråden är stängd och nya meddelanden kan inte skickas."
+  },
+  "conversation-thread.error.closing-report": {
+    "message": "Fel vid stängning av rapport"
+  },
+  "conversation-thread.error.reopening-report": {
+    "message": "Fel vid öppning av rapport"
+  },
   "conversation-thread.error.sending-message": {
     "message": "Kunde inte skicka meddelande"
   },
@@ -875,8 +920,14 @@
   "conversation-thread.reply-modal.confirmation.label": {
     "message": "Jag förstår att moderatorerna inte aktivt övervakar tråden."
   },
+  "conversation-thread.reply-modal.description": {
+    "message": "Ditt projekt är redan godkänt. Moderatorteamet övervakar därför inte aktivt den här tråden. De kan dock fortfarande se ditt inlägg om det uppstår något problem med ditt projekt."
+  },
   "conversation-thread.reply-modal.header": {
     "message": "Svara tråden"
+  },
+  "conversation-thread.reply-modal.help-center-note": {
+    "message": "Ifall du behöver komma i kontakt med moderatorteamet, vänligen använd <help-center-link>Modrinth hjälpcenter</help-center-link> och klicka på den blåa bubblan nere till höger för att kontakta support."
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Bekräfta att jag tagit itu med meddelandena från moderatorerna"
@@ -1367,6 +1418,9 @@
   "dashboard.discord-roles.role.big-creator": {
     "message": "1 mn nedladdningar"
   },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Kreatör"
+  },
   "dashboard.discord-roles.role.pride": {
     "message": "Pride 2026"
   },
@@ -1459,24 +1513,6 @@
   },
   "dashboard.projects.project.icon-alt": {
     "message": "Ikon för {title}"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Stigande"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Fallande"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Namn"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Typ"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2768,20 +2804,8 @@
   "project.details.licensed": {
     "message": "Licensierad"
   },
-  "project.download.game-version": {
-    "message": "Spelversion: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Fel: inga spelversioner hittades"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} är bara tillgängligt för {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installera med Modrinth App"
   },
   "project.download.no-app": {
     "message": "Har du inte Modrinth appen?"
@@ -2789,22 +2813,10 @@
   "project.download.no-versions-available": {
     "message": "Inga versioner finns tillgängliga för {gameVersion} och {platform}."
   },
-  "project.download.platform": {
-    "message": "Plattform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Fel: ingen plattform hittades"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} är bara tillgängligt för {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Sök spelversioner..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Sök spelversioner..."
   },
   "project.download.select-game-version": {

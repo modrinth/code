@@ -10,9 +10,8 @@ import {
 	CodeIcon,
 	CopyIcon,
 	DownloadIcon,
-	EllipsisVerticalIcon,
+	ExternalIcon,
 	EyeOffIcon,
-	LinkIcon,
 	LoaderCircleIcon,
 	ScaleIcon,
 	ShieldCheckIcon,
@@ -31,13 +30,13 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { NavTabs } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatProjectType,
@@ -113,51 +112,6 @@ const isProjectApproved = computed(() => {
 	)
 })
 
-const quickActions = computed<OverflowMenuOption[]>(() => {
-	const actions: OverflowMenuOption[] = []
-
-	const sourceUrl = props.item.project.link_urls?.['source']?.url
-	if (sourceUrl) {
-		actions.push({
-			id: 'view-source',
-			action: () => {
-				window.open(sourceUrl, '_blank', 'noopener,noreferrer')
-			},
-		})
-	}
-
-	actions.push(
-		{
-			id: 'copy-link',
-			action: () => {
-				const base = window.location.origin
-				const reportUrl = `${base}/moderation/technical-review/${props.item.project.id}`
-				navigator.clipboard.writeText(reportUrl).then(() => {
-					addNotification({
-						type: 'success',
-						title: 'Technical Review link copied',
-						text: 'The link to this review has been copied to your clipboard.',
-					})
-				})
-			},
-		},
-		{
-			id: 'copy-id',
-			action: () => {
-				navigator.clipboard.writeText(props.item.project.id).then(() => {
-					addNotification({
-						type: 'success',
-						title: 'Project ID copied',
-						text: 'The ID of this project has been copied to your clipboard.',
-					})
-				})
-			},
-		},
-	)
-
-	return actions
-})
-
 const isLoadingStatusAction = ref(false)
 const projectStatusActions = computed<OverflowMenuOption[]>(() => [
 	{
@@ -193,6 +147,7 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	isLoadingStatusAction.value = true
 	try {
 		await client.labrinth.projects_v2.edit(props.item.project.id, { status })
+		emit('refetch')
 
 		projectStatus.value = status
 	} catch (err) {
@@ -1019,6 +974,16 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 		}
 	}
 }
+
+function copyId() {
+	navigator.clipboard.writeText(props.item.project.id).then(() => {
+		addNotification({
+			type: 'success',
+			title: 'Project ID copied',
+			text: 'The ID of this project has been copied to your clipboard.',
+		})
+	})
+}
 </script>
 
 <template>
@@ -1104,25 +1069,31 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
-					<ButtonStyled circular>
-						<OverflowMenu :options="quickActions" class="!shadow-none">
-							<template #default>
-								<EllipsisVerticalIcon class="size-4" />
-							</template>
-							<template #copy-id>
-								<ClipboardCopyIcon />
-								<span class="hidden sm:inline">Copy ID</span>
-							</template>
-							<template #copy-link>
-								<LinkIcon />
-								<span class="hidden sm:inline">Copy link</span>
-							</template>
-							<template #view-source>
+					<div class="flex items-center gap-2">
+						<ButtonStyled v-if="props.item.project.link_urls?.['source']?.url" circular>
+							<a
+								v-tooltip="'Open sources in new tab'"
+								:href="props.item.project.link_urls?.['source']?.url"
+								target="_blank"
+							>
 								<CodeIcon />
-								<span class="hidden sm:inline">View source</span>
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
+							</a>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<button v-tooltip="'Copy ID'" @click="copyId">
+								<ClipboardCopyIcon />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<a
+								v-tooltip="'Open in new tab'"
+								:href="`/moderation/technical-review/${props.item.project.id}`"
+								target="_blank"
+							>
+								<ExternalIcon />
+							</a>
+						</ButtonStyled>
+					</div>
 				</div>
 			</div>
 
@@ -1206,7 +1177,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									</OverflowMenu>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug Summary</button>
+									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug</button>
 								</ButtonStyled>
 							</template>
 						</ThreadView>

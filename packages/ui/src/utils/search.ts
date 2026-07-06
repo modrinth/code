@@ -60,6 +60,10 @@ export type FilterValue = {
 	negative?: boolean
 }
 
+export type EnvironmentSearchOverride =
+	| { mode: 'include'; values: string[] }
+	| { mode: 'exclude'; values: string[] }
+
 export const LOADER_FILTER_TYPES = [
 	'mod_loader',
 	'plugin_loader',
@@ -112,6 +116,7 @@ export function useSearch(
 	projectTypes: Ref<ProjectType[]>,
 	tags: Ref<Tags>,
 	providedFilters: Ref<FilterValue[]>,
+	environmentOverride: Ref<EnvironmentSearchOverride | undefined> = ref(undefined),
 ) {
 	const query = ref('')
 	const maxResults = ref(20)
@@ -505,22 +510,34 @@ export function useSearch(
 		}
 
 		// Environment facets
-		const client = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'client',
-		)
-		const server = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'server',
-		)
-		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
-			if (envGroup.length === 1) {
-				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = ${formatSearchFilterValue(val)}`)
-			} else if (envGroup.length > 1) {
-				const conditions = envGroup.map((f) => {
-					const [field, val] = f.split(':')
-					return `${field} = ${formatSearchFilterValue(val)}`
-				})
-				parts.push(`(${conditions.join(' OR ')})`)
+		const override = environmentOverride.value
+		if (override) {
+			if (override.values.length === 1) {
+				const operator = override.mode === 'include' ? '=' : '!='
+				parts.push(`environment ${operator} ${formatSearchFilterValue(override.values[0])}`)
+			} else if (override.values.length > 1) {
+				const operator = override.mode === 'include' ? 'IN' : 'NOT IN'
+				const quoted = override.values.map(formatSearchFilterValue).join(', ')
+				parts.push(`environment ${operator} [${quoted}]`)
+			}
+		} else {
+			const client = filterValues.some(
+				(filter) => filter.type === 'environment' && filter.option === 'client',
+			)
+			const server = filterValues.some(
+				(filter) => filter.type === 'environment' && filter.option === 'server',
+			)
+			for (const envGroup of getEnvironmentFilterGroups(client, server)) {
+				if (envGroup.length === 1) {
+					const [field, val] = envGroup[0].split(':')
+					parts.push(`${field} = ${formatSearchFilterValue(val)}`)
+				} else if (envGroup.length > 1) {
+					const conditions = envGroup.map((f) => {
+						const [field, val] = f.split(':')
+						return `${field} = ${formatSearchFilterValue(val)}`
+					})
+					parts.push(`(${conditions.join(' OR ')})`)
+				}
 			}
 		}
 
@@ -777,17 +794,28 @@ function mapProjectTypeToSearch(projectType: ProjectType): string {
 function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
 	const groups: string[][] = []
 	if (client && server) {
-		groups.push(
-			['client_side:required', 'client_side:optional', 'client_side:unsupported'],
-			['server_side:required', 'server_side:optional'],
-		)
+		groups.push([
+			'environment:client_only_server_optional',
+			'environment:server_only_client_optional',
+			'environment:client_and_server',
+			'environment:client_or_server',
+			'environment:client_or_server_prefers_both',
+		])
 	} else if (client) {
-		groups.push(
-			['client_side:optional', 'client_side:required'],
-			['server_side:optional', 'server_side:unsupported'],
-		)
+		groups.push([
+			'environment:client_only',
+			'environment:client_only_server_optional',
+			'environment:client_or_server_prefers_both',
+			'environment:client_or_server',
+		])
 	} else if (server) {
-		groups.push(['server_side:optional', 'server_side:required'])
+		groups.push([
+			'environment:server_only',
+			'environment:dedicated_server_only',
+			'environment:server_only_client_optional',
+			'environment:client_or_server_prefers_both',
+			'environment:client_or_server',
+		])
 	}
 	return groups
 }

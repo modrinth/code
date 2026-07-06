@@ -286,6 +286,7 @@ import {
 	SelectedProjectsFloatingBar,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -296,6 +297,10 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
+import {
 	get_organization,
 	get_project,
 	get_project_v3,
@@ -304,21 +309,20 @@ import {
 	get_version_many,
 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
-import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
 	get_projects as getInstanceProjects,
 	kill,
 	list as listInstances,
-} from '@/helpers/profile'
+} from '@/helpers/instance'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
+import { getServerAddress } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -327,6 +331,7 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
@@ -529,10 +534,10 @@ async function handleClickPlay() {
 async function updateServerPlayState() {
 	if (!isServerProject.value || !data.value) return
 	const packs = await listInstances()
-	const inst = packs.find((p) => p.linked_data?.project_id === data.value.id)
+	const inst = packs.find((p) => p.link?.project_id === data.value.id)
 	if (inst) {
-		serverInstancePath.value = inst.path
-		const processes = await get_by_profile_path(inst.path).catch(() => [])
+		serverInstancePath.value = inst.id
+		const processes = await get_by_instance_id(inst.id).catch(() => [])
 		serverPlaying.value = Array.isArray(processes) && processes.length > 0
 	} else {
 		serverInstancePath.value = null
@@ -601,10 +606,19 @@ async function fetchProjectData() {
 function fetchDeferredServerData(project) {
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	if (serverAddress) {
-		serverPing.value = undefined
-		getServerLatency(serverAddress)
-			.then((latency) => {
-				serverPing.value = latency
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			serverPing.value = cachedStatus.ping
+			serverStatusOnline.value = true
+		} else {
+			serverPing.value = undefined
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
+			.then((status) => {
+				if (projectV3.value?.minecraft_java_server?.address !== serverAddress) return
+				serverPing.value = status.ping
+				serverStatusOnline.value = true
 			})
 			.catch((error) => {
 				console.error(`Failed to ping server ${serverAddress}:`, error)
@@ -662,7 +676,7 @@ process_listener((e) => {
 	if (
 		e.event === 'finished' &&
 		serverInstancePath.value &&
-		e.profile_path_id === serverInstancePath.value
+		e.instance_id === serverInstancePath.value
 	) {
 		serverPlaying.value = false
 	}
@@ -737,7 +751,7 @@ async function install(version) {
 	await installVersion(
 		data.value.id,
 		version,
-		instance.value ? instance.value.path : null,
+		instance.value ? instance.value.id : null,
 		'ProjectPage',
 		(version, installedProjectIds) => {
 			installing.value = false

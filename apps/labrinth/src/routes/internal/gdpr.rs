@@ -6,10 +6,16 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{HttpRequest, HttpResponse, post, web};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(web::scope("/gdpr").service(export));
 }
 
+/// Export GDPR data.  
+#[utoipa::path(
+	context_path = "/gdpr",
+	tag = "GDPR",
+	responses((status = OK, body = serde_json::Value))
+)]
 #[post("/export")]
 pub async fn export(
     req: HttpRequest,

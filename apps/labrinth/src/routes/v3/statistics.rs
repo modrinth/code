@@ -1,9 +1,9 @@
 use crate::database::PgPool;
 use crate::routes::ApiError;
-use actix_web::{HttpResponse, web};
+use actix_web::{HttpResponse, get, web};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("statistics", web::get().to(get_stats));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(get_stats_route);
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -12,6 +12,14 @@ pub struct V3Stats {
     pub versions: Option<i64>,
     pub authors: Option<i64>,
     pub files: Option<i64>,
+}
+
+#[utoipa::path(tag = "statistics", responses((status = OK)))]
+#[get("/statistics")]
+pub async fn get_stats_route(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    get_stats(pool).await
 }
 
 pub async fn get_stats(

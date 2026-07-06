@@ -297,7 +297,7 @@ pub struct UploadSearchProject {
 /// Nullable fields in Typesense-bound documents should use
 /// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
 /// serialized as `null`.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct SearchProjectDependency {
     pub project_id: String,
     pub dependency_type: DependencyType,
@@ -308,7 +308,7 @@ pub struct SearchProjectDependency {
     pub icon_url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct SearchResults {
     pub hits: Vec<ResultSearchProject>,
     pub page: usize,
@@ -316,7 +316,7 @@ pub struct SearchResults {
     pub total_hits: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
     pub version_id: String,
     pub project_id: String,

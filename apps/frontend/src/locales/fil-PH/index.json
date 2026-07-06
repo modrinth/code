@@ -386,50 +386,20 @@
   "auth.reset-password.title.long": {
     "message": "Baguhin ang iyong password"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Pakilagay ng two-factor code upang makapagpatuloy."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Ilagay ang two-factor code"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Ilagay ang code..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Lumikha ng account</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Mag-sign in gamit ang"
   },
   "auth.sign-in.title": {
     "message": "Mag-sign In"
   },
-  "auth.sign-in.use-password": {
-    "message": "O gamitin ang password"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Lumikha ng account"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Sa paggawa ng account, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hindi magkatugma ang mga password!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Mayroon ka nang account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Mag-subscribe ukol sa mga update sa Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Mag-sign Up"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "O sariling lumkiha account"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Mag-sign up gamit ang"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
@@ -460,21 +430,6 @@
   },
   "auth.verify-email.title": {
     "message": "Patunayan ang Email"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Mag-subscribe ukol sa mga update ng Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Sa paggawa ng account, sumang-ayon ka na sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Maligayang pagdating sa Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Maligayang Pagdating"
   },
   "collection.button.edit-icon": {
     "message": "Baguhin ang ikono"
@@ -1042,18 +997,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Pakisuri sa metadata sa environment"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Pangalan"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Estado"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Uri"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikono"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2465,20 +2408,8 @@
   "project.details.licensed": {
     "message": "Lisensiyang"
   },
-  "project.download.game-version": {
-    "message": "Bersiyon ng laro: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Error: walang mahanap na mga bersiyon ng laro"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "Ang {title} ay magagamit lamang sa {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "Hindi masuporta ng {title} ang {gameVersion} para sa {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "I-install gamit ang Modrinth App"
   },
   "project.download.no-app": {
     "message": "Wala kang Modrinth App?"
@@ -2486,22 +2417,10 @@
   "project.download.no-versions-available": {
     "message": "Walang bersiyong magagamit para sa {gameVersion} at {platform}."
   },
-  "project.download.platform": {
-    "message": "Plataporma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: walang mahanap na platform"
-  },
-  "project.download.platform-tooltip": {
-    "message": "Ang {title} ay magagamit lamang sa {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "Hindi masuport ng {title} ang {platform} para sa {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Maghanap ng mga bersiyon ng laro..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Maghanap ng mga bersiyon ng laro..."
   },
   "project.download.select-game-version": {
@@ -2617,9 +2536,6 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
-  },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Kung magsasama ka ng mga kontentong hindi naka-host sa Modrinth, kailangan niyong ipaalam sa amin sa pinanggalingan nito at matiyak na pinahintulutang mapakalat ang mga file. Tingnan ang <link>aming gabay</link> upang matuto kung papaano ito magawa nang maayos!"
   },
   "project.settings.title": {
     "message": "Mga Setting"

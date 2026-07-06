@@ -161,12 +161,6 @@
   "app.content-install.no-compatible-versions": {
     "message": "ไม่มีเวอร์ชันที่เข้ากันได้ {compatibilityLabel} โปรดเลือกเวอร์ชันที่จะติดตั้ง ไฟล์ที่จำเป็นจะไม่ถูกติดตั้งโดยอัตโนมัติ"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "กำลังติดตั้งแพ็กม็อด..."
-  },
   "app.export-modal.description-placeholder": {
     "message": "กรอกคำอธิบายมอดแพ็ก.."
   },
@@ -176,17 +170,11 @@
   "app.export-modal.header": {
     "message": "ส่งออกแพ็กม็อด"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "รวมถึง \"{file}\" ใช่หรือไม่"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "ชื่อแพ็กม็อด"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "ชื่อแพ็กม็อด"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "กำหนดไฟล์ที่ต้องการจะส่งออก"
   },
   "app.export-modal.version-number-label": {
     "message": "หมายเลขเวอร์ชัน"
@@ -242,12 +230,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "ค้นหาเซิร์ฟเวอร์"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' จะ**ถูกลบออกอย่างถาวร** และจะไม่มีทางสามารถกู้คืนได้"
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "คุณแน่ใจหรือไม่ว่าต้องการลบโลกนี้อย่างถาวร?"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "ม็อด"
   },
@@ -266,20 +248,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "ไม่มีเซิร์ฟเวอร์หรือโลกที่เพิ่มไว้"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' จะถูกลบออกจากรายการของคุณ ซึ่งจะรวมถึงในเกม และการลบดังกล่าวจะไม่มีทางกู้คืนได้อีก"
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) จะถูกลบออกจากรายการของคุณ ซึ่งจะรวมถึงในเกม และการลบดังกล่าวจะไม่มีทางกู้คืนได้อีก"
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "คุณแน่ใจหรือไม่ว่าต้องการลบ {name}?"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ค้าหาโลกทั้งหมด {count} โลก"
-  },
-  "app.instance.worlds.this-server": {
-    "message": "เซิร์ฟเวอร์นี้"
   },
   "app.modal.install-to-play.content-required": {
     "message": "เนื้อหาที่จำเป็น"

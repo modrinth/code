@@ -234,7 +234,7 @@
     "defaultMessage": "Mod paketini yeniden kur"
   },
   "button.remove": {
-    "defaultMessage": "Kaldır"
+    "defaultMessage": "Giriş anahtarını sil"
   },
   "button.remove-image": {
     "defaultMessage": "Görseli kaldır"
@@ -380,8 +380,14 @@
   "content.dependency-warning.context.server": {
     "defaultMessage": "sunucu"
   },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Yinede Sil"
+  },
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "Siliniyor"
+  },
+  "content.dependency-warning.what-happens-label": {
+    "defaultMessage": "Ne olur?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
@@ -829,6 +835,162 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Sunucu kurun"
+  },
+  "external-files.permissions-card.add-files-modal.load-error.title": {
+    "defaultMessage": "Dosyalar yüklenemedi"
+  },
+  "external-files.permissions-card.add-files-modal.no-search-results": {
+    "defaultMessage": "Aradığın sonuçla ilgili bir dosya yok."
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Dosya ara…"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Dosya ekle..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Dosyalar eklenemedi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.content-not-allowed": {
+    "defaultMessage": "İçerik izin verilmedi"
+  },
+  "external-files.permissions-card.attribution.moderation-status.rejected-proof": {
+    "defaultMessage": "Kanıt reddedildi"
+  },
+  "external-files.permissions-card.badge.attributed": {
+    "defaultMessage": "Tamamlananlar"
+  },
+  "external-files.permissions-card.badge.no-permission": {
+    "defaultMessage": "İzin yok"
+  },
+  "external-files.permissions-card.badge.pending": {
+    "defaultMessage": "Beklenenler"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Diğer"
+  },
+  "external-files.permissions-card.editor.all-rights-reserved": {
+    "defaultMessage": "Tüm hakları saklıdır/Lisans verilmemiştir"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Lisans"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "Notlar"
+  },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Eğer ki yüklediğin fotoğraflarla yalan söylediğin veya manipüle edildiğin tespit edilirse, projen veya hesabın devre dışı bırakılabilir."
+  },
+  "external-files.permissions-card.editor.proof-warning.title": {
+    "defaultMessage": "Modrinth çalışanları senin kanıtını doğrulayabilir"
+  },
+  "external-files.permissions-card.editor.save": {
+    "defaultMessage": "Kaynak gösterme bilgisini sakla"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Lisans Seçiniz..."
+  },
+  "external-files.permissions-card.editor.type-label": {
+    "defaultMessage": "İzin sebebi"
+  },
+  "external-files.permissions-card.error.custom-license-required": {
+    "defaultMessage": "Lütfen lisansınızda bir linke yer verin. Eğer yoksa, Tüm haklar saklıdır/Lisans yoktur seçeneğini seçmelisiniz"
+  },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Lütfen bir açıklama sağlayın veya bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.link-required": {
+    "defaultMessage": "Lütfen bir bağlantı sağlayın."
+  },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Lütfen bir not sağlayın veya bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.proof-image-invalid-type": {
+    "defaultMessage": "Lütfen bir PNG, JPEG, GIF, WebP, or BMP fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Lütfen en az bir kanıt fotoğrafı yükleyin."
+  },
+  "external-files.permissions-card.explanation-description": {
+    "defaultMessage": "Kısa bir açıklama veya kanıt fotoğrafları gerekli."
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "Açıklama"
+  },
+  "external-files.permissions-card.fallback-group-title": {
+    "defaultMessage": "Kaynak gösterme grubu {id}"
+  },
+  "external-files.permissions-card.included-files": {
+    "defaultMessage": "Dahil edilen dosyalar:"
+  },
+  "external-files.permissions-card.last-updated": {
+    "defaultMessage": "En son {date} {user} tarafından güncellendi"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Bilinmeyen"
+  },
+  "external-files.permissions-card.licensed-as": {
+    "defaultMessage": "Lisanslı:"
+  },
+  "external-files.permissions-card.link-label": {
+    "defaultMessage": "Çalışması için bağlantı:"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "Sebep"
+  },
+  "external-files.permissions-card.moderation.error.title": {
+    "defaultMessage": "Moderasyon incelemesi kaydedilemedi"
+  },
+  "external-files.permissions-card.not-used-in-versions": {
+    "defaultMessage": "Bu dosyalar şuanda hiçbir versiyon tarafından kullanılmıyor."
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "Notlar:"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Hiçbiri"
+  },
+  "external-files.permissions-card.original-project-page": {
+    "defaultMessage": "Orijinal proje"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Kanıt ekran görüntüsü {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Kanıt fotoğrafları:"
+  },
+  "external-files.permissions-card.reason.globally-allowed": {
+    "defaultMessage": "Otomatik olarak kaynak gösterildi"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Bu dosyayı daha önce gördük ve sizin için bir kaynak gösterdik. Bir şey yanlış görünürse, lütfen Modrinth Desteğinden üzerinden Yardım Merkezine ulaşın"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "Lisans"
+  },
+  "external-files.permissions-card.reason.license.proof-images-description": {
+    "defaultMessage": "Lisansla alakalı destekleyici döküman yükleyin."
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Projem"
+  },
+  "external-files.permissions-card.reason.my-project.description": {
+    "defaultMessage": "Orijinal iş senin tarafından yapıldı."
+  },
+  "external-files.permissions-card.reason.no-permission": {
+    "defaultMessage": "Yetki yok"
+  },
+  "external-files.permissions-card.reason.no-permission.automatic.description": {
+    "defaultMessage": "Bu dosyayı daha önce gördük ve lisansı normal olarak yeniden dağıtıma izin vermez."
+  },
+  "external-files.permissions-card.reason.no-permission.description": {
+    "defaultMessage": "Senin bu işi kullanmaya yetkin yok."
+  },
+  "external-files.permissions-card.reason.special-permission": {
+    "defaultMessage": "Özel yetki"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "Moderatör"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Hayır"
@@ -5269,5 +5431,8 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Modrinth Ekibi"
+  },
+  "version.content.name": {
+    "defaultMessage": "İsim"
   }
 }

@@ -107,12 +107,6 @@
   "app.browse.server.installing": {
     "message": "جاري التثبيت"
   },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "تنزيل الحزم"
-  },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."
   },
@@ -127,9 +121,6 @@
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "إسم حزمة التعديل"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "أختيار الملفات التي سيتم تصديرها"
   },
   "app.export-modal.version-number-label": {
     "message": "رقم الإصدار"
@@ -185,12 +176,6 @@
   "app.instance.worlds.browse-servers": {
     "message": "تصفح الخوادم"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "سيتم حذف '{name}' **نهائيا**, و لن هناك أي طريقة لاسترداده."
-  },
-  "app.instance.worlds.delete-world-title": {
-    "message": "هل أنت متيقِّن من رغبتك بحذف هذا العالم نهائيا؟"
-  },
   "app.instance.worlds.filter-modded": {
     "message": "معدّل"
   },
@@ -209,20 +194,8 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "لم تتم إضافة أي من الخوادم أو العوالم"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "ستتم إزالة '{name}' من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
-  },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "ستتم إزالة '{name}' ({address}) من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
-  },
-  "app.instance.worlds.remove-server-title": {
-    "message": "هل أنت متيقِّن من رغبتك في إزالة {name}؟"
-  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ابحث بين ال{count} عوالم..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "هذا الخادم"
   },
   "app.modal.install-to-play.content-required": {
     "message": "المحتوى مطلوب"

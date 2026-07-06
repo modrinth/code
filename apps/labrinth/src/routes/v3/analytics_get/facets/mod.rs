@@ -14,7 +14,7 @@ use crate::{
     routes::ApiError,
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_facets);
 }
 
@@ -58,7 +58,10 @@ pub struct ProjectPlaytimeFacets {
     pub country: Vec<String>,
 }
 
+/// Get analytics facets.  
 #[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
 	responses((status = OK, body = inline(FacetsResponse))),
 )]
 #[post("/facets")]

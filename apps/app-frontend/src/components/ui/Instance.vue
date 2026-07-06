@@ -15,9 +15,10 @@ import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
-import { get_by_profile_path } from '@/helpers/process'
-import { finish_install, kill, run } from '@/helpers/profile'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
+import { kill, run } from '@/helpers/instance'
+import { get_by_instance_id } from '@/helpers/process'
+import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
@@ -54,11 +55,11 @@ const installed = computed(() => props.instance.install_stage === 'installed')
 const router = useRouter()
 
 const seeInstance = async () => {
-	await router.push(`/instance/${encodeURIComponent(props.instance.path)}`)
+	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
 }
 
 const checkProcess = async () => {
-	const runningProcesses = await get_by_profile_path(props.instance.path).catch(handleError)
+	const runningProcesses = await get_by_instance_id(props.instance.id).catch(handleError)
 
 	playing.value = runningProcesses.length > 0
 }
@@ -66,8 +67,8 @@ const checkProcess = async () => {
 const play = async (e, context) => {
 	e?.stopPropagation()
 	loading.value = true
-	await run(props.instance.path)
-		.catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
+	await run(props.instance.id)
+		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
 		.finally(() => {
 			trackEvent('InstanceStart', {
 				loader: props.instance.loader,
@@ -82,7 +83,7 @@ const stop = async (e, context) => {
 	e?.stopPropagation()
 	playing.value = false
 
-	await kill(props.instance.path).catch(handleError)
+	await kill(props.instance.id).catch(handleError)
 
 	trackEvent('InstanceStop', {
 		loader: props.instance.loader,
@@ -94,17 +95,30 @@ const stop = async (e, context) => {
 const repair = async (e) => {
 	e?.stopPropagation()
 
-	await finish_install(props.instance).catch(handleError)
+	if (
+		props.instance.install_stage !== 'pack_installed' &&
+		(props.instance.link?.type === 'modrinth_modpack' ||
+			props.instance.link?.type === 'server_project_modpack')
+	) {
+		await install_pack_to_existing_instance(props.instance.id, {
+			type: 'fromVersionId',
+			project_id: props.instance.link.project_id ?? props.instance.link.server_project_id ?? '',
+			version_id: props.instance.link.version_id ?? props.instance.link.content_version_id ?? '',
+			title: props.instance.name,
+		}).catch(handleError)
+	} else {
+		await install_existing_instance(props.instance.id, false).catch(handleError)
+	}
 }
 
 const openFolder = async () => {
-	await showProfileInFolder(props.instance.path)
+	await showInstanceInFolder(props.instance.id)
 }
 
 const addContent = async () => {
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-		query: { i: props.instance.path },
+		query: { i: props.instance.id },
 	})
 }
 
@@ -120,7 +134,7 @@ defineExpose({
 const currentEvent = ref(null)
 
 const unlisten = await process_listener((e) => {
-	if (e.profile_path_id === props.instance.path) {
+	if (e.instance_id === props.instance.id) {
 		currentEvent.value = e.event
 		if (e.event === 'finished') {
 			playing.value = false
@@ -142,7 +156,7 @@ onUnmounted(() => unlisten())
 			<Avatar
 				size="48px"
 				:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-				:tint-by="instance.path"
+				:tint-by="instance.id"
 				alt="Mod card"
 			/>
 			<div class="h-full flex items-center font-bold text-contrast leading-normal">
@@ -191,7 +205,7 @@ onUnmounted(() => unlisten())
 				<Avatar
 					size="48px"
 					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-					:tint-by="instance.path"
+					:tint-by="instance.id"
 					alt="Mod card"
 					:class="`transition-all ${modLoading || installing ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
 				/>

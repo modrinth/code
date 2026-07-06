@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT id\n\t\tFROM instances\n\t\tWHERE id = ? OR path = ?\n\t\tORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END\n\t\tLIMIT 1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "96f3122c81934c811e6be5941d201cd51654a2e2a87925b62767762792fa82f0"
+}

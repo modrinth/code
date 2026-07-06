@@ -46,20 +46,26 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "x-vercel-ip-country",
 ];
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(page_view_ingest)
         .service(playtime_ingest)
         .service(minecraft_server_play_ingest);
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct UrlInput {
     url: String,
 }
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
-#[post("view")]
-async fn page_view_ingest(
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = UrlInput,
+	responses((status = NO_CONTENT))
+)]
+#[post("/view")]
+pub async fn page_view_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -171,7 +177,7 @@ async fn page_view_ingest(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, utoipa::ToSchema)]
 pub struct PlaytimeInput {
     seconds: u16,
     loader: String,
@@ -179,8 +185,14 @@ pub struct PlaytimeInput {
     parent: Option<crate::models::ids::VersionId>,
 }
 
-#[post("playtime")]
-async fn playtime_ingest(
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = serde_json::Value,
+	responses((status = NO_CONTENT))
+)]
+#[post("/playtime")]
+pub async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -249,7 +261,7 @@ struct MinecraftProfile {
     name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
     username: String,
@@ -258,8 +270,14 @@ pub struct MinecraftJavaServerPlayInput {
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
-#[post("minecraft-server-play")]
-async fn minecraft_server_play_ingest(
+#[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
+	request_body = MinecraftJavaServerPlayInput,
+	responses((status = NO_CONTENT))
+)]
+#[post("/minecraft-server-play")]
+pub async fn minecraft_server_play_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,

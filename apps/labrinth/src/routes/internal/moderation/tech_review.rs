@@ -37,7 +37,7 @@ use crate::{
 };
 use eyre::eyre;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search_projects)
         .service(get_project_report)
         .service(get_report)
@@ -193,13 +193,15 @@ pub enum FlagReason {
     Delphi,
 }
 
-/// Get info on an issue in a Delphi report.
+/// Get a Delphi report issue.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(FileIssue)))
 )]
 #[get("/issue/{issue_id}")]
-async fn get_issue(
+pub async fn get_issue(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -252,13 +254,15 @@ async fn get_issue(
     Ok(web::Json(row.data.0))
 }
 
-/// Get info on a specific report for a project.
+/// Get a project technical report.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(FileReport)))
 )]
 #[get("/report/{id}")]
-async fn get_report(
+pub async fn get_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -662,13 +666,15 @@ async fn fetch_project_reports(
     Ok(project_reports)
 }
 
-/// Searches all projects which are awaiting technical review.
+/// Search projects awaiting technical review.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = inline(Vec<SearchResponse>)))
+	responses((status = OK, body = SearchResponse))
 )]
 #[post("/search")]
-async fn search_projects(
+pub async fn search_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -872,13 +878,15 @@ async fn search_projects(
     }))
 }
 
-/// Gets the technical review report for a specific project.
+/// Get a project technical review report.  
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = OK, body = inline(ProjectReportResponse)))
 )]
 #[get("/project/{id}")]
-async fn get_project_report(
+pub async fn get_project_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -963,18 +971,20 @@ pub struct SubmitReport {
     pub message: Option<String>,
 }
 
-/// Submits a verdict for a project based on its technical reports.
+/// Submit a technical review verdict.  
 ///
 /// Before this is called, all issues for this project's reports must have been
 /// marked as either safe or unsafe. Otherwise, this will error with
 /// [`ApiError::TechReviewIssuesWithNoVerdict`], providing the issue IDs which
 /// are still unmarked.
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
 #[post("/submit/{project_id}")]
-async fn submit_report(
+pub async fn submit_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1164,16 +1174,18 @@ pub struct UpdateIssue {
     pub verdict: DelphiVerdict,
 }
 
-/// Updates the state of a technical review issue detail.
+/// Update technical review issue details.  
 ///
 /// This will not automatically reject the project for malware, but just flag
 /// this issue with a verdict.
 #[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
 #[patch("/issue-detail")]
-async fn update_issue_details(
+pub async fn update_issue_details(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1274,11 +1286,15 @@ pub struct AddReport {
     pub file_id: FileId,
 }
 
-/// Adds a file to the technical review queue by adding an empty report, if one
+/// Add a technical review report.  
 /// does not already exist for it.
-#[utoipa::path]
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	responses((status = OK, body = DelphiReportId))
+)]
 #[put("/report")]
-async fn add_report(
+pub async fn add_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

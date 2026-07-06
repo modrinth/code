@@ -245,7 +245,7 @@ export const commonMessages = defineMessages({
 	},
 	removeButton: {
 		id: 'button.remove',
-		defaultMessage: 'Remove',
+		defaultMessage: 'Delete passkey',
 	},
 	removeImageButton: {
 		id: 'button.remove-image',
@@ -429,11 +429,15 @@ export const commonMessages = defineMessages({
 	},
 	hideInstalledContentLabel: {
 		id: 'label.hide-installed-content',
-		defaultMessage: 'Hide already installed content',
+		defaultMessage: 'Hide content already installed',
 	},
 	hideSelectedContentLabel: {
 		id: 'label.hide-selected-content',
 		defaultMessage: 'Hide selected content',
+	},
+	serverOnlyLabel: {
+		id: 'label.server-only',
+		defaultMessage: 'Server only',
 	},
 	installedModpackTitle: {
 		id: 'label.installed-modpack',

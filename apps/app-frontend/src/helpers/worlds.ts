@@ -3,7 +3,7 @@ import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 
-import { get_full_path } from '@/helpers/profile'
+import { get_full_path } from '@/helpers/instance'
 import { openPath } from '@/helpers/utils'
 
 type BaseWorld = {
@@ -36,8 +36,8 @@ export type ServerWorld = BaseWorld & {
 
 export type World = SingleplayerWorld | ServerWorld
 
-export type WorldWithProfile = {
-	profile: string
+export type WorldWithInstance = {
+	instance_id: string
 } & World
 
 export type SingleplayerGameMode = 'survival' | 'creative' | 'adventure' | 'spectator'
@@ -88,12 +88,12 @@ export type ProtocolVersion = {
 export async function get_recent_worlds(
 	limit: number,
 	displayStatuses?: DisplayStatus[],
-): Promise<WorldWithProfile[]> {
+): Promise<WorldWithInstance[]> {
 	return await invoke('plugin:worlds|get_recent_worlds', { limit, displayStatuses })
 }
 
-export async function get_profile_worlds(path: string): Promise<World[]> {
-	return await invoke('plugin:worlds|get_profile_worlds', { path })
+export async function get_instance_worlds(instanceId: string): Promise<World[]> {
+	return await invoke('plugin:worlds|get_instance_worlds', { instanceId })
 }
 
 export async function get_singleplayer_world(
@@ -137,16 +137,16 @@ export async function delete_world(instance: string, world: string): Promise<voi
 	return await invoke('plugin:worlds|delete_world', { instance, world })
 }
 
-export async function add_server_to_profile(
-	path: string,
+export async function add_server_to_instance(
+	instanceId: string,
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
 	projectId?: string,
 	contentKind?: string,
 ): Promise<number> {
-	return await invoke('plugin:worlds|add_server_to_profile', {
-		path,
+	return await invoke('plugin:worlds|add_server_to_instance', {
+		instanceId,
 		name,
 		address,
 		packStatus,
@@ -155,15 +155,15 @@ export async function add_server_to_profile(
 	})
 }
 
-export async function edit_server_in_profile(
-	path: string,
+export async function edit_server_in_instance(
+	instanceId: string,
 	index: number,
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
 ): Promise<void> {
-	return await invoke('plugin:worlds|edit_server_in_profile', {
-		path,
+	return await invoke('plugin:worlds|edit_server_in_instance', {
+		instanceId,
 		index,
 		name,
 		address,
@@ -171,12 +171,17 @@ export async function edit_server_in_profile(
 	})
 }
 
-export async function remove_server_from_profile(path: string, index: number): Promise<void> {
-	return await invoke('plugin:worlds|remove_server_from_profile', { path, index })
+export async function remove_server_from_instance(
+	instanceId: string,
+	index: number,
+): Promise<void> {
+	return await invoke('plugin:worlds|remove_server_from_instance', { instanceId, index })
 }
 
-export async function get_profile_protocol_version(path: string): Promise<ProtocolVersion | null> {
-	return await invoke('plugin:worlds|get_profile_protocol_version', { path })
+export async function get_instance_protocol_version(
+	instanceId: string,
+): Promise<ProtocolVersion | null> {
+	return await invoke('plugin:worlds|get_instance_protocol_version', { instanceId })
 }
 
 export async function get_server_status(
@@ -186,16 +191,19 @@ export async function get_server_status(
 	return await invoke('plugin:worlds|get_server_status', { address, protocolVersion })
 }
 
-export async function start_join_singleplayer_world(path: string, world: string): Promise<unknown> {
-	return await invoke('plugin:worlds|start_join_singleplayer_world', { path, world })
+export async function start_join_singleplayer_world(
+	instanceId: string,
+	world: string,
+): Promise<unknown> {
+	return await invoke('plugin:worlds|start_join_singleplayer_world', { instanceId, world })
 }
 
-export async function start_join_server(path: string, address: string): Promise<unknown> {
-	return await invoke('plugin:worlds|start_join_server', { path, address })
+export async function start_join_server(instanceId: string, address: string): Promise<unknown> {
+	return await invoke('plugin:worlds|start_join_server', { instanceId, address })
 }
 
-export async function showWorldInFolder(instancePath: string, worldPath: string) {
-	const fullPath = await get_full_path(instancePath)
+export async function showWorldInFolder(instanceId: string, worldPath: string) {
+	const fullPath = await get_full_path(instanceId)
 	return await openPath(fullPath + '/saves/' + worldPath)
 }
 
@@ -348,6 +356,28 @@ export function resolveManagedServerWorld(
 	)
 }
 
+export function getServerAddress(javaServer?: { address?: string | null } | null) {
+	if (!javaServer) return null
+	return javaServer.address ?? null
+}
+
+export async function ensureManagedServerWorldExists(
+	instanceId: string,
+	serverName: string,
+	serverAddress: string | null,
+) {
+	if (!instanceId || !serverAddress) return
+	try {
+		const worlds = await get_instance_worlds(instanceId)
+		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
+		if (!managedWorld) {
+			await add_server_to_instance(instanceId, serverName, serverAddress, 'prompt')
+		}
+	} catch (err) {
+		console.error('Failed to ensure managed server world exists:', err)
+	}
+}
+
 export async function getServerLatency(
 	address: string,
 	protocolVersion: ProtocolVersion | null = null,
@@ -374,28 +404,35 @@ export async function refreshServerData(
 ): Promise<void> {
 	const refreshTime = Date.now()
 	serverData.refreshing = true
-	await get_server_status(address, protocolVersion)
-		.then((status) => {
-			if (serverData.lastSuccessfulRefresh && serverData.lastSuccessfulRefresh > refreshTime) {
-				// Don't update if there was a more recent successful refresh
-				return
-			}
-			serverData.lastSuccessfulRefresh = Date.now()
-			serverData.status = status
-			if (status.description) {
-				serverData.rawMotd = status.description
-				serverData.renderedMotd = autoToHTML(status.description)
-			}
-		})
-		.finally(() => {
-			serverData.refreshing = false
-		})
-		.catch((err) => {
-			console.error(`Refreshing addr ${address}`, protocolVersion, err)
-			if (!protocolVersion?.legacy) {
-				refreshServerData(serverData, { version: 74, legacy: true }, address)
-			}
-		})
+	try {
+		const status = await get_server_status(address, protocolVersion)
+		if (serverData.lastSuccessfulRefresh && serverData.lastSuccessfulRefresh > refreshTime) {
+			// Don't update if there was a more recent successful refresh
+			return
+		}
+		serverData.lastSuccessfulRefresh = Date.now()
+		serverData.status = status
+		if (status.description) {
+			serverData.rawMotd = status.description
+			serverData.renderedMotd = autoToHTML(status.description)
+		} else {
+			delete serverData.rawMotd
+			delete serverData.renderedMotd
+		}
+	} catch (err) {
+		console.error(`Refreshing addr ${address}`, protocolVersion, err)
+		if (!protocolVersion?.legacy) {
+			await refreshServerData(serverData, { version: 74, legacy: true }, address)
+			return
+		}
+		if (!serverData.lastSuccessfulRefresh || serverData.lastSuccessfulRefresh <= refreshTime) {
+			delete serverData.status
+			delete serverData.rawMotd
+			delete serverData.renderedMotd
+		}
+	} finally {
+		serverData.refreshing = false
+	}
 }
 
 export function refreshServers(
@@ -414,15 +451,15 @@ export function refreshServers(
 		}
 	})
 
-	// noinspection ES6MissingAwait - handled with .then by refreshServerData already
+	// noinspection ES6MissingAwait - handled by refreshServerData
 	Object.keys(serverData).forEach((address) =>
 		refreshServerData(serverData[address], protocolVersion, address),
 	)
 }
 
-export async function refreshWorld(worlds: World[], instancePath: string, worldPath: string) {
+export async function refreshWorld(worlds: World[], instanceId: string, worldPath: string) {
 	const index = worlds.findIndex((w) => w.type === 'singleplayer' && w.path === worldPath)
-	const newWorld = await get_singleplayer_world(instancePath, worldPath)
+	const newWorld = await get_singleplayer_world(instanceId, worldPath)
 	if (index !== -1) {
 		worlds[index] = newWorld
 	} else {
@@ -432,13 +469,13 @@ export async function refreshWorld(worlds: World[], instancePath: string, worldP
 	sortWorlds(worlds)
 }
 
-export async function handleDefaultProfileUpdateEvent(
+export async function handleDefaultInstanceUpdateEvent(
 	worlds: World[],
-	instancePath: string,
-	e: ProfileEvent,
+	instanceId: string,
+	e: InstanceEvent,
 ) {
 	if (e.event === 'world_updated') {
-		await refreshWorld(worlds, instancePath, e.world)
+		await refreshWorld(worlds, instanceId, e.world)
 	}
 
 	if (e.event === 'server_joined') {
@@ -456,9 +493,9 @@ export async function handleDefaultProfileUpdateEvent(
 	}
 }
 
-export async function refreshWorlds(instancePath: string): Promise<World[]> {
-	const worlds = await get_profile_worlds(instancePath).catch((err) => {
-		console.error(`Error refreshing worlds for instance: ${instancePath}`, err)
+export async function refreshWorlds(instanceId: string): Promise<World[]> {
+	const worlds = await get_instance_worlds(instanceId).catch((err) => {
+		console.error(`Error refreshing worlds for instance: ${instanceId}`, err)
 	})
 	if (worlds) {
 		sortWorlds(worlds)
@@ -489,7 +526,7 @@ export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVer
 	return versionIndex !== -1 && targetIndex !== -1 && versionIndex <= targetIndex
 }
 
-export type ProfileEvent = { profile_path_id: string } & (
+export type InstanceEvent = { instance_id: string } & (
 	| {
 			event: 'servers_updated'
 	  }

@@ -227,9 +227,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Reinstalează modpackul"
   },
-  "button.remove": {
-    "defaultMessage": "Elimină"
-  },
   "button.remove-image": {
     "defaultMessage": "Elimină imaginea"
   },

@@ -617,47 +617,17 @@
   "auth.reset-password.title.long": {
     "message": "Uw wachtwoord opnieuw instellen"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Voer een tweestapsverificatie code in om verder te gaan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Voer twee factor code in"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Voer code in..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Wachtwoord vergeten?</forgot-password-link> • <create-account-link>Maak een account aan</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Log in met"
   },
   "auth.sign-in.title": {
     "message": "Log in"
   },
-  "auth.sign-in.use-password": {
-    "message": "Of gebruik een wachtwoord"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Account aanmaken"
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Wachtwoorden komen niet overeen!"
-  },
   "auth.sign-up.sign-in-option.title": {
     "message": "Heb je al een account?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Schrijf je in voor updates van Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Aanmelden"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Of maak zelf een account"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Meld je aan met"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account instellingen"
@@ -688,18 +658,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifieer e-mail"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Abonneer op updates over Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Je bent nu deel van de geweldige community van makers en ontdekkers die mods bouwen, downloaden en up-to-date blijven van geweldige mods."
-  },
-  "auth.welcome.long-title": {
-    "message": "Welkom op Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Welkom"
   },
   "collection.button.edit-icon": {
     "message": "Bewerk icoon"
@@ -1400,9 +1358,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Notificaties aan het laden..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "U kunt meerdere projecten tegelijkertijd bijwerken door ze hieronder te selecteren."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Massa wijzigingen worden niet ondersteund door server projecten"
   },
@@ -1453,12 +1408,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Controller project metadata alstublieft"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Naam"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
   },
   "dashboard.projects.table.name": {
     "message": "Naam"
@@ -2843,20 +2792,8 @@
   "project.details.licensed": {
     "message": "Gelicentieerd"
   },
-  "project.download.game-version": {
-    "message": "Spel versie: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Error: geen spel-versies gevonden"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} is alleen beschikbaar voor {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} steunt niet {gameVersion} voor {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installeer met de Modrinth App"
   },
   "project.download.no-app": {
     "message": "Heb je de Modrinth App niet?"
@@ -2864,23 +2801,11 @@
   "project.download.no-versions-available": {
     "message": "Geen versies beschikbaar voor {gameVersion} en {platform}."
   },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: geen platformen gevonden"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} is alleen beschikbaar voor {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} steunt niet {platform} voor {gameVersion}"
   },
   "project.download.search-game-versions": {
     "message": "Game-versies zoeken..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Zoek game-versies..."
   },
   "project.download.select-game-version": {
     "message": "Selecteer game-versie"

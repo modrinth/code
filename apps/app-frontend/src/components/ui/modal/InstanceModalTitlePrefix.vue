@@ -14,7 +14,7 @@ defineProps<{
 		<Avatar
 			:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
 			size="24px"
-			:tint-by="instance.path"
+			:tint-by="instance.id"
 		/>
 		{{ instance.name }} <ChevronRightIcon />
 	</span>

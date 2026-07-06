@@ -21,6 +21,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	developerMode: false,
 	demoMode: false,
 	showVersionFilesInTable: false,
+	showVersionEnvironmentColumn: false,
 	showAdsWithPlus: false,
 	alwaysShowChecklistAsPopup: true,
 	testTaxForm: false,

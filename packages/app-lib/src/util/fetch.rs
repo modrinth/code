@@ -5,6 +5,7 @@ use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
+use eyre::{Context, eyre};
 use parking_lot::Mutex;
 use rand::Rng;
 use reqwest::Method;
@@ -12,7 +13,9 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
 use std::ffi::OsStr;
+use std::future::Future;
 use std::path::{Path, PathBuf};
+use std::pin::Pin;
 use std::sync::LazyLock;
 use std::time::{self};
 use tokio::sync::Semaphore;
@@ -207,6 +210,13 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 
 const FETCH_ATTEMPTS: usize = 2;
 
+pub type FetchProgressFn<'a> = dyn FnMut(
+        u64,
+        u64,
+    ) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
+    + Send
+    + 'a;
+
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
     url: &str,
@@ -311,6 +321,38 @@ pub async fn fetch_advanced(
     .await
 }
 
+#[tracing::instrument(skip(json_body, semaphore, progress))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_with_progress(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    header: Option<(&str, &str)>,
+    download_meta: Option<&DownloadMeta>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        sha1,
+        json_body,
+        header,
+        download_meta,
+        loading_bar,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        progress,
+    )
+    .await
+}
+
 /// Downloads a file with retry and checksum functionality
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
@@ -326,6 +368,39 @@ pub async fn fetch_advanced_with_client(
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     client: &reqwest::Client,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        sha1,
+        json_body,
+        header,
+        download_meta,
+        loading_bar,
+        uri_path,
+        semaphore,
+        exec,
+        client,
+        None,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(json_body, semaphore, client, progress))]
+#[allow(clippy::too_many_arguments)]
+async fn fetch_advanced_with_client_and_progress(
+    method: Method,
+    url: &str,
+    sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    header: Option<(&str, &str)>,
+    download_meta: Option<&DownloadMeta>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
 
@@ -371,7 +446,7 @@ pub async fn fetch_advanced_with_client(
         }
 
         if let Some((name, value)) = &download_meta_header {
-            tracing::info!("Sending download analytics: {value}");
+            tracing::debug!("Sending download analytics: {value}");
             req = req.header(name.as_str(), value.as_str());
         }
 
@@ -398,31 +473,55 @@ pub async fn fetch_advanced_with_client(
                     return Err(backup_error.into());
                 }
 
-                let bytes = if let Some((bar, total)) = &loading_bar {
+                let bytes: eyre::Result<Bytes> = if loading_bar.is_some()
+                    || progress.is_some()
+                {
                     let length = resp.content_length();
                     if let Some(total_size) = length {
                         use futures::StreamExt;
                         let mut stream = resp.bytes_stream();
-                        let mut bytes = Vec::new();
-                        while let Some(item) = stream.next().await {
-                            let chunk = item.or(Err(ErrorKind::NoValueFor(
-                                "fetch bytes".to_string(),
-                            )))?;
-                            bytes.append(&mut chunk.to_vec());
-                            emit_loading(
-                                bar,
-                                (chunk.len() as f64 / total_size as f64)
-                                    * total,
-                                None,
-                            )?;
-                        }
 
-                        Ok(bytes::Bytes::from(bytes))
+                        async {
+                            let mut bytes = Vec::new();
+                            let mut downloaded = 0_u64;
+
+                            while let Some(item) = stream.next().await {
+                                let chunk = item.wrap_err_with(|| {
+                                    eyre!(
+                                        "failed to read response body from {url}"
+                                    )
+                                })?;
+
+                                downloaded += chunk.len() as u64;
+                                bytes.extend_from_slice(&chunk);
+
+                                if let Some((bar, total)) = &loading_bar {
+                                    emit_loading(
+                                        bar,
+                                        (chunk.len() as f64
+                                            / total_size as f64)
+                                            * total,
+                                        None,
+                                    )?;
+                                }
+
+                                if let Some(progress) = progress.as_mut() {
+                                    progress(downloaded, total_size).await?;
+                                }
+                            }
+
+                            Ok(Bytes::from(bytes))
+                        }
+                        .await
                     } else {
-                        resp.bytes().await
+                        resp.bytes().await.wrap_err_with(|| {
+                            eyre!("failed to read response body from {url}")
+                        })
                     }
                 } else {
-                    resp.bytes().await
+                    resp.bytes().await.wrap_err_with(|| {
+                        eyre!("failed to read response body from {url}")
+                    })
                 };
 
                 if let Ok(bytes) = bytes {
