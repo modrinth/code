@@ -110,7 +110,9 @@
 									<h3 class="m-0 text-base font-bold text-contrast">
 										{{ formatMessage(messages.serversPromoTitle) }}
 									</h3>
-									<span class="rounded-full bg-brand-highlight px-2 py-0.5 text-xs font-bold text-brand">
+									<span
+										class="rounded-full bg-brand-highlight px-2 py-0.5 text-xs font-bold text-brand"
+									>
 										{{ formatMessage(commonMessages.newBadge) }}
 									</span>
 								</div>
@@ -271,10 +273,7 @@ type HeaderProject = Pick<
 	icon_url?: string | null
 }
 
-type HeaderProjectV3 = Pick<
-	Labrinth.Projects.v3.Project,
-	'status' | 'minecraft_java_server'
->
+type HeaderProjectV3 = Pick<Labrinth.Projects.v3.Project, 'status' | 'minecraft_java_server'>
 
 type HeaderCollection = {
 	projects: string[]
@@ -283,48 +282,51 @@ type HeaderCollection = {
 
 type SignInRoute = string | Record<string, unknown>
 
-const props = withDefaults(defineProps<{
-	project: HeaderProject
-	projectV3?: HeaderProjectV3 | null
-	authUser?: Labrinth.Users.v3.User | null
-	signInRoute: SignInRoute
-	collections?: HeaderCollection[]
-	baseId: string
-	collectProject: (...args: unknown[]) => unknown
-	createCollection: (...args: unknown[]) => unknown
-	isServerProject?: boolean
-	showStatusBadge?: boolean
-	showEditProject?: boolean
-	primaryMuted?: boolean
-	primaryLabelHidden?: boolean
-	canCreateServer?: boolean
-	showQuickServerButton?: boolean
-	showCreateServerPrompt?: boolean
-	following?: boolean
-	saved?: boolean
-	isMember?: boolean
-	isStaff?: boolean
-	showModerationChecklist?: boolean
-	showModerationModpackRescan?: boolean
-}>(), {
-	projectV3: null,
-	authUser: null,
-	collections: () => [],
-	isServerProject: false,
-	showStatusBadge: false,
-	showEditProject: false,
-	primaryMuted: false,
-	primaryLabelHidden: false,
-	canCreateServer: false,
-	showQuickServerButton: false,
-	showCreateServerPrompt: false,
-	following: false,
-	saved: false,
-	isMember: false,
-	isStaff: false,
-	showModerationChecklist: false,
-	showModerationModpackRescan: false,
-})
+const props = withDefaults(
+	defineProps<{
+		project: HeaderProject
+		projectV3?: HeaderProjectV3 | null
+		authUser?: Labrinth.Users.v3.User | null
+		signInRoute: SignInRoute
+		collections?: HeaderCollection[]
+		baseId: string
+		collectProject: (...args: unknown[]) => unknown
+		createCollection: (...args: unknown[]) => unknown
+		isServerProject?: boolean
+		showStatusBadge?: boolean
+		showEditProject?: boolean
+		primaryMuted?: boolean
+		primaryLabelHidden?: boolean
+		canCreateServer?: boolean
+		showQuickServerButton?: boolean
+		showCreateServerPrompt?: boolean
+		following?: boolean
+		saved?: boolean
+		isMember?: boolean
+		isStaff?: boolean
+		showModerationChecklist?: boolean
+		showModerationModpackRescan?: boolean
+	}>(),
+	{
+		projectV3: null,
+		authUser: null,
+		collections: () => [],
+		isServerProject: false,
+		showStatusBadge: false,
+		showEditProject: false,
+		primaryMuted: false,
+		primaryLabelHidden: false,
+		canCreateServer: false,
+		showQuickServerButton: false,
+		showCreateServerPrompt: false,
+		following: false,
+		saved: false,
+		isMember: false,
+		isStaff: false,
+		showModerationChecklist: false,
+		showModerationModpackRescan: false,
+	},
+)
 
 const emit = defineEmits<{
 	category: [category: string]
@@ -397,7 +399,8 @@ const formatNumber = useFormatNumber()
 const formatPrice = useFormatPrice()
 
 const projectPath = computed(
-	() => `/${props.project.project_type}/${props.project.slug ? props.project.slug : props.project.id}`,
+	() =>
+		`/${props.project.project_type}/${props.project.slug ? props.project.slug : props.project.id}`,
 )
 const primaryColor = computed(() => (props.primaryMuted ? 'standard' : 'brand'))
 const showCreateServerAction = computed(() => props.canCreateServer && props.showQuickServerButton)

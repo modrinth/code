@@ -1,12 +1,7 @@
 <template>
 	<PageHeader :title="instance.name">
 		<template #leading>
-			<Avatar
-				:src="iconSrc"
-				:alt="instance.name"
-				size="64px"
-				:tint-by="instance.id"
-			/>
+			<Avatar :src="iconSrc" :alt="instance.name" size="64px" :tint-by="instance.id" />
 		</template>
 
 		<template #metadata>
@@ -32,7 +27,11 @@
 				>
 					{{ loaderLabel }}
 				</PageHeaderMetadataItem>
-				<PageHeaderMetadataItem v-if="showInstancePlayTime" :icon="TimerIcon" tooltip="Total playtime">
+				<PageHeaderMetadataItem
+					v-if="showInstancePlayTime"
+					:icon="TimerIcon"
+					tooltip="Total playtime"
+				>
 					{{ playtimeLabel }}
 				</PageHeaderMetadataItem>
 			</PageHeaderMetadata>
@@ -41,7 +40,9 @@
 		<template #actions>
 			<PageHeaderActions>
 				<ButtonStyled v-if="isInstalling" color="brand" size="large">
-					<button type="button" disabled>{{ formatMessage(commonMessages.installingLabel) }}</button>
+					<button type="button" disabled>
+						{{ formatMessage(commonMessages.installingLabel) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
 					<button type="button" @click="emit('repair')">
@@ -53,9 +54,7 @@
 					<button type="button" :disabled="stopping" @click="emit('stop')">
 						<StopCircleIcon />
 						{{
-							stopping
-								? formatMessage(messages.stopping)
-								: formatMessage(commonMessages.stopButton)
+							stopping ? formatMessage(messages.stopping) : formatMessage(commonMessages.stopButton)
 						}}
 					</button>
 				</ButtonStyled>
@@ -119,15 +118,15 @@ import {
 	commonMessages,
 	defineMessages,
 	formatLoaderLabel,
+	type JoinedButtonAction,
 	JoinedButtons,
 	LoaderIcon as ServerLoaderIcon,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
-	TeleportOverflowMenu,
-	type JoinedButtonAction,
 	type ServerLoader,
+	TeleportOverflowMenu,
 	type TeleportOverflowMenuItem,
 	useVIntl,
 } from '@modrinth/ui'

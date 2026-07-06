@@ -3002,9 +3002,6 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
-  "profile.label.downloads": {
-    "message": "{count} download"
-  },
   "profile.label.joined": {
     "message": "Iscrizione"
   },
@@ -3022,9 +3019,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizzazioni"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."

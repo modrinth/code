@@ -2645,9 +2645,6 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
-  },
   "profile.label.joined": {
     "message": "Приєднався"
   },
@@ -2665,9 +2662,6 @@
   },
   "profile.label.organizations": {
     "message": "Організації"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "profile.label.saving": {
     "message": "Збереження…"

@@ -2855,9 +2855,6 @@
   "profile.label.collection": {
     "message": "Bộ sưu tập"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {lượt tải xuống} other {lượt tải xuống}}"
-  },
   "profile.label.joined": {
     "message": "Đã tham gia"
   },
@@ -2875,9 +2872,6 @@
   },
   "profile.label.organizations": {
     "message": "Tổ chức"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {dự án} other {dự án}}"
   },
   "profile.label.saving": {
     "message": "Đang lưu..."

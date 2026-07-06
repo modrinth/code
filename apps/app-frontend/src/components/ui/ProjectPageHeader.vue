@@ -172,33 +172,33 @@ type HeaderProject = Pick<
 	icon_url?: string | null
 }
 
-type HeaderProjectV3 = Pick<
-	Labrinth.Projects.v3.Project,
-	'status' | 'minecraft_java_server'
->
+type HeaderProjectV3 = Pick<Labrinth.Projects.v3.Project, 'status' | 'minecraft_java_server'>
 
-const props = withDefaults(defineProps<{
-	project: HeaderProject
-	projectV3?: HeaderProjectV3 | null
-	isServerProject?: boolean
-	installButtonDisabled?: boolean
-	installButtonValidating?: boolean
-	installButtonLoading?: boolean
-	installButtonInstalled?: boolean
-	serverProjectSelected?: boolean
-	serverPlaying?: boolean
-	serverInstallLoading?: boolean
-}>(), {
-	projectV3: null,
-	isServerProject: false,
-	installButtonDisabled: false,
-	installButtonValidating: false,
-	installButtonLoading: false,
-	installButtonInstalled: false,
-	serverProjectSelected: false,
-	serverPlaying: false,
-	serverInstallLoading: false,
-})
+const props = withDefaults(
+	defineProps<{
+		project: HeaderProject
+		projectV3?: HeaderProjectV3 | null
+		isServerProject?: boolean
+		installButtonDisabled?: boolean
+		installButtonValidating?: boolean
+		installButtonLoading?: boolean
+		installButtonInstalled?: boolean
+		serverProjectSelected?: boolean
+		serverPlaying?: boolean
+		serverInstallLoading?: boolean
+	}>(),
+	{
+		projectV3: null,
+		isServerProject: false,
+		installButtonDisabled: false,
+		installButtonValidating: false,
+		installButtonLoading: false,
+		installButtonInstalled: false,
+		serverProjectSelected: false,
+		serverPlaying: false,
+		serverInstallLoading: false,
+	},
+)
 
 const emit = defineEmits<{
 	contextmenu: [event: MouseEvent]

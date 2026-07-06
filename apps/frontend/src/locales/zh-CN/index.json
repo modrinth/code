@@ -3005,9 +3005,6 @@
   "profile.label.collection": {
     "message": "收藏夹"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {次下载}}"
-  },
   "profile.label.joined": {
     "message": "加入于"
   },
@@ -3025,9 +3022,6 @@
   },
   "profile.label.organizations": {
     "message": "组织"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "profile.label.saving": {
     "message": "正在保存…"

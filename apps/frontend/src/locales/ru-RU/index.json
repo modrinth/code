@@ -3005,9 +3005,6 @@
   "profile.label.collection": {
     "message": "Коллекция"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
-  },
   "profile.label.joined": {
     "message": "Регистрация:"
   },
@@ -3025,9 +3022,6 @@
   },
   "profile.label.organizations": {
     "message": "Организации"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "profile.label.saving": {
     "message": "Сохранение..."

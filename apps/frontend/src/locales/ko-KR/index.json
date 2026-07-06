@@ -2339,9 +2339,6 @@
   "profile.label.collection": {
     "message": "컬렉션"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {다운로드} other {다운로드}}"
-  },
   "profile.label.joined": {
     "message": "가입"
   },
@@ -2359,9 +2356,6 @@
   },
   "profile.label.organizations": {
     "message": "조직"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "profile.label.saving": {
     "message": "저장..."

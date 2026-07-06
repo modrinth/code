@@ -2711,9 +2711,6 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {muat turun}}"
-  },
   "profile.label.joined": {
     "message": "Telah menyertai"
   },
@@ -2731,9 +2728,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasi"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."

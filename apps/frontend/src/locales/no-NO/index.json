@@ -2045,9 +2045,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedlasting} other {nedlastinger}}"
-  },
   "profile.label.joined": {
     "message": "Blei med"
   },
@@ -2065,9 +2062,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasjoner"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
   },
   "profile.label.saving": {
     "message": "Lagrer..."

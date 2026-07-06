@@ -1823,9 +1823,6 @@
   "profile.label.collection": {
     "message": "אוסף"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
-  },
   "profile.label.joined": {
     "message": "הצטרף ב-"
   },
@@ -1843,9 +1840,6 @@
   },
   "profile.label.organizations": {
     "message": "ארגונים"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "profile.label.saving": {
     "message": "שומר..."

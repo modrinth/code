@@ -3011,9 +3011,6 @@
   "profile.label.collection": {
     "message": "Colección"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {descarga} other {descargas}}"
-  },
   "profile.label.joined": {
     "message": "Se unió"
   },
@@ -3031,9 +3028,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."

@@ -3011,9 +3011,6 @@
   "profile.label.collection": {
     "message": "收藏"
   },
-  "profile.label.downloads": {
-    "message": "下載次數：{count}"
-  },
   "profile.label.joined": {
     "message": "加入時間："
   },
@@ -3031,9 +3028,6 @@
   },
   "profile.label.organizations": {
     "message": "組織"
-  },
-  "profile.label.projects": {
-    "message": "{count} 個{countPlural, plural, other {專案}}"
   },
   "profile.label.saving": {
     "message": "儲存中..."

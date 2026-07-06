@@ -2159,9 +2159,6 @@
   "profile.label.collection": {
     "message": "Kolekce"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {stažení} few {stažení} other {stažení}}"
-  },
   "profile.label.joined": {
     "message": "Členem od"
   },
@@ -2179,9 +2176,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizace"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} few {projekty} other {projektů}}"
   },
   "profile.label.saving": {
     "message": "Ukládání..."
