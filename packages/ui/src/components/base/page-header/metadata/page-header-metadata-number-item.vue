@@ -9,8 +9,10 @@
 		:action="action"
 		:disabled="disabled"
 	>
-		<span>{{ formattedValue }}</span>
-		<span v-if="label">{{ label }}</span>
+		<span class="inline-flex items-baseline gap-1">
+			<span>{{ formattedValue }}</span>
+			<span v-if="label">{{ label }}</span>
+		</span>
 	</PageHeaderMetadataItem>
 </template>
 

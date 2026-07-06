@@ -59,15 +59,31 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<PageHeader
+				<ProjectPageHeader
 					v-else
-					:title="data.title"
-					:summary="data.description"
-					:leading="projectHeaderLeading"
-					:badges="projectHeaderBadges"
-					:metadata="projectHeaderMetadata"
-					:actions="projectHeaderActions"
-					@contextmenu.prevent.stop="handleRightClick"
+					:project="data"
+					:project-v3="projectV3"
+					:is-server-project="isServerProject"
+					:install-button-label="installButtonLabel"
+					:install-button-tooltip="installButtonTooltip"
+					:install-button-disabled="installButtonDisabled"
+					:install-button-loading="installButtonLoading"
+					:install-button-installed="installButtonInstalled"
+					:server-project-selected="serverProjectSelected"
+					:server-playing="serverPlaying"
+					:server-install-loading="!!(data && installingServerProjects.includes(data.id))"
+					:stop-label="formatMessage(commonMessages.stopButton)"
+					:play-label="formatMessage(commonMessages.playButton)"
+					:installing-label="formatMessage(commonMessages.installingLabel)"
+					:add-server-to-instance-label="formatMessage(commonMessages.addServerToInstanceButton)"
+					@contextmenu="handleRightClick"
+					@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
+					@install="() => install(null)"
+					@play-server="handleClickPlay"
+					@stop-server="handleStopServer"
+					@add-server-to-instance="handleAddServerToInstance"
+					@open-browser="openProjectInBrowser"
+					@report="reportProject"
 				/>
 				<NavTabs
 					:links="[
@@ -139,21 +155,7 @@
 </template>
 
 <script setup>
-import {
-	BookmarkIcon,
-	CheckIcon,
-	ClipboardCopyIcon,
-	DownloadIcon,
-	ExternalIcon,
-	GlobeIcon,
-	HeartIcon,
-	MoreVerticalIcon,
-	PlayIcon,
-	PlusIcon,
-	ReportIcon,
-	SpinnerIcon,
-	StopCircleIcon,
-} from '@modrinth/assets'
+import { ClipboardCopyIcon, DownloadIcon, ExternalIcon, GlobeIcon } from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
 	commonMessages,
@@ -162,7 +164,6 @@ import {
 	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
-	PageHeader,
 	ProjectBackgroundGradient,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
@@ -170,14 +171,10 @@ import {
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
-	ProjectStatusBadge,
 	requestInstall,
 	SelectedProjectsFloatingBar,
-	ServerDetails,
-	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -187,6 +184,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import ProjectPageHeader from '@/components/ui/ProjectPageHeader.vue'
 import {
 	get_organization,
 	get_project,
@@ -221,7 +219,6 @@ const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
-const { formatCompactNumber } = useCompactNumber()
 
 const messages = defineMessages({
 	backToBrowse: {
@@ -407,214 +404,9 @@ const installButtonTooltip = computed(() => {
 	return null
 })
 
-const projectHeaderLeading = computed(() => ({
-	type: 'avatar',
-	src: data.value?.icon_url,
-	alt: data.value?.title,
-	avatarSize: '96px',
-}))
-
-const projectHeaderBadges = computed(() => {
-	if (!data.value || data.value.status === 'approved') return []
-	return [
-		{
-			id: 'status',
-			type: 'component',
-			component: ProjectStatusBadge,
-			componentProps: {
-				status: data.value.status,
-			},
-		},
-	]
-})
-
 const projectSearchUrl = computed(
 	() => `/browse/${isServerProject.value ? 'server' : data.value?.project_type}`,
 )
-
-const projectHeaderMetadata = computed(() => {
-	if (!data.value) return []
-	const items = []
-
-	if (isServerProject.value) {
-		if (projectV3.value?.status !== 'draft') {
-			items.push({
-				id: 'server-details',
-				type: 'component',
-				component: ServerDetails,
-				componentProps: {
-					onlinePlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online ?? 0,
-					statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
-					recentPlays: projectV3.value?.minecraft_java_server?.verified_plays_2w ?? 0,
-				},
-			})
-		}
-	} else {
-		items.push(
-			{
-				id: 'downloads',
-				icon: DownloadIcon,
-				label: formatCompactNumber(data.value.downloads),
-				tooltip: capitalizeString(
-					formatMessage(commonMessages.projectDownloads, {
-						count: data.value.downloads,
-					}),
-				),
-				class: 'font-semibold cursor-help',
-			},
-			{
-				id: 'followers',
-				icon: HeartIcon,
-				label: formatCompactNumber(data.value.followers),
-				tooltip: capitalizeString(
-					formatMessage(commonMessages.projectFollowers, {
-						count: data.value.followers,
-					}),
-				),
-				class: 'font-semibold cursor-help',
-			},
-		)
-	}
-
-	if (data.value.categories.length > 0) {
-		items.push({
-			id: 'categories',
-			tags: data.value.categories.map((category) => ({
-				id: category,
-				tag: category,
-				onClick: () => router.push(`${projectSearchUrl.value}?f=categories:${category}`),
-			})),
-			class: 'hidden md:flex',
-		})
-	}
-
-	return items
-})
-
-const projectHeaderActions = computed(() => {
-	if (!data.value) return []
-
-	if (isServerProject.value) {
-		return [
-			serverPlaying.value
-				? {
-						id: 'stop',
-						label: formatMessage(commonMessages.stopButton),
-						icon: StopCircleIcon,
-						color: 'red',
-						onClick: handleStopServer,
-					}
-				: {
-						id: 'play',
-						label:
-							data.value && installingServerProjects.value.includes(data.value.id)
-								? formatMessage(commonMessages.installingLabel)
-								: formatMessage(commonMessages.playButton),
-						icon: PlayIcon,
-						color: 'brand',
-						disabled: data.value && installingServerProjects.value.includes(data.value.id),
-						onClick: handleClickPlay,
-					},
-			{
-				id: 'add-server-to-instance',
-				label: formatMessage(commonMessages.addServerToInstanceButton),
-				icon: PlusIcon,
-				labelHidden: true,
-				tooltip: formatMessage(commonMessages.addServerToInstanceButton),
-				onClick: handleAddServerToInstance,
-			},
-			{
-				id: 'more',
-				label: 'More options',
-				icon: MoreVerticalIcon,
-				labelHidden: true,
-				type: 'transparent',
-				tooltip: 'More options',
-				menuActions: [
-					{
-						id: 'open-in-browser',
-						label: 'Open in browser',
-						icon: ExternalIcon,
-						action: () => openUrl(`https://modrinth.com/project/${data.value.slug}`),
-					},
-					{
-						divider: true,
-					},
-					{
-						id: 'report',
-						label: 'Report',
-						icon: ReportIcon,
-						color: 'red',
-						action: () =>
-							openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`),
-					},
-				],
-			},
-		]
-	}
-
-	return [
-		{
-			id: 'install',
-			label: installButtonLabel.value,
-			icon:
-				installButtonLoading.value && !installButtonInstalled.value
-					? SpinnerIcon
-					: !installButtonInstalled.value && !serverProjectSelected.value
-						? DownloadIcon
-						: CheckIcon,
-			iconClass:
-				installButtonLoading.value && !installButtonInstalled.value ? 'animate-spin' : undefined,
-			color: 'brand',
-			tooltip: installButtonTooltip.value,
-			disabled: installButtonDisabled.value,
-			onClick: () => install(null),
-		},
-		{
-			id: 'more',
-			label: 'More options',
-			icon: MoreVerticalIcon,
-			labelHidden: true,
-			type: 'transparent',
-			tooltip: 'More options',
-			menuActions: [
-				{
-					id: 'follow',
-					label: 'Follow',
-					icon: HeartIcon,
-					disabled: true,
-					tooltip: 'Coming soon',
-					action: () => {},
-				},
-				{
-					id: 'save',
-					label: 'Save',
-					icon: BookmarkIcon,
-					disabled: true,
-					tooltip: 'Coming soon',
-					action: () => {},
-				},
-				{
-					id: 'open-in-browser',
-					label: 'Open in browser',
-					icon: ExternalIcon,
-					action: () =>
-						openUrl(`https://modrinth.com/${data.value.project_type}/${data.value.slug}`),
-				},
-				{
-					divider: true,
-				},
-				{
-					id: 'report',
-					label: 'Report',
-					icon: ReportIcon,
-					color: 'red',
-					action: () => openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`),
-				},
-			],
-		},
-	]
-})
 
 const [allLoaders, allGameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),
@@ -651,6 +443,17 @@ function handleAddServerToInstance() {
 	const address = getServerAddress(projectV3.value?.minecraft_java_server)
 	if (!address || !data.value) return
 	showAddServerToInstanceModal(data.value.title, address)
+}
+
+function openProjectInBrowser() {
+	if (!data.value) return
+	const type = isServerProject.value ? 'project' : data.value.project_type
+	void openUrl(`https://modrinth.com/${type}/${data.value.slug}`)
+}
+
+function reportProject() {
+	if (!data.value) return
+	void openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`)
 }
 
 async function fetchProjectData() {

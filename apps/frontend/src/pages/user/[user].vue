@@ -120,13 +120,42 @@
 		</NewModal>
 		<div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
 			<div class="normal-page__header py-4">
-				<PageHeader
-					:title="user.username"
+				<UserPageHeader
+					:user="user"
 					:summary="isModrinthUser ? null : profileHeaderSummary"
-					:leading="profileHeaderLeading"
-					:badges="profileHeaderBadges"
-					:metadata="profileHeaderMetadata"
-					:actions="profileHeaderActions"
+					:auth-user="auth.user"
+					:is-modrinth-user="isModrinthUser"
+					:is-official-account="isOfficialAccount"
+					:show-affiliate-badge="isAdminViewing && !!isAffiliate"
+					:is-affiliate="!!isAffiliate"
+					:is-self="auth.user?.id === user.id"
+					:is-admin="isAdminViewing"
+					:is-staff="!!(auth.user && isStaff(auth.user))"
+					:projects-count="projects?.length || 0"
+					:downloads="sumDownloads"
+					:project-count-label="
+						formatMessage(messages.profileProjectCountLabel, { count: projects?.length || 0 })
+					"
+					:downloads-label="
+						formatMessage(messages.profileDownloadCountLabel, { count: sumDownloads })
+					"
+					:downloads-tooltip="formatNumber(sumDownloads)"
+					:joined-tooltip="formatDateTime(user.created)"
+					:labels="profileHeaderLabels"
+					@manage-projects="navigateTo('/dashboard/projects')"
+					@report="reportProfileFromHeader"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
+					@open-billing="navigateTo(`/admin/billing/${user.id}`)"
+					@toggle-affiliate="toggleAffiliate(user.id)"
+					@open-info="userDetailsModal?.show()"
+					@open-analytics="
+						navigateTo({
+							path: '/dashboard/analytics',
+							query: { user: user.username || user.id },
+						})
+					"
+					@edit-role="openRoleEditModal"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -152,7 +181,7 @@
 							</template>
 						</IntlFormatted>
 					</template>
-				</PageHeader>
+				</UserPageHeader>
 			</div>
 			<div class="normal-page__content">
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
@@ -336,23 +365,12 @@
 </template>
 <script setup>
 import {
-	AffiliateIcon,
-	BadgeCheckIcon,
 	BoxIcon,
-	CalendarIcon,
-	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
-	CurrencyIcon,
-	DownloadIcon,
-	EditIcon,
 	GlobeIcon,
-	InfoIcon,
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
-	MoreVerticalIcon,
-	ReportIcon,
 	SaveIcon,
 	SpinnerIcon,
 	XIcon,
@@ -368,14 +386,11 @@ import {
 	IntlFormatted,
 	NavTabs,
 	NewModal,
-	PageHeader,
 	ProjectCard,
 	ProjectCardList,
-	useCompactNumber,
 	useFormatDateTime,
 	useFormatNumber,
 	UserBadges,
-	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -386,6 +401,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
+import UserPageHeader from '~/components/ui/UserPageHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectUserSorting } from '~/utils/projects.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
@@ -401,8 +417,6 @@ const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
-const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
-const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -411,13 +425,13 @@ const formatDateTime = useFormatDateTime({
 const { addNotification } = injectNotificationManager()
 
 const messages = defineMessages({
-	profileProjectsLabel: {
-		id: 'profile.label.projects',
-		defaultMessage: '{count} {countPlural, plural, one {project} other {projects}}',
+	profileProjectCountLabel: {
+		id: 'profile.label.project-count',
+		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
-	profileDownloadsLabel: {
-		id: 'profile.label.downloads',
-		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
+	profileDownloadCountLabel: {
+		id: 'profile.label.download-count',
+		defaultMessage: '{count, plural, one {download} other {downloads}}',
 	},
 	collectionProjectsCount: {
 		id: 'profile.collection.projects-count',
@@ -714,6 +728,15 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
+function reportProfileFromHeader() {
+	if (!user.value) return
+	if (auth.value.user) {
+		reportUser(user.value.id)
+	} else {
+		navigateTo(getSignInRouteObj(route))
+	}
+}
+
 const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
 const userDetailsModal = useTemplateRef('userDetailsModal')
@@ -731,178 +754,23 @@ const profileHeaderSummary = computed(() =>
 			: formatMessage(messages.bioFallbackCreator),
 )
 
-const profileHeaderLeading = computed(() => ({
-	type: 'avatar',
-	src: user.value?.avatar_url,
-	alt: user.value?.username,
-	avatarSize: isModrinthUser.value ? '64px' : '96px',
-	circle: true,
+const profileHeaderLabels = computed(() => ({
+	affiliate: formatMessage(messages.affiliateLabel),
+	analytics: formatMessage(messages.analyticsButton),
+	billing: formatMessage(messages.billingButton),
+	copyId: formatMessage(commonMessages.copyIdButton),
+	copyPermalink: formatMessage(commonMessages.copyPermalinkButton),
+	edit: formatMessage(commonMessages.editButton),
+	editRole: formatMessage(messages.editRoleButton),
+	info: formatMessage(messages.infoButton),
+	joined: formatMessage(messages.profileJoinedLabel),
+	manageProjects: formatMessage(messages.profileManageProjectsButton),
+	moreOptions: 'More options',
+	officialAccount: formatMessage(messages.officialAccount),
+	removeAffiliate: formatMessage(messages.removeAffiliateButton),
+	report: formatMessage(commonMessages.reportButton),
+	setAffiliate: formatMessage(messages.setAffiliateButton),
 }))
-
-const profileHeaderBadges = computed(() => [
-	...(isOfficialAccount.value
-		? [
-				{
-					id: 'official',
-					label: formatMessage(messages.officialAccount),
-					icon: BadgeCheckIcon,
-					iconProps: {
-						fill: 'var(--color-brand-highlight)',
-					},
-					tooltip: formatMessage(messages.officialAccount),
-					class: 'border-brand-highlight bg-brand-highlight text-brand',
-				},
-			]
-		: []),
-	...(isAdminViewing.value && isAffiliate.value
-		? [
-				{
-					id: 'affiliate',
-					label: 'Affiliate',
-					icon: AffiliateIcon,
-					class: 'border-brand-highlight bg-brand-highlight text-brand',
-				},
-			]
-		: []),
-])
-
-const profileHeaderMetadata = computed(() => {
-	if (isModrinthUser.value) return []
-
-	return [
-		{
-			id: 'projects',
-			label: formatMessage(messages.profileProjectsLabel, {
-				count: formatCompactNumber(projects.value?.length || 0),
-				countPlural: formatCompactNumberPlural(projects.value?.length || 0),
-			}),
-			icon: BoxIcon,
-		},
-		{
-			id: 'downloads',
-			label: formatMessage(messages.profileDownloadsLabel, {
-				count: formatCompactNumber(sumDownloads.value),
-				countPlural: formatCompactNumberPlural(sumDownloads.value),
-			}),
-			icon: DownloadIcon,
-			tooltip: formatNumber(sumDownloads.value),
-		},
-		{
-			id: 'joined',
-			label: `${formatMessage(messages.profileJoinedLabel)} ${formatRelativeTime(user.value.created)}`,
-			icon: CalendarIcon,
-			tooltip: formatDateTime(user.value.created),
-		},
-	]
-})
-
-const profileHeaderActions = computed(() => {
-	if (!user.value) return []
-
-	const viewer = auth.value.user
-	const isSelf = viewer?.id === user.value.id
-
-	return [
-		...(isSelf
-			? [
-					{
-						id: 'edit-profile',
-						label: formatMessage(commonMessages.editButton),
-						icon: EditIcon,
-						to: '/settings/profile',
-					},
-				]
-			: []),
-		{
-			id: 'more',
-			label: 'More options',
-			icon: MoreVerticalIcon,
-			labelHidden: true,
-			type: 'transparent',
-			tooltip: 'More options',
-			menuActions: [
-				{
-					id: 'manage-projects',
-					label: formatMessage(messages.profileManageProjectsButton),
-					icon: BoxIcon,
-					action: () => navigateTo('/dashboard/projects'),
-					shown: isSelf,
-				},
-				{
-					divider: true,
-					shown: isSelf,
-				},
-				{
-					id: 'report',
-					label: formatMessage(commonMessages.reportButton),
-					icon: ReportIcon,
-					action: () => (viewer ? reportUser(user.value.id) : navigateTo(getSignInRouteObj(route))),
-					color: 'red',
-					shown: viewer?.id !== user.value.id,
-				},
-				{
-					id: 'copy-id',
-					label: formatMessage(commonMessages.copyIdButton),
-					icon: ClipboardCopyIcon,
-					action: () => copyId(),
-				},
-				{
-					id: 'copy-permalink',
-					label: formatMessage(commonMessages.copyPermalinkButton),
-					icon: ClipboardCopyIcon,
-					action: () => copyPermalink(),
-				},
-				{
-					divider: true,
-					shown: viewer && isAdmin(viewer),
-				},
-				{
-					id: 'open-billing',
-					label: formatMessage(messages.billingButton),
-					icon: CurrencyIcon,
-					action: () => navigateTo(`/admin/billing/${user.value.id}`),
-					shown: viewer && isStaff(viewer),
-				},
-				{
-					id: 'toggle-affiliate',
-					label: formatMessage(
-						isAffiliate.value ? messages.removeAffiliateButton : messages.setAffiliateButton,
-					),
-					icon: AffiliateIcon,
-					action: () => toggleAffiliate(user.value.id),
-					shown: isAdminViewing.value,
-					remainOnClick: true,
-					color: isAffiliate.value ? 'red' : 'orange',
-				},
-				{
-					id: 'open-info',
-					label: formatMessage(messages.infoButton),
-					icon: InfoIcon,
-					action: () => userDetailsModal.value?.show(),
-					shown: viewer && isStaff(viewer),
-				},
-				{
-					id: 'open-analytics',
-					label: formatMessage(messages.analyticsButton),
-					icon: ChartIcon,
-					action: () =>
-						navigateTo({
-							path: '/dashboard/analytics',
-							query: { user: user.value.username || user.value.id },
-						}),
-					shown: viewer && isAdmin(viewer),
-				},
-				{
-					id: 'edit-role',
-					label: formatMessage(messages.editRoleButton),
-					icon: EditIcon,
-					action: () => openRoleEditModal(),
-					shown: viewer && isAdmin(viewer),
-				},
-			],
-		},
-	]
-})
 
 const navLinks = computed(() => [
 	{

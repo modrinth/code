@@ -13,11 +13,32 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<PageHeader
-				:title="instance.name"
-				:leading="instanceHeaderLeading"
-				:metadata="instanceHeaderMetadata"
-				:actions="instanceHeaderActions"
+			<InstancePageHeader
+				:instance="instance"
+				:icon-src="icon"
+				:is-server-instance="isServerInstance"
+				:loader-display-name="loaderDisplayName"
+				:loader-label="loaderLabel"
+				:show-instance-play-time="showInstancePlayTime"
+				:playtime-label="playtimeLabel"
+				:playing="playing"
+				:loading="loading"
+				:stopping="stopping"
+				:loading-server-ping="loadingServerPing"
+				:players-online="playersOnline"
+				:status-online="statusOnline"
+				:recent-plays="recentPlays"
+				:ping="ping"
+				:minecraft-server="minecraftServer"
+				:linked-project-v3="linkedProjectV3"
+				@repair="() => repairInstance()"
+				@stop="() => stopInstance('InstancePage')"
+				@play="() => startInstance('InstancePage')"
+				@play-server="() => handlePlayServer()"
+				@settings="() => settingsModal?.show()"
+				@open-folder="() => instance && showInstanceInFolder(instance.id)"
+				@export="() => exportModal?.show()"
+				@create-shortcut="() => createShortcut()"
 			/>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
@@ -77,34 +98,26 @@ import {
 	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
-	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
-	MoreVerticalIcon,
-	PackageIcon,
 	PlayIcon,
 	PlusIcon,
-	SettingsIcon,
 	StopCircleIcon,
-	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TerminalSquareIcon,
-	TimerIcon,
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	formatLoaderLabel,
 	injectNotificationManager,
-	LoaderIcon as ServerLoaderIcon,
 	NavTabs,
-	PageHeader,
+	type ServerLoader,
 	useLoadingBarToken,
 } from '@modrinth/ui'
-import type { Loaders } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -115,6 +128,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import InstancePageHeader from '@/components/ui/instance-page-header/index.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
@@ -131,8 +145,6 @@ import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
-
-import InstanceHeaderServerMetadata from './instance-header-server-metadata.vue'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -544,7 +556,7 @@ const timePlayedHumanized = computed(() => {
 })
 
 const loaderDisplayName = computed(() =>
-	instance.value ? (formatLoaderLabel(instance.value.loader) as Loaders) : null,
+	instance.value ? (formatLoaderLabel(instance.value.loader) as ServerLoader) : null,
 )
 
 const loaderLabel = computed(() =>
@@ -556,201 +568,6 @@ const loaderLabel = computed(() =>
 const playtimeLabel = computed(() =>
 	timePlayed.value > 0 ? timePlayedHumanized.value : 'Never played',
 )
-
-const instanceHeaderLeading = computed(() => ({
-	type: 'avatar' as const,
-	src: icon.value ? icon.value : undefined,
-	alt: instance.value?.name,
-	avatarSize: '64px',
-	tintBy: instance.value?.id,
-}))
-
-const instanceHeaderMetadata = computed(() => {
-	if (!instance.value) return []
-	if (isServerInstance.value) {
-		return [
-			{
-				id: 'server-details',
-				type: 'component' as const,
-				component: InstanceHeaderServerMetadata,
-				componentProps: {
-					loadingServerPing: loadingServerPing.value,
-					playersOnline: playersOnline.value,
-					statusOnline: statusOnline.value,
-					recentPlays: recentPlays.value,
-					ping: ping.value,
-					minecraftServer: minecraftServer.value,
-					linkedProjectV3: linkedProjectV3.value,
-					instanceId: instance.value.id,
-				},
-			},
-		]
-	}
-
-	return [
-		{
-			id: 'game-version',
-			label: `Minecraft ${instance.value.game_version}`,
-			icon: Gamepad2Icon,
-		},
-		{
-			id: 'loader',
-			label: loaderLabel.value,
-			icon: ServerLoaderIcon,
-			iconProps: {
-				loader: loaderDisplayName.value,
-			},
-		},
-		...(showInstancePlayTime.value
-			? [
-					{
-						id: 'playtime',
-						label: playtimeLabel.value,
-						icon: TimerIcon,
-					},
-				]
-			: []),
-	]
-})
-
-const installingStages = [
-	'installing',
-	'pack_installing',
-	'pack_installed',
-	'not_installed',
-	'minecraft_installing',
-]
-
-const primaryInstanceAction = computed(() => {
-	if (!instance.value) return null
-
-	if (installingStages.includes(instance.value.install_stage)) {
-		return {
-			id: 'installing',
-			label: 'Installing...',
-			color: 'brand' as const,
-			disabled: true,
-		}
-	}
-
-	if (instance.value.install_stage !== 'installed') {
-		return {
-			id: 'repair',
-			label: 'Repair',
-			icon: DownloadIcon,
-			color: 'brand' as const,
-			onClick: () => {
-				void repairInstance()
-			},
-		}
-	}
-
-	if (playing.value === true) {
-		return {
-			id: 'stop',
-			label: stopping.value ? 'Stopping...' : 'Stop',
-			icon: StopCircleIcon,
-			color: 'red' as const,
-			disabled: stopping.value,
-			onClick: () => {
-				void stopInstance('InstancePage')
-			},
-		}
-	}
-
-	if (playing.value === false && loading.value === false && !isServerInstance.value) {
-		return {
-			id: 'play',
-			label: 'Play',
-			icon: PlayIcon,
-			color: 'brand' as const,
-			onClick: () => {
-				void startInstance('InstancePage')
-			},
-		}
-	}
-
-	if (playing.value === false && loading.value === false && isServerInstance.value) {
-		return {
-			id: 'play',
-			label: 'Play',
-			color: 'brand' as const,
-			joinedActions: [
-				{
-					id: 'join_server',
-					label: 'Play',
-					icon: PlayIcon,
-					action: () => {
-						void handlePlayServer()
-					},
-				},
-				{
-					id: 'launch_instance',
-					label: 'Launch instance',
-					icon: PlayIcon,
-					action: () => {
-						void startInstance('InstancePage')
-					},
-				},
-			],
-		}
-	}
-
-	if (loading.value === true && playing.value === false) {
-		return {
-			id: 'starting',
-			label: 'Starting...',
-			color: 'brand' as const,
-			disabled: true,
-		}
-	}
-
-	return null
-})
-
-const instanceHeaderActions = computed(() => [
-	...(primaryInstanceAction.value ? [primaryInstanceAction.value] : []),
-	{
-		id: 'settings',
-		label: 'Instance settings',
-		icon: SettingsIcon,
-		labelHidden: true,
-		tooltip: 'Instance settings',
-		onClick: () => settingsModal.value?.show(),
-	},
-	{
-		id: 'more',
-		label: 'More actions',
-		icon: MoreVerticalIcon,
-		labelHidden: true,
-		type: 'transparent' as const,
-		tooltip: 'More actions',
-		menuActions: [
-			{
-				id: 'open-folder',
-				label: 'Open folder',
-				icon: FolderOpenIcon,
-				action: () => {
-					if (instance.value) void showInstanceInFolder(instance.value.id)
-				},
-			},
-			{
-				id: 'export-mrpack',
-				label: 'Export modpack',
-				icon: PackageIcon,
-				action: () => exportModal.value?.show(),
-			},
-			{
-				id: 'create-shortcut',
-				label: 'Create shortcut',
-				icon: ExternalIcon,
-				action: () => {
-					void createShortcut()
-				},
-			},
-		],
-	},
-])
 
 onUnmounted(() => {
 	unlistenProcesses()

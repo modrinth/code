@@ -128,14 +128,42 @@
 							@set-processing="setProcessing"
 						/>
 					</div>
-					<PageHeader
+					<ProjectPageHeader
 						v-if="projectV3Loaded"
-						:title="project.title"
-						:summary="project.description"
-						:leading="projectHeaderLeading"
-						:badges="projectHeaderBadges"
-						:metadata="projectHeaderMetadata"
-						:actions="projectHeaderActions"
+						:project="project"
+						:project-v3="projectV3"
+						:auth-user="auth.user"
+						:sign-in-route="signInRouteObj"
+						:collections="collections"
+						:base-id="baseId"
+						:no-collections-label="formatMessage(messages.noCollectionsFound)"
+						:create-new-collection-label="formatMessage(messages.createNewCollection)"
+						:collect-project="onUserCollectProject"
+						:create-collection="(event) => modalCollection?.show(event)"
+						:is-server-project="isServerProject"
+						:show-status-badge="!!currentMember || project.status !== 'approved'"
+						:show-edit-project="!!(auth.user && currentMember)"
+						:primary-muted="!!currentMember || route.name === 'type-project-version-version'"
+						:primary-label-hidden="!!(auth.user && currentMember)"
+						:can-create-server="canCreateServerFrom"
+						:show-quick-server-button="flags.showProjectPageQuickServerButton"
+						:show-create-server-prompt="flags.showProjectPageCreateServersTooltip"
+						:create-server-prompt-footer="projectHeaderCreateServerPromptFooter"
+						:following="following"
+						:saved="collections.some((x) => x.projects.includes(project.id))"
+						:is-member="isMember"
+						:is-staff="!!(auth.user && tags.staffRoles.includes(auth.user.role))"
+						:show-moderation-checklist="showModerationChecklist"
+						:labels="projectHeaderLabels"
+						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
+						@primary="handleProjectHeaderPrimary"
+						@create-server="dismissProjectHeaderCreateServerPrompt"
+						@dismiss-create-server="dismissProjectHeaderCreateServerPrompt"
+						@follow="followProjectFromHeader"
+						@moderation-checklist="openModerationChecklistFromMenu"
+						@report="reportProjectFromHeader"
+						@copy-id="copyId"
+						@copy-permalink="copyPermalink"
 					/>
 					<ProjectMemberHeader
 						v-if="currentMember"
@@ -372,19 +400,12 @@
 import {
 	BookTextIcon,
 	CalendarIcon,
-	ChartIcon,
 	ChevronRightIcon,
-	ClipboardCopyIcon,
 	DownloadIcon,
 	ExternalIcon,
 	HeartIcon,
 	ListIcon,
-	MoreVerticalIcon,
-	PlayIcon,
-	ReportIcon,
 	ScaleIcon,
-	ScanEyeIcon,
-	ServerPlusIcon,
 	SettingsIcon,
 	VersionIcon,
 } from '@modrinth/assets'
@@ -399,7 +420,6 @@ import {
 	NavTabs,
 	NewModal,
 	OpenInAppModal,
-	PageHeader,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
@@ -409,10 +429,7 @@ import {
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
-	ProjectStatusBadge,
 	provideProjectPageContext,
-	ServerDetails,
-	useCompactNumber,
 	useDebugLogger,
 	useFormatDateTime,
 	useFormatPrice,
@@ -430,8 +447,8 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
-import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
+import ProjectPageHeader from '~/components/ui/ProjectPageHeader.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
@@ -487,7 +504,6 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { formatMessage } = useVIntl()
-const { formatCompactNumber } = useCompactNumber()
 const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -1476,270 +1492,40 @@ const canCreateServerFrom = computed(() => {
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
-const projectHeaderLeading = computed(() => ({
-	type: 'avatar',
-	src: project.value?.icon_url,
-	alt: project.value?.title,
-	avatarSize: '96px',
-}))
-
-const projectHeaderBadges = computed(() => {
-	if (!project.value) return []
-	return currentMember.value || project.value.status !== 'approved'
-		? [
-				{
-					id: 'status',
-					type: 'component',
-					component: ProjectStatusBadge,
-					componentProps: {
-						status: project.value.status,
-					},
-				},
-			]
-		: []
-})
-
 const projectSearchUrl = computed(
 	() => `/discover/${isServerProject.value ? 'servers' : `${project.value?.project_type}s`}`,
 )
 
-const projectHeaderMetadata = computed(() => {
-	if (!project.value) return []
-	const items = []
+const projectHeaderCreateServerPromptFooter = computed(() =>
+	formatMessage(messages.serversPromoPricing, {
+		price: formatPrice(500, 'USD', true),
+		small: (children) => (Array.isArray(children) ? children.join('') : children),
+	}),
+)
 
-	if (isServerProject.value) {
-		if (projectV3.value?.status !== 'draft') {
-			items.push({
-				id: 'server-details',
-				type: 'component',
-				component: ServerDetails,
-				componentProps: {
-					onlinePlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online ?? 0,
-					statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
-					recentPlays: projectV3.value?.minecraft_java_server?.verified_plays_2w ?? 0,
-				},
-			})
-		}
-	} else {
-		items.push(
-			{
-				id: 'downloads',
-				icon: DownloadIcon,
-				label: formatCompactNumber(project.value.downloads),
-				tooltip: capitalizeString(
-					formatMessage(commonMessages.projectDownloads, {
-						count: project.value.downloads,
-					}),
-				),
-				class: 'font-semibold cursor-help',
-			},
-			{
-				id: 'followers',
-				icon: HeartIcon,
-				label: formatCompactNumber(project.value.followers),
-				tooltip: capitalizeString(
-					formatMessage(commonMessages.projectFollowers, {
-						count: project.value.followers,
-					}),
-				),
-				class: 'font-semibold cursor-help',
-			},
-		)
-	}
-
-	if (project.value.categories.length > 0) {
-		items.push({
-			id: 'categories',
-			tags: project.value.categories.map((category) => ({
-				id: category,
-				tag: category,
-				onClick: () => router.push(`${projectSearchUrl.value}?f=categories:${category}`),
-			})),
-			class: 'hidden md:flex',
-		})
-	}
-
-	return items
-})
-
-const projectHeaderActions = computed(() => {
-	if (!project.value) return []
-
-	const projectPath = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
-	const hasMember = !!currentMember.value
-	const userSignedIn = !!auth.value.user
-	const mutedPrimaryAction = hasMember || route.name === 'type-project-version-version'
-	const primaryLabel = isServerProject.value ? 'Play' : formatMessage(commonMessages.downloadButton)
-
-	return [
-		...(userSignedIn && hasMember
-			? [
-					{
-						id: 'edit-project',
-						label: 'Edit project',
-						icon: SettingsIcon,
-						color: 'brand',
-						to: `${projectPath}/settings`,
-					},
-				]
-			: []),
-		{
-			id: isServerProject.value ? 'play' : 'download',
-			label: primaryLabel,
-			icon: isServerProject.value ? PlayIcon : DownloadIcon,
-			color: mutedPrimaryAction ? 'standard' : 'brand',
-			labelHidden: userSignedIn && hasMember,
-			tooltip: userSignedIn && hasMember ? primaryLabel : undefined,
-			onClick: (event) => {
-				if (isServerProject.value) {
-					handlePlayServerProject()
-				} else {
-					downloadModal.value?.show(event)
-				}
-			},
-		},
-		...(canCreateServerFrom.value && flags.value.showProjectPageQuickServerButton
-			? [
-					{
-						id: 'create-server',
-						label: formatMessage(messages.serversPromoTitle),
-						icon: ServerPlusIcon,
-						labelHidden: true,
-						tooltip: formatMessage(messages.createServerTooltip),
-						to: `/hosting?project=${project.value.id}#plan`,
-						onClick: () => {
-							flags.value.showProjectPageCreateServersTooltip = false
-							saveFeatureFlags()
-						},
-						prompt: {
-							title: formatMessage(messages.serversPromoTitle),
-							description: formatMessage(messages.serversPromoDescription),
-							badge: formatMessage(commonMessages.newBadge),
-							footer: formatMessage(messages.serversPromoPricing, {
-								price: formatPrice(500, 'USD', true),
-								small: (children) => (Array.isArray(children) ? children.join('') : children),
-							}),
-							dismissLabel: formatMessage(messages.dontShowAgain),
-							shown: flags.value.showProjectPageCreateServersTooltip,
-							placement: 'bottom-start',
-							onDismiss: () => {
-								flags.value.showProjectPageCreateServersTooltip = false
-								saveFeatureFlags()
-							},
-						},
-					},
-				]
-			: []),
-		{
-			id: 'follow',
-			label: following.value
-				? formatMessage(commonMessages.unfollowButton)
-				: formatMessage(commonMessages.followButton),
-			icon: HeartIcon,
-			iconProps: {
-				fill: following.value ? 'currentColor' : 'none',
-			},
-			labelHidden: true,
-			tooltip: following.value
-				? formatMessage(commonMessages.unfollowButton)
-				: formatMessage(commonMessages.followButton),
-			to: userSignedIn ? undefined : signInRouteObj.value,
-			onClick: userSignedIn ? () => userFollowProject(project.value) : undefined,
-		},
-		{
-			id: 'save',
-			label: formatMessage(commonMessages.saveButton),
-			kind: 'component',
-			component: ProjectCollectionSaveButton,
-			componentProps: {
-				authUser: auth.value.user,
-				signInRoute: signInRouteObj.value,
-				projectId: project.value.id,
-				collections: collections.value,
-				saved: collections.value.some((x) => x.projects.includes(project.value.id)),
-				baseId,
-				noCollectionsLabel: formatMessage(messages.noCollectionsFound),
-				createNewCollectionLabel: formatMessage(messages.createNewCollection),
-				collectProject: onUserCollectProject,
-				createCollection: (event) => modalCollection.value?.show(event),
-			},
-		},
-		{
-			id: 'more',
-			label: formatMessage(commonMessages.moreOptionsButton),
-			icon: MoreVerticalIcon,
-			labelHidden: true,
-			type: 'transparent',
-			tooltip: formatMessage(commonMessages.moreOptionsButton),
-			menuActions: [
-				{
-					id: 'analytics',
-					label: formatMessage(commonMessages.analyticsButton),
-					icon: ChartIcon,
-					link: `${projectPath}/settings/analytics`,
-					shown: userSignedIn && hasMember,
-				},
-				{
-					divider: true,
-					shown: userSignedIn && hasMember,
-				},
-				{
-					id: 'moderation-checklist',
-					label: formatMessage(messages.reviewProject),
-					icon: ScaleIcon,
-					action: openModerationChecklistFromMenu,
-					color: 'orange',
-					shown:
-						userSignedIn &&
-						tags.value.staffRoles.includes(auth.value.user.role) &&
-						!showModerationChecklist.value,
-				},
-				{
-					divider: true,
-					shown:
-						userSignedIn &&
-						tags.value.staffRoles.includes(auth.value.user.role) &&
-						!showModerationChecklist.value,
-				},
-				{
-					id: 'tech-review',
-					label: 'Tech review',
-					icon: ScanEyeIcon,
-					link: `/moderation/technical-review/${project.value.id}`,
-					color: 'orange',
-					shown: userSignedIn && tags.value.staffRoles.includes(auth.value.user.role),
-				},
-				{
-					divider: true,
-					shown: userSignedIn && tags.value.staffRoles.includes(auth.value.user.role),
-				},
-				{
-					id: 'report',
-					label: formatMessage(commonMessages.reportButton),
-					icon: ReportIcon,
-					action: () =>
-						auth.value.user
-							? reportProject(project.value.id)
-							: navigateTo(getSignInRouteObj(route, getReportPath('project', project.value.id))),
-					color: 'red',
-					shown: !isMember.value,
-				},
-				{
-					id: 'copy-id',
-					label: formatMessage(commonMessages.copyIdButton),
-					icon: ClipboardCopyIcon,
-					action: () => copyId(),
-				},
-				{
-					id: 'copy-permalink',
-					label: formatMessage(commonMessages.copyPermalinkButton),
-					icon: ClipboardCopyIcon,
-					action: () => copyPermalink(),
-				},
-			],
-		},
-	]
-})
+const projectHeaderLabels = computed(() => ({
+	analyticsButton: formatMessage(commonMessages.analyticsButton),
+	copyIdButton: formatMessage(commonMessages.copyIdButton),
+	copyPermalinkButton: formatMessage(commonMessages.copyPermalinkButton),
+	createServer: formatMessage(messages.serversPromoTitle),
+	createServerTooltip: formatMessage(messages.createServerTooltip),
+	dontShowAgain: formatMessage(messages.dontShowAgain),
+	downloadButton: formatMessage(commonMessages.downloadButton),
+	downloadsStat: messages.downloadsStat,
+	editProject: 'Edit project',
+	followButton: formatMessage(commonMessages.followButton),
+	followersStat: messages.followersStat,
+	moreOptions: formatMessage(commonMessages.moreOptionsButton),
+	newBadge: formatMessage(commonMessages.newBadge),
+	playButton: 'Play',
+	reportButton: formatMessage(commonMessages.reportButton),
+	reviewProject: formatMessage(messages.reviewProject),
+	saveButton: formatMessage(commonMessages.saveButton),
+	serversPromoDescription: formatMessage(messages.serversPromoDescription),
+	serversPromoTitle: formatMessage(messages.serversPromoTitle),
+	techReview: 'Tech review',
+	unfollowButton: formatMessage(commonMessages.unfollowButton),
+}))
 
 const createCanonicalUrl = () =>
 	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
@@ -1774,6 +1560,33 @@ if (!route.name.startsWith('type-project-settings')) {
 }
 
 const onUserCollectProject = useClientTry(userCollectProject)
+
+function handleProjectHeaderPrimary(event) {
+	if (isServerProject.value) {
+		handlePlayServerProject()
+	} else {
+		downloadModal.value?.show(event)
+	}
+}
+
+function dismissProjectHeaderCreateServerPrompt() {
+	flags.value.showProjectPageCreateServersTooltip = false
+	saveFeatureFlags()
+}
+
+function followProjectFromHeader() {
+	if (!project.value) return
+	userFollowProject(project.value)
+}
+
+function reportProjectFromHeader() {
+	if (!project.value) return
+	if (auth.value.user) {
+		reportProject(project.value.id)
+	} else {
+		navigateTo(getSignInRouteObj(route, getReportPath('project', project.value.id)))
+	}
+}
 
 watch(
 	[versionsV3, _versionsV3Error],

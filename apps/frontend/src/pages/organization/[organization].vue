@@ -62,13 +62,17 @@
 		</template>
 		<template v-else>
 			<div class="normal-page__header py-4">
-				<PageHeader
-					:title="organization.name"
-					:summary="organization.description"
-					:leading="organizationHeaderLeading"
-					:badges="organizationHeaderBadges"
-					:metadata="organizationHeaderMetadata"
-					:actions="organizationHeaderActions"
+				<OrganizationPageHeader
+					:organization="organization"
+					:members-count="acceptedMembers?.length || 0"
+					:projects-count="projects?.length || 0"
+					:downloads="sumDownloads"
+					:downloads-tooltip="formatNumber(sumDownloads)"
+					:can-manage="!!(auth.user && currentMember)"
+					:labels="organizationHeaderLabels"
+					@manage-projects="router.push(`/organization/${organization.slug}/settings/projects`)"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
 				/>
 			</div>
 			<div class="normal-page__sidebar">
@@ -221,11 +225,7 @@ import {
 	BoxIcon,
 	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
 	CrownIcon,
-	DownloadIcon,
-	MoreVerticalIcon,
-	OrganizationIcon,
 	SettingsIcon,
 	SpinnerIcon,
 	UsersIcon,
@@ -237,7 +237,6 @@ import {
 	commonMessages,
 	injectModrinthClient,
 	NavTabs,
-	PageHeader,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectCard,
 	ProjectCardList,
@@ -253,6 +252,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
+import OrganizationPageHeader from '~/components/ui/OrganizationPageHeader.vue'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,
@@ -468,92 +468,17 @@ provideOrganizationContext(organizationContext)
 
 const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
-const organizationHeaderLeading = computed(() => ({
-	type: 'avatar' as const,
-	src: organization.value?.icon_url,
-	alt: organization.value?.name,
-	avatarSize: '96px',
+const organizationHeaderLabels = computed(() => ({
+	copyId: formatMessage(commonMessages.copyIdButton),
+	copyPermalink: formatMessage(commonMessages.copyPermalinkButton),
+	downloads: 'downloads',
+	manage: 'Manage',
+	manageProjects: 'Manage projects',
+	members: 'members',
+	moreOptions: 'More options',
+	organization: 'Organization',
+	projects: 'projects',
 }))
-
-const organizationHeaderBadges = computed(() => [
-	{
-		id: 'organization',
-		label: 'Organization',
-		icon: OrganizationIcon,
-		class: 'px-0 text-primary',
-	},
-])
-
-const organizationHeaderMetadata = computed(() => [
-	{
-		id: 'members',
-		label: `${formatCompactNumber(acceptedMembers.value?.length || 0)} members`,
-		icon: UsersIcon,
-	},
-	{
-		id: 'projects',
-		label: `${formatCompactNumber(projects.value?.length || 0)} projects`,
-		icon: BoxIcon,
-	},
-	{
-		id: 'downloads',
-		label: `${formatCompactNumber(sumDownloads.value)} downloads`,
-		icon: DownloadIcon,
-		tooltip: formatNumber(sumDownloads.value),
-	},
-])
-
-const organizationHeaderActions = computed(() => [
-	...(auth.value.user && currentMember.value
-		? [
-				{
-					id: 'manage',
-					label: 'Manage',
-					icon: SettingsIcon,
-					to: `/organization/${organization.value?.slug}/settings`,
-				},
-			]
-		: []),
-	{
-		id: 'more',
-		label: 'More options',
-		icon: MoreVerticalIcon,
-		labelHidden: true,
-		type: 'transparent' as const,
-		tooltip: 'More options',
-		menuActions: [
-			{
-				id: 'manage-projects',
-				label: 'Manage projects',
-				icon: BoxIcon,
-				action: () => {
-					void router.push(`/organization/${organization.value?.slug}/settings/projects`)
-				},
-				shown: !!(auth.value.user && currentMember.value),
-			},
-			{
-				divider: true,
-				shown: !!(auth.value.user && currentMember.value),
-			},
-			{
-				id: 'copy-id',
-				label: formatMessage(commonMessages.copyIdButton),
-				icon: ClipboardCopyIcon,
-				action: () => {
-					void copyId()
-				},
-			},
-			{
-				id: 'copy-permalink',
-				label: formatMessage(commonMessages.copyPermalinkButton),
-				icon: ClipboardCopyIcon,
-				action: () => {
-					void copyPermalink()
-				},
-			},
-		],
-	},
-])
 
 watch(
 	[routeHasSettings, acceptedMembers, currentMember],
