@@ -122,9 +122,6 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "إسم حزمة التعديل"
   },
-  "app.export-modal.select-files-label": {
-    "message": "أختيار الملفات التي سيتم تصديرها"
-  },
   "app.export-modal.version-number-label": {
     "message": "رقم الإصدار"
   },

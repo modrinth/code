@@ -7,9 +7,9 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
-mod facets;
+pub mod facets;
 mod metrics;
-mod old;
+pub mod old;
 
 use std::{
     collections::{HashMap, HashSet},
@@ -54,7 +54,7 @@ use crate::{
 pub(crate) use metrics::normalize_download_source;
 pub use metrics::*;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(fetch_analytics);
     cfg.configure(facets::config);
     cfg.configure(old::config);
@@ -172,8 +172,10 @@ pub enum ProjectAnalyticsEventKind {
 
 // logic
 
-/// Fetches analytics data for the authorized user's projects.
+/// Fetch analytics data.  
 #[utoipa::path(
+	context_path = "/analytics",
+	tag = "analytics",
     responses((status = OK, body = inline(GetResponse))),
 )]
 #[post("")]

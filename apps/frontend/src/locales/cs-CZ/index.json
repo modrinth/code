@@ -1346,9 +1346,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Načítání oznámení..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Více projektů můžete upravit najednou jejich výběrem níže."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverové projekty nepodporují hromadné úpravy"
   },
@@ -1399,24 +1396,6 @@
   },
   "dashboard.projects.project.moderator-message-aria": {
     "message": "Projekt má zprávu od moderátorů. Další informace zobrazíte v projektu."
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Vzestupně"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Sestupně"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Jméno"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Stav"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Typ"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikona"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2378,40 +2357,16 @@
   "project.details.licensed": {
     "message": "Licencováno"
   },
-  "project.download.game-version": {
-    "message": "Verze hry: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Chyba: žádné verze hry nebyly nalezeny"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} je k dispozici pouze pro verzi {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nepodporuje {gameVersion} pro {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Instalovat přes Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Nemáte Modrinth App?"
-  },
-  "project.download.platform": {
-    "message": "Platforma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Chyba: žádné platformy nenalezeny"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} je k dispozici pouze pro {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nepodporuje {platform} pro {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Hledat verze hry..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Hledat verze hry..."
   },
   "project.download.select-game-version": {

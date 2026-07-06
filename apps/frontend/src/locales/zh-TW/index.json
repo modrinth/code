@@ -1634,9 +1634,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "正在載入通知..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "你可以透過在下方選擇專案來同時編輯多個專案。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "伺服器專案不支援大量編輯"
   },
@@ -1711,24 +1708,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "請審查環境詮釋資料"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "遞增"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "遞減"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名稱"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "狀態"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "類型"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "圖示"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3242,20 +3221,8 @@
   "project.details.licensed": {
     "message": "授權條款"
   },
-  "project.download.game-version": {
-    "message": "遊戲版本：{version}"
-  },
-  "project.download.game-version-error": {
-    "message": "錯誤：找不到適合的遊戲版本"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} 僅適用於 {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"
-  },
-  "project.download.install-with-app": {
-    "message": "使用 Modrinth App 安裝"
   },
   "project.download.no-app": {
     "message": "還沒有 Modrinth App 嗎？"
@@ -3263,22 +3230,10 @@
   "project.download.no-versions-available": {
     "message": "{platform} {gameVersion} 沒有可用的版本。"
   },
-  "project.download.platform": {
-    "message": "平臺：{platform}"
-  },
-  "project.download.platform-error": {
-    "message": "錯誤：找不到平臺"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} 僅適用於 {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "搜尋遊戲版本..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "搜尋遊戲版本..."
   },
   "project.download.select-game-version": {

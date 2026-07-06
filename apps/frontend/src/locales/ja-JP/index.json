@@ -1211,9 +1211,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "通知を読み込み中…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "サーバープロジェクトでは一括編集を利用できません"
   },
@@ -1285,24 +1282,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "環境メタデータを確認してください"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "昇順"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "降順"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名前"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "ステータス"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "種類"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "アイコン"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2750,20 +2729,8 @@
   "project.details.licensed": {
     "message": "ライセンス"
   },
-  "project.download.game-version": {
-    "message": "ゲームバージョン: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "エラー: ゲームバージョンが見つかりません"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title}は{version}でのみ利用可能です"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}は{platform}の{gameVersion}に対応していません"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth Appでインストール"
   },
   "project.download.no-app": {
     "message": "Modrinth Appをお持ちでないですか？"
@@ -2771,22 +2738,10 @@
   "project.download.no-versions-available": {
     "message": "{gameVersion}および{platform}向けのバージョンは利用できません。"
   },
-  "project.download.platform": {
-    "message": "プラットフォーム: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "エラー: プラットフォームが見つかりません"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title}は{platform}でのみ利用可能です"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"
   },
   "project.download.search-game-versions": {
-    "message": "ゲームバージョンを検索…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "ゲームバージョンを検索…"
   },
   "project.download.select-game-version": {

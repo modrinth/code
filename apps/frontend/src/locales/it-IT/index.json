@@ -1628,9 +1628,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Caricando le notifiche..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Puoi modificare più progetti contemporaneamente selezionandoli qui sotto."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Non puoi modificare più server contemporaneamente"
   },
@@ -1702,24 +1699,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Si prega di rivedere i metadati d'ambiente"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Crescente"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Decrescente"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nome"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Stato"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icona"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3233,20 +3212,8 @@
   "project.details.licensed": {
     "message": "Licenza"
   },
-  "project.download.game-version": {
-    "message": "Versione del gioco: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Errore: nessuna versione del gioco trovata"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} è disponibile solo per {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} non supporta {platform} per {gameVersion}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installa con Modrinth App"
   },
   "project.download.no-app": {
     "message": "Non hai Modrinth App?"
@@ -3254,23 +3221,11 @@
   "project.download.no-versions-available": {
     "message": "Nessuna versione disponibile per {gameVersion} e {platform}."
   },
-  "project.download.platform": {
-    "message": "Piattaforma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Errore: nessuna piattaforma trovata"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} è disponibile solo per {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} non supporta {platform} per {gameVersion}"
   },
   "project.download.search-game-versions": {
     "message": "Cerca versioni del gioco..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Cerca tra le versioni del gioco..."
   },
   "project.download.select-game-version": {
     "message": "Seleziona la versione del gioco"

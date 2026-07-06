@@ -1514,24 +1514,6 @@
   "dashboard.projects.project.icon-alt": {
     "message": "Ikon för {title}"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "Stigande"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Fallande"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Namn"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Typ"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
@@ -2822,20 +2804,8 @@
   "project.details.licensed": {
     "message": "Licensierad"
   },
-  "project.download.game-version": {
-    "message": "Spelversion: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Fel: inga spelversioner hittades"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} är bara tillgängligt för {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installera med Modrinth App"
   },
   "project.download.no-app": {
     "message": "Har du inte Modrinth appen?"
@@ -2843,22 +2813,10 @@
   "project.download.no-versions-available": {
     "message": "Inga versioner finns tillgängliga för {gameVersion} och {platform}."
   },
-  "project.download.platform": {
-    "message": "Plattform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Fel: ingen plattform hittades"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} är bara tillgängligt för {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Sök spelversioner..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Sök spelversioner..."
   },
   "project.download.select-game-version": {

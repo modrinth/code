@@ -106,6 +106,7 @@ pub(crate) async fn create_instance(
         tx.commit().await?;
 
         crate::state::instances::watcher::watch_instance_folder(
+            &instance.id,
             &instance.path,
             &state.file_watcher,
             &state.directories,

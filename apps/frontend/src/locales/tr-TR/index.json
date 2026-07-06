@@ -1574,9 +1574,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Bildirimler yükleniyor..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Aşağıdan seçerek birden fazla projeyi düzenleyebilirsiniz."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Sunucu projeleri toplu düzenlemeyi desteklemez"
   },
@@ -1651,24 +1648,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Lütfen ortam meta verilerini inceleyin"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Artan"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Azalan sırada sırala"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "İsim"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Durum"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tip"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Simge"
   },
   "dashboard.projects.table.id": {
     "message": "Kimlik"
@@ -3182,20 +3161,8 @@
   "project.details.licensed": {
     "message": "Lisans:"
   },
-  "project.download.game-version": {
-    "message": "Oyun sürümü: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Hata: oyun sürümü bulunamadı"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} sadece {version} sürümünde mevcut"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}, {platform} için {gameVersion} sürümünü desteklemiyor"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth App ile yükle"
   },
   "project.download.no-app": {
     "message": "Modrinth App Yok Mu?"
@@ -3203,22 +3170,10 @@
   "project.download.no-versions-available": {
     "message": "{gameVersion} ve {platform} için sürüm mevcut değil."
   },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Hata: platform bulunamadı"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} sadece {platform} için mevcut"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}, {gameVersion} sürümünde {platform} desteklemiyor"
   },
   "project.download.search-game-versions": {
-    "message": "Oyun sürümü ara..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Oyun sürümü ara..."
   },
   "project.download.select-game-version": {

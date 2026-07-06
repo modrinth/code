@@ -1301,9 +1301,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Завантаження сповіщень…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Ви можете редагувати кілька проєктів одночасно, вибравши їх нижче."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Проєкти сервера не підтримують масове редагування"
   },
@@ -1375,24 +1372,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Перегляньте метадані середовища"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Зростання"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Спадання"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Назва"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Тип"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Значок"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2870,20 +2849,8 @@
   "project.details.licensed": {
     "message": "Ліцензія:"
   },
-  "project.download.game-version": {
-    "message": "Версія гри: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Помилка: версію гри не знайдено"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "«{title}» доступно лише для {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "«{title}» не підтримує {gameVersion} для {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Установити через Modrinth App"
   },
   "project.download.no-app": {
     "message": "Не маєте Modrinth App?"
@@ -2891,22 +2858,10 @@
   "project.download.no-versions-available": {
     "message": "Немає доступних версій для {gameVersion} та {platform}."
   },
-  "project.download.platform": {
-    "message": "Платформа: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Помилка: платформи не знайдено"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} доступне лише для {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не підтримує {platform} для {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Пошук версій гри…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "Пошук версій гри…"
   },
   "project.download.select-game-version": {

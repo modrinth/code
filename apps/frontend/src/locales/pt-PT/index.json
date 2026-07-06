@@ -821,18 +821,6 @@
   "dashboard.projects.links.wiki-page.label": {
     "message": "Página da Wiki"
   },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nome"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Tipo"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ícone"
-  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
@@ -2234,20 +2222,8 @@
   "project.details.licensed": {
     "message": "Licenciado"
   },
-  "project.download.game-version": {
-    "message": "Versão do jogo: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Erro: nenhuma versão do jogo encontrada"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} apenas está disponível para {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} não suporta {gameVersion} para {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Instala com a Modrinth App"
   },
   "project.download.no-app": {
     "message": "Não tens a Modrinth App?"
@@ -2255,22 +2231,10 @@
   "project.download.no-versions-available": {
     "message": "Nenhuma versão disponível para {gameVersion} e {platform}."
   },
-  "project.download.platform": {
-    "message": "Plataforma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Erro: nenhuma plataforma encontrada"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} apenas está disponível para {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} não suporta {platform} para {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Procurar versões do jogo..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Procurar versões do jogo..."
   },
   "project.download.select-game-version": {

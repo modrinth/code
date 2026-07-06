@@ -914,18 +914,6 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "يرجى مراجعة بيانات تعريف البيئة"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "صعوداً"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "نزولا"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "الإسم"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "الحالة"
-  },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"
   },

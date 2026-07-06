@@ -1631,9 +1631,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "加载通知…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "你可以通过下方复选框选择多个项目来一次性编辑。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "服务器项目不支持批量编辑"
   },
@@ -1708,24 +1705,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "请复核运行环境元数据"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "正序"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "降序"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名称"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "状态"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "类型"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "图标"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3236,20 +3215,8 @@
   "project.details.licensed": {
     "message": "许可证"
   },
-  "project.download.game-version": {
-    "message": "游戏版本：{version}"
-  },
-  "project.download.game-version-error": {
-    "message": "错误：没有合适的游戏版本"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title}仅适用于{version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支持 {platform} {gameVersion}"
-  },
-  "project.download.install-with-app": {
-    "message": "使用 Modrinth App 安装"
   },
   "project.download.no-app": {
     "message": "还没有 Modrinth App 吗？"
@@ -3257,22 +3224,10 @@
   "project.download.no-versions-available": {
     "message": "没有支持 {platform} {gameVersion} 的版本。"
   },
-  "project.download.platform": {
-    "message": "平台：{platform}"
-  },
-  "project.download.platform-error": {
-    "message": "错误：没有合适的平台"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} 仅适用于 {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支持 {gameVersion} 的 {platform}"
   },
   "project.download.search-game-versions": {
-    "message": "搜索游戏版本…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "搜索游戏版本…"
   },
   "project.download.select-game-version": {

@@ -288,6 +288,7 @@ type PaletteRankEntry = {
 	key: string
 	label: string
 	total: number
+	excludedFromRank?: boolean
 }
 
 function formatDatasetTooltip(projectName: string | undefined): string | undefined {
@@ -330,14 +331,38 @@ function buildPaletteColorsByDownloadRank(
 	const colorsByKey = new Map<string, string>()
 	if (palette.length === 0) return colorsByKey
 
-	const sortedEntries = [...entries].sort(
-		(a, b) => b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key),
-	)
+	const compareEntries = (a: PaletteRankEntry, b: PaletteRankEntry) =>
+		b.total - a.total || a.label.localeCompare(b.label) || a.key.localeCompare(b.key)
+	const rankedEntries = entries.filter((entry) => !entry.excludedFromRank).sort(compareEntries)
+	const excludedEntries = entries.filter((entry) => entry.excludedFromRank).sort(compareEntries)
+	const sortedEntries = [...rankedEntries, ...excludedEntries]
+
 	sortedEntries.forEach((entry, index) => {
 		colorsByKey.set(entry.key, getPaletteColorForIndex(index, palette))
 	})
 
 	return colorsByKey
+}
+
+function isExcludedFromPaletteRank(breakdownValues: readonly string[]): boolean {
+	return breakdownValues.some(
+		(value) =>
+			isUnknownAnalyticsBreakdownValue(value) || isNoDependentAnalyticsBreakdownValue(value),
+	)
+}
+
+function buildPaletteRankEntry(
+	key: string,
+	breakdownValues: readonly string[],
+	total: number,
+	formatLabel: (breakdownValues: readonly string[]) => string,
+): PaletteRankEntry {
+	return {
+		key,
+		label: formatLabel(breakdownValues),
+		total,
+		excludedFromRank: isExcludedFromPaletteRank(breakdownValues),
+	}
 }
 
 export function getMetricValue(
@@ -499,11 +524,14 @@ export function buildChartDatasets(
 		})
 
 		const colorsByBreakdown = buildPaletteColorsByDownloadRank(
-			Array.from(dataByBreakdown.keys()).map((breakdownKey) => ({
-				key: breakdownKey,
-				label: formatChartBreakdownLabels(breakdownValuesByKey.get(breakdownKey) ?? []),
-				total: downloadTotalsByBreakdown.get(breakdownKey) ?? 0,
-			})),
+			Array.from(dataByBreakdown.keys()).map((breakdownKey) =>
+				buildPaletteRankEntry(
+					breakdownKey,
+					breakdownValuesByKey.get(breakdownKey) ?? [],
+					downloadTotalsByBreakdown.get(breakdownKey) ?? 0,
+					formatChartBreakdownLabels,
+				),
+			),
 			palette,
 		)
 
@@ -538,7 +566,7 @@ export function buildChartDatasets(
 				? isNoDependentAnalyticsBreakdownValue(dependentProjectId)
 					? formatMessage(analyticsMessages.noDependentTooltip)
 					: isUnknownAnalyticsBreakdownValue(dependentProjectId)
-						? formatMessage(analyticsMessages.unknown)
+						? formatMessage(analyticsMessages.unknownDependentTooltip)
 						: formatDependentProjectDatasetTooltip(
 								versionName,
 								dependentProjectName,
@@ -675,11 +703,14 @@ export function buildChartDatasets(
 	})
 
 	const colorsByBreakdown = buildPaletteColorsByDownloadRank(
-		Array.from(dataByProjectBreakdown.keys()).map((breakdownKey) => ({
-			key: breakdownKey,
-			label: formatChartBreakdownLabels(breakdownValuesByKey.get(breakdownKey) ?? []),
-			total: downloadTotalsByProjectBreakdown.get(breakdownKey) ?? 0,
-		})),
+		Array.from(dataByProjectBreakdown.keys()).map((breakdownKey) =>
+			buildPaletteRankEntry(
+				breakdownKey,
+				breakdownValuesByKey.get(breakdownKey) ?? [],
+				downloadTotalsByProjectBreakdown.get(breakdownKey) ?? 0,
+				formatChartBreakdownLabels,
+			),
+		),
 		palette,
 	)
 

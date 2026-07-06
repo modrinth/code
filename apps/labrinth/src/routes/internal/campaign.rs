@@ -8,7 +8,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use std::collections::HashSet;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 use crate::{
@@ -27,7 +27,7 @@ use crate::{
     util::{error::Context, http::HttpClient, tiltify::TiltifyClient},
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(tiltify_webhook).service(pride_26);
 }
 
@@ -143,7 +143,13 @@ impl CampaignDonation {
     }
 }
 
-#[utoipa::path]
+/// Receive a Tiltify webhook.  
+#[utoipa::path(
+	context_path = "/campaign",
+	tag = "campaigns",
+	request_body(content = String, content_type = "text/plain"),
+	responses((status = NO_CONTENT))
+)]
 #[post("/webhook")]
 pub async fn tiltify_webhook(
     req: HttpRequest,
@@ -301,7 +307,12 @@ fn verify_tiltify_webhook_signature(
     Ok(())
 }
 
-#[utoipa::path]
+/// Get Pride campaign data.  
+#[utoipa::path(
+	context_path = "/campaign",
+	tag = "campaigns",
+	responses((status = OK, body = CampaignInfo))
+)]
 #[get("/pride-26")]
 pub async fn pride_26(
     http: web::Data<HttpClient>,
@@ -388,7 +399,7 @@ pub async fn pride_26(
         Ok(campaign_info) => Ok(web::Json(campaign_info)),
         Err(error) => {
             if let Some(cached) = cached {
-                warn!(
+                debug!(
                     "Failed to refresh campaign info from Tiltify: {error:?}"
                 );
                 Ok(web::Json(cached))

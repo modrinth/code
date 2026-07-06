@@ -180,7 +180,7 @@
     "message": "Discover servers"
   },
   "app.browse.hide-added-servers": {
-    "message": "Hide already added servers"
+    "message": "Hide servers already added"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -203,17 +203,11 @@
   "app.export-modal.header": {
     "message": "Export modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Include \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpack Name"
+    "message": "Modpack name"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack name"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Configure which files are included in this export"
   },
   "app.export-modal.version-number-label": {
     "message": "Version number"

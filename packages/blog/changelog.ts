@@ -11,6 +11,126 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-05T01:48:48+00:00`,
+		product: 'app',
+		version: '0.15.7',
+		body: `## Fixed
+- Fixed environment filters showing in server panel's browse page.`,
+	},
+	{
+		date: `2026-07-05T01:48:48+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed environment filters showing in server panel's browse page.
+- Fixed server-specific filter options not being removed from the URL when toggled off.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'app',
+		version: '0.15.6',
+		body: `## Fixed
+- Fixed the functionality of the server environment filter in Discover.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the functionality of the server environment filter in Discover.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Replaced the environment filters in the panel with a toggle for server-side only content that appears at the top of the filters.`,
+	},
+	{
+		date: `2026-07-04T22:59:54+00:00`,
+		product: 'app',
+		version: '0.15.5',
+		body: `## Changed
+- Added cdn.serilum.com and workflow.serilum.com as domains that can bypass the image proxy.
+- Allow modfolio.creeperkatze.dev to bypass image proxy.
+
+## Fixed
+- Fixed the update app button width being fixed width, causing issues with non-English translations.`,
+	},
+	{
+		date: `2026-07-04T22:59:54+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added cdn.serilum.com and workflow.serilum.com as domains that can bypass the image proxy.
+- Refreshed project download modal UI.
+- Allow modfolio.creeperkatze.dev to bypass image proxy.
+- Added a guard to prevent \`.mrpacks\` to be uploaded as supplementary files.
+
+## Fixed
+- Fixed version page table's platform tag overflow issues.`,
+	},
+	{
+		date: `2026-07-03T15:16:21+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed project license URL being required when not using a custom license.`,
+	},
+	{
+		date: `2026-07-02T00:44:14+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added pride backdrop to the Pride collection, projects featured in the Pride collection, and the pride blog posts.
+
+## Fixed
+- Fixed issue where you cannot create a project directly with an organization as the owner.`,
+	},
+	{
+		date: `2026-06-29T23:56:37+00:00`,
+		product: 'app',
+		version: '0.15.4',
+		body: `## Fixed
+- Fixes another issue causing the app to freeze up when going into an instance page.`,
+	},
+	{
+		date: `2026-06-29T22:52:04+00:00`,
+		product: 'app',
+		version: '0.15.3',
+		body: `## Fixed
+- Fixed hanging on larger legacy instances when visiting the Instance page.`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated analytics graph colors to be more accessible.
+- Updated project versions table UI and mobile view so columns overflow nicely.
+- Updates projects page in dashboard to use new table and action bar.
+- Updated translations`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'app',
+		version: '0.15.2',
+		body: `## Added
+- Added the ["Chaos Cubed"](https://minecraft.wiki/w/Chaos_Cubed_(skin_pack)) official skin pack to the Skin selector page.
+
+## Changed
+- Redesigned the modpack export modal to align with the rest of the instance pages.
+- Updated project versions table UI and mobile view so columns overflow nicely.
+- Updated translations
+
+## Fixed
+- Fixed an issue where sometimes the app would desynchronise from the file system when disabling, enabling or removing mods from the Content tab.
+- Fixed issue where server pinging in the Worlds tab of the instance page would be stuck in a loading state for too long.
+- Fixed the Logs page in Modrinth App overflowing past the window instead of keeping the console contained.
+- Fixed the Modrinth Hosting server panel in Modrinth App overflowing past the window instead of keeping the console contained.
+- Fixed issue where sometimes disabling linked modpack content would not work. Thanks [@creeperkatze](@creeperkatze)!
+- Fixed issue where unlinking a locally imported mrpack from an instance causes the content to never show up in the content list.`,
+	},
+	{
+		date: `2026-06-29T20:44:35+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
 		date: `2026-06-26T16:33:23+00:00`,
 		product: 'app',
 		version: '0.15.1',

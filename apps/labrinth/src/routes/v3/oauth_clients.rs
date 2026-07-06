@@ -29,10 +29,7 @@ use crate::{
     file_hosting::FileHost, models::oauth_clients::DeleteOAuthClientQueryParam,
     util::routes::read_limited_from_payload,
 };
-use actix_web::{
-    HttpRequest, HttpResponse, delete, get, patch, post,
-    web::{self, scope},
-};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use itertools::Itertools;
@@ -41,9 +38,9 @@ use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        scope("oauth")
+        web::scope("/oauth")
             .configure(crate::auth::oauth::config)
             .service(revoke_oauth_authorization)
             .service(oauth_client_create)
@@ -57,6 +54,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients", responses((status = OK))
+)]
+#[get("/user/{id}/oauth_apps")]
 pub async fn get_user_clients(
     req: HttpRequest,
     info: web::Path<String>,
@@ -100,7 +102,14 @@ pub async fn get_user_clients(
     }
 }
 
-#[get("app/{id}")]
+/// Get an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = OK, body = models::oauth_clients::OAuthClient)),
+)]
+#[get("/app/{id}")]
 pub async fn get_client(
     id: web::Path<OAuthClientId>,
     pool: web::Data<PgPool>,
@@ -113,7 +122,14 @@ pub async fn get_client(
     }
 }
 
-#[get("apps")]
+/// List OAuth clients.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("ids" = Vec<String>, Query)),
+	responses((status = OK, body = Vec<models::oauth_clients::OAuthClient>)),
+)]
+#[get("/apps")]
 pub async fn get_clients(
     info: web::Query<GetOAuthClientsRequest>,
     pool: web::Data<PgPool>,
@@ -129,7 +145,7 @@ pub async fn get_clients(
     Ok(HttpResponse::Ok().json(clients))
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewOAuthApp {
     #[validate(
         custom(function = "crate::util::validate::validate_name"),
@@ -154,7 +170,13 @@ pub struct NewOAuthApp {
     pub description: Option<String>,
 }
 
-#[post("app")]
+/// Create an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	responses((status = OK, body = OAuthClientCreationResult)),
+)]
+#[post("/app")]
 pub async fn oauth_client_create(
     req: HttpRequest,
     new_oauth_app: web::Json<NewOAuthApp>,
@@ -215,7 +237,14 @@ pub async fn oauth_client_create(
     }))
 }
 
-#[delete("app/{id}")]
+/// Delete an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
+)]
+#[delete("/app/{id}")]
 pub async fn oauth_client_delete(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -245,7 +274,7 @@ pub async fn oauth_client_delete(
     }
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct OAuthClientEdit {
     #[validate(
         custom(function = "crate::util::validate::validate_name"),
@@ -271,7 +300,14 @@ pub struct OAuthClientEdit {
     pub description: Option<Option<String>>,
 }
 
-#[patch("app/{id}")]
+/// Update an OAuth client.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/app/{id}")]
 pub async fn oauth_client_edit(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -346,7 +382,18 @@ pub struct Extension {
     pub ext: String,
 }
 
-#[patch("app/{id}/icon")]
+/// Update an OAuth client icon.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(
+		("id" = OAuthClientId, Path),
+		("ext" = String, Query)
+	),
+	request_body(content = Vec<u8>, content_type = "application/octet-stream"),
+	responses((status = NO_CONTENT))
+)]
+#[patch("/app/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn oauth_client_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -418,7 +465,14 @@ pub async fn oauth_client_icon_edit(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[delete("app/{id}/icon")]
+/// Delete an OAuth client icon.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("id" = OAuthClientId, Path)),
+	responses((status = NO_CONTENT))
+)]
+#[delete("/app/{id}/icon")]
 pub async fn oauth_client_icon_delete(
     req: HttpRequest,
     client_id: web::Path<OAuthClientId>,
@@ -468,7 +522,13 @@ pub async fn oauth_client_icon_delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[get("authorizations")]
+/// List OAuth authorizations.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	responses((status = OK, body = Vec<models::oauth_clients::OAuthClientAuthorization>)),
+)]
+#[get("/authorizations")]
 pub async fn get_user_oauth_authorizations(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -497,7 +557,14 @@ pub async fn get_user_oauth_authorizations(
     Ok(HttpResponse::Ok().json(mapped))
 }
 
-#[delete("authorizations")]
+/// Revoke OAuth authorization.  
+#[utoipa::path(
+	context_path = "/oauth",
+	tag = "oauth clients",
+	params(("client_id" = OAuthClientId, Query)),
+	responses((status = NO_CONTENT))
+)]
+#[delete("/authorizations")]
 pub async fn revoke_oauth_authorization(
     req: HttpRequest,
     info: web::Query<DeleteOAuthClientQueryParam>,

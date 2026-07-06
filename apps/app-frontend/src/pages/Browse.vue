@@ -22,6 +22,8 @@ import {
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useBrowseSearch,
 	useDebugLogger,
 	useVIntl,
@@ -403,7 +405,7 @@ const messages = defineMessages({
 	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
-		defaultMessage: 'Hide already added servers',
+		defaultMessage: 'Hide servers already added',
 	},
 	installingToServer: {
 		id: 'app.browse.server.installing',
@@ -680,7 +682,6 @@ async function chooseInstanceInstallVersion(
 	const selectedVersion = getLatestMatchingInstallVersion(
 		await getInstallProjectVersions(project.project_id),
 		selectedPreferences,
-		projectTypeValue,
 	)
 
 	if (!selectedVersion) {
@@ -763,11 +764,15 @@ function getCardActions(
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
-							selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+							selectedFilters: isModpack
+								? []
+								: stripServerRuntimeInstallFilters(searchState.currentFilters.value),
 							providedFilters: isModpack ? [] : combinedProvidedFilters.value,
 							overriddenProvidedFilterTypes: isModpack
 								? []
-								: searchState.overriddenProvidedFilterTypes.value,
+								: stripServerRuntimeInstallOverrides(
+										searchState.overriddenProvidedFilterTypes.value,
+									),
 							targetPreferences: getServerInstallTargetPreferences(contentType),
 							getProjectVersions: getInstallProjectVersions,
 							queue: serverInstallQueue,

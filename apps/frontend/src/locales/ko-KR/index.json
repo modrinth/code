@@ -998,9 +998,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "알림 불러오는 중..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "아래에서 여러 프로젝트를 선택하면 한 번에 편집할 수 있습니다."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "서버 프로젝트는 일괄 편집을 지원하지 않습니다"
   },
@@ -1069,24 +1066,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "환경 메타데이터를 검토해 주세요"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "오름차순"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "내림차순"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "이름"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "상태"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "유형"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "아이콘"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2564,20 +2543,8 @@
   "project.details.licensed": {
     "message": "라이선스"
   },
-  "project.download.game-version": {
-    "message": "게임 버전: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "오류: 게임 버전을 찾을 수 없습니다"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title}은(는) {version}에서만 사용할 수 있습니다"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}은(는) {platform}용 {gameVersion}을(를) 지원하지 않습니다"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth App으로 설치"
   },
   "project.download.no-app": {
     "message": "Modrinth 앱을 설치하지 않으셨나요?"
@@ -2585,22 +2552,10 @@
   "project.download.no-versions-available": {
     "message": "{gameVersion} 및 {platform}용 버전이 없습니다."
   },
-  "project.download.platform": {
-    "message": "플랫폼: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "오류: 플랫폼을 찾을 수 없음"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} 은(는) {platform} 에서만 사용할 수 있습니다"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 은(는) {gameVersion} 용 {platform} 을(를) 지원하지 않습니다."
   },
   "project.download.search-game-versions": {
-    "message": "게임 버전 검색..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "게임 버전 검색..."
   },
   "project.download.select-game-version": {

@@ -1,5 +1,6 @@
-mod moderation;
+pub(crate) mod moderation;
 mod notifications;
+mod openapi;
 pub(crate) mod project_creation;
 mod projects;
 mod reports;
@@ -14,17 +15,17 @@ mod versions;
 
 pub use super::ApiError;
 use crate::util::cors::default_cors;
+use actix_web::web;
+pub use openapi::ApiDoc;
 
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/v2")
+        web::scope("/v2")
             .wrap(default_cors())
-            .configure(super::internal::admin::config)
             .configure(super::internal::session::config)
             .configure(super::internal::flows::config)
             .configure(super::internal::pats::config)
+            .configure(super::internal::admin::config)
             .configure(moderation::config)
             .configure(notifications::config)
             .configure(project_creation::config)

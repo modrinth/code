@@ -1478,9 +1478,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Đang tải thông báo..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Bạn có thể sửa đổi nhiều dự án cùng một lúc bằng cách chọn chúng ở dưới."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Dự án máy chủ không hỗ trợ sửa đổi nhiều mục cùng một lúc"
   },
@@ -1555,24 +1552,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Vui lòng xem lại thông tin dữ liệu"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Từ dưới lên"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Từ trên xuống"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Tên"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Trạng thái"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Loại"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "B.tượng"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -3086,20 +3065,8 @@
   "project.details.licensed": {
     "message": "Giấy phép"
   },
-  "project.download.game-version": {
-    "message": "Phiên bản game: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Lỗi: không tìm thấy phiên bản game"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} chỉ khả dụng cho {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {gameVersion} cho {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Cài đặt bằng Ứng dụng Modrinth"
   },
   "project.download.no-app": {
     "message": "Chưa có Ứng dụng Modrinth?"
@@ -3107,22 +3074,10 @@
   "project.download.no-versions-available": {
     "message": "Không có phiên bản khả dụng cho {gameVersion} và {platform}."
   },
-  "project.download.platform": {
-    "message": "Nền tảng: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Lỗi: không tìm thấy nền tảng"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} chỉ khả dụng cho {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {platform} cho {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Tìm kiếm phiên bản game..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Tìm kiếm phiên bản game..."
   },
   "project.download.select-game-version": {

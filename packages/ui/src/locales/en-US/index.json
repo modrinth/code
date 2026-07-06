@@ -317,6 +317,21 @@
   "changelog.product.web": {
     "defaultMessage": "Platform"
   },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "This collection is empty."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Loading projects..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "No projects match your search."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# project} other {# projects}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Search projects"
+  },
   "collections.label.private": {
     "defaultMessage": "Private"
   },
@@ -1406,6 +1421,9 @@
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
   },
+  "files.row.parent-folder": {
+    "defaultMessage": "Parent folder"
+  },
   "files.table-header.created": {
     "defaultMessage": "Created"
   },
@@ -2172,7 +2190,7 @@
     "defaultMessage": "Game version"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Hide already installed content"
+    "defaultMessage": "Hide content already installed"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Hide selected content"
@@ -2275,6 +2293,9 @@
   },
   "label.server": {
     "defaultMessage": "Server"
+  },
+  "label.server-only": {
+    "defaultMessage": "Server only"
   },
   "label.servers": {
     "defaultMessage": "Servers"
@@ -3454,6 +3475,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Toggle filter for {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
   },
   "project.versions.version.withheld": {
     "defaultMessage": "Withheld"

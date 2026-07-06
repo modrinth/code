@@ -7,10 +7,16 @@
 		title-wrapper-class="flex flex-col gap-2 justify-start items-start"
 		:open-by-default="openByDefault !== undefined ? openByDefault : true"
 	>
-		<template #title>
-			<slot name="header" :filter="filterType">
-				<h2 class="font-semibold">{{ filterType.formatted_name }}</h2>
-			</slot>
+		<template #button="{ open }">
+			<div class="flex items-center gap-1 w-full text-contrast">
+				<slot name="header" :filter="filterType">
+					<h2 class="text-base font-semibold text-red">{{ filterType.formatted_name }}</h2>
+				</slot>
+				<DropdownIcon
+					class="ml-auto size-5 transition-transform duration-300 shrink-0 text-primary group-hover:text-contrast"
+					:class="{ 'rotate-180': open }"
+				/>
+			</div>
 		</template>
 		<template
 			v-if="
@@ -39,7 +45,7 @@
 			</div>
 		</template>
 		<template v-if="locked" #default>
-			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
+			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider">
 				<p class="m-0 font-bold items-center">
 					<slot :name="`locked-${filterType.id}`">
 						{{ formatMessage(messages.lockedTitle, { type: filterType.formatted_name }) }}

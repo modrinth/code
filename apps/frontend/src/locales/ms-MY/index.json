@@ -1367,9 +1367,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Anda boleh menyunting berbilang projek sekaligus dengan memilihnya di bawah."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Projek pelayan tidak menyokong penyuntingan pukal"
   },
@@ -1438,24 +1435,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Sila semak metadata persekitaran"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Menaik"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Menurun"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nama"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Jenis"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2939,20 +2918,8 @@
   "project.details.licensed": {
     "message": "Berlesen"
   },
-  "project.download.game-version": {
-    "message": "Versi permainan: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Ralat: tiada versi permainan dijumpai"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} hanya tersedia untuk {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Pasang dengan Modrinth App"
   },
   "project.download.no-app": {
     "message": "Tidak ada Modrinth App?"
@@ -2960,22 +2927,10 @@
   "project.download.no-versions-available": {
     "message": "Tiada versi tersedia untuk {gameVersion} dan {platform}."
   },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Ralat: tiada platform dijumpai"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} hanya tersedia untuk {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak menyokong {platform} untuk {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Cari versi permainan..."
   },
   "project.download.select-game-version": {
