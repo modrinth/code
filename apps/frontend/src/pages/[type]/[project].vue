@@ -95,6 +95,8 @@
 				@download="triggerDownloadAnimation"
 			/>
 			<CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
+			<ModpackScanModal ref="scanModal" :project_id="project.id" />
+
 			<div
 				class="new-page sidebar"
 				:class="{
@@ -151,12 +153,14 @@
 						:is-member="isMember"
 						:is-staff="!!(auth.user && tags.staffRoles.includes(auth.user.role))"
 						:show-moderation-checklist="showModerationChecklist"
+						:show-moderation-modpack-rescan="project.actualProjectType === 'modpack'"
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 						@primary="handleProjectHeaderPrimary"
 						@create-server="dismissProjectHeaderCreateServerPrompt"
 						@dismiss-create-server="dismissProjectHeaderCreateServerPrompt"
 						@follow="followProjectFromHeader"
 						@moderation-checklist="openModerationChecklistFromMenu"
+						@moderation-modpack-rescan="() => scanModal?.show()"
 						@report="reportProjectFromHeader"
 						@copy-id="copyId"
 						@copy-permalink="copyPermalink"
@@ -399,6 +403,7 @@ import {
 	ChevronRightIcon,
 	DownloadIcon,
 	ExternalIcon,
+	FolderSearchIcon,
 	HeartIcon,
 	ListIcon,
 	ScaleIcon,
@@ -442,6 +447,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
+import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectPageHeader from '~/components/ui/ProjectPageHeader.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
@@ -509,6 +515,7 @@ const debug = useDebugLogger('DownloadModal')
 const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
+const scanModal = ref()
 
 const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
