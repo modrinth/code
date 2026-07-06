@@ -4055,9 +4055,6 @@
   "settings.account.security.email.title": {
     "message": "E-mail"
   },
-  "settings.account.security.passkey.add": {
-    "message": "Ajouter une clé d'accès"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Veillez à choisir un nom facile à retenir, afin de pouvoir identifier tę klucz d'accès plus tard."
   },

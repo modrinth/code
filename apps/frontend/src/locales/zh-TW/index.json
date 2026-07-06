@@ -4055,9 +4055,6 @@
   "settings.account.security.email.title": {
     "message": "電子郵件"
   },
-  "settings.account.security.passkey.add": {
-    "message": "新增通行金鑰"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "請務必選擇容易記住的名稱，以便日後能辨識出這個通行金鑰。"
   },

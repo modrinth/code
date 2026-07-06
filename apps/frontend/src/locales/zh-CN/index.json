@@ -4049,9 +4049,6 @@
   "settings.account.security.email.title": {
     "message": "电子邮箱"
   },
-  "settings.account.security.passkey.add": {
-    "message": "添加通行密钥"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "请确保你选择的名称易于记忆，方便你日后辨认出该通行密钥。"
   },

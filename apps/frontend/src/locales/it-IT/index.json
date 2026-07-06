@@ -4028,9 +4028,6 @@
   "settings.account.security.email.title": {
     "message": "Email"
   },
-  "settings.account.security.passkey.add": {
-    "message": "Aggiungi passkey"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Assicurati di scegliere un nome facile da ricordare, così da poter identificare la passkey più tardi."
   },

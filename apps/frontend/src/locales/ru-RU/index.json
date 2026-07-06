@@ -4025,9 +4025,6 @@
   "settings.account.security.email.title": {
     "message": "Почта"
   },
-  "settings.account.security.passkey.add": {
-    "message": "Добавить ключ доступа"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Выберите что-то запоминающееся, чтобы потом опознать этот ключ доступа."
   },
