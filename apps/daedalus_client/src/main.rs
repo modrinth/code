@@ -193,8 +193,7 @@ async fn main() -> Result<()> {
                 let uploaded =
                     uploaded_files.fetch_add(1, Ordering::Relaxed) + 1;
 
-                if uploaded.is_multiple_of(100) || uploaded == upload_file_total
-                {
+                if uploaded.is_multiple_of(100) || uploaded == upload_file_total {
                     tracing::info!(
                         uploaded_files = uploaded,
                         remaining_files =
@@ -240,8 +239,7 @@ async fn main() -> Result<()> {
                 let uploaded =
                     uploaded_mirror_files.fetch_add(1, Ordering::Relaxed) + 1;
 
-                if uploaded.is_multiple_of(100) || uploaded == mirror_file_total
-                {
+                if uploaded.is_multiple_of(100) || uploaded == mirror_file_total {
                     tracing::info!(
                         uploaded_files = uploaded,
                         remaining_files =
