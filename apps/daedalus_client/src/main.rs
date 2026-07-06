@@ -110,7 +110,7 @@ async fn main() -> Result<()> {
                 write_file_to_local_output(&path, file).await?;
                 let written = written_files.fetch_add(1, Ordering::Relaxed) + 1;
 
-                if written % 100 == 0 || written == upload_file_total {
+                if written.is_multiple_of(100) || written == upload_file_total {
                     tracing::info!(
                         written_files = written,
                         remaining_files =
@@ -158,7 +158,7 @@ async fn main() -> Result<()> {
                 let written =
                     written_mirror_files.fetch_add(1, Ordering::Relaxed) + 1;
 
-                if written % 100 == 0 || written == mirror_file_total {
+                if written.is_multiple_of(100) || written == mirror_file_total {
                     tracing::info!(
                         written_files = written,
                         remaining_files =
@@ -193,7 +193,7 @@ async fn main() -> Result<()> {
                 let uploaded =
                     uploaded_files.fetch_add(1, Ordering::Relaxed) + 1;
 
-                if uploaded % 100 == 0 || uploaded == upload_file_total {
+                if uploaded.is_multiple_of(100) || uploaded == upload_file_total {
                     tracing::info!(
                         uploaded_files = uploaded,
                         remaining_files =
@@ -239,7 +239,7 @@ async fn main() -> Result<()> {
                 let uploaded =
                     uploaded_mirror_files.fetch_add(1, Ordering::Relaxed) + 1;
 
-                if uploaded % 100 == 0 || uploaded == mirror_file_total {
+                if uploaded.is_multiple_of(100) || uploaded == mirror_file_total {
                     tracing::info!(
                         uploaded_files = uploaded,
                         remaining_files =

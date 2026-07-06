@@ -259,7 +259,7 @@ pub async fn download_file(
                     let downloaded = DOWNLOADED_FILE_COUNT
                         .fetch_add(1, Ordering::Relaxed)
                         + 1;
-                    if downloaded % 100 == 0 {
+                    if downloaded.is_multiple_of(100) {
                         tracing::info!(
                             downloaded_files = downloaded,
                             "Downloaded metadata files"
