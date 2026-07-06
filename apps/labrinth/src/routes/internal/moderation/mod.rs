@@ -53,6 +53,9 @@ pub struct ProjectsRequestOptions {
     /// Whether to filter by modpacks that have external dependencies.
     #[serde(default)]
     pub has_external_dependencies: Option<bool>,
+    /// Whether to exclude projects with pending technical review issues.
+    #[serde(default)]
+    pub exclude_technical_review: bool,
     /// Text query to search against project and owner fields.
     #[serde(default)]
     pub query: Option<String>,
@@ -219,6 +222,7 @@ pub struct DeleteAllLocksResponse {
 		("count" = Option<u16>, Query),
 		("offset" = Option<u32>, Query),
 		("has_external_dependencies" = Option<bool>, Query),
+		("exclude_technical_review" = bool, Query),
 		("query" = Option<String>, Query),
 		("project_type" = Option<String>, Query),
 		("sort" = Option<ModerationProjectsSort>, Query)
@@ -260,6 +264,7 @@ pub async fn get_projects_internal(
     let listed_version_statuses = listed_version_statuses();
     let count = request_opts.count.min(MAX_PROJECTS_PER_PAGE) as i64;
     let offset = request_opts.offset as i64;
+    let exclude_technical_review = request_opts.exclude_technical_review;
     let needs_filtered_queue = query.is_some()
         || project_type.is_some()
         || request_opts.has_external_dependencies.is_some()
@@ -281,7 +286,17 @@ pub async fn get_projects_internal(
                     m.team_id,
                     m.components
                 FROM mods m
-                WHERE m.status = $1
+                WHERE
+                    m.status = $1
+                    AND (
+                        $9::boolean = false
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses didws
+                            WHERE didws.project_id = m.id
+                                AND didws.status = 'pending'
+                        )
+                    )
             ),
             external_dependencies AS (
                 SELECT
@@ -474,6 +489,7 @@ pub async fn get_projects_internal(
             count,
             offset,
             sort,
+            exclude_technical_review,
         )
         .fetch_all(&**pool)
         .await
@@ -517,7 +533,17 @@ pub async fn get_projects_internal(
                     m.queued,
                     m.published
                 FROM mods m
-                WHERE m.status = $1
+                WHERE
+                    m.status = $1
+                    AND (
+                        $6::boolean = false
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses didws
+                            WHERE didws.project_id = m.id
+                                AND didws.status = 'pending'
+                        )
+                    )
             ),
             total AS (
                 SELECT COUNT(*) AS total_count FROM filtered_projects
@@ -638,6 +664,7 @@ pub async fn get_projects_internal(
             count,
             offset,
             sort,
+            exclude_technical_review,
         )
         .fetch_all(&**pool)
         .await
@@ -682,6 +709,7 @@ pub async fn get_projects_internal(
     tag = "moderation",
     params(
 		("has_external_dependencies" = Option<bool>, Query),
+		("exclude_technical_review" = bool, Query),
 		("query" = Option<String>, Query),
 		("project_type" = Option<String>, Query),
 		("sort" = Option<ModerationProjectsSort>, Query)
@@ -711,6 +739,7 @@ pub async fn get_project_ids(
         normalize_optional_string(request_opts.project_type.as_deref());
     let sort = request_opts.sort.unwrap_or_default().as_str();
     let listed_version_statuses = listed_version_statuses();
+    let exclude_technical_review = request_opts.exclude_technical_review;
     let needs_filtered_queue = query.is_some()
         || project_type.is_some()
         || request_opts.has_external_dependencies.is_some()
@@ -734,6 +763,15 @@ pub async fn get_project_ids(
                 FROM mods m
                 WHERE
                     m.status = $1
+                    AND (
+                        $7::boolean = false
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses didws
+                            WHERE didws.project_id = m.id
+                                AND didws.status = 'pending'
+                        )
+                    )
             ),
             external_dependencies AS (
                 SELECT
@@ -836,6 +874,7 @@ pub async fn get_project_ids(
             project_type,
             request_opts.has_external_dependencies,
             sort,
+            exclude_technical_review,
         )
         .fetch_all(&**pool)
         .await
@@ -850,7 +889,17 @@ pub async fn get_project_ids(
             r#"
             SELECT id
             FROM mods
-            WHERE status = $1
+            WHERE
+                status = $1
+                AND (
+                    $3::boolean = false
+                    OR NOT EXISTS (
+                        SELECT 1
+                        FROM delphi_issue_details_with_statuses didws
+                        WHERE didws.project_id = mods.id
+                            AND didws.status = 'pending'
+                    )
+                )
             ORDER BY
                 CASE WHEN $2 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
                 CASE WHEN $2 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,
@@ -858,6 +907,7 @@ pub async fn get_project_ids(
             "#,
             ProjectStatus::Processing.as_str(),
             sort,
+            exclude_technical_review,
         )
         .fetch_all(&**pool)
         .await

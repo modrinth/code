@@ -83,14 +83,27 @@
 			</div>
 		</div>
 
-		<div v-if="totalPages > 1" class="flex items-center justify-between">
-			<div>
-				Showing {{ pageStart }}–{{ pageEnd }} of {{ totalProjects }}
-				{{
-					currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
-				}}
+		<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+			<div class="flex flex-wrap items-center gap-3">
+				<div v-if="totalProjects > 0">
+					Showing {{ pageStart }}–{{ pageEnd }} of {{ totalProjects }}
+					{{
+						currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
+					}}
+				</div>
+				<div class="flex items-center gap-2 text-sm font-semibold text-secondary">
+					<Toggle id="moderation-exclude-technical-review" v-model="excludeTechnicalReview" small />
+					<label class="cursor-pointer" for="moderation-exclude-technical-review">
+						{{ formatMessage(messages.excludeTechnicalReview) }}
+					</label>
+				</div>
 			</div>
-			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+			<Pagination
+				v-if="totalPages > 1"
+				:page="currentPage"
+				:count="totalPages"
+				@switch-page="goToPage"
+			/>
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
@@ -137,6 +150,7 @@ import {
 	injectNotificationManager,
 	Pagination,
 	StyledInput,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
@@ -172,9 +186,14 @@ const messages = defineMessages({
 		id: 'moderation.moderate',
 		defaultMessage: 'Moderate',
 	},
+	excludeTechnicalReview: {
+		id: 'moderation.exclude-technical-review',
+		defaultMessage: 'Exclude TR',
+	},
 })
 
 const query = ref(route.query.q?.toString() || '')
+const excludeTechnicalReview = ref(false)
 
 watch(
 	query,
@@ -390,6 +409,7 @@ function toApiSort(label: string): Labrinth.Moderation.Internal.ProjectsSort {
 const moderationProjectsRequest = computed<Labrinth.Moderation.Internal.ProjectsRequest>(() => ({
 	count: itemsPerPage.value,
 	offset: (currentPage.value - 1) * itemsPerPage.value,
+	exclude_technical_review: excludeTechnicalReview.value,
 	query: query.value || undefined,
 	project_type: toApiProjectType(currentFilterType.value),
 	sort: toApiSort(currentSortType.value),
@@ -445,6 +465,10 @@ watch(totalPages, (pages) => {
 	if (pages > 0 && currentPage.value > pages) {
 		currentPage.value = pages
 	}
+})
+
+watch(excludeTechnicalReview, () => {
+	goToPage(1)
 })
 
 const emptyStateHeading = computed(() => {
@@ -535,6 +559,7 @@ async function navigateToModerationProject(projectId: string) {
 
 async function getFilteredProjectIds(): Promise<string[]> {
 	const response = await client.labrinth.moderation_internal.getProjectIds({
+		exclude_technical_review: excludeTechnicalReview.value,
 		query: query.value || undefined,
 		project_type: toApiProjectType(currentFilterType.value),
 		sort: toApiSort(currentSortType.value),

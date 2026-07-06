@@ -1926,6 +1926,7 @@ export namespace Labrinth {
 				count?: number
 				offset?: number
 				has_external_dependencies?: boolean
+				exclude_technical_review?: boolean
 				query?: string
 				project_type?: string
 				sort?: ProjectsSort
