@@ -286,6 +286,7 @@ import {
 	SelectedProjectsFloatingBar,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -295,6 +296,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import {
 	get_organization,
 	get_project,
@@ -313,7 +318,7 @@ import {
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerAddress, getServerLatency } from '@/helpers/worlds'
+import { getServerAddress } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
@@ -326,6 +331,7 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
@@ -600,10 +606,19 @@ async function fetchProjectData() {
 function fetchDeferredServerData(project) {
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	if (serverAddress) {
-		serverPing.value = undefined
-		getServerLatency(serverAddress)
-			.then((latency) => {
-				serverPing.value = latency
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			serverPing.value = cachedStatus.ping
+			serverStatusOnline.value = true
+		} else {
+			serverPing.value = undefined
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
+			.then((status) => {
+				if (projectV3.value?.minecraft_java_server?.address !== serverAddress) return
+				serverPing.value = status.ping
+				serverStatusOnline.value = true
 			})
 			.catch((error) => {
 				console.error(`Failed to ping server ${serverAddress}:`, error)
