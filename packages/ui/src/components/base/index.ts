@@ -65,13 +65,23 @@ export type { Option as OverflowMenuOption } from './OverflowMenu.vue'
 export { default as OverflowMenu } from './OverflowMenu.vue'
 export { default as Page } from './Page.vue'
 export { default as PageHeader } from './page-header/index.vue'
+export { default as PageHeaderMetadata } from './page-header/metadata/index.vue'
+export { default as PageHeaderMetadataItem } from './page-header/metadata/page-header-metadata-item.vue'
+export { default as PageHeaderMetadataNumberItem } from './page-header/metadata/page-header-metadata-number-item.vue'
+export { default as PageHeaderMetadataTagsItem } from './page-header/metadata/page-header-metadata-tags-item.vue'
+export { default as PageHeaderMetadataTimeItem } from './page-header/metadata/page-header-metadata-time-item.vue'
+export { default as PageHeaderActions } from './page-header/page-header-actions.vue'
+export { default as PageHeaderBadgeItem } from './page-header/page-header-badge-item.vue'
+export { default as PageHeaderObjectAvatarLeading } from './page-header/page-header-object-avatar-leading.vue'
+export { default as PageHeaderUserAvatarLeading } from './page-header/page-header-user-avatar-leading.vue'
 export type {
-	PageHeaderAction,
-	PageHeaderActionPrompt,
-	PageHeaderBadge,
-	PageHeaderLeading,
-	PageHeaderMetadataItem,
+	PageHeaderClass,
+	PageHeaderClickHandler,
+	PageHeaderIconProps,
+	PageHeaderInteractiveProps,
+	PageHeaderMetadataItemProps,
 	PageHeaderProps,
+	PageHeaderTarget,
 } from './page-header/types'
 export { default as Pagination } from './Pagination.vue'
 export { default as PopoutMenu } from './PopoutMenu.vue'
