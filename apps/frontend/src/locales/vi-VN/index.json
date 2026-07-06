@@ -3065,20 +3065,8 @@
   "project.details.licensed": {
     "message": "Giấy phép"
   },
-  "project.download.game-version": {
-    "message": "Phiên bản game: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Lỗi: không tìm thấy phiên bản game"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} chỉ khả dụng cho {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {gameVersion} cho {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Cài đặt bằng Ứng dụng Modrinth"
   },
   "project.download.no-app": {
     "message": "Chưa có Ứng dụng Modrinth?"
@@ -3086,22 +3074,10 @@
   "project.download.no-versions-available": {
     "message": "Không có phiên bản khả dụng cho {gameVersion} và {platform}."
   },
-  "project.download.platform": {
-    "message": "Nền tảng: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Lỗi: không tìm thấy nền tảng"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} chỉ khả dụng cho {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {platform} cho {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Tìm kiếm phiên bản game..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Tìm kiếm phiên bản game..."
   },
   "project.download.select-game-version": {

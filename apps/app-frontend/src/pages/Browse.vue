@@ -403,7 +403,7 @@ const messages = defineMessages({
 	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
-		defaultMessage: 'Hide already added servers',
+		defaultMessage: 'Hide servers already added',
 	},
 	installingToServer: {
 		id: 'app.browse.server.installing',

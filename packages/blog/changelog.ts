@@ -11,6 +11,62 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-05T01:48:48+00:00`,
+		product: 'app',
+		version: '0.15.7',
+		body: `## Fixed
+- Fixed environment filters showing in server panel's browse page.`,
+	},
+	{
+		date: `2026-07-05T01:48:48+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed environment filters showing in server panel's browse page.
+- Fixed server-specific filter options not being removed from the URL when toggled off.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'app',
+		version: '0.15.6',
+		body: `## Fixed
+- Fixed the functionality of the server environment filter in Discover.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the functionality of the server environment filter in Discover.`,
+	},
+	{
+		date: `2026-07-04T23:15:47+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Replaced the environment filters in the panel with a toggle for server-side only content that appears at the top of the filters.`,
+	},
+	{
+		date: `2026-07-04T22:59:54+00:00`,
+		product: 'app',
+		version: '0.15.5',
+		body: `## Changed
+- Added cdn.serilum.com and workflow.serilum.com as domains that can bypass the image proxy.
+- Allow modfolio.creeperkatze.dev to bypass image proxy.
+
+## Fixed
+- Fixed the update app button width being fixed width, causing issues with non-English translations.`,
+	},
+	{
+		date: `2026-07-04T22:59:54+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added cdn.serilum.com and workflow.serilum.com as domains that can bypass the image proxy.
+- Refreshed project download modal UI.
+- Allow modfolio.creeperkatze.dev to bypass image proxy.
+- Added a guard to prevent \`.mrpacks\` to be uploaded as supplementary files.
+
+## Fixed
+- Fixed version page table's platform tag overflow issues.`,
+	},
+	{
 		date: `2026-07-03T15:16:21+00:00`,
 		product: 'web',
 		body: `## Fixed

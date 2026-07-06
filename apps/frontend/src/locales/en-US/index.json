@@ -2687,6 +2687,45 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
+  "modpack-scan-modal.failed": {
+    "message": "Failed"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Failed to load versions: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Loading versions..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "New Files"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "New Groups"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "No files found."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Not scanned"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "Override Files ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Pack File Name"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Scan All Files"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Some files failed to scan: {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Scanning..."
+  },
+  "modpack-scan-modal.title": {
+    "message": "Modpack Scan ({scanned}/{total} Files)"
+  },
   "muralpay.account-type.checking": {
     "message": "Checking"
   },
@@ -3233,44 +3272,80 @@
   "project.details.licensed": {
     "message": "Licensed"
   },
-  "project.download.game-version": {
-    "message": "Game version: {version}"
+  "project.download.additional-files-title": {
+    "message": "Additional files"
   },
-  "project.download.game-version-error": {
-    "message": "Error: no game versions found"
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "This game version is incompatible with the base project."
   },
-  "project.download.game-version-tooltip": {
-    "message": "{title} is only available for {version}"
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "This loader is incompatible with the base project."
+  },
+  "project.download.compatible-version-title": {
+    "message": "Compatible version"
+  },
+  "project.download.dependencies-title": {
+    "message": "Dependencies"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "This dependency is already installed"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "This dependency conflicts with another dependency"
+  },
+  "project.download.dependency-download-file": {
+    "message": "Download {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Download {filename} ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "This dependency is already included"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "This dependency version is unavailable"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "No compatible version is available for this dependency"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Fabric API is skipped for Quilt"
+  },
+  "project.download.dependency-unavailable": {
+    "message": "This dependency cannot be downloaded"
+  },
+  "project.download.download-version": {
+    "message": "Download {version}"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Duplicate dependencies are hidden"
+  },
+  "project.download.file-unavailable": {
+    "message": "This file cannot be downloaded"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} does not support {gameVersion} for {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Install with Modrinth App"
+  "project.download.install-with-app-description": {
+    "message": "Automatically install the correct version and dependencies."
+  },
+  "project.download.manually": {
+    "message": "Download manually"
   },
   "project.download.no-app": {
     "message": "Don't have Modrinth App?"
   },
+  "project.download.no-game-versions-found": {
+    "message": "No game versions found"
+  },
   "project.download.no-versions-available": {
     "message": "No versions available for {gameVersion} and {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: no platforms found"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} is only available for {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Search game versions..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Search game versions..."
+    "message": "Select game version"
   },
   "project.download.select-game-version": {
     "message": "Select game version"
@@ -3278,11 +3353,26 @@
   "project.download.select-platform": {
     "message": "Select platform"
   },
+  "project.download.selected-version-download-all": {
+    "message": "Download all (.zip)"
+  },
+  "project.download.selected-version-downloading": {
+    "message": "Downloading... ({current}/{total})"
+  },
+  "project.download.selected-version-failed-text": {
+    "message": "One or more version files could not be downloaded. Please try again."
+  },
+  "project.download.selected-version-failed-title": {
+    "message": "Could not download version"
+  },
   "project.download.show-all-versions": {
     "message": "Show all versions"
   },
   "project.download.title": {
     "message": "Download {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Unknown loader"
   },
   "project.environment.migration-no-permission.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
@@ -4773,7 +4863,7 @@
     "message": "View version"
   },
   "version.download.download-dependency": {
-    "message": "Download dependency"
+    "message": "Select a version to download"
   },
   "version.download.no-primary-file": {
     "message": "Error: No primary file found"
@@ -4783,6 +4873,9 @@
   },
   "version.download.required-resource-pack": {
     "message": "Required resource pack"
+  },
+  "version.download.version": {
+    "message": "Download {version} ({size})"
   },
   "version.edit.button": {
     "message": "Edit"

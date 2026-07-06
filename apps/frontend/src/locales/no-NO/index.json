@@ -2249,20 +2249,8 @@
   "project.details.licensed": {
     "message": "Lisensert"
   },
-  "project.download.game-version": {
-    "message": "Spillversjon: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Error: ingen spillversjon funnet"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} er bare tilgjengelig for {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} støtter ikke {gameVersion} for {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Installer med Modrinth App"
   },
   "project.download.no-app": {
     "message": "Har du ikke en Modrinth App?"
@@ -2270,22 +2258,10 @@
   "project.download.no-versions-available": {
     "message": "Ingen versjoner tilgjengelige for {gameVersion} og {platform}."
   },
-  "project.download.platform": {
-    "message": "Plattform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: Ingen plattformer funnet"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} er bare tilgjengelig for {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} støtter ikke {platform} for {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Søk opp spillversjoner..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Søk opp spillversjoner..."
   },
   "project.download.select-game-version": {

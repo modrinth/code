@@ -33,7 +33,7 @@
 						<th
 							v-for="column in columns"
 							:key="column.key"
-							class="h-12 first:pl-4 last:pr-4"
+							class="h-12 pr-2 first:pl-4 last:pr-4"
 							:class="[
 								`text-${column.align ?? 'left'}`,
 								column.enableSorting ? 'cursor-pointer select-none' : '',
@@ -79,39 +79,53 @@
 						</td>
 					</tr>
 					<template v-else>
-						<tr
+						<template
 							v-for="(row, rowIndex) in renderedRows"
-							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
-							@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
+							:key="getRowPartRenderKey(row, getAbsoluteRowIndex(rowIndex), 'group')"
 						>
-							<td
-								v-if="showSelection"
-								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
+							<tr
+								:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 							>
-								<Checkbox
-									:model-value="isSelected(row)"
-									class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
-									@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
-								/>
-							</td>
-							<td
-								v-for="column in columns"
-								:key="column.key"
-								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
-							>
-								<slot
-									:name="`cell-${column.key}`"
-									:row="row"
-									:value="row[column.key]"
-									:column="column"
-									:index="getAbsoluteRowIndex(rowIndex)"
+								<td
+									v-if="showSelection"
+									class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
 								>
-									{{ row[column.key] ?? '' }}
-								</slot>
-							</td>
-						</tr>
+									<Checkbox
+										:model-value="isSelected(row)"
+										class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+										@update:model-value="
+											(selectRow, event) => toggleSelection(row, selectRow, event)
+										"
+									/>
+								</td>
+								<td
+									v-for="column in columns"
+									:key="column.key"
+									class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
+									:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
+								>
+									<slot
+										:name="`cell-${column.key}`"
+										:row="row"
+										:value="row[column.key]"
+										:column="column"
+										:index="getAbsoluteRowIndex(rowIndex)"
+									>
+										{{ row[column.key] ?? '' }}
+									</slot>
+								</td>
+							</tr>
+							<tr
+								v-if="isRowBelowVisible(row, getAbsoluteRowIndex(rowIndex))"
+								:class="getRowBelowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
+							>
+								<td :colspan="columnSpan" class="p-0">
+									<slot name="row-below" :row="row" :index="getAbsoluteRowIndex(rowIndex)" />
+								</td>
+							</tr>
+						</template>
 					</template>
 				</TransitionGroup>
 				<tbody v-else :ref="setListContainer">
@@ -132,39 +146,53 @@
 								:style="{ height: `${topSpacerHeight}px` }"
 							></td>
 						</tr>
-						<tr
+						<template
 							v-for="(row, rowIndex) in renderedRows"
-							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
-							@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
+							:key="getRowPartRenderKey(row, getAbsoluteRowIndex(rowIndex), 'group')"
 						>
-							<td
-								v-if="showSelection"
-								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
+							<tr
+								:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 							>
-								<Checkbox
-									:model-value="isSelected(row)"
-									class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
-									@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
-								/>
-							</td>
-							<td
-								v-for="column in columns"
-								:key="column.key"
-								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
-							>
-								<slot
-									:name="`cell-${column.key}`"
-									:row="row"
-									:value="row[column.key]"
-									:column="column"
-									:index="getAbsoluteRowIndex(rowIndex)"
+								<td
+									v-if="showSelection"
+									class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
 								>
-									{{ row[column.key] ?? '' }}
-								</slot>
-							</td>
-						</tr>
+									<Checkbox
+										:model-value="isSelected(row)"
+										class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+										@update:model-value="
+											(selectRow, event) => toggleSelection(row, selectRow, event)
+										"
+									/>
+								</td>
+								<td
+									v-for="column in columns"
+									:key="column.key"
+									class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
+									:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
+								>
+									<slot
+										:name="`cell-${column.key}`"
+										:row="row"
+										:value="row[column.key]"
+										:column="column"
+										:index="getAbsoluteRowIndex(rowIndex)"
+									>
+										{{ row[column.key] ?? '' }}
+									</slot>
+								</td>
+							</tr>
+							<tr
+								v-if="isRowBelowVisible(row, getAbsoluteRowIndex(rowIndex))"
+								:class="getRowBelowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
+							>
+								<td :colspan="columnSpan" class="p-0">
+									<slot name="row-below" :row="row" :index="getAbsoluteRowIndex(rowIndex)" />
+								</td>
+							</tr>
+						</template>
 						<tr v-if="virtualized && bottomSpacerHeight > 0" aria-hidden="true">
 							<td
 								:colspan="columnSpan"
@@ -231,6 +259,7 @@ const props = withDefaults(
 		 */
 		tableMinWidth?: string
 		tableLayout?: TableLayout
+		rowBelowVisible?: boolean | ((row: T, index: number) => boolean)
 		rowClass?: string | ((row: T, index: number) => string)
 		rowClickable?: boolean | ((row: T, index: number) => boolean)
 	}>(),
@@ -250,6 +279,7 @@ const sortDirection = defineModel<SortDirection>('sortDirection', { default: 'as
 const slots = useSlots()
 const selectionAnchorId = ref<unknown>()
 const hasHeaderSlot = computed(() => Boolean(slots.header))
+const hasRowBelowSlot = computed(() => Boolean(slots['row-below']))
 const columnSpan = computed(() => Math.max(props.columns.length + (props.showSelection ? 1 : 0), 1))
 
 const {
@@ -331,12 +361,42 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 	return rowIndex
 }
 
+function getRowPartRenderKey(row: T, rowIndex: number, part: 'group' | 'row' | 'below'): string {
+	return `${String(getRowRenderKey(row, rowIndex))}-${part}`
+}
+
+function isRowBelowVisible(row: T, rowIndex: number): boolean {
+	if (!hasRowBelowSlot.value || props.virtualized) {
+		return false
+	}
+
+	if (typeof props.rowBelowVisible === 'function') {
+		return props.rowBelowVisible(row, rowIndex)
+	}
+
+	return props.rowBelowVisible ?? true
+}
+
 function getRowClass(row: T, rowIndex: number): string[] {
 	const baseClass = rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
 	const customClass =
 		typeof props.rowClass === 'function' ? props.rowClass(row, rowIndex) : props.rowClass
 
 	return customClass ? [baseClass, customClass] : [baseClass]
+}
+
+function getRowBelowClass(row: T, rowIndex: number): string[] {
+	const classes = [
+		rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
+		'table-row-below',
+		'transition-[filter]',
+	]
+
+	if (isRowClickable(row, rowIndex)) {
+		classes.push('cursor-pointer')
+	}
+
+	return classes
 }
 
 function isRowClickable(row: T, rowIndex: number): boolean {

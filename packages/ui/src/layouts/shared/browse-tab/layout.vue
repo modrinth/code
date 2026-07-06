@@ -164,7 +164,11 @@ const messages = defineMessages({
 	<SearchFilterControl
 		v-else
 		v-model:selected-filters="ctx.currentFilters.value"
-		:filters="ctx.filters.value.filter((f) => f.display !== 'none')"
+		:filters="
+			ctx.filters.value.filter(
+				(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
+			)
+		"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 		:provided-message="lockedMessages?.providedBy"

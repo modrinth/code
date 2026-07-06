@@ -180,7 +180,7 @@
     "message": "Discover servers"
   },
   "app.browse.hide-added-servers": {
-    "message": "Hide already added servers"
+    "message": "Hide servers already added"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
