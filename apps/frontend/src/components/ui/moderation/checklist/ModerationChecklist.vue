@@ -1949,7 +1949,10 @@ function generateModpackMessage(allFiles: {
 
 const hasNextProject = ref(false)
 async function refreshModerationCaches(threadId?: string) {
-	const refreshes: Promise<unknown>[] = [invalidate(), refreshNuxtData('moderation-projects')]
+	const refreshes: Promise<unknown>[] = [
+		invalidate(),
+		queryClient.invalidateQueries({ queryKey: ['moderation-projects'] }),
+	]
 
 	if (threadId) {
 		refreshes.push(queryClient.invalidateQueries({ queryKey: ['thread', threadId] }))
