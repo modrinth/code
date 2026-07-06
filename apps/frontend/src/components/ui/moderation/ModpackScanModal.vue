@@ -255,7 +255,10 @@ defineExpose({ show, hide })
 		</template>
 
 		<div class="w-full">
-			<div v-if="versionLoadError || scanError" class="mb-3 rounded-xl bg-highlight-red p-3 text-red">
+			<div
+				v-if="versionLoadError || scanError"
+				class="mb-3 rounded-xl bg-highlight-red p-3 text-red"
+			>
 				{{ versionLoadError || scanError }}
 			</div>
 			<Table
@@ -313,7 +316,7 @@ defineExpose({ show, hide })
 					</div>
 				</template>
 				<template #empty-state>
-					<div class="text-secondary flex h-64 items-center justify-center">
+					<div class="flex h-64 items-center justify-center text-secondary">
 						{{ formatMessage(isLoadingVersions ? messages.loadingVersions : messages.noFiles) }}
 					</div>
 				</template>
