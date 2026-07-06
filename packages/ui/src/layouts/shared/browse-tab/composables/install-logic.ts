@@ -388,6 +388,22 @@ export function getLoaderFilterTypes(contentType: string) {
 	return []
 }
 
+const SERVER_RUNTIME_INSTALL_FILTER_TYPES = new Set([
+	'game_version',
+	'mod_loader',
+	'plugin_loader',
+	'plugin_platform',
+	'datapack_loader',
+])
+
+export function stripServerRuntimeInstallFilters(filters: readonly FilterValue[]) {
+	return filters.filter((filter) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(filter.type))
+}
+
+export function stripServerRuntimeInstallOverrides(filterTypes: readonly string[]) {
+	return filterTypes.filter((type) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(type))
+}
+
 /**
  * Merges user-selected filters with target-provided filters for install decisions.
  *
