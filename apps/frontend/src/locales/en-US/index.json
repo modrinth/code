@@ -2690,6 +2690,45 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
+  "modpack-scan-modal.failed": {
+    "message": "Failed"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Failed to load versions: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Loading versions..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "New Files"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "New Groups"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "No files found."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Not scanned"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "Override Files ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Pack File Name"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Scan All Files"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Some files failed to scan: {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Scanning..."
+  },
+  "modpack-scan-modal.title": {
+    "message": "Modpack Scan ({scanned}/{total} Files)"
+  },
   "muralpay.account-type.checking": {
     "message": "Checking"
   },

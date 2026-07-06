@@ -397,6 +397,12 @@ export namespace Labrinth {
 				sha1: string
 				project_id: string
 			}
+
+			export type FileScanResponse = {
+				new_attribution_groups: number
+				new_attribution_files: number
+				scanned_file_names: string[]
+			}
 		}
 	}
 
@@ -1333,6 +1339,7 @@ export namespace Labrinth {
 			}
 
 			export type VersionFile = {
+				id?: string
 				hashes: VersionFileHash
 				url: string
 				filename: string
@@ -1454,6 +1461,7 @@ export namespace Labrinth {
 			}
 
 			export interface VersionFile {
+				id?: string
 				hashes: VersionFileHash
 				url: string
 				filename: string
