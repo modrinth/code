@@ -3083,9 +3083,6 @@
   "project.settings.visit-dashboard": {
     "message": "Projektek irányítópult megnyitása"
   },
-  "project.stats.downloads-label": {
-    "message": "{count} letöltés"
-  },
   "project.status.archived.message": {
     "message": "A(z) {title} archiválásra került. A(z) {title} nem kap további frissítéseket, kivéve, ha a fejlesztő úgy dönt, hogy visszavonja a projekt archiválását."
   },

@@ -3488,12 +3488,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visita bacheca del progetto"
   },
-  "project.stats.downloads-label": {
-    "message": "{count} download"
-  },
-  "project.stats.followers-label": {
-    "message": "{count} follower"
-  },
   "project.status.archived.message": {
     "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."
   },

@@ -3497,12 +3497,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visiter le tableau de contrôle des projets"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {# téléchargement} other {# téléchargements}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {# suivi} other {# suivis}}"
-  },
   "project.status.archived.message": {
     "message": "{title} a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
   },

@@ -3656,12 +3656,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visit projects dashboard"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {follower} other {followers}}"
-  },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
   },

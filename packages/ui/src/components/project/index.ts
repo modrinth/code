@@ -7,6 +7,7 @@ export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradien
 export { default as ProjectCardList } from './ProjectCardList.vue'
 export { default as ProjectCombobox } from './ProjectCombobox.vue'
 export { default as ProjectPageDescription } from './ProjectPageDescription.vue'
+export { default as ProjectPageHeader } from './ProjectPageHeader.vue'
 export { default as ProjectPageVersions } from './ProjectPageVersions.vue'
 export { default as ProjectSidebarCompatibility } from './ProjectSidebarCompatibility.vue'
 export { default as ProjectSidebarCreators } from './ProjectSidebarCreators.vue'

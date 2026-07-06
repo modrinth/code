@@ -3467,6 +3467,12 @@
   "project.settings.view.title": {
     "defaultMessage": "View"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {download} other {downloads}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {follower} other {followers}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },

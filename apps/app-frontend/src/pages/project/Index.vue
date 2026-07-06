@@ -64,22 +64,84 @@
 					:project="data"
 					:project-v3="projectV3"
 					:is-server-project="isServerProject"
-					:install-button-disabled="installButtonDisabled"
-					:install-button-validating="installButtonValidating"
-					:install-button-loading="installButtonLoading"
-					:install-button-installed="installButtonInstalled"
-					:server-project-selected="serverProjectSelected"
-					:server-playing="serverPlaying"
-					:server-install-loading="!!(data && installingServerProjects.includes(data.id))"
-					@contextmenu="handleRightClick"
+					:show-status-badge="data.status !== 'approved'"
+					@contextmenu.prevent.stop="handleRightClick"
 					@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
-					@install="() => install(null)"
-					@play-server="handleClickPlay"
-					@stop-server="handleStopServer"
-					@add-server-to-instance="handleAddServerToInstance"
-					@open-browser="openProjectInBrowser"
-					@report="reportProject"
-				/>
+				>
+					<template #actions>
+						<template v-if="isServerProject">
+							<ButtonStyled v-if="serverPlaying" color="red" size="large">
+								<button type="button" @click="handleStopServer">
+									<StopCircleIcon />
+									{{ formatMessage(commonMessages.stopButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" size="large">
+								<button type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
+									<PlayIcon />
+									{{
+										serverInstallLoading
+											? formatMessage(commonMessages.installingLabel)
+											: formatMessage(commonMessages.playButton)
+									}}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular size="large">
+								<button
+									v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
+									type="button"
+									:aria-label="formatMessage(commonMessages.addServerToInstanceButton)"
+									@click="handleAddServerToInstance"
+								>
+									<PlusIcon />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular size="large" type="transparent">
+								<TeleportOverflowMenu
+									:options="serverProjectHeaderMoreActions"
+									tooltip="More options"
+									aria-label="More options"
+								>
+									<MoreVerticalIcon />
+								</TeleportOverflowMenu>
+							</ButtonStyled>
+						</template>
+						<template v-else>
+							<ButtonStyled color="brand" size="large">
+								<button
+									v-tooltip="
+										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
+									"
+									type="button"
+									:disabled="installButtonDisabled"
+									@click="install(null)"
+								>
+									<component :is="installButtonIcon" :class="installButtonIconClass" />
+									{{
+										installButtonInstalled
+											? formatMessage(commonMessages.installedLabel)
+											: installButtonValidating
+												? formatMessage(commonMessages.validatingLabel)
+												: installButtonLoading
+													? formatMessage(commonMessages.installingLabel)
+													: serverProjectSelected
+														? formatMessage(commonMessages.selectedLabel)
+														: formatMessage(commonMessages.installButton)
+									}}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular size="large" type="transparent">
+								<TeleportOverflowMenu
+									:options="projectHeaderMoreActions"
+									tooltip="More options"
+									aria-label="More options"
+								>
+									<MoreVerticalIcon />
+								</TeleportOverflowMenu>
+							</ButtonStyled>
+						</template>
+					</template>
+				</ProjectPageHeader>
 				<NavTabs
 					:links="[
 						{
@@ -150,9 +212,24 @@
 </template>
 
 <script setup>
-import { ClipboardCopyIcon, DownloadIcon, ExternalIcon, GlobeIcon } from '@modrinth/assets'
+import {
+	BookmarkIcon,
+	CheckIcon,
+	ClipboardCopyIcon,
+	DownloadIcon,
+	ExternalIcon,
+	GlobeIcon,
+	HeartIcon,
+	MoreVerticalIcon,
+	PlayIcon,
+	PlusIcon,
+	ReportIcon,
+	SpinnerIcon,
+	StopCircleIcon,
+} from '@modrinth/assets'
 import {
 	BrowseInstallHeader,
+	ButtonStyled,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -160,6 +237,7 @@ import {
 	injectNotificationManager,
 	NavTabs,
 	ProjectBackgroundGradient,
+	ProjectPageHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
@@ -168,6 +246,7 @@ import {
 	ProjectSidebarTags,
 	requestInstall,
 	SelectedProjectsFloatingBar,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -180,7 +259,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import ProjectPageHeader from '@/components/ui/ProjectPageHeader.vue'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
@@ -225,6 +303,10 @@ const messages = defineMessages({
 	backToBrowse: {
 		id: 'app.project.install-context.back-to-browse',
 		defaultMessage: 'Back to discover',
+	},
+	alreadyInstalled: {
+		id: 'app.project.install-button.already-installed',
+		defaultMessage: 'This project is already installed',
 	},
 	installContentToInstance: {
 		id: 'app.project.install-context.install-content-to-instance',
@@ -389,6 +471,69 @@ const installButtonInstalled = computed(() =>
 const installButtonDisabled = computed(
 	() => installButtonInstalled.value || installButtonLoading.value,
 )
+const serverInstallLoading = computed(
+	() => !!data.value && installingServerProjects.value.includes(data.value.id),
+)
+const installButtonIcon = computed(() => {
+	if (installButtonLoading.value && !installButtonInstalled.value) return SpinnerIcon
+	if (!installButtonInstalled.value && !serverProjectSelected.value) return DownloadIcon
+	return CheckIcon
+})
+const installButtonIconClass = computed(() =>
+	installButtonLoading.value && !installButtonInstalled.value ? 'animate-spin' : undefined,
+)
+const serverProjectHeaderMoreActions = computed(() => [
+	{
+		id: 'open-in-browser',
+		label: formatMessage(commonMessages.openInModrinthButton),
+		icon: ExternalIcon,
+		action: openProjectInBrowser,
+	},
+	{
+		divider: true,
+	},
+	{
+		id: 'report',
+		label: formatMessage(commonMessages.reportButton),
+		icon: ReportIcon,
+		color: 'red',
+		action: reportProject,
+	},
+])
+const projectHeaderMoreActions = computed(() => [
+	{
+		id: 'follow',
+		label: formatMessage(commonMessages.followButton),
+		icon: HeartIcon,
+		disabled: true,
+		tooltip: 'Coming soon',
+		action: () => {},
+	},
+	{
+		id: 'save',
+		label: formatMessage(commonMessages.saveButton),
+		icon: BookmarkIcon,
+		disabled: true,
+		tooltip: 'Coming soon',
+		action: () => {},
+	},
+	{
+		id: 'open-in-browser',
+		label: formatMessage(commonMessages.openInModrinthButton),
+		icon: ExternalIcon,
+		action: openProjectInBrowser,
+	},
+	{
+		divider: true,
+	},
+	{
+		id: 'report',
+		label: formatMessage(commonMessages.reportButton),
+		icon: ReportIcon,
+		color: 'red',
+		action: reportProject,
+	},
+])
 const projectSearchUrl = computed(
 	() => `/browse/${isServerProject.value ? 'server' : data.value?.project_type}`,
 )

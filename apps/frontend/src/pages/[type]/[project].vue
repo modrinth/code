@@ -134,37 +134,233 @@
 						v-if="projectV3Loaded"
 						:project="project"
 						:project-v3="projectV3"
-						:auth-user="auth.user"
-						:sign-in-route="signInRouteObj"
-						:collections="collections"
-						:base-id="baseId"
-						:collect-project="onUserCollectProject"
-						:create-collection="(event) => modalCollection?.show(event)"
 						:is-server-project="isServerProject"
 						:show-status-badge="!!currentMember || project.status !== 'approved'"
-						:show-edit-project="!!(auth.user && currentMember)"
-						:primary-muted="!!currentMember || route.name === 'type-project-version-version'"
-						:primary-label-hidden="!!(auth.user && currentMember)"
-						:can-create-server="canCreateServerFrom"
-						:show-quick-server-button="flags.showProjectPageQuickServerButton"
-						:show-create-server-prompt="flags.showProjectPageCreateServersTooltip"
-						:following="following"
-						:saved="collections.some((x) => x.projects.includes(project.id))"
-						:is-member="isMember"
-						:is-staff="!!(auth.user && tags.staffRoles.includes(auth.user.role))"
-						:show-moderation-checklist="showModerationChecklist"
-						:show-moderation-modpack-rescan="project.actualProjectType === 'modpack'"
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
-						@primary="handleProjectHeaderPrimary"
-						@create-server="dismissProjectHeaderCreateServerPrompt"
-						@dismiss-create-server="dismissProjectHeaderCreateServerPrompt"
-						@follow="followProjectFromHeader"
-						@moderation-checklist="openModerationChecklistFromMenu"
-						@moderation-modpack-rescan="() => scanModal?.show()"
-						@report="reportProjectFromHeader"
-						@copy-id="copyId"
-						@copy-permalink="copyPermalink"
-					/>
+					>
+						<template #actions>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
+								<nuxt-link
+									v-tooltip="formatMessage(messages.editProject)"
+									:to="`${projectPath}/settings`"
+									class="!font-bold lg:!hidden"
+								>
+									<SettingsIcon />
+								</nuxt-link>
+							</ButtonStyled>
+							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+								<nuxt-link :to="`${projectPath}/settings`" class="!font-bold max-lg:!hidden">
+									<SettingsIcon />
+									{{ formatMessage(messages.editProject) }}
+								</nuxt-link>
+							</ButtonStyled>
+
+							<div class="hidden sm:contents">
+								<ButtonStyled
+									v-if="!isServerProject"
+									size="large"
+									:color="projectHeaderPrimaryColor"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="
+											auth.user && currentMember
+												? formatMessage(commonMessages.downloadButton)
+												: undefined
+										"
+										type="button"
+										:aria-label="formatMessage(commonMessages.downloadButton)"
+										@click="handleProjectHeaderPrimary"
+									>
+										<DownloadIcon />
+										{{
+											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+										}}
+									</button>
+								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									:color="projectHeaderPrimaryColor"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="
+											auth.user && currentMember
+												? formatMessage(commonMessages.playButton)
+												: undefined
+										"
+										type="button"
+										:aria-label="formatMessage(commonMessages.playButton)"
+										@click="handleProjectHeaderPrimary"
+									>
+										<PlayIcon />
+										{{ auth.user && currentMember ? '' : formatMessage(commonMessages.playButton) }}
+									</button>
+								</ButtonStyled>
+							</div>
+
+							<div class="contents sm:hidden">
+								<ButtonStyled
+									v-if="!isServerProject"
+									size="large"
+									circular
+									:color="projectHeaderPrimaryColor"
+								>
+									<button
+										type="button"
+										:aria-label="formatMessage(commonMessages.downloadButton)"
+										class="flex sm:hidden"
+										@click="handleProjectHeaderPrimary"
+									>
+										<DownloadIcon />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled v-else size="large" circular :color="projectHeaderPrimaryColor">
+									<button
+										type="button"
+										:aria-label="formatMessage(commonMessages.playButton)"
+										class="flex sm:hidden"
+										@click="handleProjectHeaderPrimary"
+									>
+										<PlayIcon />
+									</button>
+								</ButtonStyled>
+							</div>
+
+							<Tooltip
+								v-if="
+									showProjectHeaderCreateServerAction && flags.showProjectPageCreateServersTooltip
+								"
+								theme="dismissable-prompt"
+								class="inline-flex"
+								:triggers="[]"
+								:shown="flags.showProjectPageCreateServersTooltip"
+								:auto-hide="false"
+								placement="bottom-start"
+							>
+								<ButtonStyled circular size="large">
+									<nuxt-link
+										v-tooltip="formatMessage(messages.createServerTooltip)"
+										:to="projectHeaderCreateServerTo"
+										:aria-label="formatMessage(messages.serversPromoTitle)"
+										@click="dismissProjectHeaderCreateServerPrompt"
+									>
+										<ServerPlusIcon />
+									</nuxt-link>
+								</ButtonStyled>
+								<template #popper>
+									<div class="grid max-w-[18rem] gap-2">
+										<div class="flex items-center justify-between gap-4">
+											<div class="flex items-center gap-2">
+												<h3 class="m-0 text-base font-bold text-contrast">
+													{{ formatMessage(messages.serversPromoTitle) }}
+												</h3>
+												<span
+													class="rounded-full bg-brand-highlight px-2 py-0.5 text-xs font-bold text-brand"
+												>
+													{{ formatMessage(commonMessages.newBadge) }}
+												</span>
+											</div>
+											<ButtonStyled size="small" circular>
+												<button
+													v-tooltip="formatMessage(messages.dontShowAgain)"
+													@click="dismissProjectHeaderCreateServerPrompt"
+												>
+													<XIcon aria-hidden="true" />
+												</button>
+											</ButtonStyled>
+										</div>
+										<p class="m-0 text-sm font-medium leading-tight text-secondary">
+											{{ formatMessage(messages.serversPromoDescription) }}
+										</p>
+										<p class="m-0 text-sm font-semibold text-contrast">
+											<IntlFormatted
+												:message-id="messages.serversPromoPricing"
+												:values="{ price: formatPrice(500, 'USD', true) }"
+											>
+												<template #small="{ children }">
+													<small><component :is="() => children" /></small>
+												</template>
+											</IntlFormatted>
+										</p>
+									</div>
+								</template>
+							</Tooltip>
+							<ButtonStyled v-else-if="showProjectHeaderCreateServerAction" circular size="large">
+								<nuxt-link
+									v-tooltip="formatMessage(messages.createServerTooltip)"
+									:to="projectHeaderCreateServerTo"
+									:aria-label="formatMessage(messages.serversPromoTitle)"
+									@click="dismissProjectHeaderCreateServerPrompt"
+								>
+									<ServerPlusIcon />
+								</nuxt-link>
+							</ButtonStyled>
+
+							<ButtonStyled circular size="large">
+								<ClientOnly>
+									<button
+										v-if="auth.user"
+										v-tooltip="
+											following
+												? formatMessage(commonMessages.unfollowButton)
+												: formatMessage(commonMessages.followButton)
+										"
+										type="button"
+										:aria-label="
+											following
+												? formatMessage(commonMessages.unfollowButton)
+												: formatMessage(commonMessages.followButton)
+										"
+										@click="followProjectFromHeader"
+									>
+										<HeartIcon :fill="following ? 'currentColor' : 'none'" />
+									</button>
+									<nuxt-link
+										v-else
+										v-tooltip="formatMessage(commonMessages.followButton)"
+										:to="signInRouteObj"
+										:aria-label="formatMessage(commonMessages.followButton)"
+									>
+										<HeartIcon aria-hidden="true" />
+									</nuxt-link>
+									<template #fallback>
+										<nuxt-link
+											v-tooltip="formatMessage(commonMessages.followButton)"
+											:to="signInRouteObj"
+											:aria-label="formatMessage(commonMessages.followButton)"
+										>
+											<HeartIcon aria-hidden="true" />
+										</nuxt-link>
+									</template>
+								</ClientOnly>
+							</ButtonStyled>
+
+							<ProjectCollectionSaveButton
+								:auth-user="auth.user"
+								:sign-in-route="signInRouteObj"
+								:project-id="project.id"
+								:collections="collections"
+								:saved="collections.some((x) => x.projects.includes(project.id))"
+								:base-id="baseId"
+								:no-collections-label="formatMessage(messages.noCollectionsFound)"
+								:create-new-collection-label="formatMessage(messages.createNewCollection)"
+								:collect-project="onUserCollectProject"
+								:create-collection="(event) => modalCollection?.show(event)"
+							/>
+
+							<ButtonStyled circular size="large" type="transparent">
+								<TeleportOverflowMenu
+									:options="projectHeaderMoreActions"
+									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
+									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
+								>
+									<MoreVerticalIcon />
+								</TeleportOverflowMenu>
+							</ButtonStyled>
+						</template>
+					</ProjectPageHeader>
 					<ProjectMemberHeader
 						v-if="currentMember"
 						:project="project"
@@ -400,14 +596,23 @@
 import {
 	BookTextIcon,
 	CalendarIcon,
+	ChartIcon,
 	ChevronRightIcon,
+	ClipboardCopyIcon,
 	DownloadIcon,
 	ExternalIcon,
+	FolderSearchIcon,
 	HeartIcon,
 	ListIcon,
+	MoreVerticalIcon,
+	PlayIcon,
+	ReportIcon,
 	ScaleIcon,
+	ScanEyeIcon,
+	ServerPlusIcon,
 	SettingsIcon,
 	VersionIcon,
+	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -417,12 +622,14 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	IntlFormatted,
 	NavTabs,
 	NewModal,
 	OpenInAppModal,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
+	ProjectPageHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
@@ -430,14 +637,17 @@ import {
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 	provideProjectPageContext,
+	TeleportOverflowMenu,
 	useDebugLogger,
 	useFormatDateTime,
+	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
+import { Tooltip } from 'floating-vue'
 import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
@@ -447,9 +657,9 @@ import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
+import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
-import ProjectPageHeader from '~/components/ui/ProjectPageHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
@@ -508,6 +718,7 @@ const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
 })
+const formatPrice = useFormatPrice()
 
 const debug = useDebugLogger('DownloadModal')
 
@@ -581,9 +792,25 @@ const messages = defineMessages({
 		id: 'project.actions.create-server',
 		defaultMessage: 'Create a server',
 	},
+	createServerTooltip: {
+		id: 'project.actions.create-server-tooltip',
+		defaultMessage: 'Create a server',
+	},
+	createNewCollection: {
+		id: 'project.collections.create-new',
+		defaultMessage: 'Create new collection',
+	},
 	descriptionTab: {
 		id: 'project.description.title',
 		defaultMessage: 'Description',
+	},
+	dontShowAgain: {
+		id: 'project.actions.dont-show-again',
+		defaultMessage: "Don't show again",
+	},
+	editProject: {
+		id: 'project.actions.edit-project',
+		defaultMessage: 'Edit project',
 	},
 	errorLoadingProject: {
 		id: 'project.error.loading',
@@ -635,6 +862,10 @@ const messages = defineMessages({
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
 	},
+	noCollectionsFound: {
+		id: 'project.collections.none-found',
+		defaultMessage: 'No collections found.',
+	},
 	pageNotFound: {
 		id: 'project.error.page-not-found',
 		defaultMessage: 'The page could not be found',
@@ -662,6 +893,26 @@ const messages = defineMessages({
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
+	},
+	reviewProject: {
+		id: 'project.actions.review-project',
+		defaultMessage: 'Review project',
+	},
+	rescanModpack: {
+		id: 'project.actions.rescan-modpack',
+		defaultMessage: 'Rescan modpack',
+	},
+	serversPromoDescription: {
+		id: 'project.actions.servers-promo.description',
+		defaultMessage: 'Modrinth Hosting is the easiest way to play with your friends without hassle!',
+	},
+	serversPromoPricing: {
+		id: 'project.actions.servers-promo.pricing',
+		defaultMessage: 'Starting at {price}<small> / month</small>',
+	},
+	serversPromoTitle: {
+		id: 'project.actions.servers-promo.title',
+		defaultMessage: 'Create a server',
 	},
 	settingsTitle: {
 		id: 'project.settings.title',
@@ -1455,6 +1706,85 @@ const canCreateServerFrom = computed(() => {
 const projectSearchUrl = computed(
 	() => `/discover/${isServerProject.value ? 'servers' : `${project.value?.project_type}s`}`,
 )
+const projectPath = computed(() =>
+	project.value
+		? `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
+		: '',
+)
+const projectHeaderPrimaryColor = computed(() =>
+	currentMember.value || route.name === 'type-project-version-version' ? 'standard' : 'brand',
+)
+const showProjectHeaderCreateServerAction = computed(
+	() => canCreateServerFrom.value && flags.value.showProjectPageQuickServerButton,
+)
+const projectHeaderCreateServerTo = computed(() =>
+	project.value ? `/hosting?project=${project.value.id}#plan` : '/hosting',
+)
+const projectHeaderMoreActions = computed(() => {
+	const isStaff = !!(auth.value.user && tags.value.staffRoles.includes(auth.value.user.role))
+
+	return [
+		{
+			id: 'analytics',
+			label: formatMessage(commonMessages.analyticsButton),
+			icon: ChartIcon,
+			link: `${projectPath.value}/settings/analytics`,
+			shown: !!auth.value.user && !!currentMember.value,
+		},
+		{
+			divider: true,
+			shown: !!auth.value.user && !!currentMember.value,
+		},
+		{
+			id: 'moderation-checklist',
+			label: formatMessage(messages.reviewProject),
+			icon: ScaleIcon,
+			action: openModerationChecklistFromMenu,
+			color: 'orange',
+			shown: !!auth.value.user && isStaff && !showModerationChecklist.value,
+		},
+		{
+			id: 'tech-review',
+			label: 'Tech review',
+			icon: ScanEyeIcon,
+			link: `/moderation/technical-review/${project.value?.id}`,
+			color: 'orange',
+			shown: !!auth.value.user && isStaff,
+		},
+		{
+			id: 'moderation-modpack-rescan',
+			label: formatMessage(messages.rescanModpack),
+			icon: FolderSearchIcon,
+			action: () => scanModal.value?.show(),
+			color: 'orange',
+			shown: !!auth.value.user && isStaff && project.value?.actualProjectType === 'modpack',
+		},
+		{
+			divider: true,
+			shown: !!auth.value.user && isStaff,
+		},
+		{
+			id: 'report',
+			label: formatMessage(commonMessages.reportButton),
+			icon: ReportIcon,
+			action: reportProjectFromHeader,
+			color: 'red',
+			shown: !isMember.value,
+		},
+		{
+			id: 'copy-id',
+			label: formatMessage(commonMessages.copyIdButton),
+			icon: ClipboardCopyIcon,
+			action: copyId,
+		},
+		{
+			id: 'copy-permalink',
+			label: formatMessage(commonMessages.copyPermalinkButton),
+			icon: ClipboardCopyIcon,
+			action: copyPermalink,
+		},
+	]
+})
 
 const createCanonicalUrl = () =>
 	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined

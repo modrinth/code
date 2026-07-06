@@ -3485,12 +3485,6 @@
   "project.settings.visit-dashboard": {
     "message": "Управление проектами"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {загрузка} few {загрузки} other {загрузок}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
-  },
   "project.status.archived.message": {
     "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },

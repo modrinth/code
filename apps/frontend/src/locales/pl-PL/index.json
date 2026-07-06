@@ -3491,12 +3491,6 @@
   "project.settings.visit-dashboard": {
     "message": "Odwiedź pulpit projektów"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {pobranie} few {pobrania} other {pobrań}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {obserwujący} other {obserwujących}}"
-  },
   "project.status.archived.message": {
     "message": "{title} zostało zarchiwizowane. {title} nie będzie otrzymywać żadnych dalszych aktualizacji, chyba że autor zdecyduje się przywrócić projekt."
   },
