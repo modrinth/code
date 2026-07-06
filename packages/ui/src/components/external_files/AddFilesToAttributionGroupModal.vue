@@ -38,7 +38,7 @@ const messages = defineMessages({
 	},
 	addFilesModalSearchPlaceholder: {
 		id: 'external-files.permissions-card.add-files-modal.search-placeholder',
-		defaultMessage: 'Search files…',
+		defaultMessage: 'Search files...',
 	},
 	addFilesModalNoSearchResults: {
 		id: 'external-files.permissions-card.add-files-modal.no-search-results',

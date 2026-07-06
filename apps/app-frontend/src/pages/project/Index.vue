@@ -116,13 +116,27 @@
 								aria-label="More options"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #open-in-browser>
+									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+								</template>
 								<template #report> <ReportIcon /> Report </template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</template>
 					<template v-else #actions>
-						<ButtonStyled size="large" color="brand">
+						<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
+							<button v-tooltip="installButtonTooltip" disabled>
+								<CheckIcon />
+								{{ formatMessage(commonMessages.installedLabel) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else-if="showSwitchVersion" size="large">
+							<button @click="goToVersions">
+								<SwapIcon />
+								{{ formatMessage(messages.switchVersion) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else size="large" color="brand">
 							<button
 								v-tooltip="installButtonTooltip"
 								:disabled="installButtonDisabled"
@@ -171,7 +185,9 @@
 								aria-label="More options"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #open-in-browser>
+									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+								</template>
 								<template #follow> <HeartIcon /> Follow </template>
 								<template #save> <BookmarkIcon /> Save </template>
 								<template #report> <ReportIcon /> Report </template>
@@ -294,6 +310,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { SwapIcon } from '@/assets/icons/index.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import {
@@ -348,6 +365,10 @@ const messages = defineMessages({
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
 		defaultMessage: 'This project is already installed',
+	},
+	switchVersion: {
+		id: 'app.project.install-button.switch-version',
+		defaultMessage: 'Switch version',
 	},
 })
 
@@ -519,6 +540,13 @@ const installButtonTooltip = computed(() => {
 	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
 	return null
 })
+
+const showSwitchVersion = computed(() => !!instance.value && installed.value)
+const onVersionsPage = computed(() => route.name === 'Versions')
+
+function goToVersions() {
+	router.push(versionsHref.value)
+}
 
 const [allLoaders, allGameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),
