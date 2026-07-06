@@ -193,7 +193,7 @@ def wait_for_typesense_drain(collection, expected_documents, args):
 				f"{collection}: Typesense reports {document_count} document(s) "
 				f"and healthy after flush wait ({elapsed:.1f}s)"
 			)
-			return
+			return elapsed
 
 		elapsed = time.monotonic() - started_at
 		if elapsed > args.flush_timeout:
@@ -352,6 +352,8 @@ def import_file(collection, args):
 	skip_documents = 0
 	next_flush_at = args.flush_interval
 	started_at = time.monotonic()
+	flush_batch_started_at = started_at
+	flush_batch_start_total = 0
 
 	ensure_collection_exists(collection, args)
 
@@ -372,7 +374,9 @@ def import_file(collection, args):
 		args.file, args.batch_lines, args.max_batch_bytes, skip_documents
 	):
 		batch_count += 1
+		batch_started_at = time.monotonic()
 		response = import_batch(args.typesense_url, args.api_key, collection, args, body)
+		batch_elapsed = time.monotonic() - batch_started_at
 		imported, failed, failures = parse_import_response(response, args.failures_to_print)
 
 		if failed:
@@ -397,14 +401,29 @@ def import_file(collection, args):
 		print(
 			f"{collection}: batch {batch_count}/{total_batches} ({percent:.1f}%) "
 			f"imported {imported} document(s) "
-			f"from lines {start_line}-{end_line}; {imported_total} total ({elapsed:.1f}s)"
+			f"from lines {start_line}-{end_line}; {imported_total} total "
+			f"(batch {batch_elapsed:.1f}s, elapsed {elapsed:.1f}s)"
 		)
 
 		if args.flush_interval and imported_total >= next_flush_at:
 			expected_documents = skip_documents + imported_total
-			wait_for_typesense_drain(collection, expected_documents, args)
+			flush_batch_elapsed = time.monotonic() - flush_batch_started_at
+			flush_batch_documents = imported_total - flush_batch_start_total
+			print(
+				f"{collection}: flush checkpoint at {imported_total} imported document(s); "
+				f"imported {flush_batch_documents} document(s) since previous flush "
+				f"in {flush_batch_elapsed:.1f}s"
+			)
+			flush_wait_elapsed = wait_for_typesense_drain(collection, expected_documents, args)
+			print(
+				f"{collection}: flush checkpoint complete; "
+				f"import batch {flush_batch_elapsed:.1f}s, "
+				f"flush wait {flush_wait_elapsed:.1f}s"
+			)
 			while imported_total >= next_flush_at:
 				next_flush_at += args.flush_interval
+			flush_batch_started_at = time.monotonic()
+			flush_batch_start_total = imported_total
 
 	elapsed = time.monotonic() - started_at
 	print(f"{collection}: imported {imported_total} documents in {batch_count} batches ({elapsed:.1f}s)")
