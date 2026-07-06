@@ -1,16 +1,12 @@
 <template>
 	<div class="w-full flex flex-col gap-4" :class="{ 'mt-4': isNuxt }">
-		<ContentPageHeader :class="props.headerClass">
-			<template #icon>
-				<ServerIcon
-					:image="headerImage"
-					:class="isNuxt ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl'"
-				/>
-			</template>
-			<template #title>
-				{{ props.server?.name || 'Server' }}
-			</template>
-			<template #stats>
+		<PageHeader
+			:header="props.server?.name || 'Server'"
+			:leading="leadingItems"
+			:metadata="headerMetadata"
+			:header-class="props.headerClass"
+		>
+			<template #metadata-server-stats>
 				<div
 					v-if="props.server?.flows?.intro"
 					class="flex items-center gap-2 font-semibold text-secondary"
@@ -74,7 +70,7 @@
 			<template #actions>
 				<slot name="actions" />
 			</template>
-		</ContentPageHeader>
+		</PageHeader>
 	</div>
 </template>
 
@@ -85,7 +81,7 @@ import { LinkIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
-import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
+import { AutoLink, Avatar, PageHeader, ServerIcon } from '#ui/components'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -141,6 +137,26 @@ const headerImage = computed(() => {
 	}
 	return props.serverImage ?? undefined
 })
+
+const leadingItems = computed(() => [
+	{
+		id: 'server-icon',
+		type: 'component' as const,
+		component: ServerIcon,
+		componentProps: {
+			image: headerImage.value,
+		},
+		class: isNuxt.value ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl',
+	},
+])
+
+const headerMetadata = [
+	{
+		id: 'server-stats',
+		type: 'custom' as const,
+		class: 'contents',
+	},
+]
 
 const showUptime = computed(() => props.showUptime && (props.uptimeSeconds ?? 0) > 0)
 

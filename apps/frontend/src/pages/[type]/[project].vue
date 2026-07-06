@@ -133,358 +133,8 @@
 						:project="project"
 						:project-v3="projectV3"
 						:member="!!currentMember"
-					>
-						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand" circular>
-								<nuxt-link
-									v-tooltip="'Edit project'"
-									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold lg:!hidden"
-								>
-									<SettingsIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
-								<nuxt-link
-									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold max-lg:!hidden"
-								>
-									<SettingsIcon aria-hidden="true" />
-									Edit project
-								</nuxt-link>
-							</ButtonStyled>
-
-							<div class="hidden sm:contents">
-								<ButtonStyled
-									v-if="!isServerProject"
-									size="large"
-									:color="
-										(auth.user && currentMember) || route.name === 'type-project-version-version'
-											? `standard`
-											: `brand`
-									"
-									:circular="!!auth.user && !!currentMember"
-								>
-									<button
-										v-tooltip="
-											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
-										"
-										@click="(event) => downloadModal.show(event)"
-									>
-										<DownloadIcon aria-hidden="true" />
-										{{
-											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
-										}}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-else
-									size="large"
-									:color="
-										(auth.user && currentMember) || route.name === 'type-project-version-version'
-											? `standard`
-											: `brand`
-									"
-									:circular="!!auth.user && !!currentMember"
-								>
-									<button
-										v-tooltip="auth.user && currentMember && !openInAppModal?.open ? 'Play' : ''"
-										@click="handlePlayServerProject"
-									>
-										<PlayIcon aria-hidden="true" />
-										{{ auth.user && currentMember ? '' : 'Play' }}
-									</button>
-								</ButtonStyled>
-							</div>
-
-							<div class="contents sm:hidden">
-								<ButtonStyled
-									v-if="!isServerProject"
-									size="large"
-									circular
-									:color="
-										route.name === 'type-project-version-version' || (auth.user && currentMember)
-											? `standard`
-											: `brand`
-									"
-								>
-									<button
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										class="flex sm:hidden"
-										@click="(event) => downloadModal.show(event)"
-									>
-										<DownloadIcon aria-hidden="true" />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-else
-									size="large"
-									circular
-									:color="
-										route.name === 'type-project-version-version' || (auth.user && currentMember)
-											? `standard`
-											: `brand`
-									"
-								>
-									<button aria-label="Play" class="flex sm:hidden" @click="handlePlayServerProject">
-										<PlayIcon aria-hidden="true" />
-									</button>
-								</ButtonStyled>
-							</div>
-							<Tooltip
-								v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
-								theme="dismissable-prompt"
-								:triggers="[]"
-								:shown="flags.showProjectPageCreateServersTooltip"
-								:auto-hide="false"
-								placement="bottom-start"
-							>
-								<ButtonStyled size="large" circular>
-									<nuxt-link
-										v-tooltip="formatMessage(messages.createServerTooltip)"
-										:to="`/hosting?project=${project.id}#plan`"
-										@click="
-											() => {
-												flags.showProjectPageCreateServersTooltip = false
-												saveFeatureFlags()
-											}
-										"
-									>
-										<ServerPlusIcon aria-hidden="true" />
-									</nuxt-link>
-								</ButtonStyled>
-								<template #popper>
-									<div class="grid grid-cols-[min-content] gap-1">
-										<div class="flex min-w-60 items-center justify-between gap-4">
-											<h3
-												class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
-											>
-												{{ formatMessage(messages.serversPromoTitle) }}
-												<TagItem
-													:style="{
-														'--_color': 'var(--color-brand)',
-														'--_bg-color': 'var(--color-brand-highlight)',
-													}"
-													>{{ formatMessage(commonMessages.newBadge) }}</TagItem
-												>
-											</h3>
-											<ButtonStyled size="small" circular>
-												<button
-													v-tooltip="formatMessage(messages.dontShowAgain)"
-													@click="
-														() => {
-															flags.showProjectPageCreateServersTooltip = false
-															saveFeatureFlags()
-														}
-													"
-												>
-													<XIcon aria-hidden="true" />
-												</button>
-											</ButtonStyled>
-										</div>
-
-										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-											{{ formatMessage(messages.serversPromoDescription) }}
-										</p>
-
-										<p class="m-0 text-wrap text-sm font-bold text-primary">
-											<IntlFormatted
-												:message-id="messages.serversPromoPricing"
-												:values="{
-													price: formatPrice(500, 'USD', true),
-												}"
-											>
-												<template #small="{ children }">
-													<span class="text-xs">
-														<component :is="() => children" />
-													</span>
-												</template>
-											</IntlFormatted>
-										</p>
-									</div>
-								</template>
-							</Tooltip>
-							<ButtonStyled size="large" circular>
-								<ClientOnly>
-									<button
-										v-if="auth.user"
-										v-tooltip="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										:aria-label="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										@click="userFollowProject(project)"
-									>
-										<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
-									</button>
-									<nuxt-link
-										v-else
-										v-tooltip="formatMessage(commonMessages.followButton)"
-										:to="signInRouteObj"
-										:aria-label="formatMessage(commonMessages.followButton)"
-									>
-										<HeartIcon aria-hidden="true" />
-									</nuxt-link>
-									<template #fallback>
-										<nuxt-link
-											v-tooltip="formatMessage(commonMessages.followButton)"
-											:to="signInRouteObj"
-											:aria-label="formatMessage(commonMessages.followButton)"
-										>
-											<HeartIcon aria-hidden="true" />
-										</nuxt-link>
-									</template>
-								</ClientOnly>
-							</ButtonStyled>
-							<ButtonStyled size="large" circular>
-								<PopoutMenu
-									v-if="auth.user"
-									:tooltip="
-										collections.some((x) => x.projects.includes(project.id))
-											? formatMessage(commonMessages.savedLabel)
-											: formatMessage(commonMessages.saveButton)
-									"
-									from="top-right"
-									:aria-label="formatMessage(commonMessages.saveButton)"
-									:dropdown-id="`${baseId}-save`"
-								>
-									<BookmarkIcon
-										aria-hidden="true"
-										:fill="
-											collections.some((x) => x.projects.includes(project.id))
-												? 'currentColor'
-												: 'none'
-										"
-									/>
-									<template #menu>
-										<StyledInput
-											v-model="displayCollectionsSearch"
-											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-											wrapper-class="menu-search"
-										/>
-										<div v-if="collections.length > 0" class="collections-list text-primary">
-											<Checkbox
-												v-for="option in collections
-													.slice()
-													.sort((a, b) => a.name.localeCompare(b.name))"
-												:key="option.id"
-												:model-value="option.projects.includes(project.id)"
-												class="popout-checkbox"
-												@update:model-value="() => onUserCollectProject(option, project.id)"
-											>
-												{{ option.name }}
-											</Checkbox>
-										</div>
-
-										<div v-else class="menu-text">
-											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
-										</div>
-										<ButtonStyled>
-											<button
-												class="mx-3 mb-3"
-												@click="(event) => $refs.modal_collection.show(event)"
-											>
-												<PlusIcon aria-hidden="true" />
-												{{ formatMessage(messages.createNewCollection) }}
-											</button>
-										</ButtonStyled>
-									</template>
-								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" :to="signInRouteObj" aria-label="Save">
-									<BookmarkIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
-
-							<ButtonStyled size="large" circular type="transparent">
-								<OverflowMenu
-									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-									:options="[
-										{
-											id: 'analytics',
-											link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
-											hoverOnly: true,
-											shown: auth.user && !!currentMember,
-										},
-										{
-											divider: true,
-											shown: auth.user && !!currentMember,
-										},
-										{
-											id: 'moderation-checklist',
-											action: openModerationChecklistFromMenu,
-											color: 'orange',
-											hoverOnly: true,
-											shown:
-												auth.user &&
-												tags.staffRoles.includes(auth.user.role) &&
-												!showModerationChecklist,
-										},
-										{
-											divider: true,
-											shown:
-												auth.user &&
-												tags.staffRoles.includes(auth.user.role) &&
-												!showModerationChecklist,
-										},
-										{
-											id: 'tech-review',
-											link: `/moderation/technical-review/${project.id}`,
-											color: 'orange',
-											hoverOnly: true,
-											shown: auth.user && tags.staffRoles.includes(auth.user.role),
-										},
-										{
-											divider: true,
-											shown: auth.user && tags.staffRoles.includes(auth.user.role),
-										},
-										{
-											id: 'report',
-											action: () =>
-												auth.user
-													? reportProject(project.id)
-													: navigateTo(
-															getSignInRouteObj(route, getReportPath('project', project.id)),
-														),
-											color: 'red',
-											hoverOnly: true,
-											shown: !isMember,
-										},
-										{ id: 'copy-id', action: () => copyId() },
-										{ id: 'copy-permalink', action: () => copyPermalink() },
-									]"
-									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-									:dropdown-id="`${baseId}-more-options`"
-								>
-									<MoreVerticalIcon aria-hidden="true" />
-									<template #analytics>
-										<ChartIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.analyticsButton) }}
-									</template>
-									<template #moderation-checklist>
-										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
-									</template>
-									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
-									<template #report>
-										<ReportIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.reportButton) }}
-									</template>
-									<template #copy-id>
-										<ClipboardCopyIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.copyIdButton) }}
-									</template>
-									<template #copy-permalink>
-										<ClipboardCopyIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.copyPermalinkButton) }}
-									</template>
-								</OverflowMenu>
-							</ButtonStyled>
-						</template>
-					</ProjectHeader>
+						:actions="projectHeaderActions"
+					/>
 					<ProjectMemberHeader
 						v-if="currentMember"
 						:project="project"
@@ -718,7 +368,6 @@
 
 <script setup>
 import {
-	BookmarkIcon,
 	BookTextIcon,
 	CalendarIcon,
 	ChartIcon,
@@ -730,30 +379,24 @@ import {
 	ListIcon,
 	MoreVerticalIcon,
 	PlayIcon,
-	PlusIcon,
 	ReportIcon,
 	ScaleIcon,
 	ScanEyeIcon,
 	ServerPlusIcon,
 	SettingsIcon,
 	VersionIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
 	ButtonStyled,
-	Checkbox,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	IntlFormatted,
 	NavTabs,
 	NewModal,
 	OpenInAppModal,
-	OverflowMenu,
-	PopoutMenu,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
@@ -765,8 +408,6 @@ import {
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 	provideProjectPageContext,
-	StyledInput,
-	TagItem,
 	useDebugLogger,
 	useFormatDateTime,
 	useFormatPrice,
@@ -776,7 +417,6 @@ import {
 import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
@@ -785,6 +425,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
+import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
@@ -1055,6 +696,7 @@ const messages = defineMessages({
 })
 
 const modalLicense = ref(null)
+const modalCollection = useTemplateRef('modal_collection')
 const licenseText = ref('')
 
 const createdDate = computed(() =>
@@ -1093,13 +735,8 @@ async function getLicenseData(event) {
 	}
 }
 
-const displayCollectionsSearch = ref('')
 const collections = computed(() =>
-	user.value && user.value.collections
-		? user.value.collections.filter((x) =>
-				x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
-			)
-		: [],
+	user.value && user.value.collections ? user.value.collections : [],
 )
 
 if (
@@ -1831,6 +1468,184 @@ const description = computed(() =>
 const canCreateServerFrom = computed(() => {
 	if (!project.value) return false
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
+})
+
+const projectHeaderActions = computed(() => {
+	if (!project.value) return []
+
+	const projectPath = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
+	const hasMember = !!currentMember.value
+	const userSignedIn = !!auth.value.user
+	const mutedPrimaryAction = hasMember || route.name === 'type-project-version-version'
+	const primaryLabel = isServerProject.value ? 'Play' : formatMessage(commonMessages.downloadButton)
+
+	return [
+		...(userSignedIn && hasMember
+			? [
+					{
+						id: 'edit-project',
+						label: 'Edit project',
+						icon: SettingsIcon,
+						color: 'brand',
+						to: `${projectPath}/settings`,
+					},
+				]
+			: []),
+		{
+			id: isServerProject.value ? 'play' : 'download',
+			label: primaryLabel,
+			icon: isServerProject.value ? PlayIcon : DownloadIcon,
+			color: mutedPrimaryAction ? 'standard' : 'brand',
+			labelHidden: userSignedIn && hasMember,
+			tooltip: userSignedIn && hasMember ? primaryLabel : undefined,
+			onClick: (event) => {
+				if (isServerProject.value) {
+					handlePlayServerProject()
+				} else {
+					downloadModal.value?.show(event)
+				}
+			},
+		},
+		...(canCreateServerFrom.value && flags.value.showProjectPageQuickServerButton
+			? [
+					{
+						id: 'create-server',
+						label: formatMessage(messages.serversPromoTitle),
+						icon: ServerPlusIcon,
+						labelHidden: true,
+						tooltip: formatMessage(messages.createServerTooltip),
+						to: `/hosting?project=${project.value.id}#plan`,
+						onClick: () => {
+							flags.value.showProjectPageCreateServersTooltip = false
+							saveFeatureFlags()
+						},
+						prompt: {
+							title: formatMessage(messages.serversPromoTitle),
+							description: formatMessage(messages.serversPromoDescription),
+							badge: formatMessage(commonMessages.newBadge),
+							footer: formatMessage(messages.serversPromoPricing, {
+								price: formatPrice(500, 'USD', true),
+								small: (children) => (Array.isArray(children) ? children.join('') : children),
+							}),
+							dismissLabel: formatMessage(messages.dontShowAgain),
+							shown: flags.value.showProjectPageCreateServersTooltip,
+							placement: 'bottom-start',
+							onDismiss: () => {
+								flags.value.showProjectPageCreateServersTooltip = false
+								saveFeatureFlags()
+							},
+						},
+					},
+				]
+			: []),
+		{
+			id: 'follow',
+			label: following.value
+				? formatMessage(commonMessages.unfollowButton)
+				: formatMessage(commonMessages.followButton),
+			icon: HeartIcon,
+			iconProps: {
+				fill: following.value ? 'currentColor' : 'none',
+			},
+			labelHidden: true,
+			tooltip: following.value
+				? formatMessage(commonMessages.unfollowButton)
+				: formatMessage(commonMessages.followButton),
+			to: userSignedIn ? undefined : signInRouteObj.value,
+			onClick: userSignedIn ? () => userFollowProject(project.value) : undefined,
+		},
+		{
+			id: 'save',
+			label: formatMessage(commonMessages.saveButton),
+			component: ProjectCollectionSaveButton,
+			componentProps: {
+				authUser: auth.value.user,
+				signInRoute: signInRouteObj.value,
+				projectId: project.value.id,
+				collections: collections.value,
+				saved: collections.value.some((x) => x.projects.includes(project.value.id)),
+				baseId,
+				noCollectionsLabel: formatMessage(messages.noCollectionsFound),
+				createNewCollectionLabel: formatMessage(messages.createNewCollection),
+				collectProject: onUserCollectProject,
+				createCollection: (event) => modalCollection.value?.show(event),
+			},
+		},
+		{
+			id: 'more',
+			label: formatMessage(commonMessages.moreOptionsButton),
+			icon: MoreVerticalIcon,
+			labelHidden: true,
+			type: 'transparent',
+			tooltip: formatMessage(commonMessages.moreOptionsButton),
+			menuActions: [
+				{
+					id: 'analytics',
+					label: formatMessage(commonMessages.analyticsButton),
+					icon: ChartIcon,
+					link: `${projectPath}/settings/analytics`,
+					shown: userSignedIn && hasMember,
+				},
+				{
+					divider: true,
+					shown: userSignedIn && hasMember,
+				},
+				{
+					id: 'moderation-checklist',
+					label: formatMessage(messages.reviewProject),
+					icon: ScaleIcon,
+					action: openModerationChecklistFromMenu,
+					color: 'orange',
+					shown:
+						userSignedIn &&
+						tags.value.staffRoles.includes(auth.value.user.role) &&
+						!showModerationChecklist.value,
+				},
+				{
+					divider: true,
+					shown:
+						userSignedIn &&
+						tags.value.staffRoles.includes(auth.value.user.role) &&
+						!showModerationChecklist.value,
+				},
+				{
+					id: 'tech-review',
+					label: 'Tech review',
+					icon: ScanEyeIcon,
+					link: `/moderation/technical-review/${project.value.id}`,
+					color: 'orange',
+					shown: userSignedIn && tags.value.staffRoles.includes(auth.value.user.role),
+				},
+				{
+					divider: true,
+					shown: userSignedIn && tags.value.staffRoles.includes(auth.value.user.role),
+				},
+				{
+					id: 'report',
+					label: formatMessage(commonMessages.reportButton),
+					icon: ReportIcon,
+					action: () =>
+						auth.value.user
+							? reportProject(project.value.id)
+							: navigateTo(getSignInRouteObj(route, getReportPath('project', project.value.id))),
+					color: 'red',
+					shown: !isMember.value,
+				},
+				{
+					id: 'copy-id',
+					label: formatMessage(commonMessages.copyIdButton),
+					icon: ClipboardCopyIcon,
+					action: () => copyId(),
+				},
+				{
+					id: 'copy-permalink',
+					label: formatMessage(commonMessages.copyPermalinkButton),
+					icon: ClipboardCopyIcon,
+					action: () => copyPermalink(),
+				},
+			],
+		},
+	]
 })
 
 const createCanonicalUrl = () =>
