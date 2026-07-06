@@ -941,12 +941,31 @@ async fn resolve_overrides(
     .await
     .wrap_err("fetching files on platform by hash")?;
 
+    let matching_project_ids: Vec<_> =
+        files.iter().map(|file| file.project_id.0).collect();
+    let valid_project_ids = sqlx::query_scalar!(
+        r#"
+        select id
+        from mods
+        where id = any($1)
+          and status not in ('rejected', 'draft', 'withheld', 'withdrawn')
+        "#,
+        &matching_project_ids,
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_err("fetching matched file project statuses")?;
+
     let version_ids: Vec<_> = files.iter().map(|x| x.version_id).collect();
     let versions_data = DBVersion::get_many(&version_ids, &mut *txn, redis)
         .await
         .wrap_err("fetching versions")?;
 
     for file in &files {
+        if !valid_project_ids.contains(&file.project_id.0) {
+            continue;
+        }
+
         if !versions_data.iter().any(|v| v.inner.id == file.version_id) {
             continue;
         }

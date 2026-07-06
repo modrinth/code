@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Open folder"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Open in browser"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Open in folder"
   },
@@ -289,6 +292,9 @@
   },
   "button.stop": {
     "defaultMessage": "Stop"
+  },
+  "button.switch-to-version": {
+    "defaultMessage": "Switch to version"
   },
   "button.switch-version": {
     "defaultMessage": "Switch version"
@@ -912,7 +918,7 @@
     "defaultMessage": "No files match your search."
   },
   "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Search files…"
+    "defaultMessage": "Search files..."
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# file selected} other {# files selected}}"

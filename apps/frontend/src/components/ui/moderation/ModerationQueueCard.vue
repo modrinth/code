@@ -2,12 +2,7 @@
 	<div class="shadow-card rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
-				<NuxtLink
-					:to="`/project/${queueEntry.project.slug}`"
-					target="_blank"
-					tabindex="-1"
-					class="flex"
-				>
+				<NuxtLink :to="`/project/${projectRouteParam}`" target="_blank" tabindex="-1" class="flex">
 					<Avatar
 						:src="queueEntry.project.icon_url"
 						size="4rem"
@@ -17,7 +12,7 @@
 				<div class="flex flex-col gap-1.5">
 					<div class="flex items-center gap-2">
 						<NuxtLink
-							:to="`/project/${queueEntry.project.slug}`"
+							:to="`/project/${projectRouteParam}`"
 							target="_blank"
 							class="text-lg font-semibold text-contrast hover:underline"
 						>
@@ -177,7 +172,7 @@ function getDaysQueued(date: Date): number {
 const queuedDate = computed(() => {
 	return dayjs(
 		props.queueEntry.project.queued ||
-			props.queueEntry.project.created ||
+			props.queueEntry.project.published ||
 			props.queueEntry.project.updated,
 	)
 })
@@ -186,10 +181,14 @@ const daysInQueue = computed(() => {
 	return getDaysQueued(queuedDate.value.toDate())
 })
 
+const projectRouteParam = computed(
+	() => props.queueEntry.project.slug || props.queueEntry.project.id,
+)
+
 const formattedDate = computed(() => {
 	const date =
 		props.queueEntry.project.queued ||
-		props.queueEntry.project.created ||
+		props.queueEntry.project.published ||
 		props.queueEntry.project.updated
 	if (!date) return 'Unknown'
 
@@ -202,7 +201,7 @@ const formattedDate = computed(() => {
 
 function copyLink() {
 	const base = window.location.origin
-	const projectUrl = `${base}/project/${props.queueEntry.project.slug}`
+	const projectUrl = `${base}/project/${projectRouteParam.value}`
 	navigator.clipboard.writeText(projectUrl).then(() => {
 		addNotification({
 			type: 'success',

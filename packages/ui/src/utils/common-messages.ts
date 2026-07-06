@@ -207,6 +207,10 @@ export const commonMessages = defineMessages({
 		id: 'button.open-folder',
 		defaultMessage: 'Open folder',
 	},
+	openInBrowserButton: {
+		id: 'button.open-in-browser',
+		defaultMessage: 'Open in browser',
+	},
 	openInModrinthButton: {
 		id: 'button.open-in-modrinth',
 		defaultMessage: 'Open in Modrinth',
@@ -544,6 +548,10 @@ export const commonMessages = defineMessages({
 	copyLinkButton: {
 		id: 'button.copy-link',
 		defaultMessage: 'Copy link',
+	},
+	switchToVersionButton: {
+		id: 'button.switch-to-version',
+		defaultMessage: 'Switch to version',
 	},
 	switchVersionButton: {
 		id: 'button.switch-version',

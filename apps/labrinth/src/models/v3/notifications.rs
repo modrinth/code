@@ -179,6 +179,7 @@ pub enum NotificationBody {
     SharedInstanceInvite {
         shared_instance_id: String,
         shared_instance_name: String,
+        invited_by: UserId,
     },
     StatusChange {
         project_id: ProjectId,

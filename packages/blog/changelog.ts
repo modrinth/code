@@ -11,6 +11,23 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-06T22:19:13+00:00`,
+		product: 'app',
+		version: '0.15.8',
+		body: `## Changed
+- Updated the version pages to use the new design.
+
+## Fixed
+- Fixed project and version links from an instance not being aware of the instance you're coming from.
+- Fixed Files tab preloading files which weren't actually editable/viewable which caused a memory leak.`,
+	},
+	{
+		date: `2026-07-06T22:19:13+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed Files tab preloading files which weren't actually editable/viewable which caused a memory leak.`,
+	},
+	{
 		date: `2026-07-05T01:48:48+00:00`,
 		product: 'app',
 		version: '0.15.7',
