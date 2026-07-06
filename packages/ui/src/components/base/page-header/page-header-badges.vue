@@ -24,9 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import PageHeaderInteractiveWrapper from './page-header-interactive-wrapper.vue'
 import PageHeaderBadgeContent from './page-header-badge-content.vue'
-import type { PageHeaderBadgeContent as PageHeaderBadgeContentType, PageHeaderBadge } from './types'
+import PageHeaderInteractiveWrapper from './page-header-interactive-wrapper.vue'
+import type { PageHeaderBadge, PageHeaderBadgeContent as PageHeaderBadgeContentType } from './types'
 
 defineProps<{
 	badges: PageHeaderBadge[]

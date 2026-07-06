@@ -65,7 +65,9 @@ const emit = defineEmits<{
 	'dismiss-prompt': []
 }>()
 
-const actionLabel = computed(() => props.action.ariaLabel ?? props.action.tooltip ?? props.action.label)
+const actionLabel = computed(
+	() => props.action.ariaLabel ?? props.action.tooltip ?? props.action.label,
+)
 
 const joinedActions = computed<JoinedButtonAction[]>(() => {
 	if (!('joinedActions' in props.action)) return []

@@ -73,10 +73,7 @@ const rootClass = computed(() => [
 	props.bottomPadding ? 'pb-4' : '',
 	props.headerClass,
 ])
-const titleClassValue = computed(() => [
-	props.truncateTitle ? 'truncate' : '',
-	props.titleClass,
-])
+const titleClassValue = computed(() => [props.truncateTitle ? 'truncate' : '', props.titleClass])
 const summaryClass = computed(() => (props.disableLineClamp ? '' : 'line-clamp-2'))
 const hasSummary = computed(() => !!props.summary || !!slots.summary)
 </script>

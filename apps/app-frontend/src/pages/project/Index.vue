@@ -443,8 +443,7 @@ const projectHeaderMetadata = computed(() => {
 				type: 'component',
 				component: ServerDetails,
 				componentProps: {
-					onlinePlayers:
-						projectV3.value?.minecraft_java_server?.ping?.data?.players_online ?? 0,
+					onlinePlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online ?? 0,
 					statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
 					recentPlays: projectV3.value?.minecraft_java_server?.verified_plays_2w ?? 0,
 				},

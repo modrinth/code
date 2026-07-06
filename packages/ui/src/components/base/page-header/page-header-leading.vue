@@ -38,12 +38,7 @@
 				:loading="item.loading ?? 'eager'"
 				:class="item.class"
 			/>
-			<component
-				:is="item.component"
-				v-else
-				:class="item.class"
-				v-bind="item.componentProps"
-			/>
+			<component :is="item.component" v-else :class="item.class" v-bind="item.componentProps" />
 		</template>
 	</div>
 </template>

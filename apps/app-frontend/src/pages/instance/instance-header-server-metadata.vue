@@ -42,7 +42,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { Avatar, ServerOnlinePlayers, ServerPing, ServerRecentPlays, ServerRegion } from '@modrinth/ui'
+import {
+	Avatar,
+	ServerOnlinePlayers,
+	ServerPing,
+	ServerRecentPlays,
+	ServerRegion,
+} from '@modrinth/ui'
 
 defineProps<{
 	loadingServerPing?: boolean

@@ -19,7 +19,10 @@
 	<span v-if="item.label" :class="['truncate', item.labelClass]">
 		{{ item.label }}
 	</span>
-	<span v-if="item.value !== undefined && item.value !== null" :class="['truncate', item.valueClass]">
+	<span
+		v-if="item.value !== undefined && item.value !== null"
+		:class="['truncate', item.valueClass]"
+	>
 		{{ item.value }}
 	</span>
 	<div v-if="item.tags?.length" class="flex flex-wrap gap-2">

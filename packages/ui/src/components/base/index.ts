@@ -62,6 +62,7 @@ export { default as OptionGroup } from './OptionGroup.vue'
 export type { Option as OverflowMenuOption } from './OverflowMenu.vue'
 export { default as OverflowMenu } from './OverflowMenu.vue'
 export { default as Page } from './Page.vue'
+export { default as PageHeader } from './page-header/index.vue'
 export type {
 	PageHeaderAction,
 	PageHeaderActionPrompt,
@@ -70,7 +71,6 @@ export type {
 	PageHeaderMetadataItem,
 	PageHeaderProps,
 } from './page-header/types'
-export { default as PageHeader } from './page-header/index.vue'
 export { default as Pagination } from './Pagination.vue'
 export { default as PopoutMenu } from './PopoutMenu.vue'
 export { default as PreviewSelectButton } from './PreviewSelectButton.vue'

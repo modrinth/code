@@ -158,9 +158,7 @@ export type PageHeaderMetadataContentItem = {
 	valueClass?: PageHeaderClass
 }
 
-export type PageHeaderMetadataItem =
-	| PageHeaderMetadataComponentItem
-	| PageHeaderMetadataContentItem
+export type PageHeaderMetadataItem = PageHeaderMetadataComponentItem | PageHeaderMetadataContentItem
 
 export type PageHeaderActionPrompt = {
 	title: string
