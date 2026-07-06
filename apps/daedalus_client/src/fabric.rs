@@ -104,6 +104,7 @@ async fn fetch(
                     loader_profile_template_game_version: group
                         .loader_profile_template_game_version
                         .clone(),
+                    game_versions: group.game_versions.clone(),
                     loader_version: loader.version.clone(),
                     url: format!(
                         "{}/versions/loader/{}/{}/profile/json",
@@ -269,6 +270,7 @@ async fn fetch(
                 loader_profile_template_game_version: universal_group
                     .loader_profile_template_game_version
                     .clone(),
+                game_versions: universal_group.game_versions.clone(),
                 loader_version: loader.version.clone(),
                 url: format!(
                     "{}/versions/loader/{}/{}/profile/json",
@@ -354,6 +356,7 @@ async fn fetch(
 struct ProfileRequest {
     group: String,
     loader_profile_template_game_version: String,
+    game_versions: Vec<String>,
     loader_version: String,
     url: String,
 }
@@ -399,6 +402,7 @@ async fn fetch_metadata_profiles(
             patch_version_info(
                 &mut version_info,
                 &request.loader_profile_template_game_version,
+                &request.game_versions,
                 maven_url,
                 mirror_artifacts,
             )?;
@@ -437,6 +441,7 @@ async fn fetch_metadata_profiles(
 fn patch_version_info(
     version_info: &mut PartialVersionInfo,
     game_version: &str,
+    game_versions: &[String],
     maven_url: &str,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
 ) -> Result<(), Error> {
@@ -447,17 +452,31 @@ fn patch_version_info(
         if &*lib.name == "net.minecraft:launchwrapper:1.12" {
             lib.url = Some("https://libraries.minecraft.net/".to_string());
         }
+        let source_url =
+            lib.url.clone().unwrap_or_else(|| maven_url.to_string());
 
-        // If a library is not intermediary, we add it to mirror artifacts to be mirrored
         if lib.name == new_name {
             insert_mirrored_artifact(
                 &new_name,
                 None,
-                vec![lib.url.clone().unwrap_or_else(|| maven_url.to_string())],
+                vec![source_url],
                 false,
                 mirror_artifacts,
             )?;
         } else {
+            for concrete_game_version in game_versions {
+                let concrete_name =
+                    lib.name.replace(game_version, concrete_game_version);
+
+                insert_mirrored_artifact(
+                    &concrete_name,
+                    None,
+                    vec![source_url.clone()],
+                    false,
+                    mirror_artifacts,
+                )?;
+            }
+
             lib.name = new_name;
         }
 

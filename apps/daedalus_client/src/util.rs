@@ -4,7 +4,10 @@ use s3::creds::Credentials;
 use s3::{Bucket, Region};
 use serde::de::DeserializeOwned;
 use std::path::PathBuf;
-use std::sync::{Arc, LazyLock};
+use std::sync::{
+    Arc, LazyLock,
+    atomic::{AtomicUsize, Ordering},
+};
 use tokio::sync::Semaphore;
 
 static BUCKET: LazyLock<Bucket> = LazyLock::new(|| {
@@ -55,6 +58,8 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
         .build()
         .unwrap()
 });
+
+static DOWNLOADED_FILE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn upload_file_to_bucket(
@@ -249,6 +254,16 @@ pub async fn download_file(
                             }
                             .into());
                         }
+                    }
+
+                    let downloaded = DOWNLOADED_FILE_COUNT
+                        .fetch_add(1, Ordering::Relaxed)
+                        + 1;
+                    if downloaded % 100 == 0 {
+                        tracing::info!(
+                            downloaded_files = downloaded,
+                            "Downloaded metadata files"
+                        );
                     }
 
                     return Ok(bytes);

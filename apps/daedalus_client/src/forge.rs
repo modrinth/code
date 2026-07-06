@@ -12,7 +12,10 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
+};
 use tokio::sync::Semaphore;
 
 #[tracing::instrument(skip(semaphore))]
@@ -243,12 +246,43 @@ async fn fetch(
     };
 
     if !fetch_versions.is_empty() {
-        let forge_installers = futures::future::try_join_all(
-            fetch_versions
-                .iter()
-                .map(|x| download_file(&x.installer_url, None, &semaphore)),
-        )
-        .await?;
+        let total_installers = fetch_versions.len();
+        let downloaded_installers = Arc::new(AtomicUsize::new(0));
+
+        tracing::info!(
+            mod_loader,
+            total_files = total_installers,
+            "Downloading loader installers"
+        );
+
+        let forge_installers =
+            futures::future::try_join_all(fetch_versions.iter().map(|x| {
+                let downloaded_installers = downloaded_installers.clone();
+                let semaphore = semaphore.clone();
+
+                async move {
+                    let installer =
+                        download_file(&x.installer_url, None, &semaphore)
+                            .await?;
+                    let downloaded = downloaded_installers
+                        .fetch_add(1, Ordering::Relaxed)
+                        + 1;
+
+                    if downloaded % 100 == 0 || downloaded == total_installers {
+                        tracing::info!(
+                            mod_loader,
+                            downloaded_files = downloaded,
+                            remaining_files =
+                                total_installers.saturating_sub(downloaded),
+                            total_files = total_installers,
+                            "Downloaded loader installers"
+                        );
+                    }
+
+                    Ok::<_, Error>(installer)
+                }
+            }))
+            .await?;
 
         #[tracing::instrument(skip(raw, upload_files, mirror_artifacts))]
         async fn read_forge_installer(

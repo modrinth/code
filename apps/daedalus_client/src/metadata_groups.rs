@@ -39,6 +39,7 @@ pub struct MetadataGroup {
     pub id: &'static str,
     /// Minecraft version used to fetch and template this group's loader profiles.
     pub loader_profile_template_game_version: String,
+    pub game_versions: Vec<String>,
 }
 
 pub fn metadata_groups<'a>(
@@ -51,6 +52,10 @@ pub fn metadata_groups<'a>(
         return vec![MetadataGroup {
             id: UNIVERSAL_METADATA_GROUP,
             loader_profile_template_game_version: "1.21".to_string(),
+            game_versions: game_versions
+                .into_iter()
+                .map(|x| x.to_string())
+                .collect(),
         }];
     }
 
@@ -83,6 +88,10 @@ pub fn metadata_groups<'a>(
                 .copied()
                 .unwrap_or(legacy_game_versions[0])
                 .to_string(),
+            game_versions: legacy_game_versions
+                .iter()
+                .map(|x| x.to_string())
+                .collect(),
         });
     }
 
@@ -91,6 +100,10 @@ pub fn metadata_groups<'a>(
             id: QUILT_MODERN_METADATA_GROUP,
             loader_profile_template_game_version: modern_game_versions[0]
                 .to_string(),
+            game_versions: modern_game_versions
+                .iter()
+                .map(|x| x.to_string())
+                .collect(),
         });
     }
 
