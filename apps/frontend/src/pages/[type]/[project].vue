@@ -128,11 +128,13 @@
 							@set-processing="setProcessing"
 						/>
 					</div>
-					<ProjectHeader
+					<PageHeader
 						v-if="projectV3Loaded"
-						:project="project"
-						:project-v3="projectV3"
-						:member="!!currentMember"
+						:title="project.title"
+						:summary="project.description"
+						:leading="projectHeaderLeading"
+						:badges="projectHeaderBadges"
+						:metadata="projectHeaderMetadata"
 						:actions="projectHeaderActions"
 					/>
 					<ProjectMemberHeader
@@ -397,19 +399,22 @@ import {
 	NavTabs,
 	NewModal,
 	OpenInAppModal,
+	PageHeader,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
-	ProjectHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
+	ProjectStatusBadge,
 	provideProjectPageContext,
+	ServerDetails,
 	useDebugLogger,
 	useFormatDateTime,
+	useCompactNumber,
 	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
@@ -482,6 +487,7 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { formatMessage } = useVIntl()
+const { formatCompactNumber } = useCompactNumber()
 const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -1470,6 +1476,93 @@ const canCreateServerFrom = computed(() => {
 	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
 })
 
+const projectHeaderLeading = computed(() => ({
+	type: 'avatar',
+	src: project.value?.icon_url,
+	alt: project.value?.title,
+	avatarSize: '96px',
+}))
+
+const projectHeaderBadges = computed(() => {
+	if (!project.value) return []
+	return currentMember.value || project.value.status !== 'approved'
+		? [
+				{
+					id: 'status',
+					type: 'component',
+					component: ProjectStatusBadge,
+					componentProps: {
+						status: project.value.status,
+					},
+				},
+			]
+		: []
+})
+
+const projectSearchUrl = computed(
+	() => `/discover/${isServerProject.value ? 'servers' : `${project.value?.project_type}s`}`,
+)
+
+const projectHeaderMetadata = computed(() => {
+	if (!project.value) return []
+	const items = []
+
+	if (isServerProject.value) {
+		if (projectV3.value?.status !== 'draft') {
+			items.push({
+				id: 'server-details',
+				type: 'component',
+				component: ServerDetails,
+				componentProps: {
+					onlinePlayers:
+						projectV3.value?.minecraft_java_server?.ping?.data?.players_online ?? 0,
+					statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
+					recentPlays: projectV3.value?.minecraft_java_server?.verified_plays_2w ?? 0,
+				},
+			})
+		}
+	} else {
+		items.push(
+			{
+				id: 'downloads',
+				icon: DownloadIcon,
+				label: formatCompactNumber(project.value.downloads),
+				tooltip: capitalizeString(
+					formatMessage(commonMessages.projectDownloads, {
+						count: project.value.downloads,
+					}),
+				),
+				class: 'font-semibold cursor-help',
+			},
+			{
+				id: 'followers',
+				icon: HeartIcon,
+				label: formatCompactNumber(project.value.followers),
+				tooltip: capitalizeString(
+					formatMessage(commonMessages.projectFollowers, {
+						count: project.value.followers,
+					}),
+				),
+				class: 'font-semibold cursor-help',
+			},
+		)
+	}
+
+	if (project.value.categories.length > 0) {
+		items.push({
+			id: 'categories',
+			tags: project.value.categories.map((category) => ({
+				id: category,
+				tag: category,
+				onClick: () => router.push(`${projectSearchUrl.value}?f=categories:${category}`),
+			})),
+			class: 'hidden md:flex',
+		})
+	}
+
+	return items
+})
+
 const projectHeaderActions = computed(() => {
 	if (!project.value) return []
 
@@ -1557,6 +1650,7 @@ const projectHeaderActions = computed(() => {
 		{
 			id: 'save',
 			label: formatMessage(commonMessages.saveButton),
+			kind: 'component',
 			component: ProjectCollectionSaveButton,
 			componentProps: {
 				authUser: auth.value.user,

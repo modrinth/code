@@ -59,11 +59,13 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<ProjectHeader
+				<PageHeader
 					v-else
-					:project="data"
-					:project-v3="projectV3"
-					:ping="serverPing"
+					:title="data.title"
+					:summary="data.description"
+					:leading="projectHeaderLeading"
+					:badges="projectHeaderBadges"
+					:metadata="projectHeaderMetadata"
 					:actions="projectHeaderActions"
 					@contextmenu.prevent.stop="handleRightClick"
 				/>
@@ -160,18 +162,22 @@ import {
 	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
+	PageHeader,
 	ProjectBackgroundGradient,
-	ProjectHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
+	ProjectStatusBadge,
 	requestInstall,
 	SelectedProjectsFloatingBar,
+	ServerDetails,
+	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -215,6 +221,7 @@ const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
+const { formatCompactNumber } = useCompactNumber()
 
 const messages = defineMessages({
 	backToBrowse: {
@@ -398,6 +405,91 @@ const installButtonLabel = computed(() => {
 const installButtonTooltip = computed(() => {
 	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
 	return null
+})
+
+const projectHeaderLeading = computed(() => ({
+	type: 'avatar',
+	src: data.value?.icon_url,
+	alt: data.value?.title,
+	avatarSize: '96px',
+}))
+
+const projectHeaderBadges = computed(() => {
+	if (!data.value || data.value.status === 'approved') return []
+	return [
+		{
+			id: 'status',
+			type: 'component',
+			component: ProjectStatusBadge,
+			componentProps: {
+				status: data.value.status,
+			},
+		},
+	]
+})
+
+const projectSearchUrl = computed(
+	() => `/browse/${isServerProject.value ? 'server' : data.value?.project_type}`,
+)
+
+const projectHeaderMetadata = computed(() => {
+	if (!data.value) return []
+	const items = []
+
+	if (isServerProject.value) {
+		if (projectV3.value?.status !== 'draft') {
+			items.push({
+				id: 'server-details',
+				type: 'component',
+				component: ServerDetails,
+				componentProps: {
+					onlinePlayers:
+						projectV3.value?.minecraft_java_server?.ping?.data?.players_online ?? 0,
+					statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
+					recentPlays: projectV3.value?.minecraft_java_server?.verified_plays_2w ?? 0,
+				},
+			})
+		}
+	} else {
+		items.push(
+			{
+				id: 'downloads',
+				icon: DownloadIcon,
+				label: formatCompactNumber(data.value.downloads),
+				tooltip: capitalizeString(
+					formatMessage(commonMessages.projectDownloads, {
+						count: data.value.downloads,
+					}),
+				),
+				class: 'font-semibold cursor-help',
+			},
+			{
+				id: 'followers',
+				icon: HeartIcon,
+				label: formatCompactNumber(data.value.followers),
+				tooltip: capitalizeString(
+					formatMessage(commonMessages.projectFollowers, {
+						count: data.value.followers,
+					}),
+				),
+				class: 'font-semibold cursor-help',
+			},
+		)
+	}
+
+	if (data.value.categories.length > 0) {
+		items.push({
+			id: 'categories',
+			tags: data.value.categories.map((category) => ({
+				id: category,
+				tag: category,
+				onClick: () => router.push(`${projectSearchUrl.value}?f=categories:${category}`),
+			})),
+			class: 'hidden md:flex',
+		})
+	}
+
+	return items
 })
 
 const projectHeaderActions = computed(() => {

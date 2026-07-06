@@ -121,7 +121,7 @@
 		<div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
 			<div class="normal-page__header py-4">
 				<PageHeader
-					:header="user.username"
+					:title="user.username"
 					:summary="isModrinthUser ? null : profileHeaderSummary"
 					:leading="profileHeaderLeading"
 					:badges="profileHeaderBadges"

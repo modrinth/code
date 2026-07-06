@@ -4,7 +4,7 @@ import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import PageHeader from '#ui/components/base/PageHeader.vue'
+import PageHeader from '#ui/components/base/page-header/index.vue'
 import LoaderIcon from '#ui/components/servers/icons/LoaderIcon.vue'
 import { useServerImage } from '#ui/composables/use-server-image'
 import { formatLoaderLabel } from '#ui/utils/loaders'
@@ -161,7 +161,7 @@ async function handleSelectedProjectsLeaveResult(
 			:installing="isInstallingSelected"
 		/>
 		<PageHeader
-			:header="installContext.name"
+			:title="installContext.name"
 			:leading="leadingItems"
 			:metadata="metadataItems"
 			:divider="props.divider ?? false"

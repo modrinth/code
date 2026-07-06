@@ -16,11 +16,26 @@ import {
 } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import PageHeader from '../../components/base/PageHeader.vue'
+import PageHeader from '../../components/base/page-header/index.vue'
 import LoaderIcon from '../../components/servers/icons/LoaderIcon.vue'
 import ServerIcon from '../../components/servers/icons/ServerIcon.vue'
 
 const noop = () => undefined
+const CustomMetadataStats = {
+	components: { DownloadIcon, HeartIcon },
+	template: `
+		<div class="flex flex-wrap items-center gap-3">
+			<div class="flex items-center gap-2 font-semibold">
+				<DownloadIcon class="h-6 w-6 text-secondary" />
+				1.2M downloads
+			</div>
+			<div class="flex items-center gap-2 font-semibold">
+				<HeartIcon class="h-6 w-6 text-secondary" />
+				50K followers
+			</div>
+		</div>
+	`,
+}
 
 const meta = {
 	title: 'Base/PageHeader',
@@ -41,7 +56,7 @@ type Story = StoryObj<typeof meta>
 
 export const AppInstanceHeader: Story = {
 	args: {
-		header: 'Create: Astral',
+		title: 'Create: Astral',
 		leading: {
 			type: 'avatar',
 			src: null,
@@ -113,7 +128,7 @@ export const AppInstanceHeader: Story = {
 
 export const CreatorHeader: Story = {
 	args: {
-		header: 'Prospector',
+		title: 'Prospector',
 		summary: 'A Modrinth creator with a handful of popular projects.',
 		leading: {
 			type: 'avatar',
@@ -161,7 +176,7 @@ export const CreatorHeader: Story = {
 
 export const BrowseHeader: Story = {
 	args: {
-		header: 'Survival SMP',
+		title: 'Survival SMP',
 		leading: [
 			{
 				id: 'back',
@@ -213,7 +228,7 @@ export const BrowseHeader: Story = {
 
 export const ServerPanelRootHeader: Story = {
 	args: {
-		header: 'Survival SMP',
+		title: 'Survival SMP',
 		leading: {
 			type: 'component',
 			component: ServerIcon,
@@ -257,7 +272,7 @@ export const ServerPanelRootHeader: Story = {
 
 export const ServerPanelInstanceHeader: Story = {
 	args: {
-		header: 'My World',
+		title: 'My World',
 		leading: {
 			type: 'button',
 			icon: LeftArrowIcon,
@@ -327,27 +342,25 @@ export const ServerPanelInstanceHeader: Story = {
 
 export const CustomMetadata: Story = {
 	render: () => ({
-		components: { PageHeader, DownloadIcon, HeartIcon },
+		components: { PageHeader },
+		setup() {
+			return {
+				metadata: [
+					{
+						id: 'project-stats',
+						type: 'component',
+						component: CustomMetadataStats,
+					},
+				],
+			}
+		},
 		template: `
 			<PageHeader
-				header="Custom Metadata Project"
+				title="Custom Metadata Project"
 				summary="Custom metadata is reserved for rich stat rows that cannot be represented by icon and label data."
 				:leading="{ type: 'avatar', src: null, alt: 'Custom Metadata Project', avatarSize: '96px' }"
-				:metadata="[{ id: 'project-stats', type: 'custom', class: 'contents' }]"
-			>
-				<template #metadata-project-stats>
-					<div class="flex flex-wrap items-center gap-3">
-						<div class="flex items-center gap-2 font-semibold">
-							<DownloadIcon class="h-6 w-6 text-secondary" />
-							1.2M downloads
-						</div>
-						<div class="flex items-center gap-2 font-semibold">
-							<HeartIcon class="h-6 w-6 text-secondary" />
-							50K followers
-						</div>
-					</div>
-				</template>
-			</PageHeader>
+				:metadata="metadata"
+			/>
 		`,
 	}),
 }

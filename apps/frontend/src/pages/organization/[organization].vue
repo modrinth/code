@@ -63,7 +63,7 @@
 		<template v-else>
 			<div class="normal-page__header py-4">
 				<PageHeader
-					:header="organization.name"
+					:title="organization.name"
 					:summary="organization.description"
 					:leading="organizationHeaderLeading"
 					:badges="organizationHeaderBadges"
