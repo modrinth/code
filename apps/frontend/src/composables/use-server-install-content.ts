@@ -22,6 +22,8 @@ import {
 	readStoredServerInstallQueue,
 	removePendingServerContentInstall,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useVIntl,
 	writePendingServerContentInstallBaseline,
 	writeStoredServerInstallQueue,
@@ -604,11 +606,15 @@ export function useServerInstallContent({
 				project,
 				contentType,
 				mode: isModpack ? 'immediate' : 'queue',
-				selectedFilters: isModpack ? [] : browseSearchState.currentFilters.value,
+				selectedFilters: isModpack
+					? []
+					: stripServerRuntimeInstallFilters(browseSearchState.currentFilters.value),
 				providedFilters: isModpack ? [] : serverFilters.value,
 				overriddenProvidedFilterTypes: isModpack
 					? []
-					: browseSearchState.overriddenProvidedFilterTypes.value,
+					: stripServerRuntimeInstallOverrides(
+							browseSearchState.overriddenProvidedFilterTypes.value,
+						),
 				targetPreferences: getServerInstallTargetPreferences(contentType),
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
