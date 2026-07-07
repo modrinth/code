@@ -277,6 +277,7 @@ async fn prepare_initial_instance(
             set_instance_id(job_state, metadata.instance.id);
         }
         InstallRequest::CreateSharedInstance { data } => {
+            let shared_link = shared_instance_link(data.modpack.as_ref());
             let (game_version, loader, loader_version, icon_path) =
                 if let Some(modpack) = data.modpack.clone() {
                     let preview = get_instance_from_pack(
@@ -307,7 +308,7 @@ async fn prepare_initial_instance(
                 loader,
                 loader_version,
                 icon_path,
-                InstanceLink::SharedInstance,
+                shared_link,
             )
             .await?;
             set_display(
@@ -550,6 +551,7 @@ async fn run_request(
                 &instance_id,
                 &data.shared_instance_id,
                 SharedInstanceRole::Member,
+                data.manager_id.clone(),
                 ContentSetSyncStatus::UpToDate,
                 Some(data.version),
                 Some(data.version),
@@ -715,6 +717,7 @@ async fn run_request(
                 &instance_id,
                 &data.shared_instance_id,
                 SharedInstanceRole::Member,
+                data.manager_id.clone(),
                 ContentSetSyncStatus::UpToDate,
                 Some(data.version),
                 Some(data.version),
@@ -837,7 +840,7 @@ async fn apply_shared_instance_content(
         instance_id,
         crate::state::EditInstance {
             name: Some(data.name.clone()),
-            link: Some(InstanceLink::SharedInstance),
+            link: Some(shared_instance_link(data.modpack.as_ref())),
             ..Default::default()
         },
     )
@@ -1302,6 +1305,15 @@ fn shared_instance_pack_location(
         version_id: modpack.version_id,
         title: modpack.title,
         icon_url: modpack.icon_url,
+    }
+}
+
+fn shared_instance_link(
+    modpack: Option<&SharedInstanceInstallModpack>,
+) -> InstanceLink {
+    InstanceLink::SharedInstance {
+        modpack_project_id: modpack.map(|modpack| modpack.project_id.clone()),
+        modpack_version_id: modpack.map(|modpack| modpack.version_id.clone()),
     }
 }
 

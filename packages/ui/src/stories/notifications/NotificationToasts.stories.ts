@@ -59,6 +59,7 @@ export const FigmaExamples: Story = {
 					type="instance-invite"
 					actor-name="Fetch"
 					:actor-avatar-url="avatarUrl"
+					:entity-icon-url="instanceIconUrl"
 					entity-name="New Creation"
 					@accept="noop"
 					@decline="noop"

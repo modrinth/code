@@ -356,7 +356,7 @@ import {
 } from '@/composables/instances/use-server-status-query'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_v3 } from '@/helpers/cache.js'
+import { get_project_v3, get_user } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	install_existing_instance,
@@ -423,25 +423,50 @@ const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
 const activeInstanceId = ref<string>()
+const sharedInstanceManagerUser = ref<{
+	id: string
+	username: string
+	avatar_url?: string
+} | null>(null)
 
 const sharedInstanceManager = computed(() => {
 	if (!instance.value?.shared_instance) return null
 
 	if (instance.value.shared_instance.role === 'owner') {
 		const user = auth.user.value
+		if (!user) return null
+
 		return {
-			username: user?.username ?? 'Example user',
-			avatarUrl: user?.avatar_url ?? undefined,
-			tintBy: user?.id ?? 'Example user',
+			username: user.username,
+			avatarUrl: user.avatar_url ?? undefined,
+			tintBy: user.id,
 		}
 	}
 
+	const user = sharedInstanceManagerUser.value
+	if (!user) return null
+
 	return {
-		username: 'Example user',
-		avatarUrl: undefined,
-		tintBy: 'Example user',
+		username: user.username,
+		avatarUrl: user.avatar_url ?? undefined,
+		tintBy: user.id,
 	}
 })
+
+watch(
+	() => instance.value?.shared_instance?.manager_id,
+	async (managerId) => {
+		sharedInstanceManagerUser.value = null
+
+		if (!managerId) return
+
+		const user = await get_user(managerId, 'bypass').catch(() => null)
+		if (instance.value?.shared_instance?.manager_id !== managerId) return
+
+		sharedInstanceManagerUser.value = user
+	},
+	{ immediate: true },
+)
 
 watch(
 	() => router.currentRoute.value,

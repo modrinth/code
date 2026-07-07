@@ -671,7 +671,7 @@ fn link_project_and_version(
         } => (project_id.as_ref(), version_id.as_ref()),
         InstanceLink::Unmanaged
         | InstanceLink::ModrinthHosting { .. }
-        | InstanceLink::SharedInstance => (None, None),
+        | InstanceLink::SharedInstance { .. } => (None, None),
     }
 }
 

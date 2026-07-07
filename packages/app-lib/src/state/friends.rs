@@ -240,6 +240,11 @@ impl FriendsSocket {
     }
 
     async fn handle_notification(notification: Value) -> crate::Result<()> {
+        tracing::info!(
+            notification = %notification,
+            "Received websocket notification payload"
+        );
+
         if notification
             .get("body")
             .and_then(|body| body.get("type"))

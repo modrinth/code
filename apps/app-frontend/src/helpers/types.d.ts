@@ -87,12 +87,15 @@ export type InstanceLink = InstanceLinkIdentity &
 		  }
 		| {
 				type: 'shared_instance'
+				modpack_project_id?: ModrinthId | null
+				modpack_version_id?: ModrinthId | null
 		  }
 	)
 
 export type SharedInstanceAttachment = {
 	id: string
 	role: 'owner' | 'member'
+	manager_id?: string | null
 	status:
 		| 'unknown'
 		| 'up_to_date'

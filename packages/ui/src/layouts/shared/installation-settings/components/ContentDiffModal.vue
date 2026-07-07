@@ -47,9 +47,7 @@
 					</div>
 
 					<span class="text-sm shrink-0 whitespace-nowrap">{{
-						diff.type === 'removed' && props.removedLabel
-							? props.removedLabel
-							: formatMessage(diffTypeMessages[diff.type])
+						getDiffTypeLabel(diff.type)
 					}}</span>
 					<span
 						v-if="diff.projectName"
@@ -131,6 +129,7 @@ const props = defineProps<{
 	confirmIcon?: Component
 	showReportButton?: boolean
 	showBackupCreator?: boolean
+	addedLabel?: string
 	removedLabel?: string
 	disableClose?: boolean
 }>()
@@ -174,6 +173,13 @@ function handleConfirm() {
 function handleCancel() {
 	hide()
 	emit('cancel')
+}
+
+function getDiffTypeLabel(type: ContentDiffItem['type']) {
+	if (type === 'added' && props.addedLabel) return props.addedLabel
+	if (type === 'removed' && props.removedLabel) return props.removedLabel
+
+	return formatMessage(diffTypeMessages[type])
 }
 
 const messages = defineMessages({

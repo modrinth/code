@@ -51,6 +51,7 @@ export interface SharedInstanceInstallPreview {
 	loader: InstanceLoader
 	modCount: number
 	externalFileCount: number
+	modpackVersionId?: string | null
 	contentVersionIds: string[]
 	externalFiles: SharedInstanceExternalFilePreview[]
 }
@@ -194,10 +195,15 @@ export async function install_get_shared_instance_update_preview(instanceId: str
 	)
 }
 
-export async function install_shared_instance(sharedInstanceId: string, name: string) {
+export async function install_shared_instance(
+	sharedInstanceId: string,
+	name: string,
+	managerId?: string | null,
+) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
 		name,
+		managerId,
 	})
 }
 

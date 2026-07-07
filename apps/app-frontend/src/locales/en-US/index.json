@@ -281,6 +281,18 @@
   "app.instance.admonitions.shared-instance.publishing-button": {
     "message": "Pushing..."
   },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Push update"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Review the content changes that will be shared with everyone using this instance."
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Review changes"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Reviewing..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
   },

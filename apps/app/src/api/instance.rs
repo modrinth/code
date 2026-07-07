@@ -54,6 +54,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_get_users,
             instance_share_invite_users,
             instance_share_remove_users,
+            instance_share_get_publish_preview,
             instance_share_publish,
             instance_export_mrpack,
             instance_get_pack_export_candidates,
@@ -120,13 +121,17 @@ pub enum InstanceLink {
         instance_ids: Vec<String>,
         active_instance_id: Option<String>,
     },
-    SharedInstance,
+    SharedInstance {
+        modpack_project_id: Option<String>,
+        modpack_version_id: Option<String>,
+    },
 }
 
 #[derive(Serialize, Debug, Clone)]
 pub struct SharedInstanceAttachment {
     pub id: String,
     pub role: SharedInstanceRole,
+    pub manager_id: Option<String>,
     pub status: String,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,
@@ -137,6 +142,7 @@ impl From<CoreSharedInstanceAttachment> for SharedInstanceAttachment {
         Self {
             id: attachment.id.to_string(),
             role: attachment.role,
+            manager_id: attachment.manager_id,
             status: attachment.status.as_str().to_string(),
             applied_version: attachment.applied_version,
             latest_version: attachment.latest_version,
@@ -294,7 +300,13 @@ impl InstanceLink {
                     .collect(),
                 active_instance_id: active_instance_id.map(|id| id.to_string()),
             }),
-            CoreInstanceLink::SharedInstance => Some(Self::SharedInstance),
+            CoreInstanceLink::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            } => Some(Self::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            }),
         }
     }
 
@@ -367,7 +379,13 @@ impl InstanceLink {
                     })
                     .transpose()?,
             }),
-            Self::SharedInstance => Ok(CoreInstanceLink::SharedInstance),
+            Self::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            } => Ok(CoreInstanceLink::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            }),
         }
     }
 }
@@ -775,6 +793,16 @@ pub async fn instance_share_remove_users(
 ) -> Result<theseus::instance::SharedInstanceUsers> {
     Ok(
         theseus::instance::remove_shared_instance_users(instance_id, user_ids)
+            .await?,
+    )
+}
+
+#[tauri::command]
+pub async fn instance_share_get_publish_preview(
+    instance_id: &str,
+) -> Result<Option<theseus::instance::SharedInstancePublishPreview>> {
+    Ok(
+        theseus::instance::get_shared_instance_publish_preview(instance_id)
             .await?,
     )
 }

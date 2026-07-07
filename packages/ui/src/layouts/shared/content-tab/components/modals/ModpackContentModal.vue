@@ -33,6 +33,7 @@ import ContentSelectionBar from '../ContentSelectionBar.vue'
 const { formatMessage } = useVIntl()
 
 interface Props {
+	header?: string
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
@@ -43,6 +44,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	header: undefined,
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
@@ -160,7 +162,7 @@ const filterOptions = computed(() => {
 		options.push({ id: 'warnings', label: 'Warnings' })
 	}
 
-	if (items.value.some((item) => !item.enabled)) {
+	if (props.enableToggle && items.value.some((item) => item.enabled === false)) {
 		options.push({ id: 'disabled', label: 'Disabled' })
 	}
 
@@ -190,7 +192,7 @@ const attributeFilterIds = new Set(['disabled', 'warnings'])
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
 	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-	const hasDisabledFilter = selectedFilters.value.includes('disabled')
+	const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 	const hasWarningsFilter = selectedFilters.value.includes('warnings')
 	return items.value.filter((item) => {
 		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
@@ -208,16 +210,12 @@ const filteredItems = computed(() => {
 	if (query) {
 		result = fuse.search(query).map(({ item }) => item)
 	} else {
-		result = [...items.value].sort((a, b) => {
-			const nameA = a.project?.title ?? a.file_name
-			const nameB = b.project?.title ?? b.file_name
-			return nameA.toLowerCase().localeCompare(nameB.toLowerCase())
-		})
+		result = sortContentItems(items.value)
 	}
 
 	if (selectedFilters.value.length > 0) {
 		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-		const hasDisabledFilter = selectedFilters.value.includes('disabled')
+		const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 		const hasWarningsFilter = selectedFilters.value.includes('warnings')
 		result = result.filter((item) => {
 			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
@@ -228,7 +226,7 @@ const filteredItems = computed(() => {
 		})
 	}
 
-	return result
+	return sortContentItems(result, !query)
 })
 
 const tableItems = computed<ContentCardTableItem[]>(() =>
@@ -240,7 +238,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			title: item.file_name,
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
+		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
 			id: item.file_name,
 			version_number: 'Unknown',
@@ -291,6 +289,20 @@ function getTypeIcon(type: string) {
 		default:
 			return BoxIcon
 	}
+}
+
+function sortContentItems(contentItems: ContentItem[], sortByName = true) {
+	return [...contentItems].sort((a, b) => {
+		const externalDiff = Number(b.external === true) - Number(a.external === true)
+		if (externalDiff !== 0) return externalDiff
+		if (!sortByName) return 0
+
+		return itemDisplayName(a).toLowerCase().localeCompare(itemDisplayName(b).toLowerCase())
+	})
+}
+
+function itemDisplayName(item: ContentItem) {
+	return item.project?.title ?? item.file_name
 }
 
 function handleEnabledChange(fileName: string, value: boolean) {
@@ -414,7 +426,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				:tint-by="props.modpackName"
 			/>
 			<span class="text-lg font-extrabold text-contrast">
-				{{ formatMessage(messages.header) }}
+				{{ props.header ?? formatMessage(messages.header) }}
 			</span>
 		</template>
 		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">

@@ -827,42 +827,43 @@ function openServerInviteInviterProfile(inviterName) {
 }
 
 function getSharedInstanceInvite(notification) {
-	const sharedInstanceId = notification.body?.shared_instance_id
-	if (typeof sharedInstanceId !== 'string') {
-		throw new Error('Missing shared instance ID for invite notification.')
-	}
-
-	const invitedById = notification.body?.invited_by
-	const invitedByUsername =
-		typeof notification.body?.invited_by_username === 'string'
-			? notification.body.invited_by_username
-			: typeof notification.body?.inviter_username === 'string'
-				? notification.body.inviter_username
-				: null
-	const sharedInstanceName =
-		typeof notification.body.shared_instance_name === 'string'
-			? notification.body.shared_instance_name
-			: 'Shared instance'
+	const body = notification.body
 
 	return {
-		sharedInstanceId,
-		sharedInstanceName,
-		invitedById: typeof invitedById === 'string' ? invitedById : null,
-		invitedByUsername,
+		sharedInstanceId: body.shared_instance_id,
+		sharedInstanceName: body.shared_instance_name,
+		invitedById: body.invited_by,
+		invitedByUsername: body.invited_by_username,
+		invitedByAvatarUrl: body.invited_by_avatar_url,
+		instanceIconUrl: body.instance_icon_url,
 	}
 }
 
-async function acceptSharedInstanceInviteNotification(notification) {
-	try {
-		const sharedInstanceInvite = getSharedInstanceInvite(notification)
-		const invitedBy = sharedInstanceInvite.invitedById
+async function resolveSharedInstanceInvite(notification) {
+	const sharedInstanceInvite = getSharedInstanceInvite(notification)
+	const invitedBy =
+		!sharedInstanceInvite.invitedByUsername && typeof sharedInstanceInvite.invitedById === 'string'
 			? await get_user(sharedInstanceInvite.invitedById, 'bypass').catch(() => null)
 			: null
-		const invitedByUsername = sharedInstanceInvite.invitedByUsername ?? invitedBy?.username ?? null
+
+	return {
+		...sharedInstanceInvite,
+		invitedByUsername: sharedInstanceInvite.invitedByUsername ?? invitedBy?.username ?? null,
+		invitedByAvatarUrl: sharedInstanceInvite.invitedByAvatarUrl ?? invitedBy?.avatar_url ?? null,
+	}
+}
+
+async function acceptSharedInstanceInviteNotification(notification, resolvedSharedInstanceInvite = null) {
+	try {
+		const sharedInstanceInvite =
+			resolvedSharedInstanceInvite ?? (await resolveSharedInstanceInvite(notification))
 		const preview = await install_get_shared_instance_preview(
 			sharedInstanceInvite.sharedInstanceId,
 			sharedInstanceInvite.sharedInstanceName,
 		)
+		if (sharedInstanceInvite.instanceIconUrl && !preview.iconUrl) {
+			preview.iconUrl = sharedInstanceInvite.instanceIconUrl
+		}
 		const showInstallModal = installToPlayModal.value?.showSharedInstance
 
 		if (!showInstallModal) {
@@ -872,13 +873,14 @@ async function acceptSharedInstanceInviteNotification(notification) {
 		showInstallModal(
 			{
 				preview,
-				invitedByUsername,
+				invitedByUsername: sharedInstanceInvite.invitedByUsername,
 			},
 			async () => {
 				try {
 					await install_shared_instance(
 						sharedInstanceInvite.sharedInstanceId,
 						sharedInstanceInvite.sharedInstanceName,
+						sharedInstanceInvite.invitedById,
 					)
 					await markLiveNotificationRead(notification)
 					queryClient.invalidateQueries({ queryKey: ['instances'] })
@@ -934,30 +936,21 @@ async function handleLiveNotification(notification) {
 	if (notification.body.type === 'shared_instance_invite') {
 		if (displayedSharedInstanceInviteNotifications.has(notification.id)) return
 
-		let sharedInstanceInvite
-		try {
-			sharedInstanceInvite = getSharedInstanceInvite(notification)
-		} catch (error) {
-			handleError(error)
-			return
-		}
 		displayedSharedInstanceInviteNotifications.add(notification.id)
-		const invitedBy = sharedInstanceInvite.invitedById
-			? await get_user(sharedInstanceInvite.invitedById, 'bypass').catch(() => null)
-			: null
-		const invitedByUsername = sharedInstanceInvite.invitedByUsername ?? invitedBy?.username ?? null
+		const sharedInstanceInvite = await resolveSharedInstanceInvite(notification)
 
 		addPopupNotification({
 			title: sharedInstanceInvite.sharedInstanceName,
 			autoCloseMs: null,
 			toast: {
 				type: 'instance-invite',
-				actorName: invitedByUsername,
-				actorAvatarUrl: invitedBy?.avatar_url ?? null,
+				actorName: sharedInstanceInvite.invitedByUsername,
+				actorAvatarUrl: sharedInstanceInvite.invitedByAvatarUrl ?? undefined,
 				entityName: sharedInstanceInvite.sharedInstanceName,
-				onAccept: () => acceptSharedInstanceInviteNotification(notification),
+				entityIconUrl: sharedInstanceInvite.instanceIconUrl ?? undefined,
+				onAccept: () => acceptSharedInstanceInviteNotification(notification, sharedInstanceInvite),
 				onDecline: () => declineSharedInstanceInviteNotification(notification),
-				onOpenActor: () => openServerInviteInviterProfile(invitedByUsername),
+				onOpenActor: () => openServerInviteInviterProfile(sharedInstanceInvite.invitedByUsername),
 			},
 		})
 	}

@@ -30,6 +30,7 @@ pub struct SharedInstanceInstallPreview {
     pub loader: ModLoader,
     pub mod_count: usize,
     pub external_file_count: usize,
+    pub modpack_version_id: Option<String>,
     pub content_version_ids: Vec<String>,
     pub external_files: Vec<SharedInstanceExternalFilePreview>,
 }
@@ -48,6 +49,14 @@ pub struct SharedInstanceUpdatePreview {
     pub current_version: Option<i32>,
     pub latest_version: i32,
     pub update_available: bool,
+    pub diffs: Vec<SharedInstanceUpdateDiff>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstancePublishPreview {
+    pub shared_instance_id: String,
+    pub latest_version: i32,
     pub diffs: Vec<SharedInstanceUpdateDiff>,
 }
 
@@ -84,13 +93,6 @@ struct ExternalFileData {
     file_type: String,
 }
 
-#[derive(Clone, Debug)]
-struct SharedInstanceContentMetadata {
-    game_version: String,
-    loader: ModLoader,
-    loader_version: Option<String>,
-}
-
 #[derive(Clone, Debug, Deserialize)]
 struct CreateInstanceResponse {
     #[serde(alias = "instance_id")]
@@ -105,6 +107,11 @@ struct InstanceVersionResponse {
     ready: bool,
     #[serde(default)]
     external_files: Vec<ExternalFileResponse>,
+    #[serde(default)]
+    modpack_id: Option<String>,
+    game_version: String,
+    loader: ModLoader,
+    loader_version: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -166,6 +173,7 @@ pub async fn invite_shared_instance_users(
                 instance_id,
                 &remote.id,
                 SharedInstanceRole::Owner,
+                None,
                 ContentSetSyncStatus::Unknown,
                 None,
                 None,
@@ -251,15 +259,46 @@ pub async fn publish_shared_instance(
 }
 
 #[tracing::instrument]
+pub async fn get_shared_instance_publish_preview(
+    instance_id: &str,
+) -> crate::Result<Option<SharedInstancePublishPreview>> {
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let Some(attachment) = metadata.shared_instance.clone() else {
+        return Ok(None);
+    };
+    ensure_owner(&attachment)?;
+
+    let version = get_latest_remote_version(&attachment.id, &state).await?;
+    let diffs = shared_instance_publish_diffs(&metadata, &version, &state).await?;
+
+    Ok(Some(SharedInstancePublishPreview {
+        shared_instance_id: attachment.id,
+        latest_version: version.version,
+        diffs,
+    }))
+}
+
+#[tracing::instrument]
 pub async fn install_shared_instance(
     shared_instance_id: &str,
     name: String,
+    manager_id: Option<String>,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
-    let data =
-        shared_instance_install_data(shared_instance_id, name, version, &state)
-            .await?;
+    let data = shared_instance_install_data(
+        shared_instance_id,
+        manager_id,
+        name,
+        version,
+        &state,
+    )
+    .await?;
 
     crate::install::create_shared_instance(data).await
 }
@@ -278,8 +317,17 @@ pub async fn get_shared_instance_install_preview(
     let mut content_version_ids = version.modrinth_ids.clone();
     let mut seen_content_version_ids = HashSet::new();
     content_version_ids.retain(|id| seen_content_version_ids.insert(id.clone()));
-    let metadata =
-        shared_instance_content_metadata(&content_version_ids, &state).await?;
+    let modpack = shared_instance_install_modpack(&version, &state).await?;
+    let modpack_dependency_count = modpack
+        .as_ref()
+        .map(|modpack| modpack.dependency_count)
+        .unwrap_or_default();
+    let modpack_version_id =
+        modpack.as_ref().map(|modpack| modpack.version_id.clone());
+    if let Some(modpack_version_id) = modpack_version_id.as_deref() {
+        content_version_ids.retain(|id| id != modpack_version_id);
+    }
+    let icon_url = modpack.as_ref().and_then(|modpack| modpack.icon_url.clone());
 
     let external_files = version
         .external_files
@@ -293,11 +341,14 @@ pub async fn get_shared_instance_install_preview(
 
     Ok(SharedInstanceInstallPreview {
         name,
-        icon_url: None,
-        game_version: metadata.game_version,
-        loader: metadata.loader,
-        mod_count: content_version_ids.len() + external_file_count,
+        icon_url,
+        game_version: version.game_version,
+        loader: version.loader,
+        mod_count: modpack_dependency_count
+            + content_version_ids.len()
+            + external_file_count,
         external_file_count,
+        modpack_version_id,
         content_version_ids,
         external_files,
     })
@@ -333,7 +384,7 @@ pub async fn get_shared_instance_update_preview(
 
     let update_available = attachment
         .applied_version
-        .map_or(true, |current| current < version.version);
+        .is_none_or(|current| current < version.version);
     let diffs = if update_available {
         shared_instance_update_diffs(&metadata, &version, &state).await?
     } else {
@@ -375,6 +426,7 @@ pub async fn update_shared_instance(
     let version = get_latest_remote_version(&attachment.id, &state).await?;
     let data = shared_instance_install_data(
         &attachment.id,
+        attachment.manager_id.clone(),
         metadata.instance.name,
         version,
         &state,
@@ -386,6 +438,7 @@ pub async fn update_shared_instance(
 
 async fn shared_instance_install_data(
     shared_instance_id: &str,
+    manager_id: Option<String>,
     name: String,
     version: InstanceVersionResponse,
     state: &State,
@@ -398,14 +451,20 @@ async fn shared_instance_install_data(
     }
 
     let name = shared_instance_name(name);
-    let metadata =
-        shared_instance_content_metadata(&version.modrinth_ids, state).await?;
+    let modpack = shared_instance_install_modpack(&version, state).await?;
+    let modpack_version_id = modpack.as_ref().map(|modpack| modpack.version_id.as_str());
+    let modrinth_ids = version
+        .modrinth_ids
+        .into_iter()
+        .filter(|id| Some(id.as_str()) != modpack_version_id)
+        .collect();
 
     Ok(SharedInstanceInstallData {
         shared_instance_id: shared_instance_id.to_string(),
+        manager_id,
         name,
         version: version.version,
-        modrinth_ids: version.modrinth_ids,
+        modrinth_ids,
         external_files: version
             .external_files
             .into_iter()
@@ -415,10 +474,10 @@ async fn shared_instance_install_data(
                 url: file.url,
             })
             .collect(),
-        modpack: None,
-        game_version: metadata.game_version,
-        loader: metadata.loader,
-        loader_version: metadata.loader_version,
+        modpack,
+        game_version: version.game_version,
+        loader: version.loader,
+        loader_version: shared_instance_loader_version(version.loader_version),
     })
 }
 
@@ -431,10 +490,46 @@ async fn shared_instance_update_diffs(
         current_shared_content(metadata, state).await?;
     let (latest_version_ids, latest_external_files) =
         remote_shared_content(version);
+    shared_content_diffs(
+        &current_version_ids,
+        &current_external_files,
+        &latest_version_ids,
+        &latest_external_files,
+        state,
+    )
+    .await
+}
+
+async fn shared_instance_publish_diffs(
+    metadata: &crate::state::InstanceMetadata,
+    version: &InstanceVersionResponse,
+    state: &State,
+) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
+    let (latest_version_ids, latest_external_files) =
+        remote_shared_content(version);
+    let (current_version_ids, current_external_files) =
+        current_publish_content(metadata, state).await?;
+    shared_content_diffs(
+        &latest_version_ids,
+        &latest_external_files,
+        &current_version_ids,
+        &current_external_files,
+        state,
+    )
+    .await
+}
+
+async fn shared_content_diffs(
+    current_version_ids: &[String],
+    current_external_files: &HashSet<String>,
+    latest_version_ids: &[String],
+    latest_external_files: &HashSet<String>,
+    state: &State,
+) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let current_versions =
-        shared_versions_by_project(&current_version_ids, state).await?;
+        shared_versions_by_project(current_version_ids, state).await?;
     let latest_versions =
-        shared_versions_by_project(&latest_version_ids, state).await?;
+        shared_versions_by_project(latest_version_ids, state).await?;
     let project_ids = current_versions
         .keys()
         .chain(latest_versions.keys())
@@ -488,7 +583,7 @@ async fn shared_instance_update_diffs(
         }
     }
 
-    for file_name in latest_external_files.difference(&current_external_files) {
+    for file_name in latest_external_files.difference(current_external_files) {
         diffs.push(SharedInstanceUpdateDiff {
             type_: SharedInstanceUpdateDiffType::Added,
             project_id: None,
@@ -498,7 +593,7 @@ async fn shared_instance_update_diffs(
             new_version_name: None,
         });
     }
-    for file_name in current_external_files.difference(&latest_external_files) {
+    for file_name in current_external_files.difference(latest_external_files) {
         diffs.push(SharedInstanceUpdateDiff {
             type_: SharedInstanceUpdateDiffType::Removed,
             project_id: None,
@@ -522,6 +617,9 @@ fn remote_shared_content(
     version: &InstanceVersionResponse,
 ) -> (Vec<String>, HashSet<String>) {
     let mut version_ids = version.modrinth_ids.clone();
+    if let Some(modpack_id) = version.modpack_id.as_deref() {
+        version_ids.retain(|id| id != modpack_id);
+    }
     dedupe_strings(&mut version_ids);
 
     (
@@ -534,66 +632,47 @@ fn remote_shared_content(
     )
 }
 
-async fn shared_instance_content_metadata(
-    version_ids: &[String],
+async fn shared_instance_install_modpack(
+    version: &InstanceVersionResponse,
     state: &State,
-) -> crate::Result<SharedInstanceContentMetadata> {
-    if version_ids.is_empty() {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance version has no Modrinth content to derive Minecraft metadata from"
-                .to_string(),
-        )
-        .into());
-    }
-
-    let version_id_refs =
-        version_ids.iter().map(String::as_str).collect::<Vec<_>>();
-    let versions = CachedEntry::get_version_many(
-        &version_id_refs,
+) -> crate::Result<Option<crate::install::SharedInstanceInstallModpack>> {
+    let Some(modpack_id) = version.modpack_id.as_deref().filter(|id| !id.is_empty()) else {
+        return Ok(None);
+    };
+    let modpack_version = CachedEntry::get_version(
+        modpack_id,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance modpack version was not found".to_string(),
+            )
+        })?;
+    let project = CachedEntry::get_project(
+        &modpack_version.project_id,
         Some(CacheBehaviour::Bypass),
         &state.pool,
         &state.api_semaphore,
     )
     .await?;
 
-    let game_version = versions
-        .iter()
-        .find_map(|version| version.game_versions.first().cloned())
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance version is missing Minecraft metadata"
-                    .to_string(),
-            )
-        })?;
-    let loader = versions
-        .iter()
-        .find_map(shared_instance_version_loader)
-        .unwrap_or(ModLoader::Vanilla);
-
-    Ok(SharedInstanceContentMetadata {
-        game_version,
-        loader,
-        loader_version: None,
-    })
+    Ok(Some(crate::install::SharedInstanceInstallModpack {
+        project_id: modpack_version.project_id,
+        version_id: modpack_version.id,
+        dependency_count: modpack_version.dependencies.len(),
+        title: project
+            .as_ref()
+            .map(|project| project.title.clone())
+            .unwrap_or(modpack_version.name),
+        icon_url: project.and_then(|project| project.icon_url),
+    }))
 }
 
-fn shared_instance_version_loader(
-    version: &crate::state::Version,
-) -> Option<ModLoader> {
-    let mut vanilla = None;
-
-    for loader in &version.loaders {
-        match loader.as_str() {
-            "forge" => return Some(ModLoader::Forge),
-            "fabric" => return Some(ModLoader::Fabric),
-            "quilt" => return Some(ModLoader::Quilt),
-            "neoforge" => return Some(ModLoader::NeoForge),
-            "vanilla" | "minecraft" => vanilla = Some(ModLoader::Vanilla),
-            _ => {}
-        }
-    }
-
-    vanilla
+fn shared_instance_loader_version(loader_version: String) -> Option<String> {
+    (!loader_version.is_empty()).then_some(loader_version)
 }
 
 async fn current_shared_content(
@@ -618,22 +697,13 @@ async fn current_shared_content(
     let mut external_files = HashSet::new();
 
     for entry in entries {
-        if !matches!(
-            entry.source_kind,
-            crate::state::ContentSourceKind::SharedInstance
-                | crate::state::ContentSourceKind::ModrinthModpack
-                | crate::state::ContentSourceKind::ImportedModpack
-        ) {
+        if entry.source_kind != crate::state::ContentSourceKind::SharedInstance
+        {
             continue;
         }
 
         if let Some(version_id) = entry.version_id {
             version_ids.push(version_id);
-            continue;
-        }
-
-        if entry.source_kind != crate::state::ContentSourceKind::SharedInstance
-        {
             continue;
         }
 
@@ -647,6 +717,26 @@ async fn current_shared_content(
     dedupe_strings(&mut version_ids);
 
     Ok((version_ids, external_files))
+}
+
+async fn current_publish_content(
+    metadata: &crate::state::InstanceMetadata,
+    state: &State,
+) -> crate::Result<(Vec<String>, HashSet<String>)> {
+    let (mut version_ids, external_files) =
+        collect_publish_content(&metadata.instance.id, state).await?;
+    if let Some(modpack_id) = shared_modpack_id(&metadata.link) {
+        version_ids.retain(|id| id != &modpack_id);
+    }
+    dedupe_strings(&mut version_ids);
+
+    Ok((
+        version_ids,
+        external_files
+            .into_iter()
+            .map(|file| file.file_name)
+            .collect(),
+    ))
 }
 
 async fn shared_versions_by_project(

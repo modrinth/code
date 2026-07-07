@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            instance_id,\n            link_kind,\n            modrinth_project_id,\n            modrinth_version_id,\n            server_project_id,\n            content_project_id,\n            content_version_id,\n            hosting_server_id,\n            json(hosting_instance_ids) AS \"hosting_instance_ids?: String\",\n            hosting_active_instance_id,\n            shared_instance_id,\n            shared_instance_role,\n            imported_name,\n            imported_version_number,\n            imported_filename\n        FROM instance_links\n        WHERE instance_id = ?\n        ",
+  "query": "\n        SELECT\n            instance_id,\n            link_kind,\n            modrinth_project_id,\n            modrinth_version_id,\n            server_project_id,\n            content_project_id,\n            content_version_id,\n            hosting_server_id,\n            json(hosting_instance_ids) AS \"hosting_instance_ids?: String\",\n            hosting_active_instance_id,\n            shared_instance_id,\n            shared_instance_role,\n            shared_instance_manager_id,\n            imported_name,\n            imported_version_number,\n            imported_filename\n        FROM instance_links\n        WHERE instance_id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -64,18 +64,23 @@
         "type_info": "Text"
       },
       {
-        "name": "imported_name",
+        "name": "shared_instance_manager_id",
         "ordinal": 12,
         "type_info": "Text"
       },
       {
-        "name": "imported_version_number",
+        "name": "imported_name",
         "ordinal": 13,
         "type_info": "Text"
       },
       {
-        "name": "imported_filename",
+        "name": "imported_version_number",
         "ordinal": 14,
+        "type_info": "Text"
+      },
+      {
+        "name": "imported_filename",
+        "ordinal": 15,
         "type_info": "Text"
       }
     ],
@@ -97,8 +102,9 @@
       true,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "e5665a8f1f5360cb236199bdc7565775a8a893b9f17401f8d9ec9148725d4940"
+  "hash": "9daf7ab00f8f5e42c5bc97115066f7c0c30b2d854a5a4bdfc348e16806834d19"
 }

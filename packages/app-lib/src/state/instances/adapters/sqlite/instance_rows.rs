@@ -75,6 +75,7 @@ pub(crate) struct InstanceLinkRow {
     pub hosting_active_instance_id: Option<String>,
     pub shared_instance_id: Option<String>,
     pub shared_instance_role: Option<String>,
+    pub shared_instance_manager_id: Option<String>,
     pub imported_name: Option<String>,
     pub imported_version_number: Option<String>,
     pub imported_filename: Option<String>,
@@ -138,7 +139,10 @@ impl TryFrom<InstanceLinkRow> for InstanceLink {
                 version_number: row.imported_version_number,
                 filename: row.imported_filename,
             }),
-            "shared_instance" => Ok(Self::SharedInstance),
+            "shared_instance" => Ok(Self::SharedInstance {
+                modpack_project_id: row.modrinth_project_id,
+                modpack_version_id: row.modrinth_version_id,
+            }),
             other => Err(crate::ErrorKind::InputError(format!(
                 "Unknown instance link kind {other}"
             ))
@@ -206,6 +210,7 @@ struct InstanceMetadataRow {
     hosting_active_instance_id: Option<String>,
     shared_instance_id: Option<String>,
     shared_instance_role: Option<String>,
+    shared_instance_manager_id: Option<String>,
     shared_sync_applied_update_id: Option<String>,
     shared_sync_latest_available_update_id: Option<String>,
     shared_sync_status: Option<String>,
@@ -304,6 +309,7 @@ impl InstanceMetadataRow {
             hosting_active_instance_id: self.hosting_active_instance_id,
             shared_instance_id: self.shared_instance_id.clone(),
             shared_instance_role: self.shared_instance_role.clone(),
+            shared_instance_manager_id: self.shared_instance_manager_id.clone(),
             imported_name: self.imported_name,
             imported_version_number: self.imported_version_number,
             imported_filename: self.imported_filename,
@@ -312,6 +318,7 @@ impl InstanceMetadataRow {
         let shared_instance = shared_instance_attachment(
             self.shared_instance_id,
             self.shared_instance_role,
+            self.shared_instance_manager_id,
             self.shared_sync_status,
             self.shared_sync_applied_update_id,
             self.shared_sync_latest_available_update_id,
@@ -472,6 +479,7 @@ pub(crate) async fn get_instance_metadata_by_id(
             link.hosting_active_instance_id AS "hosting_active_instance_id?: String",
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
+            link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -561,6 +569,7 @@ pub(crate) async fn get_instance_metadata_many(
             link.hosting_active_instance_id AS "hosting_active_instance_id?: String",
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
+            link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -644,6 +653,7 @@ pub(crate) async fn list_instance_metadata(
             link.hosting_active_instance_id AS "hosting_active_instance_id?: String",
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
+            link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -724,6 +734,7 @@ pub(crate) async fn get_instance_launch_context(
             link.hosting_active_instance_id AS "hosting_active_instance_id?: String",
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
+            link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -793,6 +804,7 @@ where
             hosting_active_instance_id,
             shared_instance_id,
             shared_instance_role,
+            shared_instance_manager_id,
             imported_name,
             imported_version_number,
             imported_filename
@@ -1053,6 +1065,8 @@ pub(crate) async fn set_shared_instance_attachment(
     let shared_instance_id = attachment.map(|value| value.id.to_string());
     let shared_instance_role =
         attachment.map(|value| value.role.as_str().to_string());
+    let shared_instance_manager_id = attachment
+        .and_then(|value| value.manager_id.as_deref());
 
     sqlx::query!(
         "
@@ -1060,9 +1074,10 @@ pub(crate) async fn set_shared_instance_attachment(
 			instance_id,
 			link_kind,
 			shared_instance_id,
-			shared_instance_role
+			shared_instance_role,
+			shared_instance_manager_id
 		)
-		VALUES (?, 'unmanaged', ?, ?)
+		VALUES (?, 'unmanaged', ?, ?, ?)
 		ON CONFLICT (instance_id) DO UPDATE SET
 			link_kind = CASE
 				WHEN excluded.shared_instance_id IS NULL
@@ -1071,11 +1086,13 @@ pub(crate) async fn set_shared_instance_attachment(
 				ELSE instance_links.link_kind
 			END,
 			shared_instance_id = excluded.shared_instance_id,
-			shared_instance_role = excluded.shared_instance_role
+			shared_instance_role = excluded.shared_instance_role,
+			shared_instance_manager_id = excluded.shared_instance_manager_id
 		",
         instance_id,
         shared_instance_id,
         shared_instance_role,
+        shared_instance_manager_id,
     )
     .execute(&mut **tx)
     .await?;
@@ -1279,10 +1296,13 @@ fn instance_link_columns(
             imported_version_number: version_number.clone(),
             imported_filename: filename.clone(),
         }),
-        InstanceLink::SharedInstance => Ok(InstanceLinkColumns {
+        InstanceLink::SharedInstance {
+            modpack_project_id,
+            modpack_version_id,
+        } => Ok(InstanceLinkColumns {
             link_kind: "shared_instance",
-            modrinth_project_id: None,
-            modrinth_version_id: None,
+            modrinth_project_id: modpack_project_id.clone(),
+            modrinth_version_id: modpack_version_id.clone(),
             server_project_id: None,
             content_project_id: None,
             content_version_id: None,
@@ -1340,6 +1360,7 @@ fn launch_overrides_from_json(
 fn shared_instance_attachment(
     shared_instance_id: Option<String>,
     shared_instance_role: Option<String>,
+    shared_instance_manager_id: Option<String>,
     shared_sync_status: Option<String>,
     applied_update_id: Option<String>,
     latest_available_update_id: Option<String>,
@@ -1349,7 +1370,7 @@ fn shared_instance_attachment(
     };
 
     let role = match shared_instance_role {
-        Some(role) => SharedInstanceRole::from_str(&role)?,
+        Some(role) => SharedInstanceRole::from_stored_str(&role)?,
         None => SharedInstanceRole::Member,
     };
     let status = match shared_sync_status {
@@ -1360,6 +1381,7 @@ fn shared_instance_attachment(
     Ok(Some(SharedInstanceAttachment {
         id,
         role,
+        manager_id: shared_instance_manager_id,
         status,
         applied_version: optional_i32(applied_update_id, "applied_update_id")?,
         latest_version: optional_i32(

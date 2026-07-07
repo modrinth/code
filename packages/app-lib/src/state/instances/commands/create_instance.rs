@@ -220,7 +220,7 @@ fn content_source_kind(link: &InstanceLink) -> ContentSourceKind {
         InstanceLink::ImportedModpack { .. } => {
             ContentSourceKind::ImportedModpack
         }
-        InstanceLink::SharedInstance => ContentSourceKind::SharedInstance,
+        InstanceLink::SharedInstance { .. } => ContentSourceKind::SharedInstance,
     }
 }
 

@@ -133,10 +133,15 @@ pub async fn install_get_shared_instance_update_preview(
 pub async fn install_shared_instance(
     shared_instance_id: String,
     name: String,
+    manager_id: Option<String>,
 ) -> Result<InstallJobSnapshot> {
     Ok(
-        theseus::instance::install_shared_instance(&shared_instance_id, name)
-            .await?,
+        theseus::instance::install_shared_instance(
+            &shared_instance_id,
+            name,
+            manager_id,
+        )
+        .await?,
     )
 }
 

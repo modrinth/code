@@ -7,7 +7,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 
-import type { InstallJobSnapshot } from './install'
+import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
 	CacheBehaviour,
 	ContentFile,
@@ -337,6 +337,12 @@ export type SharedInstanceUsers = {
 	user_ids: string[]
 }
 
+export interface SharedInstancePublishPreview {
+	sharedInstanceId: string
+	latestVersion: number
+	diffs: SharedInstanceUpdateDiff[]
+}
+
 export async function get_shared_instance_users(instanceId: string): Promise<SharedInstanceUsers> {
 	return await invoke('plugin:instance|instance_share_get_users', { instanceId })
 }
@@ -353,6 +359,12 @@ export async function remove_shared_instance_users(
 	userIds: string[],
 ): Promise<SharedInstanceUsers> {
 	return await invoke('plugin:instance|instance_share_remove_users', { instanceId, userIds })
+}
+
+export async function get_shared_instance_publish_preview(
+	instanceId: string,
+): Promise<SharedInstancePublishPreview | null> {
+	return await invoke('plugin:instance|instance_share_get_publish_preview', { instanceId })
 }
 
 export async function publish_shared_instance(

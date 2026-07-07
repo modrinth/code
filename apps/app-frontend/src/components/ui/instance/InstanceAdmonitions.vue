@@ -1,5 +1,5 @@
 <template>
-	<StackedAdmonitions :items="stackItems" class="w-full">
+	<StackedAdmonitions v-bind="$attrs" :items="stackItems" class="w-full">
 		<template #item="{ item }">
 			<Admonition
 				v-if="item.kind === 'shared-instance-stale'"
@@ -10,11 +10,13 @@
 				{{ formatMessage(messages.sharedInstanceChangesBody) }}
 				<template #actions>
 					<ButtonStyled color="orange">
-						<button class="!h-10" :disabled="isPublishing" @click="publishSharedInstanceChanges">
+						<button class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewSharedInstanceChanges">
 							<UploadIcon aria-hidden="true" />
 							{{
 								isPublishing
 									? formatMessage(messages.sharedInstancePublishingButton)
+									: isReviewingPublish
+										? formatMessage(messages.sharedInstanceReviewingButton)
 									: formatMessage(messages.sharedInstancePublishButton)
 							}}
 						</button>
@@ -23,6 +25,18 @@
 			</Admonition>
 		</template>
 	</StackedAdmonitions>
+
+	<ContentDiffModal
+		ref="publishReviewModal"
+		:header="formatMessage(messages.sharedInstanceReviewHeader)"
+		:admonition-header="formatMessage(messages.sharedInstanceReviewAdmonitionHeader)"
+		:description="formatMessage(messages.sharedInstanceReviewDescription)"
+		:diffs="publishDiffs"
+		:confirm-label="formatMessage(messages.sharedInstancePublishButton)"
+		:confirm-icon="UploadIcon"
+		:added-label="formatMessage(messages.sharedInstanceAddedLabel)"
+		@confirm="publishSharedInstanceChanges"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +44,8 @@ import { UploadIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
+	type ContentDiffItem,
+	ContentDiffModal,
 	defineMessages,
 	injectNotificationManager,
 	type StackedAdmonitionItem,
@@ -38,8 +54,12 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { publish_shared_instance } from '@/helpers/instance'
+import { get_shared_instance_publish_preview, publish_shared_instance } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
+
+defineOptions({
+	inheritAttrs: false,
+})
 
 type InstanceAdmonitionItem = StackedAdmonitionItem & {
 	kind: 'shared-instance-stale'
@@ -70,11 +90,36 @@ const messages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.publishing-button',
 		defaultMessage: 'Pushing...',
 	},
+	sharedInstanceReviewingButton: {
+		id: 'app.instance.admonitions.shared-instance.reviewing-button',
+		defaultMessage: 'Reviewing...',
+	},
+	sharedInstanceReviewHeader: {
+		id: 'app.instance.admonitions.shared-instance.review-header',
+		defaultMessage: 'Review changes',
+	},
+	sharedInstanceReviewAdmonitionHeader: {
+		id: 'app.instance.admonitions.shared-instance.review-admonition-header',
+		defaultMessage: 'Push update',
+	},
+	sharedInstanceReviewDescription: {
+		id: 'app.instance.admonitions.shared-instance.review-description',
+		defaultMessage: 'Review the content changes that will be shared with everyone using this instance.',
+	},
+	sharedInstanceAddedLabel: {
+		id: 'app.instance.admonitions.shared-instance.added-label',
+		defaultMessage: 'Added',
+	},
 })
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const isPublishing = ref(false)
+const isReviewingPublish = ref(false)
+const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
+const publishDiffs = ref<ContentDiffItem[]>([])
+
+const isPublishButtonDisabled = computed(() => isPublishing.value || isReviewingPublish.value)
 
 const showSharedInstancePublishAdmonition = computed(
 	() =>
@@ -94,6 +139,29 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 		},
 	]
 })
+
+async function reviewSharedInstanceChanges(e?: MouseEvent) {
+	if (isPublishButtonDisabled.value) return
+
+	isReviewingPublish.value = true
+	try {
+		const preview = await get_shared_instance_publish_preview(props.instance.id)
+		if (!preview) return
+
+		publishDiffs.value = preview.diffs.map((diff) => ({
+			type: diff.type,
+			projectName: diff.projectName ?? undefined,
+			fileName: diff.fileName ?? undefined,
+			currentVersionName: diff.currentVersionName ?? undefined,
+			newVersionName: diff.newVersionName ?? undefined,
+		}))
+		publishReviewModal.value?.show(e)
+	} catch (err) {
+		handleError(err as Error)
+	} finally {
+		isReviewingPublish.value = false
+	}
+}
 
 async function publishSharedInstanceChanges() {
 	if (isPublishing.value) return

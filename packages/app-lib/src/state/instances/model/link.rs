@@ -34,7 +34,10 @@ pub enum InstanceLink {
         version_number: Option<String>,
         filename: Option<String>,
     },
-    SharedInstance,
+    SharedInstance {
+        modpack_project_id: Option<String>,
+        modpack_version_id: Option<String>,
+    },
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -52,7 +55,7 @@ impl SharedInstanceRole {
         }
     }
 
-    pub fn from_str(value: &str) -> crate::Result<Self> {
+    pub fn from_stored_str(value: &str) -> crate::Result<Self> {
         match value {
             "owner" => Ok(Self::Owner),
             "member" => Ok(Self::Member),
@@ -65,6 +68,7 @@ impl SharedInstanceRole {
 pub struct SharedInstanceAttachment {
     pub id: String,
     pub role: SharedInstanceRole,
+    pub manager_id: Option<String>,
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,

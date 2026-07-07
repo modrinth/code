@@ -1092,6 +1092,10 @@ fn linked_modpack_ids(link: &InstanceLink) -> Option<(String, String)> {
             version_id: Some(version_id),
             ..
         } => Some((project_id.clone(), version_id.clone())),
+        InstanceLink::SharedInstance {
+            modpack_project_id: Some(project_id),
+            modpack_version_id: Some(version_id),
+        } => Some((project_id.clone(), version_id.clone())),
         _ => None,
     }
 }
@@ -1106,6 +1110,10 @@ fn linked_modpack_source_kind(
         InstanceLink::ServerProjectModpack { .. } => {
             Some(ContentSourceKind::ServerProject)
         }
+        InstanceLink::SharedInstance {
+            modpack_project_id: Some(_),
+            modpack_version_id: Some(_),
+        } => Some(ContentSourceKind::ModrinthModpack),
         _ => None,
     }
 }

@@ -659,15 +659,22 @@ async function loadSharedRows(): Promise<ShareRow[]> {
 }
 
 async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]> {
-	if (users.user_ids.length === 0) return []
+	const excludedUserIds = new Set(
+		[props.instance.shared_instance?.manager_id, currentUserId.value].filter(
+			(id): id is string => !!id,
+		),
+	)
+	const userIds = users.user_ids.filter((id) => !excludedUserIds.has(id))
 
-	const profiles = (await get_user_many(users.user_ids)) as Array<{
+	if (userIds.length === 0) return []
+
+	const profiles = (await get_user_many(userIds)) as Array<{
 		id: string
 		username?: string
 		avatar_url?: string | null
 	}>
 
-	return users.user_ids.map((id) => {
+	return userIds.map((id) => {
 		const profile = profiles.find((user) => user.id === id)
 
 		return {
@@ -677,6 +684,7 @@ async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]
 			lastPlayedAt: null,
 			joinedAt: null,
 			method: 'direct',
+			pending: true,
 		} satisfies ShareRow
 	})
 }
@@ -771,6 +779,7 @@ function inviteUserToShareRow(user: InvitePlayersUser): ShareRow {
 		lastPlayedAt: null,
 		joinedAt: null,
 		method: 'direct',
+		pending: true,
 	}
 }
 

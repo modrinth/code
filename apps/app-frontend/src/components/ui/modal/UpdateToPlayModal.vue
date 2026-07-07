@@ -9,6 +9,7 @@
 		:diffs="normalizedDiffs"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
+		:added-label="addedLabel"
 		:show-report-button="showReportButton"
 		@confirm="handleUpdate"
 		@cancel="handleDecline"
@@ -112,6 +113,9 @@ const normalizedDiffs = computed<ContentDiffItem[]>(() => {
 	}))
 })
 const showReportButton = computed(() => mode.value !== 'shared-instance')
+const addedLabel = computed(() =>
+	mode.value === 'shared-instance' ? formatMessage(messages.sharedInstanceAddedLabel) : undefined,
+)
 
 async function computeDependencyDiffs(
 	currentDeps: Dependency[],
@@ -342,6 +346,10 @@ const messages = defineMessages({
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
 			'An update is required to play {name}. Please update to latest version to launch the game.',
+	},
+	sharedInstanceAddedLabel: {
+		id: 'app.modal.update-to-play.shared-instance-added-label',
+		defaultMessage: 'Added',
 	},
 })
 

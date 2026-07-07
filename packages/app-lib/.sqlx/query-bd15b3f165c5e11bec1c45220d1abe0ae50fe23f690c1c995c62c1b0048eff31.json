@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_links (\n\t\t\tinstance_id,\n\t\t\tlink_kind,\n\t\t\tshared_instance_id,\n\t\t\tshared_instance_role,\n\t\t\tshared_instance_manager_id\n\t\t)\n\t\tVALUES (?, 'unmanaged', ?, ?, ?)\n\t\tON CONFLICT (instance_id) DO UPDATE SET\n\t\t\tlink_kind = CASE\n\t\t\t\tWHEN excluded.shared_instance_id IS NULL\n\t\t\t\t\tAND instance_links.link_kind = 'shared_instance'\n\t\t\t\t\tTHEN 'unmanaged'\n\t\t\t\tELSE instance_links.link_kind\n\t\t\tEND,\n\t\t\tshared_instance_id = excluded.shared_instance_id,\n\t\t\tshared_instance_role = excluded.shared_instance_role,\n\t\t\tshared_instance_manager_id = excluded.shared_instance_manager_id\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "bd15b3f165c5e11bec1c45220d1abe0ae50fe23f690c1c995c62c1b0048eff31"
+}

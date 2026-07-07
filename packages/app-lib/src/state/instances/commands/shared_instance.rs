@@ -11,6 +11,7 @@ pub(crate) async fn attach_shared_instance(
     instance_id: &str,
     shared_instance_id: &str,
     role: SharedInstanceRole,
+    manager_id: Option<String>,
     status: ContentSetSyncStatus,
     applied_version: Option<i32>,
     latest_version: Option<i32>,
@@ -26,6 +27,7 @@ pub(crate) async fn attach_shared_instance(
     let attachment = SharedInstanceAttachment {
         id: shared_instance_id.to_string(),
         role,
+        manager_id,
         status,
         applied_version,
         latest_version,

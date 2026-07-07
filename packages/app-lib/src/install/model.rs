@@ -106,6 +106,7 @@ pub struct InstallPostInstallEdit {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SharedInstanceInstallData {
     pub shared_instance_id: String,
+    pub manager_id: Option<String>,
     pub name: String,
     pub version: i32,
     pub modrinth_ids: Vec<String>,
@@ -130,6 +131,7 @@ pub struct SharedInstanceInstallModpack {
     pub version_id: String,
     pub title: String,
     pub icon_url: Option<String>,
+    pub dependency_count: usize,
 }
 
 impl InstallRequest {
