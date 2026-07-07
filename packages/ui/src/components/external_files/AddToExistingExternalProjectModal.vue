@@ -216,7 +216,7 @@ defineExpose({ show, hide })
 							:icon="SearchIcon"
 							type="text"
 							autocomplete="off"
-							placeholder="Search external projects…"
+							placeholder="Search external projects..."
 							clearable
 							wrapper-class="flex-1 min-w-[12rem]"
 							:disabled="addFilesMutation.isPending.value"
@@ -237,14 +237,14 @@ defineExpose({ show, hide })
 						>
 							<span class="text-contrast font-semibold">
 								<template v-if="searchNeedsInput"> Enter a search term to get started </template>
-								<template v-else-if="isLoading"> Loading external projects… </template>
+								<template v-else-if="isLoading"> Loading external projects...</template>
 								<template v-else> No projects matched that search </template>
 							</span>
 							<span class="text-secondary text-sm">
 								<template v-if="searchNeedsInput">
 									Type at least 3 characters of a project's title to begin browsing.
 								</template>
-								<template v-else-if="isLoading"> Loading external projects… </template>
+								<template v-else-if="isLoading"> Loading external projects...</template>
 								<template v-else> No projects matched that search </template>
 							</span>
 						</div>

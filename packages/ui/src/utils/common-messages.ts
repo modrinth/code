@@ -207,6 +207,10 @@ export const commonMessages = defineMessages({
 		id: 'button.open-folder',
 		defaultMessage: 'Open folder',
 	},
+	openInBrowserButton: {
+		id: 'button.open-in-browser',
+		defaultMessage: 'Open in browser',
+	},
 	openInModrinthButton: {
 		id: 'button.open-in-modrinth',
 		defaultMessage: 'Open in Modrinth',
@@ -429,11 +433,15 @@ export const commonMessages = defineMessages({
 	},
 	hideInstalledContentLabel: {
 		id: 'label.hide-installed-content',
-		defaultMessage: 'Hide already installed content',
+		defaultMessage: 'Hide content already installed',
 	},
 	hideSelectedContentLabel: {
 		id: 'label.hide-selected-content',
 		defaultMessage: 'Hide selected content',
+	},
+	serverOnlyLabel: {
+		id: 'label.server-only',
+		defaultMessage: 'Server only',
 	},
 	installedModpackTitle: {
 		id: 'label.installed-modpack',
@@ -540,6 +548,10 @@ export const commonMessages = defineMessages({
 	copyLinkButton: {
 		id: 'button.copy-link',
 		defaultMessage: 'Copy link',
+	},
+	switchToVersionButton: {
+		id: 'button.switch-to-version',
+		defaultMessage: 'Switch to version',
 	},
 	switchVersionButton: {
 		id: 'button.switch-version',

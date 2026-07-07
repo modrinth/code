@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Open folder"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Open in browser"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Open in folder"
   },
@@ -289,6 +292,9 @@
   },
   "button.stop": {
     "defaultMessage": "Stop"
+  },
+  "button.switch-to-version": {
+    "defaultMessage": "Switch to version"
   },
   "button.switch-version": {
     "defaultMessage": "Switch version"
@@ -912,7 +918,7 @@
     "defaultMessage": "No files match your search."
   },
   "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Search files…"
+    "defaultMessage": "Search files..."
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# file selected} other {# files selected}}"
@@ -2190,7 +2196,7 @@
     "defaultMessage": "Game version"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Hide already installed content"
+    "defaultMessage": "Hide content already installed"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Hide selected content"
@@ -2293,6 +2299,9 @@
   },
   "label.server": {
     "defaultMessage": "Server"
+  },
+  "label.server-only": {
+    "defaultMessage": "Server only"
   },
   "label.servers": {
     "defaultMessage": "Servers"
@@ -3472,6 +3481,12 @@
   },
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
+  },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Toggle filter for {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
   },
   "project.versions.version.withheld": {
     "defaultMessage": "Withheld"

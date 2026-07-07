@@ -542,6 +542,26 @@ const OVERRIDE_PREFIXES: &[&str] = &[
     "client-overrides/resourcepacks",
 ];
 
+const OVERRIDE_ROOT_PREFIXES: &[&str] =
+    &["overrides/", "client-overrides/", "server-overrides/"];
+
+fn override_relative_name(name: &str) -> Option<&str> {
+    // strip the root prefix
+    let relative = OVERRIDE_ROOT_PREFIXES
+        .iter()
+        .find_map(|prefix| name.strip_prefix(prefix))?;
+
+    // check if it matches any of the whitelisted scan prefixes
+    OVERRIDE_PREFIXES
+        .iter()
+        .any(|prefix| {
+            name.strip_prefix(prefix)
+                // check the stripped prefix is actually a full segment, not something weird like "overrides/modsabce/file.jar"
+                .is_some_and(|suffix| suffix.starts_with('/'))
+        })
+        .then_some(relative)
+}
+
 fn should_scan(name: &str) -> bool {
     let name = name.to_lowercase();
     let should_skip = name.starts_with("mods/.connector/")
@@ -550,7 +570,7 @@ fn should_scan(name: &str) -> bool {
         || name.starts_with("mods/mcef-libraries/")
         || name.starts_with("mods/mcef-cache/")
         || name.starts_with("config/super_resolution/libraries/")
-        || name.starts_with("config/Veinminer/update/")
+        || name.starts_with("config/veinminer/update/")
         || name.starts_with("config/epicfight/native/")
         || name.starts_with("essential/")
         || name.ends_with(".rpo")
@@ -579,14 +599,11 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
             continue;
         }
 
-        if !OVERRIDE_PREFIXES
-            .iter()
-            .any(|prefix| name.starts_with(prefix))
-        {
+        let Some(relative_name) = override_relative_name(&name) else {
             continue;
-        }
+        };
 
-        if !should_scan(&name) {
+        if !should_scan(relative_name) {
             continue;
         }
 
@@ -941,12 +958,31 @@ async fn resolve_overrides(
     .await
     .wrap_err("fetching files on platform by hash")?;
 
+    let matching_project_ids: Vec<_> =
+        files.iter().map(|file| file.project_id.0).collect();
+    let valid_project_ids = sqlx::query_scalar!(
+        r#"
+        select id
+        from mods
+        where id = any($1)
+          and status not in ('rejected', 'draft', 'withheld', 'withdrawn')
+        "#,
+        &matching_project_ids,
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_err("fetching matched file project statuses")?;
+
     let version_ids: Vec<_> = files.iter().map(|x| x.version_id).collect();
     let versions_data = DBVersion::get_many(&version_ids, &mut *txn, redis)
         .await
         .wrap_err("fetching versions")?;
 
     for file in &files {
+        if !valid_project_ids.contains(&file.project_id.0) {
+            continue;
+        }
+
         if !versions_data.iter().any(|v| v.inner.id == file.version_id) {
             continue;
         }

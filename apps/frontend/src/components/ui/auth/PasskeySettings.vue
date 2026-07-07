@@ -257,7 +257,7 @@ const messages = defineMessages({
 	},
 	managePasskeyModalLoading: {
 		id: 'settings.account.security.passkey.modal.loading',
-		defaultMessage: 'Loading passkeys…',
+		defaultMessage: 'Loading passkeys...',
 	},
 	managePasskeyModalNoPasskeys: {
 		id: 'settings.account.security.passkey.modal.no-passkeys',
