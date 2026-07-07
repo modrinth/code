@@ -19,6 +19,7 @@
 					:project="project"
 					:versions="versions"
 					:dependency-download-files="dependencyDownloadFiles"
+					:download-data-loaded="downloadRowsLoaded"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -271,6 +272,7 @@ const additionalFiles = computed(() => {
 const downloadModalProvider = provideDownloadModalProvider({
 	project,
 	selectedVersion,
+	selectedPrimaryFile,
 	currentGameVersion,
 	currentPlatform,
 	downloadReason: computed(() => props.downloadReason),
@@ -278,6 +280,7 @@ const downloadModalProvider = provideDownloadModalProvider({
 })
 const dependencyDownloadFiles = downloadModalProvider.downloadableDependencyFiles
 const dependencyDownloadFilesLoaded = downloadModalProvider.downloadableDependencyFilesLoaded
+const downloadRowsLoaded = downloadModalProvider.downloadRowsLoaded
 
 const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 	if (!selectedVersion.value) return []

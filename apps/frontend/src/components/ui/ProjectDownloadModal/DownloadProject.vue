@@ -80,7 +80,7 @@
 		</Combobox>
 	</div>
 
-	<div v-if="selectedVersion" class="flex flex-col gap-2.5">
+	<div v-if="selectedVersion && downloadDataLoaded" class="flex flex-col gap-2.5">
 		<h3
 			v-if="[...suggestedPreReleaseVersions, selectedVersion].length > 1"
 			class="relative top-0.5 m-0 text-base font-semibold text-contrast"
@@ -163,6 +163,7 @@ const props = withDefaults(
 		project: DownloadModalProject
 		versions?: Labrinth.Versions.v3.Version[]
 		dependencyDownloadFiles?: DownloadableFile[]
+		downloadDataLoaded?: boolean
 		downloadReason?: CdnDownloadReason
 		initialGameVersion?: string | null
 		initialPlatform?: string | null
@@ -173,6 +174,7 @@ const props = withDefaults(
 	{
 		versions: () => [],
 		dependencyDownloadFiles: () => [],
+		downloadDataLoaded: false,
 		downloadReason: 'standalone',
 		initialGameVersion: null,
 		initialPlatform: null,
