@@ -507,10 +507,7 @@ function loaderLabel(loader: string) {
 	return formatMessage(getTagMessage(loader, 'loader') ?? messages.unknownLoader)
 }
 
-function comparePlatformOptions(
-	a: ComboboxOption<string>,
-	b: ComboboxOption<string>,
-) {
+function comparePlatformOptions(a: ComboboxOption<string>, b: ComboboxOption<string>) {
 	const aRank = preferredPlatformRanks.get(a.value) ?? Number.MAX_SAFE_INTEGER
 	const bRank = preferredPlatformRanks.get(b.value) ?? Number.MAX_SAFE_INTEGER
 
