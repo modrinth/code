@@ -80,35 +80,47 @@
 		</Combobox>
 	</div>
 
-	<div v-if="selectedVersion && downloadDataLoaded" class="flex flex-col gap-2.5">
+	<div
+		v-if="selectedVersion && downloadDataLoaded"
+		:role="compatibleVersions.length > 1 ? 'radiogroup' : undefined"
+		:aria-label="
+			compatibleVersions.length > 1 ? formatMessage(messages.compatibleVersionTitle) : undefined
+		"
+		class="flex flex-col gap-2.5"
+	>
 		<h3
-			v-if="[...suggestedPreReleaseVersions, selectedVersion].length > 1"
+			v-if="compatibleVersions.length > 1"
 			class="relative top-0.5 m-0 text-base font-semibold text-contrast"
 		>
 			{{ formatMessage(messages.compatibleVersionTitle) }}
 		</h3>
 		<CompatibleVersionCard
+			v-for="compatibleVersion in compatibleVersions"
+			:key="compatibleVersion.id"
 			:project="project"
-			:version="selectedVersion"
+			:version="compatibleVersion"
 			:download-reason="downloadReason"
 			:current-game-version="currentGameVersion"
 			:current-platform="currentPlatform"
-			:color="hasAdditionalDownloads ? 'standard' : 'brand'"
-			:type="hasAdditionalDownloads ? 'transparent' : 'standard'"
-			:circular="hasAdditionalDownloads"
-			@download="emit('download')"
-		/>
-		<CompatibleVersionCard
-			v-for="suggestedVersion in suggestedPreReleaseVersions"
-			:key="suggestedVersion.version.id"
-			:project="project"
-			:version="suggestedVersion.version"
-			:download-reason="downloadReason"
-			:current-game-version="currentGameVersion"
-			:current-platform="currentPlatform"
-			color="standard"
-			type="transparent"
-			circular
+			:selectable="compatibleVersions.length > 1"
+			:selected="compatibleVersion.id === selectedVersion.id"
+			:show-download="compatibleVersions.length === 1 || compatibleVersion.id === selectedVersion.id"
+			:color="
+				compatibleVersion.id === selectedVersion.id &&
+				compatibleVersions.length === 1 &&
+				!hasAdditionalDownloads
+					? 'brand'
+					: 'standard'
+			"
+			:type="
+				compatibleVersion.id === selectedVersion.id &&
+				compatibleVersions.length === 1 &&
+				!hasAdditionalDownloads
+					? 'standard'
+					: 'transparent'
+			"
+			:circular="hasAdditionalDownloads || compatibleVersions.length > 1"
+			@select="selectCompatibleVersion(compatibleVersion)"
 			@download="emit('download')"
 		/>
 	</div>
@@ -154,10 +166,6 @@ type DownloadableFile = {
 	filename: string
 }
 
-type SuggestedPreReleaseVersion = {
-	version: Labrinth.Versions.v3.Version
-}
-
 const props = withDefaults(
 	defineProps<{
 		project: DownloadModalProject
@@ -196,6 +204,7 @@ const tags = useGeneratedState()
 
 const userSelectedGameVersion = ref<string | null>(props.initialGameVersion)
 const userSelectedPlatform = ref<string | null>(props.initialPlatform)
+const userSelectedCompatibleVersionId = ref<string | null>(null)
 const showAllVersions = ref(defaultShowAllVersions())
 const versionFilter = ref('')
 
@@ -367,8 +376,40 @@ const filteredAlpha = computed<Labrinth.Versions.v3.Version | undefined>(() => {
 	return latestVersionByType('alpha')
 })
 
-const selectedVersion = computed<Labrinth.Versions.v3.Version | null>(() => {
+const defaultSelectedVersion = computed<Labrinth.Versions.v3.Version | null>(() => {
 	return filteredRelease.value || filteredBeta.value || filteredAlpha.value || null
+})
+
+const suggestedPreReleaseVersions = computed<Labrinth.Versions.v3.Version[]>(() => {
+	if (!defaultSelectedVersion.value || defaultSelectedVersion.value.version_type !== 'release') return []
+
+	const versions: Labrinth.Versions.v3.Version[] = []
+	const beta = filteredBeta.value
+	if (beta && isNewerThan(beta, defaultSelectedVersion.value)) {
+		versions.push(beta)
+	}
+
+	const alpha = filteredAlpha.value
+	if (alpha && isNewerThan(alpha, defaultSelectedVersion.value)) {
+		versions.push(alpha)
+	}
+
+	return versions
+})
+
+const compatibleVersions = computed<Labrinth.Versions.v3.Version[]>(() => {
+	if (!defaultSelectedVersion.value) return []
+	return [defaultSelectedVersion.value, ...suggestedPreReleaseVersions.value]
+})
+
+const selectedVersion = computed<Labrinth.Versions.v3.Version | null>(() => {
+	return (
+		compatibleVersions.value.find(
+			(version) => version.id === userSelectedCompatibleVersionId.value,
+		) ||
+		defaultSelectedVersion.value ||
+		null
+	)
 })
 
 const selectedPrimaryFile = computed<Labrinth.Versions.v3.VersionFile | null>(() => {
@@ -377,27 +418,6 @@ const selectedPrimaryFile = computed<Labrinth.Versions.v3.VersionFile | null>(()
 		selectedVersion.value?.files?.[0] ||
 		null
 	)
-})
-
-const suggestedPreReleaseVersions = computed<SuggestedPreReleaseVersion[]>(() => {
-	if (!selectedVersion.value || selectedVersion.value.version_type !== 'release') return []
-
-	const versions: SuggestedPreReleaseVersion[] = []
-	const beta = filteredBeta.value
-	if (beta && isNewerThan(beta, selectedVersion.value)) {
-		versions.push({
-			version: beta,
-		})
-	}
-
-	const alpha = filteredAlpha.value
-	if (alpha && isNewerThan(alpha, selectedVersion.value)) {
-		versions.push({
-			version: alpha,
-		})
-	}
-
-	return versions
 })
 
 const hasAdditionalDownloads = computed(() => {
@@ -428,11 +448,16 @@ watch(
 	{ immediate: true },
 )
 
+watch([currentGameVersion, currentPlatform], () => {
+	userSelectedCompatibleVersionId.value = null
+})
+
 watch(
 	() => props.resetKey,
 	() => {
 		userSelectedGameVersion.value = props.initialGameVersion
 		userSelectedPlatform.value = props.initialPlatform
+		userSelectedCompatibleVersionId.value = null
 		showAllVersions.value = defaultShowAllVersions()
 		versionFilter.value = ''
 	},
@@ -449,6 +474,10 @@ function selectPlatform(platform?: string) {
 	if (!platform) return
 	userSelectedPlatform.value = platform
 	emit('selectPlatform', platform)
+}
+
+function selectCompatibleVersion(version: Labrinth.Versions.v3.Version) {
+	userSelectedCompatibleVersionId.value = version.id
 }
 
 function latestVersionByType(type: Labrinth.Versions.v3.VersionChannel) {

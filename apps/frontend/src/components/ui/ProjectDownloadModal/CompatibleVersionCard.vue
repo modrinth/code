@@ -1,7 +1,25 @@
 <template>
 	<div
-		class="grid grid-cols-[1fr_min-content] items-center gap-3 rounded-2xl bg-surface-2 px-3 py-3"
+		:role="selectable ? 'radio' : undefined"
+		:aria-checked="selectable ? selected : undefined"
+		:tabindex="selectable ? 0 : undefined"
+		class="grid items-center gap-3 rounded-2xl border border-solid px-3 py-3 transition-all"
+		:class="{
+			'grid-cols-[min-content_minmax(0,1fr)_min-content]': selectable,
+			'grid-cols-[minmax(0,1fr)_min-content]': !selectable,
+			'cursor-pointer border-brand bg-surface-4 text-contrast': selectable && selected,
+			'cursor-pointer border-surface-5 bg-surface-4 hover:brightness-[115%]':
+				selectable && !selected,
+			'border-transparent bg-surface-2': !selectable,
+		}"
+		@click="select"
+		@keydown.enter.self.prevent="select"
+		@keydown.space.self.prevent="select"
 	>
+		<template v-if="selectable">
+			<RadioButtonCheckedIcon v-if="selected" aria-hidden="true" class="size-5 text-brand" />
+			<RadioButtonIcon v-else aria-hidden="true" class="size-5 text-secondary" />
+		</template>
 		<div class="flex min-w-0 flex-col gap-1">
 			<div class="flex min-w-0 items-center gap-2">
 				<nuxt-link
@@ -21,13 +39,21 @@
 				<span v-tooltip="publishedTooltip" class="min-w-0 truncate capitalize">
 					{{ publishedLabel }}
 				</span>
-				<div v-if="primaryFile" class="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-surface-5"></div>
+				<div
+					v-if="primaryFile"
+					class="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary opacity-30"
+				></div>
 				<span v-if="primaryFile" class="flex-shrink-0">
 					{{ primaryFileSizeLabel }}
 				</span>
 			</div>
 		</div>
-		<ButtonStyled v-if="primaryFile" :color="color" :type="type" :circular="circular">
+		<ButtonStyled
+			v-if="primaryFile && showDownload"
+			:color="color"
+			:type="type"
+			:circular="circular"
+		>
 			<a
 				v-tooltip="circular ? formatMessage(messages.download) : null"
 				:href="primaryFileDownloadUrl"
@@ -50,7 +76,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon } from '@modrinth/assets'
+import { DownloadIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	type CdnDownloadReason,
@@ -84,6 +110,9 @@ const props = withDefaults(
 		color?: 'brand' | 'standard'
 		type?: 'standard' | 'transparent'
 		circular?: boolean
+		selectable?: boolean
+		selected?: boolean
+		showDownload?: boolean
 	}>(),
 	{
 		downloadReason: 'standalone',
@@ -92,11 +121,15 @@ const props = withDefaults(
 		color: 'brand',
 		type: 'standard',
 		circular: false,
+		selectable: false,
+		selected: false,
+		showDownload: true,
 	},
 )
 
 const emit = defineEmits<{
 	download: []
+	select: []
 }>()
 
 const { createProjectDownloadUrl } = useCdnDownloadContext()
@@ -130,6 +163,11 @@ const primaryFileSizeLabel = computed(() => {
 	if (!primaryFile.value) return ''
 	return formatBytes(primaryFile.value.size)
 })
+
+function select() {
+	if (!props.selectable) return
+	emit('select')
+}
 
 const messages = defineMessages({
 	downloadVersion: {
