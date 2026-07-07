@@ -58,7 +58,11 @@
 		<template v-if="showDependencyDownloadActions" #actions>
 			<div class="flex flex-wrap justify-end gap-2">
 				<ButtonStyled>
-					<button :disabled="!!downloadingActionType" @click="downloadSelectedVersionZip">
+					<button
+						class="!shadow-none"
+						:disabled="!!downloadingActionType"
+						@click="downloadSelectedVersionZip"
+					>
 						<SpinnerIcon
 							v-if="downloadingActionType === 'zip'"
 							aria-hidden="true"
@@ -70,6 +74,7 @@
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button
+						class="!shadow-none"
 						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
 						@click="downloadSelectedVersionFilesWithDependencies"
 					>
@@ -199,6 +204,7 @@ const dependencyDownloadFilesLoaded = ref(false)
 const downloadingActionType = ref<DownloadActionType | null>(null)
 const MODAL_CLOSE_STATE_RESET_MS = 350
 const DOWNLOAD_URL_REVOKE_MS = 60000
+const DOWNLOAD_STAGGER_MS = 500
 let closeStateResetTimeout: ReturnType<typeof setTimeout> | null = null
 
 const routeProjectId = computed(() => showProjectId.value ?? props.projectId ?? null)
@@ -481,15 +487,10 @@ async function downloadSelectedVersionZip() {
 	try {
 		const zip = new JSZip()
 		const usedFilenames = new Set<string>()
+		const downloadedFiles = await downloadFileBlobs(files)
 
-		for (const file of files) {
-			const response = await fetch(file.href)
-
-			if (!response.ok) {
-				throw new Error(`Failed to download ${file.filename}`)
-			}
-
-			zip.file(uniqueFilename(file.filename, usedFilenames), await response.blob())
+		for (const file of downloadedFiles) {
+			zip.file(uniqueFilename(file.filename, usedFilenames), file.blob)
 		}
 
 		downloadBlob(
@@ -523,11 +524,7 @@ async function downloadSelectedVersionFilesWithDependencies() {
 			...dependencyDownloadFiles.value,
 		])
 
-		const downloadedFiles = await Promise.all(files.map(downloadFileBlob))
-
-		for (const file of downloadedFiles) {
-			downloadBlob(file.blob, file.filename)
-		}
+		await downloadFiles(files)
 
 		emit('download')
 	} catch (error) {
@@ -542,6 +539,10 @@ async function downloadSelectedVersionFilesWithDependencies() {
 	}
 }
 
+async function downloadFileBlobs(files: DownloadableFile[]): Promise<DownloadedFile[]> {
+	return Promise.all(files.map((file) => downloadFileBlob(file)))
+}
+
 async function downloadFileBlob(file: DownloadableFile): Promise<DownloadedFile> {
 	const response = await fetch(file.href)
 
@@ -553,6 +554,15 @@ async function downloadFileBlob(file: DownloadableFile): Promise<DownloadedFile>
 		...file,
 		blob: await response.blob(),
 	}
+}
+
+async function downloadFiles(files: DownloadableFile[]) {
+	await Promise.all(
+		files.map(async (file, index) => {
+			await delay(DOWNLOAD_STAGGER_MS * index)
+			downloadFileLink(file)
+		}),
+	)
 }
 
 function dedupeDownloadFiles(files: DownloadableFile[]) {
@@ -578,6 +588,15 @@ function downloadBlob(blob: Blob, filename: string) {
 	link.click()
 	link.remove()
 	window.setTimeout(() => URL.revokeObjectURL(url), DOWNLOAD_URL_REVOKE_MS)
+}
+
+function downloadFileLink(file: DownloadableFile) {
+	const link = document.createElement('a')
+	link.href = file.href
+	link.download = file.filename
+	document.body.appendChild(link)
+	link.click()
+	link.remove()
 }
 
 function selectedVersionZipFilename() {
@@ -650,7 +669,11 @@ function clearCloseStateResetTimeout() {
 
 async function waitForCloseStateReset() {
 	if (!closeStateResetTimeout) return
-	await new Promise((resolve) => setTimeout(resolve, MODAL_CLOSE_STATE_RESET_MS))
+	await delay(MODAL_CLOSE_STATE_RESET_MS)
+}
+
+async function delay(ms: number) {
+	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function loadProjectForModal(forceRefetch: boolean) {
