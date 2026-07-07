@@ -209,6 +209,11 @@ const userSelectedPlatform = ref<string | null>(props.initialPlatform)
 const userSelectedCompatibleVersionId = ref<string | null>(null)
 const showAllVersions = ref(defaultShowAllVersions())
 const versionFilter = ref('')
+const preferredPlatformRanks = new Map([
+	['fabric', 0],
+	['forge', 1],
+	['neoforge', 2],
+])
 
 const incompatibleGameVersionsSet = computed(() => new Set(props.incompatibleGameVersions))
 const incompatibleLoadersSet = computed(() => new Set(props.incompatibleLoaders))
@@ -336,13 +341,12 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 
 const platformOptions = computed<ComboboxOption<string>[]>(() => {
 	return props.project.loaders
-		.slice()
-		.reverse()
 		.map((platform) => ({
 			value: platform,
 			label: loaderLabel(platform),
 			class: '!px-0 !py-1',
 		}))
+		.sort(comparePlatformOptions)
 })
 
 const filteredVersions = computed<Labrinth.Versions.v3.Version[]>(() => {
@@ -501,6 +505,18 @@ function isNewerThan(
 
 function loaderLabel(loader: string) {
 	return formatMessage(getTagMessage(loader, 'loader') ?? messages.unknownLoader)
+}
+
+function comparePlatformOptions(
+	a: ComboboxOption<string>,
+	b: ComboboxOption<string>,
+) {
+	const aRank = preferredPlatformRanks.get(a.value) ?? Number.MAX_SAFE_INTEGER
+	const bRank = preferredPlatformRanks.get(b.value) ?? Number.MAX_SAFE_INTEGER
+
+	if (aRank !== bRank) return aRank - bRank
+
+	return a.label.localeCompare(b.label)
 }
 
 function isReleaseGameVersion(version: string) {
