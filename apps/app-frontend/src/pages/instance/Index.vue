@@ -384,10 +384,13 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3, get_user } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
+	getErrorMessage,
 	install_existing_instance,
 	install_get_shared_instance_update_preview,
 	install_pack_to_existing_instance,
+	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
+	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
@@ -447,9 +450,23 @@ const messages = defineMessages({
 		defaultMessage:
 			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
 	},
+	sharedInstanceDeletedText: {
+		id: 'instance.shared-instance.unavailable.deleted-text',
+		defaultMessage:
+			'The shared instance has been deleted. Contact {manager} for more information.',
+	},
+	sharedInstanceAccessRevokedText: {
+		id: 'instance.shared-instance.unavailable.access-revoked-text',
+		defaultMessage:
+			'Your access to this shared instance has been revoked. Contact {manager} for more information.',
+	},
 	sharedInstanceUnavailableFallbackManager: {
 		id: 'instance.shared-instance.unavailable.manager-fallback',
 		defaultMessage: 'the instance manager',
+	},
+	sharedInstanceErrorTitle: {
+		id: 'instance.shared-instance.error.title',
+		defaultMessage: 'Something has gone wrong',
 	},
 })
 
@@ -846,14 +863,20 @@ function clearSharedInstanceLaunchChecking() {
 	checkingSharedInstanceLaunch.value = false
 }
 
-async function handleSharedInstanceUnavailable() {
+function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
+	if (reason === 'deleted') return messages.sharedInstanceDeletedText
+	if (reason === 'access_revoked') return messages.sharedInstanceAccessRevokedText
+	return messages.sharedInstanceUnavailableText
+}
+
+async function handleSharedInstanceUnavailable(reason: SharedInstanceUnavailableReason | null = null) {
 	const manager =
 		sharedInstanceManager.value?.username ??
 		formatMessage(messages.sharedInstanceUnavailableFallbackManager)
 	addNotification({
 		type: 'warning',
 		title: formatMessage(messages.sharedInstanceUnavailableTitle),
-		text: formatMessage(messages.sharedInstanceUnavailableText, { manager }),
+		text: formatMessage(sharedInstanceUnavailableTextMessage(reason), { manager }),
 	})
 	await fetchInstance()
 }
@@ -878,11 +901,15 @@ const startInstance = async (context: string) => {
 				preview = await install_get_shared_instance_update_preview(instance.value.id)
 			} catch (error) {
 				if (isSharedInstanceUnavailableError(error)) {
-					await handleSharedInstanceUnavailable()
+					await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
 					return
 				}
 
-				handleError(error as Error)
+				addNotification({
+					type: 'error',
+					title: formatMessage(messages.sharedInstanceErrorTitle),
+					text: getErrorMessage(error),
+				})
 				return
 			}
 

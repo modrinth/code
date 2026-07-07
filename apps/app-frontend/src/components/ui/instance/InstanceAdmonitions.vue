@@ -55,6 +55,12 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import {
+	getErrorMessage,
+	getSharedInstanceUnavailableReason,
+	isSharedInstanceUnavailableError,
+	type SharedInstanceUnavailableReason,
+} from '@/helpers/install'
 import { get_shared_instance_publish_preview, publish_shared_instance } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
@@ -115,10 +121,37 @@ const messages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.removed-label',
 		defaultMessage: 'Removed',
 	},
+	sharedInstanceUnavailableTitle: {
+		id: 'instance.shared-instance.unavailable.title',
+		defaultMessage: 'Shared instance no longer available',
+	},
+	sharedInstanceUnavailableText: {
+		id: 'instance.shared-instance.unavailable.text',
+		defaultMessage:
+			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
+	},
+	sharedInstanceDeletedText: {
+		id: 'instance.shared-instance.unavailable.deleted-text',
+		defaultMessage:
+			'The shared instance has been deleted. Contact {manager} for more information.',
+	},
+	sharedInstanceAccessRevokedText: {
+		id: 'instance.shared-instance.unavailable.access-revoked-text',
+		defaultMessage:
+			'Your access to this shared instance has been revoked. Contact {manager} for more information.',
+	},
+	sharedInstanceUnavailableFallbackManager: {
+		id: 'instance.shared-instance.unavailable.manager-fallback',
+		defaultMessage: 'the instance manager',
+	},
+	sharedInstanceErrorTitle: {
+		id: 'instance.shared-instance.error.title',
+		defaultMessage: 'Something has gone wrong',
+	},
 })
 
 const { formatMessage } = useVIntl()
-const { handleError } = injectNotificationManager()
+const { addNotification } = injectNotificationManager()
 const isPublishing = ref(false)
 const isReviewingPublish = ref(false)
 const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
@@ -145,13 +178,41 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 	]
 })
 
+function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
+	if (reason === 'deleted') return messages.sharedInstanceDeletedText
+	if (reason === 'access_revoked') return messages.sharedInstanceAccessRevokedText
+	return messages.sharedInstanceUnavailableText
+}
+
+function notifySharedInstanceUnavailable(reason: SharedInstanceUnavailableReason | null = null) {
+	addNotification({
+		type: 'warning',
+		title: formatMessage(messages.sharedInstanceUnavailableTitle),
+		text: formatMessage(sharedInstanceUnavailableTextMessage(reason), {
+			manager: formatMessage(messages.sharedInstanceUnavailableFallbackManager),
+		}),
+	})
+}
+
+function notifySharedInstanceError(error: unknown) {
+	addNotification({
+		type: 'error',
+		title: formatMessage(messages.sharedInstanceErrorTitle),
+		text: getErrorMessage(error),
+	})
+}
+
 async function reviewSharedInstanceChanges(e?: MouseEvent) {
 	if (isPublishButtonDisabled.value) return
 
 	isReviewingPublish.value = true
 	try {
 		const preview = await get_shared_instance_publish_preview(props.instance.id)
-		if (!preview) return
+		if (!preview) {
+			notifySharedInstanceUnavailable()
+			emit('published')
+			return
+		}
 
 		publishDiffs.value = preview.diffs.map((diff) => ({
 			type: diff.type,
@@ -163,7 +224,13 @@ async function reviewSharedInstanceChanges(e?: MouseEvent) {
 		}))
 		publishReviewModal.value?.show(e)
 	} catch (err) {
-		handleError(err as Error)
+		if (isSharedInstanceUnavailableError(err)) {
+			notifySharedInstanceUnavailable(getSharedInstanceUnavailableReason(err))
+			emit('published')
+			return
+		}
+
+		notifySharedInstanceError(err)
 	} finally {
 		isReviewingPublish.value = false
 	}
@@ -177,7 +244,13 @@ async function publishSharedInstanceChanges() {
 		await publish_shared_instance(props.instance.id)
 		emit('published')
 	} catch (err) {
-		handleError(err as Error)
+		if (isSharedInstanceUnavailableError(err)) {
+			notifySharedInstanceUnavailable(getSharedInstanceUnavailableReason(err))
+			emit('published')
+			return
+		}
+
+		notifySharedInstanceError(err)
 	} finally {
 		isPublishing.value = false
 	}

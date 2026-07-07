@@ -372,3 +372,7 @@ export async function publish_shared_instance(
 ): Promise<SharedInstanceAttachment> {
 	return await invoke('plugin:instance|instance_share_publish', { instanceId })
 }
+
+export async function unpublish_shared_instance(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_share_unpublish', { instanceId })
+}

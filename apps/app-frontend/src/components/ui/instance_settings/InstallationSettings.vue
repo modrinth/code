@@ -29,6 +29,7 @@ import {
 	edit,
 	get_linked_modpack_info,
 	list,
+	unpublish_shared_instance,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
 } from '@/helpers/instance'
@@ -117,6 +118,7 @@ const isImportedModpack = computed(() => instance.value.link?.type === 'imported
 const isSharedInstanceManagedModpack = computed(
 	() => instance.value.shared_instance?.role === 'member',
 )
+const canUnpublishSharedInstance = computed(() => instance.value.shared_instance?.role === 'owner')
 
 const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
@@ -127,6 +129,7 @@ const modpackInfo = modpackInfoQuery.data
 
 const repairing = ref(false)
 const reinstalling = ref(false)
+const unpublishingSharedInstance = ref(false)
 
 const messages = defineMessages({
 	loaderVersion: {
@@ -217,6 +220,7 @@ provideInstallationSettings({
 			instance.value.install_stage !== 'installed' ||
 			repairing.value ||
 			reinstalling.value ||
+			unpublishingSharedInstance.value ||
 			!!offline,
 	),
 	skipNonEssentialWarnings,
@@ -399,6 +403,27 @@ provideInstallationSettings({
 		debug('unlinkModpack: done')
 	},
 
+	async unpublishSharedInstance() {
+		debug('unpublishSharedInstance: called', { instanceId: instance.value.id })
+		unpublishingSharedInstance.value = true
+		try {
+			await unpublish_shared_instance(instance.value.id)
+			await queryClient.invalidateQueries({
+				queryKey: ['sharedInstanceUsers', instance.value.id],
+			})
+			await queryClient.invalidateQueries({
+				queryKey: ['linkedModpackInfo', instance.value.id],
+			})
+			onUnlinked()
+			debug('unpublishSharedInstance: done')
+		} catch (error) {
+			handleError(error)
+			debug('unpublishSharedInstance: failed', { error })
+		} finally {
+			unpublishingSharedInstance.value = false
+		}
+	},
+
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
 		debug('fetchModpackVersions: called', {
@@ -444,6 +469,8 @@ provideInstallationSettings({
 	),
 	isLocalFile: isImportedModpack,
 	isSharedInstanceManagedModpack,
+	canUnpublishSharedInstance,
+	unpublishingSharedInstance,
 	repairing,
 	reinstalling,
 })

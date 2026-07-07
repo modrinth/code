@@ -66,6 +66,11 @@ export interface InstallationSettingsContext {
 	/** True when the linked modpack is controlled by a shared instance update stream. */
 	isSharedInstanceManagedModpack?: boolean | ComputedRef<boolean>
 
+	/** True when the current user owns the shared instance and can remove it from Modrinth. */
+	canUnpublishSharedInstance?: boolean | ComputedRef<boolean>
+	unpublishingSharedInstance?: Ref<boolean>
+	unpublishSharedInstance?: () => Promise<void>
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 

@@ -26,6 +26,7 @@ import {
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
+	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -34,8 +35,11 @@ import { computed, ref, watch } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import {
+	getErrorMessage,
+	getSharedInstanceUnavailableReason,
 	install_update_shared_instance,
 	isSharedInstanceUnavailableError,
+	type SharedInstanceUnavailableReason,
 	type SharedInstanceUpdatePreview,
 	wait_for_install_job,
 } from '@/helpers/install'
@@ -81,13 +85,14 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
 const emit = defineEmits<{
 	cancel: []
 	complete: []
-	sharedInstanceUnavailable: []
+	sharedInstanceUnavailable: [reason: SharedInstanceUnavailableReason | null]
 }>()
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
@@ -282,11 +287,15 @@ async function handleUpdate() {
 			}
 		} catch (error) {
 			if (isSharedInstanceUnavailableError(error)) {
-				emit('sharedInstanceUnavailable')
+				emit('sharedInstanceUnavailable', getSharedInstanceUnavailableReason(error))
 				return
 			}
 
-			console.error('Error updating shared instance:', error)
+			addNotification({
+				type: 'error',
+				title: formatMessage(messages.sharedInstanceErrorTitle),
+				text: getErrorMessage(error),
+			})
 		} finally {
 			emit('complete')
 		}
@@ -373,6 +382,10 @@ const messages = defineMessages({
 	sharedInstanceRemovedLabel: {
 		id: 'app.modal.update-to-play.shared-instance-removed-label',
 		defaultMessage: 'Removed',
+	},
+	sharedInstanceErrorTitle: {
+		id: 'instance.shared-instance.error.title',
+		defaultMessage: 'Something has gone wrong',
 	},
 })
 

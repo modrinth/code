@@ -80,10 +80,54 @@ export interface SharedInstanceUpdateDiff {
 }
 
 export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
+export const SHARED_INSTANCE_DELETED_ERROR_CODE = 'shared_instance_deleted'
+export const SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE = 'shared_instance_access_revoked'
+
+export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'unknown'
+
+function errorSearchText(error: unknown, seen = new Set<object>()): string {
+	if (error == null) return ''
+	if (typeof error === 'string') return error
+	if (typeof error === 'number' || typeof error === 'boolean') return String(error)
+	if (error instanceof Error) {
+		return [error.name, error.message, error.cause ? errorSearchText(error.cause, seen) : '']
+			.filter(Boolean)
+			.join(' ')
+	}
+	if (typeof error === 'object') {
+		if (seen.has(error)) return ''
+		seen.add(error)
+		const value = error as {
+			message?: unknown
+			error?: unknown
+			cause?: unknown
+			details?: unknown
+		}
+		return [value.message, value.error, value.cause, value.details, ...Object.values(error)]
+			.map((value) => errorSearchText(value, seen))
+			.filter(Boolean)
+			.join(' ')
+	}
+
+	return ''
+}
 
 export function isSharedInstanceUnavailableError(error: unknown) {
-	const message = error instanceof Error ? error.message : String(error)
-	return message.includes(SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE)
+	return getSharedInstanceUnavailableReason(error) !== null
+}
+
+export function getSharedInstanceUnavailableReason(
+	error: unknown,
+): SharedInstanceUnavailableReason | null {
+	const text = errorSearchText(error)
+	if (text.includes(SHARED_INSTANCE_DELETED_ERROR_CODE)) return 'deleted'
+	if (text.includes(SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE)) return 'access_revoked'
+	if (text.includes(SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE)) return 'unknown'
+	return null
+}
+
+export function getErrorMessage(error: unknown): string {
+	return errorSearchText(error) || 'Unknown error'
 }
 
 export type InstallJobStatus =

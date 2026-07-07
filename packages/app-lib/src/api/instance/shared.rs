@@ -6,8 +6,9 @@ use crate::install::{
 };
 use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
 use crate::state::{
-    CacheBehaviour, CachedEntry, ContentSetSyncStatus, ModLoader,
-    ModrinthCredentials, ProjectType, SharedInstanceRole, State,
+    AppliedContentSetPatch, CacheBehaviour, CachedEntry, ContentSetSyncStatus,
+    ContentSourceKind, EditInstance, ModLoader, ModrinthCredentials,
+    ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
 use reqwest::{Method, StatusCode};
@@ -16,8 +17,38 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 
-const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE: &str =
-    "shared_instance_unavailable";
+const SHARED_INSTANCE_DELETED_ERROR_CODE: &str = "shared_instance_deleted";
+const SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE: &str =
+    "shared_instance_access_revoked";
+
+#[derive(Clone, Copy, Debug)]
+enum SharedInstanceUnavailableReason {
+    Deleted,
+    AccessRevoked,
+}
+
+impl SharedInstanceUnavailableReason {
+    fn from_status(status: StatusCode) -> Option<Self> {
+        match status {
+            StatusCode::NOT_FOUND => Some(Self::Deleted),
+            StatusCode::UNAUTHORIZED => Some(Self::AccessRevoked),
+            _ => None,
+        }
+    }
+
+    fn error_code(self) -> &'static str {
+        match self {
+            Self::Deleted => SHARED_INSTANCE_DELETED_ERROR_CODE,
+            Self::AccessRevoked => SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE,
+        }
+    }
+}
+
+#[derive(Debug)]
+enum SharedInstanceRemoteResponse<T> {
+    Available(T),
+    Unavailable(SharedInstanceUnavailableReason),
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SharedInstanceUsers {
@@ -248,6 +279,60 @@ pub async fn remove_shared_instance_users(
 }
 
 #[tracing::instrument]
+pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
+	let state = State::get().await?;
+	let metadata = crate::state::get_instance(instance_id, &state.pool)
+		.await?
+		.ok_or_else(|| {
+			crate::ErrorKind::InputError("Unknown instance".to_string())
+		})?;
+	let Some(attachment) = metadata.shared_instance.clone() else {
+		return Ok(());
+	};
+	ensure_owner(&attachment)?;
+
+	let link_patch = match metadata.link {
+		InstanceLink::SharedInstance {
+			modpack_project_id: Some(project_id),
+			modpack_version_id: Some(version_id),
+		} => Some((
+			InstanceLink::ModrinthModpack {
+				project_id,
+				version_id,
+			},
+			ContentSourceKind::ModrinthModpack,
+		)),
+		InstanceLink::SharedInstance { .. } => {
+			Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
+		}
+		_ => None,
+	};
+
+	delete_remote_instance(&attachment.id, &state).await?;
+
+	if let Some((link, source_kind)) = link_patch {
+		crate::state::edit_instance(
+			instance_id,
+			EditInstance {
+				link: Some(link),
+				content_set_patch: Some(AppliedContentSetPatch {
+					source_kind: Some(source_kind),
+					..Default::default()
+				}),
+				..Default::default()
+			},
+			&state.pool,
+		)
+		.await?;
+	}
+
+	crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+	emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+	Ok(())
+}
+
+#[tracing::instrument]
 pub async fn publish_shared_instance(
     instance_id: &str,
 ) -> crate::Result<SharedInstanceAttachment> {
@@ -280,7 +365,23 @@ pub async fn get_shared_instance_publish_preview(
     };
     ensure_owner(&attachment)?;
 
-    let version = get_latest_remote_version(&attachment.id, &state).await?;
+    let version = match get_latest_remote_version_optional_unavailable(
+        &attachment.id,
+        &state,
+    )
+    .await?
+    {
+        SharedInstanceRemoteResponse::Available(version) => version,
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            clear_shared_instance_if_current_user(
+                instance_id,
+                &attachment,
+                &state,
+            )
+            .await?;
+            return Err(shared_instance_unavailable_error(reason));
+        }
+    };
     let diffs = shared_instance_publish_diffs(&metadata, &version, &state).await?;
 
     Ok(Some(SharedInstancePublishPreview {
@@ -452,26 +553,30 @@ async fn get_latest_remote_member_version(
     attachment: &SharedInstanceAttachment,
     state: &State,
 ) -> crate::Result<InstanceVersionResponse> {
-    let Some(version) =
-        get_latest_remote_version_optional_not_found(&attachment.id, state)
+    let version =
+        match get_latest_remote_version_optional_unavailable(&attachment.id, state)
             .await?
-    else {
-        if shared_attachment_matches_current_user(attachment, state).await? {
-            crate::state::clear_shared_instance(instance_id, &state.pool)
-                .await?;
-            emit_instance(instance_id, InstancePayloadType::Edited).await?;
-            return Err(crate::ErrorKind::InputError(
-                SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE.to_string(),
-            )
-            .into());
-        }
+        {
+            SharedInstanceRemoteResponse::Available(version) => version,
+            SharedInstanceRemoteResponse::Unavailable(reason) => {
+                if shared_attachment_matches_current_user(attachment, state).await? {
+                    clear_shared_instance_if_current_user(
+                        instance_id,
+                        attachment,
+                        state,
+                    )
+                    .await?;
+                    return Err(shared_instance_unavailable_error(reason));
+                }
 
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance {} was not found",
-            attachment.id
-        ))
-        .into());
-    };
+                return Err(crate::ErrorKind::OtherError(format!(
+                    "{}: {}",
+                    shared_instance_unavailable_message(reason),
+                    attachment.id
+                ))
+                .into());
+            }
+        };
 
     Ok(version)
 }
@@ -488,6 +593,38 @@ async fn shared_attachment_matches_current_user(
         .await?
         .as_deref()
         .is_some_and(|current_user_id| current_user_id == linked_user_id))
+}
+
+async fn clear_shared_instance_if_current_user(
+    instance_id: &str,
+    attachment: &SharedInstanceAttachment,
+    state: &State,
+) -> crate::Result<()> {
+    if shared_attachment_matches_current_user(attachment, state).await? {
+        crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    }
+
+    Ok(())
+}
+
+fn shared_instance_unavailable_error(
+    reason: SharedInstanceUnavailableReason,
+) -> crate::Error {
+    crate::ErrorKind::InputError(reason.error_code().to_string()).into()
+}
+
+fn shared_instance_unavailable_message(
+    reason: SharedInstanceUnavailableReason,
+) -> &'static str {
+    match reason {
+        SharedInstanceUnavailableReason::Deleted => {
+            "Shared instance was deleted"
+        }
+        SharedInstanceUnavailableReason::AccessRevoked => {
+            "Shared instance access was revoked"
+        }
+    }
 }
 
 async fn shared_instance_install_data(
@@ -1046,7 +1183,7 @@ async fn publish_current_content(
             file_type: file.file_type.clone(),
         })
         .collect::<Vec<_>>();
-    let response = request_json::<InstanceVersionResponse>(
+    let response = request_json_optional_unavailable::<InstanceVersionResponse>(
         "create_instance_version",
         Method::POST,
         &format!("/instances/{shared_instance_id}/versions"),
@@ -1065,6 +1202,21 @@ async fn publish_current_content(
         state,
     )
     .await?;
+    let response = match response {
+        SharedInstanceRemoteResponse::Available(response) => response,
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            if let Some(attachment) = metadata.shared_instance.as_ref() {
+                clear_shared_instance_if_current_user(
+                    instance_id,
+                    attachment,
+                    state,
+                )
+                .await?;
+            }
+
+            return Err(shared_instance_unavailable_error(reason));
+        }
+    };
 
 	if !response.external_files.is_empty() {
 		upload_external_files(
@@ -1313,11 +1465,11 @@ async fn get_latest_remote_version(
     .await
 }
 
-async fn get_latest_remote_version_optional_not_found(
+async fn get_latest_remote_version_optional_unavailable(
     shared_instance_id: &str,
     state: &State,
-) -> crate::Result<Option<InstanceVersionResponse>> {
-    request_json_optional_not_found(
+) -> crate::Result<SharedInstanceRemoteResponse<InstanceVersionResponse>> {
+    request_json_optional_unavailable(
         "get_latest_instance_version",
         Method::GET,
         &format!("/instances/{shared_instance_id}/versions"),
@@ -1371,27 +1523,29 @@ where
     decode_json_response(operation, path, response).await
 }
 
-async fn request_json_optional_not_found<T>(
+async fn request_json_optional_unavailable<T>(
     operation: &'static str,
     method: Method,
     path: &str,
     body: Option<serde_json::Value>,
     state: &State,
-) -> crate::Result<Option<T>>
+) -> crate::Result<SharedInstanceRemoteResponse<T>>
 where
     T: DeserializeOwned,
 {
     let response = send_request(operation, method.clone(), path, body, state)
         .await?;
-    if response.status() == StatusCode::NOT_FOUND {
+    if let Some(reason) =
+        SharedInstanceUnavailableReason::from_status(response.status())
+    {
         tracing::warn!(
             operation,
             method = method.as_str(),
             path,
             status = response.status().as_u16(),
-            "Shared instances API resource was not found"
+            "Shared instances API resource is unavailable"
         );
-        return Ok(None);
+        return Ok(SharedInstanceRemoteResponse::Unavailable(reason));
     }
 
     if !response.status().is_success() {
@@ -1404,7 +1558,9 @@ where
         .await;
     }
 
-    decode_json_response(operation, path, response).await.map(Some)
+    decode_json_response(operation, path, response)
+        .await
+        .map(SharedInstanceRemoteResponse::Available)
 }
 
 async fn decode_json_response<T>(
