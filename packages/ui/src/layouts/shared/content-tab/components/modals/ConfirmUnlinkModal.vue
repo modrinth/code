@@ -54,7 +54,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
-	mode?: 'default' | 'share-instance'
+	mode?: 'default' | 'share-instance' | 'shared-instance-managed'
 	server?: boolean
 	backupTip?: string
 	actionDisabled?: boolean
@@ -86,6 +86,15 @@ const messages = defineMessages({
 		id: 'content.confirm-unlink.share-instance-admonition-body',
 		defaultMessage: 'You must unlink this modpack to share your instance',
 	},
+	sharedInstanceManagedAdmonitionHeader: {
+		id: 'content.confirm-unlink.shared-instance-managed-admonition-header',
+		defaultMessage: 'This is managed by the shared instance',
+	},
+	sharedInstanceManagedAdmonitionBody: {
+		id: 'content.confirm-unlink.shared-instance-managed-admonition-body',
+		defaultMessage:
+			'Unlinking only changes your local copy. Future shared instance updates may restore or change it again.',
+	},
 	unlinkButton: {
 		id: 'content.confirm-unlink.unlink-button',
 		defaultMessage: 'Unlink',
@@ -100,14 +109,18 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 const headerMessage = computed(() => messages.header)
-const admonitionHeaderMessage = computed(() =>
-	props.mode === 'share-instance'
-		? messages.shareInstanceAdmonitionHeader
-		: messages.admonitionHeader,
-)
-const admonitionBodyMessage = computed(() =>
-	props.mode === 'share-instance' ? messages.shareInstanceAdmonitionBody : messages.admonitionBody,
-)
+const admonitionHeaderMessage = computed(() => {
+	if (props.mode === 'share-instance') return messages.shareInstanceAdmonitionHeader
+	if (props.mode === 'shared-instance-managed') return messages.sharedInstanceManagedAdmonitionHeader
+
+	return messages.admonitionHeader
+})
+const admonitionBodyMessage = computed(() => {
+	if (props.mode === 'share-instance') return messages.shareInstanceAdmonitionBody
+	if (props.mode === 'shared-instance-managed') return messages.sharedInstanceManagedAdmonitionBody
+
+	return messages.admonitionBody
+})
 const actionMessage = computed(() =>
 	props.server && props.mode !== 'share-instance' ? messages.header : messages.unlinkButton,
 )

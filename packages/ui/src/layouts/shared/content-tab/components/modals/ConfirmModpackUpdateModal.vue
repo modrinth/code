@@ -19,6 +19,13 @@
 					})
 				}}
 			</Admonition>
+			<Admonition
+				v-if="sharedInstanceManaged"
+				type="warning"
+				:header="formatMessage(messages.sharedInstanceManagedAdmonitionHeader)"
+			>
+				{{ formatMessage(messages.sharedInstanceManagedAdmonitionBody) }}
+			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
 				:backup-name="backupName"
@@ -65,6 +72,7 @@ import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
 	downgrade?: boolean
+	sharedInstanceManaged?: boolean
 	backupTip?: string
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string
@@ -92,6 +100,15 @@ const messages = defineMessages({
 		id: 'content.confirm-modpack-update.admonition-body',
 		defaultMessage:
 			'{action, select, downgrade {Downgrading} other {Updating}} may cause compatibility issues. Mods or content you added on top of the modpack will be kept, but may not be compatible with the new version.',
+	},
+	sharedInstanceManagedAdmonitionHeader: {
+		id: 'content.confirm-modpack-update.shared-instance-managed-admonition-header',
+		defaultMessage: 'This is managed by the shared instance',
+	},
+	sharedInstanceManagedAdmonitionBody: {
+		id: 'content.confirm-modpack-update.shared-instance-managed-admonition-body',
+		defaultMessage:
+			'Changing the version only changes your local copy. Future shared instance updates may restore or change it again.',
 	},
 	confirmButton: {
 		id: 'content.confirm-modpack-update.confirm-button',

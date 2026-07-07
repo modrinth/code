@@ -114,6 +114,9 @@ const isModrinthLinkedModpack = computed(
 		instance.value.link?.type === 'server_project_modpack',
 )
 const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
+const isSharedInstanceManagedModpack = computed(
+	() => instance.value.shared_instance?.role === 'member',
+)
 
 const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
@@ -440,6 +443,7 @@ provideInstallationSettings({
 		() => isModrinthLinkedModpack.value && !isMinecraftServer.value,
 	),
 	isLocalFile: isImportedModpack,
+	isSharedInstanceManagedModpack,
 	repairing,
 	reinstalling,
 })

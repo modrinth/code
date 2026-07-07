@@ -10,11 +10,14 @@ use crate::state::{
     ModrinthCredentials, ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
-use reqwest::Method;
+use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
+
+const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE: &str =
+    "shared_instance_unavailable";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SharedInstanceUsers {
@@ -373,7 +376,9 @@ pub async fn get_shared_instance_update_preview(
         return Ok(None);
     }
 
-    let version = get_latest_remote_version(&attachment.id, &state).await?;
+    let version =
+        get_latest_remote_member_version(instance_id, &attachment, &state)
+            .await?;
     if !version.ready {
         return Ok(Some(SharedInstanceUpdatePreview {
             shared_instance_id: attachment.id,
@@ -425,7 +430,9 @@ pub async fn update_shared_instance(
         .into());
     }
 
-    let version = get_latest_remote_version(&attachment.id, &state).await?;
+    let version =
+        get_latest_remote_member_version(instance_id, &attachment, &state)
+            .await?;
     let data = shared_instance_install_data(
         &attachment.id,
         attachment.manager_id.clone(),
@@ -436,6 +443,49 @@ pub async fn update_shared_instance(
     .await?;
 
     crate::install::update_shared_instance(instance_id.to_string(), data).await
+}
+
+async fn get_latest_remote_member_version(
+    instance_id: &str,
+    attachment: &SharedInstanceAttachment,
+    state: &State,
+) -> crate::Result<InstanceVersionResponse> {
+    let Some(version) =
+        get_latest_remote_version_optional_not_found(&attachment.id, state)
+            .await?
+    else {
+        if shared_attachment_matches_current_user(attachment, state).await? {
+            crate::state::clear_shared_instance(instance_id, &state.pool)
+                .await?;
+            emit_instance(instance_id, InstancePayloadType::Edited).await?;
+            return Err(crate::ErrorKind::InputError(
+                SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE.to_string(),
+            )
+            .into());
+        }
+
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance {} was not found",
+            attachment.id
+        ))
+        .into());
+    };
+
+    Ok(version)
+}
+
+async fn shared_attachment_matches_current_user(
+    attachment: &SharedInstanceAttachment,
+    state: &State,
+) -> crate::Result<bool> {
+    let Some(linked_user_id) = attachment.linked_user_id.as_deref() else {
+        return Ok(false);
+    };
+
+    Ok(linked_modrinth_user_id(state)
+        .await?
+        .as_deref()
+        .is_some_and(|current_user_id| current_user_id == linked_user_id))
 }
 
 async fn shared_instance_install_data(
@@ -1180,6 +1230,20 @@ async fn get_latest_remote_version(
     .await
 }
 
+async fn get_latest_remote_version_optional_not_found(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<Option<InstanceVersionResponse>> {
+    request_json_optional_not_found(
+        "get_latest_instance_version",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/versions"),
+        None,
+        state,
+    )
+    .await
+}
+
 async fn add_remote_users(
     shared_instance_id: &str,
     user_ids: Vec<String>,
@@ -1221,6 +1285,53 @@ where
     T: DeserializeOwned,
 {
     let response = request(operation, method, path, body, state).await?;
+    decode_json_response(operation, path, response).await
+}
+
+async fn request_json_optional_not_found<T>(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+) -> crate::Result<Option<T>>
+where
+    T: DeserializeOwned,
+{
+    let response = send_request(operation, method.clone(), path, body, state)
+        .await?;
+    if response.status() == StatusCode::NOT_FOUND {
+        tracing::warn!(
+            operation,
+            method = method.as_str(),
+            path,
+            status = response.status().as_u16(),
+            "Shared instances API resource was not found"
+        );
+        return Ok(None);
+    }
+
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            operation,
+            method,
+            path,
+            response,
+        )
+        .await;
+    }
+
+    decode_json_response(operation, path, response).await.map(Some)
+}
+
+async fn decode_json_response<T>(
+    operation: &'static str,
+    path: &str,
+    response: reqwest::Response,
+) -> crate::Result<T>
+where
+    T: DeserializeOwned,
+{
     let status = response.status();
     let body = response.text().await?;
     tracing::debug!(
@@ -1251,6 +1362,22 @@ async fn request_empty(
 }
 
 async fn request(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let response =
+        send_request(operation, method.clone(), path, body, state).await?;
+    if response.status().is_success() {
+        return Ok(response);
+    }
+
+    shared_instances_request_error(operation, method, path, response).await
+}
+
+async fn send_request(
     operation: &'static str,
     method: Method,
     path: &str,
@@ -1291,17 +1418,22 @@ async fn request(
             status = response.status().as_u16(),
             "Shared instances API request succeeded"
         );
-        return Ok(response);
     }
+    Ok(response)
+}
 
+async fn shared_instances_request_error<T>(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    response: reqwest::Response,
+) -> crate::Result<T> {
     let status = response.status();
     let body = response.text().await.unwrap_or_default();
     tracing::warn!(
         operation,
         method = method.as_str(),
         path,
-        url = %url,
-        user_id = %credentials.user_id,
         status = status.as_u16(),
         response_body = %body,
         "Shared instances API request failed"

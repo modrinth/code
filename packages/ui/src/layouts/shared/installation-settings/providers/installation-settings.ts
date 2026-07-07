@@ -63,6 +63,9 @@ export interface InstallationSettingsContext {
 	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
 	isLocalFile?: boolean | ComputedRef<boolean>
 
+	/** True when the linked modpack is controlled by a shared instance update stream. */
+	isSharedInstanceManagedModpack?: boolean | ComputedRef<boolean>
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 

@@ -121,8 +121,13 @@ function continueAnyway() {
 	emit('continue')
 }
 
-function goBack() {
+async function goBack() {
 	hide()
+	if (!auth.session_token.value) {
+		await router.push({ path: '/' })
+		return
+	}
+
 	router.back()
 }
 

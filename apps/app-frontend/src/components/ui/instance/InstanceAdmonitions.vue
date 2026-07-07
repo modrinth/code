@@ -35,6 +35,7 @@
 		:confirm-label="formatMessage(messages.sharedInstancePublishButton)"
 		:confirm-icon="UploadIcon"
 		:added-label="formatMessage(messages.sharedInstanceAddedLabel)"
+		:removed-label="formatMessage(messages.sharedInstanceRemovedLabel)"
 		@confirm="publishSharedInstanceChanges"
 	/>
 </template>
@@ -109,6 +110,10 @@ const messages = defineMessages({
 	sharedInstanceAddedLabel: {
 		id: 'app.instance.admonitions.shared-instance.added-label',
 		defaultMessage: 'Added',
+	},
+	sharedInstanceRemovedLabel: {
+		id: 'app.instance.admonitions.shared-instance.removed-label',
+		defaultMessage: 'Removed',
 	},
 })
 

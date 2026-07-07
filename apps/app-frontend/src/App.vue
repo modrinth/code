@@ -718,8 +718,13 @@ async function logOut() {
 
 async function getSharedInstancesForLogoutWarning() {
 	try {
+		const currentUserId = credentials.value?.user_id ?? credentials.value?.user?.id
+		if (!currentUserId) return []
+
 		const instances = await list()
-		return instances.filter((instance) => instance.shared_instance)
+		return instances.filter(
+			(instance) => instance.shared_instance?.linked_user_id === currentUserId,
+		)
 	} catch (error) {
 		handleError(error)
 		return []

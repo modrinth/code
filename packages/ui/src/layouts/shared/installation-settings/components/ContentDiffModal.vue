@@ -1,5 +1,12 @@
 <template>
-	<NewModal ref="modal" :header="header" :closable="true" :disable-close="disableClose" no-padding>
+	<NewModal
+		ref="modal"
+		:header="header"
+		:closable="true"
+		:disable-close="disableClose"
+		:on-hide="handleHide"
+		no-padding
+	>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
@@ -145,6 +152,7 @@ const { formatMessage } = useVIntl()
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
+const closingFromAction = ref(false)
 
 const removedCount = computed(() => props.diffs.filter((d) => d.type === 'removed').length)
 const addedCount = computed(() => props.diffs.filter((d) => d.type === 'added').length)
@@ -166,12 +174,25 @@ function hide() {
 }
 
 function handleConfirm() {
+	closingFromAction.value = true
 	hide()
 	emit('confirm')
+	closingFromAction.value = false
 }
 
 function handleCancel() {
+	closingFromAction.value = true
 	hide()
+	emit('cancel')
+	closingFromAction.value = false
+}
+
+function handleHide() {
+	if (closingFromAction.value) {
+		closingFromAction.value = false
+		return
+	}
+
 	emit('cancel')
 }
 

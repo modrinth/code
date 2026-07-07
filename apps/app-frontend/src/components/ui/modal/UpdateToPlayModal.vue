@@ -10,6 +10,7 @@
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:added-label="addedLabel"
+		:removed-label="removedLabel"
 		:show-report-button="showReportButton"
 		@confirm="handleUpdate"
 		@cancel="handleDecline"
@@ -34,6 +35,7 @@ import { computed, ref, watch } from 'vue'
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import {
 	install_update_shared_instance,
+	isSharedInstanceUnavailableError,
 	type SharedInstanceUpdatePreview,
 	wait_for_install_job,
 } from '@/helpers/install'
@@ -82,6 +84,12 @@ const { formatMessage } = useVIntl()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
+const emit = defineEmits<{
+	cancel: []
+	complete: []
+	sharedInstanceUnavailable: []
+}>()
+
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
 const mode = ref<'server-project' | 'shared-instance'>('server-project')
@@ -115,6 +123,9 @@ const normalizedDiffs = computed<ContentDiffItem[]>(() => {
 const showReportButton = computed(() => mode.value !== 'shared-instance')
 const addedLabel = computed(() =>
 	mode.value === 'shared-instance' ? formatMessage(messages.sharedInstanceAddedLabel) : undefined,
+)
+const removedLabel = computed(() =>
+	mode.value === 'shared-instance' ? formatMessage(messages.sharedInstanceRemovedLabel) : undefined,
 )
 
 async function computeDependencyDiffs(
@@ -261,7 +272,6 @@ watch(
 )
 
 async function handleUpdate() {
-	hide()
 	if (mode.value === 'shared-instance') {
 		try {
 			if (instance.value) {
@@ -270,7 +280,14 @@ async function handleUpdate() {
 				await onUpdateComplete.value()
 			}
 		} catch (error) {
+			if (isSharedInstanceUnavailableError(error)) {
+				emit('sharedInstanceUnavailable')
+				return
+			}
+
 			console.error('Error updating shared instance:', error)
+		} finally {
+			emit('complete')
 		}
 		return
 	}
@@ -287,6 +304,7 @@ async function handleUpdate() {
 		console.error('Error updating instance:', error)
 	} finally {
 		if (serverProjectId) stopInstallingServer(serverProjectId)
+		emit('complete')
 	}
 }
 
@@ -297,7 +315,7 @@ function handleReport() {
 }
 
 function handleDecline() {
-	hide()
+	emit('cancel')
 }
 
 function show(
@@ -350,6 +368,10 @@ const messages = defineMessages({
 	sharedInstanceAddedLabel: {
 		id: 'app.modal.update-to-play.shared-instance-added-label',
 		defaultMessage: 'Added',
+	},
+	sharedInstanceRemovedLabel: {
+		id: 'app.modal.update-to-play.shared-instance-removed-label',
+		defaultMessage: 'Removed',
 	},
 })
 

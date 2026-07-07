@@ -16,6 +16,7 @@ import {
 import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -204,6 +205,12 @@ const isLocalFile = computed(() => {
 	return typeof val === 'boolean' ? val : val.value
 })
 
+const isSharedInstanceManagedModpack = computed(() => {
+	const val = ctx.isSharedInstanceManagedModpack
+	if (val == null) return false
+	return typeof val === 'boolean' ? val : val.value
+})
+
 const isLinkedModpack = computed(() => showModpackVersionActions.value || isLocalFile.value)
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
@@ -226,10 +233,15 @@ function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event
 		? new Date(version.date_published) < new Date(currentVersion.date_published)
 		: false
 	const shouldShowWarning =
+		isSharedInstanceManagedModpack.value ||
 		isUpdateDowngrade.value ||
 		versionChangesGameVersion(version, ctx.updaterModalProps.value.currentGameVersion)
 
-	if (event?.shiftKey || skipNonEssentialWarnings.value || !shouldShowWarning) {
+	if (
+		event?.shiftKey ||
+		(skipNonEssentialWarnings.value && !isSharedInstanceManagedModpack.value) ||
+		!shouldShowWarning
+	) {
 		debug('handleModpackUpdateRequest: confirming without warning', {
 			isUpdateDowngrade: isUpdateDowngrade.value,
 			shouldShowWarning,
@@ -391,7 +403,7 @@ function handleShowUnlinkModal(event: MouseEvent) {
 		snapshot: stateSnapshot(),
 		refs: modalRefsSnapshot(),
 	})
-	if (event.shiftKey || skipNonEssentialWarnings.value) {
+	if (event.shiftKey || (skipNonEssentialWarnings.value && !isSharedInstanceManagedModpack.value)) {
 		handleUnlink()
 		return
 	}
@@ -558,6 +570,20 @@ const messages = defineMessages({
 		id: 'installation-settings.removed-incompatible',
 		defaultMessage: 'Removed (incompatible)',
 	},
+	sharedInstanceManagedWarningHeader: {
+		id: 'installation-settings.shared-instance-managed.warning-header',
+		defaultMessage: 'This is managed by the shared instance',
+	},
+	sharedInstanceManagedChangeVersionWarningBody: {
+		id: 'installation-settings.shared-instance-managed.change-version-warning-body',
+		defaultMessage:
+			'Changing the version only changes your local copy. Future shared instance updates may restore or change it again.',
+	},
+	sharedInstanceManagedUnlinkWarningBody: {
+		id: 'installation-settings.shared-instance-managed.unlink-warning-body',
+		defaultMessage:
+			'Unlinking only changes your local copy. Future shared instance updates may restore or change it again.',
+	},
 })
 </script>
 
@@ -667,6 +693,13 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<Admonition
+						v-if="isSharedInstanceManagedModpack && (showModpackVersionActions || isLocalFile)"
+						type="warning"
+						:header="formatMessage(messages.sharedInstanceManagedWarningHeader)"
+					>
+						{{ formatMessage(messages.sharedInstanceManagedChangeVersionWarningBody) }}
+					</Admonition>
 				</div>
 
 				<!-- Unlink -->
@@ -697,6 +730,13 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<Admonition
+						v-if="isSharedInstanceManagedModpack"
+						type="warning"
+						:header="formatMessage(messages.sharedInstanceManagedWarningHeader)"
+					>
+						{{ formatMessage(messages.sharedInstanceManagedUnlinkWarningBody) }}
+					</Admonition>
 					<span class="text-primary">
 						{{
 							formatMessage(messages.unlinkDescription, {
@@ -1048,6 +1088,7 @@ const messages = defineMessages({
 			<ConfirmModpackUpdateModal
 				ref="modpackUpdateModal"
 				:downgrade="isUpdateDowngrade"
+				:shared-instance-managed="isSharedInstanceManagedModpack"
 				:backup-tip="
 					[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
 				"
@@ -1063,6 +1104,7 @@ const messages = defineMessages({
 			/>
 			<ConfirmUnlinkModal
 				ref="unlinkModal"
+				:mode="isSharedInstanceManagedModpack ? 'shared-instance-managed' : 'default'"
 				:server="ctx.isServer"
 				:backup-tip="ctx.modpack.value?.title"
 				@unlink="handleUnlink"

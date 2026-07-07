@@ -78,6 +78,13 @@ export interface SharedInstanceUpdateDiff {
 	newVersionName?: string | null
 }
 
+export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
+
+export function isSharedInstanceUnavailableError(error: unknown) {
+	const message = error instanceof Error ? error.message : String(error)
+	return message.includes(SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE)
+}
+
 export type InstallJobStatus =
 	| 'queued'
 	| 'running'

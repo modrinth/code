@@ -12,7 +12,13 @@
 				:offline="offline"
 				@unlinked="fetchInstance"
 			/>
-			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
+			<UpdateToPlayModal
+				ref="updateToPlayModal"
+				:instance="instance"
+				@cancel="clearSharedInstanceLaunchChecking"
+				@complete="clearSharedInstanceLaunchChecking"
+				@shared-instance-unavailable="handleSharedInstanceUnavailable"
+			/>
 			<SharedInstanceWrongAccountModal
 				ref="sharedInstanceWrongAccountModal"
 				@continue="dismissSharedInstanceWrongAccountModal"
@@ -149,6 +155,12 @@
 							<button @click="repairInstance()">
 								<DownloadIcon />
 								Repair
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else-if="checkingSharedInstanceLaunch" color="brand" size="large">
+							<button disabled>
+								<SpinnerIcon class="animate-spin" />
+								Checking...
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else-if="playing === true" color="red" size="large">
@@ -325,6 +337,7 @@ import {
 	PlusIcon,
 	ServerIcon,
 	SettingsIcon,
+	SpinnerIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
 	UnknownIcon,
@@ -336,6 +349,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	ContentPageHeader,
+	defineMessages,
 	injectAuth,
 	injectNotificationManager,
 	NavTabs,
@@ -345,6 +359,7 @@ import {
 	ServerRecentPlays,
 	ServerRegion,
 	useLoadingBarToken,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -372,6 +387,7 @@ import {
 	install_existing_instance,
 	install_get_shared_instance_update_preview,
 	install_pack_to_existing_instance,
+	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
@@ -411,12 +427,31 @@ const instance = ref<GameInstance>()
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
+const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceWrongAccountModal =
 	ref<InstanceType<typeof SharedInstanceWrongAccountModal>>()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	sharedInstanceUnavailableTitle: {
+		id: 'instance.shared-instance.unavailable.title',
+		defaultMessage: 'Shared instance no longer available',
+	},
+	sharedInstanceUnavailableText: {
+		id: 'instance.shared-instance.unavailable.text',
+		defaultMessage:
+			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
+	},
+	sharedInstanceUnavailableFallbackManager: {
+		id: 'instance.shared-instance.unavailable.manager-fallback',
+		defaultMessage: 'the instance manager',
+	},
+})
 
 useLoadingBarToken(subpagePending)
 
@@ -807,32 +842,79 @@ const launchInstance = async (context: string) => {
 	})
 }
 
+function clearSharedInstanceLaunchChecking() {
+	checkingSharedInstanceLaunch.value = false
+}
+
+async function handleSharedInstanceUnavailable() {
+	const manager =
+		sharedInstanceManager.value?.username ??
+		formatMessage(messages.sharedInstanceUnavailableFallbackManager)
+	addNotification({
+		type: 'warning',
+		title: formatMessage(messages.sharedInstanceUnavailableTitle),
+		text: formatMessage(messages.sharedInstanceUnavailableText, { manager }),
+	})
+	await fetchInstance()
+}
+
 const startInstance = async (context: string) => {
 	if (!instance.value) return
-	if (instance.value.shared_instance?.role === 'member' && !sharedInstanceActionsLocked.value) {
-		let preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
-		try {
-			preview = await install_get_shared_instance_update_preview(instance.value.id)
-		} catch (error) {
-			handleError(error as Error)
+	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
+
+	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
+	const canCheckSharedInstanceUpdate =
+		isSharedInstanceMember && !sharedInstanceActionsLocked.value && !offline.value
+	let waitingForUpdateModal = false
+
+	if (isSharedInstanceMember) {
+		checkingSharedInstanceLaunch.value = true
+	}
+
+	try {
+		if (canCheckSharedInstanceUpdate) {
+			let preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
+			try {
+				preview = await install_get_shared_instance_update_preview(instance.value.id)
+			} catch (error) {
+				if (isSharedInstanceUnavailableError(error)) {
+					await handleSharedInstanceUnavailable()
+					return
+				}
+
+				handleError(error as Error)
+				return
+			}
+
+			if (preview?.updateAvailable && updateToPlayModal.value) {
+				waitingForUpdateModal = true
+				updateToPlayModal.value.showSharedInstance(instance.value, preview, async () => {
+					await fetchInstance()
+					await launchInstance(context)
+				})
+				return
+			}
+		}
+
+		if (updateToPlayModal.value?.hasUpdate) {
+			if (isSharedInstanceMember) {
+				waitingForUpdateModal = true
+				updateToPlayModal.value.show(instance.value, null, async () => {
+					await fetchInstance()
+					await launchInstance(context)
+				})
+			} else {
+				updateToPlayModal.value.show(instance.value)
+			}
 			return
 		}
 
-		if (preview?.updateAvailable) {
-			updateToPlayModal.value?.showSharedInstance(instance.value, preview, async () => {
-				await fetchInstance()
-				await launchInstance(context)
-			})
-			return
+		await launchInstance(context)
+	} finally {
+		if (!waitingForUpdateModal) {
+			clearSharedInstanceLaunchChecking()
 		}
 	}
-
-	if (updateToPlayModal.value?.hasUpdate) {
-		updateToPlayModal.value.show(instance.value)
-		return
-	}
-
-	await launchInstance(context)
 }
 
 const stopInstance = async (context: string) => {

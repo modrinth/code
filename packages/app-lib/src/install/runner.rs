@@ -303,7 +303,7 @@ async fn prepare_initial_instance(
                     )
                 };
             let metadata = crate::api::instance::create(
-                data.name,
+                data.name.clone(),
                 game_version,
                 loader,
                 loader_version,
@@ -316,7 +316,21 @@ async fn prepare_initial_instance(
                 metadata.instance.name,
                 metadata.instance.icon_path,
             );
-            set_instance_id(job_state, metadata.instance.id);
+            let instance_id = metadata.instance.id;
+            crate::state::attach_shared_instance(
+                &instance_id,
+                &data.shared_instance_id,
+                SharedInstanceRole::Member,
+                data.manager_id.clone(),
+                data.linked_user_id.clone(),
+                ContentSetSyncStatus::NotReady,
+                None,
+                Some(data.version),
+                &state.pool,
+            )
+            .await?;
+            emit_instance(&instance_id, InstancePayloadType::Edited).await?;
+            set_instance_id(job_state, instance_id);
         }
         InstallRequest::ImportInstance {
             instance_folder, ..
