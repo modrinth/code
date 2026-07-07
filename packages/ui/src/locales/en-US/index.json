@@ -458,11 +458,17 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Disabled"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Removed (disabled)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Updated"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removed"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} removed (disabled)"
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."

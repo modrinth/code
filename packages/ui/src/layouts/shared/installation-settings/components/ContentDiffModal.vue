@@ -21,6 +21,10 @@
 						<MinusIcon />
 						{{ formatMessage(messages.removedCount, { count: removedCount }) }}
 					</div>
+					<div v-if="removedDisabledCount" class="flex gap-1 items-center">
+						<MinusIcon />
+						{{ formatMessage(messages.removedDisabledCount, { count: removedDisabledCount }) }}
+					</div>
 					<div v-if="addedCount" class="flex gap-1 items-center">
 						<PlusIcon />
 						{{ formatMessage(messages.addedCount, { count: addedCount }) }}
@@ -53,9 +57,7 @@
 						></div>
 					</div>
 
-					<span class="text-sm shrink-0 whitespace-nowrap">{{
-						getDiffTypeLabel(diff.type)
-					}}</span>
+					<span class="text-sm shrink-0 whitespace-nowrap">{{ getDiffTypeLabel(diff) }}</span>
 					<span
 						v-if="diff.projectName"
 						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
@@ -154,7 +156,12 @@ const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 const closingFromAction = ref(false)
 
-const removedCount = computed(() => props.diffs.filter((d) => d.type === 'removed').length)
+const removedCount = computed(
+	() => props.diffs.filter((d) => d.type === 'removed' && !d.disabled).length,
+)
+const removedDisabledCount = computed(
+	() => props.diffs.filter((d) => d.type === 'removed' && d.disabled).length,
+)
 const addedCount = computed(() => props.diffs.filter((d) => d.type === 'added').length)
 const updatedCount = computed(() => props.diffs.filter((d) => d.type === 'updated').length)
 
@@ -196,17 +203,24 @@ function handleHide() {
 	emit('cancel')
 }
 
-function getDiffTypeLabel(type: ContentDiffItem['type']) {
-	if (type === 'added' && props.addedLabel) return props.addedLabel
-	if (type === 'removed' && props.removedLabel) return props.removedLabel
+function getDiffTypeLabel(diff: ContentDiffItem) {
+	if (diff.type === 'removed' && diff.disabled) {
+		return formatMessage(diffTypeMessages.removedDisabled)
+	}
+	if (diff.type === 'added' && props.addedLabel) return props.addedLabel
+	if (diff.type === 'removed' && props.removedLabel) return props.removedLabel
 
-	return formatMessage(diffTypeMessages[type])
+	return formatMessage(diffTypeMessages[diff.type])
 }
 
 const messages = defineMessages({
 	removedCount: {
 		id: 'content.diff-modal.removed-count',
 		defaultMessage: '{count} removed',
+	},
+	removedDisabledCount: {
+		id: 'content.diff-modal.removed-disabled-count',
+		defaultMessage: '{count} removed (disabled)',
 	},
 	addedCount: {
 		id: 'content.diff-modal.added-count',
@@ -231,6 +245,10 @@ const diffTypeMessages = defineMessages({
 	removed: {
 		id: 'content.diff-modal.diff-type.removed',
 		defaultMessage: 'Disabled',
+	},
+	removedDisabled: {
+		id: 'content.diff-modal.diff-type.removed-disabled',
+		defaultMessage: 'Removed (disabled)',
 	},
 	updated: {
 		id: 'content.diff-modal.diff-type.updated',

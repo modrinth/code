@@ -159,6 +159,7 @@ async function reviewSharedInstanceChanges(e?: MouseEvent) {
 			fileName: diff.fileName ?? undefined,
 			currentVersionName: diff.currentVersionName ?? undefined,
 			newVersionName: diff.newVersionName ?? undefined,
+			disabled: diff.disabled,
 		}))
 		publishReviewModal.value?.show(e)
 	} catch (err) {

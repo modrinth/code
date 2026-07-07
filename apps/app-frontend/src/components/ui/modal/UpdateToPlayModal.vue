@@ -108,6 +108,7 @@ const normalizedDiffs = computed<ContentDiffItem[]>(() => {
 				fileName: diff.fileName ?? undefined,
 				currentVersionName: diff.currentVersionName ?? undefined,
 				newVersionName: diff.newVersionName ?? undefined,
+				disabled: diff.disabled,
 			})) ?? []
 		)
 	}

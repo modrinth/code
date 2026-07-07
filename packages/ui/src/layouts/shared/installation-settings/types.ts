@@ -41,6 +41,7 @@ export interface ContentDiffItem {
 	fileName?: string
 	currentVersionName?: string
 	newVersionName?: string
+	disabled?: boolean
 }
 
 export interface ContentDiffPreview {

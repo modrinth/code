@@ -76,6 +76,7 @@ export interface SharedInstanceUpdateDiff {
 	fileName?: string | null
 	currentVersionName?: string | null
 	newVersionName?: string | null
+	disabled?: boolean
 }
 
 export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'

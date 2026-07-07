@@ -73,6 +73,8 @@ pub struct SharedInstanceUpdateDiff {
     pub file_name: Option<String>,
     pub current_version_name: Option<String>,
     pub new_version_name: Option<String>,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub disabled: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -555,11 +557,15 @@ async fn shared_instance_update_diffs(
         current_shared_content(metadata, state).await?;
     let (latest_version_ids, latest_external_files) =
         remote_shared_content(version);
+    let removed_disabled_project_ids = HashSet::new();
+    let removed_disabled_external_files = HashSet::new();
     shared_content_diffs(
         &current_version_ids,
         &current_external_files,
         &latest_version_ids,
         &latest_external_files,
+        &removed_disabled_project_ids,
+        &removed_disabled_external_files,
         state,
     )
     .await
@@ -574,11 +580,15 @@ async fn shared_instance_publish_diffs(
         remote_shared_content(version);
     let (current_version_ids, current_external_files) =
         current_publish_content(metadata, state).await?;
+    let (removed_disabled_project_ids, removed_disabled_external_files) =
+        current_publish_disabled_content(metadata, state).await?;
     shared_content_diffs(
         &latest_version_ids,
         &latest_external_files,
         &current_version_ids,
         &current_external_files,
+        &removed_disabled_project_ids,
+        &removed_disabled_external_files,
         state,
     )
     .await
@@ -589,6 +599,8 @@ async fn shared_content_diffs(
     current_external_files: &HashSet<String>,
     latest_version_ids: &[String],
     latest_external_files: &HashSet<String>,
+    removed_disabled_project_ids: &HashSet<String>,
+    removed_disabled_external_files: &HashSet<String>,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let current_versions =
@@ -622,9 +634,12 @@ async fn shared_content_diffs(
                     file_name: None,
                     current_version_name: None,
                     new_version_name: Some(latest.version_number.clone()),
+                    disabled: false,
                 });
             }
             (Some(current), None) => {
+                let disabled =
+                    removed_disabled_project_ids.contains(&project_id);
                 diffs.push(SharedInstanceUpdateDiff {
                     type_: SharedInstanceUpdateDiffType::Removed,
                     project_id: Some(project_id),
@@ -632,6 +647,7 @@ async fn shared_content_diffs(
                     file_name: None,
                     current_version_name: Some(current.version_number.clone()),
                     new_version_name: None,
+                    disabled,
                 });
             }
             (Some(current), Some(latest)) if current.id != latest.id => {
@@ -642,6 +658,7 @@ async fn shared_content_diffs(
                     file_name: None,
                     current_version_name: Some(current.version_number.clone()),
                     new_version_name: Some(latest.version_number.clone()),
+                    disabled: false,
                 });
             }
             _ => {}
@@ -656,6 +673,7 @@ async fn shared_content_diffs(
             file_name: Some(file_name.clone()),
             current_version_name: None,
             new_version_name: None,
+            disabled: false,
         });
     }
     for file_name in current_external_files.difference(latest_external_files) {
@@ -666,6 +684,7 @@ async fn shared_content_diffs(
             file_name: Some(file_name.clone()),
             current_version_name: None,
             new_version_name: None,
+            disabled: removed_disabled_external_files.contains(file_name),
         });
     }
 
@@ -804,6 +823,59 @@ async fn current_publish_content(
     ))
 }
 
+async fn current_publish_disabled_content(
+    metadata: &crate::state::InstanceMetadata,
+    state: &State,
+) -> crate::Result<(HashSet<String>, HashSet<String>)> {
+    let items =
+        crate::state::list_content(&metadata.instance.id, None, None, state)
+            .await?;
+    let modpack_id = shared_modpack_id(&metadata.link);
+    let mut project_ids = HashSet::new();
+    let mut version_ids = Vec::new();
+    let mut seen_version_ids = HashSet::new();
+    let mut external_files = HashSet::new();
+
+    for item in items {
+        if item.enabled {
+            continue;
+        }
+
+        let is_modpack = item
+            .version
+            .as_ref()
+            .is_some_and(|version| modpack_id.as_deref() == Some(version.id.as_str()));
+        if is_modpack {
+            continue;
+        }
+
+        if let Some(project) = item.project.as_ref() {
+            project_ids.insert(project.id.clone());
+        }
+
+        if let Some(version) = item.version {
+            if seen_version_ids.insert(version.id.clone()) {
+                version_ids.push(version.id);
+            }
+            continue;
+        }
+
+        if item.file_path.is_empty() {
+            continue;
+        }
+
+        external_files.insert(enabled_file_name(&item.file_name));
+    }
+
+    project_ids.extend(
+        shared_versions_by_project(&version_ids, state)
+            .await?
+            .into_keys(),
+    );
+
+    Ok((project_ids, external_files))
+}
+
 async fn shared_versions_by_project(
     version_ids: &[String],
     state: &State,
@@ -847,6 +919,17 @@ async fn shared_project_names(
 fn dedupe_strings(values: &mut Vec<String>) {
     let mut seen = HashSet::new();
     values.retain(|value| seen.insert(value.clone()));
+}
+
+fn enabled_file_name(file_name: &str) -> String {
+    file_name
+        .strip_suffix(".disabled")
+        .unwrap_or(file_name)
+        .to_string()
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 fn shared_instance_name(name: String) -> String {
