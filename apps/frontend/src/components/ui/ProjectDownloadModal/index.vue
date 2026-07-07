@@ -19,7 +19,7 @@
 					:project="project"
 					:versions="versions"
 					:dependency-download-files="dependencyDownloadFiles"
-					:download-data-loaded="downloadRowsLoaded"
+					:download-data-loaded="selectedVersionDownloadLoaded"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -280,7 +280,7 @@ const downloadModalProvider = provideDownloadModalProvider({
 })
 const dependencyDownloadFiles = downloadModalProvider.downloadableDependencyFiles
 const dependencyDownloadFilesLoaded = downloadModalProvider.downloadableDependencyFilesLoaded
-const downloadRowsLoaded = downloadModalProvider.downloadRowsLoaded
+const selectedVersionDownloadLoaded = computed(() => !!selectedPrimaryFile.value)
 
 const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 	if (!selectedVersion.value) return []
