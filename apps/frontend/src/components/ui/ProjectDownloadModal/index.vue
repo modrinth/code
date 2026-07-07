@@ -19,7 +19,7 @@
 					:project="project"
 					:versions="versions"
 					:dependency-download-files="dependencyDownloadFiles"
-					:download-data-loaded="selectedVersionDownloadLoaded"
+					:download-data-loaded="downloadRowsLoaded"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -280,7 +280,7 @@ const downloadModalProvider = provideDownloadModalProvider({
 })
 const dependencyDownloadFiles = downloadModalProvider.downloadableDependencyFiles
 const dependencyDownloadFilesLoaded = downloadModalProvider.downloadableDependencyFilesLoaded
-const selectedVersionDownloadLoaded = computed(() => !!selectedPrimaryFile.value)
+const downloadRowsLoaded = downloadModalProvider.downloadRowsLoaded
 
 const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 	if (!selectedVersion.value) return []
@@ -731,8 +731,7 @@ function getRouteSelectedDownloadSelection(
 	const gameVersion = initialGameVersion.value
 	const platform = initialPlatform.value
 	const version = getSelectedRouteVersion(gameVersion, platform, versionList)
-	const primaryFile =
-		version?.files?.find((file) => file.primary) || version?.files?.[0] || null
+	const primaryFile = version?.files?.find((file) => file.primary) || version?.files?.[0] || null
 
 	if (!gameVersion || !platform || !version || !primaryFile) return null
 
@@ -808,12 +807,7 @@ async function preloadDependenciesForSelection(selection: ProjectDownloadSelecti
 }
 
 function isActiveShowRequest(showRequestId: number) {
-	return (
-		!unmounted &&
-		modalShowRequestId === showRequestId &&
-		!!modal.value &&
-		!modalOpen.value
-	)
+	return !unmounted && modalShowRequestId === showRequestId && !!modal.value && !modalOpen.value
 }
 
 function resetDownloadState() {

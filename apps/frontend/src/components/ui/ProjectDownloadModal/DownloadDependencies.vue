@@ -34,7 +34,7 @@ defineOptions({
 	name: 'DownloadDependencies',
 })
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
 		showTitle?: boolean
 	}>(),

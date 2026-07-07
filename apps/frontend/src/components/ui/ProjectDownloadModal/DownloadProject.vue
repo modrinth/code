@@ -104,7 +104,9 @@
 			:current-platform="currentPlatform"
 			:selectable="compatibleVersions.length > 1"
 			:selected="compatibleVersion.id === selectedVersion.id"
-			:show-download="compatibleVersions.length === 1 || compatibleVersion.id === selectedVersion.id"
+			:show-download="
+				compatibleVersions.length === 1 || compatibleVersion.id === selectedVersion.id
+			"
 			:color="
 				compatibleVersion.id === selectedVersion.id &&
 				compatibleVersions.length === 1 &&
@@ -381,7 +383,8 @@ const defaultSelectedVersion = computed<Labrinth.Versions.v3.Version | null>(() 
 })
 
 const suggestedPreReleaseVersions = computed<Labrinth.Versions.v3.Version[]>(() => {
-	if (!defaultSelectedVersion.value || defaultSelectedVersion.value.version_type !== 'release') return []
+	if (!defaultSelectedVersion.value || defaultSelectedVersion.value.version_type !== 'release')
+		return []
 
 	const versions: Labrinth.Versions.v3.Version[] = []
 	const beta = filteredBeta.value
