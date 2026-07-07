@@ -95,6 +95,7 @@ const props = withDefaults(
 const emit = defineEmits<{
 	download: []
 	'update:downloadable-files': [files: DownloadableDependencyFile[]]
+	'update:downloadable-files-loaded': [loaded: boolean]
 }>()
 const client = injectModrinthClient()
 const { createProjectDownloadUrl } = useCdnDownloadContext()
@@ -109,7 +110,7 @@ const dependencyResolutionPreferences = computed<Labrinth.Content.v3.ResolutionP
 	loaders: props.currentPlatform ? [props.currentPlatform] : props.selectedVersion?.loaders || [],
 }))
 
-const { data: dependencyResolution } = useQuery({
+const { data: dependencyResolution, isFetching: dependencyResolutionFetching } = useQuery({
 	queryKey: computed(() => [
 		'project-download-modal',
 		'content-resolve',
@@ -147,7 +148,7 @@ const dependencyVersionIds = computed<string[]>(() => {
 	]
 })
 
-const { data: dependencyVersions } = useQuery({
+const { data: dependencyVersions, isFetching: dependencyVersionsFetching } = useQuery({
 	queryKey: computed(() => [
 		'project-download-modal',
 		'resolved-versions',
@@ -176,7 +177,7 @@ const dependencyProjectIds = computed<string[]>(() => {
 	]
 })
 
-const { data: dependencyProjects } = useQuery({
+const { data: dependencyProjects, isFetching: dependencyProjectsFetching } = useQuery({
 	queryKey: computed(() => [
 		'project-download-modal',
 		'resolved-projects',
@@ -210,6 +211,7 @@ const dependenciesByParentVersionId = computed(() => {
 
 const dependenciesLoaded = computed(() => {
 	if (!shouldResolveDependencies.value) return false
+	if (dependencyResolutionFetching.value) return false
 	if (!dependencyResolution.value) return false
 	if (
 		dependencyResolution.value.primary.version_id &&
@@ -218,11 +220,13 @@ const dependenciesLoaded = computed(() => {
 		return false
 	}
 	if (
+		dependencyVersionsFetching.value ||
 		!dependencyVersionIds.value.every((versionId) => dependencyVersionById.value.has(versionId))
 	) {
 		return false
 	}
 	if (
+		dependencyProjectsFetching.value ||
 		!dependencyProjectIds.value.every((projectId) => dependencyProjectById.value.has(projectId))
 	) {
 		return false
@@ -288,10 +292,24 @@ const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
 	collectDownloadableDependencyFiles(visibleDependencyRows.value),
 )
 
+const downloadableDependencyFilesLoaded = computed(() => {
+	if (props.dependencies) return true
+	if (!shouldResolveDependencies.value) return false
+	return dependenciesLoaded.value
+})
+
 watch(
 	downloadableDependencyFiles,
 	(files) => {
 		emit('update:downloadable-files', files)
+	},
+	{ immediate: true },
+)
+
+watch(
+	downloadableDependencyFilesLoaded,
+	(loaded) => {
+		emit('update:downloadable-files-loaded', loaded)
 	},
 	{ immediate: true },
 )

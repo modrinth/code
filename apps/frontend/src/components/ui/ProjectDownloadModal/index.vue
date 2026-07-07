@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px">
+	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px" actions-divider>
 		<template #title>
 			<template v-if="project">
 				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
@@ -27,7 +27,7 @@
 					:reset-key="downloadProjectResetKey"
 					@select-game-version="selectGameVersion"
 					@select-platform="selectPlatform"
-					@update:selection="projectDownloadSelection = $event"
+					@update:selection="updateProjectDownloadSelection"
 					@download="onDownload"
 				/>
 				<div class="flex flex-col gap-4">
@@ -39,6 +39,7 @@
 						:download-reason="downloadReason"
 						:additional-files="additionalFiles"
 						@update:downloadable-files="dependencyDownloadFiles = $event"
+						@update:downloadable-files-loaded="dependencyDownloadFilesLoaded = $event"
 						@download="onDownload"
 					/>
 				</div>
@@ -54,16 +55,48 @@
 				/>
 			</div>
 		</template>
+		<template v-if="showDependencyDownloadActions" #actions>
+			<div class="flex flex-wrap justify-end gap-2">
+				<ButtonStyled>
+					<button :disabled="!!downloadingActionType" @click="downloadSelectedVersionZip">
+						<SpinnerIcon
+							v-if="downloadingActionType === 'zip'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadAsZip) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadSelectedVersionFilesWithDependencies"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'dependencies'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadWithDependencies) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
 	injectModrinthClient,
+	injectNotificationManager,
 	NewModal,
 	ServersPromo,
 	truncatedTooltip,
@@ -72,6 +105,7 @@ import {
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
+import JSZip from 'jszip'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
@@ -98,6 +132,12 @@ type DownloadableFile = {
 	href: string
 	filename: string
 }
+
+type DownloadedFile = DownloadableFile & {
+	blob: Blob
+}
+
+type DownloadActionType = 'zip' | 'dependencies'
 
 type NewModalRef = {
 	show: (event?: MouseEvent) => void
@@ -138,6 +178,8 @@ const route = useRoute()
 const flags = useFeatureFlags()
 const tags = useGeneratedState()
 const client = injectModrinthClient()
+const { createProjectDownloadUrl } = useCdnDownloadContext()
+const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
@@ -148,8 +190,15 @@ const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
 const downloadProjectResetKey = ref(0)
 const projectDownloadSelection = ref<ProjectDownloadSelection>(getDefaultProjectDownloadSelection())
+const pendingRouteSelection = ref({
+	gameVersion: getStringQueryValue(route.query.version),
+	platform: getStringQueryValue(route.query.loader),
+})
 const dependencyDownloadFiles = ref<DownloadableFile[]>([])
+const dependencyDownloadFilesLoaded = ref(false)
+const downloadingActionType = ref<DownloadActionType | null>(null)
 const MODAL_CLOSE_STATE_RESET_MS = 350
+const DOWNLOAD_URL_REVOKE_MS = 60000
 let closeStateResetTimeout: ReturnType<typeof setTimeout> | null = null
 
 const routeProjectId = computed(() => showProjectId.value ?? props.projectId ?? null)
@@ -183,11 +232,7 @@ const downloadTitle = computed(() => {
 })
 
 const versionsEnabled = ref(false)
-const {
-	data: versionsV3,
-	error: _versionsV3Error,
-	isFetching: versionsV3Loading,
-} = useQuery({
+const { data: versionsV3, isFetching: versionsV3Loading } = useQuery({
 	queryKey: computed(() => ['project', resolvedProjectId.value, 'versions', 'v3']),
 	queryFn: () =>
 		client.labrinth.versions_v3.getProjectVersions(resolvedProjectId.value!, {
@@ -238,6 +283,23 @@ const additionalFiles = computed(() => {
 	return selectedVersion.value.files.filter((file) => file !== selectedPrimaryFile.value)
 })
 
+const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
+	if (!selectedVersion.value) return []
+
+	return selectedVersion.value.files.map((file) => ({
+		href: createProjectDownloadUrl(file.url, {
+			reason: props.downloadReason,
+			gameVersion: currentGameVersion.value ?? undefined,
+			loader: currentPlatform.value ?? undefined,
+		}),
+		filename: file.filename,
+	}))
+})
+
+const showDependencyDownloadActions = computed(
+	() => dependencyDownloadFiles.value.length > 0 && selectedVersionDownloadFiles.value.length > 0,
+)
+
 watch(projectV2Error, (error) => {
 	if (error) {
 		debug('project query failed', error)
@@ -248,6 +310,22 @@ const messages = defineMessages({
 	downloadTitle: {
 		id: 'project.download.title',
 		defaultMessage: 'Download {title}',
+	},
+	downloadAsZip: {
+		id: 'project.download.download-as-zip',
+		defaultMessage: 'Download as .zip',
+	},
+	downloadWithDependencies: {
+		id: 'project.download.download-with-dependencies',
+		defaultMessage: 'Download with deps',
+	},
+	downloadZipFailedTitle: {
+		id: 'project.download.zip-failed-title',
+		defaultMessage: 'Could not download files',
+	},
+	downloadZipFailedText: {
+		id: 'project.download.zip-failed-text',
+		defaultMessage: 'One or more files could not be downloaded. Please try again.',
 	},
 })
 
@@ -278,15 +356,27 @@ function updateDownloadQuery({
 	platform: string | null
 }) {
 	if (!props.updateRouteSelection) return
+	const nextGameVersion =
+		gameVersion ??
+		pendingRouteSelection.value.gameVersion ??
+		getStringQueryValue(route.query.version)
+	const nextPlatform =
+		platform ?? pendingRouteSelection.value.platform ?? getStringQueryValue(route.query.loader)
+
+	pendingRouteSelection.value = {
+		gameVersion: nextGameVersion,
+		platform: nextPlatform,
+	}
+
 	navigateTo(
 		{
 			query: {
 				...route.query,
-				...(gameVersion && {
-					version: gameVersion,
+				...(nextGameVersion && {
+					version: nextGameVersion,
 				}),
-				...(platform && {
-					loader: platform,
+				...(nextPlatform && {
+					loader: nextPlatform,
 				}),
 			},
 			hash: route.hash,
@@ -298,15 +388,33 @@ function updateDownloadQuery({
 function selectGameVersion(gameVersion: string) {
 	updateDownloadQuery({
 		gameVersion,
-		platform: currentPlatform.value,
+		platform: null,
 	})
 }
 
 function selectPlatform(platform: string) {
 	updateDownloadQuery({
-		gameVersion: currentGameVersion.value,
+		gameVersion: null,
 		platform,
 	})
+}
+
+function updateProjectDownloadSelection(selection: ProjectDownloadSelection) {
+	const previousSelection = projectDownloadSelection.value
+	if (
+		previousSelection.selectedVersion?.id !== selection.selectedVersion?.id ||
+		previousSelection.currentGameVersion !== selection.currentGameVersion ||
+		previousSelection.currentPlatform !== selection.currentPlatform
+	) {
+		dependencyDownloadFiles.value = []
+		dependencyDownloadFilesLoaded.value = false
+	}
+
+	projectDownloadSelection.value = selection
+	pendingRouteSelection.value = {
+		gameVersion: selection.currentGameVersion,
+		platform: selection.currentPlatform,
+	}
 }
 
 function onShow() {
@@ -361,6 +469,158 @@ function onDownload() {
 	emit('download')
 }
 
+async function downloadSelectedVersionZip() {
+	if (downloadingActionType.value) return
+
+	downloadingActionType.value = 'zip'
+	const files = dedupeDownloadFiles([
+		...selectedVersionDownloadFiles.value,
+		...dependencyDownloadFiles.value,
+	])
+
+	try {
+		const zip = new JSZip()
+		const usedFilenames = new Set<string>()
+
+		for (const file of files) {
+			const response = await fetch(file.href)
+
+			if (!response.ok) {
+				throw new Error(`Failed to download ${file.filename}`)
+			}
+
+			zip.file(uniqueFilename(file.filename, usedFilenames), await response.blob())
+		}
+
+		downloadBlob(
+			await zip.generateAsync({
+				type: 'blob',
+				mimeType: 'application/zip',
+			}),
+			selectedVersionZipFilename(),
+		)
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadZipFailedTitle),
+			text: formatMessage(messages.downloadZipFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingActionType.value = null
+	}
+}
+
+async function downloadSelectedVersionFilesWithDependencies() {
+	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
+
+	downloadingActionType.value = 'dependencies'
+
+	try {
+		const files = dedupeDownloadFiles([
+			...selectedVersionDownloadFiles.value,
+			...dependencyDownloadFiles.value,
+		])
+
+		const downloadedFiles = await Promise.all(files.map(downloadFileBlob))
+
+		for (const file of downloadedFiles) {
+			downloadBlob(file.blob, file.filename)
+		}
+
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadZipFailedTitle),
+			text: formatMessage(messages.downloadZipFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingActionType.value = null
+	}
+}
+
+async function downloadFileBlob(file: DownloadableFile): Promise<DownloadedFile> {
+	const response = await fetch(file.href)
+
+	if (!response.ok) {
+		throw new Error(`Failed to download ${file.filename}`)
+	}
+
+	return {
+		...file,
+		blob: await response.blob(),
+	}
+}
+
+function dedupeDownloadFiles(files: DownloadableFile[]) {
+	const result: DownloadableFile[] = []
+	const hrefs = new Set<string>()
+
+	for (const file of files) {
+		if (hrefs.has(file.href)) continue
+		hrefs.add(file.href)
+		result.push(file)
+	}
+
+	return result
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+	const url = URL.createObjectURL(blob)
+	const link = document.createElement('a')
+
+	link.href = url
+	link.download = filename
+	document.body.appendChild(link)
+	link.click()
+	link.remove()
+	window.setTimeout(() => URL.revokeObjectURL(url), DOWNLOAD_URL_REVOKE_MS)
+}
+
+function selectedVersionZipFilename() {
+	if (!project.value || !selectedVersion.value) return 'download.zip'
+
+	return `${sanitizeFilename(project.value.title)} ${sanitizeFilename(
+		selectedVersion.value.version_number,
+	)}.zip`
+}
+
+function sanitizeFilename(value: string) {
+	const sanitized = value
+		.replace(/[<>:"/\\|?*]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim()
+
+	return sanitized || 'download'
+}
+
+function uniqueFilename(filename: string, usedFilenames: Set<string>) {
+	const sanitizedFilename = sanitizeFilename(filename)
+
+	if (!usedFilenames.has(sanitizedFilename)) {
+		usedFilenames.add(sanitizedFilename)
+		return sanitizedFilename
+	}
+
+	const extensionIndex = sanitizedFilename.lastIndexOf('.')
+	const basename =
+		extensionIndex > 0 ? sanitizedFilename.slice(0, extensionIndex) : sanitizedFilename
+	const extension = extensionIndex > 0 ? sanitizedFilename.slice(extensionIndex) : ''
+	let index = 2
+	let candidate = `${basename} (${index})${extension}`
+
+	while (usedFilenames.has(candidate)) {
+		index += 1
+		candidate = `${basename} (${index})${extension}`
+	}
+
+	usedFilenames.add(candidate)
+	return candidate
+}
+
 function getDefaultProjectDownloadSelection(): ProjectDownloadSelection {
 	return {
 		currentGameVersion: null,
@@ -376,6 +636,10 @@ function getDefaultShowOptions(): ResolvedProjectDownloadModalShowOptions {
 		incompatibleGameVersions: [],
 		incompatibleLoaders: [],
 	}
+}
+
+function getStringQueryValue(value: unknown) {
+	return typeof value === 'string' ? value : null
 }
 
 function clearCloseStateResetTimeout() {
@@ -400,6 +664,7 @@ async function loadProjectForModal(forceRefetch: boolean) {
 function resetDownloadState() {
 	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
 	dependencyDownloadFiles.value = []
+	dependencyDownloadFilesLoaded.value = false
 	downloadProjectResetKey.value += 1
 }
 
@@ -438,6 +703,7 @@ watch(() => route.hash, openFromHash)
 watch(routeProjectId, () => {
 	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
 	dependencyDownloadFiles.value = []
+	dependencyDownloadFilesLoaded.value = false
 	downloadProjectResetKey.value += 1
 })
 
