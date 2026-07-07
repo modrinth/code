@@ -3161,20 +3161,8 @@
   "project.details.licensed": {
     "message": "Lisans:"
   },
-  "project.download.game-version": {
-    "message": "Oyun sürümü: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Hata: oyun sürümü bulunamadı"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} sadece {version} sürümünde mevcut"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}, {platform} için {gameVersion} sürümünü desteklemiyor"
-  },
-  "project.download.install-with-app": {
-    "message": "Modrinth App ile yükle"
   },
   "project.download.no-app": {
     "message": "Modrinth App Yok Mu?"
@@ -3182,22 +3170,10 @@
   "project.download.no-versions-available": {
     "message": "{gameVersion} ve {platform} için sürüm mevcut değil."
   },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Hata: platform bulunamadı"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} sadece {platform} için mevcut"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}, {gameVersion} sürümünde {platform} desteklemiyor"
   },
   "project.download.search-game-versions": {
-    "message": "Oyun sürümü ara..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Oyun sürümü ara..."
   },
   "project.download.select-game-version": {

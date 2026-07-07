@@ -100,4 +100,21 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 			body,
 		})
 	}
+
+	/**
+	 * Scan a file for attribution information.
+	 * POST /_internal/attribution/file/{file_id}/scan
+	 *
+	 * @param fileId - The file ID to scan.
+	 */
+	public async scanFile(fileId: string): Promise<Labrinth.Attribution.Internal.FileScanResponse> {
+		return this.client.request<Labrinth.Attribution.Internal.FileScanResponse>(
+			`/attribution/file/${fileId}/scan`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+			},
+		)
+	}
 }

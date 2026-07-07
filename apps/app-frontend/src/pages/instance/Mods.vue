@@ -1418,7 +1418,9 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? { path: `/project/${item.project.id}` } : undefined,
+		projectLink: item.project?.id
+			? { path: `/project/${item.project.id}`, query: { i: props.instance.id } }
+			: undefined,
 		version: item.version ?? {
 			id: item.file_name,
 			version_number: formatMessage(commonMessages.unknownLabel),
@@ -1428,6 +1430,7 @@ provideContentManager({
 			item.project?.id && item.version?.id
 				? {
 						path: `/project/${item.project.id}/version/${item.version.id}`,
+						query: { i: props.instance.id },
 					}
 				: undefined,
 		owner: item.owner

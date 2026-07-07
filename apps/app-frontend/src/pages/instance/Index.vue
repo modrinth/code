@@ -350,6 +350,10 @@ import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceAdmonitions from '@/components/ui/instance/InstanceAdmonitions.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
@@ -364,7 +368,7 @@ import { type InstanceContentData, loadInstanceContentData } from '@/helpers/ins
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
-import { get_server_status, refreshWorlds } from '@/helpers/worlds'
+import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
@@ -410,13 +414,15 @@ const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
-const statusOnline = computed(() => !!javaServerPingData.value)
+const liveServerStatusOnline = ref(false)
+const statusOnline = computed(() => liveServerStatusOnline.value || !!javaServerPingData.value)
 const recentPlays = computed(
 	() => linkedProjectV3.value?.minecraft_java_server?.verified_plays_2w ?? undefined,
 )
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
+const activeInstanceId = ref<string>()
 
 const sharedInstanceManager = computed(() => {
 	if (!instance.value?.shared_instance) return null
@@ -447,6 +453,20 @@ watch(
 	{ immediate: true },
 )
 
+function applyServerStatus(status: ServerStatus) {
+	playersOnline.value = status.players?.online
+	ping.value = status.ping
+	liveServerStatusOnline.value = true
+	loadingServerPing.value = true
+}
+
+function resetServerStatus() {
+	ping.value = undefined
+	playersOnline.value = undefined
+	liveServerStatusOnline.value = false
+	loadingServerPing.value = false
+}
+
 function isContentSubpageRoute(routeName = displayedInstanceRoute.value.name) {
 	return typeof routeName === 'string' && contentSubpageRouteNames.has(routeName)
 }
@@ -455,9 +475,7 @@ async function fetchInstance() {
 	isServerInstance.value = false
 	linkedProjectV3.value = undefined
 	preloadedContent.value = null
-	ping.value = undefined
-	playersOnline.value = undefined
-	loadingServerPing.value = false
+	resetServerStatus()
 
 	const nextInstance = await get(route.params.id as string).catch(handleError)
 	let nextLinkedProjectV3: Labrinth.Projects.v3.Project | undefined
@@ -486,8 +504,9 @@ async function fetchInstance() {
 	linkedProjectV3.value = nextLinkedProjectV3
 	isServerInstance.value = nextIsServerInstance
 	preloadedContent.value = nextPreloadedContent
+	activeInstanceId.value = nextInstance?.id
 
-	fetchDeferredData()
+	fetchDeferredData(nextInstance?.id)
 
 	if (nextInstance) {
 		queryClient.prefetchQuery({
@@ -498,18 +517,32 @@ async function fetchInstance() {
 	}
 }
 
-function fetchDeferredData() {
+function fetchDeferredData(instanceId?: string) {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
-		get_server_status(serverAddress)
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			applyServerStatus(cachedStatus)
+		} else {
+			playersOnline.value = undefined
+			ping.value = undefined
+			loadingServerPing.value = false
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
 			.then((status) => {
-				playersOnline.value = status.players?.online
-				ping.value = status.ping
+				if (
+					activeInstanceId.value !== instanceId ||
+					linkedProjectV3.value?.minecraft_java_server?.address !== serverAddress
+				)
+					return
+				applyServerStatus(status)
 			})
 			.catch((error) => {
 				console.error(`Failed to fetch server status for ${serverAddress}:`, error)
 			})
 			.finally(() => {
+				if (activeInstanceId.value !== instanceId) return
 				loadingServerPing.value = true
 			})
 	} else {

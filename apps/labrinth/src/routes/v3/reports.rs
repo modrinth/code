@@ -18,23 +18,23 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("report", web::post().to(report_create));
-    cfg.route("report", web::get().to(reports));
-    cfg.route("reports", web::get().to(reports_get));
-    cfg.route("report/{id}", web::get().to(report_get));
-    cfg.route("report/{id}", web::patch().to(report_edit));
-    cfg.route("report/{id}", web::delete().to(report_delete));
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(report_create_route)
+        .service(reports_route)
+        .service(reports_get_route)
+        .service(report_get_route)
+        .service(report_edit_route)
+        .service(report_delete_route);
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct CreateReport {
     pub report_type: String,
     pub item_id: String,
@@ -44,6 +44,22 @@ pub struct CreateReport {
     #[validate(length(max = 10))]
     #[serde(default)]
     pub uploaded_images: Vec<ImageId>,
+}
+
+#[utoipa::path(
+	tag = "reports",
+	request_body = CreateReport,
+	responses((status = OK))
+)]
+#[post("/report")]
+pub async fn report_create_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    body: web::Payload,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    report_create(req, pool, body, redis, session_queue).await
 }
 
 pub async fn report_create(
@@ -247,6 +263,26 @@ fn default_all() -> bool {
     true
 }
 
+#[utoipa::path(
+	tag = "reports",
+	params(
+		("count" = Option<u16>, Query),
+		("offset" = Option<u32>, Query),
+		("all" = Option<bool>, Query)
+	),
+	responses((status = OK))
+)]
+#[get("/report")]
+pub async fn reports_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    request_opts: web::Query<ReportsRequestOptions>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    reports(req, pool, redis, request_opts, session_queue).await
+}
+
 pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -322,6 +358,22 @@ pub struct ReportIds {
     pub ids: String,
 }
 
+#[utoipa::path(
+	tag = "reports",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
+#[get("/reports")]
+pub async fn reports_get_route(
+    req: HttpRequest,
+    ids: web::Query<ReportIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    reports_get(req, ids, pool, redis, session_queue).await
+}
+
 pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
@@ -361,6 +413,18 @@ pub async fn reports_get(
     Ok(HttpResponse::Ok().json(all_reports))
 }
 
+#[utoipa::path(tag = "reports", responses((status = OK)))]
+#[get("/report/{id}")]
+pub async fn report_get_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    report_get(req, pool, redis, info, session_queue).await
+}
+
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -395,11 +459,24 @@ pub async fn report_get(
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditReport {
     #[validate(length(max = 65536))]
     pub body: Option<String>,
     pub closed: Option<bool>,
+}
+
+#[utoipa::path(tag = "reports", responses((status = NO_CONTENT)))]
+#[patch("/report/{id}")]
+pub async fn report_edit_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
+    session_queue: web::Data<AuthQueue>,
+    edit_report: web::Json<EditReport>,
+) -> Result<HttpResponse, ApiError> {
+    report_edit(req, pool, redis, info, session_queue, edit_report).await
 }
 
 pub async fn report_edit(
@@ -509,6 +586,18 @@ pub async fn report_edit(
     } else {
         Err(ApiError::NotFound)
     }
+}
+
+#[utoipa::path(tag = "reports", responses((status = NO_CONTENT)))]
+#[delete("/report/{id}")]
+pub async fn report_delete_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    info: web::Path<(crate::models::ids::ReportId,)>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    report_delete(req, pool, info, redis, session_queue).await
 }
 
 pub async fn report_delete(

@@ -3,7 +3,7 @@ import { InfoIcon, XIcon } from '@modrinth/assets'
 import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import Checkbox from '#ui/components/base/Checkbox.vue'
+import Toggle from '#ui/components/base/Toggle.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -15,6 +15,7 @@ const { formatMessage } = useVIntl()
 
 const isApp = computed(() => ctx.variant === 'app')
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
+const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
 
 function closeFiltersMenu() {
 	if (ctx.filtersMenuOpen) {
@@ -37,7 +38,7 @@ const buttonClass = computed(() => {
 	if (isApp.value) {
 		return 'button-animation flex flex-col gap-1 px-3 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg'
 	}
-	return 'button-animation flex flex-col gap-1 px-6 py-3 w-full bg-transparent cursor-pointer border-none'
+	return 'button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none'
 })
 
 const contentClass = computed(() => (isApp.value ? 'mt-2 mb-3' : 'mb-4 mx-3'))
@@ -99,38 +100,60 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		</div>
 
 		<div
-			v-if="ctx.showHideInstalled?.value || ctx.showHideSelected?.value"
+			v-if="
+				ctx.showHideInstalled?.value || ctx.showHideSelected?.value || ctx.showServerOnly?.value
+			"
 			:class="
 				isApp
 					? 'flex flex-col gap-3 border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
-					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-bg-raised p-4'
+					: 'card-shadow flex flex-col gap-3 rounded-2xl bg-bg-raised border-solid border-surface-4 border p-4'
 			"
 		>
-			<Checkbox
+			<label
+				v-if="ctx.showServerOnly?.value"
+				class="flex cursor-pointer items-center justify-between gap-3 text-contrast font-medium"
+			>
+				{{ ctx.serverOnlyLabel?.value ?? formatMessage(commonMessages.serverOnlyLabel) }}
+				<Toggle
+					v-model="ctx.serverOnly!.value"
+					small
+					class="shrink-0"
+					@update:model-value="ctx.onFilterChange()"
+				/>
+			</label>
+			<label
 				v-if="ctx.showHideInstalled?.value"
-				v-model="ctx.hideInstalled!.value"
-				:label="
+				class="flex cursor-pointer items-center justify-between gap-3 text-contrast font-medium"
+			>
+				{{
 					ctx.hideInstalledLabel?.value ?? formatMessage(commonMessages.hideInstalledContentLabel)
-				"
-				class="filter-checkbox"
-				@update:model-value="ctx.onFilterChange()"
-				@click.prevent.stop
-			/>
-			<Checkbox
+				}}
+				<Toggle
+					v-model="ctx.hideInstalled!.value"
+					small
+					class="shrink-0"
+					@update:model-value="ctx.onFilterChange()"
+				/>
+			</label>
+			<label
 				v-if="ctx.showHideSelected?.value"
-				v-model="ctx.hideSelected!.value"
-				:label="
-					ctx.hideSelectedLabel?.value ?? formatMessage(commonMessages.hideSelectedContentLabel)
-				"
-				class="filter-checkbox"
-				@update:model-value="ctx.onFilterChange()"
-				@click.prevent.stop
-			/>
+				class="flex cursor-pointer items-center justify-between gap-3 text-contrast font-medium"
+			>
+				{{ ctx.hideSelectedLabel?.value ?? formatMessage(commonMessages.hideSelectedContentLabel) }}
+				<Toggle
+					v-model="ctx.hideSelected!.value"
+					small
+					class="shrink-0"
+					@update:model-value="ctx.onFilterChange()"
+				/>
+			</label>
 		</div>
 
 		<template v-if="ctx.isServerType.value">
 			<SearchSidebarFilter
-				v-for="filterType in ctx.serverFilterTypes.value.filter((f) => f.options.length > 0)"
+				v-for="filterType in ctx.serverFilterTypes.value.filter(
+					(f) => f.options.length > 0 && !hiddenFilterTypes.includes(f.id),
+				)"
 				:key="`server-filter-${filterType.id}`"
 				v-model:selected-filters="ctx.serverCurrentFilters.value"
 				v-model:toggled-groups="ctx.serverToggledGroups.value"
@@ -143,7 +166,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:open-by-default="getFilterOpenByDefault(filterType.id)"
 			>
 				<template #header>
-					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg font-semibold'">
+					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-base font-semibold'">
 						{{ filterType.formatted_name }}
 					</h3>
 				</template>
@@ -151,7 +174,9 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		</template>
 		<template v-else>
 			<SearchSidebarFilter
-				v-for="filter in ctx.filters.value.filter((f) => f.display !== 'none')"
+				v-for="filter in ctx.filters.value.filter(
+					(f) => f.display !== 'none' && !hiddenFilterTypes.includes(f.id),
+				)"
 				:key="`filter-${filter.id}`"
 				v-model:selected-filters="ctx.currentFilters.value"
 				v-model:toggled-groups="ctx.toggledGroups.value"

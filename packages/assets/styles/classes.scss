@@ -898,8 +898,10 @@ a:not(.no-click-animation),
 
 	img {
 		max-width: 100%;
-		height: auto;
 		display: inline-block;
+	}
+	img:not([height]) {
+		height: auto;
 	}
 
 	html:not(.dark-mode, .oled-mode) & img[src$='#gh-dark-mode-only'] {
