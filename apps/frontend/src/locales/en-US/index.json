@@ -3293,6 +3293,9 @@
   "project.download.dependency-already-installed": {
     "message": "This dependency is already installed"
   },
+  "project.download.dependency-any-compatible": {
+    "message": "Any compatible"
+  },
   "project.download.dependency-conflicting": {
     "message": "This dependency conflicts with another dependency"
   },

@@ -30,6 +30,7 @@ export interface DownloadDependencyRow {
 	downloadHref?: string
 	filename?: string
 	fileSize?: number
+	metadataLabel?: string
 	typeLabel: string
 	unavailableTooltip: string
 	dependencies: DownloadDependencyRow[]
@@ -206,6 +207,7 @@ export function provideDownloadModalProvider(
 	)
 
 	const duplicateDependencyRowsHidden = computed(() =>
+		hasSkippedDuplicateDependency(dependencyResolution.value) ||
 		hasDuplicateDependencyRows(resolvedDependencyRows.value),
 	)
 
@@ -217,6 +219,7 @@ export function provideDownloadModalProvider(
 			downloadHref: getDownloadUrl(file.url),
 			filename: file.filename,
 			fileSize: file.size,
+			metadataLabel: fileTypeLabel(file.file_type),
 			typeLabel: fileTypeLabel(file.file_type),
 			unavailableTooltip: formatMessage(messages.unavailableFile),
 			dependencies: [],
@@ -310,6 +313,7 @@ export function provideDownloadModalProvider(
 				'reason' in dependency || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
 			filename: primaryFile?.filename,
 			fileSize: primaryFile?.size,
+			metadataLabel: version?.version_number ?? formatMessage(messages.anyCompatibleDependency),
 			typeLabel: 'Required',
 			unavailableTooltip,
 			dependencies: (versionId && dependenciesByParentVersionId.value.get(versionId)
@@ -453,6 +457,10 @@ function shouldShowDependency(dependency: ResolvedContent) {
 	)
 }
 
+function hasSkippedDuplicateDependency(resolution?: Labrinth.Content.v3.ResolveContentPlan) {
+	return (resolution?.skipped || []).some((dependency) => dependency.reason === 'duplicate_project')
+}
+
 function resolveContentType(projectType: DisplayProjectType): Labrinth.Content.v3.ContentType {
 	return ['mod', 'plugin', 'datapack', 'resourcepack', 'shader', 'modpack'].includes(projectType)
 		? (projectType as Labrinth.Content.v3.ContentType)
@@ -536,6 +544,10 @@ function sortedUnique(values: string[]) {
 }
 
 const messages = defineMessages({
+	anyCompatibleDependency: {
+		id: 'project.download.dependency-any-compatible',
+		defaultMessage: 'Any compatible',
+	},
 	alreadyInstalledDependency: {
 		id: 'project.download.dependency-already-installed',
 		defaultMessage: 'This dependency is already installed',

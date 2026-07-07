@@ -1,9 +1,9 @@
 <template>
-	<div class="flex min-w-0 flex-col gap-2">
+	<div class="flex min-w-0 flex-col">
 		<div
-			class="grid min-h-10 grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 rounded-xl bg-button-bg py-0 pl-3.5 pr-2 text-primary"
+			class="z-10 grid h-11 grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 text-primary"
 		>
-			<span class="flex min-w-0 items-center gap-3">
+			<span class="flex min-w-0 items-center gap-2">
 				<Avatar
 					v-if="dependency.icon"
 					:src="dependency.icon"
@@ -13,12 +13,12 @@
 				/>
 				<span
 					v-else
-					class="flex size-4 flex-shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 text-secondary"
+					class="flex size-6 flex-shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 text-secondary"
 				>
 					<component
 						:is="dependency.fallbackIcon ?? PackageIcon"
 						aria-hidden="true"
-						class="size-5"
+						class="size-4"
 					/>
 				</span>
 				<a
@@ -28,7 +28,7 @@
 					:href="dependency.projectHref"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="min-w-0 truncate text-base font-semibold text-contrast no-underline hover:underline"
+					class="min-w-0 truncate text-base font-semibold text-contrast hover:underline"
 				>
 					{{ dependency.name }}
 				</a>
@@ -40,9 +40,12 @@
 				>
 					{{ dependency.name }}
 				</span>
-				<TagItem class="shrink-0 border !border-solid border-surface-5 !px-3 !py-1 text-base">
-					{{ dependency.typeLabel }}
-				</TagItem>
+				<span
+					v-tooltip="metadataTooltip"
+					class="min-w-0 max-w-[50%] truncate text-sm text-secondary"
+				>
+					{{ metadataLabel }}
+				</span>
 			</span>
 			<ButtonStyled v-if="dependency.downloadHref" circular type="transparent">
 				<a
@@ -68,14 +71,18 @@
 		<div
 			v-for="childDependency in dependency.dependencies"
 			:key="childDependency.key"
-			class="group/dependency relative pl-10"
+			class="group/dependency relative pl-8"
 		>
-			<DownloadDependency :dependency="childDependency" class="z-1" @download="emit('download')" />
+			<DownloadDependency
+				:dependency="childDependency"
+				class="relative z-10"
+				@download="emit('download')"
+			/>
 			<div
 				aria-hidden="true"
-				class="absolute -top-2 left-6 z-0 h-[calc(100%+1rem)] w-0.5 bg-surface-5 group-first/dependency:-top-2 group-first/dependency:h-20 group-last/dependency:h-7"
+				class="absolute -top-2.5 left-3 z-0 h-full w-0.5 bg-surface-5 group-last/dependency:h-8"
 			/>
-			<div aria-hidden="true" class="absolute left-6 top-5 z-0 h-0.5 w-4 bg-surface-5" />
+			<div aria-hidden="true" class="absolute left-3 top-[21px] z-0 h-0.5 w-7 bg-surface-5" />
 		</div>
 	</div>
 </template>
@@ -86,7 +93,6 @@ import {
 	Avatar,
 	ButtonStyled,
 	defineMessages,
-	TagItem,
 	truncatedTooltip,
 	useFormatBytes,
 	useVIntl,
@@ -106,6 +112,7 @@ interface DownloadDependencyRow {
 	downloadHref?: string
 	filename?: string
 	fileSize?: number
+	metadataLabel?: string
 	typeLabel: string
 	unavailableTooltip: string
 	dependencies: DownloadDependencyRow[]
@@ -122,6 +129,11 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const formatBytes = useFormatBytes()
 const dependencyNameRef = ref<HTMLElement | null>(null)
+
+const metadataLabel = computed(() => props.dependency.metadataLabel ?? props.dependency.typeLabel)
+const metadataTooltip = computed(() =>
+	metadataLabel.value === props.dependency.typeLabel ? null : metadataLabel.value,
+)
 
 const downloadTooltip = computed(() => {
 	const filename = props.dependency.filename || props.dependency.name

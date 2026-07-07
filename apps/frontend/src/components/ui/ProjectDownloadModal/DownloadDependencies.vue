@@ -1,5 +1,5 @@
 <template>
-	<div v-if="downloadRows.length > 0" class="flex flex-col gap-1">
+	<div v-if="downloadRows.length > 0" class="flex flex-col gap-2.5">
 		<div v-if="showTitle" class="flex flex-wrap items-center justify-between gap-2">
 			<h3 class="m-0 flex items-center gap-1.5 text-base font-semibold text-contrast">
 				{{ sectionTitle }}
@@ -11,7 +11,7 @@
 				/>
 			</h3>
 		</div>
-		<div class="flex flex-col gap-2">
+		<div class="rounded-2xl bg-surface-2 p-2 pl-4 pr-3">
 			<DownloadDependency
 				v-for="dependency in downloadRows"
 				:key="dependency.key"
@@ -47,11 +47,8 @@ const emit = defineEmits<{
 	download: []
 }>()
 const { formatMessage } = useVIntl()
-const {
-	visibleDependencyRows,
-	duplicateDependencyRowsHidden,
-	downloadRows,
-} = injectDownloadModalProvider()
+const { visibleDependencyRows, duplicateDependencyRowsHidden, downloadRows } =
+	injectDownloadModalProvider()
 
 const sectionTitle = computed(() =>
 	formatMessage(
