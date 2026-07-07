@@ -231,7 +231,7 @@ async fn scan_pending_files_chunk(
                 .await
                 .wrap_err("beginning file scan transaction")?;
 
-            let resolved = resolve_overrides(&overrides, redis, &mut txn)
+            let resolved = resolve_overrides(&overrides, &mut txn)
                 .await
                 .wrap_err_with(|| {
                     eyre!("resolving overrides for file {file_id:?}")
@@ -325,9 +325,8 @@ async fn scan_file_inner(
     if !overrides.is_empty() {
         let before = count_project_attributions(project_id, txn).await?;
 
-        let resolved = resolve_overrides(&overrides, redis, txn)
-            .await
-            .wrap_err_with(|| {
+        let resolved =
+            resolve_overrides(&overrides, txn).await.wrap_err_with(|| {
                 eyre!("resolving overrides for file {file_id:?}")
             })?;
 
@@ -494,7 +493,6 @@ pub struct OverrideFile {
 
 #[derive(Debug)]
 pub enum OverrideResolution {
-    OnModrinth,
     ExternalLicense {
         id: i64,
         status: ApprovalType,
@@ -518,8 +516,7 @@ fn log_marked_override_projects(
             | OverrideResolution::Flame(flame_project) => {
                 Some(format!("{} ({})", flame_project.title, flame_project.id))
             }
-            OverrideResolution::OnModrinth
-            | OverrideResolution::ExternalLicense { .. }
+            OverrideResolution::ExternalLicense { .. }
             | OverrideResolution::Unknown => None,
         })
         .collect::<Vec<_>>();
@@ -671,7 +668,6 @@ async fn persist_attribution_results(
         }
 
         match resolved.get(&file.sha1) {
-            Some(OverrideResolution::OnModrinth) => continue,
             Some(OverrideResolution::ExternalLicense {
                 id,
                 status,
@@ -942,69 +938,12 @@ fn default_external_license_attribution(
 
 async fn resolve_overrides(
     overrides: &[OverrideFile],
-    redis: &RedisPool,
     txn: &mut PgTransaction<'_>,
 ) -> Result<HashMap<String, OverrideResolution>> {
     let mut results: HashMap<String, OverrideResolution> = HashMap::new();
     let mut remaining: Vec<usize> = (0..overrides.len()).collect();
 
     if overrides.is_empty() {
-        return Ok(results);
-    }
-
-    let hashes: Vec<String> =
-        overrides.iter().map(|x| x.sha1.clone()).collect();
-    let files = DBVersion::get_files_from_hash(
-        "sha1".to_string(),
-        &hashes,
-        &mut *txn,
-        redis,
-    )
-    .await
-    .wrap_err("fetching files on platform by hash")?;
-
-    let matching_project_ids: Vec<_> =
-        files.iter().map(|file| file.project_id.0).collect();
-    let valid_project_ids = sqlx::query_scalar!(
-        r#"
-        select id
-        from mods
-        where id = any($1)
-          and status not in ('rejected', 'draft', 'withheld', 'withdrawn')
-        "#,
-        &matching_project_ids,
-    )
-    .fetch_all(&mut *txn)
-    .await
-    .wrap_err("fetching matched file project statuses")?;
-
-    let version_ids: Vec<_> = files.iter().map(|x| x.version_id).collect();
-    let versions_data = DBVersion::get_many(&version_ids, &mut *txn, redis)
-        .await
-        .wrap_err("fetching versions")?;
-
-    for file in &files {
-        if !valid_project_ids.contains(&file.project_id.0) {
-            continue;
-        }
-
-        if !versions_data.iter().any(|v| v.inner.id == file.version_id) {
-            continue;
-        }
-
-        if let Some(hash) = file.hashes.get("sha1")
-            && let Some(pos) =
-                remaining.iter().position(|i| overrides[*i].sha1 == *hash)
-        {
-            let idx = remaining.remove(pos);
-            results.insert(
-                overrides[idx].sha1.clone(),
-                OverrideResolution::OnModrinth,
-            );
-        }
-    }
-
-    if remaining.is_empty() {
         return Ok(results);
     }
 
