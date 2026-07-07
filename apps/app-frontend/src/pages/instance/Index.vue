@@ -13,6 +13,10 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
+			<SharedInstanceWrongAccountModal
+				ref="sharedInstanceWrongAccountModal"
+				@continue="dismissSharedInstanceWrongAccountModal"
+			/>
 			<ContentPageHeader>
 				<template #icon>
 					<Avatar
@@ -246,7 +250,12 @@
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
-			<InstanceAdmonitions class="mt-4" :instance="instance" @published="fetchInstance" />
+			<InstanceAdmonitions
+				v-if="!sharedInstanceActionsLocked"
+				class="mt-4"
+				:instance="instance"
+				@published="fetchInstance"
+			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
 			<RouterView v-slot="{ Component }" :key="instance.id" :route="displayedInstanceRoute">
@@ -265,7 +274,7 @@
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
 							:open-settings="() => settingsModal?.show(1)"
-							v-bind="contentSubpageProps"
+							v-bind="instanceSubpageProps"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
@@ -349,6 +358,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceAdmonitions from '@/components/ui/instance/InstanceAdmonitions.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import SharedInstanceWrongAccountModal from '@/components/ui/modal/SharedInstanceWrongAccountModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import {
 	fetchCachedServerStatus,
@@ -405,6 +415,8 @@ const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+const sharedInstanceWrongAccountModal =
+	ref<InstanceType<typeof SharedInstanceWrongAccountModal>>()
 
 useLoadingBarToken(subpagePending)
 
@@ -428,18 +440,33 @@ const sharedInstanceManagerUser = ref<{
 	username: string
 	avatar_url?: string
 } | null>(null)
+const sharedInstanceManagerUserId = computed(() => {
+	const attachment = instance.value?.shared_instance
+	if (!attachment) return null
+
+	if (attachment.role === 'owner') {
+		if (!sharedInstanceActionsLocked.value) return null
+
+		return attachment.linked_user_id ?? null
+	}
+
+	return attachment.manager_id ?? null
+})
 
 const sharedInstanceManager = computed(() => {
 	if (!instance.value?.shared_instance) return null
 
 	if (instance.value.shared_instance.role === 'owner') {
-		const user = auth.user.value
-		if (!user) return null
+		if (!sharedInstanceActionsLocked.value) return null
+
+		const linkedUserId = instance.value.shared_instance.linked_user_id
+		const linkedUser = sharedInstanceManagerUser.value
+		if (!linkedUserId || !linkedUser) return null
 
 		return {
-			username: user.username,
-			avatarUrl: user.avatar_url ?? undefined,
-			tintBy: user.id,
+			username: linkedUser.username,
+			avatarUrl: linkedUser.avatar_url ?? undefined,
+			tintBy: linkedUser.id,
 		}
 	}
 
@@ -453,15 +480,81 @@ const sharedInstanceManager = computed(() => {
 	}
 })
 
+const sharedInstanceExpectedUserId = computed(
+	() => instance.value?.shared_instance?.linked_user_id ?? null,
+)
+const sharedInstanceExpectedUsername = ref('')
+const sharedInstanceWrongAccount = computed(() => {
+	if (auth.isReady && !auth.isReady.value) return false
+
+	const expectedUserId = sharedInstanceExpectedUserId.value
+	if (!expectedUserId) return false
+
+	return auth.user.value?.id !== expectedUserId
+})
+const sharedInstanceActionsLocked = computed(() => sharedInstanceWrongAccount.value)
+const sharedInstanceLockedShareTooltip = computed(
+	() =>
+		`Sign in as ${sharedInstanceExpectedUsername.value || sharedInstanceExpectedUserId.value || 'the linked account'} to access`,
+)
+const shownSharedInstanceWrongAccountKeys = ref<Set<string>>(new Set())
+
+watch(sharedInstanceExpectedUserId, (expectedUserId) => {
+	sharedInstanceExpectedUsername.value = expectedUserId ?? ''
+})
+
 watch(
-	() => instance.value?.shared_instance?.manager_id,
-	async (managerId) => {
+	() => ({
+		instanceId: instance.value?.id,
+		role: instance.value?.shared_instance?.role,
+		expectedUserId: sharedInstanceExpectedUserId.value,
+		currentUserId: auth.user.value?.id ?? null,
+		authReady: auth.isReady?.value ?? true,
+		wrongAccount: sharedInstanceWrongAccount.value,
+	}),
+	async ({ instanceId, role, expectedUserId, currentUserId, authReady, wrongAccount }) => {
+		if (!authReady || !instanceId || !role || !expectedUserId || !wrongAccount) return
+
+		const key = `${instanceId}:${expectedUserId}:${currentUserId ?? 'signed-out'}`
+		if (shownSharedInstanceWrongAccountKeys.value.has(key)) return
+
+		sharedInstanceExpectedUsername.value = expectedUserId
+		shownSharedInstanceWrongAccountKeys.value = new Set([
+			...shownSharedInstanceWrongAccountKeys.value,
+			key,
+		])
+		const expectedUser = await get_user(expectedUserId, 'bypass').catch(() => null)
+		const expectedUsername = expectedUser?.username ?? expectedUserId
+		if (
+			instance.value?.id !== instanceId ||
+			sharedInstanceExpectedUserId.value !== expectedUserId ||
+			!sharedInstanceWrongAccount.value
+		) {
+			return
+		}
+
+		sharedInstanceExpectedUsername.value = expectedUsername
+		sharedInstanceWrongAccountModal.value?.show(
+			role === 'owner' ? 'owner' : 'user',
+			expectedUsername,
+		)
+	},
+	{ immediate: true },
+)
+
+function dismissSharedInstanceWrongAccountModal() {
+	sharedInstanceWrongAccountModal.value?.hide()
+}
+
+watch(
+	() => sharedInstanceManagerUserId.value,
+	async (userId) => {
 		sharedInstanceManagerUser.value = null
 
-		if (!managerId) return
+		if (!userId) return
 
-		const user = await get_user(managerId, 'bypass').catch(() => null)
-		if (instance.value?.shared_instance?.manager_id !== managerId) return
+		const user = await get_user(userId, 'bypass').catch(() => null)
+		if (sharedInstanceManagerUserId.value !== userId) return
 
 		sharedInstanceManagerUser.value = user
 	},
@@ -598,6 +691,20 @@ const basePath = computed(
 	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
 )
 
+watch(
+	() => ({
+		routeName: displayedInstanceRoute.value.name,
+		locked: sharedInstanceActionsLocked.value,
+		basePath: basePath.value,
+	}),
+	async ({ routeName, locked, basePath }) => {
+		if (routeName === 'InstanceShare' && locked) {
+			await router.replace({ path: basePath })
+		}
+	},
+	{ immediate: true },
+)
+
 /**
  * Per-route layout mode.
  * - `'scroll'` (default): the whole instance page scrolls inside `.app-viewport`. This lets
@@ -613,6 +720,12 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
+const instanceSubpageProps = computed(() => ({
+	...contentSubpageProps.value,
+	...(displayedInstanceRoute.value.name === 'InstanceShare'
+		? { sharedInstanceActionsLocked: sharedInstanceActionsLocked.value }
+		: {}),
+}))
 const showShareTab = computed(() => {
 	const linkType = instance.value?.link?.type
 
@@ -652,6 +765,8 @@ const tabs = computed(() => {
 			label: 'Share',
 			href: `${basePath.value}/share`,
 			icon: UserPlusIcon,
+			disabled: sharedInstanceActionsLocked.value,
+			tooltip: sharedInstanceActionsLocked.value ? sharedInstanceLockedShareTooltip.value : undefined,
 		})
 	}
 
@@ -694,7 +809,7 @@ const launchInstance = async (context: string) => {
 
 const startInstance = async (context: string) => {
 	if (!instance.value) return
-	if (instance.value.shared_instance?.role === 'member') {
+	if (instance.value.shared_instance?.role === 'member' && !sharedInstanceActionsLocked.value) {
 		let preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
 		try {
 			preview = await install_get_shared_instance_update_preview(instance.value.id)

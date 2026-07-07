@@ -281,6 +281,7 @@ type ShareRow = {
 
 const props = defineProps<{
 	instance: GameInstance
+	sharedInstanceActionsLocked?: boolean
 }>()
 
 const auth = injectAuth()
@@ -361,7 +362,7 @@ const userFriends = computed(() => friendsQuery.data.value ?? [])
 const sharedUsersQuery = useQuery({
 	queryKey: sharedUsersKey,
 	queryFn: loadSharedRows,
-	enabled: () => isSignedIn.value && !!props.instance.id,
+	enabled: () => isSignedIn.value && !!props.instance.id && !props.sharedInstanceActionsLocked,
 	staleTime: Infinity,
 })
 const sharedRows = computed(() => sharedUsersQuery.data.value ?? [])
@@ -605,6 +606,8 @@ const addFriendMutation = useMutation({
 
 const inviteShareMutation = useMutation({
 	mutationFn: async (user: InvitePlayersUser) => {
+		if (props.sharedInstanceActionsLocked) return
+
 		await invite_shared_instance_users(props.instance.id, [user.id])
 	},
 	onMutate: async (user): Promise<SharedRowsMutationContext> => {
@@ -628,6 +631,10 @@ const inviteShareMutation = useMutation({
 
 const removeShareMutation = useMutation({
 	mutationFn: async (id: string) => {
+		if (props.sharedInstanceActionsLocked) {
+			return { user_ids: [] } satisfies SharedInstanceUsers
+		}
+
 		return await remove_shared_instance_users(props.instance.id, [id])
 	},
 	onMutate: async (id): Promise<SharedRowsMutationContext> => {
@@ -655,6 +662,8 @@ const removeShareMutation = useMutation({
 })
 
 async function loadSharedRows(): Promise<ShareRow[]> {
+	if (props.sharedInstanceActionsLocked) return []
+
 	return sharedUsersToRows(await get_shared_instance_users(props.instance.id))
 }
 
@@ -699,6 +708,8 @@ function invitePlayer(payload: InvitePlayersInvitePayload) {
 }
 
 function inviteShareUser(user: InvitePlayersUser) {
+	if (props.sharedInstanceActionsLocked) return
+
 	const existingRow = findInviteRow(user.id, user.username)
 	if (existingRow) {
 		return
@@ -721,6 +732,8 @@ function cancelInvite(user: InvitePlayersUser) {
 }
 
 function showInvitePlayers(event?: MouseEvent) {
+	if (props.sharedInstanceActionsLocked) return
+
 	if (requiresUnlinkBeforeShare.value) {
 		shareUnlinkModal.value?.show()
 		return
@@ -743,6 +756,8 @@ async function unlinkImportedModpackForShare() {
 }
 
 function removeRow(id: string) {
+	if (props.sharedInstanceActionsLocked) return
+
 	if (pendingRows.value[id]) {
 		removePendingRow(id)
 		return

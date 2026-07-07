@@ -164,6 +164,7 @@ pub async fn invite_shared_instance_users(
                 &state,
             )
             .await?;
+            let linked_user_id = linked_modrinth_user_id(&state).await?;
             tracing::info!(
                 instance_id,
                 shared_instance_id = %remote.id,
@@ -174,6 +175,7 @@ pub async fn invite_shared_instance_users(
                 &remote.id,
                 SharedInstanceRole::Owner,
                 None,
+                linked_user_id,
                 ContentSetSyncStatus::Unknown,
                 None,
                 None,
@@ -451,6 +453,7 @@ async fn shared_instance_install_data(
     }
 
     let name = shared_instance_name(name);
+    let linked_user_id = linked_modrinth_user_id(state).await?;
     let modpack = shared_instance_install_modpack(&version, state).await?;
     let modpack_version_id = modpack.as_ref().map(|modpack| modpack.version_id.as_str());
     let modrinth_ids = version
@@ -462,6 +465,7 @@ async fn shared_instance_install_data(
     Ok(SharedInstanceInstallData {
         shared_instance_id: shared_instance_id.to_string(),
         manager_id,
+        linked_user_id,
         name,
         version: version.version,
         modrinth_ids,
@@ -479,6 +483,17 @@ async fn shared_instance_install_data(
         loader: version.loader,
         loader_version: shared_instance_loader_version(version.loader_version),
     })
+}
+
+async fn linked_modrinth_user_id(
+    state: &State,
+) -> crate::Result<Option<String>> {
+    Ok(ModrinthCredentials::get_and_refresh(
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .map(|credentials| credentials.user_id))
 }
 
 async fn shared_instance_update_diffs(

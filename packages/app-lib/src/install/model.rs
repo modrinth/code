@@ -107,6 +107,8 @@ pub struct InstallPostInstallEdit {
 pub struct SharedInstanceInstallData {
     pub shared_instance_id: String,
     pub manager_id: Option<String>,
+    #[serde(default)]
+    pub linked_user_id: Option<String>,
     pub name: String,
     pub version: i32,
     pub modrinth_ids: Vec<String>,

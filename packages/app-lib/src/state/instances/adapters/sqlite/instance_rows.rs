@@ -76,6 +76,7 @@ pub(crate) struct InstanceLinkRow {
     pub shared_instance_id: Option<String>,
     pub shared_instance_role: Option<String>,
     pub shared_instance_manager_id: Option<String>,
+    pub shared_instance_linked_user_id: Option<String>,
     pub imported_name: Option<String>,
     pub imported_version_number: Option<String>,
     pub imported_filename: Option<String>,
@@ -211,6 +212,7 @@ struct InstanceMetadataRow {
     shared_instance_id: Option<String>,
     shared_instance_role: Option<String>,
     shared_instance_manager_id: Option<String>,
+    shared_instance_linked_user_id: Option<String>,
     shared_sync_applied_update_id: Option<String>,
     shared_sync_latest_available_update_id: Option<String>,
     shared_sync_status: Option<String>,
@@ -310,6 +312,7 @@ impl InstanceMetadataRow {
             shared_instance_id: self.shared_instance_id.clone(),
             shared_instance_role: self.shared_instance_role.clone(),
             shared_instance_manager_id: self.shared_instance_manager_id.clone(),
+            shared_instance_linked_user_id: self.shared_instance_linked_user_id.clone(),
             imported_name: self.imported_name,
             imported_version_number: self.imported_version_number,
             imported_filename: self.imported_filename,
@@ -319,6 +322,7 @@ impl InstanceMetadataRow {
             self.shared_instance_id,
             self.shared_instance_role,
             self.shared_instance_manager_id,
+            self.shared_instance_linked_user_id,
             self.shared_sync_status,
             self.shared_sync_applied_update_id,
             self.shared_sync_latest_available_update_id,
@@ -480,6 +484,7 @@ pub(crate) async fn get_instance_metadata_by_id(
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
             link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
+            link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -570,6 +575,7 @@ pub(crate) async fn get_instance_metadata_many(
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
             link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
+            link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -654,6 +660,7 @@ pub(crate) async fn list_instance_metadata(
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
             link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
+            link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -735,6 +742,7 @@ pub(crate) async fn get_instance_launch_context(
             link.shared_instance_id AS "shared_instance_id?: String",
             link.shared_instance_role AS "shared_instance_role?: String",
             link.shared_instance_manager_id AS "shared_instance_manager_id?: String",
+            link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
             sync.applied_update_id AS "shared_sync_applied_update_id?: String",
             sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
             sync.status AS "shared_sync_status?: String",
@@ -805,6 +813,7 @@ where
             shared_instance_id,
             shared_instance_role,
             shared_instance_manager_id,
+            shared_instance_linked_user_id,
             imported_name,
             imported_version_number,
             imported_filename
@@ -1067,6 +1076,8 @@ pub(crate) async fn set_shared_instance_attachment(
         attachment.map(|value| value.role.as_str().to_string());
     let shared_instance_manager_id = attachment
         .and_then(|value| value.manager_id.as_deref());
+    let shared_instance_linked_user_id = attachment
+        .and_then(|value| value.linked_user_id.as_deref());
 
     sqlx::query!(
         "
@@ -1075,9 +1086,10 @@ pub(crate) async fn set_shared_instance_attachment(
 			link_kind,
 			shared_instance_id,
 			shared_instance_role,
-			shared_instance_manager_id
+			shared_instance_manager_id,
+			shared_instance_linked_user_id
 		)
-		VALUES (?, 'unmanaged', ?, ?, ?)
+		VALUES (?, 'unmanaged', ?, ?, ?, ?)
 		ON CONFLICT (instance_id) DO UPDATE SET
 			link_kind = CASE
 				WHEN excluded.shared_instance_id IS NULL
@@ -1087,12 +1099,14 @@ pub(crate) async fn set_shared_instance_attachment(
 			END,
 			shared_instance_id = excluded.shared_instance_id,
 			shared_instance_role = excluded.shared_instance_role,
-			shared_instance_manager_id = excluded.shared_instance_manager_id
+			shared_instance_manager_id = excluded.shared_instance_manager_id,
+			shared_instance_linked_user_id = excluded.shared_instance_linked_user_id
 		",
         instance_id,
         shared_instance_id,
         shared_instance_role,
         shared_instance_manager_id,
+        shared_instance_linked_user_id,
     )
     .execute(&mut **tx)
     .await?;
@@ -1361,6 +1375,7 @@ fn shared_instance_attachment(
     shared_instance_id: Option<String>,
     shared_instance_role: Option<String>,
     shared_instance_manager_id: Option<String>,
+    shared_instance_linked_user_id: Option<String>,
     shared_sync_status: Option<String>,
     applied_update_id: Option<String>,
     latest_available_update_id: Option<String>,
@@ -1382,6 +1397,7 @@ fn shared_instance_attachment(
         id,
         role,
         manager_id: shared_instance_manager_id,
+        linked_user_id: shared_instance_linked_user_id,
         status,
         applied_version: optional_i32(applied_update_id, "applied_update_id")?,
         latest_version: optional_i32(

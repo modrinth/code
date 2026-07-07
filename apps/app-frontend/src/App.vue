@@ -80,6 +80,7 @@ import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
+import SharedInstancesLogoutWarningModal from '@/components/ui/modal/SharedInstancesLogoutWarningModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
@@ -705,6 +706,27 @@ async function signIn() {
 }
 
 async function logOut() {
+	const sharedInstances = await getSharedInstancesForLogoutWarning()
+	const warningModal = sharedInstancesLogoutWarningModal.value
+	if (sharedInstances.length > 0 && warningModal) {
+		warningModal.show(sharedInstances)
+		return
+	}
+
+	await performLogOut()
+}
+
+async function getSharedInstancesForLogoutWarning() {
+	try {
+		const instances = await list()
+		return instances.filter((instance) => instance.shared_instance)
+	} catch (error) {
+		handleError(error)
+		return []
+	}
+}
+
+async function performLogOut() {
 	await logout().catch(handleError)
 	await fetchCredentials()
 }
@@ -770,6 +792,7 @@ onMounted(() => {
 })
 
 const accounts = ref(null)
+const sharedInstancesLogoutWarningModal = ref(null)
 provide('accountsCard', accounts)
 
 command_listener(handleCommand)
@@ -1511,6 +1534,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</Suspense>
 		<Suspense>
 			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
+		</Suspense>
+		<Suspense>
+			<SharedInstancesLogoutWarningModal
+				ref="sharedInstancesLogoutWarningModal"
+				@sign-out="performLogOut"
+			/>
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
