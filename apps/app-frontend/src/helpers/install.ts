@@ -85,6 +85,12 @@ export type InstallJavaStep =
 	| 'extracting'
 	| 'validating'
 
+export interface InstallErrorView {
+	code: string
+	phase?: InstallPhaseId | null
+	message: string
+}
+
 export interface InstallJobSnapshot {
 	job_id: string
 	instance_id?: string | null
@@ -114,7 +120,8 @@ export interface InstallJobSnapshot {
 		  }
 		| { type: 'import'; launcher_type: string; instance_folder: string }
 	display?: { title: string; icon?: string | null } | null
-	error?: { code: string; message: string } | null
+	error?: InstallErrorView | null
+	rollback_error?: InstallErrorView | null
 	created: string
 	modified: string
 	finished?: string | null
@@ -195,6 +202,10 @@ export async function install_job_cancel(jobId: string) {
 
 export async function install_job_dismiss(jobId: string) {
 	return await invoke<void>('plugin:install|install_job_dismiss', { jobId })
+}
+
+export async function install_job_support_details(jobId: string) {
+	return await invoke<string>('plugin:install|install_job_support_details', { jobId })
 }
 
 export function installJobInstanceId(job: InstallJobSnapshot): string | null {

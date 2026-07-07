@@ -22,6 +22,8 @@ pub struct InstallJobState {
     pub display: Option<InstallJobDisplay>,
     pub rollback: Option<InstallRollbackState>,
     pub error: Option<InstallErrorView>,
+    #[serde(default)]
+    pub rollback_error: Option<InstallErrorView>,
 }
 
 impl InstallJobState {
@@ -44,6 +46,7 @@ impl InstallJobState {
             display: None,
             rollback: None,
             error: None,
+            rollback_error: None,
         }
     }
 }
@@ -330,14 +333,33 @@ pub struct InstallRollbackState {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallErrorView {
     pub code: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phase: Option<InstallPhaseId>,
     pub message: String,
 }
 
 impl InstallErrorView {
-    pub fn from_error(code: &str, error: impl ToString) -> Self {
+    pub fn from_error(
+        code: &str,
+        phase: InstallPhaseId,
+        error: impl ToString,
+    ) -> Self {
         Self {
             code: code.to_string(),
+            phase: Some(phase),
             message: error.to_string(),
+        }
+    }
+
+    pub fn from_message(
+        code: &str,
+        phase: InstallPhaseId,
+        message: impl Into<String>,
+    ) -> Self {
+        Self {
+            code: code.to_string(),
+            phase: Some(phase),
+            message: message.into(),
         }
     }
 }
@@ -354,6 +376,7 @@ pub struct InstallJobSnapshot {
     pub details: InstallPhaseDetails,
     pub display: Option<InstallJobDisplay>,
     pub error: Option<InstallErrorView>,
+    pub rollback_error: Option<InstallErrorView>,
     pub created: DateTime<Utc>,
     pub modified: DateTime<Utc>,
     pub finished: Option<DateTime<Utc>>,

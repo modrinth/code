@@ -1,4 +1,4 @@
-import { UpdatedIcon } from '@modrinth/assets'
+import { CopyIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	defineMessages,
 	type PopupNotificationButton,
@@ -15,8 +15,10 @@ import {
 	install_job_dismiss,
 	install_job_list,
 	install_job_retry,
+	install_job_support_details,
 	installJobInstanceId,
 	type InstallJobSnapshot,
+	type InstallPhaseId,
 	type InstallJobStatus,
 	type InstallProgress,
 } from '@/helpers/install'
@@ -31,6 +33,10 @@ const messages = defineMessages({
 		id: 'app.action-bar.install.retry',
 		defaultMessage: 'Retry',
 	},
+	copyDetails: {
+		id: 'app.action-bar.install.copy-details',
+		defaultMessage: 'Copy details',
+	},
 	dismiss: {
 		id: 'app.action-bar.install.dismiss',
 		defaultMessage: 'Dismiss',
@@ -43,21 +49,72 @@ const messages = defineMessages({
 		id: 'app.action-bar.install.failed',
 		defaultMessage: 'Install failed',
 	},
-	installFailedAppClosed: {
-		id: 'app.action-bar.install.failed-app-closed',
-		defaultMessage: 'Installation failed due to app closing.',
+	installFailedWhile: {
+		id: 'app.action-bar.install.failed-while',
+		defaultMessage: 'Failed while {phase}.',
 	},
-	installFailedNetwork: {
-		id: 'app.action-bar.install.failed-network',
-		defaultMessage: 'Installation failed due to a network error.',
-	},
-	installFailedUnknown: {
-		id: 'app.action-bar.install.failed-unknown',
-		defaultMessage: 'Installation failed due to an unknown error.',
+	installInterruptedWhile: {
+		id: 'app.action-bar.install.interrupted-while',
+		defaultMessage: 'Interrupted while {phase}.',
 	},
 	unknownInstance: {
 		id: 'app.action-bar.install.unknown-instance',
 		defaultMessage: 'Unknown instance',
+	},
+})
+
+const failurePhaseMessages = defineMessages({
+	preparing_instance: {
+		id: 'app.install.failure-phase.preparing_instance',
+		defaultMessage: 'preparing instance',
+	},
+	resolving_pack: {
+		id: 'app.install.failure-phase.resolving_pack',
+		defaultMessage: 'resolving content',
+	},
+	downloading_pack_file: {
+		id: 'app.install.failure-phase.downloading_pack_file',
+		defaultMessage: 'downloading pack file',
+	},
+	reading_pack_manifest: {
+		id: 'app.install.failure-phase.reading_pack_manifest',
+		defaultMessage: 'reading pack manifest',
+	},
+	downloading_content: {
+		id: 'app.install.failure-phase.downloading_content',
+		defaultMessage: 'downloading content',
+	},
+	extracting_overrides: {
+		id: 'app.install.failure-phase.extracting_overrides',
+		defaultMessage: 'extracting overrides',
+	},
+	resolving_minecraft: {
+		id: 'app.install.failure-phase.resolving_minecraft',
+		defaultMessage: 'resolving Minecraft',
+	},
+	resolving_loader: {
+		id: 'app.install.failure-phase.resolving_loader',
+		defaultMessage: 'resolving loader',
+	},
+	preparing_java: {
+		id: 'app.install.failure-phase.preparing_java',
+		defaultMessage: 'preparing Java',
+	},
+	downloading_minecraft: {
+		id: 'app.install.failure-phase.downloading_minecraft',
+		defaultMessage: 'downloading Minecraft',
+	},
+	running_loader_processors: {
+		id: 'app.install.failure-phase.running_loader_processors',
+		defaultMessage: 'running loader processors',
+	},
+	finalizing: {
+		id: 'app.install.failure-phase.finalizing',
+		defaultMessage: 'finalizing',
+	},
+	rolling_back: {
+		id: 'app.install.failure-phase.rolling_back',
+		defaultMessage: 'rolling back',
 	},
 })
 
@@ -139,6 +196,29 @@ const javaStepMessages = defineMessages({
 	},
 })
 
+const failureJavaStepMessages = defineMessages({
+	resolving: {
+		id: 'app.install.failure-phase.preparing_java.resolving',
+		defaultMessage: 'preparing Java {version}',
+	},
+	fetching_metadata: {
+		id: 'app.install.failure-phase.preparing_java.fetching-metadata',
+		defaultMessage: 'fetching Java {version}',
+	},
+	downloading: {
+		id: 'app.install.failure-phase.preparing_java.downloading',
+		defaultMessage: 'downloading Java {version}',
+	},
+	extracting: {
+		id: 'app.install.failure-phase.preparing_java.extracting',
+		defaultMessage: 'extracting Java {version}',
+	},
+	validating: {
+		id: 'app.install.failure-phase.preparing_java.validating',
+		defaultMessage: 'validating Java {version}',
+	},
+})
+
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
@@ -172,15 +252,37 @@ export async function useInstallJobNotifications(opts: {
 		)
 	}
 
+	function getFailurePhase(job: InstallJobSnapshot): InstallPhaseId | undefined {
+		if (job.error?.phase) {
+			return job.error.phase
+		}
+		if (job.phase !== 'rolling_back') {
+			return job.phase
+		}
+		return undefined
+	}
+
+	function getFailurePhaseText(job: InstallJobSnapshot, phase: InstallPhaseId): string {
+		if (phase === 'preparing_java' && job.details.type === 'java') {
+			return formatMessage(failureJavaStepMessages[job.details.step], {
+				version: job.details.major_version,
+			})
+		}
+		return formatMessage(failurePhaseMessages[phase])
+	}
+
 	function getText(job: InstallJobSnapshot): string {
 		if (job.status === 'failed' || job.status === 'interrupted') {
-			if (job.error?.code === 'interrupted') {
-				return formatMessage(messages.installFailedAppClosed)
+			const phase = getFailurePhase(job)
+			if (phase) {
+				return formatMessage(
+					job.status === 'interrupted'
+						? messages.installInterruptedWhile
+						: messages.installFailedWhile,
+					{ phase: getFailurePhaseText(job, phase) },
+				)
 			}
-			if (job.error?.code === 'network_error') {
-				return formatMessage(messages.installFailedNetwork)
-			}
-			return formatMessage(messages.installFailedUnknown)
+			return formatMessage(messages.installFailed)
 		}
 		if (job.phase === 'preparing_java' && job.details.type === 'java') {
 			return formatMessage(javaStepMessages[job.details.step], {
@@ -235,6 +337,17 @@ export async function useInstallJobNotifications(opts: {
 		return job.status === 'failed' || job.status === 'interrupted'
 	}
 
+	async function copyJobDetails(job: InstallJobSnapshot) {
+		const details = await install_job_support_details(job.job_id).catch((error) => {
+			opts.handleError(error)
+			return null
+		})
+		if (!details) {
+			return
+		}
+		await navigator.clipboard.writeText(details).catch(opts.handleError)
+	}
+
 	function getTerminalButtons(job: InstallJobSnapshot): PopupNotificationButton[] | undefined {
 		if (!isTerminalJob(job)) return undefined
 
@@ -247,6 +360,15 @@ export async function useInstallJobNotifications(opts: {
 				action: async () => {
 					await install_job_retry(job.job_id).catch(opts.handleError)
 					await refresh()
+				},
+			},
+			{
+				label: formatMessage(messages.copyDetails),
+				icon: CopyIcon,
+				color: 'standard',
+				keepOpen: true,
+				action: async () => {
+					await copyJobDetails(job)
 				},
 			},
 		]

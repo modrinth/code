@@ -16,12 +16,20 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
-    ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
+    ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader,
+    ModrinthCredentials, State,
 };
 use crate::util::fetch::DownloadReason;
+use regex::{Captures, Regex};
 use std::collections::HashSet;
-use std::path::PathBuf;
+use std::fmt::Write as _;
+use std::io::{Read, Seek, SeekFrom};
+use std::net::{Ipv4Addr, Ipv6Addr};
+use std::path::{Path, PathBuf};
+use std::time::SystemTime;
 use uuid::Uuid;
+
+const INSTALL_SUPPORT_LOG_TAIL_BYTES: u64 = 128 * 1024;
 
 pub async fn create_instance(
     name: String,
@@ -108,6 +116,12 @@ pub async fn get_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     Ok(store::get_required(job_id, &state).await?.snapshot())
 }
 
+pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
+    let state = State::get().await?;
+    let job = store::get_required(job_id, &state).await?;
+    build_job_support_details(&job, &state).await
+}
+
 pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
@@ -127,6 +141,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.cleanup = job.state.request.cleanup();
     job.state.rollback = None;
     job.state.error = None;
+    job.state.rollback_error = None;
     job.state.progress.phase = InstallPhaseId::PreparingInstance;
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
@@ -156,10 +171,11 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .into());
     }
 
-    job.state.error = Some(InstallErrorView {
-        code: "canceled".to_string(),
-        message: "Install was canceled".to_string(),
-    });
+    job.state.error = Some(InstallErrorView::from_message(
+        "canceled",
+        job.state.progress.phase,
+        "Install was canceled",
+    ));
     recovery::apply_cleanup(&job.state, &state).await?;
     clear_deleted_new_instance_id(&mut job.state);
     let record = store::update_status(
@@ -177,6 +193,199 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
 pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     store::dismiss(job_id, &state).await
+}
+
+async fn build_job_support_details(
+    job: &store::InstallJobRecord,
+    state: &State,
+) -> crate::Result<String> {
+    let snapshot = job.snapshot();
+    let mut details = String::new();
+
+    let _ = writeln!(details, "Install job details");
+    let _ = writeln!(
+        details,
+        "Instance: {}",
+        snapshot
+            .display
+            .as_ref()
+            .map(|display| display.title.as_str())
+            .unwrap_or("Unknown")
+    );
+    let _ = writeln!(details, "Job ID: {}", snapshot.job_id);
+    let _ = writeln!(details, "Status: {}", json_string(&snapshot.status));
+    let _ = writeln!(details, "Current phase: {}", json_string(&snapshot.phase));
+
+    if let Some(error) = &snapshot.error {
+        let _ = writeln!(details);
+        let _ = writeln!(details, "Primary error");
+        let _ = writeln!(details, "Code: {}", error.code);
+        if let Some(phase) = error.phase {
+            let _ = writeln!(details, "Phase: {}", json_string(&phase));
+        }
+        let _ = writeln!(details, "Message: {}", error.message);
+    }
+
+    if let Some(error) = &snapshot.rollback_error {
+        let _ = writeln!(details);
+        let _ = writeln!(details, "Rollback error");
+        let _ = writeln!(details, "Code: {}", error.code);
+        if let Some(phase) = error.phase {
+            let _ = writeln!(details, "Phase: {}", json_string(&phase));
+        }
+        let _ = writeln!(details, "Message: {}", error.message);
+    }
+
+    let _ = writeln!(details);
+    let _ = writeln!(details, "Snapshot");
+    match serde_json::to_string_pretty(&snapshot) {
+        Ok(snapshot_json) => {
+            let _ = writeln!(details, "{snapshot_json}");
+        }
+        Err(error) => {
+            let _ = writeln!(details, "Unable to serialize snapshot: {error}");
+        }
+    }
+
+    let _ = writeln!(details);
+    let _ = writeln!(details, "Latest launcher log");
+    match latest_launcher_log_tail(state).await {
+        Ok(Some((path, output))) => {
+            let _ = writeln!(details, "File: {}", path.display());
+            details.push_str(&output);
+        }
+        Ok(None) => {
+            let _ = writeln!(details, "No launcher log found.");
+        }
+        Err(error) => {
+            let _ = writeln!(details, "Unable to read launcher log: {error}");
+        }
+    }
+
+    censor_support_text(details, state).await
+}
+
+fn json_string<T: serde::Serialize>(value: &T) -> String {
+    serde_json::to_string(value)
+        .map(|value| value.trim_matches('"').to_string())
+        .unwrap_or_else(|_| "unknown".to_string())
+}
+
+async fn latest_launcher_log_tail(
+    state: &State,
+) -> crate::Result<Option<(PathBuf, String)>> {
+    let Some(logs_dir) = state.directories.launcher_logs_dir() else {
+        return Ok(None);
+    };
+
+    let entries = match std::fs::read_dir(&logs_dir) {
+        Ok(entries) => entries,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(None);
+        }
+        Err(error) => return Err(error.into()),
+    };
+
+    let mut latest: Option<(PathBuf, SystemTime)> = None;
+    for entry in entries {
+        let entry = entry?;
+        let metadata = match entry.metadata() {
+            Ok(metadata) if metadata.is_file() => metadata,
+            _ => continue,
+        };
+        let modified = metadata
+            .modified()
+            .or_else(|_| metadata.created())
+            .unwrap_or(SystemTime::UNIX_EPOCH);
+        let path = entry.path();
+
+        match latest.as_ref() {
+            Some((_, latest_modified)) if modified <= *latest_modified => {}
+            _ => latest = Some((path, modified)),
+        }
+    }
+
+    let Some((path, _)) = latest else {
+        return Ok(None);
+    };
+
+    let output = read_file_tail(&path, INSTALL_SUPPORT_LOG_TAIL_BYTES)?;
+    Ok(Some((path, output)))
+}
+
+fn read_file_tail(path: &Path, max_bytes: u64) -> crate::Result<String> {
+    let mut file = std::fs::File::open(path)?;
+    let len = file.metadata()?.len();
+    let start = len.saturating_sub(max_bytes);
+    file.seek(SeekFrom::Start(start))?;
+
+    let mut buffer = Vec::with_capacity((len - start) as usize);
+    file.read_to_end(&mut buffer)?;
+
+    let mut output = String::from_utf8_lossy(&buffer).into_owned();
+    if start > 0 {
+        output = format!("[first {start} bytes omitted]\n{output}");
+    }
+
+    Ok(output)
+}
+
+async fn censor_support_text(
+    mut text: String,
+    state: &State,
+) -> crate::Result<String> {
+    for credentials in ModrinthCredentials::get_all(&state.pool)
+        .await?
+        .into_iter()
+        .map(|credentials| credentials.1)
+    {
+        replace_nonempty(
+            &mut text,
+            &credentials.session,
+            "{MODRINTH_ACCESS_TOKEN}",
+        );
+    }
+
+    text = censor_ip_addresses(text);
+
+    Ok(text)
+}
+
+fn replace_nonempty(text: &mut String, value: &str, replacement: &str) {
+    if !value.is_empty() {
+        *text = text.replace(value, replacement);
+    }
+}
+
+fn censor_ip_addresses(text: String) -> String {
+    let text = Regex::new(
+        r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b",
+    )
+    .expect("valid IPv4 regex")
+    .replace_all(&text, |captures: &Captures<'_>| {
+        let value = &captures[0];
+        match value.parse::<Ipv4Addr>() {
+            Ok(_) => "...".to_string(),
+            _ => value.to_string(),
+        }
+    })
+    .into_owned();
+
+    Regex::new(r"(?i)\b[0-9a-f:.%]{3,}\b")
+        .expect("valid IPv6 candidate regex")
+        .replace_all(&text, |captures: &Captures<'_>| {
+            let value = &captures[0];
+            if value.matches(':').count() < 2 {
+                return value.to_string();
+            }
+
+            let candidate = value.split('%').next().unwrap_or(value);
+            match candidate.parse::<Ipv6Addr>() {
+                Ok(_) => ":::::::".to_string(),
+                _ => value.to_string(),
+            }
+        })
+        .into_owned()
 }
 
 async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
@@ -355,6 +564,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             job_state.progress.progress = None;
             job_state.progress.details = InstallPhaseDetails::Empty;
             job_state.error = None;
+            job_state.rollback_error = None;
             let record = store::update_status(
                 job_id,
                 InstallJobStatus::Succeeded,
@@ -365,11 +575,22 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             emit_install_job(&record.snapshot()).await?;
         }
         Err(error) => {
+            let failed_phase = job_state.progress.phase;
+            job_state.error = Some(install_error_view(failed_phase, &error));
             job_state.progress.phase = InstallPhaseId::RollingBack;
             job_state.progress.progress = None;
             job_state.progress.details = InstallPhaseDetails::Empty;
-            job_state.error = Some(install_error_view(&error));
-            recovery::apply_cleanup(&job_state, &state).await?;
+            if let Err(rollback_error) =
+                recovery::apply_cleanup(&job_state, &state).await
+            {
+                tracing::error!(
+                    "Error rolling back failed install job {job_id}: {rollback_error}"
+                );
+                job_state.rollback_error = Some(install_error_view(
+                    InstallPhaseId::RollingBack,
+                    &rollback_error,
+                ));
+            }
             clear_deleted_new_instance_id(&mut job_state);
             let record = store::update_status(
                 job_id,
@@ -934,19 +1155,77 @@ fn set_display(
     job_state.display = Some(InstallJobDisplay { title, icon });
 }
 
-fn install_error_view(error: &crate::Error) -> InstallErrorView {
+fn install_error_view(
+    phase: InstallPhaseId,
+    error: &crate::Error,
+) -> InstallErrorView {
+    InstallErrorView::from_error(install_error_code(phase, error), phase, error)
+}
+
+fn install_error_code(
+    phase: InstallPhaseId,
+    error: &crate::Error,
+) -> &'static str {
+    use InstallPhaseId::*;
+
     match error.raw.as_ref() {
-        ErrorKind::FetchError(_)
-        | ErrorKind::ApiIsDownError(_)
-        | ErrorKind::WSError(_)
-        | ErrorKind::WSClosedError(_) => InstallErrorView {
-            code: "network_error".to_string(),
-            message: "network_error".to_string(),
+        ErrorKind::InputError(_) => match phase {
+            PreparingInstance | Finalizing => "instance_error",
+            ResolvingPack | DownloadingPackFile | ReadingPackManifest => {
+                "pack_error"
+            }
+            DownloadingContent => "content_error",
+            ExtractingOverrides => "path_error",
+            PreparingJava => "java_error",
+            DownloadingMinecraft => "instance_error",
+            RollingBack => "rollback_error",
+            ResolvingMinecraft | ResolvingLoader | RunningLoaderProcessors => {
+                "launcher_error"
+            }
         },
-        _ => InstallErrorView {
-            code: "unknown_error".to_string(),
-            message: "unknown_error".to_string(),
+        ErrorKind::LauncherError(_) => match phase {
+            RunningLoaderProcessors => "processor_error",
+            PreparingJava => "java_error",
+            ResolvingLoader => "loader_error",
+            _ => "launcher_error",
         },
+        ErrorKind::JREError(_) => "java_error",
+        ErrorKind::NoValueFor(_) | ErrorKind::MetadataError(_) => match phase {
+            ResolvingLoader => "loader_error",
+            PreparingJava => "java_error",
+            _ => "metadata_error",
+        },
+        ErrorKind::FetchError(_) | ErrorKind::ApiIsDownError(_) => "network_error",
+        ErrorKind::Any(_)
+            if matches!(
+                phase,
+                DownloadingPackFile
+                    | DownloadingContent
+                    | ResolvingMinecraft
+                    | ResolvingLoader
+                    | PreparingJava
+                    | DownloadingMinecraft
+            ) =>
+        {
+            "network_error"
+        }
+        ErrorKind::LabrinthError(_) => "api_error",
+        ErrorKind::HashError(_, _) => "hash_error",
+        ErrorKind::ZipError(_) => "archive_error",
+        ErrorKind::DeserializationError(_)
+        | ErrorKind::StripPrefixError(_) => "path_error",
+        ErrorKind::FSError(_)
+        | ErrorKind::IOError(_)
+        | ErrorKind::StdIOError(_)
+        | ErrorKind::UTFError(_) => "filesystem_error",
+        ErrorKind::INIError(_) | ErrorKind::JSONError(_) => "parse_error",
+        ErrorKind::Sqlx(_) | ErrorKind::SqlxMigrate(_) => "database_error",
+        ErrorKind::JoinError(_)
+        | ErrorKind::RecvError(_)
+        | ErrorKind::AcquireError(_)
+        | ErrorKind::EventError(_) => "internal_error",
+        ErrorKind::OtherError(_) | ErrorKind::Any(_) => "internal_error",
+        _ => "unknown_error",
     }
 }
 

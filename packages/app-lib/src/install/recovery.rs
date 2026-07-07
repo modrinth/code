@@ -16,19 +16,26 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
         if job.state.display.is_none() {
             job.state.display = display_from_request(&job.state);
         }
+        let interrupted_phase = job.state.progress.phase;
         job.state.progress.phase = InstallPhaseId::RollingBack;
         job.state.progress.progress = None;
         job.state.progress.details = InstallPhaseDetails::Empty;
-        job.state.error = Some(InstallErrorView {
-            code: "interrupted".to_string(),
-            message: "interrupted".to_string(),
-        });
+        job.state.error = Some(InstallErrorView::from_message(
+            "interrupted",
+            interrupted_phase,
+            "interrupted",
+        ));
 
         if let Err(error) = apply_cleanup(&job.state, state).await {
             tracing::error!(
                 "Error cleaning up interrupted install job {}: {error}",
                 job.id
             );
+            job.state.rollback_error = Some(InstallErrorView::from_error(
+                "rollback_error",
+                InstallPhaseId::RollingBack,
+                error,
+            ));
         }
         clear_deleted_new_instance_id(&mut job.state);
 

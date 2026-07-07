@@ -14,6 +14,9 @@
   "app.action-bar.install.dismiss": {
     "message": "Dismiss"
   },
+  "app.action-bar.install.copy-details": {
+    "message": "Copy details"
+  },
   "app.action-bar.install.failed": {
     "message": "Install failed"
   },
@@ -25,6 +28,12 @@
   },
   "app.action-bar.install.failed-unknown": {
     "message": "Installation failed due to an unknown error."
+  },
+  "app.action-bar.install.failed-while": {
+    "message": "Failed while {phase}."
+  },
+  "app.action-bar.install.interrupted-while": {
+    "message": "Interrupted while {phase}."
   },
   "app.action-bar.install.open-instance": {
     "message": "Open instance"
@@ -268,6 +277,60 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "Running loader processors"
+  },
+  "app.install.failure-phase.downloading_content": {
+    "message": "downloading content"
+  },
+  "app.install.failure-phase.downloading_minecraft": {
+    "message": "downloading Minecraft"
+  },
+  "app.install.failure-phase.downloading_pack_file": {
+    "message": "downloading pack file"
+  },
+  "app.install.failure-phase.extracting_overrides": {
+    "message": "extracting overrides"
+  },
+  "app.install.failure-phase.finalizing": {
+    "message": "finalizing"
+  },
+  "app.install.failure-phase.preparing_instance": {
+    "message": "preparing instance"
+  },
+  "app.install.failure-phase.preparing_java": {
+    "message": "preparing Java"
+  },
+  "app.install.failure-phase.preparing_java.downloading": {
+    "message": "downloading Java {version}"
+  },
+  "app.install.failure-phase.preparing_java.extracting": {
+    "message": "extracting Java {version}"
+  },
+  "app.install.failure-phase.preparing_java.fetching-metadata": {
+    "message": "fetching Java {version}"
+  },
+  "app.install.failure-phase.preparing_java.resolving": {
+    "message": "preparing Java {version}"
+  },
+  "app.install.failure-phase.preparing_java.validating": {
+    "message": "validating Java {version}"
+  },
+  "app.install.failure-phase.reading_pack_manifest": {
+    "message": "reading pack manifest"
+  },
+  "app.install.failure-phase.resolving_loader": {
+    "message": "resolving loader"
+  },
+  "app.install.failure-phase.resolving_minecraft": {
+    "message": "resolving Minecraft"
+  },
+  "app.install.failure-phase.resolving_pack": {
+    "message": "resolving content"
+  },
+  "app.install.failure-phase.rolling_back": {
+    "message": "rolling back"
+  },
+  "app.install.failure-phase.running_loader_processors": {
+    "message": "running loader processors"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
