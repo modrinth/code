@@ -24,8 +24,7 @@ export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
 export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
-export type LoaderManifest = LauncherMeta.Manifest.v0.Manifest
-export type LoaderManifestResolver = (loader: string) => Promise<LoaderManifest>
+export type LoaderManifestResolver = (loader: string) => Promise<LauncherMeta.Manifest.v0.Manifest>
 export interface LoaderVersionEntry {
 	id: string
 	stable: boolean
@@ -161,7 +160,7 @@ export interface CreationFlowContextValue {
 	hideLoaderChips: ComputedRef<boolean>
 	hideLoaderVersion: ComputedRef<boolean>
 	showSnapshots: Ref<boolean>
-	loaderVersionsCache: Ref<Record<string, LoaderManifest>>
+	loaderVersionsCache: Ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>
 	paperSupportedVersions: Ref<Set<string> | null>
 	purpurSupportedVersions: Ref<Set<string> | null>
 
@@ -296,7 +295,9 @@ export function createCreationFlowContext(
 	const loaderVersionType = ref<LoaderVersionType>('stable')
 	const selectedLoaderVersion = ref<string | null>(null)
 	const showSnapshots = ref(false)
-	const loaderVersionsCache = ref<Record<string, LoaderManifest>>({})
+	const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>(
+		{},
+	)
 	const paperSupportedVersions = ref<Set<string> | null>(null)
 	const purpurSupportedVersions = ref<Set<string> | null>(null)
 
@@ -363,11 +364,11 @@ export function createCreationFlowContext(
 					(await client.launchermeta.manifest_v0.getManifest(apiLoader)),
 				staleTime: Infinity,
 			})
-			loaderVersionsCache.value[apiLoader] = data
+			loaderVersionsCache.value[apiLoader] = data.gameVersions
 			debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
 		} catch (error) {
 			debug('fetchLoaderManifest: failed', apiLoader, error)
-			loaderVersionsCache.value[apiLoader] = { gameVersions: [] }
+			loaderVersionsCache.value[apiLoader] = []
 		}
 	}
 

@@ -24,7 +24,7 @@ use crate::{State, get_resource_file, process};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
-use daedalus::modded::{LoaderVersion, Manifest};
+use daedalus::modded::LoaderVersion;
 use regex::Regex;
 use serde::Deserialize;
 use std::fmt::Write;
@@ -175,42 +175,23 @@ pub async fn get_loader_version_from_profile(
     let versions =
         crate::api::metadata::get_loader_versions(loader.as_meta_str()).await?;
 
-    if let Some(loaders) =
-        loader_versions_for_game_version(&versions, game_version)
-    {
-        let loader_version =
-            loaders
-                .iter()
-                .find(|x| filter(x))
-                .or(if version == "stable" {
-                    loaders.first()
-                } else {
-                    None
-                });
+    let loaders = versions.game_versions.into_iter().find(|x| {
+        x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
+            == game_version
+    });
+
+    if let Some(loaders) = loaders {
+        let loader_version = loaders.loaders.iter().find(|x| filter(x)).or(
+            if version == "stable" {
+                loaders.loaders.first()
+            } else {
+                None
+            },
+        );
 
         Ok(loader_version.cloned())
     } else {
         Ok(None)
-    }
-}
-
-fn loader_versions_for_game_version<'a>(
-    manifest: &'a Manifest,
-    game_version: &str,
-) -> Option<&'a [LoaderVersion]> {
-    let version = manifest.game_versions.iter().find(|x| {
-        x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
-            == game_version
-    })?;
-
-    if let Some(version_group) = &version.version_group {
-        manifest
-            .version_groups
-            .iter()
-            .find(|group| group.id == *version_group)
-            .map(|group| group.loaders.as_slice())
-    } else {
-        Some(version.loaders.as_slice())
     }
 }
 

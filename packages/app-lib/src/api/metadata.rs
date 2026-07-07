@@ -22,10 +22,8 @@ pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
 // #[tracing::instrument]
 pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
     let state = State::get().await?;
-    let cache_key =
-        daedalus::modded::loader_manifest_metadata(loader).cache_key;
     let loaders = CachedEntry::get_loader_manifest(
-        &cache_key,
+        loader,
         None,
         &state.pool,
         &state.api_semaphore,

@@ -1396,25 +1396,19 @@ impl CachedEntry {
                 let fetch_urls = keys
                     .iter()
                     .map(|x| {
-                        let metadata =
-                            daedalus::modded::loader_manifest_metadata_from_cache_key(
-                                &x.key().to_string(),
-                            );
-
                         (
-                            metadata.cache_key,
-                            metadata.loader,
+                            x.key().to_string(),
                             format!(
-                                "{}{}",
+                                "{}{}/v0/manifest.json",
                                 env!("MODRINTH_LAUNCHER_META_URL"),
-                                metadata.path,
+                                x.key()
                             ),
                         )
                     })
                     .collect::<Vec<_>>();
 
                 futures::future::try_join_all(fetch_urls.iter().map(
-                    |(_, _, url)| {
+                    |(_, url)| {
                         fetch_json(
                             Method::GET,
                             url,
@@ -1430,15 +1424,14 @@ impl CachedEntry {
                 .into_iter()
                 .enumerate()
                 .map(|(index, metadata)| {
-                    let mut entry =
+                    (
                         CacheValue::LoaderManifest(CachedLoaderManifest {
-                            loader: fetch_urls[index].1.to_string(),
+                            loader: fetch_urls[index].0.to_string(),
                             manifest: metadata,
                         })
-                        .get_entry();
-                    entry.id.clone_from(&fetch_urls[index].0);
-
-                    (entry, true)
+                        .get_entry(),
+                        true,
+                    )
                 })
                 .collect()
             }

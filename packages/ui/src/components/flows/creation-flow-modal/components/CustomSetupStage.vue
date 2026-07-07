@@ -370,13 +370,11 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 		const manifest = ctx.loaderVersionsCache.value[apiLoader]
 		if (!manifest) return []
 
-		const hasPlaceholder = manifest.gameVersions.some((x) => x.id === '${modrinth.gameVersion}')
+		const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 		const supportedVersions = new Set(
-			manifest.gameVersions
+			manifest
 				.filter(
-					(x) =>
-						x.id !== '${modrinth.gameVersion}' &&
-						(hasPlaceholder || x.loaders.length > 0 || !!x.versionGroup),
+					(x) => x.id !== '${modrinth.gameVersion}' && (hasPlaceholder || x.loaders.length > 0),
 				)
 				.map((x) => x.id),
 		)
@@ -468,14 +466,14 @@ function getLoaderVersionsForGameVersion(
 		apiLoader,
 		gameVersion,
 		hasManifest: !!manifest,
-		manifestLength: manifest?.gameVersions.length,
+		manifestLength: manifest?.length,
 	})
 	if (!manifest) return []
 
 	// Some loaders (e.g. Fabric) list all versions under a placeholder entry
-	const placeholder = manifest.gameVersions.find((x) => x.id === '${modrinth.gameVersion}')
+	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) {
-		if (!manifest.gameVersions.some((x) => x.id === gameVersion)) return []
+		if (!manifest.some((x) => x.id === gameVersion)) return []
 		debug(
 			'getLoaderVersionsForGameVersion: using placeholder, loaders:',
 			placeholder.loaders.length,
@@ -483,20 +481,7 @@ function getLoaderVersionsForGameVersion(
 		return placeholder.loaders
 	}
 
-	const entry = manifest.gameVersions.find((x) => x.id === gameVersion)
-	if (entry?.versionGroup) {
-		const loaders =
-			manifest.versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
-		debug(
-			'getLoaderVersionsForGameVersion: version group for',
-			gameVersion,
-			':',
-			entry.versionGroup,
-			loaders.length + ' loaders',
-		)
-		return loaders
-	}
-
+	const entry = manifest.find((x) => x.id === gameVersion)
 	debug(
 		'getLoaderVersionsForGameVersion: entry for',
 		gameVersion,
