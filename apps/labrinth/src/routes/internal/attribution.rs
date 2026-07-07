@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, get, patch, post, web};
+use actix_web::{HttpRequest, delete, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
@@ -31,6 +31,7 @@ use crate::util::error::Context;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(list)
         .service(update_group)
+        .service(delete_group)
         .service(scan)
         .service(force_scan_file)
         .service(assign)
@@ -616,6 +617,88 @@ pub async fn update_group(
 
     clear_group_version_cache(pool.as_ref(), redis.as_ref(), &[group_id])
         .await?;
+
+    Ok(())
+}
+
+/// Delete an attribution group and all files inside it.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
+#[delete("/group/{group_id}")]
+pub async fn delete_group(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<i64>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let mut txn = pool.begin().await.wrap_internal_err(
+        "failed to begin attribution group deletion transaction",
+    )?;
+
+    let group_id = path.into_inner();
+    let version_ids = sqlx::query_scalar!(
+        r#"
+		select distinct f.version_id as "version_id: DBVersionId"
+		from project_attribution_files paf
+		inner join project_attribution_groups pag on pag.id = paf.group_id
+		inner join override_file_sources ofs on ofs.sha1 = paf.sha1
+		inner join files f on f.id = ofs.file_id
+		inner join versions v on v.id = f.version_id
+		where paf.group_id = $1
+			and pag.project_id = v.mod_id
+		"#,
+        group_id,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_internal_err("failed to fetch attribution group versions")?;
+
+    sqlx::query!(
+        "
+		delete from project_attribution_files
+		where group_id = $1
+		",
+        group_id,
+    )
+    .execute(&mut txn)
+    .await
+    .wrap_internal_err("failed to delete attribution group files")?;
+
+    let result = sqlx::query!(
+        "
+		delete from project_attribution_groups
+		where id = $1
+		",
+        group_id,
+    )
+    .execute(&mut txn)
+    .await
+    .wrap_internal_err("failed to delete attribution group")?;
+
+    if result.rows_affected() == 0 {
+        return Err(ApiError::NotFound);
+    }
+
+    txn.commit().await.wrap_internal_err(
+        "failed to commit attribution group deletion transaction",
+    )?;
+
+    DBVersion::clear_cache_ids(&version_ids, redis.as_ref())
+        .await
+        .wrap_internal_err("failed to clear version attribution cache")?;
 
     Ok(())
 }

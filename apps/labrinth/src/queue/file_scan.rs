@@ -864,14 +864,19 @@ async fn persist_attribution_results(
     }
 
     if !all_sha1s.is_empty() {
+        let file_paths: Vec<String> =
+            overrides.iter().map(|f| f.path.clone()).collect();
+
         sqlx::query!(
             "
-            insert into override_file_sources (sha1, file_id)
-            select unnest($1::bytea[]), $2
+            insert into override_file_sources (sha1, file_id, file_path)
+            select source.sha1, $2, source.file_path
+            from unnest($1::bytea[], $3::text[]) as source(sha1, file_path)
             on conflict do nothing
             ",
             &all_sha1s,
             file_id as DBFileId,
+            &file_paths,
         )
         .execute(&mut *txn)
         .await
