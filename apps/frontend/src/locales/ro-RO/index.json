@@ -1421,9 +1421,6 @@
   "project.download.no-app": {
     "message": "Nu ai Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Nu există versiuni disponibile pentru {gameVersion} și {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {platform} pentru {gameVersion}"
   },

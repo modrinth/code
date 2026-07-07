@@ -213,10 +213,11 @@ export function provideDownloadModalProvider(
 		dedupeDependencyRows(resolvedDependencyRows.value),
 	)
 
-	const duplicateDependencyRowsHidden = computed(() =>
-		downloadRowsLoaded.value &&
-		(hasSkippedDuplicateDependency(dependencyResolution.value) ||
-			hasDuplicateDependencyRows(resolvedDependencyRows.value)),
+	const duplicateDependencyRowsHidden = computed(
+		() =>
+			downloadRowsLoaded.value &&
+			(hasSkippedDuplicateDependency(dependencyResolution.value) ||
+				hasDuplicateDependencyRows(resolvedDependencyRows.value)),
 	)
 
 	const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
@@ -237,9 +238,7 @@ export function provideDownloadModalProvider(
 	)
 
 	const downloadRows = computed<DownloadDependencyRow[]>(() =>
-		downloadRowsLoaded.value
-			? [...visibleDependencyRows.value, ...additionalFileRows.value]
-			: [],
+		downloadRowsLoaded.value ? [...visibleDependencyRows.value, ...additionalFileRows.value] : [],
 	)
 
 	const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
@@ -311,6 +310,9 @@ export function provideDownloadModalProvider(
 				? skippedReasonLabel(dependency.reason)
 				: formatMessage(messages.unavailableDependency)
 		const name = project.title
+		const metadataLabel = isProjectOnlyDependencyReference(dependency)
+			? formatMessage(messages.anyCompatibleDependency)
+			: (version?.version_number ?? formatMessage(messages.anyCompatibleDependency))
 
 		return {
 			key: `${dependency.project_id}-${versionId ?? 'unresolved'}-${
@@ -323,7 +325,7 @@ export function provideDownloadModalProvider(
 				'reason' in dependency || !primaryFile ? undefined : getDownloadUrl(primaryFile.url),
 			filename: primaryFile?.filename,
 			fileSize: primaryFile?.size,
-			metadataLabel: version?.version_number ?? formatMessage(messages.anyCompatibleDependency),
+			metadataLabel,
 			typeLabel: 'Required',
 			unavailableTooltip,
 			dependencies: (versionId && dependenciesByParentVersionId.value.get(versionId)
@@ -334,6 +336,21 @@ export function provideDownloadModalProvider(
 				return row ? [row] : []
 			}),
 		}
+	}
+
+	function isProjectOnlyDependencyReference(dependency: ResolvedContent) {
+		const parentVersionId = dependency.dependent_on_version_id
+		const parentVersion =
+			parentVersionId === options.selectedVersion.value?.id
+				? options.selectedVersion.value
+				: parentVersionId
+					? dependencyVersionById.value.get(parentVersionId)
+					: undefined
+
+		return !!parentVersion?.dependencies?.some(
+			(parentDependency) =>
+				parentDependency.project_id === dependency.project_id && !parentDependency.version_id,
+		)
 	}
 
 	function skippedReasonLabel(reason: Labrinth.Content.v3.SkippedContent['reason']) {

@@ -3285,7 +3285,7 @@
     "message": "This loader is incompatible with the base project."
   },
   "project.download.compatible-version-title": {
-    "message": "Compatible version"
+    "message": "Compatible versions"
   },
   "project.download.dependencies-title": {
     "message": "Dependencies"
@@ -3320,8 +3320,17 @@
   "project.download.dependency-unavailable": {
     "message": "This dependency cannot be downloaded"
   },
+  "project.download.download": {
+    "message": "Download"
+  },
+  "project.download.download-as-zip": {
+    "message": "Download as .zip"
+  },
   "project.download.download-version": {
     "message": "Download {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Download with deps"
   },
   "project.download.duplicate-dependencies-hidden": {
     "message": "Duplicate dependencies are hidden"
@@ -3332,8 +3341,8 @@
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} does not support {gameVersion} for {platform}"
   },
-  "project.download.install-with-app-description": {
-    "message": "Automatically install the correct version and dependencies."
+  "project.download.install-with-app": {
+    "message": "Install with Modrinth App"
   },
   "project.download.manually": {
     "message": "Download manually"
@@ -3343,9 +3352,6 @@
   },
   "project.download.no-game-versions-found": {
     "message": "No game versions found"
-  },
-  "project.download.no-versions-available": {
-    "message": "No versions available for {gameVersion} and {platform}."
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
@@ -3359,18 +3365,6 @@
   "project.download.select-platform": {
     "message": "Select platform"
   },
-  "project.download.selected-version-download-all": {
-    "message": "Download all (.zip)"
-  },
-  "project.download.selected-version-downloading": {
-    "message": "Downloading... ({current}/{total})"
-  },
-  "project.download.selected-version-failed-text": {
-    "message": "One or more version files could not be downloaded. Please try again."
-  },
-  "project.download.selected-version-failed-title": {
-    "message": "Could not download version"
-  },
   "project.download.show-all-versions": {
     "message": "Show all versions"
   },
@@ -3379,6 +3373,12 @@
   },
   "project.download.unknown-loader": {
     "message": "Unknown loader"
+  },
+  "project.download.zip-failed-text": {
+    "message": "One or more files could not be downloaded. Please try again."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Could not download files"
   },
   "project.environment.migration-no-permission.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."

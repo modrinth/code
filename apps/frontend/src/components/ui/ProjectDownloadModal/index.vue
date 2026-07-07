@@ -109,10 +109,10 @@ import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 
+import { provideDownloadModalProvider } from './download-modal-provider'
 import DownloadDependencies from './DownloadDependencies.vue'
 import DownloadProject from './DownloadProject.vue'
 import InstallWithModrinthApp from './InstallWithModrinthApp.vue'
-import { provideDownloadModalProvider } from './download-modal-provider'
 
 type DownloadModalProject = Omit<Labrinth.Projects.v2.Project, 'project_type'> & {
 	project_type: DisplayProjectType

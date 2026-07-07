@@ -27,8 +27,8 @@ import { InfoIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import DownloadDependency from './DownloadDependency.vue'
 import { injectDownloadModalProvider } from './download-modal-provider'
+import DownloadDependency from './DownloadDependency.vue'
 
 defineOptions({
 	name: 'DownloadDependencies',
