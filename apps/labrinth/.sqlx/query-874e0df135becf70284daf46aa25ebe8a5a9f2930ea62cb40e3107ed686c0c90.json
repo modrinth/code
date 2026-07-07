@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tselect\n\t\t\t\tofs.file_path as \"file_path!\",\n\t\t\t\tconvert_from(ofs.sha1, 'UTF8') as \"sha1!\",\n\t\t\t\tsource_file.version_id as \"version_id: DBVersionId\",\n\t\t\t\tplatform_file.version_id as \"platform_version_id: DBVersionId\",\n\t\t\t\tplatform_version.mod_id as \"platform_project_id: DBProjectId\"\n\t\t\tfrom files source_file\n\t\t\tinner join versions source_version\n\t\t\t\ton source_version.id = source_file.version_id\n\t\t\tinner join override_file_sources ofs\n\t\t\t\ton ofs.file_id = source_file.id\n\t\t\tinner join hashes h\n\t\t\t\ton h.algorithm = 'sha1' and h.hash = ofs.sha1\n\t\t\tinner join files platform_file\n\t\t\t\ton platform_file.id = h.file_id\n\t\t\tinner join versions platform_version\n\t\t\t\ton platform_version.id = platform_file.version_id\n\t\t\twhere source_version.mod_id = $1\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_path!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "sha1!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "platform_version_id: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "platform_project_id: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "874e0df135becf70284daf46aa25ebe8a5a9f2930ea62cb40e3107ed686c0c90"
+}

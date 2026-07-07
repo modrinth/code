@@ -47,6 +47,7 @@ struct AttributionGroupResponse {
     attributed_by: Option<ariadne::ids::UserId>,
     files: Vec<AttributionFileResponse>,
     versions: Vec<VersionInfo>,
+    override_files_on_platform: Vec<OverrideFileOnPlatformResponse>,
 }
 
 #[derive(Clone, Serialize, utoipa::ToSchema)]
@@ -66,6 +67,15 @@ struct AttributionFileResponse {
     moderation_external_license_id: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     moderation_external_license: Option<ModerationExternalLicenseResponse>,
+}
+
+#[derive(Clone, Serialize, utoipa::ToSchema)]
+struct OverrideFileOnPlatformResponse {
+    file_path: String,
+    sha1: String,
+    version_id: VersionId,
+    platform_version_id: VersionId,
+    platform_project_id: ProjectId,
 }
 
 #[derive(Clone, Serialize, utoipa::ToSchema)]
@@ -359,6 +369,48 @@ pub async fn list(
         .wrap_internal_err("failed to fetch attribution group files")?
     };
 
+    let override_files_on_platform = if requester_is_mod {
+        sqlx::query!(
+            r#"
+			select
+				ofs.file_path as "file_path!",
+				convert_from(ofs.sha1, 'UTF8') as "sha1!",
+				source_file.version_id as "version_id: DBVersionId",
+				platform_file.version_id as "platform_version_id: DBVersionId",
+				platform_version.mod_id as "platform_project_id: DBProjectId"
+			from files source_file
+			inner join versions source_version
+				on source_version.id = source_file.version_id
+			inner join override_file_sources ofs
+				on ofs.file_id = source_file.id
+			inner join hashes h
+				on h.algorithm = 'sha1' and h.hash = ofs.sha1
+			inner join files platform_file
+				on platform_file.id = h.file_id
+			inner join versions platform_version
+				on platform_version.id = platform_file.version_id
+			where source_version.mod_id = $1
+			"#,
+            project_id as DBProjectId,
+        )
+        .fetch_all(pool.as_ref())
+        .await
+        .wrap_internal_err(
+            "failed to fetch override files already on platform",
+        )?
+        .into_iter()
+        .map(|row| OverrideFileOnPlatformResponse {
+            file_path: row.file_path,
+            sha1: row.sha1,
+            version_id: row.version_id.into(),
+            platform_version_id: row.platform_version_id.into(),
+            platform_project_id: row.platform_project_id.into(),
+        })
+        .collect::<Vec<_>>()
+    } else {
+        Vec::new()
+    };
+
     let moderation_external_licenses = if requester_is_mod {
         let mut ids: Vec<i64> = files
             .iter()
@@ -498,6 +550,15 @@ pub async fn list(
             .filter(|version| group_version_ids.contains(&version.id))
             .cloned()
             .collect();
+        let group_file_sha1s = group_files
+            .iter()
+            .map(|file| file.sha1.as_str())
+            .collect::<std::collections::HashSet<_>>();
+        let group_override_files_on_platform = override_files_on_platform
+            .iter()
+            .filter(|file| group_file_sha1s.contains(file.sha1.as_str()))
+            .cloned()
+            .collect();
 
         let mut attribution = group.attribution.and_then(|v| {
             serde_json::from_value::<AttributionResolution>(v).ok()
@@ -531,6 +592,7 @@ pub async fn list(
             attributed_by,
             files: group_files,
             versions: group_versions,
+            override_files_on_platform: group_override_files_on_platform,
         });
     }
 

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tselect distinct f.version_id as \"version_id: DBVersionId\"\n\t\tfrom project_attribution_files paf\n\t\tinner join project_attribution_groups pag on pag.id = paf.group_id\n\t\tinner join override_file_sources ofs on ofs.sha1 = paf.sha1\n\t\tinner join files f on f.id = ofs.file_id\n\t\tinner join versions v on v.id = f.version_id\n\t\twhere paf.group_id = $1\n\t\t\tand pag.project_id = v.mod_id\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id: DBVersionId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "97244e1acf1602c7ec0f5c3abe48f756674468f2af90b280b46f8c0ff6d5ae67"
+}
