@@ -510,9 +510,7 @@ provideInstallationSettings({
 					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 					if (!hasPlaceholder) {
 						const supportedVersions = new Set(
-							manifest
-								.filter((x) => x.loaders.length > 0 || !!x.versionGroup)
-								.map((x) => x.id),
+							manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
 						)
 						return versions
 							.filter((v) => supportedVersions.has(v.version))
