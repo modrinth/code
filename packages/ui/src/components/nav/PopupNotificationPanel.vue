@@ -268,18 +268,19 @@ async function handleToastAction(item: PopupNotification, action?: () => void | 
 async function handleToastAccept(item: PopupNotification, action?: () => void | Promise<void>) {
 	if (toastActionLoading(item.id) != null) return
 
+	const actionId = String(item.id)
 	popupNotificationManager.stopNotificationTimer(item)
 	activeToastActions.value = {
 		...activeToastActions.value,
-		[String(item.id)]: 'accept',
+		[actionId]: 'accept',
 	}
 
 	try {
 		await action?.()
 	} finally {
-		const remainingActions = { ...activeToastActions.value }
-		delete remainingActions[String(item.id)]
-		activeToastActions.value = remainingActions
+		activeToastActions.value = Object.fromEntries(
+			Object.entries(activeToastActions.value).filter(([key]) => key !== actionId),
+		)
 		popupNotificationManager.removeNotification(item.id)
 	}
 }

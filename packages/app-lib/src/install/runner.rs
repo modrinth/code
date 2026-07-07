@@ -17,9 +17,8 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
-    CachedEntry, ContentSetSyncStatus, ContentSourceKind,
-    InstanceInstallStage, InstanceLink, ModLoader, ProjectType,
-    SharedInstanceRole, State,
+    CachedEntry, ContentSetSyncStatus, ContentSourceKind, InstanceInstallStage,
+    InstanceLink, ModLoader, ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use std::collections::{HashMap, HashSet};
@@ -381,9 +380,7 @@ async fn prepare_initial_instance(
         | InstallRequest::InstallPackToExistingInstance {
             instance_id, ..
         }
-        | InstallRequest::UpdateSharedInstance {
-            instance_id, ..
-        } => {
+        | InstallRequest::UpdateSharedInstance { instance_id, .. } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
         }
     }
@@ -824,8 +821,7 @@ async fn apply_shared_instance_update(
     )
     .await?;
 
-    let current =
-        current_shared_instance_content(&metadata, state).await?;
+    let current = current_shared_instance_content(&metadata, state).await?;
     let desired = desired_shared_instance_content(data, state).await?;
 
     let project_removals = current
@@ -899,17 +895,18 @@ async fn apply_shared_instance_update(
 
     for project in project_changes {
         let current_project = current.projects.get(&project.project_id);
-        let new_path = crate::state::instances::commands::add_project_from_version(
-            instance_id,
-            &project.version_id,
-            current_project
-                .map(|_| DownloadReason::Update)
-                .unwrap_or(DownloadReason::Standalone),
-            current_project.map(|current| current.version_id.clone()),
-            ContentSourceKind::SharedInstance,
-            state,
-        )
-        .await?;
+        let new_path =
+            crate::state::instances::commands::add_project_from_version(
+                instance_id,
+                &project.version_id,
+                current_project
+                    .map(|_| DownloadReason::Update)
+                    .unwrap_or(DownloadReason::Standalone),
+                current_project.map(|current| current.version_id.clone()),
+                ContentSourceKind::SharedInstance,
+                state,
+            )
+            .await?;
 
         if let Some(current_project) = current_project
             && current_project.relative_path != new_path
@@ -945,20 +942,22 @@ fn shared_instance_update_requires_full_apply(
     metadata: &crate::state::InstanceMetadata,
     data: &SharedInstanceInstallData,
 ) -> bool {
-    let (
-        current_modpack_project_id,
-        current_modpack_version_id,
-    ) = match &metadata.link {
-        InstanceLink::SharedInstance {
-            modpack_project_id,
-            modpack_version_id,
-        } => (modpack_project_id.as_deref(), modpack_version_id.as_deref()),
-        _ => return true,
-    };
-    let next_modpack_project_id =
-        data.modpack.as_ref().map(|modpack| modpack.project_id.as_str());
-    let next_modpack_version_id =
-        data.modpack.as_ref().map(|modpack| modpack.version_id.as_str());
+    let (current_modpack_project_id, current_modpack_version_id) =
+        match &metadata.link {
+            InstanceLink::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            } => (modpack_project_id.as_deref(), modpack_version_id.as_deref()),
+            _ => return true,
+        };
+    let next_modpack_project_id = data
+        .modpack
+        .as_ref()
+        .map(|modpack| modpack.project_id.as_str());
+    let next_modpack_version_id = data
+        .modpack
+        .as_ref()
+        .map(|modpack| modpack.version_id.as_str());
 
     current_modpack_project_id != next_modpack_project_id
         || current_modpack_version_id != next_modpack_version_id
@@ -976,14 +975,12 @@ async fn current_shared_instance_content(
         &state.pool,
     )
     .await?;
-    let files = content_rows::get_instance_files(
-        &metadata.instance.id,
-        &state.pool,
-    )
-    .await?
-    .into_iter()
-    .map(|file| (file.id.clone(), file))
-    .collect::<HashMap<_, _>>();
+    let files =
+        content_rows::get_instance_files(&metadata.instance.id, &state.pool)
+            .await?
+            .into_iter()
+            .map(|file| (file.id.clone(), file))
+            .collect::<HashMap<_, _>>();
     let version_ids_without_project = entries
         .iter()
         .filter(|entry| entry.source_kind == ContentSourceKind::SharedInstance)
@@ -1063,14 +1060,13 @@ async fn desired_shared_instance_content(
     }
 
     for file in &data.external_files {
-        let file_type = ProjectType::from_name(&file.file_type).ok_or_else(
-            || {
+        let file_type =
+            ProjectType::from_name(&file.file_type).ok_or_else(|| {
                 crate::ErrorKind::InputError(format!(
                     "Unknown shared instance file type {}",
                     file.file_type
                 ))
-            },
-        )?;
+            })?;
         content.external_files.insert(
             file.file_name.clone(),
             DesiredSharedInstanceExternalFile {

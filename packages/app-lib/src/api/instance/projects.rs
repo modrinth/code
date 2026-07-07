@@ -52,12 +52,8 @@ pub async fn update_project(
     skip_send_event: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    ensure_shared_member_can_modify_project(
-        instance_id,
-        project_path,
-        &state,
-    )
-    .await?;
+    ensure_shared_member_can_modify_project(instance_id, project_path, &state)
+        .await?;
     let path = crate::state::instances::commands::update_project(
         instance_id,
         project_path,
@@ -200,12 +196,8 @@ pub async fn switch_project_version_with_dependencies(
     version_id: &str,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    ensure_shared_member_can_modify_project(
-        instance_id,
-        project_path,
-        &state,
-    )
-    .await?;
+    ensure_shared_member_can_modify_project(instance_id, project_path, &state)
+        .await?;
     let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;

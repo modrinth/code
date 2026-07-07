@@ -97,8 +97,8 @@ import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import {
 	install_create_modpack_instance,
-	install_get_shared_instance_preview,
 	install_get_modpack_preview,
+	install_get_shared_instance_preview,
 	install_shared_instance,
 } from '@/helpers/install'
 import { list, run } from '@/helpers/instance'
@@ -881,7 +881,10 @@ async function resolveSharedInstanceInvite(notification) {
 	}
 }
 
-async function acceptSharedInstanceInviteNotification(notification, resolvedSharedInstanceInvite = null) {
+async function acceptSharedInstanceInviteNotification(
+	notification,
+	resolvedSharedInstanceInvite = null,
+) {
 	try {
 		const sharedInstanceInvite =
 			resolvedSharedInstanceInvite ?? (await resolveSharedInstanceInvite(notification))

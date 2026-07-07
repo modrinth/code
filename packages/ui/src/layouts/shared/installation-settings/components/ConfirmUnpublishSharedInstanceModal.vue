@@ -1,10 +1,5 @@
 <template>
-	<NewModal
-		ref="modal"
-		:header="formatMessage(messages.header)"
-		fade="warning"
-		max-width="500px"
-	>
+	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="warning" max-width="500px">
 		<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
 			{{ formatMessage(messages.admonitionBody) }}
 		</Admonition>

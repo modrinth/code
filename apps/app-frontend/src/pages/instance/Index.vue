@@ -385,10 +385,10 @@ import { get_project_v3, get_user } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	getErrorMessage,
+	getSharedInstanceUnavailableReason,
 	install_existing_instance,
 	install_get_shared_instance_update_preview,
 	install_pack_to_existing_instance,
-	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
@@ -435,8 +435,7 @@ const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
-const sharedInstanceWrongAccountModal =
-	ref<InstanceType<typeof SharedInstanceWrongAccountModal>>()
+const sharedInstanceWrongAccountModal = ref<InstanceType<typeof SharedInstanceWrongAccountModal>>()
 
 const { formatMessage } = useVIntl()
 
@@ -452,8 +451,7 @@ const messages = defineMessages({
 	},
 	sharedInstanceDeletedText: {
 		id: 'instance.shared-instance.unavailable.deleted-text',
-		defaultMessage:
-			'The shared instance has been deleted. Contact {manager} for more information.',
+		defaultMessage: 'The shared instance has been deleted. Contact {manager} for more information.',
 	},
 	sharedInstanceAccessRevokedText: {
 		id: 'instance.shared-instance.unavailable.access-revoked-text',
@@ -818,7 +816,9 @@ const tabs = computed(() => {
 			href: `${basePath.value}/share`,
 			icon: UserPlusIcon,
 			disabled: sharedInstanceActionsLocked.value,
-			tooltip: sharedInstanceActionsLocked.value ? sharedInstanceLockedShareTooltip.value : undefined,
+			tooltip: sharedInstanceActionsLocked.value
+				? sharedInstanceLockedShareTooltip.value
+				: undefined,
 		})
 	}
 
@@ -869,7 +869,9 @@ function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableR
 	return messages.sharedInstanceUnavailableText
 }
 
-async function handleSharedInstanceUnavailable(reason: SharedInstanceUnavailableReason | null = null) {
+async function handleSharedInstanceUnavailable(
+	reason: SharedInstanceUnavailableReason | null = null,
+) {
 	const manager =
 		sharedInstanceManager.value?.username ??
 		formatMessage(messages.sharedInstanceUnavailableFallbackManager)

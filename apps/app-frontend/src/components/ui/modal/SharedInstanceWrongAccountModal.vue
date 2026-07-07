@@ -61,7 +61,9 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const mode = ref<SharedInstanceWrongAccountMode>('user')
 const username = ref('')
 const warningHeader = computed(() =>
-	formatMessage(!auth.session_token.value ? messages.signedOutWarningHeader : messages.warningHeader),
+	formatMessage(
+		!auth.session_token.value ? messages.signedOutWarningHeader : messages.warningHeader,
+	),
 )
 
 const messages = defineMessages({
@@ -102,11 +104,7 @@ const messages = defineMessages({
 	},
 })
 
-function show(
-	nextMode: SharedInstanceWrongAccountMode,
-	nextUsername: string,
-	event?: MouseEvent,
-) {
+function show(nextMode: SharedInstanceWrongAccountMode, nextUsername: string, event?: MouseEvent) {
 	mode.value = nextMode
 	username.value = nextUsername
 	modal.value?.show(event)

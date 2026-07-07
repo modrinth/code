@@ -312,7 +312,9 @@ impl InstanceMetadataRow {
             shared_instance_id: self.shared_instance_id.clone(),
             shared_instance_role: self.shared_instance_role.clone(),
             shared_instance_manager_id: self.shared_instance_manager_id.clone(),
-            shared_instance_linked_user_id: self.shared_instance_linked_user_id.clone(),
+            shared_instance_linked_user_id: self
+                .shared_instance_linked_user_id
+                .clone(),
             imported_name: self.imported_name,
             imported_version_number: self.imported_version_number,
             imported_filename: self.imported_filename,
@@ -1074,10 +1076,10 @@ pub(crate) async fn set_shared_instance_attachment(
     let shared_instance_id = attachment.map(|value| value.id.to_string());
     let shared_instance_role =
         attachment.map(|value| value.role.as_str().to_string());
-    let shared_instance_manager_id = attachment
-        .and_then(|value| value.manager_id.as_deref());
-    let shared_instance_linked_user_id = attachment
-        .and_then(|value| value.linked_user_id.as_deref());
+    let shared_instance_manager_id =
+        attachment.and_then(|value| value.manager_id.as_deref());
+    let shared_instance_linked_user_id =
+        attachment.and_then(|value| value.linked_user_id.as_deref());
 
     sqlx::query!(
         "

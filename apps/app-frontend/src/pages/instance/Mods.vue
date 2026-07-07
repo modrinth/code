@@ -78,6 +78,7 @@ import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
 	commonMessages,
+	ConfirmDisableModal,
 	ConfirmModpackUpdateModal,
 	ContentCardLayout as ContentPageLayout,
 	type ContentItem,
@@ -85,7 +86,6 @@ import {
 	type ContentModpackCardProject,
 	type ContentModpackCardVersion,
 	type ContentOwner,
-	ConfirmDisableModal,
 	ContentUpdaterModal,
 	defineMessages,
 	injectNotificationManager,

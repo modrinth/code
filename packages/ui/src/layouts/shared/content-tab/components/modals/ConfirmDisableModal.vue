@@ -12,9 +12,7 @@
 		<div class="flex flex-col gap-6">
 			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
 				{{
-					visibleCount === 1
-						? formatMessage(messages.singleBody)
-						: formatMessage(messages.bulkBody)
+					visibleCount === 1 ? formatMessage(messages.singleBody) : formatMessage(messages.bulkBody)
 				}}
 			</Admonition>
 		</div>

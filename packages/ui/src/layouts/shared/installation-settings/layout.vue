@@ -1132,10 +1132,7 @@ const messages = defineMessages({
 							:disabled="ctx.isBusy.value"
 							@click="handleShowUnpublishSharedInstanceModal"
 						>
-							<SpinnerIcon
-								v-if="ctx.unpublishingSharedInstance?.value"
-								class="animate-spin"
-							/>
+							<SpinnerIcon v-if="ctx.unpublishingSharedInstance?.value" class="animate-spin" />
 							<UnlinkIcon v-else class="size-5" />
 							{{
 								ctx.unpublishingSharedInstance?.value

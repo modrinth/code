@@ -134,10 +134,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, EyeIcon, IssuesIcon, XIcon } from '@modrinth/assets'
-import type { BulletDivider, ContentItem } from '@modrinth/ui'
+import type { ContentItem } from '@modrinth/ui'
 import {
 	Admonition,
 	Avatar,
+	BulletDivider,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
@@ -195,9 +196,7 @@ const contentModalIconUrl = computed(() =>
 		: (project.value?.icon_url ?? undefined),
 )
 const contentModalHeader = computed(() =>
-	mode.value === 'shared-instance'
-		? formatMessage(messages.sharedInstanceContent)
-		: undefined,
+	mode.value === 'shared-instance' ? formatMessage(messages.sharedInstanceContent) : undefined,
 )
 
 type VersionDependency = Labrinth.Versions.v2.Dependency & {
@@ -291,19 +290,13 @@ async function sharedInstanceModpackContentItems(preview: SharedInstanceInstallP
 	return await contentItemsFromDependencies(version?.dependencies ?? [])
 }
 
-async function contentItemsFromDependencies(
-	deps: Labrinth.Versions.v2.Dependency[],
-) {
+async function contentItemsFromDependencies(deps: Labrinth.Versions.v2.Dependency[]) {
 	const dependencies = deps as VersionDependency[]
 	const projectIds = unique(
-		dependencies
-			.map((dependency) => dependency.project_id)
-			.filter((id): id is string => !!id),
+		dependencies.map((dependency) => dependency.project_id).filter((id): id is string => !!id),
 	)
 	const versionIds = unique(
-		dependencies
-			.map((dependency) => dependency.version_id)
-			.filter((id): id is string => !!id),
+		dependencies.map((dependency) => dependency.version_id).filter((id): id is string => !!id),
 	)
 
 	const projects: Labrinth.Projects.v2.Project[] =
@@ -347,9 +340,7 @@ async function contentItemsFromDependencies(
 	})
 }
 
-async function contentItemsFromVersionIds(
-	versionIds: string[],
-) {
+async function contentItemsFromVersionIds(versionIds: string[]) {
 	const uniqueVersionIds = unique(versionIds)
 	const versions: Labrinth.Versions.v2.Version[] =
 		uniqueVersionIds.length > 0 ? await get_version_many(uniqueVersionIds, 'must_revalidate') : []

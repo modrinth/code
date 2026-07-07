@@ -189,7 +189,8 @@ pub async fn invite_shared_instance_users(
             attachment
         }
         None => {
-            let metadata = ensure_shareable_instance(instance_id, &state).await?;
+            let metadata =
+                ensure_shareable_instance(instance_id, &state).await?;
             tracing::info!(
                 instance_id,
                 user_count = user_ids.len(),
@@ -280,56 +281,56 @@ pub async fn remove_shared_instance_users(
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
-	let state = State::get().await?;
-	let metadata = crate::state::get_instance(instance_id, &state.pool)
-		.await?
-		.ok_or_else(|| {
-			crate::ErrorKind::InputError("Unknown instance".to_string())
-		})?;
-	let Some(attachment) = metadata.shared_instance.clone() else {
-		return Ok(());
-	};
-	ensure_owner(&attachment)?;
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let Some(attachment) = metadata.shared_instance.clone() else {
+        return Ok(());
+    };
+    ensure_owner(&attachment)?;
 
-	let link_patch = match metadata.link {
-		InstanceLink::SharedInstance {
-			modpack_project_id: Some(project_id),
-			modpack_version_id: Some(version_id),
-		} => Some((
-			InstanceLink::ModrinthModpack {
-				project_id,
-				version_id,
-			},
-			ContentSourceKind::ModrinthModpack,
-		)),
-		InstanceLink::SharedInstance { .. } => {
-			Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
-		}
-		_ => None,
-	};
+    let link_patch = match metadata.link {
+        InstanceLink::SharedInstance {
+            modpack_project_id: Some(project_id),
+            modpack_version_id: Some(version_id),
+        } => Some((
+            InstanceLink::ModrinthModpack {
+                project_id,
+                version_id,
+            },
+            ContentSourceKind::ModrinthModpack,
+        )),
+        InstanceLink::SharedInstance { .. } => {
+            Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
+        }
+        _ => None,
+    };
 
-	delete_remote_instance(&attachment.id, &state).await?;
+    delete_remote_instance(&attachment.id, &state).await?;
 
-	if let Some((link, source_kind)) = link_patch {
-		crate::state::edit_instance(
-			instance_id,
-			EditInstance {
-				link: Some(link),
-				content_set_patch: Some(AppliedContentSetPatch {
-					source_kind: Some(source_kind),
-					..Default::default()
-				}),
-				..Default::default()
-			},
-			&state.pool,
-		)
-		.await?;
-	}
+    if let Some((link, source_kind)) = link_patch {
+        crate::state::edit_instance(
+            instance_id,
+            EditInstance {
+                link: Some(link),
+                content_set_patch: Some(AppliedContentSetPatch {
+                    source_kind: Some(source_kind),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            },
+            &state.pool,
+        )
+        .await?;
+    }
 
-	crate::state::clear_shared_instance(instance_id, &state.pool).await?;
-	emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-	Ok(())
+    Ok(())
 }
 
 #[tracing::instrument]
@@ -382,7 +383,8 @@ pub async fn get_shared_instance_publish_preview(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
-    let diffs = shared_instance_publish_diffs(&metadata, &version, &state).await?;
+    let diffs =
+        shared_instance_publish_diffs(&metadata, &version, &state).await?;
 
     Ok(Some(SharedInstancePublishPreview {
         shared_instance_id: attachment.id,
@@ -424,7 +426,8 @@ pub async fn get_shared_instance_install_preview(
     };
     let mut content_version_ids = version.modrinth_ids.clone();
     let mut seen_content_version_ids = HashSet::new();
-    content_version_ids.retain(|id| seen_content_version_ids.insert(id.clone()));
+    content_version_ids
+        .retain(|id| seen_content_version_ids.insert(id.clone()));
     let modpack = shared_instance_install_modpack(&version, &state).await?;
     let modpack_dependency_count = modpack
         .as_ref()
@@ -435,7 +438,9 @@ pub async fn get_shared_instance_install_preview(
     if let Some(modpack_version_id) = modpack_version_id.as_deref() {
         content_version_ids.retain(|id| id != modpack_version_id);
     }
-    let icon_url = modpack.as_ref().and_then(|modpack| modpack.icon_url.clone());
+    let icon_url = modpack
+        .as_ref()
+        .and_then(|modpack| modpack.icon_url.clone());
 
     let external_files = version
         .external_files
@@ -553,30 +558,33 @@ async fn get_latest_remote_member_version(
     attachment: &SharedInstanceAttachment,
     state: &State,
 ) -> crate::Result<InstanceVersionResponse> {
-    let version =
-        match get_latest_remote_version_optional_unavailable(&attachment.id, state)
-            .await?
-        {
-            SharedInstanceRemoteResponse::Available(version) => version,
-            SharedInstanceRemoteResponse::Unavailable(reason) => {
-                if shared_attachment_matches_current_user(attachment, state).await? {
-                    clear_shared_instance_if_current_user(
-                        instance_id,
-                        attachment,
-                        state,
-                    )
-                    .await?;
-                    return Err(shared_instance_unavailable_error(reason));
-                }
-
-                return Err(crate::ErrorKind::OtherError(format!(
-                    "{}: {}",
-                    shared_instance_unavailable_message(reason),
-                    attachment.id
-                ))
-                .into());
+    let version = match get_latest_remote_version_optional_unavailable(
+        &attachment.id,
+        state,
+    )
+    .await?
+    {
+        SharedInstanceRemoteResponse::Available(version) => version,
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            if shared_attachment_matches_current_user(attachment, state).await?
+            {
+                clear_shared_instance_if_current_user(
+                    instance_id,
+                    attachment,
+                    state,
+                )
+                .await?;
+                return Err(shared_instance_unavailable_error(reason));
             }
-        };
+
+            return Err(crate::ErrorKind::OtherError(format!(
+                "{}: {}",
+                shared_instance_unavailable_message(reason),
+                attachment.id
+            ))
+            .into());
+        }
+    };
 
     Ok(version)
 }
@@ -644,7 +652,8 @@ async fn shared_instance_install_data(
     let name = shared_instance_name(name);
     let linked_user_id = linked_modrinth_user_id(state).await?;
     let modpack = shared_instance_install_modpack(&version, state).await?;
-    let modpack_version_id = modpack.as_ref().map(|modpack| modpack.version_id.as_str());
+    let modpack_version_id =
+        modpack.as_ref().map(|modpack| modpack.version_id.as_str());
     let modrinth_ids = version
         .modrinth_ids
         .into_iter()
@@ -677,12 +686,11 @@ async fn shared_instance_install_data(
 async fn linked_modrinth_user_id(
     state: &State,
 ) -> crate::Result<Option<String>> {
-    Ok(ModrinthCredentials::get_and_refresh(
-        &state.pool,
-        &state.api_semaphore,
+    Ok(
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+            .map(|credentials| credentials.user_id),
     )
-    .await?
-    .map(|credentials| credentials.user_id))
 }
 
 async fn shared_instance_update_diffs(
@@ -857,7 +865,9 @@ async fn shared_instance_install_modpack(
     version: &InstanceVersionResponse,
     state: &State,
 ) -> crate::Result<Option<crate::install::SharedInstanceInstallModpack>> {
-    let Some(modpack_id) = version.modpack_id.as_deref().filter(|id| !id.is_empty()) else {
+    let Some(modpack_id) =
+        version.modpack_id.as_deref().filter(|id| !id.is_empty())
+    else {
         return Ok(None);
     };
     let modpack_version = CachedEntry::get_version(
@@ -867,11 +877,11 @@ async fn shared_instance_install_modpack(
         &state.api_semaphore,
     )
     .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance modpack version was not found".to_string(),
-            )
-        })?;
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Shared instance modpack version was not found".to_string(),
+        )
+    })?;
     let project = CachedEntry::get_project(
         &modpack_version.project_id,
         Some(CacheBehaviour::Bypass),
@@ -978,10 +988,9 @@ async fn current_publish_disabled_content(
             continue;
         }
 
-        let is_modpack = item
-            .version
-            .as_ref()
-            .is_some_and(|version| modpack_id.as_deref() == Some(version.id.as_str()));
+        let is_modpack = item.version.as_ref().is_some_and(|version| {
+            modpack_id.as_deref() == Some(version.id.as_str())
+        });
         if is_modpack {
             continue;
         }
@@ -1218,26 +1227,26 @@ async fn publish_current_content(
         }
     };
 
-	if !response.external_files.is_empty() {
-		upload_external_files(
-			&metadata.instance.path,
-			&external_files,
-			&response.external_files,
-			state,
-		)
-		.await?;
-		mark_external_files_ready(
-			shared_instance_id,
-			response.version,
-			&response.external_files,
-			state,
-		)
-		.await?;
-	} else if !response.ready {
-		tracing::debug!(
-			"Shared instance version {} was not ready but had no external files",
-			response.version
-		);
+    if !response.external_files.is_empty() {
+        upload_external_files(
+            &metadata.instance.path,
+            &external_files,
+            &response.external_files,
+            state,
+        )
+        .await?;
+        mark_external_files_ready(
+            shared_instance_id,
+            response.version,
+            &response.external_files,
+            state,
+        )
+        .await?;
+    } else if !response.ready {
+        tracing::debug!(
+            "Shared instance version {} was not ready but had no external files",
+            response.version
+        );
     }
 
     Ok(response.version)
@@ -1322,10 +1331,10 @@ fn ensure_shareable_link(link: &InstanceLink) -> crate::Result<()> {
 }
 
 async fn upload_external_files(
-	instance_path: &str,
-	candidates: &[ExternalFileCandidate],
-	uploads: &[ExternalFileResponse],
-	state: &State,
+    instance_path: &str,
+    candidates: &[ExternalFileCandidate],
+    uploads: &[ExternalFileResponse],
+    state: &State,
 ) -> crate::Result<()> {
     for upload in uploads {
         let candidate = candidates
@@ -1358,34 +1367,34 @@ async fn upload_external_files(
         }
     }
 
-	Ok(())
+    Ok(())
 }
 
 async fn mark_external_files_ready(
-	shared_instance_id: &str,
-	version: i32,
-	uploads: &[ExternalFileResponse],
-	state: &State,
+    shared_instance_id: &str,
+    version: i32,
+    uploads: &[ExternalFileResponse],
+    state: &State,
 ) -> crate::Result<()> {
-	for upload in uploads {
-		request_empty(
-			"mark_version_file_ready",
-			Method::POST,
-			&format!(
-				"/instances/{shared_instance_id}/versions/{version}/files"
-			),
-			Some(json!({ "file_name": &upload.file_name })),
-			state,
-		)
-		.await?;
-	}
+    for upload in uploads {
+        request_empty(
+            "mark_version_file_ready",
+            Method::POST,
+            &format!(
+                "/instances/{shared_instance_id}/versions/{version}/files"
+            ),
+            Some(json!({ "file_name": &upload.file_name })),
+            state,
+        )
+        .await?;
+    }
 
-	Ok(())
+    Ok(())
 }
 
 async fn shared_attachment(
-	instance_id: &str,
-	state: &State,
+    instance_id: &str,
+    state: &State,
 ) -> crate::Result<Option<SharedInstanceAttachment>> {
     Ok(crate::state::get_instance(instance_id, &state.pool)
         .await?
@@ -1436,19 +1445,19 @@ async fn delete_remote_instance(
 }
 
 async fn get_remote_users(
-	shared_instance_id: &str,
-	state: &State,
+    shared_instance_id: &str,
+    state: &State,
 ) -> crate::Result<SharedInstanceUsers> {
-	let user_ids = request_json::<Vec<String>>(
-		"get_instance_users",
-		Method::GET,
-		&format!("/instances/{shared_instance_id}/users"),
-		None,
-		state,
-	)
-	.await?;
+    let user_ids = request_json::<Vec<String>>(
+        "get_instance_users",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/users"),
+        None,
+        state,
+    )
+    .await?;
 
-	Ok(SharedInstanceUsers { user_ids })
+    Ok(SharedInstanceUsers { user_ids })
 }
 
 async fn get_latest_remote_version(
@@ -1533,8 +1542,8 @@ async fn request_json_optional_unavailable<T>(
 where
     T: DeserializeOwned,
 {
-    let response = send_request(operation, method.clone(), path, body, state)
-        .await?;
+    let response =
+        send_request(operation, method.clone(), path, body, state).await?;
     if let Some(reason) =
         SharedInstanceUnavailableReason::from_status(response.status())
     {
@@ -1550,10 +1559,7 @@ where
 
     if !response.status().is_success() {
         return shared_instances_request_error(
-            operation,
-            method,
-            path,
-            response,
+            operation, method, path, response,
         )
         .await;
     }

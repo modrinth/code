@@ -384,9 +384,7 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 		const relevantDependencyIds = new Set(
 			remainingDependents.flatMap((dependent) => dependent.dependencies.map(getItemId)),
 		)
-		const warningItems = deletableItems.filter((item) =>
-			relevantDependencyIds.has(getItemId(item)),
-		)
+		const warningItems = deletableItems.filter((item) => relevantDependencyIds.has(getItemId(item)))
 		if (warningItems.length === 0) {
 			showDeletionConfirmation(event)
 			return

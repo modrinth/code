@@ -318,26 +318,27 @@ async fn plan_bulk_update(
             })?;
     let installed =
         installed_projects(instance_id, &content_set, state).await?;
-    let updateable_paths = if is_shared_instance_member(instance_id, state).await? {
-        let linked_modpack_paths = installed
-            .iter()
-            .filter(|project| {
-                matches!(
-                    project.source_kind,
-                    ContentSourceKind::ModrinthModpack
-                        | ContentSourceKind::ImportedModpack
-                )
-            })
-            .map(|project| project.relative_path.clone())
-            .collect::<HashSet<_>>();
+    let updateable_paths =
+        if is_shared_instance_member(instance_id, state).await? {
+            let linked_modpack_paths = installed
+                .iter()
+                .filter(|project| {
+                    matches!(
+                        project.source_kind,
+                        ContentSourceKind::ModrinthModpack
+                            | ContentSourceKind::ImportedModpack
+                    )
+                })
+                .map(|project| project.relative_path.clone())
+                .collect::<HashSet<_>>();
 
-        updateable_paths
-            .into_iter()
-            .filter(|path| !linked_modpack_paths.contains(path))
-            .collect::<HashSet<_>>()
-    } else {
-        updateable_paths
-    };
+            updateable_paths
+                .into_iter()
+                .filter(|path| !linked_modpack_paths.contains(path))
+                .collect::<HashSet<_>>()
+        } else {
+            updateable_paths
+        };
     let updates = updates
         .into_iter()
         .filter(|update| updateable_paths.contains(&update.relative_path))
@@ -505,9 +506,9 @@ async fn is_shared_instance_member(
         return Ok(false);
     };
 
-    Ok(metadata
-        .shared_instance
-        .is_some_and(|attachment| attachment.role == SharedInstanceRole::Member))
+    Ok(metadata.shared_instance.is_some_and(|attachment| {
+        attachment.role == SharedInstanceRole::Member
+    }))
 }
 
 async fn dependency_closure(

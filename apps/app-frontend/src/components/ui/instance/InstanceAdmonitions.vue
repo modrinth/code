@@ -10,14 +10,18 @@
 				{{ formatMessage(messages.sharedInstanceChangesBody) }}
 				<template #actions>
 					<ButtonStyled color="orange">
-						<button class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewSharedInstanceChanges">
+						<button
+							class="!h-10"
+							:disabled="isPublishButtonDisabled"
+							@click="reviewSharedInstanceChanges"
+						>
 							<UploadIcon aria-hidden="true" />
 							{{
 								isPublishing
 									? formatMessage(messages.sharedInstancePublishingButton)
 									: isReviewingPublish
 										? formatMessage(messages.sharedInstanceReviewingButton)
-									: formatMessage(messages.sharedInstancePublishButton)
+										: formatMessage(messages.sharedInstancePublishButton)
 							}}
 						</button>
 					</ButtonStyled>
@@ -111,7 +115,8 @@ const messages = defineMessages({
 	},
 	sharedInstanceReviewDescription: {
 		id: 'app.instance.admonitions.shared-instance.review-description',
-		defaultMessage: 'Review the content changes that will be shared with everyone using this instance.',
+		defaultMessage:
+			'Review the content changes that will be shared with everyone using this instance.',
 	},
 	sharedInstanceAddedLabel: {
 		id: 'app.instance.admonitions.shared-instance.added-label',
@@ -132,8 +137,7 @@ const messages = defineMessages({
 	},
 	sharedInstanceDeletedText: {
 		id: 'instance.shared-instance.unavailable.deleted-text',
-		defaultMessage:
-			'The shared instance has been deleted. Contact {manager} for more information.',
+		defaultMessage: 'The shared instance has been deleted. Contact {manager} for more information.',
 	},
 	sharedInstanceAccessRevokedText: {
 		id: 'instance.shared-instance.unavailable.access-revoked-text',

@@ -269,6 +269,9 @@
   "app.install.phase.running_loader_processors": {
     "message": "Running loader processors"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Added"
+  },
   "app.instance.admonitions.shared-instance.changes-body": {
     "message": "Your local instance is ahead of the users you've shared it with."
   },
@@ -280,6 +283,9 @@
   },
   "app.instance.admonitions.shared-instance.publishing-button": {
     "message": "Pushing..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Removed"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Push update"
@@ -365,6 +371,30 @@
   "app.instance.share.sign-in.heading": {
     "message": "Sign in to share"
   },
+  "app.instance.shared-instance-wrong-account.continue-button": {
+    "message": "Continue anyway"
+  },
+  "app.instance.shared-instance-wrong-account.continue-description": {
+    "message": "Continuing will disable shared instances functionality until you use the correct Modrinth account."
+  },
+  "app.instance.shared-instance-wrong-account.go-back-button": {
+    "message": "Go back"
+  },
+  "app.instance.shared-instance-wrong-account.header": {
+    "message": "Shared instance warning"
+  },
+  "app.instance.shared-instance-wrong-account.owner-body": {
+    "message": "You need to sign in as <username></username> to manage sharing and publish updates for this shared instance."
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-warning-header": {
+    "message": "Sign in to the correct Modrinth account first"
+  },
+  "app.instance.shared-instance-wrong-account.user-body": {
+    "message": "You need to sign in as <username></username> to receive updates for this shared instance."
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "You are using the wrong Modrinth account"
+  },
   "app.instance.worlds.add-server": {
     "message": "Add server"
   },
@@ -419,6 +449,9 @@
   "app.modal.install-to-play.content-required": {
     "message": "Content required"
   },
+  "app.modal.install-to-play.external-file-warning": {
+    "message": "{count, plural, one {This instance includes # file that is not from Modrinth.} other {This instance includes # files that are not from Modrinth.}}"
+  },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
   },
@@ -437,8 +470,17 @@
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Shared instance content"
+  },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Shared server instance"
+  },
+  "app.modal.install-to-play.trust-warning-description": {
+    "message": "A shared instance will install files on your computer and may include content not from Modrinth."
+  },
+  "app.modal.install-to-play.trust-warning-header": {
+    "message": "Do you trust this user?"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
@@ -446,11 +488,17 @@
   "app.modal.update-to-play.header": {
     "message": "Update to play"
   },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Added"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Removed"
+  },
   "app.modal.update-to-play.update-required": {
     "message": "Update required"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "An update is required to play {name}. Please update to the latest version to launch the game."
+    "message": "An update is required to play {name}. Please update to latest version to launch the game."
   },
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
@@ -499,6 +547,18 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
+  },
+  "app.sign-out.shared-instances-warning.admonition-body": {
+    "message": "Signing out will prevent you from managing or receiving updates for shared instances linked to this Modrinth account until you sign back in."
+  },
+  "app.sign-out.shared-instances-warning.admonition-header": {
+    "message": "Shared instances installed"
+  },
+  "app.sign-out.shared-instances-warning.header": {
+    "message": "Sign out of Modrinth?"
+  },
+  "app.sign-out.shared-instances-warning.sign-out-button": {
+    "message": "Sign out"
   },
   "app.skins.add-button": {
     "message": "Add skin"
@@ -1006,6 +1066,24 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
+  },
+  "instance.shared-instance.error.title": {
+    "message": "Something has gone wrong"
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Your access to this shared instance has been revoked. Contact {manager} for more information."
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "The shared instance has been deleted. Contact {manager} for more information."
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "the instance manager"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "The shared instance has been deleted or your access has been revoked. Contact {manager} for more information."
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "Shared instance no longer available"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "A Minecraft Server"

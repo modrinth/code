@@ -111,7 +111,8 @@ const buttonsDisabled = ref(false)
 const headerMessage = computed(() => messages.header)
 const admonitionHeaderMessage = computed(() => {
 	if (props.mode === 'share-instance') return messages.shareInstanceAdmonitionHeader
-	if (props.mode === 'shared-instance-managed') return messages.sharedInstanceManagedAdmonitionHeader
+	if (props.mode === 'shared-instance-managed')
+		return messages.sharedInstanceManagedAdmonitionHeader
 
 	return messages.admonitionHeader
 })

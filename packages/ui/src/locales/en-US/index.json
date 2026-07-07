@@ -377,6 +377,39 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Delete {itemType}"
   },
+  "content.confirm-deletion.shared-instance.admonition-header": {
+    "defaultMessage": "This is part of the shared instance"
+  },
+  "content.confirm-deletion.shared-instance.bulk-body": {
+    "defaultMessage": "Some selected projects are part of the shared instance. Deleting them only changes your local copy, and future shared instance updates may restore or change them again."
+  },
+  "content.confirm-deletion.shared-instance.delete-button": {
+    "defaultMessage": "Delete anyway"
+  },
+  "content.confirm-deletion.shared-instance.delete-many-button": {
+    "defaultMessage": "Delete {count, number} {itemType} anyway"
+  },
+  "content.confirm-deletion.shared-instance.single-body": {
+    "defaultMessage": "Deleting it only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Disable {itemType}"
+  },
+  "content.confirm-disable.shared-instance.admonition-header": {
+    "defaultMessage": "This is part of the shared instance"
+  },
+  "content.confirm-disable.shared-instance.bulk-body": {
+    "defaultMessage": "Some selected projects are part of the shared instance. Disabling them only changes your local copy, and future shared instance updates may re-enable, restore, or change them again."
+  },
+  "content.confirm-disable.shared-instance.confirm-button": {
+    "defaultMessage": "Disable anyway"
+  },
+  "content.confirm-disable.shared-instance.confirm-many-button": {
+    "defaultMessage": "Disable {count, number} {itemType} anyway"
+  },
+  "content.confirm-disable.shared-instance.single-body": {
+    "defaultMessage": "Disabling it only changes your local copy. Future shared instance updates may re-enable, restore, or change it again."
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} may cause compatibility issues. Mods or content you added on top of the modpack will be kept, but may not be compatible with the new version."
   },
@@ -388,6 +421,12 @@
   },
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} modpack"
+  },
+  "content.confirm-modpack-update.shared-instance-managed-admonition-body": {
+    "defaultMessage": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "content.confirm-modpack-update.shared-instance-managed-admonition-header": {
+    "defaultMessage": "This is managed by the shared instance"
   },
   "content.confirm-unlink.admonition-body": {
     "defaultMessage": "Mods and content will be merged with what you added on top of the modpack, and it will stop receiving updates."
@@ -403,6 +442,12 @@
   },
   "content.confirm-unlink.share-instance-admonition-header": {
     "defaultMessage": "Sharing requires unlinking"
+  },
+  "content.confirm-unlink.shared-instance-managed-admonition-body": {
+    "defaultMessage": "Unlinking only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "content.confirm-unlink.shared-instance-managed-admonition-header": {
+    "defaultMessage": "This is managed by the shared instance"
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Unlink"
@@ -1913,6 +1958,27 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Search game version..."
   },
+  "installation-settings.shared-instance-managed.change-version-warning-body": {
+    "defaultMessage": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "installation-settings.shared-instance-managed.unlink-warning-body": {
+    "defaultMessage": "Unlinking only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "installation-settings.shared-instance-managed.warning-header": {
+    "defaultMessage": "This is managed by the shared instance"
+  },
+  "installation-settings.shared-instance.title": {
+    "defaultMessage": "Shared instance"
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "defaultMessage": "Unpublish shared instance"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "defaultMessage": "Unpublishing deletes this shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, but your local instance and its content will stay on this device."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "defaultMessage": "Unpublishing shared instance"
+  },
   "installation-settings.type.instance": {
     "defaultMessage": "instance"
   },
@@ -1930,6 +1996,18 @@
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "Unlinking permanently disconnects this {type} from the {projectType} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
+  },
+  "installation-settings.unpublish-shared-instance.modal.action": {
+    "defaultMessage": "Unpublish shared instance"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "defaultMessage": "This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, but your local instance and its content will stay on this device."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "defaultMessage": "Unpublishing shared instance"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "defaultMessage": "Unpublish shared instance"
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verifying..."
