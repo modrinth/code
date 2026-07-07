@@ -239,6 +239,7 @@ pub struct UploadSearchProject {
     pub project_id: String,
     //
     pub project_types: Vec<String>,
+    #[serde(default)]
     pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
