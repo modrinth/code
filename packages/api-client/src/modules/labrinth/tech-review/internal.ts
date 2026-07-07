@@ -100,12 +100,29 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 */
 	public async updateIssueDetail(
 		detailId: string,
-		data: Labrinth.TechReview.Internal.UpdateIssueRequest,
+		data: Labrinth.TechReview.Internal.UpdateIssueDetailRequest,
 	): Promise<void> {
-		return this.client.request<void>(`/moderation/tech-review/issue-detail/${detailId}`, {
+		return this.updateIssueDetails([{ detail_id: detailId, verdict: data.verdict }])
+	}
+
+	public async updateIssueDetails(
+		data: Labrinth.TechReview.Internal.UpdateIssueRequest[],
+	): Promise<void> {
+		return this.client.request<void>('/moderation/tech-review/issue-detail', {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'PATCH',
+			body: data,
+		})
+	}
+
+	public async updateGlobalIssueDetails(
+		data: Labrinth.TechReview.Internal.UpdateGlobalIssueRequest[],
+	): Promise<void> {
+		return this.client.request<void>('/moderation/tech-review/global-issue-detail', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
 			body: data,
 		})
 	}

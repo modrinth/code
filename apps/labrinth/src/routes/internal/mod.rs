@@ -116,6 +116,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::tech_review::get_project_report,
 		moderation::tech_review::submit_report,
 		moderation::tech_review::update_issue_details,
+		moderation::tech_review::update_global_issue_details,
 		moderation::tech_review::add_report,
 		moderation::external_license::search,
 		moderation::external_license::lookup,

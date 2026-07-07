@@ -192,7 +192,12 @@ watch(selectedFile, (newFile) => {
 
 const client = injectModrinthClient()
 
-async function updateIssueDetails(data: { detail_id: string; verdict: 'safe' | 'unsafe' }[]) {
+async function updateIssueDetails(
+	data: {
+		detail_id: string
+		verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+	}[],
+) {
 	await client.request('/moderation/tech-review/issue-detail', {
 		api: 'labrinth',
 		version: 'internal',
