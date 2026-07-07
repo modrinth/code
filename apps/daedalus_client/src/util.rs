@@ -3,11 +3,7 @@ use bytes::Bytes;
 use s3::creds::Credentials;
 use s3::{Bucket, Region};
 use serde::de::DeserializeOwned;
-use std::path::PathBuf;
-use std::sync::{
-    Arc, LazyLock,
-    atomic::{AtomicUsize, Ordering},
-};
+use std::sync::{Arc, LazyLock};
 use tokio::sync::Semaphore;
 
 static BUCKET: LazyLock<Bucket> = LazyLock::new(|| {
@@ -58,8 +54,6 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
         .build()
         .unwrap()
 });
-
-static DOWNLOADED_FILE_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn upload_file_to_bucket(
@@ -141,74 +135,6 @@ pub async fn upload_url_to_bucket(
     Ok(())
 }
 
-pub async fn write_file_to_local_output(
-    path: &str,
-    bytes: Bytes,
-) -> Result<(), Error> {
-    let output_path = local_output_path(path)?;
-
-    if let Some(parent) = output_path.parent() {
-        tokio::fs::create_dir_all(parent).await?;
-    }
-
-    tokio::fs::write(output_path, bytes).await?;
-
-    Ok(())
-}
-
-pub async fn write_url_to_local_output_mirrors(
-    output_path: String,
-    mirrors: Vec<String>,
-    sha1: Option<String>,
-    semaphore: &Arc<Semaphore>,
-) -> Result<(), Error> {
-    if mirrors.is_empty() {
-        return Err(ErrorKind::InvalidInput(
-            "No mirrors provided!".to_string(),
-        )
-        .into());
-    }
-
-    for (index, mirror) in mirrors.iter().enumerate() {
-        let result = write_url_to_local_output(
-            output_path.clone(),
-            mirror.clone(),
-            sha1.clone(),
-            semaphore,
-        )
-        .await;
-
-        if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
-            return result;
-        }
-    }
-
-    unreachable!()
-}
-
-async fn write_url_to_local_output(
-    path: String,
-    url: String,
-    sha1: Option<String>,
-    semaphore: &Arc<Semaphore>,
-) -> Result<(), Error> {
-    let data = download_file(&url, sha1.as_deref(), semaphore).await?;
-
-    write_file_to_local_output(&path, data).await?;
-
-    Ok(())
-}
-
-fn local_output_path(path: &str) -> Result<PathBuf, Error> {
-    let output_dir = dotenvy::var("LOCAL_OUTPUT_DIR").map_err(|_| {
-        ErrorKind::InvalidInput(
-            "LOCAL_OUTPUT_DIR is required for local output".to_string(),
-        )
-    })?;
-
-    Ok(PathBuf::from(output_dir).join(path))
-}
-
 #[tracing::instrument(skip(bytes))]
 pub async fn sha1_async(bytes: Bytes) -> Result<String, Error> {
     let hash = tokio::task::spawn_blocking(move || {
@@ -254,16 +180,6 @@ pub async fn download_file(
                             }
                             .into());
                         }
-                    }
-
-                    let downloaded = DOWNLOADED_FILE_COUNT
-                        .fetch_add(1, Ordering::Relaxed)
-                        + 1;
-                    if downloaded.is_multiple_of(100) {
-                        tracing::info!(
-                            downloaded_files = downloaded,
-                            "Downloaded metadata files"
-                        );
                     }
 
                     return Ok(bytes);
