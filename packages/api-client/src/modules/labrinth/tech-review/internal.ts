@@ -127,6 +127,34 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		})
 	}
 
+	public async searchGlobalIssueDetails(
+		params: Labrinth.TechReview.Internal.SearchGlobalIssueDetailsRequest,
+	): Promise<Labrinth.TechReview.Internal.SearchGlobalIssueDetailsResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.SearchGlobalIssueDetailsResponse>(
+			'/moderation/tech-review/global-issue-detail/search',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: params,
+			},
+		)
+	}
+
+	public async getGlobalIssueDetail(
+		params: Labrinth.TechReview.Internal.GetGlobalIssueDetailRequest,
+	): Promise<Labrinth.TechReview.Internal.GetGlobalIssueDetailResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.GetGlobalIssueDetailResponse>(
+			'/moderation/tech-review/global-issue-detail/local-traces',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: params,
+			},
+		)
+	}
+
 	public async submitProject(
 		projectId: string,
 		data: Labrinth.TechReview.Internal.SubmitProjectRequest,

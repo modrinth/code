@@ -113,6 +113,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::tech_review::get_issue,
 		moderation::tech_review::get_report,
 		moderation::tech_review::search_projects,
+		moderation::tech_review::search_global_issue_details,
+		moderation::tech_review::get_global_issue_detail,
 		moderation::tech_review::get_project_report,
 		moderation::tech_review::submit_report,
 		moderation::tech_review::update_issue_details,

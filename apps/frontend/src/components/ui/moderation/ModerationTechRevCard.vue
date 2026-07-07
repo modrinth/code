@@ -45,7 +45,7 @@ import {
 	type User,
 } from '@modrinth/utils'
 import dayjs from 'dayjs'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
@@ -89,6 +89,7 @@ const props = defineProps<{
 		thread: Labrinth.TechReview.Internal.Thread
 		reports: FlattenedFileReport[]
 	}
+	focusedDetailId?: string | null
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
 }>()
@@ -384,6 +385,49 @@ const formattedDate = computed(() => {
 function viewFileFlags(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
 	currentTab.value = 'File'
+}
+
+function getDetailElementId(detailId: string) {
+	return `tech-review-detail-${detailId}`
+}
+
+function findFileForDetail(detailId: string): FlattenedFileReport | null {
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			if (issue.details.some((detail) => detail.id === detailId)) {
+				return report
+			}
+		}
+	}
+
+	return null
+}
+
+async function focusDetail(detailId: string) {
+	const file = findFileForDetail(detailId)
+	if (!file) return
+
+	viewFileFlags(file)
+	await nextTick()
+
+	const classItem = groupedByClass.value.find((group) =>
+		group.flags.some((flag) => flag.detail.id === detailId),
+	)
+
+	if (classItem) {
+		expandClass(classItem)
+	}
+
+	await nextTick()
+
+	if (!import.meta.client) return
+
+	window.requestAnimationFrame(() => {
+		document.getElementById(getDetailElementId(detailId))?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center',
+		})
+	})
 }
 
 function backToFileList() {
@@ -695,6 +739,16 @@ const groupedByJar = computed<JarGroup[]>(() => {
 		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
 	})
 })
+
+watch(
+	() => props.focusedDetailId,
+	(detailId) => {
+		if (detailId) {
+			focusDetail(detailId)
+		}
+	},
+	{ immediate: true },
+)
 
 // Auto-expand/load source for small files; keep larger files lazy.
 watch(
@@ -1390,7 +1444,11 @@ function copyId() {
 								<div
 									v-for="flag in classItem.flags"
 									:key="`${flag.issueId}-${flag.detail.id}`"
+									:id="getDetailElementId(flag.detail.id)"
 									class="flex flex-col gap-2 rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
+									:class="{
+										'!border-brand bg-brand-highlight': props.focusedDetailId === flag.detail.id,
+									}"
 								>
 									<div class="grid grid-cols-[1fr_auto] items-center">
 										<div
