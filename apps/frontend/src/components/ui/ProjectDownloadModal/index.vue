@@ -51,7 +51,7 @@
 				<ButtonStyled>
 					<button
 						class="!shadow-none"
-						:disabled="!!downloadingActionType"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
 						@click="downloadSelectedVersionZip"
 					>
 						<SpinnerIcon
@@ -474,7 +474,7 @@ function onDownload() {
 }
 
 async function downloadSelectedVersionZip() {
-	if (downloadingActionType.value) return
+	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
 
 	downloadingActionType.value = 'zip'
 	const files = dedupeDownloadFiles([

@@ -83,7 +83,6 @@ export function provideDownloadModalProvider(
 	const shouldResolveDependencies = computed(
 		() => !!options.project.value && !!options.selectedVersion.value,
 	)
-
 	const dependencyResolutionPreferences = computed(() =>
 		createResolutionPreferences(options.selectedVersion.value, options.currentPlatform.value),
 	)
@@ -189,13 +188,16 @@ export function provideDownloadModalProvider(
 		return true
 	})
 
-	const downloadRowsLoaded = computed(() => {
+	const selectedDownloadRowsLoaded = computed(() => {
 		if (!options.selectedPrimaryFile.value) return false
 		return dependenciesLoaded.value
 	})
+	const keepPreviousDownloadRows = computed(
+		() => shouldResolveDependencies.value && !!options.selectedPrimaryFile.value,
+	)
 
 	const resolvedDependencyRows = computed<DownloadDependencyRow[]>(() => {
-		if (!dependenciesLoaded.value) return []
+		if (!selectedDownloadRowsLoaded.value) return []
 
 		const primaryVersionId =
 			dependencyResolution.value?.primary.version_id || options.selectedVersion.value?.id
@@ -209,19 +211,27 @@ export function provideDownloadModalProvider(
 		})
 	})
 
-	const visibleDependencyRows = computed<DownloadDependencyRow[]>(() =>
-		dedupeDependencyRows(resolvedDependencyRows.value),
-	)
+	const visibleDependencyRows = computed<DownloadDependencyRow[]>((previous) => {
+		if (selectedDownloadRowsLoaded.value) {
+			return dedupeDependencyRows(resolvedDependencyRows.value)
+		}
 
-	const duplicateDependencyRowsHidden = computed(
-		() =>
-			downloadRowsLoaded.value &&
-			(hasSkippedDuplicateDependency(dependencyResolution.value) ||
-				hasDuplicateDependencyRows(resolvedDependencyRows.value)),
-	)
+		return keepPreviousDownloadRows.value ? (previous ?? []) : []
+	})
+
+	const duplicateDependencyRowsHidden = computed((previous) => {
+		if (selectedDownloadRowsLoaded.value) {
+			return (
+				hasSkippedDuplicateDependency(dependencyResolution.value) ||
+				hasDuplicateDependencyRows(resolvedDependencyRows.value)
+			)
+		}
+
+		return keepPreviousDownloadRows.value ? (previous ?? false) : false
+	})
 
 	const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
-		downloadRowsLoaded.value
+		selectedDownloadRowsLoaded.value
 			? options.additionalFiles.value.map((file) => ({
 					key: `additional-file-${additionalFileKey(file)}`,
 					name: file.filename,
@@ -237,16 +247,25 @@ export function provideDownloadModalProvider(
 			: [],
 	)
 
-	const downloadRows = computed<DownloadDependencyRow[]>(() =>
-		downloadRowsLoaded.value ? [...visibleDependencyRows.value, ...additionalFileRows.value] : [],
-	)
+	const downloadRows = computed<DownloadDependencyRow[]>((previous) => {
+		if (selectedDownloadRowsLoaded.value) {
+			return [...visibleDependencyRows.value, ...additionalFileRows.value]
+		}
+
+		return keepPreviousDownloadRows.value ? (previous ?? []) : []
+	})
+
+	const downloadRowsLoaded = computed((previous) => {
+		if (selectedDownloadRowsLoaded.value) return true
+		return keepPreviousDownloadRows.value ? (previous ?? false) : false
+	})
 
 	const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
 		collectDownloadableDependencyFiles(visibleDependencyRows.value),
 	)
 
 	const downloadableDependencyFilesLoaded = computed(() => {
-		return downloadRowsLoaded.value
+		return selectedDownloadRowsLoaded.value
 	})
 
 	async function preloadDependenciesForSelection(selection: ProjectDownloadSelection) {
