@@ -575,6 +575,18 @@ const remainingUnmarkedCount = computed(() => {
 	return getFileDetailCount(selectedFile.value) - getFileMarkedCount(selectedFile.value)
 })
 
+function getJarFlags(jarGroup: JarGroup): ClassGroup['flags'] {
+	return jarGroup.classes.flatMap((classItem) => classItem.flags)
+}
+
+function getJarMarkedCount(jarGroup: JarGroup): number {
+	return getMarkedFlagsCount(getJarFlags(jarGroup))
+}
+
+function getJarRemainingUnmarkedCount(jarGroup: JarGroup): number {
+	return getJarFlags(jarGroup).length - getJarMarkedCount(jarGroup)
+}
+
 const isBatchUpdating = ref(false)
 
 async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
@@ -622,6 +634,50 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 			type: 'error',
 			title: 'Batch update failed',
 			text: 'An error occurred while updating traces.',
+		})
+	} finally {
+		isBatchUpdating.value = false
+	}
+}
+
+async function batchMarkRemainingInJar(jarGroup: JarGroup, verdict: 'safe' | 'unsafe') {
+	if (isBatchUpdating.value) return
+
+	const detailIds = getJarFlags(jarGroup)
+		.filter((flag) => getDetailDecision(flag.detail.id, flag.detail.status) === 'pending')
+		.map((flag) => flag.detail.id)
+
+	if (detailIds.length === 0) return
+
+	isBatchUpdating.value = true
+	try {
+		await updateIssueDetails(detailIds.map((detailId) => ({ detail_id: detailId, verdict })))
+
+		applyDecisionToRelatedDetails(detailIds, verdictToDecision(verdict), 'local')
+
+		addNotification({
+			type: 'success',
+			title: `Marked ${detailIds.length} traces as ${verdict}`,
+			text: `All remaining traces in this JAR have been marked as ${
+				verdict === 'safe' ? 'false positives' : 'malicious'
+			}.`,
+		})
+
+		if (selectedFile.value) {
+			const markedCount = getFileMarkedCount(selectedFile.value)
+			const totalCount = getFileDetailCount(selectedFile.value)
+			if (markedCount === totalCount) {
+				backToFileList()
+			}
+		}
+
+		emit('refetch')
+	} catch (error) {
+		console.error('Failed to batch update JAR traces:', error)
+		addNotification({
+			type: 'error',
+			title: 'Batch update failed',
+			text: 'An error occurred while updating JAR traces.',
 		})
 	} finally {
 		isBatchUpdating.value = false
@@ -1518,26 +1574,49 @@ function copyId() {
 						v-if="jarGroup.segments.length > 0"
 						class="border-b border-solid border-surface-1 px-4 py-3"
 					>
-						<div class="flex flex-wrap items-center gap-1">
-							<template
-								v-for="(segment, index) in jarGroup.segments"
-								:key="`${jarGroup.key}-${index}`"
-							>
-								<span
-									class="font-mono text-sm"
-									:class="
-										index === jarGroup.segments.length - 1
-											? 'font-semibold text-contrast'
-											: 'text-secondary'
-									"
+						<div class="flex flex-wrap items-center justify-between gap-3">
+							<div class="flex flex-wrap items-center gap-1">
+								<template
+									v-for="(segment, index) in jarGroup.segments"
+									:key="`${jarGroup.key}-${index}`"
 								>
-									{{ segment }}
-								</span>
-								<ChevronRightIcon
-									v-if="index < jarGroup.segments.length - 1"
-									class="size-4 text-secondary"
-								/>
-							</template>
+									<span
+										class="font-mono text-sm"
+										:class="
+											index === jarGroup.segments.length - 1
+												? 'font-semibold text-contrast'
+												: 'text-secondary'
+										"
+									>
+										{{ segment }}
+									</span>
+									<ChevronRightIcon
+										v-if="index < jarGroup.segments.length - 1"
+										class="size-4 text-secondary"
+									/>
+								</template>
+							</div>
+
+							<div v-if="getJarRemainingUnmarkedCount(jarGroup) > 0" class="flex gap-2">
+								<ButtonStyled color="brand" size="small">
+									<button
+										:disabled="isBatchUpdating"
+										@click="batchMarkRemainingInJar(jarGroup, 'safe')"
+									>
+										<CheckCircleIcon class="size-4" />
+										Remaining safe ({{ getJarRemainingUnmarkedCount(jarGroup) }})
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="red" size="small">
+									<button
+										:disabled="isBatchUpdating"
+										@click="batchMarkRemainingInJar(jarGroup, 'unsafe')"
+									>
+										<TriangleAlertIcon class="size-4" />
+										Remaining malware ({{ getJarRemainingUnmarkedCount(jarGroup) }})
+									</button>
+								</ButtonStyled>
+							</div>
 						</div>
 					</div>
 
