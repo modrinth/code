@@ -405,6 +405,14 @@ impl SearchField {
                 optional: true,
                 token_separators: &["-"],
             },
+            SearchField::AllProjectTypes => TypesenseFieldSpec {
+                path: "all_project_types",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: &["-"],
+            },
             SearchField::ProjectId => TypesenseFieldSpec {
                 path: "project_id",
                 ty: "string",
