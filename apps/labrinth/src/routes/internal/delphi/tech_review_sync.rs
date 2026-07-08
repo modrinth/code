@@ -12,10 +12,26 @@
 //! audit log table, or "is project currently in tech review" table.
 //!
 //! A project is considered to need tech review when it has at least one
-//! non-dummy issue detail whose effective status is pending. Effective status
-//! is just the local detail's verdict (from `delphi_issue_detail_verdicts`), or
-//! if it's null then the global verdict for the same `drid.key` (from
-//! `delphi_global_detail_verdicts`).
+//! non-dummy issue detail whose effective status is pending or unsafe, or when
+//! it already has a dummy pending detail blocking the final review submission.
+//! Effective status is just the local detail's verdict (from
+//! `delphi_issue_detail_verdicts`), or if it's null then the global verdict for
+//! the same `drid.key` (from `delphi_global_detail_verdicts`).
+//!
+//! Some examples of how this behavior manifests: let's assume you have projects
+//! _A_ and _B_ currently in tech review. They each have one (unresolved) issue
+//! detail with key _K_.
+//! - If you mark _K_ on _A_ as locally safe/unsafe, then _A_ is fully resolved,
+//!   but we still have the `__dummy` detail, which means it's still in the
+//!   queue until the moderator submits the actual report. _B_ is entirely
+//!   unaffected.
+//! - If you mark _K_ on _A_ as globally safe, then _A_ and _B_ both get fully
+//!   resolved, but both still have the `__dummy` detail, so they also still
+//!   need the final report to be submitted by the moderator.
+//!
+//!   In practice, this means that some projects may have e.g. "100/100 traces
+//!   are safe" reported, but they will just be waiting for final moderator
+//!   approval.
 //!
 //! The logic for checking whether a project is now in tech review or not, and
 //! sending the appropriate message, is complex! That's why this module exists:
@@ -47,8 +63,8 @@ pub enum TechReviewExitReason {
 }
 
 struct ProjectTechReviewState {
-    project_id: DBProjectId,
-    needs_tech_review: bool,
+    has_pending_detail: bool,
+    has_unsafe_detail: bool,
     has_dummy: bool,
     thread_id: Option<DBThreadId>,
     report_id: Option<DelphiReportId>,
@@ -83,7 +99,16 @@ pub async fn sync_project_tech_review_state(
                     didws.project_id = p.project_id
                     AND didws.status = 'pending'
                     AND dri.issue_type != $3
-            ) AS "needs_tech_review!",
+            ) AS "has_pending_detail!",
+            EXISTS(
+                SELECT 1
+                FROM delphi_issue_details_with_statuses didws
+                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+                WHERE
+                    didws.project_id = p.project_id
+                    AND didws.status = 'unsafe'
+                    AND dri.issue_type != $3
+            ) AS "has_unsafe_detail!",
             EXISTS(
                 SELECT 1
                 FROM delphi_issue_details_with_statuses didws
@@ -131,8 +156,8 @@ pub async fn sync_project_tech_review_state(
 
     for row in rows {
         let state = ProjectTechReviewState {
-            project_id: row.project_id,
-            needs_tech_review: row.needs_tech_review,
+            has_pending_detail: row.has_pending_detail,
+            has_unsafe_detail: row.has_unsafe_detail,
             has_dummy: row.has_dummy,
             thread_id: row.thread_id,
             report_id: row.report_id,
@@ -225,15 +250,20 @@ async fn sync_one_project_tech_review_state(
     exit_reason: TechReviewExitReason,
     txn: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
-    if state.needs_tech_review {
-        if !state.has_dummy {
+    let needs_tech_review =
+        state.has_pending_detail || state.has_unsafe_detail || state.has_dummy;
+
+    if needs_tech_review {
+        if (state.has_pending_detail || state.has_unsafe_detail)
+            && !state.has_dummy
+        {
             if let Some(report_id) = state.report_id {
                 // TODO: Currently, the queue query determines whether a project
                 // is in tech review by checking whether it has any pending issue
                 // details. If all visible issue details are marked safe or
                 // unsafe before the final report is submitted, the project would
-                // otherwise leave the tech review queue and return to the normal
-                // moderation queue.
+                // otherwise leave the tech review queue without a final tech
+                // review verdict message.
                 //
                 // This should be replaced with explicit tech review state, such
                 // as an append-only project tech review event table where the
@@ -261,8 +291,15 @@ async fn sync_one_project_tech_review_state(
         return Ok(());
     }
 
-    if state.has_dummy {
-        remove_dummy_issue_details(state.project_id, txn).await?;
+    if matches!(exit_reason, TechReviewExitReason::Resolved)
+        && state.last_tech_review_message_type.as_deref()
+            == Some(MessageBody::TechReviewEntered.as_ref())
+    {
+        if let Some(report_id) = state.report_id {
+            ensure_dummy_issue_detail(report_id, txn).await?;
+        }
+
+        return Ok(());
     }
 
     if let Some(thread_id) = state.thread_id
@@ -351,34 +388,6 @@ async fn ensure_dummy_issue_detail(
     .execute(&mut *txn)
     .await
     .wrap_internal_err("failed to ensure dummy Delphi report issue detail")?;
-
-    Ok(())
-}
-
-async fn remove_dummy_issue_details(
-    project_id: DBProjectId,
-    txn: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
-    sqlx::query!(
-        r#"
-        DELETE FROM delphi_report_issue_details drid
-        WHERE drid.issue_id IN (
-            SELECT dri.id
-            FROM versions v
-            INNER JOIN files f ON f.version_id = v.id
-            INNER JOIN delphi_reports dr ON dr.file_id = f.id
-            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-            WHERE
-                v.mod_id = $1
-                AND dri.issue_type = $2
-        )
-        "#,
-        project_id as DBProjectId,
-        DUMMY_ISSUE_TYPE,
-    )
-    .execute(&mut *txn)
-    .await
-    .wrap_internal_err("failed to remove dummy Delphi report issue details")?;
 
     Ok(())
 }
