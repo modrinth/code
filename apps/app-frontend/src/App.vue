@@ -100,6 +100,7 @@ import {
 	install_get_modpack_preview,
 	install_get_shared_instance_preview,
 	install_shared_instance,
+	install_shared_instance_invite,
 } from '@/helpers/install'
 import { list, run } from '@/helpers/instance'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
@@ -1032,6 +1033,13 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'InstallSharedInstanceInvite') {
+		await install_shared_instance_invite(
+			e.instance_id,
+			e.invite_id,
+			'Shared instance',
+		).catch(handleError)
+		queryClient.invalidateQueries({ queryKey: ['instances'] })
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)

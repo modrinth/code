@@ -5,6 +5,7 @@
 			:header="inviteModalHeader"
 			:friends="inviteFriends"
 			:search-users="searchInviteUsers"
+			:link="inviteLink"
 			:user-profile-link="userProfileLink"
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
@@ -357,6 +358,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { get_user, get_user_many } from '@/helpers/cache.js'
+import { config } from '@/config'
 import { friend_listener } from '@/helpers/events.js'
 import {
 	add_friend,
@@ -370,11 +372,13 @@ import {
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import {
+	create_shared_instance_invite_link,
 	edit,
 	get_shared_instance_users,
 	invite_shared_instance_users,
 	list,
 	remove_shared_instance_users,
+	type SharedInstanceInviteLink,
 	type SharedInstanceUser,
 	type SharedInstanceUsers,
 } from '@/helpers/instance'
@@ -415,6 +419,8 @@ const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const importedModpackUnlinkedForShare = ref(false)
 const pendingRemovalRow = ref<ShareRow | null>(null)
+const inviteLink = ref<string | undefined>()
+const inviteLinkPending = ref(false)
 
 const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(props.instance.id))
 
@@ -1042,6 +1048,7 @@ function showInvitePlayers(event?: MouseEvent) {
 	}
 
 	invitePlayersModal.value?.show(event)
+	void ensureInviteLink()
 }
 
 async function unlinkImportedModpackForShare() {
@@ -1052,9 +1059,32 @@ async function unlinkImportedModpackForShare() {
 		importedModpackUnlinkedForShare.value = true
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.id] })
 		invitePlayersModal.value?.show()
+		void ensureInviteLink()
 	} catch (error) {
 		handleError(toError(error))
 	}
+}
+
+async function ensureInviteLink() {
+	if (inviteLink.value || inviteLinkPending.value) return
+
+	inviteLinkPending.value = true
+	try {
+		const invite = await create_shared_instance_invite_link(props.instance.id)
+		inviteLink.value = buildInviteLink(invite)
+	} catch (error) {
+		handleError(toError(error))
+	} finally {
+		inviteLinkPending.value = false
+	}
+}
+
+function buildInviteLink(invite: SharedInstanceInviteLink) {
+	const params = new URLSearchParams({
+		instance_id: invite.sharedInstanceId,
+	})
+
+	return `${config.siteUrl}/share/${encodeURIComponent(invite.inviteId)}?${params.toString()}`
 }
 
 function showRemoveRowModal(row: ShareRow) {
@@ -1285,6 +1315,8 @@ watch(
 	() => props.instance.id,
 	(instanceId) => {
 		importedModpackUnlinkedForShare.value = false
+		inviteLink.value = undefined
+		inviteLinkPending.value = false
 		pendingRows.value = loadPendingRows(instanceId)
 	},
 )

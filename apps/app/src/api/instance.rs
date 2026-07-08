@@ -53,6 +53,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_edit_icon,
             instance_share_get_users,
             instance_share_invite_users,
+            instance_share_create_invite_link,
             instance_share_remove_users,
             instance_share_get_publish_preview,
             instance_share_publish,
@@ -787,6 +788,14 @@ pub async fn instance_share_invite_users(
         theseus::instance::invite_shared_instance_users(instance_id, user_ids)
             .await?,
     )
+}
+
+#[tauri::command]
+pub async fn instance_share_create_invite_link(
+    instance_id: &str,
+) -> Result<theseus::instance::SharedInstanceInviteLink> {
+    Ok(theseus::instance::create_shared_instance_invite_link(instance_id)
+        .await?)
 }
 
 #[tauri::command]

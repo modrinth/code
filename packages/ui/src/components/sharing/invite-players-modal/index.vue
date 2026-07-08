@@ -110,9 +110,6 @@
 						</span>
 						<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 					</button>
-					<p class="m-0 text-base text-primary">
-						{{ inviteLinkDescription }}
-					</p>
 				</div>
 			</div>
 		</div>

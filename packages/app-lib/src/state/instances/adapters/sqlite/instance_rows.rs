@@ -521,7 +521,13 @@ pub(crate) async fn get_instance_metadata_by_id(
     .fetch_optional(pool)
     .await?;
 
-    row.map(InstanceMetadataRow::into_record).transpose()
+    let Some(row) = row else {
+        return Ok(None);
+    };
+    let record = hydrate_shared_instance_access_token(row.into_record()?, pool)
+        .await?;
+
+    Ok(Some(record))
 }
 
 pub(crate) async fn get_instance_metadata_many(
@@ -614,9 +620,15 @@ pub(crate) async fn get_instance_metadata_many(
     .fetch_all(pool)
     .await?;
 
-    rows.into_iter()
-        .map(InstanceMetadataRow::into_record)
-        .collect()
+    let mut records = Vec::with_capacity(rows.len());
+    for row in rows {
+        records.push(
+            hydrate_shared_instance_access_token(row.into_record()?, pool)
+                .await?,
+        );
+    }
+
+    Ok(records)
 }
 
 pub(crate) async fn list_instance_metadata(
@@ -695,9 +707,15 @@ pub(crate) async fn list_instance_metadata(
     .fetch_all(pool)
     .await?;
 
-    rows.into_iter()
-        .map(InstanceMetadataRow::into_record)
-        .collect()
+    let mut records = Vec::with_capacity(rows.len());
+    for row in rows {
+        records.push(
+            hydrate_shared_instance_access_token(row.into_record()?, pool)
+                .await?,
+        );
+    }
+
+    Ok(records)
 }
 
 pub(crate) async fn get_instance_launch_context(
@@ -1080,6 +1098,8 @@ pub(crate) async fn set_shared_instance_attachment(
         attachment.and_then(|value| value.manager_id.as_deref());
     let shared_instance_linked_user_id =
         attachment.and_then(|value| value.linked_user_id.as_deref());
+    let shared_instance_access_token =
+        attachment.and_then(|value| value.access_token.as_deref());
 
     sqlx::query!(
         "
@@ -1110,6 +1130,18 @@ pub(crate) async fn set_shared_instance_attachment(
         shared_instance_manager_id,
         shared_instance_linked_user_id,
     )
+    .execute(&mut **tx)
+    .await?;
+
+    sqlx::query(
+        "
+		UPDATE instance_links
+		SET shared_instance_access_token = ?
+		WHERE instance_id = ?
+		",
+    )
+    .bind(shared_instance_access_token)
+    .bind(instance_id)
     .execute(&mut **tx)
     .await?;
 
@@ -1373,6 +1405,35 @@ fn launch_overrides_from_json(
     }
 }
 
+async fn hydrate_shared_instance_access_token(
+    mut record: InstanceMetadataRecord,
+    pool: &SqlitePool,
+) -> crate::Result<InstanceMetadataRecord> {
+    if let Some(attachment) = record.shared_instance.as_mut() {
+        attachment.access_token =
+            shared_instance_access_token(&record.instance.id, pool).await?;
+    }
+
+    Ok(record)
+}
+
+async fn shared_instance_access_token(
+    instance_id: &str,
+    pool: &SqlitePool,
+) -> crate::Result<Option<String>> {
+    Ok(sqlx::query_scalar::<_, Option<String>>(
+        "
+		SELECT shared_instance_access_token
+		FROM instance_links
+		WHERE instance_id = ?
+		",
+    )
+    .bind(instance_id)
+    .fetch_optional(pool)
+    .await?
+    .flatten())
+}
+
 fn shared_instance_attachment(
     shared_instance_id: Option<String>,
     shared_instance_role: Option<String>,
@@ -1400,6 +1461,7 @@ fn shared_instance_attachment(
         role,
         manager_id: shared_instance_manager_id,
         linked_user_id: shared_instance_linked_user_id,
+        access_token: None,
         status,
         applied_version: optional_i32(applied_update_id, "applied_update_id")?,
         latest_version: optional_i32(
