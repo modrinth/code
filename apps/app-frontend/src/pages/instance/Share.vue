@@ -15,6 +15,79 @@
 			:backup-tip="importedModpackBackupTip"
 			@unlink="unlinkImportedModpackForShare"
 		/>
+		<NewModal
+			ref="removeUserConfirmModal"
+			:header="formatMessage(messages.removeUserHeader)"
+			max-width="470px"
+			@hide="pendingRemovalRow = null"
+		>
+			<div class="flex flex-col gap-4">
+				<Admonition type="warning">
+					{{
+						formatMessage(messages.removeUserWarningBody, {
+							username: pendingRemovalUsername,
+						})
+					}}
+				</Admonition>
+
+				<div class="flex min-w-0 items-center gap-2 rounded-[20px] bg-surface-2 p-3">
+					<Avatar
+						:src="pendingRemovalRow?.avatarUrl"
+						:alt="formatMessage(messages.userAvatarAlt, { username: pendingRemovalUsername })"
+						:tint-by="pendingRemovalUsername"
+						size="40px"
+						circle
+						no-shadow
+					/>
+					<div class="flex min-w-0 flex-1 flex-col gap-0.5">
+						<span class="min-w-0 truncate font-medium text-contrast">
+							{{ pendingRemovalUsername }}
+						</span>
+						<span class="truncate text-sm text-secondary">
+							{{ compactMethodLabels[pendingRemovalRow?.method ?? 'direct'] }}
+						</span>
+					</div>
+				</div>
+
+				<div class="flex flex-col gap-2">
+					<span class="font-semibold text-contrast">
+						{{ formatMessage(messages.removeUserEffectsLabel) }}
+					</span>
+					<ul class="m-0 list-disc pl-6 text-primary">
+						<li
+							v-for="effect in removeUserEffectMessages"
+							:key="effect.id"
+							class="leading-6 marker:text-secondary"
+						>
+							{{ formatMessage(effect) }}
+						</li>
+					</ul>
+				</div>
+
+				<div class="flex justify-end gap-2 pt-1">
+					<ButtonStyled type="outlined">
+						<button class="!border !border-surface-5" @click="hideRemoveUserModal">
+							<XIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="orange">
+						<button :disabled="!pendingRemovalRow" @click="confirmRemoveRow">
+							<UserXIcon aria-hidden="true" />
+							{{ formatMessage(messages.removeUserButton) }}
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</NewModal>
+
+		<Admonition
+			v-if="sharedInstanceActionsLocked"
+			type="warning"
+			:header="formatMessage(messages.lockedHeader)"
+		>
+			{{ formatMessage(messages.lockedBody) }}
+		</Admonition>
 
 		<template v-if="rows.length > 0">
 			<div class="flex flex-col gap-4">
@@ -27,7 +100,7 @@
 						input-class="!h-10"
 						clearable
 					/>
-					<ButtonStyled color="brand">
+					<ButtonStyled v-if="!sharedInstanceActionsLocked" color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
 							@click="showInvitePlayers($event)"
@@ -141,13 +214,13 @@
 				</template>
 
 				<template #cell-actions="{ row }">
-					<div class="flex items-center justify-end">
+					<div v-if="!sharedInstanceActionsLocked" class="flex items-center justify-end">
 						<ButtonStyled v-if="row.pending" circular type="transparent">
 							<button
-								v-tooltip="'Revoke invite'"
-								:aria-label="`Revoke invite for ${row.username}`"
+								v-tooltip="'Revoke access'"
+								:aria-label="`Revoke access for ${row.username}`"
 								class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
-								@click="removeRow(row.id)"
+								@click="showRemoveRowModal(row)"
 							>
 								<XIcon aria-hidden="true" />
 							</button>
@@ -157,7 +230,7 @@
 								:options="[
 									{
 										id: 'remove-user',
-										action: () => removeRow(row.id),
+										action: () => showRemoveRowModal(row),
 										color: 'red',
 									},
 								]"
@@ -174,6 +247,19 @@
 				</template>
 			</Table>
 		</template>
+
+		<EmptyState v-else-if="sharedInstanceActionsLocked" type="empty-inbox">
+			<template #heading>{{ formatMessage(messages.lockedEmptyHeading) }}</template>
+			<template #description>{{ formatMessage(messages.lockedEmptyDescription) }}</template>
+			<template #actions>
+				<ButtonStyled color="brand">
+					<button class="!h-10" @click="signInToShare">
+						<LogInIcon aria-hidden="true" />
+						{{ formatMessage(messages.switchAccountButton) }}
+					</button>
+				</ButtonStyled>
+			</template>
+		</EmptyState>
 
 		<EmptyState v-else-if="!isSignedIn" type="empty-inbox">
 			<template #heading>{{ formatMessage(messages.signInToShareHeading) }}</template>
@@ -210,13 +296,16 @@ import {
 	LogInIcon,
 	MoreVerticalIcon,
 	SearchIcon,
+	UserXIcon,
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	commonMessages,
 	ConfirmUnlinkModal,
 	defineMessages,
 	EmptyState,
@@ -226,6 +315,7 @@ import {
 	InvitePlayersModal,
 	type InvitePlayersSearchUser,
 	type InvitePlayersUser,
+	NewModal,
 	OverflowMenu,
 	provideAppBackup,
 	type SortDirection,
@@ -288,12 +378,14 @@ const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
 const shareUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>(null)
+const removeUserConfirmModal = ref<InstanceType<typeof NewModal> | null>(null)
 const memberSearch = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const importedModpackUnlinkedForShare = ref(false)
+const pendingRemovalRow = ref<ShareRow | null>(null)
 
 const pendingRows = ref<Record<string, ShareRow>>({})
 
@@ -326,6 +418,65 @@ const messages = defineMessages({
 		id: 'app.instance.share.invite-modal.heading',
 		defaultMessage: 'Share {name}',
 	},
+	lockedHeader: {
+		id: 'app.instance.share.locked.header',
+		defaultMessage: 'Shared instance access is locked',
+	},
+	lockedBody: {
+		id: 'app.instance.share.locked.body',
+		defaultMessage:
+			'Sharing is linked to another Modrinth account. Last known users are shown if they were loaded before, but changes are disabled until you sign in with the linked account.',
+	},
+	lockedEmptyHeading: {
+		id: 'app.instance.share.locked.empty-heading',
+		defaultMessage: 'Sign in with the linked account',
+	},
+	lockedEmptyDescription: {
+		id: 'app.instance.share.locked.empty-description',
+		defaultMessage:
+			'This shared instance is managed by a different Modrinth account. Sign in with that account to view and manage shared access.',
+	},
+	switchAccountButton: {
+		id: 'app.instance.share.locked.switch-account-button',
+		defaultMessage: 'Switch account',
+	},
+	removeUserHeader: {
+		id: 'app.instance.share.remove-user-modal.header',
+		defaultMessage: 'Revoke access',
+	},
+	removeUserWarningBody: {
+		id: 'app.instance.share.remove-user-modal.warning-body',
+		defaultMessage:
+			"If you revoke {username}'s access to this shared instance, you'll need to invite them again before they can receive updates.",
+	},
+	userAvatarAlt: {
+		id: 'app.instance.share.remove-user-modal.user-avatar-alt',
+		defaultMessage: "{username}'s avatar",
+	},
+	removeUserEffectsLabel: {
+		id: 'app.instance.share.remove-user-modal.effects-label',
+		defaultMessage: 'What happens?',
+	},
+	removeUserEffectAccess: {
+		id: 'app.instance.share.remove-user-modal.effect-access',
+		defaultMessage: 'They will no longer receive updates for this shared instance',
+	},
+	removeUserEffectInstalledCopy: {
+		id: 'app.instance.share.remove-user-modal.effect-installed-copy',
+		defaultMessage: 'Any copy they already installed will stay on their device',
+	},
+	removeUserEffectInviteAgain: {
+		id: 'app.instance.share.remove-user-modal.effect-invite-again',
+		defaultMessage: 'You can invite them again later',
+	},
+	removeUserEffectLastUser: {
+		id: 'app.instance.share.remove-user-modal.effect-last-user',
+		defaultMessage: 'If this is the last user, sharing will be turned off for this instance',
+	},
+	removeUserButton: {
+		id: 'app.instance.share.remove-user-modal.remove-button',
+		defaultMessage: 'Revoke access',
+	},
 })
 
 const { formatMessage } = useVIntl()
@@ -355,7 +506,8 @@ const importedModpackBackupTip = computed(() => {
 const friendsQuery = useQuery({
 	queryKey: friendsKey,
 	queryFn: async () => getFriendsWithUserData(await getCredentials()),
-	enabled: () => isSignedIn.value && !!currentUserId.value,
+	enabled: () =>
+		isSignedIn.value && !!currentUserId.value && !props.sharedInstanceActionsLocked,
 	staleTime: 30_000,
 })
 const userFriends = computed(() => friendsQuery.data.value ?? [])
@@ -365,14 +517,35 @@ const sharedUsersQuery = useQuery({
 	enabled: () => isSignedIn.value && !!props.instance.id && !props.sharedInstanceActionsLocked,
 	staleTime: Infinity,
 })
-const sharedRows = computed(() => sharedUsersQuery.data.value ?? [])
+const sharedRows = computed(
+	() =>
+		sharedUsersQuery.data.value ??
+		queryClient.getQueryData<ShareRow[]>(sharedUsersKey.value) ??
+		[],
+)
 const rows = computed(() => {
+	if (props.sharedInstanceActionsLocked) return sharedRows.value
+
 	const sharedKeys = new Set(sharedRows.value.map((row) => normalizeInviteKey(row.id)))
 	const pending = Object.values(pendingRows.value).filter(
 		(row) => !sharedKeys.has(normalizeInviteKey(row.id)),
 	)
 
 	return [...pending, ...sharedRows.value]
+})
+const pendingRemovalUsername = computed(() => pendingRemovalRow.value?.username ?? '')
+const removeUserEffectMessages = computed(() => {
+	const effects = [
+		messages.removeUserEffectAccess,
+		messages.removeUserEffectInstalledCopy,
+		messages.removeUserEffectInviteAgain,
+	]
+
+	if (rows.value.length === 1) {
+		effects.push(messages.removeUserEffectLastUser)
+	}
+
+	return effects
 })
 
 const methodLabels: Record<ShareMethod, string> = {
@@ -385,48 +558,55 @@ const compactMethodLabels: Record<ShareMethod, string> = {
 	link: 'Share link',
 }
 
-const columns: TableColumn<ShareTableColumn>[] = [
-	{
-		key: 'username',
-		label: 'Username',
-		width: 'clamp(14rem, 30%, 26rem)',
-		enableSorting: true,
-		headerClass: '!pr-3',
-		cellClass: '!pr-3',
-	},
-	{
-		key: 'lastPlayed',
-		label: 'Last played',
-		width: 'clamp(7rem, 15%, 13rem)',
-		enableSorting: true,
-		headerClass: 'whitespace-nowrap !px-2',
-		cellClass: 'whitespace-nowrap !px-2',
-	},
-	{
-		key: 'joined',
-		label: 'Joined',
-		width: 'clamp(7rem, 14%, 12rem)',
-		enableSorting: true,
-		defaultSortDirection: 'desc',
-		headerClass: 'whitespace-nowrap !px-2',
-		cellClass: 'whitespace-nowrap !px-2',
-	},
-	{
-		key: 'method',
-		label: 'Method',
-		enableSorting: true,
-		headerClass: 'whitespace-nowrap !px-2',
-		cellClass: 'whitespace-nowrap !px-2',
-	},
-	{
-		key: 'actions',
-		label: 'Actions',
-		align: 'right',
-		width: 'clamp(5.5rem, 7%, 7rem)',
-		headerClass: 'whitespace-nowrap !pl-2 !pr-4',
-		cellClass: 'whitespace-nowrap !pl-2 !pr-4',
-	},
-]
+const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
+	const tableColumns: TableColumn<ShareTableColumn>[] = [
+		{
+			key: 'username',
+			label: 'Username',
+			width: 'clamp(14rem, 30%, 26rem)',
+			enableSorting: true,
+			headerClass: '!pr-3',
+			cellClass: '!pr-3',
+		},
+		{
+			key: 'lastPlayed',
+			label: 'Last played',
+			width: 'clamp(7rem, 15%, 13rem)',
+			enableSorting: true,
+			headerClass: 'whitespace-nowrap !px-2',
+			cellClass: 'whitespace-nowrap !px-2',
+		},
+		{
+			key: 'joined',
+			label: 'Joined',
+			width: 'clamp(7rem, 14%, 12rem)',
+			enableSorting: true,
+			defaultSortDirection: 'desc',
+			headerClass: 'whitespace-nowrap !px-2',
+			cellClass: 'whitespace-nowrap !px-2',
+		},
+		{
+			key: 'method',
+			label: 'Method',
+			enableSorting: true,
+			headerClass: 'whitespace-nowrap !px-2',
+			cellClass: 'whitespace-nowrap !px-2',
+		},
+	]
+
+	if (!props.sharedInstanceActionsLocked) {
+		tableColumns.push({
+			key: 'actions',
+			label: 'Actions',
+			align: 'right',
+			width: 'clamp(5.5rem, 7%, 7rem)',
+			headerClass: 'whitespace-nowrap !pl-2 !pr-4',
+			cellClass: 'whitespace-nowrap !pl-2 !pr-4',
+		})
+	}
+
+	return tableColumns
+})
 
 const methodFilterOptions = computed<Array<{ id: ShareMethod; label: string }>>(() => [
 	{ id: 'direct', label: methodLabels.direct },
@@ -552,6 +732,8 @@ function toggleMethodFilter(filter: ShareMethod) {
 }
 
 async function searchInviteUsers(query: string): Promise<InvitePlayersSearchUser[]> {
+	if (props.sharedInstanceActionsLocked) return []
+
 	const users = await search_user(query)
 
 	return users
@@ -579,7 +761,11 @@ type SharedRowsMutationContext = {
 }
 
 const addFriendMutation = useMutation({
-	mutationFn: (user: InvitePlayersUser) => add_friend(user.id),
+	mutationFn: (user: InvitePlayersUser) => {
+		if (props.sharedInstanceActionsLocked) return
+
+		return add_friend(user.id)
+	},
 	onMutate: async (user): Promise<FriendsMutationContext> => {
 		const queryKey = friendsKey.value
 		await queryClient.cancelQueries({ queryKey })
@@ -699,6 +885,8 @@ async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]
 }
 
 function invitePlayer(payload: InvitePlayersInvitePayload) {
+	if (props.sharedInstanceActionsLocked) return
+
 	const user = payload.user
 	if (payload.source === 'search') {
 		addPendingFriend(user)
@@ -719,6 +907,7 @@ function inviteShareUser(user: InvitePlayersUser) {
 }
 
 function addPendingFriend(user: InvitePlayersUser) {
+	if (props.sharedInstanceActionsLocked) return
 	if (findInviteFriend(user.id, user.username)) return
 
 	addFriendMutation.mutate(user)
@@ -753,6 +942,27 @@ async function unlinkImportedModpackForShare() {
 	} catch (error) {
 		handleError(toError(error))
 	}
+}
+
+function showRemoveRowModal(row: ShareRow) {
+	if (props.sharedInstanceActionsLocked) return
+
+	pendingRemovalRow.value = row
+	removeUserConfirmModal.value?.show()
+}
+
+function hideRemoveUserModal() {
+	pendingRemovalRow.value = null
+	removeUserConfirmModal.value?.hide()
+}
+
+function confirmRemoveRow() {
+	const row = pendingRemovalRow.value
+	if (!row) return
+
+	removeUserConfirmModal.value?.hide()
+	pendingRemovalRow.value = null
+	removeRow(row.id)
 }
 
 function removeRow(id: string) {

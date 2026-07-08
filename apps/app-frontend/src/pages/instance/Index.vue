@@ -15,13 +15,7 @@
 			<UpdateToPlayModal
 				ref="updateToPlayModal"
 				:instance="instance"
-				@cancel="clearSharedInstanceLaunchChecking"
-				@complete="clearSharedInstanceLaunchChecking"
 				@shared-instance-unavailable="handleSharedInstanceUnavailable"
-			/>
-			<SharedInstanceWrongAccountModal
-				ref="sharedInstanceWrongAccountModal"
-				@continue="dismissSharedInstanceWrongAccountModal"
 			/>
 			<ContentPageHeader>
 				<template #icon>
@@ -157,12 +151,6 @@
 								Repair
 							</button>
 						</ButtonStyled>
-						<ButtonStyled v-else-if="checkingSharedInstanceLaunch" color="brand" size="large">
-							<button disabled>
-								<SpinnerIcon class="animate-spin" />
-								Checking...
-							</button>
-						</ButtonStyled>
 						<ButtonStyled v-else-if="playing === true" color="red" size="large">
 							<button :disabled="stopping" @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
@@ -263,9 +251,14 @@
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
 			<InstanceAdmonitions
-				v-if="!sharedInstanceActionsLocked"
 				class="mt-4"
 				:instance="instance"
+				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
+				:shared-instance-unavailable-manager="sharedInstanceManager?.username"
+				:shared-instance-wrong-account="sharedInstanceWrongAccount"
+				:shared-instance-expected-username="sharedInstanceExpectedUsername"
+				:shared-instance-role="instance.shared_instance?.role"
+				:shared-instance-signed-out="sharedInstanceSignedOut"
 				@published="fetchInstance"
 			/>
 		</div>
@@ -337,7 +330,6 @@ import {
 	PlusIcon,
 	ServerIcon,
 	SettingsIcon,
-	SpinnerIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
 	UnknownIcon,
@@ -373,7 +365,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceAdmonitions from '@/components/ui/instance/InstanceAdmonitions.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
-import SharedInstanceWrongAccountModal from '@/components/ui/modal/SharedInstanceWrongAccountModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import {
 	fetchCachedServerStatus,
@@ -390,6 +381,7 @@ import {
 	install_get_shared_instance_update_preview,
 	install_pack_to_existing_instance,
 	isSharedInstanceUnavailableError,
+	type SharedInstanceUpdatePreview,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
@@ -430,12 +422,10 @@ const instance = ref<GameInstance>()
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
-const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
-const sharedInstanceWrongAccountModal = ref<InstanceType<typeof SharedInstanceWrongAccountModal>>()
 
 const { formatMessage } = useVIntl()
 
@@ -485,6 +475,9 @@ const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
 const activeInstanceId = ref<string>()
+const sharedInstanceUpdatePreview = ref<SharedInstanceUpdatePreview | null>(null)
+const sharedInstanceUnavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
+const sharedInstanceAvailabilityCheckKey = ref<string | null>(null)
 const sharedInstanceManagerUser = ref<{
 	id: string
 	username: string
@@ -533,7 +526,7 @@ const sharedInstanceManager = computed(() => {
 const sharedInstanceExpectedUserId = computed(
 	() => instance.value?.shared_instance?.linked_user_id ?? null,
 )
-const sharedInstanceExpectedUsername = ref('')
+const sharedInstanceExpectedUsername = computed(() => sharedInstanceExpectedUserId.value ?? '')
 const sharedInstanceWrongAccount = computed(() => {
 	if (auth.isReady && !auth.isReady.value) return false
 
@@ -543,58 +536,7 @@ const sharedInstanceWrongAccount = computed(() => {
 	return auth.user.value?.id !== expectedUserId
 })
 const sharedInstanceActionsLocked = computed(() => sharedInstanceWrongAccount.value)
-const sharedInstanceLockedShareTooltip = computed(
-	() =>
-		`Sign in as ${sharedInstanceExpectedUsername.value || sharedInstanceExpectedUserId.value || 'the linked account'} to access`,
-)
-const shownSharedInstanceWrongAccountKeys = ref<Set<string>>(new Set())
-
-watch(sharedInstanceExpectedUserId, (expectedUserId) => {
-	sharedInstanceExpectedUsername.value = expectedUserId ?? ''
-})
-
-watch(
-	() => ({
-		instanceId: instance.value?.id,
-		role: instance.value?.shared_instance?.role,
-		expectedUserId: sharedInstanceExpectedUserId.value,
-		currentUserId: auth.user.value?.id ?? null,
-		authReady: auth.isReady?.value ?? true,
-		wrongAccount: sharedInstanceWrongAccount.value,
-	}),
-	async ({ instanceId, role, expectedUserId, currentUserId, authReady, wrongAccount }) => {
-		if (!authReady || !instanceId || !role || !expectedUserId || !wrongAccount) return
-
-		const key = `${instanceId}:${expectedUserId}:${currentUserId ?? 'signed-out'}`
-		if (shownSharedInstanceWrongAccountKeys.value.has(key)) return
-
-		sharedInstanceExpectedUsername.value = expectedUserId
-		shownSharedInstanceWrongAccountKeys.value = new Set([
-			...shownSharedInstanceWrongAccountKeys.value,
-			key,
-		])
-		const expectedUser = await get_user(expectedUserId, 'bypass').catch(() => null)
-		const expectedUsername = expectedUser?.username ?? expectedUserId
-		if (
-			instance.value?.id !== instanceId ||
-			sharedInstanceExpectedUserId.value !== expectedUserId ||
-			!sharedInstanceWrongAccount.value
-		) {
-			return
-		}
-
-		sharedInstanceExpectedUsername.value = expectedUsername
-		sharedInstanceWrongAccountModal.value?.show(
-			role === 'owner' ? 'owner' : 'user',
-			expectedUsername,
-		)
-	},
-	{ immediate: true },
-)
-
-function dismissSharedInstanceWrongAccountModal() {
-	sharedInstanceWrongAccountModal.value?.hide()
-}
+const sharedInstanceSignedOut = computed(() => !auth.session_token.value)
 
 watch(
 	() => sharedInstanceManagerUserId.value,
@@ -643,6 +585,9 @@ async function fetchInstance() {
 	isServerInstance.value = false
 	linkedProjectV3.value = undefined
 	preloadedContent.value = null
+	sharedInstanceUpdatePreview.value = null
+	sharedInstanceUnavailableReason.value = null
+	sharedInstanceAvailabilityCheckKey.value = null
 	resetServerStatus()
 
 	const nextInstance = await get(route.params.id as string).catch(handleError)
@@ -737,22 +682,58 @@ watch(
 	},
 )
 
-const basePath = computed(
-	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
-)
+async function checkSharedInstanceAvailability(instanceId: string) {
+	try {
+		const preview = await install_get_shared_instance_update_preview(instanceId)
+		if (instance.value?.id !== instanceId) return
+
+		sharedInstanceUpdatePreview.value = preview
+		sharedInstanceUnavailableReason.value = null
+	} catch (error) {
+		if (instance.value?.id !== instanceId) return
+
+		if (isSharedInstanceUnavailableError(error)) {
+			sharedInstanceUpdatePreview.value = null
+			sharedInstanceUnavailableReason.value = getSharedInstanceUnavailableReason(error)
+			return
+		}
+
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.sharedInstanceErrorTitle),
+			text: getErrorMessage(error),
+		})
+	}
+}
 
 watch(
 	() => ({
-		routeName: displayedInstanceRoute.value.name,
+		instanceId: instance.value?.id,
+		role: instance.value?.shared_instance?.role,
 		locked: sharedInstanceActionsLocked.value,
-		basePath: basePath.value,
+		offline: offline.value,
+		userId: auth.user.value?.id ?? null,
+		authReady: auth.isReady?.value ?? true,
 	}),
-	async ({ routeName, locked, basePath }) => {
-		if (routeName === 'InstanceShare' && locked) {
-			await router.replace({ path: basePath })
+	async ({ instanceId, role, locked, offline, userId, authReady }) => {
+		if (!instanceId || role !== 'member' || locked || offline || !authReady) {
+			sharedInstanceUpdatePreview.value = null
+			sharedInstanceUnavailableReason.value = null
+			sharedInstanceAvailabilityCheckKey.value = null
+			return
 		}
+
+		const key = `${instanceId}:${userId ?? 'signed-out'}`
+		if (sharedInstanceAvailabilityCheckKey.value === key) return
+
+		sharedInstanceAvailabilityCheckKey.value = key
+		await checkSharedInstanceAvailability(instanceId)
 	},
 	{ immediate: true },
+)
+
+const basePath = computed(
+	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
 )
 
 /**
@@ -815,10 +796,6 @@ const tabs = computed(() => {
 			label: 'Share',
 			href: `${basePath.value}/share`,
 			icon: UserPlusIcon,
-			disabled: sharedInstanceActionsLocked.value,
-			tooltip: sharedInstanceActionsLocked.value
-				? sharedInstanceLockedShareTooltip.value
-				: undefined,
 		})
 	}
 
@@ -859,10 +836,6 @@ const launchInstance = async (context: string) => {
 	})
 }
 
-function clearSharedInstanceLaunchChecking() {
-	checkingSharedInstanceLaunch.value = false
-}
-
 function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
 	if (reason === 'deleted') return messages.sharedInstanceDeletedText
 	if (reason === 'access_revoked') return messages.sharedInstanceAccessRevokedText
@@ -881,69 +854,43 @@ async function handleSharedInstanceUnavailable(
 		text: formatMessage(sharedInstanceUnavailableTextMessage(reason), { manager }),
 	})
 	await fetchInstance()
+	sharedInstanceUpdatePreview.value = null
+	sharedInstanceUnavailableReason.value = reason
 }
 
 const startInstance = async (context: string) => {
 	if (!instance.value) return
-	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
+	if (loading.value || playing.value) return
 
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
 	const canCheckSharedInstanceUpdate =
 		isSharedInstanceMember && !sharedInstanceActionsLocked.value && !offline.value
-	let waitingForUpdateModal = false
 
-	if (isSharedInstanceMember) {
-		checkingSharedInstanceLaunch.value = true
-	}
+	if (canCheckSharedInstanceUpdate) {
+		const preview = sharedInstanceUpdatePreview.value
 
-	try {
-		if (canCheckSharedInstanceUpdate) {
-			let preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
-			try {
-				preview = await install_get_shared_instance_update_preview(instance.value.id)
-			} catch (error) {
-				if (isSharedInstanceUnavailableError(error)) {
-					await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
-					return
-				}
-
-				addNotification({
-					type: 'error',
-					title: formatMessage(messages.sharedInstanceErrorTitle),
-					text: getErrorMessage(error),
-				})
-				return
-			}
-
-			if (preview?.updateAvailable && updateToPlayModal.value) {
-				waitingForUpdateModal = true
-				updateToPlayModal.value.showSharedInstance(instance.value, preview, async () => {
-					await fetchInstance()
-					await launchInstance(context)
-				})
-				return
-			}
-		}
-
-		if (updateToPlayModal.value?.hasUpdate) {
-			if (isSharedInstanceMember) {
-				waitingForUpdateModal = true
-				updateToPlayModal.value.show(instance.value, null, async () => {
-					await fetchInstance()
-					await launchInstance(context)
-				})
-			} else {
-				updateToPlayModal.value.show(instance.value)
-			}
+		if (preview?.updateAvailable && updateToPlayModal.value) {
+			updateToPlayModal.value.showSharedInstance(instance.value, preview, async () => {
+				await fetchInstance()
+				await launchInstance(context)
+			})
 			return
 		}
-
-		await launchInstance(context)
-	} finally {
-		if (!waitingForUpdateModal) {
-			clearSharedInstanceLaunchChecking()
-		}
 	}
+
+	if (updateToPlayModal.value?.hasUpdate) {
+		if (isSharedInstanceMember) {
+			updateToPlayModal.value.show(instance.value, null, async () => {
+				await fetchInstance()
+				await launchInstance(context)
+			})
+		} else {
+			updateToPlayModal.value.show(instance.value)
+		}
+		return
+	}
+
+	await launchInstance(context)
 }
 
 const stopInstance = async (context: string) => {

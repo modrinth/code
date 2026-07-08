@@ -11,6 +11,10 @@ use crate::state::{
     ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
+use super::content_set_diff::{
+    ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
+    ContentSetSnapshot, ContentSetSnapshotVersion, diff_content_sets,
+};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -269,9 +273,16 @@ pub async fn remove_shared_instance_users(
     }
 
     let remaining_users = get_remote_users(&attachment.id, &state).await?;
-    if remaining_users.user_ids.is_empty() {
+    if !has_shared_instance_recipients(&remaining_users, &attachment, &state)
+        .await?
+    {
         delete_remote_instance(&attachment.id, &state).await?;
         crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+        return Ok(SharedInstanceUsers {
+            user_ids: Vec::new(),
+        });
     }
 
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
@@ -385,6 +396,14 @@ pub async fn get_shared_instance_publish_preview(
     };
     let diffs =
         shared_instance_publish_diffs(&metadata, &version, &state).await?;
+    set_shared_instance_publish_status(
+        instance_id,
+        &attachment,
+        version.version,
+        !diffs.is_empty(),
+        &state,
+    )
+    .await?;
 
     Ok(Some(SharedInstancePublishPreview {
         shared_instance_id: attachment.id,
@@ -603,6 +622,20 @@ async fn shared_attachment_matches_current_user(
         .is_some_and(|current_user_id| current_user_id == linked_user_id))
 }
 
+async fn has_shared_instance_recipients(
+    users: &SharedInstanceUsers,
+    attachment: &SharedInstanceAttachment,
+    state: &State,
+) -> crate::Result<bool> {
+    let current_user_id = linked_modrinth_user_id(state).await?;
+
+    Ok(users.user_ids.iter().any(|user_id| {
+        Some(user_id.as_str()) != attachment.linked_user_id.as_deref()
+            && Some(user_id.as_str()) != attachment.manager_id.as_deref()
+            && Some(user_id.as_str()) != current_user_id.as_deref()
+    }))
+}
+
 async fn clear_shared_instance_if_current_user(
     instance_id: &str,
     attachment: &SharedInstanceAttachment,
@@ -748,89 +781,74 @@ async fn shared_content_diffs(
     removed_disabled_external_files: &HashSet<String>,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
-    let current_versions =
-        shared_versions_by_project(current_version_ids, state).await?;
-    let latest_versions =
-        shared_versions_by_project(latest_version_ids, state).await?;
-    let project_ids = current_versions
-        .keys()
-        .chain(latest_versions.keys())
-        .cloned()
+    let current = shared_content_snapshot(
+        current_version_ids,
+        current_external_files,
+        state,
+    )
+    .await?;
+    let latest =
+        shared_content_snapshot(latest_version_ids, latest_external_files, state)
+            .await?;
+    let options = ContentSetDiffOptions {
+        removed_disabled_project_ids: removed_disabled_project_ids.clone(),
+        removed_disabled_external_files: removed_disabled_external_files
+            .clone(),
+    };
+    let content_diffs = diff_content_sets(&current, &latest, &options);
+    let project_ids = content_diffs
+        .iter()
+        .filter_map(|diff| match diff {
+            ContentSetDiffEntry::Project { project_id, .. } => {
+                Some(project_id.clone())
+            }
+            ContentSetDiffEntry::ExternalFile { .. } => None,
+        })
         .collect::<HashSet<_>>();
     let project_names = shared_project_names(&project_ids, state).await?;
 
     let mut diffs = Vec::new();
-    for project_id in project_ids {
-        let current = current_versions.get(&project_id);
-        let latest = latest_versions.get(&project_id);
-        let project_name = Some(
-            project_names
-                .get(&project_id)
-                .cloned()
-                .unwrap_or_else(|| project_id.clone()),
-        );
-
-        match (current, latest) {
-            (None, Some(latest)) => {
+    for diff in content_diffs {
+        match diff {
+            ContentSetDiffEntry::Project {
+                kind,
+                project_id,
+                current_version_name,
+                new_version_name,
+                disabled,
+            } => {
+                let project_name = Some(
+                    project_names
+                        .get(&project_id)
+                        .cloned()
+                        .unwrap_or_else(|| project_id.clone()),
+                );
                 diffs.push(SharedInstanceUpdateDiff {
-                    type_: SharedInstanceUpdateDiffType::Added,
+                    type_: shared_update_diff_type(kind),
                     project_id: Some(project_id),
                     project_name,
                     file_name: None,
-                    current_version_name: None,
-                    new_version_name: Some(latest.version_number.clone()),
-                    disabled: false,
+                    current_version_name,
+                    new_version_name,
+                    disabled,
                 });
             }
-            (Some(current), None) => {
-                let disabled =
-                    removed_disabled_project_ids.contains(&project_id);
+            ContentSetDiffEntry::ExternalFile {
+                kind,
+                file_name,
+                disabled,
+            } => {
                 diffs.push(SharedInstanceUpdateDiff {
-                    type_: SharedInstanceUpdateDiffType::Removed,
-                    project_id: Some(project_id),
-                    project_name,
-                    file_name: None,
-                    current_version_name: Some(current.version_number.clone()),
+                    type_: shared_update_diff_type(kind),
+                    project_id: None,
+                    project_name: None,
+                    file_name: Some(file_name),
+                    current_version_name: None,
                     new_version_name: None,
                     disabled,
                 });
             }
-            (Some(current), Some(latest)) if current.id != latest.id => {
-                diffs.push(SharedInstanceUpdateDiff {
-                    type_: SharedInstanceUpdateDiffType::Updated,
-                    project_id: Some(project_id),
-                    project_name,
-                    file_name: None,
-                    current_version_name: Some(current.version_number.clone()),
-                    new_version_name: Some(latest.version_number.clone()),
-                    disabled: false,
-                });
-            }
-            _ => {}
         }
-    }
-
-    for file_name in latest_external_files.difference(current_external_files) {
-        diffs.push(SharedInstanceUpdateDiff {
-            type_: SharedInstanceUpdateDiffType::Added,
-            project_id: None,
-            project_name: None,
-            file_name: Some(file_name.clone()),
-            current_version_name: None,
-            new_version_name: None,
-            disabled: false,
-        });
-    }
-    for file_name in current_external_files.difference(latest_external_files) {
-        diffs.push(SharedInstanceUpdateDiff {
-            type_: SharedInstanceUpdateDiffType::Removed,
-            project_id: None,
-            project_name: None,
-            file_name: Some(file_name.clone()),
-            current_version_name: None,
-            new_version_name: None,
-            disabled: removed_disabled_external_files.contains(file_name),
-        });
     }
 
     diffs.sort_by(|a, b| {
@@ -840,6 +858,33 @@ async fn shared_content_diffs(
             .cmp(&b.project_name.as_deref().or(b.file_name.as_deref()))
     });
     Ok(diffs)
+}
+
+fn shared_update_diff_type(
+    kind: ContentSetDiffKind,
+) -> SharedInstanceUpdateDiffType {
+    match kind {
+        ContentSetDiffKind::Added => SharedInstanceUpdateDiffType::Added,
+        ContentSetDiffKind::Removed => SharedInstanceUpdateDiffType::Removed,
+        ContentSetDiffKind::Updated => SharedInstanceUpdateDiffType::Updated,
+    }
+}
+
+async fn shared_content_snapshot(
+    version_ids: &[String],
+    external_files: &HashSet<String>,
+    state: &State,
+) -> crate::Result<ContentSetSnapshot> {
+    let versions = shared_versions_by_project(version_ids, state)
+        .await?
+        .into_values()
+        .map(ContentSetSnapshotVersion::from)
+        .collect();
+
+    Ok(ContentSetSnapshot {
+        versions,
+        external_files: external_files.clone(),
+    })
 }
 
 fn remote_shared_content(
@@ -1089,7 +1134,104 @@ pub(crate) async fn mark_shared_instance_stale(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    crate::state::mark_shared_instance_stale(instance_id, &state.pool).await
+    let Some(metadata) = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+    else {
+        return Ok(());
+    };
+    let Some(attachment) = metadata.shared_instance.clone() else {
+        return Ok(());
+    };
+    if attachment.role != SharedInstanceRole::Owner {
+        return Ok(());
+    }
+
+    let version = match get_latest_remote_version_optional_unavailable(
+        &attachment.id,
+        state,
+    )
+    .await
+    {
+        Ok(SharedInstanceRemoteResponse::Available(version)) => version,
+        Ok(SharedInstanceRemoteResponse::Unavailable(reason)) => {
+            tracing::warn!(
+                instance_id,
+                shared_instance_id = %attachment.id,
+                reason = ?reason,
+                "Shared instance was unavailable while reconciling stale status"
+            );
+            clear_shared_instance_if_current_user(
+                instance_id,
+                &attachment,
+                state,
+            )
+            .await?;
+            return Ok(());
+        }
+        Err(error) => {
+            tracing::warn!(
+                instance_id,
+                shared_instance_id = %attachment.id,
+                error = %error,
+                "Failed to check shared instance diff before marking stale"
+            );
+            return crate::state::mark_shared_instance_stale(
+                instance_id,
+                &state.pool,
+            )
+            .await;
+        }
+    };
+
+    let has_changes =
+        match shared_instance_publish_diffs(&metadata, &version, state).await {
+            Ok(diffs) => !diffs.is_empty(),
+            Err(error) => {
+                tracing::warn!(
+                    instance_id,
+                    shared_instance_id = %attachment.id,
+                    error = %error,
+                    "Failed to calculate shared instance diff before marking stale"
+                );
+                return crate::state::mark_shared_instance_stale(
+                    instance_id,
+                    &state.pool,
+                )
+                .await;
+            }
+        };
+
+    set_shared_instance_publish_status(
+        instance_id,
+        &attachment,
+        version.version,
+        has_changes,
+        state,
+    )
+    .await
+}
+
+async fn set_shared_instance_publish_status(
+    instance_id: &str,
+    attachment: &SharedInstanceAttachment,
+    latest_version: i32,
+    has_changes: bool,
+    state: &State,
+) -> crate::Result<()> {
+    let (status, applied_version) = if has_changes {
+        (ContentSetSyncStatus::Stale, attachment.applied_version)
+    } else {
+        (ContentSetSyncStatus::UpToDate, Some(latest_version))
+    };
+
+    crate::state::set_shared_instance_sync_status(
+        instance_id,
+        status,
+        applied_version,
+        Some(latest_version),
+        &state.pool,
+    )
+    .await
 }
 
 async fn publish_shared_instance_inner(

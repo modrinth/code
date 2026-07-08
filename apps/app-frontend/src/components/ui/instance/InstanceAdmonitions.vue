@@ -27,6 +27,28 @@
 					</ButtonStyled>
 				</template>
 			</Admonition>
+			<Admonition
+				v-else-if="item.kind === 'shared-instance-wrong-account'"
+				type="warning"
+				:header="formatMessage(sharedInstanceWrongAccountHeader)"
+			>
+				{{
+					formatMessage(sharedInstanceWrongAccountBody, {
+						username: sharedInstanceExpectedUsername,
+					})
+				}}
+			</Admonition>
+			<Admonition
+				v-else-if="item.kind === 'shared-instance-unavailable'"
+				type="warning"
+				:header="formatMessage(messages.sharedInstanceUnavailableTitle)"
+			>
+				{{
+					formatMessage(sharedInstanceUnavailableTextMessage(sharedInstanceUnavailableReason), {
+						manager: sharedInstanceUnavailableManager,
+					})
+				}}
+			</Admonition>
 		</template>
 	</StackedAdmonitions>
 
@@ -73,11 +95,20 @@ defineOptions({
 })
 
 type InstanceAdmonitionItem = StackedAdmonitionItem & {
-	kind: 'shared-instance-stale'
+	kind:
+		| 'shared-instance-stale'
+		| 'shared-instance-unavailable'
+		| 'shared-instance-wrong-account'
 }
 
 const props = defineProps<{
 	instance: GameInstance
+	sharedInstanceUnavailableReason?: SharedInstanceUnavailableReason | null
+	sharedInstanceUnavailableManager?: string | null
+	sharedInstanceWrongAccount?: boolean
+	sharedInstanceExpectedUsername?: string | null
+	sharedInstanceRole?: 'owner' | 'member' | null
+	sharedInstanceSignedOut?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -152,6 +183,28 @@ const messages = defineMessages({
 		id: 'instance.shared-instance.error.title',
 		defaultMessage: 'Something has gone wrong',
 	},
+	sharedInstanceWrongAccountHeader: {
+		id: 'app.instance.shared-instance-wrong-account.warning-header',
+		defaultMessage: 'You are using the wrong Modrinth account',
+	},
+	sharedInstanceSignedOutHeader: {
+		id: 'app.instance.shared-instance-wrong-account.signed-out-warning-header',
+		defaultMessage: 'Sign in to the correct Modrinth account first',
+	},
+	sharedInstanceWrongAccountUserBody: {
+		id: 'app.instance.shared-instance-wrong-account.user-admonition-body',
+		defaultMessage:
+			'Sign in as {username} to receive updates for this shared instance. Shared instance functionality is disabled until you use the correct account.',
+	},
+	sharedInstanceWrongAccountOwnerBody: {
+		id: 'app.instance.shared-instance-wrong-account.owner-admonition-body',
+		defaultMessage:
+			'Sign in as {username} to manage sharing and publish updates for this shared instance. Shared instance functionality is disabled until you use the correct account.',
+	},
+	sharedInstanceWrongAccountFallbackUsername: {
+		id: 'app.instance.shared-instance-wrong-account.fallback-username',
+		defaultMessage: 'the linked account',
+	},
 })
 
 const { formatMessage } = useVIntl()
@@ -162,24 +215,69 @@ const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
 const publishDiffs = ref<ContentDiffItem[]>([])
 
 const isPublishButtonDisabled = computed(() => isPublishing.value || isReviewingPublish.value)
+const sharedInstanceUnavailableReason = computed(
+	() => props.sharedInstanceUnavailableReason ?? null,
+)
+const sharedInstanceUnavailableManager = computed(
+	() =>
+		props.sharedInstanceUnavailableManager ||
+		formatMessage(messages.sharedInstanceUnavailableFallbackManager),
+)
+const sharedInstanceExpectedUsername = computed(
+	() =>
+		props.sharedInstanceExpectedUsername ||
+		formatMessage(messages.sharedInstanceWrongAccountFallbackUsername),
+)
+const sharedInstanceWrongAccount = computed(() => props.sharedInstanceWrongAccount ?? false)
+const sharedInstanceWrongAccountHeader = computed(() =>
+	props.sharedInstanceSignedOut
+		? messages.sharedInstanceSignedOutHeader
+		: messages.sharedInstanceWrongAccountHeader,
+)
+const sharedInstanceWrongAccountBody = computed(() =>
+	props.sharedInstanceRole === 'owner'
+		? messages.sharedInstanceWrongAccountOwnerBody
+		: messages.sharedInstanceWrongAccountUserBody,
+)
 
 const showSharedInstancePublishAdmonition = computed(
 	() =>
+		!sharedInstanceWrongAccount.value &&
 		props.instance.shared_instance?.role === 'owner' &&
 		props.instance.shared_instance.status === 'stale',
 )
 
 const stackItems = computed<InstanceAdmonitionItem[]>(() => {
-	if (!showSharedInstancePublishAdmonition.value) return []
+	const items: InstanceAdmonitionItem[] = []
 
-	return [
-		{
+	if (sharedInstanceWrongAccount.value) {
+		items.push({
+			id: 'shared-instance-wrong-account',
+			type: 'warning',
+			dismissible: false,
+			kind: 'shared-instance-wrong-account',
+		})
+	}
+
+	if (sharedInstanceUnavailableReason.value) {
+		items.push({
+			id: 'shared-instance-unavailable',
+			type: 'warning',
+			dismissible: false,
+			kind: 'shared-instance-unavailable',
+		})
+	}
+
+	if (showSharedInstancePublishAdmonition.value) {
+		items.push({
 			id: 'shared-instance-stale',
 			type: 'warning',
 			dismissible: false,
 			kind: 'shared-instance-stale',
-		},
-	]
+		})
+	}
+
+	return items
 })
 
 function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
@@ -214,6 +312,10 @@ async function reviewSharedInstanceChanges(e?: MouseEvent) {
 		const preview = await get_shared_instance_publish_preview(props.instance.id)
 		if (!preview) {
 			notifySharedInstanceUnavailable()
+			emit('published')
+			return
+		}
+		if (preview.diffs.length === 0) {
 			emit('published')
 			return
 		}

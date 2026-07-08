@@ -371,26 +371,17 @@
   "app.instance.share.sign-in.heading": {
     "message": "Sign in to share"
   },
-  "app.instance.shared-instance-wrong-account.continue-button": {
-    "message": "Continue anyway"
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "the linked account"
   },
-  "app.instance.shared-instance-wrong-account.continue-description": {
-    "message": "Continuing will disable shared instances functionality until you use the correct Modrinth account."
-  },
-  "app.instance.shared-instance-wrong-account.go-back-button": {
-    "message": "Go back"
-  },
-  "app.instance.shared-instance-wrong-account.header": {
-    "message": "Shared instance warning"
-  },
-  "app.instance.shared-instance-wrong-account.owner-body": {
-    "message": "You need to sign in as <username></username> to manage sharing and publish updates for this shared instance."
+  "app.instance.shared-instance-wrong-account.owner-admonition-body": {
+    "message": "Sign in as {username} to manage sharing and publish updates for this shared instance. Shared instance functionality is disabled until you use the correct account."
   },
   "app.instance.shared-instance-wrong-account.signed-out-warning-header": {
     "message": "Sign in to the correct Modrinth account first"
   },
-  "app.instance.shared-instance-wrong-account.user-body": {
-    "message": "You need to sign in as <username></username> to receive updates for this shared instance."
+  "app.instance.shared-instance-wrong-account.user-admonition-body": {
+    "message": "Sign in as {username} to receive updates for this shared instance. Shared instance functionality is disabled until you use the correct account."
   },
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "You are using the wrong Modrinth account"
