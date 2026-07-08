@@ -1,7 +1,6 @@
 CREATE TABLE delphi_global_detail_verdicts (
 	detail_key TEXT PRIMARY KEY,
-	verdict    delphi_report_issue_status NOT NULL,
-	CHECK (detail_key <> '' AND detail_key NOT LIKE '<no-key-%')
+	verdict    delphi_report_issue_status NOT NULL
 );
 
 CREATE INDEX delphi_report_issue_details_key
