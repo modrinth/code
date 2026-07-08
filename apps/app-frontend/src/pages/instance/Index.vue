@@ -802,7 +802,11 @@ const contentSubpageProps = computed(() =>
 const instanceSubpageProps = computed(() => ({
 	...contentSubpageProps.value,
 	...(displayedInstanceRoute.value.name === 'InstanceShare'
-		? { sharedInstanceActionsLocked: sharedInstanceShareActionsLocked.value }
+		? {
+				sharedInstanceActionsLocked: sharedInstanceShareActionsLocked.value,
+				sharedInstanceUnavailableReason: sharedInstanceUnavailableReason.value,
+				sharedInstanceUnavailableManager: sharedInstanceManager.value?.username,
+			}
 		: {}),
 }))
 const showShareTab = computed(() => {

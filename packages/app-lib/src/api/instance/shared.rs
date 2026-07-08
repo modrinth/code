@@ -791,6 +791,10 @@ async fn has_shared_instance_recipients(
     attachment: &SharedInstanceAttachment,
     state: &State,
 ) -> crate::Result<bool> {
+    if users.tokens > 0 {
+        return Ok(true);
+    }
+
     let current_user_id = linked_modrinth_user_id(state).await?;
 
     Ok(users.user_ids.iter().any(|user_id| {

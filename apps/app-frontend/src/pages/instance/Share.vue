@@ -240,6 +240,17 @@
 			</Table>
 		</template>
 
+		<EmptyState v-else-if="sharedInstanceUnavailable" type="empty-inbox">
+			<template #heading>{{ formatMessage(messages.sharedInstanceUnavailableTitle) }}</template>
+			<template #description>
+				{{
+					formatMessage(sharedInstanceUnavailableTextMessage(sharedInstanceUnavailableReason), {
+						manager: sharedInstanceUnavailableManager,
+					})
+				}}
+			</template>
+		</EmptyState>
+
 		<EmptyState v-else-if="sharedInstanceActionsLocked" type="empty-inbox">
 			<template #heading>{{ formatMessage(lockedEmptyHeading) }}</template>
 			<template #description>
@@ -353,7 +364,11 @@ import {
 	getFriendsWithUserData,
 	getFriendUserId,
 } from '@/helpers/friends.ts'
-import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
+import {
+	install_duplicate_instance,
+	installJobInstanceId,
+	type SharedInstanceUnavailableReason,
+} from '@/helpers/install'
 import {
 	edit,
 	get_shared_instance_users,
@@ -384,6 +399,8 @@ type ShareRow = {
 const props = defineProps<{
 	instance: GameInstance
 	sharedInstanceActionsLocked?: boolean
+	sharedInstanceUnavailableReason?: SharedInstanceUnavailableReason | null
+	sharedInstanceUnavailableManager?: string | null
 }>()
 
 const auth = injectAuth()
@@ -453,6 +470,28 @@ const messages = defineMessages({
 	switchAccountButton: {
 		id: 'app.instance.share.locked.switch-account-button',
 		defaultMessage: 'Switch account',
+	},
+	sharedInstanceUnavailableTitle: {
+		id: 'instance.shared-instance.unavailable.title',
+		defaultMessage: 'Shared instance no longer available',
+	},
+	sharedInstanceUnavailableText: {
+		id: 'instance.shared-instance.unavailable.text',
+		defaultMessage:
+			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
+	},
+	sharedInstanceDeletedText: {
+		id: 'instance.shared-instance.unavailable.deleted-text',
+		defaultMessage: 'The shared instance has been deleted. Contact {manager} for more information.',
+	},
+	sharedInstanceAccessRevokedText: {
+		id: 'instance.shared-instance.unavailable.access-revoked-text',
+		defaultMessage:
+			'Your access to this shared instance has been revoked. Contact {manager} for more information.',
+	},
+	sharedInstanceUnavailableFallbackManager: {
+		id: 'instance.shared-instance.unavailable.manager-fallback',
+		defaultMessage: 'the instance manager',
 	},
 	removeUserHeader: {
 		id: 'app.instance.share.remove-user-modal.header',
@@ -531,6 +570,15 @@ const lockedEmptyHeading = computed(() =>
 )
 const lockedActionButton = computed(() =>
 	isSignedIn.value ? messages.switchAccountButton : messages.signInButton,
+)
+const sharedInstanceUnavailableReason = computed(
+	() => props.sharedInstanceUnavailableReason ?? null,
+)
+const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
+const sharedInstanceUnavailableManager = computed(
+	() =>
+		props.sharedInstanceUnavailableManager ||
+		formatMessage(messages.sharedInstanceUnavailableFallbackManager),
 )
 const requiresUnlinkBeforeShare = computed(
 	() =>
@@ -931,6 +979,12 @@ function sharedInstanceUserEntries(users: SharedInstanceUsers): SharedInstanceUs
 
 function sharedInstanceMethod(user: SharedInstanceUser): ShareMethod {
 	return user.join_type === 'link' ? 'link' : 'direct'
+}
+
+function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
+	if (reason === 'deleted') return messages.sharedInstanceDeletedText
+	if (reason === 'access_revoked') return messages.sharedInstanceAccessRevokedText
+	return messages.sharedInstanceUnavailableText
 }
 
 function parseSharedInstanceDate(value?: string | null) {
