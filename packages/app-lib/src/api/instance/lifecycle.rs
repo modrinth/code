@@ -59,7 +59,13 @@ pub async fn edit(
     patch: EditInstance,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
+    let should_reconcile_shared_publish = patch.link.is_some();
     crate::state::edit_instance(instance_id, patch, &state.pool).await?;
+
+    if should_reconcile_shared_publish {
+        super::shared::mark_shared_instance_stale(instance_id, &state).await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    }
 
     crate::state::get_instance(instance_id, &state.pool)
         .await?

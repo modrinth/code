@@ -59,6 +59,10 @@ const messages = defineMessages({
 		id: 'app.action-bar.install.unknown-instance',
 		defaultMessage: 'Unknown instance',
 	},
+	updatingSharedContent: {
+		id: 'app.action-bar.install.updating-shared-content',
+		defaultMessage: 'Updating shared content',
+	},
 })
 
 const phaseMessages = defineMessages({
@@ -186,6 +190,9 @@ export async function useInstallJobNotifications(opts: {
 			return formatMessage(javaStepMessages[job.details.step], {
 				version: job.details.major_version,
 			})
+		}
+		if (job.kind === 'update_shared_instance' && job.phase === 'downloading_content') {
+			return formatMessage(messages.updatingSharedContent)
 		}
 		return formatMessage(phaseMessages[job.phase])
 	}

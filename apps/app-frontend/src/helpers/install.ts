@@ -70,7 +70,7 @@ export interface SharedInstanceUpdatePreview {
 }
 
 export interface SharedInstanceUpdateDiff {
-	type: 'added' | 'removed' | 'updated'
+	type: 'added' | 'removed' | 'updated' | 'modpack_unlinked'
 	projectId?: string | null
 	projectName?: string | null
 	fileName?: string | null

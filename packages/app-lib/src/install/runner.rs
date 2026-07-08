@@ -2,7 +2,7 @@ use super::events::{InstallProgressReporter, emit_install_job};
 use super::model::{
     InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobSnapshot,
     InstallJobState, InstallJobStatus, InstallPhaseDetails, InstallPhaseId,
-    InstallPostInstallEdit, InstallRequest, InstallRollbackState,
+    InstallPostInstallEdit, InstallProgress, InstallRequest, InstallRollbackState,
     InstallTarget, SharedInstanceExternalFileData, SharedInstanceInstallData,
     SharedInstanceInstallModpack,
 };
@@ -154,6 +154,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         &state,
     )
     .await?;
+    lock_existing_instance_if_needed(&job.state, &state).await?;
     emit_install_job(&record.snapshot()).await?;
     spawn_job(job_id);
 
@@ -201,6 +202,7 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
     prepare_initial_instance(&mut job_state, &state).await?;
     let record =
         store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
+    lock_existing_instance_if_needed(&job_state, &state).await?;
     emit_install_job(&record.snapshot()).await?;
     spawn_job(id);
     Ok(record.snapshot())
@@ -416,13 +418,18 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
     .await?;
     emit_install_job(&record.snapshot()).await?;
 
-    let result = run_request(job_id, &mut job_state, &state).await;
-
-    match result {
+    let result = match run_request(job_id, &mut job_state, &state).await {
         Ok(instance_id) => {
             if let Some(instance_id) = instance_id {
                 set_instance_id(&mut job_state, instance_id);
             }
+            finalize_existing_instance_success(&job_state, &state).await
+        }
+        Err(error) => Err(error),
+    };
+
+    match result {
+        Ok(()) => {
             job_state.progress.phase = InstallPhaseId::Finalizing;
             job_state.progress.progress = None;
             job_state.progress.details = InstallPhaseDetails::Empty;
@@ -652,6 +659,7 @@ async fn run_request(
         }
         InstallRequest::InstallExistingInstance { instance_id, force } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
+            lock_existing_instance(&instance_id, state).await?;
             update_progress(
                 job_id,
                 job_state,
@@ -683,6 +691,7 @@ async fn run_request(
             post_install_edit,
         } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
+            lock_existing_instance(&instance_id, state).await?;
             let disabled_project_ids = remove_existing_pack_content(
                 job_id,
                 job_state,
@@ -709,6 +718,7 @@ async fn run_request(
         }
         InstallRequest::UpdateSharedInstance { instance_id, data } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
+            lock_existing_instance(&instance_id, state).await?;
             let disabled_project_ids =
                 disabled_project_ids(&instance_id, state).await?;
             apply_shared_instance_update(
@@ -855,22 +865,18 @@ async fn apply_shared_instance_update(
     let external_changes = desired
         .external_files
         .values()
-        .filter(|desired| {
-            current
-                .external_files
-                .get(&desired.file.file_name)
-                .is_none_or(|current| current.file_type != desired.file_type)
-        })
         .cloned()
         .collect::<Vec<_>>();
 
-    if !project_changes.is_empty() || !external_changes.is_empty() {
-        update_progress(
+    let content_change_count =
+        project_changes.len() as u64 + external_changes.len() as u64;
+    if content_change_count > 0 {
+        update_content_progress(
             job_id,
             job_state,
             state,
-            InstallPhaseId::DownloadingContent,
-            InstallPhaseDetails::Empty,
+            0,
+            content_change_count,
         )
         .await?;
     }
@@ -893,6 +899,7 @@ async fn apply_shared_instance_update(
         .await?;
     }
 
+    let mut completed_content_changes = 0;
     for project in project_changes {
         let current_project = current.projects.get(&project.project_id);
         let new_path =
@@ -918,11 +925,29 @@ async fn apply_shared_instance_update(
             )
             .await?;
         }
+        completed_content_changes += 1;
+        update_content_progress(
+            job_id,
+            job_state,
+            state,
+            completed_content_changes,
+            content_change_count,
+        )
+        .await?;
     }
 
     for file in external_changes {
         install_shared_instance_external_file(instance_id, &file.file, state)
             .await?;
+        completed_content_changes += 1;
+        update_content_progress(
+            job_id,
+            job_state,
+            state,
+            completed_content_changes,
+            content_change_count,
+        )
+        .await?;
     }
 
     crate::api::instance::edit(
@@ -1194,14 +1219,17 @@ async fn apply_shared_instance_content(
     }
 
     if !data.modrinth_ids.is_empty() || !data.external_files.is_empty() {
-        update_progress(
+        let content_change_count =
+            data.modrinth_ids.len() as u64 + data.external_files.len() as u64;
+        update_content_progress(
             job_id,
             job_state,
             state,
-            InstallPhaseId::DownloadingContent,
-            InstallPhaseDetails::Empty,
+            0,
+            content_change_count,
         )
         .await?;
+        let mut completed_content_changes = 0;
         for version_id in &data.modrinth_ids {
             crate::state::instances::commands::add_project_from_version(
                 instance_id,
@@ -1212,11 +1240,29 @@ async fn apply_shared_instance_content(
                 state,
             )
             .await?;
+            completed_content_changes += 1;
+            update_content_progress(
+                job_id,
+                job_state,
+                state,
+                completed_content_changes,
+                content_change_count,
+            )
+            .await?;
         }
 
         for file in &data.external_files {
             install_shared_instance_external_file(instance_id, file, state)
                 .await?;
+            completed_content_changes += 1;
+            update_content_progress(
+                job_id,
+                job_state,
+                state,
+                completed_content_changes,
+                content_change_count,
+            )
+            .await?;
         }
     }
 
@@ -1576,6 +1622,26 @@ async fn prepare_existing_rollback(
         instance_id: instance_id.to_string(),
     };
 
+    Ok(())
+}
+
+async fn lock_existing_instance_if_needed(
+    job_state: &InstallJobState,
+    state: &State,
+) -> crate::Result<()> {
+    if let InstallCleanup::RestoreExistingInstance { instance_id } =
+        &job_state.cleanup
+    {
+        lock_existing_instance(instance_id, state).await?;
+    }
+
+    Ok(())
+}
+
+async fn lock_existing_instance(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
     crate::state::instances::commands::set_instance_install_stage(
         instance_id,
         InstanceInstallStage::MinecraftInstalling,
@@ -1583,6 +1649,25 @@ async fn prepare_existing_rollback(
     )
     .await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    Ok(())
+}
+
+async fn finalize_existing_instance_success(
+    job_state: &InstallJobState,
+    state: &State,
+) -> crate::Result<()> {
+    if let InstallCleanup::RestoreExistingInstance { instance_id } =
+        &job_state.cleanup
+    {
+        crate::state::instances::commands::set_instance_install_stage(
+            instance_id,
+            InstanceInstallStage::Installed,
+            &state.pool,
+        )
+        .await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    }
 
     Ok(())
 }
@@ -1597,6 +1682,25 @@ async fn update_progress(
     job_state.progress.phase = phase;
     job_state.progress.progress = None;
     job_state.progress.details = details;
+    let record = store::update_state(job_id, job_state, state).await?;
+    emit_install_job(&record.snapshot()).await?;
+    Ok(())
+}
+
+async fn update_content_progress(
+    job_id: Uuid,
+    job_state: &mut InstallJobState,
+    state: &State,
+    current: u64,
+    total: u64,
+) -> crate::Result<()> {
+    job_state.progress.phase = InstallPhaseId::DownloadingContent;
+    job_state.progress.progress = Some(InstallProgress {
+        current,
+        total,
+        secondary: None,
+    });
+    job_state.progress.details = InstallPhaseDetails::Empty;
     let record = store::update_state(job_id, job_state, state).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())

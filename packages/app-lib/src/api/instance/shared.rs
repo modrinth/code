@@ -193,6 +193,7 @@ pub enum SharedInstanceUpdateDiffType {
     Added,
     Removed,
     Updated,
+    ModpackUnlinked,
 }
 
 #[derive(Clone, Debug)]
@@ -899,22 +900,45 @@ async fn shared_instance_update_diffs(
     version: &InstanceVersionResponse,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
+    let remote_modpack_id =
+        version.modpack_id.as_deref().filter(|id| !id.is_empty());
+    let current_modpack_id = shared_modpack_id(&metadata.link);
+    let modpack_unlinked =
+        current_modpack_id.is_some() && remote_modpack_id.is_none();
     let (current_version_ids, current_external_files) =
-        current_shared_content(metadata, state).await?;
+        current_shared_content(metadata, modpack_unlinked, state).await?;
     let (latest_version_ids, latest_external_files) =
         remote_shared_content(version);
     let removed_disabled_project_ids = HashSet::new();
     let removed_disabled_external_files = HashSet::new();
-    shared_content_diffs(
+    let mut diffs = shared_content_diffs(
         &current_version_ids,
         &current_external_files,
         &latest_version_ids,
         &latest_external_files,
         &removed_disabled_project_ids,
         &removed_disabled_external_files,
+        true,
         state,
     )
-    .await
+    .await?;
+
+    if modpack_unlinked {
+        diffs.insert(
+            0,
+            SharedInstanceUpdateDiff {
+                type_: SharedInstanceUpdateDiffType::ModpackUnlinked,
+                project_id: None,
+                project_name: None,
+                file_name: None,
+                current_version_name: None,
+                new_version_name: None,
+                disabled: false,
+            },
+        );
+    }
+
+    Ok(diffs)
 }
 
 async fn shared_instance_publish_diffs(
@@ -922,22 +946,45 @@ async fn shared_instance_publish_diffs(
     version: &InstanceVersionResponse,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
+    let remote_modpack_id =
+        version.modpack_id.as_deref().filter(|id| !id.is_empty());
+    let current_modpack_id = shared_modpack_id(&metadata.link);
+    let modpack_unlinked =
+        remote_modpack_id.is_some() && current_modpack_id.is_none();
     let (latest_version_ids, latest_external_files) =
-        remote_shared_content(version);
+        remote_publish_content(version, modpack_unlinked, state).await?;
     let (current_version_ids, current_external_files) =
         current_publish_content(metadata, state).await?;
     let (removed_disabled_project_ids, removed_disabled_external_files) =
         current_publish_disabled_content(metadata, state).await?;
-    shared_content_diffs(
+    let mut diffs = shared_content_diffs(
         &latest_version_ids,
         &latest_external_files,
         &current_version_ids,
         &current_external_files,
         &removed_disabled_project_ids,
         &removed_disabled_external_files,
+        false,
         state,
     )
-    .await
+    .await?;
+
+    if modpack_unlinked {
+        diffs.insert(
+            0,
+            SharedInstanceUpdateDiff {
+                type_: SharedInstanceUpdateDiffType::ModpackUnlinked,
+                project_id: None,
+                project_name: None,
+                file_name: None,
+                current_version_name: None,
+                new_version_name: None,
+                disabled: false,
+            },
+        );
+    }
+
+    Ok(diffs)
 }
 
 async fn shared_content_diffs(
@@ -947,6 +994,7 @@ async fn shared_content_diffs(
     latest_external_files: &HashSet<String>,
     removed_disabled_project_ids: &HashSet<String>,
     removed_disabled_external_files: &HashSet<String>,
+    common_external_files_are_updated: bool,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let current = shared_content_snapshot(
@@ -962,6 +1010,7 @@ async fn shared_content_diffs(
         removed_disabled_project_ids: removed_disabled_project_ids.clone(),
         removed_disabled_external_files: removed_disabled_external_files
             .clone(),
+        common_external_files_are_updated,
     };
     let content_diffs = diff_content_sets(&current, &latest, &options);
     let project_ids = content_diffs
@@ -1074,6 +1123,58 @@ fn remote_shared_content(
     )
 }
 
+async fn remote_publish_content(
+    version: &InstanceVersionResponse,
+    include_modpack_dependencies: bool,
+    state: &State,
+) -> crate::Result<(Vec<String>, HashSet<String>)> {
+    let mut version_ids = version.modrinth_ids.clone();
+    if let Some(modpack_id) =
+        version.modpack_id.as_deref().filter(|id| !id.is_empty())
+    {
+        version_ids.retain(|id| id != modpack_id);
+
+        if include_modpack_dependencies {
+            version_ids
+                .extend(modpack_dependency_version_ids(modpack_id, state).await?);
+        }
+    }
+    dedupe_strings(&mut version_ids);
+
+    Ok((
+        version_ids,
+        version
+            .external_files
+            .iter()
+            .map(|file| file.file_name.clone())
+            .collect(),
+    ))
+}
+
+async fn modpack_dependency_version_ids(
+    modpack_id: &str,
+    state: &State,
+) -> crate::Result<Vec<String>> {
+    let modpack_version = CachedEntry::get_version(
+        modpack_id,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Shared instance modpack version was not found".to_string(),
+        )
+    })?;
+
+    Ok(modpack_version
+        .dependencies
+        .into_iter()
+        .filter_map(|dependency| dependency.version_id)
+        .collect())
+}
+
 async fn shared_instance_install_modpack(
     version: &InstanceVersionResponse,
     state: &State,
@@ -1121,6 +1222,7 @@ fn shared_instance_loader_version(loader_version: String) -> Option<String> {
 
 async fn current_shared_content(
     metadata: &crate::state::InstanceMetadata,
+    include_linked_modpack_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, HashSet<String>)> {
     let entries =
@@ -1141,8 +1243,12 @@ async fn current_shared_content(
     let mut external_files = HashSet::new();
 
     for entry in entries {
-        if entry.source_kind != crate::state::ContentSourceKind::SharedInstance
-        {
+        let include_entry =
+            entry.source_kind == crate::state::ContentSourceKind::SharedInstance
+                || (include_linked_modpack_content
+                    && entry.source_kind
+                        == crate::state::ContentSourceKind::ModrinthModpack);
+        if !include_entry {
             continue;
         }
 
@@ -1156,6 +1262,13 @@ async fn current_shared_content(
         };
         if let Some(file) = files.get(&file_id) {
             external_files.insert(file.file_name.clone());
+        }
+    }
+    if include_linked_modpack_content {
+        if let Some(modpack_id) = shared_modpack_id(&metadata.link) {
+            version_ids.extend(
+                modpack_dependency_version_ids(&modpack_id, state).await?,
+            );
         }
     }
     dedupe_strings(&mut version_ids);
@@ -1618,6 +1731,10 @@ fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
         InstanceLink::ServerProjectModpack {
             content_version_id, ..
         } => Some(content_version_id.clone()),
+        InstanceLink::SharedInstance {
+            modpack_version_id: Some(version_id),
+            ..
+        } => Some(version_id.clone()),
         _ => None,
     }
 }

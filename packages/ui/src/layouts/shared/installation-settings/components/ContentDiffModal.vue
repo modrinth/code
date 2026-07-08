@@ -16,7 +16,7 @@
 					</div>
 				</Admonition>
 
-				<div v-if="diffs.length" class="flex gap-2">
+				<div v-if="showDiffSummary" class="flex gap-2">
 					<div v-if="removedCount" class="flex gap-1 items-center">
 						<MinusIcon />
 						{{ formatMessage(messages.removedCount, { count: removedCount }) }}
@@ -48,7 +48,10 @@
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
 						<PlusIcon v-if="diff.type === 'added'" />
-						<MinusIcon v-else-if="diff.type === 'removed'" class="text-red" />
+						<MinusIcon
+							v-else-if="diff.type === 'removed' || diff.type === 'modpack_unlinked'"
+							class="text-red"
+						/>
 						<RefreshCwIcon v-else />
 						<div
 							:class="index === sortedDiffs.length - 1 ? 'bg-transparent' : 'bg-surface-5'"
@@ -56,8 +59,19 @@
 						></div>
 					</div>
 
-					<span class="text-sm shrink-0 whitespace-nowrap">{{ getDiffTypeLabel(diff) }}</span>
-					<div class="flex min-w-0 items-center justify-between gap-3">
+					<span
+						v-if="diff.type === 'modpack_unlinked'"
+						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0 col-span-2"
+					>
+						{{ formatMessage(messages.modpackUnlinked) }}
+					</span>
+					<span v-else class="text-sm shrink-0 whitespace-nowrap">
+						{{ getDiffTypeLabel(diff) }}
+					</span>
+					<div
+						v-if="diff.type !== 'modpack_unlinked'"
+						class="flex min-w-0 items-center justify-between gap-3"
+					>
 						<span
 							v-if="diff.projectName"
 							class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
@@ -171,10 +185,17 @@ const removedDisabledCount = computed(
 )
 const addedCount = computed(() => props.diffs.filter((d) => d.type === 'added').length)
 const updatedCount = computed(() => props.diffs.filter((d) => d.type === 'updated').length)
+const showDiffSummary = computed(
+	() =>
+		removedCount.value > 0 ||
+		removedDisabledCount.value > 0 ||
+		addedCount.value > 0 ||
+		updatedCount.value > 0,
+)
 
 const sortedDiffs = computed(() =>
 	[...props.diffs].sort((a, b) => {
-		const typeOrder = { added: 0, updated: 1, removed: 2 }
+		const typeOrder = { modpack_unlinked: 0, added: 1, updated: 2, removed: 3 }
 		return typeOrder[a.type] - typeOrder[b.type]
 	}),
 )
@@ -211,6 +232,9 @@ function handleHide() {
 }
 
 function getDiffTypeLabel(diff: ContentDiffItem) {
+	if (diff.type === 'modpack_unlinked') {
+		return formatMessage(messages.modpackUnlinked)
+	}
 	if (diff.type === 'removed' && diff.disabled) {
 		return formatMessage(diffTypeMessages.removedDisabled)
 	}
@@ -247,6 +271,10 @@ const messages = defineMessages({
 		id: 'content.diff-modal.unknown-content-body',
 		defaultMessage:
 			'Some content on your server could not be analyzed and may be affected by this change.',
+	},
+	modpackUnlinked: {
+		id: 'content.diff-modal.modpack-unlinked',
+		defaultMessage: 'Unlinked modpack',
 	},
 })
 

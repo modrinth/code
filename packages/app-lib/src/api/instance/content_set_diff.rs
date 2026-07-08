@@ -28,6 +28,7 @@ pub(crate) enum ContentSetDiffEntry {
 pub(crate) struct ContentSetDiffOptions {
     pub removed_disabled_project_ids: HashSet<String>,
     pub removed_disabled_external_files: HashSet<String>,
+    pub common_external_files_are_updated: bool,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -111,6 +112,16 @@ pub(crate) fn diff_content_sets(
             file_name: file_name.clone(),
             disabled: false,
         });
+    }
+
+    if options.common_external_files_are_updated {
+        for file_name in latest.external_files.intersection(&current.external_files) {
+            diffs.push(ContentSetDiffEntry::ExternalFile {
+                kind: ContentSetDiffKind::Updated,
+                file_name: file_name.clone(),
+                disabled: false,
+            });
+        }
     }
 
     for file_name in current.external_files.difference(&latest.external_files) {
