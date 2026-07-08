@@ -223,7 +223,7 @@ export function provideDownloadModalProvider(
 		return keepPreviousDownloadRows.value ? (previous ?? []) : []
 	})
 
-	const duplicateDependencyRowsHidden = computed((previous) => {
+	const duplicateDependencyRowsHidden = computed<boolean>((previous) => {
 		if (selectedDownloadRowsLoaded.value) {
 			return (
 				hasSkippedDuplicateDependency(dependencyResolution.value) ||
@@ -286,7 +286,7 @@ export function provideDownloadModalProvider(
 		return keepPreviousDownloadRows.value ? (previous ?? []) : []
 	})
 
-	const downloadRowsLoaded = computed((previous) => {
+	const downloadRowsLoaded = computed<boolean>((previous) => {
 		if (selectedDownloadRowsLoaded.value) return true
 		return keepPreviousDownloadRows.value ? (previous ?? false) : false
 	})
@@ -367,9 +367,10 @@ export function provideDownloadModalProvider(
 		const metadataLabel = isProjectOnlyDependencyReference(dependency)
 			? formatMessage(messages.anyCompatibleDependency)
 			: (version?.version_number ?? formatMessage(messages.anyCompatibleDependency))
-		const childDependencies = (versionId && dependenciesByParentVersionId.value.get(versionId)
-			? dependenciesByParentVersionId.value.get(versionId)!
-			: []
+		const childDependencies = (
+			versionId && dependenciesByParentVersionId.value.get(versionId)
+				? dependenciesByParentVersionId.value.get(versionId)!
+				: []
 		).flatMap((subDependency) => {
 			const row = createDependencyRow(subDependency)
 			return row ? [row] : []

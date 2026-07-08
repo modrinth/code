@@ -3275,9 +3275,6 @@
   "project.details.licensed": {
     "message": "Licensed"
   },
-  "project.download.additional-files-title": {
-    "message": "Additional files"
-  },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "This game version is incompatible with the base project."
   },
@@ -3355,6 +3352,15 @@
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
+  },
+  "project.download.recommended-title": {
+    "message": "Recommended"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "This data pack also requires a resource pack. Download it and place it in your resourcepacks folder."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Resource pack"
   },
   "project.download.search-game-versions": {
     "message": "Select game version"
