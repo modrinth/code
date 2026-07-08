@@ -67,6 +67,7 @@ export interface DownloadModalProvider {
 	recommendedRows: ComputedRef<DownloadDependencyRow[]>
 	downloadRowsLoaded: ComputedRef<boolean>
 	requiredResourcePackAdmonitionVisible: ComputedRef<boolean>
+	dependencyResourcePackAdmonitionVisible: ComputedRef<boolean>
 	downloadableDependencyFiles: ComputedRef<DownloadableDependencyFile[]>
 	downloadableDependencyFilesLoaded: ComputedRef<boolean>
 	preloadDependenciesForSelection: (selection: ProjectDownloadSelection) => Promise<void>
@@ -295,6 +296,10 @@ export function provideDownloadModalProvider(
 		return selectedDownloadRowsLoaded.value && visibleRequiredResourcePackFiles.value.length > 0
 	})
 
+	const dependencyResourcePackAdmonitionVisible = computed(() => {
+		return selectedDownloadRowsLoaded.value && hasAdditionalFileRows(visibleDependencyRows.value)
+	})
+
 	const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
 		collectDownloadableDependencyFiles(visibleDependencyRows.value),
 	)
@@ -481,6 +486,7 @@ export function provideDownloadModalProvider(
 		recommendedRows,
 		downloadRowsLoaded,
 		requiredResourcePackAdmonitionVisible,
+		dependencyResourcePackAdmonitionVisible,
 		downloadableDependencyFiles,
 		downloadableDependencyFilesLoaded,
 		preloadDependenciesForSelection,
@@ -629,6 +635,15 @@ function hasDuplicateDependencyRows(
 		if (seenDependencies.has(rowId)) return true
 		seenDependencies.add(rowId)
 		if (hasDuplicateDependencyRows(row.dependencies, seenDependencies)) return true
+	}
+
+	return false
+}
+
+function hasAdditionalFileRows(rows: DownloadDependencyRow[]): boolean {
+	for (const row of rows) {
+		if (row.isAdditionalFile) return true
+		if (hasAdditionalFileRows(row.dependencies)) return true
 	}
 
 	return false
