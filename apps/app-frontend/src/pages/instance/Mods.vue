@@ -401,12 +401,7 @@ function shouldWarnBeforeDisable(items: ContentItem[]) {
 }
 
 function canUpdateProject(item: ContentItem) {
-	return (
-		canMutateContent(item) &&
-		!!item.file_path &&
-		!!item.has_update &&
-		!!item.update_version_id
-	)
+	return canMutateContent(item) && !!item.file_path && !!item.has_update && !!item.update_version_id
 }
 
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
@@ -1410,8 +1405,7 @@ provideContentManager({
 	updateItem: handleUpdate,
 	bulkUpdateAll: bulkUpdateAllProjects,
 	bulkUpdateItem: updateProject,
-	updateModpack:
-		props.isServerInstance || isSharedMember.value ? undefined : handleModpackUpdate,
+	updateModpack: props.isServerInstance || isSharedMember.value ? undefined : handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairInstance,
 	openSettings: props.openSettings,
