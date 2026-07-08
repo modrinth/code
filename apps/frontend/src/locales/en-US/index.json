@@ -3314,6 +3314,9 @@
   "project.download.dependency-quilt-fabric-api": {
     "message": "Fabric API is skipped for Quilt"
   },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "This project has a dependency with a required resource pack. Download it and place it in your {folder} folder."
+  },
   "project.download.dependency-unavailable": {
     "message": "This dependency cannot be downloaded"
   },
@@ -3363,7 +3366,7 @@
     "message": "Recommended"
   },
   "project.download.required-resource-pack-admonition": {
-    "message": "This data pack also requires a resource pack. Download it and place it in your resourcepacks folder."
+    "message": "This data pack also requires a resource pack. Download it and place it in your {folder} folder."
   },
   "project.download.required-resource-pack-short": {
     "message": "Resource pack"
