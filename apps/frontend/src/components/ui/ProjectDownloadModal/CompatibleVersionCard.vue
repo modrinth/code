@@ -157,7 +157,9 @@ const primaryFileDownloadUrl = computed(() => {
 	})
 })
 
-const publishedLabel = computed(() => capitalizeString(formatRelativeTime(props.version.date_published)))
+const publishedLabel = computed(() =>
+	capitalizeString(formatRelativeTime(props.version.date_published)),
+)
 const publishedTooltip = computed(() => formatDateTime(props.version.date_published))
 const primaryFileSizeLabel = computed(() => {
 	if (!primaryFile.value) return ''
