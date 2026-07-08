@@ -15,14 +15,12 @@ import {
 	ExternalIcon,
 	EyeOffIcon,
 	LoaderCircleIcon,
-	RestoreIcon,
 	ScaleIcon,
 	ShieldAlertIcon,
 	ShieldCheckIcon,
 	SpinnerIcon,
 	TimerIcon,
 	TriangleAlertIcon,
-	UndoIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
@@ -323,19 +321,55 @@ function isDetailActionSelected(
 	return statusMatchesDecision(detail.local_status, decision)
 }
 
-function canUpdateGlobalDetail(detail: Labrinth.TechReview.Internal.ReportIssueDetail): boolean {
-	return detail.key.length > 0 && !detail.key.startsWith('<no-key-')
+function decisionToVerdict(
+	decision: Exclude<DetailDecision, 'pending'>,
+): Labrinth.TechReview.Internal.DelphiReportIssueStatus {
+	return decision === 'safe' ? 'safe' : 'unsafe'
 }
 
-function getGlobalDetailUpdateTooltip(
+function getToggledDetailVerdict(
 	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
-	action: 'pass' | 'fail',
+	decision: Exclude<DetailDecision, 'pending'>,
+	scope: DetailDecisionScope,
+): Labrinth.TechReview.Internal.DelphiReportIssueStatus {
+	return isDetailActionSelected(detail, decision, scope) ? 'pending' : decisionToVerdict(decision)
+}
+
+function getDetailActionTooltip(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+	scope: DetailDecisionScope,
 ): string {
-	if (!canUpdateGlobalDetail(detail)) {
+	const action = decision === 'safe' ? 'pass' : 'fail'
+	const scopeLabel = scope === 'global' ? 'Global' : 'Local'
+
+	if (scope === 'global' && !canUpdateGlobalDetail(detail)) {
 		return 'Global verdict unavailable for generated trace keys'
 	}
 
-	return action === 'pass' ? 'Global pass' : 'Global fail'
+	if (isDetailActionSelected(detail, decision, scope)) {
+		return `Unset ${scopeLabel.toLowerCase()} ${action}`
+	}
+
+	return `${scopeLabel} ${action}`
+}
+
+function updateLocalDetailAction(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+) {
+	return updateDetailStatus(detail.id, getToggledDetailVerdict(detail, decision, 'local'))
+}
+
+function updateGlobalDetailAction(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+) {
+	return updateGlobalDetailStatus(detail, getToggledDetailVerdict(detail, decision, 'global'))
+}
+
+function canUpdateGlobalDetail(detail: Labrinth.TechReview.Internal.ReportIssueDetail): boolean {
+	return detail.key.length > 0 && !detail.key.startsWith('<no-key-')
 }
 
 function getFileHighestSeverity(
@@ -1722,7 +1756,7 @@ function copyId() {
 												aria-label="Trace verdict actions"
 											>
 												<button
-													v-tooltip="getGlobalDetailUpdateTooltip(flag.detail, 'pass')"
+													v-tooltip="getDetailActionTooltip(flag.detail, 'safe', 'global')"
 													class="detail-verdict-button detail-verdict-button--safe"
 													:class="{
 														'detail-verdict-button--selected': isDetailActionSelected(
@@ -1737,13 +1771,13 @@ function copyId() {
 														updatingGlobalDetailKeys.has(flag.detail.key) ||
 														updatingDetails.has(flag.detail.id)
 													"
-													@click="updateGlobalDetailStatus(flag.detail, 'safe')"
+													@click="updateGlobalDetailAction(flag.detail, 'safe')"
 												>
 													<CheckCheckIcon aria-hidden="true" />
 												</button>
 
 												<button
-													v-tooltip="'Local pass'"
+													v-tooltip="getDetailActionTooltip(flag.detail, 'safe', 'local')"
 													class="detail-verdict-button detail-verdict-button--safe"
 													:class="{
 														'detail-verdict-button--selected': isDetailActionSelected(
@@ -1757,13 +1791,13 @@ function copyId() {
 														updatingDetails.has(flag.detail.id) ||
 														updatingGlobalDetailKeys.has(flag.detail.key)
 													"
-													@click="updateDetailStatus(flag.detail.id, 'safe')"
+													@click="updateLocalDetailAction(flag.detail, 'safe')"
 												>
 													<CheckIcon aria-hidden="true" />
 												</button>
 
 												<button
-													v-tooltip="'Local fail'"
+													v-tooltip="getDetailActionTooltip(flag.detail, 'malware', 'local')"
 													class="detail-verdict-button detail-verdict-button--unsafe"
 													:class="{
 														'detail-verdict-button--selected': isDetailActionSelected(
@@ -1777,13 +1811,13 @@ function copyId() {
 														updatingDetails.has(flag.detail.id) ||
 														updatingGlobalDetailKeys.has(flag.detail.key)
 													"
-													@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+													@click="updateLocalDetailAction(flag.detail, 'malware')"
 												>
 													<BanIcon aria-hidden="true" />
 												</button>
 
 												<button
-													v-tooltip="getGlobalDetailUpdateTooltip(flag.detail, 'fail')"
+													v-tooltip="getDetailActionTooltip(flag.detail, 'malware', 'global')"
 													class="detail-verdict-button detail-verdict-button--unsafe"
 													:class="{
 														'detail-verdict-button--selected': isDetailActionSelected(
@@ -1798,46 +1832,9 @@ function copyId() {
 														updatingGlobalDetailKeys.has(flag.detail.key) ||
 														updatingDetails.has(flag.detail.id)
 													"
-													@click="updateGlobalDetailStatus(flag.detail, 'unsafe')"
+													@click="updateGlobalDetailAction(flag.detail, 'malware')"
 												>
 													<ShieldAlertIcon aria-hidden="true" />
-												</button>
-											</div>
-
-											<div
-												class="detail-verdict-buttons detail-verdict-buttons--unset"
-												role="group"
-												aria-label="Unset trace verdict actions"
-											>
-												<button
-													v-tooltip="'Unset local verdict'"
-													class="detail-verdict-button detail-verdict-button--unset"
-													aria-label="Unset local verdict"
-													:disabled="
-														updatingDetails.has(flag.detail.id) ||
-														updatingGlobalDetailKeys.has(flag.detail.key)
-													"
-													@click="updateDetailStatus(flag.detail.id, 'pending')"
-												>
-													<UndoIcon aria-hidden="true" />
-												</button>
-
-												<button
-													v-tooltip="
-														canUpdateGlobalDetail(flag.detail)
-															? 'Unset global verdict'
-															: 'Global verdict unavailable for generated trace keys'
-													"
-													class="detail-verdict-button detail-verdict-button--unset"
-													aria-label="Unset global verdict"
-													:disabled="
-														!canUpdateGlobalDetail(flag.detail) ||
-														updatingGlobalDetailKeys.has(flag.detail.key) ||
-														updatingDetails.has(flag.detail.id)
-													"
-													@click="updateGlobalDetailStatus(flag.detail, 'pending')"
-												>
-													<RestoreIcon aria-hidden="true" />
 												</button>
 											</div>
 										</div>
@@ -1986,9 +1983,18 @@ pre {
 }
 
 .detail-verdict-button:hover,
-.detail-verdict-button:focus-visible,
-.detail-verdict-button--selected {
+.detail-verdict-button:focus-visible {
 	background: var(--surface-4);
+}
+
+.detail-verdict-button--selected {
+	background: var(--color-green-bg);
+	box-shadow: inset 0 0 0 1px var(--color-green);
+}
+
+.detail-verdict-button--selected:hover,
+.detail-verdict-button--selected:focus-visible {
+	background: var(--color-green-bg);
 }
 
 .detail-verdict-button:focus-visible {
@@ -2012,9 +2018,5 @@ pre {
 
 .detail-verdict-button--unsafe {
 	color: var(--color-red);
-}
-
-.detail-verdict-button--unset {
-	color: var(--color-secondary);
 }
 </style>

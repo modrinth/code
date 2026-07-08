@@ -13,20 +13,18 @@ use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         models::{
-            DBFileId, DBProjectId, DBThreadId, DelphiReportId,
-            DelphiReportIssueDetailsId, DelphiReportIssueId,
+            DBFileId, DBProjectId, DelphiReportId, DelphiReportIssueDetailsId,
+            DelphiReportIssueId,
             delphi_report_item::{
                 DBDelphiReport, DBDelphiReportIssue, DelphiSeverity,
                 DelphiStatus, ReportIssueDetail,
             },
-            thread_item::ThreadMessageBuilder,
         },
         redis::RedisPool,
     },
     models::{
         ids::{ProjectId, VersionId},
         pats::Scopes,
-        threads::MessageBody,
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -34,6 +32,7 @@ use crate::{
 };
 
 pub mod rescan;
+pub mod tech_review_sync;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
@@ -211,109 +210,6 @@ async fn ingest_report_deserialized(
         "Delphi found issues in file",
     );
 
-    let record = sqlx::query!(
-        r#"
-        SELECT
-            EXISTS(
-                SELECT 1 FROM delphi_issue_details_with_statuses didws
-                WHERE didws.project_id = $1 AND didws.status = 'pending'
-            ) AS "pending_issue_details_exist!",
-            t.id AS "thread_id: DBThreadId"
-        FROM mods m
-        INNER JOIN threads t ON t.mod_id = $1
-        "#,
-        DBProjectId::from(report.project_id) as _,
-    )
-    .fetch_one(&mut transaction)
-    .await
-    .wrap_internal_err("failed to check if pending issue details exist")?;
-
-    let issue_detail_keys = report
-        .issues
-        .values()
-        .flatten()
-        .map(|issue_detail| issue_detail.key.0.clone())
-        .collect::<Vec<_>>();
-
-    let has_unflagged_issue_details = sqlx::query!(
-        r#"
-        SELECT EXISTS(
-            SELECT 1
-            FROM unnest($2::text[]) AS incoming(detail_key)
-            LEFT JOIN delphi_global_detail_verdicts dgdv
-                ON dgdv.detail_key = incoming.detail_key
-            LEFT JOIN delphi_issue_detail_verdicts didv
-                ON didv.project_id = $1 AND didv.detail_key = incoming.detail_key
-            WHERE dgdv.detail_key IS NULL AND didv.project_id IS NULL
-        ) AS "has_unflagged_issue_details!"
-        "#,
-        DBProjectId::from(report.project_id) as _,
-        &issue_detail_keys
-    )
-    .fetch_one(&mut transaction)
-    .await
-    .wrap_internal_err("failed to check if report has unflagged issue details")?;
-
-    let should_enter_tech_review = !record.pending_issue_details_exist
-        && has_unflagged_issue_details.has_unflagged_issue_details;
-
-    if should_enter_tech_review {
-        info!("File's project is entering tech review queue");
-
-        ThreadMessageBuilder {
-            author_id: None,
-            body: MessageBody::TechReviewEntered,
-            thread_id: record.thread_id,
-            hide_identity: false,
-        }
-        .insert(&mut transaction)
-        .await
-        .wrap_internal_err("failed to add entering tech review message")?;
-    } else {
-        info!(
-            "File's project is not entering tech review queue (already pending or no new unflagged issue details)"
-        );
-    }
-
-    // TODO: Currently, the way we determine if an issue is in tech review or not
-    // is if it has any issue details which are pending.
-    // If you mark all issue details are safe or not safe - even if you don't
-    // submit the final report - the project will be taken out of tech review
-    // queue, and into moderation queue.
-    //
-    // This is undesirable, but we can't rework the database schema to fix it
-    // right now. As a hack, we add a dummy report issue which blocks the
-    // project from exiting the tech review queue.
-    if should_enter_tech_review {
-        let dummy_issue_id = DBDelphiReportIssue {
-            id: DelphiReportIssueId(0), // This will be set by the database
-            report_id,
-            issue_type: "__dummy".into(),
-        }
-        .upsert(&mut transaction)
-        .await
-        .wrap_internal_err("failed to upsert dummy Delphi report issue")?;
-
-        ReportIssueDetail {
-            id: DelphiReportIssueDetailsId(0), // This will be set by the database
-            issue_id: dummy_issue_id,
-            key: "".into(),
-            jar: None,
-            file_path: "".into(),
-            decompiled_source: None,
-            data: HashMap::new(),
-            severity: DelphiSeverity::Low,
-            local_status: None,
-            global_status: None,
-            status: DelphiStatus::Pending,
-        }
-        .insert(&mut transaction)
-        .await
-        .wrap_internal_err(
-            "failed to insert dummy Delphi report issue detail",
-        )?;
-    }
-
     for (issue_type, issue_details) in report.issues {
         let issue_id = DBDelphiReportIssue {
             id: DelphiReportIssueId(0), // This will be set by the database
@@ -351,6 +247,13 @@ async fn ingest_report_deserialized(
             .wrap_internal_err("failed to insert Delphi issue detail")?;
         }
     }
+
+    tech_review_sync::sync_project_tech_review_state(
+        &[DBProjectId::from(report.project_id)],
+        tech_review_sync::TechReviewExitReason::Resolved,
+        &mut transaction,
+    )
+    .await?;
 
     transaction
         .commit()
@@ -399,83 +302,6 @@ pub async fn run(
         .map_err(ApiError::delphi)?;
 
     Ok(HttpResponse::NoContent().finish())
-}
-
-pub async fn is_project_in_tech_review(
-    project_id: DBProjectId,
-    exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
-) -> Result<bool, ApiError> {
-    let row = sqlx::query!(
-        r#"
-        SELECT EXISTS(
-            SELECT 1
-            FROM delphi_issue_details_with_statuses didws
-            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-            WHERE
-                didws.project_id = $1
-                AND didws.status = 'pending'
-                -- see delphi.rs todo comment
-                AND dri.issue_type != '__dummy'
-        ) AS "is_in_tech_review!"
-        "#,
-        project_id as _,
-    )
-    .fetch_one(exec)
-    .await
-    .wrap_internal_err("failed to fetch project tech review state")?;
-
-    Ok(row.is_in_tech_review)
-}
-
-pub async fn send_tech_review_exit_file_deleted_message(
-    project_id: DBProjectId,
-    txn: &mut crate::database::PgTransaction<'_>,
-) -> Result<(), ApiError> {
-    let thread = sqlx::query!(
-        r#"
-        SELECT id AS "thread_id: DBThreadId"
-        FROM threads
-        WHERE mod_id = $1
-        LIMIT 1
-        "#,
-        project_id as _,
-    )
-    .fetch_optional(&mut *txn)
-    .await
-    .wrap_internal_err("failed to fetch thread for tech review exit message")?;
-
-    if let Some(thread) = thread {
-        ThreadMessageBuilder {
-            author_id: None,
-            body: MessageBody::TechReviewExitFileDeleted,
-            thread_id: thread.thread_id,
-            hide_identity: false,
-        }
-        .insert(txn)
-        .await
-        .wrap_internal_err("failed to add tech review exit message")?;
-    }
-
-    Ok(())
-}
-
-pub async fn send_tech_review_exit_file_deleted_message_if_exited(
-    project_id: DBProjectId,
-    was_in_tech_review: bool,
-    txn: &mut crate::database::PgTransaction<'_>,
-) -> Result<(), ApiError> {
-    if !was_in_tech_review {
-        return Ok(());
-    }
-
-    let is_still_in_tech_review =
-        is_project_in_tech_review(project_id, &mut *txn).await?;
-
-    if !is_still_in_tech_review {
-        send_tech_review_exit_file_deleted_message(project_id, txn).await?;
-    }
-
-    Ok(())
 }
 
 /// Run Delphi.  

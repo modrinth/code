@@ -1834,6 +1834,19 @@ export namespace Labrinth {
 						old_status: Projects.v2.ProjectStatus
 				  }
 				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
+				  }
+				| {
 						type: 'thread_closure'
 				  }
 				| {
@@ -2392,6 +2405,19 @@ export namespace Labrinth {
 						type: 'status_change'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
 				  }
 				| {
 						type: 'thread_closure'

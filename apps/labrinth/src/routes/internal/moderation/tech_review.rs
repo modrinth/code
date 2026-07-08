@@ -31,7 +31,13 @@ use crate::{
         threads::{MessageBody, Thread},
     },
     queue::session::AuthQueue,
-    routes::{ApiError, internal::moderation::Ownership},
+    routes::{
+        ApiError,
+        internal::{
+            delphi::tech_review_sync::{self, TechReviewExitReason},
+            moderation::Ownership,
+        },
+    },
     search::SearchState,
     util::error::Context,
 };
@@ -1306,6 +1312,35 @@ pub async fn update_issue_details(
         return Err(ApiError::Request(eyre!("issue detail does not exist")));
     }
 
+    let affected_projects = sqlx::query!(
+        r#"
+        SELECT DISTINCT didws.project_id AS "project_id!: DBProjectId"
+        FROM delphi_issue_details_with_statuses didws
+        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+        WHERE
+            didws.id = ANY($1::bigint[])
+            AND dri.issue_type != '__dummy'
+        "#,
+        &detail_ids,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_internal_err(
+        "failed to fetch projects affected by issue detail updates",
+    )?;
+
+    let affected_project_ids = affected_projects
+        .into_iter()
+        .map(|row| row.project_id)
+        .collect::<Vec<_>>();
+
+    tech_review_sync::sync_project_tech_review_state(
+        &affected_project_ids,
+        TechReviewExitReason::Resolved,
+        &mut txn,
+    )
+    .await?;
+
     txn.commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
@@ -1408,6 +1443,13 @@ pub async fn update_global_issue_details(
     .execute(&mut txn)
     .await
     .wrap_internal_err("failed to update global issue details")?;
+
+    tech_review_sync::sync_detail_key_tech_review_state(
+        &detail_keys,
+        TechReviewExitReason::Resolved,
+        &mut txn,
+    )
+    .await?;
 
     txn.commit()
         .await

@@ -55,7 +55,18 @@
 							{{ formatTraceCount(trace.local_trace_count) }}
 						</p>
 					</div>
-					<Badge :type="trace.verdict" />
+					<div class="flex shrink-0 flex-wrap items-center gap-2">
+						<Badge :type="trace.verdict" />
+						<ButtonStyled color="red">
+							<button
+								:disabled="removingTraceKeys.has(trace.detail_key)"
+								@click="removeGlobalTrace(trace)"
+							>
+								<TrashIcon aria-hidden="true" />
+								Remove
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
 
 				<div v-if="getPreviewLocalTraces(trace).length > 0" class="flex flex-col gap-2">
@@ -97,12 +108,13 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { HashIcon, ListIcon, SearchIcon } from '@modrinth/assets'
+import { HashIcon, ListIcon, SearchIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Badge,
 	ButtonStyled,
 	EmptyState,
 	injectModrinthClient,
+	injectNotificationManager,
 	Pagination,
 	StyledInput,
 } from '@modrinth/ui'
@@ -110,6 +122,7 @@ import {
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'
 
 const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const query = ref('')
 const activeQuery = ref<string | null>(null)
 const isLoading = ref(false)
@@ -119,6 +132,7 @@ const itemsPerPage = 20
 const localTracePreviewLimit = 10
 const total = ref(0)
 const traces = ref<Labrinth.TechReview.Internal.GlobalIssueDetail[]>([])
+const removingTraceKeys = reactive<Set<string>>(new Set())
 
 const pageCount = computed(() => Math.max(Math.ceil(total.value / itemsPerPage), 1))
 const pageStart = computed(() =>
@@ -174,6 +188,38 @@ async function executeSearch() {
 async function switchPage(page: number) {
 	currentPage.value = page
 	await loadTraces()
+}
+
+async function removeGlobalTrace(trace: Labrinth.TechReview.Internal.GlobalIssueDetail) {
+	if (removingTraceKeys.has(trace.detail_key)) return
+
+	removingTraceKeys.add(trace.detail_key)
+	try {
+		await client.labrinth.tech_review_internal.updateGlobalIssueDetails([
+			{ detail_key: trace.detail_key, verdict: 'pending' },
+		])
+
+		addNotification({
+			type: 'success',
+			title: 'Global trace removed',
+			text: 'The global verdict for this trace key has been removed.',
+		})
+
+		if (traces.value.length === 1 && currentPage.value > 1) {
+			currentPage.value--
+		}
+
+		await loadTraces()
+	} catch (error) {
+		console.error('Failed to remove global trace', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to remove global trace',
+			text: 'An error occurred while removing the global trace verdict.',
+		})
+	} finally {
+		removingTraceKeys.delete(trace.detail_key)
+	}
 }
 
 onMounted(loadTraces)
