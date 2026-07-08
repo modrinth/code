@@ -269,6 +269,10 @@ const additionalFiles = computed(() => {
 	return selectedVersion.value.files.filter((file) => file !== selectedPrimaryFile.value)
 })
 
+const hasRequiredResourcePackAdditionalFile = computed(() =>
+	additionalFiles.value.some((file) => file.file_type === 'required-resource-pack'),
+)
+
 const downloadModalProvider = provideDownloadModalProvider({
 	project,
 	selectedVersion,
@@ -298,7 +302,9 @@ const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 })
 
 const showDependencyDownloadActions = computed(
-	() => dependencyDownloadFiles.value.length > 0 && selectedVersionDownloadFiles.value.length > 0,
+	() =>
+		selectedVersionDownloadFiles.value.length > 0 &&
+		(dependencyDownloadFiles.value.length > 0 || hasRequiredResourcePackAdditionalFile.value),
 )
 
 watch(projectV2Error, (error) => {
