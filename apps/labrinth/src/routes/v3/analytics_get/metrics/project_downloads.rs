@@ -611,6 +611,7 @@ static DOWNLOAD_SOURCE_PATTERNS: LazyLock<Vec<(Regex, DownloadSourcePattern)>> =
             (r"^(packwiz-installer|packwiz/)", P::Named("Packwiz")),
             (r"^mrpack4server", P::Named("mrpack4server")),
             (r"^DawnLauncher/", P::Named("Dawn")),
+            (r"^Complementary-Installer", P::Named("Complementary Installer")),
             (
                 r"^(Mozilla/|Chrome/|Chromium/|Firefox/|Safari/|AppleWebKit/|Edg/|OPR/)",
                 P::Website,
