@@ -1142,6 +1142,12 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Remove group"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Could not remove group"
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remove from group"
   },
