@@ -1980,6 +1980,13 @@ pre {
 
 .detail-verdict-button:first-child {
 	border-left: 0;
+	border-start-start-radius: calc(var(--radius-md) - 1px);
+	border-end-start-radius: calc(var(--radius-md) - 1px);
+}
+
+.detail-verdict-button:last-child {
+	border-start-end-radius: calc(var(--radius-md) - 1px);
+	border-end-end-radius: calc(var(--radius-md) - 1px);
 }
 
 .detail-verdict-button:hover,
@@ -1998,8 +2005,12 @@ pre {
 }
 
 .detail-verdict-button:focus-visible {
-	outline: 2px solid var(--color-brand);
-	outline-offset: -2px;
+	outline: none;
+	box-shadow: inset 0 0 0 2px var(--color-brand);
+}
+
+.detail-verdict-button--selected:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--color-green);
 }
 
 .detail-verdict-button:disabled {
