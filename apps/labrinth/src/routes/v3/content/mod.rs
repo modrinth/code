@@ -28,10 +28,10 @@ const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v1";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(web::scope("/v3").service(resolve_content));
+    cfg.service(resolve_content);
 }
 
-/// Resolve content.  
+/// Resolve content.
 #[utoipa::path(
 	tag = "content",
 	request_body = serde_json::Value,
