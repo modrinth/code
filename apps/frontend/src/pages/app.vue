@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import {
+	AppleIcon,
 	ArrowDownIcon,
 	BoxIcon,
 	DownloadIcon,
 	EditIcon,
 	FlathubIcon,
 	IssuesIcon,
+	LinuxIcon,
 	SearchIcon,
 	SendIcon,
 	TrashIcon,
-	LinuxIcon,
 	WindowsIcon,
-	AppleIcon,
 } from '@modrinth/assets'
 import {
 	Accordion,
