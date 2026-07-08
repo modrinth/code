@@ -3227,9 +3227,6 @@
   "project.download.no-app": {
     "message": "還沒有 Modrinth App 嗎？"
   },
-  "project.download.no-versions-available": {
-    "message": "{platform} {gameVersion} 沒有可用的版本。"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"
   },
