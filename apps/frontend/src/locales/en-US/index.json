@@ -2681,6 +2681,9 @@
   "moderation.page.external-projects": {
     "message": "External projects"
   },
+  "moderation.page.global-detail-traces": {
+    "message": "Global traces"
+  },
   "moderation.page.projects": {
     "message": "Projects"
   },
