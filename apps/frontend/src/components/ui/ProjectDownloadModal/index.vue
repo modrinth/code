@@ -290,7 +290,7 @@ const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 	if (!selectedVersion.value) return []
 
 	return selectedVersion.value.files
-		.filter((file) => file.file_type !== 'optional-resource-pack')
+		.filter((file) => file === selectedPrimaryFile.value || file.file_type === 'required-resource-pack')
 		.map((file) => ({
 			href: createProjectDownloadUrl(file.url, {
 				reason: props.downloadReason,
