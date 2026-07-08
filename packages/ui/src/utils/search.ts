@@ -46,7 +46,7 @@ export type FilterType = {
 	ordering?: number
 } & (
 	| {
-			display: 'all' | 'scrollable' | 'none'
+			display: 'all' | 'scrollable' | 'none' | 'toggle'
 	  }
 	| {
 			display: 'expandable'
@@ -112,6 +112,12 @@ export interface SortType {
 
 const PLUGIN_PLATFORMS = ['bungeecord', 'waterfall', 'velocity', 'geyser']
 
+const PROJECT_TYPE_EXCLUSION_FILTERS: Partial<Record<ProjectType, ProjectType[]>> = {
+	mod: ['plugin', 'datapack'],
+	plugin: ['mod', 'datapack'],
+	datapack: ['mod', 'plugin'],
+}
+
 export function useSearch(
 	projectTypes: Ref<ProjectType[]>,
 	tags: Ref<Tags>,
@@ -143,6 +149,34 @@ export function useSearch(
 		return formatCategory(formatMessage, categoryName)
 	}
 
+	const formatExcludeProjectTypeLabel = (projectType: ProjectType): string => {
+		switch (projectType) {
+			case 'mod':
+				return formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced.exclude_mod',
+						defaultMessage: 'Exclude mods',
+					}),
+				)
+			case 'plugin':
+				return formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced.exclude_plugin',
+						defaultMessage: 'Exclude plugins',
+					}),
+				)
+			case 'datapack':
+				return formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced.exclude_datapack',
+						defaultMessage: 'Exclude data packs',
+					}),
+				)
+			default:
+				return projectType
+		}
+	}
+
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
 		for (const category of sortedCategories(tags.value, formatCategoryName, locale.value)) {
@@ -169,6 +203,15 @@ export function useSearch(
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
 			})
+		}
+
+		const excludeableProjectTypes: ProjectType[] = []
+		for (const projectType of projectTypes.value) {
+			for (const target of PROJECT_TYPE_EXCLUSION_FILTERS[projectType] ?? []) {
+				if (!excludeableProjectTypes.includes(target)) {
+					excludeableProjectTypes.push(target)
+				}
+			}
 		}
 
 		const filterTypes: FilterType[] = [
@@ -429,6 +472,26 @@ export function useSearch(
 				options: [],
 				allows_custom_options: 'and',
 			},
+			{
+				id: 'advanced',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced',
+						defaultMessage: 'Advanced',
+					}),
+				),
+				supported_project_types: ['mod', 'plugin', 'datapack'],
+				display: 'toggle',
+				query_param: 'a',
+				searchable: false,
+				ordering: -1000,
+				options: excludeableProjectTypes.map((target) => ({
+					id: target,
+					formatted_name: formatExcludeProjectTypeLabel(target),
+					method: 'and',
+					value: `all_project_types:${mapProjectTypeToSearch(target)}`,
+				})),
+			},
 		]
 
 		return filterTypes
@@ -458,6 +521,9 @@ export function useSearch(
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
 				console.error(`Filter type ${filterValue.type} not found`)
+				continue
+			}
+			if (type.id === 'advanced') {
 				continue
 			}
 			let option = type?.options.find((option) => option.id === filterValue.option)
@@ -548,6 +614,15 @@ export function useSearch(
 		} else if (mappedProjectTypes.length > 1) {
 			const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
+		}
+
+		const excludedProjectTypes = filterValues
+			.filter((filterValue) => filterValue.type === 'advanced')
+			.map((filterValue) =>
+				formatSearchFilterValue(mapProjectTypeToSearch(filterValue.option as ProjectType)),
+			)
+		if (excludedProjectTypes.length > 0) {
+			parts.push(`all_project_types NOT IN [${excludedProjectTypes.join(', ')}]`)
 		}
 
 		return parts.join(' AND ')

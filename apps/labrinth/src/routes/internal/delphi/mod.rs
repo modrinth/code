@@ -240,9 +240,11 @@ async fn ingest_report_deserialized(
         SELECT EXISTS(
             SELECT 1
             FROM unnest($2::text[]) AS incoming(detail_key)
+            LEFT JOIN delphi_global_detail_verdicts dgdv
+                ON dgdv.detail_key = incoming.detail_key
             LEFT JOIN delphi_issue_detail_verdicts didv
                 ON didv.project_id = $1 AND didv.detail_key = incoming.detail_key
-            WHERE didv.project_id IS NULL
+            WHERE dgdv.detail_key IS NULL AND didv.project_id IS NULL
         ) AS "has_unflagged_issue_details!"
         "#,
         DBProjectId::from(report.project_id) as _,
