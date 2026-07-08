@@ -122,7 +122,7 @@
 <script setup lang="ts">
 import { ClipboardCopyIcon, PlusIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
@@ -182,6 +182,7 @@ const selectedSearchUser = ref<InvitePlayersSearchUser | null>(null)
 const remoteSearchUsers = ref<InvitePlayersSearchUser[]>([])
 const searchLookupStatus = ref<'idle' | 'loading' | 'loaded'>('idle')
 const searchLookupRequestId = ref(0)
+const friendOrder = ref(new Map<string, number>())
 const searchMinimumLength = 1
 const passwordManagerIgnoreAttrs = {
 	'data-1p-ignore': 'true',
@@ -325,11 +326,11 @@ const searchOptions = computed<ComboboxOption<string>[]>(() =>
 )
 const sortedFriends = computed(() =>
 	props.friends
-		.map((friend, index) => ({ friend, index }))
-		.sort((a, b) => {
-			const statusSort = friendStatusSort(a.friend) - friendStatusSort(b.friend)
-			return statusSort || a.index - b.index
-		})
+		.map((friend, index) => ({
+			friend,
+			order: friendOrder.value.get(friend.id) ?? friendOrder.value.size + index,
+		}))
+		.sort((a, b) => a.order - b.order)
 		.map(({ friend }) => friend),
 )
 const matchedSearchUser = computed(() => {
@@ -413,6 +414,30 @@ function friendStatusSort(friend: InvitePlayersUser) {
 			return 2
 		case 'added':
 			return 3
+	}
+}
+
+function syncFriendOrder(friends: InvitePlayersUser[]) {
+	const nextOrder = new Map(friendOrder.value)
+	let orderChanged = false
+	let nextIndex = nextOrder.size
+
+	const unorderedFriends = friends.filter((friend) => !nextOrder.has(friend.id))
+	const orderedFriends = unorderedFriends
+		.map((friend, index) => ({ friend, index }))
+		.sort((a, b) => {
+			const statusSort = friendStatusSort(a.friend) - friendStatusSort(b.friend)
+			return statusSort || a.index - b.index
+		})
+
+	for (const { friend } of orderedFriends) {
+		nextOrder.set(friend.id, nextIndex)
+		nextIndex += 1
+		orderChanged = true
+	}
+
+	if (orderChanged) {
+		friendOrder.value = nextOrder
 	}
 }
 
@@ -522,6 +547,8 @@ function show(event?: MouseEvent) {
 function hide() {
 	modal.value?.hide()
 }
+
+watch(() => props.friends, syncFriendOrder, { immediate: true })
 
 defineExpose({ show, hide })
 </script>

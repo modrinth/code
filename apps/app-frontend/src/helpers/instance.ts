@@ -335,6 +335,17 @@ export async function edit_icon(instanceId: string, iconPath: string | null): Pr
 
 export type SharedInstanceUsers = {
 	user_ids: string[]
+	users: SharedInstanceUser[]
+	tokens: number
+}
+
+export type SharedInstanceJoinType = 'owner' | 'invite' | 'link'
+
+export type SharedInstanceUser = {
+	id: string
+	joined_at?: string | null
+	join_type: SharedInstanceJoinType
+	last_played?: string | null
 }
 
 export interface SharedInstancePublishPreview {

@@ -35,7 +35,7 @@
 					>
 						Shared
 						<UnknownIcon
-							v-tooltip="'This instance is being shared to other users.'"
+							v-tooltip="sharedInstanceTooltip"
 							class="size-4 cursor-help"
 							aria-label="Shared instance information"
 						/>
@@ -256,7 +256,7 @@
 				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
 				:shared-instance-unavailable-manager="sharedInstanceManager?.username"
 				:shared-instance-wrong-account="sharedInstanceWrongAccount"
-				:shared-instance-expected-username="sharedInstanceExpectedUsername"
+				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
 				@published="fetchInstance"
@@ -363,7 +363,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
-import InstanceAdmonitions from '@/components/ui/instance/InstanceAdmonitions.vue'
+import InstanceAdmonitions from '@/components/ui/instance/instance-admonitions/index.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import {
@@ -456,6 +456,14 @@ const messages = defineMessages({
 		id: 'instance.shared-instance.error.title',
 		defaultMessage: 'Something has gone wrong',
 	},
+	sharedInstanceTooltip: {
+		id: 'instance.shared-instance.tooltip',
+		defaultMessage: "This instance's content is being managed by someone else.",
+	},
+	sharedInstanceOwnerTooltip: {
+		id: 'instance.shared-instance.owner-tooltip',
+		defaultMessage: "This instance's content is being shared to other users.",
+	},
 })
 
 useLoadingBarToken(subpagePending)
@@ -478,11 +486,12 @@ const activeInstanceId = ref<string>()
 const sharedInstanceUpdatePreview = ref<SharedInstanceUpdatePreview | null>(null)
 const sharedInstanceUnavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
 const sharedInstanceAvailabilityCheckKey = ref<string | null>(null)
-const sharedInstanceManagerUser = ref<{
+type SharedInstanceUserProfile = {
 	id: string
 	username: string
 	avatar_url?: string
-} | null>(null)
+}
+const sharedInstanceManagerUser = ref<SharedInstanceUserProfile | null>(null)
 const sharedInstanceManagerUserId = computed(() => {
 	const attachment = instance.value?.shared_instance
 	if (!attachment) return null
@@ -526,7 +535,6 @@ const sharedInstanceManager = computed(() => {
 const sharedInstanceExpectedUserId = computed(
 	() => instance.value?.shared_instance?.linked_user_id ?? null,
 )
-const sharedInstanceExpectedUsername = computed(() => sharedInstanceExpectedUserId.value ?? '')
 const sharedInstanceWrongAccount = computed(() => {
 	if (auth.isReady && !auth.isReady.value) return false
 
@@ -536,7 +544,17 @@ const sharedInstanceWrongAccount = computed(() => {
 	return auth.user.value?.id !== expectedUserId
 })
 const sharedInstanceActionsLocked = computed(() => sharedInstanceWrongAccount.value)
+const sharedInstanceShareActionsLocked = computed(
+	() => sharedInstanceActionsLocked.value || !!sharedInstanceUnavailableReason.value,
+)
 const sharedInstanceSignedOut = computed(() => !auth.session_token.value)
+const sharedInstanceTooltip = computed(() =>
+	formatMessage(
+		instance.value?.shared_instance?.role === 'owner'
+			? messages.sharedInstanceOwnerTooltip
+			: messages.sharedInstanceTooltip,
+	),
+)
 
 watch(
 	() => sharedInstanceManagerUserId.value,
@@ -612,6 +630,7 @@ async function fetchInstance() {
 	}
 
 	const nextPreloadedContent = await contentPreloadPromise
+	await ensureSharedInstanceExpectedUser(nextInstance)
 
 	instance.value = nextInstance ?? undefined
 	linkedProjectV3.value = nextLinkedProjectV3
@@ -627,6 +646,21 @@ async function fetchInstance() {
 			queryFn: () => refreshWorlds(nextInstance.id),
 			staleTime: 30_000,
 		})
+	}
+}
+
+async function ensureSharedInstanceExpectedUser(nextInstance?: GameInstance | null) {
+	const userId = nextInstance?.shared_instance?.linked_user_id
+	if (!userId) return
+
+	try {
+		await queryClient.ensureQueryData({
+			queryKey: ['user', userId],
+			queryFn: () => get_user(userId, 'bypass').catch(() => null),
+			staleTime: 30_000,
+		})
+	} catch {
+		// Let InstanceAdmonitions' useQuery own any fallback state after the route renders.
 	}
 }
 
@@ -712,13 +746,27 @@ watch(
 		role: instance.value?.shared_instance?.role,
 		locked: sharedInstanceActionsLocked.value,
 		offline: offline.value,
+		signedIn: !!auth.session_token.value,
 		userId: auth.user.value?.id ?? null,
 		authReady: auth.isReady?.value ?? true,
 	}),
-	async ({ instanceId, role, locked, offline, userId, authReady }) => {
-		if (!instanceId || role !== 'member' || locked || offline || !authReady) {
+	async ({ instanceId, role, locked, offline, signedIn, userId, authReady }) => {
+		if (
+			!instanceId ||
+			role !== 'member' ||
+			locked ||
+			offline ||
+			!authReady ||
+			!signedIn ||
+			!userId
+		) {
+			const keepUnavailableReason =
+				!!instanceId && !role && sharedInstanceUnavailableReason.value !== null
+
 			sharedInstanceUpdatePreview.value = null
-			sharedInstanceUnavailableReason.value = null
+			if (!keepUnavailableReason) {
+				sharedInstanceUnavailableReason.value = null
+			}
 			sharedInstanceAvailabilityCheckKey.value = null
 			return
 		}
@@ -754,7 +802,7 @@ const contentSubpageProps = computed(() =>
 const instanceSubpageProps = computed(() => ({
 	...contentSubpageProps.value,
 	...(displayedInstanceRoute.value.name === 'InstanceShare'
-		? { sharedInstanceActionsLocked: sharedInstanceActionsLocked.value }
+		? { sharedInstanceActionsLocked: sharedInstanceShareActionsLocked.value }
 		: {}),
 }))
 const showShareTab = computed(() => {

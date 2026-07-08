@@ -153,6 +153,7 @@ const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
 const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
+let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
 const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
 	sidebarToggled.value = !themeStore.toggleSidebar
@@ -672,14 +673,25 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
+	// TODO: move all of this into it's own helper
+	const refreshId = ++credentialsRefreshId
+	credentials.value = undefined
+
 	const creds = await getCreds().catch(handleError)
+	if (refreshId !== credentialsRefreshId) return
+
 	if (creds && creds.user_id) {
 		if (creds.session && !(await validateSession(creds.session))) {
+			if (refreshId !== credentialsRefreshId) return
+
 			await logout().catch(handleError)
+			if (refreshId !== credentialsRefreshId) return
+
 			credentials.value = null
 			return
 		}
 		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
+		if (refreshId !== credentialsRefreshId) return
 	}
 	credentials.value = creds ?? null
 }
@@ -732,6 +744,9 @@ async function getSharedInstancesForLogoutWarning() {
 }
 
 async function performLogOut() {
+	credentialsRefreshId++
+	credentials.value = undefined
+
 	await logout().catch(handleError)
 	await fetchCredentials()
 }

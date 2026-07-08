@@ -43,8 +43,7 @@
 				<div
 					v-for="(diff, index) in sortedDiffs"
 					:key="diff.projectName || diff.fileName || index"
-					class="grid items-center min-h-10 h-10 gap-2"
-					:class="diff.projectName ? 'grid-cols-[auto_auto_1fr]' : 'grid-cols-[auto_auto_1fr]'"
+					class="grid items-center min-h-10 h-10 gap-2 grid-cols-[auto_auto_minmax(0,1fr)]"
 				>
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
@@ -58,18 +57,26 @@
 					</div>
 
 					<span class="text-sm shrink-0 whitespace-nowrap">{{ getDiffTypeLabel(diff) }}</span>
-					<span
-						v-if="diff.projectName"
-						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
-					>
-						{{ diff.projectName }}
-					</span>
-					<span
-						v-else-if="diff.fileName"
-						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
-					>
-						{{ decodeURIComponent(diff.fileName) }}
-					</span>
+					<div class="flex min-w-0 items-center justify-between gap-3">
+						<span
+							v-if="diff.projectName"
+							class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+						>
+							{{ diff.projectName }}
+						</span>
+						<span
+							v-else-if="diff.fileName"
+							class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+						>
+							{{ decodeURIComponent(diff.fileName) }}
+						</span>
+						<span
+							v-if="getDiffVersionName(diff)"
+							class="text-sm text-secondary text-right shrink-0 whitespace-nowrap max-w-[45%] overflow-hidden text-ellipsis"
+						>
+							{{ getDiffVersionName(diff) }}
+						</span>
+					</div>
 				</div>
 			</div>
 
@@ -211,6 +218,12 @@ function getDiffTypeLabel(diff: ContentDiffItem) {
 	if (diff.type === 'removed' && props.removedLabel) return props.removedLabel
 
 	return formatMessage(diffTypeMessages[diff.type])
+}
+
+function getDiffVersionName(diff: ContentDiffItem) {
+	if (diff.type === 'removed') return diff.currentVersionName
+
+	return diff.newVersionName
 }
 
 const messages = defineMessages({

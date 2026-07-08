@@ -170,6 +170,7 @@ const props = withDefaults(
 		header?: string
 		hideHeader?: boolean
 		onHide?: () => void
+		onAfterHide?: () => void
 		onShow?: () => void
 		mergeHeader?: boolean
 		scrollable?: boolean
@@ -196,6 +197,7 @@ const props = withDefaults(
 		header: undefined,
 		hideHeader: false,
 		onHide: () => {},
+		onAfterHide: () => {},
 		onShow: () => {},
 		mergeHeader: false,
 		// TODO: migrate all modals to use scrollable and remove this prop
@@ -226,6 +228,7 @@ const visible = ref(false)
 const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
 let previousFocusEl: Element | null = null
+let hideTimeout: ReturnType<typeof setTimeout> | null = null
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
@@ -239,6 +242,10 @@ function getFocusableElements(): HTMLElement[] {
 }
 
 function show(event?: MouseEvent) {
+	if (hideTimeout) {
+		clearTimeout(hideTimeout)
+		hideTimeout = null
+	}
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
 	stackDepth.value = modalStackSize()
@@ -287,8 +294,10 @@ function hide() {
 		previousFocusEl.focus()
 	}
 	previousFocusEl = null
-	setTimeout(() => {
+	hideTimeout = setTimeout(() => {
 		open.value = false
+		hideTimeout = null
+		props.onAfterHide?.()
 	}, 300)
 }
 
@@ -334,6 +343,10 @@ function resetMousePosition() {
 }
 
 onUnmounted(() => {
+	if (hideTimeout) {
+		clearTimeout(hideTimeout)
+		hideTimeout = null
+	}
 	if (open.value) {
 		popModal()
 		window.removeEventListener('keydown', handleWindowKeyDown)

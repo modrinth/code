@@ -1,8 +1,8 @@
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{
     ContentSetRemoteRef, ContentSetRemoteRefType, ContentSetSyncProvider,
-    ContentSetSyncState, ContentSetSyncStatus, SharedInstanceAttachment,
-    SharedInstanceRole,
+    ContentSetSyncState, ContentSetSyncStatus, InstanceLink,
+    SharedInstanceAttachment, SharedInstanceRole,
 };
 use chrono::Utc;
 use sqlx::SqlitePool;
@@ -69,10 +69,23 @@ pub(crate) async fn clear_shared_instance(
         return Ok(());
     };
     let content_set_id = metadata.applied_content_set.id;
+    let retained_modpack_link = match metadata.link {
+        InstanceLink::SharedInstance {
+            modpack_project_id: Some(project_id),
+            modpack_version_id: Some(version_id),
+        } => Some(InstanceLink::ModrinthModpack {
+            project_id,
+            version_id,
+        }),
+        _ => None,
+    };
 
     let mut tx = pool.begin().await?;
     instance_rows::set_shared_instance_attachment(instance_id, None, &mut tx)
         .await?;
+    if let Some(link) = retained_modpack_link.as_ref() {
+        instance_rows::upsert_instance_link(instance_id, link, &mut tx).await?;
+    }
     content_rows::delete_content_set_remote_ref(
         &content_set_id,
         ContentSetRemoteRefType::SharedContentSet,

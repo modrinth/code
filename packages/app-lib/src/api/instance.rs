@@ -35,14 +35,17 @@ pub use self::projects::{
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,
 };
+pub(crate) use self::shared::mark_shared_instance_stale;
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstancePublishPreview, SharedInstanceUpdateDiff,
     SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceUsers, get_shared_instance_install_preview,
-    get_shared_instance_publish_preview, get_shared_instance_update_preview,
-    get_shared_instance_users, install_shared_instance,
-    invite_shared_instance_users, publish_shared_instance,
-    remove_shared_instance_users, unpublish_shared_instance,
-    update_shared_instance,
+    SharedInstanceJoinType, SharedInstanceUser, SharedInstanceUsers,
+    accept_pending_shared_instance_invite,
+    decline_pending_shared_instance_invite,
+    get_shared_instance_install_preview, get_shared_instance_publish_preview,
+    get_shared_instance_update_preview, get_shared_instance_users,
+    install_shared_instance, invite_shared_instance_users,
+    publish_shared_instance, remove_shared_instance_users,
+    unpublish_shared_instance, update_shared_instance,
 };

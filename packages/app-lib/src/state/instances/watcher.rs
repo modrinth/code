@@ -147,9 +147,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                             && let Ok(state) =
                                                 State::get().await
                                             && let Err(error) =
-                                                super::commands::mark_shared_instance_stale(
+                                                crate::api::instance::mark_shared_instance_stale(
                                                     &emit_instance_id,
-                                                    &state.pool,
+                                                    &state,
                                                 )
                                                 .await
                                         {

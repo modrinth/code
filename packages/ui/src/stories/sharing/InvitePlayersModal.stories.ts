@@ -103,7 +103,7 @@ function createRender(args: Record<string, unknown>) {
 			const friends = ref<InvitePlayersUser[]>(createFriends())
 			const searchUsers = createSearchUsers()
 			const lastAction = ref('')
-			const manuallyAddedFriendIds = ref(new Set<string>())
+			const invitedSearchUserIds = ref(new Set<string>())
 
 			async function searchInviteUsers(query: string) {
 				await new Promise((resolve) => setTimeout(resolve, 250))
@@ -119,7 +119,8 @@ function createRender(args: Record<string, unknown>) {
 					(user) =>
 						user.username.toLowerCase().startsWith(normalizedQuery) &&
 						!friendKeys.has(user.id.toLowerCase()) &&
-						!friendKeys.has(user.username.toLowerCase()),
+						!friendKeys.has(user.username.toLowerCase()) &&
+						!invitedSearchUserIds.value.has(user.id),
 				)
 			}
 
@@ -127,14 +128,11 @@ function createRender(args: Record<string, unknown>) {
 				const existingFriend = friends.value.find((friend) => friend.id === payload.user.id)
 
 				if (payload.source === 'search') {
-					if (existingFriend) {
-						existingFriend.status = 'requested'
-					} else {
-						friends.value = [{ ...payload.user, status: 'requested' }, ...friends.value]
-					}
-
-					manuallyAddedFriendIds.value = new Set([...manuallyAddedFriendIds.value, payload.user.id])
-					lastAction.value = `Sent friend request to ${payload.user.username}`
+					invitedSearchUserIds.value = new Set([
+						...invitedSearchUserIds.value,
+						payload.user.id,
+					])
+					lastAction.value = `Sent friend request and direct invite to ${payload.user.username}`
 					return
 				}
 
@@ -147,14 +145,6 @@ function createRender(args: Record<string, unknown>) {
 
 			function handleCancel(user: InvitePlayersUser) {
 				const existingFriend = friends.value.find((friend) => friend.id === user.id)
-				if (manuallyAddedFriendIds.value.has(user.id)) {
-					friends.value = friends.value.filter((friend) => friend.id !== user.id)
-					const nextManuallyAddedFriendIds = new Set(manuallyAddedFriendIds.value)
-					nextManuallyAddedFriendIds.delete(user.id)
-					manuallyAddedFriendIds.value = nextManuallyAddedFriendIds
-					lastAction.value = `Cancelled friend request for ${user.username}`
-					return
-				}
 
 				if (existingFriend) existingFriend.status = 'available'
 				lastAction.value = `Cancelled invite for ${user.username}`

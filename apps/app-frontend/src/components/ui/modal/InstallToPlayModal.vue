@@ -1,8 +1,8 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true">
+	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true" no-padding>
 		<div
 			v-if="mode === 'server-project' && requiredContentProject"
-			class="flex flex-col gap-6 max-w-[500px]"
+			class="flex flex-col gap-6 max-w-[500px] p-6 pb-2"
 		>
 			<Admonition type="info" :header="formatMessage(messages.contentRequired)">
 				{{ formatMessage(messages.serverRequiresMods) }}
@@ -49,7 +49,7 @@
 		</div>
 		<div
 			v-else-if="mode === 'shared-instance' && sharedInstance"
-			class="flex flex-col gap-6 max-w-[500px]"
+			class="flex flex-col gap-6 max-w-[500px] p-6 pb-2"
 		>
 			<Admonition type="warning" :header="formatMessage(messages.trustWarningHeader)">
 				{{ formatMessage(messages.trustWarningDescription) }}

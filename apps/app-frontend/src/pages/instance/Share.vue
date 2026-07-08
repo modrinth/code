@@ -19,7 +19,7 @@
 			ref="removeUserConfirmModal"
 			:header="formatMessage(messages.removeUserHeader)"
 			max-width="470px"
-			@hide="pendingRemovalRow = null"
+			@after-hide="pendingRemovalRow = null"
 		>
 			<div class="flex flex-col gap-4">
 				<Admonition type="warning">
@@ -80,14 +80,6 @@
 				</div>
 			</div>
 		</NewModal>
-
-		<Admonition
-			v-if="sharedInstanceActionsLocked"
-			type="warning"
-			:header="formatMessage(messages.lockedHeader)"
-		>
-			{{ formatMessage(messages.lockedBody) }}
-		</Admonition>
 
 		<template v-if="rows.length > 0">
 			<div class="flex flex-col gap-4">
@@ -249,13 +241,35 @@
 		</template>
 
 		<EmptyState v-else-if="sharedInstanceActionsLocked" type="empty-inbox">
-			<template #heading>{{ formatMessage(messages.lockedEmptyHeading) }}</template>
-			<template #description>{{ formatMessage(messages.lockedEmptyDescription) }}</template>
+			<template #heading>{{ formatMessage(lockedEmptyHeading) }}</template>
+			<template #description>
+				<span class="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
+					<span>{{ formatMessage(messages.lockedEmptyDescriptionPrefix) }}</span>
+					<span
+						v-if="linkedAccount"
+						class="inline-flex max-w-full min-w-0 items-center gap-1.5 align-middle font-semibold text-primary"
+					>
+						<Avatar
+							:src="linkedAccount.avatarUrl"
+							:alt="linkedAccount.username"
+							:tint-by="linkedAccount.tintBy"
+							size="20px"
+							circle
+							no-shadow
+						/>
+						<span class="min-w-0 truncate">{{ linkedAccount.username }}</span>
+					</span>
+					<span v-else class="font-semibold text-primary">
+						{{ formatMessage(messages.linkedAccountFallback) }}
+					</span>
+					<span>{{ formatMessage(messages.lockedEmptyDescriptionSuffix) }}</span>
+				</span>
+			</template>
 			<template #actions>
 				<ButtonStyled color="brand">
 					<button class="!h-10" @click="signInToShare">
 						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(messages.switchAccountButton) }}
+						{{ formatMessage(lockedActionButton) }}
 					</button>
 				</ButtonStyled>
 			</template>
@@ -331,16 +345,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
-import { get_user_many } from '@/helpers/cache.js'
+import { get_user, get_user_many } from '@/helpers/cache.js'
 import { friend_listener } from '@/helpers/events.js'
 import {
 	add_friend,
-	createPendingFriend,
 	friendsQueryKey,
-	type FriendWithUserData,
 	getFriendsWithUserData,
 	getFriendUserId,
-	upsertCachedFriend,
 } from '@/helpers/friends.ts'
 import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
@@ -349,6 +360,7 @@ import {
 	invite_shared_instance_users,
 	list,
 	remove_shared_instance_users,
+	type SharedInstanceUser,
 	type SharedInstanceUsers,
 } from '@/helpers/instance'
 import { get as getCredentials } from '@/helpers/mr_auth.ts'
@@ -387,7 +399,7 @@ const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const importedModpackUnlinkedForShare = ref(false)
 const pendingRemovalRow = ref<ShareRow | null>(null)
 
-const pendingRows = ref<Record<string, ShareRow>>({})
+const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(props.instance.id))
 
 const messages = defineMessages({
 	signInToShareHeading: {
@@ -418,23 +430,25 @@ const messages = defineMessages({
 		id: 'app.instance.share.invite-modal.heading',
 		defaultMessage: 'Share {name}',
 	},
-	lockedHeader: {
-		id: 'app.instance.share.locked.header',
-		defaultMessage: 'Shared instance access is locked',
+	lockedWrongAccountHeading: {
+		id: 'app.instance.share.locked.wrong-account-heading',
+		defaultMessage: 'Wrong account',
 	},
-	lockedBody: {
-		id: 'app.instance.share.locked.body',
-		defaultMessage:
-			'Sharing is linked to another Modrinth account. Last known users are shown if they were loaded before, but changes are disabled until you sign in with the linked account.',
+	lockedSignedOutHeading: {
+		id: 'app.instance.share.locked.signed-out-heading',
+		defaultMessage: 'Not signed in',
 	},
-	lockedEmptyHeading: {
-		id: 'app.instance.share.locked.empty-heading',
-		defaultMessage: 'Sign in with the linked account',
+	lockedEmptyDescriptionPrefix: {
+		id: 'app.instance.share.locked.empty-description-prefix',
+		defaultMessage: 'You need to sign in as',
 	},
-	lockedEmptyDescription: {
-		id: 'app.instance.share.locked.empty-description',
-		defaultMessage:
-			'This shared instance is managed by a different Modrinth account. Sign in with that account to view and manage shared access.',
+	lockedEmptyDescriptionSuffix: {
+		id: 'app.instance.share.locked.empty-description-suffix',
+		defaultMessage: 'to access this page.',
+	},
+	linkedAccountFallback: {
+		id: 'app.instance.share.locked.linked-account-fallback',
+		defaultMessage: 'the linked account',
 	},
 	switchAccountButton: {
 		id: 'app.instance.share.locked.switch-account-button',
@@ -491,6 +505,33 @@ const inviteModalHeader = computed(() =>
 const shareRoutePath = computed(() => `/instance/${encodeURIComponent(props.instance.id)}/share`)
 const friendsKey = computed(() => friendsQueryKey(currentUserId.value))
 const sharedUsersKey = computed(() => ['sharedInstanceUsers', props.instance.id] as const)
+const linkedAccountId = computed(() => props.instance.shared_instance?.linked_user_id ?? null)
+const linkedAccountQuery = useQuery({
+	queryKey: computed(() => ['user', linkedAccountId.value]),
+	queryFn: async () => {
+		if (!linkedAccountId.value) return null
+
+		return await get_user(linkedAccountId.value, 'bypass').catch(() => null)
+	},
+	enabled: () => !!linkedAccountId.value,
+	staleTime: 30_000,
+})
+const linkedAccount = computed(() => {
+	const user = linkedAccountQuery.data.value
+	if (!user) return null
+
+	return {
+		username: user.username ?? user.id,
+		avatarUrl: user.avatar_url ?? undefined,
+		tintBy: user.id,
+	}
+})
+const lockedEmptyHeading = computed(() =>
+	isSignedIn.value ? messages.lockedWrongAccountHeading : messages.lockedSignedOutHeading,
+)
+const lockedActionButton = computed(() =>
+	isSignedIn.value ? messages.switchAccountButton : messages.signInButton,
+)
 const requiresUnlinkBeforeShare = computed(
 	() =>
 		props.instance.link?.type === 'imported_modpack' &&
@@ -626,7 +667,7 @@ const invitedRows = computed(() => {
 
 const inviteFriends = computed<InvitePlayersUser[]>(() =>
 	userFriends.value
-		.filter((friend) => friend.username)
+		.filter((friend) => friend.username && friend.accepted)
 		.map((friend) => {
 			const id = getFriendUserId(friend, currentUserId.value)
 			const invitedRow =
@@ -638,13 +679,7 @@ const inviteFriends = computed<InvitePlayersUser[]>(() =>
 				username: friend.username,
 				avatarUrl: friend.avatar,
 				online: friend.online,
-				status: friend.accepted
-					? invitedRow
-						? invitedRow.pending
-							? 'pending'
-							: 'added'
-						: 'available'
-					: 'requested',
+				status: invitedRow ? (invitedRow.pending ? 'pending' : 'added') : 'available',
 			} satisfies InvitePlayersUser
 		}),
 )
@@ -734,15 +769,13 @@ function toggleMethodFilter(filter: ShareMethod) {
 async function searchInviteUsers(query: string): Promise<InvitePlayersSearchUser[]> {
 	if (props.sharedInstanceActionsLocked) return []
 
+	const credentials = await getCredentials()
+	const currentSearchUserId = currentUserId.value ?? credentials?.user_id ?? null
 	const users = await search_user(query)
 
 	return users
-		.filter((user) => user.id !== currentUserId.value)
-		.filter(
-			(user) =>
-				!inviteFriendKeys.value.has(normalizeInviteKey(user.id)) &&
-				!inviteFriendKeys.value.has(normalizeInviteKey(user.username)),
-		)
+		.filter((user) => user.id !== currentSearchUserId)
+		.filter((user) => canShowSearchInviteUser(user))
 		.map((user) => ({
 			id: user.id,
 			username: user.username,
@@ -750,43 +783,20 @@ async function searchInviteUsers(query: string): Promise<InvitePlayersSearchUser
 		}))
 }
 
-type FriendsMutationContext = {
-	queryKey: ReturnType<typeof friendsQueryKey>
-	previousFriends?: FriendWithUserData[]
-}
-
 type SharedRowsMutationContext = {
 	queryKey: typeof sharedUsersKey.value
 	previousRows?: ShareRow[]
+	previousPendingRows: Record<string, ShareRow>
 }
 
-const addFriendMutation = useMutation({
+const friendRequestMutation = useMutation({
 	mutationFn: (user: InvitePlayersUser) => {
 		if (props.sharedInstanceActionsLocked) return
 
 		return add_friend(user.id)
 	},
-	onMutate: async (user): Promise<FriendsMutationContext> => {
-		const queryKey = friendsKey.value
-		await queryClient.cancelQueries({ queryKey })
-		const previousFriends = queryClient.getQueryData<FriendWithUserData[]>(queryKey)
-
-		queryClient.setQueryData<FriendWithUserData[]>(queryKey, (friends = []) =>
-			upsertCachedFriend(
-				friends,
-				createPendingFriend(user, currentUserId.value),
-				currentUserId.value,
-			),
-		)
-
-		return { queryKey, previousFriends }
-	},
-	onError: (error, _user, context) => {
-		restoreFriendsQuery(context)
+	onError: (error) => {
 		handleError(toError(error))
-	},
-	onSettled: (_data, _error, _user, context) => {
-		void queryClient.invalidateQueries({ queryKey: context?.queryKey ?? friendsKey.value })
 	},
 })
 
@@ -794,31 +804,45 @@ const inviteShareMutation = useMutation({
 	mutationFn: async (user: InvitePlayersUser) => {
 		if (props.sharedInstanceActionsLocked) return
 
-		await invite_shared_instance_users(props.instance.id, [user.id])
+		return await invite_shared_instance_users(props.instance.id, [user.id])
 	},
 	onMutate: async (user): Promise<SharedRowsMutationContext> => {
 		const queryKey = sharedUsersKey.value
 		await queryClient.cancelQueries({ queryKey })
 		const previousRows = queryClient.getQueryData<ShareRow[]>(queryKey)
+		const previousPendingRows = pendingRows.value
 		setPendingRow(user)
 
-		return { queryKey, previousRows }
+		return { queryKey, previousRows, previousPendingRows }
 	},
 	onError: (error, user, context) => {
 		removePendingRow(user.id)
 		restoreSharedRowsQuery(context)
+		restorePendingRows(context)
 		handleError(toError(error))
 	},
-	onSuccess: (_data, user) => {
-		upsertSharedRow(inviteUserToShareRow(user))
-		removePendingRow(user.id)
+	onSuccess: async (users, user) => {
+		try {
+			if (users) {
+				queryClient.setQueryData<ShareRow[]>(
+					sharedUsersKey.value,
+					await sharedUsersToRows(users),
+				)
+			} else {
+				upsertSharedRow(inviteUserToShareRow(user))
+			}
+		} catch (error) {
+			handleError(toError(error))
+			upsertSharedRow(inviteUserToShareRow(user))
+			await queryClient.invalidateQueries({ queryKey: sharedUsersKey.value })
+		}
 	},
 })
 
 const removeShareMutation = useMutation({
 	mutationFn: async (id: string) => {
 		if (props.sharedInstanceActionsLocked) {
-			return { user_ids: [] } satisfies SharedInstanceUsers
+			return { user_ids: [], users: [], tokens: 0 } satisfies SharedInstanceUsers
 		}
 
 		return await remove_shared_instance_users(props.instance.id, [id])
@@ -827,14 +851,17 @@ const removeShareMutation = useMutation({
 		const queryKey = sharedUsersKey.value
 		await queryClient.cancelQueries({ queryKey })
 		const previousRows = queryClient.getQueryData<ShareRow[]>(queryKey)
+		const previousPendingRows = pendingRows.value
 		queryClient.setQueryData<ShareRow[]>(queryKey, (rows = []) =>
 			rows.filter((row) => normalizeInviteKey(row.id) !== normalizeInviteKey(id)),
 		)
+		removePendingRow(id)
 
-		return { queryKey, previousRows }
+		return { queryKey, previousRows, previousPendingRows }
 	},
 	onError: (error, _id, context) => {
 		restoreSharedRowsQuery(context)
+		restorePendingRows(context)
 		handleError(toError(error))
 	},
 	onSuccess: async (users) => {
@@ -850,7 +877,10 @@ const removeShareMutation = useMutation({
 async function loadSharedRows(): Promise<ShareRow[]> {
 	if (props.sharedInstanceActionsLocked) return []
 
-	return sharedUsersToRows(await get_shared_instance_users(props.instance.id))
+	const rows = await sharedUsersToRows(await get_shared_instance_users(props.instance.id))
+	removePendingRows(rows.map((row) => row.id))
+
+	return rows
 }
 
 async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]> {
@@ -859,7 +889,10 @@ async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]
 			(id): id is string => !!id,
 		),
 	)
-	const userIds = users.user_ids.filter((id) => !excludedUserIds.has(id))
+	const sharedUsers = sharedInstanceUserEntries(users).filter(
+		(user) => !excludedUserIds.has(user.id),
+	)
+	const userIds = sharedUsers.map((user) => user.id)
 
 	if (userIds.length === 0) return []
 
@@ -869,19 +902,42 @@ async function sharedUsersToRows(users: SharedInstanceUsers): Promise<ShareRow[]
 		avatar_url?: string | null
 	}>
 
-	return userIds.map((id) => {
-		const profile = profiles.find((user) => user.id === id)
+	return sharedUsers.map((user) => {
+		const profile = profiles.find((profile) => profile.id === user.id)
+		const joinedAt = parseSharedInstanceDate(user.joined_at)
 
 		return {
-			id,
-			username: profile?.username ?? id,
+			id: user.id,
+			username: profile?.username ?? user.id,
 			avatarUrl: profile?.avatar_url ?? undefined,
-			lastPlayedAt: null,
-			joinedAt: null,
-			method: 'direct',
-			pending: true,
+			lastPlayedAt: parseSharedInstanceDate(user.last_played),
+			joinedAt,
+			method: sharedInstanceMethod(user),
+			pending: !joinedAt,
 		} satisfies ShareRow
 	})
+}
+
+function sharedInstanceUserEntries(users: SharedInstanceUsers): SharedInstanceUser[] {
+	if (users.users?.length > 0) return users.users
+
+	return users.user_ids.map((id) => ({
+		id,
+		joined_at: null,
+		join_type: 'invite',
+		last_played: null,
+	}))
+}
+
+function sharedInstanceMethod(user: SharedInstanceUser): ShareMethod {
+	return user.join_type === 'link' ? 'link' : 'direct'
+}
+
+function parseSharedInstanceDate(value?: string | null) {
+	if (!value) return null
+
+	const date = new Date(value)
+	return Number.isNaN(date.getTime()) ? null : date
 }
 
 function invitePlayer(payload: InvitePlayersInvitePayload) {
@@ -889,7 +945,7 @@ function invitePlayer(payload: InvitePlayersInvitePayload) {
 
 	const user = payload.user
 	if (payload.source === 'search') {
-		addPendingFriend(user)
+		void sendFriendRequest(user)
 	}
 
 	inviteShareUser(user)
@@ -906,11 +962,14 @@ function inviteShareUser(user: InvitePlayersUser) {
 	inviteShareMutation.mutate(user)
 }
 
-function addPendingFriend(user: InvitePlayersUser) {
+async function sendFriendRequest(user: InvitePlayersUser) {
 	if (props.sharedInstanceActionsLocked) return
-	if (findInviteFriend(user.id, user.username)) return
+	const credentials = await getCredentials()
+	const ownUserId = currentUserId.value ?? credentials?.user_id ?? null
+	if (ownUserId && normalizeInviteKey(user.id) === normalizeInviteKey(ownUserId)) return
+	if (findUserFriend(user.id, user.username)) return
 
-	addFriendMutation.mutate(user)
+	friendRequestMutation.mutate(user)
 }
 
 function cancelInvite(user: InvitePlayersUser) {
@@ -952,7 +1011,6 @@ function showRemoveRowModal(row: ShareRow) {
 }
 
 function hideRemoveUserModal() {
-	pendingRemovalRow.value = null
 	removeUserConfirmModal.value?.hide()
 }
 
@@ -961,17 +1019,11 @@ function confirmRemoveRow() {
 	if (!row) return
 
 	removeUserConfirmModal.value?.hide()
-	pendingRemovalRow.value = null
 	removeRow(row.id)
 }
 
 function removeRow(id: string) {
 	if (props.sharedInstanceActionsLocked) return
-
-	if (pendingRows.value[id]) {
-		removePendingRow(id)
-		return
-	}
 
 	removeShareMutation.mutate(id)
 }
@@ -989,11 +1041,28 @@ function setPendingRow(user: InvitePlayersUser) {
 			pending: true,
 		},
 	}
+	savePendingRows()
 }
 
 function removePendingRow(id: string) {
 	const { [id]: _removed, ...rest } = pendingRows.value
 	pendingRows.value = rest
+	savePendingRows()
+}
+
+function removePendingRows(ids: string[]) {
+	if (ids.length === 0) return
+
+	const normalizedIds = new Set(ids.map(normalizeInviteKey))
+	const nextRows = Object.fromEntries(
+		Object.entries(pendingRows.value).filter(
+			([id]) => !normalizedIds.has(normalizeInviteKey(id)),
+		),
+	)
+	if (Object.keys(nextRows).length === Object.keys(pendingRows.value).length) return
+
+	pendingRows.value = nextRows
+	savePendingRows()
 }
 
 function inviteUserToShareRow(user: InvitePlayersUser): ShareRow {
@@ -1019,17 +1088,6 @@ function upsertSharedRow(row: ShareRow) {
 	})
 }
 
-function restoreFriendsQuery(context?: FriendsMutationContext) {
-	if (!context) return
-
-	if (context.previousFriends === undefined) {
-		queryClient.removeQueries({ queryKey: context.queryKey, exact: true })
-		return
-	}
-
-	queryClient.setQueryData(context.queryKey, context.previousFriends)
-}
-
 function restoreSharedRowsQuery(context?: SharedRowsMutationContext) {
 	if (!context) return
 
@@ -1039,6 +1097,13 @@ function restoreSharedRowsQuery(context?: SharedRowsMutationContext) {
 	}
 
 	queryClient.setQueryData(context.queryKey, context.previousRows)
+}
+
+function restorePendingRows(context?: SharedRowsMutationContext) {
+	if (!context) return
+
+	pendingRows.value = context.previousPendingRows
+	savePendingRows()
 }
 
 function userProfileLink(username: string) {
@@ -1079,15 +1144,71 @@ function findInviteRow(id: string, username: string) {
 	)
 }
 
-function findInviteFriend(id: string, username: string) {
+function findUserFriend(id: string, username: string) {
 	const normalizedId = normalizeInviteKey(id)
 	const normalizedUsername = normalizeInviteKey(username)
 
-	return inviteFriends.value.find(
-		(friend) =>
-			normalizeInviteKey(friend.id) === normalizedId ||
-			normalizeInviteKey(friend.username) === normalizedUsername,
+	return userFriends.value.find((friend) => {
+		const friendId = getFriendUserId(friend, currentUserId.value)
+
+		return (
+			normalizeInviteKey(friendId) === normalizedId ||
+			normalizeInviteKey(friend.username) === normalizedUsername
+		)
+	})
+}
+
+function canShowSearchInviteUser(user: InvitePlayersSearchUser) {
+	const normalizedId = normalizeInviteKey(user.id)
+	const normalizedUsername = normalizeInviteKey(user.username)
+
+	return (
+		!inviteFriendKeys.value.has(normalizedId) &&
+		!inviteFriendKeys.value.has(normalizedUsername) &&
+		!invitedRows.value.has(normalizedId) &&
+		!invitedRows.value.has(normalizedUsername)
 	)
+}
+
+function loadPendingRows(instanceId: string): Record<string, ShareRow> {
+	if (typeof localStorage === 'undefined') return {}
+
+	try {
+		const storedRows = localStorage.getItem(pendingRowsStorageKey(instanceId))
+		if (!storedRows) return {}
+
+		const rows = JSON.parse(storedRows) as ShareRow[]
+		return Object.fromEntries(
+			rows.map((row) => [
+				row.id,
+				{
+					...row,
+					lastPlayedAt: null,
+					joinedAt: null,
+					pending: true,
+				} satisfies ShareRow,
+			]),
+		)
+	} catch {
+		return {}
+	}
+}
+
+function savePendingRows() {
+	if (typeof localStorage === 'undefined') return
+
+	const rows = Object.values(pendingRows.value)
+	const storageKey = pendingRowsStorageKey(props.instance.id)
+	if (rows.length === 0) {
+		localStorage.removeItem(storageKey)
+		return
+	}
+
+	localStorage.setItem(storageKey, JSON.stringify(rows))
+}
+
+function pendingRowsStorageKey(instanceId: string) {
+	return `modrinth:shared-instance-pending-users:${instanceId}`
 }
 
 function normalizeInviteKey(value: string) {
@@ -1108,8 +1229,9 @@ function toError(error: unknown) {
 
 watch(
 	() => props.instance.id,
-	() => {
+	(instanceId) => {
 		importedModpackUnlinkedForShare.value = false
+		pendingRows.value = loadPendingRows(instanceId)
 	},
 )
 
