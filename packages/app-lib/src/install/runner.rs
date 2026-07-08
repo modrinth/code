@@ -2,9 +2,9 @@ use super::events::{InstallProgressReporter, emit_install_job};
 use super::model::{
     InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobSnapshot,
     InstallJobState, InstallJobStatus, InstallPhaseDetails, InstallPhaseId,
-    InstallPostInstallEdit, InstallProgress, InstallRequest, InstallRollbackState,
-    InstallTarget, SharedInstanceExternalFileData, SharedInstanceInstallData,
-    SharedInstanceInstallModpack,
+    InstallPostInstallEdit, InstallProgress, InstallRequest,
+    InstallRollbackState, InstallTarget, SharedInstanceExternalFileData,
+    SharedInstanceInstallData, SharedInstanceInstallModpack,
 };
 use super::{recovery, store};
 use crate::ErrorKind;
@@ -862,11 +862,8 @@ async fn apply_shared_instance_update(
         })
         .cloned()
         .collect::<Vec<_>>();
-    let external_changes = desired
-        .external_files
-        .values()
-        .cloned()
-        .collect::<Vec<_>>();
+    let external_changes =
+        desired.external_files.values().cloned().collect::<Vec<_>>();
 
     let content_change_count =
         project_changes.len() as u64 + external_changes.len() as u64;

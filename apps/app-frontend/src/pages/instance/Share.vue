@@ -321,8 +321,8 @@ import {
 	LogInIcon,
 	MoreVerticalIcon,
 	SearchIcon,
-	UserXIcon,
 	UserPlusIcon,
+	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -595,8 +595,7 @@ const importedModpackBackupTip = computed(() => {
 const friendsQuery = useQuery({
 	queryKey: friendsKey,
 	queryFn: async () => getFriendsWithUserData(await getCredentials()),
-	enabled: () =>
-		isSignedIn.value && !!currentUserId.value && !props.sharedInstanceActionsLocked,
+	enabled: () => isSignedIn.value && !!currentUserId.value && !props.sharedInstanceActionsLocked,
 	staleTime: 30_000,
 })
 const userFriends = computed(() => friendsQuery.data.value ?? [])
@@ -608,9 +607,7 @@ const sharedUsersQuery = useQuery({
 })
 const sharedRows = computed(
 	() =>
-		sharedUsersQuery.data.value ??
-		queryClient.getQueryData<ShareRow[]>(sharedUsersKey.value) ??
-		[],
+		sharedUsersQuery.data.value ?? queryClient.getQueryData<ShareRow[]>(sharedUsersKey.value) ?? [],
 )
 const rows = computed(() => {
 	if (props.sharedInstanceActionsLocked) return sharedRows.value
@@ -872,10 +869,7 @@ const inviteShareMutation = useMutation({
 	onSuccess: async (users, user) => {
 		try {
 			if (users) {
-				queryClient.setQueryData<ShareRow[]>(
-					sharedUsersKey.value,
-					await sharedUsersToRows(users),
-				)
+				queryClient.setQueryData<ShareRow[]>(sharedUsersKey.value, await sharedUsersToRows(users))
 			} else {
 				upsertSharedRow(inviteUserToShareRow(user))
 			}
@@ -1109,9 +1103,7 @@ function removePendingRows(ids: string[]) {
 
 	const normalizedIds = new Set(ids.map(normalizeInviteKey))
 	const nextRows = Object.fromEntries(
-		Object.entries(pendingRows.value).filter(
-			([id]) => !normalizedIds.has(normalizeInviteKey(id)),
-		),
+		Object.entries(pendingRows.value).filter(([id]) => !normalizedIds.has(normalizeInviteKey(id))),
 	)
 	if (Object.keys(nextRows).length === Object.keys(pendingRows.value).length) return
 

@@ -35,6 +35,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Unknown instance"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Updating shared content"
+  },
   "app.action-bar.installs": {
     "message": "Installs"
   },
@@ -362,6 +365,51 @@
   "app.instance.share.invite-modal.heading": {
     "message": "Share {name}"
   },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "You need to sign in as"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "to access this page."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "the linked account"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Not signed in"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Switch account"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Wrong account"
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "They will no longer receive updates for this shared instance"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Any copy they already installed will stay on their device"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "You can invite them again later"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "If this is the last user, sharing will be turned off for this instance"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "What happens?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Revoke access"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Revoke access"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username}'s avatar"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "If you revoke {username}'s access to this shared instance, you'll need to invite them again before they can receive updates."
+  },
   "app.instance.share.sign-in.button": {
     "message": "Sign in"
   },
@@ -374,14 +422,17 @@
   "app.instance.shared-instance-wrong-account.fallback-username": {
     "message": "the linked account"
   },
-  "app.instance.shared-instance-wrong-account.owner-admonition-body": {
-    "message": "Sign in as {username} to manage sharing and publish updates for this shared instance. Shared instance functionality is disabled until you use the correct account."
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "to manage this shared instance. You won't be able to push updates to users."
   },
-  "app.instance.shared-instance-wrong-account.signed-out-warning-header": {
-    "message": "Sign in to the correct Modrinth account first"
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Sign in as"
   },
-  "app.instance.shared-instance-wrong-account.user-admonition-body": {
-    "message": "Sign in as {username} to receive updates for this shared instance. Shared instance functionality is disabled until you use the correct account."
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "You need to sign in to Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "to receive updates for this shared instance."
   },
   "app.instance.shared-instance-wrong-account.warning-header": {
     "message": "You are using the wrong Modrinth account"
@@ -1060,6 +1111,12 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "This instance's content is being shared to other users."
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "This instance's content is being managed by someone else."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Your access to this shared instance has been revoked. Contact {manager} for more information."

@@ -38,9 +38,9 @@ pub use self::run::{
 pub(crate) use self::shared::mark_shared_instance_stale;
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
-    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
-    SharedInstanceJoinType, SharedInstanceUser, SharedInstanceUsers,
+    SharedInstanceJoinType, SharedInstancePublishPreview,
+    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
+    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
     accept_pending_shared_instance_invite,
     decline_pending_shared_instance_invite,
     get_shared_instance_install_preview, get_shared_instance_publish_preview,

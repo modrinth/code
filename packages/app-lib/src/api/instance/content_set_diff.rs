@@ -93,7 +93,9 @@ pub(crate) fn diff_content_sets(
                         .contains(project_id),
                 });
             }
-            (Some(current), Some(latest)) if current.version_id != latest.version_id => {
+            (Some(current), Some(latest))
+                if current.version_id != latest.version_id =>
+            {
                 diffs.push(ContentSetDiffEntry::Project {
                     kind: ContentSetDiffKind::Updated,
                     project_id: project_id.to_string(),
@@ -115,7 +117,9 @@ pub(crate) fn diff_content_sets(
     }
 
     if options.common_external_files_are_updated {
-        for file_name in latest.external_files.intersection(&current.external_files) {
+        for file_name in
+            latest.external_files.intersection(&current.external_files)
+        {
             diffs.push(ContentSetDiffEntry::ExternalFile {
                 kind: ContentSetDiffKind::Updated,
                 file_name: file_name.clone(),
@@ -128,7 +132,9 @@ pub(crate) fn diff_content_sets(
         diffs.push(ContentSetDiffEntry::ExternalFile {
             kind: ContentSetDiffKind::Removed,
             file_name: file_name.clone(),
-            disabled: options.removed_disabled_external_files.contains(file_name),
+            disabled: options
+                .removed_disabled_external_files
+                .contains(file_name),
         });
     }
 

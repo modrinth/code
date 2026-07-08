@@ -88,8 +88,7 @@ export const instanceAdmonitionsMessages = defineMessages({
 	},
 	sharedInstanceWrongAccountOwnerBody: {
 		id: 'app.instance.shared-instance-wrong-account.owner-admonition-body-v2',
-		defaultMessage:
-			"to manage this shared instance. You won't be able to push updates to users.",
+		defaultMessage: "to manage this shared instance. You won't be able to push updates to users.",
 	},
 	sharedInstanceWrongAccountFallbackUsername: {
 		id: 'app.instance.shared-instance-wrong-account.fallback-username',

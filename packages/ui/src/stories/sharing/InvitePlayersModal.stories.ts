@@ -128,10 +128,7 @@ function createRender(args: Record<string, unknown>) {
 				const existingFriend = friends.value.find((friend) => friend.id === payload.user.id)
 
 				if (payload.source === 'search') {
-					invitedSearchUserIds.value = new Set([
-						...invitedSearchUserIds.value,
-						payload.user.id,
-					])
+					invitedSearchUserIds.value = new Set([...invitedSearchUserIds.value, payload.user.id])
 					lastAction.value = `Sent friend request and direct invite to ${payload.user.username}`
 					return
 				}
