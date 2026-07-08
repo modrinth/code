@@ -47,7 +47,7 @@
 			</div>
 		</template>
 		<template v-if="showDependencyDownloadActions" #actions>
-			<div class="flex flex-wrap justify-end gap-2">
+			<div class="flex flex-wrap justify-end gap-2 p-2">
 				<ButtonStyled>
 					<button
 						class="!shadow-none"
@@ -285,14 +285,16 @@ const downloadRowsLoaded = downloadModalProvider.downloadRowsLoaded
 const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 	if (!selectedVersion.value) return []
 
-	return selectedVersion.value.files.map((file) => ({
-		href: createProjectDownloadUrl(file.url, {
-			reason: props.downloadReason,
-			gameVersion: currentGameVersion.value ?? undefined,
-			loader: currentPlatform.value ?? undefined,
-		}),
-		filename: file.filename,
-	}))
+	return selectedVersion.value.files
+		.filter((file) => file.file_type !== 'optional-resource-pack')
+		.map((file) => ({
+			href: createProjectDownloadUrl(file.url, {
+				reason: props.downloadReason,
+				gameVersion: currentGameVersion.value ?? undefined,
+				loader: currentPlatform.value ?? undefined,
+			}),
+			filename: file.filename,
+		}))
 })
 
 const showDependencyDownloadActions = computed(

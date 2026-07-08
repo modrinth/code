@@ -427,10 +427,38 @@ const selectedPrimaryFile = computed<Labrinth.Versions.v3.VersionFile | null>(()
 	)
 })
 
+const requiredResourcePackFile = computed<Labrinth.Versions.v3.VersionFile | null>(() => {
+	if (props.project.project_type !== 'datapack') return null
+
+	return (
+		selectedVersion.value?.files?.find(
+			(file) => file !== selectedPrimaryFile.value && file.file_type === 'required-resource-pack',
+		) || null
+	)
+})
+
+const recommendedResourcePackFiles = computed<Labrinth.Versions.v3.VersionFile[]>(() => {
+	if (props.project.project_type !== 'datapack') return []
+
+	return (
+		selectedVersion.value?.files?.filter(
+			(file) => file !== selectedPrimaryFile.value && file.file_type === 'optional-resource-pack',
+		) || []
+	)
+})
+
 const hasAdditionalDownloads = computed(() => {
 	const hrefs = new Set<string>()
 
-	for (const file of selectedVersion.value?.files ?? []) {
+	if (selectedPrimaryFile.value) {
+		hrefs.add(selectedPrimaryFile.value.url)
+	}
+
+	if (requiredResourcePackFile.value) {
+		hrefs.add(requiredResourcePackFile.value.url)
+	}
+
+	for (const file of recommendedResourcePackFiles.value) {
 		hrefs.add(file.url)
 	}
 

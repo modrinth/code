@@ -1,5 +1,4 @@
 import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
-import { FileIcon } from '@modrinth/assets'
 import {
 	type CdnDownloadReason,
 	createContext,
@@ -26,6 +25,8 @@ export interface DownloadDependencyRow {
 	name: string
 	icon?: string
 	fallbackIcon?: Component
+	hideIcon?: boolean
+	isAdditionalFile?: boolean
 	projectHref?: string
 	downloadHref?: string
 	filename?: string
@@ -63,7 +64,9 @@ export interface DownloadModalProvider {
 	visibleDependencyRows: ComputedRef<DownloadDependencyRow[]>
 	duplicateDependencyRowsHidden: ComputedRef<boolean>
 	downloadRows: ComputedRef<DownloadDependencyRow[]>
+	recommendedRows: ComputedRef<DownloadDependencyRow[]>
 	downloadRowsLoaded: ComputedRef<boolean>
+	requiredResourcePackAdmonitionVisible: ComputedRef<boolean>
 	downloadableDependencyFiles: ComputedRef<DownloadableDependencyFile[]>
 	downloadableDependencyFilesLoaded: ComputedRef<boolean>
 	preloadDependenciesForSelection: (selection: ProjectDownloadSelection) => Promise<void>
@@ -79,6 +82,7 @@ export function provideDownloadModalProvider(
 	const queryClient = useQueryClient()
 	const { createProjectDownloadUrl } = useCdnDownloadContext()
 	const { formatMessage } = useVIntl()
+	const tags = useGeneratedState()
 
 	const shouldResolveDependencies = computed(
 		() => !!options.project.value && !!options.selectedVersion.value,
@@ -230,22 +234,49 @@ export function provideDownloadModalProvider(
 		return keepPreviousDownloadRows.value ? (previous ?? false) : false
 	})
 
+	const visibleRequiredResourcePackFiles = computed(() => {
+		if (options.project.value?.project_type !== 'datapack') return []
+
+		return options.additionalFiles.value.filter(
+			(file) => file.file_type === 'required-resource-pack',
+		)
+	})
+
+	const visibleRecommendedResourcePackFiles = computed(() => {
+		if (options.project.value?.project_type !== 'datapack') return []
+
+		return options.additionalFiles.value.filter(
+			(file) => file.file_type === 'optional-resource-pack',
+		)
+	})
+
 	const additionalFileRows = computed<DownloadDependencyRow[]>(() =>
 		selectedDownloadRowsLoaded.value
-			? options.additionalFiles.value.map((file) => ({
-					key: `additional-file-${additionalFileKey(file)}`,
-					name: file.filename,
-					fallbackIcon: FileIcon,
-					downloadHref: getDownloadUrl(file.url),
-					filename: file.filename,
-					fileSize: file.size,
-					metadataLabel: fileTypeLabel(file.file_type),
-					typeLabel: fileTypeLabel(file.file_type),
-					unavailableTooltip: formatMessage(messages.unavailableFile),
-					dependencies: [],
-				}))
+			? visibleRequiredResourcePackFiles.value.map(createAdditionalFileRow)
 			: [],
 	)
+
+	const recommendedRows = computed<DownloadDependencyRow[]>(() =>
+		selectedDownloadRowsLoaded.value
+			? visibleRecommendedResourcePackFiles.value.map(createAdditionalFileRow)
+			: [],
+	)
+
+	function createAdditionalFileRow(file: Labrinth.Versions.v3.VersionFile): DownloadDependencyRow {
+		return {
+			key: `additional-file-${additionalFileKey(file)}`,
+			name: file.filename,
+			hideIcon: true,
+			isAdditionalFile: true,
+			downloadHref: getDownloadUrl(file.url),
+			filename: file.filename,
+			fileSize: file.size,
+			metadataLabel: fileTypeDisplayLabel(file.file_type),
+			typeLabel: fileTypeLabel(file.file_type),
+			unavailableTooltip: formatMessage(messages.unavailableFile),
+			dependencies: [],
+		}
+	}
 
 	const downloadRows = computed<DownloadDependencyRow[]>((previous) => {
 		if (selectedDownloadRowsLoaded.value) {
@@ -258,6 +289,10 @@ export function provideDownloadModalProvider(
 	const downloadRowsLoaded = computed((previous) => {
 		if (selectedDownloadRowsLoaded.value) return true
 		return keepPreviousDownloadRows.value ? (previous ?? false) : false
+	})
+
+	const requiredResourcePackAdmonitionVisible = computed(() => {
+		return selectedDownloadRowsLoaded.value && visibleRequiredResourcePackFiles.value.length > 0
 	})
 
 	const downloadableDependencyFiles = computed<DownloadableDependencyFile[]>(() =>
@@ -332,6 +367,13 @@ export function provideDownloadModalProvider(
 		const metadataLabel = isProjectOnlyDependencyReference(dependency)
 			? formatMessage(messages.anyCompatibleDependency)
 			: (version?.version_number ?? formatMessage(messages.anyCompatibleDependency))
+		const childDependencies = (versionId && dependenciesByParentVersionId.value.get(versionId)
+			? dependenciesByParentVersionId.value.get(versionId)!
+			: []
+		).flatMap((subDependency) => {
+			const row = createDependencyRow(subDependency)
+			return row ? [row] : []
+		})
 
 		return {
 			key: `${dependency.project_id}-${versionId ?? 'unresolved'}-${
@@ -347,14 +389,42 @@ export function provideDownloadModalProvider(
 			metadataLabel,
 			typeLabel: 'Required',
 			unavailableTooltip,
-			dependencies: (versionId && dependenciesByParentVersionId.value.get(versionId)
-				? dependenciesByParentVersionId.value.get(versionId)!
-				: []
-			).flatMap((subDependency) => {
-				const row = createDependencyRow(subDependency)
-				return row ? [row] : []
-			}),
+			dependencies: [
+				...childDependencies,
+				...createRequiredResourcePackRowsForDependency(project, version, primaryFile),
+			],
 		}
+	}
+
+	function createRequiredResourcePackRowsForDependency(
+		project: Labrinth.Projects.v2.Project,
+		version: Labrinth.Versions.v3.Version | undefined,
+		primaryFile: Labrinth.Versions.v3.VersionFile | undefined,
+	): DownloadDependencyRow[] {
+		if (!version || !isDataPackProject(project)) return []
+
+		return version.files
+			.filter((file) => file !== primaryFile && file.file_type === 'required-resource-pack')
+			.map((file) => ({
+				key: `dependency-resource-pack-${version.id}-${additionalFileKey(file)}`,
+				name: file.filename,
+				hideIcon: true,
+				isAdditionalFile: true,
+				downloadHref: getDownloadUrl(file.url),
+				filename: file.filename,
+				fileSize: file.size,
+				metadataLabel: fileTypeDisplayLabel(file.file_type),
+				typeLabel: fileTypeLabel(file.file_type),
+				unavailableTooltip: formatMessage(messages.unavailableFile),
+				dependencies: [],
+			}))
+	}
+
+	function isDataPackProject(project: Labrinth.Projects.v2.Project) {
+		return (
+			project.project_type === 'datapack' ||
+			project.loaders.some((loader) => tags.value.loaderData.dataPackLoaders.includes(loader))
+		)
 	}
 
 	function isProjectOnlyDependencyReference(dependency: ResolvedContent) {
@@ -397,11 +467,19 @@ export function provideDownloadModalProvider(
 		return formatMessage(fileTypeMessages[type ?? 'unknown'] ?? fileTypeMessages.unknown)
 	}
 
+	function fileTypeDisplayLabel(type?: Labrinth.Versions.v3.FileType | null) {
+		if (type === 'required-resource-pack') return formatMessage(messages.requiredResourcePackShort)
+
+		return fileTypeLabel(type)
+	}
+
 	const provider = {
 		visibleDependencyRows,
 		duplicateDependencyRowsHidden,
 		downloadRows,
+		recommendedRows,
 		downloadRowsLoaded,
+		requiredResourcePackAdmonitionVisible,
 		downloadableDependencyFiles,
 		downloadableDependencyFilesLoaded,
 		preloadDependenciesForSelection,
@@ -626,5 +704,9 @@ const messages = defineMessages({
 	unavailableFile: {
 		id: 'project.download.file-unavailable',
 		defaultMessage: 'This file cannot be downloaded',
+	},
+	requiredResourcePackShort: {
+		id: 'project.download.required-resource-pack-short',
+		defaultMessage: 'Resource pack',
 	},
 })

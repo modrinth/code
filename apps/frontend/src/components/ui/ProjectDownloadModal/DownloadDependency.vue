@@ -1,18 +1,18 @@
 <template>
 	<div class="flex min-w-0 flex-col">
 		<div
-			class="z-10 grid h-11 grid-cols-[minmax(0,1fr)_min-content] items-center gap-3 text-primary"
+			class="z-10 grid h-11 grid-cols-[minmax(0,1fr)_min-content] items-center gap-1 text-primary"
 		>
 			<span class="flex min-w-0 items-center gap-2">
 				<Avatar
-					v-if="dependency.icon"
+					v-if="dependency.icon && !dependency.hideIcon"
 					:src="dependency.icon"
 					:alt="dependency.name"
 					size="24px"
 					class="!rounded-lg !shadow-none"
 				/>
 				<span
-					v-else
+					v-else-if="!dependency.hideIcon"
 					class="flex size-6 flex-shrink-0 items-center justify-center rounded-lg border border-solid border-surface-5 text-secondary"
 				>
 					<component
@@ -28,7 +28,7 @@
 					:href="dependency.projectHref"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="min-w-0 truncate text-base font-semibold text-contrast hover:underline"
+					class="min-w-0 truncate bg-surface-2 text-base font-semibold text-contrast hover:underline"
 				>
 					{{ dependency.name }}
 				</a>
@@ -36,11 +36,20 @@
 					v-else
 					ref="dependencyNameRef"
 					v-tooltip="truncatedTooltip(dependencyNameRef, dependency.name)"
-					class="min-w-0 truncate text-base font-semibold text-contrast"
+					class="min-w-0 truncate bg-surface-2 text-base text-contrast"
+					:class="dependency.isAdditionalFile ? 'font-medium' : 'font-semibold'"
 				>
 					{{ dependency.name }}
 				</span>
+				<TagItem
+					v-if="dependency.isAdditionalFile"
+					v-tooltip="metadataTooltip"
+					class="min-w-0 max-w-[50%] shrink-0 truncate border !border-solid border-surface-5"
+				>
+					{{ metadataLabel }}
+				</TagItem>
 				<span
+					v-else
 					v-tooltip="metadataTooltip"
 					class="min-w-0 max-w-[50%] truncate text-sm text-secondary"
 				>
@@ -93,6 +102,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	defineMessages,
+	TagItem,
 	truncatedTooltip,
 	useFormatBytes,
 	useVIntl,
@@ -108,6 +118,8 @@ interface DownloadDependencyRow {
 	name: string
 	icon?: string
 	fallbackIcon?: Component
+	hideIcon?: boolean
+	isAdditionalFile?: boolean
 	projectHref?: string
 	downloadHref?: string
 	filename?: string
@@ -131,9 +143,11 @@ const formatBytes = useFormatBytes()
 const dependencyNameRef = ref<HTMLElement | null>(null)
 
 const metadataLabel = computed(() => props.dependency.metadataLabel ?? props.dependency.typeLabel)
-const metadataTooltip = computed(() =>
-	metadataLabel.value === props.dependency.typeLabel ? null : metadataLabel.value,
-)
+const metadataTooltip = computed(() => {
+	if (props.dependency.isAdditionalFile) return null
+	if (metadataLabel.value === props.dependency.typeLabel) return null
+	return metadataLabel.value
+})
 
 const downloadTooltip = computed(() => {
 	const filename = props.dependency.filename || props.dependency.name
