@@ -2224,7 +2224,64 @@ export namespace Labrinth {
 				| 'severity_desc'
 
 			export type UpdateIssueRequest = {
+				detail_id: string
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateIssueDetailRequest = {
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateGlobalIssueRequest = {
+				detail_key: string
 				verdict: 'safe' | 'unsafe'
+			}
+
+			export type SearchGlobalIssueDetailsRequest = {
+				limit?: number
+				page?: number
+				query?: string | null
+			}
+
+			export type SearchGlobalIssueDetailsResponse = {
+				total: number
+				traces: GlobalIssueDetail[]
+			}
+
+			export type GetGlobalIssueDetailRequest = {
+				detail_key: string
+				limit?: number
+				after_detail_id?: string | null
+			}
+
+			export type GetGlobalIssueDetailResponse = {
+				trace: GlobalIssueDetail
+				next_after_detail_id: string | null
+			}
+
+			export type GlobalIssueDetail = {
+				detail_key: string
+				verdict: DelphiReportIssueStatus
+				local_trace_count: number
+				local_traces: GlobalIssueDetailTrace[]
+			}
+
+			export type GlobalIssueDetailTrace = {
+				detail_id: string
+				issue_id: string
+				issue_type: string
+				project_id: string
+				project_slug: string | null
+				project_name: string
+				version_id: string
+				version_number: string
+				file_id: string
+				file_name: string
+				jar: string | null
+				file_path: string
+				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus
+				effective_status: DelphiReportIssueStatus
 			}
 
 			export type SubmitProjectRequest = {

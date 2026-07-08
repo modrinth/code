@@ -33,3 +33,4 @@
 - To seed the database locally: `psql postgresql://labrinth:labrinth@localhost/labrinth -f apps/labrinth/fixtures/labrinth-seed-data-202508052143.sql`
 - When writing `sqlx` queries, prefer `r#` raw strings over escaping quotes
 - When interacting with the Postgres database, prefer using a `ro_pool: ReadOnlyPgPool` when performing read-only operations
+- After writing a SQL query, run `EXPLAIN ANALYZE` to see how long the query would take to run. Report to the user the estimated performance impact of the query.
