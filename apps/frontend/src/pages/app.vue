@@ -2340,11 +2340,11 @@ useSeoMeta({
 	}
 
 	.dark-icon {
-		display: none !important;
+		display: none;
 	}
 
 	.light-icon {
-		display: block !important;
+		display: block;
 	}
 
 	.feature {
