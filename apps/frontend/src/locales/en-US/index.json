@@ -3329,6 +3329,12 @@
   "project.download.download-with-dependencies": {
     "message": "Download with deps"
   },
+  "project.download.download-with-recommended": {
+    "message": "Download with recommended"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Download with recommended as .zip"
+  },
   "project.download.duplicate-dependencies-hidden": {
     "message": "Duplicate dependencies are hidden"
   },

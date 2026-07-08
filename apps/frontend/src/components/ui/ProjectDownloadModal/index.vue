@@ -63,11 +63,17 @@
 						{{ formatMessage(messages.downloadAsZip) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="brand">
+				<JoinedButtons
+					v-if="hasRecommendedDownloadFiles"
+					color="brand"
+					:actions="downloadWithRecommendedActions"
+					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+				/>
+				<ButtonStyled v-else color="brand">
 					<button
 						class="!shadow-none"
 						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
-						@click="downloadSelectedVersionFilesWithDependencies"
+						@click="downloadFilesWithDependencies"
 					>
 						<SpinnerIcon
 							v-if="downloadingActionType === 'dependencies'"
@@ -93,6 +99,8 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	JoinedButtons,
+	type JoinedButtonAction,
 	NewModal,
 	ServersPromo,
 	truncatedTooltip,
@@ -135,7 +143,7 @@ type DownloadedFile = DownloadableFile & {
 	blob: Blob
 }
 
-type DownloadActionType = 'zip' | 'dependencies'
+type DownloadActionType = 'zip' | 'dependencies' | 'recommended'
 
 type NewModalRef = {
 	show: (event?: MouseEvent) => void
@@ -290,7 +298,9 @@ const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 	if (!selectedVersion.value) return []
 
 	return selectedVersion.value.files
-		.filter((file) => file === selectedPrimaryFile.value || file.file_type === 'required-resource-pack')
+		.filter(
+			(file) => file === selectedPrimaryFile.value || file.file_type === 'required-resource-pack',
+		)
 		.map((file) => ({
 			href: createProjectDownloadUrl(file.url, {
 				reason: props.downloadReason,
@@ -301,11 +311,53 @@ const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
 		}))
 })
 
+const recommendedDownloadFiles = computed<DownloadableFile[]>(() => {
+	if (project.value?.project_type !== 'datapack' || !selectedVersion.value) return []
+
+	return selectedVersion.value.files
+		.filter(
+			(file) => file !== selectedPrimaryFile.value && file.file_type === 'optional-resource-pack',
+		)
+		.map((file) => ({
+			href: createProjectDownloadUrl(file.url, {
+				reason: props.downloadReason,
+				gameVersion: currentGameVersion.value ?? undefined,
+				loader: currentPlatform.value ?? undefined,
+			}),
+			filename: file.filename,
+		}))
+})
+
+const hasRecommendedDownloadFiles = computed(() => recommendedDownloadFiles.value.length > 0)
+
 const showDependencyDownloadActions = computed(
 	() =>
 		selectedVersionDownloadFiles.value.length > 0 &&
-		(dependencyDownloadFiles.value.length > 0 || hasRequiredResourcePackAdditionalFile.value),
+		(dependencyDownloadFiles.value.length > 0 ||
+			hasRequiredResourcePackAdditionalFile.value ||
+			hasRecommendedDownloadFiles.value),
 )
+
+const downloadWithRecommendedActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'download-with-dependencies',
+		label: formatMessage(messages.downloadWithDependencies),
+		icon: downloadingActionType.value === 'dependencies' ? SpinnerIcon : DownloadIcon,
+		action: () => void downloadFilesWithDependencies(),
+	},
+	{
+		id: 'download-with-recommended',
+		label: formatMessage(messages.downloadWithRecommended),
+		icon: DownloadIcon,
+		action: () => void downloadFilesWithRecommended(),
+	},
+	{
+		id: 'download-with-recommended-zip',
+		label: formatMessage(messages.downloadWithRecommendedAsZip),
+		icon: DownloadIcon,
+		action: () => void downloadSelectedVersionZip(),
+	},
+])
 
 watch(projectV2Error, (error) => {
 	if (error) {
@@ -325,6 +377,14 @@ const messages = defineMessages({
 	downloadWithDependencies: {
 		id: 'project.download.download-with-dependencies',
 		defaultMessage: 'Download with deps',
+	},
+	downloadWithRecommended: {
+		id: 'project.download.download-with-recommended',
+		defaultMessage: 'Download with recommended',
+	},
+	downloadWithRecommendedAsZip: {
+		id: 'project.download.download-with-recommended-as-zip',
+		defaultMessage: 'Download with recommended as .zip',
 	},
 	downloadZipFailedTitle: {
 		id: 'project.download.zip-failed-title',
@@ -488,6 +548,7 @@ async function downloadSelectedVersionZip() {
 	const files = dedupeDownloadFiles([
 		...selectedVersionDownloadFiles.value,
 		...dependencyDownloadFiles.value,
+		...recommendedDownloadFiles.value,
 	])
 
 	try {
@@ -519,7 +580,7 @@ async function downloadSelectedVersionZip() {
 	}
 }
 
-async function downloadSelectedVersionFilesWithDependencies() {
+async function downloadFilesWithDependencies() {
 	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
 
 	downloadingActionType.value = 'dependencies'
@@ -528,6 +589,33 @@ async function downloadSelectedVersionFilesWithDependencies() {
 		const files = dedupeDownloadFiles([
 			...selectedVersionDownloadFiles.value,
 			...dependencyDownloadFiles.value,
+		])
+
+		await downloadFiles(files)
+
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadZipFailedTitle),
+			text: formatMessage(messages.downloadZipFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingActionType.value = null
+	}
+}
+
+async function downloadFilesWithRecommended() {
+	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
+
+	downloadingActionType.value = 'recommended'
+
+	try {
+		const files = dedupeDownloadFiles([
+			...selectedVersionDownloadFiles.value,
+			...dependencyDownloadFiles.value,
+			...recommendedDownloadFiles.value,
 		])
 
 		await downloadFiles(files)
