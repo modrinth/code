@@ -138,6 +138,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
         web::scope("")
             .wrap(default_cors())
             .service(index::index_get)
+            .service(index::build_get)
             .service(Files::new("/", "assets/")),
     );
 }

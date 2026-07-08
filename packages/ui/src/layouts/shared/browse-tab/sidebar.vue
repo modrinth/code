@@ -17,6 +17,14 @@ const isApp = computed(() => ctx.variant === 'app')
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
 
+const advancedFiltersCollapsed = computed(() => ctx.advancedFiltersCollapsed?.value ?? true)
+
+function setAdvancedFiltersCollapsed(collapsed: boolean) {
+	if (ctx.advancedFiltersCollapsed) {
+		ctx.advancedFiltersCollapsed.value = collapsed
+	}
+}
+
 function closeFiltersMenu() {
 	if (ctx.filtersMenuOpen) {
 		ctx.filtersMenuOpen.value = false
@@ -49,6 +57,9 @@ function hasProvidedFilter(filterId: string): boolean {
 }
 
 function getFilterOpenByDefault(filterId: string): boolean {
+	if (filterId === 'advanced') {
+		return !advancedFiltersCollapsed.value
+	}
 	if (hasProvidedFilter(filterId)) {
 		return true
 	}
@@ -188,6 +199,8 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				:content-class="contentClass"
 				:inner-panel-class="innerPanelClass"
 				:open-by-default="getFilterOpenByDefault(filter.id)"
+				@on-open="() => filter.id === 'advanced' && setAdvancedFiltersCollapsed(false)"
+				@on-close="() => filter.id === 'advanced' && setAdvancedFiltersCollapsed(true)"
 			>
 				<template #header>
 					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg font-semibold'">
