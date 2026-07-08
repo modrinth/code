@@ -2234,7 +2234,7 @@ export namespace Labrinth {
 
 			export type UpdateGlobalIssueRequest = {
 				detail_key: string
-				verdict: 'safe' | 'unsafe'
+				verdict: DelphiReportIssueStatus
 			}
 
 			export type SearchGlobalIssueDetailsRequest = {
@@ -2343,6 +2343,8 @@ export namespace Labrinth {
 				decompiled_source: string | null
 				data: Record<string, unknown>
 				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus | null
+				global_status: DelphiReportIssueStatus | null
 				status: DelphiReportIssueStatus
 			}
 

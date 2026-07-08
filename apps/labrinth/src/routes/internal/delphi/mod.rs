@@ -303,6 +303,8 @@ async fn ingest_report_deserialized(
             decompiled_source: None,
             data: HashMap::new(),
             severity: DelphiSeverity::Low,
+            local_status: None,
+            global_status: None,
             status: DelphiStatus::Pending,
         }
         .insert(&mut transaction)
@@ -340,6 +342,8 @@ async fn ingest_report_deserialized(
                 decompiled_source: decompiled_source.cloned().flatten(),
                 data: issue_detail.data,
                 severity: issue_detail.severity,
+                local_status: None,
+                global_status: None,
                 status: DelphiStatus::Pending,
             }
             .insert(&mut transaction)

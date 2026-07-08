@@ -238,6 +238,8 @@ pub async fn get_issue(
                             'decompiled_source', didws.decompiled_source,
                             'data', didws.data,
                             'severity', didws.severity,
+                            'local_status', didws.local_status,
+                            'global_status', didws.global_status,
                             'status', didws.status
                         )
                     ), '[]'::jsonb)
@@ -313,6 +315,8 @@ pub async fn get_report(
                                         'decompiled_source', didws.decompiled_source,
                                         'data', didws.data,
                                         'severity', didws.severity,
+                                        'local_status', didws.local_status,
+                                        'global_status', didws.global_status,
                                         'status', didws.status
                                     )
                                 ), '[]'::jsonb)
@@ -513,6 +517,8 @@ async fn fetch_project_reports(
             didws.file_path AS "file_path!: String",
             didws.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
             didws.severity AS "severity!: DelphiSeverity",
+            didws.local_status AS "local_status?: DelphiStatus",
+            didws.global_status AS "global_status?: DelphiStatus",
             didws.status AS "status!: DelphiStatus"
         FROM delphi_issue_details_with_statuses didws
         WHERE didws.issue_id = ANY($1::bigint[])
@@ -571,6 +577,8 @@ async fn fetch_project_reports(
                 decompiled_source: None,
                 data: d.data.0,
                 severity: d.severity,
+                local_status: d.local_status,
+                global_status: d.global_status,
                 status: d.status,
             })
             .into_group_map_by(|d| d.issue_id);
@@ -1176,7 +1184,9 @@ pub struct UpdateGlobalIssue {
     /// Key of the issue detail to update globally.
     pub detail_key: String,
     /// What the moderator has decided the outcome of this issue is globally.
-    pub verdict: DelphiVerdict,
+    ///
+    /// `pending` removes the global verdict for this issue detail key.
+    pub verdict: DelphiStatus,
 }
 
 /// Update technical review issue details.  
@@ -1305,7 +1315,8 @@ pub async fn update_issue_details(
 
 /// Update global technical review issue detail verdicts.
 ///
-/// This marks every issue detail with a matching key as safe or unsafe.
+/// This marks every issue detail with a matching key as safe or unsafe, or
+/// unsets the global verdict with `pending`.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -1346,8 +1357,9 @@ pub async fn update_global_issue_details(
     let verdicts = updates
         .iter()
         .map(|u| match u.verdict {
-            DelphiVerdict::Safe => "safe".to_string(),
-            DelphiVerdict::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Safe => "safe".to_string(),
+            DelphiStatus::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Pending => "pending".to_string(),
         })
         .collect::<Vec<_>>();
 
@@ -1362,16 +1374,31 @@ pub async fn update_global_issue_details(
             SELECT *
             FROM unnest($1::text[], $2::text[]) WITH ORDINALITY
                 AS u(detail_key, verdict, ord)
+        ),
+        latest AS (
+            SELECT DISTINCT ON (detail_key)
+                detail_key,
+                verdict
+            FROM incoming
+            ORDER BY detail_key, ord DESC
+        ),
+        deleted AS (
+            DELETE FROM delphi_global_detail_verdicts dgdv
+            USING latest
+            WHERE
+                dgdv.detail_key = latest.detail_key
+                AND latest.verdict = 'pending'
+            RETURNING 1
         )
         INSERT INTO delphi_global_detail_verdicts (
             detail_key,
             verdict
         )
-        SELECT DISTINCT ON (detail_key)
+        SELECT
             detail_key,
             verdict::delphi_report_issue_status
-        FROM incoming
-        ORDER BY detail_key, ord DESC
+        FROM latest
+        WHERE verdict != 'pending'
         ON CONFLICT (detail_key)
         DO UPDATE SET verdict = EXCLUDED.verdict
         "#,
