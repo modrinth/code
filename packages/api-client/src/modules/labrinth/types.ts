@@ -1742,6 +1742,7 @@ export namespace Labrinth {
 			export interface ResultSearchProject {
 				project_id: string
 				project_type: string
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1779,6 +1780,7 @@ export namespace Labrinth {
 				version_id: string
 				project_id: string
 				project_types: string[]
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
