@@ -69,9 +69,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config)
-            .configure(friends::config),
+            .configure(friends::config)
+            .configure(content::config),
     );
-    cfg.configure(content::config);
 }
 
 #[derive(utoipa::OpenApi)]
