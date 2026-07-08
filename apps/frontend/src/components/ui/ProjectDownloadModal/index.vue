@@ -698,7 +698,7 @@ function selectedVersionZipFilename() {
 
 	return `${sanitizeFilename(project.value.title)} ${sanitizeFilename(
 		selectedVersion.value.version_number,
-	)}.zip`
+	)}-EXTRACT_ME.zip`
 }
 
 function sanitizeFilename(value: string) {
