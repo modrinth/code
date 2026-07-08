@@ -36,7 +36,7 @@
 				<VersionChannelTag :channel="version.version_type" class="relative -top-px !py-1" />
 			</div>
 			<div class="flex min-w-0 items-center gap-1.5 text-sm text-secondary">
-				<span v-tooltip="publishedTooltip" class="min-w-0 truncate capitalize">
+				<span v-tooltip="publishedTooltip" class="min-w-0 truncate">
 					{{ publishedLabel }}
 				</span>
 				<div
@@ -88,7 +88,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionChannelTag from '@modrinth/ui/src/components/version/VersionChannelTag.vue'
-import type { DisplayProjectType } from '@modrinth/utils'
+import { capitalizeString, type DisplayProjectType } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 defineOptions({
@@ -157,7 +157,7 @@ const primaryFileDownloadUrl = computed(() => {
 	})
 })
 
-const publishedLabel = computed(() => formatRelativeTime(props.version.date_published))
+const publishedLabel = computed(() => capitalizeString(formatRelativeTime(props.version.date_published)))
 const publishedTooltip = computed(() => formatDateTime(props.version.date_published))
 const primaryFileSizeLabel = computed(() => {
 	if (!primaryFile.value) return ''
