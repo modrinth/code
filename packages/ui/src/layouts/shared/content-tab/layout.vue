@@ -354,7 +354,12 @@ function canDeleteItem(item: ContentItem) {
 	return ctx.canDeleteItem?.(item) ?? true
 }
 
+function canToggleItem(item: ContentItem) {
+	return ctx.canToggleItem?.(item) ?? true
+}
+
 const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
+const toggleableSelectedItems = computed(() => selectedItems.value.filter(canToggleItem))
 
 async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 	const deletableItems = items.filter(canDeleteItem)
@@ -589,6 +594,7 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 	if (ctx.isBusy.value) return
 	const item = ctx.items.value.find((i) => getItemId(i) === id)
 	if (!item) return
+	if (!canToggleItem(item)) return
 	if (!_value) {
 		await promptDisableItems([item])
 		return
@@ -603,7 +609,7 @@ async function handleToggleEnabledById(id: string, _value: boolean) {
 
 async function bulkEnable() {
 	if (ctx.isBusy.value) return
-	const items = selectedItems.value.filter((item) => !item.enabled)
+	const items = toggleableSelectedItems.value.filter((item) => !item.enabled)
 	if (items.length === 0) return
 	if (ctx.bulkEnableItems) {
 		isBulkOperating.value = true
@@ -628,7 +634,7 @@ async function bulkEnable() {
 
 async function bulkDisable() {
 	if (ctx.isBusy.value) return
-	const items = selectedItems.value.filter((item) => item.enabled)
+	const items = toggleableSelectedItems.value.filter((item) => item.enabled)
 	if (items.length === 0) return
 	await promptDisableItems(items)
 }
@@ -1023,6 +1029,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:bulk-item-count="bulkItemCount"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
 			:get-item-id="getItemId"
+			:toggle-items="toggleableSelectedItems"
 			@clear="clearSelection"
 			@enable="bulkEnable"
 			@disable="bulkDisable"

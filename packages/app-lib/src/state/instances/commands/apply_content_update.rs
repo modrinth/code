@@ -283,8 +283,14 @@ async fn plan_bulk_update(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<BulkUpdatePlan> {
-    let updateable_paths =
-        bulk_updateable_project_paths(instance_id, state).await?;
+    let shared_instance_member =
+        is_shared_instance_member(instance_id, state).await?;
+    let updateable_paths = bulk_updateable_project_paths(
+        instance_id,
+        shared_instance_member,
+        state,
+    )
+    .await?;
     if updateable_paths.is_empty() {
         return Ok(BulkUpdatePlan {
             project_updates: Vec::new(),
@@ -318,27 +324,22 @@ async fn plan_bulk_update(
             })?;
     let installed =
         installed_projects(instance_id, &content_set, state).await?;
-    let updateable_paths =
-        if is_shared_instance_member(instance_id, state).await? {
-            let linked_modpack_paths = installed
-                .iter()
-                .filter(|project| {
-                    matches!(
-                        project.source_kind,
-                        ContentSourceKind::ModrinthModpack
-                            | ContentSourceKind::ImportedModpack
-                    )
-                })
-                .map(|project| project.relative_path.clone())
-                .collect::<HashSet<_>>();
+    let updateable_paths = if shared_instance_member {
+        let managed_paths = installed
+            .iter()
+            .filter(|project| {
+                is_shared_instance_managed_source_kind(project.source_kind)
+            })
+            .map(|project| project.relative_path.clone())
+            .collect::<HashSet<_>>();
 
-            updateable_paths
-                .into_iter()
-                .filter(|path| !linked_modpack_paths.contains(path))
-                .collect::<HashSet<_>>()
-        } else {
-            updateable_paths
-        };
+        updateable_paths
+            .into_iter()
+            .filter(|path| !managed_paths.contains(path))
+            .collect::<HashSet<_>>()
+    } else {
+        updateable_paths
+    };
     let updates = updates
         .into_iter()
         .filter(|update| updateable_paths.contains(&update.relative_path))
@@ -435,6 +436,7 @@ async fn plan_bulk_update(
 
 async fn bulk_updateable_project_paths(
     instance_id: &str,
+    shared_instance_member: bool,
     state: &State,
 ) -> crate::Result<HashSet<String>> {
     let items = super::list_content::list_content(
@@ -445,7 +447,16 @@ async fn bulk_updateable_project_paths(
     )
     .await?;
 
-    Ok(items.into_iter().map(|item| item.file_path).collect())
+    Ok(items
+        .into_iter()
+        .filter(|item| {
+            !shared_instance_member
+                || !item
+                    .source_kind
+                    .is_some_and(is_shared_instance_managed_source_kind)
+        })
+        .map(|item| item.file_path)
+        .collect())
 }
 
 async fn installed_projects(
@@ -509,6 +520,17 @@ async fn is_shared_instance_member(
     Ok(metadata.shared_instance.is_some_and(|attachment| {
         attachment.role == SharedInstanceRole::Member
     }))
+}
+
+fn is_shared_instance_managed_source_kind(
+    source_kind: ContentSourceKind,
+) -> bool {
+    matches!(
+        source_kind,
+        ContentSourceKind::SharedInstance
+            | ContentSourceKind::ModrinthModpack
+            | ContentSourceKind::ImportedModpack
+    )
 }
 
 async fn dependency_closure(
