@@ -15,14 +15,14 @@
 			<Admonition v-if="requiredResourcePackAdmonitionVisible" type="info">
 				<IntlFormatted :message-id="messages.requiredResourcePackAdmonition">
 					<template #folder>
-						<code class="text-sm">resourcepacks</code class="text-sm">
+						<code class="text-sm">resourcepacks</code>
 					</template>
 				</IntlFormatted>
 			</Admonition>
 			<Admonition v-if="dependencyResourcePackAdmonitionVisible" type="info">
 				<IntlFormatted :message-id="messages.dependencyResourcePackAdmonition">
 					<template #folder>
-						<code class="text-sm">resourcepacks</code class="text-sm">
+						<code class="text-sm">resourcepacks</code>
 					</template>
 				</IntlFormatted>
 			</Admonition>
