@@ -803,10 +803,7 @@ import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
-import {
-	loadChecklistOpenState,
-	saveChecklistOpenState,
-} from '~/services/moderation-checklist-storage.ts'
+import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
@@ -2035,9 +2032,6 @@ function consumeShowChecklistHistoryState() {
 
 function setModerationChecklistOpen(open, projectId = project.value?.id) {
 	showModerationChecklist.value = open
-	if (projectId) {
-		void saveChecklistOpenState(projectId, open)
-	}
 }
 
 function isProjectInActiveModerationQueue(projectId = project.value?.id) {
@@ -2079,21 +2073,17 @@ watch(
 			return
 		}
 
-		const storedOpen = await loadChecklistOpenState(projectId)
+		const storedState = await loadChecklistState(projectId)
 		if (cancelled) return
 
-		if (storedOpen !== null) {
-			showModerationChecklist.value = storedOpen
+		if (storedState !== null) {
+			showModerationChecklist.value = storedState.open ?? false
 			return
 		}
 
 		const shouldRecoverFromQueue =
 			moderationQueue.isQueueMode && moderationQueue.getCurrentProjectId() === projectId
 		showModerationChecklist.value = shouldRecoverFromQueue
-
-		if (shouldRecoverFromQueue) {
-			void saveChecklistOpenState(projectId, true)
-		}
 	},
 	{ immediate: true },
 )

@@ -1,5 +1,5 @@
 const DB_NAME = 'modrinth-moderation'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 function hasIndexedDb(): boolean {
 	return typeof window !== 'undefined' && typeof indexedDB !== 'undefined'
@@ -9,10 +9,16 @@ function openDatabase(): Promise<IDBDatabase> {
 	return new Promise((resolve, reject) => {
 		const request = indexedDB.open(DB_NAME, DB_VERSION)
 
-		request.onupgradeneeded = () => {
+		request.onupgradeneeded = (event) => {
 			const db = request.result
-			if (!db.objectStoreNames.contains('kv')) {
-				db.createObjectStore('kv')
+			if (event.oldVersion < 2 && db.objectStoreNames.contains('kv')) {
+				db.deleteObjectStore('kv')
+			}
+			if (!db.objectStoreNames.contains('checklist')) {
+				db.createObjectStore('checklist')
+			}
+			if (!db.objectStoreNames.contains('queue')) {
+				db.createObjectStore('queue')
 			}
 		}
 

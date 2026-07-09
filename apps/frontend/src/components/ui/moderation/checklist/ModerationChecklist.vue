@@ -176,22 +176,22 @@
 							</ButtonStyled>
 							<MarkdownEditor
 								v-if="!useSimpleEditor"
-								v-model="message"
+								v-model="messageText"
 								:max-height="400"
 								placeholder="No message generated."
 								:disabled="false"
 								:heading-buttons="false"
 								:on-image-upload="onUploadHandler"
-								@input="persistGeneratedMessageState"
+								@input="persistState"
 							/>
 							<StyledInput
 								v-else
-								v-model="message"
+								v-model="messageText"
 								multiline
 								placeholder="No message generated."
 								autocomplete="off"
 								input-class="h-[400px] font-mono"
-								@input="persistGeneratedMessageState"
+								@input="persistState"
 							/>
 						</div>
 					</div>
@@ -545,23 +545,16 @@ import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from 
 import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computedAsync, useDebounceFn } from '@vueuse/core'
+import { toRaw } from 'vue'
 import type { Component } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import {
-	clearChecklistProgressState,
-	clearGeneratedMessageState as clearPersistedGeneratedMessageState,
-	createEmptyGeneratedMessageState,
-	loadChecklistActionStates,
-	loadChecklistStage,
-	loadChecklistTextInputs,
-	loadGeneratedMessageState,
-	saveChecklistActionStates,
-	saveChecklistStage,
-	saveChecklistTextInputs,
-	saveGeneratedMessageState,
+	clearChecklistState,
+	loadChecklistState,
+	saveChecklistState,
 } from '~/services/moderation-checklist-storage.ts'
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
@@ -839,7 +832,6 @@ function handleLockLost(result: LockAcquireResponse) {
 function handleLockAcquired() {
 	lockStatus.value = { locked: false, isOwnLock: true }
 	lockError.value = false
-	initializeAllStages()
 	clearLockCountdown()
 	startLockHeartbeat()
 	maintainPrefetchQueue() // Start prefetching immediately (not debounced)
@@ -848,7 +840,6 @@ function handleLockAcquired() {
 function handleLockUnavailable() {
 	lockError.value = true
 	lockStatus.value = { locked: false, isOwnLock: false }
-	initializeAllStages()
 	clearLockCountdown()
 	addNotification({
 		title: 'Lock unavailable',
@@ -924,14 +915,12 @@ async function onUploadHandler(file: File) {
 }
 
 const useSimpleEditor = ref(false)
-const checklistPersistenceProjectSlug = projectV2.value.slug
-const persistedGeneratedMessage = import.meta.client
-	? await loadGeneratedMessageState(checklistPersistenceProjectSlug)
-	: createEmptyGeneratedMessageState()
-const message = ref(
-	typeof persistedGeneratedMessage.message === 'string' ? persistedGeneratedMessage.message : '',
-)
-const generatedMessage = ref(persistedGeneratedMessage.generated === true)
+const checklistPersistenceProjectId = projectV2.value.id
+const persistedState = import.meta.client
+	? await loadChecklistState(checklistPersistenceProjectId)
+	: null
+const message = ref<string | null>(persistedState?.message ?? null)
+const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
 const loadingModerationDecision = computed(() => moderationDecision.value !== null)
@@ -940,21 +929,16 @@ const approveSendStatus = computed<ProjectStatus>(() => {
 	return requested ?? 'approved'
 })
 const done = ref(false)
-
-function persistGeneratedMessageState() {
-	void saveGeneratedMessageState(checklistPersistenceProjectSlug, {
-		generated: generatedMessage.value,
-		message: message.value,
-	})
-}
+const messageText = computed({
+	get: () => message.value ?? '',
+	set: (v: string) => {
+		message.value = v
+	},
+})
 
 function clearGeneratedMessageState() {
-	generatedMessage.value = false
-	message.value = ''
-	void clearPersistedGeneratedMessageState(checklistPersistenceProjectSlug)
+	message.value = null
 }
-
-watch([generatedMessage, message], persistGeneratedMessageState, { flush: 'sync' })
 
 function handleModpackPermissionsComplete() {
 	modpackPermissionsComplete.value = true
@@ -1018,7 +1002,6 @@ async function confirmTakeOverOverride() {
 
 function reviewAnyway() {
 	alreadyReviewed.value = false
-	initializeAllStages()
 	// Start prefetching the next project in the background
 	maintainPrefetchQueue()
 }
@@ -1269,8 +1252,6 @@ function resetProgress() {
 
 	modpackPermissionsComplete.value = false
 	modpackJudgements.value = {}
-
-	initializeAllStages()
 }
 
 function findFirstValidStage(): number {
@@ -1298,11 +1279,10 @@ const checklistTitleText = computed(() => {
 		? kebabToTitleCase(currentStageObj.value.id)
 		: currentStageObj.value.title
 })
-const persistedStage = import.meta.client
-	? await loadChecklistStage(checklistPersistenceProjectSlug)
-	: null
 const currentStage = ref(
-	persistedStage !== null && checklist[persistedStage] ? persistedStage : findFirstValidStage(),
+	persistedState?.stage !== undefined && checklist[persistedState.stage]
+		? persistedState.stage
+		: findFirstValidStage(),
 )
 
 const stageTextExpanded = computedAsync(async () => {
@@ -1321,29 +1301,39 @@ const stageTextExpanded = computedAsync(async () => {
 	return null
 }, null)
 
-const persistedActionStates = import.meta.client
-	? await loadChecklistActionStates(checklistPersistenceProjectSlug)
-	: {}
-
 const router = useRouter()
 
-const persistedTextInputs = import.meta.client
-	? await loadChecklistTextInputs(checklistPersistenceProjectSlug)
-	: {}
+const actionStates = ref<Record<string, ActionState>>(persistedState?.actionStates ?? {})
+const textInputValues = ref<Record<string, string>>(persistedState?.textInputs ?? {})
 
-const actionStates = ref<Record<string, ActionState>>(persistedActionStates)
-const textInputValues = ref<Record<string, string>>(persistedTextInputs)
+const initialStage = currentStage.value
+let hasMeaningfulState = persistedState !== null
 
 const persistState = () => {
-	void saveChecklistActionStates(checklistPersistenceProjectSlug, actionStates.value)
-	void saveChecklistTextInputs(checklistPersistenceProjectSlug, textInputValues.value)
+	if (!hasMeaningfulState) {
+		hasMeaningfulState =
+			currentStage.value !== initialStage ||
+			message.value !== null ||
+			Object.values(toRaw(actionStates.value)).some((s) => s.selected)
+		if (!hasMeaningfulState) return
+	}
+	void saveChecklistState(checklistPersistenceProjectId, {
+		open: !props.collapsed,
+		stage: currentStage.value,
+		message: message.value,
+		actionStates: toRaw(actionStates.value),
+		textInputs: toRaw(textInputValues.value),
+	})
 }
 
-watch(currentStage, (stage) => {
-	void saveChecklistStage(checklistPersistenceProjectSlug, stage)
-})
+watch(currentStage, persistState)
 watch(actionStates, persistState, { deep: true })
 watch(textInputValues, persistState, { deep: true })
+watch(message, persistState)
+watch(() => props.collapsed, (collapsed) => {
+	if (!collapsed) hasMeaningfulState = true
+	persistState()
+})
 
 interface MessagePart {
 	weight: number
@@ -1539,16 +1529,6 @@ onUnmounted(() => {
 	isPrefetching.value = false
 })
 
-function initializeAllStages() {
-	checklist.forEach((stage, stageIndex) => {
-		initializeStageActions(stage, stageIndex)
-	})
-}
-
-function initializeCurrentStage() {
-	initializeStageActions(currentStageObj.value, currentStage.value)
-}
-
 watch(
 	currentStage,
 	(newIndex, oldIndex) => {
@@ -1557,8 +1537,6 @@ watch(
 		if (oldIndex !== undefined && newIndex !== oldIndex && stage?.navigate) {
 			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage.navigate}`)
 		}
-
-		initializeCurrentStage()
 	},
 	{ immediate: true },
 )
@@ -1572,26 +1550,6 @@ watch(
 	},
 	{ immediate: true },
 )
-
-function initializeStageActions(stage: Stage, stageIndex: number) {
-	stage.actions.forEach((action, index) => {
-		const actionId = getActionIdForStage(action, stageIndex, index)
-		if (!actionStates.value[actionId]) {
-			actionStates.value[actionId] = initializeActionState(action)
-		}
-	})
-
-	stage.actions.forEach((action) => {
-		if (action.enablesActions) {
-			action.enablesActions.forEach((enabledAction, index) => {
-				const actionId = getActionIdForStage(enabledAction, currentStage.value, index)
-				if (!actionStates.value[actionId]) {
-					actionStates.value[actionId] = initializeActionState(enabledAction)
-				}
-			})
-		}
-	})
-}
 
 function getActionId(action: Action, index?: number): string {
 	// If index is not provided, find it in the current stage's actions
@@ -1734,37 +1692,51 @@ function getDropdownValue(action: DropdownAction) {
 	return visibleOptions[0] || null
 }
 
+function isDefaultActionState(action: Action, state: ActionState): boolean {
+	const def = initializeActionState(action)
+	if (state.selected !== def.selected) return false
+	if (def.value instanceof Set) return !(state.value instanceof Set) || state.value.size === 0
+	return state.value === def.value
+}
+
 function isActionSelected(action: Action): boolean {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	return actionStates.value[actionId]?.selected || false
+	const state = actionStates.value[actionId]
+	if (state !== undefined) return state.selected
+	return action.type === 'toggle' ? (action.defaultChecked ?? false) : false
 }
 
 function toggleAction(action: Action) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state) {
-		state.selected = !state.selected
-		persistState()
+	const current = actionStates.value[actionId] ?? initializeActionState(action)
+	const newState: ActionState = { ...current, selected: !current.selected }
+	if (isDefaultActionState(action, newState)) {
+		const { [actionId]: _, ...rest } = actionStates.value
+		actionStates.value = rest
+	} else {
+		actionStates.value[actionId] = newState
 	}
+	persistState()
 }
 
 function selectDropdownOption(action: DropdownAction, selected: any) {
+	if (selected === undefined || selected === null) return
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state && selected !== undefined && selected !== null) {
-		const optionIndex = action.options.findIndex(
-			(opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
-		)
-
-		if (optionIndex !== -1) {
-			state.value = optionIndex
-			state.selected = true
-			persistState()
-		}
+	const optionIndex = action.options.findIndex(
+		(opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
+	)
+	if (optionIndex === -1) return
+	const newState: ActionState = { selected: true, value: optionIndex }
+	if (isDefaultActionState(action, newState)) {
+		const { [actionId]: _, ...rest } = actionStates.value
+		actionStates.value = rest
+	} else {
+		actionStates.value[actionId] = newState
 	}
+	persistState()
 }
 
 
@@ -1777,21 +1749,21 @@ function isChipSelected(action: MultiSelectChipsAction, option: MultiSelectChips
 function toggleChip(action: MultiSelectChipsAction, option: MultiSelectChipsOption) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state) {
-		const selectedOptionIds = getSelectedChipIds(action, state)
-		const optionId = getMultiSelectOptionId(option)
-
-		if (selectedOptionIds.has(optionId)) {
-			selectedOptionIds.delete(optionId)
-		} else {
-			selectedOptionIds.add(optionId)
-		}
-
-		state.value = selectedOptionIds
-		state.selected = selectedOptionIds.size > 0
-		persistState()
+	const selectedOptionIds = getSelectedChipIds(action, actionStates.value[actionId])
+	const optionId = getMultiSelectOptionId(option)
+	if (selectedOptionIds.has(optionId)) {
+		selectedOptionIds.delete(optionId)
+	} else {
+		selectedOptionIds.add(optionId)
 	}
+	const newState: ActionState = { selected: selectedOptionIds.size > 0, value: selectedOptionIds }
+	if (isDefaultActionState(action, newState)) {
+		const { [actionId]: _, ...rest } = actionStates.value
+		actionStates.value = rest
+	} else {
+		actionStates.value[actionId] = newState
+	}
+	persistState()
 }
 
 const isAnyVisibleInputs = computed(() => {
@@ -2133,8 +2105,6 @@ async function generateMessage() {
 		}
 
 		message.value = fullMessage
-
-		generatedMessage.value = true
 	} catch (error) {
 		console.error('Error generating message:', error)
 		addNotification({
@@ -2388,10 +2358,10 @@ function clearProjectLocalStorage() {
 	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
 	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
-	void clearChecklistProgressState(checklistPersistenceProjectSlug)
+	void clearChecklistState(checklistPersistenceProjectId)
 	actionStates.value = {}
 	textInputValues.value = {}
-	clearGeneratedMessageState()
+	message.value = null
 }
 
 const isLastVisibleStage = computed(() => {

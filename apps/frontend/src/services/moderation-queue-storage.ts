@@ -13,7 +13,7 @@ export interface PersistedModerationQueueState {
 	isQueueMode: boolean
 }
 
-const STORE = 'kv'
+const STORE = 'queue'
 export const MODERATION_QUEUE_KEY = 'moderation-queue:v1'
 
 function isStringArray(value: unknown): value is string[] {
