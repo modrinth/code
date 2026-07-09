@@ -150,10 +150,10 @@ impl PendingSearchIndexOperations {
 
     fn push_event(&mut self, event: SearchProjectIndexQueueEventData) {
         match event {
-            SearchProjectIndexQueueEventData::ProjectChange { project_id } => {
+            SearchProjectIndexQueueEventData::Change { project_id } => {
                 self.push_project_change(project_id, [])
             }
-            SearchProjectIndexQueueEventData::ProjectVersionChange {
+            SearchProjectIndexQueueEventData::VersionChange {
                 project_id,
                 version_ids,
             } => {
@@ -161,7 +161,7 @@ impl PendingSearchIndexOperations {
                     self.push_project_change(project_id, version_ids)
                 }
             }
-            SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
+            SearchProjectIndexQueueEventData::Removal { project_id } => {
                 self.push_project_removal(project_id)
             }
         }
@@ -175,14 +175,14 @@ impl PendingSearchIndexOperations {
         );
 
         events.extend(self.removed_project_ids.into_iter().map(|project_id| {
-            SearchProjectIndexQueueEventData::ProjectRemoval { project_id }
+            SearchProjectIndexQueueEventData::Removal { project_id }
         }));
         events.extend(self.changed_project_ids.into_iter().map(|project_id| {
-            SearchProjectIndexQueueEventData::ProjectChange { project_id }
+            SearchProjectIndexQueueEventData::Change { project_id }
         }));
         events.extend(self.changed_project_versions.into_iter().map(
             |(project_id, version_ids)| {
-                SearchProjectIndexQueueEventData::ProjectVersionChange {
+                SearchProjectIndexQueueEventData::VersionChange {
                     project_id,
                     version_ids: version_ids.into_iter().collect(),
                 }
@@ -196,14 +196,13 @@ impl PendingSearchIndexOperations {
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum SearchProjectIndexQueueEventData {
-    ProjectChange {
-        project_id: ProjectId,
-    },
-    ProjectVersionChange {
+    #[serde(rename = "project_change")]
+    Change { project_id: ProjectId },
+    #[serde(rename = "project_version_change")]
+    VersionChange {
         project_id: ProjectId,
         version_ids: Vec<VersionId>,
     },
-    ProjectRemoval {
-        project_id: ProjectId,
-    },
+    #[serde(rename = "project_removal")]
+    Removal { project_id: ProjectId },
 }

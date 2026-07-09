@@ -168,10 +168,10 @@ async fn consume_batch(
         };
 
         match event.into_data() {
-            SearchProjectIndexQueueEventData::ProjectChange { project_id } => {
+            SearchProjectIndexQueueEventData::Change { project_id } => {
                 project_ids_to_change.insert(project_id);
             }
-            SearchProjectIndexQueueEventData::ProjectVersionChange {
+            SearchProjectIndexQueueEventData::VersionChange {
                 project_id,
                 version_ids,
             } => {
@@ -180,7 +180,7 @@ async fn consume_batch(
                     version_ids_to_change.extend(version_ids);
                 }
             }
-            SearchProjectIndexQueueEventData::ProjectRemoval { project_id } => {
+            SearchProjectIndexQueueEventData::Removal { project_id } => {
                 project_ids_to_remove.insert(project_id);
             }
         }
@@ -402,7 +402,7 @@ impl SearchProjectIndexQueueEvent {
         match self {
             Self::Current(data) => data,
             Self::Legacy { project_id } => {
-                SearchProjectIndexQueueEventData::ProjectChange { project_id }
+                SearchProjectIndexQueueEventData::Change { project_id }
             }
         }
     }
@@ -411,14 +411,13 @@ impl SearchProjectIndexQueueEvent {
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 enum SearchProjectIndexQueueEventData {
-    ProjectChange {
-        project_id: ProjectId,
-    },
-    ProjectVersionChange {
+    #[serde(rename = "project_change")]
+    Change { project_id: ProjectId },
+    #[serde(rename = "project_version_change")]
+    VersionChange {
         project_id: ProjectId,
         version_ids: Vec<VersionId>,
     },
-    ProjectRemoval {
-        project_id: ProjectId,
-    },
+    #[serde(rename = "project_removal")]
+    Removal { project_id: ProjectId },
 }
