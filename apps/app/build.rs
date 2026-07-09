@@ -343,6 +343,7 @@ fn main() {
                         "get_screenshot_data",
                         "delete_profile_screenshot",
                         "open_profile_screenshot",
+                        "open_screenshot_file",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

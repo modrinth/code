@@ -41,6 +41,16 @@ export async function getScreenshotData(
 	})
 }
 
+export async function openScreenshotFile(
+	profilePath: string,
+	screenshot: Screenshot,
+): Promise<boolean> {
+	return await invoke<boolean>('plugin:screenshots|open_screenshot_file', {
+		path: profilePath,
+		screenshot,
+	})
+}
+
 export function getScreenshotFileName(path: string | undefined) {
 	if (!path) return 'Untitled'
 	return path.split('/').pop()!

@@ -5,6 +5,7 @@ import type {
 	GalleryEntry,
 	NavigationFunction,
 	OpenExternallyFunction,
+	OpenFileFunction,
 } from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
 import ImagePreviewModal from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
 import type { Version } from '@modrinth/utils'
@@ -21,6 +22,7 @@ import {
 	getScreenshotData,
 	getScreenshotFileName,
 	openProfileScreenshot,
+	openScreenshotFile,
 } from '@/helpers/screenshots.ts'
 import type { GameInstance, InstanceEvent } from '@/helpers/types'
 
@@ -112,6 +114,16 @@ const openExternally: OpenExternallyFunction = (async (src: string, screenshot: 
 	}
 }) as OpenExternallyFunction
 
+const openFile: OpenFileFunction = (async (src: string, screenshot: Screenshot) => {
+	const result = await openScreenshotFile(props.instance.id, screenshot)
+	if (!result) {
+		addNotification({
+			title: 'Unable to open screenshot.',
+			type: 'error',
+		})
+	}
+}) as OpenFileFunction
+
 const screenshotsByDate = computed(() => groupAndSortByDate(screenshots.value))
 const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label === 'Today'))
 
@@ -145,6 +157,8 @@ onUnmounted(() => {
 			:prev="viewPreviousScreenshot"
 			:open-externally="openExternally"
 			:open-externally-tooltip="'Open in containing folder'"
+			:open-file="openFile"
+			:open-file-tooltip="'Open in default system viewer'"
 		/>
 		<div class="w-full p-5">
 			<div

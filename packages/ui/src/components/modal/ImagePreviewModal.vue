@@ -7,10 +7,10 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { pxOf } from '@modrinth/utils'
 import { computedAsync } from '@vueuse/core'
-import { defineExpose, defineProps, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { defineExpose, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import { injectModalBehavior, injectNotificationManager } from '../../providers'
 import Button from '../base/Button.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
@@ -21,9 +21,11 @@ export type GalleryEntry = {
 }
 export type NavigationFunction = (key: GalleryKey) => GalleryEntry | Promise<GalleryEntry>
 export type OpenExternallyFunction = (src: string, key: GalleryKey) => void | Promise<void>
+export type OpenFileFunction = (src: string, key: GalleryKey) => void | Promise<void>
 export type GalleryKey = Record<string, unknown> & {
 	title?: string
 	description?: string
+	path?: string
 }
 
 const props = withDefaults(
@@ -33,12 +35,18 @@ const props = withDefaults(
 		openExternally: OpenExternallyFunction
 		openExternallyTooltip?: string
 		disableZoom?: boolean
+		openFile?: OpenFileFunction
+		openFileTooltip?: string
 	}>(),
 	{
 		disableZoom: false,
 		openExternallyTooltip: 'Open externally',
+		openFileTooltip: 'Open in system viewer',
 	},
 )
+
+const modalBehavior = injectModalBehavior(null)
+const { addNotification } = injectNotificationManager()
 
 const src = ref<string>()
 const alt = ref<string>()
@@ -48,17 +56,23 @@ const scale = ref(1)
 const imageRef = ref<HTMLImageElement | null>(null)
 
 function show(_src: string, _alt: string, _key: GalleryKey) {
+	if (!shown.value) {
+		modalBehavior?.onShow?.()
+	}
 	shown.value = true
 	src.value = _src
 	alt.value = _alt
 	key.value = _key
 }
 function hide() {
+	if (shown.value) {
+		modalBehavior?.onHide?.()
+	}
 	shown.value = false
 }
 
-const nextImageData = computedAsync(() => props.next(key.value))
-const prevImageData = computedAsync(() => props.prev(key.value))
+const nextImageData = computedAsync(() => (key.value ? props.next(key.value) : undefined))
+const prevImageData = computedAsync(() => (key.value ? props.prev(key.value) : undefined))
 
 async function nextImage() {
 	const data = nextImageData.value
@@ -72,23 +86,30 @@ async function handleOpenExternally() {
 	if (src.value && key.value) await props.openExternally(src.value, key.value)
 }
 
+async function handleOpenFile() {
+	if (src.value && key.value && props.openFile) await props.openFile(src.value, key.value)
+}
+
+async function copyPathToClipboard(path?: string) {
+	if (!path) return
+	try {
+		await navigator.clipboard.writeText(path)
+		addNotification({
+			title: 'Path copied',
+			text: 'The screenshot file path has been copied to your clipboard.',
+			type: 'success',
+		})
+	} catch (err) {
+		console.error('Failed to copy path:', err)
+	}
+}
+
 async function toggleZoom() {
 	if (scale.value === 1 && imageRef.value) {
-		await nextTick()
-
-		const vpW = window.innerWidth
-		const vpH = window.innerHeight
-
-		const gapPx = pxOf('--gap-lg')
-
 		const rect = imageRef.value.getBoundingClientRect()
-		const baseW = rect.width
-		const baseH = rect.height
-
-		const maxScaleW = (vpW - 2 * gapPx) / baseW
-		const maxScaleH = (vpH - 2 * gapPx) / baseH
-
-		scale.value = Math.min(maxScaleW, maxScaleH, 3)
+		const naturalW = imageRef.value.naturalWidth
+		const zoom = naturalW > 0 ? Math.max(2.5, naturalW / rect.width) : 2.5
+		scale.value = Math.min(zoom, 4)
 	} else {
 		scale.value = 1
 	}
@@ -120,6 +141,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
 	document.removeEventListener('keydown', keyListener)
+	if (shown.value) {
+		modalBehavior?.onHide?.()
+	}
 })
 </script>
 
@@ -163,6 +187,14 @@ onBeforeUnmount(() => {
 				>
 					{{ key.description }}
 				</p>
+				<p
+					v-if="key?.path"
+					v-tooltip="'Click to copy path'"
+					class="text-shadow text-[var(--dark-color-text)]/70 m-0 text-center text-xs select-all cursor-pointer hover:underline break-all max-w-[40rem]"
+					@click="copyPathToClipboard(key.path)"
+				>
+					{{ key.path }}
+				</p>
 			</div>
 
 			<div
@@ -184,7 +216,15 @@ onBeforeUnmount(() => {
 						>
 					</ButtonStyled>
 
-					<template v-if="!disableZoom">
+					<template v-if="openFile">
+						<ButtonStyled v-tooltip="openFileTooltip" circular icon-only @click="handleOpenFile">
+							<Button>
+								<ExpandIcon />
+								<span class="sr-only">{{ openFileTooltip }}</span>
+							</Button>
+						</ButtonStyled>
+					</template>
+					<template v-else-if="!disableZoom">
 						<ButtonStyled v-tooltip="'Toggle zoom'" circular icon-only @click="toggleZoom">
 							<Button>
 								<ExpandIcon v-if="scale <= 1" /><ContractIcon v-else />

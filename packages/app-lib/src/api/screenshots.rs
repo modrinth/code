@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use tokio::fs::{canonicalize, read, remove_file};
+use tokio::fs::{read, remove_file};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Screenshot {
@@ -68,7 +68,7 @@ async fn get_all_screenshots_in_profile(
             continue;
         }
 
-        let abs_path: PathBuf = canonicalize(&path).await?;
+        let abs_path = dunce::canonicalize(&path)?;
         let full_path = abs_path.to_string_lossy().into_owned();
 
         let meta = entry.metadata().await?;
@@ -108,13 +108,13 @@ pub async fn get_valid_screenshot_path(
         return Ok(None);
     }
 
-    let canonical_dir = match canonicalize(&screenshots_dir).await {
+    let canonical_dir = match dunce::canonicalize(&screenshots_dir) {
         Ok(d) => d,
         Err(_) => return Ok(None),
     };
 
     let requested = PathBuf::from(&screenshot.path);
-    let canonical_req = match canonicalize(&requested).await {
+    let canonical_req = match dunce::canonicalize(&requested) {
         Ok(p) => p,
         Err(_) => return Ok(None),
     };

@@ -139,8 +139,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         .as_ref()
                                         .is_some_and(|s| *s == "png")
                                 {
-                                    let path_str =
-                                        e.path.to_string_lossy().into_owned();
+                                    let path_str = dunce::simplified(&e.path)
+                                        .to_string_lossy()
+                                        .into_owned();
                                     let file_exists =
                                         Path::new(&e.path).exists();
 

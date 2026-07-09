@@ -9,7 +9,8 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_all_profile_screenshots,
             get_screenshot_data,
             delete_profile_screenshot,
-            open_profile_screenshot
+            open_profile_screenshot,
+            open_screenshot_file
         ])
         .build()
 }
@@ -49,6 +50,23 @@ pub async fn open_profile_screenshot<R: Runtime>(
         get_valid_screenshot_path(&profile_dir, &screenshot).await?
     {
         app.opener().reveal_item_in_dir(path).unwrap();
+        Ok(true)
+    } else {
+        Ok(false)
+    }
+}
+
+#[tauri::command]
+pub async fn open_screenshot_file<R: Runtime>(
+    app: AppHandle<R>,
+    path: &str,
+    screenshot: Screenshot,
+) -> crate::api::Result<bool> {
+    let profile_dir = get_full_path(path).await?;
+    if let Some(path) =
+        get_valid_screenshot_path(&profile_dir, &screenshot).await?
+    {
+        let _ = app.opener().open_path(path.to_string_lossy(), None::<&str>);
         Ok(true)
     } else {
         Ok(false)
