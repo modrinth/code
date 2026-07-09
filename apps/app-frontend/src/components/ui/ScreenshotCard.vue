@@ -46,7 +46,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { ClipboardCopyIcon, TrashIcon, ExternalIcon } from '@modrinth/assets'
 import type { ImagePreviewModal } from '@modrinth/ui'
-import { Button } from '@modrinth/ui'
+import { Button, injectNotificationManager } from '@modrinth/ui'
 import {
   type Screenshot,
   deleteProfileScreenshot,
@@ -54,7 +54,6 @@ import {
   getScreenshotData,
   getScreenshotFileName,
 } from '@/helpers/screenshots'
-import { useNotifications } from '@/store/state'
 import dayjs from 'dayjs'
 
 const props = defineProps<{
@@ -63,7 +62,7 @@ const props = defineProps<{
   imagePreviewModal: typeof ImagePreviewModal
 }>()
 const emit = defineEmits(['deleted'])
-const notifications = useNotifications()
+const { addNotification } = injectNotificationManager()
 
 const loaded = ref(false)
 const blobUrl = ref<string>('')
@@ -79,7 +78,7 @@ async function loadData(): Promise<void> {
   try {
     const base64 = await getScreenshotData(props.profilePath, props.screenshot)
     if (!base64) {
-      notifications.addNotification({
+      addNotification({
         title: 'Failed to load screenshot:',
         text: props.screenshot.path,
         type: 'error',
@@ -94,7 +93,7 @@ async function loadData(): Promise<void> {
     blobUrl.value = URL.createObjectURL(blob)
     loaded.value = true
   } catch (err: any) {
-    notifications.addNotification({
+    addNotification({
       title: 'Error fetching screenshot',
       text: err.message,
       type: 'error',
@@ -134,13 +133,13 @@ async function copyImageToClipboard() {
     const resp = await fetch(blobUrl.value)
     const blob = await resp.blob()
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
-    notifications.addNotification({
+    addNotification({
       title: 'Copied to clipboard',
       text: 'The screenshot has been copied successfully.',
       type: 'success',
     })
   } catch (error: any) {
-    notifications.addNotification({ title: 'Copy failed', text: error.message, type: 'error' })
+    addNotification({ title: 'Copy failed', text: error.message, type: 'error' })
   }
 }
 
@@ -148,10 +147,10 @@ async function deleteScreenshot() {
   try {
     const ok = await deleteProfileScreenshot(props.profilePath, props.screenshot)
     if (!ok) throw new Error('Delete returned false')
-    notifications.addNotification({ title: 'Successfully deleted screenshot', type: 'success' })
+    addNotification({ title: 'Successfully deleted screenshot', type: 'success' })
     emit('deleted')
   } catch (err: any) {
-    notifications.addNotification({
+    addNotification({
       title: 'Error deleting screenshot',
       text: err.message,
       type: 'error',
@@ -162,7 +161,7 @@ async function deleteScreenshot() {
 async function viewInFolder() {
   const ok = await openProfileScreenshot(props.profilePath, props.screenshot)
   if (!ok) {
-    notifications.addNotification({ title: 'Unable to open screenshot in folder.', type: 'error' })
+    addNotification({ title: 'Unable to open screenshot in folder.', type: 'error' })
   }
 }
 </script>

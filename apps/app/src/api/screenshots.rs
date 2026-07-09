@@ -1,6 +1,6 @@
 use tauri::{AppHandle, Runtime};
 use tauri_plugin_opener::OpenerExt;
-use theseus::profile::get_full_path;
+use theseus::instance::get_full_path;
 use theseus::screenshots::{self, Screenshot, get_valid_screenshot_path};
 
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {

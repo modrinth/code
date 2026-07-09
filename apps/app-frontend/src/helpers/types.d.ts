@@ -194,7 +194,7 @@ export type ScreenshotChangedEvent = {
 }
 
 // TODO: Refactor events.js -> events.ts with proper types for all the events.
-export type ProfileEvent = { profile_path_id: string } & (
+export type InstanceEvent = { instance_id: string } & (
   | ServersUpdatedEvent
   | WorldUpdatedEvent
   | ServerJoinedEvent

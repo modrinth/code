@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GameInstance, ProfileEvent } from '@/helpers/types'
+import type { GameInstance, InstanceEvent } from '@/helpers/types'
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import { DropdownIcon } from '@modrinth/assets'
 import type { Version } from '@modrinth/utils'
@@ -20,8 +20,8 @@ import type {
   OpenExternallyFunction,
 } from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
 import ImagePreviewModal from '@modrinth/ui/src/components/modal/ImagePreviewModal.vue'
-import { useNotifications } from '@/store/state'
-import { profile_listener } from '@/helpers/events'
+import { injectNotificationManager } from '@modrinth/ui'
+import { instance_listener } from '@/helpers/events'
 
 dayjs.extend(advancedFormat)
 
@@ -34,8 +34,8 @@ const props = defineProps<{
   installed: boolean
 }>()
 
-const notifications = useNotifications()
-const screenshots = ref<Screenshot[]>((await getAllProfileScreenshots(props.instance.path)) ?? [])
+const { addNotification } = injectNotificationManager()
+const screenshots = ref<Screenshot[]>((await getAllProfileScreenshots(props.instance.id)) ?? [])
 const imagePreviewModal = ref<typeof ImagePreviewModal>()
 
 function groupAndSortByDate(items: Screenshot[]): readonly [string, Screenshot[]][] {
@@ -72,7 +72,7 @@ async function navigateScreenshot(screenshot: Screenshot, offset: number): Promi
   const next = list[newIdx]
 
   return {
-    src: `data:image/png;base64,${await getScreenshotData(props.instance.path, next)}`,
+    src: `data:image/png;base64,${await getScreenshotData(props.instance.id, next)}`,
     alt: getScreenshotFileName(next.path),
     key: {
       ...next,
@@ -89,9 +89,9 @@ const viewPreviousScreenshot: NavigationFunction = ((s) =>
   navigateScreenshot(s, -1)) as NavigationFunction
 
 const openExternally: OpenExternallyFunction = (async (src: string, screenshot: Screenshot) => {
-  const result = await openProfileScreenshot(props.instance.path, screenshot)
+  const result = await openProfileScreenshot(props.instance.id, screenshot)
   if (!result) {
-    notifications.addNotification({
+    addNotification({
       title: 'Unable to open screenshot in folder.',
       type: 'error',
     })
@@ -101,10 +101,10 @@ const openExternally: OpenExternallyFunction = (async (src: string, screenshot: 
 const screenshotsByDate = computed(() => groupAndSortByDate(screenshots.value))
 const hasToday = computed(() => screenshotsByDate.value.some(([label]) => label === 'Today'))
 
-const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
-  if (e.profile_path_id !== props.instance.path) return
+const unlistenProfile = await instance_listener(async (e: InstanceEvent) => {
+  if (e.instance_id !== props.instance.id) return
 
-  console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+  console.info(`Handling profile event '${e.event}' for profile: ${e.instance_id}`)
 
   if (e.event === 'screenshot_changed') {
     const exists = screenshots.value.some((shot) => shot.path === e.screenshot.path)
@@ -177,7 +177,7 @@ onUnmounted(() => {
                 v-for="s in shots"
                 :key="s.path"
                 :screenshot="s"
-                :profile-path="instance.path"
+                :profile-path="instance.id"
                 :image-preview-modal="imagePreviewModal!"
                 @deleted="markDeleted(s)"
               />
