@@ -236,7 +236,6 @@ pub enum CommandPayload {
     },
     InstallSharedInstanceInvite {
         invite_id: String,
-        instance_id: String,
     },
     RunMRPack {
         // run or install .mrpack

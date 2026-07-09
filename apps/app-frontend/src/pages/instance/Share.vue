@@ -1,5 +1,9 @@
 <template>
 	<div class="flex flex-col gap-4">
+		<ModrinthAccountRequiredModal
+			ref="modrinthAccountRequiredModal"
+			:request-auth="requestAuthToShare"
+		/>
 		<InvitePlayersModal
 			ref="invitePlayersModal"
 			:header="inviteModalHeader"
@@ -287,19 +291,6 @@
 			</template>
 		</EmptyState>
 
-		<EmptyState v-else-if="!isSignedIn" type="empty-inbox">
-			<template #heading>{{ formatMessage(messages.signInToShareHeading) }}</template>
-			<template #description>{{ formatMessage(messages.signInToShareDescription) }}</template>
-			<template #actions>
-				<ButtonStyled color="brand">
-					<button class="!h-10" @click="signInToShare">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(messages.signInButton) }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</EmptyState>
-
 		<EmptyState v-else type="empty-inbox">
 			<template #heading>{{ formatMessage(messages.noFriendsInvitedHeading) }}</template>
 			<template #description>{{ formatMessage(messages.noFriendsInvitedDescription) }}</template>
@@ -357,8 +348,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
-import { get_user, get_user_many } from '@/helpers/cache.js'
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import { config } from '@/config'
+import { get_user, get_user_many } from '@/helpers/cache.js'
 import { friend_listener } from '@/helpers/events.js'
 import {
 	add_friend,
@@ -382,7 +374,7 @@ import {
 	type SharedInstanceUser,
 	type SharedInstanceUsers,
 } from '@/helpers/instance'
-import { get as getCredentials } from '@/helpers/mr_auth.ts'
+import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import type { GameInstance } from '@/helpers/types'
 import { search_user } from '@/helpers/users.ts'
 
@@ -410,6 +402,9 @@ const props = defineProps<{
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
+const modrinthAccountRequiredModal = ref<InstanceType<
+	typeof ModrinthAccountRequiredModal
+> | null>(null)
 const shareUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>(null)
 const removeUserConfirmModal = ref<InstanceType<typeof NewModal> | null>(null)
 const memberSearch = ref('')
@@ -425,14 +420,6 @@ const inviteLinkPending = ref(false)
 const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(props.instance.id))
 
 const messages = defineMessages({
-	signInToShareHeading: {
-		id: 'app.instance.share.sign-in.heading',
-		defaultMessage: 'Sign in to share',
-	},
-	signInToShareDescription: {
-		id: 'app.instance.share.sign-in.description',
-		defaultMessage: 'You need a Modrinth account to share instances.',
-	},
 	signInButton: {
 		id: 'app.instance.share.sign-in.button',
 		defaultMessage: 'Sign in',
@@ -1041,6 +1028,10 @@ function cancelInvite(user: InvitePlayersUser) {
 
 function showInvitePlayers(event?: MouseEvent) {
 	if (props.sharedInstanceActionsLocked) return
+	if (!isSignedIn.value) {
+		signInToShare(event)
+		return
+	}
 
 	if (requiresUnlinkBeforeShare.value) {
 		shareUnlinkModal.value?.show()
@@ -1080,11 +1071,7 @@ async function ensureInviteLink() {
 }
 
 function buildInviteLink(invite: SharedInstanceInviteLink) {
-	const params = new URLSearchParams({
-		instance_id: invite.sharedInstanceId,
-	})
-
-	return `${config.siteUrl}/share/${encodeURIComponent(invite.inviteId)}?${params.toString()}`
+	return `${config.siteUrl}/share/${encodeURIComponent(invite.inviteId)}`
 }
 
 function showRemoveRowModal(row: ShareRow) {
@@ -1195,8 +1182,13 @@ function userProfileLink(username: string) {
 	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
 }
 
-function signInToShare() {
-	void auth.requestSignIn(shareRoutePath.value)
+async function requestAuthToShare(flow: ModrinthAuthFlow) {
+	await auth.requestSignIn(shareRoutePath.value, flow)
+	return isSignedIn.value
+}
+
+function signInToShare(event?: MouseEvent) {
+	void modrinthAccountRequiredModal.value?.show(event)
 }
 
 function setUsernameRef(id: string, element: Element | null) {
@@ -1319,6 +1311,14 @@ watch(
 		inviteLinkPending.value = false
 		pendingRows.value = loadPendingRows(instanceId)
 	},
+)
+
+watch(
+	[() => auth.isReady.value, isSignedIn, () => props.sharedInstanceActionsLocked],
+	([isReady, signedIn, actionsLocked]) => {
+		if (isReady && !signedIn && !actionsLocked) signInToShare()
+	},
+	{ immediate: true, flush: 'post' },
 )
 
 provideAppBackup({

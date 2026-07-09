@@ -355,7 +355,6 @@ export interface SharedInstancePublishPreview {
 }
 
 export interface SharedInstanceInviteLink {
-	sharedInstanceId: string
 	inviteId: string
 }
 

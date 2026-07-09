@@ -79,6 +79,7 @@ import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import SharedInstancesLogoutWarningModal from '@/components/ui/modal/SharedInstancesLogoutWarningModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
@@ -96,14 +97,19 @@ import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import {
+	install_accept_shared_instance_invite,
 	install_create_modpack_instance,
 	install_get_modpack_preview,
 	install_get_shared_instance_preview,
 	install_shared_instance,
-	install_shared_instance_invite,
 } from '@/helpers/install'
 import { list, run } from '@/helpers/instance'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
+import {
+	cancelLogin,
+	get as getCreds,
+	login,
+	logout,
+} from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -646,6 +652,7 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const modrinthAccountRequiredModal = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginFlowWaitModal = ref()
@@ -656,8 +663,8 @@ watch(incompatibilityWarningModal, (modal) => {
 	}
 })
 
-setupAuthProvider(credentials, async (_redirectPath) => {
-	await signIn()
+setupAuthProvider(credentials, async (_redirectPath, flow) => {
+	await signIn(flow)
 })
 
 async function validateSession(sessionToken) {
@@ -697,11 +704,11 @@ async function fetchCredentials() {
 	credentials.value = creds ?? null
 }
 
-async function signIn() {
+async function signIn(flow = 'sign-in') {
 	modrinthLoginFlowWaitModal.value.show()
 
 	try {
-		await login()
+		await login(flow)
 		await fetchCredentials()
 	} catch (error) {
 		if (
@@ -951,6 +958,71 @@ async function declineSharedInstanceInviteNotification(notification) {
 	}
 }
 
+function waitForCredentialsReady() {
+	if (credentials.value !== undefined) return Promise.resolve()
+
+	return new Promise((resolve) => {
+		const stop = watch(credentials, (value) => {
+			if (value !== undefined) {
+				stop()
+				resolve()
+			}
+		})
+	})
+}
+
+async function requireModrinthAccountForInvite() {
+	await waitForCredentialsReady()
+	if (credentials.value?.session) return true
+
+	const modal = modrinthAccountRequiredModal.value
+	if (modal?.show) {
+		return await modal.show()
+	}
+
+	await signIn()
+	return !!credentials.value?.session
+}
+
+async function requestModrinthAuth(flow) {
+	await signIn(flow)
+	return !!credentials.value?.session
+}
+
+async function installSharedInstanceInviteFromDeepLink(inviteId) {
+	try {
+		if (!(await requireModrinthAccountForInvite())) return
+
+		const invitePreview = await install_accept_shared_instance_invite(inviteId)
+		const showInstallModal = installToPlayModal.value?.showSharedInstance
+
+		if (!showInstallModal) {
+			throw new Error('Install to play modal is not available.')
+		}
+
+		showInstallModal(
+			{
+				preview: invitePreview.preview,
+			},
+			async () => {
+				try {
+					await install_shared_instance(
+						invitePreview.sharedInstanceId,
+						invitePreview.preview.name,
+						invitePreview.managerId,
+					)
+					queryClient.invalidateQueries({ queryKey: ['instances'] })
+				} catch (error) {
+					handleError(error)
+					throw error
+				}
+			},
+		)
+	} catch (error) {
+		handleError(error)
+	}
+}
+
 async function handleLiveNotification(notification) {
 	if (!notification?.body || notification.read) return
 
@@ -1034,12 +1106,7 @@ async function handleCommand(e) {
 			await run(e.id).catch(handleError)
 		}
 	} else if (e.event === 'InstallSharedInstanceInvite') {
-		await install_shared_instance_invite(
-			e.instance_id,
-			e.invite_id,
-			'Shared instance',
-		).catch(handleError)
-		queryClient.invalidateQueries({ queryKey: ['instances'] })
+		await installSharedInstanceInviteFromDeepLink(e.invite_id)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
@@ -1904,6 +1971,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		ref="contentInstallModpackAlreadyInstalledModal"
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
+	/>
+	<ModrinthAccountRequiredModal
+		ref="modrinthAccountRequiredModal"
+		:request-auth="requestModrinthAuth"
 	/>
 	<InstallToPlayModal ref="installToPlayModal" />
 	<UpdateToPlayModal ref="updateToPlayModal" />

@@ -30,32 +30,13 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         Some(("server", id)) => {
             CommandPayload::InstallServer { id: id.to_string() }
         }
-        // /share/{invite_id}?instance_id={shared_instance_id}
+        // /share/{invite_id}
         Some(("share", raw)) => {
-            let (raw, query) = raw.split_once('?').unwrap_or((raw, ""));
-            let mut instance_id = None;
-
-            for (key, value) in form_urlencoded::parse(query.as_bytes()) {
-                if &*key == "instance_id" {
-                    instance_id = Some(value.into_owned());
-                }
-            }
-
-            let Some(instance_id) = instance_id else {
-                emit_warning(
-                    "Invalid command, shared instance invite is missing instance_id",
-                )
-                .await?;
-                return Err(crate::ErrorKind::InputError(
-                    "Shared instance invite is missing instance_id".to_string(),
-                )
-                .into());
-            };
+            let (raw, _) = raw.split_once('?').unwrap_or((raw, ""));
 
             match decode(raw) {
                 Ok(decoded) => CommandPayload::InstallSharedInstanceInvite {
                     invite_id: decoded.to_string(),
-                    instance_id,
                 },
                 Err(e) => {
                     emit_warning(&format!(

@@ -149,6 +149,7 @@ fn main() {
                         "install_create_instance",
                         "install_create_modpack_instance",
                         "install_get_shared_instance_preview",
+                        "install_accept_shared_instance_invite",
                         "install_get_shared_instance_update_preview",
                         "install_shared_instance",
                         "install_shared_instance_invite",

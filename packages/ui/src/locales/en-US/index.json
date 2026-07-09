@@ -2693,6 +2693,24 @@
   "modal.add-payment-method.title": {
     "defaultMessage": "Adding a payment method"
   },
+  "modal.modrinth-account-required.create-account-button": {
+    "defaultMessage": "Create an account"
+  },
+  "modal.modrinth-account-required.description": {
+    "defaultMessage": "You'll need to sign into your Modrinth account before you can use this feature."
+  },
+  "modal.modrinth-account-required.header": {
+    "defaultMessage": "Account required"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "defaultMessage": "Sign in to Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "defaultMessage": "Sign in to a Modrinth account"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "defaultMessage": "Having trouble signing in? <support>Get support</support>"
+  },
   "modal.open-in-app.benefit.install": {
     "defaultMessage": "Automatically install required content"
   },

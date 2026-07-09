@@ -11,15 +11,7 @@ const route = useRoute()
 
 const deepLink = computed(() => {
 	const inviteId = encodeURIComponent(route.params.inviteId as string)
-	const params = new URLSearchParams()
-
-	const instanceId = route.query.instance_id
-	if (typeof instanceId === 'string' && instanceId) {
-		params.set('instance_id', instanceId)
-	}
-
-	const query = params.toString()
-	return `modrinth://share/${inviteId}${query ? `?${query}` : ''}`
+	return `modrinth://share/${inviteId}`
 })
 </script>
 

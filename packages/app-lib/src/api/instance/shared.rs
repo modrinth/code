@@ -195,8 +195,15 @@ pub struct SharedInstancePublishPreview {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInviteLink {
-    pub shared_instance_id: String,
     pub invite_id: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceInviteInstallPreview {
+    pub shared_instance_id: String,
+    pub manager_id: Option<String>,
+    pub preview: SharedInstanceInstallPreview,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -244,6 +251,21 @@ struct CreateInstanceResponse {
 #[derive(Clone, Debug, Deserialize)]
 struct CreateInstanceInviteResponse {
     id: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct InstanceInviteInfoResponse {
+    instance_id: String,
+    instance_name: String,
+    #[serde(default)]
+    managers: Vec<InstanceInviteManagerResponse>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+enum InstanceInviteManagerResponse {
+    User { id: String },
+    Server {},
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -393,7 +415,6 @@ pub async fn create_shared_instance_invite_link(
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(SharedInstanceInviteLink {
-        shared_instance_id: attachment.id,
         invite_id: response.id,
     })
 }
@@ -573,23 +594,26 @@ pub async fn install_shared_instance(
 
 #[tracing::instrument]
 pub async fn install_shared_instance_invite(
-    shared_instance_id: &str,
     invite_id: &str,
-    name: String,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
-    let name = shared_instance_invite_install_name(shared_instance_id, name);
+    let invite = get_shared_instance_invite_info(invite_id, &state).await?;
+    let shared_instance_id = invite.instance_id;
+    let name = shared_instance_invite_install_name(
+        &shared_instance_id,
+        invite.instance_name,
+    );
     let accepted =
-        accept_shared_instance_invite(shared_instance_id, invite_id, &state)
+        accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
             .await?;
     let version = get_latest_remote_version_with_auth(
-        shared_instance_id,
+        &shared_instance_id,
         &state,
         accepted.request_auth(),
     )
     .await?;
     let mut data = shared_instance_install_data(
-        shared_instance_id,
+        &shared_instance_id,
         None,
         name,
         version,
@@ -621,6 +645,50 @@ pub async fn get_shared_instance_install_preview(
 ) -> crate::Result<SharedInstanceInstallPreview> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
+    shared_instance_install_preview_from_version(name, version, &state).await
+}
+
+#[tracing::instrument]
+pub async fn accept_shared_instance_invite_for_install(
+    invite_id: &str,
+) -> crate::Result<SharedInstanceInviteInstallPreview> {
+    let state = State::get().await?;
+    ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+        .await?
+        .ok_or(crate::ErrorKind::NoCredentialsError)?;
+
+    let invite = get_shared_instance_invite_info(invite_id, &state).await?;
+    let shared_instance_id = invite.instance_id;
+    let manager_id = invite.managers.into_iter().find_map(|manager| match manager {
+        InstanceInviteManagerResponse::User { id } => Some(id),
+        InstanceInviteManagerResponse::Server {} => None,
+    });
+    let name =
+        shared_instance_invite_install_name(&shared_instance_id, invite.instance_name);
+    let accepted =
+        accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
+            .await?;
+    let version = get_latest_remote_version_with_auth(
+        &shared_instance_id,
+        &state,
+        accepted.request_auth(),
+    )
+    .await?;
+    let preview =
+        shared_instance_install_preview_from_version(name, version, &state).await?;
+
+    Ok(SharedInstanceInviteInstallPreview {
+        shared_instance_id,
+        manager_id,
+        preview,
+    })
+}
+
+async fn shared_instance_install_preview_from_version(
+    name: String,
+    version: InstanceVersionResponse,
+    state: &State,
+) -> crate::Result<SharedInstanceInstallPreview> {
     let name = match name.trim() {
         "" => "Shared instance".to_string(),
         name => name.to_string(),
@@ -2294,6 +2362,32 @@ async fn accept_shared_instance_invite(
         linked_user_id: None,
         access_token: Some(response.access_token),
     })
+}
+
+async fn get_shared_instance_invite_info(
+    invite_id: &str,
+    state: &State,
+) -> crate::Result<InstanceInviteInfoResponse> {
+    let operation = "get_instance_invite";
+    let method = Method::GET;
+    let path = format!("/invites/{invite_id}");
+    let response = send_request_with_auth(
+        operation,
+        method.clone(),
+        &path,
+        None,
+        state,
+        SharedInstancesRequestAuth::None,
+    )
+    .await?;
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            operation, method, &path, response,
+        )
+        .await;
+    }
+
+    decode_json_response(operation, &path, response).await
 }
 
 async fn decline_pending_remote_invite(
