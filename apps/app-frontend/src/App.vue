@@ -81,7 +81,6 @@ import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
-import SharedInstancesLogoutWarningModal from '@/components/ui/modal/SharedInstancesLogoutWarningModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
@@ -726,29 +725,7 @@ async function signIn(flow = 'sign-in') {
 }
 
 async function logOut() {
-	const sharedInstances = await getSharedInstancesForLogoutWarning()
-	const warningModal = sharedInstancesLogoutWarningModal.value
-	if (sharedInstances.length > 0 && warningModal) {
-		warningModal.show(sharedInstances)
-		return
-	}
-
 	await performLogOut()
-}
-
-async function getSharedInstancesForLogoutWarning() {
-	try {
-		const currentUserId = credentials.value?.user_id ?? credentials.value?.user?.id
-		if (!currentUserId) return []
-
-		const instances = await list()
-		return instances.filter(
-			(instance) => instance.shared_instance?.linked_user_id === currentUserId,
-		)
-	} catch (error) {
-		handleError(error)
-		return []
-	}
 }
 
 async function performLogOut() {
@@ -820,7 +797,6 @@ onMounted(() => {
 })
 
 const accounts = ref(null)
-const sharedInstancesLogoutWarningModal = ref(null)
 provide('accountsCard', accounts)
 
 command_listener(handleCommand)
@@ -1636,12 +1612,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</Suspense>
 		<Suspense>
 			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
-		</Suspense>
-		<Suspense>
-			<SharedInstancesLogoutWarningModal
-				ref="sharedInstancesLogoutWarningModal"
-				@sign-out="performLogOut"
-			/>
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"

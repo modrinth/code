@@ -469,28 +469,57 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
     };
     ensure_owner(&attachment)?;
 
-    let link_patch = match metadata.link {
-        InstanceLink::SharedInstance {
-            modpack_project_id: Some(project_id),
-            modpack_version_id: Some(version_id),
-        } => Some((
-            InstanceLink::ModrinthModpack {
-                project_id,
-                version_id,
-            },
-            ContentSourceKind::ModrinthModpack,
-        )),
-        InstanceLink::SharedInstance { .. } => {
-            Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
-        }
-        _ => None,
-    };
-
     delete_remote_instance(&attachment.id, &state).await?;
+	detach_local_shared_instance(instance_id, metadata.link, &state).await?;
+	emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-    if let Some((link, source_kind)) = link_patch {
-        crate::state::edit_instance(
-            instance_id,
+	Ok(())
+}
+
+#[tracing::instrument]
+pub async fn unlink_shared_instance(instance_id: &str) -> crate::Result<()> {
+	let state = State::get().await?;
+	let metadata = crate::state::get_instance(instance_id, &state.pool)
+		.await?
+		.ok_or_else(|| {
+			crate::ErrorKind::InputError("Unknown instance".to_string())
+		})?;
+	let Some(attachment) = metadata.shared_instance.clone() else {
+		return Ok(());
+	};
+	ensure_member(&attachment)?;
+
+	detach_local_shared_instance(instance_id, metadata.link, &state).await?;
+	emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+	Ok(())
+}
+
+async fn detach_local_shared_instance(
+	instance_id: &str,
+	link: InstanceLink,
+	state: &State,
+) -> crate::Result<()> {
+	let link_patch = match link {
+		InstanceLink::SharedInstance {
+			modpack_project_id: Some(project_id),
+			modpack_version_id: Some(version_id),
+		} => Some((
+			InstanceLink::ModrinthModpack {
+				project_id,
+				version_id,
+			},
+			ContentSourceKind::ModrinthModpack,
+		)),
+		InstanceLink::SharedInstance { .. } => {
+			Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
+		}
+		_ => None,
+	};
+
+	if let Some((link, source_kind)) = link_patch {
+		crate::state::edit_instance(
+			instance_id,
             EditInstance {
                 link: Some(link),
                 content_set_patch: Some(AppliedContentSetPatch {
@@ -502,12 +531,11 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
             &state.pool,
         )
         .await?;
-    }
+	}
 
-    crate::state::clear_shared_instance(instance_id, &state.pool).await?;
-    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+	crate::state::clear_shared_instance(instance_id, &state.pool).await?;
 
-    Ok(())
+	Ok(())
 }
 
 #[tracing::instrument]
@@ -2221,6 +2249,17 @@ fn ensure_owner(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
         "Only the owner instance can manage shared instance users".to_string(),
     )
     .into())
+}
+
+fn ensure_member(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
+	if attachment.role == SharedInstanceRole::Member {
+		return Ok(());
+	}
+
+	Err(crate::ErrorKind::InputError(
+		"Only shared instance members can unlink from shared instances".to_string(),
+	)
+	.into())
 }
 
 fn file_type(project_type: ProjectType) -> String {

@@ -1,6 +1,6 @@
 <template>
 	<StackedAdmonitions v-bind="$attrs" :items="stackItems" class="w-full">
-		<template #item="{ item }">
+		<template #item="{ item, dismissible }">
 			<InstanceAdmonitionsSharedInstanceStale
 				v-if="item.kind === 'shared-instance-stale'"
 				:instance="instance"
@@ -16,6 +16,8 @@
 				v-else-if="item.kind === 'shared-instance-unavailable'"
 				:reason="sharedInstanceUnavailableReason"
 				:manager="sharedInstanceUnavailableManager"
+				:dismissible="dismissible"
+				@dismiss="sharedInstanceUnavailableDismissed = true"
 			/>
 		</template>
 	</StackedAdmonitions>
@@ -23,7 +25,7 @@
 
 <script setup lang="ts">
 import { StackedAdmonitions } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import type { SharedInstanceUnavailableReason } from '@/helpers/install'
 import type { GameInstance } from '@/helpers/types'
@@ -52,6 +54,7 @@ const emit = defineEmits<{
 }>()
 
 const sharedInstanceWrongAccount = computed(() => props.sharedInstanceWrongAccount ?? false)
+const sharedInstanceUnavailableDismissed = ref(false)
 const showSharedInstancePublishAdmonition = computed(
 	() =>
 		!sharedInstanceWrongAccount.value &&
@@ -71,11 +74,11 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 		})
 	}
 
-	if (props.sharedInstanceUnavailableReason) {
+	if (props.sharedInstanceUnavailableReason && !sharedInstanceUnavailableDismissed.value) {
 		items.push({
 			id: 'shared-instance-unavailable',
 			type: 'warning',
-			dismissible: false,
+			dismissible: true,
 			kind: 'shared-instance-unavailable',
 		})
 	}
@@ -91,4 +94,11 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 
 	return items
 })
+
+watch(
+	() => [props.instance.id, props.sharedInstanceUnavailableReason],
+	() => {
+		sharedInstanceUnavailableDismissed.value = false
+	},
+)
 </script>

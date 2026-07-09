@@ -221,6 +221,7 @@ fn main() {
                         "instance_share_remove_users",
                         "instance_share_get_publish_preview",
                         "instance_share_publish",
+                        "instance_share_unlink",
                         "instance_share_unpublish",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",

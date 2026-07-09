@@ -453,18 +453,19 @@ const messages = defineMessages({
 		defaultMessage: 'Shared instance no longer available',
 	},
 	sharedInstanceUnavailableText: {
-		id: 'instance.shared-instance.unavailable.text',
+		id: 'instance.shared-instance.unavailable.text-v2',
 		defaultMessage:
-			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
+			"Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceDeletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text',
-		defaultMessage: 'The shared instance has been deleted. Contact {manager} for more information.',
+		id: 'instance.shared-instance.unavailable.deleted-text-v2',
+		defaultMessage:
+			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceAccessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text',
+		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
 		defaultMessage:
-			'Your access to this shared instance has been revoked. Contact {manager} for more information.',
+			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceUnavailableFallbackManager: {
 		id: 'instance.shared-instance.unavailable.manager-fallback',

@@ -123,7 +123,7 @@ onUnmounted(() => {
 		<div class="flex flex-wrap items-start justify-between gap-4">
 			<div class="flex min-w-0 flex-1 items-center gap-4">
 				<AutoLink :to="projectLink" class="shrink-0">
-					<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow raised />
+					<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow />
 				</AutoLink>
 				<div class="flex min-w-0 flex-col gap-1.5">
 					<div class="flex min-w-0 flex-col">

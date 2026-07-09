@@ -52,5 +52,5 @@ pub use self::shared::{
     install_shared_instance, install_shared_instance_invite,
     invite_shared_instance_users, publish_shared_instance,
     remove_shared_instance_users,
-    unpublish_shared_instance, update_shared_instance,
+    unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
 };

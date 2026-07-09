@@ -212,7 +212,7 @@
 
 				<template #cell-actions="{ row }">
 					<div v-if="!sharedInstanceActionsLocked" class="flex items-center justify-end">
-						<ButtonStyled v-if="row.pending" circular type="transparent">
+						<ButtonStyled circular type="transparent">
 							<button
 								v-tooltip="'Revoke access'"
 								:aria-label="`Revoke access for ${row.username}`"
@@ -221,24 +221,6 @@
 							>
 								<XIcon aria-hidden="true" />
 							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'remove-user',
-										action: () => showRemoveRowModal(row),
-										color: 'red',
-									},
-								]"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<span class="sr-only">Actions for {{ row.username }}</span>
-								<template #remove-user>
-									<XIcon aria-hidden="true" />
-									Revoke access
-								</template>
-							</OverflowMenu>
 						</ButtonStyled>
 					</div>
 				</template>
@@ -311,7 +293,6 @@ import {
 	FilterIcon,
 	LinkIcon,
 	LogInIcon,
-	MoreVerticalIcon,
 	SearchIcon,
 	UserXIcon,
 	UserPlusIcon,
@@ -333,7 +314,6 @@ import {
 	type InvitePlayersSearchUser,
 	type InvitePlayersUser,
 	NewModal,
-	OverflowMenu,
 	provideAppBackup,
 	type SortDirection,
 	StyledInput,
@@ -469,18 +449,19 @@ const messages = defineMessages({
 		defaultMessage: 'Shared instance no longer available',
 	},
 	sharedInstanceUnavailableText: {
-		id: 'instance.shared-instance.unavailable.text',
+		id: 'instance.shared-instance.unavailable.text-v2',
 		defaultMessage:
-			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
+			"Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceDeletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text',
-		defaultMessage: 'The shared instance has been deleted. Contact {manager} for more information.',
+		id: 'instance.shared-instance.unavailable.deleted-text-v2',
+		defaultMessage:
+			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceAccessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text',
+		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
 		defaultMessage:
-			'Your access to this shared instance has been revoked. Contact {manager} for more information.',
+			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceUnavailableFallbackManager: {
 		id: 'instance.shared-instance.unavailable.manager-fallback',

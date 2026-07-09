@@ -71,6 +71,11 @@ export interface InstallationSettingsContext {
 	unpublishingSharedInstance?: Ref<boolean>
 	unpublishSharedInstance?: () => Promise<void>
 
+	/** True when this receiving instance can be disconnected from its shared-instance parent. */
+	canUnlinkSharedInstance?: boolean | ComputedRef<boolean>
+	unlinkingSharedInstance?: Ref<boolean>
+	unlinkSharedInstance?: () => Promise<void>
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 
