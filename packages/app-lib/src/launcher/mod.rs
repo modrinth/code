@@ -173,7 +173,8 @@ pub async fn get_loader_version_from_profile(
     };
 
     let versions =
-        crate::api::metadata::get_loader_versions(loader.as_meta_str()).await?;
+        crate::api::metadata::get_loader_versions(loader.as_meta_str(), None)
+            .await?;
 
     let loaders = versions.game_versions.into_iter().find(|x| {
         x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
@@ -202,7 +203,7 @@ pub async fn resolve_minecraft_manifest(
     game_version: &str,
     state: &State,
 ) -> crate::Result<(d::minecraft::VersionManifest, usize)> {
-    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
+    let minecraft = crate::api::metadata::get_minecraft_versions(None).await?;
 
     if let Some(idx) = minecraft
         .versions

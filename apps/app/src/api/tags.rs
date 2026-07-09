@@ -1,4 +1,5 @@
 use crate::api::Result;
+use theseus::prelude::CacheBehaviour;
 use theseus::tags::{Category, DonationPlatform, GameVersion, Loader};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -33,8 +34,10 @@ pub async fn tags_get_loaders() -> Result<Vec<Loader>> {
 
 /// Gets cached game version tags from the database
 #[tauri::command]
-pub async fn tags_get_game_versions() -> Result<Vec<GameVersion>> {
-    Ok(theseus::tags::get_game_version_tags().await?)
+pub async fn tags_get_game_versions(
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Vec<GameVersion>> {
+    Ok(theseus::tags::get_game_version_tags(cache_behaviour).await?)
 }
 
 /// Gets cached donation platform tags from the database

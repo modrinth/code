@@ -24,7 +24,10 @@ export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
 export type GeneratorSettingsMode = 'default' | 'flat' | 'custom'
-export type LoaderManifestResolver = (loader: string) => Promise<LauncherMeta.Manifest.v0.Manifest>
+export type LoaderManifestResolver = (
+	loader: string,
+	cacheBehaviour?: 'bypass',
+) => Promise<LauncherMeta.Manifest.v0.Manifest>
 export interface LoaderVersionEntry {
 	id: string
 	stable: boolean
@@ -207,8 +210,8 @@ export interface CreationFlowContextValue {
 	browseModpacks: () => void
 	finish: () => void
 	buildProperties: () => Archon.Content.v1.PropertiesFields
-	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
-	prefetchLoaderMetadata: () => Promise<void>
+	fetchLoaderMetadata: (loader?: string | null, bypassCache?: boolean) => Promise<void>
+	prefetchLoaderMetadata: (bypassCache?: boolean) => Promise<void>
 
 	// Platform-provided search
 	searchModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
@@ -352,23 +355,25 @@ export function createCreationFlowContext(
 		return loader === 'neoforge' ? 'neo' : loader
 	}
 
-	async function fetchLoaderManifest(loader: string) {
+	async function fetchLoaderManifest(loader: string, bypassCache = false) {
 		const apiLoader = toApiLoaderName(loader)
-		if (loaderVersionsCache.value[apiLoader]) return
+		if (!bypassCache && loaderVersionsCache.value[apiLoader]) return
 
 		try {
 			const data = await queryClient.fetchQuery({
 				queryKey: loaderManifestQueryKey(apiLoader),
 				queryFn: async () =>
-					(await getLoaderManifest?.(apiLoader)) ??
+					(await getLoaderManifest?.(apiLoader, bypassCache ? 'bypass' : undefined)) ??
 					(await client.launchermeta.manifest_v0.getManifest(apiLoader)),
-				staleTime: Infinity,
+				staleTime: bypassCache ? 0 : Infinity,
 			})
 			loaderVersionsCache.value[apiLoader] = data.gameVersions
 			debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
 		} catch (error) {
 			debug('fetchLoaderManifest: failed', apiLoader, error)
-			loaderVersionsCache.value[apiLoader] = []
+			if (!loaderVersionsCache.value[apiLoader]) {
+				loaderVersionsCache.value[apiLoader] = []
+			}
 		}
 	}
 
@@ -404,7 +409,7 @@ export function createCreationFlowContext(
 		}
 	}
 
-	async function fetchLoaderMetadata(loader?: string | null) {
+	async function fetchLoaderMetadata(loader?: string | null, bypassCache = false) {
 		if (!loader || loader === 'vanilla') return
 		if (loader === 'paper') {
 			await fetchPaperSupportedVersions()
@@ -414,14 +419,14 @@ export function createCreationFlowContext(
 			await fetchPurpurSupportedVersions()
 			return
 		}
-		await fetchLoaderManifest(loader)
+		await fetchLoaderManifest(loader, bypassCache)
 	}
 
-	async function prefetchLoaderMetadata() {
+	async function prefetchLoaderMetadata(bypassCache = false) {
 		await Promise.allSettled(
 			availableLoaders
 				.filter((loader) => loader !== 'vanilla')
-				.map((loader) => fetchLoaderMetadata(loader)),
+				.map((loader) => fetchLoaderMetadata(loader, bypassCache)),
 		)
 	}
 

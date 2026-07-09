@@ -10,12 +10,12 @@ export function setupProviders(
 	notificationManager: AbstractWebNotificationManager,
 	_popupNotificationManager: AbstractPopupNotificationManager,
 ) {
-	setupTagsProvider(notificationManager)
+	const { loadGameVersions } = setupTagsProvider(notificationManager)
 	setupFileDropProvider()
 	setupFilePickerProvider()
 	setupInstanceImportProvider(notificationManager)
 
 	return {
-		...setupCreationModal(notificationManager),
+		...setupCreationModal(notificationManager, loadGameVersions),
 	}
 }

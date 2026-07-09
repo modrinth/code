@@ -16,8 +16,8 @@ export async function get_loaders() {
 }
 
 // Gets cached game_versions tags
-export async function get_game_versions() {
-	return await invoke('plugin:tags|tags_get_game_versions')
+export async function get_game_versions(cacheBehaviour) {
+	return await invoke('plugin:tags|tags_get_game_versions', { cacheBehaviour })
 }
 
 // Gets cached donation_platforms tags

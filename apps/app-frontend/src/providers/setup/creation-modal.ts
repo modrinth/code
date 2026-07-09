@@ -20,10 +20,13 @@ import {
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
-import type { InstanceLoader } from '@/helpers/types'
+import type { CacheBehaviour, InstanceLoader } from '@/helpers/types'
 import { useTheming } from '@/store/state'
 
-export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
+export function setupCreationModal(
+	notificationManager: AbstractWebNotificationManager,
+	loadGameVersions?: (cacheBehaviour?: CacheBehaviour) => Promise<void>,
+) {
 	const { handleError } = notificationManager
 	const router = useRouter()
 	const themeStore = useTheming()
@@ -45,8 +48,11 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 		return instances?.map((i) => i.name) ?? []
 	}
 
-	provide('showCreationModal', () => {
-		installationModal.value?.show()
+	provide('showCreationModal', async () => {
+		await installationModal.value?.show()
+		// bypass cache to get up to date versions
+		void loadGameVersions?.('bypass').catch(handleError)
+		void installationModal.value?.ctx.prefetchLoaderMetadata(true)
 	})
 
 	async function proceedWithModpackCreation(
