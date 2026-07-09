@@ -21,7 +21,7 @@
 					/>
 					<span
 						v-if="user.online"
-						class="absolute bottom-0 right-0 size-[7px] rounded-full border border-solid border-surface-2 bg-brand"
+						class="absolute bottom-[1.5px] right-[-1.5px] size-[9px] rounded-full border-[1.5px] border-solid border-surface-2 bg-brand"
 					/>
 				</span>
 				<span class="min-w-0 truncate text-base font-medium">

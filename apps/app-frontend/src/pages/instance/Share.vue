@@ -1,10 +1,18 @@
 <template>
 	<div class="flex flex-col gap-4">
+		<ModrinthAccountRequiredModal
+			ref="modrinthAccountRequiredModal"
+			:request-auth="requestAuthToShare"
+		/>
 		<InvitePlayersModal
 			ref="invitePlayersModal"
 			:header="inviteModalHeader"
 			:friends="inviteFriends"
 			:search-users="searchInviteUsers"
+			:link="inviteLink"
+			:link-expires-at="inviteLinkDetails?.expiresAt"
+			:link-max-uses="inviteLinkDetails?.maxUses"
+			:update-invite-link="updateInviteLink"
 			:user-profile-link="userProfileLink"
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
@@ -95,9 +103,11 @@
 					<ButtonStyled v-if="!sharedInstanceActionsLocked" color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
+							:disabled="inviteLinkPending"
 							@click="showInvitePlayers($event)"
 						>
-							<UserPlusIcon aria-hidden="true" />
+							<SpinnerIcon v-if="inviteLinkPending" class="animate-spin" aria-hidden="true" />
+							<UserPlusIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.inviteFriendsButton) }}
 						</button>
 					</ButtonStyled>
@@ -207,7 +217,7 @@
 
 				<template #cell-actions="{ row }">
 					<div v-if="!sharedInstanceActionsLocked" class="flex items-center justify-end">
-						<ButtonStyled v-if="row.pending" circular type="transparent">
+						<ButtonStyled circular type="transparent">
 							<button
 								v-tooltip="'Revoke access'"
 								:aria-label="`Revoke access for ${row.username}`"
@@ -216,24 +226,6 @@
 							>
 								<XIcon aria-hidden="true" />
 							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'remove-user',
-										action: () => showRemoveRowModal(row),
-										color: 'red',
-									},
-								]"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<span class="sr-only">Actions for {{ row.username }}</span>
-								<template #remove-user>
-									<XIcon aria-hidden="true" />
-									Revoke access
-								</template>
-							</OverflowMenu>
 						</ButtonStyled>
 					</div>
 				</template>
@@ -286,26 +278,14 @@
 			</template>
 		</EmptyState>
 
-		<EmptyState v-else-if="!isSignedIn" type="empty-inbox">
-			<template #heading>{{ formatMessage(messages.signInToShareHeading) }}</template>
-			<template #description>{{ formatMessage(messages.signInToShareDescription) }}</template>
-			<template #actions>
-				<ButtonStyled color="brand">
-					<button class="!h-10" @click="signInToShare">
-						<LogInIcon aria-hidden="true" />
-						{{ formatMessage(messages.signInButton) }}
-					</button>
-				</ButtonStyled>
-			</template>
-		</EmptyState>
-
 		<EmptyState v-else type="empty-inbox">
 			<template #heading>{{ formatMessage(messages.noFriendsInvitedHeading) }}</template>
 			<template #description>{{ formatMessage(messages.noFriendsInvitedDescription) }}</template>
 			<template #actions>
 				<ButtonStyled color="brand">
-					<button class="!h-10" @click="showInvitePlayers($event)">
-						<UserPlusIcon aria-hidden="true" />
+					<button class="!h-10" :disabled="inviteLinkPending" @click="showInvitePlayers($event)">
+						<SpinnerIcon v-if="inviteLinkPending" class="animate-spin" aria-hidden="true" />
+						<UserPlusIcon v-else aria-hidden="true" />
 						{{ formatMessage(messages.inviteFriendsButton) }}
 					</button>
 				</ButtonStyled>
@@ -319,8 +299,8 @@ import {
 	FilterIcon,
 	LinkIcon,
 	LogInIcon,
-	MoreVerticalIcon,
 	SearchIcon,
+	SpinnerIcon,
 	UserPlusIcon,
 	UserXIcon,
 	XIcon,
@@ -336,12 +316,12 @@ import {
 	EmptyState,
 	injectAuth,
 	injectNotificationManager,
+	type InviteLinkSettings,
 	type InvitePlayersInvitePayload,
 	InvitePlayersModal,
 	type InvitePlayersSearchUser,
 	type InvitePlayersUser,
 	NewModal,
-	OverflowMenu,
 	provideAppBackup,
 	type SortDirection,
 	StyledInput,
@@ -356,6 +336,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
+import { config } from '@/config'
 import { get_user, get_user_many } from '@/helpers/cache.js'
 import { friend_listener } from '@/helpers/events.js'
 import {
@@ -370,15 +352,17 @@ import {
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import {
+	create_shared_instance_invite_link,
 	edit,
 	get_shared_instance_users,
 	invite_shared_instance_users,
 	list,
 	remove_shared_instance_users,
+	type SharedInstanceInviteLink,
 	type SharedInstanceUser,
 	type SharedInstanceUsers,
 } from '@/helpers/instance'
-import { get as getCredentials } from '@/helpers/mr_auth.ts'
+import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import type { GameInstance } from '@/helpers/types'
 import { search_user } from '@/helpers/users.ts'
 
@@ -406,6 +390,9 @@ const props = defineProps<{
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
+const modrinthAccountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal> | null>(
+	null,
+)
 const shareUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>(null)
 const removeUserConfirmModal = ref<InstanceType<typeof NewModal> | null>(null)
 const memberSearch = ref('')
@@ -415,18 +402,12 @@ const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const importedModpackUnlinkedForShare = ref(false)
 const pendingRemovalRow = ref<ShareRow | null>(null)
+const inviteLinkDetails = ref<SharedInstanceInviteLink>()
+const inviteLinkPending = ref(false)
 
 const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(props.instance.id))
 
 const messages = defineMessages({
-	signInToShareHeading: {
-		id: 'app.instance.share.sign-in.heading',
-		defaultMessage: 'Sign in to share',
-	},
-	signInToShareDescription: {
-		id: 'app.instance.share.sign-in.description',
-		defaultMessage: 'You need a Modrinth account to share instances.',
-	},
 	signInButton: {
 		id: 'app.instance.share.sign-in.button',
 		defaultMessage: 'Sign in',
@@ -476,18 +457,19 @@ const messages = defineMessages({
 		defaultMessage: 'Shared instance no longer available',
 	},
 	sharedInstanceUnavailableText: {
-		id: 'instance.shared-instance.unavailable.text',
+		id: 'instance.shared-instance.unavailable.text-v2',
 		defaultMessage:
-			'The shared instance has been deleted or your access has been revoked. Contact {manager} for more information.',
+			"Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceDeletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text',
-		defaultMessage: 'The shared instance has been deleted. Contact {manager} for more information.',
+		id: 'instance.shared-instance.unavailable.deleted-text-v2',
+		defaultMessage:
+			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceAccessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text',
+		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
 		defaultMessage:
-			'Your access to this shared instance has been revoked. Contact {manager} for more information.',
+			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	sharedInstanceUnavailableFallbackManager: {
 		id: 'instance.shared-instance.unavailable.manager-fallback',
@@ -540,6 +522,9 @@ const currentUserId = computed(() => auth.user.value?.id ?? null)
 const isSignedIn = computed(() => !!auth.session_token.value)
 const inviteModalHeader = computed(() =>
 	formatMessage(messages.shareModalHeader, { name: props.instance.name }),
+)
+const inviteLink = computed(() =>
+	inviteLinkDetails.value ? buildInviteLink(inviteLinkDetails.value) : undefined,
 )
 const shareRoutePath = computed(() => `/instance/${encodeURIComponent(props.instance.id)}/share`)
 const friendsKey = computed(() => friendsQueryKey(currentUserId.value))
@@ -713,6 +698,7 @@ const invitedRows = computed(() => {
 const inviteFriends = computed<InvitePlayersUser[]>(() =>
 	userFriends.value
 		.filter((friend) => friend.username && friend.accepted)
+		.sort((a, b) => Number(b.online) - Number(a.online))
 		.map((friend) => {
 			const id = getFriendUserId(friend, currentUserId.value)
 			const invitedRow =
@@ -1027,14 +1013,19 @@ function cancelInvite(user: InvitePlayersUser) {
 	}
 }
 
-function showInvitePlayers(event?: MouseEvent) {
+async function showInvitePlayers(event?: MouseEvent) {
 	if (props.sharedInstanceActionsLocked) return
+	if (!isSignedIn.value) {
+		signInToShare(event)
+		return
+	}
 
 	if (requiresUnlinkBeforeShare.value) {
 		shareUnlinkModal.value?.show()
 		return
 	}
 
+	if (!(await ensureInviteLink())) return
 	invitePlayersModal.value?.show(event)
 }
 
@@ -1045,10 +1036,54 @@ async function unlinkImportedModpackForShare() {
 		})
 		importedModpackUnlinkedForShare.value = true
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.id] })
+		if (!(await ensureInviteLink())) return
 		invitePlayersModal.value?.show()
 	} catch (error) {
 		handleError(toError(error))
 	}
+}
+
+async function ensureInviteLink() {
+	if (inviteLinkDetails.value) return true
+	if (inviteLinkPending.value) return false
+
+	inviteLinkPending.value = true
+	try {
+		const invite = await create_shared_instance_invite_link(props.instance.id)
+		inviteLinkDetails.value = invite
+		return true
+	} catch (error) {
+		handleError(toError(error))
+		return false
+	} finally {
+		inviteLinkPending.value = false
+	}
+}
+
+async function updateInviteLink(settings: InviteLinkSettings) {
+	const currentInvite = inviteLinkDetails.value
+	if (!currentInvite) return
+
+	inviteLinkPending.value = true
+	try {
+		const maxAgeSeconds = Math.max(
+			1,
+			Math.min(604800, Math.floor((settings.expiresAt.getTime() - Date.now()) / 1000)),
+		)
+		inviteLinkDetails.value = await create_shared_instance_invite_link(props.instance.id, {
+			maxAgeSeconds,
+			maxUses: settings.maxUses,
+			replaceInviteId: currentInvite.inviteId,
+		})
+	} catch (error) {
+		throw toError(error)
+	} finally {
+		inviteLinkPending.value = false
+	}
+}
+
+function buildInviteLink(invite: SharedInstanceInviteLink) {
+	return `${config.siteUrl}/share/${encodeURIComponent(invite.inviteId)}`
 }
 
 function showRemoveRowModal(row: ShareRow) {
@@ -1157,8 +1192,13 @@ function userProfileLink(username: string) {
 	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
 }
 
-function signInToShare() {
-	void auth.requestSignIn(shareRoutePath.value)
+async function requestAuthToShare(flow: ModrinthAuthFlow) {
+	await auth.requestSignIn(shareRoutePath.value, flow)
+	return isSignedIn.value
+}
+
+function signInToShare(event?: MouseEvent) {
+	void modrinthAccountRequiredModal.value?.show(event)
 }
 
 function setUsernameRef(id: string, element: Element | null) {
@@ -1277,8 +1317,18 @@ watch(
 	() => props.instance.id,
 	(instanceId) => {
 		importedModpackUnlinkedForShare.value = false
+		inviteLinkDetails.value = undefined
+		inviteLinkPending.value = false
 		pendingRows.value = loadPendingRows(instanceId)
 	},
+)
+
+watch(
+	[() => auth.isReady.value, isSignedIn, () => props.sharedInstanceActionsLocked],
+	([isReady, signedIn, actionsLocked]) => {
+		if (isReady && !signedIn && !actionsLocked) signInToShare()
+	},
+	{ immediate: true, flush: 'post' },
 )
 
 provideAppBackup({

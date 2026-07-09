@@ -1,5 +1,10 @@
 <template>
-	<Admonition type="warning" :header="formatMessage(messages.sharedInstanceUnavailableTitle)">
+	<Admonition
+		type="warning"
+		:header="formatMessage(messages.sharedInstanceUnavailableTitle)"
+		:dismissible="dismissible"
+		@dismiss="emit('dismiss')"
+	>
 		{{
 			formatMessage(sharedInstanceUnavailableTextMessage(reason ?? null), {
 				manager: manager || formatMessage(messages.sharedInstanceUnavailableFallbackManager),
@@ -21,6 +26,11 @@ import {
 defineProps<{
 	reason?: SharedInstanceUnavailableReason | null
 	manager?: string | null
+	dismissible?: boolean
+}>()
+
+const emit = defineEmits<{
+	dismiss: []
 }>()
 
 const { formatMessage } = useVIntl()

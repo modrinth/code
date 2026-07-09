@@ -413,12 +413,6 @@
   "app.instance.share.sign-in.button": {
     "message": "Sign in"
   },
-  "app.instance.share.sign-in.description": {
-    "message": "You need a Modrinth account to share instances."
-  },
-  "app.instance.share.sign-in.heading": {
-    "message": "Sign in to share"
-  },
   "app.instance.shared-instance-wrong-account.fallback-username": {
     "message": "the linked account"
   },
@@ -589,18 +583,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
-  },
-  "app.sign-out.shared-instances-warning.admonition-body": {
-    "message": "Signing out will prevent you from managing or receiving updates for shared instances linked to this Modrinth account until you sign back in."
-  },
-  "app.sign-out.shared-instances-warning.admonition-header": {
-    "message": "Shared instances installed"
-  },
-  "app.sign-out.shared-instances-warning.header": {
-    "message": "Sign out of Modrinth?"
-  },
-  "app.sign-out.shared-instances-warning.sign-out-button": {
-    "message": "Sign out"
   },
   "app.skins.add-button": {
     "message": "Add skin"
@@ -1118,17 +1100,17 @@
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."
   },
-  "instance.shared-instance.unavailable.access-revoked-text": {
-    "message": "Your access to this shared instance has been revoked. Contact {manager} for more information."
+  "instance.shared-instance.unavailable.access-revoked-text-v2": {
+    "message": "Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates."
   },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "The shared instance has been deleted. Contact {manager} for more information."
+  "instance.shared-instance.unavailable.deleted-text-v2": {
+    "message": "The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates."
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "the instance manager"
   },
-  "instance.shared-instance.unavailable.text": {
-    "message": "The shared instance has been deleted or your access has been revoked. Contact {manager} for more information."
+  "instance.shared-instance.unavailable.text-v2": {
+    "message": "Your local instance is still available, but it is no longer linked and won't receive updates."
   },
   "instance.shared-instance.unavailable.title": {
     "message": "Shared instance no longer available"
@@ -1195,6 +1177,24 @@
   },
   "minecraft-account.sign-in": {
     "message": "Sign in to Minecraft"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Create an account"
+  },
+  "modal.modrinth-account-required.description": {
+    "message": "You'll need to sign into your Modrinth account before you can use this feature."
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Account required"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Sign in to Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Sign in to a Modrinth account"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Having trouble signing in? <support>Get support</support>"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"

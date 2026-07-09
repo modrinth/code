@@ -354,6 +354,12 @@ export interface SharedInstancePublishPreview {
 	diffs: SharedInstanceUpdateDiff[]
 }
 
+export interface SharedInstanceInviteLink {
+	inviteId: string
+	expiresAt: string
+	maxUses: number
+}
+
 export async function get_shared_instance_users(instanceId: string): Promise<SharedInstanceUsers> {
 	return await invoke('plugin:instance|instance_share_get_users', { instanceId })
 }
@@ -363,6 +369,20 @@ export async function invite_shared_instance_users(
 	userIds: string[],
 ): Promise<SharedInstanceUsers> {
 	return await invoke('plugin:instance|instance_share_invite_users', { instanceId, userIds })
+}
+
+export async function create_shared_instance_invite_link(
+	instanceId: string,
+	options: {
+		maxAgeSeconds?: number
+		maxUses?: number
+		replaceInviteId?: string
+	} = {},
+): Promise<SharedInstanceInviteLink> {
+	return await invoke('plugin:instance|instance_share_create_invite_link', {
+		instanceId,
+		...options,
+	})
 }
 
 export async function remove_shared_instance_users(
@@ -382,6 +402,10 @@ export async function publish_shared_instance(
 	instanceId: string,
 ): Promise<SharedInstanceAttachment> {
 	return await invoke('plugin:instance|instance_share_publish', { instanceId })
+}
+
+export async function unlink_shared_instance(instanceId: string): Promise<void> {
+	return await invoke('plugin:instance|instance_share_unlink', { instanceId })
 }
 
 export async function unpublish_shared_instance(instanceId: string): Promise<void> {

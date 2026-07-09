@@ -7,7 +7,8 @@ use theseus::install::{
     InstallJobSnapshot, InstallModpackPreview, InstallPostInstallEdit,
 };
 use theseus::instance::{
-    SharedInstanceInstallPreview, SharedInstanceUpdatePreview,
+    SharedInstanceInstallPreview, SharedInstanceInviteInstallPreview,
+    SharedInstanceUpdatePreview,
 };
 use theseus::pack::import::ImportLauncherType;
 use theseus::pack::install_from::CreatePackLocation;
@@ -20,8 +21,10 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_create_instance,
             install_create_modpack_instance,
             install_get_shared_instance_preview,
+            install_accept_shared_instance_invite,
             install_get_shared_instance_update_preview,
             install_shared_instance,
+            install_shared_instance_invite,
             install_update_shared_instance,
             install_import_instance,
             install_duplicate_instance,
@@ -120,6 +123,18 @@ pub async fn install_get_shared_instance_preview(
 }
 
 #[tauri::command]
+pub async fn install_accept_shared_instance_invite(
+    invite_id: String,
+) -> Result<SharedInstanceInviteInstallPreview> {
+    Ok(
+        theseus::instance::accept_shared_instance_invite_for_install(
+            &invite_id,
+        )
+        .await?,
+    )
+}
+
+#[tauri::command]
 pub async fn install_get_shared_instance_update_preview(
     instance_id: String,
 ) -> Result<Option<SharedInstanceUpdatePreview>> {
@@ -134,13 +149,24 @@ pub async fn install_shared_instance(
     shared_instance_id: String,
     name: String,
     manager_id: Option<String>,
+    server_manager_name: Option<String>,
+    server_manager_icon_url: Option<String>,
 ) -> Result<InstallJobSnapshot> {
     Ok(theseus::instance::install_shared_instance(
         &shared_instance_id,
         name,
         manager_id,
+        server_manager_name,
+        server_manager_icon_url,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn install_shared_instance_invite(
+    invite_id: String,
+) -> Result<InstallJobSnapshot> {
+    Ok(theseus::instance::install_shared_instance_invite(&invite_id).await?)
 }
 
 #[tauri::command]

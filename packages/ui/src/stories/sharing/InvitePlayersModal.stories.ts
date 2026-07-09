@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import InvitePlayersModal from '../../components/sharing/invite-players-modal/index.vue'
 import type {
+	InviteLinkSettings,
 	InvitePlayersInvitePayload,
 	InvitePlayersUser,
 	InvitePlayersUserStatus,
@@ -105,6 +106,11 @@ function createRender(args: Record<string, unknown>) {
 			const lastAction = ref('')
 			const invitedSearchUserIds = ref(new Set<string>())
 
+			async function updateInviteLink(settings: InviteLinkSettings) {
+				await new Promise((resolve) => setTimeout(resolve, 500))
+				lastAction.value = `Updated invite link to ${settings.maxUses} uses, expiring ${settings.expiresAt.toLocaleString()}`
+			}
+
 			async function searchInviteUsers(query: string) {
 				await new Promise((resolve) => setTimeout(resolve, 250))
 				const normalizedQuery = query.trim().toLowerCase()
@@ -155,6 +161,7 @@ function createRender(args: Record<string, unknown>) {
 				lastAction,
 				modalRef,
 				searchInviteUsers,
+				updateInviteLink,
 			}
 		},
 		template: /* html */ `
@@ -168,6 +175,7 @@ function createRender(args: Record<string, unknown>) {
 					v-bind="args"
 					:friends="friends"
 					:search-users="searchInviteUsers"
+					:update-invite-link="updateInviteLink"
 					@invite="handleInvite"
 					@cancel="handleCancel"
 				/>
@@ -180,6 +188,8 @@ export const ShareInstance: Story = {
 	args: {
 		header: 'Share instance',
 		link: 'https://modrinth.com/instance/abc123',
+		linkExpiresAt: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+		linkMaxUses: 10,
 	},
 	render: (args) => createRender(args),
 }

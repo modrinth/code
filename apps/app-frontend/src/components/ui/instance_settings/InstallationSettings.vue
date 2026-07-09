@@ -29,6 +29,7 @@ import {
 	edit,
 	get_linked_modpack_info,
 	list,
+	unlink_shared_instance,
 	unpublish_shared_instance,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
@@ -112,13 +113,17 @@ debug('metadata queries configured', {
 const isModrinthLinkedModpack = computed(
 	() =>
 		instance.value.link?.type === 'modrinth_modpack' ||
-		instance.value.link?.type === 'server_project_modpack',
+		instance.value.link?.type === 'server_project_modpack' ||
+		(instance.value.link?.type === 'shared_instance' &&
+			!!instance.value.link.modpack_project_id &&
+			!!instance.value.link.modpack_version_id),
 )
 const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
 const isSharedInstanceManagedModpack = computed(
 	() => instance.value.shared_instance?.role === 'member',
 )
 const canUnpublishSharedInstance = computed(() => instance.value.shared_instance?.role === 'owner')
+const canUnlinkSharedInstance = computed(() => instance.value.shared_instance?.role === 'member')
 
 const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
@@ -130,6 +135,7 @@ const modpackInfo = modpackInfoQuery.data
 const repairing = ref(false)
 const reinstalling = ref(false)
 const unpublishingSharedInstance = ref(false)
+const unlinkingSharedInstance = ref(false)
 
 const messages = defineMessages({
 	loaderVersion: {
@@ -214,12 +220,18 @@ provideInstallationSettings({
 		}
 		return rows
 	}),
-	isLinked: computed(() => isModrinthLinkedModpack.value || isImportedModpack.value),
+	isLinked: computed(
+		() =>
+			isModrinthLinkedModpack.value ||
+			isImportedModpack.value ||
+			isSharedInstanceManagedModpack.value,
+	),
 	isBusy: computed(
 		() =>
 			instance.value.install_stage !== 'installed' ||
 			repairing.value ||
 			reinstalling.value ||
+			unlinkingSharedInstance.value ||
 			unpublishingSharedInstance.value ||
 			!!offline,
 	),
@@ -424,6 +436,27 @@ provideInstallationSettings({
 		}
 	},
 
+	async unlinkSharedInstance() {
+		debug('unlinkSharedInstance: called', { instanceId: instance.value.id })
+		unlinkingSharedInstance.value = true
+		try {
+			await unlink_shared_instance(instance.value.id)
+			await queryClient.invalidateQueries({
+				queryKey: ['sharedInstanceUsers', instance.value.id],
+			})
+			await queryClient.invalidateQueries({
+				queryKey: ['linkedModpackInfo', instance.value.id],
+			})
+			onUnlinked()
+			debug('unlinkSharedInstance: done')
+		} catch (error) {
+			handleError(error)
+			debug('unlinkSharedInstance: failed', { error })
+		} finally {
+			unlinkingSharedInstance.value = false
+		}
+	},
+
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
 		debug('fetchModpackVersions: called', {
@@ -465,12 +498,17 @@ provideInstallationSettings({
 	isServer: false,
 	isApp: true,
 	showModpackVersionActions: computed(
-		() => isModrinthLinkedModpack.value && !isMinecraftServer.value,
+		() =>
+			isModrinthLinkedModpack.value &&
+			!isMinecraftServer.value &&
+			!isSharedInstanceManagedModpack.value,
 	),
 	isLocalFile: isImportedModpack,
 	isSharedInstanceManagedModpack,
 	canUnpublishSharedInstance,
 	unpublishingSharedInstance,
+	canUnlinkSharedInstance,
+	unlinkingSharedInstance,
 	repairing,
 	reinstalling,
 })

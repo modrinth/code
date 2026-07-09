@@ -110,17 +110,77 @@
 						</span>
 						<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 					</button>
-					<p class="m-0 text-base text-primary">
-						{{ inviteLinkDescription }}
+					<p v-if="link && linkExpiryDescription" class="m-0 text-base text-primary">
+						{{ linkExpiryDescription }}
+						<button
+							v-if="updateInviteLink"
+							type="button"
+							class="cursor-pointer border-0 bg-transparent p-0 text-base font-medium text-blue hover:underline"
+							@click="showEditInviteLink"
+						>
+							{{ formatMessage(messages.editInviteLink) }}
+						</button>
 					</p>
 				</div>
 			</div>
 		</div>
 	</NewModal>
+
+	<NewModal
+		ref="editInviteLinkModal"
+		:header="formatMessage(messages.editInviteLinkTitle)"
+		max-width="30rem"
+	>
+		<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.expiryLabel) }}</span>
+				<DatePicker
+					v-model="editExpiry"
+					:disabled="savingInviteLink"
+					:min-date="minimumExpiry"
+					:max-date="maximumExpiry"
+					date-format="Y-m-d H:i"
+					alt-format="F j, Y at h:i K"
+					enable-time
+					wrapper-class="w-full"
+					input-class="w-full"
+				/>
+			</div>
+			<div class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.maxUsesLabel) }}</span>
+				<StyledInput
+					v-model="editMaxUses"
+					type="number"
+					:min="1"
+					:max="2147483647"
+					:step="1"
+					:disabled="savingInviteLink"
+				/>
+			</div>
+		</div>
+
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled>
+					<button :disabled="savingInviteLink" @click="editInviteLinkModal?.hide()">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!canSaveInviteLink" @click="saveInviteLink">
+						<SpinnerIcon v-if="savingInviteLink" class="animate-spin" aria-hidden="true" />
+						<SaveIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.saveButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, PlusIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, PlusIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -129,9 +189,12 @@ import { injectNotificationManager } from '../../../providers'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
+import DatePicker from '../../base/DatePicker.vue'
+import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 import InvitePlayersModalUserRow from './invite-players-modal-user-row.vue'
 import type {
+	InviteLinkSettings,
 	InvitePlayersInvitePayload,
 	InvitePlayersSearchUser,
 	InvitePlayersUser,
@@ -146,7 +209,9 @@ const props = withDefaults(
 		suggestions?: InvitePlayersSearchUser[]
 		searchUsers?: (query: string) => Promise<InvitePlayersSearchUser[]>
 		link?: string
-		linkDescription?: string
+		linkExpiresAt?: string | Date | null
+		linkMaxUses?: number
+		updateInviteLink?: (settings: InviteLinkSettings) => Promise<void>
 		friendsLabel?: string
 		searchPlaceholder?: string
 		addLabel?: string
@@ -164,6 +229,7 @@ const props = withDefaults(
 		friends: () => [],
 		suggestions: () => [],
 		canInvite: true,
+		linkMaxUses: 10,
 	},
 )
 
@@ -176,6 +242,12 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const notificationManager = injectNotificationManager(null)
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const editInviteLinkModal = ref<InstanceType<typeof NewModal> | null>(null)
+const editExpiry = ref('')
+const editMaxUses = ref<number>()
+const minimumExpiry = ref(new Date())
+const maximumExpiry = ref(new Date())
+const savingInviteLink = ref(false)
 const searchTarget = ref('')
 const searchInputKey = ref(0)
 const selectedSearchUser = ref<InvitePlayersSearchUser | null>(null)
@@ -245,10 +317,37 @@ const messages = defineMessages({
 		id: 'sharing.invite-players-modal.invite-link-heading',
 		defaultMessage: 'Or use an invite link',
 	},
-	inviteLinkDescription: {
-		id: 'sharing.invite-players-modal.invite-link-description',
-		defaultMessage:
-			'This link invites your friends as players and automatically shares all required files!',
+	inviteExpiryDescription: {
+		id: 'sharing.invite-players-modal.invite-expiry-description',
+		defaultMessage: 'Your invite link expires in {duration}.',
+	},
+	editInviteLink: {
+		id: 'sharing.invite-players-modal.edit-invite-link',
+		defaultMessage: 'Edit invite link.',
+	},
+	editInviteLinkTitle: {
+		id: 'sharing.invite-players-modal.edit-invite-link-title',
+		defaultMessage: 'Edit invite link',
+	},
+	expiryLabel: {
+		id: 'sharing.invite-players-modal.expiry-label',
+		defaultMessage: 'Expiry date',
+	},
+	maxUsesLabel: {
+		id: 'sharing.invite-players-modal.max-uses-label',
+		defaultMessage: 'Maximum uses',
+	},
+	cancelButton: {
+		id: 'sharing.invite-players-modal.cancel-button',
+		defaultMessage: 'Cancel',
+	},
+	saveButton: {
+		id: 'sharing.invite-players-modal.save-button',
+		defaultMessage: 'Save',
+	},
+	updateInviteLinkFailedTitle: {
+		id: 'sharing.invite-players-modal.update-invite-link-failed-title',
+		defaultMessage: 'Failed to update invite link',
 	},
 	linkCopiedTitle: {
 		id: 'sharing.invite-players-modal.link-copied-title',
@@ -295,9 +394,29 @@ const emptyFriendsLabel = computed(
 	() => props.emptyFriendsLabel ?? formatMessage(messages.noFriends),
 )
 const inviteLinkHeading = computed(() => formatMessage(messages.inviteLinkHeading))
-const inviteLinkDescription = computed(
-	() => props.linkDescription ?? formatMessage(messages.inviteLinkDescription),
-)
+const linkExpiryDescription = computed(() => {
+	if (!props.linkExpiresAt) return ''
+
+	const expiresAt = new Date(props.linkExpiresAt)
+	if (Number.isNaN(expiresAt.getTime())) return ''
+	const hours = Math.max(1, Math.ceil((expiresAt.getTime() - Date.now()) / 3_600_000))
+	const duration =
+		hours < 48 ? `${hours} ${hours === 1 ? 'hour' : 'hours'}` : `${Math.ceil(hours / 24)} days`
+
+	return formatMessage(messages.inviteExpiryDescription, { duration })
+})
+const canSaveInviteLink = computed(() => {
+	const expiry = parseLocalDate(editExpiry.value)
+	return (
+		!savingInviteLink.value &&
+		!!expiry &&
+		expiry >= minimumExpiry.value &&
+		expiry <= maximumExpiry.value &&
+		Number.isInteger(editMaxUses.value ?? 0) &&
+		(editMaxUses.value ?? 0) > 0 &&
+		(editMaxUses.value ?? 0) <= 2147483647
+	)
+})
 const inviteDisabledMessage = computed(
 	() => props.inviteDisabledMessage ?? formatMessage(messages.alreadyInvited),
 )
@@ -536,6 +655,57 @@ async function copyInviteLink() {
 			title: formatMessage(messages.linkCopyFailedTitle),
 			text: message,
 		})
+	}
+}
+
+function formatLocalDate(date: Date) {
+	const pad = (value: number) => value.toString().padStart(2, '0')
+	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+function parseLocalDate(value: string) {
+	const match = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/.exec(value)
+	if (!match) return null
+	const [, year, month, day, hour, minute] = match
+	const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute))
+	return Number.isNaN(date.getTime()) ? null : date
+}
+
+function showEditInviteLink() {
+	const now = new Date()
+	minimumExpiry.value = new Date(now.getTime() + 3_600_000)
+	minimumExpiry.value.setSeconds(0, 0)
+	minimumExpiry.value.setMinutes(minimumExpiry.value.getMinutes() + 1)
+	maximumExpiry.value = new Date(now.getTime() + 7 * 86_400_000)
+	maximumExpiry.value.setSeconds(0, 0)
+	const currentExpiry = props.linkExpiresAt ? new Date(props.linkExpiresAt) : maximumExpiry.value
+	const expiry =
+		Number.isNaN(currentExpiry.getTime()) || currentExpiry < minimumExpiry.value
+			? minimumExpiry.value
+			: currentExpiry > maximumExpiry.value
+				? maximumExpiry.value
+				: currentExpiry
+	editExpiry.value = formatLocalDate(expiry)
+	editMaxUses.value = props.linkMaxUses
+	editInviteLinkModal.value?.show()
+}
+
+async function saveInviteLink() {
+	const expiry = parseLocalDate(editExpiry.value)
+	if (!canSaveInviteLink.value || !expiry || !props.updateInviteLink) return
+
+	savingInviteLink.value = true
+	try {
+		await props.updateInviteLink({ expiresAt: expiry, maxUses: editMaxUses.value ?? 1 })
+		editInviteLinkModal.value?.hide()
+	} catch (error) {
+		notificationManager?.addNotification({
+			type: 'error',
+			title: formatMessage(messages.updateInviteLinkFailedTitle),
+			text: error instanceof Error ? error.message : String(error),
+		})
+	} finally {
+		savingInviteLink.value = false
 	}
 }
 

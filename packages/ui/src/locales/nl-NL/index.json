@@ -380,15 +380,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Houd Shift ingedrukt tijdens het klikken om de bevestiging over te slaan."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "De inhoud van je modpack kan vanaf nu hier gevonden worden!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpack inhoud verplaatst"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Niet opnieuw tonen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },

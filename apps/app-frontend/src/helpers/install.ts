@@ -56,6 +56,14 @@ export interface SharedInstanceInstallPreview {
 	externalFiles: SharedInstanceExternalFilePreview[]
 }
 
+export interface SharedInstanceInviteInstallPreview {
+	sharedInstanceId: string
+	managerId?: string | null
+	serverManagerName?: string | null
+	serverManagerIconUrl?: string | null
+	preview: SharedInstanceInstallPreview
+}
+
 export interface SharedInstanceExternalFilePreview {
 	fileName: string
 	fileType: string
@@ -70,7 +78,15 @@ export interface SharedInstanceUpdatePreview {
 }
 
 export interface SharedInstanceUpdateDiff {
-	type: 'added' | 'removed' | 'updated' | 'modpack_unlinked'
+	type:
+		| 'added'
+		| 'removed'
+		| 'updated'
+		| 'modpack_linked'
+		| 'modpack_updated'
+		| 'modpack_unlinked'
+		| 'game_version_updated'
+		| 'loader_updated'
 	projectId?: string | null
 	projectName?: string | null
 	fileName?: string | null
@@ -238,6 +254,15 @@ export async function install_get_shared_instance_preview(sharedInstanceId: stri
 	)
 }
 
+export async function install_accept_shared_instance_invite(inviteId: string) {
+	return await invoke<SharedInstanceInviteInstallPreview>(
+		'plugin:install|install_accept_shared_instance_invite',
+		{
+			inviteId,
+		},
+	)
+}
+
 export async function install_get_shared_instance_update_preview(instanceId: string) {
 	return await invoke<SharedInstanceUpdatePreview | null>(
 		'plugin:install|install_get_shared_instance_update_preview',
@@ -251,11 +276,21 @@ export async function install_shared_instance(
 	sharedInstanceId: string,
 	name: string,
 	managerId?: string | null,
+	serverManagerName?: string | null,
+	serverManagerIconUrl?: string | null,
 ) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
 		name,
 		managerId,
+		serverManagerName,
+		serverManagerIconUrl,
+	})
+}
+
+export async function install_shared_instance_invite(inviteId: string) {
+	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance_invite', {
+		inviteId,
 	})
 }
 

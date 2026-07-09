@@ -16,6 +16,7 @@ import {
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
+	LinkIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -40,6 +41,7 @@ import {
 	defineMessages,
 	I18nDebugPanel,
 	LoadingBar,
+	NewModal,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -49,6 +51,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	StyledInput,
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
@@ -80,7 +83,7 @@ import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
-import SharedInstancesLogoutWarningModal from '@/components/ui/modal/SharedInstancesLogoutWarningModal.vue'
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
@@ -96,6 +99,7 @@ import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import {
+	install_accept_shared_instance_invite,
 	install_create_modpack_instance,
 	install_get_modpack_preview,
 	install_get_shared_instance_preview,
@@ -645,6 +649,10 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const manualInviteLinkModal = ref()
+const manualInviteLink = ref('')
+const manualInviteProcessing = ref(false)
+const modrinthAccountRequiredModal = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginFlowWaitModal = ref()
@@ -655,8 +663,8 @@ watch(incompatibilityWarningModal, (modal) => {
 	}
 })
 
-setupAuthProvider(credentials, async (_redirectPath) => {
-	await signIn()
+setupAuthProvider(credentials, async (_redirectPath, flow) => {
+	await signIn(flow)
 })
 
 async function validateSession(sessionToken) {
@@ -696,11 +704,11 @@ async function fetchCredentials() {
 	credentials.value = creds ?? null
 }
 
-async function signIn() {
+async function signIn(flow = 'sign-in') {
 	modrinthLoginFlowWaitModal.value.show()
 
 	try {
-		await login()
+		await login(flow)
 		await fetchCredentials()
 	} catch (error) {
 		if (
@@ -718,29 +726,7 @@ async function signIn() {
 }
 
 async function logOut() {
-	const sharedInstances = await getSharedInstancesForLogoutWarning()
-	const warningModal = sharedInstancesLogoutWarningModal.value
-	if (sharedInstances.length > 0 && warningModal) {
-		warningModal.show(sharedInstances)
-		return
-	}
-
 	await performLogOut()
-}
-
-async function getSharedInstancesForLogoutWarning() {
-	try {
-		const currentUserId = credentials.value?.user_id ?? credentials.value?.user?.id
-		if (!currentUserId) return []
-
-		const instances = await list()
-		return instances.filter(
-			(instance) => instance.shared_instance?.linked_user_id === currentUserId,
-		)
-	} catch (error) {
-		handleError(error)
-		return []
-	}
 }
 
 async function performLogOut() {
@@ -812,7 +798,6 @@ onMounted(() => {
 })
 
 const accounts = ref(null)
-const sharedInstancesLogoutWarningModal = ref(null)
 provide('accountsCard', accounts)
 
 command_listener(handleCommand)
@@ -927,6 +912,8 @@ async function acceptSharedInstanceInviteNotification(
 						sharedInstanceInvite.sharedInstanceId,
 						sharedInstanceInvite.sharedInstanceName,
 						sharedInstanceInvite.invitedById,
+						null,
+						null,
 					)
 					await markLiveNotificationRead(notification)
 					queryClient.invalidateQueries({ queryKey: ['instances'] })
@@ -947,6 +934,107 @@ async function declineSharedInstanceInviteNotification(notification) {
 		await markLiveNotificationRead(notification)
 	} catch (error) {
 		handleError(error)
+	}
+}
+
+function waitForCredentialsReady() {
+	if (credentials.value !== undefined) return Promise.resolve()
+
+	return new Promise((resolve) => {
+		const stop = watch(credentials, (value) => {
+			if (value !== undefined) {
+				stop()
+				resolve()
+			}
+		})
+	})
+}
+
+async function requireModrinthAccountForInvite() {
+	await waitForCredentialsReady()
+	if (credentials.value?.session) return true
+
+	const modal = modrinthAccountRequiredModal.value
+	if (modal?.show) {
+		return await modal.show()
+	}
+
+	await signIn()
+	return !!credentials.value?.session
+}
+
+async function requestModrinthAuth(flow) {
+	await signIn(flow)
+	return !!credentials.value?.session
+}
+
+async function installSharedInstanceInviteFromDeepLink(inviteId) {
+	try {
+		if (!(await requireModrinthAccountForInvite())) return
+
+		const invitePreview = await install_accept_shared_instance_invite(inviteId)
+		const showInstallModal = installToPlayModal.value?.showSharedInstance
+
+		if (!showInstallModal) {
+			throw new Error('Install to play modal is not available.')
+		}
+
+		showInstallModal(
+			{
+				preview: invitePreview.preview,
+			},
+			async () => {
+				try {
+					await install_shared_instance(
+						invitePreview.sharedInstanceId,
+						invitePreview.preview.name,
+						invitePreview.managerId,
+						invitePreview.serverManagerName,
+						invitePreview.serverManagerIconUrl,
+					)
+					queryClient.invalidateQueries({ queryKey: ['instances'] })
+				} catch (error) {
+					handleError(error)
+					throw error
+				}
+			},
+		)
+	} catch (error) {
+		handleError(error)
+	}
+}
+
+function manualInviteId() {
+	const value = manualInviteLink.value.trim()
+	if (!value) return null
+
+	try {
+		const url = new URL(value)
+		const match = /^\/share\/([^/]+)\/?$/.exec(url.pathname)
+		return match ? decodeURIComponent(match[1]) : null
+	} catch {
+		return null
+	}
+}
+
+function showManualInviteLinkModal() {
+	manualInviteLink.value = ''
+	manualInviteLinkModal.value?.show()
+}
+
+async function processManualInviteLink() {
+	const inviteId = manualInviteId()
+	if (!inviteId) return
+
+	manualInviteProcessing.value = true
+	try {
+		await invoke('plugin:install|install_shared_instance_invite', { inviteId })
+		manualInviteLinkModal.value?.hide()
+		queryClient.invalidateQueries({ queryKey: ['instances'] })
+	} catch (error) {
+		handleError(error)
+	} finally {
+		manualInviteProcessing.value = false
 	}
 }
 
@@ -1032,6 +1120,8 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'InstallSharedInstanceInvite') {
+		await installSharedInstanceInviteFromDeepLink(e.invite_id)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
@@ -1558,12 +1648,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<Suspense>
 			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
 		</Suspense>
-		<Suspense>
-			<SharedInstancesLogoutWarningModal
-				ref="sharedInstancesLogoutWarningModal"
-				@sign-out="performLogOut"
-			/>
-		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
 			type="instance"
@@ -1627,6 +1711,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:disabled="offline"
 			>
 				<PlusIcon />
+			</NavButton>
+			<NavButton
+				v-tooltip.right="'Install from invite link'"
+				:to="showManualInviteLinkModal"
+			>
+				<LinkIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
 			<NavButton
@@ -1897,6 +1987,46 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
+	<ModrinthAccountRequiredModal
+		ref="modrinthAccountRequiredModal"
+		:request-auth="requestModrinthAuth"
+	/>
+	<NewModal ref="manualInviteLinkModal" header="Install from invite link" max-width="32rem">
+		<div class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">Invite link</span>
+			<StyledInput
+				v-model="manualInviteLink"
+				placeholder="https://modrinth.com/share/..."
+				:disabled="manualInviteProcessing"
+				@keydown.enter="processManualInviteLink"
+			/>
+			<span v-if="manualInviteLink && !manualInviteId()" class="text-sm text-red">
+				Enter a valid Modrinth shared-instance invite link.
+			</span>
+		</div>
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled>
+					<button
+						:disabled="manualInviteProcessing"
+						@click="manualInviteLinkModal?.hide()"
+					>
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!manualInviteId() || manualInviteProcessing"
+						@click="processManualInviteLink"
+					>
+						<LinkIcon />
+						Process
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 	<InstallToPlayModal ref="installToPlayModal" />
 	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>

@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { type AuthProvider, type AuthUser, provideAuth } from '@modrinth/ui'
+import { type AuthFlow, type AuthProvider, type AuthUser, provideAuth } from '@modrinth/ui'
 import { computed, type Ref, ref, watchEffect } from 'vue'
 
 type AppCredentials = {
@@ -9,7 +9,7 @@ type AppCredentials = {
 
 export function setupAuthProvider(
 	credentials: Ref<AppCredentials | null | undefined>,
-	requestSignIn: (redirectPath: string) => void | Promise<void>,
+	requestSignIn: (redirectPath: string, flow?: AuthFlow) => void | Promise<void>,
 ) {
 	const sessionToken = ref<string | null>(null)
 	const user = ref<AuthUser | null>(null)

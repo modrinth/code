@@ -35,6 +35,7 @@ import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReins
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../content-tab/components/modals/content-updater-modal/index.vue'
+import ConfirmUnlinkSharedInstanceModal from './components/ConfirmUnlinkSharedInstanceModal.vue'
 import ConfirmUnpublishSharedInstanceModal from './components/ConfirmUnpublishSharedInstanceModal.vue'
 import ContentDiffModal from './components/ContentDiffModal.vue'
 import IncompatibleContentModal from './components/IncompatibleContentModal.vue'
@@ -54,6 +55,7 @@ const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const repairModal = ref<InstanceType<typeof ConfirmRepairModal>>()
 const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+const unlinkSharedInstanceModal = ref<InstanceType<typeof ConfirmUnlinkSharedInstanceModal>>()
 const unpublishSharedInstanceModal = ref<InstanceType<typeof ConfirmUnpublishSharedInstanceModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
@@ -91,6 +93,7 @@ function stateSnapshot() {
 		repairing: ctx.repairing?.value,
 		reinstalling: ctx.reinstalling?.value,
 		unpublishingSharedInstance: ctx.unpublishingSharedInstance?.value,
+		unlinkingSharedInstance: ctx.unlinkingSharedInstance?.value,
 	}
 }
 
@@ -100,6 +103,7 @@ function modalRefsSnapshot() {
 		repairModal: !!repairModal.value,
 		reinstallModal: !!reinstallModal.value,
 		unlinkModal: !!unlinkModal.value,
+		unlinkSharedInstanceModal: !!unlinkSharedInstanceModal.value,
 		unpublishSharedInstanceModal: !!unpublishSharedInstanceModal.value,
 		contentUpdaterModal: !!contentUpdaterModal.value,
 		contentDiffModal: !!contentDiffModal.value,
@@ -218,6 +222,12 @@ const isSharedInstanceManagedModpack = computed(() => {
 const canUnpublishSharedInstance = computed(() => {
 	const val = ctx.canUnpublishSharedInstance
 	if (val == null || !ctx.unpublishSharedInstance) return false
+	return typeof val === 'boolean' ? val : val.value
+})
+
+const canUnlinkSharedInstance = computed(() => {
+	const val = ctx.canUnlinkSharedInstance
+	if (val == null || !ctx.unlinkSharedInstance) return false
 	return typeof val === 'boolean' ? val : val.value
 })
 
@@ -364,6 +374,20 @@ function handleUnpublishSharedInstance() {
 	debug('handleUnpublishSharedInstance: invoked ctx.unpublishSharedInstance')
 }
 
+function handleUnlinkSharedInstance() {
+	debug('handleUnlinkSharedInstance: start', {
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	if (ctx.isBusy.value || !ctx.unlinkSharedInstance) {
+		debug('handleUnlinkSharedInstance: ignored busy or missing handler')
+		return
+	}
+	form.cancelEditing()
+	ctx.unlinkSharedInstance()
+	debug('handleUnlinkSharedInstance: invoked ctx.unlinkSharedInstance')
+}
+
 const emit = defineEmits<{
 	'reset-server': []
 }>()
@@ -456,6 +480,18 @@ function handleShowUnpublishSharedInstanceModal() {
 			refs: modalRefsSnapshot(),
 		})
 	})
+}
+
+function handleShowUnlinkSharedInstanceModal() {
+	debug('handleShowUnlinkSharedInstanceModal: before', {
+		snapshot: stateSnapshot(),
+		refs: modalRefsSnapshot(),
+	})
+	if (ctx.isBusy.value) {
+		debug('handleShowUnlinkSharedInstanceModal: ignored busy')
+		return
+	}
+	unlinkSharedInstanceModal.value?.show()
 }
 
 function handleShowReinstallModal(event: MouseEvent) {
@@ -630,6 +666,23 @@ const messages = defineMessages({
 		id: 'installation-settings.shared-instance.title',
 		defaultMessage: 'Shared instance',
 	},
+	linkedSharedInstanceTitle: {
+		id: 'installation-settings.shared-instance.linked-title',
+		defaultMessage: 'Linked shared instance',
+	},
+	unlinkSharedInstanceButton: {
+		id: 'installation-settings.shared-instance.unlink-button',
+		defaultMessage: 'Unlink shared instance',
+	},
+	unlinkingSharedInstanceButton: {
+		id: 'installation-settings.shared-instance.unlinking-button',
+		defaultMessage: 'Unlinking shared instance',
+	},
+	unlinkSharedInstanceDescription: {
+		id: 'installation-settings.shared-instance.unlink-description',
+		defaultMessage:
+			'Unlinking disconnects this instance from the shared instance. Your installed content will stay on this device, but you will stop receiving updates and can manage the installation independently.',
+	},
 	unpublishSharedInstanceButton: {
 		id: 'installation-settings.shared-instance.unpublish-button',
 		defaultMessage: 'Unpublish shared instance',
@@ -678,7 +731,7 @@ const messages = defineMessages({
 			<!-- LINKED -->
 			<template v-if="ctx.isLinked.value">
 				<!-- Installed Modpack -->
-				<div class="flex flex-col gap-2.5">
+				<div v-if="ctx.modpack.value" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(commonMessages.installedModpackTitle) }}
 					</span>
@@ -762,7 +815,7 @@ const messages = defineMessages({
 				</div>
 
 				<!-- Unlink -->
-				<div class="flex flex-col gap-2.5">
+				<div v-if="!isSharedInstanceManagedModpack" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(messages.linkedInstanceTitle, {
@@ -1147,6 +1200,34 @@ const messages = defineMessages({
 				</span>
 			</div>
 
+			<!-- Shared instance member controls -->
+			<div v-if="canUnlinkSharedInstance" class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.linkedSharedInstanceTitle) }}
+				</span>
+				<div>
+					<ButtonStyled color="orange">
+						<button
+							v-tooltip="ctx.isBusy.value ? ctx.busyMessage?.value : undefined"
+							class="!shadow-none"
+							:disabled="ctx.isBusy.value"
+							@click="handleShowUnlinkSharedInstanceModal"
+						>
+							<SpinnerIcon v-if="ctx.unlinkingSharedInstance?.value" class="animate-spin" />
+							<UnlinkIcon v-else class="size-5" />
+							{{
+								ctx.unlinkingSharedInstance?.value
+									? formatMessage(messages.unlinkingSharedInstanceButton)
+									: formatMessage(messages.unlinkSharedInstanceButton)
+							}}
+						</button>
+					</ButtonStyled>
+				</div>
+				<span class="text-primary">
+					{{ formatMessage(messages.unlinkSharedInstanceDescription) }}
+				</span>
+			</div>
+
 			<slot name="extra" />
 		</template>
 	</div>
@@ -1202,6 +1283,13 @@ const messages = defineMessages({
 				:action-disabled="ctx.isBusy.value"
 				:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 				@unpublish="handleUnpublishSharedInstance"
+			/>
+			<ConfirmUnlinkSharedInstanceModal
+				v-if="canUnlinkSharedInstance"
+				ref="unlinkSharedInstanceModal"
+				:action-disabled="ctx.isBusy.value"
+				:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
+				@unlink="handleUnlinkSharedInstance"
 			/>
 
 			<IncompatibleContentModal

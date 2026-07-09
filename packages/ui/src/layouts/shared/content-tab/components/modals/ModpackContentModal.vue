@@ -106,18 +106,17 @@ const selectedFilters = ref<string[]>([])
 const selectedIds = ref<string[]>([])
 
 const selectedItems = computed(() =>
-	items.value.filter((item) => selectedIds.value.includes(item.file_name)),
+	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
 
 const allSelected = computed(() => {
 	if (filteredItems.value.length === 0) return false
-	return filteredItems.value.every((item) => selectedIds.value.includes(item.file_name))
+	return filteredItems.value.every((item) => selectedIds.value.includes(item.id))
 })
 
 const someSelected = computed(() => {
 	return (
-		filteredItems.value.some((item) => selectedIds.value.includes(item.file_name)) &&
-		!allSelected.value
+		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
 	)
 })
 
@@ -125,7 +124,7 @@ function toggleSelectAll() {
 	if (allSelected.value || someSelected.value) {
 		selectedIds.value = []
 	} else {
-		selectedIds.value = filteredItems.value.map((item) => item.file_name)
+		selectedIds.value = filteredItems.value.map((item) => item.id)
 	}
 }
 
@@ -231,16 +230,16 @@ const filteredItems = computed(() => {
 
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
-		id: item.file_name,
+		id: item.id,
 		project: item.project ?? {
-			id: item.file_name,
+			id: item.id,
 			slug: null,
 			title: item.file_name,
 			icon_url: null,
 		},
 		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
-			id: item.file_name,
+			id: item.id,
 			version_number: 'Unknown',
 			file_name: item.file_name,
 		},
@@ -305,9 +304,9 @@ function itemDisplayName(item: ContentItem) {
 	return item.project?.title ?? item.file_name
 }
 
-function handleEnabledChange(fileName: string, value: boolean) {
+function handleEnabledChange(id: string, value: boolean) {
 	if (props.actionDisabled) return
-	const item = items.value.find((i) => i.file_name === fileName)
+	const item = items.value.find((item) => item.id === id)
 	if (!item) return
 	emit('update:enabled', item, value)
 }
@@ -400,9 +399,10 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 }
 
 function setItems(contentItems: ContentItem[]) {
+	const contentIds = new Set(contentItems.map((item) => item.id))
 	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
 	items.value = contentItems.map((item) => ({ ...item }))
-	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
+	selectedIds.value = selectedIds.value.filter((id) => contentIds.has(id))
 	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
 	loading.value = false
 }

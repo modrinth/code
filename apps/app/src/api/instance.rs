@@ -53,9 +53,11 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_edit_icon,
             instance_share_get_users,
             instance_share_invite_users,
+            instance_share_create_invite_link,
             instance_share_remove_users,
             instance_share_get_publish_preview,
             instance_share_publish,
+            instance_share_unlink,
             instance_share_unpublish,
             instance_export_mrpack,
             instance_get_pack_export_candidates,
@@ -790,6 +792,22 @@ pub async fn instance_share_invite_users(
 }
 
 #[tauri::command]
+pub async fn instance_share_create_invite_link(
+    instance_id: &str,
+    max_age_seconds: Option<i32>,
+    max_uses: Option<i32>,
+    replace_invite_id: Option<String>,
+) -> Result<theseus::instance::SharedInstanceInviteLink> {
+    Ok(theseus::instance::create_shared_instance_invite_link(
+        instance_id,
+        max_age_seconds,
+        max_uses,
+        replace_invite_id,
+    )
+    .await?)
+}
+
+#[tauri::command]
 pub async fn instance_share_remove_users(
     instance_id: &str,
     user_ids: Vec<String>,
@@ -817,6 +835,12 @@ pub async fn instance_share_publish(
     Ok(theseus::instance::publish_shared_instance(instance_id)
         .await?
         .into())
+}
+
+#[tauri::command]
+pub async fn instance_share_unlink(instance_id: &str) -> Result<()> {
+    theseus::instance::unlink_shared_instance(instance_id).await?;
+    Ok(())
 }
 
 #[tauri::command]

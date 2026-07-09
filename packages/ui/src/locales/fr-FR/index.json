@@ -485,15 +485,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "monde"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Le contenu de votre modpack peut maintenant être retrouvé ici !"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Contenu du modpack déplacé"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Ne plus afficher"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenu supplémentaire"
   },
