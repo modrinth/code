@@ -2,7 +2,7 @@
 use crate::state::CachedEntry;
 pub use crate::{
     State,
-    state::{Category, DonationPlatform, GameVersion, Loader},
+    state::{CacheBehaviour, Category, DonationPlatform, GameVersion, Loader},
 };
 
 /// Get category tags
@@ -49,14 +49,19 @@ pub async fn get_loader_tags() -> crate::Result<Vec<Loader>> {
 
 /// Get game version tags
 #[tracing::instrument]
-pub async fn get_game_version_tags() -> crate::Result<Vec<GameVersion>> {
+pub async fn get_game_version_tags(
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<GameVersion>> {
     let state = State::get().await?;
-    let game_versions =
-        CachedEntry::get_game_versions(None, &state.pool, &state.api_semaphore)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::NoValueFor("game version tags".to_string())
-            })?;
+    let game_versions = CachedEntry::get_game_versions(
+        cache_behaviour,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::NoValueFor("game version tags".to_string())
+    })?;
 
     Ok(game_versions)
 }

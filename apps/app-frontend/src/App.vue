@@ -243,6 +243,7 @@ const {
 	searchModpacks,
 	getProjectVersions,
 	getLoaderManifest,
+	showCreationModal,
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
@@ -1462,7 +1463,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</suspense>
 			<NavButton
 				v-tooltip.right="'Create new instance'"
-				:to="() => installationModal?.show()"
+				:to="showCreationModal"
 				:disabled="offline"
 			>
 				<PlusIcon />
