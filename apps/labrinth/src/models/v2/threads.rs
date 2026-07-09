@@ -114,6 +114,14 @@ impl From<crate::models::v3::threads::MessageBody> for LegacyMessageBody {
                     associated_images: Vec::new(),
                 }
             }
+            crate::models::v3::threads::MessageBody::TechReviewExited => {
+                LegacyMessageBody::Text {
+                    body: "(legacy) Exited technical review".into(),
+                    private: true,
+                    replying_to: None,
+                    associated_images: Vec::new(),
+                }
+            }
             crate::models::v3::threads::MessageBody::TechReviewExitFileDeleted => {
                 LegacyMessageBody::Text {
                     body: "(legacy) Exited technical review because file was deleted".into(),
