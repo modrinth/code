@@ -1,4 +1,5 @@
 import type { ModrinthId } from '@modrinth/utils'
+
 import type { Screenshot } from '@/helpers/screenshots.ts'
 
 export type GameInstance = {
@@ -182,21 +183,21 @@ type AppSettings = {
 export type ServersUpdatedEvent = { event: 'servers_updated' }
 export type WorldUpdatedEvent = { event: 'world_updated'; world: string }
 export type ServerJoinedEvent = {
-  event: 'server_joined'
-  host: string
-  port: number
-  timestamp: string
+	event: 'server_joined'
+	host: string
+	port: number
+	timestamp: string
 }
 export type ScreenshotChangedEvent = {
-  event: 'screenshot_changed'
-  screenshot: Screenshot
-  file_exists: boolean
+	event: 'screenshot_changed'
+	screenshot: Screenshot
+	file_exists: boolean
 }
 
 // TODO: Refactor events.js -> events.ts with proper types for all the events.
 export type InstanceEvent = { instance_id: string } & (
-  | ServersUpdatedEvent
-  | WorldUpdatedEvent
-  | ServerJoinedEvent
-  | ScreenshotChangedEvent
+	| ServersUpdatedEvent
+	| WorldUpdatedEvent
+	| ServerJoinedEvent
+	| ScreenshotChangedEvent
 )

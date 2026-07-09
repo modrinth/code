@@ -88,13 +88,12 @@ async fn get_all_screenshots_in_profile(
 pub async fn get_screenshot_data(
     profile_dir: &Path,
     screenshot: &Screenshot,
-) -> crate::Result<Option<String>> {
+) -> crate::Result<Option<Vec<u8>>> {
     if let Some(valid_path) =
         get_valid_screenshot_path(profile_dir, screenshot).await?
     {
         let bytes = read(&valid_path).await?;
-        let encoded = STANDARD.encode(&bytes);
-        Ok(Some(encoded))
+        Ok(Some(bytes))
     } else {
         Ok(None)
     }

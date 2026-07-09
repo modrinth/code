@@ -515,7 +515,6 @@ export function hasServerQuickPlaySupport(gameVersions: GameVersion[], currentVe
 	return versionIndex === -1 || targetIndex === -1 || versionIndex <= targetIndex
 }
 
-
 export function hasWorldQuickPlaySupport(gameVersions: GameVersion[], currentVersion: string) {
 	if (!gameVersions.length) {
 		return false

@@ -25,7 +25,7 @@ pub async fn get_all_profile_screenshots(
 pub async fn get_screenshot_data(
     path: &str,
     screenshot: Screenshot,
-) -> crate::api::Result<Option<String>> {
+) -> crate::api::Result<Option<Vec<u8>>> {
     let profile_dir = get_full_path(path).await?;
     Ok(screenshots::get_screenshot_data(&profile_dir, &screenshot).await?)
 }
