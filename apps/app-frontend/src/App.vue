@@ -1028,9 +1028,8 @@ async function processManualInviteLink() {
 
 	manualInviteProcessing.value = true
 	try {
-		await invoke('plugin:install|install_shared_instance_invite', { inviteId })
 		manualInviteLinkModal.value?.hide()
-		queryClient.invalidateQueries({ queryKey: ['instances'] })
+		await installSharedInstanceInviteFromDeepLink(inviteId)
 	} catch (error) {
 		handleError(error)
 	} finally {
