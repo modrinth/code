@@ -46,7 +46,8 @@ function getProjectLinkDefinitions(context: ChecklistActionContext): LinkOptionD
 		pushLink(
 			'source',
 			'Source',
-			async () => (await import('../messages/links/not_accessible-source.md?raw')).default,
+			async () =>
+				(await import('../messages/checklist-messages/links/not_accessible-source.md?raw')).default,
 		)
 	}
 
@@ -63,7 +64,9 @@ function getProjectLinkDefinitions(context: ChecklistActionContext): LinkOptionD
 		pushLink(
 			'discord',
 			'Discord',
-			async () => (await import('../messages/links/not_accessible-discord.md?raw')).default,
+			async () =>
+				(await import('../messages/checklist-messages/links/not_accessible-discord.md?raw'))
+					.default,
 		)
 	}
 

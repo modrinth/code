@@ -223,7 +223,7 @@
 											:color="isActionSelected(action) ? 'brand' : 'standard'"
 											@click="toggleAction(action)"
 										>
-											<button>
+											<button v-tooltip="getChecklistButtonTooltipConfig(action)">
 												{{ action.label }}
 											</button>
 										</ButtonStyled>
@@ -616,6 +616,134 @@ const isPrefetching = ref(false)
 const PREFETCH_STALE_MS = 30_000 // 30 seconds
 const PREFETCH_TARGET_COUNT = 3 // Keep 3 unlocked projects ready
 const PREFETCH_BATCH_SIZE = 5 // Check 5 at a time in parallel
+
+// Tooltip constants and cache
+const BUTTON_TOOLTIP_DELAY_MS = 500 // Show tooltip after 1.5 seconds of hovering
+const BUTTON_TOOLTIP_HIDE_DELAY_MS = 0 // Hide immediately on mouseleave
+const buttonActionTooltipCache = ref<Record<string, { text: string; expiresAt: number }>>({})
+const TOOLTIP_CACHE_TTL_MS = 30000 // Cache tooltip text for 30 seconds
+
+// Helper: compute the message text that a button action would generate
+async function getButtonActionTooltipText(action: Action): Promise<string> {
+	try {
+		const actionIndex = currentStageObj.value.actions.indexOf(action)
+		const actionId = getActionId(action, actionIndex)
+		const state = actionStates.value[actionId]
+
+		if (!state) return ''
+
+		// Build list of selected action IDs (including this action as if selected)
+		const tempSelectedIds = Object.entries(actionStates.value)
+			.filter(([_, s]) => s.selected)
+			.map(([id]) => id)
+
+		if (!tempSelectedIds.includes(actionId)) {
+			tempSelectedIds.push(actionId)
+		}
+
+		// Build all valid action IDs across all stages
+		const allValidActionIds: string[] = []
+		checklist.forEach((stage, stageIdx) => {
+			stage.actions.forEach((stageAction, actionIdx) => {
+				allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx))
+				if (stageAction.enablesActions) {
+					stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
+						allValidActionIds.push(
+							getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
+						)
+					})
+				}
+			})
+		})
+
+		let messageText = ''
+
+		if (action.type === 'button' || action.type === 'toggle') {
+			const buttonAction = action as ButtonAction | ToggleAction
+			const message = await getActionMessage(buttonAction, tempSelectedIds, allValidActionIds)
+			if (message) {
+				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
+			}
+		} else if (action.type === 'conditional-button') {
+			const conditionalAction = action as ConditionalButtonAction
+			const matchingVariant = findMatchingVariant(
+				conditionalAction.messageVariants,
+				tempSelectedIds,
+				allValidActionIds,
+				currentStage.value,
+			)
+
+			if (matchingVariant) {
+				const message = (await matchingVariant.message()) as string
+				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
+			} else if (conditionalAction.fallbackMessage) {
+				const message = (await conditionalAction.fallbackMessage()) as string
+				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
+			}
+		}
+
+		return expandVariables(
+			messageText.trim(),
+			projectV2.value,
+			projectV3.value,
+			variables.value,
+		).trim()
+	} catch (error) {
+		console.warn('[tooltip] Error computing action message:', error)
+		return ''
+	}
+}
+
+// Helper: render markdown tooltip content using the app's markdown renderer
+function renderTooltipMarkdownHtml(text: string): string {
+	const trimmed = text/*.slice(0, 500)*/.trim()
+	if (!trimmed) return ''
+
+	return `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(trimmed)}</div>`
+}
+
+// Helper: get tooltip directive config for a button action with caching & delay
+function getChecklistButtonTooltipConfig(action: Action): any {
+	const actionKey = getActionKey(action)
+	const now = Date.now()
+	const cached = buttonActionTooltipCache.value[actionKey]
+
+	if (cached && now < cached.expiresAt) {
+		const renderedHtml = renderTooltipMarkdownHtml(cached.text)
+		return renderedHtml
+			? {
+					content: renderedHtml,
+					html: true,
+					delay: { show: BUTTON_TOOLTIP_DELAY_MS, hide: BUTTON_TOOLTIP_HIDE_DELAY_MS },
+					triggers: ['hover', 'focus'],
+					placement: 'top',
+				}
+			: undefined
+	}
+
+	void (async () => {
+		const text = await getButtonActionTooltipText(action)
+		buttonActionTooltipCache.value[actionKey] = {
+			text,
+			expiresAt: Date.now() + TOOLTIP_CACHE_TTL_MS,
+		}
+	})()
+
+	if (cached) {
+		const renderedHtml = renderTooltipMarkdownHtml(cached.text)
+		return renderedHtml
+			? {
+					content: renderedHtml,
+					html: true,
+					delay: { show: BUTTON_TOOLTIP_DELAY_MS, hide: BUTTON_TOOLTIP_HIDE_DELAY_MS },
+					triggers: ['hover', 'focus'],
+					placement: 'top',
+				}
+			: undefined
+	}
+
+	return undefined
+}
 
 async function handleVisibilityChange() {
 	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
@@ -2365,5 +2493,51 @@ const stageOptionsForSlots = computed(() =>
 	:deep(.title-stage-selector-disabled > button) {
 		cursor: default;
 	}
+}
+
+// Tooltip styling for button action message previews.
+// Must use :global since floating-vue teleports tooltips outside the component DOM.
+:global(.v-popper--theme-tooltip .v-popper__inner) {
+	max-width: 400px;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	white-space: normal;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown) {
+	line-height: 1.45;
+	font-size: 0.9rem;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown p) {
+	margin: 0.35rem 0;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ul),
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ol) {
+	margin: 0.35rem 0;
+	padding-left: 1.15rem;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown pre) {
+	max-width: 100%;
+	overflow-x: auto;
+	margin: 0.4rem 0;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown code) {
+	background-color: rgba(255, 255, 255, 0.15);
+	padding: 0.1rem 0.3rem;
+	border-radius: 0.25rem;
+	font-family: monospace;
+	font-size: 0.85em;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown strong) {
+	font-weight: 700;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
+	font-style: italic;
 }
 </style>

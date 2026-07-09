@@ -186,7 +186,7 @@ const versions: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			weight: 1001,
-			message: async () => (await import('../messages/versions/incorrect_loader.md?raw')).default,
+			message: async () => (await import('../messages/checklist-messages/versions/incorrect_loader.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'versions_incorrect_loader_options',

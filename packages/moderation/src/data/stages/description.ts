@@ -19,7 +19,9 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-header.md?raw')).default,
+				(
+					await import('../messages/checklist-messages/description/insufficient/insufficient-header.md?raw')
+				).default,
 			enablesActions: [
 				{
 					id: 'description_insufficient_options',
@@ -33,8 +35,9 @@ const description: Stage = {
 							shouldShow: (project, projectV3) =>
 								project.project_type === 'modpack' && !projectV3?.minecraft_server,
 							message: async () =>
-								(await import('../messages/checklist-messages/description/insufficient/insufficient-packs.md?raw'))
-									.default,
+								(
+									await import('../messages/checklist-messages/description/insufficient/insufficient-packs.md?raw')
+								).default,
 						},
 						{
 							id: 'description_insufficient_projects',
@@ -42,34 +45,38 @@ const description: Stage = {
 							weight: 402,
 							shouldShow: (project, projectV3) =>
 								project.project_type !== 'modpack' && !projectV3?.minecraft_server,
-							message: async () =>(
-								await import('../messages/checklist-messages/description/insufficient/insufficient-projects.md?raw'))
-									.default,
+							message: async () =>
+								(
+									await import('../messages/checklist-messages/description/insufficient/insufficient-projects.md?raw')
+								).default,
 						},
 						{
 							id: 'description_insufficient_servers',
 							label: 'Missing basic details',
 							weight: 403,
 							shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
-							message: async () =>(
-								await import('../messages/checklist-messages/description/insufficient/insufficient-servers.md?raw'))
-									.default,
+							message: async () =>
+								(
+									await import('../messages/checklist-messages/description/insufficient/insufficient-servers.md?raw')
+								).default,
 						},
 						{
 							id: 'description_insufficient_fork',
 							label: 'Fork',
 							weight: 404,
 							message: async () =>
-								(await import('../messages/description/insufficient/insufficient-fork.md?raw'))
-									.default,
+								(
+									await import('../messages/checklist-messages/description/insufficient/insufficient-fork.md?raw')
+								).default,
 						},
 						{
 							id: 'description_insufficient_port',
 							label: 'Port',
 							weight: 405,
 							message: async () =>
-								(await import('../messages/description/insufficient/insufficient-port.md?raw'))
-									.default,
+								(
+									await import('../messages/checklist-messages/description/insufficient/insufficient-port.md?raw')
+								).default,
 						},
 					],
 				} as MultiSelectChipsAction,
@@ -80,8 +87,10 @@ const description: Stage = {
 					weight: 406,
 					suggestedStatus: 'flagged',
 					severity: 'medium',
-					message: async () =>(
-						await import('../messages/checklist-messages/description/insufficient/insufficient.md?raw')).default,
+					message: async () =>
+						(
+							await import('../messages/checklist-messages/description/insufficient/insufficient.md?raw')
+						).default,
 					relevantExtraInput: [
 						{
 							label: 'Please elaborate on how the author can improve their description.',
