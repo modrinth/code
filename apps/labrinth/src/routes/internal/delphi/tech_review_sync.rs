@@ -256,21 +256,20 @@ async fn sync_one_project_tech_review_state(
     if needs_tech_review {
         if (state.has_pending_detail || state.has_unsafe_detail)
             && !state.has_dummy
+            && let Some(report_id) = state.report_id
         {
-            if let Some(report_id) = state.report_id {
-                // TODO: Currently, the queue query determines whether a project
-                // is in tech review by checking whether it has any pending issue
-                // details. If all visible issue details are marked safe or
-                // unsafe before the final report is submitted, the project would
-                // otherwise leave the tech review queue without a final tech
-                // review verdict message.
-                //
-                // This should be replaced with explicit tech review state, such
-                // as an append-only project tech review event table where the
-                // latest enter/exit event is the current state. Until then, this
-                // dummy issue detail acts as the pending queue blocker.
-                ensure_dummy_issue_detail(report_id, txn).await?;
-            }
+            // TODO: Currently, the queue query determines whether a project is
+            // in tech review by checking whether it has any pending issue
+            // details. If all visible issue details are marked safe or unsafe
+            // before the final report is submitted, the project would otherwise
+            // leave the tech review queue without a final tech review verdict
+            // message.
+            //
+            // This should be replaced with explicit tech review state, such as
+            // an append-only project tech review event table where the latest
+            // enter/exit event is the current state. Until then, this dummy
+            // issue detail acts as the pending queue blocker.
+            ensure_dummy_issue_detail(report_id, txn).await?;
         }
 
         if let Some(thread_id) = state.thread_id
