@@ -523,10 +523,7 @@ export async function useInstallJobNotifications(opts: {
 	}
 
 	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
-		return (
-			isTerminalJob(job) ||
-			(canShowStalledProgressDetails(job) && hasStalledProgress(job))
-		)
+		return isTerminalJob(job) || (canShowStalledProgressDetails(job) && hasStalledProgress(job))
 	}
 
 	function isCopied(job: InstallJobSnapshot): boolean {

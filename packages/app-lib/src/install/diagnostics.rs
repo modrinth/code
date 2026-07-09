@@ -612,10 +612,13 @@ async fn censor_support_text(
     Ok(text)
 }
 
-async fn minecraft_tokens(pool: &sqlx::SqlitePool) -> crate::Result<Vec<String>> {
-    let rows = sqlx::query("SELECT access_token, refresh_token FROM minecraft_users")
-        .fetch_all(pool)
-        .await?;
+async fn minecraft_tokens(
+    pool: &sqlx::SqlitePool,
+) -> crate::Result<Vec<String>> {
+    let rows =
+        sqlx::query("SELECT access_token, refresh_token FROM minecraft_users")
+            .fetch_all(pool)
+            .await?;
     let mut tokens = Vec::with_capacity(rows.len() * 2);
 
     for row in rows {
