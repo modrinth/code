@@ -794,9 +794,17 @@ pub async fn instance_share_invite_users(
 #[tauri::command]
 pub async fn instance_share_create_invite_link(
     instance_id: &str,
+    max_age_seconds: Option<i32>,
+    max_uses: Option<i32>,
+    replace_invite_id: Option<String>,
 ) -> Result<theseus::instance::SharedInstanceInviteLink> {
-    Ok(theseus::instance::create_shared_instance_invite_link(instance_id)
-        .await?)
+    Ok(theseus::instance::create_shared_instance_invite_link(
+        instance_id,
+        max_age_seconds,
+        max_uses,
+        replace_invite_id,
+    )
+    .await?)
 }
 
 #[tauri::command]
@@ -831,8 +839,8 @@ pub async fn instance_share_publish(
 
 #[tauri::command]
 pub async fn instance_share_unlink(instance_id: &str) -> Result<()> {
-	theseus::instance::unlink_shared_instance(instance_id).await?;
-	Ok(())
+    theseus::instance::unlink_shared_instance(instance_id).await?;
+    Ok(())
 }
 
 #[tauri::command]

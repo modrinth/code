@@ -288,9 +288,7 @@ export async function install_shared_instance(
 	})
 }
 
-export async function install_shared_instance_invite(
-	inviteId: string,
-) {
+export async function install_shared_instance_invite(inviteId: string) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance_invite', {
 		inviteId,
 	})

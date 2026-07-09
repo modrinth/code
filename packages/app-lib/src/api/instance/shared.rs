@@ -1,3 +1,7 @@
+use super::content_set_diff::{
+    ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
+    ContentSetSnapshot, ContentSetSnapshotVersion, diff_content_sets,
+};
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::install::{
@@ -11,10 +15,6 @@ use crate::state::{
     ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
-use super::content_set_diff::{
-    ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
-    ContentSetSnapshot, ContentSetSnapshotVersion, diff_content_sets,
-};
 use chrono::{DateTime, Utc};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
@@ -196,6 +196,8 @@ pub struct SharedInstancePublishPreview {
 #[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInviteLink {
     pub invite_id: String,
+    pub expires_at: DateTime<Utc>,
+    pub max_uses: i32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -288,7 +290,9 @@ struct AcceptedSharedInstanceInvite {
 impl AcceptedSharedInstanceInvite {
     fn request_auth(&self) -> SharedInstancesRequestAuth<'_> {
         match self.access_token.as_deref() {
-            Some(access_token) => SharedInstancesRequestAuth::Bearer(access_token),
+            Some(access_token) => {
+                SharedInstancesRequestAuth::Bearer(access_token)
+            }
             None => SharedInstancesRequestAuth::ModrinthSession,
         }
     }
@@ -337,7 +341,9 @@ impl RemoteSharedInstanceUsersResponse {
             Self::Current(response) => {
                 SharedInstanceUsers::from_users(response.users, response.tokens)
             }
-            Self::Legacy(user_ids) => SharedInstanceUsers::from_user_ids(user_ids),
+            Self::Legacy(user_ids) => {
+                SharedInstanceUsers::from_user_ids(user_ids)
+            }
         }
     }
 }
@@ -366,8 +372,12 @@ pub async fn invite_shared_instance_users(
 
     ensure_owner(&attachment)?;
     if !user_ids.is_empty() {
-        ensure_ready_remote_version_for_invite(instance_id, &attachment, &state)
-            .await?;
+        ensure_ready_remote_version_for_invite(
+            instance_id,
+            &attachment,
+            &state,
+        )
+        .await?;
         update_remote_instance(
             &attachment.id,
             shared_instance_name(metadata.instance.name.clone()),
@@ -392,6 +402,9 @@ pub async fn invite_shared_instance_users(
 #[tracing::instrument]
 pub async fn create_shared_instance_invite_link(
     instance_id: &str,
+    max_age_seconds: Option<i32>,
+    max_uses: Option<i32>,
+    replace_invite_id: Option<String>,
 ) -> crate::Result<SharedInstanceInviteLink> {
     let state = State::get().await?;
     let (metadata, attachment) =
@@ -406,13 +419,44 @@ pub async fn create_shared_instance_invite_link(
     )
     .await?;
 
+    let max_age_seconds =
+        max_age_seconds.unwrap_or(SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS);
+    let max_uses = max_uses.unwrap_or(SHARED_INSTANCE_INVITE_MAX_USES);
+    if max_age_seconds <= 0
+        || max_age_seconds > SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS
+    {
+        return Err(crate::ErrorKind::InputError(
+            "Invite expiry must be between now and seven days".to_string(),
+        )
+        .into());
+    }
+    if max_uses <= 0 {
+        return Err(crate::ErrorKind::InputError(
+            "Invite max uses must be greater than zero".to_string(),
+        )
+        .into());
+    }
+
+    if let Some(invite_id) = replace_invite_id {
+        request_empty(
+            "delete_instance_invite",
+            Method::DELETE,
+            &format!("/instances/{}/invites/{invite_id}", attachment.id),
+            None,
+            &state,
+        )
+        .await?;
+    }
+
+    let created_at = Utc::now();
+
     let response = request_json::<CreateInstanceInviteResponse>(
         "create_instance_invite",
         Method::POST,
         &format!("/instances/{}/invites", attachment.id),
         Some(json!({
-            "max_age": SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS,
-            "max_uses": SHARED_INSTANCE_INVITE_MAX_USES,
+            "max_age": max_age_seconds,
+            "max_uses": max_uses,
         })),
         &state,
     )
@@ -422,6 +466,9 @@ pub async fn create_shared_instance_invite_link(
 
     Ok(SharedInstanceInviteLink {
         invite_id: response.id,
+        expires_at: created_at
+            + chrono::Duration::seconds(i64::from(max_age_seconds)),
+        max_uses,
     })
 }
 
@@ -470,56 +517,56 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
     ensure_owner(&attachment)?;
 
     delete_remote_instance(&attachment.id, &state).await?;
-	detach_local_shared_instance(instance_id, metadata.link, &state).await?;
-	emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    detach_local_shared_instance(instance_id, metadata.link, &state).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-	Ok(())
+    Ok(())
 }
 
 #[tracing::instrument]
 pub async fn unlink_shared_instance(instance_id: &str) -> crate::Result<()> {
-	let state = State::get().await?;
-	let metadata = crate::state::get_instance(instance_id, &state.pool)
-		.await?
-		.ok_or_else(|| {
-			crate::ErrorKind::InputError("Unknown instance".to_string())
-		})?;
-	let Some(attachment) = metadata.shared_instance.clone() else {
-		return Ok(());
-	};
-	ensure_member(&attachment)?;
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let Some(attachment) = metadata.shared_instance.clone() else {
+        return Ok(());
+    };
+    ensure_member(&attachment)?;
 
-	detach_local_shared_instance(instance_id, metadata.link, &state).await?;
-	emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    detach_local_shared_instance(instance_id, metadata.link, &state).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-	Ok(())
+    Ok(())
 }
 
 async fn detach_local_shared_instance(
-	instance_id: &str,
-	link: InstanceLink,
-	state: &State,
+    instance_id: &str,
+    link: InstanceLink,
+    state: &State,
 ) -> crate::Result<()> {
-	let link_patch = match link {
-		InstanceLink::SharedInstance {
-			modpack_project_id: Some(project_id),
-			modpack_version_id: Some(version_id),
-		} => Some((
-			InstanceLink::ModrinthModpack {
-				project_id,
-				version_id,
-			},
-			ContentSourceKind::ModrinthModpack,
-		)),
-		InstanceLink::SharedInstance { .. } => {
-			Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
-		}
-		_ => None,
-	};
+    let link_patch = match link {
+        InstanceLink::SharedInstance {
+            modpack_project_id: Some(project_id),
+            modpack_version_id: Some(version_id),
+        } => Some((
+            InstanceLink::ModrinthModpack {
+                project_id,
+                version_id,
+            },
+            ContentSourceKind::ModrinthModpack,
+        )),
+        InstanceLink::SharedInstance { .. } => {
+            Some((InstanceLink::Unmanaged, ContentSourceKind::Local))
+        }
+        _ => None,
+    };
 
-	if let Some((link, source_kind)) = link_patch {
-		crate::state::edit_instance(
-			instance_id,
+    if let Some((link, source_kind)) = link_patch {
+        crate::state::edit_instance(
+            instance_id,
             EditInstance {
                 link: Some(link),
                 content_set_patch: Some(AppliedContentSetPatch {
@@ -531,11 +578,11 @@ async fn detach_local_shared_instance(
             &state.pool,
         )
         .await?;
-	}
+    }
 
-	crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+    crate::state::clear_shared_instance(instance_id, &state.pool).await?;
 
-	Ok(())
+    Ok(())
 }
 
 #[tracing::instrument]
@@ -703,8 +750,10 @@ pub async fn accept_shared_instance_invite_for_install(
     let shared_instance_id = invite.instance_id;
     let (manager_id, server_manager_name, server_manager_icon_url) =
         shared_instance_invite_manager(invite.managers);
-    let name =
-        shared_instance_invite_install_name(&shared_instance_id, invite.instance_name);
+    let name = shared_instance_invite_install_name(
+        &shared_instance_id,
+        invite.instance_name,
+    );
     let accepted =
         accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
             .await?;
@@ -715,7 +764,8 @@ pub async fn accept_shared_instance_invite_for_install(
     )
     .await?;
     let preview =
-        shared_instance_install_preview_from_version(name, version, &state).await?;
+        shared_instance_install_preview_from_version(name, version, &state)
+            .await?;
 
     Ok(SharedInstanceInviteInstallPreview {
         shared_instance_id,
@@ -941,36 +991,37 @@ async fn get_latest_remote_member_version(
     attachment: &SharedInstanceAttachment,
     state: &State,
 ) -> crate::Result<InstanceVersionResponse> {
-    let version = match get_latest_remote_version_optional_unavailable_with_auth(
-        &attachment.id,
-        state,
-        auth_for_attachment(attachment),
-    )
-    .await?
-    {
-        SharedInstanceRemoteResponse::Available(version) => version,
-        SharedInstanceRemoteResponse::Unavailable(reason) => {
-            if attachment.access_token.is_some()
-                || shared_attachment_matches_current_user(attachment, state)
-                    .await?
-            {
-                clear_shared_instance_if_current_user(
-                    instance_id,
-                    attachment,
-                    state,
-                )
-                .await?;
-                return Err(shared_instance_unavailable_error(reason));
-            }
+    let version =
+        match get_latest_remote_version_optional_unavailable_with_auth(
+            &attachment.id,
+            state,
+            auth_for_attachment(attachment),
+        )
+        .await?
+        {
+            SharedInstanceRemoteResponse::Available(version) => version,
+            SharedInstanceRemoteResponse::Unavailable(reason) => {
+                if attachment.access_token.is_some()
+                    || shared_attachment_matches_current_user(attachment, state)
+                        .await?
+                {
+                    clear_shared_instance_if_current_user(
+                        instance_id,
+                        attachment,
+                        state,
+                    )
+                    .await?;
+                    return Err(shared_instance_unavailable_error(reason));
+                }
 
-            return Err(crate::ErrorKind::OtherError(format!(
-                "{}: {}",
-                shared_instance_unavailable_message(reason),
-                attachment.id
-            ))
-            .into());
-        }
-    };
+                return Err(crate::ErrorKind::OtherError(format!(
+                    "{}: {}",
+                    shared_instance_unavailable_message(reason),
+                    attachment.id
+                ))
+                .into());
+            }
+        };
 
     Ok(version)
 }
@@ -1229,16 +1280,11 @@ async fn shared_instance_configuration_diffs(
                 None,
             )),
             (Some(current_modpack_id), Some(new_modpack_id)) => {
-                let current = shared_modpack_version_details(
-                    current_modpack_id,
-                    state,
-                )
-                .await;
-                let new = shared_modpack_version_details(
-                    new_modpack_id,
-                    state,
-                )
-                .await;
+                let current =
+                    shared_modpack_version_details(current_modpack_id, state)
+                        .await;
+                let new =
+                    shared_modpack_version_details(new_modpack_id, state).await;
                 let project_name = new
                     .as_ref()
                     .and_then(|details| details.project_name.clone())
@@ -1271,17 +1317,15 @@ async fn shared_instance_configuration_diffs(
         ));
     }
 
-    let current_loader_version = normalized_loader_version(current_loader_version);
+    let current_loader_version =
+        normalized_loader_version(current_loader_version);
     let new_loader_version = normalized_loader_version(new_loader_version);
     if current_loader != new_loader
         || current_loader_version != new_loader_version
     {
         diffs.push(configuration_diff(
             SharedInstanceUpdateDiffType::LoaderUpdated,
-            Some(shared_loader_label(
-                current_loader,
-                current_loader_version,
-            )),
+            Some(shared_loader_label(current_loader, current_loader_version)),
             Some(shared_loader_label(new_loader, new_loader_version)),
         ));
     }
@@ -1339,8 +1383,7 @@ async fn shared_modpack_version_details(
     )
     .await
     .ok()
-    .flatten()
-    else {
+    .flatten() else {
         return Some(SharedModpackVersionDetails {
             project_name: None,
             version_name: version_id.to_string(),
@@ -1368,7 +1411,10 @@ fn normalized_loader_version(loader_version: Option<&str>) -> Option<&str> {
     loader_version.filter(|version| !version.is_empty())
 }
 
-fn shared_loader_label(loader: ModLoader, loader_version: Option<&str>) -> String {
+fn shared_loader_label(
+    loader: ModLoader,
+    loader_version: Option<&str>,
+) -> String {
     let loader_name = match loader {
         ModLoader::Vanilla => "Vanilla",
         ModLoader::Forge => "Forge",
@@ -1399,9 +1445,12 @@ async fn shared_content_diffs(
         state,
     )
     .await?;
-    let latest =
-        shared_content_snapshot(latest_version_ids, latest_external_files, state)
-            .await?;
+    let latest = shared_content_snapshot(
+        latest_version_ids,
+        latest_external_files,
+        state,
+    )
+    .await?;
     let options = ContentSetDiffOptions {
         removed_disabled_project_ids: removed_disabled_project_ids.clone(),
         removed_disabled_external_files: removed_disabled_external_files
@@ -1531,8 +1580,9 @@ async fn remote_publish_content(
         version_ids.retain(|id| id != modpack_id);
 
         if include_modpack_dependencies {
-            version_ids
-                .extend(modpack_dependency_version_ids(modpack_id, state).await?);
+            version_ids.extend(
+                modpack_dependency_version_ids(modpack_id, state).await?,
+            );
         }
     }
     dedupe_strings(&mut version_ids);
@@ -1639,11 +1689,11 @@ async fn current_shared_content(
     let mut external_files = HashSet::new();
 
     for entry in entries {
-        let include_entry =
-            entry.source_kind == crate::state::ContentSourceKind::SharedInstance
-                || (include_linked_modpack_content
-                    && entry.source_kind
-                        == crate::state::ContentSourceKind::ModrinthModpack);
+        let include_entry = entry.source_kind
+            == crate::state::ContentSourceKind::SharedInstance
+            || (include_linked_modpack_content
+                && entry.source_kind
+                    == crate::state::ContentSourceKind::ModrinthModpack);
         if !include_entry {
             continue;
         }
@@ -1663,9 +1713,8 @@ async fn current_shared_content(
     if include_linked_modpack_content
         && let Some(modpack_id) = shared_modpack_id(&metadata.link)
     {
-        version_ids.extend(
-            modpack_dependency_version_ids(&modpack_id, state).await?,
-        );
+        version_ids
+            .extend(modpack_dependency_version_ids(&modpack_id, state).await?);
     }
     dedupe_strings(&mut version_ids);
 
@@ -1811,8 +1860,8 @@ pub(crate) async fn mark_shared_instance_stale(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    let Some(metadata) = crate::state::get_instance(instance_id, &state.pool)
-        .await?
+    let Some(metadata) =
+        crate::state::get_instance(instance_id, &state.pool).await?
     else {
         return Ok(());
     };
@@ -1860,23 +1909,26 @@ pub(crate) async fn mark_shared_instance_stale(
         }
     };
 
-    let has_changes =
-        match shared_instance_publish_diffs(&metadata, &version, state).await {
-            Ok(diffs) => !diffs.is_empty(),
-            Err(error) => {
-                tracing::warn!(
-                    instance_id,
-                    shared_instance_id = %attachment.id,
-                    error = %error,
-                    "Failed to calculate shared instance diff before marking stale"
-                );
-                return crate::state::mark_shared_instance_stale(
-                    instance_id,
-                    &state.pool,
-                )
-                .await;
-            }
-        };
+    let has_changes = match shared_instance_publish_diffs(
+        &metadata, &version, state,
+    )
+    .await
+    {
+        Ok(diffs) => !diffs.is_empty(),
+        Err(error) => {
+            tracing::warn!(
+                instance_id,
+                shared_instance_id = %attachment.id,
+                error = %error,
+                "Failed to calculate shared instance diff before marking stale"
+            );
+            return crate::state::mark_shared_instance_stale(
+                instance_id,
+                &state.pool,
+            )
+            .await;
+        }
+    };
 
     set_shared_instance_publish_status(
         instance_id,
@@ -1991,7 +2043,7 @@ async fn publish_current_content(
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+        })?;
     ensure_shareable_link(&metadata.link)?;
     update_remote_instance(
         shared_instance_id,
@@ -2222,10 +2274,7 @@ async fn shared_instance_for_invites(
     instance_id: &str,
     user_count: usize,
     state: &State,
-) -> crate::Result<(
-    crate::state::InstanceMetadata,
-    SharedInstanceAttachment,
-)> {
+) -> crate::Result<(crate::state::InstanceMetadata, SharedInstanceAttachment)> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
@@ -2307,14 +2356,15 @@ fn ensure_owner(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
 }
 
 fn ensure_member(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
-	if attachment.role == SharedInstanceRole::Member {
-		return Ok(());
-	}
+    if attachment.role == SharedInstanceRole::Member {
+        return Ok(());
+    }
 
-	Err(crate::ErrorKind::InputError(
-		"Only shared instance members can unlink from shared instances".to_string(),
-	)
-	.into())
+    Err(crate::ErrorKind::InputError(
+        "Only shared instance members can unlink from shared instances"
+            .to_string(),
+    )
+    .into())
 }
 
 fn file_type(project_type: ProjectType) -> String {
@@ -2522,17 +2572,17 @@ async fn accept_pending_remote_invite(
     let operation = "accept_pending_instance_invite";
     let method = Method::POST;
     let path = format!("/instances/{shared_instance_id}/invites/pending");
-    let response = send_request(operation, method.clone(), &path, None, state)
-        .await?;
+    let response =
+        send_request(operation, method.clone(), &path, None, state).await?;
 
     match response.status() {
         StatusCode::OK | StatusCode::NO_CONTENT => Ok(true),
         StatusCode::NOT_FOUND => Ok(false),
         status if status.is_success() => Ok(true),
-        _ => shared_instances_request_error(
-            operation, method, &path, response,
-        )
-        .await,
+        _ => {
+            shared_instances_request_error(operation, method, &path, response)
+                .await
+        }
     }
 }
 
@@ -2607,9 +2657,10 @@ async fn accept_shared_instance_invite(
         .await;
     }
 
-    let response =
-        decode_json_response::<AcceptInstanceInviteResponse>(operation, &path, response)
-            .await?;
+    let response = decode_json_response::<AcceptInstanceInviteResponse>(
+        operation, &path, response,
+    )
+    .await?;
 
     Ok(AcceptedSharedInstanceInvite {
         linked_user_id: None,
@@ -2682,9 +2733,15 @@ async fn request_json_optional_unavailable<T>(
 where
     T: DeserializeOwned,
 {
-    let response =
-        send_request_with_auth(operation, method.clone(), path, body, state, auth)
-            .await?;
+    let response = send_request_with_auth(
+        operation,
+        method.clone(),
+        path,
+        body,
+        state,
+        auth,
+    )
+    .await?;
     if let Some(reason) =
         SharedInstanceUnavailableReason::from_status(response.status())
     {
@@ -2724,7 +2781,9 @@ where
         .map(SharedInstanceRemoteResponse::Available)
 }
 
-async fn active_modrinth_session_is_valid(state: &State) -> crate::Result<bool> {
+async fn active_modrinth_session_is_valid(
+    state: &State,
+) -> crate::Result<bool> {
     let Some(credentials) =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?

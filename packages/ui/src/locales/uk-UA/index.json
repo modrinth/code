@@ -437,15 +437,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "світ"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Уміст збірки перемістився"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Не показувати знову"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Додатковий уміст"
   },

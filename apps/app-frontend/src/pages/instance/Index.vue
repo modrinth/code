@@ -399,8 +399,8 @@ import {
 	install_get_shared_instance_update_preview,
 	install_pack_to_existing_instance,
 	isSharedInstanceUnavailableError,
-	type SharedInstanceUpdatePreview,
 	type SharedInstanceUnavailableReason,
+	type SharedInstanceUpdatePreview,
 } from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'

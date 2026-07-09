@@ -126,10 +126,12 @@ pub async fn install_get_shared_instance_preview(
 pub async fn install_accept_shared_instance_invite(
     invite_id: String,
 ) -> Result<SharedInstanceInviteInstallPreview> {
-    Ok(theseus::instance::accept_shared_instance_invite_for_install(
-        &invite_id,
+    Ok(
+        theseus::instance::accept_shared_instance_invite_for_install(
+            &invite_id,
+        )
+        .await?,
     )
-    .await?)
 }
 
 #[tauri::command]

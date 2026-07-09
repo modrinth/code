@@ -116,8 +116,7 @@ const allSelected = computed(() => {
 
 const someSelected = computed(() => {
 	return (
-		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) &&
-		!allSelected.value
+		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
 	)
 })
 

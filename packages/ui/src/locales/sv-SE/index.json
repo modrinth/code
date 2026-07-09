@@ -467,15 +467,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "värld"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Modpaketets innehåll kan nu ses här!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpaketets innehåll flyttades"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Visa inte igen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Ytterligare innehåll"
   },
@@ -3582,4 +3573,3 @@
     "defaultMessage": "Du har osparade ändringar."
   }
 }
-

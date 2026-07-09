@@ -25,3 +25,8 @@ export interface InvitePlayersInvitePayload {
 	user: InvitePlayersUser
 	source: 'friend' | 'search'
 }
+
+export interface InviteLinkSettings {
+	expiresAt: Date
+	maxUses: number
+}

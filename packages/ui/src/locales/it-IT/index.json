@@ -464,15 +464,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "mondo"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "I contenuti del tuo pacchetto ora si trovano qui!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Contenuti del pacchetto spostati"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Non mostrare più"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenuto aggiuntivo"
   },

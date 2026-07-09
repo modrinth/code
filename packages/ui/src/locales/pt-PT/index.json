@@ -350,15 +350,6 @@
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Pressiona Shift enquanto clicas para saltar a confirmação."
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "O conteúdo do teu modpack agora pode ser encontrado aqui!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Conteúdo do modpack foi movido"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Não mostrar novamente"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
   },
@@ -2538,4 +2529,3 @@
     "defaultMessage": "Tens alterações por guardar."
   }
 }
-

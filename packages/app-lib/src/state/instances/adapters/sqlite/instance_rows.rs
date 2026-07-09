@@ -524,7 +524,8 @@ pub(crate) async fn get_instance_metadata_by_id(
     let Some(row) = row else {
         return Ok(None);
     };
-    let record = hydrate_shared_instance_fields(row.into_record()?, pool).await?;
+    let record =
+        hydrate_shared_instance_fields(row.into_record()?, pool).await?;
 
     Ok(Some(record))
 }
@@ -1099,8 +1100,8 @@ pub(crate) async fn set_shared_instance_attachment(
         attachment.and_then(|value| value.access_token.as_deref());
     let shared_instance_server_manager_name =
         attachment.and_then(|value| value.server_manager_name.as_deref());
-    let shared_instance_server_manager_icon_url = attachment
-        .and_then(|value| value.server_manager_icon_url.as_deref());
+    let shared_instance_server_manager_icon_url =
+        attachment.and_then(|value| value.server_manager_icon_url.as_deref());
 
     sqlx::query!(
         "
@@ -1429,8 +1430,9 @@ async fn shared_instance_fields(
     instance_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<(Option<String>, Option<String>, Option<String>)> {
-    Ok(sqlx::query_as::<_, (Option<String>, Option<String>, Option<String>)>(
-        "
+    Ok(
+        sqlx::query_as::<_, (Option<String>, Option<String>, Option<String>)>(
+            "
 		SELECT
 			shared_instance_access_token,
 			shared_instance_server_manager_name,
@@ -1438,11 +1440,12 @@ async fn shared_instance_fields(
 		FROM instance_links
 		WHERE instance_id = ?
 		",
+        )
+        .bind(instance_id)
+        .fetch_optional(pool)
+        .await?
+        .unwrap_or((None, None, None)),
     )
-    .bind(instance_id)
-    .fetch_optional(pool)
-    .await?
-    .unwrap_or((None, None, None)))
 }
 
 fn shared_instance_attachment(

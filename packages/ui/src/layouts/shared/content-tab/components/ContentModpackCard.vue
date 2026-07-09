@@ -236,10 +236,7 @@ onUnmounted(() => {
 						</ButtonStyled>
 					</div>
 					<ButtonStyled v-if="collapsedOptions.length" circular type="outlined">
-						<TeleportOverflowMenu
-							:options="collapsedOptions"
-							class="flex @[700px]:hidden"
-						>
+						<TeleportOverflowMenu :options="collapsedOptions" class="flex @[700px]:hidden">
 							<MoreVerticalIcon class="size-5" />
 							<template #content>
 								<BoxesIcon class="size-5" />

@@ -356,6 +356,8 @@ export interface SharedInstancePublishPreview {
 
 export interface SharedInstanceInviteLink {
 	inviteId: string
+	expiresAt: string
+	maxUses: number
 }
 
 export async function get_shared_instance_users(instanceId: string): Promise<SharedInstanceUsers> {
@@ -371,8 +373,16 @@ export async function invite_shared_instance_users(
 
 export async function create_shared_instance_invite_link(
 	instanceId: string,
+	options: {
+		maxAgeSeconds?: number
+		maxUses?: number
+		replaceInviteId?: string
+	} = {},
 ): Promise<SharedInstanceInviteLink> {
-	return await invoke('plugin:instance|instance_share_create_invite_link', { instanceId })
+	return await invoke('plugin:instance|instance_share_create_invite_link', {
+		instanceId,
+		...options,
+	})
 }
 
 export async function remove_shared_instance_users(

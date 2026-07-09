@@ -509,6 +509,21 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Updated"
   },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Game version"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Linked modpack"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Unlinked modpack"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Updated modpack"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removed"
   },
@@ -562,15 +577,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "world"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Your modpack's content can now be found here!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpack content moved"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Don't show again"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
@@ -1967,8 +1973,20 @@
   "installation-settings.shared-instance-managed.warning-header": {
     "defaultMessage": "This is managed by the shared instance"
   },
+  "installation-settings.shared-instance.linked-title": {
+    "defaultMessage": "Linked shared instance"
+  },
   "installation-settings.shared-instance.title": {
     "defaultMessage": "Shared instance"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "defaultMessage": "Unlink shared instance"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "defaultMessage": "Unlinking disconnects this instance from the shared instance. Your installed content will stay on this device, but you will stop receiving updates and can manage the installation independently."
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "defaultMessage": "Unlinking shared instance"
   },
   "installation-settings.shared-instance.unpublish-button": {
     "defaultMessage": "Unpublish shared instance"
@@ -1993,6 +2011,18 @@
   },
   "installation-settings.unlink": {
     "defaultMessage": "Unlink"
+  },
+  "installation-settings.unlink-shared-instance.modal.action": {
+    "defaultMessage": "Unlink shared instance"
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "defaultMessage": "This only affects your local instance. Your installed content will stay on this device, and the shared instance and other people using it will not be affected."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "defaultMessage": "Unlinking shared instance"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "defaultMessage": "Unlink shared instance"
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "Unlinking permanently disconnects this {type} from the {projectType} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
@@ -2692,24 +2722,6 @@
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Adding a payment method"
-  },
-  "modal.modrinth-account-required.create-account-button": {
-    "defaultMessage": "Create an account"
-  },
-  "modal.modrinth-account-required.description": {
-    "defaultMessage": "You'll need to sign into your Modrinth account before you can use this feature."
-  },
-  "modal.modrinth-account-required.header": {
-    "defaultMessage": "Account required"
-  },
-  "modal.modrinth-account-required.sign-in-button": {
-    "defaultMessage": "Sign in to Modrinth"
-  },
-  "modal.modrinth-account-required.sign-in-heading": {
-    "defaultMessage": "Sign in to a Modrinth account"
-  },
-  "modal.modrinth-account-required.support-prompt": {
-    "defaultMessage": "Having trouble signing in? <support>Get support</support>"
   },
   "modal.open-in-app.benefit.install": {
     "defaultMessage": "Automatically install required content"
@@ -5126,14 +5138,26 @@
   "sharing.invite-players-modal.cancel": {
     "defaultMessage": "Cancel"
   },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Cancel"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Edit invite link."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Edit invite link"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Expiry date"
+  },
   "sharing.invite-players-modal.friends-heading": {
     "defaultMessage": "Your friends - {count}"
   },
   "sharing.invite-players-modal.invite": {
     "defaultMessage": "Invite"
   },
-  "sharing.invite-players-modal.invite-link-description": {
-    "defaultMessage": "This link invites your friends as players and automatically shares all required files!"
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Your invite link expires in {duration}."
   },
   "sharing.invite-players-modal.invite-link-heading": {
     "defaultMessage": "Or use an invite link"
@@ -5147,6 +5171,9 @@
   "sharing.invite-players-modal.link-copy-failed-title": {
     "defaultMessage": "Failed to copy link"
   },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Maximum uses"
+  },
   "sharing.invite-players-modal.no-friends": {
     "defaultMessage": "No friends found."
   },
@@ -5159,11 +5186,17 @@
   "sharing.invite-players-modal.requested-tooltip": {
     "defaultMessage": "{username} needs to accept your friend request first"
   },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Save"
+  },
   "sharing.invite-players-modal.search-placeholder": {
     "defaultMessage": "Enter Modrinth username"
   },
   "sharing.invite-players-modal.searching": {
     "defaultMessage": "Searching..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Failed to update invite link"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

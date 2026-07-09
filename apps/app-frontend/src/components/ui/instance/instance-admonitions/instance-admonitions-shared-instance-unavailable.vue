@@ -16,11 +16,12 @@
 <script setup lang="ts">
 import { Admonition, useVIntl } from '@modrinth/ui'
 
+import type { SharedInstanceUnavailableReason } from '@/helpers/install'
+
 import {
 	instanceAdmonitionsMessages as messages,
 	sharedInstanceUnavailableTextMessage,
 } from './instance-admonitions-messages'
-import type { SharedInstanceUnavailableReason } from '@/helpers/install'
 
 defineProps<{
 	reason?: SharedInstanceUnavailableReason | null

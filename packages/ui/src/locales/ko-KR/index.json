@@ -437,15 +437,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "세계"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "여기서 모드팩의 콘텐츠를 확인할 수 있습니다!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "모드팩 콘텐츠 이동됨"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "다시 보지 않기"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "추가 콘텐츠"
   },

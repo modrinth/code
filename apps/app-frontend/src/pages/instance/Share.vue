@@ -10,6 +10,9 @@
 			:friends="inviteFriends"
 			:search-users="searchInviteUsers"
 			:link="inviteLink"
+			:link-expires-at="inviteLinkDetails?.expiresAt"
+			:link-max-uses="inviteLinkDetails?.maxUses"
+			:update-invite-link="updateInviteLink"
 			:user-profile-link="userProfileLink"
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
@@ -100,9 +103,11 @@
 					<ButtonStyled v-if="!sharedInstanceActionsLocked" color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
+							:disabled="inviteLinkPending"
 							@click="showInvitePlayers($event)"
 						>
-							<UserPlusIcon aria-hidden="true" />
+							<SpinnerIcon v-if="inviteLinkPending" class="animate-spin" aria-hidden="true" />
+							<UserPlusIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.inviteFriendsButton) }}
 						</button>
 					</ButtonStyled>
@@ -278,8 +283,9 @@
 			<template #description>{{ formatMessage(messages.noFriendsInvitedDescription) }}</template>
 			<template #actions>
 				<ButtonStyled color="brand">
-					<button class="!h-10" @click="showInvitePlayers($event)">
-						<UserPlusIcon aria-hidden="true" />
+					<button class="!h-10" :disabled="inviteLinkPending" @click="showInvitePlayers($event)">
+						<SpinnerIcon v-if="inviteLinkPending" class="animate-spin" aria-hidden="true" />
+						<UserPlusIcon v-else aria-hidden="true" />
 						{{ formatMessage(messages.inviteFriendsButton) }}
 					</button>
 				</ButtonStyled>
@@ -294,8 +300,9 @@ import {
 	LinkIcon,
 	LogInIcon,
 	SearchIcon,
-	UserXIcon,
+	SpinnerIcon,
 	UserPlusIcon,
+	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -309,6 +316,7 @@ import {
 	EmptyState,
 	injectAuth,
 	injectNotificationManager,
+	type InviteLinkSettings,
 	type InvitePlayersInvitePayload,
 	InvitePlayersModal,
 	type InvitePlayersSearchUser,
@@ -382,9 +390,9 @@ const props = defineProps<{
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
-const modrinthAccountRequiredModal = ref<InstanceType<
-	typeof ModrinthAccountRequiredModal
-> | null>(null)
+const modrinthAccountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal> | null>(
+	null,
+)
 const shareUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal> | null>(null)
 const removeUserConfirmModal = ref<InstanceType<typeof NewModal> | null>(null)
 const memberSearch = ref('')
@@ -394,7 +402,7 @@ const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
 const importedModpackUnlinkedForShare = ref(false)
 const pendingRemovalRow = ref<ShareRow | null>(null)
-const inviteLink = ref<string | undefined>()
+const inviteLinkDetails = ref<SharedInstanceInviteLink>()
 const inviteLinkPending = ref(false)
 
 const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(props.instance.id))
@@ -515,6 +523,9 @@ const isSignedIn = computed(() => !!auth.session_token.value)
 const inviteModalHeader = computed(() =>
 	formatMessage(messages.shareModalHeader, { name: props.instance.name }),
 )
+const inviteLink = computed(() =>
+	inviteLinkDetails.value ? buildInviteLink(inviteLinkDetails.value) : undefined,
+)
 const shareRoutePath = computed(() => `/instance/${encodeURIComponent(props.instance.id)}/share`)
 const friendsKey = computed(() => friendsQueryKey(currentUserId.value))
 const sharedUsersKey = computed(() => ['sharedInstanceUsers', props.instance.id] as const)
@@ -569,8 +580,7 @@ const importedModpackBackupTip = computed(() => {
 const friendsQuery = useQuery({
 	queryKey: friendsKey,
 	queryFn: async () => getFriendsWithUserData(await getCredentials()),
-	enabled: () =>
-		isSignedIn.value && !!currentUserId.value && !props.sharedInstanceActionsLocked,
+	enabled: () => isSignedIn.value && !!currentUserId.value && !props.sharedInstanceActionsLocked,
 	staleTime: 30_000,
 })
 const userFriends = computed(() => friendsQuery.data.value ?? [])
@@ -582,9 +592,7 @@ const sharedUsersQuery = useQuery({
 })
 const sharedRows = computed(
 	() =>
-		sharedUsersQuery.data.value ??
-		queryClient.getQueryData<ShareRow[]>(sharedUsersKey.value) ??
-		[],
+		sharedUsersQuery.data.value ?? queryClient.getQueryData<ShareRow[]>(sharedUsersKey.value) ?? [],
 )
 const rows = computed(() => {
 	if (props.sharedInstanceActionsLocked) return sharedRows.value
@@ -847,10 +855,7 @@ const inviteShareMutation = useMutation({
 	onSuccess: async (users, user) => {
 		try {
 			if (users) {
-				queryClient.setQueryData<ShareRow[]>(
-					sharedUsersKey.value,
-					await sharedUsersToRows(users),
-				)
+				queryClient.setQueryData<ShareRow[]>(sharedUsersKey.value, await sharedUsersToRows(users))
 			} else {
 				upsertSharedRow(inviteUserToShareRow(user))
 			}
@@ -1008,7 +1013,7 @@ function cancelInvite(user: InvitePlayersUser) {
 	}
 }
 
-function showInvitePlayers(event?: MouseEvent) {
+async function showInvitePlayers(event?: MouseEvent) {
 	if (props.sharedInstanceActionsLocked) return
 	if (!isSignedIn.value) {
 		signInToShare(event)
@@ -1020,8 +1025,8 @@ function showInvitePlayers(event?: MouseEvent) {
 		return
 	}
 
+	if (!(await ensureInviteLink())) return
 	invitePlayersModal.value?.show(event)
-	void ensureInviteLink()
 }
 
 async function unlinkImportedModpackForShare() {
@@ -1031,22 +1036,47 @@ async function unlinkImportedModpackForShare() {
 		})
 		importedModpackUnlinkedForShare.value = true
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.id] })
+		if (!(await ensureInviteLink())) return
 		invitePlayersModal.value?.show()
-		void ensureInviteLink()
 	} catch (error) {
 		handleError(toError(error))
 	}
 }
 
 async function ensureInviteLink() {
-	if (inviteLink.value || inviteLinkPending.value) return
+	if (inviteLinkDetails.value) return true
+	if (inviteLinkPending.value) return false
 
 	inviteLinkPending.value = true
 	try {
 		const invite = await create_shared_instance_invite_link(props.instance.id)
-		inviteLink.value = buildInviteLink(invite)
+		inviteLinkDetails.value = invite
+		return true
 	} catch (error) {
 		handleError(toError(error))
+		return false
+	} finally {
+		inviteLinkPending.value = false
+	}
+}
+
+async function updateInviteLink(settings: InviteLinkSettings) {
+	const currentInvite = inviteLinkDetails.value
+	if (!currentInvite) return
+
+	inviteLinkPending.value = true
+	try {
+		const maxAgeSeconds = Math.max(
+			1,
+			Math.min(604800, Math.floor((settings.expiresAt.getTime() - Date.now()) / 1000)),
+		)
+		inviteLinkDetails.value = await create_shared_instance_invite_link(props.instance.id, {
+			maxAgeSeconds,
+			maxUses: settings.maxUses,
+			replaceInviteId: currentInvite.inviteId,
+		})
+	} catch (error) {
+		throw toError(error)
 	} finally {
 		inviteLinkPending.value = false
 	}
@@ -1108,9 +1138,7 @@ function removePendingRows(ids: string[]) {
 
 	const normalizedIds = new Set(ids.map(normalizeInviteKey))
 	const nextRows = Object.fromEntries(
-		Object.entries(pendingRows.value).filter(
-			([id]) => !normalizedIds.has(normalizeInviteKey(id)),
-		),
+		Object.entries(pendingRows.value).filter(([id]) => !normalizedIds.has(normalizeInviteKey(id))),
 	)
 	if (Object.keys(nextRows).length === Object.keys(pendingRows.value).length) return
 
@@ -1289,7 +1317,7 @@ watch(
 	() => props.instance.id,
 	(instanceId) => {
 		importedModpackUnlinkedForShare.value = false
-		inviteLink.value = undefined
+		inviteLinkDetails.value = undefined
 		inviteLinkPending.value = false
 		pendingRows.value = loadPendingRows(instanceId)
 	},

@@ -428,15 +428,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "világ"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Mostantól itt találhatod meg!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "A modcsomag tartalmát áthelyeztük"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Ne mutasd többször"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "További tartalom"
   },
