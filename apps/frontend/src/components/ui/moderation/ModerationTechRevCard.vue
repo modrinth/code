@@ -3,8 +3,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	BanIcon,
 	BugIcon,
-	CheckCircleIcon,
 	CheckCheckIcon,
+	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ChevronRightIcon,
