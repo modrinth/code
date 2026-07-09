@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            drid.id AS \"id!: DelphiReportIssueDetailsId\",\n            drid.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            drid.key AS \"key!: String\",\n            drid.jar AS \"jar?: String\",\n            drid.file_path AS \"file_path!: String\",\n            drid.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            drid.severity AS \"severity!: DelphiSeverity\",\n            COALESCE(didv.verdict, 'pending'::delphi_report_issue_status) AS \"status!: DelphiStatus\"\n        FROM delphi_report_issue_details drid\n        INNER JOIN delphi_report_issues dri ON dri.id = drid.issue_id\n        INNER JOIN delphi_reports dr ON dr.id = dri.report_id\n        INNER JOIN files f ON f.id = dr.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m ON m.id = v.mod_id\n        LEFT JOIN delphi_issue_detail_verdicts didv\n            ON m.id = didv.project_id AND drid.key = didv.detail_key\n        WHERE drid.issue_id = ANY($1::bigint[])\n        ",
+  "query": "\n        SELECT\n            didws.id AS \"id!: DelphiReportIssueDetailsId\",\n            didws.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            didws.key AS \"key!: String\",\n            didws.jar AS \"jar?: String\",\n            didws.file_path AS \"file_path!: String\",\n            didws.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            didws.severity AS \"severity!: DelphiSeverity\",\n            didws.status AS \"status!: DelphiStatus\"\n        FROM delphi_issue_details_with_statuses didws\n        WHERE didws.issue_id = ANY($1::bigint[])\n        ",
   "describe": {
     "columns": [
       {
@@ -73,15 +73,15 @@
       ]
     },
     "nullable": [
-      false,
-      false,
-      false,
       true,
-      false,
-      false,
-      false,
-      null
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
     ]
   },
-  "hash": "263ad3654f544ffb6061c839d49dada47fb382a76fdcabad2077fb1ef6d1010a"
+  "hash": "951700c659d040068dae8e2f91b82b6a3af676439b47ff76d72000ddeca0e334"
 }

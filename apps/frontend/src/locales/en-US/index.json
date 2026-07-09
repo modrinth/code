@@ -2681,6 +2681,9 @@
   "moderation.page.external-projects": {
     "message": "External projects"
   },
+  "moderation.page.global-detail-traces": {
+    "message": "Global traces"
+  },
   "moderation.page.projects": {
     "message": "Projects"
   },
@@ -3275,9 +3278,6 @@
   "project.details.licensed": {
     "message": "Licensed"
   },
-  "project.download.additional-files-title": {
-    "message": "Additional files"
-  },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "This game version is incompatible with the base project."
   },
@@ -3285,13 +3285,16 @@
     "message": "This loader is incompatible with the base project."
   },
   "project.download.compatible-version-title": {
-    "message": "Compatible version"
+    "message": "Compatible versions"
   },
   "project.download.dependencies-title": {
     "message": "Dependencies"
   },
   "project.download.dependency-already-installed": {
     "message": "This dependency is already installed"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Any compatible"
   },
   "project.download.dependency-conflicting": {
     "message": "This dependency conflicts with another dependency"
@@ -3314,11 +3317,29 @@
   "project.download.dependency-quilt-fabric-api": {
     "message": "Fabric API is skipped for Quilt"
   },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "This project has a dependency with a required resource pack. Download it and place it in your {folder} folder."
+  },
   "project.download.dependency-unavailable": {
     "message": "This dependency cannot be downloaded"
   },
+  "project.download.download": {
+    "message": "Download"
+  },
+  "project.download.download-as-zip": {
+    "message": "Download as .zip"
+  },
   "project.download.download-version": {
     "message": "Download {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Download with deps"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Download with recommended"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Download with recommended as .zip"
   },
   "project.download.duplicate-dependencies-hidden": {
     "message": "Duplicate dependencies are hidden"
@@ -3329,8 +3350,8 @@
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} does not support {gameVersion} for {platform}"
   },
-  "project.download.install-with-app-description": {
-    "message": "Automatically install the correct version and dependencies."
+  "project.download.install-with-app": {
+    "message": "Install with Modrinth App"
   },
   "project.download.manually": {
     "message": "Download manually"
@@ -3341,11 +3362,17 @@
   "project.download.no-game-versions-found": {
     "message": "No game versions found"
   },
-  "project.download.no-versions-available": {
-    "message": "No versions available for {gameVersion} and {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
+  },
+  "project.download.recommended-title": {
+    "message": "Recommended"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "This data pack also requires a resource pack. Download it and place it in your {folder} folder."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Resource pack"
   },
   "project.download.search-game-versions": {
     "message": "Select game version"
@@ -3356,18 +3383,6 @@
   "project.download.select-platform": {
     "message": "Select platform"
   },
-  "project.download.selected-version-download-all": {
-    "message": "Download all (.zip)"
-  },
-  "project.download.selected-version-downloading": {
-    "message": "Downloading... ({current}/{total})"
-  },
-  "project.download.selected-version-failed-text": {
-    "message": "One or more version files could not be downloaded. Please try again."
-  },
-  "project.download.selected-version-failed-title": {
-    "message": "Could not download version"
-  },
   "project.download.show-all-versions": {
     "message": "Show all versions"
   },
@@ -3376,6 +3391,12 @@
   },
   "project.download.unknown-loader": {
     "message": "Unknown loader"
+  },
+  "project.download.zip-failed-text": {
+    "message": "One or more files could not be downloaded. Please try again."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Could not download files"
   },
   "project.environment.migration-no-permission.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."

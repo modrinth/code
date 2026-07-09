@@ -3227,9 +3227,6 @@
   "project.download.no-app": {
     "message": "Du hast die Modrinth App nicht?"
   },
-  "project.download.no-versions-available": {
-    "message": "Keinen versionen verfügbar für {gameVersion} und {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} unterstützt {platform} für {gameVersion} nicht"
   },

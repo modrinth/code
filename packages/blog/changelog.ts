@@ -11,6 +11,33 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-08T22:58:25+00:00`,
+		product: 'web',
+		body: `## Changed
+- Revised design for the project download modal.`,
+	},
+	{
+		date: `2026-07-08T15:05:35+00:00`,
+		product: 'app',
+		version: '0.15.9',
+		body: `## Added
+- Added new advanced filter category to Discover content.
+- Added options to exclude plugins and data packs from mod search
+- Added options to exclude mods and plugins from data pack search
+
+## Fixed
+- Instance edits not appearing to be immediately saved.`,
+	},
+	{
+		date: `2026-07-08T15:05:35+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new advanced filter category to Discover content.
+- Added options to exclude plugins and data packs from mod search
+- Added options to exclude mods and data packs from plugin search
+- Added options to exclude mods and plugins from data pack search`,
+	},
+	{
 		date: `2026-07-06T22:19:13+00:00`,
 		product: 'app',
 		version: '0.15.8',

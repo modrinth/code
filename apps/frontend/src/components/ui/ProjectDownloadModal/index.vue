@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px">
+	<NewModal ref="modal" :on-show="onShow" :on-hide="onHide" width="544px" actions-divider>
 		<template #title>
 			<template v-if="project">
 				<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
@@ -19,6 +19,7 @@
 					:project="project"
 					:versions="versions"
 					:dependency-download-files="dependencyDownloadFiles"
+					:download-data-loaded="downloadRowsLoaded"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -27,20 +28,11 @@
 					:reset-key="downloadProjectResetKey"
 					@select-game-version="selectGameVersion"
 					@select-platform="selectPlatform"
-					@update:selection="projectDownloadSelection = $event"
+					@update:selection="updateProjectDownloadSelection"
 					@download="onDownload"
 				/>
 				<div class="flex flex-col gap-4">
-					<DownloadDependencies
-						:project="project"
-						:selected-version="selectedVersion"
-						:current-game-version="currentGameVersion"
-						:current-platform="currentPlatform"
-						:download-reason="downloadReason"
-						:additional-files="additionalFiles"
-						@update:downloadable-files="dependencyDownloadFiles = $event"
-						@download="onDownload"
-					/>
+					<DownloadDependencies @download="onDownload" />
 				</div>
 				<ServersPromo
 					v-if="flags.showProjectPageDownloadModalServersPromo"
@@ -54,16 +46,61 @@
 				/>
 			</div>
 		</template>
+		<template v-if="showDependencyDownloadActions" #actions>
+			<div class="flex flex-wrap justify-end gap-2 p-2">
+				<ButtonStyled>
+					<button
+						class="!shadow-none"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadSelectedVersionZip"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'zip'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadAsZip) }}
+					</button>
+				</ButtonStyled>
+				<JoinedButtons
+					v-if="hasRecommendedDownloadFiles"
+					color="brand"
+					:actions="downloadWithRecommendedActions"
+					:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+				/>
+				<ButtonStyled v-else color="brand">
+					<button
+						class="!shadow-none"
+						:disabled="!!downloadingActionType || !dependencyDownloadFilesLoaded"
+						@click="downloadFilesWithDependencies"
+					>
+						<SpinnerIcon
+							v-if="downloadingActionType === 'dependencies'"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
+						<DownloadIcon v-else aria-hidden="true" />
+						{{ formatMessage(messages.downloadWithDependencies) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	Avatar,
+	ButtonStyled,
 	type CdnDownloadReason,
 	defineMessages,
 	injectModrinthClient,
+	injectNotificationManager,
+	type JoinedButtonAction,
+	JoinedButtons,
 	NewModal,
 	ServersPromo,
 	truncatedTooltip,
@@ -71,13 +108,16 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { DisplayProjectType } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import dayjs from 'dayjs'
+import JSZip from 'jszip'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { navigateTo } from '#app'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 
+import { provideDownloadModalProvider } from './download-modal-provider'
 import DownloadDependencies from './DownloadDependencies.vue'
 import DownloadProject from './DownloadProject.vue'
 import InstallWithModrinthApp from './InstallWithModrinthApp.vue'
@@ -98,6 +138,12 @@ type DownloadableFile = {
 	href: string
 	filename: string
 }
+
+type DownloadedFile = DownloadableFile & {
+	blob: Blob
+}
+
+type DownloadActionType = 'zip' | 'dependencies' | 'recommended'
 
 type NewModalRef = {
 	show: (event?: MouseEvent) => void
@@ -138,19 +184,31 @@ const route = useRoute()
 const flags = useFeatureFlags()
 const tags = useGeneratedState()
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { createProjectDownloadUrl } = useCdnDownloadContext()
+const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadModal')
 
 const modal = ref<NewModalRef | null>(null)
 const downloadTitleRef = ref<HTMLElement | null>(null)
+const modalOpening = ref(false)
 const modalOpen = ref(false)
 const showProjectId = ref<string | null>(null)
 const showOptions = ref<ResolvedProjectDownloadModalShowOptions>(getDefaultShowOptions())
 const downloadProjectResetKey = ref(0)
 const projectDownloadSelection = ref<ProjectDownloadSelection>(getDefaultProjectDownloadSelection())
-const dependencyDownloadFiles = ref<DownloadableFile[]>([])
+const pendingRouteSelection = ref({
+	gameVersion: getStringQueryValue(route.query.version),
+	platform: getStringQueryValue(route.query.loader),
+})
+const downloadingActionType = ref<DownloadActionType | null>(null)
 const MODAL_CLOSE_STATE_RESET_MS = 350
+const DOWNLOAD_URL_REVOKE_MS = 60000
+const DOWNLOAD_STAGGER_MS = 500
 let closeStateResetTimeout: ReturnType<typeof setTimeout> | null = null
+let modalShowRequestId = 0
+let unmounted = false
 
 const routeProjectId = computed(() => showProjectId.value ?? props.projectId ?? null)
 
@@ -183,11 +241,7 @@ const downloadTitle = computed(() => {
 })
 
 const versionsEnabled = ref(false)
-const {
-	data: versionsV3,
-	error: _versionsV3Error,
-	isFetching: versionsV3Loading,
-} = useQuery({
+const { data: versionsV3, isFetching: versionsV3Loading } = useQuery({
 	queryKey: computed(() => ['project', resolvedProjectId.value, 'versions', 'v3']),
 	queryFn: () =>
 		client.labrinth.versions_v3.getProjectVersions(resolvedProjectId.value!, {
@@ -198,24 +252,9 @@ const {
 	enabled: computed(() => !!resolvedProjectId.value && versionsEnabled.value),
 })
 
-const versions = computed<Labrinth.Versions.v3.Version[]>(() => {
-	const isModpack =
-		project.value?.actualProjectType === 'modpack' || project.value?.project_type === 'modpack'
-
-	return (versionsV3.value ?? []).map((version) => {
-		const files = Array.isArray(version.files) ? version.files : []
-		const gameVersions = Array.isArray(version.game_versions) ? version.game_versions : []
-		const loaders = Array.isArray(version.loaders) ? version.loaders : []
-		const mrpackLoaders = Array.isArray(version.mrpack_loaders) ? version.mrpack_loaders : []
-
-		return {
-			...version,
-			files,
-			game_versions: gameVersions,
-			loaders: isModpack && mrpackLoaders.length ? mrpackLoaders : loaders,
-		}
-	})
-})
+const versions = computed<Labrinth.Versions.v3.Version[]>(() =>
+	normalizeVersionsForDownload(versionsV3.value ?? []),
+)
 
 const initialGameVersion = computed(() => {
 	const version = route.query.version
@@ -238,6 +277,88 @@ const additionalFiles = computed(() => {
 	return selectedVersion.value.files.filter((file) => file !== selectedPrimaryFile.value)
 })
 
+const hasRequiredResourcePackAdditionalFile = computed(() =>
+	additionalFiles.value.some((file) => file.file_type === 'required-resource-pack'),
+)
+
+const downloadModalProvider = provideDownloadModalProvider({
+	project,
+	selectedVersion,
+	selectedPrimaryFile,
+	currentGameVersion,
+	currentPlatform,
+	downloadReason: computed(() => props.downloadReason),
+	additionalFiles,
+})
+const dependencyDownloadFiles = downloadModalProvider.downloadableDependencyFiles
+const dependencyDownloadFilesLoaded = downloadModalProvider.downloadableDependencyFilesLoaded
+const downloadRowsLoaded = downloadModalProvider.downloadRowsLoaded
+
+const selectedVersionDownloadFiles = computed<DownloadableFile[]>(() => {
+	if (!selectedVersion.value) return []
+
+	return selectedVersion.value.files
+		.filter(
+			(file) => file === selectedPrimaryFile.value || file.file_type === 'required-resource-pack',
+		)
+		.map((file) => ({
+			href: createProjectDownloadUrl(file.url, {
+				reason: props.downloadReason,
+				gameVersion: currentGameVersion.value ?? undefined,
+				loader: currentPlatform.value ?? undefined,
+			}),
+			filename: file.filename,
+		}))
+})
+
+const recommendedDownloadFiles = computed<DownloadableFile[]>(() => {
+	if (project.value?.project_type !== 'datapack' || !selectedVersion.value) return []
+
+	return selectedVersion.value.files
+		.filter(
+			(file) => file !== selectedPrimaryFile.value && file.file_type === 'optional-resource-pack',
+		)
+		.map((file) => ({
+			href: createProjectDownloadUrl(file.url, {
+				reason: props.downloadReason,
+				gameVersion: currentGameVersion.value ?? undefined,
+				loader: currentPlatform.value ?? undefined,
+			}),
+			filename: file.filename,
+		}))
+})
+
+const hasRecommendedDownloadFiles = computed(() => recommendedDownloadFiles.value.length > 0)
+
+const showDependencyDownloadActions = computed(
+	() =>
+		selectedVersionDownloadFiles.value.length > 0 &&
+		(dependencyDownloadFiles.value.length > 0 ||
+			hasRequiredResourcePackAdditionalFile.value ||
+			hasRecommendedDownloadFiles.value),
+)
+
+const downloadWithRecommendedActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'download-with-dependencies',
+		label: formatMessage(messages.downloadWithDependencies),
+		icon: downloadingActionType.value === 'dependencies' ? SpinnerIcon : DownloadIcon,
+		action: () => void downloadFilesWithDependencies(),
+	},
+	{
+		id: 'download-with-recommended',
+		label: formatMessage(messages.downloadWithRecommended),
+		icon: DownloadIcon,
+		action: () => void downloadFilesWithRecommended(),
+	},
+	{
+		id: 'download-with-recommended-zip',
+		label: formatMessage(messages.downloadWithRecommendedAsZip),
+		icon: DownloadIcon,
+		action: () => void downloadSelectedVersionZip(),
+	},
+])
+
 watch(projectV2Error, (error) => {
 	if (error) {
 		debug('project query failed', error)
@@ -248,6 +369,30 @@ const messages = defineMessages({
 	downloadTitle: {
 		id: 'project.download.title',
 		defaultMessage: 'Download {title}',
+	},
+	downloadAsZip: {
+		id: 'project.download.download-as-zip',
+		defaultMessage: 'Download as .zip',
+	},
+	downloadWithDependencies: {
+		id: 'project.download.download-with-dependencies',
+		defaultMessage: 'Download with deps',
+	},
+	downloadWithRecommended: {
+		id: 'project.download.download-with-recommended',
+		defaultMessage: 'Download with recommended',
+	},
+	downloadWithRecommendedAsZip: {
+		id: 'project.download.download-with-recommended-as-zip',
+		defaultMessage: 'Download with recommended as .zip',
+	},
+	downloadZipFailedTitle: {
+		id: 'project.download.zip-failed-title',
+		defaultMessage: 'Could not download files',
+	},
+	downloadZipFailedText: {
+		id: 'project.download.zip-failed-text',
+		defaultMessage: 'One or more files could not be downloaded. Please try again.',
 	},
 })
 
@@ -278,15 +423,27 @@ function updateDownloadQuery({
 	platform: string | null
 }) {
 	if (!props.updateRouteSelection) return
+	const nextGameVersion =
+		gameVersion ??
+		pendingRouteSelection.value.gameVersion ??
+		getStringQueryValue(route.query.version)
+	const nextPlatform =
+		platform ?? pendingRouteSelection.value.platform ?? getStringQueryValue(route.query.loader)
+
+	pendingRouteSelection.value = {
+		gameVersion: nextGameVersion,
+		platform: nextPlatform,
+	}
+
 	navigateTo(
 		{
 			query: {
 				...route.query,
-				...(gameVersion && {
-					version: gameVersion,
+				...(nextGameVersion && {
+					version: nextGameVersion,
 				}),
-				...(platform && {
-					loader: platform,
+				...(nextPlatform && {
+					loader: nextPlatform,
 				}),
 			},
 			hash: route.hash,
@@ -298,15 +455,23 @@ function updateDownloadQuery({
 function selectGameVersion(gameVersion: string) {
 	updateDownloadQuery({
 		gameVersion,
-		platform: currentPlatform.value,
+		platform: null,
 	})
 }
 
 function selectPlatform(platform: string) {
 	updateDownloadQuery({
-		gameVersion: currentGameVersion.value,
+		gameVersion: null,
 		platform,
 	})
+}
+
+function updateProjectDownloadSelection(selection: ProjectDownloadSelection) {
+	projectDownloadSelection.value = selection
+	pendingRouteSelection.value = {
+		gameVersion: selection.currentGameVersion,
+		platform: selection.currentPlatform,
+	}
 }
 
 function onShow() {
@@ -337,28 +502,236 @@ async function show(
 	event?: MouseEvent,
 	options: ProjectDownloadModalShowOptions = {},
 ): Promise<void> {
-	if (!modal.value || modalOpen.value) return
-	await waitForCloseStateReset()
-	if (!modal.value || modalOpen.value) return
-	showOptions.value = {
-		...getDefaultShowOptions(),
-		...options,
+	if (!modal.value || modalOpening.value || modalOpen.value) return
+	const showRequestId = ++modalShowRequestId
+	modalOpening.value = true
+
+	try {
+		await waitForCloseStateReset()
+		if (!isActiveShowRequest(showRequestId)) return
+		showOptions.value = {
+			...getDefaultShowOptions(),
+			...options,
+		}
+		showProjectId.value = showOptions.value.projectId ?? null
+		await nextTick()
+		if (!isActiveShowRequest(showRequestId)) return
+		if (!(await loadProjectForModal(!!showOptions.value.projectId))) return
+		if (!isActiveShowRequest(showRequestId)) return
+		resetDownloadState()
+		await preloadRouteSelectedDownload()
+		if (!isActiveShowRequest(showRequestId)) return
+		modalOpen.value = true
+		modal.value.show(event)
+	} finally {
+		if (modalShowRequestId === showRequestId) {
+			modalOpening.value = false
+		}
 	}
-	showProjectId.value = showOptions.value.projectId ?? null
-	await nextTick()
-	if (!(await loadProjectForModal(!!showOptions.value.projectId))) return
-	resetDownloadState()
-	modalOpen.value = true
-	modal.value.show(event)
 }
 
 function hide() {
+	modalShowRequestId += 1
+	modalOpening.value = false
 	if (!modal.value || !modalOpen.value) return
 	modal.value?.hide()
 }
 
 function onDownload() {
 	emit('download')
+}
+
+async function downloadSelectedVersionZip() {
+	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
+
+	downloadingActionType.value = 'zip'
+	const files = dedupeDownloadFiles([
+		...selectedVersionDownloadFiles.value,
+		...dependencyDownloadFiles.value,
+		...recommendedDownloadFiles.value,
+	])
+
+	try {
+		const zip = new JSZip()
+		const usedFilenames = new Set<string>()
+		const downloadedFiles = await downloadFileBlobs(files)
+
+		for (const file of downloadedFiles) {
+			zip.file(uniqueFilename(file.filename, usedFilenames), file.blob)
+		}
+
+		downloadBlob(
+			await zip.generateAsync({
+				type: 'blob',
+				mimeType: 'application/zip',
+			}),
+			selectedVersionZipFilename(),
+		)
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadZipFailedTitle),
+			text: formatMessage(messages.downloadZipFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingActionType.value = null
+	}
+}
+
+async function downloadFilesWithDependencies() {
+	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
+
+	downloadingActionType.value = 'dependencies'
+
+	try {
+		const files = dedupeDownloadFiles([
+			...selectedVersionDownloadFiles.value,
+			...dependencyDownloadFiles.value,
+		])
+
+		await downloadFiles(files)
+
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadZipFailedTitle),
+			text: formatMessage(messages.downloadZipFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingActionType.value = null
+	}
+}
+
+async function downloadFilesWithRecommended() {
+	if (downloadingActionType.value || !dependencyDownloadFilesLoaded.value) return
+
+	downloadingActionType.value = 'recommended'
+
+	try {
+		const files = dedupeDownloadFiles([
+			...selectedVersionDownloadFiles.value,
+			...dependencyDownloadFiles.value,
+			...recommendedDownloadFiles.value,
+		])
+
+		await downloadFiles(files)
+
+		emit('download')
+	} catch (error) {
+		console.error('Failed to download selected version files:', error)
+		addNotification({
+			title: formatMessage(messages.downloadZipFailedTitle),
+			text: formatMessage(messages.downloadZipFailedText),
+			type: 'error',
+		})
+	} finally {
+		downloadingActionType.value = null
+	}
+}
+
+async function downloadFileBlobs(files: DownloadableFile[]): Promise<DownloadedFile[]> {
+	return Promise.all(files.map((file) => downloadFileBlob(file)))
+}
+
+async function downloadFileBlob(file: DownloadableFile): Promise<DownloadedFile> {
+	const response = await fetch(file.href)
+
+	if (!response.ok) {
+		throw new Error(`Failed to download ${file.filename}`)
+	}
+
+	return {
+		...file,
+		blob: await response.blob(),
+	}
+}
+
+async function downloadFiles(files: DownloadableFile[]) {
+	await Promise.all(
+		files.map(async (file, index) => {
+			await delay(DOWNLOAD_STAGGER_MS * index)
+			downloadFileLink(file)
+		}),
+	)
+}
+
+function dedupeDownloadFiles(files: DownloadableFile[]) {
+	const result: DownloadableFile[] = []
+	const hrefs = new Set<string>()
+
+	for (const file of files) {
+		if (hrefs.has(file.href)) continue
+		hrefs.add(file.href)
+		result.push(file)
+	}
+
+	return result
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+	const url = URL.createObjectURL(blob)
+	const link = document.createElement('a')
+
+	link.href = url
+	link.download = filename
+	document.body.appendChild(link)
+	link.click()
+	link.remove()
+	window.setTimeout(() => URL.revokeObjectURL(url), DOWNLOAD_URL_REVOKE_MS)
+}
+
+function downloadFileLink(file: DownloadableFile) {
+	const link = document.createElement('a')
+	link.href = file.href
+	link.download = file.filename
+	document.body.appendChild(link)
+	link.click()
+	link.remove()
+}
+
+function selectedVersionZipFilename() {
+	if (!project.value || !selectedVersion.value) return 'download.zip'
+
+	return `${sanitizeFilename(project.value.title)} ${sanitizeFilename(
+		selectedVersion.value.version_number,
+	)}-EXTRACT_ME.zip`
+}
+
+function sanitizeFilename(value: string) {
+	const sanitized = value
+		.replace(/[<>:"/\\|?*]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim()
+
+	return sanitized || 'download'
+}
+
+function uniqueFilename(filename: string, usedFilenames: Set<string>) {
+	const sanitizedFilename = sanitizeFilename(filename)
+
+	if (!usedFilenames.has(sanitizedFilename)) {
+		usedFilenames.add(sanitizedFilename)
+		return sanitizedFilename
+	}
+
+	const extensionIndex = sanitizedFilename.lastIndexOf('.')
+	const basename =
+		extensionIndex > 0 ? sanitizedFilename.slice(0, extensionIndex) : sanitizedFilename
+	const extension = extensionIndex > 0 ? sanitizedFilename.slice(extensionIndex) : ''
+	let index = 2
+	let candidate = `${basename} (${index})${extension}`
+
+	while (usedFilenames.has(candidate)) {
+		index += 1
+		candidate = `${basename} (${index})${extension}`
+	}
+
+	usedFilenames.add(candidate)
+	return candidate
 }
 
 function getDefaultProjectDownloadSelection(): ProjectDownloadSelection {
@@ -378,6 +751,19 @@ function getDefaultShowOptions(): ResolvedProjectDownloadModalShowOptions {
 	}
 }
 
+function getStringQueryValue(value: unknown) {
+	return typeof value === 'string' ? value : null
+}
+
+function shouldPreloadRouteSelectedDownload() {
+	return (
+		props.useRouteHash &&
+		!showOptions.value.projectId &&
+		!!getStringQueryValue(route.query.version) &&
+		!!getStringQueryValue(route.query.loader)
+	)
+}
+
 function clearCloseStateResetTimeout() {
 	if (!closeStateResetTimeout) return
 	clearTimeout(closeStateResetTimeout)
@@ -386,7 +772,11 @@ function clearCloseStateResetTimeout() {
 
 async function waitForCloseStateReset() {
 	if (!closeStateResetTimeout) return
-	await new Promise((resolve) => setTimeout(resolve, MODAL_CLOSE_STATE_RESET_MS))
+	await delay(MODAL_CLOSE_STATE_RESET_MS)
+}
+
+async function delay(ms: number) {
+	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function loadProjectForModal(forceRefetch: boolean) {
@@ -397,9 +787,127 @@ async function loadProjectForModal(forceRefetch: boolean) {
 	return !!data
 }
 
+async function loadVersionsForModal() {
+	if (!resolvedProjectId.value) return null
+	versionsEnabled.value = true
+	if (versionsV3.value) return versions.value
+
+	const data = await queryClient.ensureQueryData({
+		queryKey: ['project', resolvedProjectId.value, 'versions', 'v3'],
+		queryFn: () =>
+			client.labrinth.versions_v3.getProjectVersions(resolvedProjectId.value!, {
+				include_changelog: false,
+				apiVersion: 3,
+			}),
+		staleTime: STALE_TIME_LONG,
+	})
+
+	return Array.isArray(data) ? normalizeVersionsForDownload(data) : null
+}
+
+async function preloadRouteSelectedDownload() {
+	if (!shouldPreloadRouteSelectedDownload()) return
+
+	try {
+		const routeVersions = await loadVersionsForModal()
+		if (!routeVersions) return
+
+		const selection = getRouteSelectedDownloadSelection(routeVersions)
+		if (!selection) return
+
+		await preloadDependenciesForSelection(selection)
+	} catch (error) {
+		debug('failed to preload selected route download', error)
+	}
+}
+
+function getRouteSelectedDownloadSelection(
+	versionList: Labrinth.Versions.v3.Version[] = versions.value,
+): ProjectDownloadSelection | null {
+	const gameVersion = initialGameVersion.value
+	const platform = initialPlatform.value
+	const version = getSelectedRouteVersion(gameVersion, platform, versionList)
+	const primaryFile = version?.files?.find((file) => file.primary) || version?.files?.[0] || null
+
+	if (!gameVersion || !platform || !version || !primaryFile) return null
+
+	return {
+		currentGameVersion: gameVersion,
+		currentPlatform: platform,
+		selectedVersion: version,
+		selectedPrimaryFile: primaryFile,
+	}
+}
+
+function getSelectedRouteVersion(
+	gameVersion: string | null,
+	platform: string | null,
+	versionList: Labrinth.Versions.v3.Version[],
+) {
+	if (!gameVersion || !platform || !project.value) return null
+
+	const filteredVersions = versionList.filter((version) => {
+		const matchesPlatform =
+			project.value?.project_type === 'resourcepack' ||
+			(!!platform && version.loaders.includes(platform))
+
+		return version.game_versions.includes(gameVersion) && matchesPlatform
+	})
+
+	return (
+		latestVersionByType(filteredVersions, 'release') ||
+		latestVersionByType(filteredVersions, 'beta') ||
+		latestVersionByType(filteredVersions, 'alpha') ||
+		null
+	)
+}
+
+function normalizeVersionsForDownload(
+	versionList: Labrinth.Versions.v3.Version[],
+): Labrinth.Versions.v3.Version[] {
+	const isModpack =
+		project.value?.actualProjectType === 'modpack' || project.value?.project_type === 'modpack'
+
+	return versionList.map((version) => {
+		const files = Array.isArray(version.files) ? version.files : []
+		const gameVersions = Array.isArray(version.game_versions) ? version.game_versions : []
+		const loaders = Array.isArray(version.loaders) ? version.loaders : []
+		const mrpackLoaders = Array.isArray(version.mrpack_loaders) ? version.mrpack_loaders : []
+
+		return {
+			...version,
+			files,
+			game_versions: gameVersions,
+			loaders: isModpack && mrpackLoaders.length ? mrpackLoaders : loaders,
+		}
+	})
+}
+
+function latestVersionByType(
+	versionList: Labrinth.Versions.v3.Version[],
+	type: Labrinth.Versions.v3.VersionChannel,
+) {
+	return versionList
+		.filter((version) => version.version_type === type)
+		.reduce<Labrinth.Versions.v3.Version | undefined>((latest, version) => {
+			if (!latest || dayjs(version.date_published).isAfter(dayjs(latest.date_published))) {
+				return version
+			}
+
+			return latest
+		}, undefined)
+}
+
+async function preloadDependenciesForSelection(selection: ProjectDownloadSelection) {
+	await downloadModalProvider.preloadDependenciesForSelection(selection)
+}
+
+function isActiveShowRequest(showRequestId: number) {
+	return !unmounted && modalShowRequestId === showRequestId && !!modal.value && !modalOpen.value
+}
+
 function resetDownloadState() {
 	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
-	dependencyDownloadFiles.value = []
 	downloadProjectResetKey.value += 1
 }
 
@@ -407,6 +915,7 @@ function openFromHash() {
 	if (
 		!props.useRouteHash ||
 		!modal.value ||
+		modalOpening.value ||
 		modalOpen.value ||
 		showProjectId.value ||
 		route.hash !== '#download'
@@ -437,11 +946,14 @@ watch(modal, openFromHash)
 watch(() => route.hash, openFromHash)
 watch(routeProjectId, () => {
 	projectDownloadSelection.value = getDefaultProjectDownloadSelection()
-	dependencyDownloadFiles.value = []
 	downloadProjectResetKey.value += 1
 })
 
-onUnmounted(clearCloseStateResetTimeout)
+onUnmounted(() => {
+	unmounted = true
+	modalShowRequestId += 1
+	clearCloseStateResetTimeout()
+})
 
 defineExpose({ show, hide })
 </script>
