@@ -20,20 +20,65 @@
   "app.action-bar.install.failed": {
     "message": "Install failed"
   },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installation failed due to app closing."
+  "app.action-bar.install.failure.app-closed": {
+    "message": "Canceled: app closed"
   },
-  "app.action-bar.install.failed-network": {
-    "message": "Installation failed due to a network error."
+  "app.action-bar.install.failure.bad-modpack-file": {
+    "message": "Bad modpack file"
   },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installation failed due to an unknown error."
+  "app.action-bar.install.failure.canceled": {
+    "message": "Canceled"
   },
-  "app.action-bar.install.failed-while": {
-    "message": "Failed while {phase}."
+  "app.action-bar.install.failure.cleanup-incomplete": {
+    "message": "Cleanup incomplete"
   },
-  "app.action-bar.install.interrupted-while": {
-    "message": "Interrupted while {phase}."
+  "app.action-bar.install.failure.content-download-failed": {
+    "message": "Content download failed"
+  },
+  "app.action-bar.install.failure.corrupt-download": {
+    "message": "Corrupt download"
+  },
+  "app.action-bar.install.failure.could-not-save-files": {
+    "message": "Could not save files"
+  },
+  "app.action-bar.install.failure.download-failed": {
+    "message": "Download failed"
+  },
+  "app.action-bar.install.failure.instance-not-found": {
+    "message": "Instance not found"
+  },
+  "app.action-bar.install.failure.invalid-file-path": {
+    "message": "Invalid file path"
+  },
+  "app.action-bar.install.failure.invalid-modpack": {
+    "message": "Invalid modpack"
+  },
+  "app.action-bar.install.failure.invalid-modpack-files": {
+    "message": "Invalid modpack files"
+  },
+  "app.action-bar.install.failure.java-setup-failed": {
+    "message": "Java setup failed"
+  },
+  "app.action-bar.install.failure.loader-setup-failed": {
+    "message": "Loader setup failed"
+  },
+  "app.action-bar.install.failure.local-data-error": {
+    "message": "Local data error"
+  },
+  "app.action-bar.install.failure.minecraft-setup-failed": {
+    "message": "Minecraft setup failed"
+  },
+  "app.action-bar.install.failure.modrinth-unreachable": {
+    "message": "Modrinth unreachable"
+  },
+  "app.action-bar.install.failure.no-write-permission": {
+    "message": "No write permission"
+  },
+  "app.action-bar.install.failure.pack-download-failed": {
+    "message": "Pack download failed"
+  },
+  "app.action-bar.install.failure.unexpected-error": {
+    "message": "Unexpected error"
   },
   "app.action-bar.install.open-instance": {
     "message": "Open instance"

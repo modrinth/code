@@ -1,6 +1,6 @@
 use super::model::{
-    InstallJobSnapshot, InstallJobState, InstallPhaseDetails, InstallPhaseId,
-    InstallProgress,
+    InstallJobEventKind, InstallJobSnapshot, InstallJobState,
+    InstallPhaseDetails, InstallPhaseId, InstallProgress,
 };
 use super::store;
 use std::sync::Arc;
@@ -27,11 +27,23 @@ impl InstallProgressReporter {
         progress: Option<InstallProgress>,
         details: InstallPhaseDetails,
     ) -> crate::Result<()> {
+        self.update_with_events(phase, progress, details, Vec::new())
+            .await
+    }
+
+    pub async fn update_with_events(
+        &self,
+        phase: InstallPhaseId,
+        progress: Option<InstallProgress>,
+        details: InstallPhaseDetails,
+        events: Vec<InstallJobEventKind>,
+    ) -> crate::Result<()> {
         let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
-        state.progress.phase = phase;
-        state.progress.progress = progress;
-        state.progress.details = details;
+        state.set_progress(phase, progress, details);
+        for event in events {
+            state.record_event(event);
+        }
 
         let record =
             store::update_state(self.job_id, &state, &app_state).await?;

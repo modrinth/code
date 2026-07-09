@@ -1,7 +1,7 @@
 use crate::State;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
-    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallJobEventKind, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter, InstallProgressSecondary,
 };
 use crate::pack::install_from::{
@@ -413,7 +413,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .map(|file| file.file_size as u64)
         .sum::<u64>();
     reporter
-        .update(
+        .update_with_events(
             InstallPhaseId::DownloadingContent,
             Some(InstallProgress {
                 current: 0,
@@ -426,6 +426,10 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 ),
             }),
             modpack_details.clone(),
+            vec![InstallJobEventKind::ContentDownloadStarted {
+                files: num_files as u64,
+                bytes: (content_total_bytes > 0).then_some(content_total_bytes),
+            }],
         )
         .await?;
     let content_progress = Arc::new(AtomicU64::new(0));
@@ -448,45 +452,61 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             let content_progress = content_progress.clone();
             let content_bytes_progress = content_bytes_progress.clone();
             async move {
-                let mark_downloaded = |file_size: u64| {
-                    let reporter = reporter.clone();
-                    let modpack_details = modpack_details.clone();
-                    let content_progress = content_progress.clone();
-                    let content_bytes_progress = content_bytes_progress.clone();
-                    async move {
-                        let current = content_progress
-                            .fetch_add(1, Ordering::Relaxed)
-                            + 1;
-                        let current_bytes = content_bytes_progress
-                            .fetch_add(file_size, Ordering::Relaxed)
-                            + file_size;
-                        reporter
-                            .update(
-                                InstallPhaseId::DownloadingContent,
-                                Some(InstallProgress {
-                                    current,
-                                    total: num_files as u64,
-                                    secondary: (content_total_bytes > 0)
-                                        .then_some(InstallProgressSecondary {
-                                            current: current_bytes
-                                                .min(content_total_bytes),
-                                            total: content_total_bytes,
-                                        }),
-                                }),
-                                modpack_details,
-                            )
-                            .await?;
-                        Ok::<(), crate::Error>(())
-                    }
-                };
+                let mark_downloaded =
+                    |file_size: u64, event: InstallJobEventKind| {
+                        let reporter = reporter.clone();
+                        let modpack_details = modpack_details.clone();
+                        let content_progress = content_progress.clone();
+                        let content_bytes_progress =
+                            content_bytes_progress.clone();
+                        async move {
+                            let current = content_progress
+                                .fetch_add(1, Ordering::Relaxed)
+                                + 1;
+                            let current_bytes = content_bytes_progress
+                                .fetch_add(file_size, Ordering::Relaxed)
+                                + file_size;
+                            reporter
+                                .update_with_events(
+                                    InstallPhaseId::DownloadingContent,
+                                    Some(InstallProgress {
+                                        current,
+                                        total: num_files as u64,
+                                        secondary: (content_total_bytes > 0)
+                                            .then_some(
+                                                InstallProgressSecondary {
+                                                    current: current_bytes.min(
+                                                        content_total_bytes,
+                                                    ),
+                                                    total: content_total_bytes,
+                                                },
+                                            ),
+                                    }),
+                                    modpack_details,
+                                    vec![event],
+                                )
+                                .await?;
+                            Ok::<(), crate::Error>(())
+                        }
+                    };
+
+                let project_size = project.file_size as u64;
+                let project_path = project.path.as_str().to_string();
 
                 //TODO: Future update: prompt user for optional files in a modpack
-                if let Some(env) = project.env
+                if let Some(env) = project.env.as_ref()
                     && env
                         .get(&EnvType::Client)
                         .is_some_and(|x| x == &SideType::Unsupported)
                 {
-                    mark_downloaded(project.file_size as u64).await?;
+                    mark_downloaded(
+                        project_size,
+                        InstallJobEventKind::ContentFileSkipped {
+                            path: project_path,
+                            reason: "unsupported on client".to_string(),
+                        },
+                    )
+                    .await?;
                     return Ok(());
                 }
 
@@ -503,6 +523,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     &state.pool,
                 )
                 .await?;
+                let downloaded_bytes = file.len() as u64;
 
                 let path = instance_full_path.join(project.path.as_str());
 
@@ -557,7 +578,14 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     }
                 }
 
-                mark_downloaded(project.file_size as u64).await?;
+                mark_downloaded(
+                    project_size,
+                    InstallJobEventKind::ContentFileCompleted {
+                        path: project_path,
+                        bytes: downloaded_bytes,
+                    },
+                )
+                .await?;
                 Ok(())
             }
         },

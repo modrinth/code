@@ -45,76 +45,9 @@ const messages = defineMessages({
 		id: 'app.action-bar.install.open-instance',
 		defaultMessage: 'Open instance',
 	},
-	installFailed: {
-		id: 'app.action-bar.install.failed',
-		defaultMessage: 'Install failed',
-	},
-	installFailedWhile: {
-		id: 'app.action-bar.install.failed-while',
-		defaultMessage: 'Failed while {phase}.',
-	},
-	installInterruptedWhile: {
-		id: 'app.action-bar.install.interrupted-while',
-		defaultMessage: 'Interrupted while {phase}.',
-	},
 	unknownInstance: {
 		id: 'app.action-bar.install.unknown-instance',
 		defaultMessage: 'Unknown instance',
-	},
-})
-
-const failurePhaseMessages = defineMessages({
-	preparing_instance: {
-		id: 'app.install.failure-phase.preparing_instance',
-		defaultMessage: 'preparing instance',
-	},
-	resolving_pack: {
-		id: 'app.install.failure-phase.resolving_pack',
-		defaultMessage: 'resolving content',
-	},
-	downloading_pack_file: {
-		id: 'app.install.failure-phase.downloading_pack_file',
-		defaultMessage: 'downloading pack file',
-	},
-	reading_pack_manifest: {
-		id: 'app.install.failure-phase.reading_pack_manifest',
-		defaultMessage: 'reading pack manifest',
-	},
-	downloading_content: {
-		id: 'app.install.failure-phase.downloading_content',
-		defaultMessage: 'downloading content',
-	},
-	extracting_overrides: {
-		id: 'app.install.failure-phase.extracting_overrides',
-		defaultMessage: 'extracting overrides',
-	},
-	resolving_minecraft: {
-		id: 'app.install.failure-phase.resolving_minecraft',
-		defaultMessage: 'resolving Minecraft',
-	},
-	resolving_loader: {
-		id: 'app.install.failure-phase.resolving_loader',
-		defaultMessage: 'resolving loader',
-	},
-	preparing_java: {
-		id: 'app.install.failure-phase.preparing_java',
-		defaultMessage: 'preparing Java',
-	},
-	downloading_minecraft: {
-		id: 'app.install.failure-phase.downloading_minecraft',
-		defaultMessage: 'downloading Minecraft',
-	},
-	running_loader_processors: {
-		id: 'app.install.failure-phase.running_loader_processors',
-		defaultMessage: 'running loader processors',
-	},
-	finalizing: {
-		id: 'app.install.failure-phase.finalizing',
-		defaultMessage: 'finalizing',
-	},
-	rolling_back: {
-		id: 'app.install.failure-phase.rolling_back',
-		defaultMessage: 'rolling back',
 	},
 })
 
@@ -196,30 +129,91 @@ const javaStepMessages = defineMessages({
 	},
 })
 
-const failureJavaStepMessages = defineMessages({
-	resolving: {
-		id: 'app.install.failure-phase.preparing_java.resolving',
-		defaultMessage: 'preparing Java {version}',
+const failureSummaryMessages = defineMessages({
+	canceled: {
+		id: 'app.action-bar.install.failure.canceled',
+		defaultMessage: 'Canceled',
 	},
-	fetching_metadata: {
-		id: 'app.install.failure-phase.preparing_java.fetching-metadata',
-		defaultMessage: 'fetching Java {version}',
+	appClosed: {
+		id: 'app.action-bar.install.failure.app-closed',
+		defaultMessage: 'Canceled: app closed',
 	},
-	downloading: {
-		id: 'app.install.failure-phase.preparing_java.downloading',
-		defaultMessage: 'downloading Java {version}',
+	downloadFailed: {
+		id: 'app.action-bar.install.failure.download-failed',
+		defaultMessage: 'Download failed',
 	},
-	extracting: {
-		id: 'app.install.failure-phase.preparing_java.extracting',
-		defaultMessage: 'extracting Java {version}',
+	modrinthUnreachable: {
+		id: 'app.action-bar.install.failure.modrinth-unreachable',
+		defaultMessage: 'Modrinth unreachable',
 	},
-	validating: {
-		id: 'app.install.failure-phase.preparing_java.validating',
-		defaultMessage: 'validating Java {version}',
+	packDownloadFailed: {
+		id: 'app.action-bar.install.failure.pack-download-failed',
+		defaultMessage: 'Pack download failed',
+	},
+	badModpackFile: {
+		id: 'app.action-bar.install.failure.bad-modpack-file',
+		defaultMessage: 'Bad modpack file',
+	},
+	invalidModpack: {
+		id: 'app.action-bar.install.failure.invalid-modpack',
+		defaultMessage: 'Invalid modpack',
+	},
+	contentDownloadFailed: {
+		id: 'app.action-bar.install.failure.content-download-failed',
+		defaultMessage: 'Content download failed',
+	},
+	corruptDownload: {
+		id: 'app.action-bar.install.failure.corrupt-download',
+		defaultMessage: 'Corrupt download',
+	},
+	invalidModpackFiles: {
+		id: 'app.action-bar.install.failure.invalid-modpack-files',
+		defaultMessage: 'Invalid modpack files',
+	},
+	noWritePermission: {
+		id: 'app.action-bar.install.failure.no-write-permission',
+		defaultMessage: 'No write permission',
+	},
+	couldNotSaveFiles: {
+		id: 'app.action-bar.install.failure.could-not-save-files',
+		defaultMessage: 'Could not save files',
+	},
+	invalidFilePath: {
+		id: 'app.action-bar.install.failure.invalid-file-path',
+		defaultMessage: 'Invalid file path',
+	},
+	instanceNotFound: {
+		id: 'app.action-bar.install.failure.instance-not-found',
+		defaultMessage: 'Instance not found',
+	},
+	cleanupIncomplete: {
+		id: 'app.action-bar.install.failure.cleanup-incomplete',
+		defaultMessage: 'Cleanup incomplete',
+	},
+	javaSetupFailed: {
+		id: 'app.action-bar.install.failure.java-setup-failed',
+		defaultMessage: 'Java setup failed',
+	},
+	minecraftSetupFailed: {
+		id: 'app.action-bar.install.failure.minecraft-setup-failed',
+		defaultMessage: 'Minecraft setup failed',
+	},
+	loaderSetupFailed: {
+		id: 'app.action-bar.install.failure.loader-setup-failed',
+		defaultMessage: 'Loader setup failed',
+	},
+	localDataError: {
+		id: 'app.action-bar.install.failure.local-data-error',
+		defaultMessage: 'Local data error',
+	},
+	unexpectedError: {
+		id: 'app.action-bar.install.failure.unexpected-error',
+		defaultMessage: 'Unexpected error',
 	},
 })
 
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
+const copyDetailsStallMs = 5_000
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	if (!icon) return null
@@ -240,6 +234,14 @@ export async function useInstallJobNotifications(opts: {
 	let refreshRequest = 0
 	let metadataRequest = 0
 	let nextJobOrder = 0
+	const progressSnapshots = new Map<string, { signature: string; changedAt: number }>()
+	const staleProgressTick = ref(Date.now())
+	const staleProgressInterval = window.setInterval(() => {
+		if (jobs.value.some((job) => isActiveProgressJob(job))) {
+			staleProgressTick.value = Date.now()
+			opts.onChange()
+		}
+	}, 1_000)
 
 	function getTitle(job: InstallJobSnapshot): string {
 		if (job.display?.title) return job.display.title
@@ -252,37 +254,9 @@ export async function useInstallJobNotifications(opts: {
 		)
 	}
 
-	function getFailurePhase(job: InstallJobSnapshot): InstallPhaseId | undefined {
-		if (job.error?.phase) {
-			return job.error.phase
-		}
-		if (job.phase !== 'rolling_back') {
-			return job.phase
-		}
-		return undefined
-	}
-
-	function getFailurePhaseText(job: InstallJobSnapshot, phase: InstallPhaseId): string {
-		if (phase === 'preparing_java' && job.details.type === 'java') {
-			return formatMessage(failureJavaStepMessages[job.details.step], {
-				version: job.details.major_version,
-			})
-		}
-		return formatMessage(failurePhaseMessages[phase])
-	}
-
 	function getText(job: InstallJobSnapshot): string {
 		if (job.status === 'failed' || job.status === 'interrupted') {
-			const phase = getFailurePhase(job)
-			if (phase) {
-				return formatMessage(
-					job.status === 'interrupted'
-						? messages.installInterruptedWhile
-						: messages.installFailedWhile,
-					{ phase: getFailurePhaseText(job, phase) },
-				)
-			}
-			return formatMessage(messages.installFailed)
+			return getFailureSummary(job)
 		}
 		if (job.phase === 'preparing_java' && job.details.type === 'java') {
 			return formatMessage(javaStepMessages[job.details.step], {
@@ -290,6 +264,104 @@ export async function useInstallJobNotifications(opts: {
 			})
 		}
 		return formatMessage(phaseMessages[job.phase])
+	}
+
+	function getFailureSummary(job: InstallJobSnapshot): string {
+		const code = job.error?.code
+		const phase = job.error?.phase ?? job.phase
+
+		if (code === 'app_closed' || (job.status === 'interrupted' && code === 'interrupted')) {
+			return formatMessage(failureSummaryMessages.appClosed)
+		}
+		if (code === 'canceled') {
+			return formatMessage(failureSummaryMessages.canceled)
+		}
+		if (job.rollback_error || code === 'rollback_error') {
+			return formatMessage(failureSummaryMessages.cleanupIncomplete)
+		}
+		if (hasPermissionError(job)) {
+			return formatMessage(failureSummaryMessages.noWritePermission)
+		}
+
+		switch (code) {
+			case 'network_error':
+				return formatMessage(
+					phase === 'downloading_pack_file'
+						? failureSummaryMessages.packDownloadFailed
+						: failureSummaryMessages.downloadFailed,
+				)
+			case 'api_error':
+				return formatMessage(failureSummaryMessages.modrinthUnreachable)
+			case 'pack_error':
+				return formatMessage(
+					phase === 'downloading_pack_file'
+						? failureSummaryMessages.packDownloadFailed
+						: failureSummaryMessages.invalidModpack,
+				)
+			case 'archive_error':
+				return formatMessage(failureSummaryMessages.badModpackFile)
+			case 'parse_error':
+				return formatMessage(failureSummaryMessages.invalidModpack)
+			case 'content_error':
+				return formatMessage(failureSummaryMessages.invalidModpackFiles)
+			case 'hash_error':
+				return formatMessage(failureSummaryMessages.corruptDownload)
+			case 'filesystem_error':
+				return formatMessage(failureSummaryMessages.couldNotSaveFiles)
+			case 'path_error':
+				return formatMessage(failureSummaryMessages.invalidFilePath)
+			case 'instance_error':
+				return formatMessage(failureSummaryMessages.instanceNotFound)
+			case 'java_error':
+				return formatMessage(failureSummaryMessages.javaSetupFailed)
+			case 'loader_error':
+			case 'processor_error':
+				return formatMessage(failureSummaryMessages.loaderSetupFailed)
+			case 'database_error':
+				return formatMessage(failureSummaryMessages.localDataError)
+			case 'launcher_error':
+			case 'metadata_error':
+				return getFailureSummaryForPhase(phase)
+			default:
+				return getFailureSummaryForPhase(phase)
+		}
+	}
+
+	function getFailureSummaryForPhase(phase: InstallPhaseId): string {
+		switch (phase) {
+			case 'downloading_pack_file':
+				return formatMessage(failureSummaryMessages.packDownloadFailed)
+			case 'resolving_pack':
+			case 'reading_pack_manifest':
+				return formatMessage(failureSummaryMessages.invalidModpack)
+			case 'downloading_content':
+				return formatMessage(failureSummaryMessages.contentDownloadFailed)
+			case 'extracting_overrides':
+				return formatMessage(failureSummaryMessages.couldNotSaveFiles)
+			case 'resolving_minecraft':
+			case 'downloading_minecraft':
+				return formatMessage(failureSummaryMessages.minecraftSetupFailed)
+			case 'resolving_loader':
+			case 'running_loader_processors':
+				return formatMessage(failureSummaryMessages.loaderSetupFailed)
+			case 'preparing_java':
+				return formatMessage(failureSummaryMessages.javaSetupFailed)
+			case 'preparing_instance':
+				return formatMessage(failureSummaryMessages.instanceNotFound)
+			case 'rolling_back':
+				return formatMessage(failureSummaryMessages.cleanupIncomplete)
+			default:
+				return formatMessage(failureSummaryMessages.unexpectedError)
+		}
+	}
+
+	function hasPermissionError(job: InstallJobSnapshot): boolean {
+		const message = job.error?.message.toLowerCase() ?? ''
+		return (
+			message.includes('permission denied') ||
+			message.includes('access is denied') ||
+			message.includes('operation not permitted')
+		)
 	}
 
 	function getProgressType(job: InstallJobSnapshot): PopupNotificationProgressType | undefined {
@@ -337,6 +409,56 @@ export async function useInstallJobNotifications(opts: {
 		return job.status === 'failed' || job.status === 'interrupted'
 	}
 
+	function isActiveProgressJob(job: InstallJobSnapshot): boolean {
+		return (
+			(job.status === 'queued' || job.status === 'running') &&
+			job.phase !== 'finalizing' &&
+			job.phase !== 'rolling_back'
+		)
+	}
+
+	function progressSignature(job: InstallJobSnapshot): string {
+		const progress = job.progress
+		const secondary = progress?.secondary
+		return [
+			job.status,
+			job.phase,
+			JSON.stringify(job.details),
+			progress?.current ?? '',
+			progress?.total ?? '',
+			secondary?.current ?? '',
+			secondary?.total ?? '',
+		].join(':')
+	}
+
+	function syncProgressSnapshots(nextJobs: InstallJobSnapshot[]) {
+		const activeIds = new Set(nextJobs.map((job) => job.job_id))
+		const now = Date.now()
+
+		for (const job of nextJobs) {
+			const signature = progressSignature(job)
+			const snapshot = progressSnapshots.get(job.job_id)
+			if (!snapshot || snapshot.signature !== signature) {
+				progressSnapshots.set(job.job_id, { signature, changedAt: now })
+			}
+		}
+
+		for (const jobId of progressSnapshots.keys()) {
+			if (!activeIds.has(jobId)) {
+				progressSnapshots.delete(jobId)
+			}
+		}
+	}
+
+	function hasStalledProgress(job: InstallJobSnapshot): boolean {
+		const snapshot = progressSnapshots.get(job.job_id)
+		return !!snapshot && staleProgressTick.value - snapshot.changedAt >= copyDetailsStallMs
+	}
+
+	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
+		return isTerminalJob(job) || (isActiveProgressJob(job) && hasStalledProgress(job))
+	}
+
 	async function copyJobDetails(job: InstallJobSnapshot) {
 		const details = await install_job_support_details(job.job_id).catch((error) => {
 			opts.handleError(error)
@@ -348,11 +470,11 @@ export async function useInstallJobNotifications(opts: {
 		await navigator.clipboard.writeText(details).catch(opts.handleError)
 	}
 
-	function getTerminalButtons(job: InstallJobSnapshot): PopupNotificationButton[] | undefined {
-		if (!isTerminalJob(job)) return undefined
+	function getButtons(job: InstallJobSnapshot): PopupNotificationButton[] {
+		const buttons: PopupNotificationButton[] = []
 
-		return [
-			{
+		if (isTerminalJob(job)) {
+			buttons.push({
 				label: formatMessage(messages.retry),
 				icon: UpdatedIcon,
 				color: 'brand',
@@ -361,8 +483,11 @@ export async function useInstallJobNotifications(opts: {
 					await install_job_retry(job.job_id).catch(opts.handleError)
 					await refresh()
 				},
-			},
-			{
+			})
+		}
+
+		if (shouldShowCopyDetails(job)) {
+			buttons.push({
 				label: formatMessage(messages.copyDetails),
 				icon: CopyIcon,
 				color: 'standard',
@@ -370,8 +495,10 @@ export async function useInstallJobNotifications(opts: {
 				action: async () => {
 					await copyJobDetails(job)
 				},
-			},
-		]
+			})
+		}
+
+		return buttons
 	}
 
 	function setJobs(nextJobs: InstallJobSnapshot[]) {
@@ -381,13 +508,14 @@ export async function useInstallJobNotifications(opts: {
 			}
 		}
 
-		jobs.value = nextJobs
-			.filter((job) => visibleJobStatuses.has(job.status))
-			.sort(
-				(a, b) =>
-					a.created.localeCompare(b.created) ||
-					(jobOrder.get(a.job_id) ?? 0) - (jobOrder.get(b.job_id) ?? 0),
-			)
+		const visibleJobs = nextJobs.filter((job) => visibleJobStatuses.has(job.status))
+		syncProgressSnapshots(visibleJobs)
+
+		jobs.value = visibleJobs.sort(
+			(a, b) =>
+				a.created.localeCompare(b.created) ||
+				(jobOrder.get(a.job_id) ?? 0) - (jobOrder.get(b.job_id) ?? 0),
+		)
 	}
 
 	const progressItems = computed<PopupNotificationProgressItem[]>(() =>
@@ -406,7 +534,7 @@ export async function useInstallJobNotifications(opts: {
 				progressType: isTerminalJob(job) ? undefined : getProgressType(job),
 				progressCurrent: isTerminalJob(job) ? undefined : progress?.current,
 				progressTotal: isTerminalJob(job) ? undefined : progress?.total,
-				buttons: getTerminalButtons(job),
+				buttons: getButtons(job),
 				onDismiss: isTerminalJob(job)
 					? async () => {
 							await install_job_dismiss(job.job_id).catch(opts.handleError)
@@ -504,6 +632,9 @@ export async function useInstallJobNotifications(opts: {
 		progressItems,
 		buttons,
 		refresh,
-		dispose: () => unlisten(),
+		dispose: () => {
+			window.clearInterval(staleProgressInterval)
+			unlisten()
+		},
 	}
 }

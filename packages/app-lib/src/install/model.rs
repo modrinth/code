@@ -19,6 +19,8 @@ pub struct InstallJobState {
     pub progress: InstallProgressState,
     pub paths: InstallJobPaths,
     #[serde(default)]
+    pub events: Vec<InstallJobEvent>,
+    #[serde(default)]
     pub display: Option<InstallJobDisplay>,
     pub rollback: Option<InstallRollbackState>,
     pub error: Option<InstallErrorView>,
@@ -30,6 +32,7 @@ impl InstallJobState {
     pub fn new(request: InstallRequest) -> Self {
         let target = request.target();
         let cleanup = request.cleanup();
+        let kind = request.kind();
         let phase = InstallPhaseId::PreparingInstance;
 
         Self {
@@ -43,12 +46,104 @@ impl InstallJobState {
                 details: InstallPhaseDetails::Empty,
             },
             paths: InstallJobPaths::default(),
+            events: vec![InstallJobEvent {
+                at: Utc::now(),
+                kind: InstallJobEventKind::JobQueued { kind },
+            }],
             display: None,
             rollback: None,
             error: None,
             rollback_error: None,
         }
     }
+
+    pub fn record_event(&mut self, kind: InstallJobEventKind) {
+        self.events.push(InstallJobEvent {
+            at: Utc::now(),
+            kind,
+        });
+    }
+
+    pub fn set_progress(
+        &mut self,
+        phase: InstallPhaseId,
+        progress: Option<InstallProgress>,
+        details: InstallPhaseDetails,
+    ) {
+        if self.progress.phase != phase
+            || matches!(&self.progress.details, InstallPhaseDetails::Empty)
+                && !matches!(&details, InstallPhaseDetails::Empty)
+        {
+            self.record_event(InstallJobEventKind::PhaseStarted {
+                phase,
+                details: details.clone(),
+            });
+        }
+
+        self.progress.phase = phase;
+        self.progress.progress = progress;
+        self.progress.details = details;
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InstallJobEvent {
+    pub at: DateTime<Utc>,
+    pub kind: InstallJobEventKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum InstallInterruptReason {
+    AppClosed,
+    Unknown,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum InstallJobEventKind {
+    JobQueued {
+        kind: InstallJobKind,
+    },
+    JobStarted,
+    JobSucceeded {
+        instance_id: Option<String>,
+    },
+    JobCanceled {
+        phase: InstallPhaseId,
+    },
+    PhaseStarted {
+        phase: InstallPhaseId,
+        details: InstallPhaseDetails,
+    },
+    ContentDownloadStarted {
+        files: u64,
+        bytes: Option<u64>,
+    },
+    ContentFileSkipped {
+        path: String,
+        reason: String,
+    },
+    ContentFileCompleted {
+        path: String,
+        bytes: u64,
+    },
+    Interrupted {
+        reason: InstallInterruptReason,
+        phase: InstallPhaseId,
+    },
+    Failed {
+        phase: InstallPhaseId,
+        code: String,
+        message: String,
+    },
+    RollbackStarted {
+        cleanup: InstallCleanup,
+    },
+    RollbackCompleted,
+    RollbackFailed {
+        message: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
