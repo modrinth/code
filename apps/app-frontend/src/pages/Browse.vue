@@ -884,7 +884,7 @@ async function search(requestParams: string) {
 	const rawResults = await queryClient.fetchQuery({
 		queryKey: ['search', 'v3', requestParams],
 		queryFn: () =>
-			get_search_results_v3(requestParams) as Promise<{
+			get_search_results_v3(requestParams, 'must_revalidate') as Promise<{
 				result: Labrinth.Search.v3.SearchResults & {
 					hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
 				}
