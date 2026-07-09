@@ -16,15 +16,24 @@ fn main() {
 }
 
 fn set_env() {
-    for (var_name, var_value) in
-        dotenvy::dotenv_iter().into_iter().flatten().flatten()
-    {
-        if var_name == "DATABASE_URL" {
-            // The sqlx database URL is a build-time detail that should not be exposed to the crate
-            continue;
-        }
+    let manifest_dir = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
+    let env_path = manifest_dir.join(".env");
 
-        println!("cargo::rustc-env={var_name}={var_value}");
+    match dotenvy::from_path_iter(&env_path) {
+        Ok(iter) => {
+            for item in iter {
+                if let Ok((var_name, var_value)) = item {
+                    if var_name == "DATABASE_URL" {
+                        // The sqlx database URL is a build-time detail that should not be exposed to the crate
+                        continue;
+                    }
+                    println!("cargo::rustc-env={var_name}={var_value}");
+                }
+            }
+        }
+        Err(e) => {
+            println!("cargo::warning=Failed to load .env file from {}: {}", env_path.display(), e);
+        }
     }
 }
 
