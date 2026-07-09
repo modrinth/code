@@ -58,6 +58,7 @@ const sharedInstanceUnavailableDismissed = ref(false)
 const showSharedInstancePublishAdmonition = computed(
 	() =>
 		!sharedInstanceWrongAccount.value &&
+		props.instance.install_stage === 'installed' &&
 		props.instance.shared_instance?.role === 'owner' &&
 		props.instance.shared_instance.status === 'stale',
 )

@@ -65,7 +65,7 @@
 						{{ getDiffTypeLabel(diff) }}
 					</span>
 					<div
-						v-if="!isConfigurationDiff(diff)"
+						v-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
 						class="flex min-w-0 items-center justify-between gap-3"
 					>
 						<span
@@ -261,6 +261,9 @@ function handleHide() {
 }
 
 function getDiffTypeLabel(diff: ContentDiffItem) {
+	if (diff.type === 'modpack_updated') {
+		return formatMessage(diffTypeMessages.updated)
+	}
 	if (isConfigurationDiff(diff)) {
 		return formatMessage(configurationDiffMessages[diff.type])
 	}
@@ -274,6 +277,7 @@ function getDiffTypeLabel(diff: ContentDiffItem) {
 }
 
 function getDiffVersionName(diff: ContentDiffItem) {
+	if (diff.type === 'modpack_updated') return diff.newVersionName
 	if (isConfigurationDiff(diff)) {
 		if (diff.currentVersionName && diff.newVersionName) {
 			return `${diff.currentVersionName} → ${diff.newVersionName}`

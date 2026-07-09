@@ -1217,21 +1217,50 @@ async fn shared_instance_configuration_diffs(
     let mut diffs = Vec::new();
 
     if current_modpack_id != new_modpack_id {
-        let type_ = match (current_modpack_id, new_modpack_id) {
-            (None, Some(_)) => SharedInstanceUpdateDiffType::ModpackLinked,
-            (Some(_), None) => {
-                SharedInstanceUpdateDiffType::ModpackUnlinked
-            }
-            (Some(_), Some(_)) => {
-                SharedInstanceUpdateDiffType::ModpackUpdated
+        match (current_modpack_id, new_modpack_id) {
+            (None, Some(_)) => diffs.push(configuration_diff(
+                SharedInstanceUpdateDiffType::ModpackLinked,
+                None,
+                shared_modpack_version_label(new_modpack_id, state).await,
+            )),
+            (Some(_), None) => diffs.push(configuration_diff(
+                SharedInstanceUpdateDiffType::ModpackUnlinked,
+                shared_modpack_version_label(current_modpack_id, state).await,
+                None,
+            )),
+            (Some(current_modpack_id), Some(new_modpack_id)) => {
+                let current = shared_modpack_version_details(
+                    current_modpack_id,
+                    state,
+                )
+                .await;
+                let new = shared_modpack_version_details(
+                    new_modpack_id,
+                    state,
+                )
+                .await;
+                let project_name = new
+                    .as_ref()
+                    .and_then(|details| details.project_name.clone())
+                    .or_else(|| {
+                        current
+                            .as_ref()
+                            .and_then(|details| details.project_name.clone())
+                    });
+
+                diffs.push(SharedInstanceUpdateDiff {
+                    type_: SharedInstanceUpdateDiffType::ModpackUpdated,
+                    project_id: None,
+                    project_name,
+                    file_name: None,
+                    current_version_name: current
+                        .map(|details| details.version_name),
+                    new_version_name: new.map(|details| details.version_name),
+                    disabled: false,
+                });
             }
             (None, None) => unreachable!(),
-        };
-        diffs.push(configuration_diff(
-            type_,
-            shared_modpack_version_label(current_modpack_id, state).await,
-            shared_modpack_version_label(new_modpack_id, state).await,
-        ));
+        }
     }
 
     if current_game_version != new_game_version {
@@ -1283,6 +1312,25 @@ async fn shared_modpack_version_label(
     let Some(version_id) = version_id else {
         return None;
     };
+    let details = shared_modpack_version_details(version_id, state).await?;
+
+    Some(match details.project_name {
+        Some(project_name) => {
+            format!("{project_name} {}", details.version_name)
+        }
+        None => details.version_name,
+    })
+}
+
+struct SharedModpackVersionDetails {
+    project_name: Option<String>,
+    version_name: String,
+}
+
+async fn shared_modpack_version_details(
+    version_id: &str,
+    state: &State,
+) -> Option<SharedModpackVersionDetails> {
     let Some(version) = CachedEntry::get_version(
         version_id,
         Some(CacheBehaviour::Bypass),
@@ -1293,7 +1341,10 @@ async fn shared_modpack_version_label(
     .ok()
     .flatten()
     else {
-        return Some(version_id.to_string());
+        return Some(SharedModpackVersionDetails {
+            project_name: None,
+            version_name: version_id.to_string(),
+        });
     };
     let project = CachedEntry::get_project(
         &version.project_id,
@@ -1304,9 +1355,13 @@ async fn shared_modpack_version_label(
     .await
     .ok()
     .flatten();
-    let title = project.map(|project| project.title).unwrap_or(version.name);
 
-    Some(format!("{title} {}", version.version_number))
+    Some(SharedModpackVersionDetails {
+        project_name: Some(
+            project.map(|project| project.title).unwrap_or(version.name),
+        ),
+        version_name: version.version_number,
+    })
 }
 
 fn normalized_loader_version(loader_version: Option<&str>) -> Option<&str> {
