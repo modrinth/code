@@ -796,8 +796,6 @@ impl SearchBackend for Typesense {
             ("per_page", parsed.hits_per_page.to_string()),
             ("group_by", "project_id".to_string()),
             ("group_limit", "1".to_string()),
-            ("facet_by", "project_id".to_string()),
-            ("max_facet_values", "0".to_string()),
             (
                 "max_candidates",
                 info.typesense_config.max_candidates.to_string(),
@@ -853,16 +851,7 @@ impl SearchBackend for Typesense {
             .cloned()
             .unwrap_or(body);
 
-        let total_hits = body["facet_counts"]
-            .as_array()
-            .and_then(|facets| {
-                facets.iter().find(|facet| {
-                    facet["field_name"].as_str() == Some("project_id")
-                })
-            })
-            .and_then(|facet| facet["stats"]["total_values"].as_u64())
-            .unwrap_or_else(|| body["found"].as_u64().unwrap_or(0))
-            as usize;
+        let total_hits = body["found"].as_u64().unwrap_or(0) as usize;
 
         let hits = body["grouped_hits"]
             .as_array()
