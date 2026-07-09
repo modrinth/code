@@ -202,6 +202,7 @@ pub enum SearchField {
     Author,
     License,
     ProjectTypes,
+    AllProjectTypes,
     ProjectId,
     OpenSource,
     Environment,
@@ -241,7 +242,8 @@ pub struct UploadSearchProject {
     pub project_id: String,
     //
     pub project_types: Vec<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     pub author_id: String,
@@ -321,6 +323,8 @@ pub struct ResultSearchProject {
     pub version_id: String,
     pub project_id: String,
     pub project_types: Vec<String>,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     #[serde(default)]
@@ -369,6 +373,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             version_id: source.version_id,
             project_id: source.project_id,
             project_types: source.project_types,
+            all_project_types: source.all_project_types,
             slug: source.slug,
             author: source.author,
             author_id: Some(source.author_id),

@@ -11,6 +11,50 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-08T22:58:25+00:00`,
+		product: 'web',
+		body: `## Changed
+- Revised design for the project download modal.`,
+	},
+	{
+		date: `2026-07-08T15:05:35+00:00`,
+		product: 'app',
+		version: '0.15.9',
+		body: `## Added
+- Added new advanced filter category to Discover content.
+- Added options to exclude plugins and data packs from mod search
+- Added options to exclude mods and plugins from data pack search
+
+## Fixed
+- Instance edits not appearing to be immediately saved.`,
+	},
+	{
+		date: `2026-07-08T15:05:35+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new advanced filter category to Discover content.
+- Added options to exclude plugins and data packs from mod search
+- Added options to exclude mods and data packs from plugin search
+- Added options to exclude mods and plugins from data pack search`,
+	},
+	{
+		date: `2026-07-06T22:19:13+00:00`,
+		product: 'app',
+		version: '0.15.8',
+		body: `## Changed
+- Updated the version pages to use the new design.
+
+## Fixed
+- Fixed project and version links from an instance not being aware of the instance you're coming from.
+- Fixed Files tab preloading files which weren't actually editable/viewable which caused a memory leak.`,
+	},
+	{
+		date: `2026-07-06T22:19:13+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed Files tab preloading files which weren't actually editable/viewable which caused a memory leak.`,
+	},
+	{
 		date: `2026-07-05T01:48:48+00:00`,
 		product: 'app',
 		version: '0.15.7',

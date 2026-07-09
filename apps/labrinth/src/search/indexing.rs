@@ -553,6 +553,20 @@ async fn build_search_documents(
                 .flat_map(|x| x.loaders.clone())
                 .collect::<Vec<_>>();
 
+            // all valid project types across every version of the project, so that
+            // filters can exclude projects that have *any* version of a given
+            // project type (unlike the version-specific `project_types` field).
+            let mut all_project_types = versions
+                .iter()
+                .flat_map(|x| x.project_types.clone())
+                .collect::<Vec<_>>();
+            all_project_types.sort();
+            all_project_types.dedup();
+            exp::compat::correct_project_types(
+                &project.components,
+                &mut all_project_types,
+            );
+
             for version in versions {
                 if let Some(version_ids_to_index) = version_ids_to_index
                     && !version_ids_to_index.contains(&version.id)
@@ -673,6 +687,7 @@ async fn build_search_documents(
                     slug: project.slug.clone(),
                     // TODO
                     project_types,
+                    all_project_types: all_project_types.clone(),
                     gallery: gallery.clone(),
                     featured_gallery: featured_gallery.clone(),
                     open_source,

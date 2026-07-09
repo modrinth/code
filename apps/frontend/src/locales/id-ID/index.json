@@ -2429,9 +2429,6 @@
   "project.download.no-app": {
     "message": "Tidak memiliki Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Tidak ada versi tersedia untuk {gameVersion} dan {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak mendukung {platform} untuk {gameVersion}"
   },

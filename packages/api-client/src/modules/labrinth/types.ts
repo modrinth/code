@@ -1742,6 +1742,7 @@ export namespace Labrinth {
 			export interface ResultSearchProject {
 				project_id: string
 				project_type: string
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1779,6 +1780,7 @@ export namespace Labrinth {
 				version_id: string
 				project_id: string
 				project_types: string[]
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1914,6 +1916,57 @@ export namespace Labrinth {
 
 	export namespace Moderation {
 		export namespace Internal {
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url: string | null
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url: string | null
+				  }
+
+			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+
+			export type ProjectsRequest = {
+				count?: number
+				offset?: number
+				has_external_dependencies?: boolean
+				exclude_technical_review?: boolean
+				query?: string
+				project_type?: string
+				sort?: ProjectsSort
+			}
+
+			export type QueueProject = {
+				id: string
+				slug: string | null
+				name: string
+				summary: string
+				icon_url: string | null
+				status: Projects.v2.ProjectStatus
+				requested_status: Projects.v2.ProjectStatus | null
+				queued: string | null
+				published: string
+				updated: string
+				project_types: string[]
+				ownership: Ownership
+				external_dependencies_count: number
+			}
+
+			export type ProjectsResponse = {
+				total: number
+				projects: QueueProject[]
+			}
+
+			export type ProjectIdsResponse = {
+				ids: string[]
+			}
+
 			export type LockedByUser = {
 				id: string
 				username: string
@@ -2171,7 +2224,64 @@ export namespace Labrinth {
 				| 'severity_desc'
 
 			export type UpdateIssueRequest = {
+				detail_id: string
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateIssueDetailRequest = {
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateGlobalIssueRequest = {
+				detail_key: string
 				verdict: 'safe' | 'unsafe'
+			}
+
+			export type SearchGlobalIssueDetailsRequest = {
+				limit?: number
+				page?: number
+				query?: string | null
+			}
+
+			export type SearchGlobalIssueDetailsResponse = {
+				total: number
+				traces: GlobalIssueDetail[]
+			}
+
+			export type GetGlobalIssueDetailRequest = {
+				detail_key: string
+				limit?: number
+				after_detail_id?: string | null
+			}
+
+			export type GetGlobalIssueDetailResponse = {
+				trace: GlobalIssueDetail
+				next_after_detail_id: string | null
+			}
+
+			export type GlobalIssueDetail = {
+				detail_key: string
+				verdict: DelphiReportIssueStatus
+				local_trace_count: number
+				local_traces: GlobalIssueDetailTrace[]
+			}
+
+			export type GlobalIssueDetailTrace = {
+				detail_id: string
+				issue_id: string
+				issue_type: string
+				project_id: string
+				project_slug: string | null
+				project_name: string
+				version_id: string
+				version_number: string
+				file_id: string
+				file_name: string
+				jar: string | null
+				file_path: string
+				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus
+				effective_status: DelphiReportIssueStatus
 			}
 
 			export type SubmitProjectRequest = {
