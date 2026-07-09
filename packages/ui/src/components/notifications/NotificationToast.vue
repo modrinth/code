@@ -146,7 +146,7 @@
 						:key="index"
 						:color="action.color || (index === 0 ? 'brand' : undefined)"
 					>
-						<button @click="$emit('action', index)">
+						<button class="!shadow-none" @click="$emit('action', index)">
 							<component :is="action.icon" v-if="action.icon" />
 							{{ action.label }}
 						</button>

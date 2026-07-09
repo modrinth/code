@@ -1,7 +1,7 @@
 use crate::State;
 use crate::data::ModLoader;
 use crate::install::{
-    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallErrorContext, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
 };
 use crate::state::{
@@ -343,7 +343,13 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         };
     let progress = Some(&mut progress as &mut FetchProgressFn<'_>);
 
-    let file = fetch_advanced_with_progress(
+    let context = InstallErrorContext::new("download modpack file")
+        .url(url.clone())
+        .expected_hash_opt(hash.cloned())
+        .project_id_opt(Some(project_id.clone()))
+        .version_id_opt(Some(version_id.clone()));
+    reporter.set_context(context.clone()).await?;
+    let file = match fetch_advanced_with_progress(
         Method::GET,
         &url,
         hash.map(|x| &**x),
@@ -356,7 +362,23 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         &state.pool,
         progress,
     )
-    .await?;
+    .await
+    {
+        Ok(file) => file,
+        Err(error) => {
+            reporter.set_context(context).await?;
+            if let Err(persist_error) = reporter.persist().await {
+                tracing::warn!(
+                    "Failed to persist install context for failed modpack download: {persist_error}"
+                );
+            }
+            return Err(error);
+        }
+    };
+
+    reporter
+        .update(InstallPhaseId::ResolvingPack, None, details.clone())
+        .await?;
 
     let project = CachedEntry::get_project(
         &version.project_id,
@@ -377,6 +399,14 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     let icon = if has_icon_url {
         if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
+            reporter
+                .set_context(
+                    InstallErrorContext::new("download modpack icon")
+                        .url(icon_url.clone())
+                        .project_id_opt(Some(project_id.clone()))
+                        .version_id_opt(Some(version_id.clone())),
+                )
+                .await?;
             let icon_bytes = fetch(
                 &icon_url,
                 None,

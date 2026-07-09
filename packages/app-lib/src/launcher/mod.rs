@@ -348,6 +348,7 @@ pub async fn install_minecraft_with_reporter(
         loader_version.as_ref(),
         Some(repairing),
         loading_bar.as_ref(),
+        reporter.as_ref(),
     )
     .await?;
 
@@ -748,6 +749,7 @@ pub async fn launch_minecraft(
         loader_version.as_ref(),
         None,
         None,
+        None,
     )
     .await?;
     if version_info.logging.is_none() {
@@ -763,6 +765,7 @@ pub async fn launch_minecraft(
                 version,
                 loader_version.as_ref(),
                 Some(true),
+                None,
                 None,
             )
             .await?;

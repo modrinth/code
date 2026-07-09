@@ -1,8 +1,8 @@
 //! Authentication flow interface
 use crate::event::emit::{emit_loading, init_loading};
 use crate::install::{
-    InstallJavaStep, InstallPhaseDetails, InstallPhaseId, InstallProgress,
-    InstallProgressReporter,
+    InstallErrorContext, InstallJavaStep, InstallPhaseDetails, InstallPhaseId,
+    InstallProgress, InstallProgressReporter,
 };
 use crate::state::JavaVersion;
 use crate::util::fetch::{
@@ -148,23 +148,46 @@ async fn auto_install_java_inner(
         Some(java_step_progress(1)),
     )
     .await?;
+    let metadata_url = format!(
+        "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
+        std::env::consts::ARCH,
+        java_version,
+        std::env::consts::OS
+    );
+    if let Some(reporter) = &reporter {
+        reporter
+            .set_context(
+                InstallErrorContext::new("fetch Java package metadata")
+                    .url(metadata_url.clone())
+                    .java_runtime(java_version),
+            )
+            .await?;
+    }
     let packages = fetch_json::<Vec<Package>>(
-                Method::GET,
-                &format!(
-                    "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
-                    std::env::consts::ARCH, java_version, std::env::consts::OS
-                ),
-                None,
-                None,
-                None,
-                &state.fetch_semaphore,
-                &state.pool,
-            ).await?;
+        Method::GET,
+        &metadata_url,
+        None,
+        None,
+        None,
+        &state.fetch_semaphore,
+        &state.pool,
+    )
+    .await?;
     if let Some(loading_bar) = &loading_bar {
         emit_loading(loading_bar, 10.0, Some("Downloading java version"))?;
     }
 
     if let Some(download) = packages.first() {
+        if let Some(reporter) = &reporter {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("download Java archive")
+                        .url(download.download_url.clone())
+                        .file_path(download.name.display().to_string())
+                        .java_runtime(java_version),
+                )
+                .await?;
+        }
         update_java_install_progress(
             reporter.as_ref(),
             java_version,
@@ -237,6 +260,17 @@ async fn auto_install_java_inner(
 
         let path = state.directories.java_versions_dir();
 
+        if let Some(reporter) = &reporter {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("read Java archive")
+                        .url(download.download_url.clone())
+                        .file_path(download.name.display().to_string())
+                        .target_path(path.display().to_string())
+                        .java_runtime(java_version),
+                )
+                .await?;
+        }
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
             .map_err(|_| {
                 crate::Error::from(crate::ErrorKind::InputError(
@@ -265,6 +299,17 @@ async fn auto_install_java_inner(
             Some(java_step_progress(3)),
         )
         .await?;
+        if let Some(reporter) = &reporter {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("extract Java archive")
+                        .url(download.download_url.clone())
+                        .file_path(download.name.display().to_string())
+                        .target_path(path.display().to_string())
+                        .java_runtime(java_version),
+                )
+                .await?;
+        }
         archive.extract(&path).map_err(|_| {
             crate::Error::from(crate::ErrorKind::InputError(
                 "Failed to extract java zip".to_string(),

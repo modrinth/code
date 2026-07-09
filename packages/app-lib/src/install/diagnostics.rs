@@ -41,6 +41,7 @@ pub async fn build_job_support_details(
         );
     }
 
+    write_environment_details(&mut details);
     write_timeline(&mut details, &job.state.events);
     write_content_summary(&mut details, &job.state.events);
     write_errors(&mut details, &snapshot);
@@ -90,6 +91,25 @@ fn result_summary(
                 }
             })
             .unwrap_or_else(|| "interrupted".to_string()),
+    }
+}
+
+fn write_environment_details(details: &mut String) {
+    let _ = writeln!(details);
+    let _ = writeln!(details, "Environment");
+    let _ = writeln!(details, "App version: {}", env!("CARGO_PKG_VERSION"));
+    let _ = writeln!(
+        details,
+        "OS: {}",
+        sysinfo::System::long_os_version()
+            .or_else(sysinfo::System::name)
+            .unwrap_or_else(|| std::env::consts::OS.to_string())
+    );
+    let _ = writeln!(details, "OS kind: {}", std::env::consts::OS);
+    let _ = writeln!(details, "OS family: {}", std::env::consts::FAMILY);
+    let _ = writeln!(details, "Architecture: {}", std::env::consts::ARCH);
+    if let Some(kernel_version) = sysinfo::System::kernel_version() {
+        let _ = writeln!(details, "Kernel: {kernel_version}");
     }
 }
 
@@ -270,6 +290,8 @@ fn write_errors(details: &mut String, snapshot: &InstallJobSnapshot) {
             let _ = writeln!(details, "Phase: {}", phase_label(phase));
         }
         let _ = writeln!(details, "Message: {}", error.message);
+        write_api_error_details(details, error);
+        write_error_context(details, error);
     }
 
     if let Some(error) = &snapshot.rollback_error {
@@ -280,6 +302,87 @@ fn write_errors(details: &mut String, snapshot: &InstallJobSnapshot) {
             let _ = writeln!(details, "Phase: {}", phase_label(phase));
         }
         let _ = writeln!(details, "Message: {}", error.message);
+        write_api_error_details(details, error);
+        write_error_context(details, error);
+    }
+}
+
+fn write_api_error_details(
+    details: &mut String,
+    error: &super::model::InstallErrorView,
+) {
+    let Some(api) = &error.api else {
+        return;
+    };
+
+    let _ = writeln!(details, "API error: {}", api.error);
+    if let Some(status) = api.status {
+        let _ = writeln!(details, "HTTP status: {status}");
+    }
+    if api.method.is_some() || api.url.is_some() {
+        let method = api.method.as_deref().unwrap_or("unknown method");
+        let url = api.url.as_deref().unwrap_or("unknown URL");
+        let _ = writeln!(details, "Request: {method} {url}");
+    }
+    if let Some(route) = &api.route {
+        let _ = writeln!(details, "Route: {route}");
+    }
+}
+
+fn write_error_context(
+    details: &mut String,
+    error: &super::model::InstallErrorView,
+) {
+    let Some(context) = &error.context else {
+        return;
+    };
+
+    let _ = writeln!(details, "Operation: {}", context.operation);
+    if let Some(source_path) = &context.source_path {
+        let _ = writeln!(details, "Source path: {source_path}");
+    }
+    if let Some(target_path) = &context.target_path {
+        let _ = writeln!(details, "Target path: {target_path}");
+    }
+    if let Some(file_path) = &context.file_path {
+        let _ = writeln!(details, "File path: {file_path}");
+    }
+    if let Some(entry_path) = &context.entry_path {
+        let _ = writeln!(details, "Archive entry: {entry_path}");
+    }
+    if !context.urls.is_empty() {
+        let _ = writeln!(details, "URLs:");
+        for url in &context.urls {
+            let _ = writeln!(details, "- {url}");
+        }
+    }
+    if let Some(expected_hash) = &context.expected_hash {
+        let _ = writeln!(details, "Expected hash: {expected_hash}");
+    }
+    if let Some(expected_size) = context.expected_size {
+        let _ =
+            writeln!(details, "Expected size: {}", format_bytes(expected_size));
+    }
+    if let Some(project_id) = &context.project_id {
+        let _ = writeln!(details, "Project ID: {project_id}");
+    }
+    if let Some(version_id) = &context.version_id {
+        let _ = writeln!(details, "Version ID: {version_id}");
+    }
+    if let Some(minecraft_version) = &context.minecraft_version {
+        let _ = writeln!(details, "Minecraft version: {minecraft_version}");
+    }
+    if let Some(loader) = &context.loader {
+        let _ = writeln!(details, "Loader: {loader}");
+    }
+    if let Some(java_version) = context.java_version {
+        let _ = writeln!(details, "Java version: {java_version}");
+    }
+    if let Some(os) = &context.os {
+        let _ = writeln!(details, "OS: {os}");
+    }
+    if let Some(arch) = &context.arch {
+        let _ = writeln!(details, "Architecture: {arch}");
     }
 }
 

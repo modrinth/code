@@ -43,6 +43,7 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
                 "rollback_error",
                 InstallPhaseId::RollingBack,
                 &error,
+                None,
             ));
             job.state.record_event(InstallJobEventKind::RollbackFailed {
                 message: error.to_string(),

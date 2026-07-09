@@ -89,6 +89,30 @@ export interface InstallErrorView {
 	code: string
 	phase?: InstallPhaseId | null
 	message: string
+	api?: {
+		error: string
+		status?: number | null
+		method?: string | null
+		url?: string | null
+		route?: string | null
+	} | null
+	context?: {
+		operation: string
+		source_path?: string | null
+		target_path?: string | null
+		file_path?: string | null
+		entry_path?: string | null
+		urls?: string[]
+		expected_hash?: string | null
+		expected_size?: number | null
+		project_id?: string | null
+		version_id?: string | null
+		minecraft_version?: string | null
+		loader?: string | null
+		java_version?: number | null
+		os?: string | null
+		arch?: string | null
+	} | null
 }
 
 export interface InstallJobSnapshot {

@@ -1,9 +1,9 @@
 use super::events::{InstallProgressReporter, emit_install_job};
 use super::model::{
-    InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobEventKind,
-    InstallJobSnapshot, InstallJobState, InstallJobStatus, InstallPhaseDetails,
-    InstallPhaseId, InstallPostInstallEdit, InstallRequest,
-    InstallRollbackState, InstallTarget,
+    InstallCleanup, InstallErrorContext, InstallErrorView, InstallJobDisplay,
+    InstallJobEventKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
+    InstallPhaseDetails, InstallPhaseId, InstallPostInstallEdit,
+    InstallRequest, InstallRollbackState, InstallTarget,
 };
 use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
@@ -134,6 +134,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.rollback = None;
     job.state.error = None;
     job.state.rollback_error = None;
+    job.state.context = None;
     job.state.progress.phase = InstallPhaseId::PreparingInstance;
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
@@ -188,6 +189,7 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
                 "rollback_error",
                 InstallPhaseId::RollingBack,
                 &error,
+                None,
             ));
             job.state.record_event(InstallJobEventKind::RollbackFailed {
                 message: error.to_string(),
@@ -361,7 +363,14 @@ fn spawn_job(job_id: Uuid) {
 
 async fn run_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-    let job = store::get_required(job_id, &state).await?;
+    let mut job = store::get_required(job_id, &state).await?;
+
+    if job.status != InstallJobStatus::Queued {
+        return Ok(());
+    }
+
+    let _install_permit = state.install_job_semaphore.acquire().await?;
+    job = store::get_required(job_id, &state).await?;
 
     if job.status != InstallJobStatus::Queued {
         return Ok(());
@@ -396,6 +405,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             job_state.progress.details = InstallPhaseDetails::Empty;
             job_state.error = None;
             job_state.rollback_error = None;
+            job_state.context = None;
             let record = store::update_status(
                 job_id,
                 InstallJobStatus::Succeeded,
@@ -407,7 +417,11 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
         }
         Err(error) => {
             let failed_phase = job_state.progress.phase;
-            let error_view = install_error_view(failed_phase, &error);
+            let error_view = install_error_view(
+                failed_phase,
+                &error,
+                job_state.context.clone(),
+            );
             job_state.record_event(InstallJobEventKind::Failed {
                 phase: failed_phase,
                 code: error_view.code.clone(),
@@ -429,6 +443,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
                 job_state.rollback_error = Some(install_error_view(
                     InstallPhaseId::RollingBack,
                     &rollback_error,
+                    None,
                 ));
                 job_state.record_event(InstallJobEventKind::RollbackFailed {
                     message: rollback_error.to_string(),
@@ -878,6 +893,13 @@ async fn install_pack(
             title,
             icon_url,
         } => {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("download modpack file")
+                        .project_id_opt(Some(project_id.clone()))
+                        .version_id_opt(Some(version_id.clone())),
+                )
+                .await?;
             generate_pack_from_version_id_with_reporter(
                 project_id,
                 version_id,
@@ -890,6 +912,12 @@ async fn install_pack(
             .await?
         }
         CreatePackLocation::FromFile { path } => {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("read local modpack file")
+                        .source_path(path.display().to_string()),
+                )
+                .await?;
             generate_pack_from_file(path, instance_id.clone()).await?
         }
     };
@@ -1001,8 +1029,14 @@ fn set_display(
 fn install_error_view(
     phase: InstallPhaseId,
     error: &crate::Error,
+    context: Option<InstallErrorContext>,
 ) -> InstallErrorView {
-    InstallErrorView::from_error(install_error_code(phase, error), phase, error)
+    InstallErrorView::from_error(
+        install_error_code(phase, error),
+        phase,
+        error,
+        context,
+    )
 }
 
 fn install_error_code(

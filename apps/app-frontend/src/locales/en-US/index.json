@@ -285,7 +285,7 @@
     "message": "Finalizing"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Preparing instance"
+    "message": "Queued to install"
   },
   "app.install.phase.preparing_java": {
     "message": "Preparing Java"

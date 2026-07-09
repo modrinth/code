@@ -7,10 +7,11 @@ pub mod store;
 
 pub use events::InstallProgressReporter;
 pub use model::{
-    InstallErrorView, InstallJavaStep, InstallJobEventKind, InstallJobKind,
-    InstallJobSnapshot, InstallJobStatus, InstallModpackPreview,
-    InstallPhaseDetails, InstallPhaseId, InstallPostInstallEdit,
-    InstallProgress, InstallProgressSecondary, InstallRequest,
+    InstallErrorContext, InstallErrorView, InstallJavaStep,
+    InstallJobEventKind, InstallJobKind, InstallJobSnapshot, InstallJobStatus,
+    InstallModpackPreview, InstallPhaseDetails, InstallPhaseId,
+    InstallPostInstallEdit, InstallProgress, InstallProgressSecondary,
+    InstallRequest,
 };
 pub use runner::{
     cancel_job, create_instance, create_modpack_instance, dismiss_job,

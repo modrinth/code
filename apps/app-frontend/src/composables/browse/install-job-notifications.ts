@@ -1,4 +1,4 @@
-import { CopyIcon, UpdatedIcon } from '@modrinth/assets'
+import { CheckIcon, CopyIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	defineMessages,
 	type PopupNotificationButton,
@@ -18,8 +18,8 @@ import {
 	install_job_support_details,
 	installJobInstanceId,
 	type InstallJobSnapshot,
-	type InstallPhaseId,
 	type InstallJobStatus,
+	type InstallPhaseId,
 	type InstallProgress,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
@@ -36,6 +36,10 @@ const messages = defineMessages({
 	copyDetails: {
 		id: 'app.action-bar.install.copy-details',
 		defaultMessage: 'Copy details',
+	},
+	copied: {
+		id: 'app.action-bar.install.copied-details',
+		defaultMessage: 'Copied',
 	},
 	dismiss: {
 		id: 'app.action-bar.install.dismiss',
@@ -54,7 +58,7 @@ const messages = defineMessages({
 const phaseMessages = defineMessages({
 	preparing_instance: {
 		id: 'app.install.phase.preparing_instance',
-		defaultMessage: 'Preparing instance',
+		defaultMessage: 'Queued to install',
 	},
 	resolving_pack: {
 		id: 'app.install.phase.resolving_pack',
@@ -131,89 +135,89 @@ const javaStepMessages = defineMessages({
 
 const failureSummaryMessages = defineMessages({
 	canceled: {
-		id: 'app.action-bar.install.failure.canceled',
+		id: 'app.action-bar.install.summary.canceled',
 		defaultMessage: 'Canceled',
 	},
 	appClosed: {
-		id: 'app.action-bar.install.failure.app-closed',
-		defaultMessage: 'Canceled: app closed',
+		id: 'app.action-bar.install.summary.app-closing',
+		defaultMessage: 'Canceled due to app closing',
 	},
 	downloadFailed: {
-		id: 'app.action-bar.install.failure.download-failed',
-		defaultMessage: 'Download failed',
+		id: 'app.action-bar.install.summary.download-failed',
+		defaultMessage: "Download couldn't finish",
 	},
 	modrinthUnreachable: {
-		id: 'app.action-bar.install.failure.modrinth-unreachable',
-		defaultMessage: 'Modrinth unreachable',
+		id: 'app.action-bar.install.summary.modrinth-unreachable',
+		defaultMessage: "Couldn't reach Modrinth",
 	},
 	packDownloadFailed: {
-		id: 'app.action-bar.install.failure.pack-download-failed',
-		defaultMessage: 'Pack download failed',
+		id: 'app.action-bar.install.summary.pack-download-failed',
+		defaultMessage: "Couldn't download pack",
 	},
 	badModpackFile: {
-		id: 'app.action-bar.install.failure.bad-modpack-file',
-		defaultMessage: 'Bad modpack file',
+		id: 'app.action-bar.install.summary.bad-modpack-file',
+		defaultMessage: "Couldn't read modpack",
 	},
 	invalidModpack: {
-		id: 'app.action-bar.install.failure.invalid-modpack',
-		defaultMessage: 'Invalid modpack',
+		id: 'app.action-bar.install.summary.invalid-modpack',
+		defaultMessage: 'Modpack data invalid',
 	},
 	contentDownloadFailed: {
-		id: 'app.action-bar.install.failure.content-download-failed',
-		defaultMessage: 'Content download failed',
+		id: 'app.action-bar.install.summary.content-download-failed',
+		defaultMessage: "Couldn't download files",
 	},
 	corruptDownload: {
-		id: 'app.action-bar.install.failure.corrupt-download',
-		defaultMessage: 'Corrupt download',
+		id: 'app.action-bar.install.summary.corrupt-download',
+		defaultMessage: 'Downloaded file is corrupt',
 	},
 	invalidModpackFiles: {
-		id: 'app.action-bar.install.failure.invalid-modpack-files',
-		defaultMessage: 'Invalid modpack files',
+		id: 'app.action-bar.install.summary.invalid-modpack-files',
+		defaultMessage: 'Modpack files have invalid metadata',
 	},
 	noWritePermission: {
-		id: 'app.action-bar.install.failure.no-write-permission',
-		defaultMessage: 'No write permission',
+		id: 'app.action-bar.install.summary.no-write-permission',
+		defaultMessage: 'No permission to write',
 	},
 	couldNotSaveFiles: {
-		id: 'app.action-bar.install.failure.could-not-save-files',
-		defaultMessage: 'Could not save files',
+		id: 'app.action-bar.install.summary.could-not-save-files',
+		defaultMessage: "Couldn't save files",
 	},
 	invalidFilePath: {
-		id: 'app.action-bar.install.failure.invalid-file-path',
-		defaultMessage: 'Invalid file path',
+		id: 'app.action-bar.install.summary.invalid-file-path',
+		defaultMessage: 'File path is invalid',
 	},
 	instanceNotFound: {
-		id: 'app.action-bar.install.failure.instance-not-found',
-		defaultMessage: 'Instance not found',
+		id: 'app.action-bar.install.summary.instance-not-found',
+		defaultMessage: "Instance couldn't be found",
 	},
 	cleanupIncomplete: {
-		id: 'app.action-bar.install.failure.cleanup-incomplete',
-		defaultMessage: 'Cleanup incomplete',
+		id: 'app.action-bar.install.summary.cleanup-incomplete',
+		defaultMessage: "Cleanup didn't finish",
 	},
 	javaSetupFailed: {
-		id: 'app.action-bar.install.failure.java-setup-failed',
-		defaultMessage: 'Java setup failed',
+		id: 'app.action-bar.install.summary.java-setup-failed',
+		defaultMessage: "Java setup couldn't finish",
 	},
 	minecraftSetupFailed: {
-		id: 'app.action-bar.install.failure.minecraft-setup-failed',
+		id: 'app.action-bar.install.summary.minecraft-setup-failed',
 		defaultMessage: 'Minecraft setup failed',
 	},
 	loaderSetupFailed: {
-		id: 'app.action-bar.install.failure.loader-setup-failed',
+		id: 'app.action-bar.install.summary.loader-setup-failed',
 		defaultMessage: 'Loader setup failed',
 	},
 	localDataError: {
-		id: 'app.action-bar.install.failure.local-data-error',
-		defaultMessage: 'Local data error',
+		id: 'app.action-bar.install.summary.local-data-error',
+		defaultMessage: "Couldn't update local data",
 	},
 	unexpectedError: {
-		id: 'app.action-bar.install.failure.unexpected-error',
-		defaultMessage: 'Unexpected error',
+		id: 'app.action-bar.install.summary.unexpected-error',
+		defaultMessage: 'Something went wrong',
 	},
 })
 
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
-const copyDetailsStallMs = 5_000
+const copyDetailsStallMs = 30_000
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	if (!icon) return null
@@ -230,11 +234,13 @@ export async function useInstallJobNotifications(opts: {
 	const jobs = ref<InstallJobSnapshot[]>([])
 	const iconUrls = ref<Record<string, string | null>>({})
 	const instanceNames = ref<Record<string, string>>({})
+	const copiedJobIds = ref<Set<string>>(new Set())
 	const jobOrder = new Map<string, number>()
 	let refreshRequest = 0
 	let metadataRequest = 0
 	let nextJobOrder = 0
 	const progressSnapshots = new Map<string, { signature: string; changedAt: number }>()
+	const copiedResetTimeouts = new Map<string, number>()
 	const staleProgressTick = ref(Date.now())
 	const staleProgressInterval = window.setInterval(() => {
 		if (jobs.value.some((job) => isActiveProgressJob(job))) {
@@ -417,6 +423,12 @@ export async function useInstallJobNotifications(opts: {
 		)
 	}
 
+	function getJobSortRank(job: InstallJobSnapshot): number {
+		if (isTerminalJob(job)) return 0
+		if (job.status === 'queued' || job.phase === 'preparing_instance') return 2
+		return 1
+	}
+
 	function progressSignature(job: InstallJobSnapshot): string {
 		const progress = job.progress
 		const secondary = progress?.secondary
@@ -440,6 +452,11 @@ export async function useInstallJobNotifications(opts: {
 			const snapshot = progressSnapshots.get(job.job_id)
 			if (!snapshot || snapshot.signature !== signature) {
 				progressSnapshots.set(job.job_id, { signature, changedAt: now })
+				if (copiedJobIds.value.has(job.job_id)) {
+					const nextCopiedJobIds = new Set(copiedJobIds.value)
+					nextCopiedJobIds.delete(job.job_id)
+					copiedJobIds.value = nextCopiedJobIds
+				}
 			}
 		}
 
@@ -456,7 +473,34 @@ export async function useInstallJobNotifications(opts: {
 	}
 
 	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
+		if (job.status === 'queued' || job.phase === 'preparing_instance') return false
 		return isTerminalJob(job) || (isActiveProgressJob(job) && hasStalledProgress(job))
+	}
+
+	function isCopied(job: InstallJobSnapshot): boolean {
+		return copiedJobIds.value.has(job.job_id)
+	}
+
+	function setCopied(job: InstallJobSnapshot) {
+		copiedJobIds.value = new Set([...copiedJobIds.value, job.job_id])
+		const existingTimeout = copiedResetTimeouts.get(job.job_id)
+		if (existingTimeout != null) {
+			window.clearTimeout(existingTimeout)
+		}
+		copiedResetTimeouts.set(
+			job.job_id,
+			window.setTimeout(() => {
+				copiedResetTimeouts.delete(job.job_id)
+				if (!copiedJobIds.value.has(job.job_id)) {
+					return
+				}
+				const nextCopiedJobIds = new Set(copiedJobIds.value)
+				nextCopiedJobIds.delete(job.job_id)
+				copiedJobIds.value = nextCopiedJobIds
+				opts.onChange()
+			}, 1_000),
+		)
+		opts.onChange()
 	}
 
 	async function copyJobDetails(job: InstallJobSnapshot) {
@@ -467,7 +511,10 @@ export async function useInstallJobNotifications(opts: {
 		if (!details) {
 			return
 		}
-		await navigator.clipboard.writeText(details).catch(opts.handleError)
+		await navigator.clipboard
+			.writeText(details)
+			.then(() => setCopied(job))
+			.catch(opts.handleError)
 	}
 
 	function getButtons(job: InstallJobSnapshot): PopupNotificationButton[] {
@@ -487,9 +534,10 @@ export async function useInstallJobNotifications(opts: {
 		}
 
 		if (shouldShowCopyDetails(job)) {
+			const copied = isCopied(job)
 			buttons.push({
-				label: formatMessage(messages.copyDetails),
-				icon: CopyIcon,
+				label: formatMessage(copied ? messages.copied : messages.copyDetails),
+				icon: copied ? CheckIcon : CopyIcon,
 				color: 'standard',
 				keepOpen: true,
 				action: async () => {
@@ -513,6 +561,7 @@ export async function useInstallJobNotifications(opts: {
 
 		jobs.value = visibleJobs.sort(
 			(a, b) =>
+				getJobSortRank(a) - getJobSortRank(b) ||
 				a.created.localeCompare(b.created) ||
 				(jobOrder.get(a.job_id) ?? 0) - (jobOrder.get(b.job_id) ?? 0),
 		)
@@ -634,6 +683,9 @@ export async function useInstallJobNotifications(opts: {
 		refresh,
 		dispose: () => {
 			window.clearInterval(staleProgressInterval)
+			for (const timeout of copiedResetTimeouts.values()) {
+				window.clearTimeout(timeout)
+			}
 			unlisten()
 		},
 	}
