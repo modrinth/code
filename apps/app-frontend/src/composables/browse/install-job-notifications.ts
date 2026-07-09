@@ -219,6 +219,12 @@ const failureSummaryMessages = defineMessages({
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
 const copyDetailsStallMs = 30_000
 
+interface ProgressSnapshot {
+	signature: string
+	changedAt: number
+	timeout: number | null
+}
+
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	if (!icon) return null
 	if (/^(https?:|data:|blob:|asset:|tauri:)/.test(icon)) return icon
@@ -239,15 +245,8 @@ export async function useInstallJobNotifications(opts: {
 	let refreshRequest = 0
 	let metadataRequest = 0
 	let nextJobOrder = 0
-	const progressSnapshots = new Map<string, { signature: string; changedAt: number }>()
 	const copiedResetTimeouts = new Map<string, number>()
-	const staleProgressTick = ref(Date.now())
-	const staleProgressInterval = window.setInterval(() => {
-		if (jobs.value.some((job) => isActiveProgressJob(job))) {
-			staleProgressTick.value = Date.now()
-			opts.onChange()
-		}
-	}, 1_000)
+	const progressSnapshots = new Map<string, ProgressSnapshot>()
 
 	function getTitle(job: InstallJobSnapshot): string {
 		if (job.display?.title) return job.display.title
@@ -415,9 +414,10 @@ export async function useInstallJobNotifications(opts: {
 		return job.status === 'failed' || job.status === 'interrupted'
 	}
 
-	function isActiveProgressJob(job: InstallJobSnapshot): boolean {
+	function canShowStalledProgressDetails(job: InstallJobSnapshot): boolean {
 		return (
-			(job.status === 'queued' || job.status === 'running') &&
+			job.status === 'running' &&
+			job.phase !== 'preparing_instance' &&
 			job.phase !== 'finalizing' &&
 			job.phase !== 'rolling_back'
 		)
@@ -443,38 +443,90 @@ export async function useInstallJobNotifications(opts: {
 		].join(':')
 	}
 
+	function clearCopied(jobId: string) {
+		if (!copiedJobIds.value.has(jobId)) {
+			return
+		}
+
+		const timeout = copiedResetTimeouts.get(jobId)
+		if (timeout != null) {
+			window.clearTimeout(timeout)
+			copiedResetTimeouts.delete(jobId)
+		}
+
+		const nextCopiedJobIds = new Set(copiedJobIds.value)
+		nextCopiedJobIds.delete(jobId)
+		copiedJobIds.value = nextCopiedJobIds
+	}
+
+	function clearProgressSnapshot(jobId: string) {
+		const snapshot = progressSnapshots.get(jobId)
+		if (snapshot?.timeout != null) {
+			window.clearTimeout(snapshot.timeout)
+		}
+		progressSnapshots.delete(jobId)
+	}
+
+	function scheduleStaleProgressRefresh(jobId: string) {
+		const snapshot = progressSnapshots.get(jobId)
+		if (!snapshot) {
+			return
+		}
+
+		snapshot.timeout = window.setTimeout(() => {
+			const snapshot = progressSnapshots.get(jobId)
+			if (!snapshot) {
+				return
+			}
+
+			snapshot.timeout = null
+			opts.onChange()
+		}, copyDetailsStallMs)
+	}
+
 	function syncProgressSnapshots(nextJobs: InstallJobSnapshot[]) {
-		const activeIds = new Set(nextJobs.map((job) => job.job_id))
+		const trackedJobIds = new Set<string>()
 		const now = Date.now()
 
 		for (const job of nextJobs) {
+			if (!canShowStalledProgressDetails(job)) {
+				continue
+			}
+
+			trackedJobIds.add(job.job_id)
 			const signature = progressSignature(job)
 			const snapshot = progressSnapshots.get(job.job_id)
-			if (!snapshot || snapshot.signature !== signature) {
-				progressSnapshots.set(job.job_id, { signature, changedAt: now })
-				if (copiedJobIds.value.has(job.job_id)) {
-					const nextCopiedJobIds = new Set(copiedJobIds.value)
-					nextCopiedJobIds.delete(job.job_id)
-					copiedJobIds.value = nextCopiedJobIds
-				}
+			if (snapshot?.signature === signature) {
+				continue
 			}
+
+			clearProgressSnapshot(job.job_id)
+			clearCopied(job.job_id)
+			progressSnapshots.set(job.job_id, {
+				signature,
+				changedAt: now,
+				timeout: null,
+			})
+			scheduleStaleProgressRefresh(job.job_id)
 		}
 
 		for (const jobId of progressSnapshots.keys()) {
-			if (!activeIds.has(jobId)) {
-				progressSnapshots.delete(jobId)
+			if (!trackedJobIds.has(jobId)) {
+				clearProgressSnapshot(jobId)
 			}
 		}
 	}
 
 	function hasStalledProgress(job: InstallJobSnapshot): boolean {
 		const snapshot = progressSnapshots.get(job.job_id)
-		return !!snapshot && staleProgressTick.value - snapshot.changedAt >= copyDetailsStallMs
+		return !!snapshot && Date.now() - snapshot.changedAt >= copyDetailsStallMs
 	}
 
 	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
-		if (job.status === 'queued' || job.phase === 'preparing_instance') return false
-		return isTerminalJob(job) || (isActiveProgressJob(job) && hasStalledProgress(job))
+		return (
+			isTerminalJob(job) ||
+			(canShowStalledProgressDetails(job) && hasStalledProgress(job))
+		)
 	}
 
 	function isCopied(job: InstallJobSnapshot): boolean {
@@ -684,9 +736,11 @@ export async function useInstallJobNotifications(opts: {
 		buttons,
 		refresh,
 		dispose: () => {
-			window.clearInterval(staleProgressInterval)
 			for (const timeout of copiedResetTimeouts.values()) {
 				window.clearTimeout(timeout)
+			}
+			for (const jobId of progressSnapshots.keys()) {
+				clearProgressSnapshot(jobId)
 			}
 			unlisten()
 		},
