@@ -99,10 +99,7 @@ impl InstallProgressReporter {
         Ok(snapshot)
     }
 
-    pub async fn persist_failure_context(
-        &self,
-        context: InstallErrorContext,
-    ) {
+    pub async fn persist_failure_context(&self, context: InstallErrorContext) {
         if let Err(error) = self.update_context(Some(context), true).await {
             tracing::warn!(
                 "Failed to persist install context for failed operation: {error}"
@@ -134,8 +131,10 @@ impl InstallProgressReporter {
         let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
         let phase_started = state.job.progress.phase != phase
-            || matches!(&state.job.progress.details, InstallPhaseDetails::Empty)
-                && !matches!(&details, InstallPhaseDetails::Empty);
+            || matches!(
+                &state.job.progress.details,
+                InstallPhaseDetails::Empty
+            ) && !matches!(&details, InstallPhaseDetails::Empty);
 
         state.job.set_progress(phase, progress, details);
         for event in events {

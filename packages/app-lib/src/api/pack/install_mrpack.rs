@@ -459,7 +459,8 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .await?;
     let content_progress = Arc::new(AtomicU64::new(0));
     let content_bytes_progress = Arc::new(AtomicU64::new(0));
-    let active_download_bytes = Arc::new(Mutex::new(HashMap::<String, u64>::new()));
+    let active_download_bytes =
+        Arc::new(Mutex::new(HashMap::<String, u64>::new()));
     let file_info_hashes = pack
         .files
         .iter()
