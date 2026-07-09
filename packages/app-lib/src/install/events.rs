@@ -99,6 +99,31 @@ impl InstallProgressReporter {
         Ok(snapshot)
     }
 
+    pub async fn persist_failure_context(
+        &self,
+        context: InstallErrorContext,
+    ) {
+        if let Err(error) = self.update_context(Some(context), true).await {
+            tracing::warn!(
+                "Failed to persist install context for failed operation: {error}"
+            );
+        }
+    }
+
+    pub async fn preserve_failure_context<T>(
+        &self,
+        context: InstallErrorContext,
+        result: crate::Result<T>,
+    ) -> crate::Result<T> {
+        match result {
+            Ok(value) => Ok(value),
+            Err(error) => {
+                self.persist_failure_context(context).await;
+                Err(error)
+            }
+        }
+    }
+
     pub async fn update_with_events(
         &self,
         phase: InstallPhaseId,

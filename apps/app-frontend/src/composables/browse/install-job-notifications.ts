@@ -511,10 +511,12 @@ export async function useInstallJobNotifications(opts: {
 		if (!details) {
 			return
 		}
-		await navigator.clipboard
-			.writeText(details)
-			.then(() => setCopied(job))
-			.catch(opts.handleError)
+		try {
+			await navigator.clipboard.writeText(details)
+			setCopied(job)
+		} catch (error) {
+			opts.handleError(error)
+		}
 	}
 
 	function getButtons(job: InstallJobSnapshot): PopupNotificationButton[] {

@@ -17,68 +17,71 @@
   "app.action-bar.install.copy-details": {
     "message": "Copy details"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Copied"
+  },
   "app.action-bar.install.failed": {
     "message": "Install failed"
   },
-  "app.action-bar.install.failure.app-closed": {
-    "message": "Canceled: app closed"
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Canceled due to app closing"
   },
-  "app.action-bar.install.failure.bad-modpack-file": {
-    "message": "Bad modpack file"
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Couldn't read modpack"
   },
-  "app.action-bar.install.failure.canceled": {
+  "app.action-bar.install.summary.canceled": {
     "message": "Canceled"
   },
-  "app.action-bar.install.failure.cleanup-incomplete": {
-    "message": "Cleanup incomplete"
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Cleanup didn't finish"
   },
-  "app.action-bar.install.failure.content-download-failed": {
-    "message": "Content download failed"
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Couldn't download files"
   },
-  "app.action-bar.install.failure.corrupt-download": {
-    "message": "Corrupt download"
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Downloaded file is corrupt"
   },
-  "app.action-bar.install.failure.could-not-save-files": {
-    "message": "Could not save files"
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Couldn't save files"
   },
-  "app.action-bar.install.failure.download-failed": {
-    "message": "Download failed"
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Download couldn't finish"
   },
-  "app.action-bar.install.failure.instance-not-found": {
-    "message": "Instance not found"
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instance couldn't be found"
   },
-  "app.action-bar.install.failure.invalid-file-path": {
-    "message": "Invalid file path"
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "File path is invalid"
   },
-  "app.action-bar.install.failure.invalid-modpack": {
-    "message": "Invalid modpack"
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Modpack data invalid"
   },
-  "app.action-bar.install.failure.invalid-modpack-files": {
-    "message": "Invalid modpack files"
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpack files have invalid metadata"
   },
-  "app.action-bar.install.failure.java-setup-failed": {
-    "message": "Java setup failed"
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java setup couldn't finish"
   },
-  "app.action-bar.install.failure.loader-setup-failed": {
+  "app.action-bar.install.summary.loader-setup-failed": {
     "message": "Loader setup failed"
   },
-  "app.action-bar.install.failure.local-data-error": {
-    "message": "Local data error"
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Couldn't update local data"
   },
-  "app.action-bar.install.failure.minecraft-setup-failed": {
+  "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "Minecraft setup failed"
   },
-  "app.action-bar.install.failure.modrinth-unreachable": {
-    "message": "Modrinth unreachable"
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Couldn't reach Modrinth"
   },
-  "app.action-bar.install.failure.no-write-permission": {
-    "message": "No write permission"
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "No permission to write"
   },
-  "app.action-bar.install.failure.pack-download-failed": {
-    "message": "Pack download failed"
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Couldn't download pack"
   },
-  "app.action-bar.install.failure.unexpected-error": {
-    "message": "Unexpected error"
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Something went wrong"
   },
   "app.action-bar.install.open-instance": {
     "message": "Open instance"
@@ -322,60 +325,6 @@
   },
   "app.install.phase.running_loader_processors": {
     "message": "Running loader processors"
-  },
-  "app.install.failure-phase.downloading_content": {
-    "message": "downloading content"
-  },
-  "app.install.failure-phase.downloading_minecraft": {
-    "message": "downloading Minecraft"
-  },
-  "app.install.failure-phase.downloading_pack_file": {
-    "message": "downloading pack file"
-  },
-  "app.install.failure-phase.extracting_overrides": {
-    "message": "extracting overrides"
-  },
-  "app.install.failure-phase.finalizing": {
-    "message": "finalizing"
-  },
-  "app.install.failure-phase.preparing_instance": {
-    "message": "preparing instance"
-  },
-  "app.install.failure-phase.preparing_java": {
-    "message": "preparing Java"
-  },
-  "app.install.failure-phase.preparing_java.downloading": {
-    "message": "downloading Java {version}"
-  },
-  "app.install.failure-phase.preparing_java.extracting": {
-    "message": "extracting Java {version}"
-  },
-  "app.install.failure-phase.preparing_java.fetching-metadata": {
-    "message": "fetching Java {version}"
-  },
-  "app.install.failure-phase.preparing_java.resolving": {
-    "message": "preparing Java {version}"
-  },
-  "app.install.failure-phase.preparing_java.validating": {
-    "message": "validating Java {version}"
-  },
-  "app.install.failure-phase.reading_pack_manifest": {
-    "message": "reading pack manifest"
-  },
-  "app.install.failure-phase.resolving_loader": {
-    "message": "resolving loader"
-  },
-  "app.install.failure-phase.resolving_minecraft": {
-    "message": "resolving Minecraft"
-  },
-  "app.install.failure-phase.resolving_pack": {
-    "message": "resolving content"
-  },
-  "app.install.failure-phase.rolling_back": {
-    "message": "rolling back"
-  },
-  "app.install.failure-phase.running_loader_processors": {
-    "message": "running loader processors"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."

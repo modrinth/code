@@ -136,9 +136,8 @@ impl MinecraftDownloadProgress {
         self.reporter.set_transient_context(context).await
     }
 
-    async fn persist(&self) -> crate::Result<()> {
-        self.reporter.persist().await?;
-        Ok(())
+    async fn persist_failure_context(&self, context: InstallErrorContext) {
+        self.reporter.persist_failure_context(context).await;
     }
 }
 
@@ -195,12 +194,7 @@ async fn fetch_minecraft_file(
     {
         Ok(bytes) => bytes,
         Err(error) => {
-            progress.set_context(context).await?;
-            if let Err(persist_error) = progress.persist().await {
-                tracing::warn!(
-                    "Failed to persist install context for failed Minecraft download: {persist_error}"
-                );
-            }
+            progress.persist_failure_context(context).await;
             return Err(error);
         }
     };

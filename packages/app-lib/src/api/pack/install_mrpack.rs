@@ -663,12 +663,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                             active_download_bytes.lock().await;
                         active_download_bytes.remove(&project_path);
                         drop(active_download_bytes);
-                        reporter.set_context(context).await?;
-                        if let Err(persist_error) = reporter.persist().await {
-                            tracing::warn!(
-                                "Failed to persist install context for failed content download: {persist_error}"
-                            );
-                        }
+                        reporter.persist_failure_context(context).await;
                         return Err(error);
                     }
                 };
@@ -678,19 +673,32 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
 
                 {
                     let _permit = state.install_db_semaphore.acquire().await?;
-                    cache_file_hash(
-                        file.clone(),
-                        &instance_path,
-                        project.path.as_str(),
-                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                        ProjectType::get_from_parent_folder(&path),
-                        None,
-                        &state.pool,
-                    )
-                    .await?;
+                    reporter
+                        .preserve_failure_context(
+                            context.clone(),
+                            cache_file_hash(
+                                file.clone(),
+                                &instance_path,
+                                project.path.as_str(),
+                                project
+                                    .hashes
+                                    .get(&PackFileHash::Sha1)
+                                    .map(|x| &**x),
+                                ProjectType::get_from_parent_folder(&path),
+                                None,
+                                &state.pool,
+                            )
+                            .await,
+                        )
+                        .await?;
                 }
 
-                write(&path, &file, &state.io_semaphore).await?;
+                reporter
+                    .preserve_failure_context(
+                        context.clone(),
+                        write(&path, &file, &state.io_semaphore).await,
+                    )
+                    .await?;
 
                 if let Some(project_type) =
                     ProjectType::get_from_parent_folder(project.path.as_str())
@@ -702,18 +710,29 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     if let Some(hash) = hash {
                         let _permit =
                             state.install_db_semaphore.acquire().await?;
-                        crate::state::instances::commands::record_project_file(
-                            &instance_id,
-                            project.path.as_str(),
-                            hash,
-                            project.file_size as u64,
-                            project_type,
-                            modpack_source_kind(pack_version_id.as_deref()),
-                            file_info.map(|file| file.project_id.as_str()),
-                            file_info.map(|file| file.version_id.as_str()),
-                            state,
-                        )
-                        .await?;
+                        reporter
+                            .preserve_failure_context(
+                                context.clone(),
+                                crate::state::instances::commands::record_project_file(
+                                    &instance_id,
+                                    project.path.as_str(),
+                                    hash,
+                                    project.file_size as u64,
+                                    project_type,
+                                    modpack_source_kind(
+                                        pack_version_id.as_deref(),
+                                    ),
+                                    file_info.map(|file| {
+                                        file.project_id.as_str()
+                                    }),
+                                    file_info.map(|file| {
+                                        file.version_id.as_str()
+                                    }),
+                                    state,
+                                )
+                                .await,
+                            )
+                            .await?;
                     }
                 }
 
@@ -813,17 +832,17 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
 
         let path =
             instance_full_path.join(relative_override_file_path.as_str());
+        let override_context =
+            InstallErrorContext::new("extract modpack override")
+                .project_id_opt(project_id.clone())
+                .version_id_opt(version_id.clone())
+                .source_path(source_path.clone())
+                .entry_path(file.filename().as_str().unwrap_or_default())
+                .target_path(path.display().to_string());
         reporter
-            .set_transient_context(
-                InstallErrorContext::new("extract modpack override")
-                    .project_id_opt(project_id.clone())
-                    .version_id_opt(version_id.clone())
-                    .source_path(source_path.clone())
-                    .entry_path(file.filename().as_str().unwrap_or_default())
-                    .target_path(path.display().to_string()),
-            )
+            .set_transient_context(override_context.clone())
             .await?;
-        let (size, hash) = if override_total_bytes > 0 {
+        let extract_result = if override_total_bytes > 0 {
             let progress =
                 &mut report_override_progress as &mut ExtractProgressFn<'_>;
             zip_reader
@@ -833,43 +852,63 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     &state.io_semaphore,
                     Some(progress),
                 )
-                .await?
+                .await
         } else {
             zip_reader
                 .extract_entry(index, &path, &state.io_semaphore, None)
-                .await?
+                .await
         };
+        let (size, hash) = reporter
+            .preserve_failure_context(override_context, extract_result)
+            .await?;
 
         {
             let _permit = state.install_db_semaphore.acquire().await?;
-            crate::state::cache_file_hash_metadata(
-                &instance_path,
-                relative_override_file_path.as_str(),
-                size,
-                hash.clone(),
-                ProjectType::get_from_parent_folder(
-                    relative_override_file_path.as_str(),
-                ),
-                None,
-                &state.pool,
-            )
-            .await?;
+            let record_context =
+                InstallErrorContext::new("record modpack override")
+                    .project_id_opt(project_id.clone())
+                    .version_id_opt(version_id.clone())
+                    .source_path(source_path.clone())
+                    .entry_path(file.filename().as_str().unwrap_or_default())
+                    .target_path(path.display().to_string());
+            reporter
+                .preserve_failure_context(
+                    record_context.clone(),
+                    crate::state::cache_file_hash_metadata(
+                        &instance_path,
+                        relative_override_file_path.as_str(),
+                        size,
+                        hash.clone(),
+                        ProjectType::get_from_parent_folder(
+                            relative_override_file_path.as_str(),
+                        ),
+                        None,
+                        &state.pool,
+                    )
+                    .await,
+                )
+                .await?;
 
             if let Some(project_type) = ProjectType::get_from_parent_folder(
                 relative_override_file_path.as_str(),
             ) {
-                crate::state::instances::commands::record_project_file(
-                    &instance_id,
-                    relative_override_file_path.as_str(),
-                    &hash,
-                    size,
-                    project_type,
-                    modpack_source_kind(version_id.as_deref()),
-                    None,
-                    None,
-                    state,
-                )
-                .await?;
+                reporter
+                    .preserve_failure_context(
+                        record_context,
+                        crate::state::instances::commands::record_project_file(
+                            &instance_id,
+                            relative_override_file_path.as_str(),
+                            &hash,
+                            size,
+                            project_type,
+                            modpack_source_kind(version_id.as_deref()),
+                            None,
+                            None,
+                            state,
+                        )
+                        .await,
+                    )
+                    .await?;
             }
         }
     }

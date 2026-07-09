@@ -348,8 +348,8 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         .expected_hash_opt(hash.cloned())
         .project_id_opt(Some(project_id.clone()))
         .version_id_opt(Some(version_id.clone()));
-    reporter.set_context(context.clone()).await?;
-    let file = match fetch_advanced_with_progress(
+    reporter.set_context(context).await?;
+    let file = fetch_advanced_with_progress(
         Method::GET,
         &url,
         hash.map(|x| &**x),
@@ -362,19 +362,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         &state.pool,
         progress,
     )
-    .await
-    {
-        Ok(file) => file,
-        Err(error) => {
-            reporter.set_context(context).await?;
-            if let Err(persist_error) = reporter.persist().await {
-                tracing::warn!(
-                    "Failed to persist install context for failed modpack download: {persist_error}"
-                );
-            }
-            return Err(error);
-        }
-    };
+    .await?;
 
     reporter
         .update(InstallPhaseId::ResolvingPack, None, details.clone())
