@@ -33,8 +33,8 @@ export interface LoaderVersionEntry {
 	stable: boolean
 }
 
-const loaderManifestQueryKey = (loader: string) =>
-	['creation-flow', 'loader-manifest', loader] as const
+const loaderManifestQueryKey = (loader: string, bypassCache = false) =>
+	['creation-flow', 'loader-manifest', loader, bypassCache ? 'bypass' : 'cached'] as const
 const paperSupportedVersionsQueryKey = ['creation-flow', 'paper', 'supported-versions'] as const
 const purpurSupportedVersionsQueryKey = ['creation-flow', 'purpur', 'supported-versions'] as const
 
@@ -361,12 +361,15 @@ export function createCreationFlowContext(
 
 		try {
 			const data = await queryClient.fetchQuery({
-				queryKey: loaderManifestQueryKey(apiLoader),
+				queryKey: loaderManifestQueryKey(apiLoader, bypassCache),
 				queryFn: async () =>
 					(await getLoaderManifest?.(apiLoader, bypassCache ? 'bypass' : undefined)) ??
 					(await client.launchermeta.manifest_v0.getManifest(apiLoader)),
 				staleTime: bypassCache ? 0 : Infinity,
 			})
+			if (bypassCache) {
+				queryClient.setQueryData(loaderManifestQueryKey(apiLoader), data)
+			}
 			loaderVersionsCache.value[apiLoader] = data.gameVersions
 			debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
 		} catch (error) {

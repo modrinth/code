@@ -48,12 +48,14 @@ export function setupCreationModal(
 		return instances?.map((i) => i.name) ?? []
 	}
 
-	provide('showCreationModal', async () => {
+	async function showCreationModal() {
 		await installationModal.value?.show()
 		// bypass cache to get up to date versions
 		void loadGameVersions?.('bypass').catch(handleError)
 		void installationModal.value?.ctx.prefetchLoaderMetadata(true)
-	})
+	}
+
+	provide('showCreationModal', showCreationModal)
 
 	async function proceedWithModpackCreation(
 		projectId: string,
@@ -210,6 +212,7 @@ export function setupCreationModal(
 		searchModpacks,
 		getProjectVersions,
 		getLoaderManifest,
+		showCreationModal,
 		setModpackAlreadyInstalledModal,
 		handleModpackDuplicateCreateAnyway,
 		handleModpackDuplicateGoToInstance,
