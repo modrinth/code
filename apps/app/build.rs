@@ -298,6 +298,8 @@ fn main() {
                         "hide_ads_window",
                         "scroll_ads_window",
                         "show_ads_window",
+                        "show_ads_consent_overlay",
+                        "hide_ads_consent_overlay",
                         "record_ads_click",
                         "open_link",
                         "get_ads_personalization",

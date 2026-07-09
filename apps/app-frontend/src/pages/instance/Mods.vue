@@ -12,10 +12,12 @@
 					ref="modpackContentModal"
 					:modpack-name="displayedModpackProject?.title"
 					:modpack-icon-url="displayedModpackProject?.icon_url ?? undefined"
-					:enable-toggle="!props.isServerInstance"
+					:enable-toggle="!props.isServerInstance && !isSharedMember"
 					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
-					:switch-version="isSharedMember ? undefined : handleSwitchVersion"
+					:switch-version="
+						props.isServerInstance || isSharedMember ? undefined : handleSwitchVersion
+					"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
 					@bulk:disable="(items) => handleModpackContentBulkToggle(items, false)"
@@ -373,36 +375,33 @@ function hasContentOperation(item: ContentItem) {
 	return keys.some((key) => activeContentOperationKeys.value.has(key))
 }
 
-function isSharedExtraContent(item: ContentItem) {
-	return isSharedMember.value && item.source_kind === 'shared_instance'
-}
-
-function isSharedLinkedModpackContent(item: ContentItem) {
+function isSharedInstanceManagedContent(item: ContentItem) {
 	return (
 		isSharedMember.value &&
-		(item.source_kind === 'modrinth_modpack' || item.source_kind === 'imported_modpack')
+		(item.source_kind === 'shared_instance' ||
+			item.source_kind === 'modrinth_modpack' ||
+			item.source_kind === 'imported_modpack')
 	)
+}
+
+function canMutateContent(item: ContentItem) {
+	return !isSharedInstanceManagedContent(item)
 }
 
 function canDeleteContent(item: ContentItem) {
-	return !isSharedLinkedModpackContent(item)
+	return canMutateContent(item)
 }
 
 function shouldWarnBeforeDelete(items: ContentItem[]) {
-	return items.some(isSharedExtraContent)
+	return items.some(isSharedInstanceManagedContent)
 }
 
 function shouldWarnBeforeDisable(items: ContentItem[]) {
-	return items.some((item) => isSharedExtraContent(item) || isSharedLinkedModpackContent(item))
+	return items.some(isSharedInstanceManagedContent)
 }
 
 function canUpdateProject(item: ContentItem) {
-	return (
-		!isSharedLinkedModpackContent(item) &&
-		!!item.file_path &&
-		!!item.has_update &&
-		!!item.update_version_id
-	)
+	return canMutateContent(item) && !!item.file_path && !!item.has_update && !!item.update_version_id
 }
 
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
@@ -755,6 +754,7 @@ async function updateProject(mod: ContentItem) {
 }
 
 async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
+	if (!canMutateContent(mod)) return
 	if (!mod.file_path) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
@@ -891,7 +891,7 @@ async function handleUpdate(id: string) {
 }
 
 async function handleSwitchVersion(item: ContentItem) {
-	if (isSharedLinkedModpackContent(item)) return
+	if (!canMutateContent(item)) return
 	if (!item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
@@ -1371,16 +1371,21 @@ provideContentManager({
 	toggleEnabled: toggleDisableDebounced,
 	bulkEnableItems: (items: ContentItem[]) =>
 		Promise.all(
-			items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item, true)),
+			items
+				.filter((item) => canMutateContent(item) && !item.enabled)
+				.map((item) => toggleDisableMod(item, true)),
 		).then(() => {}),
 	bulkDisableItems: (items: ContentItem[]) =>
 		Promise.all(
-			items.filter((item) => item.enabled).map((item) => toggleDisableMod(item, false)),
+			items
+				.filter((item) => canMutateContent(item) && item.enabled)
+				.map((item) => toggleDisableMod(item, false)),
 		).then(() => {}),
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
-		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+		Promise.all(items.filter(canMutateContent).map((item) => removeMod(item))).then(() => {}),
 	canDeleteItem: canDeleteContent,
+	canToggleItem: canMutateContent,
 	getDeleteWarningMode: (items: ContentItem[]) =>
 		shouldWarnBeforeDelete(items) ? 'shared-instance' : 'default',
 	getDisableWarningMode: (items: ContentItem[]) =>
@@ -1393,7 +1398,7 @@ provideContentManager({
 	updateItem: handleUpdate,
 	bulkUpdateAll: bulkUpdateAllProjects,
 	bulkUpdateItem: updateProject,
-	updateModpack: props.isServerInstance ? undefined : handleModpackUpdate,
+	updateModpack: props.isServerInstance || isSharedMember.value ? undefined : handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairInstance,
 	openSettings: props.openSettings,
@@ -1430,11 +1435,11 @@ provideContentManager({
 					link: () => openUrl(`https://modrinth.com/${item.owner!.type}/${item.owner!.id}`),
 				}
 			: undefined,
-		enabled: item.enabled,
+		enabled: canMutateContent(item) ? item.enabled : undefined,
 		installing: item.installing,
 		hideDelete: !canDeleteContent(item),
-		hideSwitchVersion: isSharedLinkedModpackContent(item),
-		hasUpdate: isSharedLinkedModpackContent(item) ? false : item.has_update,
+		hideSwitchVersion: !canMutateContent(item),
+		hasUpdate: canUpdateProject(item),
 	}),
 	filterPersistKey: props.instance.id,
 })

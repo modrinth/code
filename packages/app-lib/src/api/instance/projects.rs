@@ -52,8 +52,12 @@ pub async fn update_project(
     skip_send_event: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    ensure_shared_member_can_modify_project(instance_id, project_path, &state)
-        .await?;
+    ensure_shared_instance_can_modify_project(
+        instance_id,
+        project_path,
+        &state,
+    )
+    .await?;
     let path = crate::state::instances::commands::update_project(
         instance_id,
         project_path,
@@ -196,8 +200,12 @@ pub async fn switch_project_version_with_dependencies(
     version_id: &str,
 ) -> crate::Result<String> {
     let state = State::get().await?;
-    ensure_shared_member_can_modify_project(instance_id, project_path, &state)
-        .await?;
+    ensure_shared_instance_can_modify_project(
+        instance_id,
+        project_path,
+        &state,
+    )
+    .await?;
     let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
@@ -243,6 +251,8 @@ pub async fn toggle_disable_project(
     desired_enabled: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
+    ensure_shared_instance_can_modify_project(instance_id, project, &state)
+        .await?;
     let res = crate::state::instances::commands::toggle_disable_project(
         instance_id,
         project,
@@ -262,7 +272,7 @@ pub async fn remove_project(
     project: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    ensure_shared_member_can_modify_project(instance_id, project, &state)
+    ensure_shared_instance_can_modify_project(instance_id, project, &state)
         .await?;
     crate::state::instances::commands::remove_project(
         instance_id,
@@ -276,7 +286,7 @@ pub async fn remove_project(
     Ok(())
 }
 
-async fn ensure_shared_member_can_modify_project(
+async fn ensure_shared_instance_can_modify_project(
     instance_id: &str,
     project_path: &str,
     state: &State,
@@ -303,21 +313,28 @@ async fn ensure_shared_member_can_modify_project(
             state,
         )
         .await?;
-    if matches!(
-        source_kind,
-        Some(
-            ContentSourceKind::ModrinthModpack
-                | ContentSourceKind::ImportedModpack
-        )
-    ) {
+    if is_shared_instance_managed_source_kind(source_kind) {
         return Err(crate::ErrorKind::InputError(
-            "Linked modpack content from a shared instance cannot be changed directly. Disable it instead."
+            "Shared instance managed content cannot be changed directly."
                 .to_string(),
         )
         .into());
     }
 
     Ok(())
+}
+
+fn is_shared_instance_managed_source_kind(
+    source_kind: Option<ContentSourceKind>,
+) -> bool {
+    matches!(
+        source_kind,
+        Some(
+            ContentSourceKind::SharedInstance
+                | ContentSourceKind::ModrinthModpack
+                | ContentSourceKind::ImportedModpack
+        )
+    )
 }
 
 #[tracing::instrument]

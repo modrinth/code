@@ -67,6 +67,7 @@ export interface ContentManagerContext {
 	bulkEnableItems?: (items: ContentItem[]) => Promise<void>
 	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
 	canDeleteItem?: (item: ContentItem) => boolean
+	canToggleItem?: (item: ContentItem) => boolean
 	getDeleteWarningMode?: (items: ContentItem[]) => ContentActionWarningMode
 	getDisableWarningMode?: (items: ContentItem[]) => ContentActionWarningMode
 	getDeleteDependencyWarning?: (

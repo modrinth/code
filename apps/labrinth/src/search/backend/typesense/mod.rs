@@ -405,6 +405,14 @@ impl SearchField {
                 optional: true,
                 token_separators: &["-"],
             },
+            SearchField::AllProjectTypes => TypesenseFieldSpec {
+                path: "all_project_types",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+                token_separators: &["-"],
+            },
             SearchField::ProjectId => TypesenseFieldSpec {
                 path: "project_id",
                 ty: "string",
@@ -563,6 +571,7 @@ impl Typesense {
             json!({"name": "indexed_name", "type": "string", "facet": false, "stem": true}),
             json!({"name": "indexed_author", "type": "string", "facet": false}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
+            json!({"name": "downloads", "type": "int32", "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
             json!({"name": "modified_timestamp", "type": "int64", "sort": true}),
@@ -1255,9 +1264,12 @@ fn facets_to_typesense(facets_json: &str) -> Result<String> {
 /// Converts a single facet condition such as `"categories:mods"`,
 /// `"categories=mods"`, or `"downloads!=100"` into a Typesense filter clause.
 fn condition_to_typesense_filter(cond: &str) -> String {
-    // Handle `!=` before `=` so we don't misfire on the equality arm.
-    if let Some((field, value)) = cond.split_once("!=") {
-        return format!("{}:!= {}", field.trim(), value.trim());
+    // Match multi-character operators before their single-character prefixes,
+    // and range/inequality operators before the plain `=` equality arm.
+    for op in ["!=", ">=", "<=", ">", "<"] {
+        if let Some((field, value)) = cond.split_once(op) {
+            return format!("{}:{} {}", field.trim(), op, value.trim());
+        }
     }
     if let Some((field, value)) = cond.split_once(':') {
         return format!("{}:= {}", field.trim(), value.trim());
