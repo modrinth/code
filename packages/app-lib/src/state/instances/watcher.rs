@@ -139,15 +139,20 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         .as_ref()
                                         .is_some_and(|s| *s == "png")
                                 {
-                                    let path_str = e.path.to_string_lossy().into_owned();
-                                    let file_exists = Path::new(&e.path).exists();
+                                    let path_str =
+                                        e.path.to_string_lossy().into_owned();
+                                    let file_exists =
+                                        Path::new(&e.path).exists();
 
                                     let creation_date = if file_exists {
-                                        let meta = std::fs::metadata(&e.path).unwrap();
-                                        let created_time = meta.created()
-                                            .unwrap_or_else(|_| meta.modified().unwrap());
+                                        let meta =
+                                            std::fs::metadata(&e.path).unwrap();
+                                        let created_time =
+                                            meta.created().unwrap_or_else(
+                                                |_| meta.modified().unwrap(),
+                                            );
                                         DateTime::<Utc>::from(created_time)
-                                    } else { 
+                                    } else {
                                         Utc::now()
                                     };
 
@@ -224,10 +229,11 @@ pub(crate) async fn watch_instance_folder(
     }
 
     let mut to_watch = Vec::new();
-    for sub_path in ProjectType::iterator()
-        .map(|x| x.get_folder())
-        .chain(["crash-reports", "saves", "screenshots"])
-    {
+    for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
+        "crash-reports",
+        "saves",
+        "screenshots",
+    ]) {
         let full_path = full_instance_path.join(sub_path);
 
         let meta = tokio::fs::symlink_metadata(&full_path).await;

@@ -16,7 +16,8 @@ fn main() {
 }
 
 fn set_env() {
-    let manifest_dir = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
+    let manifest_dir =
+        PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
     let env_path = manifest_dir.join(".env");
 
     match dotenvy::from_path_iter(&env_path) {
@@ -32,7 +33,11 @@ fn set_env() {
             }
         }
         Err(e) => {
-            println!("cargo::warning=Failed to load .env file from {}: {}", env_path.display(), e);
+            println!(
+                "cargo::warning=Failed to load .env file from {}: {}",
+                env_path.display(),
+                e
+            );
         }
     }
 }
