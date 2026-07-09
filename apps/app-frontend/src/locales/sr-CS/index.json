@@ -1,10 +1,4 @@
 {
-  "app.action-bar.install.failed": {
-    "message": "Neuspešna instalacija"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Neuspešna instalacija zbog zatvaranja aplikacije."
-  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft serveri za autentifikaciju su možda trenutno nedostupni. Molimo vas da proverite vašu internet vezu i pokušajte ponovo kasnije."
   },

@@ -232,7 +232,10 @@ async function handleProgressItemDismiss(
 	dismiss(item.id)
 }
 
-async function handleProgressItemAction(progressItem: PopupNotificationProgressItem, index: number) {
+async function handleProgressItemAction(
+	progressItem: PopupNotificationProgressItem,
+	index: number,
+) {
 	const button = progressItem.buttons?.[index]
 	if (button) {
 		await handleProgressItemButtonClick(progressItem, button)

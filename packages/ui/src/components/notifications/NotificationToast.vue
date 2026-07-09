@@ -179,10 +179,7 @@ import { XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
-import type {
-	PopupNotificationButton,
-	PopupNotificationProgressType,
-} from '../../providers'
+import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
 import { truncatedTooltip } from '../../utils/truncate'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'

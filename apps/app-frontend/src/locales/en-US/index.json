@@ -11,17 +11,20 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Hide more running instances"
   },
-  "app.action-bar.install.dismiss": {
-    "message": "Dismiss"
+  "app.action-bar.install.copied-details": {
+    "message": "Copied"
   },
   "app.action-bar.install.copy-details": {
     "message": "Copy details"
   },
-  "app.action-bar.install.copied-details": {
-    "message": "Copied"
+  "app.action-bar.install.dismiss": {
+    "message": "Dismiss"
   },
-  "app.action-bar.install.failed": {
-    "message": "Install failed"
+  "app.action-bar.install.open-instance": {
+    "message": "Open instance"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Retry"
   },
   "app.action-bar.install.summary.app-closing": {
     "message": "Canceled due to app closing"
@@ -82,12 +85,6 @@
   },
   "app.action-bar.install.summary.unexpected-error": {
     "message": "Something went wrong"
-  },
-  "app.action-bar.install.open-instance": {
-    "message": "Open instance"
-  },
-  "app.action-bar.install.retry": {
-    "message": "Retry"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Unknown instance"

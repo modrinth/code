@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Rejeter"
   },
-  "app.action-bar.install.failed": {
-    "message": "Échec de l'installation"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Échec de l'installation dû à la fermeture de l'app."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Échec de l'installation dû à une erreur réseau."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Échec de l'installation dû à une erreur inconnue."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Ouvrir l'instance"
   },
