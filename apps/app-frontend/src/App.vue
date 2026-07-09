@@ -16,6 +16,7 @@ import {
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
+	LinkIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -40,6 +41,7 @@ import {
 	defineMessages,
 	I18nDebugPanel,
 	LoadingBar,
+	NewModal,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -49,6 +51,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	StyledInput,
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
@@ -646,6 +649,9 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const manualInviteLinkModal = ref()
+const manualInviteLink = ref('')
+const manualInviteProcessing = ref(false)
 const modrinthAccountRequiredModal = ref()
 const updateToPlayModal = ref()
 
@@ -995,6 +1001,40 @@ async function installSharedInstanceInviteFromDeepLink(inviteId) {
 		)
 	} catch (error) {
 		handleError(error)
+	}
+}
+
+function manualInviteId() {
+	const value = manualInviteLink.value.trim()
+	if (!value) return null
+
+	try {
+		const url = new URL(value)
+		const match = /^\/share\/([^/]+)\/?$/.exec(url.pathname)
+		return match ? decodeURIComponent(match[1]) : null
+	} catch {
+		return null
+	}
+}
+
+function showManualInviteLinkModal() {
+	manualInviteLink.value = ''
+	manualInviteLinkModal.value?.show()
+}
+
+async function processManualInviteLink() {
+	const inviteId = manualInviteId()
+	if (!inviteId) return
+
+	manualInviteProcessing.value = true
+	try {
+		await invoke('plugin:install|install_shared_instance_invite', { inviteId })
+		manualInviteLinkModal.value?.hide()
+		queryClient.invalidateQueries({ queryKey: ['instances'] })
+	} catch (error) {
+		handleError(error)
+	} finally {
+		manualInviteProcessing.value = false
 	}
 }
 
@@ -1672,6 +1712,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<PlusIcon />
 			</NavButton>
+			<NavButton
+				v-tooltip.right="'Install from invite link'"
+				:to="showManualInviteLinkModal"
+			>
+				<LinkIcon />
+			</NavButton>
 			<div class="flex flex-grow"></div>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
@@ -1945,6 +1991,42 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		ref="modrinthAccountRequiredModal"
 		:request-auth="requestModrinthAuth"
 	/>
+	<NewModal ref="manualInviteLinkModal" header="Install from invite link" max-width="32rem">
+		<div class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">Invite link</span>
+			<StyledInput
+				v-model="manualInviteLink"
+				placeholder="https://modrinth.com/share/..."
+				:disabled="manualInviteProcessing"
+				@keydown.enter="processManualInviteLink"
+			/>
+			<span v-if="manualInviteLink && !manualInviteId()" class="text-sm text-red">
+				Enter a valid Modrinth shared-instance invite link.
+			</span>
+		</div>
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled>
+					<button
+						:disabled="manualInviteProcessing"
+						@click="manualInviteLinkModal?.hide()"
+					>
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						:disabled="!manualInviteId() || manualInviteProcessing"
+						@click="processManualInviteLink"
+					>
+						<LinkIcon />
+						Process
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 	<InstallToPlayModal ref="installToPlayModal" />
 	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>
