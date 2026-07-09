@@ -42,12 +42,14 @@
 			>
 				<div
 					v-for="(diff, index) in sortedDiffs"
-					:key="diff.projectName || diff.fileName || index"
+					:key="
+						diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)
+					"
 					class="grid items-center min-h-10 h-10 gap-2 grid-cols-[auto_auto_minmax(0,1fr)]"
 				>
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
-						<PlusIcon v-if="diff.type === 'added'" />
+						<PlusIcon v-if="diff.type === 'added' || diff.type === 'modpack_linked'" />
 						<MinusIcon
 							v-else-if="diff.type === 'removed' || diff.type === 'modpack_unlinked'"
 							class="text-red"
@@ -59,17 +61,11 @@
 						></div>
 					</div>
 
-					<span
-						v-if="diff.type === 'modpack_unlinked'"
-						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0 col-span-2"
-					>
-						{{ formatMessage(messages.modpackUnlinked) }}
-					</span>
-					<span v-else class="text-sm shrink-0 whitespace-nowrap">
+					<span class="text-sm shrink-0 whitespace-nowrap">
 						{{ getDiffTypeLabel(diff) }}
 					</span>
 					<div
-						v-if="diff.type !== 'modpack_unlinked'"
+						v-if="!isConfigurationDiff(diff)"
 						class="flex min-w-0 items-center justify-between gap-3"
 					>
 						<span
@@ -87,6 +83,14 @@
 						<span
 							v-if="getDiffVersionName(diff)"
 							class="text-sm text-secondary text-right shrink-0 whitespace-nowrap max-w-[45%] overflow-hidden text-ellipsis"
+						>
+							{{ getDiffVersionName(diff) }}
+						</span>
+					</div>
+					<div v-else class="flex min-w-0 justify-end">
+						<span
+							v-if="getDiffVersionName(diff)"
+							class="truncate text-right text-sm font-medium text-contrast"
 						>
 							{{ getDiffVersionName(diff) }}
 						</span>
@@ -195,10 +199,35 @@ const showDiffSummary = computed(
 
 const sortedDiffs = computed(() =>
 	[...props.diffs].sort((a, b) => {
-		const typeOrder = { modpack_unlinked: 0, added: 1, updated: 2, removed: 3 }
+		const typeOrder: Record<ContentDiffItem['type'], number> = {
+			modpack_linked: 0,
+			modpack_updated: 0,
+			modpack_unlinked: 0,
+			game_version_updated: 1,
+			loader_updated: 2,
+			added: 3,
+			updated: 4,
+			removed: 5,
+		}
 		return typeOrder[a.type] - typeOrder[b.type]
 	}),
 )
+
+type ConfigurationDiffType = Exclude<ContentDiffItem['type'], 'added' | 'removed' | 'updated'>
+
+const configurationDiffTypes = new Set<ConfigurationDiffType>([
+	'modpack_linked',
+	'modpack_updated',
+	'modpack_unlinked',
+	'game_version_updated',
+	'loader_updated',
+])
+
+function isConfigurationDiff(
+	diff: ContentDiffItem,
+): diff is ContentDiffItem & { type: ConfigurationDiffType } {
+	return configurationDiffTypes.has(diff.type as ConfigurationDiffType)
+}
 
 function show(e?: MouseEvent) {
 	modal.value?.show(e)
@@ -232,8 +261,8 @@ function handleHide() {
 }
 
 function getDiffTypeLabel(diff: ContentDiffItem) {
-	if (diff.type === 'modpack_unlinked') {
-		return formatMessage(messages.modpackUnlinked)
+	if (isConfigurationDiff(diff)) {
+		return formatMessage(configurationDiffMessages[diff.type])
 	}
 	if (diff.type === 'removed' && diff.disabled) {
 		return formatMessage(diffTypeMessages.removedDisabled)
@@ -245,6 +274,12 @@ function getDiffTypeLabel(diff: ContentDiffItem) {
 }
 
 function getDiffVersionName(diff: ContentDiffItem) {
+	if (isConfigurationDiff(diff)) {
+		if (diff.currentVersionName && diff.newVersionName) {
+			return `${diff.currentVersionName} → ${diff.newVersionName}`
+		}
+		return diff.newVersionName ?? diff.currentVersionName
+	}
 	if (diff.type === 'removed') return diff.currentVersionName
 
 	return diff.newVersionName
@@ -272,9 +307,28 @@ const messages = defineMessages({
 		defaultMessage:
 			'Some content on your server could not be analyzed and may be affected by this change.',
 	},
-	modpackUnlinked: {
+})
+
+const configurationDiffMessages = defineMessages({
+	modpack_linked: {
+		id: 'content.diff-modal.modpack-linked',
+		defaultMessage: 'Linked modpack',
+	},
+	modpack_updated: {
+		id: 'content.diff-modal.modpack-updated',
+		defaultMessage: 'Updated modpack',
+	},
+	modpack_unlinked: {
 		id: 'content.diff-modal.modpack-unlinked',
 		defaultMessage: 'Unlinked modpack',
+	},
+	game_version_updated: {
+		id: 'content.diff-modal.game-version-updated',
+		defaultMessage: 'Game version',
+	},
+	loader_updated: {
+		id: 'content.diff-modal.loader-updated',
+		defaultMessage: 'Loader',
 	},
 })
 

@@ -709,6 +709,7 @@ const invitedRows = computed(() => {
 const inviteFriends = computed<InvitePlayersUser[]>(() =>
 	userFriends.value
 		.filter((friend) => friend.username && friend.accepted)
+		.sort((a, b) => Number(b.online) - Number(a.online))
 		.map((friend) => {
 			const id = getFriendUserId(friend, currentUserId.value)
 			const invitedRow =

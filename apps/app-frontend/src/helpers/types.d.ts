@@ -96,6 +96,8 @@ export type SharedInstanceAttachment = {
 	id: string
 	role: 'owner' | 'member'
 	manager_id?: string | null
+	server_manager_name?: string | null
+	server_manager_icon_url?: string | null
 	linked_user_id?: string | null
 	status:
 		| 'unknown'

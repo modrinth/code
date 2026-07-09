@@ -69,6 +69,10 @@ pub struct SharedInstanceAttachment {
     pub id: String,
     pub role: SharedInstanceRole,
     pub manager_id: Option<String>,
+    #[serde(default)]
+    pub server_manager_name: Option<String>,
+    #[serde(default)]
+    pub server_manager_icon_url: Option<String>,
     pub linked_user_id: Option<String>,
     pub access_token: Option<String>,
     pub status: ContentSetSyncStatus,

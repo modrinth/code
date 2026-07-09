@@ -203,6 +203,8 @@ pub struct SharedInstanceInviteLink {
 pub struct SharedInstanceInviteInstallPreview {
     pub shared_instance_id: String,
     pub manager_id: Option<String>,
+    pub server_manager_name: Option<String>,
+    pub server_manager_icon_url: Option<String>,
     pub preview: SharedInstanceInstallPreview,
 }
 
@@ -226,7 +228,11 @@ pub enum SharedInstanceUpdateDiffType {
     Added,
     Removed,
     Updated,
+    ModpackLinked,
+    ModpackUpdated,
     ModpackUnlinked,
+    GameVersionUpdated,
+    LoaderUpdated,
 }
 
 #[derive(Clone, Debug)]
@@ -265,7 +271,7 @@ struct InstanceInviteInfoResponse {
 #[serde(tag = "type", rename_all = "snake_case")]
 enum InstanceInviteManagerResponse {
     User { id: String },
-    Server {},
+    Server { name: String, icon: Option<String> },
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -577,12 +583,16 @@ pub async fn install_shared_instance(
     shared_instance_id: &str,
     name: String,
     manager_id: Option<String>,
+    server_manager_name: Option<String>,
+    server_manager_icon_url: Option<String>,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
     let data = shared_instance_install_data(
         shared_instance_id,
         manager_id,
+        server_manager_name,
+        server_manager_icon_url,
         name,
         version,
         &state,
@@ -599,6 +609,8 @@ pub async fn install_shared_instance_invite(
     let state = State::get().await?;
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
+    let (manager_id, server_manager_name, server_manager_icon_url) =
+        shared_instance_invite_manager(invite.managers);
     let name = shared_instance_invite_install_name(
         &shared_instance_id,
         invite.instance_name,
@@ -614,7 +626,9 @@ pub async fn install_shared_instance_invite(
     .await?;
     let mut data = shared_instance_install_data(
         &shared_instance_id,
-        None,
+        manager_id,
+        server_manager_name,
+        server_manager_icon_url,
         name,
         version,
         &state,
@@ -659,10 +673,8 @@ pub async fn accept_shared_instance_invite_for_install(
 
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
-    let manager_id = invite.managers.into_iter().find_map(|manager| match manager {
-        InstanceInviteManagerResponse::User { id } => Some(id),
-        InstanceInviteManagerResponse::Server {} => None,
-    });
+    let (manager_id, server_manager_name, server_manager_icon_url) =
+        shared_instance_invite_manager(invite.managers);
     let name =
         shared_instance_invite_install_name(&shared_instance_id, invite.instance_name);
     let accepted =
@@ -680,8 +692,24 @@ pub async fn accept_shared_instance_invite_for_install(
     Ok(SharedInstanceInviteInstallPreview {
         shared_instance_id,
         manager_id,
+        server_manager_name,
+        server_manager_icon_url,
         preview,
     })
+}
+
+fn shared_instance_invite_manager(
+    managers: Vec<InstanceInviteManagerResponse>,
+) -> (Option<String>, Option<String>, Option<String>) {
+    match managers.into_iter().next() {
+        Some(InstanceInviteManagerResponse::User { id }) => {
+            (Some(id), None, None)
+        }
+        Some(InstanceInviteManagerResponse::Server { name, icon }) => {
+            (None, Some(name), icon)
+        }
+        None => (None, None, None),
+    }
 }
 
 async fn shared_instance_install_preview_from_version(
@@ -813,6 +841,8 @@ pub async fn update_shared_instance(
     let mut data = shared_instance_install_data(
         &attachment.id,
         attachment.manager_id.clone(),
+        attachment.server_manager_name.clone(),
+        attachment.server_manager_icon_url.clone(),
         metadata.instance.name,
         version,
         &state,
@@ -995,6 +1025,8 @@ fn shared_instance_unavailable_message(
 async fn shared_instance_install_data(
     shared_instance_id: &str,
     manager_id: Option<String>,
+    server_manager_name: Option<String>,
+    server_manager_icon_url: Option<String>,
     name: String,
     version: InstanceVersionResponse,
     state: &State,
@@ -1020,6 +1052,8 @@ async fn shared_instance_install_data(
     Ok(SharedInstanceInstallData {
         shared_instance_id: shared_instance_id.to_string(),
         manager_id,
+        server_manager_name,
+        server_manager_icon_url,
         linked_user_id,
         access_token: None,
         name,
@@ -1079,22 +1113,21 @@ async fn shared_instance_update_diffs(
     )
     .await?;
 
-    if modpack_unlinked {
-        diffs.insert(
-            0,
-            SharedInstanceUpdateDiff {
-                type_: SharedInstanceUpdateDiffType::ModpackUnlinked,
-                project_id: None,
-                project_name: None,
-                file_name: None,
-                current_version_name: None,
-                new_version_name: None,
-                disabled: false,
-            },
-        );
-    }
+    let mut configuration_diffs = shared_instance_configuration_diffs(
+        current_modpack_id.as_deref(),
+        remote_modpack_id,
+        &metadata.applied_content_set.game_version,
+        &version.game_version,
+        metadata.applied_content_set.loader,
+        version.loader,
+        metadata.applied_content_set.loader_version.as_deref(),
+        Some(version.loader_version.as_str()),
+        state,
+    )
+    .await?;
+    configuration_diffs.append(&mut diffs);
 
-    Ok(diffs)
+    Ok(configuration_diffs)
 }
 
 async fn shared_instance_publish_diffs(
@@ -1125,22 +1158,146 @@ async fn shared_instance_publish_diffs(
     )
     .await?;
 
-    if modpack_unlinked {
-        diffs.insert(
-            0,
-            SharedInstanceUpdateDiff {
-                type_: SharedInstanceUpdateDiffType::ModpackUnlinked,
-                project_id: None,
-                project_name: None,
-                file_name: None,
-                current_version_name: None,
-                new_version_name: None,
-                disabled: false,
-            },
-        );
+    let mut configuration_diffs = shared_instance_configuration_diffs(
+        remote_modpack_id,
+        current_modpack_id.as_deref(),
+        &version.game_version,
+        &metadata.applied_content_set.game_version,
+        version.loader,
+        metadata.applied_content_set.loader,
+        Some(version.loader_version.as_str()),
+        metadata.applied_content_set.loader_version.as_deref(),
+        state,
+    )
+    .await?;
+    configuration_diffs.append(&mut diffs);
+
+    Ok(configuration_diffs)
+}
+
+async fn shared_instance_configuration_diffs(
+    current_modpack_id: Option<&str>,
+    new_modpack_id: Option<&str>,
+    current_game_version: &str,
+    new_game_version: &str,
+    current_loader: ModLoader,
+    new_loader: ModLoader,
+    current_loader_version: Option<&str>,
+    new_loader_version: Option<&str>,
+    state: &State,
+) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
+    let mut diffs = Vec::new();
+
+    if current_modpack_id != new_modpack_id {
+        let type_ = match (current_modpack_id, new_modpack_id) {
+            (None, Some(_)) => SharedInstanceUpdateDiffType::ModpackLinked,
+            (Some(_), None) => {
+                SharedInstanceUpdateDiffType::ModpackUnlinked
+            }
+            (Some(_), Some(_)) => {
+                SharedInstanceUpdateDiffType::ModpackUpdated
+            }
+            (None, None) => unreachable!(),
+        };
+        diffs.push(configuration_diff(
+            type_,
+            shared_modpack_version_label(current_modpack_id, state).await,
+            shared_modpack_version_label(new_modpack_id, state).await,
+        ));
+    }
+
+    if current_game_version != new_game_version {
+        diffs.push(configuration_diff(
+            SharedInstanceUpdateDiffType::GameVersionUpdated,
+            Some(current_game_version.to_string()),
+            Some(new_game_version.to_string()),
+        ));
+    }
+
+    let current_loader_version = normalized_loader_version(current_loader_version);
+    let new_loader_version = normalized_loader_version(new_loader_version);
+    if current_loader != new_loader
+        || current_loader_version != new_loader_version
+    {
+        diffs.push(configuration_diff(
+            SharedInstanceUpdateDiffType::LoaderUpdated,
+            Some(shared_loader_label(
+                current_loader,
+                current_loader_version,
+            )),
+            Some(shared_loader_label(new_loader, new_loader_version)),
+        ));
     }
 
     Ok(diffs)
+}
+
+fn configuration_diff(
+    type_: SharedInstanceUpdateDiffType,
+    current_version_name: Option<String>,
+    new_version_name: Option<String>,
+) -> SharedInstanceUpdateDiff {
+    SharedInstanceUpdateDiff {
+        type_,
+        project_id: None,
+        project_name: None,
+        file_name: None,
+        current_version_name,
+        new_version_name,
+        disabled: false,
+    }
+}
+
+async fn shared_modpack_version_label(
+    version_id: Option<&str>,
+    state: &State,
+) -> Option<String> {
+    let Some(version_id) = version_id else {
+        return None;
+    };
+    let Some(version) = CachedEntry::get_version(
+        version_id,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await
+    .ok()
+    .flatten()
+    else {
+        return Some(version_id.to_string());
+    };
+    let project = CachedEntry::get_project(
+        &version.project_id,
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await
+    .ok()
+    .flatten();
+    let title = project.map(|project| project.title).unwrap_or(version.name);
+
+    Some(format!("{title} {}", version.version_number))
+}
+
+fn normalized_loader_version(loader_version: Option<&str>) -> Option<&str> {
+    loader_version.filter(|version| !version.is_empty())
+}
+
+fn shared_loader_label(loader: ModLoader, loader_version: Option<&str>) -> String {
+    let loader_name = match loader {
+        ModLoader::Vanilla => "Vanilla",
+        ModLoader::Forge => "Forge",
+        ModLoader::Fabric => "Fabric",
+        ModLoader::Quilt => "Quilt",
+        ModLoader::NeoForge => "NeoForge",
+    };
+
+    match loader_version {
+        Some(version) => format!("{loader_name} {version}"),
+        None => loader_name.to_string(),
+    }
 }
 
 async fn shared_content_diffs(
@@ -2024,6 +2181,8 @@ async fn shared_instance_for_invites(
                 instance_id,
                 &remote.id,
                 SharedInstanceRole::Owner,
+                None,
+                None,
                 None,
                 linked_user_id,
                 None,

@@ -106,7 +106,23 @@
 							</div>
 						</template>
 
-						<template v-if="sharedInstanceManager">
+						<template v-if="sharedInstanceServerManager">
+							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div class="flex min-w-0 items-center gap-[5px] font-medium">
+								Linked to
+								<Avatar
+									:src="sharedInstanceServerManager.iconUrl"
+									:alt="sharedInstanceServerManager.name"
+									:tint-by="sharedInstanceServerManager.name"
+									size="24px"
+									no-shadow
+								/>
+								<span class="min-w-0 truncate">{{ sharedInstanceServerManager.name }}</span>
+							</div>
+						</template>
+
+						<template v-else-if="sharedInstanceManager">
 							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
 
 							<div class="flex min-w-0 items-center gap-[5px] font-medium">
@@ -254,7 +270,9 @@
 				class="mt-4"
 				:instance="instance"
 				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
-				:shared-instance-unavailable-manager="sharedInstanceManager?.username"
+				:shared-instance-unavailable-manager="
+					sharedInstanceManager?.username ?? sharedInstanceServerManager?.name
+				"
 				:shared-instance-wrong-account="sharedInstanceWrongAccount"
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
@@ -531,6 +549,15 @@ const sharedInstanceManager = computed(() => {
 		tintBy: user.id,
 	}
 })
+const sharedInstanceServerManager = computed(() => {
+	const attachment = instance.value?.shared_instance
+	if (!attachment?.server_manager_name) return null
+
+	return {
+		name: attachment.server_manager_name,
+		iconUrl: attachment.server_manager_icon_url ?? undefined,
+	}
+})
 
 const sharedInstanceExpectedUserId = computed(
 	() => instance.value?.shared_instance?.linked_user_id ?? null,
@@ -805,7 +832,8 @@ const instanceSubpageProps = computed(() => ({
 		? {
 				sharedInstanceActionsLocked: sharedInstanceShareActionsLocked.value,
 				sharedInstanceUnavailableReason: sharedInstanceUnavailableReason.value,
-				sharedInstanceUnavailableManager: sharedInstanceManager.value?.username,
+				sharedInstanceUnavailableManager:
+					sharedInstanceManager.value?.username ?? sharedInstanceServerManager.value?.name,
 			}
 		: {}),
 }))
@@ -899,6 +927,7 @@ async function handleSharedInstanceUnavailable(
 ) {
 	const manager =
 		sharedInstanceManager.value?.username ??
+		sharedInstanceServerManager.value?.name ??
 		formatMessage(messages.sharedInstanceUnavailableFallbackManager)
 	addNotification({
 		type: 'warning',

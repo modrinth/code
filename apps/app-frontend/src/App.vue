@@ -935,6 +935,8 @@ async function acceptSharedInstanceInviteNotification(
 						sharedInstanceInvite.sharedInstanceId,
 						sharedInstanceInvite.sharedInstanceName,
 						sharedInstanceInvite.invitedById,
+						null,
+						null,
 					)
 					await markLiveNotificationRead(notification)
 					queryClient.invalidateQueries({ queryKey: ['instances'] })
@@ -1010,6 +1012,8 @@ async function installSharedInstanceInviteFromDeepLink(inviteId) {
 						invitePreview.sharedInstanceId,
 						invitePreview.preview.name,
 						invitePreview.managerId,
+						invitePreview.serverManagerName,
+						invitePreview.serverManagerIconUrl,
 					)
 					queryClient.invalidateQueries({ queryKey: ['instances'] })
 				} catch (error) {

@@ -1311,13 +1311,6 @@ provideAppBackup({
 	},
 })
 
-const CONTENT_HINT_KEY = 'content-tab-modpack-hint-dismissed'
-const showContentHint = ref(localStorage.getItem(CONTENT_HINT_KEY) === null)
-function dismissContentHint() {
-	showContentHint.value = false
-	localStorage.setItem(CONTENT_HINT_KEY, 'true')
-}
-
 provideContentManager({
 	items: mergedProjects,
 	loading,
@@ -1406,8 +1399,6 @@ provideContentManager({
 	openSettings: props.openSettings,
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
-	showContentHint,
-	dismissContentHint,
 	shareItems: handleShareItems,
 	getItemId: getContentItemId,
 	mapToTableItem: (item: ContentItem) => ({
