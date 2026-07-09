@@ -20,6 +20,7 @@
 					:versions="versions"
 					:dependency-download-files="dependencyDownloadFiles"
 					:download-data-loaded="downloadRowsLoaded"
+					:versions-loaded="versionsLoaded"
 					:download-reason="downloadReason"
 					:initial-game-version="initialGameVersion"
 					:initial-platform="initialPlatform"
@@ -254,6 +255,9 @@ const { data: versionsV3, isFetching: versionsV3Loading } = useQuery({
 
 const versions = computed<Labrinth.Versions.v3.Version[]>(() =>
 	normalizeVersionsForDownload(versionsV3.value ?? []),
+)
+const versionsLoaded = computed(
+	() => versionsEnabled.value && !versionsV3Loading.value && Array.isArray(versionsV3.value),
 )
 
 const initialGameVersion = computed(() => {

@@ -126,6 +126,9 @@
 			@download="emit('download')"
 		/>
 	</div>
+	<div v-else-if="showNoCompatibleVersions" class="pl-1 text-base text-primary" role="status">
+		{{ noCompatibleVersionsDescription }}
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -174,6 +177,7 @@ const props = withDefaults(
 		versions?: Labrinth.Versions.v3.Version[]
 		dependencyDownloadFiles?: DownloadableFile[]
 		downloadDataLoaded?: boolean
+		versionsLoaded?: boolean
 		downloadReason?: CdnDownloadReason
 		initialGameVersion?: string | null
 		initialPlatform?: string | null
@@ -185,6 +189,7 @@ const props = withDefaults(
 		versions: () => [],
 		dependencyDownloadFiles: () => [],
 		downloadDataLoaded: false,
+		versionsLoaded: false,
 		downloadReason: 'standalone',
 		initialGameVersion: null,
 		initialPlatform: null,
@@ -407,6 +412,25 @@ const suggestedPreReleaseVersions = computed<Labrinth.Versions.v3.Version[]>(() 
 const compatibleVersions = computed<Labrinth.Versions.v3.Version[]>(() => {
 	if (!defaultSelectedVersion.value) return []
 	return [defaultSelectedVersion.value, ...suggestedPreReleaseVersions.value]
+})
+
+const showNoCompatibleVersions = computed(() => {
+	return (
+		props.versionsLoaded &&
+		compatibleVersions.value.length === 0 &&
+		!!currentGameVersion.value &&
+		!!currentPlatform.value
+	)
+})
+
+const noCompatibleVersionsDescription = computed(() => {
+	const gameVersion = currentGameVersion.value
+	if (!gameVersion || !currentPlatform.value) return ''
+
+	return formatMessage(messages.noVersionsAvailable, {
+		gameVersion,
+		platform: currentPlatformText.value,
+	})
 })
 
 const selectedVersion = computed<Labrinth.Versions.v3.Version | null>(() => {
@@ -635,6 +659,10 @@ const messages = defineMessages({
 	noGameVersionsFound: {
 		id: 'project.download.no-game-versions-found',
 		defaultMessage: 'No game versions found',
+	},
+	noVersionsAvailable: {
+		id: 'project.download.no-versions-available',
+		defaultMessage: 'No versions available for {gameVersion} and {platform}.',
 	},
 	platformUnsupportedTooltip: {
 		id: 'project.download.platform-unsupported-tooltip',
