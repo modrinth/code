@@ -205,7 +205,7 @@
 					</div>
 					<div v-else>
 						<h2 class="m-0 mb-2 text-lg font-extrabold">
-							{{ currentStageObj.title }}
+							{{ currentStageObj.hint }}
 						</h2>
 
 						<div v-if="currentStageObj.text" class="mb-4">
@@ -1275,9 +1275,7 @@ const checklistTitleText = computed(() => {
 	if (alreadyReviewed.value || done.value) return 'Moderation'
 	if (generatedMessage.value) return 'Generated Message'
 
-	return currentStageObj.value.id
-		? kebabToTitleCase(currentStageObj.value.id)
-		: currentStageObj.value.title
+	return currentStageObj.value.title ?? kebabToTitleCase(currentStageObj.value.id)
 })
 const currentStage = ref(
 	persistedState?.stage !== undefined && checklist[persistedState.stage]
@@ -1353,7 +1351,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				currentStage: currentStage.value,
 				totalStages: checklist.length,
 				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value.title,
+				currentStageTitle: currentStageObj.value.hint,
 
 				isCollapsed: props.collapsed,
 				isDone: done.value,
@@ -2390,7 +2388,7 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 			return {
 				id: String(index),
 				action: () => (currentStage.value = index),
-				text: stage.id ? kebabToTitleCase(stage.id) : stage.title,
+				text: stage.title ?? kebabToTitleCase(stage.id),
 				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
 				hoverFilled: true,
 				icon: stage.icon ? stage.icon : undefined,

@@ -42,7 +42,8 @@ function getIncorrectLoaderOptions(context: ChecklistActionContext): MultiSelect
 }
 
 const versions: Stage = {
-	title: "Are this project's files correct?",
+	title: 'Versions',
+	hint: "Are this project's files correct?",
 	id: 'versions',
 	icon: VersionIcon,
 	guidance_url:
@@ -186,7 +187,8 @@ const versions: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			weight: 1001,
-			message: async () => (await import('../messages/checklist-messages/versions/incorrect_loader.md?raw')).default,
+			message: async () =>
+				(await import('../messages/checklist-messages/versions/incorrect_loader.md?raw')).default,
 			enablesActions: [
 				{
 					id: 'versions_incorrect_loader_options',

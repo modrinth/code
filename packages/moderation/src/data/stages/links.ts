@@ -120,7 +120,8 @@ function getInaccessibleLinkOptions(context: ChecklistActionContext): MultiSelec
 }
 
 const links: Stage = {
-	title: "Are the project's links accurate and accessible?",
+	title: 'Links',
+	hint: "Are the project's links accurate and accessible?",
 	id: 'links',
 	icon: LinkIcon,
 	guidance_url:

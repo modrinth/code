@@ -3,7 +3,8 @@ import { SignatureIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
 
 const permissions: Stage = {
-	title: 'Does this projects external content have any issues?',
+  title: "Modpack Permissions",
+	hint: 'Does this projects external content have any issues?',
 	id: 'permissions',
 	icon: SignatureIcon,
 	guidance_url: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',

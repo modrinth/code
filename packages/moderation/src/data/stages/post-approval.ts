@@ -4,7 +4,8 @@ import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const postApproval: Stage = {
-	title: 'Issue warnings, notices, or takedowns?',
+	title: 'Post-Approval',
+	hint: 'Issue warnings, notices, or takedowns?',
 	id: 'post-approval',
 	icon: ScaleIcon,
 	guidance_url:

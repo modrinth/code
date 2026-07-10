@@ -4,7 +4,8 @@ import type { ButtonAction, MultiSelectChipsAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const description: Stage = {
-	title: 'Is the description sufficient, accurate, and accessible?',
+	title: "Description",
+	hint: 'Is the description sufficient, accurate, and accessible?',
 	id: 'description',
 	icon: LibraryIcon,
 	guidance_url:

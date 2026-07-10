@@ -4,7 +4,8 @@ import type { ButtonAction, ToggleAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const reupload: Stage = {
-	title: 'Does the author have proper permissions to post this project?',
+	title: 'Reupload',
+	hint: 'Does the author have proper permissions to post this project?',
 	id: 'reupload',
 	icon: CopyrightIcon,
 	guidance_url:
