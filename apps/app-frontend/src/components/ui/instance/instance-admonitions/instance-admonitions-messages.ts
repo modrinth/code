@@ -1,7 +1,5 @@
 import { defineMessages } from '@modrinth/ui'
 
-import type { SharedInstanceUnavailableReason } from '@/helpers/install'
-
 export const instanceAdmonitionsMessages = defineMessages({
 	sharedInstanceChangesHeader: {
 		id: 'app.instance.admonitions.shared-instance.changes-header',
@@ -44,33 +42,6 @@ export const instanceAdmonitionsMessages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.removed-label',
 		defaultMessage: 'Removed',
 	},
-	sharedInstanceUnavailableTitle: {
-		id: 'instance.shared-instance.unavailable.title',
-		defaultMessage: 'Shared instance no longer available',
-	},
-	sharedInstanceUnavailableText: {
-		id: 'instance.shared-instance.unavailable.text-v2',
-		defaultMessage:
-			"Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceDeletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text-v2',
-		defaultMessage:
-			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceAccessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
-		defaultMessage:
-			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceUnavailableFallbackManager: {
-		id: 'instance.shared-instance.unavailable.manager-fallback',
-		defaultMessage: 'the instance manager',
-	},
-	sharedInstanceErrorTitle: {
-		id: 'instance.shared-instance.error.title',
-		defaultMessage: 'Something has gone wrong',
-	},
 	sharedInstanceWrongAccountHeader: {
 		id: 'app.instance.shared-instance-wrong-account.warning-header',
 		defaultMessage: 'You are using the wrong Modrinth account',
@@ -96,14 +67,3 @@ export const instanceAdmonitionsMessages = defineMessages({
 		defaultMessage: 'the linked account',
 	},
 })
-
-export function sharedInstanceUnavailableTextMessage(
-	reason: SharedInstanceUnavailableReason | null,
-) {
-	if (reason === 'deleted') return instanceAdmonitionsMessages.sharedInstanceDeletedText
-	if (reason === 'access_revoked') {
-		return instanceAdmonitionsMessages.sharedInstanceAccessRevokedText
-	}
-
-	return instanceAdmonitionsMessages.sharedInstanceUnavailableText
-}

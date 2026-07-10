@@ -1,15 +1,11 @@
 <template>
 	<Admonition
 		type="warning"
-		:header="formatMessage(messages.sharedInstanceUnavailableTitle)"
+		:header="formatMessage(sharedInstanceErrorMessages.unavailableTitle)"
 		:dismissible="dismissible"
 		@dismiss="emit('dismiss')"
 	>
-		{{
-			formatMessage(sharedInstanceUnavailableTextMessage(reason ?? null), {
-				manager: manager || formatMessage(messages.sharedInstanceUnavailableFallbackManager),
-			})
-		}}
+		{{ formatSharedInstanceUnavailable(reason ?? null, manager) }}
 	</Admonition>
 </template>
 
@@ -17,11 +13,10 @@
 import { Admonition, useVIntl } from '@modrinth/ui'
 
 import type { SharedInstanceUnavailableReason } from '@/helpers/install'
-
 import {
-	instanceAdmonitionsMessages as messages,
-	sharedInstanceUnavailableTextMessage,
-} from './instance-admonitions-messages'
+	sharedInstanceErrorMessages,
+	useSharedInstanceErrors,
+} from '@/helpers/shared-instance-errors'
 
 defineProps<{
 	reason?: SharedInstanceUnavailableReason | null
@@ -34,4 +29,5 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const { formatSharedInstanceUnavailable } = useSharedInstanceErrors()
 </script>

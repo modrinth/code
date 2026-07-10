@@ -42,24 +42,19 @@ import {
 	ButtonStyled,
 	type ContentDiffItem,
 	ContentDiffModal,
-	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import {
-	getErrorMessage,
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
-	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import { get_shared_instance_publish_preview, publish_shared_instance } from '@/helpers/instance'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 
-import {
-	instanceAdmonitionsMessages as messages,
-	sharedInstanceUnavailableTextMessage,
-} from './instance-admonitions-messages'
+import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
 
 const props = defineProps<{
 	instance: GameInstance
@@ -70,31 +65,13 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
+const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 const isPublishing = ref(false)
 const isReviewingPublish = ref(false)
 const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
 const publishDiffs = ref<ContentDiffItem[]>([])
 
 const isPublishButtonDisabled = computed(() => isPublishing.value || isReviewingPublish.value)
-
-function notifySharedInstanceUnavailable(reason: SharedInstanceUnavailableReason | null = null) {
-	addNotification({
-		type: 'warning',
-		title: formatMessage(messages.sharedInstanceUnavailableTitle),
-		text: formatMessage(sharedInstanceUnavailableTextMessage(reason), {
-			manager: formatMessage(messages.sharedInstanceUnavailableFallbackManager),
-		}),
-	})
-}
-
-function notifySharedInstanceError(error: unknown) {
-	addNotification({
-		type: 'error',
-		title: formatMessage(messages.sharedInstanceErrorTitle),
-		text: getErrorMessage(error),
-	})
-}
 
 async function reviewChanges(e?: MouseEvent) {
 	if (isPublishButtonDisabled.value) return

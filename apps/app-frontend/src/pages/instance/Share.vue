@@ -233,13 +233,9 @@
 		</template>
 
 		<EmptyState v-else-if="sharedInstanceUnavailable" type="empty-inbox">
-			<template #heading>{{ formatMessage(messages.sharedInstanceUnavailableTitle) }}</template>
+			<template #heading>{{ formatMessage(sharedInstanceErrorMessages.unavailableTitle) }}</template>
 			<template #description>
-				{{
-					formatMessage(sharedInstanceUnavailableTextMessage(sharedInstanceUnavailableReason), {
-						manager: sharedInstanceUnavailableManager,
-					})
-				}}
+				{{ formatSharedInstanceUnavailable(sharedInstanceUnavailableReason, sharedInstanceUnavailableManager) }}
 			</template>
 		</EmptyState>
 
@@ -347,8 +343,10 @@ import {
 	getFriendUserId,
 } from '@/helpers/friends.ts'
 import {
+	getSharedInstanceUnavailableReason,
 	install_duplicate_instance,
 	installJobInstanceId,
+	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import {
@@ -363,6 +361,10 @@ import {
 	type SharedInstanceUsers,
 } from '@/helpers/instance'
 import { get as getCredentials, type ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
+import {
+	sharedInstanceErrorMessages,
+	useSharedInstanceErrors,
+} from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { search_user } from '@/helpers/users.ts'
 
@@ -389,6 +391,11 @@ const props = defineProps<{
 
 const auth = injectAuth()
 const { handleError } = injectNotificationManager()
+const {
+	formatSharedInstanceUnavailable,
+	notifySharedInstanceError,
+	notifySharedInstanceUnavailable,
+} = useSharedInstanceErrors()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal> | null>(null)
 const modrinthAccountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal> | null>(
 	null,
@@ -451,29 +458,6 @@ const messages = defineMessages({
 	switchAccountButton: {
 		id: 'app.instance.share.locked.switch-account-button',
 		defaultMessage: 'Switch account',
-	},
-	sharedInstanceUnavailableTitle: {
-		id: 'instance.shared-instance.unavailable.title',
-		defaultMessage: 'Shared instance no longer available',
-	},
-	sharedInstanceUnavailableText: {
-		id: 'instance.shared-instance.unavailable.text-v2',
-		defaultMessage:
-			"Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceDeletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text-v2',
-		defaultMessage:
-			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceAccessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
-		defaultMessage:
-			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceUnavailableFallbackManager: {
-		id: 'instance.shared-instance.unavailable.manager-fallback',
-		defaultMessage: 'the instance manager',
 	},
 	removeUserHeader: {
 		id: 'app.instance.share.remove-user-modal.header',
@@ -561,10 +545,21 @@ const sharedInstanceUnavailableReason = computed(
 )
 const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
 const sharedInstanceUnavailableManager = computed(
-	() =>
-		props.sharedInstanceUnavailableManager ||
-		formatMessage(messages.sharedInstanceUnavailableFallbackManager),
+	() => props.sharedInstanceUnavailableManager ?? null,
 )
+
+function notifySharedInstanceOperationError(error: unknown) {
+	if (isSharedInstanceUnavailableError(error)) {
+		notifySharedInstanceUnavailable(
+			getSharedInstanceUnavailableReason(error),
+			sharedInstanceUnavailableManager.value,
+		)
+		return
+	}
+
+	notifySharedInstanceError(toError(error))
+}
+
 const requiresUnlinkBeforeShare = computed(
 	() =>
 		props.instance.link?.type === 'imported_modpack' &&
@@ -850,7 +845,7 @@ const inviteShareMutation = useMutation({
 		removePendingRow(user.id)
 		restoreSharedRowsQuery(context)
 		restorePendingRows(context)
-		handleError(toError(error))
+		notifySharedInstanceOperationError(error)
 	},
 	onSuccess: async (users, user) => {
 		try {
@@ -890,7 +885,7 @@ const removeShareMutation = useMutation({
 	onError: (error, _id, context) => {
 		restoreSharedRowsQuery(context)
 		restorePendingRows(context)
-		handleError(toError(error))
+		notifySharedInstanceOperationError(error)
 	},
 	onSuccess: async (users) => {
 		try {
@@ -959,12 +954,6 @@ function sharedInstanceUserEntries(users: SharedInstanceUsers): SharedInstanceUs
 
 function sharedInstanceMethod(user: SharedInstanceUser): ShareMethod {
 	return user.join_type === 'link' ? 'link' : 'direct'
-}
-
-function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
-	if (reason === 'deleted') return messages.sharedInstanceDeletedText
-	if (reason === 'access_revoked') return messages.sharedInstanceAccessRevokedText
-	return messages.sharedInstanceUnavailableText
 }
 
 function parseSharedInstanceDate(value?: string | null) {
@@ -1039,7 +1028,7 @@ async function unlinkImportedModpackForShare() {
 		if (!(await ensureInviteLink())) return
 		invitePlayersModal.value?.show()
 	} catch (error) {
-		handleError(toError(error))
+		notifySharedInstanceOperationError(error)
 	}
 }
 
@@ -1053,7 +1042,7 @@ async function ensureInviteLink() {
 		inviteLinkDetails.value = invite
 		return true
 	} catch (error) {
-		handleError(toError(error))
+		notifySharedInstanceOperationError(error)
 		return false
 	} finally {
 		inviteLinkPending.value = false

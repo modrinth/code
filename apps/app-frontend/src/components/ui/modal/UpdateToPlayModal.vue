@@ -26,7 +26,6 @@ import {
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
-	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -35,7 +34,6 @@ import { computed, ref, watch } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import {
-	getErrorMessage,
 	getSharedInstanceUnavailableReason,
 	install_update_shared_instance,
 	isSharedInstanceUnavailableError,
@@ -44,6 +42,7 @@ import {
 	wait_for_install_job,
 } from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { injectServerInstall } from '@/providers/server-install'
 
@@ -85,7 +84,7 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
+const { notifySharedInstanceError } = useSharedInstanceErrors()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
@@ -291,11 +290,7 @@ async function handleUpdate() {
 				return
 			}
 
-			addNotification({
-				type: 'error',
-				title: formatMessage(messages.sharedInstanceErrorTitle),
-				text: getErrorMessage(error),
-			})
+			notifySharedInstanceError(error)
 		} finally {
 			emit('complete')
 		}
@@ -382,10 +377,6 @@ const messages = defineMessages({
 	sharedInstanceRemovedLabel: {
 		id: 'app.modal.update-to-play.shared-instance-removed-label',
 		defaultMessage: 'Removed',
-	},
-	sharedInstanceErrorTitle: {
-		id: 'instance.shared-instance.error.title',
-		defaultMessage: 'Something has gone wrong',
 	},
 })
 

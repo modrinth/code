@@ -393,7 +393,6 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3, get_user } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
-	getErrorMessage,
 	getSharedInstanceUnavailableReason,
 	install_existing_instance,
 	install_get_shared_instance_update_preview,
@@ -405,6 +404,7 @@ import {
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
@@ -446,35 +446,9 @@ const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const { formatMessage } = useVIntl()
+const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 
 const messages = defineMessages({
-	sharedInstanceUnavailableTitle: {
-		id: 'instance.shared-instance.unavailable.title',
-		defaultMessage: 'Shared instance no longer available',
-	},
-	sharedInstanceUnavailableText: {
-		id: 'instance.shared-instance.unavailable.text-v2',
-		defaultMessage:
-			"Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceDeletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text-v2',
-		defaultMessage:
-			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceAccessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
-		defaultMessage:
-			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
-	},
-	sharedInstanceUnavailableFallbackManager: {
-		id: 'instance.shared-instance.unavailable.manager-fallback',
-		defaultMessage: 'the instance manager',
-	},
-	sharedInstanceErrorTitle: {
-		id: 'instance.shared-instance.error.title',
-		defaultMessage: 'Something has gone wrong',
-	},
 	sharedInstanceTooltip: {
 		id: 'instance.shared-instance.tooltip',
 		defaultMessage: "This instance's content is being managed by someone else.",
@@ -760,11 +734,7 @@ async function checkSharedInstanceAvailability(instanceId: string) {
 			return
 		}
 
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.sharedInstanceErrorTitle),
-			text: getErrorMessage(error),
-		})
+		notifySharedInstanceError(error)
 	}
 }
 
@@ -917,24 +887,14 @@ const launchInstance = async (context: string) => {
 	})
 }
 
-function sharedInstanceUnavailableTextMessage(reason: SharedInstanceUnavailableReason | null) {
-	if (reason === 'deleted') return messages.sharedInstanceDeletedText
-	if (reason === 'access_revoked') return messages.sharedInstanceAccessRevokedText
-	return messages.sharedInstanceUnavailableText
-}
-
 async function handleSharedInstanceUnavailable(
 	reason: SharedInstanceUnavailableReason | null = null,
 ) {
 	const manager =
 		sharedInstanceManager.value?.username ??
 		sharedInstanceServerManager.value?.name ??
-		formatMessage(messages.sharedInstanceUnavailableFallbackManager)
-	addNotification({
-		type: 'warning',
-		title: formatMessage(messages.sharedInstanceUnavailableTitle),
-		text: formatMessage(sharedInstanceUnavailableTextMessage(reason), { manager }),
-	})
+		null
+	notifySharedInstanceUnavailable(reason, manager)
 	await fetchInstance()
 	sharedInstanceUpdatePreview.value = null
 	sharedInstanceUnavailableReason.value = reason
