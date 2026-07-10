@@ -43,6 +43,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	public readonly launchermeta!: InferredClientModules['launchermeta']
 	public readonly paper!: InferredClientModules['paper']
 	public readonly purpur!: InferredClientModules['purpur']
+	public readonly sharedinstances!: InferredClientModules['sharedinstances']
 
 	constructor(config: ClientConfig) {
 		super()

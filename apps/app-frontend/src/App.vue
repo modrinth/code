@@ -1711,10 +1711,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<PlusIcon />
 			</NavButton>
-			<NavButton
-				v-tooltip.right="'Install from invite link'"
-				:to="showManualInviteLinkModal"
-			>
+			<NavButton v-tooltip.right="'Install from invite link'" :to="showManualInviteLinkModal">
 				<LinkIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
@@ -2006,10 +2003,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<template #actions>
 			<div class="flex justify-end gap-2">
 				<ButtonStyled>
-					<button
-						:disabled="manualInviteProcessing"
-						@click="manualInviteLinkModal?.hide()"
-					>
+					<button :disabled="manualInviteProcessing" @click="manualInviteLinkModal?.hide()">
 						<XIcon />
 						Cancel
 					</button>

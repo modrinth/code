@@ -3692,6 +3692,18 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Show more"
   },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Advanced"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Exclude data packs"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Exclude mods"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Exclude plugins"
+  },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
   },

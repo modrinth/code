@@ -102,7 +102,7 @@ import ButtonStyled from './ButtonStyled.vue'
 
 const props = withDefaults(
 	defineProps<{
-		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation' | 'circle-warning'
+		type?: 'info' | 'warning' | 'critical' | 'success' | 'moderation' | 'circle-warning' | 'neutral'
 		header?: string
 		body?: string
 		inlineActions?: boolean
@@ -167,6 +167,7 @@ const typeClasses = {
 	critical: 'border-brand-red bg-bg-red',
 	success: 'border-brand-green bg-bg-green',
 	moderation: 'border-brand-orange bg-bg-orange',
+	neutral: 'border-surface-4 bg-surface-3',
 }
 
 const iconClasses = {
@@ -176,6 +177,7 @@ const iconClasses = {
 	critical: 'text-brand-red',
 	success: 'text-brand-green',
 	moderation: 'text-brand-orange',
+	neutral: 'text-secondary',
 }
 
 const buttonColors = {
@@ -185,6 +187,7 @@ const buttonColors = {
 	critical: 'red',
 	success: 'green',
 	moderation: 'orange',
+	neutral: 'standard',
 } as const
 
 const progressTrackClasses = {
@@ -194,6 +197,7 @@ const progressTrackClasses = {
 	critical: 'bg-brand-red/20',
 	success: 'bg-brand-green/20',
 	moderation: 'bg-brand-orange/20',
+	neutral: 'bg-surface-4',
 }
 
 const progressFillClasses = {
@@ -205,6 +209,7 @@ const progressFillClasses = {
 	blue: 'bg-brand-blue',
 	green: 'bg-brand-green',
 	red: 'bg-brand-red',
+	neutral: 'bg-surface-5',
 }
 </script>
 
