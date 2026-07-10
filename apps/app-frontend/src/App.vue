@@ -41,7 +41,6 @@ import {
 	defineMessages,
 	I18nDebugPanel,
 	LoadingBar,
-	NewModal,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
@@ -51,7 +50,6 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
-	StyledInput,
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
@@ -83,12 +81,12 @@ import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
-import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import SharedInstanceInviteHandler from '@/components/ui/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
@@ -98,13 +96,7 @@ import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
-import {
-	install_accept_shared_instance_invite,
-	install_create_modpack_instance,
-	install_get_modpack_preview,
-	install_get_shared_instance_preview,
-	install_shared_instance,
-} from '@/helpers/install'
+import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import { list, run } from '@/helpers/instance'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
@@ -262,7 +254,6 @@ const {
 const news = ref([])
 const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
-const displayedSharedInstanceInviteNotifications = new Set()
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -649,10 +640,7 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
-const manualInviteLinkModal = ref()
-const manualInviteLink = ref('')
-const manualInviteProcessing = ref(false)
-const modrinthAccountRequiredModal = ref()
+const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginFlowWaitModal = ref()
@@ -681,7 +669,6 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
-	// TODO: move all of this into it's own helper
 	const refreshId = ++credentialsRefreshId
 	credentials.value = undefined
 
@@ -854,191 +841,9 @@ function openServerInviteInviterProfile(inviterName) {
 	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
 }
 
-function getSharedInstanceInvite(notification) {
-	const body = notification.body
-
-	return {
-		sharedInstanceId: body.shared_instance_id,
-		sharedInstanceName: body.shared_instance_name,
-		invitedById: body.invited_by,
-		invitedByUsername: body.invited_by_username,
-		invitedByAvatarUrl: body.invited_by_avatar_url,
-		instanceIconUrl: body.instance_icon_url,
-	}
-}
-
-async function resolveSharedInstanceInvite(notification) {
-	const sharedInstanceInvite = getSharedInstanceInvite(notification)
-	const invitedBy =
-		!sharedInstanceInvite.invitedByUsername && typeof sharedInstanceInvite.invitedById === 'string'
-			? await get_user(sharedInstanceInvite.invitedById, 'bypass').catch(() => null)
-			: null
-
-	return {
-		...sharedInstanceInvite,
-		invitedByUsername: sharedInstanceInvite.invitedByUsername ?? invitedBy?.username ?? null,
-		invitedByAvatarUrl: sharedInstanceInvite.invitedByAvatarUrl ?? invitedBy?.avatar_url ?? null,
-	}
-}
-
-async function acceptSharedInstanceInviteNotification(
-	notification,
-	resolvedSharedInstanceInvite = null,
-) {
-	try {
-		const sharedInstanceInvite =
-			resolvedSharedInstanceInvite ?? (await resolveSharedInstanceInvite(notification))
-		const preview = await install_get_shared_instance_preview(
-			sharedInstanceInvite.sharedInstanceId,
-			sharedInstanceInvite.sharedInstanceName,
-		)
-		if (sharedInstanceInvite.instanceIconUrl && !preview.iconUrl) {
-			preview.iconUrl = sharedInstanceInvite.instanceIconUrl
-		}
-		const showInstallModal = installToPlayModal.value?.showSharedInstance
-
-		if (!showInstallModal) {
-			throw new Error('Install to play modal is not available.')
-		}
-
-		showInstallModal(
-			{
-				preview,
-				invitedByUsername: sharedInstanceInvite.invitedByUsername,
-			},
-			async () => {
-				try {
-					await install_shared_instance(
-						sharedInstanceInvite.sharedInstanceId,
-						sharedInstanceInvite.sharedInstanceName,
-						sharedInstanceInvite.invitedById,
-						null,
-						null,
-					)
-					await markLiveNotificationRead(notification)
-					queryClient.invalidateQueries({ queryKey: ['instances'] })
-				} catch (error) {
-					handleError(error)
-					throw error
-				}
-			},
-		)
-	} catch (error) {
-		handleError(error)
-	}
-}
-
-async function declineSharedInstanceInviteNotification(notification) {
-	try {
-		getSharedInstanceInvite(notification)
-		await markLiveNotificationRead(notification)
-	} catch (error) {
-		handleError(error)
-	}
-}
-
-function waitForCredentialsReady() {
-	if (credentials.value !== undefined) return Promise.resolve()
-
-	return new Promise((resolve) => {
-		const stop = watch(credentials, (value) => {
-			if (value !== undefined) {
-				stop()
-				resolve()
-			}
-		})
-	})
-}
-
-async function requireModrinthAccountForInvite() {
-	await waitForCredentialsReady()
-	if (credentials.value?.session) return true
-
-	const modal = modrinthAccountRequiredModal.value
-	if (modal?.show) {
-		return await modal.show()
-	}
-
-	await signIn()
-	return !!credentials.value?.session
-}
-
-async function requestModrinthAuth(flow) {
-	await signIn(flow)
-	return !!credentials.value?.session
-}
-
-async function installSharedInstanceInviteFromDeepLink(inviteId) {
-	try {
-		if (!(await requireModrinthAccountForInvite())) return
-
-		const invitePreview = await install_accept_shared_instance_invite(inviteId)
-		const showInstallModal = installToPlayModal.value?.showSharedInstance
-
-		if (!showInstallModal) {
-			throw new Error('Install to play modal is not available.')
-		}
-
-		showInstallModal(
-			{
-				preview: invitePreview.preview,
-			},
-			async () => {
-				try {
-					await install_shared_instance(
-						invitePreview.sharedInstanceId,
-						invitePreview.preview.name,
-						invitePreview.managerId,
-						invitePreview.serverManagerName,
-						invitePreview.serverManagerIconUrl,
-					)
-					queryClient.invalidateQueries({ queryKey: ['instances'] })
-				} catch (error) {
-					handleError(error)
-					throw error
-				}
-			},
-		)
-	} catch (error) {
-		handleError(error)
-	}
-}
-
-function manualInviteId() {
-	const value = manualInviteLink.value.trim()
-	if (!value) return null
-
-	try {
-		const url = new URL(value)
-		const match = /^\/share\/([^/]+)\/?$/.exec(url.pathname)
-		return match ? decodeURIComponent(match[1]) : null
-	} catch {
-		return null
-	}
-}
-
-function showManualInviteLinkModal() {
-	manualInviteLink.value = ''
-	manualInviteLinkModal.value?.show()
-}
-
-async function processManualInviteLink() {
-	const inviteId = manualInviteId()
-	if (!inviteId) return
-
-	manualInviteProcessing.value = true
-	try {
-		manualInviteLinkModal.value?.hide()
-		await installSharedInstanceInviteFromDeepLink(inviteId)
-	} catch (error) {
-		handleError(error)
-	} finally {
-		manualInviteProcessing.value = false
-	}
-}
-
 async function handleLiveNotification(notification) {
 	if (!notification?.body || notification.read) return
+	if (await sharedInstanceInviteHandler.value?.handleNotification(notification)) return
 
 	if (notification.body.type === 'server_invite') {
 		if (displayedServerInviteNotifications.has(notification.id)) return
@@ -1066,27 +871,6 @@ async function handleLiveNotification(notification) {
 		})
 	}
 
-	if (notification.body.type === 'shared_instance_invite') {
-		if (displayedSharedInstanceInviteNotifications.has(notification.id)) return
-
-		displayedSharedInstanceInviteNotifications.add(notification.id)
-		const sharedInstanceInvite = await resolveSharedInstanceInvite(notification)
-
-		addPopupNotification({
-			title: sharedInstanceInvite.sharedInstanceName,
-			autoCloseMs: null,
-			toast: {
-				type: 'instance-invite',
-				actorName: sharedInstanceInvite.invitedByUsername,
-				actorAvatarUrl: sharedInstanceInvite.invitedByAvatarUrl ?? undefined,
-				entityName: sharedInstanceInvite.sharedInstanceName,
-				entityIconUrl: sharedInstanceInvite.instanceIconUrl ?? undefined,
-				onAccept: () => acceptSharedInstanceInviteNotification(notification, sharedInstanceInvite),
-				onDecline: () => declineSharedInstanceInviteNotification(notification),
-				onOpenActor: () => openServerInviteInviterProfile(sharedInstanceInvite.invitedByUsername),
-			},
-		})
-	}
 }
 
 async function handleCommand(e) {
@@ -1120,7 +904,7 @@ async function handleCommand(e) {
 			await run(e.id).catch(handleError)
 		}
 	} else if (e.event === 'InstallSharedInstanceInvite') {
-		await installSharedInstanceInviteFromDeepLink(e.invite_id)
+		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
@@ -1711,7 +1495,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<PlusIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="'Install from invite link'" :to="showManualInviteLinkModal">
+			<NavButton
+				v-tooltip.right="'Install from invite link'"
+				:to="(event) => sharedInstanceInviteHandler?.showManualInviteLinkModal(event)"
+			>
 				<LinkIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
@@ -1983,43 +1770,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
-	<ModrinthAccountRequiredModal
-		ref="modrinthAccountRequiredModal"
-		:request-auth="requestModrinthAuth"
-	/>
-	<NewModal ref="manualInviteLinkModal" header="Install from invite link" max-width="32rem">
-		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Invite link</span>
-			<StyledInput
-				v-model="manualInviteLink"
-				placeholder="https://modrinth.com/share/..."
-				:disabled="manualInviteProcessing"
-				@keydown.enter="processManualInviteLink"
-			/>
-			<span v-if="manualInviteLink && !manualInviteId()" class="text-sm text-red">
-				Enter a valid Modrinth shared-instance invite link.
-			</span>
-		</div>
-		<template #actions>
-			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button :disabled="manualInviteProcessing" @click="manualInviteLinkModal?.hide()">
-						<XIcon />
-						Cancel
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button
-						:disabled="!manualInviteId() || manualInviteProcessing"
-						@click="processManualInviteLink"
-					>
-						<LinkIcon />
-						Process
-					</button>
-				</ButtonStyled>
-			</div>
-		</template>
-	</NewModal>
+	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" />
 	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>
