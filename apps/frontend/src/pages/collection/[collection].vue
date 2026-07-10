@@ -365,7 +365,7 @@
 							:filter-type="filterType"
 							:provided-filters="[]"
 							:open-by-default="false"
-							class="card-shadow rounded-2xl border border-solid bg-surface-3 border-surface-4"
+							class="card-shadow rounded-2xl border border-solid border-surface-4 bg-surface-3"
 							button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none"
 							content-class="mb-4 mx-3"
 							inner-panel-class="p-1"
@@ -384,51 +384,55 @@
 						:overridden-provided-filter-types="[]"
 					/>
 				</div>
-			<ProjectCardList
+				<ProjectCardList
 					v-if="displayProjects.length > 0"
-				:layout="cosmetics.searchDisplayMode.collection"
-			>
-				<ProjectCard
-						v-for="project in displayProjects"
-					:key="project.id"
-					:link="`/${project.project_type}/${project.slug ?? project.id}`"
-					:title="project.title"
-					:icon-url="project.icon_url"
-					:banner="project.gallery.find((element) => element.featured)?.url"
-					:summary="project.description"
-					:date-updated="project.updated"
-					:downloads="project.downloads ?? 0"
-					:followers="project.followers ?? 0"
-					:tags="project.categories"
-					:environment="{
-						clientSide: project.client_side,
-						serverSide: project.server_side,
-					}"
-					:color="project.color"
-					:layout="
-						cosmetics.searchDisplayMode.collection === 'grid' ||
-						cosmetics.searchDisplayMode.collection === 'gallery'
-							? 'grid'
-							: 'list'
-					"
+					:layout="cosmetics.searchDisplayMode.collection"
 				>
-					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<ButtonStyled v-if="canEdit">
-							<button class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
-								<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-								<XIcon v-else aria-hidden="true" />
-								{{ formatMessage(messages.removeProjectButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-if="collection.id === 'following'">
-							<button @click="unfollowProject(project)">
-								<HeartMinusIcon aria-hidden="true" />
-								{{ formatMessage(messages.unfollowProjectButton) }}
-							</button>
-						</ButtonStyled>
-					</template>
-				</ProjectCard>
-			</ProjectCardList>
+					<ProjectCard
+						v-for="project in displayProjects"
+						:key="project.id"
+						:link="`/${project.project_type}/${project.slug ?? project.id}`"
+						:title="project.title"
+						:icon-url="project.icon_url"
+						:banner="project.gallery.find((element) => element.featured)?.url"
+						:summary="project.description"
+						:date-updated="project.updated"
+						:downloads="project.downloads ?? 0"
+						:followers="project.followers ?? 0"
+						:tags="project.categories"
+						:environment="{
+							clientSide: project.client_side,
+							serverSide: project.server_side,
+						}"
+						:color="project.color"
+						:layout="
+							cosmetics.searchDisplayMode.collection === 'grid' ||
+							cosmetics.searchDisplayMode.collection === 'gallery'
+								? 'grid'
+								: 'list'
+						"
+					>
+						<template v-if="canEdit || collection.id === 'following'" #actions>
+							<ButtonStyled v-if="canEdit">
+								<button
+									class="remove-btn"
+									:disabled="removing"
+									@click="() => removeProject(project)"
+								>
+									<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+									<XIcon v-else aria-hidden="true" />
+									{{ formatMessage(messages.removeProjectButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-if="collection.id === 'following'">
+								<button @click="unfollowProject(project)">
+									<HeartMinusIcon aria-hidden="true" />
+									{{ formatMessage(messages.unfollowProjectButton) }}
+								</button>
+							</ButtonStyled>
+						</template>
+					</ProjectCard>
+				</ProjectCardList>
 				<EmptyState
 					v-else
 					type="no-search-result"
