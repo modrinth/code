@@ -175,6 +175,7 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.error = Some(InstallErrorView {
         code: "canceled".to_string(),
         message: "Install was canceled".to_string(),
+        reason: None,
     });
     recovery::apply_cleanup(&job.state, &state).await?;
     clear_deleted_new_instance_id(&mut job.state);
@@ -1750,16 +1751,23 @@ fn set_display(
 
 fn install_error_view(error: &crate::Error) -> InstallErrorView {
     match error.raw.as_ref() {
+        ErrorKind::SharedInstanceUnavailable(reason) => InstallErrorView {
+            code: "shared_instance_unavailable".to_string(),
+            message: error.to_string(),
+            reason: Some(*reason),
+        },
         ErrorKind::FetchError(_)
         | ErrorKind::ApiIsDownError(_)
         | ErrorKind::WSError(_)
         | ErrorKind::WSClosedError(_) => InstallErrorView {
             code: "network_error".to_string(),
             message: "network_error".to_string(),
+            reason: None,
         },
         _ => InstallErrorView {
             code: "unknown_error".to_string(),
             message: "unknown_error".to_string(),
+            reason: None,
         },
     }
 }

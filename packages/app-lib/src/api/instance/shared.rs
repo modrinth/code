@@ -15,6 +15,7 @@ use crate::state::{
     ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
+use crate::SharedInstanceUnavailableReason;
 use chrono::{DateTime, Utc};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
@@ -22,9 +23,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 
-const SHARED_INSTANCE_DELETED_ERROR_CODE: &str = "shared_instance_deleted";
-const SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE: &str =
-    "shared_instance_access_revoked";
 const SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS: i32 = 604800;
 const SHARED_INSTANCE_INVITE_MAX_USES: i32 = 10;
 
@@ -43,12 +41,6 @@ impl SharedInstancesRequestAuth {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum SharedInstanceUnavailableReason {
-    Deleted,
-    AccessRevoked,
-}
-
 impl SharedInstanceUnavailableReason {
     fn from_status(status: StatusCode) -> Option<Self> {
         match status {
@@ -58,12 +50,6 @@ impl SharedInstanceUnavailableReason {
         }
     }
 
-    fn error_code(self) -> &'static str {
-        match self {
-            Self::Deleted => SHARED_INSTANCE_DELETED_ERROR_CODE,
-            Self::AccessRevoked => SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE,
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -997,7 +983,7 @@ async fn clear_shared_instance_if_current_user(
 fn shared_instance_unavailable_error(
     reason: SharedInstanceUnavailableReason,
 ) -> crate::Error {
-    crate::ErrorKind::InputError(reason.error_code().to_string()).into()
+    crate::ErrorKind::SharedInstanceUnavailable(reason).into()
 }
 
 fn shared_instance_unavailable_message(

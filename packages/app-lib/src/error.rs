@@ -14,6 +14,22 @@ pub struct LabrinthError {
     pub description: String,
 }
 
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SharedInstanceUnavailableReason {
+    Deleted,
+    AccessRevoked,
+}
+
+impl std::fmt::Display for SharedInstanceUnavailableReason {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Deleted => write!(fmt, "deleted"),
+            Self::AccessRevoked => write!(fmt, "access_revoked"),
+        }
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum ErrorKind {
     #[error("{0:?}")]
@@ -91,6 +107,9 @@ pub enum ErrorKind {
 
     #[error("Invalid input: {0}")]
     InputError(String),
+
+    #[error("Shared instance unavailable: {0}")]
+    SharedInstanceUnavailable(SharedInstanceUnavailableReason),
 
     #[error("Join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),

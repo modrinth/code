@@ -96,36 +96,11 @@ export interface SharedInstanceUpdateDiff {
 }
 
 export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
-export const SHARED_INSTANCE_DELETED_ERROR_CODE = 'shared_instance_deleted'
-export const SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE = 'shared_instance_access_revoked'
 
-export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'unknown'
+export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked'
 
-function errorSearchText(error: unknown, seen = new Set<object>()): string {
-	if (error == null) return ''
-	if (typeof error === 'string') return error
-	if (typeof error === 'number' || typeof error === 'boolean') return String(error)
-	if (error instanceof Error) {
-		return [error.name, error.message, error.cause ? errorSearchText(error.cause, seen) : '']
-			.filter(Boolean)
-			.join(' ')
-	}
-	if (typeof error === 'object') {
-		if (seen.has(error)) return ''
-		seen.add(error)
-		const value = error as {
-			message?: unknown
-			error?: unknown
-			cause?: unknown
-			details?: unknown
-		}
-		return [value.message, value.error, value.cause, value.details, ...Object.values(error)]
-			.map((value) => errorSearchText(value, seen))
-			.filter(Boolean)
-			.join(' ')
-	}
-
-	return ''
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null
 }
 
 export function isSharedInstanceUnavailableError(error: unknown) {
@@ -135,15 +110,15 @@ export function isSharedInstanceUnavailableError(error: unknown) {
 export function getSharedInstanceUnavailableReason(
 	error: unknown,
 ): SharedInstanceUnavailableReason | null {
-	const text = errorSearchText(error)
-	if (text.includes(SHARED_INSTANCE_DELETED_ERROR_CODE)) return 'deleted'
-	if (text.includes(SHARED_INSTANCE_ACCESS_REVOKED_ERROR_CODE)) return 'access_revoked'
-	if (text.includes(SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE)) return 'unknown'
-	return null
+	if (!isRecord(error) || error.code !== SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE) return null
+	return error.reason === 'deleted' || error.reason === 'access_revoked' ? error.reason : null
 }
 
 export function getErrorMessage(error: unknown): string {
-	return errorSearchText(error) || 'Unknown error'
+	if (typeof error === 'string') return error
+	if (error instanceof Error) return error.message || 'Unknown error'
+	if (isRecord(error) && typeof error.message === 'string') return error.message
+	return 'Unknown error'
 }
 
 export type InstallJobStatus =
@@ -218,7 +193,11 @@ export interface InstallJobSnapshot {
 		  }
 		| { type: 'import'; launcher_type: string; instance_folder: string }
 	display?: { title: string; icon?: string | null } | null
-	error?: { code: string; message: string } | null
+	error?: {
+		code: string
+		message: string
+		reason?: SharedInstanceUnavailableReason | null
+	} | null
 	created: string
 	modified: string
 	finished?: string | null
@@ -367,7 +346,8 @@ export function isInstallJobFinished(status: InstallJobStatus) {
 function settleInstallJob(job: InstallJobSnapshot) {
 	if (job.status === 'succeeded') return job
 
-	throw new Error(job.error?.message ?? `Install job ${job.job_id} ${job.status}`)
+	if (job.error) throw job.error
+	throw new Error(`Install job ${job.job_id} ${job.status}`)
 }
 
 export async function wait_for_install_job(jobId: string) {

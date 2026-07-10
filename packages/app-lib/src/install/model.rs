@@ -389,6 +389,8 @@ pub struct InstallRollbackState {
 pub struct InstallErrorView {
     pub code: String,
     pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<crate::SharedInstanceUnavailableReason>,
 }
 
 impl InstallErrorView {
@@ -396,6 +398,7 @@ impl InstallErrorView {
         Self {
             code: code.to_string(),
             message: error.to_string(),
+            reason: None,
         }
     }
 }
