@@ -6,7 +6,7 @@ import { createContext } from '#ui/providers/create-context'
 
 import type {
 	BulkOperationStatus,
-	ContentActionWarningMode,
+	ContentActionWarning,
 	ContentCardTableItem,
 	ContentItem,
 	ContentModpackCardCategory,
@@ -68,8 +68,8 @@ export interface ContentManagerContext {
 	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
 	canDeleteItem?: (item: ContentItem) => boolean
 	canToggleItem?: (item: ContentItem) => boolean
-	getDeleteWarningMode?: (items: ContentItem[]) => ContentActionWarningMode
-	getDisableWarningMode?: (items: ContentItem[]) => ContentActionWarningMode
+	getDeleteWarning?: (items: ContentItem[]) => ContentActionWarning | null
+	getDisableWarning?: (items: ContentItem[]) => ContentActionWarning | null
 	getDeleteDependencyWarning?: (
 		items: ContentItem[],
 	) => ContentDependencyWarning | null | Promise<ContentDependencyWarning | null>

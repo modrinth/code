@@ -48,6 +48,10 @@ pub enum SharedInstanceRole {
 }
 
 impl SharedInstanceRole {
+	pub fn is_member(self) -> bool {
+		self == Self::Member
+	}
+
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Owner => "owner",

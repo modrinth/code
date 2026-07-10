@@ -1,7 +1,7 @@
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
 use crate::state::instances::adapters::sqlite::instance_rows;
-use crate::state::{ContentSourceKind, ProjectType, SharedInstanceRole, State};
+use crate::state::{ContentSourceKind, ProjectType, State};
 use crate::util::fetch;
 use modrinth_content_management::{
     ContentType, ResolutionPreferences, ResolveContentPlan,
@@ -283,7 +283,7 @@ async fn ensure_shared_instance_can_modify_project(
     })?;
     if !metadata
         .shared_instance
-        .is_some_and(|attachment| attachment.role == SharedInstanceRole::Member)
+        .is_some_and(|attachment| attachment.role.is_member())
     {
         return Ok(());
     }
@@ -295,7 +295,7 @@ async fn ensure_shared_instance_can_modify_project(
             state,
         )
         .await?;
-    if is_shared_instance_managed_source_kind(source_kind) {
+    if source_kind.is_some_and(ContentSourceKind::is_shared_instance_managed) {
         return Err(crate::ErrorKind::InputError(
             "Shared instance managed content cannot be changed directly."
                 .to_string(),
@@ -304,19 +304,6 @@ async fn ensure_shared_instance_can_modify_project(
     }
 
     Ok(())
-}
-
-fn is_shared_instance_managed_source_kind(
-    source_kind: Option<ContentSourceKind>,
-) -> bool {
-    matches!(
-        source_kind,
-        Some(
-            ContentSourceKind::SharedInstance
-                | ContentSourceKind::ModrinthModpack
-                | ContentSourceKind::ImportedModpack
-        )
-    )
 }
 
 #[tracing::instrument]

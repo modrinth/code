@@ -1,6 +1,5 @@
 use crate::state::instances::{
     ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
-    SharedInstanceRole,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
@@ -328,7 +327,7 @@ async fn plan_bulk_update(
         let managed_paths = installed
             .iter()
             .filter(|project| {
-                is_shared_instance_managed_source_kind(project.source_kind)
+                project.source_kind.is_shared_instance_managed()
             })
             .map(|project| project.relative_path.clone())
             .collect::<HashSet<_>>();
@@ -453,7 +452,7 @@ async fn bulk_updateable_project_paths(
             !shared_instance_member
                 || !item
                     .source_kind
-                    .is_some_and(is_shared_instance_managed_source_kind)
+                    .is_some_and(ContentSourceKind::is_shared_instance_managed)
         })
         .map(|item| item.file_path)
         .collect())
@@ -517,20 +516,9 @@ async fn is_shared_instance_member(
         return Ok(false);
     };
 
-    Ok(metadata.shared_instance.is_some_and(|attachment| {
-        attachment.role == SharedInstanceRole::Member
-    }))
-}
-
-fn is_shared_instance_managed_source_kind(
-    source_kind: ContentSourceKind,
-) -> bool {
-    matches!(
-        source_kind,
-        ContentSourceKind::SharedInstance
-            | ContentSourceKind::ModrinthModpack
-            | ContentSourceKind::ImportedModpack
-    )
+    Ok(metadata
+        .shared_instance
+        .is_some_and(|attachment| attachment.role.is_member()))
 }
 
 async fn dependency_closure(

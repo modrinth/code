@@ -1,14 +1,14 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(headerMessage)"
+		:header="props.header ?? formatMessage(messages.header)"
 		fade="warning"
 		max-width="500px"
 		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(admonitionHeaderMessage)">
-				{{ formatMessage(admonitionBodyMessage) }}
+			<Admonition type="warning" :header="admonitionHeader">
+				{{ admonitionBody }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
@@ -54,7 +54,8 @@ import { commonMessages } from '#ui/utils/common-messages'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
-	mode?: 'default' | 'share-instance' | 'shared-instance-managed'
+	header?: string
+	warning?: { header: string; body: string } | null
 	server?: boolean
 	backupTip?: string
 	actionDisabled?: boolean
@@ -78,23 +79,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'Mods and content will be merged with what you added on top of the modpack, and it will stop receiving updates.',
 	},
-	shareInstanceAdmonitionHeader: {
-		id: 'content.confirm-unlink.share-instance-admonition-header',
-		defaultMessage: 'Sharing requires unlinking',
-	},
-	shareInstanceAdmonitionBody: {
-		id: 'content.confirm-unlink.share-instance-admonition-body',
-		defaultMessage: 'You must unlink this modpack to share your instance',
-	},
-	sharedInstanceManagedAdmonitionHeader: {
-		id: 'content.confirm-unlink.shared-instance-managed-admonition-header',
-		defaultMessage: 'This is managed by the shared instance',
-	},
-	sharedInstanceManagedAdmonitionBody: {
-		id: 'content.confirm-unlink.shared-instance-managed-admonition-body',
-		defaultMessage:
-			'Unlinking only changes your local copy. Future shared instance updates may restore or change it again.',
-	},
 	unlinkButton: {
 		id: 'content.confirm-unlink.unlink-button',
 		defaultMessage: 'Unlink',
@@ -108,22 +92,16 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
-const headerMessage = computed(() => messages.header)
-const admonitionHeaderMessage = computed(() => {
-	if (props.mode === 'share-instance') return messages.shareInstanceAdmonitionHeader
-	if (props.mode === 'shared-instance-managed')
-		return messages.sharedInstanceManagedAdmonitionHeader
-
-	return messages.admonitionHeader
+const admonitionHeader = computed(() => {
+	if (props.warning) return props.warning.header
+	return formatMessage(messages.admonitionHeader)
 })
-const admonitionBodyMessage = computed(() => {
-	if (props.mode === 'share-instance') return messages.shareInstanceAdmonitionBody
-	if (props.mode === 'shared-instance-managed') return messages.sharedInstanceManagedAdmonitionBody
-
-	return messages.admonitionBody
+const admonitionBody = computed(() => {
+	if (props.warning) return props.warning.body
+	return formatMessage(messages.admonitionBody)
 })
 const actionMessage = computed(() =>
-	props.server && props.mode !== 'share-instance' ? messages.header : messages.unlinkButton,
+	props.server ? messages.header : messages.unlinkButton,
 )
 
 function show() {

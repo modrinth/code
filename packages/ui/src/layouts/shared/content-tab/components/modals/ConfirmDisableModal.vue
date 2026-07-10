@@ -10,10 +10,8 @@
 		max-width="500px"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{
-					visibleCount === 1 ? formatMessage(messages.singleBody) : formatMessage(messages.bulkBody)
-				}}
+			<Admonition type="warning" :header="visibleWarning?.admonitionHeader ?? ''">
+				{{ visibleWarning?.admonitionBody }}
 			</Admonition>
 		</div>
 
@@ -32,18 +30,7 @@
 						@click="confirm"
 					>
 						<SlashIcon />
-						{{
-							visibleCount === 1
-								? formatMessage(messages.confirmButton)
-								: formatMessage(messages.confirmManyButton, {
-										count: visibleCount,
-										itemType: formatContentTypeSentence(
-											formatMessage,
-											visibleItemType,
-											visibleCount,
-										),
-									})
-						}}
+						{{ visibleWarning?.actionLabel }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -61,6 +48,8 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
+import type { ContentActionWarning } from '../../types'
+
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -68,40 +57,20 @@ const messages = defineMessages({
 		id: 'content.confirm-disable.header',
 		defaultMessage: 'Disable {itemType}',
 	},
-	admonitionHeader: {
-		id: 'content.confirm-disable.shared-instance.admonition-header',
-		defaultMessage: 'This is part of the shared instance',
-	},
-	singleBody: {
-		id: 'content.confirm-disable.shared-instance.single-body',
-		defaultMessage:
-			'Disabling it only changes your local copy. Future shared instance updates may re-enable, restore, or change it again.',
-	},
-	bulkBody: {
-		id: 'content.confirm-disable.shared-instance.bulk-body',
-		defaultMessage:
-			'Some selected projects are part of the shared instance. Disabling them only changes your local copy, and future shared instance updates may re-enable, restore, or change them again.',
-	},
-	confirmButton: {
-		id: 'content.confirm-disable.shared-instance.confirm-button',
-		defaultMessage: 'Disable anyway',
-	},
-	confirmManyButton: {
-		id: 'content.confirm-disable.shared-instance.confirm-many-button',
-		defaultMessage: 'Disable {count, number} {itemType} anyway',
-	},
 })
 
 const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
+		warning?: ContentActionWarning | null
 		actionDisabled?: boolean
 		actionDisabledTooltip?: string
 	}>(),
 	{
 		actionDisabled: false,
 		actionDisabledTooltip: undefined,
+		warning: null,
 	},
 )
 
@@ -112,11 +81,13 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const visibleCount = ref(props.count)
 const visibleItemType = ref(props.itemType)
+const visibleWarning = ref(props.warning)
 
 async function show() {
 	await nextTick()
 	visibleCount.value = props.count
 	visibleItemType.value = props.itemType
+	visibleWarning.value = props.warning
 	modal.value?.show()
 }
 

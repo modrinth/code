@@ -770,7 +770,7 @@ pub async fn get_shared_instance_update_preview(
     let Some(attachment) = metadata.shared_instance.clone() else {
         return Ok(None);
     };
-    if attachment.role != SharedInstanceRole::Member {
+    if !attachment.role.is_member() {
         return Ok(None);
     }
 
@@ -820,7 +820,7 @@ pub async fn update_shared_instance(
             "Instance is not attached to a shared instance".to_string(),
         )
     })?;
-    if attachment.role != SharedInstanceRole::Member {
+    if !attachment.role.is_member() {
         return Err(crate::ErrorKind::InputError(
             "Only shared instance members can update from shared instances"
                 .to_string(),
@@ -2168,7 +2168,7 @@ fn ensure_owner(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
 }
 
 fn ensure_member(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
-    if attachment.role == SharedInstanceRole::Member {
+    if attachment.role.is_member() {
         return Ok(());
     }
 

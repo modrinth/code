@@ -14,7 +14,15 @@
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
 		/>
-		<ConfirmUnlinkModal ref="unlinkModal" mode="share-instance" :backup-tip="importedModpackBackupTip" @unlink="unlinkImportedModpack" />
+		<ConfirmUnlinkModal
+			ref="unlinkModal"
+			:warning="{
+				header: formatMessage(messages.unlinkForShareHeader),
+				body: formatMessage(messages.unlinkForShareBody),
+			}"
+			:backup-tip="importedModpackBackupTip"
+			@unlink="unlinkImportedModpack"
+		/>
 		<SharedInstanceRemoveMemberModal ref="removeMemberModal" :row="pendingRemovalRow" :member-count="members.rows.value.length" @confirm="removeMember" @clear="pendingRemovalRow = null" />
 
 		<SharedInstanceMembersTable
@@ -169,6 +177,8 @@ const messages = defineMessages({
 	lockedEmptyDescriptionSuffix: { id: 'app.instance.share.locked.empty-description-suffix', defaultMessage: 'to access this page.' },
 	linkedAccountFallback: { id: 'app.instance.share.locked.linked-account-fallback', defaultMessage: 'the linked account' },
 	switchAccountButton: { id: 'app.instance.share.locked.switch-account-button', defaultMessage: 'Switch account' },
+	unlinkForShareHeader: { id: 'app.instance.share.unlink.header', defaultMessage: 'Sharing requires unlinking' },
+	unlinkForShareBody: { id: 'app.instance.share.unlink.body', defaultMessage: 'You must unlink this modpack to share your instance' },
 })
 
 function invitePlayer(payload: InvitePlayersInvitePayload) {

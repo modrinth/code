@@ -48,7 +48,7 @@ import {
 import { injectContentManager } from './providers/content-manager'
 import type {
 	BulkOperationStatus,
-	ContentActionWarningMode,
+	ContentActionWarning,
 	ContentCardTableItem,
 	ContentItem,
 } from './types'
@@ -329,11 +329,12 @@ const hasOutdatedProjects = computed(() => {
 
 //  Deletion
 const pendingDeletionItems = ref<ContentItem[]>([])
-const pendingDeletionWarningMode = ref<ContentActionWarningMode>('default')
+const pendingDeletionWarning = ref<ContentActionWarning | null>(null)
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 const confirmDisableModal = ref<InstanceType<typeof ConfirmDisableModal>>()
 const contentDependencyWarningModal = ref<InstanceType<typeof ContentDependencyWarningModal>>()
 const pendingDisableItems = ref<ContentItem[]>([])
+const pendingDisableWarning = ref<ContentActionWarning | null>(null)
 const pendingDependencyWarningItems = ref<ContentCardTableItem[]>([])
 const pendingDependencyWarningDependents = ref<
 	Array<{
@@ -365,7 +366,7 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 	const deletableItems = items.filter(canDeleteItem)
 	if (deletableItems.length === 0) return
 	pendingDeletionItems.value = deletableItems
-	pendingDeletionWarningMode.value = ctx.getDeleteWarningMode?.(deletableItems) ?? 'default'
+	pendingDeletionWarning.value = ctx.getDeleteWarning?.(deletableItems) ?? null
 	pendingDependencyWarningItems.value = []
 	pendingDependencyWarningDependents.value = []
 	pendingDependencyWarningDisableTargets.value = []
@@ -414,7 +415,7 @@ async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
 
 async function showDeletionConfirmation(event?: MouseEvent) {
 	if (
-		pendingDeletionWarningMode.value === 'default' &&
+		!pendingDeletionWarning.value &&
 		(event?.shiftKey || skipNonEssentialWarnings.value) &&
 		!ctx.isBusy.value
 	) {
@@ -446,7 +447,7 @@ async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: bo
 
 	pendingDependencyWarningItems.value = []
 	pendingDependencyWarningDependents.value = []
-	if (pendingDeletionWarningMode.value === 'shared-instance') {
+	if (pendingDeletionWarning.value) {
 		confirmDeletionModal.value?.show()
 		return
 	}
@@ -483,7 +484,7 @@ async function confirmDelete() {
 	if (ctx.isBusy.value) return
 	const itemsToDelete = [...pendingDeletionItems.value]
 	pendingDeletionItems.value = []
-	pendingDeletionWarningMode.value = 'default'
+	pendingDeletionWarning.value = null
 	if (itemsToDelete.length === 0) return
 
 	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
@@ -535,8 +536,9 @@ async function confirmDelete() {
 async function promptDisableItems(items: ContentItem[]) {
 	if (items.length === 0) return
 	pendingDisableItems.value = items
-	const warningMode = ctx.getDisableWarningMode?.(items) ?? 'default'
-	if (warningMode === 'shared-instance') {
+	const warning = ctx.getDisableWarning?.(items) ?? null
+	if (warning) {
+		pendingDisableWarning.value = warning
 		confirmDisableModal.value?.show()
 		return
 	}
@@ -548,6 +550,7 @@ async function confirmDisable() {
 	if (ctx.isBusy.value) return
 	const itemsToDisable = [...pendingDisableItems.value]
 	pendingDisableItems.value = []
+	pendingDisableWarning.value = null
 	if (itemsToDisable.length === 0) return
 
 	if (ctx.bulkDisableItems && itemsToDisable.length > 1) {
@@ -1116,7 +1119,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmDeletionModal"
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
-			:mode="pendingDeletionWarningMode"
+			:warning="pendingDeletionWarning"
 			:variant="ctx.deletionContext ?? 'instance'"
 			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			:action-disabled="ctx.isBusy.value"
@@ -1127,6 +1130,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			ref="confirmDisableModal"
 			:count="pendingDisableItems.length"
 			:item-type="ctx.contentTypeLabel.value"
+			:warning="pendingDisableWarning"
 			:action-disabled="ctx.isBusy.value"
 			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
 			@disable="confirmDisable"

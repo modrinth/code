@@ -31,7 +31,11 @@ export type ContentSourceKind =
 	| 'imported_modpack'
 	| 'shared_instance'
 
-export type ContentActionWarningMode = 'default' | 'shared-instance'
+export interface ContentActionWarning {
+	admonitionHeader: string
+	admonitionBody: string
+	actionLabel: string
+}
 
 export interface ContentCardTableItem {
 	id: string

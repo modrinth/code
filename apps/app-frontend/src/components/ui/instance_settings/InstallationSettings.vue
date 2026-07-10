@@ -16,6 +16,8 @@ import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
+import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
@@ -49,6 +51,7 @@ const debug = useDebugLogger('AppInstallationSettings')
 const themeStore = useTheming()
 
 const { instance, offline, isMinecraftServer, onUnlinked, closeModal } = injectInstanceSettings()
+const managedContentPolicy = useManagedContentPolicy(instance)
 const skipNonEssentialWarnings = computed(() =>
 	themeStore.getFeatureFlag('skip_non_essential_warnings'),
 )
@@ -119,11 +122,9 @@ const isModrinthLinkedModpack = computed(
 			!!instance.value.link.modpack_version_id),
 )
 const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
-const isSharedInstanceManagedModpack = computed(
-	() => instance.value.shared_instance?.role === 'member',
-)
-const canUnpublishSharedInstance = computed(() => instance.value.shared_instance?.role === 'owner')
-const canUnlinkSharedInstance = computed(() => instance.value.shared_instance?.role === 'member')
+const isSharedInstanceManagedModpack = managedContentPolicy.isManagedModpack
+const canUnpublishSharedInstance = managedContentPolicy.canUnpublish
+const canUnlinkSharedInstance = managedContentPolicy.canUnlink
 
 const modpackInfoQuery = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', instance.value.id]),
@@ -136,6 +137,34 @@ const repairing = ref(false)
 const reinstalling = ref(false)
 const unpublishingSharedInstance = ref(false)
 const unlinkingSharedInstance = ref(false)
+
+async function unpublishSharedInstance() {
+	unpublishingSharedInstance.value = true
+	try {
+		await unpublish_shared_instance(instance.value.id)
+		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
+		onUnlinked()
+	} catch (error) {
+		handleError(error)
+	} finally {
+		unpublishingSharedInstance.value = false
+	}
+}
+
+async function unlinkSharedInstance() {
+	unlinkingSharedInstance.value = true
+	try {
+		await unlink_shared_instance(instance.value.id)
+		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
+		onUnlinked()
+	} catch (error) {
+		handleError(error)
+	} finally {
+		unlinkingSharedInstance.value = false
+	}
+}
 
 const messages = defineMessages({
 	loaderVersion: {
@@ -430,48 +459,6 @@ provideInstallationSettings({
 		debug('unlinkModpack: done')
 	},
 
-	async unpublishSharedInstance() {
-		debug('unpublishSharedInstance: called', { instanceId: instance.value.id })
-		unpublishingSharedInstance.value = true
-		try {
-			await unpublish_shared_instance(instance.value.id)
-			await queryClient.invalidateQueries({
-				queryKey: ['sharedInstanceUsers', instance.value.id],
-			})
-			await queryClient.invalidateQueries({
-				queryKey: ['linkedModpackInfo', instance.value.id],
-			})
-			onUnlinked()
-			debug('unpublishSharedInstance: done')
-		} catch (error) {
-			handleError(error)
-			debug('unpublishSharedInstance: failed', { error })
-		} finally {
-			unpublishingSharedInstance.value = false
-		}
-	},
-
-	async unlinkSharedInstance() {
-		debug('unlinkSharedInstance: called', { instanceId: instance.value.id })
-		unlinkingSharedInstance.value = true
-		try {
-			await unlink_shared_instance(instance.value.id)
-			await queryClient.invalidateQueries({
-				queryKey: ['sharedInstanceUsers', instance.value.id],
-			})
-			await queryClient.invalidateQueries({
-				queryKey: ['linkedModpackInfo', instance.value.id],
-			})
-			onUnlinked()
-			debug('unlinkSharedInstance: done')
-		} catch (error) {
-			handleError(error)
-			debug('unlinkSharedInstance: failed', { error })
-		} finally {
-			unlinkingSharedInstance.value = false
-		}
-	},
-
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
 		debug('fetchModpackVersions: called', {
@@ -519,16 +506,32 @@ provideInstallationSettings({
 			!isSharedInstanceManagedModpack.value,
 	),
 	isLocalFile: isImportedModpack,
-	isSharedInstanceManagedModpack,
-	canUnpublishSharedInstance,
-	unpublishingSharedInstance,
-	canUnlinkSharedInstance,
-	unlinkingSharedInstance,
+	isManagedModpack: isSharedInstanceManagedModpack,
+	managedModpackWarning: managedContentPolicy.managedModpackWarning,
 	repairing,
 	reinstalling,
 })
 </script>
 
 <template>
-	<InstallationSettingsLayout />
+	<InstallationSettingsLayout>
+		<template #extra>
+			<SharedInstanceInstallationSettingsControls
+				:can-unpublish="canUnpublishSharedInstance"
+				:can-unlink="canUnlinkSharedInstance"
+				:busy="
+					instance.install_stage !== 'installed' ||
+					repairing ||
+					reinstalling ||
+					unpublishingSharedInstance ||
+					unlinkingSharedInstance ||
+					!!offline
+				"
+				:unpublishing="unpublishingSharedInstance"
+				:unlinking="unlinkingSharedInstance"
+				:unpublish="unpublishSharedInstance"
+				:unlink="unlinkSharedInstance"
+			/>
+		</template>
+	</InstallationSettingsLayout>
 </template>

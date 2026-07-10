@@ -63,18 +63,13 @@ export interface InstallationSettingsContext {
 	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
 	isLocalFile?: boolean | ComputedRef<boolean>
 
-	/** True when the linked modpack is controlled by a shared instance update stream. */
-	isSharedInstanceManagedModpack?: boolean | ComputedRef<boolean>
-
-	/** True when the current user owns the shared instance and can remove it from Modrinth. */
-	canUnpublishSharedInstance?: boolean | ComputedRef<boolean>
-	unpublishingSharedInstance?: Ref<boolean>
-	unpublishSharedInstance?: () => Promise<void>
-
-	/** True when this receiving instance can be disconnected from its shared-instance parent. */
-	canUnlinkSharedInstance?: boolean | ComputedRef<boolean>
-	unlinkingSharedInstance?: Ref<boolean>
-	unlinkSharedInstance?: () => Promise<void>
+	/** True when an external source controls the linked modpack. */
+	isManagedModpack?: boolean | ComputedRef<boolean>
+	managedModpackWarning?: ComputedRef<{
+		admonitionHeader: string
+		changeVersionBody: string
+		unlinkBody: string
+	}>
 
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>

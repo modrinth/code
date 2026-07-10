@@ -54,6 +54,7 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
+import type { ContentActionWarning } from '../../types'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const { formatMessage } = useVIntl()
@@ -76,42 +77,20 @@ const messages = defineMessages({
 		id: 'content.confirm-deletion.delete-button',
 		defaultMessage: 'Delete {count, number} {itemType}',
 	},
-	sharedAdmonitionHeader: {
-		id: 'content.confirm-deletion.shared-instance.admonition-header',
-		defaultMessage: 'This is part of the shared instance',
-	},
-	sharedSingleBody: {
-		id: 'content.confirm-deletion.shared-instance.single-body',
-		defaultMessage:
-			'Deleting it only changes your local copy. Future shared instance updates may restore or change it again.',
-	},
-	sharedBulkBody: {
-		id: 'content.confirm-deletion.shared-instance.bulk-body',
-		defaultMessage:
-			'Some selected projects are part of the shared instance. Deleting them only changes your local copy, and future shared instance updates may restore or change them again.',
-	},
-	sharedDeleteButton: {
-		id: 'content.confirm-deletion.shared-instance.delete-button',
-		defaultMessage: 'Delete anyway',
-	},
-	sharedDeleteManyButton: {
-		id: 'content.confirm-deletion.shared-instance.delete-many-button',
-		defaultMessage: 'Delete {count, number} {itemType} anyway',
-	},
 })
 
 const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
-		mode?: 'default' | 'shared-instance'
+		warning?: ContentActionWarning | null
 		variant?: 'instance' | 'server'
 		backupTip?: string
 		actionDisabled?: boolean
 		actionDisabledTooltip?: string
 	}>(),
 	{
-		mode: 'default',
+		warning: null,
 		variant: 'instance',
 		backupTip: undefined,
 		actionDisabled: false,
@@ -128,41 +107,22 @@ const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 const visibleCount = ref(props.count)
 const visibleItemType = ref(props.itemType)
-const visibleMode = ref(props.mode)
+const visibleWarning = ref(props.warning)
 
 const formattedItemType = computed(() =>
 	formatContentTypeSentence(formatMessage, visibleItemType.value, visibleCount.value),
 )
 
 const admonitionHeader = computed(() =>
-	visibleMode.value === 'shared-instance'
-		? formatMessage(messages.sharedAdmonitionHeader)
-		: formatMessage(messages.admonitionHeader),
+	visibleWarning.value?.admonitionHeader ?? formatMessage(messages.admonitionHeader),
 )
 
 const admonitionBody = computed(() => {
-	if (visibleMode.value !== 'shared-instance') {
-		return formatMessage(messages.admonitionBody)
-	}
-
-	return visibleCount.value === 1
-		? formatMessage(messages.sharedSingleBody)
-		: formatMessage(messages.sharedBulkBody)
+	return visibleWarning.value?.admonitionBody ?? formatMessage(messages.admonitionBody)
 })
 
 const deleteButtonLabel = computed(() => {
-	if (visibleMode.value !== 'shared-instance') {
-		return formatMessage(messages.deleteButton, {
-			count: visibleCount.value,
-			itemType: formattedItemType.value,
-		})
-	}
-
-	if (visibleCount.value === 1) {
-		return formatMessage(messages.sharedDeleteButton)
-	}
-
-	return formatMessage(messages.sharedDeleteManyButton, {
+	return visibleWarning.value?.actionLabel ?? formatMessage(messages.deleteButton, {
 		count: visibleCount.value,
 		itemType: formattedItemType.value,
 	})
@@ -172,7 +132,7 @@ async function show() {
 	await nextTick()
 	visibleCount.value = props.count
 	visibleItemType.value = props.itemType
-	visibleMode.value = props.mode
+	visibleWarning.value = props.warning
 	modal.value?.show()
 }
 

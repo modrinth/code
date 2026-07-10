@@ -26,6 +26,7 @@
 					ref="sharedDisableConfirmModal"
 					:count="pendingModpackDisableItems.length"
 					:item-type="formatMessage(messages.contentTypeProject)"
+					:warning="managedContentPolicy.disableWarning(pendingModpackDisableItems)"
 					:action-disabled="isInstanceBusy"
 					@disable="confirmPendingModpackContentDisable"
 				/>
@@ -111,6 +112,7 @@ import { useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import {
@@ -195,6 +197,12 @@ const props = defineProps<{
 	openSettings?: () => void
 	preloadedContent?: InstanceContentData | null
 }>()
+const managedContentPolicy = useManagedContentPolicy(computed(() => props.instance))
+const {
+	isManagedModpack: isSharedMember,
+	canMutateContent,
+	canUpdateContent: canUpdateProject,
+} = managedContentPolicy
 
 function hasPreloadedContent(contentData: InstanceContentData | null | undefined) {
 	return contentData?.path === props.instance.id
@@ -283,7 +291,6 @@ watch(
 const isModpackUpdating = ref(false)
 const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
-const isSharedMember = computed(() => props.instance.shared_instance?.role === 'member')
 const isPackLocked = computed(
 	() =>
 		props.instance?.link?.type === 'modrinth_modpack' ||
@@ -375,33 +382,8 @@ function hasContentOperation(item: ContentItem) {
 	return keys.some((key) => activeContentOperationKeys.value.has(key))
 }
 
-function isSharedInstanceManagedContent(item: ContentItem) {
-	return (
-		isSharedMember.value &&
-		(item.source_kind === 'shared_instance' ||
-			item.source_kind === 'modrinth_modpack' ||
-			item.source_kind === 'imported_modpack')
-	)
-}
-
-function canMutateContent(item: ContentItem) {
-	return !isSharedInstanceManagedContent(item)
-}
-
 function canDeleteContent(item: ContentItem) {
 	return canMutateContent(item)
-}
-
-function shouldWarnBeforeDelete(items: ContentItem[]) {
-	return items.some(isSharedInstanceManagedContent)
-}
-
-function shouldWarnBeforeDisable(items: ContentItem[]) {
-	return items.some(isSharedInstanceManagedContent)
-}
-
-function canUpdateProject(item: ContentItem) {
-	return canMutateContent(item) && !!item.file_path && !!item.has_update && !!item.update_version_id
 }
 
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
@@ -919,7 +901,7 @@ async function handleSwitchVersion(item: ContentItem) {
 }
 
 async function handleModpackContentToggle(item: ContentItem, enabled: boolean) {
-	if (!enabled && shouldWarnBeforeDisable([item])) {
+	if (!enabled && managedContentPolicy.disableWarning([item])) {
 		pendingModpackDisableItems.value = [item]
 		sharedDisableConfirmModal.value?.show()
 		return
@@ -929,7 +911,7 @@ async function handleModpackContentToggle(item: ContentItem, enabled: boolean) {
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[], enabled: boolean) {
-	if (!enabled && shouldWarnBeforeDisable(items)) {
+	if (!enabled && managedContentPolicy.disableWarning(items)) {
 		pendingModpackDisableItems.value = items
 		sharedDisableConfirmModal.value?.show()
 		return
@@ -1386,10 +1368,8 @@ provideContentManager({
 		Promise.all(items.filter(canMutateContent).map((item) => removeMod(item))).then(() => {}),
 	canDeleteItem: canDeleteContent,
 	canToggleItem: canMutateContent,
-	getDeleteWarningMode: (items: ContentItem[]) =>
-		shouldWarnBeforeDelete(items) ? 'shared-instance' : 'default',
-	getDisableWarningMode: (items: ContentItem[]) =>
-		shouldWarnBeforeDisable(items) ? 'shared-instance' : 'default',
+	getDeleteWarning: managedContentPolicy.deleteWarning,
+	getDisableWarning: managedContentPolicy.disableWarning,
 	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,

@@ -1422,12 +1422,7 @@ async fn remove_existing_shared_instance_content(
 
     let mut removed_file_ids = HashSet::new();
     for entry in entries {
-        if !matches!(
-            entry.source_kind,
-            ContentSourceKind::SharedInstance
-                | ContentSourceKind::ModrinthModpack
-                | ContentSourceKind::ImportedModpack
-        ) {
+        if !entry.source_kind.is_shared_instance_managed() {
             continue;
         }
 
