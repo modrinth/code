@@ -15,6 +15,9 @@
 			<UpdateToPlayModal
 				ref="updateToPlayModal"
 				:instance="instance"
+			/>
+			<SharedInstanceUpdateModal
+				ref="sharedInstanceUpdateModal"
 				@shared-instance-unavailable="handleSharedInstanceUnavailable"
 			/>
 			<ContentPageHeader>
@@ -364,6 +367,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceAdmonitions from '@/components/ui/instance/instance-admonitions/index.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
+import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import {
 	fetchCachedServerStatus,
@@ -425,6 +429,7 @@ const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
+const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
 
 const { formatMessage } = useVIntl()
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
@@ -722,8 +727,8 @@ const startInstance = async (context: string) => {
 	if (canCheckSharedInstanceUpdate) {
 		const preview = sharedInstanceUpdatePreview.value
 
-		if (preview?.updateAvailable && updateToPlayModal.value) {
-			updateToPlayModal.value.showSharedInstance(instance.value, preview, async () => {
+		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
+			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
 				await fetchInstance()
 				await launchInstance(context)
 			})

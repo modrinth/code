@@ -1,15 +1,15 @@
 <template>
 	<SharedInstanceInviteLinkModal ref="inviteLinkModal" :process-invite="installFromInviteId" />
 	<ModrinthAccountRequiredModal ref="accountRequiredModal" :request-auth="requestAuth" />
-	<InstallToPlayModal ref="installModal" />
+	<SharedInstanceInstallModal ref="installModal" />
 </template>
 
 <script setup lang="ts">
 import { injectAuth } from '@modrinth/ui'
 import { nextTick, ref } from 'vue'
 
-import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
+import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth'
 
 import SharedInstanceInviteLinkModal from './shared-instance-invite-link-modal.vue'
@@ -18,7 +18,7 @@ import { useSharedInstanceInviteHandler } from './use-shared-instance-invite-han
 
 const auth = injectAuth()
 const inviteLinkModal = ref<InstanceType<typeof SharedInstanceInviteLinkModal>>()
-const installModal = ref<InstanceType<typeof InstallToPlayModal>>()
+const installModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
 const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
 const { handleNotification, installFromInviteId } = useSharedInstanceInviteHandler(
 	installModal,

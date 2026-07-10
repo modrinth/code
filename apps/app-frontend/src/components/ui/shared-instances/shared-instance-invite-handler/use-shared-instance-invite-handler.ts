@@ -20,11 +20,8 @@ import { parseSharedInstanceInviteNotification } from './shared-instance-invite-
 import type { AppNotification, SharedInstanceInvite } from './shared-instance-invite-types'
 
 type InstallModal = {
-	showSharedInstance(
-		options: {
-			preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>
-			invitedByUsername?: string | null
-		},
+	show(
+		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
 		install: () => Promise<void>,
 	): void
 }
@@ -68,10 +65,9 @@ export function useSharedInstanceInviteHandler(
 	function showInstall(
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
 		install: () => Promise<void>,
-		invitedByUsername?: string | null,
 	) {
 		if (!installModal.value) throw new Error('Shared instance install modal is not available.')
-		installModal.value.showSharedInstance({ preview, invitedByUsername }, install)
+		installModal.value.show(preview, install)
 	}
 
 	async function acceptNotification(notification: AppNotification, invite: SharedInstanceInvite) {
@@ -95,7 +91,6 @@ export function useSharedInstanceInviteHandler(
 					await markNotificationRead(notification)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},
-				invite.invitedByUsername,
 			)
 		} catch (error) {
 			handleError(toError(error))

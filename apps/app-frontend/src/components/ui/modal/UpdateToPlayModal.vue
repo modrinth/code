@@ -9,9 +9,7 @@
 		:diffs="normalizedDiffs"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
-		:added-label="addedLabel"
-		:removed-label="removedLabel"
-		:show-report-button="showReportButton"
+		:show-report-button="true"
 		@confirm="handleUpdate"
 		@cancel="handleDecline"
 		@report="handleReport"
@@ -33,16 +31,8 @@ import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
-import {
-	getSharedInstanceUnavailableReason,
-	install_update_shared_instance,
-	isSharedInstanceUnavailableError,
-	type SharedInstanceUnavailableReason,
-	type SharedInstanceUpdatePreview,
-	wait_for_install_job,
-} from '@/helpers/install'
+import { wait_for_install_job } from '@/helpers/install'
 import { update_managed_modrinth_version } from '@/helpers/instance'
-import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { injectServerInstall } from '@/providers/server-install'
 
@@ -84,39 +74,22 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
-const { notifySharedInstanceError } = useSharedInstanceErrors()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
 const emit = defineEmits<{
 	cancel: []
 	complete: []
-	sharedInstanceUnavailable: [reason: SharedInstanceUnavailableReason | null]
 }>()
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
-const mode = ref<'server-project' | 'shared-instance'>('server-project')
 const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
-const sharedInstancePreview = ref<SharedInstanceUpdatePreview | null>(null)
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
 
 const normalizedDiffs = computed<ContentDiffItem[]>(() => {
-	if (mode.value === 'shared-instance') {
-		return (
-			sharedInstancePreview.value?.diffs.map((diff) => ({
-				type: diff.type,
-				projectName: diff.projectName ?? undefined,
-				fileName: diff.fileName ?? undefined,
-				currentVersionName: diff.currentVersionName ?? undefined,
-				newVersionName: diff.newVersionName ?? undefined,
-				disabled: diff.disabled,
-			})) ?? []
-		)
-	}
-
 	return diffs.value.map((diff) => ({
 		type: diff.type,
 		projectName: diff.project?.title,
@@ -125,13 +98,6 @@ const normalizedDiffs = computed<ContentDiffItem[]>(() => {
 		newVersionName: diff.newVersion?.version_number,
 	}))
 })
-const showReportButton = computed(() => mode.value !== 'shared-instance')
-const addedLabel = computed(() =>
-	mode.value === 'shared-instance' ? formatMessage(messages.sharedInstanceAddedLabel) : undefined,
-)
-const removedLabel = computed(() =>
-	mode.value === 'shared-instance' ? formatMessage(messages.sharedInstanceRemovedLabel) : undefined,
-)
 
 async function computeDependencyDiffs(
 	currentDeps: Dependency[],
@@ -277,26 +243,6 @@ watch(
 )
 
 async function handleUpdate() {
-	if (mode.value === 'shared-instance') {
-		try {
-			if (instance.value) {
-				const job = await install_update_shared_instance(instance.value.id)
-				await wait_for_install_job(job.job_id)
-				await onUpdateComplete.value()
-			}
-		} catch (error) {
-			if (isSharedInstanceUnavailableError(error)) {
-				emit('sharedInstanceUnavailable', getSharedInstanceUnavailableReason(error))
-				return
-			}
-
-			notifySharedInstanceError(error)
-		} finally {
-			emit('complete')
-		}
-		return
-	}
-
 	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
@@ -329,25 +275,8 @@ function show(
 	callback: UpdateCompleteCallback = () => {},
 	e?: MouseEvent,
 ) {
-	mode.value = 'server-project'
 	instance.value = instanceVal
-	sharedInstancePreview.value = null
 	modpackVersionId.value = modpackVersionIdVal
-	onUpdateComplete.value = callback
-	diffModal.value?.show(e)
-}
-
-function showSharedInstance(
-	instanceVal: GameInstance,
-	preview: SharedInstanceUpdatePreview,
-	callback: UpdateCompleteCallback = () => {},
-	e?: MouseEvent,
-) {
-	mode.value = 'shared-instance'
-	instance.value = instanceVal
-	sharedInstancePreview.value = preview
-	modpackVersionId.value = null
-	diffs.value = []
 	onUpdateComplete.value = callback
 	diffModal.value?.show(e)
 }
@@ -370,14 +299,6 @@ const messages = defineMessages({
 		defaultMessage:
 			'An update is required to play {name}. Please update to latest version to launch the game.',
 	},
-	sharedInstanceAddedLabel: {
-		id: 'app.modal.update-to-play.shared-instance-added-label',
-		defaultMessage: 'Added',
-	},
-	sharedInstanceRemovedLabel: {
-		id: 'app.modal.update-to-play.shared-instance-removed-label',
-		defaultMessage: 'Removed',
-	},
 })
 
 const hasUpdate = computed(() => {
@@ -385,5 +306,5 @@ const hasUpdate = computed(() => {
 	return modpackVersionId.value != null && modpackVersionId.value !== instance.value.link.version_id
 })
 
-defineExpose({ show, showSharedInstance, hide, hasUpdate })
+defineExpose({ show, hide, hasUpdate })
 </script>
