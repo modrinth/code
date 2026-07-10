@@ -11,7 +11,7 @@ use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
     CachedEntry, ContentSetSyncStatus, ContentSourceKind, InstanceLink,
-    ProjectType, SharedInstanceRole, State,
+    ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use std::collections::{HashMap, HashSet};
@@ -24,15 +24,17 @@ pub(super) async fn attach_pending_shared_instance(
 ) -> crate::Result<()> {
     crate::state::attach_shared_instance(
         instance_id,
-        &data.shared_instance_id,
-        SharedInstanceRole::Member,
-        data.manager_id.clone(),
-        data.server_manager_name.clone(),
-        data.server_manager_icon_url.clone(),
-        data.linked_user_id.clone(),
-        ContentSetSyncStatus::NotReady,
-        None,
-        Some(data.version),
+        SharedInstanceAttachmentInput {
+            id: data.shared_instance_id.clone(),
+            role: SharedInstanceRole::Member,
+            manager_id: data.manager_id.clone(),
+            server_manager_name: data.server_manager_name.clone(),
+            server_manager_icon_url: data.server_manager_icon_url.clone(),
+            linked_user_id: data.linked_user_id.clone(),
+            status: ContentSetSyncStatus::NotReady,
+            applied_version: None,
+            latest_version: Some(data.version),
+        },
         &state.pool,
     )
     .await
@@ -45,15 +47,17 @@ pub(super) async fn finalize_shared_instance_attachment(
 ) -> crate::Result<()> {
     crate::state::attach_shared_instance(
         instance_id,
-        &data.shared_instance_id,
-        SharedInstanceRole::Member,
-        data.manager_id.clone(),
-        data.server_manager_name.clone(),
-        data.server_manager_icon_url.clone(),
-        data.linked_user_id.clone(),
-        ContentSetSyncStatus::UpToDate,
-        Some(data.version),
-        Some(data.version),
+        SharedInstanceAttachmentInput {
+            id: data.shared_instance_id.clone(),
+            role: SharedInstanceRole::Member,
+            manager_id: data.manager_id.clone(),
+            server_manager_name: data.server_manager_name.clone(),
+            server_manager_icon_url: data.server_manager_icon_url.clone(),
+            linked_user_id: data.linked_user_id.clone(),
+            status: ContentSetSyncStatus::UpToDate,
+            applied_version: Some(data.version),
+            latest_version: Some(data.version),
+        },
         &state.pool,
     )
     .await

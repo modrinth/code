@@ -2,22 +2,15 @@ use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{
     ContentSetRemoteRef, ContentSetRemoteRefType, ContentSetSyncProvider,
     ContentSetSyncState, ContentSetSyncStatus, InstanceLink,
-    SharedInstanceAttachment, SharedInstanceRole,
+    SharedInstanceAttachment, SharedInstanceAttachmentInput,
+    SharedInstanceRole,
 };
 use chrono::Utc;
 use sqlx::SqlitePool;
 
 pub(crate) async fn attach_shared_instance(
     instance_id: &str,
-    shared_instance_id: &str,
-    role: SharedInstanceRole,
-    manager_id: Option<String>,
-    server_manager_name: Option<String>,
-    server_manager_icon_url: Option<String>,
-    linked_user_id: Option<String>,
-    status: ContentSetSyncStatus,
-    applied_version: Option<i32>,
-    latest_version: Option<i32>,
+    input: SharedInstanceAttachmentInput,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
     let metadata =
@@ -27,17 +20,7 @@ pub(crate) async fn attach_shared_instance(
                 crate::ErrorKind::InputError("Unknown instance".to_string())
             })?;
     let content_set_id = metadata.applied_content_set.id;
-    let attachment = SharedInstanceAttachment {
-        id: shared_instance_id.to_string(),
-        role,
-        manager_id,
-        server_manager_name,
-        server_manager_icon_url,
-        linked_user_id,
-        status,
-        applied_version,
-        latest_version,
-    };
+    let attachment = SharedInstanceAttachment::from(input);
     let sync_state =
         shared_sync_state(&content_set_id, &attachment, Some(Utc::now()));
 
@@ -52,7 +35,7 @@ pub(crate) async fn attach_shared_instance(
         &ContentSetRemoteRef {
             content_set_id: content_set_id.clone(),
             ref_type: ContentSetRemoteRefType::SharedContentSet,
-            ref_id: shared_instance_id.to_string(),
+            ref_id: attachment.id.clone(),
         },
         &mut tx,
     )

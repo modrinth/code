@@ -809,15 +809,17 @@ pub(super) async fn shared_instance_for_invites(
             );
             crate::state::attach_shared_instance(
                 instance_id,
-                &remote.id,
-                SharedInstanceRole::Owner,
-                None,
-                None,
-                None,
-                linked_user_id,
-                ContentSetSyncStatus::Unknown,
-                None,
-                None,
+                crate::state::SharedInstanceAttachmentInput {
+                    id: remote.id.clone(),
+                    role: SharedInstanceRole::Owner,
+                    manager_id: None,
+                    server_manager_name: None,
+                    server_manager_icon_url: None,
+                    linked_user_id,
+                    status: ContentSetSyncStatus::Unknown,
+                    applied_version: None,
+                    latest_version: None,
+                },
                 &state.pool,
             )
             .await?;
@@ -867,4 +869,3 @@ pub(super) fn ensure_member(attachment: &SharedInstanceAttachment) -> crate::Res
 pub(super) fn file_type(project_type: ProjectType) -> String {
     project_type.get_name().to_string()
 }
-
