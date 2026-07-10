@@ -39,12 +39,7 @@ const props = defineProps({
 		type: Boolean,
 		default: false,
 	},
-	list: {
-		type: Boolean,
-		default: false,
-	},
 })
-const emit = defineEmits(['select'])
 
 const playing = ref(false)
 const loading = ref(false)
@@ -138,49 +133,23 @@ defineExpose({
 
 const currentEvent = ref(null)
 
-const unlisten = props.list
-	? () => {}
-	: await process_listener((e) => {
-			if (e.instance_id === props.instance.id) {
-				currentEvent.value = e.event
-				if (e.event === 'finished') {
-					playing.value = false
-				}
-			}
-		})
+const unlisten = await process_listener((e) => {
+	if (e.instance_id === props.instance.id) {
+		currentEvent.value = e.event
+		if (e.event === 'finished') {
+			playing.value = false
+		}
+	}
+})
 
 onMounted(() => {
-	if (!props.list) {
-		checkProcess()
-	}
+	checkProcess()
 })
 onUnmounted(() => unlisten())
 </script>
 
 <template>
-	<RouterLink
-		v-if="list"
-		:to="`/instance/${encodeURIComponent(instance.id)}`"
-		class="card-shadow flex w-full min-w-0 cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4 text-left no-underline transition-all hover:brightness-110"
-		@click="emit('select', instance)"
-	>
-		<Avatar
-			size="40px"
-			:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-			:tint-by="instance.id"
-			alt="Instance icon"
-		/>
-		<div class="flex min-w-0 flex-col gap-1">
-			<p class="m-0 truncate text-base font-semibold leading-5 text-contrast">
-				{{ instance.name }}
-			</p>
-			<div class="flex min-w-0 items-center gap-1 text-sm font-medium text-secondary">
-				<GameIcon class="shrink-0" />
-				<span class="truncate capitalize">{{ instance.loader }} {{ instance.game_version }}</span>
-			</div>
-		</div>
-	</RouterLink>
-	<template v-else-if="compact">
+	<template v-if="compact">
 		<div
 			class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer hover:brightness-90 transition-all"
 			@click="seeInstance"

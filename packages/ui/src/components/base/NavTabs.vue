@@ -6,45 +6,28 @@
 		:class="{ 'drop-shadow-xl border border-solid border-surface-4': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
-			<template v-for="(link, index) in filteredLinks" :key="link.href">
-				<div
-					v-if="link.disabled"
-					v-show="link.shown ?? true"
-					ref="tabLinkElements"
-					v-tooltip="link.tooltip"
-					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 opacity-60 focus:rounded-full"
-					:class="getSSRFallbackClasses(index)"
-					:aria-disabled="true"
-					@mouseenter="link.onHover?.()"
-					@focus="link.onHover?.()"
-				>
-					<component :is="link.icon" v-if="link.icon" class="size-5 text-secondary" />
-					<span class="text-nowrap text-secondary">
-						{{ link.label }}
-					</span>
-				</div>
-				<RouterLink
-					v-else
-					v-show="link.shown ?? true"
-					ref="tabLinkElements"
-					:replace="replace"
-					:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-					:class="getSSRFallbackClasses(index)"
-					@mouseenter="link.onHover?.()"
-					@focus="link.onHover?.()"
-				>
-					<component
-						:is="link.icon"
-						v-if="link.icon"
-						class="size-5"
-						:class="getIconClasses(index)"
-					/>
-					<span class="text-nowrap" :class="getLabelClasses(index)">
-						{{ link.label }}
-					</span>
-				</RouterLink>
-			</template>
+			<RouterLink
+				v-for="(link, index) in filteredLinks"
+				v-show="link.shown ?? true"
+				:key="link.href"
+				ref="tabLinkElements"
+				:replace="replace"
+				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+				:class="getSSRFallbackClasses(index)"
+				@mouseenter="link.onHover?.()"
+				@focus="link.onHover?.()"
+			>
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5"
+					:class="getIconClasses(index)"
+				/>
+				<span class="text-nowrap" :class="getLabelClasses(index)">
+					{{ link.label }}
+				</span>
+			</RouterLink>
 		</template>
 
 		<template v-else>
@@ -89,8 +72,6 @@ interface Tab {
 	label: string
 	href: string
 	shown?: boolean
-	disabled?: boolean
-	tooltip?: string
 	icon?: Component
 	subpages?: string[]
 	onHover?: () => void
