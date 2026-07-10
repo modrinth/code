@@ -24,7 +24,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_accept_shared_instance_invite,
             install_get_shared_instance_update_preview,
             install_shared_instance,
-            install_shared_instance_invite,
             install_update_shared_instance,
             install_import_instance,
             install_duplicate_instance,
@@ -160,13 +159,6 @@ pub async fn install_shared_instance(
         server_manager_icon_url,
     )
     .await?)
-}
-
-#[tauri::command]
-pub async fn install_shared_instance_invite(
-    invite_id: String,
-) -> Result<InstallJobSnapshot> {
-    Ok(theseus::instance::install_shared_instance_invite(&invite_id).await?)
 }
 
 #[tauri::command]

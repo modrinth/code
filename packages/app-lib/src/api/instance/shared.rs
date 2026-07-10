@@ -29,17 +29,15 @@ const SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS: i32 = 604800;
 const SHARED_INSTANCE_INVITE_MAX_USES: i32 = 10;
 
 #[derive(Clone, Copy, Debug)]
-enum SharedInstancesRequestAuth<'a> {
+enum SharedInstancesRequestAuth {
     ModrinthSession,
-    Bearer(&'a str),
     None,
 }
 
-impl SharedInstancesRequestAuth<'_> {
+impl SharedInstancesRequestAuth {
     fn label(self) -> &'static str {
         match self {
             Self::ModrinthSession => "modrinth_session",
-            Self::Bearer(_) => "bearer",
             Self::None => "none",
         }
     }
@@ -274,28 +272,6 @@ struct InstanceInviteInfoResponse {
 enum InstanceInviteManagerResponse {
     User { id: String },
     Server { name: String, icon: Option<String> },
-}
-
-#[derive(Clone, Debug, Deserialize)]
-struct AcceptInstanceInviteResponse {
-    access_token: String,
-}
-
-#[derive(Clone, Debug)]
-struct AcceptedSharedInstanceInvite {
-    linked_user_id: Option<String>,
-    access_token: Option<String>,
-}
-
-impl AcceptedSharedInstanceInvite {
-    fn request_auth(&self) -> SharedInstancesRequestAuth<'_> {
-        match self.access_token.as_deref() {
-            Some(access_token) => {
-                SharedInstancesRequestAuth::Bearer(access_token)
-            }
-            None => SharedInstancesRequestAuth::ModrinthSession,
-        }
-    }
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -677,44 +653,6 @@ pub async fn install_shared_instance(
     crate::install::create_shared_instance(data).await
 }
 
-#[tracing::instrument]
-pub async fn install_shared_instance_invite(
-    invite_id: &str,
-) -> crate::Result<InstallJobSnapshot> {
-    let state = State::get().await?;
-    let invite = get_shared_instance_invite_info(invite_id, &state).await?;
-    let shared_instance_id = invite.instance_id;
-    let (manager_id, server_manager_name, server_manager_icon_url) =
-        shared_instance_invite_manager(invite.managers);
-    let name = shared_instance_invite_install_name(
-        &shared_instance_id,
-        invite.instance_name,
-    );
-    let accepted =
-        accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
-            .await?;
-    let version = get_latest_remote_version_with_auth(
-        &shared_instance_id,
-        &state,
-        accepted.request_auth(),
-    )
-    .await?;
-    let mut data = shared_instance_install_data(
-        &shared_instance_id,
-        manager_id,
-        server_manager_name,
-        server_manager_icon_url,
-        name,
-        version,
-        &state,
-    )
-    .await?;
-    data.linked_user_id = accepted.linked_user_id;
-    data.access_token = accepted.access_token;
-
-    crate::install::create_shared_instance(data).await
-}
-
 fn shared_instance_invite_install_name(
     shared_instance_id: &str,
     name: String,
@@ -742,10 +680,6 @@ pub async fn accept_shared_instance_invite_for_install(
     invite_id: &str,
 ) -> crate::Result<SharedInstanceInviteInstallPreview> {
     let state = State::get().await?;
-    ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
-        .await?
-        .ok_or(crate::ErrorKind::NoCredentialsError)?;
-
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
     let (manager_id, server_manager_name, server_manager_icon_url) =
@@ -754,15 +688,10 @@ pub async fn accept_shared_instance_invite_for_install(
         &shared_instance_id,
         invite.instance_name,
     );
-    let accepted =
-        accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
-            .await?;
-    let version = get_latest_remote_version_with_auth(
-        &shared_instance_id,
-        &state,
-        accepted.request_auth(),
-    )
-    .await?;
+    accept_shared_instance_invite(&shared_instance_id, invite_id, &state)
+        .await?;
+    let version =
+        get_latest_remote_version(&shared_instance_id, &state).await?;
     let preview =
         shared_instance_install_preview_from_version(name, version, &state)
             .await?;
@@ -916,7 +845,7 @@ pub async fn update_shared_instance(
     let version =
         get_latest_remote_member_version(instance_id, &attachment, &state)
             .await?;
-    let mut data = shared_instance_install_data(
+    let data = shared_instance_install_data(
         &attachment.id,
         attachment.manager_id.clone(),
         attachment.server_manager_name.clone(),
@@ -926,8 +855,6 @@ pub async fn update_shared_instance(
         &state,
     )
     .await?;
-    data.access_token = attachment.access_token.clone();
-
     crate::install::update_shared_instance(instance_id.to_string(), data).await
 }
 
@@ -991,48 +918,35 @@ async fn get_latest_remote_member_version(
     attachment: &SharedInstanceAttachment,
     state: &State,
 ) -> crate::Result<InstanceVersionResponse> {
-    let version =
-        match get_latest_remote_version_optional_unavailable_with_auth(
-            &attachment.id,
-            state,
-            auth_for_attachment(attachment),
-        )
-        .await?
-        {
-            SharedInstanceRemoteResponse::Available(version) => version,
-            SharedInstanceRemoteResponse::Unavailable(reason) => {
-                if attachment.access_token.is_some()
-                    || shared_attachment_matches_current_user(attachment, state)
-                        .await?
-                {
-                    clear_shared_instance_if_current_user(
-                        instance_id,
-                        attachment,
-                        state,
-                    )
-                    .await?;
-                    return Err(shared_instance_unavailable_error(reason));
-                }
-
-                return Err(crate::ErrorKind::OtherError(format!(
-                    "{}: {}",
-                    shared_instance_unavailable_message(reason),
-                    attachment.id
-                ))
-                .into());
+    let version = match get_latest_remote_version_optional_unavailable(
+        &attachment.id,
+        state,
+    )
+    .await?
+    {
+        SharedInstanceRemoteResponse::Available(version) => version,
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            if shared_attachment_matches_current_user(attachment, state).await?
+            {
+                clear_shared_instance_if_current_user(
+                    instance_id,
+                    attachment,
+                    state,
+                )
+                .await?;
+                return Err(shared_instance_unavailable_error(reason));
             }
-        };
+
+            return Err(crate::ErrorKind::OtherError(format!(
+                "{}: {}",
+                shared_instance_unavailable_message(reason),
+                attachment.id
+            ))
+            .into());
+        }
+    };
 
     Ok(version)
-}
-
-fn auth_for_attachment(
-    attachment: &SharedInstanceAttachment,
-) -> SharedInstancesRequestAuth<'_> {
-    match attachment.access_token.as_deref() {
-        Some(access_token) => SharedInstancesRequestAuth::Bearer(access_token),
-        None => SharedInstancesRequestAuth::ModrinthSession,
-    }
 }
 
 async fn shared_attachment_matches_current_user(
@@ -1072,9 +986,7 @@ async fn clear_shared_instance_if_current_user(
     attachment: &SharedInstanceAttachment,
     state: &State,
 ) -> crate::Result<()> {
-    if attachment.access_token.is_some()
-        || shared_attachment_matches_current_user(attachment, state).await?
-    {
+    if shared_attachment_matches_current_user(attachment, state).await? {
         crate::state::clear_shared_instance(instance_id, &state.pool).await?;
         emit_instance(instance_id, InstancePayloadType::Edited).await?;
     }
@@ -1134,7 +1046,6 @@ async fn shared_instance_install_data(
         server_manager_name,
         server_manager_icon_url,
         linked_user_id,
-        access_token: None,
         name,
         version: version.version,
         modrinth_ids,
@@ -2317,7 +2228,6 @@ async fn shared_instance_for_invites(
                 None,
                 None,
                 linked_user_id,
-                None,
                 ContentSetSyncStatus::Unknown,
                 None,
                 None,
@@ -2488,25 +2398,6 @@ async fn get_latest_remote_version(
     }
 }
 
-async fn get_latest_remote_version_with_auth(
-    shared_instance_id: &str,
-    state: &State,
-    auth: SharedInstancesRequestAuth<'_>,
-) -> crate::Result<InstanceVersionResponse> {
-    match get_latest_remote_version_optional_unavailable_with_auth(
-        shared_instance_id,
-        state,
-        auth,
-    )
-    .await?
-    {
-        SharedInstanceRemoteResponse::Available(version) => Ok(version),
-        SharedInstanceRemoteResponse::Unavailable(reason) => {
-            Err(shared_instance_unavailable_error(reason))
-        }
-    }
-}
-
 async fn get_latest_remote_version_optional_unavailable(
     shared_instance_id: &str,
     state: &State,
@@ -2522,7 +2413,7 @@ async fn get_latest_remote_version_optional_unavailable(
 async fn get_latest_remote_version_optional_unavailable_with_auth(
     shared_instance_id: &str,
     state: &State,
-    auth: SharedInstancesRequestAuth<'_>,
+    auth: SharedInstancesRequestAuth,
 ) -> crate::Result<SharedInstanceRemoteResponse<InstanceVersionResponse>> {
     request_json_optional_unavailable(
         "get_latest_instance_version",
@@ -2590,56 +2481,10 @@ async fn accept_shared_instance_invite(
     shared_instance_id: &str,
     invite_id: &str,
     state: &State,
-) -> crate::Result<AcceptedSharedInstanceInvite> {
+) -> crate::Result<()> {
     let path = format!("/instances/{shared_instance_id}/invites/{invite_id}");
     let operation = "accept_instance_invite";
     let method = Method::POST;
-
-    if let Some(credentials) =
-        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
-            .await?
-    {
-        let response = send_request_with_auth(
-            operation,
-            method.clone(),
-            &path,
-            None,
-            state,
-            SharedInstancesRequestAuth::Bearer(&credentials.session),
-        )
-        .await?;
-
-        if response.status().is_success() {
-            return Ok(AcceptedSharedInstanceInvite {
-                linked_user_id: Some(credentials.user_id),
-                access_token: None,
-            });
-        }
-
-        let status = response.status();
-        let body = response.text().await.unwrap_or_default();
-        if status == StatusCode::BAD_REQUEST
-            && body.contains("already has access")
-        {
-            return Ok(AcceptedSharedInstanceInvite {
-                linked_user_id: Some(credentials.user_id),
-                access_token: None,
-            });
-        }
-
-        tracing::warn!(
-            operation,
-            method = method.as_str(),
-            path,
-            status = status.as_u16(),
-            response_body = %body,
-            "Shared instances API request failed"
-        );
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instances API request {operation} {method} {path} failed with status {status}: {body}"
-        ))
-        .into());
-    }
 
     let response = send_request_with_auth(
         operation,
@@ -2647,25 +2492,32 @@ async fn accept_shared_instance_invite(
         &path,
         None,
         state,
-        SharedInstancesRequestAuth::None,
+        SharedInstancesRequestAuth::ModrinthSession,
     )
     .await?;
-    if !response.status().is_success() {
-        return shared_instances_request_error(
-            operation, method, &path, response,
-        )
-        .await;
+    if response.status().is_success() {
+        return Ok(());
     }
 
-    let response = decode_json_response::<AcceptInstanceInviteResponse>(
-        operation, &path, response,
-    )
-    .await?;
+    let status = response.status();
+    let body = response.text().await.unwrap_or_default();
+    if status == StatusCode::BAD_REQUEST && body.contains("already has access")
+    {
+        return Ok(());
+    }
 
-    Ok(AcceptedSharedInstanceInvite {
-        linked_user_id: None,
-        access_token: Some(response.access_token),
-    })
+    tracing::warn!(
+        operation,
+        method = method.as_str(),
+        path,
+        status = status.as_u16(),
+        response_body = %body,
+        "Shared instances API request failed"
+    );
+    Err(crate::ErrorKind::OtherError(format!(
+        "Shared instances API request {operation} {method} {path} failed with status {status}: {body}"
+    ))
+    .into())
 }
 
 async fn get_shared_instance_invite_info(
@@ -2728,7 +2580,7 @@ async fn request_json_optional_unavailable<T>(
     path: &str,
     body: Option<serde_json::Value>,
     state: &State,
-    auth: SharedInstancesRequestAuth<'_>,
+    auth: SharedInstancesRequestAuth,
 ) -> crate::Result<SharedInstanceRemoteResponse<T>>
 where
     T: DeserializeOwned,
@@ -2892,7 +2744,7 @@ async fn send_request_with_auth(
     path: &str,
     body: Option<serde_json::Value>,
     state: &State,
-    auth: SharedInstancesRequestAuth<'_>,
+    auth: SharedInstancesRequestAuth,
 ) -> crate::Result<reqwest::Response> {
     let modrinth_credentials =
         if matches!(auth, SharedInstancesRequestAuth::ModrinthSession) {
@@ -2920,9 +2772,6 @@ async fn send_request_with_auth(
                 .expect("Modrinth session credentials were loaded");
             user_id = Some(credentials.user_id);
             request = request.bearer_auth(credentials.session);
-        }
-        SharedInstancesRequestAuth::Bearer(token) => {
-            request = request.bearer_auth(token);
         }
         SharedInstancesRequestAuth::None => {}
     }

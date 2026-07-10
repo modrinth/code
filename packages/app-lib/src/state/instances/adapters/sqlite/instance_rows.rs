@@ -1096,8 +1096,6 @@ pub(crate) async fn set_shared_instance_attachment(
         attachment.and_then(|value| value.manager_id.as_deref());
     let shared_instance_linked_user_id =
         attachment.and_then(|value| value.linked_user_id.as_deref());
-    let shared_instance_access_token =
-        attachment.and_then(|value| value.access_token.as_deref());
     let shared_instance_server_manager_name =
         attachment.and_then(|value| value.server_manager_name.as_deref());
     let shared_instance_server_manager_icon_url =
@@ -1138,13 +1136,11 @@ pub(crate) async fn set_shared_instance_attachment(
     sqlx::query(
         "
 		UPDATE instance_links
-		SET shared_instance_access_token = ?,
-			shared_instance_server_manager_name = ?,
+		SET shared_instance_server_manager_name = ?,
 			shared_instance_server_manager_icon_url = ?
 		WHERE instance_id = ?
 		",
     )
-    .bind(shared_instance_access_token)
     .bind(shared_instance_server_manager_name)
     .bind(shared_instance_server_manager_icon_url)
     .bind(instance_id)
@@ -1416,9 +1412,8 @@ async fn hydrate_shared_instance_fields(
     pool: &SqlitePool,
 ) -> crate::Result<InstanceMetadataRecord> {
     if let Some(attachment) = record.shared_instance.as_mut() {
-        let (access_token, server_manager_name, server_manager_icon_url) =
+        let (server_manager_name, server_manager_icon_url) =
             shared_instance_fields(&record.instance.id, pool).await?;
-        attachment.access_token = access_token;
         attachment.server_manager_name = server_manager_name;
         attachment.server_manager_icon_url = server_manager_icon_url;
     }
@@ -1429,23 +1424,20 @@ async fn hydrate_shared_instance_fields(
 async fn shared_instance_fields(
     instance_id: &str,
     pool: &SqlitePool,
-) -> crate::Result<(Option<String>, Option<String>, Option<String>)> {
-    Ok(
-        sqlx::query_as::<_, (Option<String>, Option<String>, Option<String>)>(
-            "
+) -> crate::Result<(Option<String>, Option<String>)> {
+    Ok(sqlx::query_as::<_, (Option<String>, Option<String>)>(
+        "
 		SELECT
-			shared_instance_access_token,
 			shared_instance_server_manager_name,
 			shared_instance_server_manager_icon_url
 		FROM instance_links
 		WHERE instance_id = ?
 		",
-        )
-        .bind(instance_id)
-        .fetch_optional(pool)
-        .await?
-        .unwrap_or((None, None, None)),
     )
+    .bind(instance_id)
+    .fetch_optional(pool)
+    .await?
+    .unwrap_or((None, None)))
 }
 
 fn shared_instance_attachment(
@@ -1477,7 +1469,6 @@ fn shared_instance_attachment(
         server_manager_name: None,
         server_manager_icon_url: None,
         linked_user_id: shared_instance_linked_user_id,
-        access_token: None,
         status,
         applied_version: optional_i32(applied_update_id, "applied_update_id")?,
         latest_version: optional_i32(

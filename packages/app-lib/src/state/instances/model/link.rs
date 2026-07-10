@@ -74,7 +74,6 @@ pub struct SharedInstanceAttachment {
     #[serde(default)]
     pub server_manager_icon_url: Option<String>,
     pub linked_user_id: Option<String>,
-    pub access_token: Option<String>,
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
     pub latest_version: Option<i32>,

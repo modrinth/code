@@ -152,7 +152,6 @@ fn main() {
                         "install_accept_shared_instance_invite",
                         "install_get_shared_instance_update_preview",
                         "install_shared_instance",
-                        "install_shared_instance_invite",
                         "install_update_shared_instance",
                         "install_import_instance",
                         "install_duplicate_instance",

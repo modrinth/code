@@ -47,8 +47,7 @@ pub use self::shared::{
     create_shared_instance_invite_link, decline_pending_shared_instance_invite,
     get_shared_instance_install_preview, get_shared_instance_publish_preview,
     get_shared_instance_update_preview, get_shared_instance_users,
-    install_shared_instance, install_shared_instance_invite,
-    invite_shared_instance_users, publish_shared_instance,
-    remove_shared_instance_users, unlink_shared_instance,
-    unpublish_shared_instance, update_shared_instance,
+    install_shared_instance, invite_shared_instance_users,
+    publish_shared_instance, remove_shared_instance_users,
+    unlink_shared_instance, unpublish_shared_instance, update_shared_instance,
 };
