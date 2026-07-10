@@ -1,10 +1,11 @@
-import type {CookieOptions} from '#app'
 import {
 	type KeybindDefinition,
 	type KeybindListener,
 	keybinds,
-	normalizeKeybind
-} from "@modrinth/moderation";
+	normalizeKeybind,
+} from '@modrinth/moderation'
+
+import type { CookieOptions } from '#app'
 
 const moderationKeybindsId = 'moderation-keybinds'
 
@@ -22,7 +23,10 @@ const getCookieOptions = () =>
 
 export const useModerationKeybinds = () =>
 	useState<{ [id: string]: KeybindListener }>(moderationKeybindsId, () => {
-		const storedKeybinds = useCookie<PartialStoredKeybinds>(moderationKeybindsId, getCookieOptions())
+		const storedKeybinds = useCookie<PartialStoredKeybinds>(
+			moderationKeybindsId,
+			getCookieOptions(),
+		)
 
 		if (!storedKeybinds.value) {
 			storedKeybinds.value = {}
@@ -49,7 +53,9 @@ export const saveModerationKeybinds = () => {
 
 	const storedKeybinds: PartialStoredKeybinds = {}
 	for (const [id, keybind] of Object.entries(keybinds.value)) {
-		storedKeybinds[id] = (Array.isArray(keybind.keybind) ? keybind.keybind : [keybind.keybind]).map(normalizeKeybind)
+		storedKeybinds[id] = (Array.isArray(keybind.keybind) ? keybind.keybind : [keybind.keybind]).map(
+			normalizeKeybind,
+		)
 	}
 	cookie.value = storedKeybinds
 }

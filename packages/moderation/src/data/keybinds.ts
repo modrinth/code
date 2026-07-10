@@ -33,7 +33,7 @@ const keybinds: { [id: string]: KeybindListener } = {
 		description: 'Skip to next project',
 		enabled: (ctx) => ctx.state.futureProjectCount > 0 && !ctx.state.isDone,
 		action: (ctx) => ctx.actions.trySkipProject(),
-	}
+	},
 }
 
 export default keybinds

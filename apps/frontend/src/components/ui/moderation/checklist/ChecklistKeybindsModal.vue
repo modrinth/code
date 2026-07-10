@@ -8,16 +8,24 @@
 						:key="id"
 						class="keybind-item flex flex-wrap items-center justify-between gap-4"
 						:class="{
-							'col-span-2': Object.keys(keybinds).length % 2 === 1 && Object.keys(keybinds)[Object.keys(keybinds).length - 1] === id,
+							'col-span-2':
+								Object.keys(keybinds).length % 2 === 1 &&
+								Object.keys(keybinds)[Object.keys(keybinds).length - 1] === id,
 						}"
 					>
 						<span class="text-sm text-secondary">{{ keybind.description }}</span>
 						<ChecklistKeybind
-							:definitions="(!Array.isArray(keybind.keybind) ? [keybind.keybind] : keybind.keybind).map(normalizeKeybind)"
-							:on-change="(definitions) => {
-								keybinds[id].keybind = definitions
-								saveModerationKeybinds()
-							}"
+							:definitions="
+								(!Array.isArray(keybind.keybind) ? [keybind.keybind] : keybind.keybind).map(
+									normalizeKeybind,
+								)
+							"
+							:on-change="
+								(definitions) => {
+									keybinds[id].keybind = definitions
+									saveModerationKeybinds()
+								}
+							"
 						/>
 					</div>
 				</div>
@@ -27,11 +35,12 @@
 </template>
 
 <script setup lang="ts">
-import {normalizeKeybind} from '@modrinth/moderation'
+import { normalizeKeybind } from '@modrinth/moderation'
 import NewModal from '@modrinth/ui/src/components/modal/NewModal.vue'
-import {ref} from 'vue'
-import ChecklistKeybind from "~/components/ui/moderation/checklist/ChecklistKeybind.vue";
-import {saveModerationKeybinds} from "#imports";
+import { ref } from 'vue'
+
+import { saveModerationKeybinds } from '#imports'
+import ChecklistKeybind from '~/components/ui/moderation/checklist/ChecklistKeybind.vue'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const keybinds = useModerationKeybinds()

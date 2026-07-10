@@ -184,12 +184,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import {
-	CheckCircleIcon,
-	ClipboardCopyIcon, CodeIcon,
-	EllipsisVerticalIcon, ExternalIcon,
-	LinkIcon,
-} from '@modrinth/assets'
+import { CheckCircleIcon, ClipboardCopyIcon, ExternalIcon } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
@@ -197,8 +192,6 @@ import {
 	CollapsibleRegion,
 	getProjectTypeIcon,
 	injectNotificationManager,
-	OverflowMenu,
-	type OverflowMenuOption,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'

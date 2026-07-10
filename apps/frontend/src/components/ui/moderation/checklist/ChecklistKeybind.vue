@@ -1,14 +1,14 @@
 <template>
 	<div class="flex flex-row items-center gap-2">
 		<kbd
-			v-for="(definition, index) in props.definitions"
+			v-for="(definition, index) in definitions"
 			:key="`keybind-${index}`"
 			ref="keybinding"
-			@click="startEditing(index)"
-			class="font-bold !text-lg border-2 cursor-pointer"
+			class="cursor-pointer border-2 !text-lg font-bold"
 			:class="{
 				editing: editing === index,
 			}"
+			@click="startEditing(index)"
 		>
 			{{ toDisplay(definition) }}
 		</kbd>
@@ -16,32 +16,32 @@
 </template>
 
 <script setup lang="ts">
-
-import {type KeybindDefinition, toKeybindDefinition} from "@modrinth/moderation";
-import {onUnmounted} from "vue";
+import { type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
+import { onUnmounted } from 'vue'
 
 const props = defineProps<{
-	definitions: KeybindDefinition[],
-	onChange: (definitions: KeybindDefinition[]) => void,
-}>();
+	definitions: KeybindDefinition[]
+	onChange: (definitions: KeybindDefinition[]) => void
+}>()
 
-const keybinding = useTemplateRef('keybinding');
-const editing = ref(-1);
+const keybinding = useTemplateRef('keybinding')
+const definitions = ref(structuredClone(props.definitions))
+const editing = ref(-1)
 
 function startEditing(index: number) {
 	if (editing.value === index) {
 		stopEditing()
 	} else {
-		editing.value = index;
+		editing.value = index
 		window.addEventListener('keyup', handleKeybinds)
 		window.addEventListener('click', handleMouse)
 	}
 }
 
 function stopEditing() {
-	console.log('stop editing');
+	console.log('stop editing')
 
-	editing.value = -1;
+	editing.value = -1
 	window.removeEventListener('keyup', handleKeybinds)
 	window.removeEventListener('click', handleMouse)
 }
@@ -58,8 +58,8 @@ function handleMouse(event: MouseEvent) {
 }
 
 function handleKeybinds(event: KeyboardEvent) {
-	props.definitions[editing.value] = toKeybindDefinition(event)
-	props.onChange(props.definitions)
+	definitions.value[editing.value] = toKeybindDefinition(event)
+	props.onChange(definitions.value)
 	stopEditing()
 
 	event.preventDefault()
@@ -93,8 +93,7 @@ function isMac() {
 	return navigator.platform.toUpperCase().includes('MAC')
 }
 
-onUnmounted(stopEditing);
-
+onUnmounted(stopEditing)
 </script>
 
 <style scoped lang="scss">
@@ -103,7 +102,8 @@ onUnmounted(stopEditing);
 }
 
 @keyframes blink {
-	0%, 100% {
+	0%,
+	100% {
 		border-color: var(--color-red);
 		box-shadow: 0 0 10px 1px var(--color-red);
 	}
