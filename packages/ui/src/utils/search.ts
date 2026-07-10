@@ -5,6 +5,8 @@ import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
 
 import { defineMessage, useVIntl } from '../composables/i18n'
+import { getProjectTypeIcon } from './auto-icons.ts'
+import { getProjectTypeTitleMessage } from './common-messages.ts'
 import {
 	DEFAULT_MOD_LOADERS,
 	DEFAULT_PLUGIN_LOADERS,
@@ -43,6 +45,7 @@ export type FilterType = {
 	}[]
 	searchable: boolean
 	allows_custom_options?: 'and' | 'or'
+	category_group?: string
 	ordering?: number
 } & (
 	| {
@@ -177,6 +180,25 @@ export function useSearch(
 		}
 	}
 
+	const activeProjectTypes = computed(() => {
+		let baseTypes: ProjectType[]
+		if (!projectTypes.value.includes('all' as unknown as ProjectType)) {
+			baseTypes = projectTypes.value
+		} else {
+			const selectedTypes = currentFilters.value
+				.filter((f) => f.type === 'project_type' && !f.negative)
+				.map((f) => f.option as ProjectType)
+			if (selectedTypes.length > 0) {
+				baseTypes = [...selectedTypes, 'all' as unknown as ProjectType]
+			} else {
+				baseTypes = [...ALL_PROJECT_TYPES, 'all' as unknown as ProjectType]
+			}
+		}
+
+		const mappedTypes = baseTypes.map((t) => mapProjectTypeToSearch(t) as unknown as ProjectType)
+		return Array.from(new Set([...baseTypes, ...mappedTypes]))
+	})
+
 	const filters = computed(() => {
 		const categoryFilters: Record<string, FilterType> = {}
 		for (const category of sortedCategories(tags.value, formatCategoryName, locale.value)) {
@@ -184,6 +206,7 @@ export function useSearch(
 			if (!categoryFilters[filterTypeId]) {
 				categoryFilters[filterTypeId] = {
 					id: filterTypeId,
+					category_group: 'wrapper',
 					formatted_name: formatCategoryHeader(formatMessage, category.header),
 					supported_project_types:
 						category.project_type === 'mod'
@@ -295,25 +318,35 @@ export function useSearch(
 						: undefined,
 			},
 			{
-				id: 'mod_loader',
+				id: 'loader',
+				category_group: 'wrapper',
 				formatted_name: formatMessage(
 					defineMessage({
-						id: 'search.filter_type.mod_loader',
+						id: 'search.filter_type.loader',
 						defaultMessage: 'Loader',
 					}),
 				),
-				supported_project_types: ['mod'],
+				supported_project_types: ['mod', 'modpack', 'plugin', 'shader'],
 				display: 'expandable',
 				query_param: 'g',
 				supports_negative_filter: true,
-				default_values: DEFAULT_MOD_LOADERS,
+				default_values: Array.from(
+					new Set([...DEFAULT_MOD_LOADERS, ...DEFAULT_PLUGIN_LOADERS, ...DEFAULT_SHADER_LOADERS]),
+				),
 				searchable: false,
 				options: tags.value.loaders
 					.filter(
 						(loader) =>
-							loader.supported_project_types.includes('mod') &&
-							!loader.supported_project_types.includes('plugin') &&
-							!loader.supported_project_types.includes('datapack'),
+							loader.supported_project_types.some(
+								(t) =>
+									['mod', 'modpack', 'plugin', 'shader'].includes(t) &&
+									activeProjectTypes.value.includes(t as ProjectType),
+							) &&
+							!PLUGIN_PLATFORMS.includes(loader.name) &&
+							!(
+								DEFAULT_PLUGIN_LOADERS.includes(loader.name) &&
+								!activeProjectTypes.value.includes('plugin')
+							),
 					)
 					.map((loader) => {
 						return {
@@ -322,67 +355,14 @@ export function useSearch(
 							icon: getLoaderIcon(loader.name),
 							method: 'or',
 							value: `categories:${loader.name}`,
+							supported_project_types: loader.supported_project_types as ProjectType[],
 						}
 					}),
-				ordering: projectTypes.value.includes('mod') ? 1 : undefined,
-			},
-			{
-				id: 'modpack_loader',
-				formatted_name: formatMessage(
-					defineMessage({
-						id: 'search.filter_type.modpack_loader',
-						defaultMessage: 'Loader',
-					}),
-				),
-				supported_project_types: ['modpack'],
-				display: 'all',
-				query_param: 'g',
-				supports_negative_filter: true,
-				searchable: false,
-				options: tags.value.loaders
-					.filter((loader) => loader.supported_project_types.includes('modpack'))
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
-			},
-			{
-				id: 'plugin_loader',
-				formatted_name: formatMessage(
-					defineMessage({
-						id: 'search.filter_type.plugin_loader',
-						defaultMessage: 'Loader',
-					}),
-				),
-				supported_project_types: ['plugin'],
-				display: 'expandable',
-				default_values: DEFAULT_PLUGIN_LOADERS,
-				query_param: 'g',
-				supports_negative_filter: true,
-				searchable: false,
-				options: tags.value.loaders
-					.filter(
-						(loader) =>
-							loader.supported_project_types.includes('plugin') &&
-							!PLUGIN_PLATFORMS.includes(loader.name),
-					)
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
+				ordering: 900,
 			},
 			{
 				id: 'plugin_platform',
+				category_group: 'wrapper',
 				formatted_name: formatMessage(
 					defineMessage({
 						id: 'search.filter_type.plugin_platform',
@@ -396,32 +376,6 @@ export function useSearch(
 				searchable: false,
 				options: tags.value.loaders
 					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
-					.map((loader) => {
-						return {
-							id: loader.name,
-							formatted_name: formatLoader(formatMessage, loader.name),
-							icon: getLoaderIcon(loader.name),
-							method: 'or',
-							value: `categories:${loader.name}`,
-						}
-					}),
-			},
-			{
-				id: 'shader_loader',
-				formatted_name: formatMessage(
-					defineMessage({
-						id: 'search.filter_type.shader_loader',
-						defaultMessage: 'Loader',
-					}),
-				),
-				supported_project_types: ['shader'],
-				query_param: 'g',
-				supports_negative_filter: true,
-				searchable: false,
-				display: 'expandable',
-				default_values: DEFAULT_SHADER_LOADERS,
-				options: tags.value.loaders
-					.filter((loader) => loader.supported_project_types.includes('shader'))
 					.map((loader) => {
 						return {
 							id: loader.name,
@@ -473,6 +427,29 @@ export function useSearch(
 				allows_custom_options: 'and',
 			},
 			{
+				id: 'project_type',
+				formatted_name: formatMessage(
+					defineMessage({ id: 'search.filter_type.project_type', defaultMessage: 'Type' }),
+				),
+				supported_project_types: ['all' as unknown as ProjectType],
+				display: 'all',
+				query_param: 't',
+				supports_negative_filter: true,
+				searchable: false,
+				ordering: 1000,
+				options: ALL_PROJECT_TYPES.map((pt) => ({
+					id: pt,
+					formatted_name: formatMessage(getProjectTypeTitleMessage(pt), { count: 2 }),
+					icon: getProjectTypeIcon(
+						(pt === 'server' ? 'minecraft_java_server' : pt) as Parameters<
+							typeof getProjectTypeIcon
+						>[0],
+					),
+					method: 'or',
+					value: `project_types:${mapProjectTypeToSearch(pt)}`,
+				})),
+			},
+			{
 				id: 'advanced',
 				formatted_name: formatMessage(
 					defineMessage({
@@ -483,6 +460,7 @@ export function useSearch(
 				supported_project_types: ['mod', 'plugin', 'datapack'],
 				display: 'toggle',
 				query_param: 'a',
+				supports_negative_filter: false,
 				searchable: false,
 				ordering: -1000,
 				options: excludeableProjectTypes.map((target) => ({
@@ -497,7 +475,7 @@ export function useSearch(
 		return filterTypes
 			.filter((filterType) =>
 				filterType.supported_project_types.some((projectType) =>
-					projectTypes.value.includes(projectType),
+					activeProjectTypes.value.includes(projectType),
 				),
 			)
 			.sort((a, b) => (b.ordering ?? 0) - (a.ordering ?? 0))
@@ -609,11 +587,13 @@ export function useSearch(
 
 		// Project types
 		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
-		if (mappedProjectTypes.length === 1) {
-			parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
-		} else if (mappedProjectTypes.length > 1) {
-			const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
-			parts.push(`project_types IN [${quoted}]`)
+		if (!mappedProjectTypes.includes('all' as unknown as string)) {
+			if (mappedProjectTypes.length === 1) {
+				parts.push(`project_types = ${formatSearchFilterValue(mappedProjectTypes[0])}`)
+			} else if (mappedProjectTypes.length > 1) {
+				const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
+				parts.push(`project_types IN [${quoted}]`)
+			}
 		}
 
 		const excludedProjectTypes = filterValues
