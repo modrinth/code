@@ -18,16 +18,23 @@ pub struct InstallJobState {
     pub cleanup: InstallCleanup,
     pub progress: InstallProgressState,
     pub paths: InstallJobPaths,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<InstallErrorContext>,
+    #[serde(default)]
+    pub events: Vec<InstallJobEvent>,
     #[serde(default)]
     pub display: Option<InstallJobDisplay>,
     pub rollback: Option<InstallRollbackState>,
     pub error: Option<InstallErrorView>,
+    #[serde(default)]
+    pub rollback_error: Option<InstallErrorView>,
 }
 
 impl InstallJobState {
     pub fn new(request: InstallRequest) -> Self {
         let target = request.target();
         let cleanup = request.cleanup();
+        let kind = request.kind();
         let phase = InstallPhaseId::PreparingInstance;
 
         Self {
@@ -41,11 +48,109 @@ impl InstallJobState {
                 details: InstallPhaseDetails::Empty,
             },
             paths: InstallJobPaths::default(),
+            context: None,
+            events: vec![InstallJobEvent {
+                at: Utc::now(),
+                kind: InstallJobEventKind::JobQueued { kind },
+            }],
             display: None,
             rollback: None,
             error: None,
+            rollback_error: None,
         }
     }
+
+    pub fn record_event(&mut self, kind: InstallJobEventKind) {
+        self.events.push(InstallJobEvent {
+            at: Utc::now(),
+            kind,
+        });
+    }
+
+    pub fn set_context(&mut self, context: Option<InstallErrorContext>) {
+        self.context = context;
+    }
+
+    pub fn set_progress(
+        &mut self,
+        phase: InstallPhaseId,
+        progress: Option<InstallProgress>,
+        details: InstallPhaseDetails,
+    ) {
+        if self.progress.phase != phase
+            || matches!(&self.progress.details, InstallPhaseDetails::Empty)
+                && !matches!(&details, InstallPhaseDetails::Empty)
+        {
+            self.record_event(InstallJobEventKind::PhaseStarted {
+                phase,
+                details: details.clone(),
+            });
+        }
+
+        self.progress.phase = phase;
+        self.progress.progress = progress;
+        self.progress.details = details;
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InstallJobEvent {
+    pub at: DateTime<Utc>,
+    pub kind: InstallJobEventKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum InstallInterruptReason {
+    AppClosed,
+    Unknown,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum InstallJobEventKind {
+    JobQueued {
+        kind: InstallJobKind,
+    },
+    JobStarted,
+    JobSucceeded {
+        instance_id: Option<String>,
+    },
+    JobCanceled {
+        phase: InstallPhaseId,
+    },
+    PhaseStarted {
+        phase: InstallPhaseId,
+        details: InstallPhaseDetails,
+    },
+    ContentDownloadStarted {
+        files: u64,
+        bytes: Option<u64>,
+    },
+    ContentFileSkipped {
+        path: String,
+        reason: String,
+    },
+    ContentFileCompleted {
+        path: String,
+        bytes: u64,
+    },
+    Interrupted {
+        reason: InstallInterruptReason,
+        phase: InstallPhaseId,
+    },
+    Failed {
+        phase: InstallPhaseId,
+        code: String,
+        message: String,
+    },
+    RollbackStarted {
+        cleanup: InstallCleanup,
+    },
+    RollbackCompleted,
+    RollbackFailed {
+        message: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -315,6 +420,51 @@ pub struct InstallJobPaths {
     pub final_instance_path: Option<PathBuf>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, bon::Builder)]
+#[builder(start_fn = new)]
+pub struct InstallErrorContext {
+    #[builder(start_fn, into)]
+    pub operation: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub source_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub target_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub file_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub entry_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[builder(default)]
+    pub urls: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub expected_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expected_size: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub version_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub minecraft_version: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub loader: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub java_version: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub os: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
+    pub arch: Option<String>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallJobDisplay {
     pub title: String,
@@ -330,14 +480,66 @@ pub struct InstallRollbackState {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallErrorView {
     pub code: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phase: Option<InstallPhaseId>,
     pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api: Option<InstallApiErrorDetails>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<InstallErrorContext>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InstallApiErrorDetails {
+    pub error: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub route: Option<String>,
 }
 
 impl InstallErrorView {
-    pub fn from_error(code: &str, error: impl ToString) -> Self {
+    pub fn from_error(
+        code: &str,
+        phase: InstallPhaseId,
+        error: &crate::Error,
+        context: Option<InstallErrorContext>,
+    ) -> Self {
         Self {
             code: code.to_string(),
+            phase: Some(phase),
             message: error.to_string(),
+            api: match error.raw.as_ref() {
+                crate::ErrorKind::LabrinthError(error) => {
+                    Some(InstallApiErrorDetails {
+                        error: error.error.clone(),
+                        status: error.status,
+                        method: error.method.clone(),
+                        url: error.url.clone(),
+                        route: error.route.clone(),
+                    })
+                }
+                _ => None,
+            },
+            context,
+        }
+    }
+
+    pub fn from_message(
+        code: &str,
+        phase: InstallPhaseId,
+        message: impl Into<String>,
+    ) -> Self {
+        Self {
+            code: code.to_string(),
+            phase: Some(phase),
+            message: message.into(),
+            api: None,
+            context: None,
         }
     }
 }
@@ -354,6 +556,7 @@ pub struct InstallJobSnapshot {
     pub details: InstallPhaseDetails,
     pub display: Option<InstallJobDisplay>,
     pub error: Option<InstallErrorView>,
+    pub rollback_error: Option<InstallErrorView>,
     pub created: DateTime<Utc>,
     pub modified: DateTime<Utc>,
     pub finished: Option<DateTime<Utc>>,
