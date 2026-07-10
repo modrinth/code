@@ -4,7 +4,8 @@ import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const gallery: Stage = {
-	title: "Are this project's gallery images sufficient?",
+	title: "Gallery",
+	hint: "Are this project's gallery images sufficient?",
 	id: 'gallery',
 	icon: ImageIcon,
 	guidance_url:

@@ -3,7 +3,8 @@ import { XIcon } from '@modrinth/assets'
 import type { Stage } from '../../types/stage'
 
 const undefinedProjectStage: Stage = {
-	title: 'This project is undefined!',
+	title: 'Undefined Project',
+	hint: 'This project is undefined!',
 	id: 'undefined-project',
 	icon: XIcon,
 	guidance_url:

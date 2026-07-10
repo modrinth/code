@@ -16,8 +16,31 @@
 		:class="{ '!w-fit': collapsed, locked: lockStatus?.locked && !lockStatus?.isOwnLock }"
 	>
 		<div class="flex grow-0 items-center gap-2">
-			<h1 class="m-0 mr-auto flex items-center gap-2 text-2xl font-extrabold text-contrast">
-				<ScaleIcon class="text-orange" /> Moderation
+			<h1 class="m-0 mr-auto">
+				<OverflowMenu
+					:options="stageOptions"
+					:disabled="!canOpenStageSelectorFromTitle"
+					placement="center"
+					dropdown-class="title-stage-selector-dropdown"
+					:class="{ 'title-stage-selector-disabled': !canOpenStageSelectorFromTitle }"
+					class="bg-transparent p-0"
+				>
+					<span
+						class="inline-flex items-center gap-2 text-2xl font-extrabold text-contrast"
+						:class="{
+							'cursor-pointer': canOpenStageSelectorFromTitle,
+							'cursor-default': !canOpenStageSelectorFromTitle,
+						}"
+					>
+						<ScaleIcon class="text-orange" />
+						{{ checklistTitleText }}
+					</span>
+
+					<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
+						<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+						{{ opt.text }}
+					</template>
+				</OverflowMenu>
 			</h1>
 			<ButtonStyled circular>
 				<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
@@ -153,22 +176,22 @@
 							</ButtonStyled>
 							<MarkdownEditor
 								v-if="!useSimpleEditor"
-								v-model="message"
+								v-model="messageText"
 								:max-height="400"
 								placeholder="No message generated."
 								:disabled="false"
 								:heading-buttons="false"
 								:on-image-upload="onUploadHandler"
-								@input="persistGeneratedMessageState"
+								@input="persistState"
 							/>
 							<StyledInput
 								v-else
-								v-model="message"
+								v-model="messageText"
 								multiline
 								placeholder="No message generated."
 								autocomplete="off"
 								input-class="h-[400px] font-mono"
-								@input="persistGeneratedMessageState"
+								@input="persistState"
 							/>
 						</div>
 					</div>
@@ -182,7 +205,7 @@
 					</div>
 					<div v-else>
 						<h2 class="m-0 mb-2 text-lg font-extrabold">
-							{{ currentStageObj.title }}
+							{{ currentStageObj.hint }}
 						</h2>
 
 						<div v-if="currentStageObj.text" class="mb-4">
@@ -200,7 +223,7 @@
 											:color="isActionSelected(action) ? 'brand' : 'standard'"
 											@click="toggleAction(action)"
 										>
-											<button>
+											<button v-tooltip="getChecklistButtonTooltipConfig(action)">
 												{{ action.label }}
 											</button>
 										</ButtonStyled>
@@ -257,10 +280,10 @@
 										<div class="mb-2 font-semibold">{{ action.label }}</div>
 										<div class="flex flex-wrap gap-2">
 											<ButtonStyled
-												v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
-												:key="`${getActionId(action)}-chip-${optIndex}`"
-												:color="isChipSelected(action, optIndex) ? 'brand' : 'standard'"
-												@click="toggleChip(action, optIndex)"
+															v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
+															:key="getMultiSelectOptionKey(action, option, optIndex)"
+															:color="isChipSelected(action, option) ? 'brand' : 'standard'"
+															@click="toggleChip(action, option)"
 											>
 												<button>
 													{{ option.label }}
@@ -357,6 +380,21 @@
 							</div>
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
+								<OverflowMenu
+									:options="stageOptions"
+									class="bg-transparent p-0"
+								>
+									<ButtonStyled circular>
+										<button v-tooltip="`Stages`">
+											<ListBulletedIcon />
+										</button>
+									</ButtonStyled>
+
+									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
+										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+										{{ opt.text }}
+									</template>
+								</OverflowMenu>
 								<ButtonStyled>
 									<button :disabled="loadingModerationDecision" @click="goBackToStages">
 										<LeftArrowIcon aria-hidden="true" />
@@ -459,13 +497,20 @@ import {
 	ToggleRightIcon,
 	XIcon,
 } from '@modrinth/assets'
+import type {
+	Action,
+	ActionState,
+	ButtonAction,
+	ChecklistActionContext,
+	ConditionalButtonAction,
+	DropdownAction,
+	MultiSelectChipsAction,
+	MultiSelectChipsOption,
+	Stage,
+	ToggleAction,
+} from '@modrinth/moderation'
 import {
-	type Action,
-	type ActionState,
-	type ButtonAction,
 	checklist,
-	type ConditionalButtonAction,
-	type DropdownAction,
 	expandVariables,
 	finalPermissionMessages,
 	findMatchingVariant,
@@ -479,11 +524,9 @@ import {
 	initializeActionState,
 	kebabToTitleCase,
 	keybinds,
-	type MultiSelectChipsAction,
 	processMessage,
-	type Stage,
-	type ToggleAction,
 } from '@modrinth/moderation'
+import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -495,37 +538,26 @@ import {
 	injectProjectPageContext,
 	MarkdownEditor,
 	OverflowMenu,
-	type OverflowMenuOption,
 	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
-import {
-	type ModerationJudgements,
-	type ModerationModpackItem,
-	type ProjectStatus,
-	renderHighlightedString,
-} from '@modrinth/utils'
+import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
+import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computedAsync, useDebounceFn } from '@vueuse/core'
+import { toRaw } from 'vue'
 import type { Component } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import {
-	clearChecklistProgressState,
-	clearGeneratedMessageState as clearPersistedGeneratedMessageState,
-	createEmptyGeneratedMessageState,
-	loadChecklistActionStates,
-	loadChecklistStage,
-	loadChecklistTextInputs,
-	loadGeneratedMessageState,
-	saveChecklistActionStates,
-	saveChecklistStage,
-	saveChecklistTextInputs,
-	saveGeneratedMessageState,
+	clearChecklistState,
+	loadChecklistState,
+	saveChecklistState,
 } from '~/services/moderation-checklist-storage.ts'
-import { type LockAcquireResponse, useModerationQueue } from '~/services/moderation-queue.ts'
+import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
+import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
@@ -541,7 +573,7 @@ const props = defineProps<{
 	collapsed: boolean
 }>()
 
-const { projectV2, projectV3, invalidate } = injectProjectPageContext()
+const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
 
 const moderationQueue = useModerationQueue()
 const queryClient = useQueryClient()
@@ -577,6 +609,134 @@ const isPrefetching = ref(false)
 const PREFETCH_STALE_MS = 30_000 // 30 seconds
 const PREFETCH_TARGET_COUNT = 3 // Keep 3 unlocked projects ready
 const PREFETCH_BATCH_SIZE = 5 // Check 5 at a time in parallel
+
+// Tooltip constants and cache
+const BUTTON_TOOLTIP_DELAY_MS = 500 // Show tooltip after 1.5 seconds of hovering
+const BUTTON_TOOLTIP_HIDE_DELAY_MS = 0 // Hide immediately on mouseleave
+const buttonActionTooltipCache = ref<Record<string, { text: string; expiresAt: number }>>({})
+const TOOLTIP_CACHE_TTL_MS = 30000 // Cache tooltip text for 30 seconds
+
+// Helper: compute the message text that a button action would generate
+async function getButtonActionTooltipText(action: Action): Promise<string> {
+	try {
+		const actionIndex = currentStageObj.value.actions.indexOf(action)
+		const actionId = getActionId(action, actionIndex)
+		const state = actionStates.value[actionId]
+
+		if (!state) return ''
+
+		// Build list of selected action IDs (including this action as if selected)
+		const tempSelectedIds = Object.entries(actionStates.value)
+			.filter(([_, s]) => s.selected)
+			.map(([id]) => id)
+
+		if (!tempSelectedIds.includes(actionId)) {
+			tempSelectedIds.push(actionId)
+		}
+
+		// Build all valid action IDs across all stages
+		const allValidActionIds: string[] = []
+		checklist.forEach((stage, stageIdx) => {
+			stage.actions.forEach((stageAction, actionIdx) => {
+				allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx))
+				if (stageAction.enablesActions) {
+					stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
+						allValidActionIds.push(
+							getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
+						)
+					})
+				}
+			})
+		})
+
+		let messageText = ''
+
+		if (action.type === 'button' || action.type === 'toggle') {
+			const buttonAction = action as ButtonAction | ToggleAction
+			const message = await getActionMessage(buttonAction, tempSelectedIds, allValidActionIds)
+			if (message) {
+				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
+			}
+		} else if (action.type === 'conditional-button') {
+			const conditionalAction = action as ConditionalButtonAction
+			const matchingVariant = findMatchingVariant(
+				conditionalAction.messageVariants,
+				tempSelectedIds,
+				allValidActionIds,
+				currentStage.value,
+			)
+
+			if (matchingVariant) {
+				const message = (await matchingVariant.message()) as string
+				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
+			} else if (conditionalAction.fallbackMessage) {
+				const message = (await conditionalAction.fallbackMessage()) as string
+				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
+			}
+		}
+
+		return expandVariables(
+			messageText.trim(),
+			projectV2.value,
+			projectV3.value,
+			variables.value,
+		).trim()
+	} catch (error) {
+		console.warn('[tooltip] Error computing action message:', error)
+		return ''
+	}
+}
+
+// Helper: render markdown tooltip content using the app's markdown renderer
+function renderTooltipMarkdownHtml(text: string): string {
+	const trimmed = text/*.slice(0, 500)*/.trim()
+	if (!trimmed) return ''
+
+	return `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(trimmed)}</div>`
+}
+
+// Helper: get tooltip directive config for a button action with caching & delay
+function getChecklistButtonTooltipConfig(action: Action): any {
+	const actionKey = getActionKey(action)
+	const now = Date.now()
+	const cached = buttonActionTooltipCache.value[actionKey]
+
+	if (cached && now < cached.expiresAt) {
+		const renderedHtml = renderTooltipMarkdownHtml(cached.text)
+		return renderedHtml
+			? {
+					content: renderedHtml,
+					html: true,
+					delay: { show: BUTTON_TOOLTIP_DELAY_MS, hide: BUTTON_TOOLTIP_HIDE_DELAY_MS },
+					triggers: ['hover', 'focus'],
+					placement: 'top',
+				}
+			: undefined
+	}
+
+	void (async () => {
+		const text = await getButtonActionTooltipText(action)
+		buttonActionTooltipCache.value[actionKey] = {
+			text,
+			expiresAt: Date.now() + TOOLTIP_CACHE_TTL_MS,
+		}
+	})()
+
+	if (cached) {
+		const renderedHtml = renderTooltipMarkdownHtml(cached.text)
+		return renderedHtml
+			? {
+					content: renderedHtml,
+					html: true,
+					delay: { show: BUTTON_TOOLTIP_DELAY_MS, hide: BUTTON_TOOLTIP_HIDE_DELAY_MS },
+					triggers: ['hover', 'focus'],
+					placement: 'top',
+				}
+			: undefined
+	}
+
+	return undefined
+}
 
 async function handleVisibilityChange() {
 	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
@@ -672,7 +832,6 @@ function handleLockLost(result: LockAcquireResponse) {
 function handleLockAcquired() {
 	lockStatus.value = { locked: false, isOwnLock: true }
 	lockError.value = false
-	initializeAllStages()
 	clearLockCountdown()
 	startLockHeartbeat()
 	maintainPrefetchQueue() // Start prefetching immediately (not debounced)
@@ -681,7 +840,6 @@ function handleLockAcquired() {
 function handleLockUnavailable() {
 	lockError.value = true
 	lockStatus.value = { locked: false, isOwnLock: false }
-	initializeAllStages()
 	clearLockCountdown()
 	addNotification({
 		title: 'Lock unavailable',
@@ -736,6 +894,12 @@ const variables = computed(() => {
 	}
 })
 
+const checklistActionContext = computed<ChecklistActionContext>(() => ({
+	project: projectV2.value,
+	projectV3: projectV3.value,
+	versions: versions.value,
+}))
+
 const modpackPermissionsComplete = ref(false)
 const modpackJudgements = ref<ModerationJudgements>({})
 const isModpackPermissionsStage = computed(() => {
@@ -751,14 +915,12 @@ async function onUploadHandler(file: File) {
 }
 
 const useSimpleEditor = ref(false)
-const checklistPersistenceProjectSlug = projectV2.value.slug
-const persistedGeneratedMessage = import.meta.client
-	? await loadGeneratedMessageState(checklistPersistenceProjectSlug)
-	: createEmptyGeneratedMessageState()
-const message = ref(
-	typeof persistedGeneratedMessage.message === 'string' ? persistedGeneratedMessage.message : '',
-)
-const generatedMessage = ref(persistedGeneratedMessage.generated === true)
+const checklistPersistenceProjectId = projectV2.value.id
+const persistedState = import.meta.client
+	? await loadChecklistState(checklistPersistenceProjectId)
+	: null
+const message = ref<string | null>(persistedState?.message ?? null)
+const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
 const loadingModerationDecision = computed(() => moderationDecision.value !== null)
@@ -767,21 +929,16 @@ const approveSendStatus = computed<ProjectStatus>(() => {
 	return requested ?? 'approved'
 })
 const done = ref(false)
-
-function persistGeneratedMessageState() {
-	void saveGeneratedMessageState(checklistPersistenceProjectSlug, {
-		generated: generatedMessage.value,
-		message: message.value,
-	})
-}
+const messageText = computed({
+	get: () => message.value ?? '',
+	set: (v: string) => {
+		message.value = v
+	},
+})
 
 function clearGeneratedMessageState() {
-	generatedMessage.value = false
-	message.value = ''
-	void clearPersistedGeneratedMessageState(checklistPersistenceProjectSlug)
+	message.value = null
 }
-
-watch([generatedMessage, message], persistGeneratedMessageState, { flush: 'sync' })
 
 function handleModpackPermissionsComplete() {
 	modpackPermissionsComplete.value = true
@@ -845,7 +1002,6 @@ async function confirmTakeOverOverride() {
 
 function reviewAnyway() {
 	alreadyReviewed.value = false
-	initializeAllStages()
 	// Start prefetching the next project in the background
 	maintainPrefetchQueue()
 }
@@ -1096,8 +1252,6 @@ function resetProgress() {
 
 	modpackPermissionsComplete.value = false
 	modpackJudgements.value = {}
-
-	initializeAllStages()
 }
 
 function findFirstValidStage(): number {
@@ -1110,11 +1264,23 @@ function findFirstValidStage(): number {
 }
 
 const currentStageObj = computed(() => checklist[currentStage.value])
-const persistedStage = import.meta.client
-	? await loadChecklistStage(checklistPersistenceProjectSlug)
-	: null
+const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
+const canOpenStageSelectorFromTitle = computed(
+	() =>
+		!alreadyReviewed.value &&
+		!done.value &&
+		!isLockedByOther.value,
+)
+const checklistTitleText = computed(() => {
+	if (alreadyReviewed.value || done.value) return 'Moderation'
+	if (generatedMessage.value) return 'Generated Message'
+
+	return currentStageObj.value.title ?? kebabToTitleCase(currentStageObj.value.id)
+})
 const currentStage = ref(
-	persistedStage !== null && checklist[persistedStage] ? persistedStage : findFirstValidStage(),
+	persistedState?.stage !== undefined && checklist[persistedState.stage]
+		? persistedState.stage
+		: findFirstValidStage(),
 )
 
 const stageTextExpanded = computedAsync(async () => {
@@ -1133,29 +1299,39 @@ const stageTextExpanded = computedAsync(async () => {
 	return null
 }, null)
 
-const persistedActionStates = import.meta.client
-	? await loadChecklistActionStates(checklistPersistenceProjectSlug)
-	: {}
-
 const router = useRouter()
 
-const persistedTextInputs = import.meta.client
-	? await loadChecklistTextInputs(checklistPersistenceProjectSlug)
-	: {}
+const actionStates = ref<Record<string, ActionState>>(persistedState?.actionStates ?? {})
+const textInputValues = ref<Record<string, string>>(persistedState?.textInputs ?? {})
 
-const actionStates = ref<Record<string, ActionState>>(persistedActionStates)
-const textInputValues = ref<Record<string, string>>(persistedTextInputs)
+const initialStage = currentStage.value
+let hasMeaningfulState = persistedState !== null
 
 const persistState = () => {
-	void saveChecklistActionStates(checklistPersistenceProjectSlug, actionStates.value)
-	void saveChecklistTextInputs(checklistPersistenceProjectSlug, textInputValues.value)
+	if (!hasMeaningfulState) {
+		hasMeaningfulState =
+			currentStage.value !== initialStage ||
+			message.value !== null ||
+			Object.values(toRaw(actionStates.value)).some((s) => s.selected)
+		if (!hasMeaningfulState) return
+	}
+	void saveChecklistState(checklistPersistenceProjectId, {
+		open: !props.collapsed,
+		stage: currentStage.value,
+		message: message.value,
+		actionStates: toRaw(actionStates.value),
+		textInputs: toRaw(textInputValues.value),
+	})
 }
 
-watch(currentStage, (stage) => {
-	void saveChecklistStage(checklistPersistenceProjectSlug, stage)
-})
+watch(currentStage, persistState)
 watch(actionStates, persistState, { deep: true })
 watch(textInputValues, persistState, { deep: true })
+watch(message, persistState)
+watch(() => props.collapsed, (collapsed) => {
+	if (!collapsed) hasMeaningfulState = true
+	persistState()
+})
 
 interface MessagePart {
 	weight: number
@@ -1175,7 +1351,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				currentStage: currentStage.value,
 				totalStages: checklist.length,
 				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value.title,
+				currentStageTitle: currentStageObj.value.hint,
 
 				isCollapsed: props.collapsed,
 				isDone: done.value,
@@ -1227,7 +1403,7 @@ function handleKeybinds(event: KeyboardEvent) {
 					if (action && action.type === 'multi-select-chips') {
 						const visibleOptions = getVisibleMultiSelectOptions(action)
 						if (chipIndex < visibleOptions.length) {
-							toggleChip(action, chipIndex)
+							toggleChip(action, visibleOptions[chipIndex])
 						}
 					}
 				},
@@ -1351,16 +1527,6 @@ onUnmounted(() => {
 	isPrefetching.value = false
 })
 
-function initializeAllStages() {
-	checklist.forEach((stage, stageIndex) => {
-		initializeStageActions(stage, stageIndex)
-	})
-}
-
-function initializeCurrentStage() {
-	initializeStageActions(currentStageObj.value, currentStage.value)
-}
-
 watch(
 	currentStage,
 	(newIndex, oldIndex) => {
@@ -1369,31 +1535,19 @@ watch(
 		if (oldIndex !== undefined && newIndex !== oldIndex && stage?.navigate) {
 			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage.navigate}`)
 		}
-
-		initializeCurrentStage()
 	},
 	{ immediate: true },
 )
 
-function initializeStageActions(stage: Stage, stageIndex: number) {
-	stage.actions.forEach((action, index) => {
-		const actionId = getActionIdForStage(action, stageIndex, index)
-		if (!actionStates.value[actionId]) {
-			actionStates.value[actionId] = initializeActionState(action)
+watch(
+	() => currentStageObj.value.id,
+	(stageId) => {
+		if (stageId === 'versions') {
+			loadVersions()
 		}
-	})
-
-	stage.actions.forEach((action) => {
-		if (action.enablesActions) {
-			action.enablesActions.forEach((enabledAction, index) => {
-				const actionId = getActionIdForStage(enabledAction, currentStage.value, index)
-				if (!actionStates.value[actionId]) {
-					actionStates.value[actionId] = initializeActionState(enabledAction)
-				}
-			})
-		}
-	})
-}
+	},
+	{ immediate: true },
+)
 
 function getActionId(action: Action, index?: number): string {
 	// If index is not provided, find it in the current stage's actions
@@ -1472,17 +1626,62 @@ const dropdownActions = computed(() =>
 )
 
 const multiSelectActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'multi-select-chips'),
+	visibleActions.value.filter(
+		(action) =>
+			action.type === 'multi-select-chips' && getVisibleMultiSelectOptions(action).length > 0,
+	),
 )
+
+function resolveMultiSelectOptions(action: MultiSelectChipsAction) {
+	return typeof action.options === 'function'
+		? action.options(checklistActionContext.value)
+		: action.options
+}
+
+function getMultiSelectOptionId(option: MultiSelectChipsOption): string {
+	return option.id ?? option.label
+}
+
+function getMultiSelectOptionKey(
+	action: MultiSelectChipsAction,
+	option: MultiSelectChipsOption,
+	optionIndex: number,
+) {
+	return `${getActionId(action)}-chip-${getMultiSelectOptionId(option) || optionIndex}`
+}
+
+function getSelectedChipIds(action: MultiSelectChipsAction, state?: ActionState): Set<string> {
+	const selectedValues = state?.value
+	if (!(selectedValues instanceof Set)) {
+		return new Set<string>()
+	}
+
+	const optionIds = new Set<string>()
+	const resolvedOptions = resolveMultiSelectOptions(action)
+
+	for (const selectedValue of selectedValues) {
+		if (typeof selectedValue === 'string') {
+			optionIds.add(selectedValue)
+		} else if (typeof selectedValue === 'number') {
+			const option = resolvedOptions[selectedValue]
+			if (option) {
+				optionIds.add(getMultiSelectOptionId(option))
+			}
+		}
+	}
+
+	return optionIds
+}
 
 function getDropdownValue(action: DropdownAction) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
 	const visibleOptions = getVisibleDropdownOptions(action)
-	const currentValue = actionStates.value[actionId]?.value ?? action.defaultOption ?? 0
+	const storedValue = actionStates.value[actionId]?.value
+	const currentValue: number = typeof storedValue === 'number' ? storedValue : (action.defaultOption ?? 0)
 
 	const allOptions = action.options
-	const storedOption = allOptions[currentValue]
+	const storedOption = allOptions.at(currentValue)
 
 	if (storedOption && visibleOptions.includes(storedOption)) {
 		return storedOption
@@ -1491,70 +1690,78 @@ function getDropdownValue(action: DropdownAction) {
 	return visibleOptions[0] || null
 }
 
+function isDefaultActionState(action: Action, state: ActionState): boolean {
+	const def = initializeActionState(action)
+	if (state.selected !== def.selected) return false
+	if (def.value instanceof Set) return !(state.value instanceof Set) || state.value.size === 0
+	return state.value === def.value
+}
+
 function isActionSelected(action: Action): boolean {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	return actionStates.value[actionId]?.selected || false
+	const state = actionStates.value[actionId]
+	if (state !== undefined) return state.selected
+	return action.type === 'toggle' ? (action.defaultChecked ?? false) : false
 }
 
 function toggleAction(action: Action) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state) {
-		state.selected = !state.selected
-		persistState()
+	const current = actionStates.value[actionId] ?? initializeActionState(action)
+	const newState: ActionState = { ...current, selected: !current.selected }
+	if (isDefaultActionState(action, newState)) {
+		const { [actionId]: _, ...rest } = actionStates.value
+		actionStates.value = rest
+	} else {
+		actionStates.value[actionId] = newState
 	}
+	persistState()
 }
 
 function selectDropdownOption(action: DropdownAction, selected: any) {
+	if (selected === undefined || selected === null) return
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state && selected !== undefined && selected !== null) {
-		const optionIndex = action.options.findIndex(
-			(opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
-		)
-
-		if (optionIndex !== -1) {
-			state.value = optionIndex
-			state.selected = true
-			persistState()
-		}
+	const optionIndex = action.options.findIndex(
+		(opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
+	)
+	if (optionIndex === -1) return
+	const newState: ActionState = { selected: true, value: optionIndex }
+	if (isDefaultActionState(action, newState)) {
+		const { [actionId]: _, ...rest } = actionStates.value
+		actionStates.value = rest
+	} else {
+		actionStates.value[actionId] = newState
 	}
+	persistState()
 }
 
-function isChipSelected(action: MultiSelectChipsAction, optionIndex: number): boolean {
+
+function isChipSelected(action: MultiSelectChipsAction, option: MultiSelectChipsOption): boolean {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const selectedSet = actionStates.value[actionId]?.value as Set<number> | undefined
-
-	const visibleOptions = getVisibleMultiSelectOptions(action)
-	const visibleOption = visibleOptions[optionIndex]
-	const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
-
-	return selectedSet?.has(originalIndex) || false
+	return getSelectedChipIds(action, actionStates.value[actionId]).has(getMultiSelectOptionId(option))
 }
 
-function toggleChip(action: MultiSelectChipsAction, optionIndex: number) {
+function toggleChip(action: MultiSelectChipsAction, option: MultiSelectChipsOption) {
 	const actionIndex = currentStageObj.value.actions.indexOf(action)
 	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state && state.value instanceof Set) {
-		const visibleOptions = getVisibleMultiSelectOptions(action)
-		const visibleOption = visibleOptions[optionIndex]
-		const originalIndex = action.options.findIndex((opt) => opt === visibleOption)
-
-		if (originalIndex !== -1) {
-			if (state.value.has(originalIndex)) {
-				state.value.delete(originalIndex)
-			} else {
-				state.value.add(originalIndex)
-			}
-			state.selected = state.value.size > 0
-			persistState()
-		}
+	const selectedOptionIds = getSelectedChipIds(action, actionStates.value[actionId])
+	const optionId = getMultiSelectOptionId(option)
+	if (selectedOptionIds.has(optionId)) {
+		selectedOptionIds.delete(optionId)
+	} else {
+		selectedOptionIds.add(optionId)
 	}
+	const newState: ActionState = { selected: selectedOptionIds.size > 0, value: selectedOptionIds }
+	if (isDefaultActionState(action, newState)) {
+		const { [actionId]: _, ...rest } = actionStates.value
+		actionStates.value = rest
+	} else {
+		actionStates.value[actionId] = newState
+	}
+	persistState()
 }
 
 const isAnyVisibleInputs = computed(() => {
@@ -1715,8 +1922,8 @@ async function processAction(
 		})
 	} else if (action.type === 'dropdown') {
 		const dropdownAction = action as DropdownAction
-		const selectedIndex = state.value ?? 0
-		const selectedOption = dropdownAction.options[selectedIndex]
+		const selectedIndex: number = typeof state.value === 'number' ? state.value : 0
+		const selectedOption = dropdownAction.options.at(selectedIndex)
 
 		if (selectedOption && 'message' in selectedOption && 'weight' in selectedOption) {
 			const message = (await selectedOption.message()) as string
@@ -1729,18 +1936,44 @@ async function processAction(
 		}
 	} else if (action.type === 'multi-select-chips') {
 		const multiSelectAction = action as MultiSelectChipsAction
-		const selectedIndices = state.value as Set<number>
+		const visibleOptions = getVisibleMultiSelectOptions(multiSelectAction)
+		const selectedOptionIds = getSelectedChipIds(multiSelectAction, state)
 
-		for (const index of selectedIndices) {
-			const option = multiSelectAction.options[index]
-			if (option && 'message' in option && 'weight' in option) {
-				const message = (await option.message()) as string
+		if (multiSelectAction.joinWith !== undefined) {
+			const parts: { weight: number; content: string }[] = []
+			for (const option of visibleOptions) {
+				if (selectedOptionIds.has(getMultiSelectOptionId(option))) {
+					parts.push({
+						weight: option.weight,
+						content: processMessage(
+							(await option.message()) as string,
+							action,
+							stageIndex,
+							textInputValues.value,
+						),
+					})
+				}
+			}
+			if (parts.length > 0) {
+				parts.sort((a, b) => a.weight - b.weight)
 				messageParts.push({
-					weight: option.weight,
-					content: processMessage(message, action, stageIndex, textInputValues.value),
-					actionId: `${actionId}-option-${index}`,
+					weight: parts[0].weight,
+					content: parts.map((p) => p.content.trim()).join(multiSelectAction.joinWith),
+					actionId: `${actionId}-combined`,
 					stageIndex,
 				})
+			}
+		} else {
+			for (const option of visibleOptions) {
+				if (selectedOptionIds.has(getMultiSelectOptionId(option))) {
+					const message = (await option.message()) as string
+					messageParts.push({
+						weight: option.weight,
+						content: processMessage(message, action, stageIndex, textInputValues.value),
+						actionId: `${actionId}-option-${getMultiSelectOptionId(option)}`,
+						stageIndex,
+					})
+				}
 			}
 		}
 	}
@@ -1768,7 +2001,7 @@ function shouldShowStage(stage: Stage): boolean {
 
 function shouldShowAction(action: Action): boolean {
 	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(projectV2.value, projectV3.value)
+		return action.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
 	}
 
 	return true
@@ -1777,16 +2010,16 @@ function shouldShowAction(action: Action): boolean {
 function getVisibleDropdownOptions(action: DropdownAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value)
+			return option.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
 		}
 		return true
 	})
 }
 
 function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
-	return action.options.filter((option) => {
+	return resolveMultiSelectOptions(action).filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value)
+			return option.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
 		}
 		return true
 	})
@@ -1870,8 +2103,6 @@ async function generateMessage() {
 		}
 
 		message.value = fullMessage
-
-		generatedMessage.value = true
 	} catch (error) {
 		console.error('Error generating message:', error)
 		addNotification({
@@ -2125,10 +2356,10 @@ function clearProjectLocalStorage() {
 	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
 	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
-	void clearChecklistProgressState(checklistPersistenceProjectSlug)
+	void clearChecklistState(checklistPersistenceProjectId)
 	actionStates.value = {}
 	textInputValues.value = {}
-	clearGeneratedMessageState()
+	message.value = null
 }
 
 const isLastVisibleStage = computed(() => {
@@ -2157,7 +2388,7 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 			return {
 				id: String(index),
 				action: () => (currentStage.value = index),
-				text: stage.id ? kebabToTitleCase(stage.id) : stage.title,
+				text: stage.title ?? kebabToTitleCase(stage.id),
 				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
 				hoverFilled: true,
 				icon: stage.icon ? stage.icon : undefined,
@@ -2221,5 +2452,60 @@ const stageOptionsForSlots = computed(() =>
 			transform: translateY(0);
 		}
 	}
+
+	:deep(.title-stage-selector-dropdown .v-popper__inner) {
+		max-height: min(70vh, 28rem) !important;
+		overflow-y: auto;
+	}
+
+	:deep(.title-stage-selector-disabled > button) {
+		cursor: default;
+	}
+}
+
+// Tooltip styling for button action message previews.
+// Must use :global since floating-vue teleports tooltips outside the component DOM.
+:global(.v-popper--theme-tooltip .v-popper__inner) {
+	max-width: 400px;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	white-space: normal;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown) {
+	line-height: 1.45;
+	font-size: 0.9rem;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown p) {
+	margin: 0.35rem 0;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ul),
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown ol) {
+	margin: 0.35rem 0;
+	padding-left: 1.15rem;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown pre) {
+	max-width: 100%;
+	overflow-x: auto;
+	margin: 0.4rem 0;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown code) {
+	background-color: rgba(255, 255, 255, 0.15);
+	padding: 0.1rem 0.3rem;
+	border-radius: 0.25rem;
+	font-family: monospace;
+	font-size: 0.85em;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown strong) {
+	font-weight: 700;
+}
+
+:global(.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
+	font-style: italic;
 }
 </style>

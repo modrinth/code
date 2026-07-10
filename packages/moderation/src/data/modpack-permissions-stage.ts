@@ -6,7 +6,7 @@ import type { Stage } from '../types/stage'
 
 export default {
 	id: 'modpack-permissions',
-	title: 'Modpack Permissions',
+	hint: 'Modpack Permissions',
 	icon: PackageOpenIcon,
 	// Replace me please.
 	guidance_url:

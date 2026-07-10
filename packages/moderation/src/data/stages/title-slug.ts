@@ -16,7 +16,8 @@ function hasCustomSlug(project: Labrinth.Projects.v2.Project): boolean {
 }
 
 const titleSlug: Stage = {
-	title: 'Are the Name and URL accurate and appropriate?',
+	title: 'Title & Slug',
+	hint: 'Are the Name and URL accurate and appropriate?',
 	id: 'title-&-slug',
 	text: async (project) => {
 		let text = (await import('../messages/checklist-text/title-slug/title.md?raw')).default

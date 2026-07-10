@@ -4,7 +4,8 @@ import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const statusAlerts: Stage = {
-	title: `Is anything else affecting this project's status?`,
+	title: 'Status Alerts',
+	hint: `Is anything else affecting this project's status?`,
 	id: 'status-alerts',
 	icon: TriangleAlertIcon,
 	text: async () => (await import('../messages/checklist-text/status-alerts/text.md?raw')).default,

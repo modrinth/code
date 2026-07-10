@@ -4,7 +4,8 @@ import type { ButtonAction } from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
 const summary: Stage = {
-	title: "Is the project's summary sufficient?",
+	title: 'Summary',
+	hint: "Is the project's summary sufficient?",
 	text: async () => (await import('../messages/checklist-text/summary/summary.md?raw')).default,
 	id: 'summary',
 	icon: AlignLeftIcon,

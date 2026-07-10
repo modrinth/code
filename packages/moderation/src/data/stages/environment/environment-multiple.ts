@@ -4,7 +4,8 @@ import type { ButtonAction } from '../../../types/actions'
 import type { Stage } from '../../../types/stage'
 
 const environmentMultiple: Stage = {
-	title: "Is the project's environment information accurate?",
+  title: "Environment",
+	hint: "Is the project's environment information accurate?",
 	id: 'environment',
 	navigate: '/settings/versions',
 	icon: GlobeIcon,

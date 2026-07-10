@@ -10,7 +10,7 @@ import type {
 
 export interface ActionState {
 	selected: boolean
-	value?: Set<number> | number | string | unknown
+	value?: Set<string | number> | number | string | unknown
 }
 
 export interface MessagePart {
@@ -19,10 +19,6 @@ export interface MessagePart {
 	actionId: string
 	stageIndex: number
 }
-
-export type SerializedActionState = {
-	isSet?: boolean
-} & ActionState
 
 export function getActionIdForStage(
 	action: Action,
@@ -50,34 +46,6 @@ export function getActionKey(
 	return `${currentStage}-${index}-${getActionId(action, currentStage)}`
 }
 
-export function serializeActionStates(states: Record<string, ActionState>): string {
-	const serializable: Record<string, SerializedActionState> = {}
-	for (const [key, state] of Object.entries(states)) {
-		serializable[key] = {
-			selected: state.selected,
-			value: state.value instanceof Set ? Array.from(state.value) : state.value,
-			isSet: state.value instanceof Set,
-		}
-	}
-	return JSON.stringify(serializable)
-}
-
-export function deserializeActionStates(data: string): Record<string, ActionState> {
-	try {
-		const parsed = JSON.parse(data)
-		const states: Record<string, ActionState> = {}
-		for (const [key, state] of Object.entries(parsed as Record<string, SerializedActionState>)) {
-			states[key] = {
-				selected: state.selected,
-				value: state.isSet ? new Set(state.value as unknown[]) : state.value,
-			}
-		}
-		return states
-	} catch {
-		return {}
-	}
-}
-
 export function initializeActionState(action: Action): ActionState {
 	if (action.type === 'toggle') {
 		return {
@@ -91,7 +59,7 @@ export function initializeActionState(action: Action): ActionState {
 	} else if (action.type === 'multi-select-chips') {
 		return {
 			selected: false,
-			value: new Set<number>(),
+			value: new Set<string | number>(),
 		}
 	} else {
 		return {

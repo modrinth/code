@@ -1,10 +1,49 @@
 import { VersionIcon } from '@modrinth/assets'
 
-import type { ButtonAction, DropdownAction, DropdownActionOption } from '../../types/actions'
+import type {
+	ButtonAction,
+	ChecklistActionContext,
+	DropdownAction,
+	DropdownActionOption,
+	MultiSelectChipsAction,
+	MultiSelectChipsOption,
+} from '../../types/actions'
 import type { Stage } from '../../types/stage'
 
+const loaderLabels: Record<string, string> = {
+	datapack: 'Data Pack',
+	resourcepack: 'Resource Pack',
+	neoforge: 'NeoForge',
+	liteloader: 'LiteLoader',
+}
+
+function formatLoaderLabel(loader: string): string {
+	if (loaderLabels[loader]) {
+		return loaderLabels[loader]
+	}
+
+	return loader
+		.split(/[-_]/g)
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ')
+}
+
+function getIncorrectLoaderOptions(context: ChecklistActionContext): MultiSelectChipsOption[] {
+	const distinctLoaders = [...new Set((context.versions ?? []).flatMap((version) => version.loaders ?? []))]
+
+	return distinctLoaders
+		.sort((a, b) => formatLoaderLabel(a).localeCompare(formatLoaderLabel(b)))
+		.map((loader, index) => ({
+			id: loader,
+			label: formatLoaderLabel(loader),
+			weight: 1002 + index,
+			message: async () => `- ${formatLoaderLabel(loader)}`,
+		}))
+}
+
 const versions: Stage = {
-	title: "Are this project's files correct?",
+	title: 'Versions',
+	hint: "Are this project's files correct?",
 	id: 'versions',
 	icon: VersionIcon,
 	guidance_url:
@@ -139,6 +178,27 @@ const versions: Stage = {
 						} as DropdownActionOption,
 					],
 				} as DropdownAction,
+			],
+		} as ButtonAction,
+		{
+			id: 'versions_incorrect_loader',
+			type: 'button',
+			label: 'Incorrect Loader',
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			weight: 1001,
+			message: async () =>
+				(await import('../messages/checklist-messages/versions/incorrect_loader.md?raw')).default,
+			enablesActions: [
+				{
+					id: 'versions_incorrect_loader_options',
+					type: 'multi-select-chips',
+					label: 'Which loader labels are incorrect?',
+					joinWith: '\n',
+					shouldShow: (_project, _projectV3, context) =>
+						Boolean(context && getIncorrectLoaderOptions(context).length > 0),
+					options: (context) => getIncorrectLoaderOptions(context),
+				} as MultiSelectChipsAction,
 			],
 		} as ButtonAction,
 		{
