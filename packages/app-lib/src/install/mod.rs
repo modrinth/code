@@ -1,4 +1,5 @@
 mod diagnostics;
+mod shared_instance;
 pub mod events;
 pub mod model;
 pub mod recovery;
