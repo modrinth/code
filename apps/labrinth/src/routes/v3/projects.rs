@@ -2835,6 +2835,11 @@ pub async fn project_delete_internal(
         )
         .await?;
         search_state
+            .backend
+            .remove_project_documents(&[project.inner.id.into()])
+            .await
+            .wrap_internal_err("failed to remove project from search index")?;
+        search_state
             .queue
             .push_project_removal(project.inner.id.into())
             .await;
