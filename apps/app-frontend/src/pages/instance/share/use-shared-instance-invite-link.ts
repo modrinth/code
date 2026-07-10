@@ -2,9 +2,8 @@ import type { InviteLinkSettings } from '@modrinth/ui'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { config } from '@/config'
+import { toError } from '@/helpers/errors'
 import { create_shared_instance_invite_link } from '@/helpers/instance'
-
-import { toError } from './shared-instance-share-types'
 
 export function useSharedInstanceInviteLink(
 	instanceId: Ref<string>,

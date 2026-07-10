@@ -7,7 +7,6 @@ import {
 	injectFilePicker,
 	injectNotificationManager,
 	InstallationSettingsLayout,
-	provideAppBackup,
 	provideInstallationSettings,
 	useDebugLogger,
 	useVIntl,
@@ -21,16 +20,13 @@ import { useManagedContentPolicy } from '@/composables/instances/use-managed-con
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import {
-	install_duplicate_instance,
 	install_existing_instance,
 	install_pack_to_existing_instance,
-	installJobInstanceId,
 	wait_for_install_job,
 } from '@/helpers/install'
 import {
 	edit,
 	get_linked_modpack_info,
-	list,
 	unlink_shared_instance,
 	unpublish_shared_instance,
 	update_managed_modrinth_version,
@@ -39,6 +35,7 @@ import {
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { injectInstanceSettings } from '@/providers/instance-settings'
+import { provideInstanceBackup } from '@/providers/instance-backup'
 import { useTheming } from '@/store/state'
 
 import type { Manifest } from '../../../helpers/types'
@@ -203,27 +200,7 @@ async function installLocalModpackFromPicker() {
 	return !!completed
 }
 
-provideAppBackup({
-	async createBackup() {
-		debug('createBackup: start', {
-			instanceId: instance.value.id,
-			instanceName: instance.value.name,
-		})
-		const allInstances = await list()
-		const prefix = `${instance.value.name} - Backup #`
-		const existingNums = allInstances
-			.filter((p) => p.name.startsWith(prefix))
-			.map((p) => parseInt(p.name.slice(prefix.length), 10))
-			.filter((n) => !isNaN(n))
-		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const job = await install_duplicate_instance(instance.value.id)
-		const newInstanceId = installJobInstanceId(job)
-		if (newInstanceId) {
-			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
-		}
-		debug('createBackup: done', { newInstanceId, backupName: `${prefix}${nextNum}` })
-	},
-})
+provideInstanceBackup(instance)
 
 provideInstallationSettings({
 	closeSettings: closeModal,

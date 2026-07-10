@@ -10,6 +10,7 @@ import { type Ref, watch } from 'vue'
 
 import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
+import { toError } from '@/helpers/errors'
 import {
 	install_accept_shared_instance_invite,
 	install_get_shared_instance_preview,
@@ -28,10 +29,6 @@ type InstallModal = {
 
 type AccountRequiredModal = {
 	show(event?: MouseEvent): Promise<boolean>
-}
-
-function toError(error: unknown) {
-	return error instanceof Error ? error : new Error(String(error))
 }
 
 export function useSharedInstanceInviteHandler(

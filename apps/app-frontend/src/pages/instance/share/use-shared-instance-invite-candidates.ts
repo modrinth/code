@@ -3,20 +3,14 @@ import {
 	type InvitePlayersSearchUser,
 	type InvitePlayersUser,
 } from '@modrinth/ui'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onUnmounted, type Ref } from 'vue'
+import { computed, type Ref } from 'vue'
 
-import { friend_listener } from '@/helpers/events.js'
-import {
-	add_friend,
-	friendsQueryKey,
-	getFriendsWithUserData,
-	getFriendUserId,
-} from '@/helpers/friends.ts'
+import { useFriends } from '@/composables/use-friends'
+import { getFriendUserId } from '@/helpers/friends.ts'
 import { get as getCredentials } from '@/helpers/mr_auth.ts'
 import { search_user } from '@/helpers/users.ts'
 
-import { normalizeInviteKey, type ShareRow, toError } from './shared-instance-share-types'
+import { normalizeInviteKey, type ShareRow } from './shared-instance-share-types'
 
 export function useSharedInstanceInviteCandidates(options: {
 	rows: Ref<ShareRow[]>
@@ -24,17 +18,17 @@ export function useSharedInstanceInviteCandidates(options: {
 	isSignedIn: Ref<boolean>
 	actionsLocked: Ref<boolean>
 }) {
-	const queryClient = useQueryClient()
 	const { handleError } = injectNotificationManager()
-	const queryKey = computed(() => friendsQueryKey(options.currentUserId.value))
-	const friendsQuery = useQuery({
-		queryKey,
-		queryFn: async () => getFriendsWithUserData(await getCredentials()),
-		enabled: () =>
+	const friendsState = useFriends({
+		currentUserId: options.currentUserId,
+		getCredentials,
+		enabled: computed(
+			() =>
 			options.isSignedIn.value && !!options.currentUserId.value && !options.actionsLocked.value,
-		staleTime: 30_000,
+		),
+		onError: handleError,
 	})
-	const friends = computed(() => friendsQuery.data.value ?? [])
+	const friends = friendsState.friends
 	const invitedRows = computed(() => {
 		const invited = new Map<string, ShareRow>()
 		for (const row of options.rows.value) {
@@ -70,13 +64,6 @@ export function useSharedInstanceInviteCandidates(options: {
 		return keys
 	})
 
-	const friendRequestMutation = useMutation({
-		mutationFn: (user: InvitePlayersUser) => {
-			if (!options.actionsLocked.value) return add_friend(user.id)
-		},
-		onError: (error) => handleError(toError(error)),
-	})
-
 	async function search(query: string): Promise<InvitePlayersSearchUser[]> {
 		if (options.actionsLocked.value) return []
 		const credentials = await getCredentials()
@@ -105,20 +92,14 @@ export function useSharedInstanceInviteCandidates(options: {
 		const credentials = await getCredentials()
 		const ownUserId = options.currentUserId.value ?? credentials?.user_id ?? null
 		if (ownUserId && normalizeInviteKey(user.id) === normalizeInviteKey(ownUserId)) return
-		const existing = friends.value.find((friend) => {
-			const friendId = getFriendUserId(friend, options.currentUserId.value)
-			return (
-				normalizeInviteKey(friendId) === normalizeInviteKey(user.id) ||
-				normalizeInviteKey(friend.username) === normalizeInviteKey(user.username)
-			)
-		})
-		if (!existing) friendRequestMutation.mutate(user)
+		if (!friendsState.findFriend(user.id, user.username)) {
+			friendsState.requestFriend({
+				id: user.id,
+				username: user.username,
+				avatarUrl: user.avatarUrl,
+			})
+		}
 	}
-
-	const unlisten = await friend_listener(() => {
-		void queryClient.invalidateQueries({ queryKey: queryKey.value })
-	})
-	onUnmounted(unlisten)
 
 	return { inviteFriends, search, requestFriend }
 }

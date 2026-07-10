@@ -95,7 +95,6 @@ import {
 	ModpackContentModal,
 	type ModpackContentModalState,
 	type OverflowMenuOption,
-	provideAppBackup,
 	provideContentManager,
 	ReadyTransition,
 	useDebugLogger,
@@ -120,12 +119,10 @@ import {
 	instance_listener,
 	type InstanceBulkUpdateProgress,
 } from '@/helpers/events.js'
-import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
 	add_project_from_path,
 	edit,
 	get_linked_modpack_content,
-	list,
 	remove_project,
 	switch_project_version_with_dependencies,
 	toggle_disable_project,
@@ -136,6 +133,7 @@ import { type InstanceContentData, loadInstanceContentData } from '@/helpers/ins
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
+import { provideInstanceBackup } from '@/providers/instance-backup'
 import { useTheming } from '@/store/state'
 
 const messages = defineMessages({
@@ -1276,22 +1274,7 @@ function applyContentData(contentData: InstanceContentData) {
 	return true
 }
 
-provideAppBackup({
-	async createBackup() {
-		const allInstances = await list()
-		const prefix = `${props.instance.name} - Backup #`
-		const existingNums = allInstances
-			.filter((p) => p.name.startsWith(prefix))
-			.map((p) => parseInt(p.name.slice(prefix.length), 10))
-			.filter((n) => !isNaN(n))
-		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const job = await install_duplicate_instance(props.instance.id)
-		const newInstanceId = installJobInstanceId(job)
-		if (newInstanceId) {
-			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
-		}
-	},
-})
+provideInstanceBackup(() => props.instance)
 
 provideContentManager({
 	items: mergedProjects,

@@ -77,7 +77,6 @@ import {
 	type InvitePlayersInvitePayload,
 	InvitePlayersModal,
 	type InvitePlayersUser,
-	provideAppBackup,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -87,14 +86,13 @@ import { computed, ref, toRef, watch } from 'vue'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import {
 	getSharedInstanceUnavailableReason,
-	install_duplicate_instance,
-	installJobInstanceId,
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
-import { edit, list } from '@/helpers/instance'
+import { edit } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import { sharedInstanceErrorMessages, useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
+import { provideInstanceBackup } from '@/providers/instance-backup'
 
 import { injectSharedInstanceState } from '../use-shared-instance-state'
 import SharedInstanceMembersTable from './shared-instance-members-table.vue'
@@ -210,13 +208,5 @@ function signInToShare(event?: MouseEvent) { void accountRequiredModal.value?.sh
 watch(() => props.instance.id, () => { importedModpackUnlinked.value = false })
 watch([() => auth.isReady.value, isSignedIn, actionsLocked], ([ready, signedIn, locked]) => { if (ready && !signedIn && !locked) signInToShare() }, { immediate: true, flush: 'post' })
 
-provideAppBackup({
-	async createBackup() {
-		const prefix = `${props.instance.name} - Backup #`
-		const existingNumbers = (await list()).filter((candidate) => candidate.name.startsWith(prefix)).map((candidate) => parseInt(candidate.name.slice(prefix.length), 10)).filter((value) => !isNaN(value))
-		const job = await install_duplicate_instance(props.instance.id)
-		const newInstanceId = installJobInstanceId(job)
-		if (newInstanceId) await edit(newInstanceId, { name: `${prefix}${existingNumbers.length ? Math.max(...existingNumbers) + 1 : 1}` })
-	},
-})
+provideInstanceBackup(() => props.instance)
 </script>

@@ -149,7 +149,7 @@ export function removeCachedFriend(
 	return friends.filter((friend) => !matchesFriend(friend, id, username, currentUserId))
 }
 
-function normalizeFriendKey(value: string) {
+export function normalizeFriendKey(value: string) {
 	return value.trim().toLowerCase()
 }
 

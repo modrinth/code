@@ -30,3 +30,7 @@ export interface InviteLinkSettings {
 	expiresAt: Date
 	maxUses: number
 }
+
+export function normalizeInviteKey(value: string) {
+	return value.trim().toLowerCase()
+}

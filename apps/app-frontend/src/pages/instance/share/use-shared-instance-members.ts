@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref, ref, watch } from 'vue'
 
 import { get_user_many } from '@/helpers/cache.js'
+import { toError } from '@/helpers/errors'
 import {
 	get_shared_instance_users,
 	invite_shared_instance_users,
@@ -12,7 +13,7 @@ import {
 } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
-import { normalizeInviteKey, type ShareRow, toError } from './shared-instance-share-types'
+import { normalizeInviteKey, type ShareRow } from './shared-instance-share-types'
 
 type MutationContext = {
 	queryKey: readonly ['sharedInstanceUsers', string]
