@@ -1,0 +1,218 @@
+<template>
+	<div class="flex flex-col gap-4">
+		<ModrinthAccountRequiredModal ref="accountRequiredModal" :request-auth="requestAuth" />
+		<InvitePlayersModal
+			ref="invitePlayersModal"
+			:header="formatMessage(messages.shareModalHeader, { name: instance.name })"
+			:friends="inviteFriends"
+			:search-users="searchInviteUsers"
+			:link="inviteLink.link.value"
+			:link-expires-at="inviteLink.details.value?.expiresAt"
+			:link-max-uses="inviteLink.details.value?.maxUses"
+			:update-invite-link="inviteLink.update"
+			:user-profile-link="userProfileLink"
+			@invite="invitePlayer"
+			@cancel="cancelInvite"
+		/>
+		<ConfirmUnlinkModal ref="unlinkModal" mode="share-instance" :backup-tip="importedModpackBackupTip" @unlink="unlinkImportedModpack" />
+		<SharedInstanceRemoveMemberModal ref="removeMemberModal" :row="pendingRemovalRow" :member-count="members.rows.value.length" @confirm="removeMember" @clear="pendingRemovalRow = null" />
+
+		<SharedInstanceMembersTable
+			v-if="members.rows.value.length > 0"
+			:rows="members.rows.value"
+			:actions-locked="sharedInstanceActionsLocked"
+			:invite-pending="inviteLink.pending.value"
+			@invite="showInvitePlayers"
+			@remove="showRemoveMemberModal"
+		/>
+
+		<SharedInstanceShareEmptyState
+			v-else-if="sharedInstanceUnavailable"
+			:heading="formatMessage(sharedInstanceErrorMessages.unavailableTitle)"
+			:description="formatSharedInstanceUnavailable(sharedInstanceUnavailableReason, sharedInstanceUnavailableManager)"
+		/>
+
+		<SharedInstanceShareEmptyState v-else-if="sharedInstanceActionsLocked" :heading="formatMessage(lockedEmptyHeading)">
+			<template #description>
+				<span class="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
+					<span>{{ formatMessage(messages.lockedEmptyDescriptionPrefix) }}</span>
+					<span v-if="linkedAccount" class="inline-flex max-w-full min-w-0 items-center gap-1.5 align-middle font-semibold text-primary">
+						<Avatar :src="linkedAccount.avatarUrl" :alt="linkedAccount.username" :tint-by="linkedAccount.tintBy" size="20px" circle no-shadow />
+						<span class="min-w-0 truncate">{{ linkedAccount.username }}</span>
+					</span>
+					<span v-else class="font-semibold text-primary">{{ formatMessage(messages.linkedAccountFallback) }}</span>
+					<span>{{ formatMessage(messages.lockedEmptyDescriptionSuffix) }}</span>
+				</span>
+			</template>
+			<template #actions>
+				<ButtonStyled color="brand"><button class="!h-10" @click="signInToShare"><LogInIcon aria-hidden="true" />{{ formatMessage(lockedActionButton) }}</button></ButtonStyled>
+			</template>
+		</SharedInstanceShareEmptyState>
+
+		<SharedInstanceShareEmptyState v-else :heading="formatMessage(messages.noFriendsInvitedHeading)" :description="formatMessage(messages.noFriendsInvitedDescription)">
+			<template #actions>
+				<ButtonStyled color="brand"><button class="!h-10" :disabled="inviteLink.pending.value" @click="showInvitePlayers($event)"><SpinnerIcon v-if="inviteLink.pending.value" class="animate-spin" aria-hidden="true" /><UserPlusIcon v-else aria-hidden="true" />{{ formatMessage(messages.inviteFriendsButton) }}</button></ButtonStyled>
+			</template>
+		</SharedInstanceShareEmptyState>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { LogInIcon, SpinnerIcon, UserPlusIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	ButtonStyled,
+	ConfirmUnlinkModal,
+	defineMessages,
+	injectAuth,
+	injectNotificationManager,
+	type InvitePlayersInvitePayload,
+	InvitePlayersModal,
+	type InvitePlayersUser,
+	provideAppBackup,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { computed, ref, toRef, watch } from 'vue'
+
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
+import { get_user } from '@/helpers/cache.js'
+import {
+	getSharedInstanceUnavailableReason,
+	install_duplicate_instance,
+	installJobInstanceId,
+	isSharedInstanceUnavailableError,
+	type SharedInstanceUnavailableReason,
+} from '@/helpers/install'
+import { edit, list } from '@/helpers/instance'
+import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
+import { sharedInstanceErrorMessages, useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
+import type { GameInstance } from '@/helpers/types'
+
+import SharedInstanceMembersTable from './shared-instance-members-table.vue'
+import SharedInstanceRemoveMemberModal from './shared-instance-remove-member-modal.vue'
+import SharedInstanceShareEmptyState from './shared-instance-share-empty-state.vue'
+import type { ShareRow } from './shared-instance-share-types'
+import { useSharedInstanceInviteCandidates } from './use-shared-instance-invite-candidates'
+import { useSharedInstanceInviteLink } from './use-shared-instance-invite-link'
+import { useSharedInstanceMembers } from './use-shared-instance-members'
+
+const props = defineProps<{
+	instance: GameInstance
+	sharedInstanceActionsLocked?: boolean
+	sharedInstanceUnavailableReason?: SharedInstanceUnavailableReason | null
+	sharedInstanceUnavailableManager?: string | null
+}>()
+const auth = injectAuth()
+const queryClient = useQueryClient()
+const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const { formatSharedInstanceUnavailable, notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
+const instance = toRef(props, 'instance')
+const actionsLocked = computed(() => !!props.sharedInstanceActionsLocked)
+const currentUserId = computed(() => auth.user.value?.id ?? null)
+const isSignedIn = computed(() => !!auth.session_token.value)
+const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
+const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
+const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+const removeMemberModal = ref<InstanceType<typeof SharedInstanceRemoveMemberModal>>()
+const pendingRemovalRow = ref<ShareRow | null>(null)
+const importedModpackUnlinked = ref(false)
+
+function notifyOperationError(error: unknown) {
+	if (isSharedInstanceUnavailableError(error)) {
+		notifySharedInstanceUnavailable(getSharedInstanceUnavailableReason(error), props.sharedInstanceUnavailableManager ?? null)
+	} else {
+		notifySharedInstanceError(error instanceof Error ? error : new Error(String(error)))
+	}
+}
+
+const members = useSharedInstanceMembers({
+	instance,
+	currentUserId,
+	isSignedIn,
+	actionsLocked,
+	onError: notifyOperationError,
+	onHydrationError: handleError,
+})
+const { inviteFriends, search: searchInviteUsers, requestFriend } = useSharedInstanceInviteCandidates({
+	rows: members.rows,
+	currentUserId,
+	isSignedIn,
+	actionsLocked,
+})
+const inviteLink = useSharedInstanceInviteLink(computed(() => props.instance.id), notifyOperationError)
+
+const linkedAccountId = computed(() => props.instance.shared_instance?.linked_user_id ?? null)
+const linkedAccountQuery = useQuery({
+	queryKey: computed(() => ['user', linkedAccountId.value]),
+	queryFn: async () => linkedAccountId.value ? await get_user(linkedAccountId.value, 'bypass').catch(() => null) : null,
+	enabled: () => !!linkedAccountId.value,
+	staleTime: 30_000,
+})
+const linkedAccount = computed(() => {
+	const user = linkedAccountQuery.data.value
+	return user ? { username: user.username ?? user.id, avatarUrl: user.avatar_url ?? undefined, tintBy: user.id } : null
+})
+const lockedEmptyHeading = computed(() => isSignedIn.value ? messages.lockedWrongAccountHeading : messages.lockedSignedOutHeading)
+const lockedActionButton = computed(() => isSignedIn.value ? messages.switchAccountButton : messages.signInButton)
+const sharedInstanceUnavailableReason = computed(() => props.sharedInstanceUnavailableReason ?? null)
+const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
+const sharedInstanceUnavailableManager = computed(() => props.sharedInstanceUnavailableManager ?? null)
+const requiresUnlink = computed(() => props.instance.link?.type === 'imported_modpack' && !props.instance.shared_instance && !importedModpackUnlinked.value)
+const importedModpackBackupTip = computed(() => props.instance.link?.type === 'imported_modpack' ? (props.instance.link.name ?? props.instance.link.filename ?? undefined) : undefined)
+
+const messages = defineMessages({
+	signInButton: { id: 'app.instance.share.sign-in.button', defaultMessage: 'Sign in' },
+	noFriendsInvitedHeading: { id: 'app.instance.share.empty.heading', defaultMessage: 'No friends invited' },
+	noFriendsInvitedDescription: { id: 'app.instance.share.empty.description', defaultMessage: 'You can share this instance with your friends!' },
+	inviteFriendsButton: { id: 'app.instance.share.empty.invite-friends-button', defaultMessage: 'Invite friends' },
+	shareModalHeader: { id: 'app.instance.share.invite-modal.heading', defaultMessage: 'Share {name}' },
+	lockedWrongAccountHeading: { id: 'app.instance.share.locked.wrong-account-heading', defaultMessage: 'Wrong account' },
+	lockedSignedOutHeading: { id: 'app.instance.share.locked.signed-out-heading', defaultMessage: 'Not signed in' },
+	lockedEmptyDescriptionPrefix: { id: 'app.instance.share.locked.empty-description-prefix', defaultMessage: 'You need to sign in as' },
+	lockedEmptyDescriptionSuffix: { id: 'app.instance.share.locked.empty-description-suffix', defaultMessage: 'to access this page.' },
+	linkedAccountFallback: { id: 'app.instance.share.locked.linked-account-fallback', defaultMessage: 'the linked account' },
+	switchAccountButton: { id: 'app.instance.share.locked.switch-account-button', defaultMessage: 'Switch account' },
+})
+
+function invitePlayer(payload: InvitePlayersInvitePayload) {
+	if (actionsLocked.value) return
+	if (payload.source === 'search') void requestFriend(payload.user)
+	members.invite(payload.user)
+}
+function cancelInvite(user: InvitePlayersUser) { const row = members.find(user.id, user.username); if (row) members.remove(row.id) }
+async function showInvitePlayers(event?: MouseEvent) {
+	if (actionsLocked.value) return
+	if (!isSignedIn.value) return signInToShare(event)
+	if (requiresUnlink.value) return unlinkModal.value?.show()
+	if (await inviteLink.ensure()) invitePlayersModal.value?.show(event)
+}
+async function unlinkImportedModpack() {
+	try {
+		await edit(props.instance.id, { link: null as unknown as undefined })
+		importedModpackUnlinked.value = true
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.id] })
+		if (await inviteLink.ensure()) invitePlayersModal.value?.show()
+	} catch (error) { notifyOperationError(error) }
+}
+function showRemoveMemberModal(row: ShareRow) { if (!actionsLocked.value) { pendingRemovalRow.value = row; removeMemberModal.value?.show() } }
+function removeMember(row: ShareRow) { members.remove(row.id) }
+function userProfileLink(username: string) { return !username || username.includes('@') ? undefined : () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`) }
+async function requestAuth(flow: ModrinthAuthFlow) { await auth.requestSignIn(`/instance/${encodeURIComponent(props.instance.id)}/share`, flow); return !!auth.session_token.value }
+function signInToShare(event?: MouseEvent) { void accountRequiredModal.value?.show(event) }
+
+watch(() => props.instance.id, () => { importedModpackUnlinked.value = false })
+watch([() => auth.isReady.value, isSignedIn, actionsLocked], ([ready, signedIn, locked]) => { if (ready && !signedIn && !locked) signInToShare() }, { immediate: true, flush: 'post' })
+
+provideAppBackup({
+	async createBackup() {
+		const prefix = `${props.instance.name} - Backup #`
+		const existingNumbers = (await list()).filter((candidate) => candidate.name.startsWith(prefix)).map((candidate) => parseInt(candidate.name.slice(prefix.length), 10)).filter((value) => !isNaN(value))
+		const job = await install_duplicate_instance(props.instance.id)
+		const newInstanceId = installJobInstanceId(job)
+		if (newInstanceId) await edit(newInstanceId, { name: `${prefix}${existingNumbers.length ? Math.max(...existingNumbers) + 1 : 1}` })
+	},
+})
+</script>
