@@ -34,6 +34,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_job_retry,
             install_job_cancel,
             install_job_dismiss,
+            install_job_support_details,
         ])
         .build()
 }
@@ -236,4 +237,9 @@ pub async fn install_job_cancel(job_id: Uuid) -> Result<InstallJobSnapshot> {
 #[tauri::command]
 pub async fn install_job_dismiss(job_id: Uuid) -> Result<()> {
     Ok(theseus::install::dismiss_job(job_id).await?)
+}
+
+#[tauri::command]
+pub async fn install_job_support_details(job_id: Uuid) -> Result<String> {
+    Ok(theseus::install::job_support_details(job_id).await?)
 }

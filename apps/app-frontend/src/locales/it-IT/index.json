@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ignora"
   },
-  "app.action-bar.install.failed": {
-    "message": "Installazione fallita"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installazione fallita: l'app è stata chiusa."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Installazione fallita: errore di rete."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installazione fallita: errore sconosciuto."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Apri istanza"
   },

@@ -4,7 +4,7 @@ import { createContext } from '.'
 
 export interface PopupNotificationButton {
 	label: string
-	action: () => void
+	action: () => void | Promise<void>
 	icon?: Component
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
 	keepOpen?: boolean

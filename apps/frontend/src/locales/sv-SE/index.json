@@ -2810,9 +2810,6 @@
   "project.download.no-app": {
     "message": "Har du inte Modrinth appen?"
   },
-  "project.download.no-versions-available": {
-    "message": "Inga versioner finns tillgängliga för {gameVersion} och {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"
   },

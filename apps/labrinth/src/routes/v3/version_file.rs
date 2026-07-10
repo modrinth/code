@@ -910,9 +910,6 @@ pub async fn delete_file(
         }
 
         let mut transaction = pool.begin().await?;
-        let was_in_tech_review =
-            delphi::is_project_in_tech_review(row.project_id, &mut transaction)
-                .await?;
 
         sqlx::query!(
             "
@@ -937,9 +934,9 @@ pub async fn delete_file(
         database::models::version_item::cleanup_unused_attribution_files_and_groups(&mut transaction)
             .await?;
 
-        delphi::send_tech_review_exit_file_deleted_message_if_exited(
-            row.project_id,
-            was_in_tech_review,
+        delphi::tech_review_sync::sync_project_tech_review_state(
+            &[row.project_id],
+            delphi::tech_review_sync::TechReviewExitReason::FileDeleted,
             &mut transaction,
         )
         .await?;

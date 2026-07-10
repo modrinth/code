@@ -51,10 +51,9 @@
 							:progress-type="progressItem.progressType"
 							:progress-current="progressItem.progressCurrent"
 							:progress-total="progressItem.progressTotal"
-							:action-label="progressItem.buttons?.[0]?.label"
-							:action-icon="progressItem.buttons?.[0]?.icon"
+							:actions="progressItem.buttons"
 							@dismiss="handleProgressItemDismiss(item, progressItem)"
-							@action="handleProgressItemAction(progressItem)"
+							@action="(index) => handleProgressItemAction(progressItem, index)"
 						/>
 					</div>
 				</div>
@@ -236,8 +235,11 @@ async function handleProgressItemDismiss(
 	dismiss(item.id)
 }
 
-async function handleProgressItemAction(progressItem: PopupNotificationProgressItem) {
-	const button = progressItem.buttons?.[0]
+async function handleProgressItemAction(
+	progressItem: PopupNotificationProgressItem,
+	index: number,
+) {
+	const button = progressItem.buttons?.[index]
 	if (button) {
 		await handleProgressItemButtonClick(progressItem, button)
 	}
@@ -253,8 +255,8 @@ async function handleProgressItemButtonClick(
 	}
 }
 
-function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
-	btn.action()
+async function handleButtonClick(id: string | number, btn: PopupNotificationButton) {
+	await btn.action()
 	if (!btn.keepOpen) {
 		popupNotificationManager.removeNotification(id)
 	}

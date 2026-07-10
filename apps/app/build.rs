@@ -162,6 +162,7 @@ fn main() {
                         "install_job_retry",
                         "install_job_cancel",
                         "install_job_dismiss",
+                        "install_job_support_details",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

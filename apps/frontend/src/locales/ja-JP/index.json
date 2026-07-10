@@ -2735,9 +2735,6 @@
   "project.download.no-app": {
     "message": "Modrinth Appをお持ちでないですか？"
   },
-  "project.download.no-versions-available": {
-    "message": "{gameVersion}および{platform}向けのバージョンは利用できません。"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"
   },

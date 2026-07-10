@@ -288,16 +288,31 @@ provideInstallationSettings({
 			debug('resolveLoaderVersions: no manifest', { loader, gameVersion })
 			return []
 		}
-		if (loader === 'fabric' || loader === 'quilt') {
-			const result = manifest.gameVersions[0]?.loaders ?? []
-			debug('resolveLoaderVersions: fabric/quilt result', {
+		const entry = manifest.gameVersions?.find((item) => item.id === gameVersion)
+		if (entry?.versionGroup) {
+			const result =
+				manifest.versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
+			debug('resolveLoaderVersions: version group result', {
+				loader,
+				gameVersion,
+				versionGroup: entry.versionGroup,
+				count: result.length,
+			})
+			return result
+		}
+		const placeholder = manifest.gameVersions?.find((item) => item.id === '${modrinth.gameVersion}')
+		if (placeholder) {
+			const result = manifest.gameVersions?.some((item) => item.id === gameVersion)
+				? placeholder.loaders
+				: []
+			debug('resolveLoaderVersions: placeholder result', {
 				loader,
 				gameVersion,
 				count: result.length,
 			})
 			return result
 		}
-		const result = manifest.gameVersions?.find((item) => item.id === gameVersion)?.loaders ?? []
+		const result = entry?.loaders ?? []
 		debug('resolveLoaderVersions: result', { loader, gameVersion, count: result.length })
 		return result
 	},

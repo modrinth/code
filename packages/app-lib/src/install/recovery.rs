@@ -1,8 +1,8 @@
 use super::events::emit_install_job;
 use super::model::{
-    InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobState,
-    InstallJobStatus, InstallPhaseDetails, InstallPhaseId, InstallRequest,
-    InstallTarget,
+    InstallCleanup, InstallErrorView, InstallInterruptReason,
+    InstallJobDisplay, InstallJobEventKind, InstallJobState, InstallJobStatus,
+    InstallPhaseDetails, InstallPhaseId, InstallRequest, InstallTarget,
 };
 use super::store;
 use crate::event::InstancePayloadType;
@@ -16,20 +16,41 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
         if job.state.display.is_none() {
             job.state.display = display_from_request(&job.state);
         }
+        let interrupted_phase = job.state.progress.phase;
+        job.state.record_event(InstallJobEventKind::Interrupted {
+            reason: InstallInterruptReason::AppClosed,
+            phase: interrupted_phase,
+        });
         job.state.progress.phase = InstallPhaseId::RollingBack;
         job.state.progress.progress = None;
         job.state.progress.details = InstallPhaseDetails::Empty;
-        job.state.error = Some(InstallErrorView {
-            code: "interrupted".to_string(),
-            message: "interrupted".to_string(),
-            reason: None,
-        });
+        job.state.error = Some(InstallErrorView::from_message(
+            "app_closed",
+            interrupted_phase,
+            "App closed while install was running",
+        ));
 
+        job.state
+            .record_event(InstallJobEventKind::RollbackStarted {
+                cleanup: job.state.cleanup.clone(),
+            });
         if let Err(error) = apply_cleanup(&job.state, state).await {
             tracing::error!(
                 "Error cleaning up interrupted install job {}: {error}",
                 job.id
             );
+            job.state.rollback_error = Some(InstallErrorView::from_error(
+                "rollback_error",
+                InstallPhaseId::RollingBack,
+                &error,
+                None,
+            ));
+            job.state.record_event(InstallJobEventKind::RollbackFailed {
+                message: error.to_string(),
+            });
+        } else {
+            job.state
+                .record_event(InstallJobEventKind::RollbackCompleted);
         }
         clear_deleted_new_instance_id(&mut job.state);
 
@@ -56,48 +77,50 @@ fn clear_deleted_new_instance_id(job_state: &mut InstallJobState) {
 
 fn display_from_request(state: &InstallJobState) -> Option<InstallJobDisplay> {
     match &state.request {
-		InstallRequest::CreateInstance { name, icon_path, .. } => {
-			Some(InstallJobDisplay {
-				title: name.clone(),
-				icon: icon_path.clone(),
-			})
-		}
-		InstallRequest::CreateModpackInstance { location, .. } => match location {
-			crate::api::pack::install_from::CreatePackLocation::FromVersionId {
-				title,
-				icon_url,
-				..
-			} => Some(InstallJobDisplay {
-				title: title.clone(),
-				icon: icon_url.clone(),
-			}),
-			crate::api::pack::install_from::CreatePackLocation::FromFile { .. } => None,
-		},
-		InstallRequest::CreateSharedInstance { data } => {
-			Some(InstallJobDisplay {
-				title: data.name.clone(),
-				icon: data
-					.modpack
-					.as_ref()
-					.and_then(|modpack| modpack.icon_url.clone()),
-			})
-		}
-		InstallRequest::ImportInstance {
-			instance_folder, ..
-		} => Some(InstallJobDisplay {
-			title: instance_folder.clone(),
-			icon: None,
-		}),
-		InstallRequest::DuplicateInstance { .. }
-		| InstallRequest::InstallExistingInstance { .. }
-		| InstallRequest::InstallPackToExistingInstance { .. }
-		| InstallRequest::UpdateSharedInstance { .. } => {
-			state.rollback.as_ref().map(|rollback| InstallJobDisplay {
-				title: rollback.instance.instance.name.clone(),
-				icon: rollback.instance.instance.icon_path.clone(),
-			})
-		}
-	}
+        InstallRequest::CreateInstance { name, icon_path, .. } => {
+            Some(InstallJobDisplay {
+                title: name.clone(),
+                icon: icon_path.clone(),
+            })
+        }
+        InstallRequest::CreateModpackInstance { location, .. } => match location {
+            crate::api::pack::install_from::CreatePackLocation::FromVersionId {
+                title,
+                icon_url,
+                ..
+            } => Some(InstallJobDisplay {
+                title: title.clone(),
+                icon: icon_url.clone(),
+            }),
+            crate::api::pack::install_from::CreatePackLocation::FromFile {
+                ..
+            } => None,
+        },
+        InstallRequest::CreateSharedInstance { data } => {
+            Some(InstallJobDisplay {
+                title: data.name.clone(),
+                icon: data
+                    .modpack
+                    .as_ref()
+                    .and_then(|modpack| modpack.icon_url.clone()),
+            })
+        }
+        InstallRequest::ImportInstance {
+            instance_folder, ..
+        } => Some(InstallJobDisplay {
+            title: instance_folder.clone(),
+            icon: None,
+        }),
+        InstallRequest::DuplicateInstance { .. }
+        | InstallRequest::InstallExistingInstance { .. }
+        | InstallRequest::InstallPackToExistingInstance { .. }
+        | InstallRequest::UpdateSharedInstance { .. } => {
+            state.rollback.as_ref().map(|rollback| InstallJobDisplay {
+                title: rollback.instance.instance.name.clone(),
+                icon: rollback.instance.instance.icon_path.clone(),
+            })
+        }
+    }
 }
 
 pub async fn apply_cleanup(

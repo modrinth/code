@@ -31,7 +31,13 @@ use crate::{
         threads::{MessageBody, Thread},
     },
     queue::session::AuthQueue,
-    routes::{ApiError, internal::moderation::Ownership},
+    routes::{
+        ApiError,
+        internal::{
+            delphi::tech_review_sync::{self, TechReviewExitReason},
+            moderation::Ownership,
+        },
+    },
     search::SearchState,
     util::error::Context,
 };
@@ -238,6 +244,8 @@ pub async fn get_issue(
                             'decompiled_source', didws.decompiled_source,
                             'data', didws.data,
                             'severity', didws.severity,
+                            'local_status', didws.local_status,
+                            'global_status', didws.global_status,
                             'status', didws.status
                         )
                     ), '[]'::jsonb)
@@ -313,6 +321,8 @@ pub async fn get_report(
                                         'decompiled_source', didws.decompiled_source,
                                         'data', didws.data,
                                         'severity', didws.severity,
+                                        'local_status', didws.local_status,
+                                        'global_status', didws.global_status,
                                         'status', didws.status
                                     )
                                 ), '[]'::jsonb)
@@ -513,6 +523,8 @@ async fn fetch_project_reports(
             didws.file_path AS "file_path!: String",
             didws.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
             didws.severity AS "severity!: DelphiSeverity",
+            didws.local_status AS "local_status?: DelphiStatus",
+            didws.global_status AS "global_status?: DelphiStatus",
             didws.status AS "status!: DelphiStatus"
         FROM delphi_issue_details_with_statuses didws
         WHERE didws.issue_id = ANY($1::bigint[])
@@ -571,6 +583,8 @@ async fn fetch_project_reports(
                 decompiled_source: None,
                 data: d.data.0,
                 severity: d.severity,
+                local_status: d.local_status,
+                global_status: d.global_status,
                 status: d.status,
             })
             .into_group_map_by(|d| d.issue_id);
@@ -1176,7 +1190,9 @@ pub struct UpdateGlobalIssue {
     /// Key of the issue detail to update globally.
     pub detail_key: String,
     /// What the moderator has decided the outcome of this issue is globally.
-    pub verdict: DelphiVerdict,
+    ///
+    /// `pending` removes the global verdict for this issue detail key.
+    pub verdict: DelphiStatus,
 }
 
 /// Update technical review issue details.  
@@ -1296,6 +1312,35 @@ pub async fn update_issue_details(
         return Err(ApiError::Request(eyre!("issue detail does not exist")));
     }
 
+    let affected_projects = sqlx::query!(
+        r#"
+        SELECT DISTINCT didws.project_id AS "project_id!: DBProjectId"
+        FROM delphi_issue_details_with_statuses didws
+        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+        WHERE
+            didws.id = ANY($1::bigint[])
+            AND dri.issue_type != '__dummy'
+        "#,
+        &detail_ids,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_internal_err(
+        "failed to fetch projects affected by issue detail updates",
+    )?;
+
+    let affected_project_ids = affected_projects
+        .into_iter()
+        .map(|row| row.project_id)
+        .collect::<Vec<_>>();
+
+    tech_review_sync::sync_project_tech_review_state(
+        &affected_project_ids,
+        TechReviewExitReason::Resolved,
+        &mut txn,
+    )
+    .await?;
+
     txn.commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
@@ -1305,7 +1350,8 @@ pub async fn update_issue_details(
 
 /// Update global technical review issue detail verdicts.
 ///
-/// This marks every issue detail with a matching key as safe or unsafe.
+/// This marks every issue detail with a matching key as safe or unsafe, or
+/// unsets the global verdict with `pending`.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -1346,8 +1392,9 @@ pub async fn update_global_issue_details(
     let verdicts = updates
         .iter()
         .map(|u| match u.verdict {
-            DelphiVerdict::Safe => "safe".to_string(),
-            DelphiVerdict::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Safe => "safe".to_string(),
+            DelphiStatus::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Pending => "pending".to_string(),
         })
         .collect::<Vec<_>>();
 
@@ -1362,16 +1409,31 @@ pub async fn update_global_issue_details(
             SELECT *
             FROM unnest($1::text[], $2::text[]) WITH ORDINALITY
                 AS u(detail_key, verdict, ord)
+        ),
+        latest AS (
+            SELECT DISTINCT ON (detail_key)
+                detail_key,
+                verdict
+            FROM incoming
+            ORDER BY detail_key, ord DESC
+        ),
+        deleted AS (
+            DELETE FROM delphi_global_detail_verdicts dgdv
+            USING latest
+            WHERE
+                dgdv.detail_key = latest.detail_key
+                AND latest.verdict = 'pending'
+            RETURNING 1
         )
         INSERT INTO delphi_global_detail_verdicts (
             detail_key,
             verdict
         )
-        SELECT DISTINCT ON (detail_key)
+        SELECT
             detail_key,
             verdict::delphi_report_issue_status
-        FROM incoming
-        ORDER BY detail_key, ord DESC
+        FROM latest
+        WHERE verdict != 'pending'
         ON CONFLICT (detail_key)
         DO UPDATE SET verdict = EXCLUDED.verdict
         "#,
@@ -1381,6 +1443,13 @@ pub async fn update_global_issue_details(
     .execute(&mut txn)
     .await
     .wrap_internal_err("failed to update global issue details")?;
+
+    tech_review_sync::sync_detail_key_tech_review_state(
+        &detail_keys,
+        TechReviewExitReason::Resolved,
+        &mut txn,
+    )
+    .await?;
 
     txn.commit()
         .await
