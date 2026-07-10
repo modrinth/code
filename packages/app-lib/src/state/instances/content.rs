@@ -14,6 +14,7 @@ pub struct ContentItem {
     pub owner: Option<ContentItemOwner>,
     pub has_update: bool,
     pub update_version_id: Option<String>,
+    pub update_excluded: bool,
     pub date_added: Option<String>,
 }
 

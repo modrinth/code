@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon, LockIcon, LockOpenIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
 	commonMessages,
@@ -117,6 +117,7 @@ import {
 	remove_project,
 	switch_project_version_with_dependencies,
 	toggle_disable_project,
+	toggle_update_excluded_project,
 	update_all,
 	update_managed_modrinth_version,
 } from '@/helpers/instance'
@@ -162,6 +163,14 @@ const messages = defineMessages({
 	bulkUpdateFinishing: {
 		id: 'app.instance.mods.bulk-update.finishing',
 		defaultMessage: 'Finishing update...',
+	},
+	excludeFromUpdateAll: {
+		id: 'app.instance.mods.exclude-from-update-all',
+		defaultMessage: 'Exclude from Update All',
+	},
+	includeInUpdateAll: {
+		id: 'app.instance.mods.include-in-update-all',
+		defaultMessage: 'Include in Update All',
 	},
 })
 
@@ -554,6 +563,26 @@ async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
 }
 
 const toggleDisableDebounced = toggleDisableMod
+
+async function toggleUpdateExcluded(mod: ContentItem, desiredExcluded?: boolean) {
+	if (!mod.file_path) return
+	const operation = beginContentOperation(mod)
+	if (!operation) return
+
+	try {
+		const excluded =
+			desiredExcluded !== undefined ? desiredExcluded : !(mod.update_excluded ?? false)
+		await toggle_update_excluded_project(props.instance.id, mod.file_path, excluded)
+		mod.update_excluded = excluded
+		updateLinkedModpackContentCache(mod, operation.originalFileName, mod.file_path, {
+			update_excluded: excluded,
+		})
+	} catch (err) {
+		handleError(err as Error)
+	} finally {
+		finishContentOperation(mod, operation)
+	}
+}
 
 async function removeMod(mod: ContentItem) {
 	if (!mod.file_path) return
@@ -1174,6 +1203,16 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 		icon: FolderOpenIcon,
 		action: () => highlightModInInstance(props.instance.id, item.file_path),
 	})
+
+	if (item.file_path) {
+		options.push({
+			id: item.update_excluded
+				? formatMessage(messages.includeInUpdateAll)
+				: formatMessage(messages.excludeFromUpdateAll),
+			icon: (item.update_excluded ?? false) ? LockOpenIcon : LockIcon,
+			action: () => toggleUpdateExcluded(item),
+		})
+	}
 
 	if (item.project?.slug) {
 		options.push({

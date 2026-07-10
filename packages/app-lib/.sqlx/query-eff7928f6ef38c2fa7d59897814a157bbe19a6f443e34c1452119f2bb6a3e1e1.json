@@ -59,13 +59,18 @@
         "type_info": "Integer"
       },
       {
-        "name": "added_at",
+        "name": "update_excluded",
         "ordinal": 11,
         "type_info": "Integer"
       },
       {
-        "name": "modified_at",
+        "name": "added_at",
         "ordinal": 12,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 13,
         "type_info": "Integer"
       }
     ],
@@ -80,6 +85,7 @@
       false,
       true,
       true,
+      false,
       false,
       false,
       false,

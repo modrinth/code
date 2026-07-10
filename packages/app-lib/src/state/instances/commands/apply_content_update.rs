@@ -412,7 +412,11 @@ async fn bulk_updateable_project_paths(
     )
     .await?;
 
-    Ok(items.into_iter().map(|item| item.file_path).collect())
+    Ok(items
+        .into_iter()
+        .filter(|item| !item.update_excluded)
+        .map(|item| item.file_path)
+        .collect())
 }
 
 async fn installed_projects(

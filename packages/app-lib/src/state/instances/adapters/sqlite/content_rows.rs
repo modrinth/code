@@ -136,6 +136,7 @@ pub(crate) struct ContentEntryRow {
     pub server_requirement: String,
     pub client_requirement: String,
     pub enabled: i64,
+    pub update_excluded: i64,
     pub added_at: i64,
     pub modified_at: i64,
 }
@@ -160,6 +161,7 @@ impl TryFrom<ContentEntryRow> for ContentEntry {
                 &row.client_requirement,
             )?,
             enabled: row.enabled == 1,
+            update_excluded: row.update_excluded == 1,
             added_at: timestamp(row.added_at),
             modified_at: timestamp(row.modified_at),
         })
@@ -947,6 +949,32 @@ pub(crate) async fn set_content_entry_enabled_for_file(
 		WHERE content_set_id = ? AND file_id = ?
 		",
         enabled,
+        modified_at,
+        content_set_id,
+        file_id,
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(result.rows_affected() > 0)
+}
+
+pub(crate) async fn set_content_entry_update_excluded_for_file(
+    content_set_id: &str,
+    file_id: &str,
+    update_excluded: bool,
+    pool: &SqlitePool,
+) -> crate::Result<bool> {
+    let update_excluded = i64::from(update_excluded);
+    let modified_at = Utc::now().timestamp();
+
+    let result = sqlx::query!(
+        "
+		UPDATE instance_content_entries
+		SET update_excluded = ?, modified_at = ?
+		WHERE content_set_id = ? AND file_id = ?
+		",
+        update_excluded,
         modified_at,
         content_set_id,
         file_id,

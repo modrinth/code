@@ -255,6 +255,18 @@ export async function toggle_disable_project(
 	})
 }
 
+export async function toggle_update_excluded_project(
+	instanceId: string,
+	projectPath: string,
+	desiredExcluded?: boolean,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_toggle_update_excluded_project', {
+		instanceId,
+		projectPath,
+		desiredExcluded,
+	})
+}
+
 // Remove a project
 export async function remove_project(instanceId: string, projectPath: string): Promise<void> {
 	return await invoke('plugin:instance|instance_remove_project', { instanceId, projectPath })

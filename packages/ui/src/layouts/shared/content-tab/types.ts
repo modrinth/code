@@ -65,6 +65,7 @@ export interface ContentItem extends Omit<
 	project_type: string
 	has_update: boolean
 	update_version_id: string | null
+	update_excluded?: boolean
 	date_added?: string
 	environment?: string
 	pack_client_retained?: boolean

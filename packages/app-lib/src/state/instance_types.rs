@@ -118,6 +118,7 @@ pub struct ContentFile {
     pub hash: String,
     pub file_name: String,
     pub enabled: bool,
+    pub update_excluded: bool,
     pub size: u64,
     pub metadata: Option<FileMetadata>,
     pub update_version_id: Option<String>,

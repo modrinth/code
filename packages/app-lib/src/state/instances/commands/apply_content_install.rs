@@ -690,6 +690,55 @@ pub(crate) async fn toggle_disable_project(
     Ok(new_path)
 }
 
+pub(crate) async fn toggle_update_excluded_project(
+    instance_id: &str,
+    project_path: &str,
+    desired_excluded: Option<bool>,
+    state: &State,
+) -> crate::Result<()> {
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let file = content_rows::get_instance_file_by_relative_path(
+        &scope.instance.id,
+        project_path,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Could not find project file for '{project_path}' in instance"
+        ))
+    })?;
+
+    let excluded = match desired_excluded {
+        Some(v) => v,
+        None => {
+            let entries = content_rows::get_content_entries(
+                &scope.content_set_id,
+                &state.pool,
+            )
+            .await?;
+            let current = entries
+                .iter()
+                .find(|entry| {
+                    entry.file_id.as_deref() == Some(file.id.as_str())
+                })
+                .map(|entry| entry.update_excluded)
+                .unwrap_or(false);
+            !current
+        }
+    };
+
+    content_rows::set_content_entry_update_excluded_for_file(
+        &scope.content_set_id,
+        &file.id,
+        excluded,
+        &state.pool,
+    )
+    .await?;
+
+    Ok(())
+}
+
 pub(crate) async fn remove_project(
     instance_id: &str,
     project_path: &str,

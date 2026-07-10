@@ -42,6 +42,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_switch_project_version_with_dependencies,
             instance_add_project_from_path,
             instance_toggle_disable_project,
+            instance_toggle_update_excluded_project,
             instance_remove_project,
             instance_update_managed_modrinth_version,
             instance_repair_managed_modrinth,
@@ -645,6 +646,21 @@ pub async fn instance_toggle_disable_project(
         desired_enabled,
     )
     .await?)
+}
+
+#[tauri::command]
+pub async fn instance_toggle_update_excluded_project(
+    instance_id: &str,
+    project_path: &str,
+    desired_excluded: Option<bool>,
+) -> Result<()> {
+    theseus::instance::toggle_update_excluded_project(
+        instance_id,
+        project_path,
+        desired_excluded,
+    )
+    .await?;
+    Ok(())
 }
 
 #[tauri::command]

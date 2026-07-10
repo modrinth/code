@@ -233,6 +233,25 @@ pub async fn toggle_disable_project(
 }
 
 #[tracing::instrument]
+pub async fn toggle_update_excluded_project(
+    instance_id: &str,
+    project: &str,
+    desired_excluded: Option<bool>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    crate::state::instances::commands::toggle_update_excluded_project(
+        instance_id,
+        project,
+        desired_excluded,
+        &state,
+    )
+    .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    Ok(())
+}
+
+#[tracing::instrument]
 pub async fn remove_project(
     instance_id: &str,
     project: &str,

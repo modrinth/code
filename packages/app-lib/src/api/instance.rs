@@ -28,7 +28,8 @@ pub use self::projects::{
     add_project_from_version, install_project_with_dependencies,
     remove_project, repair_managed_modrinth,
     switch_project_version_with_dependencies, toggle_disable_project,
-    update_all_projects, update_managed_modrinth_version, update_project,
+    toggle_update_excluded_project, update_all_projects,
+    update_managed_modrinth_version, update_project,
 };
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,

@@ -47,6 +47,7 @@ pub struct ContentEntry {
     pub server_requirement: ContentRequirement,
     pub client_requirement: ContentRequirement,
     pub enabled: bool,
+    pub update_excluded: bool,
     pub added_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
 }

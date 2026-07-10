@@ -527,6 +527,7 @@ pub(crate) async fn dependencies_to_content_items(
                 owner,
                 has_update: false,
                 update_version_id: None,
+                update_excluded: false,
                 date_added: None,
             })
         })
@@ -735,6 +736,9 @@ async fn content_projects_for_scope(
                 enabled: entry.map_or(file.enabled, |entry| {
                     entry.enabled && file.enabled
                 }),
+                update_excluded: entry.map_or(false, |entry| {
+                    entry.update_excluded
+                }),
                 size: file.size,
                 metadata: file_metadata_from_entry_or_cache(entry, metadata),
                 project_type,
@@ -899,6 +903,7 @@ async fn content_files_to_content_items(
                 owner,
                 has_update: file.update_version_id.is_some(),
                 update_version_id: file.update_version_id.clone(),
+                update_excluded: file.update_excluded,
                 date_added: modification_times[index].clone(),
             }
         })
