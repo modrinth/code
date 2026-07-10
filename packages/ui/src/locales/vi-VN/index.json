@@ -3278,15 +3278,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Mã nguồn mở"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Trình nạp"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Trình nạp"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Trình nạp"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Nền tảng"
   },
@@ -3304,9 +3295,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Trạng thái"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Trình nạp"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modded"
@@ -5097,4 +5085,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

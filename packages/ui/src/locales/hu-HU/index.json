@@ -3041,15 +3041,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Nyílt forráskódú"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Betöltő"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Betöltő"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Betöltő"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
@@ -3067,9 +3058,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Állapot"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Betöltő"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modolt"

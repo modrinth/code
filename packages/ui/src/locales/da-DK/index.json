@@ -1073,23 +1073,11 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Open source"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Loader"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Loader"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Loader"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "Projekt-ID"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Loader"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
@@ -1308,4 +1296,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

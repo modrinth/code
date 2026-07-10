@@ -3206,15 +3206,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Відкритий код"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Завантажувач"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Завантажувач"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Завантажувач"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Платформа"
   },
@@ -3232,9 +3223,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Статус"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Завантажувач"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Модифікований"

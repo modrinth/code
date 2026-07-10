@@ -2858,15 +2858,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Öppen källkod"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Laddare"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Laddare"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Laddare"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Plattform"
   },
@@ -2884,9 +2875,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Status"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Laddare"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Moddat"
@@ -3582,4 +3570,3 @@
     "defaultMessage": "Du har osparade ändringar."
   }
 }
-

@@ -3155,15 +3155,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Sumber terbuka"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Pemuat"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Pemuat"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Pemuat"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
@@ -3181,9 +3172,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Status"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Pemuat"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Diubah Suai"
@@ -4764,4 +4752,3 @@
     "defaultMessage": "Pasukan Modrinth"
   }
 }
-

@@ -983,23 +983,11 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "קוד פתוח"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "מנהל מודים"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "מנהל חבילת מודים"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "מנהל פלאגינים"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "פלטפורמה"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "מזהה פרויקט"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "מנהל שיידרים"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "סגור"

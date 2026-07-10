@@ -2417,15 +2417,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Sursă deschisă"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Loader"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Loader"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Loader"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platformă"
   },
@@ -2443,9 +2434,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Stare"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Loader"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modat"

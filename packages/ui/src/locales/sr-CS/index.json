@@ -206,9 +206,6 @@
   "search.filter.locked.default.description": {
     "defaultMessage": "Otključavanje ovog filtera može omogućiti instalaciju nekompatibilnog sadržaja."
   },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Učitavač"
-  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modificiran"
   },
@@ -384,4 +381,3 @@
     "defaultMessage": "Tip"
   }
 }
-

@@ -2360,15 +2360,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Sumber terbuka"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Pemuat"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Pemuat"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Pemuat"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
@@ -2380,9 +2371,6 @@
   },
   "search.filter_type.server_region": {
     "defaultMessage": "Wilayah"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Pemuat"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatis"
@@ -2997,4 +2985,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

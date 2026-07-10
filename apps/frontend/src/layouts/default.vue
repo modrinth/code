@@ -93,6 +93,18 @@
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
 						type="transparent"
+						:highlighted="route.name === 'discover-all' || route.path === '/discover/all'"
+						:highlighted-style="
+							route.name === 'discover-all' ? 'main-nav-primary' : 'main-nav-secondary'
+						"
+					>
+						<nuxt-link to="/discover/all">
+							<BoxIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.allProjectType) }}
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled
+						type="transparent"
 						:highlighted="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
 						:highlighted-style="
 							route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary'
@@ -189,6 +201,10 @@
 						<TeleportOverflowMenu
 							:options="[
 								{
+									id: 'all',
+									action: '/discover/all',
+								},
+								{
 									id: 'mods',
 									action: '/discover/mods',
 								},
@@ -220,7 +236,11 @@
 							hoverable
 						>
 							<BoxIcon
-								v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
+								v-if="route.name === 'discover-all' || route.path === '/discover/all'"
+								aria-hidden="true"
+							/>
+							<BoxIcon
+								v-else-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
 								aria-hidden="true"
 							/>
 							<PaintbrushIcon
@@ -258,6 +278,10 @@
 							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
 							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 
+							<template #all>
+								<BoxIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.allProjectType) }}
+							</template>
 							<template #mods>
 								<BoxIcon aria-hidden="true" />
 								{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}

@@ -4664,6 +4664,9 @@
   "settings.display.notification.developer-mode-deactivated.title": {
     "message": "Developer mode deactivated"
   },
+  "settings.display.project-list-layouts.all": {
+    "message": "All projects page"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Data Packs page"
   },

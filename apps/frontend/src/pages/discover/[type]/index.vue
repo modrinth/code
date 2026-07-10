@@ -123,8 +123,8 @@ watch(
 	(val) => debug('projectType.id changed:', val),
 )
 
-const resultsDisplayLocation = computed<DisplayLocation | undefined>(
-	() => projectType.value?.id as DisplayLocation,
+const resultsDisplayLocation = computed<DisplayLocation | undefined>(() =>
+	currentType.value === 'all' ? 'all' : (projectType.value?.id as DisplayLocation),
 )
 const resultsDisplayMode = computed<DisplayMode>(() =>
 	resultsDisplayLocation.value
@@ -380,7 +380,10 @@ const advancedFiltersCollapsed = computed({
 	},
 })
 
-const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
+const projectTypeId = computed(() => {
+	if (currentType.value === 'all') return 'all'
+	return projectType.value?.id ?? 'mod'
+})
 
 debug('projectTypeId:', projectTypeId.value)
 watch(projectTypeId, (val) => debug('projectTypeId changed:', val))

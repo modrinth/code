@@ -3557,15 +3557,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Código aberto"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Carregador"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Carregador"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Carregador"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Plataforma"
   },
@@ -3583,9 +3574,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Status"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Carregador"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modificado"

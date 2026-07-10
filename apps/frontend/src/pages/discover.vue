@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { commonProjectTypeCategoryMessages, NavTabs, useVIntl } from '@modrinth/ui'
+import { commonMessages, commonProjectTypeCategoryMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 
@@ -10,6 +10,11 @@ const route = useRoute()
 const allowTabChanging = computed(() => !route.query.sid)
 
 const selectableProjectTypes = [
+	{
+		label: formatMessage(commonMessages.allProjectType),
+		href: `/discover/all`,
+		type: 'all',
+	},
 	{
 		label: formatMessage(commonProjectTypeCategoryMessages.mod),
 		href: `/discover/mods`,

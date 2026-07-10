@@ -3236,15 +3236,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "오픈 소스"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "로더"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "로더"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "로더"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "플랫폼"
   },
@@ -3262,9 +3253,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "상태"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "로더"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "모딩 됨"

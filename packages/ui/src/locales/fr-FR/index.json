@@ -3443,15 +3443,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Source libre"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Chargeur"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Chargeur"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Chargeur"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Plateforme"
   },
@@ -3469,9 +3460,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Statut"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Chargeur"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Moddé"

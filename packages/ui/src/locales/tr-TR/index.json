@@ -3407,15 +3407,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Açık kaynak"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Yükleyici"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Yükleyici"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Yükleyici"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Platform"
   },
@@ -3433,9 +3424,6 @@
   },
   "search.filter_type.server_status": {
     "defaultMessage": "Durum"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Yükleyici"
   },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modlu"

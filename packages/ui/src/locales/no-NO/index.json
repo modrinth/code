@@ -1577,15 +1577,6 @@
   "search.filter_type.license.open_source": {
     "defaultMessage": "Åpen kildekode"
   },
-  "search.filter_type.mod_loader": {
-    "defaultMessage": "Laster"
-  },
-  "search.filter_type.modpack_loader": {
-    "defaultMessage": "Laster"
-  },
-  "search.filter_type.plugin_loader": {
-    "defaultMessage": "Laster"
-  },
   "search.filter_type.plugin_platform": {
     "defaultMessage": "Plattform"
   },
@@ -1597,9 +1588,6 @@
   },
   "search.filter_type.server_language": {
     "defaultMessage": "Språk"
-  },
-  "search.filter_type.shader_loader": {
-    "defaultMessage": "Laster"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
@@ -2133,4 +2121,3 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
-

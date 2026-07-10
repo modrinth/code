@@ -160,12 +160,19 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 				LOADER_FILTER_TYPES.includes(f.type as (typeof LOADER_FILTER_TYPES)[number]),
 			) || ['resourcepack', 'datapack'].includes(options.projectType.value),
 	)
-	const loadersNotForThisType = computed(
-		() =>
+	const loadersNotForThisType = computed(() => {
+		if (options.projectType.value === 'all') return []
+		return (
 			options.tags.value?.loaders
-				?.filter((loader) => !loader.supported_project_types.includes(options.projectType.value))
-				?.map((loader) => loader.name) ?? [],
-	)
+				?.filter(
+					(loader) =>
+						!loader.supported_project_types.includes(
+							options.projectType.value as unknown as ProjectType,
+						),
+				)
+				?.map((loader) => loader.name) ?? []
+		)
+	})
 	const deprioritizedTags = computed(() => [
 		...selectedFilterTags.value,
 		...loadersNotForThisType.value,

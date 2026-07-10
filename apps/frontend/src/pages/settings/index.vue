@@ -268,6 +268,10 @@ const projectListLayouts = defineMessages({
 		defaultMessage:
 			'Select your preferred layout for each page that displays project lists on this device.',
 	},
+	all: {
+		id: 'settings.display.project-list-layouts.all',
+		defaultMessage: 'All projects page',
+	},
 	mod: {
 		id: 'settings.display.project-list-layouts.mod',
 		defaultMessage: 'Mods page',
@@ -418,6 +422,12 @@ const listTypes = computed(() => {
 			name: formatProjectType(type.id) + 's',
 			display: 'the ' + formatProjectType(type.id).toLowerCase() + 's search page',
 		}
+	})
+
+	types.unshift({
+		id: 'all' as DisplayLocation,
+		name: 'All projects',
+		display: 'all projects search page',
 	})
 
 	types.push({

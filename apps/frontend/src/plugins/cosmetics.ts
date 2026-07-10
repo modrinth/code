@@ -3,12 +3,14 @@ import type { DarkTheme } from './theme/index.ts'
 export type DisplayMode = 'list' | 'gallery' | 'grid'
 
 export type DisplayLocation =
+	| 'all'
 	| 'mod'
 	| 'plugin'
 	| 'resourcepack'
 	| 'modpack'
 	| 'shader'
 	| 'datapack'
+	| 'server'
 	| 'user'
 	| 'collection'
 
@@ -43,6 +45,7 @@ export default defineNuxtPlugin({
 				hideModrinthAppPromos: false,
 				preferredDarkTheme: 'dark',
 				searchDisplayMode: {
+					all: 'list',
 					mod: 'list',
 					plugin: 'list',
 					resourcepack: 'gallery',
