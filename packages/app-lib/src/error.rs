@@ -1,7 +1,7 @@
 //! Theseus error type
 use std::sync::Arc;
 
-use crate::{profile, util};
+use crate::util;
 use data_url::DataUrlError;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
@@ -12,6 +12,14 @@ use tracing_error::InstrumentError;
 pub struct LabrinthError {
     pub error: String,
     pub description: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub route: Option<String>,
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -101,11 +109,8 @@ pub enum ErrorKind {
     #[error("Error acquiring semaphore: {0}")]
     AcquireError(#[from] tokio::sync::AcquireError),
 
-    #[error("Profile {0} is not managed by the app!")]
-    UnmanagedProfileError(String),
-
-    #[error("Could not create profile: {0}")]
-    ProfileCreationError(#[from] profile::create::ProfileCreationError),
+    #[error("Instance {0} is not managed by the app!")]
+    UnmanagedInstanceError(String),
 
     #[error("User is not logged in, no credentials available!")]
     NoCredentialsError,

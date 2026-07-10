@@ -560,50 +560,20 @@
   "auth.reset-password.title.long": {
     "message": "Скидання пароля"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Будь ласка, укажіть код двофакторної автентифікації, щоб продовжити."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Укажіть код двофакторної автентифікації"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Уведіть код…"
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Забули пароль?</forgot-password-link> • <create-account-link>Створити обліковий запис</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Увійдіть за допомогою"
   },
   "auth.sign-in.title": {
     "message": "Вхід"
   },
-  "auth.sign-in.use-password": {
-    "message": "Або ж з паролем"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Створити обліковий запис"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Паролі не збігаються!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже маєте обліковий запис?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Підписатися на оновлення Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Реєстрація"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Або зробіть обліковий запис самотужки"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Реєстрація за допомогою"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Налаштування облікового запису"
@@ -634,21 +604,6 @@
   },
   "auth.verify-email.title": {
     "message": "Підтвердити електронну пошту"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Підписатися на оновлення Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Ви тепер частина чудової спільноти авторів і дослідників, що вже створюють, завантажують та оновлюють дивовижні моди."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Створивши обліковий запис, ви погодилися з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Вітаємо в Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Вітаємо"
   },
   "collection.button.edit-icon": {
     "message": "Редагувати значок"
@@ -1346,9 +1301,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Завантаження сповіщень…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Ви можете редагувати кілька проєктів одночасно, вибравши їх нижче."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Проєкти сервера не підтримують масове редагування"
   },
@@ -1420,24 +1372,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Перегляньте метадані середовища"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Зростання"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Спадання"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Назва"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Статус"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Тип"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Значок"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2915,43 +2849,16 @@
   "project.details.licensed": {
     "message": "Ліцензія:"
   },
-  "project.download.game-version": {
-    "message": "Версія гри: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Помилка: версію гри не знайдено"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "«{title}» доступно лише для {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "«{title}» не підтримує {gameVersion} для {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Установити через Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Не маєте Modrinth App?"
-  },
-  "project.download.no-versions-available": {
-    "message": "Немає доступних версій для {gameVersion} та {platform}."
-  },
-  "project.download.platform": {
-    "message": "Платформа: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Помилка: платформи не знайдено"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} доступне лише для {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не підтримує {platform} для {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Пошук версій гри…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "Пошук версій гри…"
   },
   "project.download.select-game-version": {
@@ -3143,44 +3050,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження всіх наведених нижче файлів, і будь-які приховані версії буде автоматично опубліковано."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Будь ласка, надайте підтвердження того, що у вас є дозвіл на повторне розповсюдження всіх наведених нижче файлів, перш ніж ви зможете подати свій проєкт на розгляд."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Невідомий убудований уміст"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Весь зовнішній вміст має посилання на авторство."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Авторство завершено!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Жодна з ваших версій не містить зовнішнього вмісту, тому вам не потрібно турбуватися про отримання дозволів."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Усе готово!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "Ви не маєте дозволу на повторне розповсюдження зовнішнього вмісту, який ви додали. Щоб опублікувати на Modrinth, видаліть правопорушний вміст."
   },
   "project.settings.permissions.fail.title": {
     "message": "Деякий уміст не можна включити"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Якщо ви додаєте вміст, який не розміщено на Modrinth, вам потрібно повідомити нам, звідки він походить, і підтвердити, що у вас є дозвіл на розповсюдження файлів. Перегляньте <link>наш посібник</link>, щоб дізнатися, як це зробити правильно!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Дізнайтеся, як працює авторство"
-  },
   "project.settings.permissions.learn-more": {
     "message": "Дізнатися більше"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Пошук {count} {count, plural, one {зовнішнього проєкту} few {зовнішніх проєктів} many {зовнішніх проєктів} other {зовнішніх проєктів}}…"
   },
   "project.settings.title": {
     "message": "Налаштування"

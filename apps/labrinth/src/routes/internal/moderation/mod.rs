@@ -5,8 +5,8 @@ use crate::database::PgPool;
 use crate::database::models::DBModerationLock;
 use crate::database::models::moderation_external_item;
 use crate::database::redis::RedisPool;
-use crate::models::ids::OrganizationId;
-use crate::models::projects::{Project, ProjectStatus};
+use crate::models::ids::{OrganizationId, ProjectId};
+use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::util::error::Context;
@@ -17,16 +17,17 @@ use crate::{
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
-use ownership::get_projects_ownership;
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-mod external_license;
+pub mod external_license;
 mod ownership;
-mod tech_review;
+pub mod tech_review;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_projects)
+        .service(get_project_ids)
         .service(get_project_meta)
         .service(set_project_meta)
         .service(acquire_lock)
@@ -35,13 +36,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
+        .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
-            utoipa_actix_web::scope("/tech-review")
-                .configure(tech_review::config),
-        )
-        .service(
-            utoipa_actix_web::scope("/external-license")
-                .configure(external_license::config),
+            web::scope("/external-license").configure(external_license::config),
         );
 }
 
@@ -56,19 +53,74 @@ pub struct ProjectsRequestOptions {
     /// Whether to filter by modpacks that have external dependencies.
     #[serde(default)]
     pub has_external_dependencies: Option<bool>,
+    /// Whether to exclude projects with pending technical review issues.
+    #[serde(default)]
+    pub exclude_technical_review: bool,
+    /// Text query to search against project and owner fields.
+    #[serde(default)]
+    pub query: Option<String>,
+    /// Project type to filter by. Use `none` for projects without a type.
+    #[serde(default)]
+    pub project_type: Option<String>,
+    /// Sort order for the moderation queue.
+    #[serde(default)]
+    pub sort: Option<ModerationProjectsSort>,
 }
 
 fn default_count() -> u16 {
     100
 }
 
-/// Project with extra information fetched from the database, to avoid having
-/// clients make more round trips.
+const MAX_PROJECTS_PER_PAGE: u16 = 200;
+
+#[derive(
+    Debug, Clone, Copy, Serialize, Deserialize, utoipa::ToSchema, Default,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ModerationProjectsSort {
+    #[default]
+    Oldest,
+    Newest,
+    MostExternalDeps,
+    LeastExternalDeps,
+}
+
+impl ModerationProjectsSort {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Oldest => "oldest",
+            Self::Newest => "newest",
+            Self::MostExternalDeps => "most_external_deps",
+            Self::LeastExternalDeps => "least_external_deps",
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FetchedProject {
-    /// Project info.
-    #[serde(flatten)]
-    pub project: Project,
+pub struct ModerationProjectsResponse {
+    pub total: i64,
+    pub projects: Vec<ModerationQueueProject>,
+}
+
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ModerationProjectIdsResponse {
+    pub ids: Vec<ProjectId>,
+}
+
+/// Lightweight project information for the moderation queue index.
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ModerationQueueProject {
+    pub id: ProjectId,
+    pub slug: Option<String>,
+    pub name: String,
+    pub summary: String,
+    pub icon_url: Option<String>,
+    pub status: ProjectStatus,
+    pub requested_status: Option<ProjectStatus>,
+    pub queued: Option<DateTime<Utc>>,
+    pub published: DateTime<Utc>,
+    pub updated: DateTime<Utc>,
+    pub project_types: Vec<String>,
     /// Who owns the project.
     pub ownership: Ownership,
     /// How many external file dependencies the project has.
@@ -162,18 +214,29 @@ pub struct DeleteAllLocksResponse {
     pub deleted_count: u64,
 }
 
-/// Fetch all projects which are in the moderation queue.
+/// List projects in the moderation queue.  
 #[utoipa::path(
-    responses((status = OK, body = inline(Vec<FetchedProject>)))
+	context_path = "/moderation",
+	tag = "moderation",
+    params(
+		("count" = Option<u16>, Query),
+		("offset" = Option<u32>, Query),
+		("has_external_dependencies" = Option<bool>, Query),
+		("exclude_technical_review" = bool, Query),
+		("query" = Option<String>, Query),
+		("project_type" = Option<String>, Query),
+		("sort" = Option<ModerationProjectsSort>, Query)
+	),
+    responses((status = OK, body = ModerationProjectsResponse))
 )]
 #[get("/projects")]
-async fn get_projects(
+pub async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<FetchedProject>>, ApiError> {
+) -> Result<web::Json<ModerationProjectsResponse>, ApiError> {
     get_projects_internal(req, pool, redis, request_opts, session_queue).await
 }
 
@@ -183,7 +246,7 @@ pub async fn get_projects_internal(
     redis: web::Data<RedisPool>,
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<FetchedProject>>, ApiError> {
+) -> Result<web::Json<ModerationProjectsResponse>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -193,110 +256,813 @@ pub async fn get_projects_internal(
     )
     .await?;
 
-    use futures::stream::TryStreamExt;
+    let request_opts = request_opts.into_inner();
+    let query = normalize_optional_string(request_opts.query.as_deref());
+    let project_type =
+        normalize_optional_string(request_opts.project_type.as_deref());
+    let sort = request_opts.sort.unwrap_or_default().as_str();
+    let listed_version_statuses = listed_version_statuses();
+    let count = request_opts.count.min(MAX_PROJECTS_PER_PAGE) as i64;
+    let offset = request_opts.offset as i64;
+    let exclude_technical_review = request_opts.exclude_technical_review;
+    let needs_filtered_queue = query.is_some()
+        || project_type.is_some()
+        || request_opts.has_external_dependencies.is_some()
+        || matches!(sort, "most_external_deps" | "least_external_deps");
 
-    let project_rows = sqlx::query!(
-        r#"
-        SELECT
-            id,
-            external_dependencies_count as "external_dependencies_count!"
-        FROM (
-            SELECT DISTINCT ON (m.id)
-                m.id,
-                m.queued,
-                (
-                    SELECT COUNT(*)
-                    FROM versions v
-                    INNER JOIN dependencies d ON d.dependent_id = v.id
-                    WHERE v.mod_id = m.id
-                        AND d.dependency_file_name IS NOT NULL
-                ) external_dependencies_count
-            FROM mods m
-
-            /* -- Temporarily, don't exclude projects in tech rev q
-
-                -- exclude projects in tech review queue
-                LEFT JOIN delphi_issue_details_with_statuses didws
-                    ON didws.project_id = m.id AND didws.status = 'pending'
-            */
-
-            WHERE
-                m.status = $1
-                /* AND didws.status IS NULL */ -- Temporarily don't exclude
-
-            GROUP BY m.id
-        ) t
-        WHERE
-            ($4::boolean IS NULL OR (external_dependencies_count > 0) = $4)
-        ORDER BY queued ASC
-        OFFSET $3
-        LIMIT $2
-        "#,
-        ProjectStatus::Processing.as_str(),
-        request_opts.count as i64,
-        request_opts.offset as i64,
-        request_opts.has_external_dependencies,
-    )
-    .fetch(&**pool)
-    .try_collect::<Vec<_>>()
-    .await
-    .wrap_internal_err("failed to fetch projects awaiting review")?;
-
-    let project_ids = project_rows
-        .iter()
-        .map(|m| database::models::DBProjectId(m.id))
-        .collect::<Vec<_>>();
-    let project_metadata = project_rows
-        .into_iter()
-        .map(|m| {
-            (
-                database::models::DBProjectId(m.id),
-                m.external_dependencies_count,
+    let (total, projects) = if needs_filtered_queue {
+        let project_rows = sqlx::query!(
+            r#"
+            WITH moderation_projects AS (
+                SELECT
+                    m.id,
+                    m.slug,
+                    m.name,
+                    m.summary,
+                    m.description,
+                    m.queued,
+                    m.published,
+                    m.organization_id,
+                    m.team_id,
+                    m.components
+                FROM mods m
+                WHERE
+                    m.status = $1
+                    AND (
+                        $9::boolean = false
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses didws
+                            WHERE didws.project_id = m.id
+                                AND didws.status = 'pending'
+                        )
+                    )
+            ),
+            external_dependencies AS (
+                SELECT
+                    v.mod_id,
+                    COUNT(*) AS external_dependencies_count
+                FROM versions v
+                INNER JOIN moderation_projects mp ON mp.id = v.mod_id
+                INNER JOIN dependencies d ON d.dependent_id = v.id
+                WHERE d.dependency_file_name IS NOT NULL
+                GROUP BY v.mod_id
+            ),
+            version_project_types AS (
+                SELECT
+                    v.mod_id,
+                    ARRAY_AGG(DISTINCT pt.name::text) FILTER (WHERE pt.name IS NOT NULL) AS project_types
+                FROM versions v
+                INNER JOIN moderation_projects mp ON mp.id = v.mod_id
+                INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                INNER JOIN loaders l ON lv.loader_id = l.id
+                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
+                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                WHERE v.status = ANY($2)
+                GROUP BY v.mod_id
+            ),
+            queue_projects AS (
+                SELECT
+                    mp.id,
+                    mp.slug,
+                    mp.name,
+                    mp.summary,
+                    mp.description,
+                    mp.queued,
+                    mp.published,
+                    search_organization.name AS organization_name,
+                    search_owner.username AS owner_name,
+                    CASE
+                        WHEN mp.components ? 'minecraft_server'
+                            THEN ARRAY_APPEND(
+                                ARRAY_REMOVE(
+                                    COALESCE(vpt.project_types::text[], ARRAY[]::text[]),
+                                    'modpack'
+                                ),
+                                'minecraft_java_server'
+                            )
+                        ELSE COALESCE(vpt.project_types::text[], ARRAY[]::text[])
+                    END AS project_types,
+                    COALESCE(ed.external_dependencies_count, 0) AS external_dependencies_count
+                FROM moderation_projects mp
+                LEFT JOIN organizations search_organization
+                    ON search_organization.id = mp.organization_id
+                    AND $3::text IS NOT NULL
+                LEFT JOIN LATERAL (
+                    SELECT
+                        u.username
+                    FROM team_members tm
+                    INNER JOIN users u ON u.id = tm.user_id
+                    WHERE tm.team_id = mp.team_id
+                        AND tm.is_owner
+                    ORDER BY tm.ordering ASC
+                    LIMIT 1
+                ) search_owner ON $3::text IS NOT NULL
+                    AND mp.organization_id IS NULL
+                LEFT JOIN external_dependencies ed ON ed.mod_id = mp.id
+                LEFT JOIN version_project_types vpt ON vpt.mod_id = mp.id
+            ),
+            filtered_projects AS (
+                SELECT
+                    id,
+                    queued,
+                    published,
+                    project_types,
+                    external_dependencies_count
+                FROM queue_projects
+                WHERE
+                    (
+                        $3::text IS NULL
+                        OR name ILIKE '%' || $3 || '%'
+                        OR slug ILIKE '%' || $3 || '%'
+                        OR summary ILIKE '%' || $3 || '%'
+                        OR description ILIKE '%' || $3 || '%'
+                        OR owner_name ILIKE '%' || $3 || '%'
+                        OR organization_name ILIKE '%' || $3 || '%'
+                        OR EXISTS (
+                            SELECT 1
+                            FROM UNNEST(project_types) AS searched_project_type(project_type)
+                            WHERE searched_project_type.project_type ILIKE '%' || $3 || '%'
+                        )
+                    )
+                    AND (
+                        $4::text IS NULL
+                        OR ($4 = 'none' AND CARDINALITY(project_types) = 0)
+                        OR ($4 = 'minecraft_java_server' AND project_types @> ARRAY['minecraft_java_server']::text[])
+                        OR ($4 <> 'none' AND $4 <> 'minecraft_java_server' AND
+                            project_types[1] = $4
+                        )
+                    )
+                    AND ($5::boolean IS NULL OR (external_dependencies_count > 0) = $5)
+            ),
+            total AS (
+                SELECT COUNT(*) AS total_count FROM filtered_projects
+            ),
+            page_ids AS (
+                SELECT
+                    id,
+                    queued,
+                    published,
+                    project_types,
+                    external_dependencies_count
+                FROM filtered_projects
+                ORDER BY
+                    CASE WHEN $8 = 'most_external_deps' THEN external_dependencies_count END DESC,
+                    CASE WHEN $8 = 'least_external_deps' THEN external_dependencies_count END ASC,
+                    CASE WHEN $8 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                    CASE WHEN $8 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(queued, published) END ASC NULLS LAST,
+                    id ASC
+                OFFSET $7
+                LIMIT $6
+            ),
+            page_projects AS (
+                SELECT
+                    m.id,
+                    m.slug,
+                    m.name,
+                    m.summary,
+                    m.icon_url,
+                    m.status,
+                    m.requested_status,
+                    m.queued,
+                    m.published,
+                    m.updated,
+                    m.organization_id,
+                    m.team_id,
+                    o.name AS organization_name,
+                    o.icon_url AS organization_icon_url,
+                    owner.user_id AS owner_id,
+                    owner.username AS owner_name,
+                    owner.avatar_url AS owner_icon_url,
+                    page_ids.project_types,
+                    page_ids.external_dependencies_count
+                FROM page_ids
+                INNER JOIN mods m ON m.id = page_ids.id
+                LEFT JOIN organizations o ON o.id = m.organization_id
+                LEFT JOIN LATERAL (
+                    SELECT
+                        tm.user_id,
+                        u.username,
+                        u.avatar_url
+                    FROM team_members tm
+                    INNER JOIN users u ON u.id = tm.user_id
+                    WHERE tm.team_id = m.team_id
+                        AND tm.is_owner
+                    ORDER BY tm.ordering ASC
+                    LIMIT 1
+                ) owner ON m.organization_id IS NULL
             )
-        })
-        .collect::<HashMap<_, _>>();
-
-    let projects =
-        database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
-            .await
-            .wrap_internal_err("failed to fetch projects")?
-            .into_iter()
-            .map(crate::models::projects::Project::from)
-            .collect::<Vec<_>>();
-
-    let ownerships = get_projects_ownership(&projects, &pool, &redis)
+            SELECT
+                total.total_count AS "total_count!",
+                page_projects.id AS "id?",
+                page_projects.slug AS "slug?",
+                page_projects.name AS "name?",
+                page_projects.summary AS "summary?",
+                page_projects.icon_url AS "icon_url?",
+                page_projects.status AS "status?",
+                page_projects.requested_status AS "requested_status?",
+                page_projects.queued AS "queued?",
+                page_projects.published AS "published?",
+                page_projects.updated AS "updated?",
+                page_projects.organization_id AS "organization_id?",
+                page_projects.organization_name AS "organization_name?",
+                page_projects.organization_icon_url AS "organization_icon_url?",
+                page_projects.owner_id AS "owner_id?",
+                page_projects.owner_name AS "owner_name?",
+                page_projects.owner_icon_url AS "owner_icon_url?",
+                page_projects.project_types AS "project_types?: Vec<String>",
+                page_projects.external_dependencies_count AS "external_dependencies_count?"
+            FROM total
+            LEFT JOIN page_projects ON true
+            ORDER BY
+                CASE WHEN $8 = 'most_external_deps' THEN page_projects.external_dependencies_count END DESC,
+                CASE WHEN $8 = 'least_external_deps' THEN page_projects.external_dependencies_count END ASC,
+                CASE WHEN $8 = 'newest' THEN COALESCE(page_projects.queued, page_projects.published) END DESC NULLS LAST,
+                CASE WHEN $8 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,
+                page_projects.id ASC
+            "#,
+            ProjectStatus::Processing.as_str(),
+            &listed_version_statuses,
+            query,
+            project_type,
+            request_opts.has_external_dependencies,
+            count,
+            offset,
+            sort,
+            exclude_technical_review,
+        )
+        .fetch_all(&**pool)
         .await
-        .wrap_internal_err("failed to fetch project ownerships")?;
+        .wrap_internal_err("failed to fetch filtered projects awaiting review")?;
 
-    let map_project =
-        |(project, ownership): (Project, Ownership)| -> FetchedProject {
-            let external_dependencies_count = project_metadata
-                .get(&database::models::DBProjectId(project.id.0 as i64))
-                .copied()
-                .unwrap_or_default();
-
-            FetchedProject {
-                ownership,
-                project,
-                external_dependencies_count,
+        let total =
+            project_rows.first().map(|row| row.total_count).unwrap_or(0);
+        let mut projects = Vec::new();
+        for row in project_rows {
+            if let Some(project) = row_to_queue_project(
+                row.id,
+                row.slug,
+                row.name,
+                row.summary,
+                row.icon_url,
+                row.status,
+                row.requested_status,
+                row.queued,
+                row.published,
+                row.updated,
+                row.organization_id,
+                row.organization_name,
+                row.organization_icon_url,
+                row.owner_id,
+                row.owner_name,
+                row.owner_icon_url,
+                row.project_types,
+                row.external_dependencies_count,
+            )? {
+                projects.push(project);
             }
-        };
+        }
 
-    let projects = projects
-        .into_iter()
-        .zip(ownerships)
-        .map(map_project)
-        .collect::<Vec<_>>();
+        (total, projects)
+    } else {
+        let project_rows = sqlx::query!(
+            r#"
+            WITH filtered_projects AS (
+                SELECT
+                    m.id,
+                    m.queued,
+                    m.published
+                FROM mods m
+                WHERE
+                    m.status = $1
+                    AND (
+                        $6::boolean = false
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses didws
+                            WHERE didws.project_id = m.id
+                                AND didws.status = 'pending'
+                        )
+                    )
+            ),
+            total AS (
+                SELECT COUNT(*) AS total_count FROM filtered_projects
+            ),
+            page_ids AS (
+                SELECT
+                    id,
+                    queued,
+                    published
+                FROM filtered_projects
+                ORDER BY
+                    CASE WHEN $5 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                    CASE WHEN $5 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,
+                    id ASC
+                OFFSET $4
+                LIMIT $3
+            ),
+            page_project_types AS (
+                SELECT
+                    v.mod_id,
+                    ARRAY_AGG(DISTINCT pt.name::text) FILTER (WHERE pt.name IS NOT NULL) AS project_types
+                FROM versions v
+                INNER JOIN page_ids page ON page.id = v.mod_id
+                INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                INNER JOIN loaders l ON lv.loader_id = l.id
+                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
+                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                WHERE v.status = ANY($2)
+                GROUP BY v.mod_id
+            ),
+            page_external_dependencies AS (
+                SELECT
+                    v.mod_id,
+                    COUNT(*) AS external_dependencies_count
+                FROM versions v
+                INNER JOIN page_ids page ON page.id = v.mod_id
+                INNER JOIN dependencies d ON d.dependent_id = v.id
+                WHERE d.dependency_file_name IS NOT NULL
+                GROUP BY v.mod_id
+            ),
+            page_projects AS (
+                SELECT
+                    m.id,
+                    m.slug,
+                    m.name,
+                    m.summary,
+                    m.icon_url,
+                    m.status,
+                    m.requested_status,
+                    m.queued,
+                    m.published,
+                    m.updated,
+                    m.organization_id,
+                    o.name AS organization_name,
+                    o.icon_url AS organization_icon_url,
+                    owner.user_id AS owner_id,
+                    owner.username AS owner_name,
+                    owner.avatar_url AS owner_icon_url,
+                    CASE
+                        WHEN m.components ? 'minecraft_server'
+                            THEN ARRAY_APPEND(
+                                ARRAY_REMOVE(
+                                    COALESCE(ppt.project_types::text[], ARRAY[]::text[]),
+                                    'modpack'
+                                ),
+                                'minecraft_java_server'
+                            )
+                        ELSE COALESCE(ppt.project_types::text[], ARRAY[]::text[])
+                    END AS project_types,
+                    COALESCE(ped.external_dependencies_count, 0) AS external_dependencies_count
+                FROM page_ids page
+                INNER JOIN mods m ON m.id = page.id
+                LEFT JOIN organizations o ON o.id = m.organization_id
+                LEFT JOIN LATERAL (
+                    SELECT
+                        tm.user_id,
+                        u.username,
+                        u.avatar_url
+                    FROM team_members tm
+                    INNER JOIN users u ON u.id = tm.user_id
+                    WHERE tm.team_id = m.team_id
+                        AND tm.is_owner
+                    ORDER BY tm.ordering ASC
+                    LIMIT 1
+                ) owner ON m.organization_id IS NULL
+                LEFT JOIN page_project_types ppt ON ppt.mod_id = m.id
+                LEFT JOIN page_external_dependencies ped ON ped.mod_id = m.id
+            )
+            SELECT
+                total.total_count AS "total_count!",
+                page_projects.id AS "id?",
+                page_projects.slug AS "slug?",
+                page_projects.name AS "name?",
+                page_projects.summary AS "summary?",
+                page_projects.icon_url AS "icon_url?",
+                page_projects.status AS "status?",
+                page_projects.requested_status AS "requested_status?",
+                page_projects.queued AS "queued?",
+                page_projects.published AS "published?",
+                page_projects.updated AS "updated?",
+                page_projects.organization_id AS "organization_id?",
+                page_projects.organization_name AS "organization_name?",
+                page_projects.organization_icon_url AS "organization_icon_url?",
+                page_projects.owner_id AS "owner_id?",
+                page_projects.owner_name AS "owner_name?",
+                page_projects.owner_icon_url AS "owner_icon_url?",
+                page_projects.project_types AS "project_types?: Vec<String>",
+                page_projects.external_dependencies_count AS "external_dependencies_count?"
+            FROM total
+            LEFT JOIN page_projects ON true
+            ORDER BY
+                CASE WHEN $5 = 'newest' THEN COALESCE(page_projects.queued, page_projects.published) END DESC NULLS LAST,
+                CASE WHEN $5 = 'oldest' THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,
+                page_projects.id ASC
+            "#,
+            ProjectStatus::Processing.as_str(),
+            &listed_version_statuses,
+            count,
+            offset,
+            sort,
+            exclude_technical_review,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_internal_err("failed to fetch projects awaiting review")?;
 
-    Ok(web::Json(projects))
+        let total =
+            project_rows.first().map(|row| row.total_count).unwrap_or(0);
+        let mut projects = Vec::new();
+        for row in project_rows {
+            if let Some(project) = row_to_queue_project(
+                row.id,
+                row.slug,
+                row.name,
+                row.summary,
+                row.icon_url,
+                row.status,
+                row.requested_status,
+                row.queued,
+                row.published,
+                row.updated,
+                row.organization_id,
+                row.organization_name,
+                row.organization_icon_url,
+                row.owner_id,
+                row.owner_name,
+                row.owner_icon_url,
+                row.project_types,
+                row.external_dependencies_count,
+            )? {
+                projects.push(project);
+            }
+        }
+
+        (total, projects)
+    };
+
+    Ok(web::Json(ModerationProjectsResponse { total, projects }))
 }
 
-/// Fetch moderation metadata for a specific project.
 #[utoipa::path(
-    responses((status = OK, body = inline(Vec<Project>)))
+    context_path = "/moderation",
+    tag = "moderation",
+    params(
+		("has_external_dependencies" = Option<bool>, Query),
+		("exclude_technical_review" = bool, Query),
+		("query" = Option<String>, Query),
+		("project_type" = Option<String>, Query),
+		("sort" = Option<ModerationProjectsSort>, Query)
+	),
+    responses((status = OK, body = ModerationProjectIdsResponse))
+)]
+#[get("/projects/ids")]
+pub async fn get_project_ids(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    request_opts: web::Query<ProjectsRequestOptions>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<ModerationProjectIdsResponse>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let request_opts = request_opts.into_inner();
+    let query = normalize_optional_string(request_opts.query.as_deref());
+    let project_type =
+        normalize_optional_string(request_opts.project_type.as_deref());
+    let sort = request_opts.sort.unwrap_or_default().as_str();
+    let listed_version_statuses = listed_version_statuses();
+    let exclude_technical_review = request_opts.exclude_technical_review;
+    let needs_filtered_queue = query.is_some()
+        || project_type.is_some()
+        || request_opts.has_external_dependencies.is_some()
+        || matches!(sort, "most_external_deps" | "least_external_deps");
+
+    let ids = if needs_filtered_queue {
+        let project_rows = sqlx::query!(
+            r#"
+            WITH moderation_projects AS (
+                SELECT
+                    m.id,
+                    m.slug,
+                    m.name,
+                    m.summary,
+                    m.description,
+                    m.queued,
+                    m.published,
+                    m.organization_id,
+                    m.team_id,
+                    m.components
+                FROM mods m
+                WHERE
+                    m.status = $1
+                    AND (
+                        $7::boolean = false
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses didws
+                            WHERE didws.project_id = m.id
+                                AND didws.status = 'pending'
+                        )
+                    )
+            ),
+            external_dependencies AS (
+                SELECT
+                    v.mod_id,
+                    COUNT(*) AS external_dependencies_count
+                FROM versions v
+                INNER JOIN moderation_projects mp ON mp.id = v.mod_id
+                INNER JOIN dependencies d ON d.dependent_id = v.id
+                WHERE d.dependency_file_name IS NOT NULL
+                GROUP BY v.mod_id
+            ),
+            version_project_types AS (
+                SELECT
+                    v.mod_id,
+                    ARRAY_AGG(DISTINCT pt.name::text) FILTER (WHERE pt.name IS NOT NULL) AS project_types
+                FROM versions v
+                INNER JOIN moderation_projects mp ON mp.id = v.mod_id
+                INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                INNER JOIN loaders l ON lv.loader_id = l.id
+                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
+                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                WHERE v.status = ANY($2)
+                GROUP BY v.mod_id
+            ),
+            queue_projects AS (
+                SELECT
+                    mp.id,
+                    mp.slug,
+                    mp.name,
+                    mp.summary,
+                    mp.description,
+                    mp.queued,
+                    mp.published,
+                    search_organization.name AS organization_name,
+                    search_owner.username AS owner_name,
+                    CASE
+                        WHEN mp.components ? 'minecraft_server'
+                            THEN ARRAY_APPEND(
+                                ARRAY_REMOVE(
+                                    COALESCE(vpt.project_types::text[], ARRAY[]::text[]),
+                                    'modpack'
+                                ),
+                                'minecraft_java_server'
+                            )
+                        ELSE COALESCE(vpt.project_types::text[], ARRAY[]::text[])
+                    END AS project_types,
+                    COALESCE(ed.external_dependencies_count, 0) AS external_dependencies_count
+                FROM moderation_projects mp
+                LEFT JOIN organizations search_organization
+                    ON search_organization.id = mp.organization_id
+                    AND $3::text IS NOT NULL
+                LEFT JOIN LATERAL (
+                    SELECT
+                        u.username
+                    FROM team_members tm
+                    INNER JOIN users u ON u.id = tm.user_id
+                    WHERE tm.team_id = mp.team_id
+                        AND tm.is_owner
+                    ORDER BY tm.ordering ASC
+                    LIMIT 1
+                ) search_owner ON $3::text IS NOT NULL
+                    AND mp.organization_id IS NULL
+                LEFT JOIN external_dependencies ed ON ed.mod_id = mp.id
+                LEFT JOIN version_project_types vpt ON vpt.mod_id = mp.id
+            )
+            SELECT id
+            FROM queue_projects
+            WHERE
+                (
+                    $3::text IS NULL
+                    OR name ILIKE '%' || $3 || '%'
+                    OR slug ILIKE '%' || $3 || '%'
+                    OR summary ILIKE '%' || $3 || '%'
+                    OR description ILIKE '%' || $3 || '%'
+                    OR owner_name ILIKE '%' || $3 || '%'
+                    OR organization_name ILIKE '%' || $3 || '%'
+                    OR EXISTS (
+                        SELECT 1
+                        FROM UNNEST(project_types) AS searched_project_type(project_type)
+                        WHERE searched_project_type.project_type ILIKE '%' || $3 || '%'
+                    )
+                )
+                AND (
+                    $4::text IS NULL
+                    OR ($4 = 'none' AND CARDINALITY(project_types) = 0)
+                    OR ($4 = 'minecraft_java_server' AND project_types @> ARRAY['minecraft_java_server']::text[])
+                    OR ($4 <> 'none' AND $4 <> 'minecraft_java_server' AND project_types[1] = $4)
+                )
+                AND ($5::boolean IS NULL OR (external_dependencies_count > 0) = $5)
+            ORDER BY
+                CASE WHEN $6 = 'most_external_deps' THEN external_dependencies_count END DESC,
+                CASE WHEN $6 = 'least_external_deps' THEN external_dependencies_count END ASC,
+                CASE WHEN $6 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                CASE WHEN $6 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(queued, published) END ASC NULLS LAST,
+                id ASC
+            "#,
+            ProjectStatus::Processing.as_str(),
+            &listed_version_statuses,
+            query,
+            project_type,
+            request_opts.has_external_dependencies,
+            sort,
+            exclude_technical_review,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_internal_err("failed to fetch filtered project ids awaiting review")?;
+
+        project_rows
+            .into_iter()
+            .map(|row| ProjectId::from(database::models::DBProjectId(row.id)))
+            .collect()
+    } else {
+        let project_rows = sqlx::query!(
+            r#"
+            SELECT id
+            FROM mods
+            WHERE
+                status = $1
+                AND (
+                    $3::boolean = false
+                    OR NOT EXISTS (
+                        SELECT 1
+                        FROM delphi_issue_details_with_statuses didws
+                        WHERE didws.project_id = mods.id
+                            AND didws.status = 'pending'
+                    )
+                )
+            ORDER BY
+                CASE WHEN $2 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,
+                CASE WHEN $2 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,
+                id ASC
+            "#,
+            ProjectStatus::Processing.as_str(),
+            sort,
+            exclude_technical_review,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_internal_err("failed to fetch project ids awaiting review")?;
+
+        project_rows
+            .into_iter()
+            .map(|row| ProjectId::from(database::models::DBProjectId(row.id)))
+            .collect()
+    };
+
+    Ok(web::Json(ModerationProjectIdsResponse { ids }))
+}
+
+fn row_to_queue_project(
+    id: Option<i64>,
+    slug: Option<String>,
+    name: Option<String>,
+    summary: Option<String>,
+    icon_url: Option<String>,
+    status: Option<String>,
+    requested_status: Option<String>,
+    queued: Option<DateTime<Utc>>,
+    published: Option<DateTime<Utc>>,
+    updated: Option<DateTime<Utc>>,
+    organization_id: Option<i64>,
+    organization_name: Option<String>,
+    organization_icon_url: Option<String>,
+    owner_id: Option<i64>,
+    owner_name: Option<String>,
+    owner_icon_url: Option<String>,
+    project_types: Option<Vec<String>>,
+    external_dependencies_count: Option<i64>,
+) -> Result<Option<ModerationQueueProject>, ApiError> {
+    let Some(id) = id else {
+        return Ok(None);
+    };
+
+    let project_id = ProjectId::from(database::models::DBProjectId(id));
+    let name = name.wrap_internal_err_with(|| {
+        eyre!("project {project_id} is missing `name` in moderation queue row")
+    })?;
+    let summary = summary.wrap_internal_err_with(|| {
+        eyre!(
+            "project {project_id} is missing `summary` in moderation queue row"
+        )
+    })?;
+    let status = status.wrap_internal_err_with(|| {
+        eyre!(
+            "project {project_id} is missing `status` in moderation queue row"
+        )
+    })?;
+    let published = published.wrap_internal_err_with(|| {
+        eyre!(
+            "project {project_id} is missing `published` in moderation queue row"
+        )
+    })?;
+    let updated = updated.wrap_internal_err_with(|| {
+        eyre!(
+            "project {project_id} is missing `updated` in moderation queue row"
+        )
+    })?;
+    let ownership = row_to_ownership(
+        project_id,
+        organization_id,
+        organization_name,
+        organization_icon_url,
+        owner_id,
+        owner_name,
+        owner_icon_url,
+    )?;
+
+    Ok(Some(ModerationQueueProject {
+        id: project_id,
+        slug,
+        name,
+        summary,
+        icon_url,
+        status: ProjectStatus::from_string(&status),
+        requested_status: requested_status
+            .as_deref()
+            .map(ProjectStatus::from_string),
+        queued,
+        published,
+        updated,
+        project_types: project_types.unwrap_or_default(),
+        ownership,
+        external_dependencies_count: external_dependencies_count.unwrap_or(0),
+    }))
+}
+
+fn normalize_optional_string(value: Option<&str>) -> Option<&str> {
+    value.map(str::trim).filter(|value| !value.is_empty())
+}
+
+fn listed_version_statuses() -> Vec<String> {
+    VersionStatus::iterator()
+        .filter(|status| status.is_listed())
+        .map(|status| status.as_str().to_string())
+        .collect()
+}
+
+fn row_to_ownership(
+    project_id: ProjectId,
+    organization_id: Option<i64>,
+    organization_name: Option<String>,
+    organization_icon_url: Option<String>,
+    owner_id: Option<i64>,
+    owner_name: Option<String>,
+    owner_icon_url: Option<String>,
+) -> Result<Ownership, ApiError> {
+    if let Some(organization_id) = organization_id {
+        let organization_name =
+            organization_name.wrap_internal_err_with(|| {
+                eyre!(
+                    "project {project_id} is owned by organization {} without a valid name",
+                    OrganizationId::from(database::models::DBOrganizationId(
+                        organization_id
+                    ))
+                )
+            })?;
+
+        return Ok(Ownership::Organization {
+            id: OrganizationId::from(database::models::DBOrganizationId(
+                organization_id,
+            )),
+            name: organization_name,
+            icon_url: organization_icon_url,
+        });
+    }
+
+    let owner_id = owner_id.wrap_internal_err_with(|| {
+        eyre!("project {project_id} is owned by a team without a valid owner")
+    })?;
+    let owner_name = owner_name.wrap_internal_err_with(|| {
+        eyre!(
+            "project {project_id} is owned by a team owner without a valid name"
+        )
+    })?;
+
+    Ok(Ownership::User {
+        id: UserId::from(database::models::DBUserId(owner_id)),
+        name: owner_name,
+        icon_url: owner_icon_url,
+    })
+}
+
+/// Get project moderation metadata.  
+#[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
+	responses((status = OK, body = MissingMetadata))
 )]
 #[get("/project/{id}")]
-async fn get_project_meta(
+pub async fn get_project_meta(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -447,10 +1213,14 @@ pub enum Judgement {
     },
 }
 
-/// Update moderation judgements for projects in the review queue.
-#[utoipa::path]
+/// Update project moderation judgements.  
+#[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
+	responses((status = NO_CONTENT))
+)]
 #[post("/project")]
-async fn set_project_meta(
+pub async fn set_project_meta(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -536,16 +1306,18 @@ async fn set_project_meta(
     Ok(())
 }
 
-/// Acquire or refresh a moderation lock on a project.
+/// Acquire a moderation lock.  
 /// Returns success if acquired, or info about who holds the lock if blocked.
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockAcquireResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[post("/lock/{project_id}")]
-async fn acquire_lock(
+pub async fn acquire_lock(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -594,15 +1366,17 @@ async fn acquire_lock(
     }
 }
 
-/// Force-acquire a moderation lock on a project (moderator override).
+/// Override a moderation lock.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockAcquireResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[post("/lock/{project_id}/override")]
-async fn override_lock(
+pub async fn override_lock(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -639,15 +1413,17 @@ async fn override_lock(
     }))
 }
 
-/// Check the lock status for a project
+/// Get moderation lock status.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockStatusResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[get("/lock/{project_id}")]
-async fn get_lock_status(
+pub async fn get_lock_status(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -699,15 +1475,17 @@ async fn get_lock_status(
     }
 }
 
-/// Release a moderation lock on a project
+/// Release a moderation lock.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = LockReleaseResponse),
         (status = NOT_FOUND, description = "Project not found")
     )
 )]
 #[delete("/lock/{project_id}")]
-async fn release_lock(
+pub async fn release_lock(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -740,12 +1518,14 @@ async fn release_lock(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Release a moderation lock using credentials in the request body.
+/// Release a moderation lock by beacon.  
 ///
 /// For use with `navigator.sendBeacon`, which cannot set `Authorization` or send `DELETE`.
 /// The body must be `text/plain` containing the same token value as the `Authorization` header
 /// (optional `Bearer ` prefix). This avoids a CORS preflight compared to `application/json`.
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     request_body(
         content = String,
         description = "Token value (same as Authorization header)",
@@ -757,7 +1537,7 @@ async fn release_lock(
     )
 )]
 #[post("/lock/{project_id}/release")]
-async fn release_lock_beacon(
+pub async fn release_lock_beacon(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -811,15 +1591,17 @@ async fn release_lock_beacon(
     Ok(web::Json(LockReleaseResponse { success: released }))
 }
 
-/// Delete all moderation locks (admin only)
+/// Delete all moderation locks.  
 #[utoipa::path(
+	context_path = "/moderation",
+	tag = "moderation",
     responses(
         (status = OK, body = DeleteAllLocksResponse),
         (status = UNAUTHORIZED, description = "Not an admin")
     )
 )]
 #[delete("/locks")]
-async fn delete_all_locks(
+pub async fn delete_all_locks(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

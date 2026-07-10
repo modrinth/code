@@ -656,50 +656,20 @@
   "auth.reset-password.title.long": {
     "message": "Tetap semula kata laluan anda"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Sila masukkan kod dua faktor untuk meneruskan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Masukkan kod dua faktor"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Masukkan kod..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Lupa kata laluan?</forgot-password-link> • <create-account-link>Cipta akaun</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Daftar masuk dengan"
   },
   "auth.sign-in.title": {
     "message": "Daftar Masuk"
   },
-  "auth.sign-in.use-password": {
-    "message": "Atau gunakan kata laluan"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Cipta akaun"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Dengan mencipta akaun, anda bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-policy-link>Dasar Privasi</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Kata laluan tidak sepadan!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Sudah mempunyai akaun?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Langgan kepada kemas kini tentang Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Daftar"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Atau cipta akaun anda sendiri"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Daftar dengan"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Tetapan akaun"
@@ -730,21 +700,6 @@
   },
   "auth.verify-email.title": {
     "message": "Sahkan E-mel"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Langgan kepada kemas kini tentang Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Anda kini sebahagian daripada komuniti hebat pencipta & peneroka yang sudah membina, memuat turun dan sentiasa mengikuti perkembangan terkini mengenai mod yang menakjubkan."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Dengan mencipta akaun, anda telah bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-policy-link>Dasar Privasi</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Selamat Datang ke Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Selamat Datang"
   },
   "collection.button.edit-icon": {
     "message": "Sunting ikon"
@@ -1412,9 +1367,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Sedang memuat pemberitahuan..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "Anda boleh menyunting berbilang projek sekaligus dengan memilihnya di bawah."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Projek pelayan tidak menyokong penyuntingan pukal"
   },
@@ -1483,24 +1435,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Sila semak metadata persekitaran"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "Menaik"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "Menurun"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Nama"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Jenis"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Ikon"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2984,43 +2918,16 @@
   "project.details.licensed": {
     "message": "Berlesen"
   },
-  "project.download.game-version": {
-    "message": "Versi permainan: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Ralat: tiada versi permainan dijumpai"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} hanya tersedia untuk {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Pasang dengan Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Tidak ada Modrinth App?"
-  },
-  "project.download.no-versions-available": {
-    "message": "Tiada versi tersedia untuk {gameVersion} dan {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Ralat: tiada platform dijumpai"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} hanya tersedia untuk {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak menyokong {platform} untuk {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Cari versi permainan..."
   },
   "project.download.select-game-version": {
@@ -3212,44 +3119,14 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut dan sebarang versi yang ditahan akan diterbitkan secara automatik."
-  },
-  "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut sebelum anda boleh menghantar projek anda untuk semakan."
-  },
-  "project.settings.permissions.attention-needed.title": {
-    "message": "Kandungan terbenam yang tidak diketahui"
-  },
-  "project.settings.permissions.completed.description": {
-    "message": "Semua kandungan luaran mempunyai atribusi yang disediakan."
-  },
-  "project.settings.permissions.completed.title": {
-    "message": "Atribusi selesai!"
-  },
-  "project.settings.permissions.empty-state.description": {
-    "message": "Tiada satu pun versi anda mengandungi kandungan luaran, jadi anda tidak perlu risau tentang mendapatkan kebenaran."
-  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Semuanya sudah siap!"
-  },
-  "project.settings.permissions.fail.description": {
-    "message": "Anda tidak mempunyai kebenaran untuk mengedarkan semula beberapa kandungan luaran yang ditambahkan. Untuk menerbitkan projek ini di Modrinth, sila buang kandungan yang melanggar hak."
   },
   "project.settings.permissions.fail.title": {
     "message": "Sesetengah kandungan tidak boleh disertakan"
   },
-  "project.settings.permissions.info-banner.description": {
-    "message": "Jika anda memasukkan kandungan yang tidak dihoskan di Modrinth, anda perlu memberitahu kami dari mana ia berasal dan mengesahkan bahawa anda mempunyai kebenaran untuk mengedarkan fail tersebut. Lihat <link>panduan kami</link> untuk mengetahui cara untuk melakukannya dengan betul!"
-  },
-  "project.settings.permissions.info-banner.title": {
-    "message": "Ketahui cara atribusi berfungsi"
-  },
   "project.settings.permissions.learn-more": {
     "message": "Ketahui lebih lanjut"
-  },
-  "project.settings.permissions.search-placeholder": {
-    "message": "Cari {count} {count, plural, other {projek luaran}}..."
   },
   "project.settings.title": {
     "message": "Tetapan"

@@ -731,11 +731,71 @@
   "auth.authorize.authorize-app-name": {
     "message": "授權「{appName}」"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "缺少必要的 OAuth 查詢參數。"
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "找不到回應中的重新導向位置"
   },
+  "auth.authorize.errro-title": {
+    "message": "發生錯誤"
+  },
   "auth.authorize.redirect-url": {
     "message": "系統會將你重新導向至 <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "使用 {provider} 繼續"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "年齡限制"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "完成註冊"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "請輸入有效的出生日期。年份不能為0000。"
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "出生日期無效"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "出生日期"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "選取你的出生日期"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "請先輸入你的出生日期再繼續。"
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "出生日期是必填欄位"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "你未達到建立 Modrinth 帳號的最低年齡限制。"
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "相關原始碼"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "我們不會儲存你的出生日期，僅在註冊時用來驗證是否符合《兒童網路隱私保護法》（COPPA）的規範。"
+  },
+  "auth.create-account.page-title": {
+    "message": "建立帳號"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "安全檢查"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "透過電子郵件通知我 Modrinth 的最新動態"
+  },
+  "auth.create-account.title": {
+    "message": "建立帳號"
+  },
+  "auth.create-account.username.label": {
+    "message": "使用者名稱"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "輸入使用者名稱"
   },
   "auth.reset-password.method-choice.action": {
     "message": "傳送密碼重設電子郵件"
@@ -771,52 +831,67 @@
     "message": "重設你的密碼"
   },
   "auth.sign-in.2fa.description": {
-    "message": "請輸入雙重驗證碼以繼續。"
+    "message": "請輸入驗證應用程式中的 6 位數驗證碼，或其中一個備用碼。"
   },
   "auth.sign-in.2fa.label": {
-    "message": "輸入雙重驗證碼"
+    "message": "雙重驗證"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "輸入驗證碼..."
   },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>忘記密碼？</forgot-password-link> • <create-account-link>建立帳號</create-account-link>"
+  "auth.sign-in.continue-with-email": {
+    "message": "使用電子郵件地址繼續"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "使用通行金鑰繼續"
+  },
+  "auth.sign-in.create-account": {
+    "message": "註冊"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "忘記密碼"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "上次使用"
+  },
+  "auth.sign-in.no-account": {
+    "message": "還沒有帳號嗎？"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "使用以下方式登入"
+    "message": "登入 Modrinth"
   },
   "auth.sign-in.title": {
     "message": "登入"
   },
-  "auth.sign-in.use-password": {
-    "message": "或使用密碼"
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "年齡限制"
   },
-  "auth.sign-up.action.create-account": {
-    "message": "建立帳號"
+  "auth.sign-up.continue-with-email": {
+    "message": "使用電子郵件地址繼續"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "密碼不相符！"
+  "auth.sign-up.show-fewer-options": {
+    "message": "顯示較少選項"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "顯示其他選項"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "已經有帳號了？"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "訂閱 Modrinth 的最新消息"
-  },
   "auth.sign-up.title": {
     "message": "註冊"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "或自行建立帳號"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "使用以下方式註冊"
+    "message": "建立帳號"
   },
   "auth.verify-email.action.account-settings": {
     "message": "帳號設定"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "探索模組"
   },
   "auth.verify-email.already-verified.description": {
     "message": "你的電子郵件地址已經完成過驗證！"
@@ -836,6 +911,15 @@
   "auth.verify-email.failed-verification.title": {
     "message": "電子郵件驗證失敗"
   },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "驗證連結已傳送至你的電子信箱 {email} 。"
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "電子郵件已送出"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "發生錯誤"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "你的電子郵件地址已成功驗證！"
   },
@@ -844,21 +928,6 @@
   },
   "auth.verify-email.title": {
     "message": "驗證電子郵件"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "訂閱 Modrinth 的最新消息"
-  },
-  "auth.welcome.description": {
-    "message": "你現在已加入由創作者與探索者組成的精彩社群，大家都在積極打造、下載並持續掌握優質模組的最新動態。"
-  },
-  "auth.welcome.label.tos": {
-    "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用條款</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
-  },
-  "auth.welcome.long-title": {
-    "message": "歡迎使用 Modrinth！"
-  },
-  "auth.welcome.title": {
-    "message": "歡迎"
   },
   "collection.button.edit-icon": {
     "message": "編輯圖示"
@@ -1565,9 +1634,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "正在載入通知..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "你可以透過在下方選擇專案來同時編輯多個專案。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "伺服器專案不支援大量編輯"
   },
@@ -1587,7 +1653,7 @@
     "message": "編輯連結"
   },
   "dashboard.projects.links.changes-applied": {
-    "message": "變更將套用於<strong>{count}</strong> 個{count, plural, other {專案}}。"
+    "message": "變更將套用於 <strong>{count}</strong> 個{count, plural, other {專案}}。"
   },
   "dashboard.projects.links.description": {
     "message": "你在下方指定的任何連結都將覆蓋到每個選定的專案中。留空的連結將被忽略。你可以使用垃圾桶按鈕從所有選定的專案中清除連結。"
@@ -1642,24 +1708,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "請審查環境詮釋資料"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "遞增"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "遞減"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名稱"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "狀態"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "類型"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "圖示"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2967,7 +3015,7 @@
     "message": "下載次數：{count}"
   },
   "profile.label.joined": {
-    "message": "加入時間"
+    "message": "加入時間："
   },
   "profile.label.no-collections": {
     "message": "這個使用者沒有任何收藏！"
@@ -3173,43 +3221,16 @@
   "project.details.licensed": {
     "message": "授權條款"
   },
-  "project.download.game-version": {
-    "message": "遊戲版本：{version}"
-  },
-  "project.download.game-version-error": {
-    "message": "錯誤：找不到適合的遊戲版本"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} 僅適用於 {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"
   },
-  "project.download.install-with-app": {
-    "message": "使用 Modrinth App 安裝"
-  },
   "project.download.no-app": {
     "message": "還沒有 Modrinth App 嗎？"
-  },
-  "project.download.no-versions-available": {
-    "message": "{platform} {gameVersion} 沒有可用的版本。"
-  },
-  "project.download.platform": {
-    "message": "平臺：{platform}"
-  },
-  "project.download.platform-error": {
-    "message": "錯誤：找不到平臺"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} 僅適用於 {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支援 {platform} {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "搜尋遊戲版本..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "搜尋遊戲版本..."
   },
   "project.download.select-game-version": {
@@ -3278,17 +3299,62 @@
   "project.moderation.admonition.approved.header": {
     "message": "專案已獲核准"
   },
+  "project.moderation.admonition.draft.body": {
+    "message": "這是一個草稿專案，在送交審查並獲得 Modrinth 管理團隊核准之前，其他人無法查看。"
+  },
   "project.moderation.admonition.draft.header": {
-    "message": "專案草稿"
+    "message": "草稿專案"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "完成所有必要步驟，並確保你的專案符合 Modrinth 的《<rules-link>內容規範</rules-link>》後，即可將專案送交審查。"
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "在重新提交專案之前，請先處理管理團隊提出的所有疑慮，包括下方訊息中列出的任何問題。"
   },
   "project.moderation.admonition.rejected.header": {
     "message": "需要修改"
   },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "在未解決管理員提出的所有問題的情況下反覆提交專案，可能會導致帳號被停權。"
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "你的專案已在佇列中，等待 Modrinth 管理團隊審查。"
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "你的專案會先被掃描，再由管理員人工審核，以確保其符合 Modrinth 的《<rules-link>內容規範</rules-link>》與《<terms-link>服務條款</terms-link>》。"
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "你仍可修改專案，這不會影響你在佇列中的位置。"
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "我們的目標是在 24 至 48 小時內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>感謝你的耐心等候，我們的管理員正努力維護 Modrinth 的安全，我們期待能協助你分享你的內容！💚</emphasis>"
+  },
   "project.moderation.admonition.under-review.header": {
     "message": "專案審查中"
   },
+  "project.moderation.admonition.withheld.body": {
+    "message": "你的專案不會公開顯示，只能透過直接連結存取。{requestedStatus, select, unlisted {根據你所選的<visibility-settings-link>瀏覽權限設定</visibility-settings-link>，你很可能無需採取任何行動。} other {在重新這個專案之前，請先處理管理團隊提出的所有疑慮，包括下方訊息中列出的任何問題。}}"
+  },
   "project.moderation.admonition.withheld.header": {
     "message": "由工作人員設為不公開"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "未經授權"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "管理團隊不會主動查看這個討論串，但如果有需要，他們可能會查看討論串以獲取專案相關資訊。"
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "大多數的問題無法由內容管理員提供協助，且這個討論串的訊息不會通知工作人員。"
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "如果你需要協助或有其他疑問，請前往 <help-center-link>Modrinth 說明中心</help-center-link>，然後按一下藍色對話氣泡以聯絡客服團隊。"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "這是你與 Modrinth 管理員之間的私人討論串。他們可能會就專案的相關問題向你傳送訊息。"
   },
   "project.moderation.thread.title": {
     "message": "審核訊息"
@@ -3357,43 +3423,76 @@
     "message": "網址"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限；此外，任何遭保留的版本都將自動發布。"
+    "message": "請提供證明，以確認你擁有重新發布下列所有檔案的權限。提供完成後，任何遭保留的版本都將自動發布。"
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
     "message": "在提交專案進行審查之前，請先提供你擁有下列所有檔案重新發布權限的證明。"
   },
   "project.settings.permissions.attention-needed.title": {
-    "message": "未知的嵌入內容"
+    "message": "未知的外部內容"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Modrinth 的管理團隊拒絕了你針對部分外部內容所提供的授權資訊。請檢視以下被拒絕的項目，並提供可接受的證明文件，或移除該內容。"
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "部分證明被拒絕"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "收起全部"
   },
   "project.settings.permissions.completed.description": {
-    "message": "所有外部內容均已標明出處。"
+    "message": "所有外部內容均已附有授權資訊，並標明出處。"
   },
   "project.settings.permissions.completed.title": {
-    "message": "出處標註已完成！"
+    "message": "授權設定已完成！"
   },
   "project.settings.permissions.empty-state.description": {
-    "message": "你的所有版本皆不含外部內容，因此無需擔心取得授權的問題。"
+    "message": "你的專案的所有版本皆不含外部內容，因此無需擔心取得授權的問題。"
   },
   "project.settings.permissions.empty-state.heading": {
     "message": "一切就緒！"
   },
+  "project.settings.permissions.expand-all": {
+    "message": "展開全部"
+  },
   "project.settings.permissions.fail.description": {
-    "message": "你上傳的部分外部內容不具備重新發布權限。如要在 Modrinth 上發布，請移除侵權內容。"
+    "message": "專案中的部分外部內容可能不具備重新發布權限。如要在 Modrinth 上發布，請移除這些內容，或提供你擁有這些內容重新發布權限的證明。"
   },
   "project.settings.permissions.fail.title": {
     "message": "部分內容無法包含在內"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "如果你包含的內容並非託管於 Modrinth，你需要告知我們其來源，並確認你擁有重新發布這些檔案的權限。請參閱我們的<link>指南</link>以了解如何正確處理！"
+    "message": "如果你包含的內容並非託管於 Modrinth，你需要告知我們其來源，並確認你擁有重新發布這些檔案的權限。請參閱我們<link>關於這個新系統的公告</link>以了解更多！"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "了解引用標註的處理方式"
+    "message": "了解引用標註"
   },
   "project.settings.permissions.learn-more": {
     "message": "了解更多"
   },
+  "project.settings.permissions.no-results": {
+    "message": "沒有外部檔案符合你的搜尋字詞。"
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "部分外部內容因違反我們的《內容規範》，不得在 Modrinth 上發布，並且必須移除。"
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {沒有需要核准的引用標註} other {有 # 個引用標註需要核准}}"
+  },
   "project.settings.permissions.search-placeholder": {
-    "message": "搜尋 {count} 個{count, plural, other {外部專案}}..."
+    "message": "搜尋 {count} 個{count, plural, other {專案}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "檔案數量多寡"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "最近編輯時間"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "已拒絕"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "狀態"
   },
   "project.settings.title": {
     "message": "設定"
@@ -3952,6 +4051,48 @@
   },
   "settings.account.security.email.title": {
     "message": "電子郵件"
+  },
+  "settings.account.security.passkey.add": {
+    "message": "新增通行金鑰"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "請務必選擇容易記住的名稱，以便日後能辨識出這個通行金鑰。"
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "名稱"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "我的通行金鑰"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "管理或新增你的通行金鑰。"
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "新增時間：{ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "上次使用：{ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "正在載入通行金鑰..."
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "從未使用"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "你還沒有新增任何通行金鑰。"
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "這會永久移除通行金鑰「{name}」。你將無法再使用這個通行金鑰登入。"
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "你確定要移除這個通行金鑰嗎？"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "重新命名通行金鑰"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "管理通行金鑰"
   },
   "settings.account.security.password.action.add": {
     "message": "新增密碼"
@@ -4565,6 +4706,48 @@
   "ui.newsletter-button.tooltip": {
     "message": "訂閱 Modrinth 的最新消息"
   },
+  "version.all-versions": {
+    "message": "所有版本"
+  },
+  "version.confirm-delete.description": {
+    "message": "這個版本將永久刪除。這個操作無法復原。"
+  },
+  "version.confirm-delete.proceed": {
+    "message": "刪除版本"
+  },
+  "version.confirm-delete.title": {
+    "message": "你確定要刪除這個版本嗎？"
+  },
+  "version.dependency.view-project": {
+    "message": "查看專案"
+  },
+  "version.dependency.view-version": {
+    "message": "查看版本"
+  },
+  "version.download.download-dependency": {
+    "message": "下載相依項"
+  },
+  "version.download.no-primary-file": {
+    "message": "錯誤：找不到主要檔案"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "可選資源包"
+  },
+  "version.download.required-resource-pack": {
+    "message": "所需資源包"
+  },
+  "version.edit.button": {
+    "message": "編輯"
+  },
+  "version.edit.details": {
+    "message": "編輯詳細資訊"
+  },
+  "version.edit.files": {
+    "message": "編輯檔案"
+  },
+  "version.edit.metadata": {
+    "message": "編輯詮釋資料"
+  },
   "version.environment.none.description": {
     "message": "此版本的執行環境尚未指定。"
   },
@@ -4576,5 +4759,56 @@
   },
   "version.environment.unknown.title": {
     "message": "未知的執行環境"
+  },
+  "version.package-as-mod.button": {
+    "message": "打包為模組"
+  },
+  "version.package-as-mod.description": {
+    "message": "這將建立一個支援所選模組載入器的新版本。你將被重新導向到新版本，你可依個人偏好編輯它。"
+  },
+  "version.package-as-mod.header": {
+    "message": "將資料包打包為模組"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "模組載入器"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "你想要將資料包打包成哪些模組載入器所支援的形式。"
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "選擇模組載入器..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "打包資料包"
+  },
+  "version.section.content.dev-info": {
+    "message": "開發者資訊"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle："
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven 座標："
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Modrinth 上的專案會透過 Maven 儲存庫自動提供，以便與 <gradle-link>Gradle</gradle-link> 等 JVM 建構工具搭配使用。<article-link>按這裡</article-link>深入了解 Modrinth Maven API。"
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "注意：如有提供，你應該改用創作者的 Maven 儲存庫，因為該儲存庫包含 Modrinth Maven API 所沒有的遞移相依關係資訊。此外，若你同時使用 Modrinth 與非 Modrinth 的 Maven 儲存庫來取得相依項，可能會導致相依項重複，因為透過 Modrinth Maven API 提供時，群組識別碼將會有所不同。"
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "版本 ID："
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "複製 SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "複製 SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "這個版本目前被保留且不公開。提供你擁有特定檔案重新發布權限的證明。"
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "由於存在未知的嵌入內容而被保留"
   }
 }

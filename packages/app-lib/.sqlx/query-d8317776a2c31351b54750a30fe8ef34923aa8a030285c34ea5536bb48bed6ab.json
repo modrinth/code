@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT OR REPLACE INTO instances (\n            id,\n            path,\n            applied_content_set_id,\n            install_stage,\n            launcher_feature_version,\n            update_channel,\n            name,\n            icon_path,\n            created,\n            modified,\n            last_played,\n            submitted_time_played,\n            recent_time_played\n        )\n        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 13
+    },
+    "nullable": []
+  },
+  "hash": "d8317776a2c31351b54750a30fe8ef34923aa8a030285c34ea5536bb48bed6ab"
+}

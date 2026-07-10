@@ -42,7 +42,7 @@ use stripe::{
 };
 use tracing::warn;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/billing")
             .service(products)
@@ -58,11 +58,18 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(active_servers)
             .service(initiate_payment)
             .service(stripe_webhook)
-            .service(refund_charge),
+            .service(refund_charge)
+            .service(reprocess_charge_tax),
     );
 }
 
-#[get("products")]
+/// List products.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = OK, body = serde_json::Value))
+)]
+#[get("/products")]
 pub async fn products(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -107,6 +114,14 @@ struct UserSubscriptionWithNextChargeTaxAmount {
 }
 
 #[get("subscriptions")]
+/// List subscriptions.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	params(("user_id" = Option<ariadne::ids::UserId>, Query)),
+	responses((status = OK, body = serde_json::Value))
+)]
+#[get("/subscriptions")]
 pub async fn subscriptions(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -158,7 +173,7 @@ pub async fn subscriptions(
     Ok(HttpResponse::Ok().json(subscriptions))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ChargeRefundAmount {
     Full,
@@ -166,14 +181,21 @@ pub enum ChargeRefundAmount {
     None,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ChargeRefund {
     #[serde(flatten)]
     pub amount: ChargeRefundAmount,
     pub unprovision: Option<bool>,
 }
 
-#[post("charge/{id}/refund")]
+/// Refund a charge.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	request_body = ChargeRefund,
+	responses((status = NO_CONTENT))
+)]
+#[post("/charge/{id}/refund")]
 #[allow(clippy::too_many_arguments)]
 pub async fn refund_charge(
     req: HttpRequest,
@@ -436,7 +458,13 @@ pub async fn refund_charge(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[post("charge/{id}/tax/reprocess")]
+/// Reprocess tax for a charge.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = NO_CONTENT))
+)]
+#[post("/charge/{id}/tax/reprocess")]
 pub async fn reprocess_charge_tax(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -604,8 +632,9 @@ pub async fn reprocess_charge_tax(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct SubscriptionEdit {
+    #[schema(value_type = String)]
     pub interval: Option<PriceDuration>,
     pub payment_method: Option<String>,
     pub cancelled: Option<bool>,
@@ -618,7 +647,17 @@ pub struct SubscriptionEditQuery {
     pub dry: Option<bool>,
 }
 
-#[patch("subscription/{id}")]
+/// Update a subscription.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	params(("dry" = Option<bool>, Query)),
+	responses(
+		(status = OK, body = serde_json::Value),
+		(status = NO_CONTENT),
+	)
+)]
+#[patch("/subscription/{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn edit_subscription(
     req: HttpRequest,
@@ -1108,7 +1147,13 @@ pub async fn edit_subscription(
     }
 }
 
-#[get("customer")]
+/// Get the current customer.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = OK, body = serde_json::Value))
+)]
+#[get("/customer")]
 pub async fn user_customer(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1146,7 +1191,14 @@ pub struct ChargesQuery {
     pub user_id: Option<ariadne::ids::UserId>,
 }
 
-#[get("payments")]
+/// List payments.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	params(("user_id" = Option<ariadne::ids::UserId>, Query)),
+	responses((status = OK, body = serde_json::Value))
+)]
+#[get("/payments")]
 pub async fn charges(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1205,7 +1257,13 @@ pub async fn charges(
     ))
 }
 
-#[post("payment_method")]
+/// Start a payment method flow.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = OK, body = serde_json::Value))
+)]
+#[post("/payment_method")]
 pub async fn add_payment_method_flow(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1258,7 +1316,13 @@ pub struct EditPaymentMethod {
     pub primary: bool,
 }
 
-#[patch("payment_method/{id}")]
+/// Update a payment method.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = NO_CONTENT))
+)]
+#[patch("/payment_method/{id}")]
 pub async fn edit_payment_method(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1322,7 +1386,13 @@ pub async fn edit_payment_method(
     }
 }
 
-#[delete("payment_method/{id}")]
+/// Remove a payment method.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = NO_CONTENT))
+)]
+#[delete("/payment_method/{id}")]
 pub async fn remove_payment_method(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1405,7 +1475,16 @@ pub async fn remove_payment_method(
     }
 }
 
-#[get("payment_methods")]
+/// List payment methods.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses(
+		(status = OK, body = serde_json::Value),
+		(status = NO_CONTENT),
+	)
+)]
+#[get("/payment_methods")]
 pub async fn payment_methods(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1449,7 +1528,24 @@ pub struct ActiveServersQuery {
     pub subscription_status: Option<SubscriptionStatus>,
 }
 
-#[get("active_servers")]
+#[derive(Serialize, utoipa::ToSchema)]
+struct ActiveServerResponse {
+    pub user_id: ariadne::ids::UserId,
+    pub server_id: String,
+    pub price_id: crate::models::ids::ProductPriceId,
+    #[schema(value_type = String)]
+    pub interval: PriceDuration,
+    pub region: Option<String>,
+}
+
+/// List active servers.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	params(("subscription_status" = Option<String>, Query)),
+	responses((status = OK, body = inline(Vec<ActiveServerResponse>)))
+)]
+#[get("/active_servers")]
 pub async fn active_servers(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1474,21 +1570,12 @@ pub async fn active_servers(
     )
     .await?;
 
-    #[derive(Serialize)]
-    struct ActiveServer {
-        pub user_id: ariadne::ids::UserId,
-        pub server_id: String,
-        pub price_id: crate::models::ids::ProductPriceId,
-        pub interval: PriceDuration,
-        pub region: Option<String>,
-    }
-
     let server_ids = servers
         .into_iter()
         .filter_map(|x| {
             x.metadata.as_ref().and_then(|metadata| match metadata {
                 SubscriptionMetadata::Pyro { id, region } => {
-                    Some(ActiveServer {
+                    Some(ActiveServerResponse {
                         user_id: x.user_id.into(),
                         server_id: id.clone(),
                         price_id: x.price_id.into(),
@@ -1499,12 +1586,12 @@ pub async fn active_servers(
                 SubscriptionMetadata::Medal { .. } => None,
             })
         })
-        .collect::<Vec<ActiveServer>>();
+        .collect::<Vec<ActiveServerResponse>>();
 
     Ok(HttpResponse::Ok().json(server_ids))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum PaymentRequestType {
     PaymentMethod { id: String },
@@ -1524,7 +1611,7 @@ impl PaymentRequestType {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ChargeRequestType {
     Existing {
@@ -1532,11 +1619,12 @@ pub enum ChargeRequestType {
     },
     New {
         product_id: crate::models::ids::ProductId,
+        #[schema(value_type = String)]
         interval: Option<PriceDuration>,
     },
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct PaymentRequestMetadata {
     #[serde(flatten)]
@@ -1544,7 +1632,7 @@ pub struct PaymentRequestMetadata {
     pub affiliate_code: Option<AffiliateCodeId>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum PaymentRequestMetadataKind {
     Pyro {
@@ -1554,16 +1642,23 @@ pub enum PaymentRequestMetadataKind {
     },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct PaymentRequest {
     #[serde(flatten)]
     pub type_: PaymentRequestType,
     pub charge: ChargeRequestType,
+    #[schema(value_type = String)]
     pub existing_payment_intent: Option<stripe::PaymentIntentId>,
     pub metadata: Option<PaymentRequestMetadata>,
 }
 
-#[post("payment")]
+/// Initiate a payment.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = OK, body = serde_json::Value))
+)]
+#[post("/payment")]
 pub async fn initiate_payment(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1627,7 +1722,14 @@ pub async fn initiate_payment(
     }
 }
 
-#[post("_stripe")]
+/// Receive a Stripe webhook.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	request_body(content = String, content_type = "text/plain"),
+	responses((status = NO_CONTENT))
+)]
+#[post("/_stripe")]
 pub async fn stripe_webhook(
     req: HttpRequest,
     payload: String,
@@ -2520,7 +2622,7 @@ async fn apply_credit_many(
     Ok(())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct CreditRequest {
     #[serde(flatten)]
     pub target: CreditTarget,
@@ -2529,7 +2631,7 @@ pub struct CreditRequest {
     pub message: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 #[serde(untagged)]
 pub enum CreditTarget {
     Subscriptions {
@@ -2543,7 +2645,13 @@ pub enum CreditTarget {
     },
 }
 
-#[post("credit")]
+/// Credit subscriptions.  
+#[utoipa::path(
+	context_path = "/billing",
+	tag = "billing",
+	responses((status = NO_CONTENT))
+)]
+#[post("/credit")]
 pub async fn credit(
     req: HttpRequest,
     pool: web::Data<PgPool>,

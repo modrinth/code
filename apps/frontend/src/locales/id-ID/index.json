@@ -473,50 +473,20 @@
   "auth.reset-password.title.long": {
     "message": "Atur ulang kata sandi Anda"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Mohon masukkan kode autentikasi dwifaktor untuk melanjutkan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Masukkan kode dwifaktor"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Masukkan kode..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Lupa kata sandi?</forgot-password-link> • <create-account-link>Buat akun</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Masuk dengan"
   },
   "auth.sign-in.title": {
     "message": "Masuk"
   },
-  "auth.sign-in.use-password": {
-    "message": "Atau gunakan kata sandi"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Buat akun"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Dengan membuat sebuah akun, Anda menyetujui <terms-link>Ketentuan</terms-link> dan <privacy-policy-link>Kebijakan Privasi</privacy-policy-link> Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Kata sandi tidak cocok!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Sudah memiliki akun?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "Berlangganan pembaruan tentang Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "Daftar"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "Atau buat akun Anda sendiri"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Daftar dengan"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Pengaturan akun"
@@ -547,21 +517,6 @@
   },
   "auth.verify-email.title": {
     "message": "Verifikasi Sur-el"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "Berlangganan pembaruan tentang Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "Anda kini menjadi bagian dari komunitas kreator dan penjelajah hebat yang sudah membangun, mengunduh, dan terus mengikuti perkembangan terkini dari mod-mod yang luar biasa."
-  },
-  "auth.welcome.label.tos": {
-    "message": "Dengan membuat sebuah akun, Anda telah menyetujui <terms-link>Ketentuan</terms-link> dan <privacy-policy-link>Kebijakan Privasi</privacy-policy-link> Modrinth."
-  },
-  "auth.welcome.long-title": {
-    "message": "Selamat datang di Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "Selamat Datang"
   },
   "collection.button.edit-icon": {
     "message": "Sunting ikon"
@@ -2468,43 +2423,16 @@
   "project.details.licensed": {
     "message": "Berlisensi"
   },
-  "project.download.game-version": {
-    "message": "Versi permainan: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Kesalahan: tidak ada versi permainan yang ditemukan"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} hanya tersedia untuk {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak mendukung {gameVersion} untuk {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Pasang dengan Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Tidak memiliki Modrinth App?"
-  },
-  "project.download.no-versions-available": {
-    "message": "Tidak ada versi tersedia untuk {gameVersion} dan {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Kesalahan: tidak ada platform yang ditemukan"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} hanya tersedia untuk {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak mendukung {platform} untuk {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Cari versi permainan..."
   },
   "project.download.select-game-version": {

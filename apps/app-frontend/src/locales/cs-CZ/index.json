@@ -11,6 +11,21 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Skrýt více spuštěných instancí"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Zavřít"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Otevřít instanci"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Zkusit znovu"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Neznámá instance"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalace"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Nastavit jako primární instanci"
   },
@@ -33,7 +48,7 @@
     "message": "Zastavit instanci"
   },
   "app.action-bar.update": {
-    "message": "Aktualizace"
+    "message": "Aktualizovat"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Zobrazit probíhající stahování"
@@ -101,8 +116,14 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Zobrazit odehraný čas"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Automaticky přeskočí nízko riziková potrvzení jako duplicitní instalace modpacků, běžné mazání obsahu, hromadné aktualizace, odpojování modpacků a výzvy k opravě. Nebezpečná upozornění se budou nadále zobrazovat."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Přeskočit nedůležitá upozornění"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Umožní přepínat zobrazení postranního panelu."
+    "message": "Umožňí přepínat zobrazení postranního panelu."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Přepnout postranní panel"
@@ -141,10 +162,10 @@
     "message": "Zpět k instanci"
   },
   "app.browse.discover-content": {
-    "message": "Objevovat obsah"
+    "message": "Objevit obsah"
   },
   "app.browse.discover-servers": {
-    "message": "Objevovat servery"
+    "message": "Objevit servery"
   },
   "app.browse.hide-added-servers": {
     "message": "Skrýt již přidané servery"
@@ -159,13 +180,7 @@
     "message": "Instalování"
   },
   "app.content-install.no-compatible-versions": {
-    "message": "Žádná dostupná verze se neshoduje s verzí {compatibilityLabel}. Vyber verzi, abys ji i přesto nainstaloval/a. Závislosti nebudou automaticky nainstalovány."
-  },
-  "app.creation-modal.installing-modpack.description": {
-    "message": "{fileName}"
-  },
-  "app.creation-modal.installing-modpack.title": {
-    "message": "Probíhá instalace modpacku..."
+    "message": "Žádné dostupné verze se neshodují s {compatibilityLabel}. Vyberte verzi, kterou chcete přesto nainstalovat. Závislosti nebudou nainstalovány automaticky."
   },
   "app.export-modal.description-placeholder": {
     "message": "Zadej popis modpacku..."
@@ -176,23 +191,71 @@
   "app.export-modal.header": {
     "message": "Exportovat modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Zahrnout \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Název modpacku"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Název modpacku"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Nastavte, které soubory mají být do tohoto exportu zahrnuty"
-  },
   "app.export-modal.version-number-label": {
     "message": "Číslo verze"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Stahování obsahu"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Stahování Minecraftu"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Stahování pack souboru"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Rozbalování souborů overrides"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Dokončení instalace"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Příprava instance"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Příprava Javy"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Stahování Javy {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Rozbalování Javy {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Získávání Javy {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Připravení Javy {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validace Javy {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Čtení pack manifestu"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Vyhodnocování loaderu"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Vyhodnocování Minecraftu"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Vyhodnocování obsahu"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Obnovování do předchozího stavu"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Spuštění loader procesů"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Všechna data tvé instance budou trvale smazána, včetně světů, konfigurací a veškerého nainstalovaného obsahu."
@@ -201,7 +264,7 @@
     "message": "Tato akce nemůže být vrácena"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Odstranit instanci"
+    "message": "Smazat instanci"
   },
   "app.instance.confirm-delete.header": {
     "message": "Odstranění instance"
@@ -217,6 +280,15 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Stahování {current, number}/{total, number} projektů..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Dokončení aktualizace..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Vyhodnocování verzí..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -242,14 +314,20 @@
   "app.instance.worlds.browse-servers": {
     "message": "Procházet servery"
   },
-  "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' bude **navždy smazán** a nebude možné jej obnovit."
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Smazat svět"
   },
-  "app.instance.worlds.delete-world-title": {
-    "message": "Jsi si jistý, že chceš trvale smazat tento svět?"
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Smazat svět"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Tento svět bude trvale smazán z této instance. Tuto akci nelze vrátit zpět."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Mazání {name}"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "Módovaný"
+    "message": "Módované"
   },
   "app.instance.worlds.filter-offline": {
     "message": "Offline"
@@ -261,25 +339,25 @@
     "message": "Vanilla"
   },
   "app.instance.worlds.no-worlds-description": {
-    "message": "Přidej server nebo začni procházet"
+    "message": "Začněte přidáním serveru nebo procházením obsahu"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "Žádné servery nebo světy nebyly přidány"
+    "message": "Nejsou přidané žádné servery nebo světy"
   },
-  "app.instance.worlds.remove-server-description": {
-    "message": "'{name}' bude odstraněn z tvého seznamu i ze hry a nebude možné jej obnovit."
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Odebrat server"
   },
-  "app.instance.worlds.remove-server-description-with-address": {
-    "message": "'{name}' ({address}) bude odstraněn z tvého seznamu i ze hry a nebude možné jej obnovit."
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Odebrat server"
   },
-  "app.instance.worlds.remove-server-title": {
-    "message": "Opravdu chceš odstranit {name}?"
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Tento server bude odebrán z vašeho seznamu serverů i ze seznamu serverů ve hře. Pokud znáte jeho adresu, můžete ho později znovu přidat."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Odebírání {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hledat v {count} světech..."
-  },
-  "app.instance.worlds.this-server": {
-    "message": "tento server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Požadovaný obsah"
@@ -363,7 +441,7 @@
     "message": "Smazat skin"
   },
   "app.skins.delete-modal.description": {
-    "message": "Tahle akce navždy smaže vybraný skin a nejde vrátit zpět."
+    "message": "Tímto dojde k trvalému smazání vybreného skinu. Tuto akci nelze vrátit zpět."
   },
   "app.skins.delete-modal.title": {
     "message": "Opravdu chceš smazat tenhle skin?"
@@ -492,19 +570,19 @@
     "message": "Nadšený Modrinth Bot"
   },
   "app.skins.sign-in.title": {
-    "message": "Přihlas se prosím"
+    "message": "Přihlaš se prosím"
   },
   "app.skins.title": {
     "message": "Výběr skinu"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
+    "message": "Stahování Modrinth App v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
   },
   "app.update-popup.body.linux": {
-    "message": "Aplikace Modrinth v{version} je k dispozici. Aktualizujte ji pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
+    "message": "Modrinth App v{version} je k dispozici. Aktualizujte ji pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
   },
   "app.update-popup.body.metered": {
-    "message": "Aplikace Modrinth v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
+    "message": "Modrinth App v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
   },
   "app.update-popup.changelog": {
     "message": "Seznam změn"
@@ -717,13 +795,13 @@
     "message": "Jméno"
   },
   "instance.settings.tabs.general.update-channel": {
-    "message": "Aktualizační kanál"
+    "message": "Kanál aktualizací"
   },
   "instance.settings.tabs.general.update-channel.alpha": {
     "message": "Alfa"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Vydané, beta a alfa verze se zobrazí jako dostupné aktualizace."
+    "message": "Verze typu release, beta a alpha se budou zobrazovat jako dostupné aktualizace."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
@@ -862,6 +940,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Kopírovat adresu"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Vytvořit záložku"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nezobrazovat na domovské stránce"

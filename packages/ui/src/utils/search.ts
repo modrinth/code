@@ -46,7 +46,7 @@ export type FilterType = {
 	ordering?: number
 } & (
 	| {
-			display: 'all' | 'scrollable' | 'none'
+			display: 'all' | 'scrollable' | 'none' | 'toggle'
 	  }
 	| {
 			display: 'expandable'
@@ -59,6 +59,10 @@ export type FilterValue = {
 	option: string
 	negative?: boolean
 }
+
+export type EnvironmentSearchOverride =
+	| { mode: 'include'; values: string[] }
+	| { mode: 'exclude'; values: string[] }
 
 export const LOADER_FILTER_TYPES = [
 	'mod_loader',
@@ -108,10 +112,17 @@ export interface SortType {
 
 const PLUGIN_PLATFORMS = ['bungeecord', 'waterfall', 'velocity', 'geyser']
 
+const PROJECT_TYPE_EXCLUSION_FILTERS: Partial<Record<ProjectType, ProjectType[]>> = {
+	mod: ['plugin', 'datapack'],
+	plugin: ['mod', 'datapack'],
+	datapack: ['mod', 'plugin'],
+}
+
 export function useSearch(
 	projectTypes: Ref<ProjectType[]>,
 	tags: Ref<Tags>,
 	providedFilters: Ref<FilterValue[]>,
+	environmentOverride: Ref<EnvironmentSearchOverride | undefined> = ref(undefined),
 ) {
 	const query = ref('')
 	const maxResults = ref(20)
@@ -136,6 +147,34 @@ export function useSearch(
 	const { formatMessage, locale } = useVIntl()
 	const formatCategoryName = (categoryName: string) => {
 		return formatCategory(formatMessage, categoryName)
+	}
+
+	const formatExcludeProjectTypeLabel = (projectType: ProjectType): string => {
+		switch (projectType) {
+			case 'mod':
+				return formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced.exclude_mod',
+						defaultMessage: 'Exclude mods',
+					}),
+				)
+			case 'plugin':
+				return formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced.exclude_plugin',
+						defaultMessage: 'Exclude plugins',
+					}),
+				)
+			case 'datapack':
+				return formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced.exclude_datapack',
+						defaultMessage: 'Exclude data packs',
+					}),
+				)
+			default:
+				return projectType
+		}
 	}
 
 	const filters = computed(() => {
@@ -164,6 +203,15 @@ export function useSearch(
 				value: `categories:${category.name}`,
 				method: category.header === 'resolutions' ? 'or' : 'and',
 			})
+		}
+
+		const excludeableProjectTypes: ProjectType[] = []
+		for (const projectType of projectTypes.value) {
+			for (const target of PROJECT_TYPE_EXCLUSION_FILTERS[projectType] ?? []) {
+				if (!excludeableProjectTypes.includes(target)) {
+					excludeableProjectTypes.push(target)
+				}
+			}
 		}
 
 		const filterTypes: FilterType[] = [
@@ -424,6 +472,26 @@ export function useSearch(
 				options: [],
 				allows_custom_options: 'and',
 			},
+			{
+				id: 'advanced',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.advanced',
+						defaultMessage: 'Advanced',
+					}),
+				),
+				supported_project_types: ['mod', 'plugin', 'datapack'],
+				display: 'toggle',
+				query_param: 'a',
+				searchable: false,
+				ordering: -1000,
+				options: excludeableProjectTypes.map((target) => ({
+					id: target,
+					formatted_name: formatExcludeProjectTypeLabel(target),
+					method: 'and',
+					value: `all_project_types:${mapProjectTypeToSearch(target)}`,
+				})),
+			},
 		]
 
 		return filterTypes
@@ -453,6 +521,9 @@ export function useSearch(
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
 				console.error(`Filter type ${filterValue.type} not found`)
+				continue
+			}
+			if (type.id === 'advanced') {
 				continue
 			}
 			let option = type?.options.find((option) => option.id === filterValue.option)
@@ -505,22 +576,34 @@ export function useSearch(
 		}
 
 		// Environment facets
-		const client = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'client',
-		)
-		const server = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'server',
-		)
-		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
-			if (envGroup.length === 1) {
-				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = ${formatSearchFilterValue(val)}`)
-			} else if (envGroup.length > 1) {
-				const conditions = envGroup.map((f) => {
-					const [field, val] = f.split(':')
-					return `${field} = ${formatSearchFilterValue(val)}`
-				})
-				parts.push(`(${conditions.join(' OR ')})`)
+		const override = environmentOverride.value
+		if (override) {
+			if (override.values.length === 1) {
+				const operator = override.mode === 'include' ? '=' : '!='
+				parts.push(`environment ${operator} ${formatSearchFilterValue(override.values[0])}`)
+			} else if (override.values.length > 1) {
+				const operator = override.mode === 'include' ? 'IN' : 'NOT IN'
+				const quoted = override.values.map(formatSearchFilterValue).join(', ')
+				parts.push(`environment ${operator} [${quoted}]`)
+			}
+		} else {
+			const client = filterValues.some(
+				(filter) => filter.type === 'environment' && filter.option === 'client',
+			)
+			const server = filterValues.some(
+				(filter) => filter.type === 'environment' && filter.option === 'server',
+			)
+			for (const envGroup of getEnvironmentFilterGroups(client, server)) {
+				if (envGroup.length === 1) {
+					const [field, val] = envGroup[0].split(':')
+					parts.push(`${field} = ${formatSearchFilterValue(val)}`)
+				} else if (envGroup.length > 1) {
+					const conditions = envGroup.map((f) => {
+						const [field, val] = f.split(':')
+						return `${field} = ${formatSearchFilterValue(val)}`
+					})
+					parts.push(`(${conditions.join(' OR ')})`)
+				}
 			}
 		}
 
@@ -531,6 +614,15 @@ export function useSearch(
 		} else if (mappedProjectTypes.length > 1) {
 			const quoted = mappedProjectTypes.map(formatSearchFilterValue).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
+		}
+
+		const excludedProjectTypes = filterValues
+			.filter((filterValue) => filterValue.type === 'advanced')
+			.map((filterValue) =>
+				formatSearchFilterValue(mapProjectTypeToSearch(filterValue.option as ProjectType)),
+			)
+		if (excludedProjectTypes.length > 0) {
+			parts.push(`all_project_types NOT IN [${excludedProjectTypes.join(', ')}]`)
 		}
 
 		return parts.join(' AND ')
@@ -777,17 +869,28 @@ function mapProjectTypeToSearch(projectType: ProjectType): string {
 function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
 	const groups: string[][] = []
 	if (client && server) {
-		groups.push(
-			['client_side:required', 'client_side:optional', 'client_side:unsupported'],
-			['server_side:required', 'server_side:optional'],
-		)
+		groups.push([
+			'environment:client_only_server_optional',
+			'environment:server_only_client_optional',
+			'environment:client_and_server',
+			'environment:client_or_server',
+			'environment:client_or_server_prefers_both',
+		])
 	} else if (client) {
-		groups.push(
-			['client_side:optional', 'client_side:required'],
-			['server_side:optional', 'server_side:unsupported'],
-		)
+		groups.push([
+			'environment:client_only',
+			'environment:client_only_server_optional',
+			'environment:client_or_server_prefers_both',
+			'environment:client_or_server',
+		])
 	} else if (server) {
-		groups.push(['server_side:optional', 'server_side:required'])
+		groups.push([
+			'environment:server_only',
+			'environment:dedicated_server_only',
+			'environment:server_only_client_optional',
+			'environment:client_or_server_prefers_both',
+			'environment:client_or_server',
+		])
 	}
 	return groups
 }

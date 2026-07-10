@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT id\n\t\tFROM instance_files\n\t\tWHERE instance_id = ? AND relative_path = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b4885df7ebd5300533179c0ed98cbca8ca982489597f413638c6af8ccbbe2bfa"
+}

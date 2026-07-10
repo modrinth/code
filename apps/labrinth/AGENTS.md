@@ -25,6 +25,7 @@
   - `Modrinth-Admin: feedbeef` as admin key
 - If some steps require you to create a project/mod or version for testing, ask the user to go into the web frontend and manually create a project/version
 - When using `sqlx::query` etc. always use the macro form like `sqlx::query!` or `sqlx::query_scalar!` - never the plain function form. Avoid using `query_as!`.
+- Do not use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `eyre::Report`.
 - Do not run `cargo test`, even for a single specific test, unless explicitly prompted to by the user, since it takes a long time to run.
 - You can force a search reindex by:
   - Running `cd apps/labrinth && cargo run -p labrinth -- --run-background-task index-search` (prefer this if backend is running locally)
@@ -32,3 +33,4 @@
 - To seed the database locally: `psql postgresql://labrinth:labrinth@localhost/labrinth -f apps/labrinth/fixtures/labrinth-seed-data-202508052143.sql`
 - When writing `sqlx` queries, prefer `r#` raw strings over escaping quotes
 - When interacting with the Postgres database, prefer using a `ro_pool: ReadOnlyPgPool` when performing read-only operations
+- After writing a SQL query, run `EXPLAIN ANALYZE` to see how long the query would take to run. Report to the user the estimated performance impact of the query.

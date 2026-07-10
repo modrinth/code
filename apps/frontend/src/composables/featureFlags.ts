@@ -21,6 +21,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	developerMode: false,
 	demoMode: false,
 	showVersionFilesInTable: false,
+	showVersionEnvironmentColumn: false,
 	showAdsWithPlus: false,
 	alwaysShowChecklistAsPopup: true,
 	testTaxForm: false,
@@ -57,6 +58,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showHostingAccessInstanceAuditLog: false,
 	versionDevInfoCollapsed: true,
 	alwaysShowVersionDevInfo: false,
+	advancedFiltersCollapsed: true,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

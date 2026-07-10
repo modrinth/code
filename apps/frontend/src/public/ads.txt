@@ -527,3 +527,14 @@ yahoo.com, 100033, DIRECT, e1a5b5b6e3255540
 #IndexExchange
 indexexchange.com, 184169, DIRECT, 50b1c356f2c5c8fc
 indexexchange.com, 198988, DIRECT, 50b1c356f2c5c8fc
+
+#AppNexus
+Xandr.com, 2398, DIRECT
+
+#Rubicon
+rubiconproject.com, 24584, DIRECT, 0bfd66d529a55807
+rubiconproject.com, 24586, DIRECT, 0bfd66d529a55807
+
+copper6.com, 916020, Reseller
+openx.com, 563905670, RESELLER, 6a698e2ec38604c6
+xandr.com, 16546, RESELLER

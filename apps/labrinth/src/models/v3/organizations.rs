@@ -4,7 +4,7 @@ use crate::models::ids::{OrganizationId, TeamId};
 use serde::{Deserialize, Serialize};
 
 /// An organization of users who control a project
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Organization {
     /// The id of the organization
     pub id: OrganizationId,

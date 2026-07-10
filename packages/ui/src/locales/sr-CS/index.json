@@ -1,2 +1,387 @@
-{}
+{
+  "action.no-permission": {
+    "defaultMessage": "Nemaš dozvolu."
+  },
+  "affiliate.create.button": {
+    "defaultMessage": "Kreiraj partnersku/sponzorisanu vezu"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "na primer Youtube"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Unesi korisničko ime..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Kreirano od {user}"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Pregled analitike"
+  },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Neuspeh sa učitavanjem podešavanja servera"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta izdanje"
+  },
+  "badge.new": {
+    "defaultMessage": "Novo"
+  },
+  "badge.release": {
+    "defaultMessage": "Izdati"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Otkaži"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} zajedničkih procesora"
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Greška sa ponovnom pretplatom, neuspeh sa učitavanjem detalja pretplate."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Greška"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Greška sa učitavanjem detalja pretplate."
+  },
+  "billing.resubscribe-modal.interval": {
+    "defaultMessage": "{intervalOption, select, fiveDays {/5 dana} monthly {/mesec} quarterly {/tromesečno} yearly {/godinu} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Tvoja sledeća naplata će biti u <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Plan"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB radne memorije"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Ponovno se pretplati"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB memorije"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Ponovna pretplata"
+  },
+  "browse.filter-results": {
+    "defaultMessage": "Filtriranje resultata..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Nema rezultata za tvoju potragu!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Traži {projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Izabrani projekti"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Instaliraj {count, plural, one {# projekat} other {# projekata}}"
+  },
+  "browse.selected-projects-floating-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# projekata izabran} other {# projekata izabranih}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-body": {
+    "defaultMessage": "Izabrali ste {count, plural, one {# projekat} other {# projekata}} za instalaciju. Instalirajte ih sada ili se bez instalacije vratite."
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Izabrani projekati još nisu instalirani"
+  },
+  "browse.selected-projects-leave-modal.discard": {
+    "defaultMessage": "Odbaci"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Izabrani projekati još nisu instalirani"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Pogled:"
+  },
+  "button.accept": {
+    "defaultMessage": "Prihvati"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Dodaj server instanci"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Partnerski/sponzorisani linkovi"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analitike"
+  },
+  "button.back": {
+    "defaultMessage": "Nazad"
+  },
+  "button.cancel": {
+    "defaultMessage": "Odustaj"
+  },
+  "button.change-version": {
+    "defaultMessage": "Promeni verziju"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Kreiraj projekat"
+  },
+  "content-type.content.lowercase": {
+    "defaultMessage": "sadržaji"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {sadržaj} other {sadržaji}}"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Izaberi {project}"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Jesi li siguran da želiš ažuirati {count, plural, one {# projekat} few {# projekta} other {# projekata}} na najnoviju verziju? Preporučeno je ažuirati sadržaje jedan po jedan."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Upozorenje ažuiranja"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Ažuiranje projekata"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Drži Shift dok klikneš \"Ažuiraj sve\" da preskočiš ovu potvrdu u budučnosti."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Ažuirajte {count, plural, one {# projekat} few {# projekta} other {# projekata}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Brisanje moda može trajno promeniti tvoj svet i može dovesti do nestanka sadržaja ili neočekivanih problema kada ga ponovo pokreneš."
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Izbriši {itemType}"
+  },
+  "external-files.permissions-card.reason.globally-allowed.description": {
+    "defaultMessage": "Već smo videli ovu datoteku i pripremili smo vam navođenje izvora. Ako ti se čini da nešto nije u redu, kontaktiraj podršku Modrintha putem centra za pomoć"
+  },
+  "external-files.permissions-card.reason.my-project.proof-images-description": {
+    "defaultMessage": "Postavi datoteke koje pomažu da se potvrdi da si ti kreirao ovaj rad."
+  },
+  "hosting.content.failed-to-load-versions": {
+    "defaultMessage": "Greška sa učitavanjem verzija"
+  },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Greška sa brisanjem sadržaja"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Greška sa preklapanjem {name}"
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Greška sa uklanjanjem veze od modpacka"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Preopterećenje procesora omogućava vašem serveru da privremeno koristi dodatne procesorske niti kako bi ublažio skokove TPS-a. Klikni za više informacija."
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Promena na verziju {gameVersion} če modificirati sledeče sadržaje na tvom serveru."
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Kod promene verzije igre, možemo ili isključiti nekompatibilni instalirani sadržaj ili pokušati rešiti nekompatibilnosti."
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Kod promene učitavača, sav instalirani sadržaj će biti isključen. U mestu toga preporučujemo resetiranje servera."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Promena učitavača je destruktivno"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Kreirano {ago}"
+  },
+  "label.played": {
+    "defaultMessage": "Igrano {ago}"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Engleski (Sjedinjene Američke Države)"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Engleski"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Otključavanje ovog filtera može omogućiti instalaciju nekompatibilnog sadržaja."
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Učitavač"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Modificiran"
+  },
+  "servers.access-page.activity-log-filter.action-group.content": {
+    "defaultMessage": "Sadržaj i modpack"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Promenjen modpack"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-unlinked": {
+    "defaultMessage": "Nepovezani modpack"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Promenio/la modpack"
+  },
+  "servers.audit-log.event.modpack-unlinked": {
+    "defaultMessage": "Uklonio/la je vezu za modpak"
+  },
+  "servers.audit-log.event.modpack-unlinked-modpack": {
+    "defaultMessage": "Uklonio/la je vezu za modpak <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-unlinked-version": {
+    "defaultMessage": "Uklonio/la je modpack verziju <version></version>"
+  },
+  "servers.grant-access-modal.permissions-help": {
+    "defaultMessage": "Vidi punu listu dozvola za svaku ulogo <link>ovde</link>."
+  },
+  "servers.grant-access-modal.target.help": {
+    "defaultMessage": "Nekoristi njihovo/njeno Minecarft Ime."
+  },
+  "servers.installing-banner.phase.installing-modpack": {
+    "defaultMessage": "Instaliranje modpacka..."
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Idealno za 15-25 igrača, modpackove, ili velike modifikacije."
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Promena jezika {platform} može dovesti do toga da se neki sadržaj prikaže na engleskom jeziku ako prevod nije dostupan. {platform} još uvek nije u potpunosti prevedena, tako da neki sadržaj može ostati na engleskom jeziku za određene jezike."
+  },
+  "tag.category.custom-content": {
+    "defaultMessage": "Prilagođeni sadržaj"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Modpack"
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Imaš nesačuvane promene"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Napusti stranicu"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Ostani na stranici"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Napusti stranicu?"
+  },
+  "ui.stacked-admonitions.alert-count": {
+    "defaultMessage": "{count, plural, one {# uzbuna} few {# uzbune} other {# uzbuna}}"
+  },
+  "ui.stacked-admonitions.dismiss-all": {
+    "defaultMessage": "Odbaci sve"
+  },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "Ovaj koristnik je tu od Modrinth Alfa, koji je završio u novembru 2020."
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alfa tester"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "Ovaj koristnik je tu od Modrinth Beta, koji je završio u februaru 2022."
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "Klikni da pročitaš o pokretu Modrinth Bete."
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Beta tester"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "Projekti ovog koristnika su kolektivno sakupili {download_sum} preuzimanja."
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} preuzimanja"
+  },
+  "user.profile.badge.early-datapack-adopter.about.1": {
+    "defaultMessage": "Ovaj koristnik nam je pomogao sa testiranjem data packe na Modrinthu pre nego što smo ih lansirali u januaru 2023."
+  },
+  "user.profile.badge.early-modpack-adopter.about.1": {
+    "defaultMessage": "Ovaj koristnik nam je pomogao sa testiranjem modpacka na Modrinthu pre nego što smo ih lansirali u maju 2022."
+  },
+  "user.profile.badge.early-modpack-adopter.name": {
+    "defaultMessage": "Rani usvojitelj modpacka"
+  },
+  "user.profile.badge.early-plugin-adopter.about.1": {
+    "defaultMessage": "Ovaj koristnik nam je pomogao sa testiranjem projekate plugina na Modrinthu pre nego što smo ih lansirali u august 2022."
+  },
+  "user.profile.badge.early-resourcepack-adopter.about.1": {
+    "defaultMessage": "Ovaj koristnik nam je pomogao sa testiranjem resurs paketa na Modrinthu pre nego što smo ih lansirali u augustu 2022."
+  },
+  "user.profile.badge.early-server-adopter.about.1": {
+    "defaultMessage": "Ovaj koristnik nam je pomogao sa testiranjem projekate servera na Modrinthu pre nego što smo ih lansirali u martu 2026."
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "Ovaj koristnik nam je pomogao sa testiranjem shader packe na Modrinthu pre nego što smo ih lansirali u januaru 2023."
+  },
+  "user.profile.badge.moderator.about.1": {
+    "defaultMessage": "Ovaj koristnik radi za Modrinth kao moderator sadržaja."
+  },
+  "user.profile.badge.moderator.about.2": {
+    "defaultMessage": "Moderatori sadržaja na Modrinthu pregledaju projekate, obrađuju izveštaje, i pomože u održavanju bezbednosti Modrintha."
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "Moderator sadržaja"
+  },
+  "user.profile.badge.plus.about.1": {
+    "defaultMessage": "Ovaj korisnik se posebno trudi da podrži Modrinth i kreatore na platformi."
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Član od Modrinth+"
+  },
+  "user.profile.badge.pride.about.1": {
+    "defaultMessage": "Ovaj koristnik je učestvovao u barem jednoj od Modrinthovih akcija prikupljanja sredstava za LGBT+ zajednicu povodom ponosa."
+  },
+  "user.profile.badge.pride.link": {
+    "defaultMessage": "Klikni da posjetiš našu najnoviju akciju prikupljanja sredstava za ponos."
+  },
+  "user.profile.badge.pride.name": {
+    "defaultMessage": "Pristalica prikupljanja sredstava ponosa"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Ovaj korstnik radi za Modrinth."
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth tim"
+  },
+  "version.content.name": {
+    "defaultMessage": "Ime"
+  },
+  "version.content.version": {
+    "defaultMessage": "Verzija"
+  },
+  "version.section.content": {
+    "defaultMessage": "Sadržaji"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "Traži sadržaje..."
+  },
+  "version.section.files": {
+    "defaultMessage": "Datoteke"
+  },
+  "version.section.included-content": {
+    "defaultMessage": "Uključeni sadržaji"
+  },
+  "version.section.no-modpack-mod-loader": {
+    "defaultMessage": "Bez učitavača modova"
+  },
+  "version.section.optional-dependencies": {
+    "defaultMessage": "Opcionalne zavisnosti"
+  },
+  "version.section.required-content": {
+    "defaultMessage": "Potrebni sadržaji"
+  },
+  "version.section.supplementary-resources": {
+    "defaultMessage": "Dodatni resursi"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Datoteka"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Veličina"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Tip"
+  }
+}
 

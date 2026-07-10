@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BanIcon,
 	BugIcon,
+	CheckCheckIcon,
 	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
@@ -10,11 +12,11 @@ import {
 	CodeIcon,
 	CopyIcon,
 	DownloadIcon,
-	EllipsisVerticalIcon,
+	ExternalIcon,
 	EyeOffIcon,
-	LinkIcon,
 	LoaderCircleIcon,
 	ScaleIcon,
+	ShieldAlertIcon,
 	ShieldCheckIcon,
 	SpinnerIcon,
 	TimerIcon,
@@ -31,13 +33,13 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { NavTabs } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatProjectType,
@@ -46,7 +48,7 @@ import {
 	type User,
 } from '@modrinth/utils'
 import dayjs from 'dayjs'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
@@ -90,6 +92,7 @@ const props = defineProps<{
 		thread: Labrinth.TechReview.Internal.Thread
 		reports: FlattenedFileReport[]
 	}
+	focusedDetailId?: string | null
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
 }>()
@@ -111,51 +114,6 @@ const isProjectApproved = computed(() => {
 		projectStatus.value === 'unlisted' ||
 		projectStatus.value === 'private'
 	)
-})
-
-const quickActions = computed<OverflowMenuOption[]>(() => {
-	const actions: OverflowMenuOption[] = []
-
-	const sourceUrl = props.item.project.link_urls?.['source']?.url
-	if (sourceUrl) {
-		actions.push({
-			id: 'view-source',
-			action: () => {
-				window.open(sourceUrl, '_blank', 'noopener,noreferrer')
-			},
-		})
-	}
-
-	actions.push(
-		{
-			id: 'copy-link',
-			action: () => {
-				const base = window.location.origin
-				const reportUrl = `${base}/moderation/technical-review/${props.item.project.id}`
-				navigator.clipboard.writeText(reportUrl).then(() => {
-					addNotification({
-						type: 'success',
-						title: 'Technical Review link copied',
-						text: 'The link to this review has been copied to your clipboard.',
-					})
-				})
-			},
-		},
-		{
-			id: 'copy-id',
-			action: () => {
-				navigator.clipboard.writeText(props.item.project.id).then(() => {
-					addNotification({
-						type: 'success',
-						title: 'Project ID copied',
-						text: 'The ID of this project has been copied to your clipboard.',
-					})
-				})
-			},
-		},
-	)
-
-	return actions
 })
 
 const isLoadingStatusAction = ref(false)
@@ -193,6 +151,7 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	isLoadingStatusAction.value = true
 	try {
 		await client.labrinth.projects_v2.edit(props.item.project.id, { status })
+		emit('refetch')
 
 		projectStatus.value = status
 	} catch (err) {
@@ -237,7 +196,12 @@ watch(selectedFile, (newFile) => {
 
 const client = injectModrinthClient()
 
-async function updateIssueDetails(data: { detail_id: string; verdict: 'safe' | 'unsafe' }[]) {
+async function updateIssueDetails(
+	data: {
+		detail_id: string
+		verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+	}[],
+) {
 	await client.request('/moderation/tech-review/issue-detail', {
 		api: 'labrinth',
 		version: 'internal',
@@ -246,15 +210,31 @@ async function updateIssueDetails(data: { detail_id: string; verdict: 'safe' | '
 	})
 }
 
+async function updateGlobalIssueDetail(
+	detailKey: string,
+	verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+) {
+	await client.labrinth.tech_review_internal.updateGlobalIssueDetails([
+		{ detail_key: detailKey, verdict },
+	])
+}
+
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 
-type DetailDecision = 'safe' | 'malware'
+type DetailDecision = 'safe' | 'malware' | 'pending'
+type DetailDecisionScope = 'local' | 'global'
 
 const detailDecisions = reactive<Map<string, DetailDecision>>(new Map())
+const detailDecisionScopes = reactive<Map<string, DetailDecisionScope>>(new Map())
 const updatingDetails = reactive<Set<string>>(new Set())
+const updatingGlobalDetailKeys = reactive<Set<string>>(new Set())
 
-function verdictToDecision(verdict: 'safe' | 'unsafe'): DetailDecision {
-	return verdict === 'safe' ? 'safe' : 'malware'
+function verdictToDecision(
+	verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+): DetailDecision {
+	if (verdict === 'safe') return 'safe'
+	if (verdict === 'unsafe') return 'malware'
+	return 'pending'
 }
 
 function getAllDetails(): Labrinth.TechReview.Internal.ReportIssueDetail[] {
@@ -264,6 +244,7 @@ function getAllDetails(): Labrinth.TechReview.Internal.ReportIssueDetail[] {
 function applyDecisionToRelatedDetails(
 	detailIds: string[],
 	decision: DetailDecision,
+	scope: DetailDecisionScope,
 ): { otherMatchedCount: number } {
 	const allDetails = getAllDetails()
 	const selectedDetailIds = new Set(detailIds)
@@ -281,12 +262,14 @@ function applyDecisionToRelatedDetails(
 
 		if (matchingDetails.length === 0) {
 			detailDecisions.set(detailId, decision)
+			detailDecisionScopes.set(detailId, scope)
 			updatedDetailIds.add(detailId)
 			continue
 		}
 
 		for (const matchingDetail of matchingDetails) {
 			detailDecisions.set(matchingDetail.id, decision)
+			detailDecisionScopes.set(matchingDetail.id, scope)
 			updatedDetailIds.add(matchingDetail.id)
 		}
 	}
@@ -295,6 +278,98 @@ function applyDecisionToRelatedDetails(
 		otherMatchedCount: [...updatedDetailIds].filter((detailId) => !selectedDetailIds.has(detailId))
 			.length,
 	}
+}
+
+function statusMatchesDecision(
+	status: Labrinth.TechReview.Internal.DelphiReportIssueStatus | null,
+	decision: DetailDecision,
+): boolean {
+	if (status === 'safe') return decision === 'safe'
+	if (status === 'unsafe') return decision === 'malware'
+	return false
+}
+
+function isDetailActionSelected(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: DetailDecision,
+	scope: DetailDecisionScope,
+): boolean {
+	const localDecision = detailDecisions.get(detail.id)
+	const localScope = detailDecisionScopes.get(detail.id)
+	if (localDecision && localScope) {
+		if (localDecision === 'pending') {
+			if (localScope === 'local') {
+				if (scope === 'local') return false
+				return statusMatchesDecision(detail.global_status, decision)
+			}
+
+			if (scope === 'global') return false
+			return statusMatchesDecision(detail.local_status, decision)
+		}
+
+		return localDecision === decision && localScope === scope
+	}
+
+	if (scope === 'global') {
+		return statusMatchesDecision(detail.global_status, decision)
+	}
+
+	if (detail.global_status) {
+		return false
+	}
+
+	return statusMatchesDecision(detail.local_status, decision)
+}
+
+function decisionToVerdict(
+	decision: Exclude<DetailDecision, 'pending'>,
+): Labrinth.TechReview.Internal.DelphiReportIssueStatus {
+	return decision === 'safe' ? 'safe' : 'unsafe'
+}
+
+function getToggledDetailVerdict(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+	scope: DetailDecisionScope,
+): Labrinth.TechReview.Internal.DelphiReportIssueStatus {
+	return isDetailActionSelected(detail, decision, scope) ? 'pending' : decisionToVerdict(decision)
+}
+
+function getDetailActionTooltip(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+	scope: DetailDecisionScope,
+): string {
+	const action = decision === 'safe' ? 'pass' : 'fail'
+	const scopeLabel = scope === 'global' ? 'Global' : 'Local'
+
+	if (scope === 'global' && !canUpdateGlobalDetail(detail)) {
+		return 'Global verdict unavailable for generated trace keys'
+	}
+
+	if (isDetailActionSelected(detail, decision, scope)) {
+		return `Unset ${scopeLabel.toLowerCase()} ${action}`
+	}
+
+	return `${scopeLabel} ${action}`
+}
+
+function updateLocalDetailAction(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+) {
+	return updateDetailStatus(detail.id, getToggledDetailVerdict(detail, decision, 'local'))
+}
+
+function updateGlobalDetailAction(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	decision: Exclude<DetailDecision, 'pending'>,
+) {
+	return updateGlobalDetailStatus(detail, getToggledDetailVerdict(detail, decision, 'global'))
+}
+
+function canUpdateGlobalDetail(detail: Labrinth.TechReview.Internal.ReportIssueDetail): boolean {
+	return detail.key.length > 0 && !detail.key.startsWith('<no-key-')
 }
 
 function getFileHighestSeverity(
@@ -426,6 +501,49 @@ function viewFileFlags(file: FlattenedFileReport) {
 	currentTab.value = 'File'
 }
 
+function getDetailElementId(detailId: string) {
+	return `tech-review-detail-${detailId}`
+}
+
+function findFileForDetail(detailId: string): FlattenedFileReport | null {
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			if (issue.details.some((detail) => detail.id === detailId)) {
+				return report
+			}
+		}
+	}
+
+	return null
+}
+
+async function focusDetail(detailId: string) {
+	const file = findFileForDetail(detailId)
+	if (!file) return
+
+	viewFileFlags(file)
+	await nextTick()
+
+	const classItem = groupedByClass.value.find((group) =>
+		group.flags.some((flag) => flag.detail.id === detailId),
+	)
+
+	if (classItem) {
+		expandClass(classItem)
+	}
+
+	await nextTick()
+
+	if (!import.meta.client) return
+
+	window.requestAnimationFrame(() => {
+		document.getElementById(getDetailElementId(detailId))?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center',
+		})
+	})
+}
+
 function backToFileList() {
 	selectedFileId.value = null
 	if (currentTab.value === 'File') {
@@ -491,6 +609,18 @@ const remainingUnmarkedCount = computed(() => {
 	return getFileDetailCount(selectedFile.value) - getFileMarkedCount(selectedFile.value)
 })
 
+function getJarFlags(jarGroup: JarGroup): ClassGroup['flags'] {
+	return jarGroup.classes.flatMap((classItem) => classItem.flags)
+}
+
+function getJarMarkedCount(jarGroup: JarGroup): number {
+	return getMarkedFlagsCount(getJarFlags(jarGroup))
+}
+
+function getJarRemainingUnmarkedCount(jarGroup: JarGroup): number {
+	return getJarFlags(jarGroup).length - getJarMarkedCount(jarGroup)
+}
+
 const isBatchUpdating = ref(false)
 
 async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
@@ -514,7 +644,7 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 	try {
 		await updateIssueDetails(detailIds.map((detailId) => ({ detail_id: detailId, verdict })))
 
-		applyDecisionToRelatedDetails(detailIds, verdictToDecision(verdict))
+		applyDecisionToRelatedDetails(detailIds, verdictToDecision(verdict), 'local')
 
 		addNotification({
 			type: 'success',
@@ -544,7 +674,54 @@ async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 	}
 }
 
-async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
+async function batchMarkRemainingInJar(jarGroup: JarGroup, verdict: 'safe' | 'unsafe') {
+	if (isBatchUpdating.value) return
+
+	const detailIds = getJarFlags(jarGroup)
+		.filter((flag) => getDetailDecision(flag.detail.id, flag.detail.status) === 'pending')
+		.map((flag) => flag.detail.id)
+
+	if (detailIds.length === 0) return
+
+	isBatchUpdating.value = true
+	try {
+		await updateIssueDetails(detailIds.map((detailId) => ({ detail_id: detailId, verdict })))
+
+		applyDecisionToRelatedDetails(detailIds, verdictToDecision(verdict), 'local')
+
+		addNotification({
+			type: 'success',
+			title: `Marked ${detailIds.length} traces as ${verdict}`,
+			text: `All remaining traces in this JAR have been marked as ${
+				verdict === 'safe' ? 'false positives' : 'malicious'
+			}.`,
+		})
+
+		if (selectedFile.value) {
+			const markedCount = getFileMarkedCount(selectedFile.value)
+			const totalCount = getFileDetailCount(selectedFile.value)
+			if (markedCount === totalCount) {
+				backToFileList()
+			}
+		}
+
+		emit('refetch')
+	} catch (error) {
+		console.error('Failed to batch update JAR traces:', error)
+		addNotification({
+			type: 'error',
+			title: 'Batch update failed',
+			text: 'An error occurred while updating JAR traces.',
+		})
+	} finally {
+		isBatchUpdating.value = false
+	}
+}
+
+async function updateDetailStatus(
+	detailId: string,
+	verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+) {
 	let priorDecision: 'safe' | 'malware' | 'pending' = 'pending'
 	outer: for (const report of props.item.reports) {
 		for (const issue of report.issues) {
@@ -564,10 +741,11 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 		const { otherMatchedCount } = applyDecisionToRelatedDetails(
 			[detailId],
 			verdictToDecision(verdict),
+			'local',
 		)
 
 		// Only collapse if the prior state was 'pending' (new decision, not updating existing)
-		if (priorDecision === 'pending') {
+		if (verdict !== 'pending' && priorDecision === 'pending') {
 			for (const classGroup of groupedByClass.value) {
 				const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
 				if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
@@ -578,7 +756,7 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 		}
 
 		// Jump back to Files tab when all flags in the current file are marked
-		if (selectedFile.value) {
+		if (verdict !== 'pending' && selectedFile.value) {
 			const markedCount = getFileMarkedCount(selectedFile.value)
 			const totalCount = getFileDetailCount(selectedFile.value)
 			if (markedCount === totalCount) {
@@ -591,7 +769,13 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
 				: ''
 
-		if (verdict === 'safe') {
+		if (verdict === 'pending') {
+			addNotification({
+				type: 'success',
+				title: 'Local trace verdict unset',
+				text: `The project-local verdict has been removed.${otherText}`,
+			})
+		} else if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as pass',
@@ -615,6 +799,82 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 		})
 	} finally {
 		updatingDetails.delete(detailId)
+	}
+}
+
+async function updateGlobalDetailStatus(
+	detail: Labrinth.TechReview.Internal.ReportIssueDetail,
+	verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+) {
+	if (!canUpdateGlobalDetail(detail)) {
+		addNotification({
+			type: 'error',
+			title: 'Global update unavailable',
+			text: 'Generated trace keys cannot be marked globally.',
+		})
+		return
+	}
+
+	updatingGlobalDetailKeys.add(detail.key)
+
+	try {
+		await updateGlobalIssueDetail(detail.key, verdict)
+
+		const { otherMatchedCount } = applyDecisionToRelatedDetails(
+			[detail.id],
+			verdictToDecision(verdict),
+			'global',
+		)
+
+		if (verdict !== 'pending') {
+			for (const classGroup of groupedByClass.value) {
+				if (getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
+					expandedClasses.delete(classGroup.key)
+				}
+			}
+		}
+
+		if (verdict !== 'pending' && selectedFile.value) {
+			const markedCount = getFileMarkedCount(selectedFile.value)
+			const totalCount = getFileDetailCount(selectedFile.value)
+			if (markedCount === totalCount) {
+				backToFileList()
+			}
+		}
+
+		const otherText =
+			otherMatchedCount > 0
+				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked in this project)`
+				: ''
+
+		if (verdict === 'pending') {
+			addNotification({
+				type: 'success',
+				title: 'Global trace verdict unset',
+				text: `The global verdict for this trace key has been removed.${otherText}`,
+			})
+		} else {
+			addNotification({
+				type: 'success',
+				title:
+					verdict === 'safe' ? 'Trace globally marked as pass' : 'Trace globally marked as fail',
+				text:
+					verdict === 'safe'
+						? `This trace key has been marked as a global false positive.${otherText}`
+						: `This trace key has been globally flagged as malicious.${otherText}`,
+			})
+		}
+
+		emit('refetch')
+	} catch (error) {
+		console.error('Failed to update global detail status:', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to update global trace',
+			text: 'An error occurred while updating the global trace status.',
+		})
+	} finally {
+		updatingGlobalDetailKeys.delete(detail.key)
 	}
 }
 
@@ -735,6 +995,16 @@ const groupedByJar = computed<JarGroup[]>(() => {
 		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
 	})
 })
+
+watch(
+	() => props.focusedDetailId,
+	(detailId) => {
+		if (detailId) {
+			focusDetail(detailId)
+		}
+	},
+	{ immediate: true },
+)
 
 // Auto-expand/load source for small files; keep larger files lazy.
 watch(
@@ -1019,6 +1289,16 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 		}
 	}
 }
+
+function copyId() {
+	navigator.clipboard.writeText(props.item.project.id).then(() => {
+		addNotification({
+			type: 'success',
+			title: 'Project ID copied',
+			text: 'The ID of this project has been copied to your clipboard.',
+		})
+	})
+}
 </script>
 
 <template>
@@ -1104,25 +1384,31 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
-					<ButtonStyled circular>
-						<OverflowMenu :options="quickActions" class="!shadow-none">
-							<template #default>
-								<EllipsisVerticalIcon class="size-4" />
-							</template>
-							<template #copy-id>
-								<ClipboardCopyIcon />
-								<span class="hidden sm:inline">Copy ID</span>
-							</template>
-							<template #copy-link>
-								<LinkIcon />
-								<span class="hidden sm:inline">Copy link</span>
-							</template>
-							<template #view-source>
+					<div class="flex items-center gap-2">
+						<ButtonStyled v-if="props.item.project.link_urls?.['source']?.url" circular>
+							<a
+								v-tooltip="'Open sources in new tab'"
+								:href="props.item.project.link_urls?.['source']?.url"
+								target="_blank"
+							>
 								<CodeIcon />
-								<span class="hidden sm:inline">View source</span>
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
+							</a>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<button v-tooltip="'Copy ID'" @click="copyId">
+								<ClipboardCopyIcon />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<a
+								v-tooltip="'Open in new tab'"
+								:href="`/moderation/technical-review/${props.item.project.id}`"
+								target="_blank"
+							>
+								<ExternalIcon />
+							</a>
+						</ButtonStyled>
+					</div>
 				</div>
 			</div>
 
@@ -1206,7 +1492,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									</OverflowMenu>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug Summary</button>
+									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug</button>
 								</ButtonStyled>
 							</template>
 						</ThreadView>
@@ -1322,26 +1608,49 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						v-if="jarGroup.segments.length > 0"
 						class="border-b border-solid border-surface-1 px-4 py-3"
 					>
-						<div class="flex flex-wrap items-center gap-1">
-							<template
-								v-for="(segment, index) in jarGroup.segments"
-								:key="`${jarGroup.key}-${index}`"
-							>
-								<span
-									class="font-mono text-sm"
-									:class="
-										index === jarGroup.segments.length - 1
-											? 'font-semibold text-contrast'
-											: 'text-secondary'
-									"
+						<div class="flex flex-wrap items-center justify-between gap-3">
+							<div class="flex flex-wrap items-center gap-1">
+								<template
+									v-for="(segment, index) in jarGroup.segments"
+									:key="`${jarGroup.key}-${index}`"
 								>
-									{{ segment }}
-								</span>
-								<ChevronRightIcon
-									v-if="index < jarGroup.segments.length - 1"
-									class="size-4 text-secondary"
-								/>
-							</template>
+									<span
+										class="font-mono text-sm"
+										:class="
+											index === jarGroup.segments.length - 1
+												? 'font-semibold text-contrast'
+												: 'text-secondary'
+										"
+									>
+										{{ segment }}
+									</span>
+									<ChevronRightIcon
+										v-if="index < jarGroup.segments.length - 1"
+										class="size-4 text-secondary"
+									/>
+								</template>
+							</div>
+
+							<div v-if="getJarRemainingUnmarkedCount(jarGroup) > 0" class="flex gap-2">
+								<ButtonStyled color="brand" size="small">
+									<button
+										:disabled="isBatchUpdating"
+										@click="batchMarkRemainingInJar(jarGroup, 'safe')"
+									>
+										<CheckCircleIcon class="size-4" />
+										Remaining safe ({{ getJarRemainingUnmarkedCount(jarGroup) }})
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="red" size="small">
+									<button
+										:disabled="isBatchUpdating"
+										@click="batchMarkRemainingInJar(jarGroup, 'unsafe')"
+									>
+										<TriangleAlertIcon class="size-4" />
+										Remaining malware ({{ getJarRemainingUnmarkedCount(jarGroup) }})
+									</button>
+								</ButtonStyled>
+							</div>
 						</div>
 					</div>
 
@@ -1413,8 +1722,12 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							>
 								<div
 									v-for="flag in classItem.flags"
+									:id="getDetailElementId(flag.detail.id)"
 									:key="`${flag.issueId}-${flag.detail.id}`"
 									class="flex flex-col gap-2 rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
+									:class="{
+										'!border-brand bg-brand-highlight': props.focusedDetailId === flag.detail.id,
+									}"
 								>
 									<div class="grid grid-cols-[1fr_auto] items-center">
 										<div
@@ -1436,38 +1749,94 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 											</div>
 										</div>
 
-										<div class="flex w-40 items-center justify-center gap-2">
-											<ButtonStyled
-												color="brand"
-												:type="
-													getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
-														? undefined
-														: 'outlined'
-												"
+										<div class="detail-verdict-action-groups">
+											<div
+												class="detail-verdict-buttons"
+												role="group"
+												aria-label="Trace verdict actions"
 											>
 												<button
-													:disabled="updatingDetails.has(flag.detail.id)"
-													@click="updateDetailStatus(flag.detail.id, 'safe')"
+													v-tooltip="getDetailActionTooltip(flag.detail, 'safe', 'global')"
+													class="detail-verdict-button detail-verdict-button--safe"
+													:class="{
+														'detail-verdict-button--selected': isDetailActionSelected(
+															flag.detail,
+															'safe',
+															'global',
+														),
+													}"
+													aria-label="Global pass"
+													:disabled="
+														!canUpdateGlobalDetail(flag.detail) ||
+														updatingGlobalDetailKeys.has(flag.detail.key) ||
+														updatingDetails.has(flag.detail.id)
+													"
+													@click="updateGlobalDetailAction(flag.detail, 'safe')"
 												>
-													Pass
+													<CheckCheckIcon aria-hidden="true" />
 												</button>
-											</ButtonStyled>
 
-											<ButtonStyled
-												color="red"
-												:type="
-													getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
-														? undefined
-														: 'outlined'
-												"
-											>
 												<button
-													:disabled="updatingDetails.has(flag.detail.id)"
-													@click="updateDetailStatus(flag.detail.id, 'unsafe')"
+													v-tooltip="getDetailActionTooltip(flag.detail, 'safe', 'local')"
+													class="detail-verdict-button detail-verdict-button--safe"
+													:class="{
+														'detail-verdict-button--selected': isDetailActionSelected(
+															flag.detail,
+															'safe',
+															'local',
+														),
+													}"
+													aria-label="Local pass"
+													:disabled="
+														updatingDetails.has(flag.detail.id) ||
+														updatingGlobalDetailKeys.has(flag.detail.key)
+													"
+													@click="updateLocalDetailAction(flag.detail, 'safe')"
 												>
-													Fail
+													<CheckIcon aria-hidden="true" />
 												</button>
-											</ButtonStyled>
+
+												<button
+													v-tooltip="getDetailActionTooltip(flag.detail, 'malware', 'local')"
+													class="detail-verdict-button detail-verdict-button--unsafe"
+													:class="{
+														'detail-verdict-button--selected': isDetailActionSelected(
+															flag.detail,
+															'malware',
+															'local',
+														),
+													}"
+													aria-label="Local fail"
+													:disabled="
+														updatingDetails.has(flag.detail.id) ||
+														updatingGlobalDetailKeys.has(flag.detail.key)
+													"
+													@click="updateLocalDetailAction(flag.detail, 'malware')"
+												>
+													<BanIcon aria-hidden="true" />
+												</button>
+
+												<button
+													v-tooltip="getDetailActionTooltip(flag.detail, 'malware', 'global')"
+													class="detail-verdict-button detail-verdict-button--unsafe"
+													:class="{
+														'detail-verdict-button--selected': isDetailActionSelected(
+															flag.detail,
+															'malware',
+															'global',
+														),
+													}"
+													aria-label="Global fail"
+													:disabled="
+														!canUpdateGlobalDetail(flag.detail) ||
+														updatingGlobalDetailKeys.has(flag.detail.key) ||
+														updatingDetails.has(flag.detail.id)
+													"
+													@click="updateGlobalDetailAction(flag.detail, 'malware')"
+												>
+													<ShieldAlertIcon aria-hidden="true" />
+												</button>
+											</div>
 										</div>
 									</div>
 									<div
@@ -1574,5 +1943,91 @@ pre {
 .fade-enter-from,
 .fade-leave-to {
 	opacity: 0;
+}
+
+.detail-verdict-action-groups {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	margin-inline-end: 0.5rem;
+}
+
+.detail-verdict-buttons {
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+	border: 1px solid var(--surface-5);
+	border-radius: var(--radius-md);
+	background: var(--surface-3);
+}
+
+.detail-verdict-button {
+	display: flex;
+	width: 2rem;
+	height: 2rem;
+	align-items: center;
+	justify-content: center;
+	border: 0;
+	border-left: 1px solid var(--surface-5);
+	background: transparent;
+	padding: 0;
+	cursor: pointer;
+	transition:
+		background-color 0.15s ease-in-out,
+		filter 0.15s ease-in-out;
+}
+
+.detail-verdict-button:first-child {
+	border-left: 0;
+	border-start-start-radius: calc(var(--radius-md) - 1px);
+	border-end-start-radius: calc(var(--radius-md) - 1px);
+}
+
+.detail-verdict-button:last-child {
+	border-start-end-radius: calc(var(--radius-md) - 1px);
+	border-end-end-radius: calc(var(--radius-md) - 1px);
+}
+
+.detail-verdict-button:hover,
+.detail-verdict-button:focus-visible {
+	background: var(--surface-4);
+}
+
+.detail-verdict-button--selected {
+	background: var(--color-green-bg);
+	box-shadow: inset 0 0 0 1px var(--color-green);
+}
+
+.detail-verdict-button--selected:hover,
+.detail-verdict-button--selected:focus-visible {
+	background: var(--color-green-bg);
+}
+
+.detail-verdict-button:focus-visible {
+	outline: none;
+	box-shadow: inset 0 0 0 2px var(--color-brand);
+}
+
+.detail-verdict-button--selected:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--color-green);
+}
+
+.detail-verdict-button:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.detail-verdict-button svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+.detail-verdict-button--safe {
+	color: var(--color-green);
+}
+
+.detail-verdict-button--unsafe {
+	color: var(--color-red);
 }
 </style>

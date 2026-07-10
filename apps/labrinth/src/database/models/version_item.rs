@@ -25,16 +25,33 @@ use tracing::error;
 pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
 
-pub async fn cleanup_empty_attribution_groups(
+pub async fn cleanup_unused_attribution_files_and_groups(
     transaction: &mut PgTransaction<'_>,
 ) -> Result<(), DatabaseError> {
+    sqlx::query!(
+        "
+        DELETE FROM project_attribution_files paf
+        USING project_attribution_groups pag
+        WHERE pag.id = paf.group_id
+            AND NOT EXISTS (
+            SELECT 1
+            FROM override_file_sources ofs
+            INNER JOIN files f ON f.id = ofs.file_id
+            INNER JOIN versions v ON v.id = f.version_id
+            WHERE ofs.sha1 = paf.sha1
+                AND v.mod_id = pag.project_id
+        )
+        ",
+    )
+    .execute(&mut *transaction)
+    .await?;
+
     sqlx::query!(
         "
         DELETE FROM project_attribution_groups g
         WHERE NOT EXISTS (
             SELECT 1
             FROM project_attribution_files paf
-            INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1
             WHERE paf.group_id = g.id
         )
         ",
@@ -493,7 +510,7 @@ impl DBVersion {
         .execute(&mut *transaction)
         .await?;
 
-        cleanup_empty_attribution_groups(transaction).await?;
+        cleanup_unused_attribution_files_and_groups(transaction).await?;
 
         // Sync dependencies
 

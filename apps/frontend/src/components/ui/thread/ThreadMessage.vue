@@ -54,15 +54,21 @@
 				class="message__icon backed-svg circle moderation-color"
 				:class="{
 					raised: raised,
-					'system-message-icon': ['tech_review_entered', 'tech_review_exit_file_deleted'].includes(
-						message.body.type,
-					),
+					'system-message-icon': [
+						'tech_review_entered',
+						'tech_review_exited',
+						'tech_review_exit_file_deleted',
+					].includes(message.body.type),
 				}"
 			>
 				<ScaleIcon />
 			</div>
 			<span
-				v-if="!['tech_review_entered', 'tech_review_exit_file_deleted'].includes(message.body.type)"
+				v-if="
+					!['tech_review_entered', 'tech_review_exited', 'tech_review_exit_file_deleted'].includes(
+						message.body.type,
+					)
+				"
 				class="message__author moderation-color"
 			>
 				Moderator
@@ -99,6 +105,9 @@
 			</span>
 			<span v-else-if="message.body.type === 'tech_review_entered'">
 				The project has entered the technical review queue.
+			</span>
+			<span v-else-if="message.body.type === 'tech_review_exited'">
+				The project has left the technical review queue as all pending traces have been resolved.
 			</span>
 			<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
 				The project has left the technical review queue as all files pending review were deleted by
@@ -214,9 +223,12 @@ const timeSincePosted = ref(formatRelativeTime(props.message.created))
 const isPrivateMessage = computed(() => {
 	return (
 		props.message.body.private ||
-		['tech_review', 'tech_review_entered', 'tech_review_exit_file_deleted'].includes(
-			props.message.body.type,
-		)
+		[
+			'tech_review',
+			'tech_review_entered',
+			'tech_review_exited',
+			'tech_review_exit_file_deleted',
+		].includes(props.message.body.type)
 	)
 })
 

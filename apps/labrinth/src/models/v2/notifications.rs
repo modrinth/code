@@ -1,3 +1,5 @@
+#![allow(clippy::large_stack_arrays)]
+
 use crate::models::ids::{ThreadMessageId, VersionId};
 use crate::models::v3::billing::PriceDuration;
 use crate::models::{
@@ -13,7 +15,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LegacyNotification {
     pub id: NotificationId,
     pub user_id: UserId,
@@ -30,14 +32,14 @@ pub struct LegacyNotification {
     pub actions: Vec<LegacyNotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct LegacyNotificationAction {
     pub title: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
     pub action_route: (String, String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
     TaxNotification {
@@ -72,6 +74,12 @@ pub enum LegacyNotificationBody {
         server_name: String,
         invited_by: UserId,
         role: String,
+    },
+    SharedInstanceInvite {
+        shared_instance_id: String,
+        shared_instance_name: String,
+        shared_instance_icon: Option<String>,
+        invited_by: UserId,
     },
     StatusChange {
         project_id: ProjectId,
@@ -176,6 +184,9 @@ impl LegacyNotification {
             }
             NotificationBody::ServerInvite { .. } => {
                 Some("server_invite".to_string())
+            }
+            NotificationBody::SharedInstanceInvite { .. } => {
+                Some("shared_instance_invite".to_string())
             }
             NotificationBody::StatusChange { .. } => {
                 Some("status_change".to_string())
@@ -293,6 +304,17 @@ impl LegacyNotification {
                 server_name,
                 invited_by,
                 role,
+            },
+            NotificationBody::SharedInstanceInvite {
+                shared_instance_id,
+                shared_instance_name,
+                shared_instance_icon,
+                invited_by,
+            } => LegacyNotificationBody::SharedInstanceInvite {
+                shared_instance_id,
+                shared_instance_name,
+                shared_instance_icon,
+                invited_by,
             },
             NotificationBody::StatusChange {
                 project_id,

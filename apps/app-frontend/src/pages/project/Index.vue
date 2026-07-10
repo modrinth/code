@@ -116,13 +116,27 @@
 								aria-label="More options"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #open-in-browser>
+									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+								</template>
 								<template #report> <ReportIcon /> Report </template>
 							</OverflowMenu>
 						</ButtonStyled>
 					</template>
 					<template v-else #actions>
-						<ButtonStyled size="large" color="brand">
+						<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
+							<button v-tooltip="installButtonTooltip" disabled>
+								<CheckIcon />
+								{{ formatMessage(commonMessages.installedLabel) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else-if="showSwitchVersion" size="large">
+							<button @click="goToVersions">
+								<SwapIcon />
+								{{ formatMessage(messages.switchVersion) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else size="large" color="brand">
 							<button
 								v-tooltip="installButtonTooltip"
 								:disabled="installButtonDisabled"
@@ -171,7 +185,9 @@
 								aria-label="More options"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+								<template #open-in-browser>
+									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+								</template>
 								<template #follow> <HeartIcon /> Follow </template>
 								<template #save> <BookmarkIcon /> Save </template>
 								<template #report> <ReportIcon /> Report </template>
@@ -286,6 +302,7 @@ import {
 	SelectedProjectsFloatingBar,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
@@ -293,8 +310,13 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { SwapIcon } from '@/assets/icons/index.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import {
 	get_organization,
 	get_project,
@@ -304,21 +326,20 @@ import {
 	get_version_many,
 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
-import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
 	get_projects as getInstanceProjects,
 	kill,
 	list as listInstances,
-} from '@/helpers/profile'
+} from '@/helpers/instance'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
+import { getServerAddress } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -327,6 +348,7 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
@@ -343,6 +365,10 @@ const messages = defineMessages({
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
 		defaultMessage: 'This project is already installed',
+	},
+	switchVersion: {
+		id: 'app.project.install-button.switch-version',
+		defaultMessage: 'Switch version',
 	},
 })
 
@@ -515,6 +541,13 @@ const installButtonTooltip = computed(() => {
 	return null
 })
 
+const showSwitchVersion = computed(() => !!instance.value && installed.value)
+const onVersionsPage = computed(() => route.name === 'Versions')
+
+function goToVersions() {
+	router.push(versionsHref.value)
+}
+
 const [allLoaders, allGameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),
 	get_game_versions().catch(handleError).then(ref),
@@ -529,10 +562,10 @@ async function handleClickPlay() {
 async function updateServerPlayState() {
 	if (!isServerProject.value || !data.value) return
 	const packs = await listInstances()
-	const inst = packs.find((p) => p.linked_data?.project_id === data.value.id)
+	const inst = packs.find((p) => p.link?.project_id === data.value.id)
 	if (inst) {
-		serverInstancePath.value = inst.path
-		const processes = await get_by_profile_path(inst.path).catch(() => [])
+		serverInstancePath.value = inst.id
+		const processes = await get_by_instance_id(inst.id).catch(() => [])
 		serverPlaying.value = Array.isArray(processes) && processes.length > 0
 	} else {
 		serverInstancePath.value = null
@@ -601,10 +634,19 @@ async function fetchProjectData() {
 function fetchDeferredServerData(project) {
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	if (serverAddress) {
-		serverPing.value = undefined
-		getServerLatency(serverAddress)
-			.then((latency) => {
-				serverPing.value = latency
+		const cachedStatus = getFreshCachedServerStatus(queryClient, serverAddress)
+		if (cachedStatus) {
+			serverPing.value = cachedStatus.ping
+			serverStatusOnline.value = true
+		} else {
+			serverPing.value = undefined
+		}
+
+		fetchCachedServerStatus(queryClient, serverAddress)
+			.then((status) => {
+				if (projectV3.value?.minecraft_java_server?.address !== serverAddress) return
+				serverPing.value = status.ping
+				serverStatusOnline.value = true
 			})
 			.catch((error) => {
 				console.error(`Failed to ping server ${serverAddress}:`, error)
@@ -662,7 +704,7 @@ process_listener((e) => {
 	if (
 		e.event === 'finished' &&
 		serverInstancePath.value &&
-		e.profile_path_id === serverInstancePath.value
+		e.instance_id === serverInstancePath.value
 	) {
 		serverPlaying.value = false
 	}
@@ -737,7 +779,7 @@ async function install(version) {
 	await installVersion(
 		data.value.id,
 		version,
-		instance.value ? instance.value.path : null,
+		instance.value ? instance.value.id : null,
 		'ProjectPage',
 		(version, installedProjectIds) => {
 			installing.value = false

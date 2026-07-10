@@ -71,9 +71,6 @@
   "button.refresh": {
     "defaultMessage": "รีเฟรช"
   },
-  "button.remove": {
-    "defaultMessage": "ลบ"
-  },
   "button.remove-image": {
     "defaultMessage": "ลบรูป"
   },

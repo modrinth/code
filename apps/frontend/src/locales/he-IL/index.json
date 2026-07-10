@@ -254,50 +254,20 @@
   "auth.reset-password.title.long": {
     "message": "הפס סיסמתכם"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "כתבו את הקוד אימות דו-שלבי שלכם כדי להמשיך."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "כתבו את האימות דו-שלבי"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "כתבו קוד..."
-  },
-  "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>שככו את הסיסמה?</forgot-password-link>\n<create-account-link>ליצור חשבון</create-account-link>"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "הכנס אם"
   },
   "auth.sign-in.title": {
     "message": "הכנס"
   },
-  "auth.sign-in.use-password": {
-    "message": "או להשתמש בסיסמה"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "ליצור חשבון"
-  },
   "auth.sign-up.legal-dislaimer": {
     "message": "כליצור את החשבון, אתם מסכימים ל<terms-link>תנאים</terms-link> ו<privacy-policy-link>מדיניות פרטיות</privacy-policy-link> של Modrinth."
-  },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "סיסמאות לא תואמות!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "כבר יש לכם חשבון?"
   },
-  "auth.sign-up.subscribe.label": {
-    "message": "להרשם לעדכונים על Modrinth"
-  },
   "auth.sign-up.title": {
     "message": "הרשם"
-  },
-  "auth.sign-up.title.create-account": {
-    "message": "או עצרו חשבון בעצמכם"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "הרשם אם"
   },
   "auth.verify-email.action.account-settings": {
     "message": "הגדרות חשבון"
@@ -328,21 +298,6 @@
   },
   "auth.verify-email.title": {
     "message": "אמת אימייל"
-  },
-  "auth.welcome.checkbox.subscribe": {
-    "message": "הירשם לעדכונים על Modrinth"
-  },
-  "auth.welcome.description": {
-    "message": "אתה עכשיו חלק מהקהילה המדהימה של יוצרים ומשתמשים שכבר בונים, מורידים ומתעדכנים עם מודים מגניבים."
-  },
-  "auth.welcome.label.tos": {
-    "message": "ע\"י יצירת חשבון, אתה הסכמת ל<terms-link>תנאים</terms-link> של מודרינפ ו<privacy-policy-link>מדיניות הפרטיות</privacy-policy-link>."
-  },
-  "auth.welcome.long-title": {
-    "message": "ברוכים הבאים ל-Modrinth!"
-  },
-  "auth.welcome.title": {
-    "message": "ברוכים הבאים"
   },
   "collection.button.edit-icon": {
     "message": "ערוך סמל"
@@ -2072,43 +2027,16 @@
   "project.details.licensed": {
     "message": "ברישיון"
   },
-  "project.download.game-version": {
-    "message": "גרסת המשחק: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "שגיאה: לא נמצאו גרסאות משחק"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} זמין עבור {version} בלבד"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{gameVersion} עבור {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "התקן באמצעות Modrinth App"
-  },
   "project.download.no-app": {
     "message": "אין לכם את אפליקציית Modrinth?"
-  },
-  "project.download.no-versions-available": {
-    "message": "אין גרסאות זמינות עבור {gameVersion} ו-{platform}."
-  },
-  "project.download.platform": {
-    "message": "פלטפורמה: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "שגיאה: לא נמצאו פלטפורמות"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} זמין עבור {platform} בלבד"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{platform} עבור {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "חיפוש גרסאות משחק..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "חיפוש גרסאות משחק..."
   },
   "project.download.select-game-version": {

@@ -140,9 +140,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "התקן מחדש חבילת מודים"
   },
-  "button.remove": {
-    "defaultMessage": "מחק"
-  },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
   },

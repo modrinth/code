@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{routes::v2_reroute, search::ResultSearchProject};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, utoipa::ToSchema)]
 pub struct LegacySearchResults {
     pub hits: Vec<LegacyResultSearchProject>,
     pub offset: usize,
@@ -11,10 +11,12 @@ pub struct LegacySearchResults {
     pub total_hits: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, utoipa::ToSchema)]
 pub struct LegacyResultSearchProject {
     pub project_id: String,
     pub project_type: String,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     #[serde(default)]
@@ -136,6 +138,7 @@ impl LegacyResultSearchProject {
 
         Self {
             project_type,
+            all_project_types: result_search_project.all_project_types,
             client_side,
             server_side,
             versions,

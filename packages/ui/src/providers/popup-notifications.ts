@@ -4,11 +4,13 @@ import { createContext } from '.'
 
 export interface PopupNotificationButton {
 	label: string
-	action: () => void
+	action: () => void | Promise<void>
 	icon?: Component
 	color?: 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'standard'
 	keepOpen?: boolean
 }
+
+export type PopupNotificationProgressType = 'percentage' | 'bytes' | 'count'
 
 export interface PopupNotificationProgressItem {
 	id: string
@@ -17,6 +19,13 @@ export interface PopupNotificationProgressItem {
 	iconUrl?: string | null
 	progress: number
 	waiting: boolean
+	showProgress?: boolean
+	wrapText?: boolean
+	progressType?: PopupNotificationProgressType
+	progressCurrent?: number
+	progressTotal?: number
+	onDismiss?: () => void | Promise<void>
+	buttons?: PopupNotificationButton[]
 }
 
 export type PopupNotificationToastType =
@@ -35,6 +44,10 @@ export interface PopupNotificationToast {
 	statusText?: string
 	progress?: number
 	waiting?: boolean
+	showProgress?: boolean
+	progressType?: PopupNotificationProgressType
+	progressCurrent?: number
+	progressTotal?: number
 	onAccept?: () => void | Promise<void>
 	onDecline?: () => void | Promise<void>
 	onDismiss?: () => void | Promise<void>

@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Välj korrekt upplösning"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Se till att du har visat bevis för din tillåtelse att använda externt innehåll i ditt Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Läs externa behörigheter"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Välj vilka versioner din server stödjer, välj ett modpaket, eller ladda upp ditt egna."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Besök länkinställningar"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Gå till behörighets kontrollpanel"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Besök tagginställningar"

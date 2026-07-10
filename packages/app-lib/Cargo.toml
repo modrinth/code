@@ -6,9 +6,9 @@ edition.workspace = true
 
 [dependencies]
 ariadne = { workspace = true }
-async-compression = { workspace = true, features = ["gzip", "tokio"] }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
 async-recursion = { workspace = true }
+async-trait = { workspace = true }
 async-tungstenite = { workspace = true, features = [
   "tokio-runtime",
   "tokio-rustls-webpki-roots"
@@ -23,6 +23,7 @@ async_zip = { workspace = true, features = [
   "zstd",
 ] }
 base64 = { workspace = true }
+bon = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 bytes = { workspace = true, features = ["serde"] }
 chardetng = { workspace = true }
@@ -46,6 +47,7 @@ heck = { workspace = true }
 hickory-resolver = { workspace = true }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
+modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
@@ -104,6 +106,7 @@ tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 url = { workspace = true, features = ["serde"] }
+urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
 whoami = { workspace = true }
 zbus = { workspace = true }

@@ -1,6 +1,9 @@
-import { defineMessage } from '@modrinth/ui'
+import { defineMessage, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
+
+const MAX_LANGUAGE_COUNT = 10
+const ALL_LANGUAGE_COUNT = 72
 
 export const serverProjectsNags: Nag[] = [
 	{
@@ -16,6 +19,84 @@ export const serverProjectsNags: Nag[] = [
 		status: 'required',
 		shouldShow: (context: NagContext) =>
 			!!context.projectV3?.minecraft_server && !context.projectV3?.minecraft_server.region,
+		link: {
+			path: 'settings/server',
+			title: defineMessage({
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-server',
+		},
+	},
+	{
+		id: 'too-many-languages',
+		title: defineMessage({
+			id: 'nags.too-many-languages.title',
+			defaultMessage: 'Select accurate languages',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			const languageCount = context.projectV3?.minecraft_server?.languages?.length || 0
+			const maxLanguageCount = MAX_LANGUAGE_COUNT
+
+			return formatMessage(
+				defineMessage({
+					id: 'nags.too-many-languages.description',
+					defaultMessage:
+						"You've selected {languageCount, plural, one {# language} other {# languages}}. Please list only the languages your server actively supports.",
+				}),
+				{
+					languageCount,
+					maxLanguageCount,
+				},
+			)
+		},
+		status: 'warning',
+		shouldShow: (context: NagContext) => {
+			const languageCount = context.projectV3?.minecraft_server?.languages?.length || 0
+			return (
+				languageCount > MAX_LANGUAGE_COUNT &&
+				//languageCount <= ALL_LANGUAGE_COUNT &&
+				context.projectV3?.minecraft_server != null
+			)
+		},
+		link: {
+			path: 'settings/server',
+			title: defineMessage({
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-project-settings-server',
+		},
+	},
+	{
+		id: 'all-languages',
+		title: defineMessage({
+			id: 'nags.all-languages.title',
+			defaultMessage: 'Select accurate languages',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			const languageCount = context.projectV3?.minecraft_server?.languages?.length || 0
+			const allLanguageCount = ALL_LANGUAGE_COUNT
+
+			return formatMessage(
+				defineMessage({
+					id: 'nags.all-languages.description',
+					defaultMessage:
+						"You've selected all available language options. Please list only the languages your server actively supports.",
+				}),
+				{
+					languageCount,
+					allLanguageCount,
+				},
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) => {
+			// const languageCount = context.projectV3?.minecraft_server?.languages?.length || 0
+			return false //languageCount >= ALL_LANGUAGE_COUNT && context.projectV3?.minecraft_server != null
+		},
 		link: {
 			path: 'settings/server',
 			title: defineMessage({

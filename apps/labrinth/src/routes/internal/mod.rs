@@ -19,99 +19,176 @@ pub mod session;
 pub mod statuses;
 
 pub use super::ApiError;
+use super::SecurityAddon;
 use super::v3::oauth_clients;
 use crate::util::cors::default_cors;
+use actix_web::web;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        actix_web::web::scope("/_internal")
+        web::scope("/_internal")
             .wrap(default_cors())
-            .configure(|cfg| {
-                cfg.service(
-                    actix_web::web::scope("/admin")
-                        .service(admin::count_download)
-                        .service(admin::force_reindex)
-                        .service(admin::force_reindex_project),
-                );
-                cfg.service(
-                    actix_web::web::scope("/session")
-                        .service(session::list)
-                        .service(session::delete)
-                        .service(session::refresh),
-                );
-                cfg.service(
-                    actix_web::web::scope("/auth")
-                        .service(flows::init)
-                        .service(flows::auth_callback)
-                        .service(flows::delete_auth_provider)
-                        .service(flows::create_account_with_password)
-                        .service(flows::login_password)
-                        .service(flows::login_2fa)
-                        .service(flows::begin_2fa_flow)
-                        .service(flows::finish_2fa_flow)
-                        .service(flows::remove_2fa)
-                        .service(flows::reset_password_begin)
-                        .service(flows::change_password)
-                        .service(flows::resend_verify_email)
-                        .service(flows::set_email)
-                        .service(flows::verify_email)
-                        .service(flows::subscribe_newsletter)
-                        .service(flows::get_newsletter_subscription_status)
-                        .service(flows::discord_community_link),
-                );
-                cfg.service(pats::get_pats);
-                cfg.service(pats::create_pat);
-                cfg.service(pats::edit_pat);
-                cfg.service(pats::delete_pat);
-            })
+            .configure(admin::config)
+            .configure(session::config)
+            .configure(flows::config)
+            .configure(pats::config)
             .configure(oauth_clients::config)
+            .service(web::scope("/moderation").configure(moderation::config))
+            .service(web::scope("/affiliate").configure(affiliate::config))
+            .service(web::scope("/campaign").configure(campaign::config))
+            .service(web::scope("/search-management").configure(search::config))
+            .service(web::scope("/globals").configure(globals::config))
+            .service(web::scope("/server-ping").configure(server_ping::config))
+            .service(web::scope("/attribution").configure(attribution::config))
             .configure(billing::config)
+            .configure(delphi::config)
+            .configure(external_notifications::config)
             .configure(gdpr::config)
             .configure(gotenberg::config)
-            .configure(statuses::config)
             .configure(medal::config)
-            .configure(external_notifications::config)
             .configure(mural::config)
-            .configure(delphi::config),
+            .configure(statuses::config),
+    )
+    .service(
+        web::scope("/v3/analytics-event")
+            .wrap(default_cors())
+            .configure(super::v3::analytics_event::config),
     );
 }
 
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/_internal/moderation")
-            .wrap(default_cors())
-            .configure(moderation::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/affiliate")
-            .wrap(default_cors())
-            .configure(affiliate::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/campaign")
-            .wrap(default_cors())
-            .configure(campaign::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/search-management")
-            .wrap(default_cors())
-            .configure(search::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/globals")
-            .wrap(default_cors())
-            .configure(globals::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/server-ping")
-            .wrap(default_cors())
-            .configure(server_ping::config),
-    )
-    .service(
-        utoipa_actix_web::scope("/_internal/attribution")
-            .wrap(default_cors())
-            .configure(attribution::config),
-    );
+#[derive(utoipa::OpenApi)]
+#[openapi(
+	info(
+		title = "Internal API (UNSTABLE)",
+		version = "internal",
+		description = include_str!("../../api_internal_description.md"),
+	),
+	paths(
+		admin::count_download,
+		admin::force_reindex,
+		admin::force_reindex_project,
+		session::list,
+		session::delete,
+		session::refresh,
+		flows::init,
+		flows::auth_callback,
+		flows::create_oauth_account,
+		flows::discord_community_link,
+		flows::delete_auth_provider,
+		flows::validate_create_account_with_password,
+		flows::create_account_with_password,
+		flows::login_password,
+		flows::login_2fa,
+		flows::begin_2fa_flow,
+		flows::finish_2fa_flow,
+		flows::remove_2fa,
+		flows::reset_password_begin,
+		flows::change_password,
+		flows::set_email,
+		flows::resend_verify_email,
+		flows::verify_email,
+		flows::subscribe_newsletter,
+		flows::get_newsletter_subscription_status,
+		flows::register_passkey_start,
+		flows::register_passkey_finish,
+		flows::authenticate_passkey_start,
+		flows::authenticate_passkey_finish,
+		flows::list_passkeys,
+		flows::rename_passkey,
+		flows::delete_passkey,
+		pats::get_pats,
+		pats::create_pat,
+		pats::edit_pat,
+		pats::delete_pat,
+		moderation::get_projects,
+		moderation::get_project_ids,
+		moderation::get_project_meta,
+		moderation::set_project_meta,
+		moderation::acquire_lock,
+		moderation::override_lock,
+		moderation::get_lock_status,
+		moderation::release_lock,
+		moderation::release_lock_beacon,
+		moderation::delete_all_locks,
+		moderation::tech_review::get_issue,
+		moderation::tech_review::get_report,
+		moderation::tech_review::search_projects,
+		moderation::tech_review::global::search_global_issue_details,
+		moderation::tech_review::global::get_global_issue_detail,
+		moderation::tech_review::get_project_report,
+		moderation::tech_review::submit_report,
+		moderation::tech_review::update_issue_details,
+		moderation::tech_review::update_global_issue_details,
+		moderation::tech_review::add_report,
+		moderation::external_license::search,
+		moderation::external_license::lookup,
+		moderation::external_license::get_by_sha1,
+		moderation::external_license::get_by_sha1_bulk,
+		moderation::external_license::add_file,
+		moderation::external_license::reassign_file,
+		moderation::external_license::update_license,
+		affiliate::ingest_click,
+		affiliate::get_all,
+		affiliate::create,
+		affiliate::get,
+		affiliate::delete,
+		affiliate::patch,
+		campaign::tiltify_webhook,
+		campaign::pride_26,
+		search::tasks,
+		search::tasks_cancel,
+		globals::get_globals,
+		server_ping::ping_minecraft_java,
+		attribution::scan,
+		attribution::list,
+		attribution::update_group,
+		attribution::assign,
+		attribution::split,
+		billing::products,
+		billing::subscriptions,
+		billing::refund_charge,
+		billing::reprocess_charge_tax,
+		billing::edit_subscription,
+		billing::user_customer,
+		billing::charges,
+		billing::add_payment_method_flow,
+		billing::edit_payment_method,
+		billing::remove_payment_method,
+		billing::payment_methods,
+		billing::active_servers,
+		billing::initiate_payment,
+		billing::stripe_webhook,
+		billing::credit,
+		delphi::ingest_report,
+		delphi::_run,
+		delphi::version,
+		delphi::issue_type_schema,
+		external_notifications::create,
+		external_notifications::create_email_sync,
+		external_notifications::remove,
+		external_notifications::send_custom_email,
+		gdpr::export,
+		gotenberg::success_callback,
+		gotenberg::error_callback,
+		medal::verify,
+		medal::redeem,
+		mural::get_bank_details,
+		statuses::ws_init,
+		super::v3::analytics_event::analytics_events_get,
+		super::v3::analytics_event::analytics_event_create,
+		super::v3::analytics_event::analytics_event_edit,
+		super::v3::analytics_event::analytics_event_delete,
+	),
+	modifiers(&InternalPathModifier, &SecurityAddon)
+)]
+pub struct ApiDoc;
+
+struct InternalPathModifier;
+
+impl utoipa::Modify for InternalPathModifier {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        super::prefix_openapi_paths(openapi, "/_internal", |path| {
+            path.starts_with("/v3/")
+        });
+    }
 }

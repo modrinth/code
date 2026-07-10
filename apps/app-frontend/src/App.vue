@@ -94,9 +94,9 @@ import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
+import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
+import { list, run } from '@/helpers/instance'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
-import { create_profile_and_install_from_file } from '@/helpers/pack'
-import { list } from '@/helpers/profile.js'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -110,6 +110,7 @@ import {
 	isNetworkMetered,
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
+import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n from '@/i18n.config'
 import {
 	appUpdateState,
@@ -852,12 +853,29 @@ async function handleCommand(e) {
 	if (e.event === 'RunMRPack') {
 		// RunMRPack should directly install a local mrpack given a path
 		if (e.path.endsWith('.mrpack')) {
-			await create_profile_and_install_from_file(e.path, (createProfile, fileName) =>
-				unknownPackWarningModal.value?.show(createProfile, fileName),
-			).catch(handleError)
+			const location = { type: 'fromFile', path: e.path }
+			const preview = await install_get_modpack_preview(location).catch(handleError)
+			if (preview?.unknownFile) {
+				const splitPath = e.path.split(/[\\/]/)
+				const fileName = splitPath ? splitPath[splitPath.length - 1] : e.path
+				unknownPackWarningModal.value?.show(
+					() => install_create_modpack_instance(location).then(() => undefined),
+					fileName,
+				)
+			} else {
+				await install_create_modpack_instance(location).catch(handleError)
+			}
 			trackEvent('InstanceCreate', {
 				source: 'CreationModalFileDrop',
 			})
+		}
+	} else if (e.event === 'LaunchInstance') {
+		if (e.server) {
+			await start_join_server(e.id, e.server).catch(handleError)
+		} else if (e.singleplayer_world) {
+			await start_join_singleplayer_world(e.id, e.singleplayer_world).catch(handleError)
+		} else {
+			await run(e.id).catch(handleError)
 		}
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
@@ -1323,12 +1341,11 @@ async function processPendingSurveys() {
 	const creds = await getCreds().catch(handleError)
 	const userId = creds?.user_id
 
-	const instances = await list().catch(handleError)
-	const isActivePlayer =
-		instances.findIndex(
-			(instance) =>
-				isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
-		) >= 0
+	const instances = (await list().catch(handleError)) ?? []
+	const isActivePlayer = instances.some(
+		(instance) =>
+			isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
+	)
 
 	let surveys = []
 	try {

@@ -55,6 +55,11 @@ async function handleBack() {
 	if (!context) return
 
 	if (selectedCount.value > 0 && !isInstallingSelected.value) {
+		if (context.skipNonEssentialWarnings) {
+			await handleSelectedProjectsLeaveResult('discard', context)
+			return
+		}
+
 		const result = await selectedProjectsLeaveModal.value?.prompt()
 		await handleSelectedProjectsLeaveResult(result ?? 'cancel', context)
 		return

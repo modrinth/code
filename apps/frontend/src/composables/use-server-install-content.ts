@@ -4,6 +4,7 @@ import type {
 	BrowseInstallPlan,
 	BrowseSearchState,
 	CreationFlowContextValue,
+	EnvironmentSearchOverride,
 	FilterValue,
 	PendingServerContentInstall,
 	PendingServerContentInstallType,
@@ -21,6 +22,8 @@ import {
 	readStoredServerInstallQueue,
 	removePendingServerContentInstall,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useVIntl,
 	writePendingServerContentInstallBaseline,
 	writeStoredServerInstallQueue,
@@ -160,6 +163,7 @@ export function useServerInstallContent({
 	})
 
 	const serverHideInstalled = ref(false)
+	const serverContentServerOnly = ref(false)
 	const hideSelectedServerInstalls = ref(false)
 	const installingProjectIds = ref<Set<string>>(new Set())
 	const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
@@ -348,10 +352,6 @@ export function useServerInstallContent({
 				filters.push({ type: 'plugin_loader', option: platform })
 			}
 
-			if (projectType.value?.id === 'mod') {
-				filters.push({ type: 'environment', option: 'server' })
-			}
-
 			if (serverHideInstalled.value && hiddenInstalledProjectIds.value.size > 0) {
 				for (const x of hiddenInstalledProjectIds.value) {
 					filters.push({
@@ -383,6 +383,28 @@ export function useServerInstallContent({
 		return filters
 	})
 
+	const showServerOnlyToggle = computed(() => !!serverData.value && projectType.value?.id === 'mod')
+
+	const serverEnvironmentOverride = computed<EnvironmentSearchOverride | undefined>(() => {
+		if (!showServerOnlyToggle.value) return undefined
+		if (serverContentServerOnly.value) {
+			return {
+				mode: 'include',
+				values: [
+					'server_only',
+					'dedicated_server_only',
+					'server_only_client_optional',
+					'client_or_server_prefers_both',
+					'client_or_server',
+				],
+			}
+		}
+		return {
+			mode: 'exclude',
+			values: ['client_only', 'singleplayer_only'],
+		}
+	})
+
 	function getCurrentServerInstallType(): BrowseInstallContentType {
 		const type = projectType.value?.id
 		if (type === 'modpack' || type === 'mod' || type === 'plugin' || type === 'datapack') {
@@ -399,6 +421,43 @@ export function useServerInstallContent({
 			},
 			contentType,
 		)
+	}
+
+	function toResolvePreferences(
+		preferences?: BrowseInstallPlan<ServerInstallSearchResult>['preferences'],
+	): Labrinth.Content.v3.ResolutionPreferences {
+		return {
+			game_versions: preferences?.gameVersions,
+			loaders: preferences?.loaders,
+		}
+	}
+
+	async function resolveQueuedAddonPlans(plans: BrowseInstallPlan<ServerInstallSearchResult>[]) {
+		const existingProjectIds = getServerInstalledProjectIds()
+		const resolvedAddons: Array<{ project_id: string; version_id: string }> = []
+
+		for (const plan of plans) {
+			const resolved = await client.labrinth.content_v3.resolve({
+				project_id: plan.projectId,
+				version_id: plan.versionId,
+				content_type: plan.contentType as Labrinth.Content.v3.ContentType,
+				selected: toResolvePreferences(plan.preferences),
+				target: toResolvePreferences(getServerInstallTargetPreferences(plan.contentType)),
+				existing_project_ids: Array.from(existingProjectIds),
+			})
+			const content = [resolved.primary, ...resolved.dependencies]
+
+			for (const item of content) {
+				if (existingProjectIds.has(item.project_id)) continue
+				existingProjectIds.add(item.project_id)
+				resolvedAddons.push({
+					project_id: item.project_id,
+					version_id: item.version_id,
+				})
+			}
+		}
+
+		return resolvedAddons
 	}
 
 	function getInstallProjectVersions(projectId: string) {
@@ -444,15 +503,12 @@ export function useServerInstallContent({
 			const result = await flushStoredServerAddonInstallQueue({
 				serverId,
 				worldId,
-				install: (plans) =>
-					client.archon.content_v1.addAddons(
-						serverId,
-						worldId,
-						plans.map((plan) => ({
-							project_id: plan.projectId,
-							version_id: plan.versionId,
-						})),
-					),
+				install: async (plans) => {
+					const addons = await resolveQueuedAddonPlans(plans)
+					if (addons.length > 0) {
+						await client.archon.content_v1.addAddons(serverId, worldId, addons)
+					}
+				},
 				onQueueChange: (plans) => setStoredServerInstallPlans(serverId, worldId, plans),
 			})
 
@@ -550,11 +606,15 @@ export function useServerInstallContent({
 				project,
 				contentType,
 				mode: isModpack ? 'immediate' : 'queue',
-				selectedFilters: isModpack ? [] : browseSearchState.currentFilters.value,
+				selectedFilters: isModpack
+					? []
+					: stripServerRuntimeInstallFilters(browseSearchState.currentFilters.value),
 				providedFilters: isModpack ? [] : serverFilters.value,
 				overriddenProvidedFilterTypes: isModpack
 					? []
-					: browseSearchState.overriddenProvidedFilterTypes.value,
+					: stripServerRuntimeInstallOverrides(
+							browseSearchState.overriddenProvidedFilterTypes.value,
+						),
 				targetPreferences: getServerInstallTargetPreferences(contentType),
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
@@ -703,6 +763,10 @@ export function useServerInstallContent({
 		serverHideInstalled.value = route.query.shi === 'true'
 	}
 
+	if (route.query.so && projectType.value?.id === 'mod') {
+		serverContentServerOnly.value = route.query.so === 'true'
+	}
+
 	watch(serverHideInstalled, (hideInstalled) => {
 		if (hideInstalled) {
 			syncHiddenInstalledProjectIds()
@@ -729,6 +793,9 @@ export function useServerInstallContent({
 		serverContentData,
 		serverFilters,
 		serverHideInstalled,
+		serverContentServerOnly,
+		showServerOnlyToggle,
+		serverEnvironmentOverride,
 		hideSelectedServerInstalls,
 		installingProjectIds,
 		optimisticallyInstalledProjectIds,

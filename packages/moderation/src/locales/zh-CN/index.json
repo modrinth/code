@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "请确保您已提供授权证明，证明您有权在您的整合包中分发任何外部内容。"
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "核查外部授权"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "选择你的服务器支持的版本；挑一个整合包，或者自行上传。"
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "访问链接设置"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "前往权限管理面板"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "访问标签设置"

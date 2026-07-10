@@ -1396,19 +1396,25 @@ impl CachedEntry {
                 let fetch_urls = keys
                     .iter()
                     .map(|x| {
+                        let metadata =
+                            daedalus::modded::loader_manifest_metadata_from_cache_key(
+                                &x.key().to_string(),
+                            );
+
                         (
-                            x.key().to_string(),
+                            metadata.cache_key,
+                            metadata.loader,
                             format!(
-                                "{}{}/v0/manifest.json",
+                                "{}{}",
                                 env!("MODRINTH_LAUNCHER_META_URL"),
-                                x.key()
+                                metadata.path,
                             ),
                         )
                     })
                     .collect::<Vec<_>>();
 
                 futures::future::try_join_all(fetch_urls.iter().map(
-                    |(_, url)| {
+                    |(_, _, url)| {
                         fetch_json(
                             Method::GET,
                             url,
@@ -1424,14 +1430,15 @@ impl CachedEntry {
                 .into_iter()
                 .enumerate()
                 .map(|(index, metadata)| {
-                    (
+                    let mut entry =
                         CacheValue::LoaderManifest(CachedLoaderManifest {
-                            loader: fetch_urls[index].0.to_string(),
+                            loader: fetch_urls[index].1.to_string(),
                             manifest: metadata,
                         })
-                        .get_entry(),
-                        true,
-                    )
+                        .get_entry();
+                    entry.id.clone_from(&fetch_urls[index].0);
+
+                    (entry, true)
                 })
                 .collect()
             }
@@ -1495,16 +1502,16 @@ impl CachedEntry {
             CacheValueType::FileHash => {
                 // TODO: Replace state call here
                 let state = crate::State::get().await?;
-                let profiles_dir = state.directories.profiles_dir();
+                let instances_dir = state.directories.instances_dir();
 
                 async fn hash_file(
-                    profiles_dir: &Path,
+                    instances_dir: &Path,
                     key: String,
                 ) -> crate::Result<(CachedEntry, bool)> {
                     let path =
                         key.split_once('-').map(|x| x.1).unwrap_or_default();
 
-                    let full_path = profiles_dir.join(path);
+                    let full_path = instances_dir.join(path);
 
                     let mut file = tokio::fs::File::open(&full_path).await?;
                     let size = file.metadata().await?.len();
@@ -1541,7 +1548,7 @@ impl CachedEntry {
 
                 use futures::stream::StreamExt;
                 let results: Vec<_> = futures::stream::iter(keys)
-                    .map(|x| hash_file(&profiles_dir, x.to_string()))
+                    .map(|x| hash_file(&instances_dir, x.to_string()))
                     .buffer_unordered(64) // hash 64 files at once
                     .collect::<Vec<_>>()
                     .await
@@ -2120,7 +2127,7 @@ impl CachedEntry {
 
 pub async fn cache_file_hash(
     bytes: bytes::Bytes,
-    profile_path: &str,
+    instance_id: &str,
     path: &str,
     known_hash: Option<&str>,
     project_type: Option<ProjectType>,
@@ -2136,7 +2143,7 @@ pub async fn cache_file_hash(
     };
 
     cache_file_hash_metadata(
-        profile_path,
+        instance_id,
         path,
         size as u64,
         hash,
@@ -2148,7 +2155,7 @@ pub async fn cache_file_hash(
 }
 
 pub async fn cache_file_hash_metadata(
-    profile_path: &str,
+    instance_id: &str,
     path: &str,
     size: u64,
     hash: String,
@@ -2167,7 +2174,7 @@ pub async fn cache_file_hash_metadata(
     // Streamed extraction already computed these values, so avoid buffering the file just to cache them.
     CachedEntry::upsert_many(
         &[CacheValue::FileHash(CachedFileHash {
-            path: format!("{profile_path}/{path}"),
+            path: format!("{instance_id}/{path}"),
             size,
             hash,
             project_type,

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { type Component, computed } from 'vue'
 
+import PrideCollectionWidget from './PrideCollectionWidget.vue'
 import SparkLiveWidget from './SparkLiveWidget.vue'
 import SparkLiveWidgetEmbed from './SparkLiveWidgetEmbed.vue'
 
 const ARTICLE_WIDGETS: Record<string, Component> = {
 	'spark-live-widget': SparkLiveWidget,
 	'spark-live-widget-embed': SparkLiveWidgetEmbed,
+	'pride-collection-widget': PrideCollectionWidget,
 }
 
 type ArticleBodyPart = { type: 'html'; content: string } | { type: 'widget'; id: string }
@@ -50,9 +52,9 @@ const parts = computed(() => parseArticleHtml(props.html))
 		class="markdown-body"
 		v-html="parts[0]?.content"
 	/>
-	<div v-else class="markdown-body">
+	<div v-else class="flex flex-col gap-4">
 		<template v-for="(part, index) in parts" :key="index">
-			<div v-if="part.type === 'html'" v-html="part.content" />
+			<div v-if="part.type === 'html'" class="markdown-body" v-html="part.content" />
 			<component :is="ARTICLE_WIDGETS[part.id]" v-else />
 		</template>
 	</div>
