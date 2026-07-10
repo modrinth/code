@@ -72,24 +72,23 @@ import {
 	provideAppBackup,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, toRef, watch } from 'vue'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
-import { get_user } from '@/helpers/cache.js'
 import {
 	getSharedInstanceUnavailableReason,
 	install_duplicate_instance,
 	installJobInstanceId,
 	isSharedInstanceUnavailableError,
-	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import { edit, list } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import { sharedInstanceErrorMessages, useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 
+import { injectSharedInstanceState } from '../use-shared-instance-state'
 import SharedInstanceMembersTable from './shared-instance-members-table.vue'
 import SharedInstanceRemoveMemberModal from './shared-instance-remove-member-modal.vue'
 import SharedInstanceShareEmptyState from './shared-instance-share-empty-state.vue'
@@ -98,19 +97,16 @@ import { useSharedInstanceInviteCandidates } from './use-shared-instance-invite-
 import { useSharedInstanceInviteLink } from './use-shared-instance-invite-link'
 import { useSharedInstanceMembers } from './use-shared-instance-members'
 
-const props = defineProps<{
-	instance: GameInstance
-	sharedInstanceActionsLocked?: boolean
-	sharedInstanceUnavailableReason?: SharedInstanceUnavailableReason | null
-	sharedInstanceUnavailableManager?: string | null
-}>()
+const props = defineProps<{ instance: GameInstance }>()
 const auth = injectAuth()
 const queryClient = useQueryClient()
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { formatSharedInstanceUnavailable, notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
+const sharedInstanceState = injectSharedInstanceState()
 const instance = toRef(props, 'instance')
-const actionsLocked = computed(() => !!props.sharedInstanceActionsLocked)
+const actionsLocked = sharedInstanceState.shareActionsLocked
+const sharedInstanceActionsLocked = actionsLocked
 const currentUserId = computed(() => auth.user.value?.id ?? null)
 const isSignedIn = computed(() => !!auth.session_token.value)
 const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
@@ -122,7 +118,10 @@ const importedModpackUnlinked = ref(false)
 
 function notifyOperationError(error: unknown) {
 	if (isSharedInstanceUnavailableError(error)) {
-		notifySharedInstanceUnavailable(getSharedInstanceUnavailableReason(error), props.sharedInstanceUnavailableManager ?? null)
+		notifySharedInstanceUnavailable(
+			getSharedInstanceUnavailableReason(error),
+			sharedInstanceState.unavailableManager.value,
+		)
 	} else {
 		notifySharedInstanceError(error instanceof Error ? error : new Error(String(error)))
 	}
@@ -144,22 +143,17 @@ const { inviteFriends, search: searchInviteUsers, requestFriend } = useSharedIns
 })
 const inviteLink = useSharedInstanceInviteLink(computed(() => props.instance.id), notifyOperationError)
 
-const linkedAccountId = computed(() => props.instance.shared_instance?.linked_user_id ?? null)
-const linkedAccountQuery = useQuery({
-	queryKey: computed(() => ['user', linkedAccountId.value]),
-	queryFn: async () => linkedAccountId.value ? await get_user(linkedAccountId.value, 'bypass').catch(() => null) : null,
-	enabled: () => !!linkedAccountId.value,
-	staleTime: 30_000,
-})
 const linkedAccount = computed(() => {
-	const user = linkedAccountQuery.data.value
-	return user ? { username: user.username ?? user.id, avatarUrl: user.avatar_url ?? undefined, tintBy: user.id } : null
+	const manager = sharedInstanceState.manager.value
+	return manager?.type === 'user'
+		? { username: manager.name, avatarUrl: manager.avatarUrl, tintBy: manager.tintBy }
+		: null
 })
 const lockedEmptyHeading = computed(() => isSignedIn.value ? messages.lockedWrongAccountHeading : messages.lockedSignedOutHeading)
 const lockedActionButton = computed(() => isSignedIn.value ? messages.switchAccountButton : messages.signInButton)
-const sharedInstanceUnavailableReason = computed(() => props.sharedInstanceUnavailableReason ?? null)
+const sharedInstanceUnavailableReason = sharedInstanceState.unavailableReason
 const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
-const sharedInstanceUnavailableManager = computed(() => props.sharedInstanceUnavailableManager ?? null)
+const sharedInstanceUnavailableManager = sharedInstanceState.unavailableManager
 const requiresUnlink = computed(() => props.instance.link?.type === 'imported_modpack' && !props.instance.shared_instance && !importedModpackUnlinked.value)
 const importedModpackBackupTip = computed(() => props.instance.link?.type === 'imported_modpack' ? (props.instance.link.name ?? props.instance.link.filename ?? undefined) : undefined)
 

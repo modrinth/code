@@ -106,36 +106,20 @@
 							</div>
 						</template>
 
-						<template v-if="sharedInstanceServerManager">
+						<template v-if="sharedInstanceManager">
 							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
 
 							<div class="flex min-w-0 items-center gap-[5px] font-medium">
-								Linked to
-								<Avatar
-									:src="sharedInstanceServerManager.iconUrl"
-									:alt="sharedInstanceServerManager.name"
-									:tint-by="sharedInstanceServerManager.name"
-									size="24px"
-									no-shadow
-								/>
-								<span class="min-w-0 truncate">{{ sharedInstanceServerManager.name }}</span>
-							</div>
-						</template>
-
-						<template v-else-if="sharedInstanceManager">
-							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-							<div class="flex min-w-0 items-center gap-[5px] font-medium">
-								Managed by
+								{{ sharedInstanceManager.type === 'server' ? 'Linked to' : 'Managed by' }}
 								<Avatar
 									:src="sharedInstanceManager.avatarUrl"
-									:alt="sharedInstanceManager.username"
+									:alt="sharedInstanceManager.name"
 									:tint-by="sharedInstanceManager.tintBy"
 									size="24px"
-									circle
+									:circle="sharedInstanceManager.type === 'user'"
 									no-shadow
 								/>
-								<span class="min-w-0 truncate">{{ sharedInstanceManager.username }}</span>
+								<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
 							</div>
 						</template>
 					</div>
@@ -270,9 +254,7 @@
 				class="mt-4"
 				:instance="instance"
 				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
-				:shared-instance-unavailable-manager="
-					sharedInstanceManager?.username ?? sharedInstanceServerManager?.name
-				"
+				:shared-instance-unavailable-manager="sharedInstanceUnavailableManager"
 				:shared-instance-wrong-account="sharedInstanceWrongAccount"
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
@@ -297,7 +279,7 @@
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
 							:open-settings="() => settingsModal?.show(1)"
-							v-bind="instanceSubpageProps"
+							v-bind="contentSubpageProps"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
@@ -360,7 +342,6 @@ import {
 	ButtonStyled,
 	ContentPageHeader,
 	defineMessages,
-	injectAuth,
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
@@ -390,16 +371,12 @@ import {
 } from '@/composables/instances/use-server-status-query'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_v3, get_user } from '@/helpers/cache.js'
+import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
-	getSharedInstanceUnavailableReason,
 	install_existing_instance,
-	install_get_shared_instance_update_preview,
 	install_pack_to_existing_instance,
-	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
-	type SharedInstanceUpdatePreview,
 } from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
@@ -412,11 +389,15 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
 
+import {
+	provideSharedInstanceState,
+	useSharedInstanceState,
+} from './use-shared-instance-state'
+
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
-const auth = injectAuth()
 const { playServerProject } = injectServerInstall()
 const queryClient = useQueryClient()
 const route = useRoute()
@@ -476,101 +457,25 @@ const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 const loadingServerPing = ref(false)
 const activeInstanceId = ref<string>()
-const sharedInstanceUpdatePreview = ref<SharedInstanceUpdatePreview | null>(null)
-const sharedInstanceUnavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
-const sharedInstanceAvailabilityCheckKey = ref<string | null>(null)
-type SharedInstanceUserProfile = {
-	id: string
-	username: string
-	avatar_url?: string
-}
-const sharedInstanceManagerUser = ref<SharedInstanceUserProfile | null>(null)
-const sharedInstanceManagerUserId = computed(() => {
-	const attachment = instance.value?.shared_instance
-	if (!attachment) return null
-
-	if (attachment.role === 'owner') {
-		if (!sharedInstanceActionsLocked.value) return null
-
-		return attachment.linked_user_id ?? null
-	}
-
-	return attachment.manager_id ?? null
-})
-
-const sharedInstanceManager = computed(() => {
-	if (!instance.value?.shared_instance) return null
-
-	if (instance.value.shared_instance.role === 'owner') {
-		if (!sharedInstanceActionsLocked.value) return null
-
-		const linkedUserId = instance.value.shared_instance.linked_user_id
-		const linkedUser = sharedInstanceManagerUser.value
-		if (!linkedUserId || !linkedUser) return null
-
-		return {
-			username: linkedUser.username,
-			avatarUrl: linkedUser.avatar_url ?? undefined,
-			tintBy: linkedUser.id,
-		}
-	}
-
-	const user = sharedInstanceManagerUser.value
-	if (!user) return null
-
-	return {
-		username: user.username,
-		avatarUrl: user.avatar_url ?? undefined,
-		tintBy: user.id,
-	}
-})
-const sharedInstanceServerManager = computed(() => {
-	const attachment = instance.value?.shared_instance
-	if (!attachment?.server_manager_name) return null
-
-	return {
-		name: attachment.server_manager_name,
-		iconUrl: attachment.server_manager_icon_url ?? undefined,
-	}
-})
-
-const sharedInstanceExpectedUserId = computed(
-	() => instance.value?.shared_instance?.linked_user_id ?? null,
-)
-const sharedInstanceWrongAccount = computed(() => {
-	if (auth.isReady && !auth.isReady.value) return false
-
-	const expectedUserId = sharedInstanceExpectedUserId.value
-	if (!expectedUserId) return false
-
-	return auth.user.value?.id !== expectedUserId
-})
-const sharedInstanceActionsLocked = computed(() => sharedInstanceWrongAccount.value)
-const sharedInstanceShareActionsLocked = computed(
-	() => sharedInstanceActionsLocked.value || !!sharedInstanceUnavailableReason.value,
-)
-const sharedInstanceSignedOut = computed(() => !auth.session_token.value)
+const sharedInstanceState = useSharedInstanceState(instance, offline, notifySharedInstanceError)
+provideSharedInstanceState(sharedInstanceState)
+const {
+	actionsLocked: sharedInstanceActionsLocked,
+	expectedUserId: sharedInstanceExpectedUserId,
+	manager: sharedInstanceManager,
+	setUnavailable: setSharedInstanceUnavailable,
+	signedOut: sharedInstanceSignedOut,
+	unavailableManager: sharedInstanceUnavailableManager,
+	unavailableReason: sharedInstanceUnavailableReason,
+	updatePreview: sharedInstanceUpdatePreview,
+	wrongAccount: sharedInstanceWrongAccount,
+} = sharedInstanceState
 const sharedInstanceTooltip = computed(() =>
 	formatMessage(
 		instance.value?.shared_instance?.role === 'owner'
 			? messages.sharedInstanceOwnerTooltip
 			: messages.sharedInstanceTooltip,
 	),
-)
-
-watch(
-	() => sharedInstanceManagerUserId.value,
-	async (userId) => {
-		sharedInstanceManagerUser.value = null
-
-		if (!userId) return
-
-		const user = await get_user(userId, 'bypass').catch(() => null)
-		if (sharedInstanceManagerUserId.value !== userId) return
-
-		sharedInstanceManagerUser.value = user
-	},
-	{ immediate: true },
 )
 
 watch(
@@ -605,9 +510,7 @@ async function fetchInstance() {
 	isServerInstance.value = false
 	linkedProjectV3.value = undefined
 	preloadedContent.value = null
-	sharedInstanceUpdatePreview.value = null
-	sharedInstanceUnavailableReason.value = null
-	sharedInstanceAvailabilityCheckKey.value = null
+	sharedInstanceState.reset()
 	resetServerStatus()
 
 	const nextInstance = await get(route.params.id as string).catch(handleError)
@@ -632,9 +535,8 @@ async function fetchInstance() {
 	}
 
 	const nextPreloadedContent = await contentPreloadPromise
-	await ensureSharedInstanceExpectedUser(nextInstance)
-
 	instance.value = nextInstance ?? undefined
+	sharedInstanceState.refreshAvailability()
 	linkedProjectV3.value = nextLinkedProjectV3
 	isServerInstance.value = nextIsServerInstance
 	preloadedContent.value = nextPreloadedContent
@@ -648,21 +550,6 @@ async function fetchInstance() {
 			queryFn: () => refreshWorlds(nextInstance.id),
 			staleTime: 30_000,
 		})
-	}
-}
-
-async function ensureSharedInstanceExpectedUser(nextInstance?: GameInstance | null) {
-	const userId = nextInstance?.shared_instance?.linked_user_id
-	if (!userId) return
-
-	try {
-		await queryClient.ensureQueryData({
-			queryKey: ['user', userId],
-			queryFn: () => get_user(userId, 'bypass').catch(() => null),
-			staleTime: 30_000,
-		})
-	} catch {
-		// Let InstanceAdmonitions' useQuery own any fallback state after the route renders.
 	}
 }
 
@@ -718,66 +605,6 @@ watch(
 	},
 )
 
-async function checkSharedInstanceAvailability(instanceId: string) {
-	try {
-		const preview = await install_get_shared_instance_update_preview(instanceId)
-		if (instance.value?.id !== instanceId) return
-
-		sharedInstanceUpdatePreview.value = preview
-		sharedInstanceUnavailableReason.value = null
-	} catch (error) {
-		if (instance.value?.id !== instanceId) return
-
-		if (isSharedInstanceUnavailableError(error)) {
-			sharedInstanceUpdatePreview.value = null
-			sharedInstanceUnavailableReason.value = getSharedInstanceUnavailableReason(error)
-			return
-		}
-
-		notifySharedInstanceError(error)
-	}
-}
-
-watch(
-	() => ({
-		instanceId: instance.value?.id,
-		role: instance.value?.shared_instance?.role,
-		locked: sharedInstanceActionsLocked.value,
-		offline: offline.value,
-		signedIn: !!auth.session_token.value,
-		userId: auth.user.value?.id ?? null,
-		authReady: auth.isReady?.value ?? true,
-	}),
-	async ({ instanceId, role, locked, offline, signedIn, userId, authReady }) => {
-		if (
-			!instanceId ||
-			role !== 'member' ||
-			locked ||
-			offline ||
-			!authReady ||
-			!signedIn ||
-			!userId
-		) {
-			const keepUnavailableReason =
-				!!instanceId && !role && sharedInstanceUnavailableReason.value !== null
-
-			sharedInstanceUpdatePreview.value = null
-			if (!keepUnavailableReason) {
-				sharedInstanceUnavailableReason.value = null
-			}
-			sharedInstanceAvailabilityCheckKey.value = null
-			return
-		}
-
-		const key = `${instanceId}:${userId ?? 'signed-out'}`
-		if (sharedInstanceAvailabilityCheckKey.value === key) return
-
-		sharedInstanceAvailabilityCheckKey.value = key
-		await checkSharedInstanceAvailability(instanceId)
-	},
-	{ immediate: true },
-)
-
 const basePath = computed(
 	() => `/instance/${encodeURIComponent(displayedInstanceRoute.value.params.id as string)}`,
 )
@@ -797,17 +624,6 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
-const instanceSubpageProps = computed(() => ({
-	...contentSubpageProps.value,
-	...(displayedInstanceRoute.value.name === 'InstanceShare'
-		? {
-				sharedInstanceActionsLocked: sharedInstanceShareActionsLocked.value,
-				sharedInstanceUnavailableReason: sharedInstanceUnavailableReason.value,
-				sharedInstanceUnavailableManager:
-					sharedInstanceManager.value?.username ?? sharedInstanceServerManager.value?.name,
-			}
-		: {}),
-}))
 const showShareTab = computed(() => {
 	const linkType = instance.value?.link?.type
 
@@ -890,14 +706,9 @@ const launchInstance = async (context: string) => {
 async function handleSharedInstanceUnavailable(
 	reason: SharedInstanceUnavailableReason | null = null,
 ) {
-	const manager =
-		sharedInstanceManager.value?.username ??
-		sharedInstanceServerManager.value?.name ??
-		null
-	notifySharedInstanceUnavailable(reason, manager)
+	notifySharedInstanceUnavailable(reason, sharedInstanceUnavailableManager.value)
 	await fetchInstance()
-	sharedInstanceUpdatePreview.value = null
-	sharedInstanceUnavailableReason.value = reason
+	setSharedInstanceUnavailable(reason)
 }
 
 const startInstance = async (context: string) => {
