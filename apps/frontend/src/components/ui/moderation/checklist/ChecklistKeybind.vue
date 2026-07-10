@@ -25,7 +25,7 @@ const props = defineProps<{
 }>()
 
 const keybinding = useTemplateRef('keybinding')
-const definitions = ref(structuredClone(props.definitions))
+const definitions = ref(JSON.parse(JSON.stringify(props.definitions)))
 const editing = ref(-1)
 
 function startEditing(index: number) {
