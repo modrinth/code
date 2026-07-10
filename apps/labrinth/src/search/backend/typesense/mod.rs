@@ -32,6 +32,7 @@ pub struct TypesenseConfig {
     pub index_prefix: String,
     pub meta_namespace: String,
     pub index_chunk_size: i64,
+    pub import_batch_size: usize,
     pub delete_batch_size: usize,
 }
 
@@ -161,6 +162,7 @@ impl TypesenseConfig {
             index_prefix: ENV.TYPESENSE_INDEX_PREFIX.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
             index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
+            import_batch_size: ENV.TYPESENSE_IMPORT_BATCH_SIZE,
             delete_batch_size: ENV.TYPESENSE_DELETE_BATCH_SIZE,
         }
     }
@@ -751,6 +753,58 @@ impl Typesense {
 
         Ok(())
     }
+
+    async fn import_document_batches(
+        &self,
+        collections: &[String],
+        documents: &[UploadSearchProject],
+    ) -> Result<()> {
+        let batch_size = self.config.import_batch_size.max(1);
+
+        for batch in documents.chunks(batch_size) {
+            let jsonl = documents_to_jsonl(batch)?;
+
+            for collection in collections {
+                info!(
+                    collection,
+                    document_count = batch.len(),
+                    content_length_bytes = jsonl.len(),
+                    "sending Typesense document import"
+                );
+                self.client
+                    .import_documents(collection, jsonl.clone())
+                    .await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    async fn existing_write_collections(&self) -> Result<Vec<String>> {
+        let mut collections = Vec::new();
+
+        for alias in [
+            self.config.get_alias_name("projects"),
+            self.config.get_alias_name("projects_filtered"),
+        ] {
+            let live = self.client.get_alias(&alias).await?;
+            let shadow_alt = self.config.get_next_collection_name(&alias, true);
+            let shadow_current =
+                self.config.get_next_collection_name(&alias, false);
+
+            for collection in
+                live.into_iter().chain([shadow_alt, shadow_current])
+            {
+                if !collections.contains(&collection)
+                    && self.client.collection_exists(&collection).await?
+                {
+                    collections.push(collection);
+                }
+            }
+        }
+
+        Ok(collections)
+    }
 }
 
 #[async_trait]
@@ -979,11 +1033,11 @@ impl SearchBackend for Typesense {
             total += uploads.len();
             cursor = next_cursor;
 
-            let jsonl = documents_to_jsonl(&uploads)?;
-            self.client
-                .import_documents(&projects_next, jsonl.clone())
-                .await?;
-            self.client.import_documents(&filtered_next, jsonl).await?;
+            self.import_document_batches(
+                &[projects_next.clone(), filtered_next.clone()],
+                &uploads,
+            )
+            .await?;
         }
 
         info!("swapping aliases");
@@ -1014,37 +1068,14 @@ impl SearchBackend for Typesense {
             return Ok(());
         }
 
-        let num_documents = documents.len();
-        let jsonl = documents_to_jsonl(documents)?;
-        for alias in [
-            self.config.get_alias_name("projects"),
-            self.config.get_alias_name("projects_filtered"),
-        ] {
-            let live = self.client.get_alias(&alias).await?;
-            let shadow_alt = self.config.get_next_collection_name(&alias, true);
-            let shadow_current =
-                self.config.get_next_collection_name(&alias, false);
-
-            debug!(
-                ?alias,
-                ?live,
-                ?shadow_alt,
-                ?shadow_current,
-                num_documents,
-                "Inserting into alias",
-            );
-
-            for collection in
-                live.into_iter().chain([shadow_alt, shadow_current])
-            {
-                if self.client.collection_exists(&collection).await? {
-                    debug!("Inserting into existing collection {collection:?}");
-                    self.client
-                        .import_documents(&collection, jsonl.clone())
-                        .await?;
-                }
-            }
-        }
+        let collections = self.existing_write_collections().await?;
+        debug!(
+            ?collections,
+            num_documents = documents.len(),
+            "Inserting into collections",
+        );
+        self.import_document_batches(&collections, documents)
+            .await?;
 
         debug!("Done importing");
         Ok(())

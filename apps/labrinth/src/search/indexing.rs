@@ -548,10 +548,12 @@ async fn build_search_documents(
                 from_duplicate_version_fields(aggregated_version_fields);
 
             // aggregated project loaders
-            let project_loaders = versions
+            let mut project_loaders = versions
                 .iter()
                 .flat_map(|x| x.loaders.clone())
                 .collect::<Vec<_>>();
+            project_loaders.sort();
+            project_loaders.dedup();
 
             // all valid project types across every version of the project, so that
             // filters can exclude projects that have *any* version of a given
