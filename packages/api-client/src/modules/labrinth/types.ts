@@ -1834,6 +1834,19 @@ export namespace Labrinth {
 						old_status: Projects.v2.ProjectStatus
 				  }
 				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
+				  }
+				| {
 						type: 'thread_closure'
 				  }
 				| {
@@ -2234,7 +2247,7 @@ export namespace Labrinth {
 
 			export type UpdateGlobalIssueRequest = {
 				detail_key: string
-				verdict: 'safe' | 'unsafe'
+				verdict: DelphiReportIssueStatus
 			}
 
 			export type SearchGlobalIssueDetailsRequest = {
@@ -2343,6 +2356,8 @@ export namespace Labrinth {
 				decompiled_source: string | null
 				data: Record<string, unknown>
 				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus | null
+				global_status: DelphiReportIssueStatus | null
 				status: DelphiReportIssueStatus
 			}
 
@@ -2390,6 +2405,19 @@ export namespace Labrinth {
 						type: 'status_change'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
 				  }
 				| {
 						type: 'thread_closure'

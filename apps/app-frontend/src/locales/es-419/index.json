@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Descartar"
   },
-  "app.action-bar.install.failed": {
-    "message": "La instalación falló"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "La instalación falló porque la aplicación se cerró."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "La instalación falló debido a un error de red."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "La instalación falló debido a un error desconocido."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Abrir instancia"
   },

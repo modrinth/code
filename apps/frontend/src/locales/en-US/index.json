@@ -3362,6 +3362,9 @@
   "project.download.no-game-versions-found": {
     "message": "No game versions found"
   },
+  "project.download.no-versions-available": {
+    "message": "No versions available for {gameVersion} and {platform}."
+  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
   },

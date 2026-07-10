@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Odrzuć"
   },
-  "app.action-bar.install.failed": {
-    "message": "Instalacja nie powiodła się"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Instalacja nie powiodła się z powodu zamknięcia aplikacji."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Instalacja nie powiodła się z powodu problemów z połączeniem."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Instalacja nie powiodła się z nieznanych przyczyn."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Otwórz instancję"
   },

@@ -23,6 +23,7 @@ async_zip = { workspace = true, features = [
   "zstd",
 ] }
 base64 = { workspace = true }
+bon = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 bytes = { workspace = true, features = ["serde"] }
 chardetng = { workspace = true }

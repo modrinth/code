@@ -1,7 +1,7 @@
 //! Downloader for Minecraft data
 
 use crate::install::{
-    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallErrorContext, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
 };
 use crate::instance::QuickPlayType;
@@ -128,6 +128,17 @@ impl MinecraftDownloadProgress {
             )
             .await
     }
+
+    async fn set_context(
+        &self,
+        context: InstallErrorContext,
+    ) -> crate::Result<()> {
+        self.reporter.set_transient_context(context).await
+    }
+
+    async fn persist_failure_context(&self, context: InstallErrorContext) {
+        self.reporter.persist_failure_context(context).await;
+    }
 }
 
 async fn fetch_minecraft_file(
@@ -136,7 +147,16 @@ async fn fetch_minecraft_file(
     sha1: Option<&str>,
     expected_size: Option<u64>,
     progress: Option<MinecraftDownloadProgress>,
+    context: InstallErrorContext,
 ) -> crate::Result<bytes::Bytes> {
+    let mut context = context;
+    context.urls.push(url.to_string());
+    context.expected_hash = sha1.map(str::to_string);
+    context.expected_size = expected_size;
+    if let Some(progress) = &progress {
+        progress.set_context(context.clone()).await?;
+    }
+
     let Some(progress) = progress else {
         return fetch(url, sha1, None, None, &st.fetch_semaphore, &st.pool)
             .await;
@@ -157,7 +177,7 @@ async fn fetch_minecraft_file(
         }
     };
 
-    let bytes = fetch_advanced_with_progress(
+    let bytes = match fetch_advanced_with_progress(
         Method::GET,
         url,
         sha1,
@@ -170,7 +190,14 @@ async fn fetch_minecraft_file(
         &st.pool,
         Some(&mut progress_fn as &mut FetchProgressFn<'_>),
     )
-    .await?;
+    .await
+    {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            progress.persist_failure_context(context).await;
+            return Err(error);
+        }
+    };
 
     if let Some(expected_size) = expected_size {
         let downloaded = last_downloaded.load(Ordering::Relaxed);
@@ -432,6 +459,7 @@ pub async fn download_version_info(
     loader: Option<&LoaderVersion>,
     force: Option<bool>,
     loading_bar: Option<&LoadingBarId>,
+    reporter: Option<&InstallProgressReporter>,
 ) -> crate::Result<GameVersionInfo> {
     let version_id = loader
         .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
@@ -452,6 +480,19 @@ pub async fn download_version_info(
             &version.id,
             version.url
         );
+        if let Some(reporter) = reporter {
+            reporter
+                .set_context(
+                    InstallErrorContext::new(
+                        "download Minecraft version metadata",
+                    )
+                    .minecraft_version(version.id.clone())
+                    .urls(vec![version.url.clone()])
+                    .target_path(path.display().to_string())
+                    .build(),
+                )
+                .await?;
+        }
         let mut info = fetch_json(
             Method::GET,
             &version.url,
@@ -464,6 +505,19 @@ pub async fn download_version_info(
         .await?;
 
         if let Some(loader) = loader {
+            if let Some(reporter) = reporter {
+                reporter
+                    .set_context(
+                        InstallErrorContext::new(
+                            "download loader version metadata",
+                        )
+                        .minecraft_version(version.id.clone())
+                        .urls(vec![loader.url.clone()])
+                        .target_path(path.display().to_string())
+                        .build(),
+                    )
+                    .await?;
+            }
             let partial: d::modded::PartialVersionInfo = fetch_json(
                 Method::GET,
                 &loader.url,
@@ -523,6 +577,11 @@ pub async fn download_client(
             Some(&client_download.sha1),
             Some(client_download.size as u64),
             progress,
+            InstallErrorContext::new("download Minecraft client")
+                .minecraft_version(version.to_string())
+                .file_path(format!("{version}.jar"))
+                .target_path(path.display().to_string())
+                .build(),
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -563,6 +622,11 @@ pub async fn download_assets_index(
             None,
             Some(version.asset_index.size as u64),
             progress,
+            InstallErrorContext::new("download Minecraft assets index")
+                .minecraft_version(version.id.clone())
+                .file_path(format!("{}.json", version.asset_index.id))
+                .target_path(path.display().to_string())
+                .build(),
         )
         .await?;
         let index = serde_json::from_slice(&index)?;
@@ -632,6 +696,10 @@ pub async fn download_assets(
                                     Some(hash),
                                     Some(asset.size as u64),
                                     fetch_progress.clone(),
+                                    InstallErrorContext::new("download Minecraft asset")
+                                        .file_path(name.clone())
+                                        .target_path(resource_path.display().to_string())
+                                        .build(),
                                 ))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
@@ -648,6 +716,10 @@ pub async fn download_assets(
                                     Some(hash),
                                     Some(asset.size as u64),
                                     fetch_progress.clone(),
+                                    InstallErrorContext::new("download Minecraft asset")
+                                        .file_path(name.clone())
+                                        .target_path(legacy_resource_path.display().to_string())
+                                        .build(),
                                 ))
                                 .await?;
                             write(&legacy_resource_path, resource, &st.io_semaphore).await?;
@@ -729,6 +801,16 @@ pub async fn download_libraries(
                         Some(&native.sha1),
                         Some(native.size as u64),
                         progress.clone(),
+                        InstallErrorContext::new("download Minecraft native library")
+                            .minecraft_version(version.to_string())
+                            .file_path(library.name.clone())
+                            .target_path(
+                                st.directories
+                                    .version_natives_dir(version)
+                                    .display()
+                                    .to_string(),
+                            )
+                            .build(),
                     )
                     .await?;
 
@@ -774,6 +856,11 @@ pub async fn download_libraries(
                         Some(&artifact.sha1),
                         Some(artifact.size as u64),
                         progress.clone(),
+                        InstallErrorContext::new("download Minecraft library")
+                            .minecraft_version(version.to_string())
+                            .file_path(library.name.clone())
+                            .target_path(path.display().to_string())
+                            .build(),
                     )
                     .await?;
                     write(&path, &bytes, &st.io_semaphore).await?;
@@ -880,6 +967,11 @@ pub async fn download_log_config(
             Some(&log_download.sha1),
             Some(log_download.size as u64),
             progress,
+            InstallErrorContext::new("download Minecraft log config")
+                .minecraft_version(version_info.id.clone())
+                .file_path(log_download.id.clone())
+                .target_path(path.display().to_string())
+                .build(),
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;

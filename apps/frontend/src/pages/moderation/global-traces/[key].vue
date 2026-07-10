@@ -33,7 +33,15 @@
 						{{ pageStart }}-{{ pageEnd }} of {{ trace.local_trace_count }} local traces
 					</p>
 				</div>
-				<Badge :type="trace.verdict" />
+				<div class="flex shrink-0 flex-wrap items-center gap-2">
+					<Badge :type="trace.verdict" />
+					<ButtonStyled color="red">
+						<button :disabled="isRemoving" @click="removeGlobalTrace">
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</button>
+					</ButtonStyled>
+				</div>
 			</div>
 
 			<div
@@ -63,13 +71,22 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftIcon, HashIcon } from '@modrinth/assets'
-import { Badge, ButtonStyled, EmptyState, injectModrinthClient, Pagination } from '@modrinth/ui'
+import { ArrowLeftIcon, HashIcon, TrashIcon } from '@modrinth/assets'
+import {
+	Badge,
+	ButtonStyled,
+	EmptyState,
+	injectModrinthClient,
+	injectNotificationManager,
+	Pagination,
+} from '@modrinth/ui'
 
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'
 
 const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const route = useRoute()
+const router = useRouter()
 
 const detailKey = computed(() => {
 	const key = route.params.key
@@ -80,6 +97,7 @@ useHead({ title: () => `Global trace - ${detailKey.value} - Modrinth` })
 
 const localTracePageSize = 20
 const isLoading = ref(false)
+const isRemoving = ref(false)
 const loadError = ref(false)
 const currentPage = ref(1)
 const pageStartCursors = ref<(string | null)[]>([null])
@@ -138,6 +156,34 @@ async function loadPage(page: number) {
 
 async function switchPage(page: number) {
 	await loadPage(page)
+}
+
+async function removeGlobalTrace() {
+	if (isRemoving.value) return
+
+	isRemoving.value = true
+	try {
+		await client.labrinth.tech_review_internal.updateGlobalIssueDetails([
+			{ detail_key: detailKey.value, verdict: 'pending' },
+		])
+
+		addNotification({
+			type: 'success',
+			title: 'Global trace removed',
+			text: 'The global verdict for this trace key has been removed.',
+		})
+
+		await router.push('/moderation/global-traces')
+	} catch (error) {
+		console.error('Failed to remove global detail trace', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to remove global trace',
+			text: 'An error occurred while removing the global trace verdict.',
+		})
+	} finally {
+		isRemoving.value = false
+	}
 }
 
 watch(

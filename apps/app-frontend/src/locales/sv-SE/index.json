@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Avvisa"
   },
-  "app.action-bar.install.failed": {
-    "message": "Installationen misslyckades"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installationen misslyckades för att appen stängdes."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Installationen misslyckades av ett nätverksfel."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installationen misslyckades med ett okänt fel."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Öppna instans"
   },
