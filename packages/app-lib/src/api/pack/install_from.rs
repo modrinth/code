@@ -344,10 +344,11 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     let progress = Some(&mut progress as &mut FetchProgressFn<'_>);
 
     let context = InstallErrorContext::new("download modpack file")
-        .url(url.clone())
-        .expected_hash_opt(hash.cloned())
-        .project_id_opt(Some(project_id.clone()))
-        .version_id_opt(Some(version_id.clone()));
+        .urls(vec![url.clone()])
+        .maybe_expected_hash(hash.cloned())
+        .project_id(project_id.clone())
+        .version_id(version_id.clone())
+        .build();
     reporter.set_context(context).await?;
     let file = fetch_advanced_with_progress(
         Method::GET,
@@ -390,9 +391,10 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
             reporter
                 .set_context(
                     InstallErrorContext::new("download modpack icon")
-                        .url(icon_url.clone())
-                        .project_id_opt(Some(project_id.clone()))
-                        .version_id_opt(Some(version_id.clone())),
+                        .urls(vec![icon_url.clone()])
+                        .project_id(project_id.clone())
+                        .version_id(version_id.clone())
+                        .build(),
                 )
                 .await?;
             let icon_bytes = fetch(

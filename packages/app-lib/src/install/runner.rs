@@ -896,8 +896,9 @@ async fn install_pack(
             reporter
                 .set_context(
                     InstallErrorContext::new("download modpack file")
-                        .project_id_opt(Some(project_id.clone()))
-                        .version_id_opt(Some(version_id.clone())),
+                        .project_id(project_id.clone())
+                        .version_id(version_id.clone())
+                        .build(),
                 )
                 .await?;
             generate_pack_from_version_id_with_reporter(
@@ -915,7 +916,8 @@ async fn install_pack(
             reporter
                 .set_context(
                     InstallErrorContext::new("read local modpack file")
-                        .source_path(path.display().to_string()),
+                        .source_path(path.display().to_string())
+                        .build(),
                 )
                 .await?;
             generate_pack_from_file(path, instance_id.clone()).await?

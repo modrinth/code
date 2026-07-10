@@ -420,20 +420,28 @@ pub struct InstallJobPaths {
     pub final_instance_path: Option<PathBuf>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, bon::Builder)]
+#[builder(start_fn = new)]
 pub struct InstallErrorContext {
+    #[builder(start_fn, into)]
     pub operation: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub source_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub target_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub file_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub entry_path: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[builder(default)]
     pub urls: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub expected_hash: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expected_size: Option<u64>,
@@ -442,130 +450,19 @@ pub struct InstallErrorContext {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub version_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub minecraft_version: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub loader: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub java_version: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub os: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(into)]
     pub arch: Option<String>,
-}
-
-impl InstallErrorContext {
-    pub fn new(operation: impl Into<String>) -> Self {
-        Self {
-            operation: operation.into(),
-            source_path: None,
-            target_path: None,
-            file_path: None,
-            entry_path: None,
-            urls: Vec::new(),
-            expected_hash: None,
-            expected_size: None,
-            project_id: None,
-            version_id: None,
-            minecraft_version: None,
-            loader: None,
-            java_version: None,
-            os: None,
-            arch: None,
-        }
-    }
-
-    pub fn source_path(mut self, source_path: impl Into<String>) -> Self {
-        self.source_path = Some(source_path.into());
-        self
-    }
-
-    pub fn target_path(mut self, target_path: impl Into<String>) -> Self {
-        self.target_path = Some(target_path.into());
-        self
-    }
-
-    pub fn file_path(mut self, file_path: impl Into<String>) -> Self {
-        self.file_path = Some(file_path.into());
-        self
-    }
-
-    pub fn entry_path(mut self, entry_path: impl Into<String>) -> Self {
-        self.entry_path = Some(entry_path.into());
-        self
-    }
-
-    pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.urls.push(url.into());
-        self
-    }
-
-    pub fn urls<I, S>(mut self, urls: I) -> Self
-    where
-        I: IntoIterator<Item = S>,
-        S: Into<String>,
-    {
-        self.urls = urls.into_iter().map(Into::into).collect();
-        self
-    }
-
-    pub fn expected_hash(mut self, expected_hash: impl Into<String>) -> Self {
-        self.expected_hash = Some(expected_hash.into());
-        self
-    }
-
-    pub fn expected_hash_opt(
-        mut self,
-        expected_hash: Option<impl Into<String>>,
-    ) -> Self {
-        self.expected_hash = expected_hash.map(Into::into);
-        self
-    }
-
-    pub fn expected_size(mut self, expected_size: u64) -> Self {
-        self.expected_size = Some(expected_size);
-        self
-    }
-
-    pub fn expected_size_opt(mut self, expected_size: Option<u64>) -> Self {
-        self.expected_size = expected_size;
-        self
-    }
-
-    pub fn project_id_opt(
-        mut self,
-        project_id: Option<impl Into<String>>,
-    ) -> Self {
-        self.project_id = project_id.map(Into::into);
-        self
-    }
-
-    pub fn version_id_opt(
-        mut self,
-        version_id: Option<impl Into<String>>,
-    ) -> Self {
-        self.version_id = version_id.map(Into::into);
-        self
-    }
-
-    pub fn minecraft_version(
-        mut self,
-        minecraft_version: impl Into<String>,
-    ) -> Self {
-        self.minecraft_version = Some(minecraft_version.into());
-        self
-    }
-
-    pub fn loader(mut self, loader: impl Into<String>) -> Self {
-        self.loader = Some(loader.into());
-        self
-    }
-
-    pub fn java_runtime(mut self, java_version: u32) -> Self {
-        self.java_version = Some(java_version);
-        self.os = Some(std::env::consts::OS.to_string());
-        self.arch = Some(std::env::consts::ARCH.to_string());
-        self
-    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

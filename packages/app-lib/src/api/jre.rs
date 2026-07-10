@@ -158,8 +158,11 @@ async fn auto_install_java_inner(
         reporter
             .set_context(
                 InstallErrorContext::new("fetch Java package metadata")
-                    .url(metadata_url.clone())
-                    .java_runtime(java_version),
+                    .urls(vec![metadata_url.clone()])
+                    .java_version(java_version)
+                    .os(std::env::consts::OS)
+                    .arch(std::env::consts::ARCH)
+                    .build(),
             )
             .await?;
     }
@@ -182,9 +185,12 @@ async fn auto_install_java_inner(
             reporter
                 .set_context(
                     InstallErrorContext::new("download Java archive")
-                        .url(download.download_url.clone())
+                        .urls(vec![download.download_url.clone()])
                         .file_path(download.name.display().to_string())
-                        .java_runtime(java_version),
+                        .java_version(java_version)
+                        .os(std::env::consts::OS)
+                        .arch(std::env::consts::ARCH)
+                        .build(),
                 )
                 .await?;
         }
@@ -264,10 +270,13 @@ async fn auto_install_java_inner(
             reporter
                 .set_context(
                     InstallErrorContext::new("read Java archive")
-                        .url(download.download_url.clone())
+                        .urls(vec![download.download_url.clone()])
                         .file_path(download.name.display().to_string())
                         .target_path(path.display().to_string())
-                        .java_runtime(java_version),
+                        .java_version(java_version)
+                        .os(std::env::consts::OS)
+                        .arch(std::env::consts::ARCH)
+                        .build(),
                 )
                 .await?;
         }
@@ -303,10 +312,13 @@ async fn auto_install_java_inner(
             reporter
                 .set_context(
                     InstallErrorContext::new("extract Java archive")
-                        .url(download.download_url.clone())
+                        .urls(vec![download.download_url.clone()])
                         .file_path(download.name.display().to_string())
                         .target_path(path.display().to_string())
-                        .java_runtime(java_version),
+                        .java_version(java_version)
+                        .os(std::env::consts::OS)
+                        .arch(std::env::consts::ARCH)
+                        .build(),
                 )
                 .await?;
         }

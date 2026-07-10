@@ -149,10 +149,10 @@ async fn fetch_minecraft_file(
     progress: Option<MinecraftDownloadProgress>,
     context: InstallErrorContext,
 ) -> crate::Result<bytes::Bytes> {
-    let context = context
-        .url(url.to_string())
-        .expected_hash_opt(sha1.map(str::to_string))
-        .expected_size_opt(expected_size);
+    let mut context = context;
+    context.urls.push(url.to_string());
+    context.expected_hash = sha1.map(str::to_string);
+    context.expected_size = expected_size;
     if let Some(progress) = &progress {
         progress.set_context(context.clone()).await?;
     }
@@ -487,8 +487,9 @@ pub async fn download_version_info(
                         "download Minecraft version metadata",
                     )
                     .minecraft_version(version.id.clone())
-                    .url(version.url.clone())
-                    .target_path(path.display().to_string()),
+                    .urls(vec![version.url.clone()])
+                    .target_path(path.display().to_string())
+                    .build(),
                 )
                 .await?;
         }
@@ -511,8 +512,9 @@ pub async fn download_version_info(
                             "download loader version metadata",
                         )
                         .minecraft_version(version.id.clone())
-                        .url(loader.url.clone())
-                        .target_path(path.display().to_string()),
+                        .urls(vec![loader.url.clone()])
+                        .target_path(path.display().to_string())
+                        .build(),
                     )
                     .await?;
             }
@@ -578,7 +580,8 @@ pub async fn download_client(
             InstallErrorContext::new("download Minecraft client")
                 .minecraft_version(version.to_string())
                 .file_path(format!("{version}.jar"))
-                .target_path(path.display().to_string()),
+                .target_path(path.display().to_string())
+                .build(),
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -622,7 +625,8 @@ pub async fn download_assets_index(
             InstallErrorContext::new("download Minecraft assets index")
                 .minecraft_version(version.id.clone())
                 .file_path(format!("{}.json", version.asset_index.id))
-                .target_path(path.display().to_string()),
+                .target_path(path.display().to_string())
+                .build(),
         )
         .await?;
         let index = serde_json::from_slice(&index)?;
@@ -694,7 +698,8 @@ pub async fn download_assets(
                                     fetch_progress.clone(),
                                     InstallErrorContext::new("download Minecraft asset")
                                         .file_path(name.clone())
-                                        .target_path(resource_path.display().to_string()),
+                                        .target_path(resource_path.display().to_string())
+                                        .build(),
                                 ))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
@@ -713,7 +718,8 @@ pub async fn download_assets(
                                     fetch_progress.clone(),
                                     InstallErrorContext::new("download Minecraft asset")
                                         .file_path(name.clone())
-                                        .target_path(legacy_resource_path.display().to_string()),
+                                        .target_path(legacy_resource_path.display().to_string())
+                                        .build(),
                                 ))
                                 .await?;
                             write(&legacy_resource_path, resource, &st.io_semaphore).await?;
@@ -803,7 +809,8 @@ pub async fn download_libraries(
                                     .version_natives_dir(version)
                                     .display()
                                     .to_string(),
-                            ),
+                            )
+                            .build(),
                     )
                     .await?;
 
@@ -852,7 +859,8 @@ pub async fn download_libraries(
                         InstallErrorContext::new("download Minecraft library")
                             .minecraft_version(version.to_string())
                             .file_path(library.name.clone())
-                            .target_path(path.display().to_string()),
+                            .target_path(path.display().to_string())
+                            .build(),
                     )
                     .await?;
                     write(&path, &bytes, &st.io_semaphore).await?;
@@ -962,7 +970,8 @@ pub async fn download_log_config(
             InstallErrorContext::new("download Minecraft log config")
                 .minecraft_version(version_info.id.clone())
                 .file_path(log_download.id.clone())
-                .target_path(path.display().to_string()),
+                .target_path(path.display().to_string())
+                .build(),
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;

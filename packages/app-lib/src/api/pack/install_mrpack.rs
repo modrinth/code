@@ -325,9 +325,10 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     reporter
         .set_context(
             InstallErrorContext::new("read modpack archive")
-                .project_id_opt(project_id.clone())
-                .version_id_opt(version_id.clone())
-                .source_path(source_path.clone()),
+                .maybe_project_id(project_id.clone())
+                .maybe_version_id(version_id.clone())
+                .source_path(source_path.clone())
+                .build(),
         )
         .await?;
     let mut zip_reader = MrpackZipReader::new(&file).await?;
@@ -348,10 +349,11 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     reporter
         .set_context(
             InstallErrorContext::new("read modpack manifest")
-                .project_id_opt(project_id.clone())
-                .version_id_opt(version_id.clone())
+                .maybe_project_id(project_id.clone())
+                .maybe_version_id(version_id.clone())
                 .source_path(source_path.clone())
-                .entry_path("modrinth.index.json"),
+                .entry_path("modrinth.index.json")
+                .build(),
         )
         .await?;
 
@@ -599,15 +601,20 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
 
                 let context =
                     InstallErrorContext::new("download modpack content file")
-                        .project_id_opt(content_context.pack_project_id.clone())
-                        .version_id_opt(content_context.pack_version_id.clone())
+                        .maybe_project_id(
+                            content_context.pack_project_id.clone(),
+                        )
+                        .maybe_version_id(
+                            content_context.pack_version_id.clone(),
+                        )
                         .file_path(project_path.clone())
                         .target_path(target_path.display().to_string())
                         .urls(project.downloads.clone())
-                        .expected_hash_opt(
+                        .maybe_expected_hash(
                             project.hashes.get(&PackFileHash::Sha1).cloned(),
                         )
-                        .expected_size(project_size);
+                        .expected_size(project_size)
+                        .build();
                 content_context
                     .reporter
                     .set_transient_context(context.clone())
@@ -873,11 +880,12 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             instance_full_path.join(relative_override_file_path.as_str());
         let override_context =
             InstallErrorContext::new("extract modpack override")
-                .project_id_opt(project_id.clone())
-                .version_id_opt(version_id.clone())
+                .maybe_project_id(project_id.clone())
+                .maybe_version_id(version_id.clone())
                 .source_path(source_path.clone())
                 .entry_path(file.filename().as_str().unwrap_or_default())
-                .target_path(path.display().to_string());
+                .target_path(path.display().to_string())
+                .build();
         reporter
             .set_transient_context(override_context.clone())
             .await?;
@@ -905,11 +913,12 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             let _permit = state.install_db_semaphore.acquire().await?;
             let record_context =
                 InstallErrorContext::new("record modpack override")
-                    .project_id_opt(project_id.clone())
-                    .version_id_opt(version_id.clone())
+                    .maybe_project_id(project_id.clone())
+                    .maybe_version_id(version_id.clone())
                     .source_path(source_path.clone())
                     .entry_path(file.filename().as_str().unwrap_or_default())
-                    .target_path(path.display().to_string());
+                    .target_path(path.display().to_string())
+                    .build();
             reporter
                 .preserve_failure_context(
                     record_context.clone(),
