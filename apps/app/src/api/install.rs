@@ -151,6 +151,7 @@ pub async fn install_shared_instance(
     manager_id: Option<String>,
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
+    instance_icon_url: Option<String>,
 ) -> Result<InstallJobSnapshot> {
     Ok(theseus::instance::install_shared_instance(
         &shared_instance_id,
@@ -158,6 +159,7 @@ pub async fn install_shared_instance(
         manager_id,
         server_manager_name,
         server_manager_icon_url,
+        instance_icon_url,
     )
     .await?)
 }

@@ -768,6 +768,21 @@ pub(super) async fn shared_attachment(
         .and_then(|metadata| metadata.shared_instance))
 }
 
+pub(crate) async fn sync_shared_instance_icon(
+    instance_id: &str,
+    icon_path: Option<&str>,
+    state: &State,
+) -> crate::Result<()> {
+    let Some(attachment) = shared_attachment(instance_id, state).await? else {
+        return Ok(());
+    };
+    if attachment.role != SharedInstanceRole::Owner {
+        return Ok(());
+    }
+
+    update_remote_instance_icon(&attachment.id, icon_path, state).await
+}
+
 pub(super) async fn shared_instance_for_invites(
     instance_id: &str,
     user_count: usize,
@@ -839,6 +854,14 @@ pub(super) async fn shared_instance_for_invites(
                 })?
         }
     };
+
+    ensure_owner(&attachment)?;
+    update_remote_instance_icon(
+        &attachment.id,
+        metadata.instance.icon_path.as_deref(),
+        state,
+    )
+    .await?;
 
     Ok((metadata, attachment))
 }

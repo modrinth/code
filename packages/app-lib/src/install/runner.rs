@@ -329,10 +329,14 @@ async fn prepare_initial_instance(
                         preview.game_version,
                         preview.modloader,
                         preview.loader_version,
-                        preview
-                            .icon
-                            .as_ref()
-                            .map(|path| path.to_string_lossy().to_string())
+                        data.instance_icon_url
+                            .clone()
+                            .or_else(|| {
+                                preview
+                                    .icon
+                                    .as_ref()
+                                    .map(|path| path.to_string_lossy().to_string())
+                            })
                             .or_else(|| preview.icon_url.clone()),
                     )
                 } else {
@@ -340,7 +344,7 @@ async fn prepare_initial_instance(
                         data.game_version.clone(),
                         data.loader,
                         data.loader_version.clone(),
-                        None,
+                        data.instance_icon_url.clone(),
                     )
                 };
             let metadata = crate::api::instance::create(

@@ -406,4 +406,3 @@ pub(super) fn remote_shared_content(
             .collect(),
     )
 }
-

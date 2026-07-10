@@ -73,7 +73,7 @@ export function useSharedInstanceInviteHandler(
 				invite.sharedInstanceId,
 				invite.sharedInstanceName,
 			)
-			if (invite.instanceIconUrl && !preview.iconUrl) preview.iconUrl = invite.instanceIconUrl
+			if (invite.instanceIconUrl) preview.iconUrl = invite.instanceIconUrl
 
 			showInstall(
 				preview,
@@ -84,6 +84,7 @@ export function useSharedInstanceInviteHandler(
 						invite.invitedById,
 						null,
 						null,
+						invite.instanceIconUrl,
 					)
 					await markNotificationRead(notification)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
@@ -148,6 +149,7 @@ export function useSharedInstanceInviteHandler(
 					invite.managerId,
 					invite.serverManagerName,
 					invite.serverManagerIconUrl,
+					invite.instanceIconUrl,
 				)
 				await queryClient.invalidateQueries({ queryKey: ['instances'] })
 			})

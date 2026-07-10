@@ -133,6 +133,7 @@ pub struct SharedInstanceInviteInstallPreview {
     pub manager_id: Option<String>,
     pub server_manager_name: Option<String>,
     pub server_manager_icon_url: Option<String>,
+    pub instance_icon_url: Option<String>,
     pub preview: SharedInstanceInstallPreview,
 }
 
@@ -167,4 +168,3 @@ pub enum SharedInstanceUpdateDiffType {
 pub(super) fn is_false(value: &bool) -> bool {
     !*value
 }
-

@@ -47,14 +47,15 @@
 						class="flex flex-col items-center gap-4 rounded-3xl border border-solid border-surface-5 bg-surface-3 p-6"
 					>
 						<div class="flex w-full items-center gap-3 rounded-xl bg-surface-2 p-3">
-							<Avatar :src="null" :alt="instance.name" size="48px" />
+							<Avatar :src="instance.icon" :alt="instance.name" size="48px" />
 							<div class="flex min-w-0 flex-col gap-1">
 								<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
-								<span class="flex items-center gap-2 font-medium text-primary">
+								<span class="flex items-center gap-1.5 text-sm font-medium leading-4 text-primary">
+									<span>{{ formatMessage(messages.invitedBy) }}</span>
 									<Avatar
 										:src="instance.inviterAvatar"
 										:alt="instance.inviterName"
-										size="24px"
+										size="16px"
 										circle
 										no-shadow
 									/>
@@ -144,6 +145,10 @@ const messages = defineMessages({
 		id: 'modal.shared-instance.open-in-app.title',
 		defaultMessage: 'Opening Modrinth App',
 	},
+	invitedBy: {
+		id: 'modal.shared-instance.open-in-app.invited-by',
+		defaultMessage: 'Invited by',
+	},
 	whyUseApp: {
 		id: 'modal.shared-instance.open-in-app.why-use',
 		defaultMessage: 'Why use the Modrinth App',
@@ -177,6 +182,7 @@ const messages = defineMessages({
 export interface SharedInstanceInviteModalData {
 	inviteId: string
 	name: string
+	icon?: string | null
 	inviterName: string
 	inviterAvatar?: string | null
 	gameVersion: string
@@ -190,6 +196,7 @@ const countdownProgress = ref(1)
 const instance = ref<SharedInstanceInviteModalData>({
 	inviteId: '',
 	name: '',
+	icon: null,
 	inviterName: '',
 	inviterAvatar: null,
 	gameVersion: '',

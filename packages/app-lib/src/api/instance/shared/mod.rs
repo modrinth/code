@@ -30,6 +30,8 @@ mod invites;
 mod publish;
 mod types;
 
+pub(crate) use self::publish::sync_shared_instance_icon;
+
 pub use self::install::{
     accept_shared_instance_invite_for_install,
     get_shared_instance_install_preview, get_shared_instance_update_preview,

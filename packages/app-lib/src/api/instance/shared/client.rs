@@ -62,6 +62,8 @@ pub(super) struct InstanceInviteInfoResponse {
     pub(super) instance_id: String,
     pub(super) instance_name: String,
     #[serde(default)]
+    pub(super) instance_icon: Option<String>,
+    #[serde(default)]
     pub(super) managers: Vec<InstanceInviteManagerResponse>,
 }
 
@@ -181,6 +183,74 @@ pub(super) async fn update_remote_instance(
             request_id = request_id.as_deref().unwrap_or("none"),
             "Shared instances API does not support remote instance updates; skipping name sync"
         );
+        return Ok(());
+    }
+
+    shared_instances_request_error(operation, method, &path, response).await
+}
+
+pub(super) async fn get_remote_instance_access(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceRemoteResponse<()>> {
+    let operation = "get_instance";
+    let method = Method::GET;
+    let path = format!("/instances/{shared_instance_id}");
+    let response =
+        send_request(operation, method.clone(), &path, None, state).await?;
+
+    if let Some(reason) =
+        SharedInstanceUnavailableReason::from_status(response.status())
+    {
+        if reason == SharedInstanceUnavailableReason::AccessRevoked
+            && !active_modrinth_session_is_valid(state).await?
+        {
+            return Err(crate::ErrorKind::NoCredentialsError.into());
+        }
+
+        return Ok(SharedInstanceRemoteResponse::Unavailable(reason));
+    }
+
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            operation, method, &path, response,
+        )
+        .await;
+    }
+
+    Ok(SharedInstanceRemoteResponse::Available(()))
+}
+
+pub(super) async fn update_remote_instance_icon(
+    shared_instance_id: &str,
+    icon_path: Option<&str>,
+    state: &State,
+) -> crate::Result<()> {
+    let path = format!("/instances/{shared_instance_id}/icon");
+    let Some(icon_path) = icon_path else {
+        return request_empty(
+            "delete_instance_icon",
+            Method::DELETE,
+            &path,
+            None,
+            state,
+        )
+        .await;
+    };
+
+    let bytes = crate::util::io::read(icon_path).await?;
+    let operation = "upload_instance_icon";
+    let method = Method::PUT;
+    let response = send_bytes_request(
+        operation,
+        method.clone(),
+        &path,
+        bytes,
+        state,
+    )
+    .await?;
+
+    if response.status().is_success() {
         return Ok(());
     }
 
@@ -600,6 +670,58 @@ pub(super) async fn send_request(
     .await
 }
 
+pub(super) async fn send_bytes_request(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    body: Vec<u8>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let credentials = ModrinthCredentials::get_and_refresh(
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or(crate::ErrorKind::NoCredentialsError)?;
+    let _permit = state.api_semaphore.0.acquire().await?;
+    let base_url = service_base_url();
+    let url = service_url(base_url, path);
+
+    tracing::debug!(
+        operation,
+        method = method.as_str(),
+        path,
+        url = %url,
+        user_id = credentials.user_id.as_str(),
+        auth = SharedInstancesRequestAuth::ModrinthSession.label(),
+        has_body = true,
+        "Sending shared instances API request"
+    );
+
+    let response = shared_instances_client(base_url)
+        .request(method.clone(), &url)
+        .bearer_auth(credentials.session)
+        .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
+        .body(body)
+        .send()
+        .await?;
+
+    if response.status().is_success() {
+        let request_id = response_request_id(&response);
+        tracing::debug!(
+            operation,
+            method = method.as_str(),
+            path,
+            url = %url,
+            status = response.status().as_u16(),
+            request_id = request_id.as_deref().unwrap_or("none"),
+            "Shared instances API request succeeded"
+        );
+    }
+
+    Ok(response)
+}
+
 pub(super) async fn send_request_with_auth(
     operation: &'static str,
     method: Method,
@@ -720,5 +842,3 @@ pub(super) fn shared_instances_client(base_url: &str) -> &'static reqwest::Clien
         &INSECURE_REQWEST_CLIENT
     }
 }
-
-

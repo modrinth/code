@@ -61,6 +61,7 @@ export interface SharedInstanceInviteInstallPreview {
 	managerId?: string | null
 	serverManagerName?: string | null
 	serverManagerIconUrl?: string | null
+	instanceIconUrl?: string | null
 	preview: SharedInstanceInstallPreview
 }
 
@@ -285,6 +286,7 @@ export async function install_shared_instance(
 	managerId?: string | null,
 	serverManagerName?: string | null,
 	serverManagerIconUrl?: string | null,
+	instanceIconUrl?: string | null,
 ) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
@@ -292,6 +294,7 @@ export async function install_shared_instance(
 		managerId,
 		serverManagerName,
 		serverManagerIconUrl,
+		instanceIconUrl,
 	})
 }
 

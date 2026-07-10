@@ -217,6 +217,8 @@ pub struct SharedInstanceInstallData {
     #[serde(default)]
     pub server_manager_icon_url: Option<String>,
     #[serde(default)]
+    pub instance_icon_url: Option<String>,
+    #[serde(default)]
     pub linked_user_id: Option<String>,
     pub name: String,
     pub version: i32,

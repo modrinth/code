@@ -3,12 +3,18 @@
 		class="relative isolate min-h-screen overflow-hidden bg-surface-1 px-4 pb-16 pt-36 sm:pt-52"
 	>
 		<div
-			class="absolute left-1/2 top-0 -z-10 h-[23.3125rem] w-full -translate-x-1/2 overflow-hidden rounded-none sm:top-10 sm:w-[min(70rem,100%)] sm:rounded-[2.375rem]"
+			class="absolute left-1/2 top-0 -z-10 h-[23.3125rem] w-full -translate-x-1/2 overflow-hidden rounded-none !rounded-b-none sm:top-10 sm:w-[min(70rem,100%)] sm:rounded-[2.375rem]"
 			aria-hidden="true"
 		>
 			<img
 				:src="InviteBackgroundIllustration"
 				class="absolute inset-0 size-full scale-[2] object-cover object-[center_25%]"
+				alt=""
+			/>
+			<img
+				v-if="instanceIcon"
+				:src="instanceIcon"
+				class="absolute -inset-1/2 size-[200%] object-cover opacity-90 blur-[160px] saturate-200 [mix-blend-mode:color]"
 				alt=""
 			/>
 			<div
@@ -62,18 +68,41 @@
 						<span
 							class="flex min-w-0 max-w-full items-center gap-1.5 whitespace-nowrap rounded-xl font-semibold text-contrast"
 						>
-							<Avatar :src="instanceIcon" :alt="invite.instance_name" size="32px" no-shadow />
+							<Avatar
+								:src="instanceIcon"
+								:alt="invite.instance_name"
+								size="32px"
+								no-shadow
+							/>
 							<span class="min-w-0 truncate whitespace-nowrap">{{ invite.instance_name }}</span>
 						</span>
 					</div>
 				</div>
-
-				<!-- TODO: Hook this up once the shared instances API exposes invite join counts. -->
 				<div
-					v-if="false"
-					class="items-center gap-2 rounded-full border border-solid border-surface-4 bg-surface-2 px-4 py-2 text-primary"
+					v-if="instanceUsers.length"
+					class="flex items-center gap-2 rounded-full border border-solid border-surface-3 bg-surface-2 px-4 py-2 text-primary [box-shadow:0_1px_1px_rgb(0_0_0/12%)]"
 				>
-					{{ formatMessage(messages.joinedCount, { count: 5 }) }}
+					<div class="flex shrink-0 items-center">
+						<Avatar
+							v-for="(user, index) in visibleInstanceUsers"
+							:key="user.id"
+							:src="user.avatar"
+							:alt="user.name"
+							:tint-by="user.id"
+							size="28px"
+							circle
+							no-shadow
+							class="!border-2 !border-surface-2"
+							:class="{ '-mr-1.5': index < visibleInstanceUsers.length - 1 || hiddenUserCount > 0 }"
+						/>
+						<div
+							v-if="hiddenUserCount"
+							class="flex size-7 items-center justify-center rounded-full border-2 border-solid border-surface-2 bg-surface-3 text-xs font-medium leading-4 text-primary"
+						>
+							+{{ hiddenUserCount }}
+						</div>
+					</div>
+					{{ formatMessage(messages.joinedCount, { count: instanceUsers.length }) }}
 				</div>
 			</div>
 
@@ -170,7 +199,6 @@ const route = useRoute()
 const client = injectModrinthClient()
 const inviteId = computed(() => String(route.params.inviteId))
 const openInAppModal = useTemplateRef('openInAppModal')
-const instanceIcon = null
 
 const {
 	data: invite,
@@ -182,6 +210,13 @@ const {
 	queryFn: () => client.sharedinstances.invites_v1.get(inviteId.value),
 	retry: false,
 })
+
+const instanceIcon = computed(() => invite.value?.instance_icon ?? null)
+const instanceUsers = computed(() => invite.value?.instance_users ?? [])
+const visibleInstanceUsers = computed(() => instanceUsers.value.slice(0, 4))
+const hiddenUserCount = computed(() =>
+	Math.max(0, instanceUsers.value.length - visibleInstanceUsers.value.length),
+)
 
 onServerPrefetch(() => suspense())
 
@@ -202,6 +237,7 @@ function acceptInvite() {
 		instance: {
 			inviteId: inviteId.value,
 			name: invite.value.instance_name,
+			icon: invite.value.instance_icon,
 			inviterName: inviterName.value,
 			inviterAvatar: inviterAvatar.value,
 			gameVersion: invite.value.game_version,
