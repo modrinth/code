@@ -30,6 +30,18 @@ export default [
 		private: false,
 	},
 	{
+		label: '📝 ARR License',
+		message: async () =>
+			(await import('./messages/quick-replies/externals-permissions/arr-license.md?raw')).default,
+		private: false,
+	},
+	{
+		label: '💰 Non-Commercial License',
+		message: async () =>
+			(await import('./messages/quick-replies/externals-permissions/nc-license.md?raw')).default,
+		private: false,
+	},
+	{
 		label: '🍴 Forks',
 		message: async () =>
 			(await import('./messages/quick-replies/externals-permissions/forks.md?raw')).default,
