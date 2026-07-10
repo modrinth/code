@@ -2233,13 +2233,13 @@ async fn update_remote_instance(
     }
 
     if response.status() == StatusCode::METHOD_NOT_ALLOWED {
-        let body = response.text().await.unwrap_or_default();
+        let request_id = response_request_id(&response);
         tracing::warn!(
             operation,
             method = method.as_str(),
             path,
             status = StatusCode::METHOD_NOT_ALLOWED.as_u16(),
-            response_body = %body,
+            request_id = request_id.as_deref().unwrap_or("none"),
             "Shared instances API does not support remote instance updates; skipping name sync"
         );
         return Ok(());
@@ -2402,6 +2402,7 @@ async fn accept_shared_instance_invite(
     }
 
     let status = response.status();
+    let request_id = response_request_id(&response);
     let body = response.text().await.unwrap_or_default();
     if status == StatusCode::BAD_REQUEST && body.contains("already has access")
     {
@@ -2413,11 +2414,11 @@ async fn accept_shared_instance_invite(
         method = method.as_str(),
         path,
         status = status.as_u16(),
-        response_body = %body,
+        request_id = request_id.as_deref().unwrap_or("none"),
         "Shared instances API request failed"
     );
     Err(crate::ErrorKind::OtherError(format!(
-        "Shared instances API request {operation} {method} {path} failed with status {status}: {body}"
+        "Shared instances API request {operation} {method} {path} failed with status {status}"
     ))
     .into())
 }
@@ -2445,7 +2446,7 @@ async fn get_shared_instance_invite_info(
         .await;
     }
 
-    decode_json_response(operation, &path, response).await
+    decode_json_response(operation, method, &path, response).await
 }
 
 async fn decline_pending_remote_invite(
@@ -2472,8 +2473,15 @@ async fn request_json<T>(
 where
     T: DeserializeOwned,
 {
-    let response = request(operation, method, path, body, state).await?;
-    decode_json_response(operation, path, response).await
+    let response = request(
+        operation,
+        method.clone(),
+        path,
+        body,
+        state,
+    )
+    .await?;
+    decode_json_response(operation, method, path, response).await
 }
 
 async fn request_json_optional_unavailable<T>(
@@ -2530,7 +2538,7 @@ where
         .await;
     }
 
-    decode_json_response(operation, path, response)
+    decode_json_response(operation, method, path, response)
         .await
         .map(SharedInstanceRemoteResponse::Available)
 }
@@ -2562,15 +2570,24 @@ async fn active_modrinth_session_is_valid(
     }
 
     let status = response.status();
-    let body = response.text().await.unwrap_or_default();
+    let request_id = response_request_id(&response);
+    tracing::warn!(
+        operation = "validate_modrinth_session",
+        method = Method::GET.as_str(),
+        path = "/user",
+        status = status.as_u16(),
+        request_id = request_id.as_deref().unwrap_or("none"),
+        "Modrinth auth validation request failed"
+    );
     Err(crate::ErrorKind::OtherError(format!(
-        "Modrinth auth validation failed with status {status}: {body}"
+        "Modrinth auth validation failed with status {status}"
     ))
     .into())
 }
 
 async fn decode_json_response<T>(
     operation: &'static str,
+    method: Method,
     path: &str,
     response: reqwest::Response,
 ) -> crate::Result<T>
@@ -2578,18 +2595,22 @@ where
     T: DeserializeOwned,
 {
     let status = response.status();
+    let request_id = response_request_id(&response);
     let body = response.text().await?;
-    tracing::debug!(
-        operation,
-        path,
-        status = status.as_u16(),
-        response_body = %body,
-        "Decoding shared instances API response"
-    );
-
     serde_json::from_str::<T>(&body).map_err(|error| {
+        tracing::warn!(
+            operation,
+            method = method.as_str(),
+            path,
+            status = status.as_u16(),
+            request_id = request_id.as_deref().unwrap_or("none"),
+            error_category = ?error.classify(),
+            error_line = error.line(),
+            error_column = error.column(),
+            "Shared instances API returned an invalid JSON response"
+        );
         crate::ErrorKind::OtherError(format!(
-            "Shared instances API request {operation} {path} failed to decode JSON response with status {status}: {error}; body: {body}"
+            "Shared instances API request {operation} {method} {path} returned invalid JSON with status {status}"
         ))
         .into()
     })
@@ -2695,12 +2716,14 @@ async fn send_request_with_auth(
 
     let response = request.send().await?;
     if response.status().is_success() {
+        let request_id = response_request_id(&response);
         tracing::debug!(
             operation,
             method = method.as_str(),
             path,
             url = %url,
             status = response.status().as_u16(),
+            request_id = request_id.as_deref().unwrap_or("none"),
             "Shared instances API request succeeded"
         );
     }
@@ -2714,19 +2737,33 @@ async fn shared_instances_request_error<T>(
     response: reqwest::Response,
 ) -> crate::Result<T> {
     let status = response.status();
-    let body = response.text().await.unwrap_or_default();
+    let request_id = response_request_id(&response);
     tracing::warn!(
         operation,
         method = method.as_str(),
         path,
         status = status.as_u16(),
-        response_body = %body,
+        request_id = request_id.as_deref().unwrap_or("none"),
         "Shared instances API request failed"
     );
     Err(crate::ErrorKind::OtherError(format!(
-        "Shared instances API request {operation} {method} {path} failed with status {status}: {body}"
+        "Shared instances API request {operation} {method} {path} failed with status {status}"
     ))
     .into())
+}
+
+fn response_request_id(response: &reqwest::Response) -> Option<String> {
+    let request_id = response.headers().get("x-request-id")?.to_str().ok()?;
+    if request_id.is_empty()
+        || request_id.len() > 128
+        || !request_id
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || "-_.:".contains(character))
+    {
+        return None;
+    }
+
+    Some(request_id.to_string())
 }
 
 fn service_url(base_url: &str, path: &str) -> String {
