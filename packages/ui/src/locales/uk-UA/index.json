@@ -233,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Перевстановити збірку"
   },
-  "button.remove": {
-    "defaultMessage": "Видалити"
-  },
   "button.remove-image": {
     "defaultMessage": "Видалити зображення"
   },

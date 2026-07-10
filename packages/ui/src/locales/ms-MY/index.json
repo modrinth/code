@@ -230,9 +230,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Pasang semula pek mod"
   },
-  "button.remove": {
-    "defaultMessage": "Alih keluar"
-  },
   "button.remove-image": {
     "defaultMessage": "Alih keluar gambar"
   },

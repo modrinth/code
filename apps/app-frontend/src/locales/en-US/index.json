@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Hide more running instances"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Copied"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copy details"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Dismiss"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Install failed"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installation failed due to app closing."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Installation failed due to a network error."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installation failed due to an unknown error."
   },
   "app.action-bar.install.open-instance": {
     "message": "Open instance"
   },
   "app.action-bar.install.retry": {
     "message": "Retry"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Canceled due to app closing"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Couldn't read modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Canceled"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Cleanup didn't finish"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Couldn't download files"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Downloaded file is corrupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Couldn't save files"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Download couldn't finish"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instance couldn't be found"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "File path is invalid"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Modpack data invalid"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpack files have invalid metadata"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java setup couldn't finish"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Loader setup failed"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Couldn't update local data"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft setup failed"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Couldn't reach Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "No permission to write"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Couldn't download pack"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Something went wrong"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Unknown instance"
@@ -180,7 +234,7 @@
     "message": "Discover servers"
   },
   "app.browse.hide-added-servers": {
-    "message": "Hide already added servers"
+    "message": "Hide servers already added"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -203,17 +257,11 @@
   "app.export-modal.header": {
     "message": "Export modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "Include \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpack Name"
+    "message": "Modpack name"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack name"
-  },
-  "app.export-modal.select-files-label": {
-    "message": "Configure which files are included in this export"
   },
   "app.export-modal.version-number-label": {
     "message": "Version number"
@@ -237,7 +285,7 @@
     "message": "Finalizing"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Preparing instance"
+    "message": "Queued to install"
   },
   "app.install.phase.preparing_java": {
     "message": "Preparing Java"
@@ -416,11 +464,26 @@
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Switch version"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Install content to instance"
+  },
+  "app.project.version.all-versions": {
+    "message": "All versions"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Download in browser"
+  },
+  "app.project.version.installing": {
+    "message": "Installing"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Already installed"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
@@ -541,6 +604,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"

@@ -1,0 +1,135 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH filtered_projects AS (\n                SELECT\n                    m.id,\n                    m.queued,\n                    m.published\n                FROM mods m\n                WHERE\n                    m.status = $1\n                    AND (\n                        $6::boolean = false\n                        OR NOT EXISTS (\n                            SELECT 1\n                            FROM delphi_issue_details_with_statuses didws\n                            WHERE didws.project_id = m.id\n                                AND didws.status = 'pending'\n                        )\n                    )\n            ),\n            total AS (\n                SELECT COUNT(*) AS total_count FROM filtered_projects\n            ),\n            page_ids AS (\n                SELECT\n                    id,\n                    queued,\n                    published\n                FROM filtered_projects\n                ORDER BY\n                    CASE WHEN $5 = 'newest' THEN COALESCE(queued, published) END DESC NULLS LAST,\n                    CASE WHEN $5 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,\n                    id ASC\n                OFFSET $4\n                LIMIT $3\n            ),\n            page_project_types AS (\n                SELECT\n                    v.mod_id,\n                    ARRAY_AGG(DISTINCT pt.name::text) FILTER (WHERE pt.name IS NOT NULL) AS project_types\n                FROM versions v\n                INNER JOIN page_ids page ON page.id = v.mod_id\n                INNER JOIN loaders_versions lv ON v.id = lv.version_id\n                INNER JOIN loaders l ON lv.loader_id = l.id\n                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id\n                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n                WHERE v.status = ANY($2)\n                GROUP BY v.mod_id\n            ),\n            page_external_dependencies AS (\n                SELECT\n                    v.mod_id,\n                    COUNT(*) AS external_dependencies_count\n                FROM versions v\n                INNER JOIN page_ids page ON page.id = v.mod_id\n                INNER JOIN dependencies d ON d.dependent_id = v.id\n                WHERE d.dependency_file_name IS NOT NULL\n                GROUP BY v.mod_id\n            ),\n            page_projects AS (\n                SELECT\n                    m.id,\n                    m.slug,\n                    m.name,\n                    m.summary,\n                    m.icon_url,\n                    m.status,\n                    m.requested_status,\n                    m.queued,\n                    m.published,\n                    m.updated,\n                    m.organization_id,\n                    o.name AS organization_name,\n                    o.icon_url AS organization_icon_url,\n                    owner.user_id AS owner_id,\n                    owner.username AS owner_name,\n                    owner.avatar_url AS owner_icon_url,\n                    CASE\n                        WHEN m.components ? 'minecraft_server'\n                            THEN ARRAY_APPEND(\n                                ARRAY_REMOVE(\n                                    COALESCE(ppt.project_types::text[], ARRAY[]::text[]),\n                                    'modpack'\n                                ),\n                                'minecraft_java_server'\n                            )\n                        ELSE COALESCE(ppt.project_types::text[], ARRAY[]::text[])\n                    END AS project_types,\n                    COALESCE(ped.external_dependencies_count, 0) AS external_dependencies_count\n                FROM page_ids page\n                INNER JOIN mods m ON m.id = page.id\n                LEFT JOIN organizations o ON o.id = m.organization_id\n                LEFT JOIN LATERAL (\n                    SELECT\n                        tm.user_id,\n                        u.username,\n                        u.avatar_url\n                    FROM team_members tm\n                    INNER JOIN users u ON u.id = tm.user_id\n                    WHERE tm.team_id = m.team_id\n                        AND tm.is_owner\n                    ORDER BY tm.ordering ASC\n                    LIMIT 1\n                ) owner ON m.organization_id IS NULL\n                LEFT JOIN page_project_types ppt ON ppt.mod_id = m.id\n                LEFT JOIN page_external_dependencies ped ON ped.mod_id = m.id\n            )\n            SELECT\n                total.total_count AS \"total_count!\",\n                page_projects.id AS \"id?\",\n                page_projects.slug AS \"slug?\",\n                page_projects.name AS \"name?\",\n                page_projects.summary AS \"summary?\",\n                page_projects.icon_url AS \"icon_url?\",\n                page_projects.status AS \"status?\",\n                page_projects.requested_status AS \"requested_status?\",\n                page_projects.queued AS \"queued?\",\n                page_projects.published AS \"published?\",\n                page_projects.updated AS \"updated?\",\n                page_projects.organization_id AS \"organization_id?\",\n                page_projects.organization_name AS \"organization_name?\",\n                page_projects.organization_icon_url AS \"organization_icon_url?\",\n                page_projects.owner_id AS \"owner_id?\",\n                page_projects.owner_name AS \"owner_name?\",\n                page_projects.owner_icon_url AS \"owner_icon_url?\",\n                page_projects.project_types AS \"project_types?: Vec<String>\",\n                page_projects.external_dependencies_count AS \"external_dependencies_count?\"\n            FROM total\n            LEFT JOIN page_projects ON true\n            ORDER BY\n                CASE WHEN $5 = 'newest' THEN COALESCE(page_projects.queued, page_projects.published) END DESC NULLS LAST,\n                CASE WHEN $5 = 'oldest' THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,\n                page_projects.id ASC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "slug?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "summary?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "icon_url?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "status?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "requested_status?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "queued?",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "published?",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated?",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "organization_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "organization_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "organization_icon_url?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "owner_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 15,
+        "name": "owner_name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "owner_icon_url?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "project_types?: Vec<String>",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 18,
+        "name": "external_dependencies_count?",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "TextArray",
+        "Int8",
+        "Int8",
+        "Text",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      null,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      null,
+      null
+    ]
+  },
+  "hash": "5a68c53bd00c08edf9dfb9ffdabc28f86cdd77cd06bbb10c9a8e5199509f9c4b"
+}

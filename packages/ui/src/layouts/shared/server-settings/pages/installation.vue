@@ -376,18 +376,39 @@ function getLoaderVersionsForGameVersion(
 	}
 
 	const manifest = manifestQuery.data.value?.gameVersions
+	const versionGroups = manifestQuery.data.value?.versionGroups
 	if (!manifest) return []
 
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) return placeholder.loaders
 
 	const entry = manifest.find((x) => x.id === gameVersion)
+	if (entry?.versionGroup) {
+		return versionGroups?.find((group) => group.id === entry.versionGroup)?.loaders ?? []
+	}
+
 	return entry?.loaders ?? []
 }
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	if (loader === 'neoforge') return 'neo_forge'
 	return loader as Archon.Content.v1.Modloader
+}
+
+async function uploadLocalModpackWithSoftOverride() {
+	const picked = await filePicker.pickModpackFile()
+	if (!picked?.file) return false
+
+	const handle = client.kyros.content_v1.uploadModpackFile(
+		worldId.value!,
+		picked.file,
+		{ known: {} },
+		{ softOverride: true },
+	)
+	await uploadProgressModal.value!.track(handle)
+	emit('reinstall')
+	await invalidateServerState()
+	return true
 }
 
 provideInstallationSettings({
@@ -489,7 +510,7 @@ provideInstallationSettings({
 					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 					if (!hasPlaceholder) {
 						const supportedVersions = new Set(
-							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
+							manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
 						)
 						return versions
 							.filter((v) => supportedVersions.has(v.version))
@@ -531,7 +552,9 @@ provideInstallationSettings({
 		if (hasPlaceholder) {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
 		}
-		const supportedVersions = new Set(manifest.filter((x) => x.loaders.length > 0).map((x) => x.id))
+		const supportedVersions = new Set(
+			manifest.filter((x) => x.loaders.length > 0 || !!x.versionGroup).map((x) => x.id),
+		)
 		const supported = tags.gameVersions.value.filter((v) => supportedVersions.has(v.version))
 		return supported.some((v) => v.version_type !== 'release')
 	},
@@ -612,18 +635,8 @@ provideInstallationSettings({
 		if (!modpack.value) return
 		if (modpack.value.spec.platform === 'local_file') {
 			debug('reinstallModpack: local file, opening file picker')
-			const picked = await filePicker.pickModpackFile()
-			if (!picked?.file) return
 			try {
-				const handle = client.kyros.content_v1.uploadModpackFile(
-					worldId.value!,
-					picked.file,
-					{ known: {} },
-					{ softOverride: true },
-				)
-				await uploadProgressModal.value!.track(handle)
-				emit('reinstall')
-				invalidateServerState()
+				await uploadLocalModpackWithSoftOverride()
 			} catch (err) {
 				emit('reinstall-failed')
 				addNotification({
@@ -660,6 +673,21 @@ provideInstallationSettings({
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
+			})
+		}
+	},
+
+	async swapModpack() {
+		if (setupActionDisabled.value) return
+		if (modpack.value?.spec.platform !== 'local_file') return
+		debug('swapModpack: local file, opening file picker')
+		try {
+			await uploadLocalModpackWithSoftOverride()
+		} catch (err) {
+			emit('reinstall-failed')
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
 			})
 		}
 	},

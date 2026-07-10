@@ -10,7 +10,7 @@ export interface PickedFile {
 }
 
 export interface PickedModpackFile extends Omit<PickedFile, 'file'> {
-	/** Only present for upload flows; native imports avoid copying huge packs into the webview heap. */
+	/** Only present for upload flows; native imports avoid copying huge packs into the browser heap. */
 	file?: File
 }
 

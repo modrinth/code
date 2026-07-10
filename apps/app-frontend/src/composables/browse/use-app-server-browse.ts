@@ -8,13 +8,18 @@ import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
+import {
+	fetchCachedServerStatus,
+	getFreshCachedServerStatus,
+} from '@/composables/instances/use-server-status-query'
 import { process_listener } from '@/helpers/events'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_instance, getServerAddress, getServerLatency } from '@/helpers/worlds'
+import { add_server_to_instance, getServerAddress } from '@/helpers/worlds'
 
 interface BrowseServerInstance {
+	id: string
 	name: string
 	path: string
 }
@@ -68,12 +73,10 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const queryClient = useQueryClient()
 	const debugLog = useDebugLogger('BrowseServer')
 	const serverPings = shallowRef<Record<string, number | undefined>>({})
-	const serverPingCache = new Map<string, number | undefined>()
-	const pendingServerPings = new Map<string, Promise<number | undefined>>()
 	const runningServerProjects = ref<Record<string, string>>({})
 	const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 	const contextMenuRef = ref<ContextMenuHandle | null>(null)
-	let serverPingCacheActive = true
+	let serverPingsActive = true
 	let unlistenProcesses: (() => void) | null = null
 
 	async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
@@ -146,37 +149,26 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		})
 		const nextPings = { ...serverPings.value }
 		for (const { hit, address } of pingsToFetch) {
-			if (serverPingCache.has(address)) {
-				nextPings[hit.project_id] = serverPingCache.get(address)
+			const cachedStatus = getFreshCachedServerStatus(queryClient, address)
+			if (cachedStatus) {
+				nextPings[hit.project_id] = cachedStatus.ping
 			}
 		}
 		serverPings.value = nextPings
 
 		await Promise.all(
 			pingsToFetch.map(async ({ hit, address }) => {
-				if (serverPingCache.has(address)) return
+				if (getFreshCachedServerStatus(queryClient, address)) return
 
-				let pending = pendingServerPings.get(address)
-				if (!pending) {
-					pending = getServerLatency(address)
-						.then((latency) => {
-							if (serverPingCacheActive) serverPingCache.set(address, latency)
-							return latency
-						})
-						.catch((error) => {
-							console.error(`Failed to ping server ${address}:`, error)
-							if (serverPingCacheActive) serverPingCache.set(address, undefined)
-							return undefined
-						})
-						.finally(() => {
-							pendingServerPings.delete(address)
-						})
-					pendingServerPings.set(address, pending)
+				try {
+					const status = await fetchCachedServerStatus(queryClient, address)
+					if (!serverPingsActive) return
+					serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
+				} catch (error) {
+					console.error(`Failed to ping server ${address}:`, error)
+					if (!serverPingsActive) return
+					serverPings.value = { ...serverPings.value, [hit.project_id]: undefined }
 				}
-
-				const latency = await pending
-				if (!serverPingCacheActive) return
-				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
 			}),
 		)
 	}
@@ -308,10 +300,8 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		.catch(options.handleError)
 
 	onUnmounted(() => {
-		serverPingCacheActive = false
+		serverPingsActive = false
 		unlistenProcesses?.()
-		serverPingCache.clear()
-		pendingServerPings.clear()
 	})
 
 	return {

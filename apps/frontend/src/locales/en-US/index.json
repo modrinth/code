@@ -518,6 +518,9 @@
   "analytics.value.unknown": {
     "message": "Unknown"
   },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "There's no metadata to determine which dependent project this download attributes to."
+  },
   "analytics.value.unmonetized": {
     "message": "Unmonetized"
   },
@@ -1634,9 +1637,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "Loading notifications..."
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "You can edit multiple projects at once by selecting them below."
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Server projects do not support bulk editing"
   },
@@ -1712,29 +1712,20 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Please review environment metadata"
   },
-  "dashboard.projects.sort.ascending": {
-    "message": "Ascending"
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Selected projects actions"
   },
-  "dashboard.projects.sort.descending": {
-    "message": "Descending"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "Name"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "Status"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "Type"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "Icon"
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, one {# project selected} other {# projects selected}}"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
   "dashboard.projects.table.name": {
     "message": "Name"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "Select all projects that support bulk editing"
   },
   "dashboard.projects.table.status": {
     "message": "Status"
@@ -2681,11 +2672,17 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
+  "moderation.exclude-technical-review": {
+    "message": "Exclude TR"
+  },
   "moderation.moderate": {
     "message": "Moderate"
   },
   "moderation.page.external-projects": {
     "message": "External projects"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "Global traces"
   },
   "moderation.page.projects": {
     "message": "Projects"
@@ -2695,6 +2692,45 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tech review"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Failed"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Failed to load versions: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Loading versions..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "New Files"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "New Groups"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "No files found."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Not scanned"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "Override Files ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Pack File Name"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Scan All Files"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Some files failed to scan: {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Scanning..."
+  },
+  "modpack-scan-modal.title": {
+    "message": "Modpack Scan ({scanned}/{total} Files)"
   },
   "muralpay.account-type.checking": {
     "message": "Checking"
@@ -3242,14 +3278,74 @@
   "project.details.licensed": {
     "message": "Licensed"
   },
-  "project.download.game-version": {
-    "message": "Game version: {version}"
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "This game version is incompatible with the base project."
   },
-  "project.download.game-version-error": {
-    "message": "Error: no game versions found"
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "This loader is incompatible with the base project."
   },
-  "project.download.game-version-tooltip": {
-    "message": "{title} is only available for {version}"
+  "project.download.compatible-version-title": {
+    "message": "Compatible versions"
+  },
+  "project.download.dependencies-title": {
+    "message": "Dependencies"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "This dependency is already installed"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Any compatible"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "This dependency conflicts with another dependency"
+  },
+  "project.download.dependency-download-file": {
+    "message": "Download {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Download {filename} ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "This dependency is already included"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "This dependency version is unavailable"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "No compatible version is available for this dependency"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Fabric API is skipped for Quilt"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "This project has a dependency with a required resource pack. Download it and place it in your {folder} folder."
+  },
+  "project.download.dependency-unavailable": {
+    "message": "This dependency cannot be downloaded"
+  },
+  "project.download.download": {
+    "message": "Download"
+  },
+  "project.download.download-as-zip": {
+    "message": "Download as .zip"
+  },
+  "project.download.download-version": {
+    "message": "Download {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Download with deps"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Download with recommended"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Download with recommended as .zip"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Duplicate dependencies are hidden"
+  },
+  "project.download.file-unavailable": {
+    "message": "This file cannot be downloaded"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} does not support {gameVersion} for {platform}"
@@ -3257,29 +3353,32 @@
   "project.download.install-with-app": {
     "message": "Install with Modrinth App"
   },
+  "project.download.manually": {
+    "message": "Download manually"
+  },
   "project.download.no-app": {
     "message": "Don't have Modrinth App?"
+  },
+  "project.download.no-game-versions-found": {
+    "message": "No game versions found"
   },
   "project.download.no-versions-available": {
     "message": "No versions available for {gameVersion} and {platform}."
   },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: no platforms found"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} is only available for {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} does not support {platform} for {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Search game versions..."
+  "project.download.recommended-title": {
+    "message": "Recommended"
   },
-  "project.download.search-game-versions-label": {
-    "message": "Search game versions..."
+  "project.download.required-resource-pack-admonition": {
+    "message": "This data pack also requires a resource pack. Download it and place it in your {folder} folder."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Resource pack"
+  },
+  "project.download.search-game-versions": {
+    "message": "Select game version"
   },
   "project.download.select-game-version": {
     "message": "Select game version"
@@ -3292,6 +3391,15 @@
   },
   "project.download.title": {
     "message": "Download {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Unknown loader"
+  },
+  "project.download.zip-failed-text": {
+    "message": "One or more files could not be downloaded. Please try again."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Could not download files"
   },
   "project.environment.migration-no-permission.message": {
     "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
@@ -4122,7 +4230,7 @@
     "message": "Last used {ago}"
   },
   "settings.account.security.passkey.modal.loading": {
-    "message": "Loading passkeys…"
+    "message": "Loading passkeys..."
   },
   "settings.account.security.passkey.modal.never-used": {
     "message": "Never used"
@@ -4773,7 +4881,7 @@
     "message": "View version"
   },
   "version.download.download-dependency": {
-    "message": "Download dependency"
+    "message": "Select a version to download"
   },
   "version.download.no-primary-file": {
     "message": "Error: No primary file found"
@@ -4783,6 +4891,9 @@
   },
   "version.download.required-resource-pack": {
     "message": "Required resource pack"
+  },
+  "version.download.version": {
+    "message": "Download {version} ({size})"
   },
   "version.edit.button": {
     "message": "Edit"

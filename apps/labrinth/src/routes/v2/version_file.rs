@@ -5,15 +5,16 @@ use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::version_file::HashQuery;
-use crate::routes::{v2_reroute, v3};
+use crate::routes::HashAlgorithm;
+use crate::routes::v3::version_file::{DownloadRedirect, HashQuery};
+use crate::routes::{FileHash, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/version_file")
+        web::scope("/version_file")
             .service(delete_file)
             .service(get_version_from_hash)
             .service(download_version)
@@ -22,7 +23,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     );
 
     cfg.service(
-        utoipa_actix_web::scope("/version_files")
+        web::scope("/version_files")
             .service(get_versions_from_hashes)
             .service(update_files)
             .service(update_files_many)
@@ -33,27 +34,17 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 // under /api/v1/version_file/{hash}
 /// Get version metadata by file hash.
 #[utoipa::path(
+	context_path = "/version_file",
+	tag = "version files",
     get,
     operation_id = "versionFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<crate::models::ids::VersionId>,
-            Query,
-            description = "Optional version ID when hash maps to multiple files"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -93,27 +84,17 @@ pub async fn get_version_from_hash(
 // under /api/v1/version_file/{hash}/download
 /// Download a file by hash.
 #[utoipa::path(
+	context_path = "/version_file",
+	tag = "version files",
     get,
     operation_id = "downloadVersionFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<crate::models::ids::VersionId>,
-            Query,
-            description = "Optional version ID when hash maps to multiple files"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     responses(
-        (status = 302, description = "Temporary redirect to file URL"),
+        (status = 302, description = "Temporary redirect to file URL", body = DownloadRedirect),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -145,27 +126,17 @@ pub async fn download_version(
 // under /api/v1/version_file/{hash}
 /// Delete a file by hash.
 #[utoipa::path(
+	context_path = "/version_file",
+	tag = "version files",
     delete,
     operation_id = "deleteFileFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<crate::models::ids::VersionId>,
-            Query,
-            description = "Optional version ID to delete from"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID to delete from")
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -208,28 +179,18 @@ pub struct UpdateData {
 
 /// Get the latest compatible version from a file hash.
 #[utoipa::path(
+	context_path = "/version_file",
+	tag = "version files",
     post,
     operation_id = "getLatestVersionFromHash",
     params(
-        (
-            "version_id" = String,
-            Path,
-            description = "The hexadecimal file hash"
-        ),
-        (
-            "algorithm" = Option<String>,
-            Query,
-            description = "Hash algorithm to use (sha1 or sha512)"
-        ),
-        (
-            "version_id" = Option<crate::models::ids::VersionId>,
-            Query,
-            description = "Optional version ID when hash maps to multiple files"
-        )
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<HashAlgorithm>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<crate::models::ids::VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
     ),
     request_body = UpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 404,
@@ -287,18 +248,23 @@ pub async fn get_update_from_hash(
 // Requests above with multiple versions below
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileHashes {
+    /// Hash algorithm to use (sha1 or sha512)
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>,
+    #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,
 }
 
 // under /api/v2/version_files
 /// Get versions from file hashes.
 #[utoipa::path(
+	context_path = "/version_files",
+	tag = "version files",
     post,
     operation_id = "versionsFromHashes",
     request_body = FileHashes,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<FileHash, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -345,11 +311,13 @@ pub async fn get_versions_from_hashes(
 
 /// Get projects from file hashes.
 #[utoipa::path(
+	context_path = "/version_file",
+	tag = "version files",
     post,
     operation_id = "projectsFromHashes",
     request_body = FileHashes,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<FileHash, LegacyProject>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -413,7 +381,10 @@ pub async fn get_projects_from_hashes(
 
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyUpdateData {
+    /// Hash algorithm to use (sha1 or sha512)
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,
     pub loaders: Option<Vec<String>>,
     pub game_versions: Option<Vec<String>>,
@@ -422,11 +393,13 @@ pub struct ManyUpdateData {
 
 /// Get latest compatible versions for multiple hashes.
 #[utoipa::path(
+	context_path = "/version_files",
+	tag = "version files",
     post,
     operation_id = "getLatestVersionsFromHashes",
     request_body = ManyUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<FileHash, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -471,11 +444,13 @@ pub async fn update_files(
 
 /// Get all latest compatible versions for multiple hashes.
 #[utoipa::path(
+	context_path = "/version_files",
+	tag = "version files",
     post,
     operation_id = "getLatestVersionsFromHashesMany",
     request_body = ManyUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<FileHash, Vec<LegacyVersion>>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
@@ -531,17 +506,20 @@ pub struct FileUpdateData {
 
 #[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyFileUpdateData {
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<FileUpdateData>,
 }
 
 /// Get latest versions with per-hash filters.
 #[utoipa::path(
+	context_path = "/version_files",
+	tag = "version files",
     post,
     operation_id = "getLatestVersionsFromHashesIndividual",
     request_body = ManyFileUpdateData,
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = HashMap<FileHash, LegacyVersion>),
         (status = 400, description = "Request was invalid, see given error")
     )
 )]

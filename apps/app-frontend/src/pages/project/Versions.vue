@@ -5,16 +5,23 @@
 			:game-versions="gameVersions"
 			:versions="versions"
 			:project="project"
+			:show-environment-column="themeStore.featureFlags.show_version_environment_column"
 			:version-link="(version) => buildProjectHref(`/project/${project.id}/version/${version.id}`)"
 		>
 			<template #actions="{ version }">
-				<ButtonStyled circular type="transparent">
+				<ButtonStyled
+					circular
+					type="transparent"
+					:color="installed && version.id === installedVersion ? 'standard' : 'green'"
+				>
 					<button
-						v-tooltip="`Install`"
-						:class="{
-							'group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted':
-								!installed || version.id !== installedVersion,
-						}"
+						v-tooltip="
+							!installed
+								? formatMessage(commonMessages.installButton)
+								: version.id !== installedVersion
+									? formatMessage(commonMessages.switchToVersionButton)
+									: formatMessage(messages.alreadyInstalled)
+						"
 						:disabled="installing || (installed && version.id === installedVersion)"
 						@click.stop="() => install(version.id)"
 					>
@@ -26,7 +33,6 @@
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
 						v-if="false"
-						class="group-hover:!bg-button-bg"
 						:options="[
 							{
 								id: 'install-elsewhere',
@@ -47,12 +53,13 @@
 							<DownloadIcon aria-hidden="true" />
 							Add to another instance
 						</template>
-						<template #open-in-browser> <ExternalIcon /> Open in browser </template>
+						<template #open-in-browser>
+							<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
+						</template>
 					</OverflowMenu>
 					<a
 						v-else
-						v-tooltip="`Open in browser`"
-						class="group-hover:!bg-button-bg"
+						v-tooltip="formatMessage(commonMessages.openInBrowserButton)"
 						:href="`https://modrinth.com/${project.project_type}/${project.slug}/version/${version.id}`"
 						target="_blank"
 					>
@@ -68,15 +75,29 @@
 import { CheckIcon, DownloadIcon, ExternalIcon, MoreVerticalIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
+	defineMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	ProjectPageVersions,
+	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
+import { useTheming } from '@/store/theme.ts'
+
+const { formatMessage } = useVIntl()
+const themeStore = useTheming()
+
+const messages = defineMessages({
+	alreadyInstalled: {
+		id: 'app.project.versions.already-installed',
+		defaultMessage: 'Already installed',
+	},
+})
 
 defineProps({
 	project: {

@@ -8,7 +8,6 @@ use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionStatus, VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
-use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
@@ -76,8 +75,9 @@ pub struct InitialVersionData {
 }
 
 // under `/api/v1/version`
-/// Create a version on an existing project.
+/// Create a version on an existing project.  
 #[utoipa::path(
+	tag = "version creation",
     post,
     operation_id = "createVersion",
     request_body(
@@ -85,7 +85,7 @@ pub struct InitialVersionData {
         description = "Multipart payload containing `data` and uploaded files"
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,
@@ -102,7 +102,6 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<dyn FileHost>,
     session_queue: Data<AuthQueue>,
-    moderation_queue: Data<AutomatedModerationQueue>,
     http: Data<HttpClient>,
     search_state: Data<SearchState>,
 ) -> Result<HttpResponse, CreateError> {
@@ -262,7 +261,6 @@ pub async fn version_create(
         redis.clone(),
         file_host,
         session_queue,
-        moderation_queue,
         http,
         search_state,
     )
@@ -305,17 +303,20 @@ async fn get_example_version_fields(
 }
 
 // under /api/v1/version/{version_id}
-/// Add files to an existing version.
+/// Add files to an existing version.  
 #[utoipa::path(
+	tag = "version creation",
     post,
     operation_id = "addFilesToVersion",
-    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = VersionId, Path, description = "The ID of the version")
+    ),
     request_body(
         content(("multipart/form-data")),
         description = "Multipart payload containing files to upload"
     ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

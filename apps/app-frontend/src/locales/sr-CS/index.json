@@ -156,10 +156,13 @@
     "message": "Minecraft svet"
   },
   "instance.edit-world.title": {
-    "message": "Izmeni svet"
+    "message": "Promeni svet"
   },
   "instance.server-modal.placeholder-name": {
     "message": "Minecraft Server"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generalno"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Brisanje..."

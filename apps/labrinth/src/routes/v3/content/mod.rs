@@ -27,12 +27,18 @@ const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat";
 const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v1";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(resolve_content);
 }
 
-#[post("content/resolve")]
-async fn resolve_content(
+/// Resolve content.
+#[utoipa::path(
+	tag = "content",
+	request_body = serde_json::Value,
+	responses((status = OK, body = serde_json::Value)),
+)]
+#[post("/content/resolve")]
+pub async fn resolve_content(
     req: HttpRequest,
     request: web::Json<ResolveContentRequest>,
     pool: web::Data<PgPool>,

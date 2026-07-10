@@ -414,7 +414,7 @@ components:
         - unknown
         - signature
       example: required-resource-pack
-    # https://github.com/modrinth/labrinth/blob/master/src/routes/version_creation.rs#L27-L57
+    # https://github.com/modrinth/code/blob/main/apps/labrinth/src/routes/v2/version_creation.rs#L32-L76
     CreatableVersion:
       allOf:
         - $ref: '#/components/schemas/BaseVersion'
@@ -446,6 +446,11 @@ components:
                 - client_or_server_prefers_both
                 - unknown
               description: The environment that this version is for.
+            file_types:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/FileTypeEnum'
+              description: A map of file parts to their associated file type, a file type is used for additional files such as sources jars.
           required:
             - file_parts
             - project_id
@@ -687,6 +692,12 @@ components:
               type: string
               description: The ID of the project
               example: AABBCCDD
+            all_project_types:
+              type: array
+              items:
+                type: string
+              description: All project types across every version of the project, unlike `project_type` which only reflects a version-specific type
+              example: [mod, plugin, datapack]
             author:
               type: string
               description: The username of the project's author
@@ -743,6 +754,7 @@ components:
             - client_side
             - server_side
             - project_id
+            - all_project_types
             - author
             - versions
             - follows
@@ -1943,6 +1955,7 @@ paths:
 
             These are the most commonly used facet types:
             - `project_type`
+            - `all_project_types` (matches against every project type across all of the project's versions, not just the primary/version-specific type)
             - `categories` (loaders are lumped in with categories in search)
             - `versions`
             - `client_side`

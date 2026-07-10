@@ -48,7 +48,7 @@
     "message": "メンバー"
   },
   "analytics.breakdown.monetization": {
-    "message": "収益化"
+    "message": "収益の発生"
   },
   "analytics.breakdown.none.selected": {
     "message": "分析 - デフォルト"
@@ -102,7 +102,7 @@
     "message": "プロジェクトのイベントがありません。"
   },
   "analytics.chart.controls.previous-period": {
-    "message": "１期前の描画"
+    "message": "前期の描画"
   },
   "analytics.chart.controls.project-events": {
     "message": "プロジェクト"
@@ -158,6 +158,15 @@
   "analytics.filter.search.countries": {
     "message": "国を検索…"
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "プロジェクトを検索..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "ソースを検索..."
+  },
+  "analytics.filter.search.members": {
+    "message": "メンバーを検索..."
+  },
   "analytics.filter.search.project-versions": {
     "message": "プロジェクトバージョンを検索…"
   },
@@ -167,8 +176,59 @@
   "analytics.graph.title.downloads": {
     "message": "ダウンロードの推移"
   },
+  "analytics.graph.title.playtime": {
+    "message": "プレイ時間の推移"
+  },
   "analytics.graph.title.revenue": {
     "message": "収益の推移"
+  },
+  "analytics.graph.title.views": {
+    "message": "表示の推移"
+  },
+  "analytics.group-by.1h": {
+    "message": "1時間"
+  },
+  "analytics.group-by.6h": {
+    "message": "6時間"
+  },
+  "analytics.group-by.date": {
+    "message": "日付"
+  },
+  "analytics.group-by.day": {
+    "message": "1日"
+  },
+  "analytics.group-by.month": {
+    "message": "1月"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "日足"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "1時間足"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "月足"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "6時間足"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "週足"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "年足"
+  },
+  "analytics.group-by.week": {
+    "message": "1週"
+  },
+  "analytics.group-by.year": {
+    "message": "1年"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "データを取得中..."
+  },
+  "analytics.options.loading": {
+    "message": "ロード中..."
   },
   "analytics.project-event.project-approved": {
     "message": "承認済み"
@@ -201,7 +261,7 @@
     "message": "ダウンロード"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Modrinthを通じて行われた閲覧およびダウンロードが収益の対象となります。\nまた、Webからの場合は不正防止のためのフィルターを通過する必要があり、アプリからの場合は先述のフィルターに加え、Modrinthにログインされたユーザーに限ります。\n注意として、すべてのプロジェクトにおいて、収益の対象となる操作の割合はほぼ均一に保たれるため、最終的な収益で不公平が生まれることはありません。"
+    "message": "Modrinthを通じて行われた閲覧およびダウンロードが収益の対象となります。また、Webからの場合は不正防止のためのフィルターを通過する必要があり、アプリからの場合は先述のフィルターに加え、Modrinthにログインされたユーザーに限ります。注意として、すべてのプロジェクトにおいて、収益の対象となる操作の割合はほぼ均一に保たれるため、最終的な収益で不公平が生まれることはありません。"
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "もっと詳しく"
@@ -530,17 +590,8 @@
   "auth.reset-password.title.long": {
     "message": "パスワードを再設定する"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "続行するには二要素認証コードを入力してください。"
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "二要素認証コードを入力"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "コードを入力…"
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "外部アカウントでログイン"
   },
   "auth.sign-in.title": {
     "message": "ログイン"
@@ -553,9 +604,6 @@
   },
   "auth.sign-up.title": {
     "message": "アカウント作成"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "外部アカウントで作成"
   },
   "auth.verify-email.action.account-settings": {
     "message": "アカウント設定"
@@ -1163,9 +1211,6 @@
   "dashboard.overview.notifications.loading": {
     "message": "通知を読み込み中…"
   },
-  "dashboard.projects.bulk-edit-hint": {
-    "message": "以下で選択することで、複数のプロジェクトを一括で編集できます。"
-  },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "サーバープロジェクトでは一括編集を利用できません"
   },
@@ -1237,24 +1282,6 @@
   },
   "dashboard.projects.project.review-environment-metadata": {
     "message": "環境メタデータを確認してください"
-  },
-  "dashboard.projects.sort.ascending": {
-    "message": "昇順"
-  },
-  "dashboard.projects.sort.descending": {
-    "message": "降順"
-  },
-  "dashboard.projects.sort.option.name": {
-    "message": "名前"
-  },
-  "dashboard.projects.sort.option.status": {
-    "message": "ステータス"
-  },
-  "dashboard.projects.sort.option.type": {
-    "message": "種類"
-  },
-  "dashboard.projects.table.icon": {
-    "message": "アイコン"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -2702,43 +2729,16 @@
   "project.details.licensed": {
     "message": "ライセンス"
   },
-  "project.download.game-version": {
-    "message": "ゲームバージョン: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "エラー: ゲームバージョンが見つかりません"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title}は{version}でのみ利用可能です"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}は{platform}の{gameVersion}に対応していません"
   },
-  "project.download.install-with-app": {
-    "message": "Modrinth Appでインストール"
-  },
   "project.download.no-app": {
     "message": "Modrinth Appをお持ちでないですか？"
-  },
-  "project.download.no-versions-available": {
-    "message": "{gameVersion}および{platform}向けのバージョンは利用できません。"
-  },
-  "project.download.platform": {
-    "message": "プラットフォーム: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "エラー: プラットフォームが見つかりません"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title}は{platform}でのみ利用可能です"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"
   },
   "project.download.search-game-versions": {
-    "message": "ゲームバージョンを検索…"
-  },
-  "project.download.search-game-versions-label": {
     "message": "ゲームバージョンを検索…"
   },
   "project.download.select-game-version": {

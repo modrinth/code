@@ -11,6 +11,21 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "隐藏更多运行中的实例"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "忽略"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "打开实例"
+  },
+  "app.action-bar.install.retry": {
+    "message": "重试"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "未知的实例"
+  },
+  "app.action-bar.installs": {
+    "message": "安装"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "设为主实例"
   },
@@ -101,6 +116,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "显示总游玩时间"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "自动跳过低风险确认，包括重复安装整合包、常规内容删除、批量更新、解除整合包关联及修复提示。危险警告仍会显示。"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "跳过非必要的警告"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "启用切换侧边栏的功能。"
   },
@@ -108,7 +129,7 @@
     "message": "切换侧边栏"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "如果你尝试安装一个未托管在 Modrinth 上的 Modrinth 打包文件（.mrpack），我们会确保你在安装之前了解相关风险。"
+    "message": "如果你尝试安装一个未托管在 Modrinth 上的 Modrinth 整合包文件（.mrpack），我们会确保你在安装之前了解相关风险。"
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "安装未知整合包前提醒我"
@@ -120,7 +141,7 @@
     "message": "无法连接到身份验证服务器"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "正在添加服务器到此实例"
+    "message": "添加服务器到实例"
   },
   "app.browse.add-to-an-instance": {
     "message": "添加到实例"
@@ -170,23 +191,71 @@
   "app.export-modal.header": {
     "message": "导出整合包"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "包含 \"{file}\"？"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "整合包名称"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "整合包名称"
   },
-  "app.export-modal.select-files-label": {
-    "message": "配置此导出中包含哪些文件"
-  },
   "app.export-modal.version-number-label": {
     "message": "版本号"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "正在下载内容"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "正在下载 Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "正在下载包文件"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "提取覆盖项"
+  },
+  "app.install.phase.finalizing": {
+    "message": "完成"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "准备实例"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "正在准备 Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "正在下载 Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "正在提取 Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "正在获取 Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "正在准备 Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "正在校验 Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "正在读取整合包清单"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "正在解析加载器"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "正在解析 Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "正在解析内容"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "回滚"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "正在运行加载处理器"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你实例的所有数据将被永久删除，包括你的世界、配置和所有已安装的内容。"
@@ -212,6 +281,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "实例"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "正在下载 {current, number}/{total, number}个 项目……"
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "正在结束更新……"
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "正在解析版本……"
+  },
   "app.instance.mods.content-type-project": {
     "message": "项目"
   },
@@ -236,6 +314,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "浏览服务器"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "删除世界"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "删除世界"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "这个世界将会被永久删除，此操作无法撤销。"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "正在删除 {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "模组适配"
   },
@@ -253,6 +343,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "未添加服务器或世界"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "删除服务器"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "删除服务器"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "该服务器将会被移出你的服务器列表，也包括游戏内的服务器列表。之后如果你记得地址，仍可将其添加回来。"
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "正在删除 {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜索 {count} 个世界……"
@@ -651,7 +753,7 @@
     "message": "将从设备中永久删除该实例，包括所有存档、配置文件及已安装内容。此操作不可撤销，请谨慎操作。"
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "删除中..."
+    "message": "删除中……"
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "复制"
@@ -732,7 +834,7 @@
     "message": "在游戏关闭后运行。"
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "输入退出后运行的命令…"
+    "message": "输入退出后运行的命令……"
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "启动前"
@@ -741,7 +843,7 @@
     "message": "在实例启动前运行。"
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "输入启动前命令..."
+    "message": "输入启动前命令……"
   },
   "instance.settings.tabs.hooks.title": {
     "message": "游戏启动钩子"
@@ -753,7 +855,7 @@
     "message": "用于启动 Minecraft 的包装器命令。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "输入封装命令..."
+    "message": "输入封装命令……"
   },
   "instance.settings.tabs.installation": {
     "message": "安装"
@@ -819,7 +921,7 @@
     "message": "游戏启动时的窗口高度。"
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "输入高度…"
+    "message": "输入高度……"
   },
   "instance.settings.tabs.window.width": {
     "message": "宽度"
@@ -828,7 +930,7 @@
     "message": "游戏启动时的窗口宽度。"
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "输入宽度…"
+    "message": "输入宽度……"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 服务器"
@@ -838,6 +940,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "复制地址"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "创建快照"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "在主界面隐藏"
@@ -927,7 +1032,7 @@
     "message": "仍然安装"
   },
   "unknown-pack-warning-modal.malware-statement": {
-    "message": "恶意软件常常通过模组包文件在 Discord 等平台上分享而传播。"
+    "message": "恶意软件常常通过整合包文件在 Discord 等平台上分享而传播。"
   },
   "unknown-pack-warning-modal.warning.body": {
     "message": "我们在 Modrinth 上找不到此文件。强烈建议你仅从可信来源安装文件。"

@@ -207,31 +207,20 @@ pub(crate) async fn list_content(
         &state.pool,
     )
     .await?;
-    let imported_modpack_scope = is_imported_modpack_scope(&resolved, &link);
+    let imported_modpack_scope = is_imported_modpack_scope(&link);
     let linked_modpack_source_kind = linked_modpack_source_kind(&link);
-    let mut failed_modpack_identifier_lookup = false;
     let modpack_ids = if imported_modpack_scope {
         None
     } else {
         match linked_modpack_ids(&link) {
-            Some((_, version_id)) => match get_modpack_identifiers(
-                &version_id,
-                &resolved.content_set,
-                &state.pool,
-                &state.api_semaphore,
-            )
-            .await
-            {
-                Ok(ids) => Some(ids),
-                Err(err) => {
-                    tracing::warn!(
-                        "Failed to fetch modpack identifiers: {}",
-                        err
-                    );
-                    failed_modpack_identifier_lookup = true;
-                    None
-                }
-            },
+            Some((_, version_id)) => {
+                get_cached_modpack_identifiers(
+                    &version_id,
+                    &state.pool,
+                    &state.api_semaphore,
+                )
+                .await?
+            }
             None => None,
         }
     };
@@ -243,10 +232,9 @@ pub(crate) async fn list_content(
         }
     } else if let Some(ids) = modpack_ids.as_ref() {
         ContentFilter::ExcludeModpack(ids)
-    } else if failed_modpack_identifier_lookup {
+    } else if let Some(source_kind) = linked_modpack_source_kind {
         ContentFilter::ExcludeSourceKind {
-            source_kind: linked_modpack_source_kind
-                .unwrap_or(ContentSourceKind::ModrinthModpack),
+            source_kind,
             exclude_untracked: true,
         }
     } else {
@@ -283,7 +271,7 @@ pub(crate) async fn list_linked_modpack_content(
         &state.pool,
     )
     .await?;
-    if is_imported_modpack_scope(&resolved, &link) {
+    if is_imported_modpack_scope(&link) {
         let files = content_projects_for_scope(
             &resolved,
             cache_behaviour,
@@ -1072,12 +1060,8 @@ fn file_metadata_from_entry_or_cache(
     })
 }
 
-fn is_imported_modpack_scope(
-    resolved: &ResolvedContentScope,
-    link: &InstanceLink,
-) -> bool {
-    resolved.content_set.source_kind == ContentSourceKind::ImportedModpack
-        || matches!(link, InstanceLink::ImportedModpack { .. })
+fn is_imported_modpack_scope(link: &InstanceLink) -> bool {
+    matches!(link, InstanceLink::ImportedModpack { .. })
 }
 
 async fn linked_modpack_ids_for_instance(
@@ -1184,6 +1168,28 @@ impl ModpackIdentifiers {
             || file
                 .is_some_and(|file| self.project_ids.contains(&file.project_id))
     }
+}
+
+async fn get_cached_modpack_identifiers(
+    version_id: &str,
+    pool: &SqlitePool,
+    fetch_semaphore: &FetchSemaphore,
+) -> crate::Result<Option<ModpackIdentifiers>> {
+    let Some(cached) =
+        CachedEntry::get_modpack_files(version_id, pool, fetch_semaphore)
+            .await?
+    else {
+        return Ok(None);
+    };
+
+    if cached.project_ids.is_empty() {
+        return Ok(None);
+    }
+
+    Ok(Some(ModpackIdentifiers {
+        hashes: cached.file_hashes.into_iter().collect(),
+        project_ids: cached.project_ids.into_iter().collect(),
+    }))
 }
 
 async fn get_modpack_identifiers(

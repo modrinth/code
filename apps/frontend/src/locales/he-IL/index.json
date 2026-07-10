@@ -254,17 +254,8 @@
   "auth.reset-password.title.long": {
     "message": "הפס סיסמתכם"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "כתבו את הקוד אימות דו-שלבי שלכם כדי להמשיך."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "כתבו את האימות דו-שלבי"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "כתבו קוד..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "הכנס אם"
   },
   "auth.sign-in.title": {
     "message": "הכנס"
@@ -277,9 +268,6 @@
   },
   "auth.sign-up.title": {
     "message": "הרשם"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "הרשם אם"
   },
   "auth.verify-email.action.account-settings": {
     "message": "הגדרות חשבון"
@@ -2039,43 +2027,16 @@
   "project.details.licensed": {
     "message": "ברישיון"
   },
-  "project.download.game-version": {
-    "message": "גרסת המשחק: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "שגיאה: לא נמצאו גרסאות משחק"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} זמין עבור {version} בלבד"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{gameVersion} עבור {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "התקן באמצעות Modrinth App"
-  },
   "project.download.no-app": {
     "message": "אין לכם את אפליקציית Modrinth?"
-  },
-  "project.download.no-versions-available": {
-    "message": "אין גרסאות זמינות עבור {gameVersion} ו-{platform}."
-  },
-  "project.download.platform": {
-    "message": "פלטפורמה: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "שגיאה: לא נמצאו פלטפורמות"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} זמין עבור {platform} בלבד"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{platform} עבור {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "חיפוש גרסאות משחק..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "חיפוש גרסאות משחק..."
   },
   "project.download.select-game-version": {

@@ -11,6 +11,21 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Weitere laufende Instanzen ausblenden"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Ignorieren"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Instanz öffnen"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Wiederholen"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Unbekannte Instanz"
+  },
+  "app.action-bar.installs": {
+    "message": "Installationen"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Zur primären Instanz machen"
   },
@@ -101,6 +116,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Spielzeit anzeigen"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Überspringt automatisch Bestätigungen mit geringem Risiko, wie z. B. die doppelte Installation von Modpacks, das Löschen normaler Inhalte, Massenaktualisierungen, das Trennen von Modpacks und Reparaturen. Warnungen bei gefährlichen Aktionen werden weiterhin angezeigt."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Nicht essenzielle Warnungen überspringen"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Ermöglicht das Umschalten der Seitenleiste."
   },
@@ -170,23 +191,71 @@
   "app.export-modal.header": {
     "message": "Modpack exportieren"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "\"{file}\" einschliessen?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Modpaketname"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketname"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Konfiguriere, welche Dateien in diesem Export miteinbezogen werden"
-  },
   "app.export-modal.version-number-label": {
     "message": "Versionsnummer"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Lade Inhalte herunter"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Lade Minecraft herunter"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Lade Packdatei herunter"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Überschreibungen extrahieren"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Abschliessen"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Instanz präparieren"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Java präparieren"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Java {version} herunterladen"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Java {version} extrahieren"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Java {version} wird heruntergeladen"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Java {version} präparieren"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Java {version} validieren"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Paketmanifest wird gelesen"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Loader wird ermittelt"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Minecraft wird ermittelt"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Inhalte werden ermittelt"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Wird rückgängig gemacht"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Loader-Prozesse werden ausgeführt"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle Daten deiner Instanz werden permanent gelöscht, inlusive deiner Welten, Konfigurationen und allen installierten Inhalten."
@@ -212,6 +281,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanz"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Lade {current, number}/{total, number} Projekte..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Update abschliessen..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Versionen werden ermittelt..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "Projekt"
   },
@@ -236,6 +314,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Server durchsuchen"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Welt löschen"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Welt löschen"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Diese Welt wird permanent gelöscht von dieser Instanz, dies kann nicht rückgängig gemacht werden."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Lösche {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Modifiziert"
   },
@@ -253,6 +343,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "Keine Server oder Welten hinzugefügt"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Server entfernen"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Server entfernen"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Dieser Server wird aus deiner Serverliste und aus der Serverliste im Spiel entfernt. Du kannst ihn später wieder hinzufügen, wenn du die Adresse kennst."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Entferne {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Durchsuche {count} Welten..."
@@ -838,6 +940,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Adresse kopieren"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Shortcut erstellen"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nicht auf Startseite anzeigen"

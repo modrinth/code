@@ -473,17 +473,8 @@
   "auth.reset-password.title.long": {
     "message": "Atur ulang kata sandi Anda"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Mohon masukkan kode autentikasi dwifaktor untuk melanjutkan."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Masukkan kode dwifaktor"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Masukkan kode..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Masuk dengan"
   },
   "auth.sign-in.title": {
     "message": "Masuk"
@@ -496,9 +487,6 @@
   },
   "auth.sign-up.title": {
     "message": "Daftar"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Daftar dengan"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Pengaturan akun"
@@ -2435,43 +2423,16 @@
   "project.details.licensed": {
     "message": "Berlisensi"
   },
-  "project.download.game-version": {
-    "message": "Versi permainan: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Kesalahan: tidak ada versi permainan yang ditemukan"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} hanya tersedia untuk {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak mendukung {gameVersion} untuk {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Pasang dengan Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Tidak memiliki Modrinth App?"
-  },
-  "project.download.no-versions-available": {
-    "message": "Tidak ada versi tersedia untuk {gameVersion} dan {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platform: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Kesalahan: tidak ada platform yang ditemukan"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} hanya tersedia untuk {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak mendukung {platform} untuk {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Cari versi permainan..."
   },
   "project.download.select-game-version": {

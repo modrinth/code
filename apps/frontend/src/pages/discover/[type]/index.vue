@@ -158,6 +158,9 @@ const {
 	serverContentData,
 	serverFilters,
 	serverHideInstalled,
+	serverContentServerOnly,
+	showServerOnlyToggle,
+	serverEnvironmentOverride,
 	hideSelectedServerInstalls,
 	installingProjectIds,
 	optimisticallyInstalledProjectIds,
@@ -369,6 +372,14 @@ const messages = defineMessages({
 	},
 })
 
+const advancedFiltersCollapsed = computed({
+	get: () => flags.value.advancedFiltersCollapsed,
+	set: (value) => {
+		flags.value.advancedFiltersCollapsed = value
+		saveFeatureFlags()
+	},
+})
+
 const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
@@ -378,10 +389,12 @@ const searchState = useBrowseSearch({
 	projectType: projectTypeId,
 	tags,
 	providedFilters: serverFilters,
+	environmentOverride: serverEnvironmentOverride,
 	search,
-	persistentQueryParams: ['sid', 'wid', 'shi', 'from'],
+	persistentQueryParams: ['sid', 'wid', 'shi', 'so', 'from'],
 	getExtraQueryParams: () => ({
 		shi: serverHideInstalled.value ? 'true' : undefined,
+		so: showServerOnlyToggle.value && serverContentServerOnly.value ? 'true' : undefined,
 	}),
 	maxResultsOptions: currentMaxResultsOptions,
 	displayMode: resultsDisplayMode,
@@ -469,6 +482,11 @@ provideBrowseManager({
 			queuedServerInstallCount.value > 0,
 	),
 	hideSelectedLabel: computed(() => formatMessage(commonMessages.hideSelectedContentLabel)),
+	serverOnly: serverContentServerOnly,
+	showServerOnly: showServerOnlyToggle,
+	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
+	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
+	advancedFiltersCollapsed,
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,

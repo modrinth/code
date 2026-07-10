@@ -16,11 +16,11 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(versions_get);
     cfg.service(super::version_creation::version_create);
     cfg.service(
-        utoipa_actix_web::scope("/version")
+        web::scope("/version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)
@@ -44,39 +44,24 @@ fn default_true() -> bool {
     true
 }
 
-/// List versions for a project.
+/// List versions for a project.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
+	tag = "versions",
     get,
     operation_id = "getProjectVersions",
     params(
-        (
-            "project_id" = String,
-            Path,
-            description = "The ID or slug of the project"
-        ),
-        (
-            "loaders" = Option<String>,
-            Query,
-            description = "JSON array of loaders to filter by"
-        ),
-        (
-            "game_versions" = Option<String>,
-            Query,
-            description = "JSON array of game versions to filter by"
-        ),
-        (
-            "featured" = Option<bool>,
-            Query,
-            description = "Filter by featured status"
-        ),
-        (
-            "include_changelog" = Option<bool>,
-            Query,
-            description = "Whether to include changelog fields"
-        )
+        ("project_id" = String, Path, description = "The ID or slug of the project"),
+        ("loaders" = Option<String>, Query, description = "JSON array of loaders to filter by"),
+        ("game_versions" = Option<String>, Query, description = "JSON array of game versions to filter by"),
+        ("featured" = Option<bool>, Query, description = "Filter by featured status"),
+        ("version_type" = Option<VersionType>, Query, description = "Filter by version type"),
+        ("limit" = Option<usize>, Query, description = "Maximum number of versions"),
+        ("offset" = Option<usize>, Query, description = "Version offset"),
+        ("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -169,24 +154,18 @@ pub async fn version_list(
 }
 
 // Given a project ID/slug and a version slug
-/// Get a project version by ID or version number.
+/// Get a project version by ID or version number.  
 #[utoipa::path(
+	context_path = "/project/{project_id}",
+	tag = "versions",
     get,
     operation_id = "getVersionFromIdOrNumber",
     params(
-        (
-            "project_id" = String,
-            Path,
-            description = "The ID or slug of the project"
-        ),
-        (
-            "slug" = String,
-            Path,
-            description = "The version ID or version number"
-        )
+        ("project_id" = String, Path, description = "The ID or slug of the project"),
+        ("slug" = String, Path, description = "The version ID or version number")
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -230,12 +209,16 @@ pub struct VersionIds {
     pub include_changelog: bool,
 }
 
-/// Get multiple versions by ID.
+/// Get multiple versions by ID.  
 #[utoipa::path(
+	tag = "versions",
     get,
     operation_id = "getVersions",
-    params(("ids" = String, Query, description = "The JSON array of version IDs")),
-    responses((status = 200, description = "Expected response to a valid request"))
+    params(
+        ("ids" = String, Query, description = "The JSON array of version IDs"),
+        ("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
+    ),
+    responses((status = 200, description = "Expected response to a valid request", body = Vec<LegacyVersion>))
 )]
 #[get("/versions")]
 pub async fn versions_get(
@@ -274,13 +257,17 @@ pub async fn versions_get(
     }
 }
 
-/// Get a version by ID.
+/// Get a version by ID.  
 #[utoipa::path(
+	context_path = "/version",
+	tag = "versions",
     get,
     operation_id = "getVersion",
-    params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = models::ids::VersionId, Path, description = "The ID of the version")
+    ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
         (
             status = 404,
             description = "The requested item(s) were not found or no authorization to access the requested item(s)"
@@ -353,14 +340,18 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
-/// Modify an existing version.
+/// Update an existing version.  
 #[utoipa::path(
+	context_path = "/version",
+	tag = "versions",
     patch,
     operation_id = "modifyVersion",
-    params(("id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("id" = VersionId, Path, description = "The ID of the version")
+    ),
     request_body = EditVersion,
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"
@@ -468,13 +459,17 @@ pub async fn version_edit(
     Ok(response)
 }
 
-/// Delete a version by ID.
+/// Delete a version by ID.  
 #[utoipa::path(
+	context_path = "/version",
+	tag = "versions",
     delete,
     operation_id = "deleteVersion",
-    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    params(
+        ("version_id" = VersionId, Path, description = "The ID of the version")
+    ),
     responses(
-        (status = 204, description = "Expected response to a valid request"),
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
         (
             status = 401,
             description = "Incorrect token scopes or no authorization to access the requested item(s)"

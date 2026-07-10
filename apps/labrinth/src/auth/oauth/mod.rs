@@ -18,7 +18,7 @@ use crate::models::ids::OAuthClientId;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use actix_web::http::header::{CACHE_CONTROL, LOCATION, PRAGMA};
-use actix_web::web::{Data, Query, ServiceConfig};
+use actix_web::web::{Data, Query};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Duration};
 use rand::distributions::Alphanumeric;
@@ -33,7 +33,7 @@ use super::AuthenticationError;
 pub mod errors;
 pub mod uris;
 
-pub fn config(cfg: &mut ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(init_oauth)
         .service(accept_client_scopes)
         .service(reject_client_scopes)
@@ -57,6 +57,18 @@ pub struct OAuthClientAccessRequest {
     pub requested_scopes: Scopes,
 }
 
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/authorize",
+	tag = "oauth",
+	params(
+		("client_id" = OAuthClientId, Query),
+		("redirect_uri" = Option<String>, Query),
+		("scope" = Option<String>, Query),
+		("state" = Option<String>, Query)
+	),
+	responses((status = OK))
+)]
 #[get("authorize")]
 pub async fn init_oauth(
     req: HttpRequest,
@@ -165,11 +177,15 @@ pub async fn init_oauth(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct RespondToOAuthClientScopes {
     pub flow: String,
 }
 
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/accept", tag = "oauth", responses((status = OK))
+)]
 #[post("accept")]
 pub async fn accept_client_scopes(
     req: HttpRequest,
@@ -189,6 +205,10 @@ pub async fn accept_client_scopes(
     .await
 }
 
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/reject", tag = "oauth", responses((status = OK))
+)]
 #[post("reject")]
 pub async fn reject_client_scopes(
     req: HttpRequest,
@@ -201,7 +221,7 @@ pub async fn reject_client_scopes(
         .await
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TokenRequest {
     pub grant_type: String,
     pub code: String,
@@ -216,6 +236,10 @@ pub struct TokenResponse {
     pub expires_in: i64,
 }
 
+#[utoipa::path(
+	context_path = "/oauth",
+	path = "/token", tag = "oauth", responses((status = OK))
+)]
 #[post("token")]
 /// Params should be in the urlencoded request body
 /// And client secret should be in the HTTP basic authorization header

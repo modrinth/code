@@ -8,6 +8,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	worlds_tab: false,
 	worlds_in_home: true,
 	server_project_qa: false,
+	show_version_environment_column: false,
 	server_ram_as_bytes_always_on: false,
 	always_show_app_controls: false,
 	skip_non_essential_warnings: false,
@@ -15,6 +16,7 @@ export const DEFAULT_FEATURE_FLAGS = {
 	pride_fundraiser: true,
 	i18n_debug: false,
 	show_instance_play_time: true,
+	advanced_filters_collapsed: true,
 }
 
 export const THEME_OPTIONS = ['dark', 'light', 'oled', 'system'] as const

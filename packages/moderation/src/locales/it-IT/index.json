@@ -137,6 +137,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona la risoluzione corretta"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Assicurati di aver fornito la prova del permesso di distribuzione dei contenuti esterni del tuo pacchetto di mod."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Ricontrolla i permessi esterni"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Seleziona le versioni supportate dal tuo server, scegli un pacchetto di mod, o caricane il tuo."
   },
@@ -175,6 +181,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Vedi impostazioni dei collegamenti"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visita bacheca dei permessi"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Vedi impostazioni dei tag"

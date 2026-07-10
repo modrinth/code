@@ -88,339 +88,15 @@
 					</div>
 				</div>
 			</div>
-			<NewModal
+			<ProjectDownloadModal
 				ref="downloadModal"
-				:on-show="
-					() => {
-						debug('on-show fired')
-						loadVersions()
-						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
-					}
-				"
-				:on-hide="
-					() => {
-						navigateTo({ query: route.query, hash: '' }, { replace: true })
-					}
-				"
-			>
-				<template #title>
-					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-					<div class="truncate text-lg font-extrabold text-contrast">
-						{{ formatMessage(messages.downloadTitle, { title: project.title }) }}
-					</div>
-				</template>
-				<template #default>
-					<div class="mx-auto flex max-w-[44rem] flex-col gap-4 md:w-[30rem]">
-						<div
-							v-if="
-								project.project_type !== 'plugin' ||
-								project.loaders.some((x) => !tags.loaderData.allPluginLoaders.includes(x))
-							"
-							class="modrinth-app-section contents"
-						>
-							<div class="mx-auto flex w-fit flex-col">
-								<ButtonStyled color="brand">
-									<a
-										class="w-fit"
-										:href="`modrinth://mod/${project.slug}`"
-										@click="() => installWithApp()"
-									>
-										<ModrinthIcon aria-hidden="true" />
-										{{ formatMessage(messages.installWithModrinthApp) }}
-										<ExternalIcon aria-hidden="true" />
-									</a>
-								</ButtonStyled>
-								<Accordion ref="getModrinthAppAccordion">
-									<nuxt-link
-										class="mt-2 flex justify-center text-brand-blue hover:underline"
-										to="/app"
-									>
-										{{ formatMessage(messages.dontHaveModrinthApp) }}
-									</nuxt-link>
-								</Accordion>
-							</div>
-
-							<div class="flex items-center gap-4 px-4">
-								<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-								<span class="flex-shrink-0 text-sm font-semibold text-secondary">
-									{{ formatMessage(commonMessages.orLabel) }}
-								</span>
-								<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-							</div>
-						</div>
-
-						<div class="mx-auto flex w-fit flex-col gap-2">
-							<ButtonStyled v-if="project.game_versions.length === 1">
-								<div class="disabled button-like">
-									<GameIcon aria-hidden="true" />
-									{{
-										currentGameVersion
-											? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-											: formatMessage(messages.gameVersionError)
-									}}
-									<InfoIcon
-										v-tooltip="
-											formatMessage(messages.gameVersionTooltip, {
-												title: project.title,
-												version: currentGameVersion,
-											})
-										"
-										class="ml-auto size-5"
-									/>
-								</div>
-							</ButtonStyled>
-							<Accordion
-								v-else
-								ref="gameVersionAccordion"
-								class="accordion-with-bg"
-								@on-open="
-									() => {
-										if (platformAccordion) {
-											platformAccordion.close()
-										}
-									}
-								"
-							>
-								<template #title>
-									<GameIcon aria-hidden="true" />
-									{{
-										currentGameVersion
-											? formatMessage(messages.gameVersionLabel, { version: currentGameVersion })
-											: formatMessage(messages.selectGameVersion)
-									}}
-								</template>
-								<label for="game-versions-filtering" hidden>{{
-									formatMessage(messages.searchGameVersionsLabel)
-								}}</label>
-								<StyledInput
-									id="game-versions-filtering"
-									ref="gameVersionFilterInput"
-									v-model="versionFilter"
-									type="search"
-									autocomplete="off"
-									:icon="SearchIcon"
-									:placeholder="formatMessage(messages.searchGameVersions)"
-									wrapper-class="mb-2 w-full"
-								/>
-								<ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
-									<ButtonStyled
-										v-for="gameVersion in project.game_versions
-											.filter(
-												(x) =>
-													(versionFilter && x.includes(versionFilter)) ||
-													(!versionFilter && (showAllVersions || isReleaseGameVersion(x))),
-											)
-											.slice()
-											.reverse()"
-										:key="gameVersion"
-										:color="currentGameVersion === gameVersion ? 'brand' : 'standard'"
-									>
-										<button
-											v-tooltip="
-												!possibleGameVersions.includes(gameVersion)
-													? formatMessage(messages.gameVersionUnsupportedTooltip, {
-															title: project.title,
-															gameVersion: gameVersion,
-															platform: currentPlatformText,
-														})
-													: null
-											"
-											:class="{
-												'looks-disabled !text-brand-red':
-													!possibleGameVersions.includes(gameVersion),
-											}"
-											@click="
-												() => {
-													userSelectedGameVersion = gameVersion
-													gameVersionAccordion.close()
-													if (!currentPlatform && platformAccordion) {
-														platformAccordion.open()
-													}
-
-													navigateTo(
-														{
-															query: {
-																...route.query,
-																...(userSelectedGameVersion && {
-																	version: userSelectedGameVersion,
-																}),
-																...(userSelectedPlatform && {
-																	loader: userSelectedPlatform,
-																}),
-															},
-															hash: route.hash,
-														},
-														{ replace: true },
-													)
-												}
-											"
-										>
-											{{ gameVersion }}
-											<CheckIcon v-if="userSelectedGameVersion === gameVersion" />
-										</button>
-									</ButtonStyled>
-								</ScrollablePanel>
-								<Checkbox
-									v-if="showVersionsCheckbox"
-									v-model="showAllVersions"
-									class="mx-1"
-									:label="formatMessage(messages.showAllVersions)"
-									:disabled="!!versionFilter"
-								/>
-							</Accordion>
-							<ButtonStyled
-								v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
-							>
-								<div class="disabled button-like">
-									<WrenchIcon aria-hidden="true" />
-									{{
-										currentPlatform
-											? formatMessage(messages.platformLabel, {
-													platform: currentPlatformText,
-												})
-											: formatMessage(messages.platformError)
-									}}
-									<InfoIcon
-										v-tooltip="
-											formatMessage(messages.platformTooltip, {
-												title: project.title,
-												platform: currentPlatformText,
-											})
-										"
-										class="ml-auto size-5"
-									/>
-								</div>
-							</ButtonStyled>
-							<Accordion
-								v-else-if="project.project_type !== 'resourcepack'"
-								ref="platformAccordion"
-								class="accordion-with-bg"
-								@on-open="
-									() => {
-										if (gameVersionAccordion) {
-											gameVersionAccordion.close()
-										}
-									}
-								"
-							>
-								<template #title>
-									<WrenchIcon aria-hidden="true" />
-									{{
-										currentPlatform
-											? formatMessage(messages.platformLabel, {
-													platform: currentPlatformText,
-												})
-											: formatMessage(messages.selectPlatform)
-									}}
-								</template>
-								<ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
-									<ButtonStyled
-										v-for="platform in project.loaders.slice().reverse()"
-										:key="platform"
-										:color="currentPlatform === platform ? 'brand' : 'standard'"
-									>
-										<button
-											v-tooltip="
-												!possiblePlatforms.includes(platform)
-													? formatMessage(messages.platformUnsupportedTooltip, {
-															title: project.title,
-															platform: currentPlatformText,
-															gameVersion: currentGameVersion,
-														})
-													: null
-											"
-											:class="{
-												'looks-disabled !text-brand-red': !possiblePlatforms.includes(platform),
-											}"
-											@click="
-												() => {
-													userSelectedPlatform = platform
-
-													platformAccordion.close()
-													if (!currentGameVersion && gameVersionAccordion) {
-														gameVersionAccordion.open()
-													}
-
-													navigateTo(
-														{
-															query: {
-																...route.query,
-																...(userSelectedGameVersion && {
-																	version: userSelectedGameVersion,
-																}),
-																...(userSelectedPlatform && {
-																	loader: userSelectedPlatform,
-																}),
-															},
-															hash: route.hash,
-														},
-														{ replace: true },
-													)
-												}
-											"
-										>
-											{{ formatMessage(getTagMessage(platform, 'loader')) }}
-											<CheckIcon v-if="userSelectedPlatform === platform" />
-										</button>
-									</ButtonStyled>
-								</ScrollablePanel>
-							</Accordion>
-						</div>
-						<AutomaticAccordion div class="flex flex-col gap-2">
-							<VersionSummary
-								v-if="filteredRelease"
-								:version="filteredRelease"
-								:decorate-download-url="decorateModalDownloadUrl"
-								@on-download="onDownload"
-								@on-navigate="onVersionNavigate"
-							/>
-							<VersionSummary
-								v-if="filteredBeta"
-								:version="filteredBeta"
-								:decorate-download-url="decorateModalDownloadUrl"
-								@on-download="onDownload"
-								@on-navigate="onVersionNavigate"
-							/>
-							<VersionSummary
-								v-if="filteredAlpha"
-								:version="filteredAlpha"
-								:decorate-download-url="decorateModalDownloadUrl"
-								@on-download="onDownload"
-								@on-navigate="onVersionNavigate"
-							/>
-							<p
-								v-if="
-									currentPlatform &&
-									currentGameVersion &&
-									!filteredRelease &&
-									!filteredBeta &&
-									!filteredAlpha &&
-									!versionsLoading &&
-									versions.length > 0
-								"
-							>
-								{{
-									formatMessage(messages.noVersionsAvailable, {
-										gameVersion: currentGameVersion,
-										platform: currentPlatformText,
-									})
-								}}
-							</p>
-						</AutomaticAccordion>
-						<ServersPromo
-							v-if="flags.showProjectPageDownloadModalServersPromo"
-							:link="`/hosting#plan`"
-							@close="
-								() => {
-									flags.showProjectPageDownloadModalServersPromo = false
-									saveFeatureFlags()
-								}
-							"
-						/>
-					</div>
-				</template>
-			</NewModal>
+				:project-id="routeProjectId"
+				:download-reason="downloadReason"
+				@download="triggerDownloadAnimation"
+			/>
 			<CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
+			<ModpackScanModal ref="scanModal" :project_id="project.id" />
+
 			<div
 				class="new-page sidebar"
 				:class="{
@@ -751,18 +427,21 @@
 												!showModerationChecklist,
 										},
 										{
-											divider: true,
-											shown:
-												auth.user &&
-												tags.staffRoles.includes(auth.user.role) &&
-												!showModerationChecklist,
-										},
-										{
 											id: 'tech-review',
 											link: `/moderation/technical-review/${project.id}`,
 											color: 'orange',
 											hoverOnly: true,
 											shown: auth.user && tags.staffRoles.includes(auth.user.role),
+										},
+										{
+											id: 'moderation-modpack-rescan',
+											action: () => scanModal.show(),
+											color: 'orange',
+											hoverOnly: true,
+											shown:
+												auth.user &&
+												tags.staffRoles.includes(auth.user.role) &&
+												project.actualProjectType === 'modpack',
 										},
 										{
 											divider: true,
@@ -795,6 +474,9 @@
 										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
 									</template>
 									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
+									<template #moderation-modpack-rescan>
+										<FolderSearchIcon aria-hidden="true" /> Rescan modpack
+									</template>
 									<template #report>
 										<ReportIcon aria-hidden="true" />
 										{{ formatMessage(commonMessages.reportButton) }}
@@ -1017,7 +699,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
+					<div class="mb-3 overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-1" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -1048,27 +730,22 @@ import {
 	BookTextIcon,
 	CalendarIcon,
 	ChartIcon,
-	CheckIcon,
 	ChevronRightIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	ExternalIcon,
-	GameIcon,
+	FolderSearchIcon,
 	HeartIcon,
-	InfoIcon,
 	ListIcon,
-	ModrinthIcon,
 	MoreVerticalIcon,
 	PlayIcon,
 	PlusIcon,
 	ReportIcon,
 	ScaleIcon,
 	ScanEyeIcon,
-	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
 	VersionIcon,
-	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -1078,7 +755,6 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
-	getTagMessage,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -1098,8 +774,6 @@ import {
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 	provideProjectPageContext,
-	ScrollablePanel,
-	ServersPromo,
 	StyledInput,
 	TagItem,
 	useDebugLogger,
@@ -1108,28 +782,27 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
 import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
-import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { nextTick, readonly, ref, useTemplateRef, watch } from 'vue'
+import { onScopeDispose, readonly, ref, useTemplateRef, watch, watchEffect } from 'vue'
 
 import { navigateTo } from '#app'
-import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
+import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
+import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
+import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import {
 	loadChecklistOpenState,
 	saveChecklistOpenState,
@@ -1189,14 +862,7 @@ const debug = useDebugLogger('DownloadModal')
 const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
-
-const userSelectedGameVersion = ref(null)
-const userSelectedPlatform = ref(null)
-const showAllVersions = ref(false)
-
-const gameVersionFilterInput = ref()
-
-const versionFilter = ref('')
+const scanModal = ref()
 
 const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
@@ -1204,80 +870,6 @@ const isServerProject = computed(() => projectV3.value?.minecraft_server != null
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
 const baseId = useId()
-
-const currentGameVersion = computed(() => {
-	if (!project.value) return null
-	return (
-		userSelectedGameVersion.value ||
-		(project.value.game_versions.length === 1 && project.value.game_versions[0])
-	)
-})
-
-const possibleGameVersions = computed(() => {
-	return versions.value
-		.filter((x) => !currentPlatform.value || x.loaders.includes(currentPlatform.value))
-		.flatMap((x) => x.game_versions)
-})
-
-const possiblePlatforms = computed(() => {
-	return versions.value
-		.filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
-		.flatMap((x) => x.loaders)
-})
-
-const currentPlatform = computed(() => {
-	if (!project.value) return null
-	return (
-		userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
-	)
-})
-
-const currentPlatformText = computed(() => {
-	if (!currentPlatform.value) return null
-	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
-})
-
-function decorateModalDownloadUrl(url) {
-	return createProjectDownloadUrl(url, {
-		reason: downloadReason.value,
-		gameVersion: currentGameVersion.value ?? undefined,
-		loader: currentPlatform.value ?? undefined,
-	})
-}
-
-const releaseVersions = computed(() => {
-	const set = new Set()
-	for (const gv of tags.value.gameVersions || []) {
-		if (gv?.version && gv.version_type === 'release') set.add(gv.version)
-	}
-	return set
-})
-
-const nonReleaseVersions = computed(() => {
-	const set = new Set()
-	for (const gv of tags.value.gameVersions || []) {
-		if (gv?.version && gv.version_type !== 'release') set.add(gv.version)
-	}
-	return set
-})
-
-function isReleaseGameVersion(ver) {
-	if (releaseVersions.value.has(ver)) return true
-	if (nonReleaseVersions.value.has(ver)) return false
-	return true
-}
-
-const showVersionsCheckbox = computed(() => {
-	const list = project.value?.game_versions || []
-	let hasRelease = false
-	let hasNonRelease = false
-	for (const v of list) {
-		if (isReleaseGameVersion(v)) hasRelease = true
-		else hasNonRelease = true
-		if (hasRelease && hasNonRelease) return true
-	}
-	return false
-})
 
 const serverProject = computed(() => ({
 	name: project.value.title,
@@ -1293,16 +885,6 @@ function handlePlayServerProject() {
 		serverProject: serverProject.value,
 	})
 }
-
-function installWithApp() {
-	setTimeout(() => {
-		getModrinthAppAccordion.value.open()
-	}, 1500)
-}
-
-const gameVersionAccordion = ref()
-const platformAccordion = ref()
-const getModrinthAppAccordion = ref()
 
 const formatRelativeTime = useRelativeTime()
 
@@ -1359,17 +941,9 @@ const messages = defineMessages({
 		id: 'project.description.title',
 		defaultMessage: 'Description',
 	},
-	dontHaveModrinthApp: {
-		id: 'project.download.no-app',
-		defaultMessage: "Don't have Modrinth App?",
-	},
 	dontShowAgain: {
 		id: 'project.actions.dont-show-again',
 		defaultMessage: "Don't show again",
-	},
-	downloadTitle: {
-		id: 'project.download.title',
-		defaultMessage: 'Download {title}',
 	},
 	downloadsStat: {
 		id: 'project.stats.downloads-label',
@@ -1409,26 +983,6 @@ const messages = defineMessages({
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
 	},
-	gameVersionError: {
-		id: 'project.download.game-version-error',
-		defaultMessage: 'Error: no game versions found',
-	},
-	gameVersionLabel: {
-		id: 'project.download.game-version',
-		defaultMessage: 'Game version: {version}',
-	},
-	gameVersionTooltip: {
-		id: 'project.download.game-version-tooltip',
-		defaultMessage: '{title} is only available for {version}',
-	},
-	gameVersionUnsupportedTooltip: {
-		id: 'project.download.game-version-unsupported-tooltip',
-		defaultMessage: '{title} does not support {gameVersion} for {platform}',
-	},
-	installWithModrinthApp: {
-		id: 'project.download.install-with-app',
-		defaultMessage: 'Install with Modrinth App',
-	},
 	licenseErrorMessage: {
 		id: 'project.license.error',
 		defaultMessage: 'License text could not be retrieved.',
@@ -1453,29 +1007,9 @@ const messages = defineMessages({
 		id: 'project.collections.none-found',
 		defaultMessage: 'No collections found.',
 	},
-	noVersionsAvailable: {
-		id: 'project.download.no-versions-available',
-		defaultMessage: 'No versions available for {gameVersion} and {platform}.',
-	},
 	pageNotFound: {
 		id: 'project.error.page-not-found',
 		defaultMessage: 'The page could not be found',
-	},
-	platformError: {
-		id: 'project.download.platform-error',
-		defaultMessage: 'Error: no platforms found',
-	},
-	platformLabel: {
-		id: 'project.download.platform',
-		defaultMessage: 'Platform: {platform}',
-	},
-	platformTooltip: {
-		id: 'project.download.platform-tooltip',
-		defaultMessage: '{title} is only available for {platform}',
-	},
-	platformUnsupportedTooltip: {
-		id: 'project.download.platform-unsupported-tooltip',
-		defaultMessage: '{title} does not support {platform} for {gameVersion}',
 	},
 	projectIconUpdated: {
 		id: 'project.notification.icon-updated.title',
@@ -1505,22 +1039,6 @@ const messages = defineMessages({
 		id: 'project.actions.review-project',
 		defaultMessage: 'Review project',
 	},
-	searchGameVersions: {
-		id: 'project.download.search-game-versions',
-		defaultMessage: 'Search game versions...',
-	},
-	searchGameVersionsLabel: {
-		id: 'project.download.search-game-versions-label',
-		defaultMessage: 'Search game versions...',
-	},
-	selectGameVersion: {
-		id: 'project.download.select-game-version',
-		defaultMessage: 'Select game version',
-	},
-	selectPlatform: {
-		id: 'project.download.select-platform',
-		defaultMessage: 'Select platform',
-	},
 	serversPromoDescription: {
 		id: 'project.actions.servers-promo.description',
 		defaultMessage: 'Modrinth Hosting is the easiest way to play with your friends without hassle!',
@@ -1536,10 +1054,6 @@ const messages = defineMessages({
 	settingsTitle: {
 		id: 'project.settings.title',
 		defaultMessage: 'Settings',
-	},
-	showAllVersions: {
-		id: 'project.download.show-all-versions',
-		defaultMessage: 'Show all versions',
 	},
 	versionsTab: {
 		id: 'project.versions.title',
@@ -1589,48 +1103,6 @@ async function getLicenseData(event) {
 		licenseText.value = formatMessage(messages.licenseErrorMessage)
 	}
 }
-
-const filteredVersions = computed(() => {
-	const result = versions.value.filter(
-		(x) =>
-			x.game_versions?.includes(currentGameVersion.value) &&
-			(x.loaders?.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
-	)
-	debug('filteredVersions', {
-		total: versions.value.length,
-		filtered: result.length,
-		currentGameVersion: currentGameVersion.value,
-		currentPlatform: currentPlatform.value,
-		versionsEnabled: versionsEnabled.value,
-		versionsLoading: versionsV3Loading.value,
-		sampleLoaders: versions.value.slice(0, 3).map((v) => v.loaders),
-	})
-	return result
-})
-
-const filteredRelease = computed(() => {
-	return filteredVersions.value.find((x) => x.version_type === 'release')
-})
-
-const filteredBeta = computed(() => {
-	return filteredVersions.value.find(
-		(x) =>
-			x.version_type === 'beta' &&
-			(!filteredRelease.value ||
-				dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))),
-	)
-})
-
-const filteredAlpha = computed(() => {
-	return filteredVersions.value.find(
-		(x) =>
-			x.version_type === 'alpha' &&
-			(!filteredRelease.value ||
-				dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))) &&
-			(!filteredBeta.value ||
-				dayjs(x.date_published).isAfter(dayjs(filteredBeta.value.date_published))),
-	)
-})
 
 const displayCollectionsSearch = ref('')
 const collections = computed(() =>
@@ -1704,6 +1176,16 @@ const project = computed(() => {
 
 // Use actual project ID for dependent queries (ensures cache consistency)
 const projectId = computed(() => projectRaw.value?.id)
+
+const sharedProjectId = injectCurrentProjectId(null)
+if (sharedProjectId) {
+	watchEffect(() => {
+		sharedProjectId.value = projectId.value ?? undefined
+	})
+	onScopeDispose(() => {
+		sharedProjectId.value = undefined
+	})
+}
 
 // V3 Project
 const {
@@ -2396,40 +1878,6 @@ if (!route.name.startsWith('type-project-settings')) {
 
 const onUserCollectProject = useClientTry(userCollectProject)
 
-const { version, loader } = route.query
-
-if (
-	project.value &&
-	project.value.game_versions.length > 0 &&
-	project.value.game_versions.every((v) => !isReleaseGameVersion(v))
-) {
-	showAllVersions.value = true
-}
-
-if (project.value && version !== undefined && project.value.game_versions.includes(version)) {
-	userSelectedGameVersion.value = version
-}
-
-if (project.value && loader !== undefined && project.value.loaders.includes(loader)) {
-	userSelectedPlatform.value = loader
-}
-
-if (route.hash === '#download' || version !== undefined || loader !== undefined) {
-	debug('eager loadVersions from setup', { hash: route.hash, version, loader })
-	loadVersions()
-}
-
-watch(downloadModal, (modal) => {
-	if (!modal) return
-
-	// route.hash returns everything in the hash string, including the # itself
-	if (route.hash === '#download') {
-		debug('hash #download watch fired, opening modal')
-		loadVersions()
-		modal.show()
-	}
-})
-
 watch(
 	[versionsV3, _versionsV3Error],
 	([data, error]) => {
@@ -2650,30 +2098,9 @@ watch(
 	{ immediate: true },
 )
 
-function closeDownloadModal(event) {
-	downloadModal.value.hide(event)
-	userSelectedPlatform.value = null
-	userSelectedGameVersion.value = null
-	showAllVersions.value = false
-}
-
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
-}
-
-function onDownload(event) {
-	triggerDownloadAnimation()
-	setTimeout(() => {
-		closeDownloadModal(event)
-	}, 400)
-}
-
-function onVersionNavigate(url) {
-	closeDownloadModal()
-	nextTick(() => {
-		navigateTo(url)
-	})
 }
 
 async function deleteVersion(id) {
@@ -2831,11 +2258,6 @@ provideProjectPageContext({
 	display: none;
 }
 
-:deep(.accordion-with-bg) {
-	@apply rounded-2xl bg-bg p-2;
-	--scrollable-pane-bg: var(--color-bg);
-}
-
 .over-the-top-download-animation {
 	position: fixed;
 	z-index: 100;
@@ -2883,12 +2305,6 @@ provideProjectPageContext({
 			width: 20rem;
 			height: 20rem;
 		}
-	}
-}
-
-@media (hover: none) and (max-width: 767px) {
-	.modrinth-app-section {
-		display: none;
 	}
 }
 

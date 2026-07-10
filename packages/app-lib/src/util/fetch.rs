@@ -1,10 +1,11 @@
 //! Functions for fetching information from the Internet
 use super::io::{self, IOError};
-use crate::ErrorKind;
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
+use eyre::{Context, eyre};
 use parking_lot::Mutex;
 use rand::Rng;
 use reqwest::Method;
@@ -189,6 +190,8 @@ static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
 
 fn reqwest_client_builder() -> reqwest::ClientBuilder {
     reqwest::Client::builder()
+        .connect_timeout(time::Duration::from_secs(15))
+        .read_timeout(time::Duration::from_secs(30))
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
         .user_agent(crate::launcher_user_agent())
 }
@@ -262,6 +265,34 @@ pub async fn fetch_with_client(
         semaphore,
         exec,
         client,
+    )
+    .await
+}
+
+#[tracing::instrument(skip(semaphore, progress))]
+pub async fn fetch_with_client_progress(
+    url: &str,
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    client: &reqwest::Client,
+    progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        download_meta,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        client,
+        progress,
     )
     .await
 }
@@ -445,7 +476,7 @@ async fn fetch_advanced_with_client_and_progress(
         }
 
         if let Some((name, value)) = &download_meta_header {
-            tracing::info!("Sending download analytics: {value}");
+            tracing::debug!("Sending download analytics: {value}");
             req = req.header(name.as_str(), value.as_str());
         }
 
@@ -465,45 +496,67 @@ async fn fetch_advanced_with_client_and_progress(
                 if resp.status().is_client_error()
                     || resp.status().is_server_error()
                 {
+                    let status = resp.status();
                     let backup_error = resp.error_for_status_ref().unwrap_err();
-                    if let Ok(error) = resp.json().await {
+                    if let Ok(mut error) = resp.json::<LabrinthError>().await {
+                        error.status = Some(status.as_u16());
+                        error.method = Some(method.as_str().to_string());
+                        error.url = Some(url.to_string());
+                        error.route = uri_path.map(str::to_string);
                         return Err(ErrorKind::LabrinthError(error).into());
                     }
                     return Err(backup_error.into());
                 }
 
-                let bytes = if loading_bar.is_some() || progress.is_some() {
+                let bytes: eyre::Result<Bytes> = if loading_bar.is_some()
+                    || progress.is_some()
+                {
                     let length = resp.content_length();
                     if let Some(total_size) = length {
                         use futures::StreamExt;
                         let mut stream = resp.bytes_stream();
-                        let mut bytes = Vec::new();
-                        let mut downloaded = 0_u64;
-                        while let Some(item) = stream.next().await {
-                            let chunk = item.or(Err(ErrorKind::NoValueFor(
-                                "fetch bytes".to_string(),
-                            )))?;
-                            downloaded += chunk.len() as u64;
-                            bytes.append(&mut chunk.to_vec());
-                            if let Some((bar, total)) = &loading_bar {
-                                emit_loading(
-                                    bar,
-                                    (chunk.len() as f64 / total_size as f64)
-                                        * total,
-                                    None,
-                                )?;
-                            }
-                            if let Some(progress) = progress.as_mut() {
-                                progress(downloaded, total_size).await?;
-                            }
-                        }
 
-                        Ok(bytes::Bytes::from(bytes))
+                        async {
+                            let mut bytes = Vec::new();
+                            let mut downloaded = 0_u64;
+
+                            while let Some(item) = stream.next().await {
+                                let chunk = item.wrap_err_with(|| {
+                                    eyre!(
+                                        "failed to read response body from {url}"
+                                    )
+                                })?;
+
+                                downloaded += chunk.len() as u64;
+                                bytes.extend_from_slice(&chunk);
+
+                                if let Some((bar, total)) = &loading_bar {
+                                    emit_loading(
+                                        bar,
+                                        (chunk.len() as f64
+                                            / total_size as f64)
+                                            * total,
+                                        None,
+                                    )?;
+                                }
+
+                                if let Some(progress) = progress.as_mut() {
+                                    progress(downloaded, total_size).await?;
+                                }
+                            }
+
+                            Ok(Bytes::from(bytes))
+                        }
+                        .await
                     } else {
-                        resp.bytes().await
+                        resp.bytes().await.wrap_err_with(|| {
+                            eyre!("failed to read response body from {url}")
+                        })
                     }
                 } else {
-                    resp.bytes().await
+                    resp.bytes().await.wrap_err_with(|| {
+                        eyre!("failed to read response body from {url}")
+                    })
                 };
 
                 if let Ok(bytes) = bytes {
@@ -570,6 +623,43 @@ pub async fn fetch_mirrors(
             semaphore,
             exec,
             &REQWEST_CLIENT,
+        )
+        .await;
+
+        if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
+            return result;
+        }
+    }
+
+    unreachable!()
+}
+
+#[tracing::instrument(skip(semaphore, progress))]
+pub async fn fetch_mirrors_with_progress(
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    download_meta: Option<&DownloadMeta>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    mut progress: Option<&mut FetchProgressFn<'_>>,
+) -> crate::Result<Bytes> {
+    if mirrors.is_empty() {
+        return Err(
+            ErrorKind::InputError("No mirrors provided!".to_string()).into()
+        );
+    }
+
+    for (index, mirror) in mirrors.iter().enumerate() {
+        let result = fetch_with_client_progress(
+            mirror,
+            sha1,
+            download_meta,
+            uri_path,
+            semaphore,
+            exec,
+            &REQWEST_CLIENT,
+            progress.as_deref_mut(),
         )
         .await;
 

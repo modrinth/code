@@ -3,17 +3,18 @@ use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
-use crate::auth::get_user_from_headers;
+use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::{
-    DBOrganization, DBTeamMember, DBVersion,
+    DBFileId, DBOrganization, DBTeamMember, DBVersion,
     ids::{
         DBAttributionGroupId, DBProjectId, DBVersionId,
         generate_attribution_group_id,
     },
 };
 use crate::database::redis::RedisPool;
-use crate::models::ids::{ProjectId, VersionId};
+use crate::file_hosting::FileHost;
+use crate::models::ids::{FileId, ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     AttributionModerationStatusKind, AttributionResolution,
@@ -21,20 +22,22 @@ use crate::models::projects::{
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::users::User;
+use crate::queue::file_scan::{FileScanSummary, scan_file};
 use crate::queue::moderation::ApprovalType;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(list)
         .service(update_group)
         .service(scan)
+        .service(force_scan_file)
         .service(assign)
         .service(split);
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct AttributionGroupResponse {
     id: crate::models::ids::AttributionGroupId,
     flame_project: Option<FlameProject>,
@@ -45,7 +48,7 @@ struct AttributionGroupResponse {
     versions: Vec<VersionInfo>,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, utoipa::ToSchema)]
 struct VersionInfo {
     id: VersionId,
     name: String,
@@ -53,7 +56,7 @@ struct VersionInfo {
     date_created: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct AttributionFileResponse {
     name: String,
     sha1: String,
@@ -64,7 +67,7 @@ struct AttributionFileResponse {
     moderation_external_license: Option<ModerationExternalLicenseResponse>,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, utoipa::ToSchema)]
 struct ModerationExternalLicenseResponse {
     id: i64,
     title: Option<String>,
@@ -89,9 +92,14 @@ struct ScanResponse {
     queued_files: u64,
 }
 
-#[utoipa::path]
+/// Queue an attribution scan.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	responses((status = OK, body = ScanResponse))
+)]
 #[post("/scan")]
-async fn scan(
+pub async fn scan(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -202,8 +210,90 @@ async fn scan(
 }
 
 #[utoipa::path]
+#[post("/file/{file_id}/scan")]
+async fn force_scan_file(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    file_host: web::Data<dyn FileHost>,
+    path: web::Path<FileId>,
+) -> Result<web::Json<FileScanSummary>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let file_id: DBFileId = path.into_inner().into();
+    let file = sqlx::query!(
+        r#"
+		select
+			f.url,
+			f.version_id as "version_id: DBVersionId",
+			v.mod_id as "project_id: DBProjectId"
+		from files f
+		inner join versions v on v.id = f.version_id
+		where f.id = $1
+		"#,
+        file_id as DBFileId,
+    )
+    .fetch_optional(pool.as_ref())
+    .await
+    .wrap_internal_err("failed to fetch attribution scan file")?
+    .ok_or(ApiError::NotFound)?;
+
+    let mut transaction = pool.begin().await.wrap_internal_err(
+        "failed to begin attribution file scan transaction",
+    )?;
+
+    sqlx::query!(
+        r#"
+		delete from attributions_exemptions
+		where version_id = $1
+		"#,
+        file.version_id as DBVersionId,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("failed to remove attribution scan exemption")?;
+
+    let scan_summary = scan_file(
+        &mut transaction,
+        redis.as_ref(),
+        &**file_host,
+        file.project_id,
+        file_id,
+        &file.url,
+    )
+    .await
+    .wrap_internal_err("failed to scan file for attributions")?;
+
+    transaction.commit().await.wrap_internal_err(
+        "failed to commit attribution file scan transaction",
+    )?;
+
+    DBVersion::clear_cache_ids(&[file.version_id], redis.as_ref())
+        .await
+        .wrap_internal_err("failed to clear version cache")?;
+
+    Ok(web::Json(scan_summary))
+}
+
+/// List project attribution groups.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	params(
+		("project_id" = ProjectId, Path)
+	),
+	responses((status = OK, body = inline(Vec<AttributionGroupResponse>)))
+)]
 #[get("/{project_id}")]
-async fn list(
+pub async fn list(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -451,9 +541,14 @@ struct UpdateGroupBody {
     attribution: AttributionResolution,
 }
 
-#[utoipa::path]
+/// Update an attribution group.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
 #[patch("/group/{group_id}")]
-async fn update_group(
+pub async fn update_group(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -532,9 +627,14 @@ struct AssignBody {
     project_id: ProjectId,
 }
 
-#[utoipa::path]
+/// Move a file to an attribution group.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
 #[post("/assign")]
-async fn assign(
+pub async fn assign(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -688,9 +788,14 @@ struct SplitBody {
     project_id: ProjectId,
 }
 
-#[utoipa::path]
+/// Split a file into a new attribution group.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	responses((status = NO_CONTENT))
+)]
 #[post("/split")]
-async fn split(
+pub async fn split(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,

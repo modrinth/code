@@ -202,6 +202,7 @@ pub enum SearchField {
     Author,
     License,
     ProjectTypes,
+    AllProjectTypes,
     ProjectId,
     OpenSource,
     Environment,
@@ -238,6 +239,8 @@ pub struct UploadSearchProject {
     pub project_id: String,
     //
     pub project_types: Vec<String>,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     pub author_id: String,
@@ -285,7 +288,7 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct SearchProjectDependency {
     pub project_id: String,
     pub dependency_type: DependencyType,
@@ -294,7 +297,7 @@ pub struct SearchProjectDependency {
     pub icon_url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct SearchResults {
     pub hits: Vec<ResultSearchProject>,
     pub page: usize,
@@ -302,11 +305,13 @@ pub struct SearchResults {
     pub total_hits: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
     pub version_id: String,
     pub project_id: String,
     pub project_types: Vec<String>,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     #[serde(default)]
@@ -355,6 +360,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             version_id: source.version_id,
             project_id: source.project_id,
             project_types: source.project_types,
+            all_project_types: source.all_project_types,
             slug: source.slug,
             author: source.author,
             author_id: Some(source.author_id),

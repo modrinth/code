@@ -248,17 +248,8 @@
   "auth.reset-password.title.long": {
     "message": "Resetează-ți parola"
   },
-  "auth.sign-in.2fa.description": {
-    "message": "Te rugăm să introduci codul de autorizare în doi pași (2FA) pentru a continua."
-  },
-  "auth.sign-in.2fa.label": {
-    "message": "Introduceți codul 2FA"
-  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Introdu codul..."
-  },
-  "auth.sign-in.sign-in-with": {
-    "message": "Conectează-te cu"
   },
   "auth.sign-in.title": {
     "message": "Conectare"
@@ -271,9 +262,6 @@
   },
   "auth.sign-up.title": {
     "message": "Înregistrare"
-  },
-  "auth.sign-up.title.sign-up-with": {
-    "message": "Înregistrare cu"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Setările contului"
@@ -1427,43 +1415,16 @@
   "project.details.licensed": {
     "message": "Licență"
   },
-  "project.download.game-version": {
-    "message": "Versiunea jocului: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Eroare: nu s-au găsit versiuni ale jocului"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} este disponibil doar pentru {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {gameVersion} pentru {platform}"
   },
-  "project.download.install-with-app": {
-    "message": "Instalează cu Modrinth App"
-  },
   "project.download.no-app": {
     "message": "Nu ai Modrinth App?"
-  },
-  "project.download.no-versions-available": {
-    "message": "Nu există versiuni disponibile pentru {gameVersion} și {platform}."
-  },
-  "project.download.platform": {
-    "message": "Platformă: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Eroare: nu s-au găsit platforme"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} este disponibil doar pentru {platform}"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {platform} pentru {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Caută versiuni ale jocului..."
-  },
-  "project.download.search-game-versions-label": {
     "message": "Caută versiuni ale jocului..."
   },
   "project.download.select-game-version": {

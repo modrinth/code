@@ -8,7 +8,8 @@
 		</div>
 		<div class="overflow-x-auto overflow-y-hidden">
 			<table
-				class="w-full table-fixed border-separate border-spacing-0 border-surface-4"
+				class="w-full border-separate border-spacing-0 border-surface-4"
+				:class="tableLayout === 'auto' ? 'table-auto' : 'table-fixed'"
 				:style="tableMinWidth ? { minWidth: tableMinWidth } : undefined"
 			>
 				<colgroup>
@@ -32,10 +33,11 @@
 						<th
 							v-for="column in columns"
 							:key="column.key"
-							class="h-12 first:pl-4 last:pr-4"
+							class="h-12 pr-2 first:pl-4 last:pr-4"
 							:class="[
 								`text-${column.align ?? 'left'}`,
 								column.enableSorting ? 'cursor-pointer select-none' : '',
+								column.headerClass,
 							]"
 							:style="column.width ? { width: column.width } : undefined"
 							@click="column.enableSorting ? handleSort(column.key) : undefined"
@@ -77,38 +79,53 @@
 						</td>
 					</tr>
 					<template v-else>
-						<tr
+						<template
 							v-for="(row, rowIndex) in renderedRows"
-							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getRowClass(getAbsoluteRowIndex(rowIndex))"
+							:key="getRowPartRenderKey(row, getAbsoluteRowIndex(rowIndex), 'group')"
 						>
-							<td
-								v-if="showSelection"
-								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
+							<tr
+								:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 							>
-								<Checkbox
-									:model-value="isSelected(row)"
-									class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
-									@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
-								/>
-							</td>
-							<td
-								v-for="column in columns"
-								:key="column.key"
-								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="`text-${column.align ?? 'left'}`"
-							>
-								<slot
-									:name="`cell-${column.key}`"
-									:row="row"
-									:value="row[column.key]"
-									:column="column"
-									:index="getAbsoluteRowIndex(rowIndex)"
+								<td
+									v-if="showSelection"
+									class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
 								>
-									{{ row[column.key] ?? '' }}
-								</slot>
-							</td>
-						</tr>
+									<Checkbox
+										:model-value="isSelected(row)"
+										class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+										@update:model-value="
+											(selectRow, event) => toggleSelection(row, selectRow, event)
+										"
+									/>
+								</td>
+								<td
+									v-for="column in columns"
+									:key="column.key"
+									class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
+									:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
+								>
+									<slot
+										:name="`cell-${column.key}`"
+										:row="row"
+										:value="row[column.key]"
+										:column="column"
+										:index="getAbsoluteRowIndex(rowIndex)"
+									>
+										{{ row[column.key] ?? '' }}
+									</slot>
+								</td>
+							</tr>
+							<tr
+								v-if="isRowBelowVisible(row, getAbsoluteRowIndex(rowIndex))"
+								:class="getRowBelowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
+							>
+								<td :colspan="columnSpan" class="p-0">
+									<slot name="row-below" :row="row" :index="getAbsoluteRowIndex(rowIndex)" />
+								</td>
+							</tr>
+						</template>
 					</template>
 				</TransitionGroup>
 				<tbody v-else :ref="setListContainer">
@@ -129,38 +146,53 @@
 								:style="{ height: `${topSpacerHeight}px` }"
 							></td>
 						</tr>
-						<tr
+						<template
 							v-for="(row, rowIndex) in renderedRows"
-							:key="getRowRenderKey(row, getAbsoluteRowIndex(rowIndex))"
-							:class="getRowClass(getAbsoluteRowIndex(rowIndex))"
+							:key="getRowPartRenderKey(row, getAbsoluteRowIndex(rowIndex), 'group')"
 						>
-							<td
-								v-if="showSelection"
-								class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
+							<tr
+								:class="getRowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
 							>
-								<Checkbox
-									:model-value="isSelected(row)"
-									class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
-									@update:model-value="(selectRow, event) => toggleSelection(row, selectRow, event)"
-								/>
-							</td>
-							<td
-								v-for="column in columns"
-								:key="column.key"
-								class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
-								:class="`text-${column.align ?? 'left'}`"
-							>
-								<slot
-									:name="`cell-${column.key}`"
-									:row="row"
-									:value="row[column.key]"
-									:column="column"
-									:index="getAbsoluteRowIndex(rowIndex)"
+								<td
+									v-if="showSelection"
+									class="w-12 border-solid border-0 border-t border-surface-4 focus:outline-none"
 								>
-									{{ row[column.key] ?? '' }}
-								</slot>
-							</td>
-						</tr>
+									<Checkbox
+										:model-value="isSelected(row)"
+										class="shrink-0 p-4 -outline-offset-[14px] outline rounded-2xl"
+										@update:model-value="
+											(selectRow, event) => toggleSelection(row, selectRow, event)
+										"
+									/>
+								</td>
+								<td
+									v-for="column in columns"
+									:key="column.key"
+									class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-4"
+									:class="[`text-${column.align ?? 'left'}`, column.cellClass]"
+								>
+									<slot
+										:name="`cell-${column.key}`"
+										:row="row"
+										:value="row[column.key]"
+										:column="column"
+										:index="getAbsoluteRowIndex(rowIndex)"
+									>
+										{{ row[column.key] ?? '' }}
+									</slot>
+								</td>
+							</tr>
+							<tr
+								v-if="isRowBelowVisible(row, getAbsoluteRowIndex(rowIndex))"
+								:class="getRowBelowClass(row, getAbsoluteRowIndex(rowIndex))"
+								@click="handleRowClick(row, getAbsoluteRowIndex(rowIndex), $event)"
+							>
+								<td :colspan="columnSpan" class="p-0">
+									<slot name="row-below" :row="row" :index="getAbsoluteRowIndex(rowIndex)" />
+								</td>
+							</tr>
+						</template>
 						<tr v-if="virtualized && bottomSpacerHeight > 0" aria-hidden="true">
 							<td
 								:colspan="columnSpan"
@@ -188,6 +220,7 @@ import Checkbox from './Checkbox.vue'
 
 export type TableColumnAlign = 'left' | 'center' | 'right'
 export type SortDirection = 'asc' | 'desc'
+export type TableLayout = 'fixed' | 'auto'
 
 /**
  * Defines a table column configuration.
@@ -204,6 +237,8 @@ export interface TableColumn<K extends string = string> {
 	 * Accepts any valid CSS width (e.g., '200px', '20%', '10rem', 'auto', 'fit-content').
 	 */
 	width?: string
+	headerClass?: string
+	cellClass?: string
 }
 
 const props = withDefaults(
@@ -223,10 +258,15 @@ const props = withDefaults(
 		 * Sets a minimum width for the table content, allowing horizontal overflow below that width.
 		 */
 		tableMinWidth?: string
+		tableLayout?: TableLayout
+		rowBelowVisible?: boolean | ((row: T, index: number) => boolean)
+		rowClass?: string | ((row: T, index: number) => string)
+		rowClickable?: boolean | ((row: T, index: number) => boolean)
 	}>(),
 	{
 		showSelection: false,
 		rowKey: 'id' as keyof T,
+		tableLayout: 'fixed',
 		virtualized: false,
 		virtualRowHeight: 56,
 		virtualBufferSize: 5,
@@ -239,6 +279,7 @@ const sortDirection = defineModel<SortDirection>('sortDirection', { default: 'as
 const slots = useSlots()
 const selectionAnchorId = ref<unknown>()
 const hasHeaderSlot = computed(() => Boolean(slots.header))
+const hasRowBelowSlot = computed(() => Boolean(slots['row-below']))
 const columnSpan = computed(() => Math.max(props.columns.length + (props.showSelection ? 1 : 0), 1))
 
 const {
@@ -267,6 +308,7 @@ const bottomSpacerHeight = computed(() => {
 
 const emit = defineEmits<{
 	sort: [column: string, direction: SortDirection]
+	rowClick: [row: T, index: number, event: MouseEvent]
 }>()
 
 const selectableRows = computed(() => props.selectionData ?? props.data)
@@ -319,8 +361,67 @@ function getRowRenderKey(row: T, rowIndex: number): PropertyKey {
 	return rowIndex
 }
 
-function getRowClass(rowIndex: number): string {
-	return rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
+function getRowPartRenderKey(row: T, rowIndex: number, part: 'group' | 'row' | 'below'): string {
+	return `${String(getRowRenderKey(row, rowIndex))}-${part}`
+}
+
+function isRowBelowVisible(row: T, rowIndex: number): boolean {
+	if (!hasRowBelowSlot.value || props.virtualized) {
+		return false
+	}
+
+	if (typeof props.rowBelowVisible === 'function') {
+		return props.rowBelowVisible(row, rowIndex)
+	}
+
+	return props.rowBelowVisible ?? true
+}
+
+function getRowClass(row: T, rowIndex: number): string[] {
+	const baseClass = rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'
+	const customClass =
+		typeof props.rowClass === 'function' ? props.rowClass(row, rowIndex) : props.rowClass
+
+	return customClass ? [baseClass, customClass] : [baseClass]
+}
+
+function getRowBelowClass(row: T, rowIndex: number): string[] {
+	const classes = [
+		rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
+		'table-row-below',
+		'transition-[filter]',
+	]
+
+	if (isRowClickable(row, rowIndex)) {
+		classes.push('cursor-pointer')
+	}
+
+	return classes
+}
+
+function isRowClickable(row: T, rowIndex: number): boolean {
+	return typeof props.rowClickable === 'function'
+		? props.rowClickable(row, rowIndex)
+		: props.rowClickable === true
+}
+
+function isNoRowClickTarget(event: MouseEvent): boolean {
+	const target = event.target
+	const currentTarget = event.currentTarget
+	if (!(target instanceof Element) || !(currentTarget instanceof Element)) {
+		return false
+	}
+
+	const noRowClickTarget = target.closest('[data-no-row-click]')
+	return noRowClickTarget !== null && noRowClickTarget !== currentTarget
+}
+
+function handleRowClick(row: T, rowIndex: number, event: MouseEvent) {
+	if (!isRowClickable(row, rowIndex) || isNoRowClickTarget(event)) {
+		return
+	}
+
+	emit('rowClick', row, rowIndex, event)
 }
 
 function isSelected(row: T): boolean {

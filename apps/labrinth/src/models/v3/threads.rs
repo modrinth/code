@@ -28,8 +28,11 @@ pub struct ThreadMessage {
     pub hide_identity: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, utoipa::ToSchema, strum::AsRefStr,
+)]
 #[serde(tag = "type", rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum MessageBody {
     Text {
         body: String,
@@ -47,6 +50,7 @@ pub enum MessageBody {
         verdict: DelphiVerdict,
     },
     TechReviewEntered,
+    TechReviewExited,
     TechReviewExitFileDeleted,
     ThreadClosure,
     ThreadReopen,
@@ -62,6 +66,7 @@ impl MessageBody {
             Self::Text { private, .. } | Self::Deleted { private } => *private,
             Self::TechReview { .. }
             | Self::TechReviewEntered
+            | Self::TechReviewExited
             | Self::TechReviewExitFileDeleted => true,
             Self::StatusChange { .. }
             | Self::ThreadClosure

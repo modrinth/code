@@ -25,7 +25,7 @@ use validator::Validate;
 
 use super::version_creation::InitialVersionData;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create);
 }
 
@@ -134,8 +134,9 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
-/// Create a new project with initial versions.
+/// Create a new project with initial versions.  
 #[utoipa::path(
+	tag = "project creation",
     post,
     operation_id = "createProject",
     request_body(
@@ -143,7 +144,7 @@ struct ProjectCreateData {
         description = "Multipart payload containing `data` and uploaded files"
     ),
     responses(
-        (status = 200, description = "Expected response to a valid request"),
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
         (status = 400, description = "Request was invalid, see given error"),
         (
             status = 401,

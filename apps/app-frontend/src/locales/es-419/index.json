@@ -11,6 +11,21 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar más instancias en ejecución"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Descartar"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Abrir instancia"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Reintentar"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instancia desconocida"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalaciones"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Hacer instancia principal"
   },
@@ -101,6 +116,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tiempo de juego"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Omite automáticamente las confirmaciones de bajo riesgo, como las instalaciones duplicadas de paquetes de mods, la eliminación de contenido normal, las actualizaciones masivas, la desvinculación de paquetes de mods y las solicitudes de reparación. Las advertencias peligrosas seguirán mostrándose."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Omitir advertencias que no sean esenciales"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Permite mostrar u ocultar la barra lateral."
   },
@@ -170,23 +191,71 @@
   "app.export-modal.header": {
     "message": "Exportar modpack"
   },
-  "app.export-modal.include-file-accessibility-label": {
-    "message": "¿Incluir \"{file}\"?"
-  },
   "app.export-modal.modpack-name-label": {
     "message": "Nombre del modpack"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nombre del modpack"
   },
-  "app.export-modal.select-files-label": {
-    "message": "Configura que archivos incluir en esta exportación"
-  },
   "app.export-modal.version-number-label": {
     "message": "Número de la versión"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Descargando contenido"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Descargando Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Descargando el archivo del paquete"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Extracción de anulaciones"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Finalizando"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Preparando la instancia"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Preparando Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Descargando Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Descomprimiendo Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Obteniendo Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Preparando Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validación de Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Leer el manifiesto del paquete"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Resolviendo el cargador"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Resolviendo Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Resolviendo el contenido"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Revertir"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Ejecutando los procesadores del cargador"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Todos los datos de tu instancia se eliminarán permanentemente, incluidos tus mundos, configuraciones y todo el contenido instalado."
@@ -212,6 +281,15 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instancia"
   },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Descargando {current, number}/{total, number} proyectos..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Finalizando la actualización..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Resolviendo versiones..."
+  },
   "app.instance.mods.content-type-project": {
     "message": "proyecto"
   },
@@ -236,6 +314,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Explorar servidores"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Eliminar mundo"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Eliminar mundo"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Este mundo se eliminará de forma permanente de esta instancia. Esta acción no se puede deshacer."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Eliminando {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Con mods"
   },
@@ -253,6 +343,18 @@
   },
   "app.instance.worlds.no-worlds-heading": {
     "message": "No hay servidores ni mundos añadidos"
+  },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Eliminar servidor"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Eliminar servidor"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Este servidor se eliminará de tu lista de servidores y de la lista de servidores del juego. Puedes volver a agregarlo más adelante si conoces la dirección."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Se está eliminando {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Buscar en {count} mundos..."
@@ -838,6 +940,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Copiar dirección"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Crear un acceso directo"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "No mostrar en la página de inicio"

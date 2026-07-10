@@ -140,6 +140,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Upewnij się, że zewnętrzna zawartość w Twojej paczce modów ma podany dowód na to, że możesz ją rozpowszechniać."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Sprawdź zewnętrzną zawartość"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Wybierz wersje gry, które wspiera Twój serwer, wybierz istniejącą paczkę modów lub prześlij własną."
   },
@@ -181,6 +187,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Odwiedź ustawienia linków"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Odwiedź pulpit uprawnień"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Odwiedź ustawienia etykiet"

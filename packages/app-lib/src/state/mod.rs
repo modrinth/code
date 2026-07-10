@@ -57,6 +57,7 @@ pub mod server_join_log;
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
+const MAX_CONCURRENT_INSTALL_JOBS: usize = 3;
 pub struct State {
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
@@ -68,6 +69,8 @@ pub struct State {
     /// Semaphore to limit concurrent API requests. This is separate from the fetch semaphore
     /// to keep API functionality while the app is performing intensive tasks.
     pub api_semaphore: FetchSemaphore,
+    pub(crate) install_job_semaphore: Semaphore,
+    pub(crate) install_db_semaphore: Semaphore,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -107,6 +110,7 @@ impl State {
             instances::watcher::watch_instances_init(
                 &state.file_watcher,
                 &state.directories,
+                &state.pool,
             )
             .await;
 
@@ -204,6 +208,8 @@ impl State {
             fetch_semaphore,
             io_semaphore,
             api_semaphore,
+            install_job_semaphore: Semaphore::new(MAX_CONCURRENT_INSTALL_JOBS),
+            install_db_semaphore: Semaphore::new(1),
             discord_rpc,
             process_manager,
             friends_socket,
