@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Hylkää"
   },
-  "app.action-bar.install.failed": {
-    "message": "Asennus epäonnistui"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Asennus epäonnistui sovelluksen sulkeutumisen vuoksi."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Asennus epäonnistui verkkovirheen vuoksi."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Asennus epäonnistui tuntemattoman virheen vuoksi."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Avaa instanssi"
   },

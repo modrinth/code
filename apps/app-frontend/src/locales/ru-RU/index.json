@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Закрыть"
   },
-  "app.action-bar.install.failed": {
-    "message": "Установка не удалась"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Установка не удалась из-за закрытия приложения."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Установка не удалась из-за сетевой ошибки."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Установка не удалась из-за неизвестной ошибки."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Открыть сборку"
   },

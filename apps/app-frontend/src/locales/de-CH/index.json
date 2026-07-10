@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Ignorieren"
   },
-  "app.action-bar.install.failed": {
-    "message": "Installation fehlgeschlagen"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installation aufgrund des Schließens der App fehlgeschlagen."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Installation aufgrund eines Netzwerkfehlers fehlgeschlagen."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installation aufgrund eines unbekannten Fehlers fehlgeschlagen."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Instanz öffnen"
   },

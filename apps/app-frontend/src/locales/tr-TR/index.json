@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Reddet"
   },
-  "app.action-bar.install.failed": {
-    "message": "Yükleme yapılamadı"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Yükleme uygulama kapandığından yapılamadı."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Yükleme ağ hatasından dolayı yapılamadı."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Yükleme bilinmeyen bir hatadan yapılamadı."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Kurulumu aç"
   },
