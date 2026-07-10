@@ -151,6 +151,8 @@ pub async fn random_projects_get(
                 INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = lv.loader_id
                 INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
                 WHERE v.mod_id = mods.id AND pt.name = $3
+                -- prevents decorrelation, so this stops at the first match instead
+                -- of scanning all versions before the outer sort/limit applies
                 OFFSET 0
             )
             ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
