@@ -38,7 +38,6 @@ pub async fn update_all_projects(
         &state,
     )
     .await?;
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_loading(&loading_bar, 100.0, Some("Updated instance"))?;
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
@@ -64,8 +63,6 @@ pub async fn update_project(
         &state,
     )
     .await?;
-
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     if !skip_send_event.unwrap_or(false) {
         emit_instance(instance_id, InstancePayloadType::Edited).await?;
     }
@@ -91,7 +88,6 @@ pub async fn add_project_from_version(
             &state,
         )
         .await?;
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(project_path)
@@ -130,16 +126,6 @@ pub async fn install_project_with_dependencies(
         .await
         {
             Ok(()) => {
-                if let Err(error) = super::shared::mark_shared_instance_stale(
-                    &instance_id,
-                    &state,
-                )
-                .await
-                {
-                    tracing::error!(
-                        "Failed to mark shared instance stale after content install: {error}"
-                    );
-                }
                 if let Err(error) = emit_instance(
                     &instance_id,
                     InstancePayloadType::ContentInstallFinished {
@@ -217,7 +203,6 @@ pub async fn switch_project_version_with_dependencies(
             &state,
         )
         .await?;
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_instance(&metadata.instance.id, InstancePayloadType::Edited).await?;
 
     Ok(path)
@@ -238,7 +223,6 @@ pub async fn add_project_from_path(
             &state,
         )
         .await?;
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(project_path)
@@ -260,7 +244,6 @@ pub async fn toggle_disable_project(
         &state,
     )
     .await?;
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(res)
@@ -280,7 +263,6 @@ pub async fn remove_project(
         &state,
     )
     .await?;
-    super::shared::mark_shared_instance_stale(instance_id, &state).await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(())

@@ -548,6 +548,7 @@ pub(crate) async fn add_project_bytes(
         &state.pool,
     )
     .await?;
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
 
     Ok(relative_path)
 }
@@ -591,7 +592,8 @@ pub(crate) async fn record_project_file(
         source_kind,
         &state.pool,
     )
-    .await
+    .await?;
+    super::mark_shared_instance_stale(instance_id, &state.pool).await
 }
 
 pub(crate) async fn toggle_disable_project(
@@ -687,6 +689,8 @@ pub(crate) async fn toggle_disable_project(
         .await?;
     }
 
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
+
     Ok(new_path)
 }
 
@@ -720,6 +724,8 @@ pub(crate) async fn remove_project(
         )
         .await?;
     }
+
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
 
     Ok(())
 }

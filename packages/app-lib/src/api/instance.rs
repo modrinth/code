@@ -35,7 +35,6 @@ pub use self::projects::{
 pub use self::run::{
     QuickPlayType, kill, run, try_update_playtime_by_instance_id,
 };
-pub(crate) use self::shared::mark_shared_instance_stale;
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,

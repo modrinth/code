@@ -86,6 +86,22 @@ pub(crate) async fn sync_instance_content_files(
         });
     }
 
+    let content_changed = existing_files_by_path
+        .values()
+        .filter(|file| !file.missing)
+        .count()
+        != files.len()
+        || files.iter().any(|file| {
+            existing_files_by_path
+                .get(&file.relative_path)
+                .is_none_or(|existing| {
+                    existing.missing
+                        || existing.enabled != file.enabled
+                        || existing.sha1 != file.sha1
+                        || existing.size != file.size
+                })
+        });
+
     let mut tx = state.pool.begin().await?;
     sqlite::content_rows::mark_instance_files_missing(&instance.id, &mut tx)
         .await?;
@@ -95,6 +111,10 @@ pub(crate) async fn sync_instance_content_files(
     }
 
     tx.commit().await?;
+
+    if content_changed {
+        super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
+    }
 
     Ok(files)
 }
