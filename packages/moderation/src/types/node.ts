@@ -211,8 +211,8 @@ export function stage(
 	title: string,
 	hint: string,
 	guidance_url: string,
-	nodes: Resolvable[],
 	options: StageOptions = {},
+	nodes: Resolvable[],
 ): ChecklistStage {
 	return {
 		id,

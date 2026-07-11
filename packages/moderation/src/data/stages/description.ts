@@ -7,6 +7,7 @@ export default stage(
 	'Description',
 	'Is the description sufficient, accurate, and accessible?',
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e',
+	{ icon: LibraryIcon, navigate: '/' },
 	[
 		group().children(
 			button('insufficient', 'Insufficient')
@@ -86,5 +87,4 @@ export default stage(
 				.message(mdMsg('description/clarity')),
 		),
 	],
-	{ icon: LibraryIcon, navigate: '/' },
 )

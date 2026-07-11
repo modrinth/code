@@ -21,6 +21,11 @@ export default stage(
 	'Versions',
 	"Are this project's files correct?",
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
+	{
+		icon: VersionIcon,
+		navigate: '/versions',
+		shown: (_project, projectV3) => !projectV3?.minecraft_server,
+	},
 	[
 		group().children(
 			button('incorrect_additional', 'Incorrect additional files')
@@ -63,7 +68,11 @@ export default stage(
 							.weight(1002)
 							.message(mdMsg('versions/alternate_versions-additional')),
 						toggle('mono', 'Monofile')
-							.shown(({ project }) => project.project_types.includes('resourcepack') || project.loaders.includes('datapack'))
+							.shown(
+								({ project }) =>
+									project.project_types.includes('resourcepack') ||
+									project.loaders.includes('datapack'),
+							)
 							.weight(1002)
 							.message(mdMsg('versions/alternate_versions-mono')),
 						toggle('server', 'Server Files (Primary Files)')
@@ -96,8 +105,9 @@ export default stage(
 				})
 				//TODO: different message for empty vs non empty + quick fix?
 				.children(
-					chips('loaders', 'Which loader labels are incorrect?')
-						.childrenFn(({ project }) => project.loaders.map((id) => toggle(id, formatLoaderLabel(id)).build())),
+					chips('loaders', 'Which loader labels are incorrect?').childrenFn(({ project }) =>
+						project.loaders.map((id) => toggle(id, formatLoaderLabel(id)).build()),
+					),
 				),
 
 			button('vanilla_assets', 'Vanilla Assets')
@@ -108,7 +118,10 @@ export default stage(
 				.message(mdMsg('versions/vanilla_assets')),
 
 			button('redist_libs', 'Packed Libs')
-				.shown(({ project }) => project.project_types.includes('mod') || project.project_types.includes('plugin'))
+				.shown(
+					({ project }) =>
+						project.project_types.includes('mod') || project.project_types.includes('plugin'),
+				)
 				.weight(1004)
 				.suggestedStatus('rejected')
 				.severity('medium')
@@ -124,17 +137,12 @@ export default stage(
 				.weight(1006)
 				.suggestedStatus('rejected')
 				.severity('medium')
-				.message(mdMsg('versions/unsupported_project', (ctx) => ({
-					INVALID_TYPE: ctx.state.invalid_type,
-				})))
-				.children(
-					text('invalid_type', 'Project type').required(),
-				),
+				.message(
+					mdMsg('versions/unsupported_project', (ctx) => ({
+						INVALID_TYPE: ctx.state.invalid_type,
+					})),
+				)
+				.children(text('invalid_type', 'Project type').required()),
 		),
 	],
-	{
-		icon: VersionIcon,
-		navigate: '/versions',
-		shown: (_project, projectV3) => !projectV3?.minecraft_server
-	},
 )

@@ -7,6 +7,10 @@ export default stage(
 	'Gallery',
 	"Are this project's gallery images sufficient?",
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08096828bd1c3f24d8b8e',
+	{
+		icon: ImageIcon,
+		navigate: '/gallery',
+	},
 	[
 		group().children(
 			button('insufficient', 'Insufficient')
@@ -24,8 +28,4 @@ export default stage(
 				.message(mdMsg('gallery/not-relevant')),
 		),
 	],
-	{
-		icon: ImageIcon,
-		navigate: '/gallery',
-	},
 )

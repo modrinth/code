@@ -20,11 +20,12 @@ export default stage(
 	'Title & Slug',
 	'Are the Name and URL accurate and appropriate?',
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
+	{ icon: BookOpenIcon },
 	[
 		prose(async (ctx) => {
 			const title = await mdText('title-slug/title')(ctx)
 			if (!hasCustomSlug(ctx.project)) return title
-			return title + await mdText('title-slug/slug')(ctx)
+			return title + (await mdText('title-slug/slug')(ctx))
 		}),
 
 		group('title').children(
@@ -46,18 +47,17 @@ export default stage(
 				.severity('medium')
 				.message(mdMsg('title/similarities'))
 				.children(
-					chips('options', 'Similarities Additional Info')
-						.children(
-							toggle('modpack_named_after_mod', 'Modpack Named After Mod')
-								.shown(({ project }) => project.project_types.includes('modpack'))
-								.weight(111)
-								.message(mdMsg('title/similarities-modpack')),
+					chips('options', 'Similarities Additional Info').children(
+						toggle('modpack_named_after_mod', 'Modpack Named After Mod')
+							.shown(({ project }) => project.project_types.includes('modpack'))
+							.weight(111)
+							.message(mdMsg('title/similarities-modpack')),
 
-							toggle('forked_project', 'Forked Project')
-								.shown(({ project }) => !project?.minecraft_server)
-								.weight(112)
-								.message(mdMsg('title/similarities-fork')),
-						),
+						toggle('forked_project', 'Forked Project')
+							.shown(({ project }) => !project?.minecraft_server)
+							.weight(112)
+							.message(mdMsg('title/similarities-fork')),
+					),
 				),
 		),
 
@@ -68,12 +68,7 @@ export default stage(
 				chips('options', 'Slug Issues?')
 					.suggestedStatus('rejected')
 					.severity('low')
-					.children(
-						toggle('misused', 'Misused')
-							.weight(200)
-							.message(mdMsg('slug/misused')),
-					),
+					.children(toggle('misused', 'Misused').weight(200).message(mdMsg('slug/misused'))),
 			),
 	],
-	{ icon: BookOpenIcon },
 )

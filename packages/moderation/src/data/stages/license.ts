@@ -24,6 +24,11 @@ export default stage(
 	'License',
 	'Is this license and link valid?',
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770',
+	{
+		icon: BookTextIcon,
+		navigate: '/settings/license',
+		shown: (_project, projectV3) => !projectV3?.minecraft_server,
+	},
 	[
 		prose(mdText('licensing')),
 
@@ -49,14 +54,7 @@ export default stage(
 					if (ctx.state.fork) return mdMsg('license/no_source-fork')(ctx)
 					return mdMsg('license/no_source')(ctx)
 				})
-				.children(
-					toggle('fork', 'No Source: Fork').severity('high'),
-				),
+				.children(toggle('fork', 'No Source: Fork').severity('high')),
 		),
 	],
-	{
-		icon: BookTextIcon,
-		navigate: '/settings/license',
-		shown: (_project, projectV3) => !projectV3?.minecraft_server,
-	},
 )
