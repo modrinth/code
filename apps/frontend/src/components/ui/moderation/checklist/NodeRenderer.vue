@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import type { Node, NodeContext, NodeState, NodeStateWithChildren } from '@modrinth/moderation'
+import {
+	expandVariables,
+	flattenProjectV3Variables,
+	flattenProjectVariables,
+	flattenStaticVariables,
+} from '@modrinth/moderation'
 import { ButtonStyled, Checkbox, MarkdownEditor, StyledInput } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { renderHighlightedString, renderString } from '@modrinth/utils'
 import { reactive, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -138,12 +144,52 @@ function renderProse(content: string): string {
 	return renderString(content).replace(/<a /g, '<a target="_blank" ')
 }
 
+const tooltipHtml = reactive(new Map<Node, string>())
+
+function getNodeTooltipConfig(node: Node) {
+	const html = tooltipHtml.get(node)
+	if (!html) return undefined
+	return {
+		content: html,
+		html: true,
+		delay: { show: 500, hide: 0 },
+		triggers: ['hover', 'focus'],
+		placement: 'top',
+	}
+}
+
 const proseContents = reactive(new Map<Node, string | null>())
 
 watchEffect(async () => {
+	// Read all reactive state synchronously before any await so Vue tracks dependencies
+	const buttonTasks: Array<{ node: Node; ctx: NodeContext }> = []
 	for (const node of props.nodes) {
 		if (node.type === 'prose' && node.content && isVisible(node)) {
 			proseContents.set(node, await node.content(props.showContext))
+		}
+		if (node.type === 'boolean' && node.variant === 'button' && node.message && isVisible(node)) {
+			const nodeState = props.getState(node.id!)
+			const childState = (nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set))
+				? (() => { const { value: _v, ...rest } = nodeState as NodeStateWithChildren & Record<string, NodeState>; return rest })()
+				: {}
+			buttonTasks.push({ node, ctx: { ...props.showContext, state: childState } })
+		}
+	}
+	for (const { node, ctx } of buttonTasks) {
+		try {
+			const raw = await node.message!(ctx)
+			const expanded = expandVariables(raw, props.showContext.projectV2, props.showContext.project, {
+				...flattenStaticVariables(),
+				...flattenProjectVariables(props.showContext.projectV2),
+				...flattenProjectV3Variables(props.showContext.project),
+			})
+			const trimmed = expanded.trim()
+			tooltipHtml.set(node, trimmed
+				? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(trimmed)}</div>`
+				: '',
+			)
+		} catch {
+			tooltipHtml.set(node, '')
 		}
 	}
 })
@@ -169,7 +215,11 @@ watchEffect(async () => {
 					v-else-if="node.type === 'boolean' && node.variant === 'button'"
 					:color="getBooleanState(node) ? 'brand' : 'standard'"
 				>
-					<button :disabled="!isEnabled(node)" @click="toggleBoolean(node)">{{ node.label }}</button>
+					<button
+						v-tooltip="getNodeTooltipConfig(node)"
+						:disabled="!isEnabled(node)"
+						@click="toggleBoolean(node)"
+					>{{ node.label }}</button>
 				</ButtonStyled>
 
 				<!-- toggle -->
