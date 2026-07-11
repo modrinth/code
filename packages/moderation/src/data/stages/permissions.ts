@@ -32,6 +32,13 @@ export default stage(
 				.suggestedStatus('rejected')
 				.severity('high')
 				.message(mdMsg('externals-permissions/missing')),
+
+			button('non-commercial-external-content', 'Non-commercial externals')
+				.weight(2003)
+				.suggestedStatus('rejected')
+				.severity('high')
+				.shown(({ project }) => project.monetization_status === 'monetized')
+				.message(mdMsg('externals-permissions/non-commercial')),
 		),
 	],
 )

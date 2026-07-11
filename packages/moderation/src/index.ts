@@ -2,12 +2,12 @@ export { default as checklist } from './data/checklist'
 export { default as keybinds } from './data/keybinds'
 export { default as nags } from './data/nags'
 export * from './data/nags/index'
-export { default as reportQuickReplies } from './data/report-quick-replies'
+export { default as reportQuickReplies } from './data/quick-replies/report-quick-replies'
 export {
 	type TechReviewContext,
 	default as techReviewQuickReplies,
-} from './data/tech-review-quick-replies'
-export { default as attributionQuickReplies } from './data/attribution-quick-replies'
+} from './data/quick-replies/tech-review-quick-replies'
+export { default as attributionQuickReplies } from './data/quick-replies/attribution-quick-replies'
 export * from './locales'
 export * from './types/actions'
 export * from './types/keybinds'

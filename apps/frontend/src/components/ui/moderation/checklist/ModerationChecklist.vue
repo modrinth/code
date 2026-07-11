@@ -381,7 +381,10 @@ import {
 	flattenStaticVariables,
 	handleKeybind,
 	kebabToTitleCase,
-	keybinds,
+	type MultiSelectChipsAction,
+	processMessage,
+	type Stage,
+	type ToggleAction,
 } from '@modrinth/moderation'
 import type { OverflowMenuOption } from '@modrinth/ui'
 import {
@@ -420,6 +423,7 @@ import NodeRenderer from './NodeRenderer.vue'
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
+const keybinds = useModerationKeybinds()
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
@@ -1089,7 +1093,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryActivateFocusedAction: () => {},
 			},
 		},
-		keybinds,
+		Object.values(keybinds.value),
 	)
 }
 

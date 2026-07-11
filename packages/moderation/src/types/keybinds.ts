@@ -59,7 +59,6 @@ export interface KeybindDefinition {
 }
 
 export interface KeybindListener {
-	id: string
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
 	enabled?: (ctx: ModerationContext) => boolean
@@ -94,6 +93,17 @@ export function matchesKeybind(event: KeyboardEvent, keybind: KeybindDefinition 
 	)
 }
 
+export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
+	return {
+		key: event.key.toLowerCase(),
+		ctrl: event.ctrlKey,
+		shift: event.shiftKey,
+		alt: event.altKey,
+		meta: event.metaKey,
+		preventDefault: true,
+	}
+}
+
 export function handleKeybind(
 	event: KeyboardEvent,
 	ctx: ModerationContext,
@@ -104,7 +114,8 @@ export function handleKeybind(
 		event.target instanceof HTMLTextAreaElement ||
 		(event.target as HTMLElement)?.closest('.cm-editor') ||
 		(event.target as HTMLElement)?.classList?.contains('cm-content') ||
-		(event.target as HTMLElement)?.classList?.contains('cm-line')
+		(event.target as HTMLElement)?.classList?.contains('cm-line') ||
+		document.getElementById('moderation-checklist-keybinds-modal')
 	) {
 		return false
 	}

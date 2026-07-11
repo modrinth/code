@@ -37,7 +37,9 @@ export default stage(
 				.message(mdMsg('status-alerts/private/private-server')),
 
 			button('server_use', 'Server use')
-				.shown(({ project }) => project.project_types.includes('modpack') && !project.minecraft_server)
+				.shown(
+					({ project }) => project.project_types.includes('modpack') && !project.minecraft_server,
+				)
 				.weight(-999999)
 				.message(mdMsg('status-alerts/serverpack')),
 
@@ -50,6 +52,24 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.weight(-999999)
 				.message(mdMsg('status-alerts/automod_confusion')),
+
+			button('status_demonetized', 'Demonetized')
+				.shown(
+					({ project }) =>
+						project.monetization_status === 'force-demonetized' &&
+						!project.project_types?.includes('modpack'),
+				)
+				.weight(-999999)
+				.message(mdMsg('status-alerts/demonetized')),
+
+			button('status_demonetized-modpack', 'Demonetized')
+				.shown(
+					({ project }) =>
+						project.monetization_status === 'force-demonetized' &&
+						project.project_types?.includes('modpack'),
+				)
+				.weight(-999999)
+				.message(mdMsg('status-alerts/demonetized-modpack')),
 		),
 	],
 )
