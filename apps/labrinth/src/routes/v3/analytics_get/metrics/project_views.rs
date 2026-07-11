@@ -223,6 +223,18 @@ pub(crate) async fn fetch(
         ) {
             continue;
         }
+        if !uses(F::Domain) {
+            key.domain = None;
+        }
+        if !uses(F::SitePath) {
+            key.site_path = None;
+        }
+        if !uses(F::Monetized) {
+            key.monetized = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
+        }
         *output_buckets.entry(key).or_default() += views;
     }
 

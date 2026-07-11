@@ -277,6 +277,18 @@ pub(crate) async fn fetch(
         ) {
             continue;
         }
+        if !uses(F::VersionId) {
+            key.version_id = None;
+        }
+        if !uses(F::Loader) {
+            key.loader = None;
+        }
+        if !uses(F::GameVersion) {
+            key.game_version = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
+        }
         *output_buckets.entry(key).or_default() += seconds;
     }
 

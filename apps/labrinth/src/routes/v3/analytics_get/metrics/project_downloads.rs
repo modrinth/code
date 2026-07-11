@@ -526,6 +526,30 @@ pub(crate) async fn fetch(
         ) {
             continue;
         }
+        if !uses(F::Domain) {
+            key.domain = None;
+        }
+        if !uses(F::UserAgent) {
+            key.user_agent = None;
+        }
+        if !uses(F::VersionId) {
+            key.version_id = None;
+        }
+        if !uses(F::Monetized) {
+            key.monetized = None;
+        }
+        if !uses(F::Country) {
+            key.country = None;
+        }
+        if !uses(F::Reason) {
+            key.reason = None;
+        }
+        if !uses(F::GameVersion) {
+            key.game_version = None;
+        }
+        if !uses(F::Loader) {
+            key.loader = None;
+        }
         *output_buckets.entry(key).or_default() += downloads;
     }
 
