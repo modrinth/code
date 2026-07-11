@@ -1,257 +1,140 @@
 import { VersionIcon } from '@modrinth/assets'
 
-import type {
-	ButtonAction,
-	ChecklistActionContext,
-	DropdownAction,
-	DropdownActionOption,
-	MultiSelectChipsAction,
-	MultiSelectChipsOption,
-} from '../../types/actions'
-import type { Stage } from '../../types/stage'
+import { button, chips, group, mdMsg, select, stage, text, toggle } from '../../types/node'
 
 const loaderLabels: Record<string, string> = {
-	datapack: 'Data Pack',
-	resourcepack: 'Resource Pack',
 	neoforge: 'NeoForge',
 	liteloader: 'LiteLoader',
+	datapack: 'Data Pack',
+	resourcepack: 'Resource Pack',
 }
 
-function formatLoaderLabel(loader: string): string {
-	if (loaderLabels[loader]) {
-		return loaderLabels[loader]
-	}
-
-	return loader
+function formatLoaderLabel(id: string): string {
+	return loaderLabels[id] ?? id
 		.split(/[-_]/g)
-		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
 		.join(' ')
 }
 
-function getIncorrectLoaderOptions(context: ChecklistActionContext): MultiSelectChipsOption[] {
-	const distinctLoaders = [...new Set((context.versions ?? []).flatMap((version) => version.loaders ?? []))]
+export default stage(
+	'versions',
+	'Versions',
+	"Are this project's files correct?",
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
+	[
+		group().children(
+			button('incorrect_additional', 'Incorrect additional files')
+				.weight(1000)
+				.suggestedStatus('flagged')
+				.severity('medium')
+				.message(mdMsg('versions/incorrect_additional_files')),
 
-	return distinctLoaders
-		.sort((a, b) => formatLoaderLabel(a).localeCompare(formatLoaderLabel(b)))
-		.map((loader, index) => ({
-			id: loader,
-			label: formatLoaderLabel(loader),
-			weight: 1002 + index,
-			message: async () => `- ${formatLoaderLabel(loader)}`,
-		}))
-}
+			button('incorrect_project_type', 'Incorrect Project Type')
+				.weight(1001)
+				.suggestedStatus('rejected')
+				.severity('medium')
+				.children(
+					select('type', 'What type should this project be?').children(
+						toggle('modpack', 'Modpack')
+							.shown(({ project }) => !project.project_types.includes('modpack'))
+							.weight(1001)
+							.message(mdMsg('versions/invalid-modpacks')),
+						toggle('resourcepack', 'Resource Pack')
+							.shown(({ project }) => !project.project_types.includes('resourcepack'))
+							.weight(1001)
+							.message(mdMsg('versions/invalid-resourcepacks')),
+						toggle('datapack', 'Data Pack')
+							.shown(({ project }) => !project.loaders.includes('datapack'))
+							.weight(1001)
+							.message(mdMsg('versions/invalid-datapacks')),
+					),
+				),
 
-const versions: Stage = {
-	title: 'Versions',
-	hint: "Are this project's files correct?",
-	id: 'versions',
-	icon: VersionIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
-	navigate: '/versions',
-	shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-	actions: [
-		{
-			id: 'versions_incorrect_additional',
-			type: 'button',
-			label: 'Incorrect additional files',
-			weight: 1000,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/incorrect_additional_files.md?raw'))
-					.default,
-		} as ButtonAction,
-		{
-			id: 'versions_incorrect_project_type',
-			type: 'button',
-			label: 'Incorrect Project Type',
-			suggestedStatus: 'rejected',
-			severity: 'medium',
-			weight: -999999,
-			message: async () => '',
-			enablesActions: [
-				{
-					id: 'versions_incorrect_project_type_options',
-					type: 'dropdown',
-					label: 'What type should this project be?',
-					options: [
-						{
-							label: 'Modpack',
-							weight: 1001,
-							shouldShow: (project) => project.project_type !== 'modpack',
-							message: async () =>
-								(await import('../messages/checklist-messages/versions/invalid-modpacks.md?raw'))
-									.default,
-						} as DropdownActionOption,
-						{
-							label: 'Resource Pack',
-							weight: 1001,
-							shouldShow: (project) => project.project_type !== 'resourcepack',
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/invalid-resourcepacks.md?raw')
-								).default,
-						} as DropdownActionOption,
-						{
-							label: 'Data Pack',
-							weight: 1001,
-							shouldShow: (project) => !project.loaders.includes('datapack'),
-							message: async () =>
-								(await import('../messages/checklist-messages/versions/invalid-datapacks.md?raw'))
-									.default,
-						} as DropdownActionOption,
-					],
-				} as DropdownAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'versions_alternate_versions',
-			type: 'button',
-			label: 'Alternate Versions',
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			weight: -999999,
-			message: async () => '',
-			enablesActions: [
-				{
-					id: 'versions_alternate_versions_options',
-					type: 'dropdown',
-					label: 'How are the alternate versions distributed?',
-					options: [
-						{
-							label: 'Primary Files',
-							weight: 1002,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-primary.md?raw')
-								).default,
-						} as DropdownActionOption,
-						{
-							label: 'Additional Files',
-							weight: 1002,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-additional.md?raw')
-								).default,
-						} as DropdownActionOption,
-						{
-							label: 'Monofile',
-							weight: 1002,
-							shouldShow: (project) =>
-								project.project_type === 'resourcepack' || project.loaders.includes('datapack'),
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-mono.md?raw')
-								).default,
-						} as DropdownActionOption,
-						{
-							label: 'Server Files (Primary Files)',
-							weight: 1002,
-							shouldShow: (project) => project.project_type === 'modpack',
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-server.md?raw')
-								).default,
-						} as DropdownActionOption,
-						{
-							label: 'Server Files (Additional Files)',
-							weight: 1002,
-							suggestedStatus: 'rejected',
-							severity: 'high',
-							shouldShow: (project) => project.project_type === 'modpack',
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-server-additional.md?raw')
-								).default,
-						} as DropdownActionOption,
-						{
-							label: 'mods.zip',
-							weight: 1002,
-							suggestedStatus: 'rejected',
-							severity: 'high',
-							shouldShow: (project) => project.project_type === 'modpack',
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/versions/alternate_versions-zip.md?raw')
-								).default,
-						} as DropdownActionOption,
-					],
-				} as DropdownAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'versions_incorrect_loader',
-			type: 'button',
-			label: 'Incorrect Loader',
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			weight: 1001,
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/incorrect_loader.md?raw')).default,
-			enablesActions: [
-				{
-					id: 'versions_incorrect_loader_options',
-					type: 'multi-select-chips',
-					label: 'Which loader labels are incorrect?',
-					joinWith: '\n',
-					shouldShow: (_project, _projectV3, context) =>
-						Boolean(context && getIncorrectLoaderOptions(context).length > 0),
-					options: (context) => getIncorrectLoaderOptions(context),
-				} as MultiSelectChipsAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'versions_vanilla_assets',
-			type: 'button',
-			label: 'Vanilla Assets',
-			suggestedStatus: `rejected`,
-			severity: `medium`,
-			weight: 1003,
-			shouldShow: (project) => project.project_type === 'resourcepack',
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/vanilla_assets.md?raw')).default,
-		} as ButtonAction,
-		{
-			id: 'versions_redist_libs',
-			type: 'button',
-			label: 'Packed Libs',
-			suggestedStatus: `rejected`,
-			severity: `medium`,
-			weight: 1003,
-			shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'plugin',
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/redist_libs.md?raw')).default,
-		} as ButtonAction,
-		{
-			id: 'versions_duplicate_primary_files',
-			type: 'button',
-			label: 'Duplicate Primary Files',
-			suggestedStatus: 'flagged',
-			severity: `medium`,
-			weight: 1004,
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/broken_version.md?raw')).default,
-		} as ButtonAction,
-		{
-			id: 'unsupported_project_type',
-			type: 'button',
-			label: `Unsupported`,
-			suggestedStatus: `rejected`,
-			severity: `medium`,
-			weight: 1005,
-			message: async () =>
-				(await import('../messages/checklist-messages/versions/unsupported_project.md?raw'))
-					.default,
-			relevantExtraInput: [
-				{
-					label: 'Project Type',
-					required: true,
-					variable: 'INVALID_TYPE',
-				},
-			],
-		} as ButtonAction,
+			button('alternate_versions', 'Alternate Versions')
+				.weight(1002)
+				.suggestedStatus('rejected')
+				.severity('high')
+				.children(
+					select('distribution', 'How are they distributed?').children(
+						toggle('primary', 'Primary Files')
+							.weight(1002)
+							.message(mdMsg('versions/alternate_versions-primary')),
+						toggle('additional', 'Additional Files')
+							.weight(1002)
+							.message(mdMsg('versions/alternate_versions-additional')),
+						toggle('mono', 'Monofile')
+							.shown(({ project }) => project.project_types.includes('resourcepack') || project.loaders.includes('datapack'))
+							.weight(1002)
+							.message(mdMsg('versions/alternate_versions-mono')),
+						toggle('server', 'Server Files (Primary Files)')
+							.shown(({ project }) => project.project_types.includes('modpack'))
+							.weight(1002)
+							.message(mdMsg('versions/alternate_versions-server')),
+						toggle('server_additional', 'Server Files (Additional Files)')
+							.shown(({ project }) => project.project_types.includes('modpack'))
+							.weight(1002)
+							.message(mdMsg('versions/alternate_versions-server-additional')),
+						toggle('zip', 'mods.zip')
+							.shown(({ project }) => project.project_types.includes('modpack'))
+							.weight(1002)
+							.message(mdMsg('versions/alternate_versions-zip')),
+					),
+				),
+
+			button('incorrect_loader', 'Incorrect Loader')
+				.weight(1003)
+				.suggestedStatus('flagged')
+				.severity('medium')
+				.message(async (ctx) => {
+					const header = await mdMsg('versions/incorrect_loader')(ctx)
+					const selected = ctx.state.loaders
+					if (selected instanceof Set && selected.size > 0) {
+						const list = [...selected].map((id) => `- ${formatLoaderLabel(id)}`).join('\n')
+						return `${header}\n${list}`
+					}
+					return header
+				})
+				//TODO: different message for empty vs non empty + quick fix?
+				.children(
+					chips('loaders', 'Which loader labels are incorrect?')
+						.childrenFn(({ project }) => project.loaders.map((id) => toggle(id, formatLoaderLabel(id)).build())),
+				),
+
+			button('vanilla_assets', 'Vanilla Assets')
+				.shown(({ project }) => project.project_types.includes('resourcepack'))
+				.weight(1004)
+				.suggestedStatus('rejected')
+				.severity('medium')
+				.message(mdMsg('versions/vanilla_assets')),
+
+			button('redist_libs', 'Packed Libs')
+				.shown(({ project }) => project.project_types.includes('mod') || project.project_types.includes('plugin'))
+				.weight(1004)
+				.suggestedStatus('rejected')
+				.severity('medium')
+				.message(mdMsg('versions/redist_libs')),
+
+			button('duplicate_primary_files', 'Duplicate Primary Files')
+				.weight(1005)
+				.suggestedStatus('flagged')
+				.severity('medium')
+				.message(mdMsg('versions/broken_version')),
+
+			button('unsupported', 'Unsupported')
+				.weight(1006)
+				.suggestedStatus('rejected')
+				.severity('medium')
+				.message(mdMsg('versions/unsupported_project', (ctx) => ({
+					INVALID_TYPE: ctx.state.invalid_type,
+				})))
+				.children(
+					text('invalid_type', 'Project type').required(),
+				),
+		),
 	],
-}
-
-export default versions
+	{
+		icon: VersionIcon,
+		navigate: '/versions',
+		shown: (_project, projectV3) => !projectV3?.minecraft_server
+	},
+)

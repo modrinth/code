@@ -1,6 +1,6 @@
 import { BookTextIcon } from '@modrinth/assets'
 
-import type { Stage } from '../../types/stage'
+import { button, group, mdMsg, mdText, prose, stage, toggle } from '../../types/node'
 
 const licensesNotRequiringSource: string[] = [
 	'LicenseRef-All-Rights-Reserved',
@@ -19,77 +19,44 @@ const licensesNotRequiringSource: string[] = [
 	'Zlib',
 ]
 
-const licenseStage: Stage = {
-	title: 'License',
-	hint: 'Is this license and link valid?',
-	text: async () => (await import('../messages/checklist-text/licensing.md?raw')).default,
-	id: 'license',
-	icon: BookTextIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770',
-	navigate: '/settings/license',
-	shouldShow(project, projectV3) {
-		return !projectV3?.minecraft_server
-	},
-	actions: [
-		{
-			id: 'license_invalid_link',
-			type: 'button',
-			label: 'Invalid Link',
-			weight: 600,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project) => Boolean(project.license.url),
-			message: async () =>
-				(await import('../messages/checklist-messages/license/invalid_link.md?raw')).default,
-			enablesActions: [
-				{
-					id: 'license_invalid_link-custom_license',
-					type: 'toggle',
-					label: 'Invalid Link: Custom License',
-					weight: 601,
-					suggestedStatus: 'flagged',
-					severity: 'medium',
-					message: async () =>
-						(
-							await import('../messages/checklist-messages/license/invalid_link-custom_license.md?raw')
-						).default,
-				},
-			],
-		},
-		{
-			id: 'license_no_source',
-			type: 'conditional-button',
-			label: 'No Source',
-			suggestedStatus: 'rejected',
-			severity: 'medium',
-			shouldShow: (project) => !licensesNotRequiringSource.includes(project.license.id),
-			messageVariants: [
-				{
-					conditions: {
-						excludedActions: ['license_no_source-fork'],
-					},
-					weight: 602,
-					message: async () =>
-						(await import('../messages/checklist-messages/license/no_source.md?raw')).default,
-				},
-			],
-			fallbackWeight: 602,
-			fallbackMessage: async () => '',
-			enablesActions: [
-				{
-					id: 'license_no_source-fork',
-					type: 'toggle',
-					label: 'No Source: Fork',
-					weight: 602,
-					suggestedStatus: 'rejected',
-					severity: 'high',
-					message: async () =>
-						(await import('../messages/checklist-messages/license/no_source-fork.md?raw')).default,
-				},
-			],
-		},
-	],
-}
+export default stage(
+	'license',
+	'License',
+	'Is this license and link valid?',
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770',
+	[
+		prose(mdText('licensing')),
 
-export default licenseStage
+		group().children(
+			button('invalid_link', 'Invalid Link')
+				.shown(({ project }) => !!project.license?.url)
+				.weight(600)
+				.suggestedStatus('flagged')
+				.severity('medium')
+				.message(mdMsg('license/invalid_link'))
+				.children(
+					toggle('custom_license', 'Invalid Link: Custom License')
+						.weight(601)
+						.message(mdMsg('license/invalid_link-custom_license')),
+				),
+
+			button('no_source', 'No Source')
+				.shown(({ project }) => !licensesNotRequiringSource.includes(project.license?.id ?? ''))
+				.weight(602)
+				.suggestedStatus('rejected')
+				.severity('medium')
+				.message(async (ctx) => {
+					if (ctx.state.fork) return mdMsg('license/no_source-fork')(ctx)
+					return mdMsg('license/no_source')(ctx)
+				})
+				.children(
+					toggle('fork', 'No Source: Fork').severity('high'),
+				),
+		),
+	],
+	{
+		icon: BookTextIcon,
+		navigate: '/settings/license',
+		shown: (_project, projectV3) => !projectV3?.minecraft_server,
+	},
+)

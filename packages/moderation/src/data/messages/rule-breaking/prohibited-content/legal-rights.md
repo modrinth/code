@@ -1,1 +1,0 @@
-- 1.4: Content violating the legal rights of others

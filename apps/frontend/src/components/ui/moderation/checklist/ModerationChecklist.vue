@@ -208,144 +208,13 @@
 							{{ currentStageObj.hint }}
 						</h2>
 
-						<div v-if="currentStageObj.text" class="mb-4">
-							<div v-if="stageTextExpanded" class="markdown-body" v-html="stageTextExpanded"></div>
-							<div v-else class="markdown-body">Loading stage content...</div>
-						</div>
-
-						<!-- Action components grouped by type -->
-						<div class="space-y-4">
-							<!-- Button actions group -->
-							<div v-if="buttonActions.length > 0" class="button-actions-group">
-								<div class="flex flex-wrap gap-2">
-									<template v-for="action in buttonActions" :key="getActionKey(action)">
-										<ButtonStyled
-											:color="isActionSelected(action) ? 'brand' : 'standard'"
-											@click="toggleAction(action)"
-										>
-											<button v-tooltip="getChecklistButtonTooltipConfig(action)">
-												{{ action.label }}
-											</button>
-										</ButtonStyled>
-									</template>
-								</div>
-							</div>
-
-							<!-- Toggle actions group -->
-							<div v-if="toggleActions.length > 0" class="toggle-actions-group space-y-3">
-								<template v-for="action in toggleActions" :key="getActionKey(action)">
-									<Checkbox
-										:model-value="isActionSelected(action)"
-										:label="action.label"
-										:description="action.description"
-										:disabled="false"
-										@update:model-value="toggleAction(action)"
-									/>
-								</template>
-							</div>
-
-							<!-- Dropdown actions group -->
-							<div v-if="dropdownActions.length > 0" class="dropdown-actions-group space-y-3">
-								<template v-for="action in dropdownActions" :key="getActionKey(action)">
-									<div class="inputs universal-labels">
-										<div>
-											<label :for="`dropdown-${getActionId(action)}`">
-												<span class="label__title">{{ action.label }}</span>
-											</label>
-											<DropdownSelect
-												:max-visible-options="3"
-												render-up
-												:name="`dropdown-${getActionId(action)}`"
-												:options="getVisibleDropdownOptions(action)"
-												:model-value="getDropdownValue(action)"
-												:placeholder="'Select an option'"
-												:disabled="false"
-												:display-name="(opt: any) => opt?.label || 'Unknown option'"
-												@update:model-value="
-													(selected: any) => selectDropdownOption(action, selected)
-												"
-											/>
-										</div>
-									</div>
-								</template>
-							</div>
-
-							<!-- Multi-select chips actions group -->
-							<div
-								v-if="multiSelectActions.length > 0"
-								class="multi-select-actions-group space-y-3"
-							>
-								<template v-for="action in multiSelectActions" :key="getActionKey(action)">
-									<div>
-										<div class="mb-2 font-semibold">{{ action.label }}</div>
-										<div class="flex flex-wrap gap-2">
-											<ButtonStyled
-															v-for="(option, optIndex) in getVisibleMultiSelectOptions(action)"
-															:key="getMultiSelectOptionKey(action, option, optIndex)"
-															:color="isChipSelected(action, option) ? 'brand' : 'standard'"
-															@click="toggleChip(action, option)"
-											>
-												<button>
-													{{ option.label }}
-												</button>
-											</ButtonStyled>
-										</div>
-									</div>
-								</template>
-							</div>
-						</div>
-
-						<div v-if="isAnyVisibleInputs" class="my-4 h-[1px] w-full bg-divider" />
-
-						<!-- Additional text inputs -->
-						<div class="space-y-4">
-							<template v-for="action in visibleActions" :key="`inputs-${getActionKey(action)}`">
-								<div
-									v-if="action.relevantExtraInput && isActionSelected(action)"
-									class="inputs universal-labels"
-								>
-									<div
-										v-for="(input, inputIndex) in getVisibleInputs(action, actionStates)"
-										:key="`input-${getActionId(action)}-${inputIndex}`"
-										class="mt-2"
-									>
-										<template v-if="input.large">
-											<label :for="`input-${getActionId(action)}-${inputIndex}`">
-												<span class="label__title">
-													{{ input.label }}
-													<span v-if="input.required" class="required">*</span>
-												</span>
-											</label>
-											<MarkdownEditor
-												:id="`input-${getActionId(action)}-${inputIndex}`"
-												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												:placeholder="input.placeholder"
-												:max-height="300"
-												:disabled="false"
-												:heading-buttons="false"
-												:on-image-upload="onUploadHandler"
-												@input="persistState"
-											/>
-										</template>
-										<template v-else>
-											<label :for="`input-${getActionId(action)}-${inputIndex}`">
-												<span class="label__title">
-													{{ input.label }}
-													<span v-if="input.required" class="required">*</span>
-												</span>
-											</label>
-											<StyledInput
-												:id="`input-${getActionId(action)}-${inputIndex}`"
-												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												:placeholder="input.placeholder"
-												autocomplete="off"
-												@update:model-value="persistState"
-											/>
-										</template>
-									</div>
-								</div>
-							</template>
-						</div>
+						<NodeRenderer
+							:nodes="currentStageObj.nodes"
+							:get-state="(nodeId) => getNodeState(currentStageObj.id, nodeId)"
+							:set-state="(nodeId, value) => setNodeState(currentStageObj.id, nodeId, value)"
+							:show-context="makeNodeContext(currentStageObj)"
+							:on-image-upload="onUploadHandler"
+						/>
 					</div>
 				</div>
 
@@ -498,42 +367,28 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type {
-	Action,
-	ActionState,
-	ButtonAction,
-	ChecklistActionContext,
-	ConditionalButtonAction,
-	DropdownAction,
-	MultiSelectChipsAction,
-	MultiSelectChipsOption,
-	Stage,
-	ToggleAction,
+	ChecklistStage,
+	Node,
+	NodeContext,
+	NodeState,
+	NodeStateWithChildren,
 } from '@modrinth/moderation'
 import {
 	checklist,
 	expandVariables,
-	finalPermissionMessages,
-	findMatchingVariant,
 	flattenProjectV3Variables,
 	flattenProjectVariables,
 	flattenStaticVariables,
-	getActionIdForStage,
-	getActionMessage,
-	getVisibleInputs,
 	handleKeybind,
-	initializeActionState,
 	kebabToTitleCase,
 	keybinds,
-	processMessage,
 } from '@modrinth/moderation'
 import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
-	Checkbox,
 	Collapsible,
 	ConfirmModal,
-	DropdownSelect,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
@@ -542,9 +397,8 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
-import { renderHighlightedString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computedAsync, useDebounceFn } from '@vueuse/core'
+import { useDebounceFn } from '@vueuse/core'
 import { toRaw } from 'vue'
 import type { Component } from 'vue'
 
@@ -561,6 +415,7 @@ import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
+import NodeRenderer from './NodeRenderer.vue'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
@@ -610,133 +465,6 @@ const PREFETCH_STALE_MS = 30_000 // 30 seconds
 const PREFETCH_TARGET_COUNT = 3 // Keep 3 unlocked projects ready
 const PREFETCH_BATCH_SIZE = 5 // Check 5 at a time in parallel
 
-// Tooltip constants and cache
-const BUTTON_TOOLTIP_DELAY_MS = 500 // Show tooltip after 1.5 seconds of hovering
-const BUTTON_TOOLTIP_HIDE_DELAY_MS = 0 // Hide immediately on mouseleave
-const buttonActionTooltipCache = ref<Record<string, { text: string; expiresAt: number }>>({})
-const TOOLTIP_CACHE_TTL_MS = 30000 // Cache tooltip text for 30 seconds
-
-// Helper: compute the message text that a button action would generate
-async function getButtonActionTooltipText(action: Action): Promise<string> {
-	try {
-		const actionIndex = currentStageObj.value.actions.indexOf(action)
-		const actionId = getActionId(action, actionIndex)
-		const state = actionStates.value[actionId]
-
-		if (!state) return ''
-
-		// Build list of selected action IDs (including this action as if selected)
-		const tempSelectedIds = Object.entries(actionStates.value)
-			.filter(([_, s]) => s.selected)
-			.map(([id]) => id)
-
-		if (!tempSelectedIds.includes(actionId)) {
-			tempSelectedIds.push(actionId)
-		}
-
-		// Build all valid action IDs across all stages
-		const allValidActionIds: string[] = []
-		checklist.forEach((stage, stageIdx) => {
-			stage.actions.forEach((stageAction, actionIdx) => {
-				allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx))
-				if (stageAction.enablesActions) {
-					stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
-						allValidActionIds.push(
-							getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
-						)
-					})
-				}
-			})
-		})
-
-		let messageText = ''
-
-		if (action.type === 'button' || action.type === 'toggle') {
-			const buttonAction = action as ButtonAction | ToggleAction
-			const message = await getActionMessage(buttonAction, tempSelectedIds, allValidActionIds)
-			if (message) {
-				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
-			}
-		} else if (action.type === 'conditional-button') {
-			const conditionalAction = action as ConditionalButtonAction
-			const matchingVariant = findMatchingVariant(
-				conditionalAction.messageVariants,
-				tempSelectedIds,
-				allValidActionIds,
-				currentStage.value,
-			)
-
-			if (matchingVariant) {
-				const message = (await matchingVariant.message()) as string
-				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
-			} else if (conditionalAction.fallbackMessage) {
-				const message = (await conditionalAction.fallbackMessage()) as string
-				messageText = processMessage(message, action, currentStage.value, textInputValues.value)
-			}
-		}
-
-		return expandVariables(
-			messageText.trim(),
-			projectV2.value,
-			projectV3.value,
-			variables.value,
-		).trim()
-	} catch (error) {
-		console.warn('[tooltip] Error computing action message:', error)
-		return ''
-	}
-}
-
-// Helper: render markdown tooltip content using the app's markdown renderer
-function renderTooltipMarkdownHtml(text: string): string {
-	const trimmed = text/*.slice(0, 500)*/.trim()
-	if (!trimmed) return ''
-
-	return `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(trimmed)}</div>`
-}
-
-// Helper: get tooltip directive config for a button action with caching & delay
-function getChecklistButtonTooltipConfig(action: Action): any {
-	const actionKey = getActionKey(action)
-	const now = Date.now()
-	const cached = buttonActionTooltipCache.value[actionKey]
-
-	if (cached && now < cached.expiresAt) {
-		const renderedHtml = renderTooltipMarkdownHtml(cached.text)
-		return renderedHtml
-			? {
-					content: renderedHtml,
-					html: true,
-					delay: { show: BUTTON_TOOLTIP_DELAY_MS, hide: BUTTON_TOOLTIP_HIDE_DELAY_MS },
-					triggers: ['hover', 'focus'],
-					placement: 'top',
-				}
-			: undefined
-	}
-
-	void (async () => {
-		const text = await getButtonActionTooltipText(action)
-		buttonActionTooltipCache.value[actionKey] = {
-			text,
-			expiresAt: Date.now() + TOOLTIP_CACHE_TTL_MS,
-		}
-	})()
-
-	if (cached) {
-		const renderedHtml = renderTooltipMarkdownHtml(cached.text)
-		return renderedHtml
-			? {
-					content: renderedHtml,
-					html: true,
-					delay: { show: BUTTON_TOOLTIP_DELAY_MS, hide: BUTTON_TOOLTIP_HIDE_DELAY_MS },
-					triggers: ['hover', 'focus'],
-					placement: 'top',
-				}
-			: undefined
-	}
-
-	return undefined
-}
 
 async function handleVisibilityChange() {
 	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
@@ -894,11 +622,6 @@ const variables = computed(() => {
 	}
 })
 
-const checklistActionContext = computed<ChecklistActionContext>(() => ({
-	project: projectV2.value,
-	projectV3: projectV3.value,
-	versions: versions.value,
-}))
 
 const modpackPermissionsComplete = ref(false)
 const modpackJudgements = ref<ModerationJudgements>({})
@@ -919,6 +642,7 @@ const checklistPersistenceProjectId = projectV2.value.id
 const persistedState = import.meta.client
 	? await loadChecklistState(checklistPersistenceProjectId)
 	: null
+const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
@@ -1002,6 +726,9 @@ async function confirmTakeOverOverride() {
 
 function reviewAnyway() {
 	alreadyReviewed.value = false
+	reviewedAnyway.value = true
+	hasMeaningfulState = true
+	persistState()
 	// Start prefetching the next project in the background
 	maintainPrefetchQueue()
 }
@@ -1235,8 +962,7 @@ async function skipToNextProject() {
 
 function resetProgress() {
 	currentStage.value = findFirstValidStage()
-	actionStates.value = {}
-	textInputValues.value = {}
+	nodeStates.value = {}
 
 	done.value = false
 	clearGeneratedMessageState()
@@ -1277,32 +1003,12 @@ const checklistTitleText = computed(() => {
 
 	return currentStageObj.value.title ?? kebabToTitleCase(currentStageObj.value.id)
 })
-const currentStage = ref(
-	persistedState?.stage !== undefined && checklist[persistedState.stage]
-		? persistedState.stage
-		: findFirstValidStage(),
-)
+const nodeStates = ref<Record<string, Record<string, NodeState>>>(persistedState?.state ?? {})
 
-const stageTextExpanded = computedAsync(async () => {
-	const stageIndex = currentStage.value
-	const stage = checklist[stageIndex]
-	if (stage.text) {
-		return renderHighlightedString(
-			expandVariables(
-				await stage.text(projectV2.value, projectV3.value),
-				projectV2.value,
-				projectV3.value,
-				variables.value,
-			),
-		)
-	}
-	return null
-}, null)
+const restoredStage = persistedState ? checklist.findIndex((s) => s.id === persistedState.stage) : -1
+const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
 
 const router = useRouter()
-
-const actionStates = ref<Record<string, ActionState>>(persistedState?.actionStates ?? {})
-const textInputValues = ref<Record<string, string>>(persistedState?.textInputs ?? {})
 
 const initialStage = currentStage.value
 let hasMeaningfulState = persistedState !== null
@@ -1312,21 +1018,20 @@ const persistState = () => {
 		hasMeaningfulState =
 			currentStage.value !== initialStage ||
 			message.value !== null ||
-			Object.values(toRaw(actionStates.value)).some((s) => s.selected)
+			Object.values(toRaw(nodeStates.value)).some((s) => Object.keys(s).length > 0)
 		if (!hasMeaningfulState) return
 	}
 	void saveChecklistState(checklistPersistenceProjectId, {
 		open: !props.collapsed,
-		stage: currentStage.value,
+		reviewAnyway: reviewedAnyway.value || undefined,
+		stage: currentStageObj.value.id,
 		message: message.value,
-		actionStates: toRaw(actionStates.value),
-		textInputs: toRaw(textInputValues.value),
+		state: toRaw(nodeStates.value),
 	})
 }
 
 watch(currentStage, persistState)
-watch(actionStates, persistState, { deep: true })
-watch(textInputValues, persistState, { deep: true })
+watch(nodeStates, persistState, { deep: true })
 watch(message, persistState)
 watch(() => props.collapsed, (collapsed) => {
 	if (!collapsed) hasMeaningfulState = true
@@ -1336,13 +1041,9 @@ watch(() => props.collapsed, (collapsed) => {
 interface MessagePart {
 	weight: number
 	content: string
-	actionId: string
-	stageIndex: number
 }
 
 function handleKeybinds(event: KeyboardEvent) {
-	const focusedActionIndex = ref<number | null>(null)
-
 	handleKeybind(
 		event,
 		{
@@ -1360,13 +1061,10 @@ function handleKeybinds(event: KeyboardEvent) {
 				isModpackPermissionsStage: isModpackPermissionsStage.value,
 
 				futureProjectCount: moderationQueue.queueLength,
-				visibleActionsCount: visibleActions.value.length,
+				visibleActionsCount: currentStageObj.value.nodes.length,
 
-				focusedActionIndex: focusedActionIndex.value,
-				focusedActionType:
-					focusedActionIndex.value !== null
-						? (visibleActions.value[focusedActionIndex.value]?.type as any)
-						: null,
+				focusedActionIndex: null,
+				focusedActionType: null,
 			},
 			actions: {
 				tryGoNext: nextStage,
@@ -1383,63 +1081,12 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryWithhold: () => sendMessage('withheld'),
 				tryEditMessage: goBackToStages,
 
-				tryToggleAction: (actionIndex: number) => {
-					const action = visibleActions.value[actionIndex]
-					if (action) {
-						toggleAction(action)
-					}
-				},
-				trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
-					const action = visibleActions.value[actionIndex] as DropdownAction
-					if (action && action.type === 'dropdown') {
-						const visibleOptions = getVisibleDropdownOptions(action)
-						if (optionIndex < visibleOptions.length) {
-							selectDropdownOption(action, visibleOptions[optionIndex])
-						}
-					}
-				},
-				tryToggleChip: (actionIndex: number, chipIndex: number) => {
-					const action = visibleActions.value[actionIndex] as MultiSelectChipsAction
-					if (action && action.type === 'multi-select-chips') {
-						const visibleOptions = getVisibleMultiSelectOptions(action)
-						if (chipIndex < visibleOptions.length) {
-							toggleChip(action, visibleOptions[chipIndex])
-						}
-					}
-				},
-
-				tryFocusNextAction: () => {
-					if (visibleActions.value.length === 0) return
-					if (focusedActionIndex.value === null) {
-						focusedActionIndex.value = 0
-					} else {
-						focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length
-					}
-				},
-				tryFocusPreviousAction: () => {
-					if (visibleActions.value.length === 0) return
-					if (focusedActionIndex.value === null) {
-						focusedActionIndex.value = visibleActions.value.length - 1
-					} else {
-						focusedActionIndex.value =
-							focusedActionIndex.value === 0
-								? visibleActions.value.length - 1
-								: focusedActionIndex.value - 1
-					}
-				},
-				tryActivateFocusedAction: () => {
-					if (focusedActionIndex.value === null) return
-					const action = visibleActions.value[focusedActionIndex.value]
-					if (!action) return
-
-					if (
-						action.type === 'button' ||
-						action.type === 'conditional-button' ||
-						action.type === 'toggle'
-					) {
-						toggleAction(action)
-					}
-				},
+				tryToggleAction: () => {},
+				trySelectDropdownOption: () => {},
+				tryToggleChip: () => {},
+				tryFocusNextAction: () => {},
+				tryFocusPreviousAction: () => {},
+				tryActivateFocusedAction: () => {},
 			},
 		},
 		keybinds,
@@ -1460,7 +1107,7 @@ onMounted(async () => {
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
 
-	if (projectV2.value.status !== 'processing') {
+	if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
 		alreadyReviewed.value = true
 		return
 	}
@@ -1549,227 +1196,26 @@ watch(
 	{ immediate: true },
 )
 
-function getActionId(action: Action, index?: number): string {
-	// If index is not provided, find it in the current stage's actions
-	if (index === undefined) {
-		index = currentStageObj.value.actions.indexOf(action)
-	}
-	return getActionIdForStage(action, currentStage.value, index)
+function getNodeState(stageId: string, nodeId: string): NodeState {
+	return nodeStates.value[stageId]?.[nodeId]
 }
 
-function getActionKey(action: Action): string {
-	// Find the actual index of this action in the current stage's actions array
-	const index = currentStageObj.value.actions.indexOf(action)
-	return `${currentStage.value}-${index}-${getActionId(action, index)}`
-}
-
-const visibleActions = computed(() => {
-	const selectedActionIds = Object.entries(actionStates.value)
-		.filter(([_, state]) => state.selected)
-		.map(([id]) => id)
-
-	const allActions: Action[] = []
-	const actionSources = new Map<Action, { enabledBy?: Action; actionIndex?: number }>()
-
-	currentStageObj.value.actions.forEach((action, actionIndex) => {
-		if (shouldShowAction(action)) {
-			allActions.push(action)
-			actionSources.set(action, { actionIndex })
-
-			if (action.enablesActions) {
-				action.enablesActions.forEach((enabledAction) => {
-					if (shouldShowAction(enabledAction)) {
-						allActions.push(enabledAction)
-						actionSources.set(enabledAction, { enabledBy: action, actionIndex })
-					}
-				})
-			}
+function setNodeState(stageId: string, nodeId: string, value: NodeState) {
+	if (value === undefined) {
+		if (!nodeStates.value[stageId]) return
+		const { [nodeId]: _, ...rest } = nodeStates.value[stageId]
+		if (Object.keys(rest).length === 0) {
+			const { [stageId]: __, ...restStages } = nodeStates.value
+			nodeStates.value = restStages
+		} else {
+			nodeStates.value[stageId] = rest
 		}
-	})
-
-	return allActions.filter((action) => {
-		const source = actionSources.get(action)
-
-		if (source?.enabledBy) {
-			const enablerId = getActionId(source.enabledBy, source.actionIndex)
-			if (!selectedActionIds.includes(enablerId)) {
-				return false
-			}
-		}
-
-		const disabledByOthers = currentStageObj.value.actions.some((otherAction, otherIndex) => {
-			const otherId = getActionId(otherAction, otherIndex)
-			return (
-				selectedActionIds.includes(otherId) &&
-				otherAction.disablesActions?.includes(
-					action.id || `action-${currentStage.value}-${source?.actionIndex}`,
-				)
-			)
-		})
-
-		return !disabledByOthers
-	})
-})
-
-const buttonActions = computed(() =>
-	visibleActions.value.filter(
-		(action) => action.type === 'button' || action.type === 'conditional-button',
-	),
-)
-
-const toggleActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'toggle'),
-)
-
-const dropdownActions = computed(() =>
-	visibleActions.value.filter((action) => action.type === 'dropdown'),
-)
-
-const multiSelectActions = computed(() =>
-	visibleActions.value.filter(
-		(action) =>
-			action.type === 'multi-select-chips' && getVisibleMultiSelectOptions(action).length > 0,
-	),
-)
-
-function resolveMultiSelectOptions(action: MultiSelectChipsAction) {
-	return typeof action.options === 'function'
-		? action.options(checklistActionContext.value)
-		: action.options
-}
-
-function getMultiSelectOptionId(option: MultiSelectChipsOption): string {
-	return option.id ?? option.label
-}
-
-function getMultiSelectOptionKey(
-	action: MultiSelectChipsAction,
-	option: MultiSelectChipsOption,
-	optionIndex: number,
-) {
-	return `${getActionId(action)}-chip-${getMultiSelectOptionId(option) || optionIndex}`
-}
-
-function getSelectedChipIds(action: MultiSelectChipsAction, state?: ActionState): Set<string> {
-	const selectedValues = state?.value
-	if (!(selectedValues instanceof Set)) {
-		return new Set<string>()
-	}
-
-	const optionIds = new Set<string>()
-	const resolvedOptions = resolveMultiSelectOptions(action)
-
-	for (const selectedValue of selectedValues) {
-		if (typeof selectedValue === 'string') {
-			optionIds.add(selectedValue)
-		} else if (typeof selectedValue === 'number') {
-			const option = resolvedOptions[selectedValue]
-			if (option) {
-				optionIds.add(getMultiSelectOptionId(option))
-			}
-		}
-	}
-
-	return optionIds
-}
-
-function getDropdownValue(action: DropdownAction) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const visibleOptions = getVisibleDropdownOptions(action)
-	const storedValue = actionStates.value[actionId]?.value
-	const currentValue: number = typeof storedValue === 'number' ? storedValue : (action.defaultOption ?? 0)
-
-	const allOptions = action.options
-	const storedOption = allOptions.at(currentValue)
-
-	if (storedOption && visibleOptions.includes(storedOption)) {
-		return storedOption
-	}
-
-	return visibleOptions[0] || null
-}
-
-function isDefaultActionState(action: Action, state: ActionState): boolean {
-	const def = initializeActionState(action)
-	if (state.selected !== def.selected) return false
-	if (def.value instanceof Set) return !(state.value instanceof Set) || state.value.size === 0
-	return state.value === def.value
-}
-
-function isActionSelected(action: Action): boolean {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const state = actionStates.value[actionId]
-	if (state !== undefined) return state.selected
-	return action.type === 'toggle' ? (action.defaultChecked ?? false) : false
-}
-
-function toggleAction(action: Action) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const current = actionStates.value[actionId] ?? initializeActionState(action)
-	const newState: ActionState = { ...current, selected: !current.selected }
-	if (isDefaultActionState(action, newState)) {
-		const { [actionId]: _, ...rest } = actionStates.value
-		actionStates.value = rest
 	} else {
-		actionStates.value[actionId] = newState
+		if (!nodeStates.value[stageId]) nodeStates.value[stageId] = {}
+		nodeStates.value[stageId][nodeId] = value
 	}
 	persistState()
 }
-
-function selectDropdownOption(action: DropdownAction, selected: any) {
-	if (selected === undefined || selected === null) return
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const optionIndex = action.options.findIndex(
-		(opt) => opt === selected || (opt?.label && selected?.label && opt.label === selected.label),
-	)
-	if (optionIndex === -1) return
-	const newState: ActionState = { selected: true, value: optionIndex }
-	if (isDefaultActionState(action, newState)) {
-		const { [actionId]: _, ...rest } = actionStates.value
-		actionStates.value = rest
-	} else {
-		actionStates.value[actionId] = newState
-	}
-	persistState()
-}
-
-
-function isChipSelected(action: MultiSelectChipsAction, option: MultiSelectChipsOption): boolean {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	return getSelectedChipIds(action, actionStates.value[actionId]).has(getMultiSelectOptionId(option))
-}
-
-function toggleChip(action: MultiSelectChipsAction, option: MultiSelectChipsOption) {
-	const actionIndex = currentStageObj.value.actions.indexOf(action)
-	const actionId = getActionId(action, actionIndex)
-	const selectedOptionIds = getSelectedChipIds(action, actionStates.value[actionId])
-	const optionId = getMultiSelectOptionId(option)
-	if (selectedOptionIds.has(optionId)) {
-		selectedOptionIds.delete(optionId)
-	} else {
-		selectedOptionIds.add(optionId)
-	}
-	const newState: ActionState = { selected: selectedOptionIds.size > 0, value: selectedOptionIds }
-	if (isDefaultActionState(action, newState)) {
-		const { [actionId]: _, ...rest } = actionStates.value
-		actionStates.value = rest
-	} else {
-		actionStates.value[actionId] = newState
-	}
-	persistState()
-}
-
-const isAnyVisibleInputs = computed(() => {
-	return visibleActions.value.some((action) => {
-		const visibleInputs = getVisibleInputs(action, actionStates.value)
-		return visibleInputs.length > 0 && isActionSelected(action)
-	})
-})
 
 function getModpackFilesFromStorage(): {
 	interactive: ModerationModpackItem[]
@@ -1796,233 +1242,148 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
+function isNodeActive(node: Node, state: NodeState): boolean {
+	switch (node.type) {
+		case 'boolean': {
+			if (typeof state === 'boolean') return state
+			if (state && typeof state === 'object' && !(state instanceof Set)) {
+				const v = (state as NodeStateWithChildren).value
+				if (typeof v === 'boolean') return v
+			}
+			return node.defaultChecked === true
+		}
+		case 'multi-select': return state instanceof Set && state.size > 0
+		case 'select': return typeof state === 'string' && state !== ''
+		case 'text':
+		case 'markdown': return typeof state === 'string' && state !== ''
+		default: return false
+	}
+}
+
+function getBooleanChildState(nodeState: NodeState): Record<string, NodeState> {
+	if (nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set)) {
+		return nodeState as Record<string, NodeState>
+	}
+	return {}
+}
+
+function resolveChildren(node: Node, ctx: NodeContext): Node[] {
+	if (node.childrenFn) return node.childrenFn(ctx)
+	return node.children ?? []
+}
+
+async function collectNodeMessages(
+	nodes: Node[],
+	stageState: Record<string, NodeState>,
+	ctx: NodeContext,
+	parts: MessagePart[],
+): Promise<void> {
+	for (const node of nodes) {
+		if (node.shown && !node.shown(ctx)) continue
+
+		if (node.type === 'group') {
+			if (node.id) {
+				const raw = stageState[node.id]
+				const childState = (raw && typeof raw === 'object' && !(raw instanceof Set))
+					? (raw as Record<string, NodeState>)
+					: {}
+				await collectNodeMessages(resolveChildren(node, ctx), childState, { ...ctx, state: childState }, parts)
+			} else {
+				await collectNodeMessages(resolveChildren(node, ctx), stageState, ctx, parts)
+			}
+			continue
+		}
+
+		const nodeState = stageState[node.id!]
+		const active = isNodeActive(node, nodeState)
+
+		if (active && node.message) {
+			const nodeCtx: NodeContext = node.type === 'boolean'
+				? { ...ctx, state: getBooleanChildState(nodeState) }
+				: ctx
+			const msg = await node.message(nodeCtx)
+			if (msg) parts.push({ weight: node.weight ?? 0, content: msg })
+		}
+
+		const children = resolveChildren(node, ctx)
+		if (children.length > 0 && active) {
+			if (node.type === 'multi-select') {
+				const selected = nodeState instanceof Set ? nodeState : new Set<string>()
+				for (const child of children) {
+					if (!selected.has(child.id!)) continue
+					if (child.shown && !child.shown(ctx)) continue
+					if (child.message) {
+						const msg = await child.message(ctx)
+						if (msg) parts.push({ weight: child.weight ?? 0, content: msg })
+					}
+					if (child.children) {
+						await collectNodeMessages(child.children, stageState, ctx, parts)
+					}
+				}
+			} else if (node.type === 'boolean') {
+				const childState = getBooleanChildState(nodeState)
+				await collectNodeMessages(children, childState, { ...ctx, state: childState }, parts)
+			} else if (node.type === 'select') {
+				const selectedId = typeof nodeState === 'string' ? nodeState : undefined
+				if (selectedId) {
+					for (const child of children) {
+						if (child.id !== selectedId) continue
+						if (child.shown && !child.shown(ctx)) continue
+						if (child.message) {
+							const msg = await child.message(ctx)
+							if (msg) parts.push({ weight: child.weight ?? node.weight ?? 0, content: msg })
+						}
+						if (child.children) {
+							await collectNodeMessages(child.children, stageState, ctx, parts)
+						}
+						break
+					}
+				}
+			} else {
+				await collectNodeMessages(children, stageState, ctx, parts)
+			}
+		}
+	}
+}
+
 async function assembleFullMessage() {
-	const messageParts: MessagePart[] = []
+	const parts: MessagePart[] = []
 
-	for (let stageIndex = 0; stageIndex < checklist.length; stageIndex++) {
-		const stage = checklist[stageIndex]
-
-		await processStageActions(stage, stageIndex, messageParts)
+	for (const stage of checklist) {
+		const stageState = nodeStates.value[stage.id] ?? {}
+		await collectNodeMessages(stage.nodes, stageState, makeNodeContext(stage), parts)
 	}
 
-	messageParts.sort((a, b) => a.weight - b.weight)
+	parts.sort((a, b) => a.weight - b.weight)
 
-	const finalMessage = expandVariables(
-		messageParts
-			.map((part) => part.content)
-			.filter((content) => content.trim().length > 0)
+	return expandVariables(
+		parts
+			.map((p) => p.content)
+			.filter((c) => c.trim().length > 0)
 			.join('\n\n'),
 		projectV2.value,
 		projectV3.value,
 	)
-
-	return finalMessage
 }
 
-async function processStageActions(stage: Stage, stageIndex: number, messageParts: MessagePart[]) {
-	const selectedActionIds = Object.entries(actionStates.value)
-		.filter(([_, state]) => state.selected)
-		.map(([id]) => id)
-
-	for (let actionIndex = 0; actionIndex < stage.actions.length; actionIndex++) {
-		const action = stage.actions[actionIndex]
-		const actionId = getActionIdForStage(action, stageIndex, actionIndex)
-		const state = actionStates.value[actionId]
-
-		if (!state?.selected) continue
-
-		await processAction(action, actionId, state, selectedActionIds, stageIndex, messageParts)
-
-		if (action.enablesActions) {
-			for (let enabledIndex = 0; enabledIndex < action.enablesActions.length; enabledIndex++) {
-				const enabledAction = action.enablesActions[enabledIndex]
-				const enabledActionId = getActionIdForStage(
-					enabledAction,
-					stageIndex,
-					actionIndex,
-					enabledIndex,
-				)
-				const enabledState = actionStates.value[enabledActionId]
-
-				if (enabledState?.selected) {
-					await processAction(
-						enabledAction,
-						enabledActionId,
-						enabledState,
-						selectedActionIds,
-						stageIndex,
-						messageParts,
-					)
-				}
-			}
-		}
+function makeNodeContext(stage: ChecklistStage): NodeContext {
+	return {
+		project: projectV3.value,
+		projectV2: projectV2.value,
+		state: nodeStates.value[stage.id] ?? {},
+		globalState: nodeStates.value,
 	}
 }
 
-async function processAction(
-	action: Action,
-	actionId: string,
-	state: ActionState,
-	selectedActionIds: string[],
-	stageIndex: number,
-	messageParts: MessagePart[],
-) {
-	const allValidActionIds: string[] = []
-	checklist.forEach((stage, stageIdx) => {
-		stage.actions.forEach((stageAction, actionIdx) => {
-			allValidActionIds.push(getActionIdForStage(stageAction, stageIdx, actionIdx))
-			if (stageAction.enablesActions) {
-				stageAction.enablesActions.forEach((enabledAction, enabledIdx) => {
-					allValidActionIds.push(
-						getActionIdForStage(enabledAction, stageIdx, actionIdx, enabledIdx),
-					)
-				})
-			}
-		})
-	})
-
-	if (action.type === 'button' || action.type === 'toggle') {
-		const buttonAction = action as ButtonAction | ToggleAction
-		const message = await getActionMessage(buttonAction, selectedActionIds, allValidActionIds)
-		if (message) {
-			messageParts.push({
-				weight: buttonAction.weight,
-				content: processMessage(message, action, stageIndex, textInputValues.value),
-				actionId,
-				stageIndex,
-			})
-		}
-	} else if (action.type === 'conditional-button') {
-		const conditionalAction = action as ConditionalButtonAction
-		const matchingVariant = findMatchingVariant(
-			conditionalAction.messageVariants,
-			selectedActionIds,
-			allValidActionIds,
-			stageIndex,
-		)
-
-		let message: string
-		let weight: number
-
-		if (matchingVariant) {
-			message = (await matchingVariant.message()) as string
-			weight = matchingVariant.weight
-		} else if (conditionalAction.fallbackMessage) {
-			message = (await conditionalAction.fallbackMessage()) as string
-			weight = conditionalAction.fallbackWeight ?? 0
-		} else {
-			return
-		}
-
-		messageParts.push({
-			weight,
-			content: processMessage(message, action, stageIndex, textInputValues.value),
-			actionId,
-			stageIndex,
-		})
-	} else if (action.type === 'dropdown') {
-		const dropdownAction = action as DropdownAction
-		const selectedIndex: number = typeof state.value === 'number' ? state.value : 0
-		const selectedOption = dropdownAction.options.at(selectedIndex)
-
-		if (selectedOption && 'message' in selectedOption && 'weight' in selectedOption) {
-			const message = (await selectedOption.message()) as string
-			messageParts.push({
-				weight: selectedOption.weight,
-				content: processMessage(message, action, stageIndex, textInputValues.value),
-				actionId,
-				stageIndex,
-			})
-		}
-	} else if (action.type === 'multi-select-chips') {
-		const multiSelectAction = action as MultiSelectChipsAction
-		const visibleOptions = getVisibleMultiSelectOptions(multiSelectAction)
-		const selectedOptionIds = getSelectedChipIds(multiSelectAction, state)
-
-		if (multiSelectAction.joinWith !== undefined) {
-			const parts: { weight: number; content: string }[] = []
-			for (const option of visibleOptions) {
-				if (selectedOptionIds.has(getMultiSelectOptionId(option))) {
-					parts.push({
-						weight: option.weight,
-						content: processMessage(
-							(await option.message()) as string,
-							action,
-							stageIndex,
-							textInputValues.value,
-						),
-					})
-				}
-			}
-			if (parts.length > 0) {
-				parts.sort((a, b) => a.weight - b.weight)
-				messageParts.push({
-					weight: parts[0].weight,
-					content: parts.map((p) => p.content.trim()).join(multiSelectAction.joinWith),
-					actionId: `${actionId}-combined`,
-					stageIndex,
-				})
-			}
-		} else {
-			for (const option of visibleOptions) {
-				if (selectedOptionIds.has(getMultiSelectOptionId(option))) {
-					const message = (await option.message()) as string
-					messageParts.push({
-						weight: option.weight,
-						content: processMessage(message, action, stageIndex, textInputValues.value),
-						actionId: `${actionId}-option-${getMultiSelectOptionId(option)}`,
-						stageIndex,
-					})
-				}
-			}
-		}
-	}
+function isNodeVisible(node: Node, ctx: NodeContext): boolean {
+	return !node.shown || node.shown(ctx)
 }
 
-function shouldShowStage(stage: Stage): boolean {
-	let hasVisibleActions = false
-
-	for (const a of stage.actions) {
-		if (shouldShowAction(a)) {
-			hasVisibleActions = true
-		}
-	}
-
-	if (!hasVisibleActions) {
-		return false
-	}
-
-	if (typeof stage.shouldShow === 'function') {
-		return stage.shouldShow(projectV2.value, projectV3.value)
-	}
-
+function shouldShowStage(stage: ChecklistStage): boolean {
+	const ctx = makeNodeContext(stage)
+	if (!stage.nodes.some((n) => isNodeVisible(n, ctx))) return false
+	if (stage.shown) return stage.shown(projectV2.value, projectV3.value)
 	return true
-}
-
-function shouldShowAction(action: Action): boolean {
-	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
-	}
-
-	return true
-}
-
-function getVisibleDropdownOptions(action: DropdownAction) {
-	return action.options.filter((option) => {
-		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
-		}
-		return true
-	})
-}
-
-function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
-	return resolveMultiSelectOptions(action).filter((option) => {
-		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value, projectV3.value, checklistActionContext.value)
-		}
-		return true
-	})
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
@@ -2113,6 +1474,13 @@ async function generateMessage() {
 	} finally {
 		loadingMessage.value = false
 	}
+}
+
+const finalPermissionMessages = {
+	'with-attribution': `The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your Modpack's description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):`,
+	no: 'The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:',
+	'permanent-no': `The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks Modrinth's content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:`,
+	unidentified: `The following content could not be identified. Please provide proof of its origin along with proof that you have permission to include it:`,
 }
 
 function generateModpackMessage(allFiles: {
@@ -2357,8 +1725,7 @@ function clearProjectLocalStorage() {
 	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
 	void clearChecklistState(checklistPersistenceProjectId)
-	actionStates.value = {}
-	textInputValues.value = {}
+	nodeStates.value = {}
 	message.value = null
 }
 
@@ -2381,17 +1748,20 @@ const hasValidPreviousStage = computed(() => {
 })
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
-	const options = checklist
+	const options = (checklist as ReadonlyArray<ChecklistStage>)
 		.map((stage, index) => {
 			if (!shouldShowStage(stage)) return null
 
 			return {
 				id: String(index),
-				action: () => (currentStage.value = index),
+				action: () => {
+					clearGeneratedMessageState()
+					currentStage.value = index
+				},
 				text: stage.title ?? kebabToTitleCase(stage.id),
 				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
 				hoverFilled: true,
-				icon: stage.icon ? stage.icon : undefined,
+				icon: stage.icon ?? undefined,
 			} as OverflowMenuOption
 		})
 		.filter((opt): opt is OverflowMenuOption => opt !== null)

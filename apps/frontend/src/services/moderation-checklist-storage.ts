@@ -1,14 +1,14 @@
-import type { ActionState } from '@modrinth/moderation'
+import type { NodeState } from '@modrinth/moderation'
 
 import { dbDelete, dbGet, dbPut, dbScan } from './moderation-db.ts'
 
 export interface PersistedChecklistState {
 	savedAt: string
 	open?: boolean
-	stage: number
+	reviewAnyway?: boolean
+	stage: string
 	message: string | null
-	actionStates: Record<string, ActionState>
-	textInputs: Record<string, string>
+	state: Record<string, Record<string, NodeState>>
 }
 
 const STORE = 'checklist'
@@ -22,10 +22,9 @@ function isPersistedChecklistState(value: unknown): value is PersistedChecklistS
 	if (!value || typeof value !== 'object') return false
 	const v = value as PersistedChecklistState
 	if (typeof v.savedAt !== 'string') return false
-	if (typeof v.stage !== 'number' || !Number.isFinite(v.stage)) return false
+	if (typeof v.stage !== 'string') return false
 	if (v.message !== null && typeof v.message !== 'string') return false
-	if (!v.actionStates || typeof v.actionStates !== 'object') return false
-	if (!v.textInputs || typeof v.textInputs !== 'object') return false
+	if (!v.state || typeof v.state !== 'object') return false
 	return true
 }
 
@@ -37,7 +36,7 @@ function isStale(savedAt: string, now = Date.now()): boolean {
 async function cleanupStaleStates(now = Date.now()): Promise<void> {
 	const entries = await dbScan<unknown>(STORE)
 	const staleKeys = entries
-		.filter(({ key, value }) => {
+		.filter(({ value }) => {
 			if (!isPersistedChecklistState(value)) return false
 			return isStale(value.savedAt, now)
 		})
@@ -115,4 +114,3 @@ export async function clearChecklistState(projectId: string): Promise<void> {
 		console.debug('Failed to clear checklist state from IndexedDB:', error)
 	}
 }
-
