@@ -1,24 +1,30 @@
 import { LinkIcon } from '@modrinth/assets'
 
 import type { ContentFn } from '../../types/node'
-import { button, group, mdEscape, mdMsg, prose, stage } from '../../types/node'
+import { action, button, group, label, mdEscape, md, stage } from '../../types/node'
 
 function linkSection(id: string, urlLine: ContentFn, baseWeight: number) {
 	return group(id)
-		.column()
+		.layout('column')
 		.children(
-			prose(urlLine),
+			label(urlLine),
 			group().children(
 				button('misused', 'Misused')
-					.weight(baseWeight)
-					.suggestedStatus('flagged')
-					.severity('low')
-					.message(mdMsg(`links/${id}/misused`)),
+					.action(
+						action()
+							.weight(baseWeight)
+							.suggestedStatus('flagged')
+							.severity('low')
+							.message(md(`checklist/messages/links/${id}/misused`)),
+					),
 				button('inaccessible', 'Inaccessible')
-					.weight(baseWeight + 1)
-					.suggestedStatus('flagged')
-					.severity('medium')
-					.message(mdMsg(`links/${id}/inaccessible`)),
+					.action(
+						action()
+							.weight(baseWeight + 1)
+							.suggestedStatus('flagged')
+							.severity('medium')
+							.message(md(`checklist/messages/links/${id}/inaccessible`)),
+					),
 			),
 		)
 }
@@ -28,13 +34,11 @@ export default stage(
 	'Links',
 	"Are the project's links accurate and accessible?",
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08013b36cd75cbf1a9177',
-	{
-		icon: LinkIcon,
-		navigate: '/settings/links',
-		shown: (_project, projectV3) =>
-			Boolean(projectV3 && Object.keys(projectV3.link_urls).length > 0),
-	},
-	[
+)
+	.icon(LinkIcon)
+	.navigate('/settings/links')
+	.shown(({ project }) => Object.keys(project.link_urls).length > 0)
+	.children(
 		linkSection(
 			'issues',
 			({ project }) => `**Issues:** ${mdEscape(project.link_urls.issues?.url ?? '')}`,
@@ -72,10 +76,10 @@ export default stage(
 		).shown(({ project }) => !!project.link_urls.store?.url),
 
 		group('donations')
-			.column()
+			.layout('column')
 			.shown(({ project }) => Object.values(project.link_urls).some((l) => l.donation))
 			.children(
-				prose(({ project }) =>
+				label(({ project }) =>
 					Object.values(project.link_urls)
 						.filter((l) => l.donation)
 						.map((l) => `**${mdEscape(l.platform)}:** ${mdEscape(l.url)}`)
@@ -83,16 +87,21 @@ export default stage(
 				),
 				group().children(
 					button('misused', 'Misused')
-						.weight(560)
-						.suggestedStatus('flagged')
-						.severity('low')
-						.message(mdMsg('links/donations/misused')),
+						.action(
+							action()
+								.weight(560)
+								.suggestedStatus('flagged')
+								.severity('low')
+								.message(md('checklist/messages/links/donations/misused')),
+						),
 					button('inaccessible', 'Inaccessible')
-						.weight(561)
-						.suggestedStatus('flagged')
-						.severity('medium')
-						.message(mdMsg('links/donations/inaccessible')),
+						.action(
+							action()
+								.weight(561)
+								.suggestedStatus('flagged')
+								.severity('medium')
+								.message(md('checklist/messages/links/donations/inaccessible')),
+						),
 				),
 			),
-	],
-)
+	)

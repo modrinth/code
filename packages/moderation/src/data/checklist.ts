@@ -1,8 +1,7 @@
-import type { ChecklistStage } from '../types/node'
+import type { StageNodeBuilder } from '../types/node'
 import categories from './stages/categories'
 import description from './stages/description'
-import environment from './stages/environment/environment'
-import environmentMultiple from './stages/environment/environment-multiple'
+import environment from './stages/environment'
 import gallery from './stages/gallery'
 import license from './stages/license'
 import links from './stages/links'
@@ -24,7 +23,6 @@ export default [
 	license,
 	categories,
 	environment,
-	environmentMultiple,
 	gallery,
 	versions,
 	reupload,
@@ -33,4 +31,4 @@ export default [
 	statusAlerts,
 	undefinedProject,
 	postApproval,
-] as ReadonlyArray<ChecklistStage>
+] as ReadonlyArray<StageNodeBuilder>

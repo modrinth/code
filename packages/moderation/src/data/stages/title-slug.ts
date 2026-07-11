@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { BookOpenIcon } from '@modrinth/assets'
 
-import { button, chips, group, mdMsg, mdText, prose, stage, toggle } from '../../types/node'
+import { action, button, chips, group, label, md, stage, toggle } from '../../types/node'
 
 function hasCustomSlug(project: Labrinth.Projects.v3.Project): boolean {
 	return (
@@ -20,55 +20,80 @@ export default stage(
 	'Title & Slug',
 	'Are the Name and URL accurate and appropriate?',
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
-	{ icon: BookOpenIcon },
-	[
-		prose(async (ctx) => {
-			const title = await mdText('title-slug/title')(ctx)
+)
+	.icon(BookOpenIcon)
+	.children(
+		label(async (ctx) => {
+			const title = await md('checklist/text/title-slug/title')(ctx)
 			if (!hasCustomSlug(ctx.project)) return title
-			return title + (await mdText('title-slug/slug')(ctx))
+			return title + (await md('checklist/text/title-slug/slug')(ctx))
 		}),
 
 		group('title').children(
 			button('useless_info', 'Contains Useless Info')
-				.weight(100)
-				.suggestedStatus('flagged')
-				.severity('low')
-				.message(mdMsg('title/useless-info')),
+				.action(
+					action()
+						.weight(100)
+						.suggestedStatus('flagged')
+						.severity('low')
+						.message(md('checklist/messages/title/useless-info')),
+				),
 
 			button('minecraft_branding', 'Minecraft Title')
-				.weight(100)
-				.suggestedStatus('flagged')
-				.severity('medium')
-				.message(mdMsg('title/minecraft-branding')),
+				.action(
+					action()
+						.weight(100)
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(md('checklist/messages/title/minecraft-branding')),
+				),
 
 			button('similarities', 'Title Similarities')
-				.weight(110)
-				.suggestedStatus('flagged')
-				.severity('medium')
-				.message(mdMsg('title/similarities'))
+				.action(
+					action()
+						.weight(110)
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(md('checklist/messages/title/similarities')),
+				)
 				.children(
 					chips('options', 'Similarities Additional Info').children(
 						toggle('modpack_named_after_mod', 'Modpack Named After Mod')
 							.shown(({ project }) => project.project_types.includes('modpack'))
-							.weight(111)
-							.message(mdMsg('title/similarities-modpack')),
+							.action(
+								action()
+									.weight(111)
+									.message(md('checklist/messages/title/similarities-modpack')),
+							),
 
 						toggle('forked_project', 'Forked Project')
 							.shown(({ project }) => !project?.minecraft_server)
-							.weight(112)
-							.message(mdMsg('title/similarities-fork')),
+							.action(
+								action()
+									.weight(112)
+									.message(md('checklist/messages/title/similarities-fork')),
+							),
 					),
 				),
 		),
 
 		group('slug')
-			.column()
+			.layout('column')
 			.shown(({ project }) => hasCustomSlug(project))
 			.children(
 				chips('options', 'Slug Issues?')
-					.suggestedStatus('rejected')
-					.severity('low')
-					.children(toggle('misused', 'Misused').weight(200).message(mdMsg('slug/misused'))),
+					.action(
+						action()
+							.suggestedStatus('rejected')
+							.severity('low'),
+					)
+					.children(
+						toggle('misused', 'Misused')
+							.action(
+								action()
+									.weight(200)
+									.message(md('checklist/messages/slug/misused')),
+							),
+					),
 			),
-	],
-)
+	)

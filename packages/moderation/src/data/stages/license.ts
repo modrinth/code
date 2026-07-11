@@ -1,6 +1,6 @@
 import { BookTextIcon } from '@modrinth/assets'
 
-import { button, group, mdMsg, mdText, prose, stage, toggle } from '../../types/node'
+import { action, button, group, label, md, stage, toggle } from '../../types/node'
 
 const licensesNotRequiringSource: string[] = [
 	'LicenseRef-All-Rights-Reserved',
@@ -24,37 +24,47 @@ export default stage(
 	'License',
 	'Is this license and link valid?',
 	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770',
-	{
-		icon: BookTextIcon,
-		navigate: '/settings/license',
-		shown: (_project, projectV3) => !projectV3?.minecraft_server,
-	},
-	[
-		prose(mdText('licensing')),
+)
+	.icon(BookTextIcon)
+	.navigate('/settings/license')
+	.shown(({ project }) => !project?.minecraft_server)
+	.children(
+		label(md('checklist/text/licensing')),
 
 		group().children(
 			button('invalid_link', 'Invalid Link')
 				.shown(({ project }) => !!project.license?.url)
-				.weight(600)
-				.suggestedStatus('flagged')
-				.severity('medium')
-				.message(mdMsg('license/invalid_link'))
+				.action(
+					action()
+						.weight(600)
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(md('checklist/messages/license/invalid_link')),
+				)
 				.children(
 					toggle('custom_license', 'Invalid Link: Custom License')
-						.weight(601)
-						.message(mdMsg('license/invalid_link-custom_license')),
+						.action(
+							action()
+								.weight(601)
+								.message(md('checklist/messages/license/invalid_link-custom_license')),
+						),
 				),
 
 			button('no_source', 'No Source')
 				.shown(({ project }) => !licensesNotRequiringSource.includes(project.license?.id ?? ''))
-				.weight(602)
-				.suggestedStatus('rejected')
-				.severity('medium')
-				.message(async (ctx) => {
-					if (ctx.state.fork) return mdMsg('license/no_source-fork')(ctx)
-					return mdMsg('license/no_source')(ctx)
-				})
-				.children(toggle('fork', 'No Source: Fork').severity('high')),
+				.action(
+					action()
+						.weight(602)
+						.suggestedStatus('rejected')
+						.severity('medium')
+						.message(async (ctx) => {
+							if (ctx.state.fork) return md('checklist/messages/license/no_source-fork')(ctx)
+							return md('checklist/messages/license/no_source')(ctx)
+						}),
+				)
+				.children(
+					toggle('fork', 'No Source: Fork')
+						.action(action().severity('high')),
+				),
 		),
-	],
-)
+	)

@@ -8,10 +8,7 @@ import {
 	flattenStaticVariables,
 } from '../utils'
 
-export type NodeType = 'boolean' | 'select' | 'multi-select' | 'text' | 'markdown' | 'label' | 'group' | 'prose'
-export type NodeVariant = 'button' | 'toggle'
-export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
-export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
+// ─── State ────────────────────────────────────────────────────────────────────
 
 export type NodeState = boolean | string | number | Set<string> | NodeStateWithChildren | null | undefined
 
@@ -20,6 +17,8 @@ export interface NodeStateWithChildren {
 	[childId: string]: NodeState
 }
 
+// ─── Context ──────────────────────────────────────────────────────────────────
+
 export interface NodeContext {
 	project: Labrinth.Projects.v3.Project
 	projectV2: Labrinth.Projects.v2.Project
@@ -27,34 +26,32 @@ export interface NodeContext {
 	globalState: Record<string, Record<string, NodeState>>
 }
 
+// ─── Function types ───────────────────────────────────────────────────────────
+
 export type MessageFn = (ctx: NodeContext) => Promise<string>
 export type ContentFn = (ctx: NodeContext) => string | Promise<string>
 export type ShowFn = (ctx: NodeContext) => boolean
-export type ChildrenFn = (ctx: NodeContext) => Node[]
+export type ChildrenFn = (ctx: NodeContext) => NodeBuilder[]
 
-const messageFiles = import.meta.glob('../data/messages/checklist-messages/**/*.md', {
-	query: '?raw',
-	import: 'default',
-})
+// ─── Enum-like types ──────────────────────────────────────────────────────────
 
-export function mdMsg(
-	path: string,
-	getVars?: (ctx: NodeContext) => Record<string, NodeState>,
-): MessageFn {
-	return async (ctx) => {
-		const loader = messageFiles[`../data/messages/checklist-messages/${path}.md`]
-		if (!loader) return ''
-		const raw = (await loader()) as string
-		if (!getVars) return raw
-		const vars = getVars(ctx)
-		return Object.entries(vars).reduce(
-			(result, [key, value]) => result.replace(new RegExp(`%${key}%`, 'g'), String(value ?? '')),
-			raw,
-		)
-	}
-}
+export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
+export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
-const textFiles = import.meta.glob('../data/messages/checklist-text/**/*.md', {
+export type NodeType =
+	| 'button'
+	| 'toggle'
+	| 'text'
+	| 'markdown'
+	| 'group'
+	| 'select'
+	| 'multi-select'
+	| 'display'
+	| 'stage'
+
+// ─── Message helpers ──────────────────────────────────────────────────────────
+
+const messageFiles = import.meta.glob('../data/messages/**/*.md', {
 	query: '?raw',
 	import: 'default',
 })
@@ -65,9 +62,12 @@ export function mdEscape(text: string): string {
 
 const USER_CONTENT_KEYS = ['PROJECT_TITLE', 'PROJECT_SLUG', 'PROJECT_SUMMARY', 'PROJECT_TYPE', 'PROJECT_STATUS']
 
-export function mdText(path: string): ContentFn {
+export function md(
+	path: string,
+	getVars?: (ctx: NodeContext) => Record<string, NodeState>,
+): MessageFn {
 	return async (ctx) => {
-		const loader = textFiles[`../data/messages/checklist-text/${path}.md`]
+		const loader = messageFiles[`../data/messages/${path}.md`]
 		if (!loader) return ''
 		const raw = (await loader()) as string
 		const vars: Record<string, string> = {
@@ -78,161 +78,237 @@ export function mdText(path: string): ContentFn {
 		for (const key of USER_CONTENT_KEYS) {
 			if (key in vars) vars[key] = mdEscape(vars[key])
 		}
+		if (getVars) {
+			for (const [k, v] of Object.entries(getVars(ctx))) {
+				vars[k] = String(v ?? '')
+			}
+		}
 		return expandVariables(raw, ctx.projectV2, ctx.project, vars)
 	}
 }
+// ─── Fix builder ──────────────────────────────────────────────────────────────
 
-export interface Node {
-	id?: string
-	type: NodeType
-	label?: string
-	variant?: NodeVariant
-	layout?: 'flex' | 'column'
-	weight?: number
-	children?: Node[]
-	childrenFn?: ChildrenFn
-	message?: MessageFn
-	content?: ContentFn
-	shown?: ShowFn
-	enabled?: ShowFn
-	suggestedStatus?: ModerationStatus
-	severity?: ModerationSeverity
-	defaultChecked?: boolean
-	placeholder?: string
-	required?: boolean
-}
+type ProjectPatch = Partial<Labrinth.Projects.v3.Project>
+type VersionPatch = Partial<Labrinth.Projects.v3.Version>
 
-export interface ChecklistStage {
-	id: string
-	title: string
-	hint: string
-	guidance_url: string
-	icon?: FunctionalComponent<SVGAttributes>
-	navigate?: string
-	nodes: Node[]
-	shown?: (
-		project: Labrinth.Projects.v2.Project,
-		projectV3?: Labrinth.Projects.v3.Project,
-	) => boolean
-}
+export class FixBuilder {
+	_projectFn?: (patch: ProjectPatch) => void | false
+	_versionsFn?: (patches: Map<string, VersionPatch>) => void | false
 
-type Resolvable = Node | NodeBuilder
-
-function resolve(n: Resolvable): Node {
-	return n instanceof NodeBuilder ? n.build() : n
-}
-
-export class NodeBuilder {
-	private data: Partial<Node>
-
-	constructor(data: Partial<Node>) {
-		this.data = { ...data }
-	}
-
-	weight(w: number): this {
-		this.data.weight = w
+	project(fn: (patch: ProjectPatch) => void | false): this {
+		this._projectFn = fn
 		return this
 	}
+
+	versions(fn: (patches: Map<string, VersionPatch>) => void | false): this {
+		this._versionsFn = fn
+		return this
+	}
+}
+
+export function fix(): FixBuilder {
+	return new FixBuilder()
+}
+
+// ─── Action builder ───────────────────────────────────────────────────────────
+
+export class ActionBuilder {
+	_message?: MessageFn
+	_weight?: number
+	_suggestedStatus?: ModerationStatus
+	_severity?: ModerationSeverity
+	_fixes: FixBuilder[] = []
 
 	message(fn: MessageFn): this {
-		this.data.message = fn
+		this._message = fn
 		return this
 	}
 
-	content(fn: ContentFn): this {
-		this.data.content = fn
-		return this
-	}
-
-	column(): this {
-		this.data.layout = 'column'
-		return this
-	}
-
-	children(...nodes: Resolvable[]): this {
-		this.data.children = nodes.map(resolve)
-		return this
-	}
-
-	childrenFn(fn: ChildrenFn): this {
-		this.data.childrenFn = fn
-		return this
-	}
-
-	shown(fn: ShowFn): this {
-		this.data.shown = fn
-		return this
-	}
-
-	enabled(fn: ShowFn): this {
-		this.data.enabled = fn
+	weight(n: number): this {
+		this._weight = n
 		return this
 	}
 
 	suggestedStatus(s: ModerationStatus): this {
-		this.data.suggestedStatus = s
+		this._suggestedStatus = s
 		return this
 	}
 
 	severity(s: ModerationSeverity): this {
-		this.data.severity = s
+		this._severity = s
 		return this
 	}
 
-	defaultChecked(v = true): this {
-		this.data.defaultChecked = v
+	fix(f: FixBuilder): this {
+		this._fixes.push(f)
+		return this
+	}
+}
+
+export function action(): ActionBuilder {
+	return new ActionBuilder()
+}
+
+// ─── Node builders ────────────────────────────────────────────────────────────
+
+export abstract class NodeBuilder {
+	abstract readonly type: NodeType
+	_shown?: ShowFn
+
+	shown(fn: ShowFn): this {
+		this._shown = fn
+		return this
+	}
+}
+
+export class DisplayNodeBuilder extends NodeBuilder {
+	readonly type = 'display' as const
+	_content: string | ContentFn
+
+	constructor(content: string | ContentFn) {
+		super()
+		this._content = content
+	}
+}
+
+export abstract class IdentifiedNodeBuilder extends NodeBuilder {
+	readonly id: string | undefined
+	readonly label: string
+	_children: NodeBuilder[] = []
+	_childrenFn?: ChildrenFn
+	_action?: ActionBuilder
+	_enabled?: ShowFn
+
+	constructor(id: string | undefined, label: string) {
+		super()
+		this.id = id
+		this.label = label
+	}
+
+	children(...nodes: NodeBuilder[]): this
+	children(fn: ChildrenFn): this
+	children(...args: NodeBuilder[] | [ChildrenFn]): this {
+		if (args.length === 1 && typeof args[0] === 'function') {
+			this._childrenFn = args[0] as ChildrenFn
+		} else {
+			this._children.push(...(args as NodeBuilder[]))
+		}
 		return this
 	}
 
-	placeholder(p: string): this {
-		this.data.placeholder = p
+	action(a: ActionBuilder): this {
+		this._action = a
+		return this
+	}
+
+	enabled(fn: ShowFn): this {
+		this._enabled = fn
+		return this
+	}
+}
+
+export abstract class ValueNodeBuilder extends IdentifiedNodeBuilder {
+	_defaultValue?: NodeState
+	_required?: boolean
+
+	initial(v: NodeState): this {
+		this._defaultValue = v
 		return this
 	}
 
 	required(v = true): this {
-		this.data.required = v
+		this._required = v
+		return this
+	}
+}
+
+export class BooleanNodeBuilder extends ValueNodeBuilder {
+	readonly type: 'button' | 'toggle'
+
+	constructor(id: string, nodeLabel: string, type: 'button' | 'toggle') {
+		super(id, nodeLabel)
+		this.type = type
+	}
+}
+
+export class InputNodeBuilder extends ValueNodeBuilder {
+	readonly type: 'text' | 'markdown'
+	_placeholder?: string
+
+	constructor(id: string, nodeLabel: string, type: 'text' | 'markdown') {
+		super(id, nodeLabel)
+		this.type = type
+	}
+
+	placeholder(p: string): this {
+		this._placeholder = p
+		return this
+	}
+}
+
+export class SelectNodeBuilder extends ValueNodeBuilder {
+	readonly type = 'select' as const
+
+	constructor(id: string, nodeLabel: string) {
+		super(id, nodeLabel)
+	}
+}
+
+export class ChipsNodeBuilder extends ValueNodeBuilder {
+	readonly type = 'multi-select' as const
+
+	constructor(id: string, nodeLabel: string) {
+		super(id, nodeLabel)
+	}
+}
+
+export class GroupNodeBuilder extends IdentifiedNodeBuilder {
+	readonly type = 'group' as const
+	_layout?: 'flex' | 'column'
+
+	constructor(id?: string) {
+		super(id, '')
+	}
+
+	layout(l: 'flex' | 'column'): this {
+		this._layout = l
+		return this
+	}
+}
+
+export class StageNodeBuilder extends IdentifiedNodeBuilder {
+	readonly type = 'stage' as const
+	readonly hint: string
+	readonly guidanceUrl: string
+	_icon?: FunctionalComponent<SVGAttributes>
+	_navigate?: string
+
+	constructor(id: string, title: string, hint: string, guidanceUrl: string) {
+		super(id, title)
+		this.hint = hint
+		this.guidanceUrl = guidanceUrl
+	}
+
+	icon(i: FunctionalComponent<SVGAttributes>): this {
+		this._icon = i
 		return this
 	}
 
-	build(): Node {
-		return this.data as Node
+	navigate(path: string): this {
+		this._navigate = path
+		return this
 	}
 }
 
-function node(id: string, label: string, type: NodeType, variant?: NodeVariant): NodeBuilder {
-	return new NodeBuilder({ id, label, type, variant })
-}
+// ─── Factory functions ────────────────────────────────────────────────────────
 
-export const button = (id: string, label: string) => node(id, label, 'boolean', 'button')
-export const toggle = (id: string, label: string) => node(id, label, 'boolean', 'toggle')
-export const select = (id: string, label: string) => node(id, label, 'select')
-export const chips = (id: string, label: string) => node(id, label, 'multi-select')
-export const text = (id: string, label: string) => node(id, label, 'text')
-export const markdown = (id: string, label: string) => node(id, label, 'markdown')
-export const label = (id: string, content: string) => node(id, content, 'label')
-export const group = (id?: string) => new NodeBuilder({ id, type: 'group' })
-export const prose = (content: ContentFn) => new NodeBuilder({ type: 'prose', content })
-
-interface StageOptions {
-	icon?: ChecklistStage['icon']
-	navigate?: string
-	shown?: ChecklistStage['shown']
-}
-
-export function stage(
-	id: string,
-	title: string,
-	hint: string,
-	guidance_url: string,
-	options: StageOptions = {},
-	nodes: Resolvable[],
-): ChecklistStage {
-	return {
-		id,
-		title,
-		hint,
-		guidance_url,
-		nodes: nodes.map(resolve),
-		...options,
-	}
-}
+export const button = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'button')
+export const toggle = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'toggle')
+export const text = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'text')
+export const markdown = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'markdown')
+export const group = (id?: string) => new GroupNodeBuilder(id)
+export const select = (id: string, nodeLabel: string) => new SelectNodeBuilder(id, nodeLabel)
+export const chips = (id: string, nodeLabel: string) => new ChipsNodeBuilder(id, nodeLabel)
+export const label = (content: string | ContentFn) => new DisplayNodeBuilder(content)
+export const stage = (id: string, title: string, hint: string, guidanceUrl: string) =>
+	new StageNodeBuilder(id, title, hint, guidanceUrl)
