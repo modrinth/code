@@ -1,462 +1,110 @@
 import { ListBulletedIcon } from '@modrinth/assets'
 
-import type { ButtonAction, MultiSelectChipsAction } from '../../types/actions'
-import type { Stage } from '../../types/stage'
+import { button, chips, group, markdown, mdMsg, stage, toggle } from '../../types/node'
 
-const ruleFollowing: Stage = {
-	title: 'Rule Following',
-	hint: 'Does this project violate the rules?',
-	id: 'rule-following',
-	icon: ListBulletedIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
-	navigate: '/moderation',
-	actions: [
-		{
-			id: 'paid_access_server',
-			type: 'button',
-			label: 'Paid access server',
-			weight: 0,
-			suggestedStatus: 'rejected',
-			severity: 'critical',
-			shouldShow(project, projectV3) {
-				return !!projectV3?.minecraft_server
-			},
-			message: async () =>
-				(await import('../messages/checklist-messages/paid-access-server.md?raw')).default,
-		},
-		{
-			id: 'prohibited_content',
-			type: 'button',
-			label: 'Prohibited Content',
-			weight: 100,
-			suggestedStatus: 'rejected',
-			severity: 'critical',
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/rule-breaking/prohibited-content-header.md?raw')
-				).default.trimEnd(),
-			enablesActions: [
-				{
-					id: 'prohibited_content_options',
-					type: 'multi-select-chips',
-					label: 'Which Prohibited Content rules does this project violate?',
-					joinWith: '\n',
-					options: [
-						{
-							label: 'Objectionable',
-							weight: 101,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/objectionable.md?raw')
-								).default,
-						},
-						{
-							label: 'Discriminatory or Explicit',
-							weight: 102,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/discriminatory.md?raw')
-								).default,
-						},
-						{
-							label: 'IP Infringement',
-							weight: 103,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/ip-infringement.md?raw')
-								).default,
-						},
-						{
-							label: 'Rights Violation',
-							weight: 104,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/legal-rights.md?raw')
-								).default,
-						},
-						{
-							label: 'Illegal Activity',
-							weight: 105,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/illegal-activity.md?raw')
-								).default,
-						},
-						{
-							label: 'Harmful or Deceptive',
-							weight: 106,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/harmful.md?raw')
-								).default,
-						},
-						{
-							label: 'Misleading claims',
-							weight: 107,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/misleading.md?raw')
-								).default,
-						},
-						{
-							label: 'Impersonation',
-							weight: 108,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/impersonation.md?raw')
-								).default,
-						},
-						{
-							label: 'False Endorsement',
-							weight: 109,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/false-endorsement.md?raw')
-								).default,
-						},
-						{
-							label: 'Profanity',
-							weight: 110,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/profanity.md?raw')
-								).default,
-						},
-						{
-							label: 'Undisclosed Data Upload',
-							weight: 111,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/undisclosed-upload.md?raw')
-								).default,
-						},
-						{
-							label: 'Mojang Bypass',
-							weight: 112,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/prohibited-content/mojang-bypass.md?raw')
-								).default,
-						},
-					],
-				} as MultiSelectChipsAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'cheat_or_hack_advertising',
-			type: 'button',
-			label: 'Hacks',
-			weight: 150,
-			suggestedStatus: 'rejected',
-			severity: 'critical',
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/rule-breaking/cheat-or-hack-advertising.md?raw')
-				).default,
-		} as ButtonAction,
-		{
-			id: 'server_side_opt_out',
-			type: 'button',
-			label: 'Opt-out',
-			weight: 200,
-			suggestedStatus: 'flagged',
-			severity: 'high',
-			message: async () =>
-				(await import('../messages/checklist-messages/rule-breaking/server-side-opt-out.md?raw'))
-					.default,
-		} as ButtonAction,
-		{
-			id: 'server_side_opt_in',
-			type: 'button',
-			label: 'Opt-in',
-			weight: 300,
-			suggestedStatus: 'flagged',
-			severity: 'high',
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/rule-breaking/server-side-opt-in-header.md?raw')
-				).default.trimEnd(),
-			enablesActions: [
-				{
-					id: 'server_side_opt_in_options',
-					type: 'multi-select-chips',
-					label: 'Which features of this project require a Server-side Opt-in?',
-					joinWith: '\n',
-					options: [
-						{
-							label: 'X-ray',
-							weight: 301,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/server-side-opt-in/x-ray.md?raw')
-								).default,
-						},
-						{
-							label: 'Aim Assist',
-							weight: 302,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/server-side-opt-in/aim-bot.md?raw')
-								).default,
-						},
-						{
-							label: 'Movement',
-							weight: 303,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/server-side-opt-in/movement.md?raw')
-								).default,
-						},
-						{
-							label: 'PvP',
-							weight: 304,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/server-side-opt-in/pvp.md?raw')
-								).default,
-						},
-						{
-							label: 'Anti 3.x',
-							weight: 305,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/server-side-opt-in/hiding-mods.md?raw')
-								).default,
-						},
-						{
-							label: 'Dupe',
-							weight: 306,
-							message: async () =>
-								(
-									await import('../messages/checklist-messages/rule-breaking/server-side-opt-in/item-duplication.md?raw')
-								).default,
-						},
-					],
-				} as MultiSelectChipsAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'prohibited_content',
-			type: 'button',
-			label: 'Prohibited Content',
-			weight: 100,
-			suggestedStatus: 'rejected',
-			severity: 'critical',
-			message: async () =>
-				(
-					await import('../messages/rule-breaking/prohibited-content-header.md?raw')
-				).default.trimEnd(),
-			enablesActions: [
-				{
-					id: 'prohibited_content_options',
-					type: 'multi-select-chips',
-					label: 'Which Prohibited Content rules does this project violate?',
-					joinWith: '\n',
-					options: [
-						{
-							label: 'Objectionable',
-							weight: 101,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/objectionable.md?raw'))
-									.default,
-						},
-						{
-							label: 'Discriminatory or Explicit',
-							weight: 102,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/discriminatory.md?raw'))
-									.default,
-						},
-						{
-							label: 'IP Infringement',
-							weight: 103,
-							message: async () =>
-								(
-									await import('../messages/rule-breaking/prohibited-content/ip-infringement.md?raw')
-								).default,
-						},
-						{
-							label: 'Rights Violation',
-							weight: 104,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/legal-rights.md?raw'))
-									.default,
-						},
-						{
-							label: 'Illegal Activity',
-							weight: 105,
-							message: async () =>
-								(
-									await import('../messages/rule-breaking/prohibited-content/illegal-activity.md?raw')
-								).default,
-						},
-						{
-							label: 'Harmful or Deceptive',
-							weight: 106,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/harmful.md?raw'))
-									.default,
-						},
-						{
-							label: 'Misleading claims',
-							weight: 107,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/misleading.md?raw'))
-									.default,
-						},
-						{
-							label: 'Impersonation',
-							weight: 108,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/impersonation.md?raw'))
-									.default,
-						},
-						{
-							label: 'False Endorsement',
-							weight: 109,
-							message: async () =>
-								(
-									await import('../messages/rule-breaking/prohibited-content/false-endorsement.md?raw')
-								).default,
-						},
-						{
-							label: 'Profanity',
-							weight: 110,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/profanity.md?raw'))
-									.default,
-						},
-						{
-							label: 'Undisclosed Data Upload',
-							weight: 111,
-							message: async () =>
-								(
-									await import('../messages/rule-breaking/prohibited-content/undisclosed-upload.md?raw')
-								).default,
-						},
-						{
-							label: 'Mojang Bypass',
-							weight: 112,
-							message: async () =>
-								(await import('../messages/rule-breaking/prohibited-content/mojang-bypass.md?raw'))
-									.default,
-						},
-					],
-				} as MultiSelectChipsAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'server_side_opt_out',
-			type: 'button',
-			label: 'Opt-out',
-			weight: 200,
-			suggestedStatus: 'flagged',
-			severity: 'high',
-			message: async () =>
-				(await import('../messages/rule-breaking/server-side-opt-out.md?raw')).default,
-		} as ButtonAction,
-		{
-			id: 'server_side_opt_in',
-			type: 'button',
-			label: 'Opt-in',
-			weight: 300,
-			suggestedStatus: 'flagged',
-			severity: 'high',
-			message: async () =>
-				(
-					await import('../messages/rule-breaking/server-side-opt-in-header.md?raw')
-				).default.trimEnd(),
-			enablesActions: [
-				{
-					id: 'server_side_opt_in_options',
-					type: 'multi-select-chips',
-					label: 'Which features of this project require a Server-side Opt-in?',
-					joinWith: '\n',
-					options: [
-						{
-							label: 'X-ray',
-							weight: 301,
-							message: async () =>
-								(await import('../messages/rule-breaking/server-side-opt-in/x-ray.md?raw')).default,
-						},
-						{
-							label: 'Aim Assist',
-							weight: 302,
-							message: async () =>
-								(await import('../messages/rule-breaking/server-side-opt-in/aim-bot.md?raw'))
-									.default,
-						},
-						{
-							label: 'Movement',
-							weight: 303,
-							message: async () =>
-								(await import('../messages/rule-breaking/server-side-opt-in/movement.md?raw'))
-									.default,
-						},
-						{
-							label: 'PvP',
-							weight: 304,
-							message: async () =>
-								(await import('../messages/rule-breaking/server-side-opt-in/pvp.md?raw')).default,
-						},
-						{
-							label: 'Anti 3.x',
-							weight: 305,
-							message: async () =>
-								(await import('../messages/rule-breaking/server-side-opt-in/hiding-mods.md?raw'))
-									.default,
-						},
-						{
-							label: 'Dupe',
-							weight: 306,
-							message: async () =>
-								(
-									await import('../messages/rule-breaking/server-side-opt-in/item-duplication.md?raw')
-								).default,
-						},
-					],
-				} as MultiSelectChipsAction,
-			],
-		} as ButtonAction,
-		{
-			id: 'excessive_languages',
-			type: 'button',
-			label: 'Excessive languages',
-			weight: 0,
-			suggestedStatus: 'flagged',
-			severity: 'low',
-			shouldShow(project, projectV3) {
-				return (
-					!!projectV3?.minecraft_server &&
-					!!projectV3?.minecraft_server?.languages?.length &&
-					projectV3?.minecraft_server?.languages?.length > 4
+export default stage(
+	'rule-following',
+	'Rule Following',
+	'Does this project violate the rules?',
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
+	{
+		icon: ListBulletedIcon,
+		navigate: '/moderation',
+	},
+	[
+		group().children(
+			button('paid_access_server', 'Paid access server')
+				.shown(({ project }) => !!project.minecraft_server)
+				.weight(0)
+				.suggestedStatus('rejected')
+				.severity('critical')
+				.message(mdMsg('paid-access-server')),
+
+			button('prohibited_content', 'Prohibited Content')
+				.weight(100)
+				.suggestedStatus('rejected')
+				.severity('critical')
+				.message(async (ctx) => {
+					const header = (await mdMsg('rule-breaking/prohibited-content-header')(ctx)).trimEnd()
+					const selected = ctx.state.options
+					if (!(selected instanceof Set) || selected.size === 0) return header
+					const items = await Promise.all(
+						[...selected].map((id) => mdMsg(`rule-breaking/prohibited-content/${id}`)(ctx)),
+					)
+					return `${header}\n${items.join('\n')}`
+				})
+				.children(
+					chips('options', 'Which Prohibited Content rules does this project violate?').children(
+						toggle('objectionable', 'Objectionable'),
+						toggle('discriminatory', 'Discriminatory or Explicit'),
+						toggle('ip-infringement', 'IP Infringement'),
+						toggle('legal-rights', 'Rights Violation'),
+						toggle('illegal-activity', 'Illegal Activity'),
+						toggle('harmful', 'Harmful or Deceptive'),
+						toggle('misleading', 'Misleading claims'),
+						toggle('impersonation', 'Impersonation'),
+						toggle('false-endorsement', 'False Endorsement'),
+						toggle('profanity', 'Profanity'),
+						toggle('undisclosed-upload', 'Undisclosed Data Upload'),
+						toggle('mojang-bypass', 'Mojang Bypass'),
+					),
+				),
+
+			button('cheat_or_hack_advertising', 'Hacks')
+				.weight(150)
+				.suggestedStatus('rejected')
+				.severity('critical')
+				.message(mdMsg('rule-breaking/cheat-or-hack-advertising')),
+
+			button('server_side_opt_out', 'Opt-out')
+				.weight(200)
+				.suggestedStatus('flagged')
+				.severity('high')
+				.message(mdMsg('rule-breaking/server-side-opt-out')),
+
+			button('server_side_opt_in', 'Opt-in')
+				.weight(300)
+				.suggestedStatus('flagged')
+				.severity('high')
+				.message(async (ctx) => {
+					const header = (await mdMsg('rule-breaking/server-side-opt-in-header')(ctx)).trimEnd()
+					const selected = ctx.state.options
+					if (!(selected instanceof Set) || selected.size === 0) return header
+					const items = await Promise.all(
+						[...selected].map((id) => mdMsg(`rule-breaking/server-side-opt-in/${id}`)(ctx)),
+					)
+					return `${header}\n${items.join('\n')}`
+				})
+				.children(
+					chips('options', 'Which features require a Server-side Opt-in?').children(
+						toggle('x-ray', 'X-ray'),
+						toggle('aim-bot', 'Aim Assist'),
+						toggle('movement', 'Movement'),
+						toggle('pvp', 'PvP'),
+						toggle('hiding-mods', 'Anti 3.x'),
+						toggle('item-duplication', 'Dupe'),
+					),
+				),
+
+			button('excessive_languages', 'Excessive languages')
+				.shown(({ project }) =>
+					!!project.minecraft_server &&
+					!!project.minecraft_server?.languages?.length &&
+					project.minecraft_server.languages.length > 4,
 				)
-			},
-			message: async () =>
-				(
-					await import('../messages/checklist-messages/misc-metadata/excessive_languages-server.md?raw')
-				).default,
-		},
-		{
-			id: 'rule_breaking_other',
-			type: 'button',
-			label: 'Other',
-			weight: 0,
-			suggestedStatus: 'rejected',
-			severity: 'critical',
-			message: async () =>
-				(await import('../messages/checklist-messages/rule-breaking.md?raw')).default,
-			relevantExtraInput: [
-				{
-					label: 'Please explain to the user how it infringes on our content rules.',
-					variable: 'MESSAGE',
-					required: true,
-					large: true,
-				},
-			],
-		} as ButtonAction,
-	],
-}
+				.weight(0)
+				.suggestedStatus('flagged')
+				.severity('low')
+				.message(mdMsg('misc-metadata/excessive_languages-server')),
 
-export default ruleFollowing
+			button('rule_breaking_other', 'Other')
+				.weight(0)
+				.suggestedStatus('rejected')
+				.severity('critical')
+				.message(mdMsg('rule-breaking', (ctx) => ({ MESSAGE: ctx.state.message })))
+				.children(
+					markdown('message', 'Explain how it infringes on content rules.').required(),
+				),
+		),
+	],
+)

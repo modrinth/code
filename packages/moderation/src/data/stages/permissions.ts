@@ -1,55 +1,38 @@
 import { SignatureIcon } from '@modrinth/assets'
 
-import type { Stage } from '../../types/stage'
+import { button, group, mdMsg, stage } from '../../types/node'
 
-const permissions: Stage = {
-  title: "Modpack Permissions",
-	hint: 'Does this projects external content have any issues?',
-	id: 'permissions',
-	icon: SignatureIcon,
-	guidance_url: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
-	navigate: '/settings/permissions',
-	actions: [
-		{
-			id: 'invalid-permissions',
-			type: 'button',
-			label: 'Invalid permissions',
-			weight: 2000,
-			suggestedStatus: 'rejected',
-			severity: 'high',
-			shouldShow: (project, projectV3) =>
-				projectV3.project_types?.includes('modpack') && !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/externals-permissions/invalid.md?raw'))
-					.default,
-		},
-		{
-			id: 'prohibited-extrernal-content',
-			type: 'button',
-			label: 'Prohibited externals',
-			weight: 2001,
-			suggestedStatus: 'rejected',
-			severity: 'high',
-			shouldShow: (project, projectV3) =>
-				projectV3.project_types?.includes('modpack') && !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/externals-permissions/prohibited.md?raw'))
-					.default,
-		},
-		{
-			id: 'missing-permissions',
-			type: 'button',
-			label: 'Missing permissions',
-			weight: 2002,
-			suggestedStatus: 'rejected',
-			severity: 'high',
-			shouldShow: (project, projectV3) =>
-				projectV3.project_types?.includes('modpack') && !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/externals-permissions/missing.md?raw'))
-					.default,
-		},
+const isModpack = ({ project }: { project: { project_types: string[]; minecraft_server?: unknown } }) =>
+	project.project_types.includes('modpack') && !project.minecraft_server
+
+export default stage(
+	'permissions',
+	'Modpack Permissions',
+	'Does this project\'s external content have any issues?',
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
+	{ icon: SignatureIcon, navigate: '/settings/permissions' },
+	[
+		group().children(
+			button('invalid_permissions', 'Invalid permissions')
+				.shown(isModpack)
+				.weight(2000)
+				.suggestedStatus('rejected')
+				.severity('high')
+				.message(mdMsg('externals-permissions/invalid')),
+
+			button('prohibited_external_content', 'Prohibited externals')
+				.shown(isModpack)
+				.weight(2001)
+				.suggestedStatus('rejected')
+				.severity('high')
+				.message(mdMsg('externals-permissions/prohibited')),
+
+			button('missing_permissions', 'Missing permissions')
+				.shown(isModpack)
+				.weight(2002)
+				.suggestedStatus('rejected')
+				.severity('high')
+				.message(mdMsg('externals-permissions/missing')),
+		),
 	],
-}
-
-export default permissions
+)

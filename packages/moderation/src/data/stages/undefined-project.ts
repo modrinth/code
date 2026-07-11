@@ -1,28 +1,23 @@
 import { XIcon } from '@modrinth/assets'
 
-import type { Stage } from '../../types/stage'
+import { button, group, mdMsg, stage } from '../../types/node'
 
-const undefinedProjectStage: Stage = {
-	title: 'Undefined Project',
-	hint: 'This project is undefined!',
-	id: 'undefined-project',
-	icon: XIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080018bf3d822a2f51a35',
-	navigate: '/versions',
-	shouldShow: (project, projectV3) => project.versions.length === 0 && !projectV3?.minecraft_server,
-	actions: [
-		{
-			id: 'undefined_no_versions',
-			type: 'button',
-			label: 'No Versions',
-			weight: -100,
-			suggestedStatus: 'rejected',
-			message: async () =>
-				(await import('../messages/checklist-messages/undefined-project/no_versions.md?raw'))
-					.default,
-		},
+export default stage(
+	'undefined-project',
+	'Undefined Project',
+	'This project is undefined!',
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080018bf3d822a2f51a35',
+	{
+		icon: XIcon,
+		navigate: '/versions',
+		shown: (project, projectV3) => project.versions.length === 0 && !projectV3?.minecraft_server,
+	},
+	[
+		group().children(
+			button('no_versions', 'No Versions')
+				.weight(-100)
+				.suggestedStatus('rejected')
+				.message(mdMsg('undefined-project/no_versions')),
+		),
 	],
-}
-
-export default undefinedProjectStage
+)

@@ -1,128 +1,66 @@
 import { ScaleIcon } from '@modrinth/assets'
 
-import type { ButtonAction } from '../../types/actions'
-import type { Stage } from '../../types/stage'
+import { button, group, mdMsg, stage, text } from '../../types/node'
 
-const postApproval: Stage = {
-	title: 'Post-Approval',
-	hint: 'Issue warnings, notices, or takedowns?',
-	id: 'post-approval',
-	icon: ScaleIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
-	shouldShow: (project) => project.status === 'approved',
-	actions: [
-		{
-			id: 'issue_warning',
-			type: 'button',
-			label: 'Issue warning',
-			weight: 3000,
-			suggestedStatus: 'approved',
-			severity: 'low',
-			message: async () =>
-				(await import('../messages/checklist-messages/post-approval/issue-warning.md?raw')).default,
-		},
-		{
-			id: 'missed_deadline',
-			type: 'button',
-			label: 'Missed due date',
-			weight: -999,
-			suggestedStatus: 'flagged',
-			severity: 'high',
-			message: async () =>
-				(await import('../messages/checklist-messages/post-approval/missed-deadline.md?raw'))
-					.default,
-			disablesActions: ['issue_warning', 'metadata_issue'],
-			relevantExtraInput: [
-				{
-					label: 'What status is the project being set to?',
-					variable: 'STATUS',
-					required: true,
-				},
-			],
-		},
-		{
-			id: 'metadata_issue',
-			type: 'button',
-			label: 'Incorrect metadata',
-			weight: 0,
-			suggestedStatus: 'approved',
-			severity: 'low',
-			message: async () =>
-				(await import('../messages/checklist-messages/post-approval/metadata-issue.md?raw'))
-					.default,
-			enablesActions: [
-				{
-					id: 'dependencies',
-					type: 'button',
-					label: 'Missing Dependencies',
-					weight: 1,
-					severity: 'low',
-					message: async () =>
-						(await import('../messages/checklist-messages/misc-metadata/dependencies.md?raw'))
-							.default,
-					relevantExtraInput: [
-						{
-							label: 'Dependency Name',
-							variable: 'DEPENDENCY_NAME',
-							required: true,
-						},
-						{
-							label: 'Dependency Link',
-							variable: 'DEPENDENCY_LINK',
-							required: true,
-						},
-					],
-				},
-				{
-					id: 'mc_versions',
-					type: 'button',
-					label: 'Game versions',
-					weight: 2,
-					severity: 'low',
-					message: async () =>
-						(await import('../messages/checklist-messages/misc-metadata/mc-versions.md?raw'))
-							.default,
-					relevantExtraInput: [
-						{
-							label: 'Provide more details about game versions issue?',
-							variable: 'SPECIFICS',
-							required: false,
-							large: true,
-						},
-					],
-				},
-				{
-					id: 'loaders',
-					type: 'button',
-					label: 'Loaders',
-					weight: 3,
-					severity: 'low',
-					message: async () =>
-						(await import('../messages/checklist-messages/misc-metadata/loaders.md?raw')).default,
-					relevantExtraInput: [
-						{
-							label: 'Provide more details about loaders issue?',
-							variable: 'SPECIFICS',
-							required: false,
-							large: true,
-						},
-					],
-				},
-				{
-					id: 'license',
-					type: 'button',
-					label: 'Inconsistent Licensing',
-					weight: 4,
-					severity: 'low',
-					message: async () =>
-						(
-							await import('../messages/checklist-messages/misc-metadata/inconsistent-license.md?raw')
-						).default,
-				},
-			],
-		} as ButtonAction,
+export default stage(
+	'post-approval',
+	'Post-Approval',
+	'Issue warnings, notices, or takedowns?',
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
+	{
+		icon: ScaleIcon,
+		shown: (project) => project.status === 'approved',
+	},
+	[
+		group().children(
+			button('issue_warning', 'Issue warning')
+				.weight(3000)
+				.suggestedStatus('approved')
+				.severity('low')
+				.message(mdMsg('post-approval/issue-warning')),
+
+			button('missed_deadline', 'Missed due date')
+				.weight(-999)
+				.suggestedStatus('flagged')
+				.severity('high')
+				.message(mdMsg('post-approval/missed-deadline', (ctx) => ({ STATUS: ctx.state.status })))
+				.children(text('status', 'What status is the project being set to?').required()),
+
+			button('metadata_issue', 'Incorrect metadata')
+				.weight(0)
+				.suggestedStatus('approved')
+				.severity('low')
+				.message(mdMsg('post-approval/metadata-issue'))
+				.children(
+					button('dependencies', 'Missing Dependencies')
+						.weight(1)
+						.severity('low')
+						.message(mdMsg('misc-metadata/dependencies', (ctx) => ({
+							DEPENDENCY_NAME: ctx.state.dependency_name,
+							DEPENDENCY_LINK: ctx.state.dependency_link,
+						})))
+						.children(
+							text('dependency_name', 'Dependency name').required(),
+							text('dependency_link', 'Dependency link').required(),
+						),
+
+					button('mc_versions', 'Game versions')
+						.weight(2)
+						.severity('low')
+						.message(mdMsg('misc-metadata/mc-versions', (ctx) => ({ SPECIFICS: ctx.state.specifics })))
+						.children(text('specifics', 'More details about the game versions issue?')),
+
+					button('loaders', 'Loaders')
+						.weight(3)
+						.severity('low')
+						.message(mdMsg('misc-metadata/loaders', (ctx) => ({ SPECIFICS: ctx.state.specifics })))
+						.children(text('specifics', 'More details about the loaders issue?')),
+
+					button('license', 'Inconsistent Licensing')
+						.weight(4)
+						.severity('low')
+						.message(mdMsg('misc-metadata/inconsistent-license')),
+				),
+		),
 	],
-}
-
-export default postApproval
+)

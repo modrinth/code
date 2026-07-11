@@ -1,33 +1,30 @@
 import { GlobeIcon } from '@modrinth/assets'
 
-import type { ButtonAction } from '../../../types/actions'
-import type { Stage } from '../../../types/stage'
+import { button, group, mdMsg, mdText, prose, stage } from '../../../types/node'
 
-const environment: Stage = {
-	title: "Environment",
-	hint: "Is the project's environment information accurate?",
-	id: 'environment',
-	navigate: '/settings/environment',
-	icon: GlobeIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
-	text: async () =>
-		(await import('../../messages/checklist-text/environment/environment.md?raw')).default,
-	shouldShow: (project, projectV3) =>
-		(projectV3?.environment?.length ?? 0) === 1 && !projectV3?.minecraft_server,
-	actions: [
-		{
-			id: 'side_types_inaccurate',
-			type: 'button',
-			label: 'Inaccurate',
-			weight: 800,
-			suggestedStatus: 'flagged',
-			severity: 'low',
-			shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'modpack',
-			message: async () =>
-				(await import('../../messages/checklist-messages/environment/inaccurate.md?raw')).default,
-		} as ButtonAction,
+export default stage(
+	'environment',
+	'Environment',
+	"Is the project's environment information accurate?",
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
+	{
+		icon: GlobeIcon,
+		navigate: '/settings/environment',
+		shown: (_project, projectV3) =>
+			(projectV3?.environment?.length ?? 0) === 1 && !projectV3?.minecraft_server,
+	},
+	[
+		prose(mdText('environment/environment')),
+
+		group().children(
+			button('side_types_inaccurate', 'Inaccurate')
+				.shown(({ project }) =>
+					project.project_types.includes('mod') || project.project_types.includes('modpack'),
+				)
+				.weight(800)
+				.suggestedStatus('flagged')
+				.severity('low')
+				.message(mdMsg('environment/inaccurate')),
+		),
 	],
-}
-
-export default environment
+)

@@ -1,97 +1,55 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
-import type { ButtonAction } from '../../types/actions'
-import type { Stage } from '../../types/stage'
+import { button, group, mdMsg, mdText, prose, stage } from '../../types/node'
 
-const statusAlerts: Stage = {
-	title: 'Status Alerts',
-	hint: `Is anything else affecting this project's status?`,
-	id: 'status-alerts',
-	icon: TriangleAlertIcon,
-	text: async () => (await import('../messages/checklist-text/status-alerts/text.md?raw')).default,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
-	navigate: '/moderation',
-	actions: [
-		{
-			id: 'status_corrections_applied',
-			type: 'button',
-			label: 'Corrections applied',
-			weight: -999999,
-			suggestedStatus: 'approved',
-			disablesActions: ['status_private_use', 'status_account_issues'],
-			shouldShow: (project) => project.status !== 'approved',
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/fixed.md?raw')).default,
-		} as ButtonAction,
-		{
-			id: 'status_corrections_applied-approved',
-			type: 'button',
-			label: 'Corrections applied',
-			weight: -999999,
-			suggestedStatus: 'approved',
-			disablesActions: ['status_private_use', 'status_account_issues'],
-			shouldShow: (project) => project.status === 'approved',
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/fixed-approved.md?raw'))
-					.default,
-		} as ButtonAction,
-		{
-			id: 'status_private_use',
-			type: 'button',
-			label: 'Private use',
-			weight: -999999,
-			suggestedStatus: 'flagged',
-			disablesActions: ['status_corrections_applied', 'status_account_issues'],
-			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/private/private.md?raw'))
-					.default,
-		} as ButtonAction,
-		{
-			id: 'status_private_use-server',
-			type: 'button',
-			label: 'Private community',
-			weight: -999999,
-			suggestedStatus: 'flagged',
-			disablesActions: ['status_corrections_applied', 'status_account_issues'],
-			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/private/private-server.md?raw'))
-					.default,
-		} as ButtonAction,
-		{
-			id: 'status_server_use',
-			type: 'button',
-			label: 'Server use',
-			weight: -999999,
-			shouldShow: (project, projectV3) =>
-				project.project_type === 'modpack' && !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/serverpack.md?raw')).default,
-		} as ButtonAction,
-		{
-			id: 'status_account_issues',
-			type: 'button',
-			label: 'Account issues',
-			weight: -999999,
-			suggestedStatus: 'rejected',
-			disablesActions: ['status_corrections_applied', 'status_private_use'],
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/account_issues.md?raw'))
-					.default,
-		} as ButtonAction,
-		{
-			id: 'status_automod_confusion',
-			type: 'button',
-			label: `Automod confusion`,
-			weight: -999999,
-			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/checklist-messages/status-alerts/automod_confusion.md?raw'))
-					.default,
-		} as ButtonAction,
+export default stage(
+	'status-alerts',
+	'Status Alerts',
+	`Is anything else affecting this project's status?`,
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
+	{ icon: TriangleAlertIcon, navigate: '/moderation' },
+	[
+		prose(mdText('status-alerts/text')),
+
+		group().children(
+			button('corrections_applied', 'Corrections applied')
+				.shown(({ projectV2 }) => projectV2.status !== 'approved')
+				.weight(-999999)
+				.suggestedStatus('approved')
+				.message(mdMsg('status-alerts/fixed')),
+
+			button('corrections_applied_approved', 'Corrections applied')
+				.shown(({ projectV2 }) => projectV2.status === 'approved')
+				.weight(-999999)
+				.suggestedStatus('approved')
+				.message(mdMsg('status-alerts/fixed-approved')),
+
+			button('private_use', 'Private use')
+				.shown(({ project }) => !project.minecraft_server)
+				.weight(-999999)
+				.suggestedStatus('flagged')
+				.message(mdMsg('status-alerts/private/private')),
+
+			button('private_use_server', 'Private community')
+				.shown(({ project }) => !!project.minecraft_server)
+				.weight(-999999)
+				.suggestedStatus('flagged')
+				.message(mdMsg('status-alerts/private/private-server')),
+
+			button('server_use', 'Server use')
+				.shown(({ project }) => project.project_types.includes('modpack') && !project.minecraft_server)
+				.weight(-999999)
+				.message(mdMsg('status-alerts/serverpack')),
+
+			button('account_issues', 'Account issues')
+				.weight(-999999)
+				.suggestedStatus('rejected')
+				.message(mdMsg('status-alerts/account_issues')),
+
+			button('automod_confusion', 'Automod confusion')
+				.shown(({ project }) => !project.minecraft_server)
+				.weight(-999999)
+				.message(mdMsg('status-alerts/automod_confusion')),
+		),
 	],
-}
-
-export default statusAlerts
+)

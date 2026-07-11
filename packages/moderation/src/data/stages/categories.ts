@@ -1,64 +1,53 @@
 import { TagsIcon } from '@modrinth/assets'
 
-import type { ButtonAction } from '../../types/actions'
-import type { Stage } from '../../types/stage'
+import { button, group, mdMsg, mdText, prose, stage } from '../../types/node'
 
-const categories: Stage = {
-	title: "Tags",
-	hint: "Are the project's tags accurate?",
-	id: 'tags',
-	icon: TagsIcon,
-	guidance_url:
-		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0802f96aafc0397a9f6d3',
-	navigate: '/settings/tags',
-	shouldShow: (project) =>
-		project.categories.length > 0 || project.additional_categories.length > 0,
-	text: async () => {
-		return (await import('../messages/checklist-text/categories.md?raw')).default
+export default stage(
+	'tags',
+	'Tags',
+	"Are the project's tags accurate?",
+	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0802f96aafc0397a9f6d3',
+	{
+		icon: TagsIcon,
+		navigate: '/settings/tags',
+		shown: (_project, projectV3) =>
+			(projectV3?.categories.length ?? 0) > 0 ||
+			(projectV3?.additional_categories.length ?? 0) > 0,
 	},
-	actions: [
-		{
-			id: 'categories_inaccurate',
-			type: 'button',
-			label: 'Inaccurate',
-			weight: 700,
-			suggestedStatus: 'flagged',
-			severity: 'low',
-			message: async () =>
-				(await import('../messages/checklist-messages/categories/inaccurate.md?raw')).default,
-			disablesActions: ['categories_optimization_misused', 'categories_resolutions_misused'],
-		} as ButtonAction,
-		{
-			id: 'categories_optimization_misused',
-			type: 'button',
-			label: 'Optimization',
-			weight: 701,
-			suggestedStatus: 'flagged',
-			severity: 'low',
-			shouldShow: (project) =>
-				project.categories.includes('optimization') ||
-				project.additional_categories.includes('optimization'),
-			message: async () =>
-				(await import('../messages/checklist-messages/categories/inaccurate.md?raw')).default +
-				(await import('../messages/checklist-messages/categories/optimization_misused.md?raw'))
-					.default,
-			disablesActions: ['categories_inaccurate', 'categories_resolutions_misused'],
-		} as ButtonAction,
-		{
-			id: 'categories_resolutions_misused',
-			type: 'button',
-			label: 'Resolutions',
-			weight: 702,
-			suggestedStatus: 'flagged',
-			severity: 'low',
-			shouldShow: (project) => project.project_type === 'resourcepack',
-			message: async () =>
-				(await import('../messages/checklist-messages/categories/inaccurate.md?raw')).default +
-				(await import('../messages/checklist-messages/categories/resolutions_misused.md?raw'))
-					.default,
-			disablesActions: ['categories_inaccurate', 'categories_optimization_misused'],
-		},
-	],
-}
+	[
+		prose(mdText('categories')),
 
-export default categories
+		group().children(
+			button('inaccurate', 'Inaccurate')
+				.weight(700)
+				.suggestedStatus('flagged')
+				.severity('low')
+				.message(mdMsg('categories/inaccurate')),
+
+			button('optimization_misused', 'Optimization')
+				.shown(({ project }) =>
+					project.categories.includes('optimization') ||
+					project.additional_categories.includes('optimization'),
+				)
+				.weight(701)
+				.suggestedStatus('flagged')
+				.severity('low')
+				.message(async (ctx) => {
+					const base = await mdMsg('categories/inaccurate')(ctx)
+					const extra = await mdMsg('categories/optimization_misused')(ctx)
+					return base + extra
+				}),
+
+			button('resolutions_misused', 'Resolutions')
+				.shown(({ project }) => project.project_types.includes('resourcepack'))
+				.weight(702)
+				.suggestedStatus('flagged')
+				.severity('low')
+				.message(async (ctx) => {
+					const base = await mdMsg('categories/inaccurate')(ctx)
+					const extra = await mdMsg('categories/resolutions_misused')(ctx)
+					return base + extra
+				}),
+		),
+	],
+)
