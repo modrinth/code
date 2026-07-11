@@ -182,12 +182,6 @@
 									: formatMessage(messages.bioFallbackUser)
 						}}
 					</template>
-					<template #bio-collapse>
-						{{formatMessage(messages.bioCollapse)}}
-					</template>
-					<template #bio-expand>
-						{{formatMessage(messages.bioExpand)}}
-					</template>
 					<template v-if="!isModrinthUser" #stats>
 						<div
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
@@ -653,14 +647,6 @@ const messages = defineMessages({
 	bioFallbackCreator: {
 		id: 'profile.bio.fallback.creator',
 		defaultMessage: 'A Modrinth creator.',
-	},
-	bioExpand: {
-		id: 'profile.bio.expand',
-		defaultMessage: 'Expand',
-	},
-	bioCollapse: {
-		id: 'profile.bio.collapse',
-		defaultMessage: 'Collapse',
 	},
 	collectionLabel: {
 		id: 'profile.label.collection',

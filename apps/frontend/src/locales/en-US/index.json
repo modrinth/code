@@ -2963,12 +2963,6 @@
   "profile.bio.fallback.user": {
     "message": "A Modrinth user."
   },
-  "profile.bio.expand": {
-	"message": "Expand"
-  },
-  "profile.bio.collapse": {
-	"message": "Collapse"
-  },
   "profile.button.analytics": {
     "message": "View user analytics"
   },
