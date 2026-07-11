@@ -23,6 +23,13 @@ export default [
 		private: false,
 	},
 	{
+		label: '🗃️ Misused Group',
+		message: async () =>
+			(await import('../messages/quick-replies/externals-permissions/misused-group.md?raw'))
+				.default,
+		private: false,
+	},
+	{
 		label: '🌐 Not Permission to Distribute',
 		message: async () =>
 			(await import('../messages/quick-replies/externals-permissions/but-its-online.md?raw'))
