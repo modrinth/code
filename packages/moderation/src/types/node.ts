@@ -129,60 +129,73 @@ export class NodeBuilder {
 		this.data = { ...data }
 	}
 
-	weight(w: number): NodeBuilder {
-		return new NodeBuilder({ ...this.data, weight: w })
+	weight(w: number): this {
+		this.data.weight = w
+		return this
 	}
 
-	message(fn: MessageFn): NodeBuilder {
-		return new NodeBuilder({ ...this.data, message: fn })
+	message(fn: MessageFn): this {
+		this.data.message = fn
+		return this
 	}
 
-	content(fn: ContentFn): NodeBuilder {
-		return new NodeBuilder({ ...this.data, content: fn })
+	content(fn: ContentFn): this {
+		this.data.content = fn
+		return this
 	}
 
-	column(): NodeBuilder {
-		return new NodeBuilder({ ...this.data, layout: 'column' })
+	column(): this {
+		this.data.layout = 'column'
+		return this
 	}
 
-	children(...nodes: Resolvable[]): NodeBuilder {
-		return new NodeBuilder({ ...this.data, children: nodes.map(resolve) })
+	children(...nodes: Resolvable[]): this {
+		this.data.children = nodes.map(resolve)
+		return this
 	}
 
-	childrenFn(fn: ChildrenFn): NodeBuilder {
-		return new NodeBuilder({ ...this.data, childrenFn: fn })
+	childrenFn(fn: ChildrenFn): this {
+		this.data.childrenFn = fn
+		return this
 	}
 
-	shown(fn: ShowFn): NodeBuilder {
-		return new NodeBuilder({ ...this.data, shown: fn })
+	shown(fn: ShowFn): this {
+		this.data.shown = fn
+		return this
 	}
 
-	enabled(fn: ShowFn): NodeBuilder {
-		return new NodeBuilder({ ...this.data, enabled: fn })
+	enabled(fn: ShowFn): this {
+		this.data.enabled = fn
+		return this
 	}
 
-	suggestedStatus(s: ModerationStatus): NodeBuilder {
-		return new NodeBuilder({ ...this.data, suggestedStatus: s })
+	suggestedStatus(s: ModerationStatus): this {
+		this.data.suggestedStatus = s
+		return this
 	}
 
-	severity(s: ModerationSeverity): NodeBuilder {
-		return new NodeBuilder({ ...this.data, severity: s })
+	severity(s: ModerationSeverity): this {
+		this.data.severity = s
+		return this
 	}
 
-	defaultChecked(v = true): NodeBuilder {
-		return new NodeBuilder({ ...this.data, defaultChecked: v })
+	defaultChecked(v = true): this {
+		this.data.defaultChecked = v
+		return this
 	}
 
-	placeholder(p: string): NodeBuilder {
-		return new NodeBuilder({ ...this.data, placeholder: p })
+	placeholder(p: string): this {
+		this.data.placeholder = p
+		return this
 	}
 
-	required(v = true): NodeBuilder {
-		return new NodeBuilder({ ...this.data, required: v })
+	required(v = true): this {
+		this.data.required = v
+		return this
 	}
 
 	build(): Node {
-		return { ...this.data } as Node
+		return this.data as Node
 	}
 }
 
