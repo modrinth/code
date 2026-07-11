@@ -123,29 +123,35 @@ const projectStatusActions = computed<OverflowMenuOption[]>(() => [
 		color: 'green',
 		action: () => setStatus('approved'),
 		hoverFilled: true,
-		disabled: isProjectApproved.value || isLoadingStatusAction.value,
+		disabled: isStatusActionDisabled('approved'),
 	},
 	{
 		id: 'withhold',
 		color: 'orange',
 		action: () => setStatus('withheld'),
 		hoverFilled: true,
-		disabled: projectStatus.value === 'withheld' || isLoadingStatusAction.value,
+		disabled: isStatusActionDisabled('withheld'),
 	},
 	{
 		id: 'send-to-review',
 		action: () => setStatus('processing'),
 		hoverFilled: true,
-		disabled: projectStatus.value === 'processing' || isLoadingStatusAction.value,
+		disabled: isStatusActionDisabled('processing'),
 	},
 	{
 		id: 'reject',
 		color: 'red',
 		action: () => setStatus('rejected'),
 		hoverFilled: true,
-		disabled: projectStatus.value === 'rejected' || isLoadingStatusAction.value,
+		disabled: isStatusActionDisabled('rejected'),
 	},
 ])
+
+function isStatusActionDisabled(status: Labrinth.Projects.v2.ProjectStatus): boolean {
+	const currentStatus = projectStatus.value
+	const isLoading = isLoadingStatusAction.value
+	return currentStatus === status || isLoading
+}
 
 async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	isLoadingStatusAction.value = true

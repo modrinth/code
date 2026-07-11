@@ -38,6 +38,10 @@ function installAdsConsentOverlayStyle() {
 		html.modrinth-ads-consent-overlay #modrinth-rail-1 {
 			visibility: hidden !important;
 		}
+
+		.qc-cmp2-close-icon {
+			background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M.5.5l23 23m0-23l-23 23' fill='none' stroke='%23b0bac5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10'/%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3C/svg%3E") 0% 0% / 66% auto no-repeat !important;
+		}
 	`
 	document.documentElement.appendChild(style)
 }
@@ -186,6 +190,7 @@ function muteVideos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	installAdsConsentOverlayStyle()
 	muteVideos()
 	muteAudioContext()
 	installTcfConsentListener()

@@ -208,7 +208,7 @@ const reupload: Stage = {
 							required: false,
 						},
 					],
-				} as ToggleAction,
+				},
 			],
 
 			disablesActions: [

@@ -48,6 +48,21 @@ const permissions: Stage = {
 				(await import('../messages/checklist-messages/externals-permissions/missing.md?raw'))
 					.default,
 		},
+		{
+			id: 'non-commercial-external-content',
+			type: 'button',
+			label: 'Non-commercial externals',
+			weight: 2003,
+			suggestedStatus: 'rejected',
+			severity: 'high',
+			shouldShow: (project, projectV3) =>
+				projectV3.project_types?.includes('modpack') &&
+				projectV3.monetization_status === 'monetized' &&
+				!projectV3?.minecraft_server,
+			message: async () =>
+				(await import('../messages/checklist-messages/externals-permissions/non-commercial.md?raw'))
+					.default,
+		},
 	],
 }
 

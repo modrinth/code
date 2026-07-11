@@ -4052,9 +4052,6 @@
   "settings.account.security.email.title": {
     "message": "E-Mail"
   },
-  "settings.account.security.passkey.add": {
-    "message": "Passkey hinzufügen"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Stell sicher, dass du etwas nimmst, was du dir gut merken kannst, damit du den Passkey später identifizieren kannst."
   },
