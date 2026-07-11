@@ -65,7 +65,7 @@ Make sure the title starts with a semantic prefix:
 
 ### No AI-generated Pull requests
 
-Due to limited capacity on our side, A-generated pull requests will not be merged. They may suffer from unmaintainable code, hallucinations, among other things.
+Due to limited capacity on our side, AI-generated pull requests will not be merged. They may suffer from unmaintainable code, hallucinations, or other issues requiring additional review.
 
 ## Things to keep in mind
 
