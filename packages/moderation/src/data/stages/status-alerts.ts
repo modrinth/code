@@ -22,7 +22,7 @@ const statusAlerts: Stage = {
 			shouldShow: (project) => project.status !== 'approved',
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/fixed.md?raw')).default,
-		} as ButtonAction,
+		},
 		{
 			id: 'status_corrections_applied-approved',
 			type: 'button',
@@ -34,7 +34,7 @@ const statusAlerts: Stage = {
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/fixed-approved.md?raw'))
 					.default,
-		} as ButtonAction,
+		},
 		{
 			id: 'status_private_use',
 			type: 'button',
@@ -46,7 +46,7 @@ const statusAlerts: Stage = {
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/private/private.md?raw'))
 					.default,
-		} as ButtonAction,
+		},
 		{
 			id: 'status_private_use-server',
 			type: 'button',
@@ -58,7 +58,7 @@ const statusAlerts: Stage = {
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/private/private-server.md?raw'))
 					.default,
-		} as ButtonAction,
+		},
 		{
 			id: 'status_server_use',
 			type: 'button',
@@ -68,7 +68,7 @@ const statusAlerts: Stage = {
 				project.project_type === 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/serverpack.md?raw')).default,
-		} as ButtonAction,
+		},
 		{
 			id: 'status_account_issues',
 			type: 'button',
@@ -79,7 +79,7 @@ const statusAlerts: Stage = {
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/account_issues.md?raw'))
 					.default,
-		} as ButtonAction,
+		},
 		{
 			id: 'status_automod_confusion',
 			type: 'button',
@@ -89,7 +89,35 @@ const statusAlerts: Stage = {
 			message: async () =>
 				(await import('../messages/checklist-messages/status-alerts/automod_confusion.md?raw'))
 					.default,
-		} as ButtonAction,
+		},
+		{
+			id: 'status_demonetized',
+			type: 'button',
+			label: `Demonetized`,
+			weight: -999999,
+			shouldShow: (project, projectV3) =>
+				projectV3.monetization_status === 'force-demonetized' &&
+				!projectV3.project_types?.includes('modpack') &&
+				!projectV3?.minecraft_server,
+			message: async () =>
+				(
+					await import('../messages/checklist-messages/status-alerts/demonetized/demonetized.md?raw')
+				).default,
+		},
+		{
+			id: 'status_demonetized_modpack',
+			type: 'button',
+			label: `Demonetized`,
+			weight: -999999,
+			shouldShow: (project, projectV3) =>
+				projectV3.monetization_status === 'force-demonetized' &&
+				projectV3.project_types?.includes('modpack') &&
+				!projectV3?.minecraft_server,
+			message: async () =>
+				(
+					await import('../messages/checklist-messages/status-alerts/demonetized/demonetized-modpack.md?raw')
+				).default,
+		},
 	],
 }
 
