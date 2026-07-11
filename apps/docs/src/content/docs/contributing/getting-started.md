@@ -63,6 +63,10 @@ Make sure the title starts with a semantic prefix:
 - **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
 - **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
 
+### No AI-generated Pull requests
+
+Due to limited capacity on our side, A-generated pull requests will not be merged. They may suffer from unmaintainable code, hallucinations, among other things.
+
 ## Things to keep in mind
 
 Here are some tips and reminders to help you in your contribution.
