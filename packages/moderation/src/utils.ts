@@ -224,6 +224,36 @@ export function formatProjectTypes(type: string, lower: boolean = false) {
 	return value
 }
 
+export function formatEnvironments(environment: string, lower: boolean = false) {
+	let value = environment
+	try {
+		value = value
+			// These must have translatable strings somewhere right?
+			.replaceAll('client_and_server', 'Required on both')
+			.replaceAll('client_only', 'Client-side only')
+			.replaceAll('client_only_server_optional', 'Client and server: Optional on server')
+			.replaceAll('singleplayer_only', 'Singleplayer only')
+			.replaceAll('server_only', 'Servers and Singleplayer')
+			.replaceAll('server_only_client_optional', 'Client optional')
+			.replaceAll('dedicated_server_only', 'Dedicated server only')
+			.replaceAll(
+				'client_or_server',
+				'Optional on both, works the same if installed on either side',
+			)
+			.replaceAll(
+				'client_or_server_prefers_both',
+				'Optional on both, works best when installed on both sides',
+			)
+			// This shouldn't come up for this use but yk
+			.replaceAll('unknown', 'Unknown')
+	} catch {
+		return 'No project environment'
+	}
+
+	if (lower === true) value = value.toLowerCase()
+	return value
+}
+
 export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
