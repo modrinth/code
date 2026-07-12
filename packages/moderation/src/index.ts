@@ -1,4 +1,4 @@
-export { default as checklist } from './data/checklist'
+export { default as checklist, stages } from './data/checklist'
 export { default as keybinds } from './data/keybinds'
 export { default as nags } from './data/nags'
 export * from './data/nags/index'

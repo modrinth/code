@@ -1,6 +1,8 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
-import { action, button, group, label, md, stage } from '../../types/node'
+import type { NodeBuilder, NodeState } from '../../types/node'
+import { action, button, group, label, md, stage, walkNodes, resolveChildren, isNodeActive } from '../../types/node'
+import checklist from '../checklist'
 
 export default stage(
 	'status-alerts',
@@ -21,7 +23,15 @@ export default stage(
 						.weight(-999999)
 						.suggestedStatus('approved')
 						.message(md('checklist/messages/status-alerts/fixed')),
-				),
+				)
+				.children(ctx => {
+					const result: NodeBuilder[] = []
+					walkNodes(resolveChildren(checklist, ctx), ctx.globalState as unknown as Record<string, NodeState>, ctx, (node, state) => {
+						if (!node._action?._fixes?.length || !isNodeActive(node, state)) return
+						result.push(...resolveChildren(node, ctx))
+					})
+					return result
+				}),
 
 			button('corrections_applied_approved', 'Corrections applied')
 				.shown(({ project }) => project.status === 'approved')

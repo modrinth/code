@@ -13,7 +13,7 @@ import {
 export type NodeState = boolean | string | number | Set<string> | NodeStateWithChildren | null | undefined
 
 export interface NodeStateWithChildren {
-	value?: boolean | string | number | Set<string> | null
+	value?: NodeState
 	[childId: string]: NodeState
 }
 
@@ -88,20 +88,33 @@ export function md(
 }
 // ─── Fix builder ──────────────────────────────────────────────────────────────
 
-type ProjectPatch = Partial<Labrinth.Projects.v3.Project>
-type VersionPatch = Partial<Labrinth.Projects.v3.Version>
+export function createTrackedPatch<T extends object>(source: T): { proxy: T; changes: () => Partial<T> } {
+	const written = new Set<string | symbol>()
+	const data = { ...source }
+	const proxy = new Proxy(data, {
+		set(target, key, value) {
+			written.add(key)
+			;(target as Record<string | symbol, unknown>)[key] = value
+			return true
+		},
+	})
+	return {
+		proxy,
+		changes: () => Object.fromEntries([...written].map((k) => [k, data[k as keyof T]])) as Partial<T>,
+	}
+}
 
 export class FixBuilder {
-	_projectFn?: (patch: ProjectPatch) => void | false
-	_versionsFn?: (patches: Map<string, VersionPatch>) => void | false
+	_projectFn?: (patch: Labrinth.Projects.v3.Project, ctx: NodeContext) => void | false
+	_versionFn?: (patch: Labrinth.Versions.v3.Version, ctx: NodeContext) => void | false
 
-	project(fn: (patch: ProjectPatch) => void | false): this {
+	project(fn: (patch: Labrinth.Projects.v3.Project, ctx: NodeContext) => void | false): this {
 		this._projectFn = fn
 		return this
 	}
 
-	versions(fn: (patches: Map<string, VersionPatch>) => void | false): this {
-		this._versionsFn = fn
+	version(fn: (patch: Labrinth.Versions.v3.Version, ctx: NodeContext) => void | false): this {
+		this._versionFn = fn
 		return this
 	}
 }
@@ -176,8 +189,10 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 	readonly label: string
 	_children: NodeBuilder[] = []
 	_childrenFn?: ChildrenFn
+	_computingChildren = false
 	_action?: ActionBuilder
 	_enabled?: ShowFn
+	_statePath?: string[]
 
 	constructor(id: string | undefined, label: string) {
 		super()
@@ -203,6 +218,11 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 
 	enabled(fn: ShowFn): this {
 		this._enabled = fn
+		return this
+	}
+
+	statePath(path: string[]): this {
+		this._statePath = path
 		return this
 	}
 }
@@ -248,9 +268,21 @@ export class InputNodeBuilder extends ValueNodeBuilder {
 
 export class SelectNodeBuilder extends ValueNodeBuilder {
 	readonly type = 'select' as const
+	_dropdown: false | { none?: string } = false
+	_fullWidth = false
 
 	constructor(id: string, nodeLabel: string) {
 		super(id, nodeLabel)
+	}
+
+	dropdown(none?: string): this {
+		this._dropdown = none !== undefined ? { none } : {}
+		return this
+	}
+
+	fullWidth(): this {
+		this._fullWidth = true
+		return this
 	}
 }
 
@@ -297,6 +329,157 @@ export class StageNodeBuilder extends IdentifiedNodeBuilder {
 	navigate(path: string): this {
 		this._navigate = path
 		return this
+	}
+
+	override children(...nodes: NodeBuilder[]): this
+	override children(fn: ChildrenFn): this
+	override children(...args: NodeBuilder[] | [ChildrenFn]): this {
+		if (typeof args[0] === 'function') {
+			super.children(args[0] as ChildrenFn)
+			if (!this._statePath) this._statePath = [this.id!]
+			return this
+		}
+		const nodes = args as NodeBuilder[]
+		super.children(...nodes)
+		if (!this._statePath) this._statePath = [this.id!]
+		stampChildPaths(nodes, [this.id!])
+		return this
+	}
+}
+
+// ─── Node traversal ───────────────────────────────────────────────────────────
+
+function childrenScopePath(node: IdentifiedNodeBuilder): string[] | null {
+	if (!node._statePath) return null
+	switch (node.type) {
+		case 'button':
+		case 'toggle':
+		case 'group':
+		case 'stage':
+			return node._statePath
+		case 'select':
+		case 'multi-select':
+			// Option nodes act as namespaces for sub-children state but aren't boolean
+			// containers themselves — use parent scope so option id becomes the namespace
+			return node._statePath.slice(0, -1)
+		default:
+			return null
+	}
+}
+
+function stampChildPaths(nodes: NodeBuilder[], scopePath: string[]): void {
+	for (const node of nodes) {
+		if (!(node instanceof IdentifiedNodeBuilder)) continue
+		if (!node.id) {
+			stampChildPaths(node._children, scopePath)
+			continue
+		}
+		if (!node._statePath) {
+			node._statePath = [...scopePath, node.id]
+		}
+		const childScope = childrenScopePath(node)
+		if (childScope) stampChildPaths(node._children, childScope)
+	}
+}
+
+export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
+	switch (node.type) {
+		case 'button':
+		case 'toggle': {
+			if (typeof state === 'boolean') return state
+			if (state && typeof state === 'object' && !(state instanceof Set)) {
+				const v = (state as NodeStateWithChildren).value
+				if (typeof v === 'boolean') return v
+			}
+			return (node as BooleanNodeBuilder)._defaultValue === true
+		}
+		case 'multi-select': return state instanceof Set && state.size > 0
+		case 'select': return typeof state === 'string' && state !== ''
+		case 'text':
+		case 'markdown': return typeof state === 'string' && state !== ''
+		default: return false
+	}
+}
+
+export function getBooleanChildState(nodeState: NodeState): Record<string, NodeState> {
+	if (nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set)) {
+		return nodeState as Record<string, NodeState>
+	}
+	return {}
+}
+
+export function resolveChildren(node: IdentifiedNodeBuilder, ctx: NodeContext): NodeBuilder[] {
+	if (node._childrenFn) {
+		if (node._computingChildren) return []
+		node._computingChildren = true
+		try {
+			const result = node._childrenFn(ctx)
+			const scopePath = childrenScopePath(node)
+			if (scopePath) stampChildPaths(result, scopePath)
+			return result
+		} finally {
+			node._computingChildren = false
+		}
+	}
+	return node._children
+}
+
+export function walkNodes(
+	nodes: NodeBuilder[],
+	stageState: Record<string, NodeState>,
+	ctx: NodeContext,
+	visitor: (node: IdentifiedNodeBuilder, state: NodeState, ctx: NodeContext) => void,
+): void {
+	for (const node of nodes) {
+		if (node._shown && !node._shown(ctx)) continue
+		if (node.type === 'group' || node.type === 'stage') {
+			const identified = node as IdentifiedNodeBuilder
+			if (identified.id) {
+				const raw = stageState[identified.id]
+				const childState = (raw && typeof raw === 'object' && !(raw instanceof Set))
+					? (raw as Record<string, NodeState>)
+					: {}
+				walkNodes(resolveChildren(identified, ctx), childState, { ...ctx, state: childState }, visitor)
+			} else {
+				walkNodes(resolveChildren(identified, ctx), stageState, ctx, visitor)
+			}
+			continue
+		}
+		if (node.type === 'display') continue
+
+		const identified = node as IdentifiedNodeBuilder
+		const nodeState = stageState[identified.id!]
+		visitor(identified, nodeState, ctx)
+
+		const active = isNodeActive(node, nodeState)
+		const children = resolveChildren(identified, ctx)
+		if (children.length === 0 || !active) continue
+
+		if (node.type === 'multi-select') {
+			const selected = nodeState instanceof Set ? nodeState : new Set<string>()
+			for (const child of children) {
+				const childId = child as IdentifiedNodeBuilder
+				if (!selected.has(childId.id!) || (child._shown && !child._shown(ctx))) continue
+				visitor(childId, stageState[childId.id!], ctx)
+				walkNodes(resolveChildren(childId, ctx), stageState, ctx, visitor)
+			}
+		} else if (node.type === 'button' || node.type === 'toggle') {
+			const childState = getBooleanChildState(nodeState)
+			walkNodes(children, childState, { ...ctx, state: childState }, visitor)
+		} else if (node.type === 'select') {
+			const selectedId = typeof nodeState === 'string' ? nodeState : undefined
+			if (selectedId) {
+				for (const child of children) {
+					const childId = child as IdentifiedNodeBuilder
+					if (childId.id !== selectedId || (child._shown && !child._shown(ctx))) continue
+					visitor(childId, stageState[childId.id!], ctx)
+					walkNodes(resolveChildren(childId, ctx), stageState, ctx, visitor)
+					break
+				}
+			}
+		} else {
+			walkNodes(children, stageState, ctx, visitor)
+		}
 	}
 }
 
