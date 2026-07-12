@@ -372,24 +372,24 @@ pub async fn list(
     let override_files_on_platform = if requester_is_mod {
         sqlx::query!(
             r#"
-			select
-				ofs.file_path as "file_path!",
-				convert_from(ofs.sha1, 'UTF8') as "sha1!",
-				source_file.version_id as "version_id: DBVersionId",
-				platform_file.version_id as "platform_version_id: DBVersionId",
-				platform_version.mod_id as "platform_project_id: DBProjectId"
-			from files source_file
-			inner join versions source_version
-				on source_version.id = source_file.version_id
-			inner join override_file_sources ofs
-				on ofs.file_id = source_file.id
-			inner join hashes h
-				on h.algorithm = 'sha1' and h.hash = ofs.sha1
-			inner join files platform_file
-				on platform_file.id = h.file_id
-			inner join versions platform_version
-				on platform_version.id = platform_file.version_id
-			where source_version.mod_id = $1
+			SELECT
+				ofs.file_path AS "file_path!",
+				CONVERT_FROM(ofs.sha1, 'UTF8') AS "sha1!",
+				source_file.version_id AS "version_id: DBVersionId",
+				platform_file.version_id AS "platform_version_id: DBVersionId",
+				platform_version.mod_id AS "platform_project_id: DBProjectId"
+			FROM files source_file
+			INNER JOIN versions source_version
+				ON source_version.id = source_file.version_id
+			INNER JOIN override_file_sources ofs
+				ON ofs.file_id = source_file.id
+			INNER JOIN hashes h
+				ON h.algorithm = 'sha1' AND h.hash = ofs.sha1
+			INNER JOIN files platform_file
+				ON platform_file.id = h.file_id
+			INNER JOIN versions platform_version
+				ON platform_version.id = platform_file.version_id
+			WHERE source_version.mod_id = $1
 			"#,
             project_id as DBProjectId,
         )
@@ -713,14 +713,14 @@ pub async fn delete_group(
     let group_id = path.into_inner();
     let version_ids = sqlx::query_scalar!(
         r#"
-		select distinct f.version_id as "version_id: DBVersionId"
-		from project_attribution_files paf
-		inner join project_attribution_groups pag on pag.id = paf.group_id
-		inner join override_file_sources ofs on ofs.sha1 = paf.sha1
-		inner join files f on f.id = ofs.file_id
-		inner join versions v on v.id = f.version_id
-		where paf.group_id = $1
-			and pag.project_id = v.mod_id
+		SELECT DISTINCT f.version_id AS "version_id: DBVersionId"
+		FROM project_attribution_files paf
+		INNER JOIN project_attribution_groups pag ON pag.id = paf.group_id
+		INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1
+		INNER JOIN files f ON f.id = ofs.file_id
+		INNER JOIN versions v ON v.id = f.version_id
+		WHERE paf.group_id = $1
+			AND pag.project_id = v.mod_id
 		"#,
         group_id,
     )
@@ -730,8 +730,8 @@ pub async fn delete_group(
 
     sqlx::query!(
         "
-		delete from project_attribution_files
-		where group_id = $1
+		DELETE FROM project_attribution_files
+		WHERE group_id = $1
 		",
         group_id,
     )
@@ -741,8 +741,8 @@ pub async fn delete_group(
 
     let result = sqlx::query!(
         "
-		delete from project_attribution_groups
-		where id = $1
+		DELETE FROM project_attribution_groups
+		WHERE id = $1
 		",
         group_id,
     )

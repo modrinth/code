@@ -865,10 +865,10 @@ async fn persist_attribution_results(
 
         sqlx::query!(
             "
-            insert into override_file_sources (sha1, file_id, file_path)
-            select source.sha1, $2, source.file_path
-            from unnest($1::bytea[], $3::text[]) as source(sha1, file_path)
-            on conflict do nothing
+            INSERT INTO override_file_sources (sha1, file_id, file_path)
+            SELECT source.sha1, $2, source.file_path
+            FROM UNNEST($1::BYTEA[], $3::TEXT[]) AS source(sha1, file_path)
+            ON CONFLICT DO NOTHING
             ",
             &all_sha1s,
             file_id as DBFileId,
