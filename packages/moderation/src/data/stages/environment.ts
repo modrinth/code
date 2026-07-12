@@ -2,6 +2,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { GlobeIcon } from '@modrinth/assets'
 
 import { action, button, fix, group, label, md, select, stage, toggle } from '../../types/node'
+import { formatEnvironments } from '../../utils'
 
 const textSingle = md('checklist/text/environment/environment')
 const textMultiple = md('checklist/text/environment/environment-multiple')
@@ -30,7 +31,19 @@ export default stage(
 					action()
 						.suggestedStatus('flagged')
 						.severity('low')
-						.message(md('checklist/messages/environment/inaccurate'))
+						.message(async (ctx) => {
+							const correct_environment = ctx?.state.correct_environment as string | undefined
+
+							let correct_output = ''
+							if (correct_environment)
+								correct_output = `It looks like this project is probably "${formatEnvironments(String(ctx?.state.correct_environment))}"`
+							else if (correct_environment === 'Mixed')
+								correct_output = `It looks like some %PROJECT_VERSIONS_FLINK% of your project should have unique environments from other versions, please ensure *each version* is set correctly.`
+
+							return md('checklist/messages/environment/inaccurate', (c) => ({
+								CORRECT: correct_output,
+							}))(ctx)
+						})
 						.fix(
 							fix().version((version, ctx) => {
 								const env = ctx.state.correct_environment as
@@ -46,8 +59,8 @@ export default stage(
 						.children(
 							toggle('client_only', 'Client-side Only'),
 
-							toggle('dedicated_server_only', 'Dedicated Server Only'),
 							toggle('server_only', 'Server-side + Singleplayer'),
+							toggle('dedicated_server_only', 'Dedicated Server Only'),
 
 							toggle('client_and_server', 'Required on Both'),
 							toggle('server_only_client_optional', 'Client Optional'),
@@ -56,6 +69,8 @@ export default stage(
 							toggle('client_or_server_prefers_both', 'Client or Server, Prefers Both'),
 
 							toggle('singleplayer_only', 'Singleplayer'),
+
+							toggle('mixed', 'Mixed'),
 						)
 						.dropdown('Unknown'),
 				),
