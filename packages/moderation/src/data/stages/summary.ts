@@ -17,7 +17,6 @@ export default stage(
 				.enabled(({ state }) => !state['repeat_title'])
 				.action(
 					action()
-						.weight(300)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/summary/insufficient')),
@@ -27,7 +26,6 @@ export default stage(
 				.enabled(({ state }) => !state['insufficient'])
 				.action(
 					action()
-						.weight(300)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/summary/repeat-title')),
@@ -36,7 +34,6 @@ export default stage(
 			button('formatting', 'Formatting')
 				.action(
 					action()
-						.weight(301)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/summary/formatting')),
@@ -45,7 +42,6 @@ export default stage(
 			button('non_english', 'Non-english')
 				.action(
 					action()
-						.weight(302)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/summary/non-english')),
@@ -55,7 +51,6 @@ export default stage(
 				.shown(({ project }) => !!project?.minecraft_server)
 				.action(
 					action()
-						.weight(303)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/summary/repeat-ip')),

@@ -30,7 +30,6 @@ export default stage(
 			button('incorrect_additional', 'Incorrect additional files')
 				.action(
 					action()
-						.weight(1000)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/versions/incorrect_additional_files')),
@@ -39,7 +38,6 @@ export default stage(
 			button('incorrect_project_type', 'Incorrect Project Type')
 				.action(
 					action()
-						.weight(1001)
 						.suggestedStatus('rejected')
 						.severity('medium'),
 				)
@@ -49,21 +47,18 @@ export default stage(
 							.shown(({ project }) => !project.project_types.includes('modpack'))
 							.action(
 								action()
-									.weight(1001)
 									.message(md('checklist/messages/versions/invalid-modpacks')),
 							),
 						toggle('resourcepack', 'Resource Pack')
 							.shown(({ project }) => !project.project_types.includes('resourcepack'))
 							.action(
 								action()
-									.weight(1001)
 									.message(md('checklist/messages/versions/invalid-resourcepacks')),
 							),
 						toggle('datapack', 'Data Pack')
 							.shown(({ project }) => !project.loaders.includes('datapack'))
 							.action(
 								action()
-									.weight(1001)
 									.message(md('checklist/messages/versions/invalid-datapacks')),
 							),
 					),
@@ -72,7 +67,6 @@ export default stage(
 			button('alternate_versions', 'Alternate Versions')
 				.action(
 					action()
-						.weight(1002)
 						.suggestedStatus('rejected')
 						.severity('high'),
 				)
@@ -81,13 +75,11 @@ export default stage(
 						toggle('primary', 'Primary Files')
 							.action(
 								action()
-									.weight(1002)
 									.message(md('checklist/messages/versions/alternate_versions-primary')),
 							),
 						toggle('additional', 'Additional Files')
 							.action(
 								action()
-									.weight(1002)
 									.message(md('checklist/messages/versions/alternate_versions-additional')),
 							),
 						toggle('mono', 'Monofile')
@@ -98,28 +90,24 @@ export default stage(
 							)
 							.action(
 								action()
-									.weight(1002)
 									.message(md('checklist/messages/versions/alternate_versions-mono')),
 							),
 						toggle('server', 'Server Files (Primary Files)')
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
-									.weight(1002)
 									.message(md('checklist/messages/versions/alternate_versions-server')),
 							),
 						toggle('server_additional', 'Server Files (Additional Files)')
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
-									.weight(1002)
 									.message(md('checklist/messages/versions/alternate_versions-server-additional')),
 							),
 						toggle('zip', 'mods.zip')
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
-									.weight(1002)
 									.message(md('checklist/messages/versions/alternate_versions-zip')),
 							),
 					),
@@ -128,7 +116,6 @@ export default stage(
 			button('incorrect_loader', 'Incorrect Loader')
 				.action(
 					action()
-						.weight(1003)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(async (ctx) => {
@@ -152,7 +139,6 @@ export default stage(
 				.shown(({ project }) => project.project_types.includes('resourcepack'))
 				.action(
 					action()
-						.weight(1004)
 						.suggestedStatus('rejected')
 						.severity('medium')
 						.message(md('checklist/messages/versions/vanilla_assets')),
@@ -165,7 +151,6 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(1004)
 						.suggestedStatus('rejected')
 						.severity('medium')
 						.message(md('checklist/messages/versions/redist_libs')),
@@ -174,7 +159,6 @@ export default stage(
 			button('duplicate_primary_files', 'Duplicate Primary Files')
 				.action(
 					action()
-						.weight(1005)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/versions/broken_version')),
@@ -183,7 +167,6 @@ export default stage(
 			button('unsupported', 'Unsupported')
 				.action(
 					action()
-						.weight(1006)
 						.suggestedStatus('rejected')
 						.severity('medium')
 						.message(

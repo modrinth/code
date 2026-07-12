@@ -19,7 +19,6 @@ export default stage(
 			button('invalid_permissions', 'Invalid permissions')
 				.action(
 					action()
-						.weight(2000)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/externals-permissions/invalid')),
@@ -28,7 +27,6 @@ export default stage(
 			button('prohibited_external_content', 'Prohibited externals')
 				.action(
 					action()
-						.weight(2001)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/externals-permissions/prohibited')),
@@ -37,7 +35,6 @@ export default stage(
 			button('missing_permissions', 'Missing permissions')
 				.action(
 					action()
-						.weight(2002)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/externals-permissions/missing')),
@@ -47,7 +44,6 @@ export default stage(
 				.shown(({ project }) => project.monetization_status === 'monetized')
 				.action(
 					action()
-						.weight(2003)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/externals-permissions/non-commercial')),

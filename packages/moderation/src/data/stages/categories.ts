@@ -21,7 +21,6 @@ export default stage(
 			button('inaccurate', 'Inaccurate')
 				.action(
 					action()
-						.weight(700)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/categories/inaccurate')),
@@ -34,7 +33,6 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(701)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(async (ctx) => {
@@ -48,7 +46,6 @@ export default stage(
 				.shown(({ project }) => project.project_types.includes('resourcepack'))
 				.action(
 					action()
-						.weight(702)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(async (ctx) => {

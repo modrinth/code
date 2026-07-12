@@ -33,7 +33,6 @@ export default stage(
 			button('useless_info', 'Contains Useless Info')
 				.action(
 					action()
-						.weight(100)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/title/useless-info')),
@@ -42,7 +41,6 @@ export default stage(
 			button('minecraft_branding', 'Minecraft Title')
 				.action(
 					action()
-						.weight(100)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/title/minecraft-branding')),
@@ -51,7 +49,6 @@ export default stage(
 			button('similarities', 'Title Similarities')
 				.action(
 					action()
-						.weight(110)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/title/similarities')),
@@ -62,7 +59,6 @@ export default stage(
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
-									.weight(111)
 									.message(md('checklist/messages/title/similarities-modpack')),
 							),
 
@@ -70,7 +66,6 @@ export default stage(
 							.shown(({ project }) => !project?.minecraft_server)
 							.action(
 								action()
-									.weight(112)
 									.message(md('checklist/messages/title/similarities-fork')),
 							),
 					),
@@ -91,7 +86,6 @@ export default stage(
 						toggle('misused', 'Misused')
 							.action(
 								action()
-									.weight(200)
 									.message(md('checklist/messages/slug/misused')),
 							),
 					),

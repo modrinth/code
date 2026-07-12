@@ -15,7 +15,6 @@ export default stage(
 			button('insufficient', 'Insufficient')
 				.action(
 					action()
-						.weight(400)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(async (ctx) => {
@@ -51,7 +50,6 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_java_server)
 				.action(
 					action()
-						.weight(402)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/description/accessability/non-english/non-english')),
@@ -61,7 +59,6 @@ export default stage(
 				.shown(({ project }) => !!project.minecraft_java_server)
 				.action(
 					action()
-						.weight(402)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/description/accessability/non-english/non-english-server')),
@@ -70,7 +67,6 @@ export default stage(
 			button('unfinished', 'Unfinished')
 				.action(
 					action()
-						.weight(403)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/description/unfinished')),
@@ -79,7 +75,6 @@ export default stage(
 			button('headers_as_body', 'Headers as body text')
 				.action(
 					action()
-						.weight(404)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/description/accessability/headers-as-body')),
@@ -88,7 +83,6 @@ export default stage(
 			button('image_only', 'Image-only')
 				.action(
 					action()
-						.weight(405)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/description/accessability/image-only')),
@@ -97,7 +91,6 @@ export default stage(
 			button('non_standard_text', 'Non-standard text')
 				.action(
 					action()
-						.weight(406)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/description/accessability/non-standard-text')),
@@ -106,7 +99,6 @@ export default stage(
 			button('clarity', 'Unclear / Misleading')
 				.action(
 					action()
-						.weight(407)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/description/clarity')),

@@ -24,7 +24,6 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(
@@ -43,7 +42,6 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/reupload/fork')),
@@ -53,7 +51,6 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/reupload/insufficient_fork')),
@@ -62,7 +59,6 @@ export default stage(
 			button('request_proof', 'Proof of permissions')
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/reupload/proof_of_permissions')),
@@ -72,7 +68,6 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(
@@ -87,7 +82,6 @@ export default stage(
 				.shown(({ project }) => !!project.minecraft_server)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(
@@ -102,7 +96,6 @@ export default stage(
 				.shown(isServerModpack)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/reupload/custom_server/custom_server_permissions')),
@@ -112,7 +105,6 @@ export default stage(
 				.shown(isServerModpack)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(md('checklist/messages/reupload/custom_server/custom_server_overrides-verification')),
@@ -121,7 +113,6 @@ export default stage(
 					toggle('list', 'List overrides?')
 						.action(
 							action()
-								.weight(1101)
 								.message(
 									md('checklist/messages/reupload/custom_server/custom_server_overrides-verification-list', (ctx) => ({
 										OVERRIDES: ctx.state.overrides,
@@ -135,7 +126,6 @@ export default stage(
 				.shown(isServerModpack)
 				.action(
 					action()
-						.weight(1100)
 						.suggestedStatus('rejected')
 						.severity('high')
 						.message(

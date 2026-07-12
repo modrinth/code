@@ -28,7 +28,6 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(800)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/environment/inaccurate'))

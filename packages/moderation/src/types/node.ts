@@ -7,6 +7,8 @@ import {
 	flattenProjectVariables,
 	flattenStaticVariables,
 } from '../utils'
+import type { ModerationSeverity, ModerationStatus } from './actions'
+import type { Priority } from './priority.ts'
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
@@ -32,11 +34,6 @@ export type MessageFn = (ctx: NodeContext) => Promise<string>
 export type ContentFn = (ctx: NodeContext) => string | Promise<string>
 export type ShowFn = (ctx: NodeContext) => boolean
 export type ChildrenFn = (ctx: NodeContext) => NodeBuilder[]
-
-// ─── Enum-like types ──────────────────────────────────────────────────────────
-
-export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
-export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
 export type NodeType =
 	| 'button'
@@ -127,18 +124,19 @@ export function fix(): FixBuilder {
 
 export class ActionBuilder {
 	_message?: MessageFn
-	_weight?: number
+	_priority?: Priority
 	_suggestedStatus?: ModerationStatus
 	_severity?: ModerationSeverity
 	_fixes: FixBuilder[] = []
+	_applyFixes = false
 
 	message(fn: MessageFn): this {
 		this._message = fn
 		return this
 	}
 
-	weight(n: number): this {
-		this._weight = n
+	priority(p: Priority): this {
+		this._priority = p
 		return this
 	}
 
@@ -154,6 +152,11 @@ export class ActionBuilder {
 
 	fix(f: FixBuilder): this {
 		this._fixes.push(f)
+		return this
+	}
+
+	applyFixes(): this {
+		this._applyFixes = true
 		return this
 	}
 }
@@ -271,10 +274,6 @@ export class SelectNodeBuilder extends ValueNodeBuilder {
 	_dropdown: false | { none?: string } = false
 	_fullWidth = false
 
-	constructor(id: string, nodeLabel: string) {
-		super(id, nodeLabel)
-	}
-
 	dropdown(none?: string): this {
 		this._dropdown = none !== undefined ? { none } : {}
 		return this
@@ -288,10 +287,6 @@ export class SelectNodeBuilder extends ValueNodeBuilder {
 
 export class ChipsNodeBuilder extends ValueNodeBuilder {
 	readonly type = 'multi-select' as const
-
-	constructor(id: string, nodeLabel: string) {
-		super(id, nodeLabel)
-	}
 }
 
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {

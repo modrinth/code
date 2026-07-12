@@ -16,7 +16,6 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(900)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/gallery/insufficient')),
@@ -26,7 +25,6 @@ export default stage(
 				.shown(({ project }) => project.gallery.length > 0)
 				.action(
 					action()
-						.weight(901)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/gallery/not-relevant')),

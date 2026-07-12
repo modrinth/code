@@ -1,7 +1,7 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 import type { NodeBuilder, NodeState } from '../../types/node'
-import { action, button, group, label, md, stage, walkNodes, resolveChildren, isNodeActive } from '../../types/node'
+import { action, button, group, isNodeActive,label, md, resolveChildren, stage, walkNodes } from '../../types/node'
 import checklist from '../checklist'
 
 export default stage(
@@ -20,9 +20,10 @@ export default stage(
 				.shown(({ project }) => project.status !== 'approved')
 				.action(
 					action()
-						.weight(-999999)
+
 						.suggestedStatus('approved')
-						.message(md('checklist/messages/status-alerts/fixed')),
+						.message(md('checklist/messages/status-alerts/fixed'))
+						.applyFixes(),
 				)
 				.children(ctx => {
 					const result: NodeBuilder[] = []
@@ -37,7 +38,7 @@ export default stage(
 				.shown(({ project }) => project.status === 'approved')
 				.action(
 					action()
-						.weight(-999999)
+
 						.suggestedStatus('approved')
 						.message(md('checklist/messages/status-alerts/fixed-approved')),
 				),
@@ -46,7 +47,7 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(-999999)
+
 						.suggestedStatus('flagged')
 						.message(md('checklist/messages/status-alerts/private/private')),
 				),
@@ -55,7 +56,7 @@ export default stage(
 				.shown(({ project }) => !!project.minecraft_server)
 				.action(
 					action()
-						.weight(-999999)
+
 						.suggestedStatus('flagged')
 						.message(md('checklist/messages/status-alerts/private/private-server')),
 				),
@@ -66,14 +67,14 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(-999999)
+
 						.message(md('checklist/messages/status-alerts/serverpack')),
 				),
 
 			button('account_issues', 'Account issues')
 				.action(
 					action()
-						.weight(-999999)
+
 						.suggestedStatus('rejected')
 						.message(md('checklist/messages/status-alerts/account_issues')),
 				),
@@ -82,7 +83,7 @@ export default stage(
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
-						.weight(-999999)
+
 						.message(md('checklist/messages/status-alerts/automod_confusion')),
 				),
 
@@ -95,7 +96,7 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(-999999)
+
 						.message(md('checklist/messages/status-alerts/demonetized/demonetized')),
 				),
 
@@ -108,7 +109,7 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(-999999)
+
 						.message(md('checklist/messages/status-alerts/demonetized/demonetized-modpack')),
 				),
 		),

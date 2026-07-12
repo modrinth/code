@@ -12,7 +12,6 @@ function linkSection(id: string, urlLine: ContentFn, baseWeight: number) {
 				button('misused', 'Misused')
 					.action(
 						action()
-							.weight(baseWeight)
 							.suggestedStatus('flagged')
 							.severity('low')
 							.message(md(`checklist/messages/links/${id}/misused`)),
@@ -20,7 +19,6 @@ function linkSection(id: string, urlLine: ContentFn, baseWeight: number) {
 				button('inaccessible', 'Inaccessible')
 					.action(
 						action()
-							.weight(baseWeight + 1)
 							.suggestedStatus('flagged')
 							.severity('medium')
 							.message(md(`checklist/messages/links/${id}/inaccessible`)),
@@ -89,7 +87,6 @@ export default stage(
 					button('misused', 'Misused')
 						.action(
 							action()
-								.weight(560)
 								.suggestedStatus('flagged')
 								.severity('low')
 								.message(md('checklist/messages/links/donations/misused')),
@@ -97,7 +94,6 @@ export default stage(
 					button('inaccessible', 'Inaccessible')
 						.action(
 							action()
-								.weight(561)
 								.suggestedStatus('flagged')
 								.severity('medium')
 								.message(md('checklist/messages/links/donations/inaccessible')),

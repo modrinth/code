@@ -16,7 +16,6 @@ export default stage(
 			button('no_versions', 'No Versions')
 				.action(
 					action()
-						.weight(-100)
 						.suggestedStatus('rejected')
 						.message(md('checklist/messages/undefined-project/no_versions')),
 				),

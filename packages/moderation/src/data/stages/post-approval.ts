@@ -15,7 +15,6 @@ export default stage(
 			button('issue_warning', 'Issue warning')
 				.action(
 					action()
-						.weight(3000)
 						.suggestedStatus('approved')
 						.severity('low')
 						.message(md('checklist/messages/post-approval/issue-warning')),
@@ -24,7 +23,6 @@ export default stage(
 			button('missed_deadline', 'Missed due date')
 				.action(
 					action()
-						.weight(-999)
 						.suggestedStatus('flagged')
 						.severity('high')
 						.message(md('checklist/messages/post-approval/missed-deadline', (ctx) => ({ STATUS: ctx.state.status }))),
@@ -34,7 +32,6 @@ export default stage(
 			button('metadata_issue', 'Incorrect metadata')
 				.action(
 					action()
-						.weight(0)
 						.suggestedStatus('approved')
 						.severity('low')
 						.message(md('checklist/messages/post-approval/metadata-issue')),
@@ -43,7 +40,6 @@ export default stage(
 					button('dependencies', 'Missing Dependencies')
 						.action(
 							action()
-								.weight(1)
 								.severity('low')
 								.message(md('checklist/messages/misc-metadata/dependencies', (ctx) => ({
 									DEPENDENCY_NAME: ctx.state.dependency_name,
@@ -58,7 +54,6 @@ export default stage(
 					button('mc_versions', 'Game versions')
 						.action(
 							action()
-								.weight(2)
 								.severity('low')
 								.message(md('checklist/messages/misc-metadata/mc-versions', (ctx) => ({ SPECIFICS: ctx.state.specifics }))),
 						)
@@ -67,7 +62,6 @@ export default stage(
 					button('loaders', 'Loaders')
 						.action(
 							action()
-								.weight(3)
 								.severity('low')
 								.message(md('checklist/messages/misc-metadata/loaders', (ctx) => ({ SPECIFICS: ctx.state.specifics }))),
 						)
@@ -76,7 +70,6 @@ export default stage(
 					button('license', 'Inconsistent Licensing')
 						.action(
 							action()
-								.weight(4)
 								.severity('low')
 								.message(md('checklist/messages/misc-metadata/inconsistent-license')),
 						),

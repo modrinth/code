@@ -36,7 +36,6 @@ export default stage(
 				.shown(({ project }) => !!project.license?.url)
 				.action(
 					action()
-						.weight(600)
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.message(md('checklist/messages/license/invalid_link')),
@@ -45,7 +44,6 @@ export default stage(
 					toggle('custom_license', 'Invalid Link: Custom License')
 						.action(
 							action()
-								.weight(601)
 								.message(md('checklist/messages/license/invalid_link-custom_license')),
 						),
 				),
@@ -54,7 +52,6 @@ export default stage(
 				.shown(({ project }) => !licensesNotRequiringSource.includes(project.license?.id ?? ''))
 				.action(
 					action()
-						.weight(602)
 						.suggestedStatus('rejected')
 						.severity('medium')
 						.message(async (ctx) => {

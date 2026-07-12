@@ -371,6 +371,7 @@ import type {
 	NodeBuilder,
 	NodeContext,
 	NodeState,
+	Priority,
 	StageNodeBuilder,
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
@@ -1045,7 +1046,7 @@ watch(() => props.collapsed, (collapsed) => {
 })
 
 interface MessagePart {
-	weight: number
+	priority?: Priority
 	content: string
 }
 
@@ -1262,7 +1263,7 @@ async function collectNodeMessages(
 			: nodeCtx
 		tasks.push(
 			identified._action._message(msgCtx).then((msg) => {
-				if (msg) parts.push({ weight: identified._action!._weight ?? 0, content: msg })
+				if (msg) parts.push({ priority: identified._action!._priority, content: msg })
 			}),
 		)
 	})
@@ -1280,7 +1281,12 @@ async function assembleFullMessage() {
 	}
 	await collectNodeMessages(resolveChildren(checklist, rootCtx), nodeStates.value as unknown as Record<string, NodeState>, rootCtx, parts)
 
-	parts.sort((a, b) => a.weight - b.weight)
+	parts.sort((a, b) => {
+		if (!a.priority && !b.priority) return 0
+		if (!a.priority) return 1
+		if (!b.priority) return -1
+		return a.priority.compareTo(b.priority)
+	})
 
 	return expandVariables(
 		parts

@@ -16,7 +16,6 @@ export default stage(
 				.shown(({ project }) => !!project.minecraft_server)
 				.action(
 					action()
-						.weight(0)
 						.suggestedStatus('rejected')
 						.severity('critical')
 						.message(md('checklist/messages/paid-access-server')),
@@ -25,7 +24,6 @@ export default stage(
 			button('prohibited_content', 'Prohibited Content')
 				.action(
 					action()
-						.weight(100)
 						.suggestedStatus('rejected')
 						.severity('critical')
 						.message(async (ctx) => {
@@ -58,7 +56,6 @@ export default stage(
 			button('cheat_or_hack_advertising', 'Hacks')
 				.action(
 					action()
-						.weight(150)
 						.suggestedStatus('rejected')
 						.severity('critical')
 						.message(md('checklist/messages/rule-breaking/cheat-or-hack-advertising')),
@@ -67,7 +64,6 @@ export default stage(
 			button('server_side_opt_out', 'Opt-out')
 				.action(
 					action()
-						.weight(200)
 						.suggestedStatus('flagged')
 						.severity('high')
 						.message(md('checklist/messages/rule-breaking/server-side-opt-out')),
@@ -76,7 +72,6 @@ export default stage(
 			button('server_side_opt_in', 'Opt-in')
 				.action(
 					action()
-						.weight(300)
 						.suggestedStatus('flagged')
 						.severity('high')
 						.message(async (ctx) => {
@@ -108,7 +103,6 @@ export default stage(
 				)
 				.action(
 					action()
-						.weight(0)
 						.suggestedStatus('flagged')
 						.severity('low')
 						.message(md('checklist/messages/misc-metadata/excessive_languages-server')),
@@ -117,7 +111,6 @@ export default stage(
 			button('rule_breaking_other', 'Other')
 				.action(
 					action()
-						.weight(0)
 						.suggestedStatus('rejected')
 						.severity('critical')
 						.message(md('checklist/messages/rule-breaking', (ctx) => ({ MESSAGE: ctx.state.message }))),
