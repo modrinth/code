@@ -41,7 +41,7 @@ export default stage(
 						toggle('custom', 'Custom').children(
 							markdown(
 								'explainer',
-								'Please elaborate on how the author can improve their description.',
+								'How can the author improve their description?',
 							).required(),
 						),
 					),

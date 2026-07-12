@@ -38,7 +38,8 @@
 
 					<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
 						<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-						{{ opt.text }}
+						<span>{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span>
+						<span v-if="opt.count" class="ml-auto pl-2 text-m font-semibold opacity-75">{{ opt.count }}</span>
 					</template>
 				</OverflowMenu>
 			</h1>
@@ -211,8 +212,6 @@
 						<NodeRenderer
 							class="min-h-0 flex-1 overflow-y-auto"
 							:nodes="getStageChildren(currentStageObj)"
-							:get-state="(nodeId) => getNodeState(currentStageObj.id, nodeId)"
-							:set-state="(nodeId, value) => setNodeState(currentStageObj.id, nodeId, value)"
 							:show-context="makeNodeContext(currentStageObj)"
 							:on-image-upload="onUploadHandler"
 						/>
@@ -368,13 +367,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type {
-	BooleanNodeBuilder,
 	IdentifiedNodeBuilder,
 	NodeBuilder,
 	NodeContext,
 	NodeState,
-	NodeStateWithChildren,
 	StageNodeBuilder,
+	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
 	checklist,
@@ -382,8 +380,13 @@ import {
 	flattenProjectV3Variables,
 	flattenProjectVariables,
 	flattenStaticVariables,
+	getBooleanChildState,
 	handleKeybind,
+	isNodeActive,
 	kebabToTitleCase,
+	resolveChildren,
+	stages,
+	walkNodes,
 } from '@modrinth/moderation'
 import type { OverflowMenuOption } from '@modrinth/ui'
 import {
@@ -984,7 +987,7 @@ function resetProgress() {
 }
 
 function findFirstValidStage(): number {
-	for (let i = 0; i < checklist.length; i++) {
+	for (let i = 0; i < stages.length; i++) {
 		if (shouldShowStageIndex(i)) {
 			return i
 		}
@@ -992,7 +995,7 @@ function findFirstValidStage(): number {
 	return 0
 }
 
-const currentStageObj = computed(() => checklist[currentStage.value])
+const currentStageObj = computed(() => stages[currentStage.value])
 const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
 const canOpenStageSelectorFromTitle = computed(
 	() =>
@@ -1008,7 +1011,7 @@ const checklistTitleText = computed(() => {
 })
 const nodeStates = ref<Record<string, Record<string, NodeState>>>(persistedState?.state ?? {})
 
-const restoredStage = persistedState ? checklist.findIndex((s) => s.id === persistedState.stage) : -1
+const restoredStage = persistedState ? stages.findIndex((s) => s.id === persistedState.stage) : -1
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
 
 const router = useRouter()
@@ -1053,7 +1056,7 @@ function handleKeybinds(event: KeyboardEvent) {
 			project: projectV2.value,
 			state: {
 				currentStage: currentStage.value,
-				totalStages: checklist.length,
+				totalStages: stages.length,
 				currentStageId: currentStageObj.value.id,
 				currentStageTitle: currentStageObj.value.hint,
 
@@ -1180,7 +1183,7 @@ onUnmounted(() => {
 watch(
 	currentStage,
 	(newIndex, oldIndex) => {
-		const stage = checklist[newIndex]
+		const stage = stages[newIndex]
 		// only navigate when the stage actually changes (not on initial mount/remount)
 		if (oldIndex !== undefined && newIndex !== oldIndex && stage?._navigate) {
 			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage._navigate}`)
@@ -1199,26 +1202,6 @@ watch(
 	{ immediate: true },
 )
 
-function getNodeState(stageId: string, nodeId: string): NodeState {
-	return nodeStates.value[stageId]?.[nodeId]
-}
-
-function setNodeState(stageId: string, nodeId: string, value: NodeState) {
-	if (value === undefined) {
-		if (!nodeStates.value[stageId]) return
-		const { [nodeId]: _, ...rest } = nodeStates.value[stageId]
-		if (Object.keys(rest).length === 0) {
-			const { [stageId]: __, ...restStages } = nodeStates.value
-			nodeStates.value = restStages
-		} else {
-			nodeStates.value[stageId] = rest
-		}
-	} else {
-		if (!nodeStates.value[stageId]) nodeStates.value[stageId] = {}
-		nodeStates.value[stageId][nodeId] = value
-	}
-	persistState()
-}
 
 function getModpackFilesFromStorage(): {
 	interactive: ModerationModpackItem[]
@@ -1245,35 +1228,24 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
-function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
-	switch (node.type) {
-		case 'button':
-		case 'toggle': {
-			if (typeof state === 'boolean') return state
-			if (state && typeof state === 'object' && !(state instanceof Set)) {
-				const v = (state as NodeStateWithChildren).value
-				if (typeof v === 'boolean') return v
-			}
-			return (node as BooleanNodeBuilder)._defaultValue === true
-		}
-		case 'multi-select': return state instanceof Set && state.size > 0
-		case 'select': return typeof state === 'string' && state !== ''
-		case 'text':
-		case 'markdown': return typeof state === 'string' && state !== ''
-		default: return false
-	}
+function countStageActions(stage: StageNodeBuilder): number {
+	const ctx = makeNodeContext(stage)
+	const stageState = nodeStates.value[stage.id] ?? {}
+	let count = 0
+	walkNodes(getStageChildren(stage), stageState, ctx, (node, state) => {
+		if (node._action && isNodeActive(node, state)) count++
+	})
+	return count
 }
 
-function getBooleanChildState(nodeState: NodeState): Record<string, NodeState> {
-	if (nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set)) {
-		return nodeState as Record<string, NodeState>
-	}
-	return {}
-}
-
-function resolveChildren(node: IdentifiedNodeBuilder, ctx: NodeContext): NodeBuilder[] {
-	if (node._childrenFn) return node._childrenFn(ctx)
-	return node._children
+function hasRequiredMissing(stage: StageNodeBuilder): boolean {
+	const ctx = makeNodeContext(stage)
+	const stageState = nodeStates.value[stage.id] ?? {}
+	let missing = false
+	walkNodes(getStageChildren(stage), stageState, ctx, (node, state) => {
+		if (!missing && (node as ValueNodeBuilder)._required && !isNodeActive(node, state)) missing = true
+	})
+	return missing
 }
 
 async function collectNodeMessages(
@@ -1282,84 +1254,31 @@ async function collectNodeMessages(
 	ctx: NodeContext,
 	parts: MessagePart[],
 ): Promise<void> {
-	for (const node of nodes) {
-		if (node._shown && !node._shown(ctx)) continue
-
-		if (node.type === 'group') {
-			const identified = node as IdentifiedNodeBuilder
-			if (identified.id) {
-				const raw = stageState[identified.id]
-				const childState = (raw && typeof raw === 'object' && !(raw instanceof Set))
-					? (raw as Record<string, NodeState>)
-					: {}
-				await collectNodeMessages(resolveChildren(identified, ctx), childState, { ...ctx, state: childState }, parts)
-			} else {
-				await collectNodeMessages(resolveChildren(identified, ctx), stageState, ctx, parts)
-			}
-			continue
-		}
-
-		if (node.type === 'display') continue
-
-		const identified = node as IdentifiedNodeBuilder
-		const nodeState = stageState[identified.id!]
-		const active = isNodeActive(node, nodeState)
-
-		if (active && identified._action?._message) {
-			const nodeCtx: NodeContext = (node.type === 'button' || node.type === 'toggle')
-				? { ...ctx, state: getBooleanChildState(nodeState) }
-				: ctx
-			const msg = await identified._action._message(nodeCtx)
-			if (msg) parts.push({ weight: identified._action._weight ?? 0, content: msg })
-		}
-
-		const children = resolveChildren(identified, ctx)
-		if (children.length > 0 && active) {
-			if (node.type === 'multi-select') {
-				const selected = nodeState instanceof Set ? nodeState : new Set<string>()
-				for (const child of children) {
-					const childId = (child as IdentifiedNodeBuilder)
-					if (!selected.has(childId.id!)) continue
-					if (child._shown && !child._shown(ctx)) continue
-					if (childId._action?._message) {
-						const msg = await childId._action._message(ctx)
-						if (msg) parts.push({ weight: childId._action._weight ?? 0, content: msg })
-					}
-					await collectNodeMessages(resolveChildren(childId, ctx), stageState, ctx, parts)
-				}
-			} else if (node.type === 'button' || node.type === 'toggle') {
-				const childState = getBooleanChildState(nodeState)
-				await collectNodeMessages(children, childState, { ...ctx, state: childState }, parts)
-			} else if (node.type === 'select') {
-				const selectedId = typeof nodeState === 'string' ? nodeState : undefined
-				if (selectedId) {
-					for (const child of children) {
-						const childId = (child as IdentifiedNodeBuilder)
-						if (childId.id !== selectedId) continue
-						if (child._shown && !child._shown(ctx)) continue
-						if (childId._action?._message) {
-							const msg = await childId._action._message(ctx)
-							if (msg) parts.push({ weight: childId._action._weight ?? identified._action?._weight ?? 0, content: msg })
-						}
-						await collectNodeMessages(resolveChildren(childId, ctx), stageState, ctx, parts)
-						break
-					}
-				}
-			} else {
-				await collectNodeMessages(children, stageState, ctx, parts)
-			}
-		}
-	}
+	const tasks: Promise<void>[] = []
+	walkNodes(nodes, stageState, ctx, (identified, nodeState, nodeCtx) => {
+		if (!identified._action?._message || !isNodeActive(identified, nodeState)) return
+		const msgCtx: NodeContext = (identified.type === 'button' || identified.type === 'toggle')
+			? { ...nodeCtx, state: getBooleanChildState(nodeState) }
+			: nodeCtx
+		tasks.push(
+			identified._action._message(msgCtx).then((msg) => {
+				if (msg) parts.push({ weight: identified._action!._weight ?? 0, content: msg })
+			}),
+		)
+	})
+	await Promise.all(tasks)
 }
 
 async function assembleFullMessage() {
 	const parts: MessagePart[] = []
 
-	for (const stage of checklist) {
-		const stageState = nodeStates.value[stage.id] ?? {}
-		const ctx = makeNodeContext(stage)
-		await collectNodeMessages(getStageChildren(stage), stageState, ctx, parts)
+	const rootCtx: NodeContext = {
+		project: projectV3.value,
+		projectV2: projectV2.value,
+		state: nodeStates.value as unknown as Record<string, NodeState>,
+		globalState: nodeStates.value,
 	}
+	await collectNodeMessages(resolveChildren(checklist, rootCtx), nodeStates.value as unknown as Record<string, NodeState>, rootCtx, parts)
 
 	parts.sort((a, b) => a.weight - b.weight)
 
@@ -1383,8 +1302,7 @@ function makeNodeContext(stage: StageNodeBuilder): NodeContext {
 }
 
 function getStageChildren(stage: StageNodeBuilder): NodeBuilder[] {
-	const ctx = makeNodeContext(stage)
-	return stage._childrenFn ? stage._childrenFn(ctx) : stage._children
+	return resolveChildren(stage, makeNodeContext(stage))
 }
 
 function isNodeVisible(node: NodeBuilder, ctx: NodeContext): boolean {
@@ -1393,14 +1311,14 @@ function isNodeVisible(node: NodeBuilder, ctx: NodeContext): boolean {
 
 function shouldShowStage(stage: StageNodeBuilder): boolean {
 	const ctx = makeNodeContext(stage)
-	const children = stage._childrenFn ? stage._childrenFn(ctx) : stage._children
+	const children = resolveChildren(stage, ctx)
 	if (!children.some((n) => isNodeVisible(n, ctx))) return false
 	if (stage._shown) return stage._shown(ctx)
 	return true
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
-	return shouldShowStage(checklist[stageIndex])
+	return shouldShowStage(stages[stageIndex])
 }
 
 function previousStage() {
@@ -1428,7 +1346,7 @@ function nextStage() {
 
 	let targetStage = currentStage.value + 1
 
-	while (targetStage < checklist.length) {
+	while (targetStage < stages.length) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
 			if (!isModpackPermissionsStage.value) {
@@ -1444,7 +1362,7 @@ function nextStage() {
 function goBackToStages() {
 	clearGeneratedMessageState()
 
-	let targetStage = checklist.length - 1
+	let targetStage = stages.length - 1
 	while (targetStage >= 0) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
@@ -1743,7 +1661,7 @@ function clearProjectLocalStorage() {
 }
 
 const isLastVisibleStage = computed(() => {
-	for (let i = currentStage.value + 1; i < checklist.length; i++) {
+	for (let i = currentStage.value + 1; i < stages.length; i++) {
 		if (shouldShowStageIndex(i)) {
 			return false
 		}
@@ -1761,7 +1679,7 @@ const hasValidPreviousStage = computed(() => {
 })
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
-	const options = checklist
+	const options = stages
 		.map((stage, index) => {
 			if (!shouldShowStage(stage)) return null
 
@@ -1775,6 +1693,8 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
 				hoverFilled: true,
 				icon: stage._icon ?? undefined,
+				count: countStageActions(stage) || undefined,
+			requiredMissing: hasRequiredMissing(stage) || undefined,
 			} as OverflowMenuOption
 		})
 		.filter((opt): opt is OverflowMenuOption => opt !== null)
@@ -1791,7 +1711,7 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 	return options
 })
 
-type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string; icon?: Component }
+type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string; icon?: Component; count?: number; requiredMissing?: boolean }
 
 const stageOptionsForSlots = computed(() =>
 	stageOptions.value.filter((opt): opt is StageOverflowSlotOption => 'id' in opt && 'text' in opt),

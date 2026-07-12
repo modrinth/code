@@ -1,4 +1,5 @@
 import type { StageNodeBuilder } from '../types/node'
+import { group } from '../types/node'
 import categories from './stages/categories'
 import description from './stages/description'
 import environment from './stages/environment'
@@ -15,7 +16,7 @@ import titleSlug from './stages/title-slug'
 import undefinedProject from './stages/undefined-project'
 import versions from './stages/versions'
 
-export default [
+export const stages = [
 	titleSlug,
 	summary,
 	description,
@@ -32,3 +33,5 @@ export default [
 	undefinedProject,
 	postApproval,
 ] as ReadonlyArray<StageNodeBuilder>
+
+export default group().children(...stages)
