@@ -373,6 +373,14 @@ export namespace Labrinth {
 				date_created: string
 			}
 
+			export type OverrideFileOnPlatform = {
+				file_path: string
+				sha1: string
+				version_id: string
+				platform_version_id: string
+				platform_project_id: string
+			}
+
 			export type AttributionGroup = {
 				id: string
 				flame_project: FlameProject | null
@@ -381,6 +389,7 @@ export namespace Labrinth {
 				attributed_by: string | null
 				files: AttributionFile[]
 				versions: AttributionVersionInfo[]
+				override_files_on_platform: OverrideFileOnPlatform[]
 			}
 
 			export type UpdateGroupRequest = {
