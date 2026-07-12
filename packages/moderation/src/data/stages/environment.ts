@@ -40,17 +40,15 @@ export default stage(
 							else if (correct_environment === 'Mixed')
 								correct_output = `It looks like some %PROJECT_VERSIONS_FLINK% of your project should have unique environments from other versions, please ensure *each version* is set correctly.`
 
-							return md('checklist/messages/environment/inaccurate', (c) => ({
+							return md('checklist/messages/environment/inaccurate', () => ({
 								CORRECT: correct_output,
 							}))(ctx)
 						})
 						.fix(
-							fix().version((version, ctx) => {
-								const env = ctx.state.correct_environment as
-									| Labrinth.Projects.v3.Environment
-									| undefined
-								if (!env) return false
-								version.environment = env
+							fix().project((patch, ctx) => {
+								const env = ctx.state.correct_environment as Labrinth.Projects.v3.Environment
+								if (!env) return
+								patch.environment = env
 							}),
 						),
 				)

@@ -211,7 +211,7 @@
 
 						<NodeRenderer
 							class="min-h-0 flex-1 overflow-y-auto"
-							:nodes="getStageChildren(currentStageObj)"
+							:nodes="resolveChildren(currentStageObj, makeNodeContext(currentStageObj))"
 							:show-context="makeNodeContext(currentStageObj)"
 							:on-image-upload="onUploadHandler"
 						/>
@@ -367,8 +367,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type {
-	IdentifiedNodeBuilder,
-	NodeBuilder,
+	ActionBuilder,
 	NodeContext,
 	NodeState,
 	Priority,
@@ -377,6 +376,7 @@ import type {
 } from '@modrinth/moderation'
 import {
 	checklist,
+	createTrackedPatch,
 	expandVariables,
 	flattenProjectV3Variables,
 	flattenProjectVariables,
@@ -395,6 +395,7 @@ import {
 	ButtonStyled,
 	Collapsible,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
@@ -436,6 +437,7 @@ const props = defineProps<{
 }>()
 
 const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
+const client = injectModrinthClient()
 
 const moderationQueue = useModerationQueue()
 const queryClient = useQueryClient()
@@ -651,6 +653,7 @@ const persistedState = import.meta.client
 	: null
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
+const generatedActiveActions = ref<ActiveAction[] | null>(null)
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
@@ -669,6 +672,7 @@ const messageText = computed({
 
 function clearGeneratedMessageState() {
 	message.value = null
+	generatedActiveActions.value = null
 }
 
 function handleModpackPermissionsComplete() {
@@ -1050,6 +1054,11 @@ interface MessagePart {
 	content: string
 }
 
+interface ActiveAction {
+	action: ActionBuilder
+	ctx: NodeContext
+}
+
 function handleKeybinds(event: KeyboardEvent) {
 	handleKeybind(
 		event,
@@ -1231,9 +1240,8 @@ function getModpackFilesFromStorage(): {
 
 function countStageActions(stage: StageNodeBuilder): number {
 	const ctx = makeNodeContext(stage)
-	const stageState = nodeStates.value[stage.id] ?? {}
 	let count = 0
-	walkNodes(getStageChildren(stage), stageState, ctx, (node, state) => {
+	walkNodes([stage], nodeStates.value as unknown as Record<string, NodeState>, ctx, (node, state) => {
 		if (node._action && isNodeActive(node, state)) count++
 	})
 	return count
@@ -1241,45 +1249,43 @@ function countStageActions(stage: StageNodeBuilder): number {
 
 function hasRequiredMissing(stage: StageNodeBuilder): boolean {
 	const ctx = makeNodeContext(stage)
-	const stageState = nodeStates.value[stage.id] ?? {}
 	let missing = false
-	walkNodes(getStageChildren(stage), stageState, ctx, (node, state) => {
+	walkNodes([stage], nodeStates.value as unknown as Record<string, NodeState>, ctx, (node, state) => {
 		if (!missing && (node as ValueNodeBuilder)._required && !isNodeActive(node, state)) missing = true
 	})
 	return missing
 }
 
-async function collectNodeMessages(
-	nodes: NodeBuilder[],
-	stageState: Record<string, NodeState>,
-	ctx: NodeContext,
-	parts: MessagePart[],
-): Promise<void> {
-	const tasks: Promise<void>[] = []
-	walkNodes(nodes, stageState, ctx, (identified, nodeState, nodeCtx) => {
-		if (!identified._action?._message || !isNodeActive(identified, nodeState)) return
-		const msgCtx: NodeContext = (identified.type === 'button' || identified.type === 'toggle')
-			? { ...nodeCtx, state: getBooleanChildState(nodeState) }
-			: nodeCtx
-		tasks.push(
-			identified._action._message(msgCtx).then((msg) => {
-				if (msg) parts.push({ priority: identified._action!._priority, content: msg })
-			}),
-		)
-	})
-	await Promise.all(tasks)
-}
-
-async function assembleFullMessage() {
-	const parts: MessagePart[] = []
-
+function collectActiveActions(): ActiveAction[] {
+	const result: ActiveAction[] = []
 	const rootCtx: NodeContext = {
 		project: projectV3.value,
 		projectV2: projectV2.value,
 		state: nodeStates.value as unknown as Record<string, NodeState>,
 		globalState: nodeStates.value,
 	}
-	await collectNodeMessages(resolveChildren(checklist, rootCtx), nodeStates.value as unknown as Record<string, NodeState>, rootCtx, parts)
+	walkNodes([checklist], nodeStates.value as unknown as Record<string, NodeState>, rootCtx, (node, state, ctx) => {
+		if (!node._action || !isNodeActive(node, state)) return
+		const localCtx = (node.type === 'button' || node.type === 'toggle')
+			? { ...ctx, state: getBooleanChildState(state) }
+			: ctx
+		result.push({ action: node._action, ctx: localCtx })
+	})
+	return result
+}
+
+async function assembleFullMessage() {
+	const active = collectActiveActions()
+	generatedActiveActions.value = active
+	const parts: MessagePart[] = []
+
+	await Promise.all(active
+		.filter(a => a.action._message)
+		.map(async (a) => {
+			const msg = await a.action._message!(a.ctx)
+			if (msg) parts.push({ priority: a.action._priority, content: msg })
+		}),
+	)
 
 	parts.sort((a, b) => {
 		if (!a.priority && !b.priority) return 0
@@ -1307,20 +1313,12 @@ function makeNodeContext(stage: StageNodeBuilder): NodeContext {
 	}
 }
 
-function getStageChildren(stage: StageNodeBuilder): NodeBuilder[] {
-	return resolveChildren(stage, makeNodeContext(stage))
-}
-
-function isNodeVisible(node: NodeBuilder, ctx: NodeContext): boolean {
-	return !node._shown || node._shown(ctx)
-}
-
 function shouldShowStage(stage: StageNodeBuilder): boolean {
 	const ctx = makeNodeContext(stage)
-	const children = resolveChildren(stage, ctx)
-	if (!children.some((n) => isNodeVisible(n, ctx))) return false
-	if (stage._shown) return stage._shown(ctx)
-	return true
+	if (stage._shown && !stage._shown(ctx)) return false
+	let hasVisible = false
+	walkNodes([stage], nodeStates.value as unknown as Record<string, NodeState>, ctx, () => { hasVisible = true })
+	return hasVisible
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
@@ -1512,14 +1510,46 @@ async function sendMessage(status: ProjectStatus) {
 		return
 	}
 
+	const active = generatedActiveActions.value ?? collectActiveActions()
+	const shouldApplyFixes = active.some(a => a.action._applyFixes)
+
+	if (shouldApplyFixes) {
+		const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch({} as any)
+		for (const { action, ctx } of active) {
+			for (const f of action._fixes) {
+				f._projectFn?.(projectProxy, ctx)
+			}
+		}
+		const projectFixChanges = projectChanges()
+		if (Object.keys(projectFixChanges).length > 0) {
+			await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
+		}
+	}
+
 	moderationDecision.value = status
 	try {
 		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
-			body: {
-				status,
-			},
+			body: { status },
 		})
+
+		if (shouldApplyFixes && versions.value) {
+			const versionFixes = active.flatMap(({ action, ctx }) =>
+				action._fixes.filter(f => f._versionFn).map(f => ({ fix: f, ctx })),
+			)
+			if (versionFixes.length > 0) {
+				await Promise.all(versions.value.map(async (version) => {
+					const { proxy, changes } = createTrackedPatch({} as any)
+					for (const { fix, ctx } of versionFixes) {
+						fix._versionFn!(proxy, ctx)
+					}
+					const changed = changes()
+					if (Object.keys(changed).length > 0) {
+						await client.labrinth.versions_v3.modifyVersion(version.id, changed)
+					}
+				}))
+			}
+		}
 
 		if (message.value && threadId) {
 			await useBaseFetch(`thread/${threadId}`, {

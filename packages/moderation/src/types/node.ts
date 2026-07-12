@@ -102,15 +102,15 @@ export function createTrackedPatch<T extends object>(source: T): { proxy: T; cha
 }
 
 export class FixBuilder {
-	_projectFn?: (patch: Labrinth.Projects.v3.Project, ctx: NodeContext) => void | false
-	_versionFn?: (patch: Labrinth.Versions.v3.Version, ctx: NodeContext) => void | false
+	_projectFn?: (patch: Labrinth.Projects.v3.EditProjectRequest, ctx: NodeContext) => void
+	_versionFn?: (patch: Labrinth.Versions.v3.ModifyVersionRequest, ctx: NodeContext) => void
 
-	project(fn: (patch: Labrinth.Projects.v3.Project, ctx: NodeContext) => void | false): this {
+	project(fn: (patch: Labrinth.Projects.v3.EditProjectRequest, ctx: NodeContext) => void): this {
 		this._projectFn = fn
 		return this
 	}
 
-	version(fn: (patch: Labrinth.Versions.v3.Version, ctx: NodeContext) => void | false): this {
+	version(fn: (patch: Labrinth.Versions.v3.ModifyVersionRequest, ctx: NodeContext) => void): this {
 		this._versionFn = fn
 		return this
 	}

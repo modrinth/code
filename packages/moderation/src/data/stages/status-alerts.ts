@@ -1,7 +1,7 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 import type { NodeBuilder, NodeState } from '../../types/node'
-import { action, button, group, isNodeActive,label, md, resolveChildren, stage, walkNodes } from '../../types/node'
+import { action, button, group, isNodeActive, label, md, stage, walkNodes } from '../../types/node'
 import checklist from '../checklist'
 
 export default stage(
@@ -27,9 +27,9 @@ export default stage(
 				)
 				.children(ctx => {
 					const result: NodeBuilder[] = []
-					walkNodes(resolveChildren(checklist, ctx), ctx.globalState as unknown as Record<string, NodeState>, ctx, (node, state) => {
+					walkNodes([checklist], ctx.globalState as unknown as Record<string, NodeState>, ctx, (node, state) => {
 						if (!node._action?._fixes?.length || !isNodeActive(node, state)) return
-						result.push(...resolveChildren(node, ctx))
+						result.push(...node._children)
 					})
 					return result
 				}),
