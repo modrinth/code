@@ -359,11 +359,41 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Delete folder"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {mod} other {mods}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Folder \"{name}\" created"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Folder name..."
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Move to {name}"
+  },
+  "app.instance.mods.new-folder": {
+    "message": "New folder"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Create a folder to organize your mods."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "New folder with this mod..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was added"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projects were added"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Remove from folder"
+  },
+  "app.instance.mods.rename-folder": {
+    "message": "Rename"
   },
   "app.instance.mods.share-text": {
     "message": "Check out the projects I'm using in my modpack!"
@@ -706,6 +736,66 @@
   },
   "app.world.world-item.players-online": {
     "message": "{count} online"
+  },
+  "content.page-layout.additional-content": {
+    "message": "Additional content"
+  },
+  "content.page-layout.browse-content": {
+    "message": "Browse content"
+  },
+  "content.page-layout.empty.hint": {
+    "message": "Browse or upload {contentType} to get started"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "message": "Add additional content on top of this modpack"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "message": "No content installed"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "message": "No extra content installed"
+  },
+  "content.page-layout.failed-to-load": {
+    "message": "Failed to load content"
+  },
+  "content.page-layout.no-content-found": {
+    "message": "No content found."
+  },
+  "content.page-layout.search-placeholder": {
+    "message": "Search {count, number} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "message": "File names"
+  },
+  "content.page-layout.share.label": {
+    "message": "Share"
+  },
+  "content.page-layout.share.markdown-links": {
+    "message": "Markdown links"
+  },
+  "content.page-layout.share.project-links": {
+    "message": "Project links"
+  },
+  "content.page-layout.share.project-names": {
+    "message": "Project names"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "message": "Alphabetical"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "message": "Newest first"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "message": "Oldest first"
+  },
+  "content.page-layout.sort.label": {
+    "message": "Sort by {mode}"
+  },
+  "content.page-layout.update-all": {
+    "message": "Update all"
+  },
+  "content.page-layout.upload-files": {
+    "message": "Upload files"
   },
   "friends.action.add-friend": {
     "message": "Add a friend"

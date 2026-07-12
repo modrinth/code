@@ -1,6 +1,12 @@
 <template>
 	<ReadyTransition :pending="loading">
-		<ContentPageLayout>
+		<ModFolderLayout
+			:folders="folders"
+			:toggle-folder="toggleFolder"
+			:rename-folder="showRenameFolder"
+			:delete-folder="deleteFolder"
+			:get-mod-id="getModId"
+		>
 			<template #modals>
 				<ShareModalWrapper
 					ref="shareModal"
@@ -60,19 +66,41 @@
 					@version-select="handleVersionSelect"
 					@version-hover="handleVersionHover"
 				/>
+				<CreateFolderModal
+					ref="createFolderModal"
+					:title="formatMessage(messages.newFolder)"
+					:description="formatMessage(messages.newFolderDescription)"
+					confirm-label="Create"
+					:existing-names="folderNames"
+					@confirm="handleCreateFolder"
+				/>
+				<CreateFolderModal
+					ref="renameFolderModal"
+					:title="formatMessage(messages.renameFolderTitle)"
+					:description="formatMessage(messages.renameFolderDescription)"
+					confirm-label="Rename"
+					:existing-names="folderNames"
+					:exclude-name="renamingFolderName"
+					@confirm="handleRenameFolder"
+				/>
 			</template>
-		</ContentPageLayout>
+		</ModFolderLayout>
 	</ReadyTransition>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
+import {
+	ClipboardCopyIcon,
+	FolderIcon,
+	FolderOpenIcon,
+	FolderUpIcon,
+	PlusIcon,
+} from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
 	commonMessages,
 	ConfirmModpackUpdateModal,
-	ContentCardLayout as ContentPageLayout,
 	type ContentItem,
 	type ContentModpackCardCategory,
 	type ContentModpackCardProject,
@@ -99,6 +127,8 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import CreateFolderModal from '@/components/instance/CreateFolderModal.vue'
+import ModFolderLayout from '@/components/instance/ModFolderLayout.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
@@ -121,6 +151,7 @@ import {
 	update_managed_modrinth_version,
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
+import { useModFolders } from '@/helpers/mod-folders'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
@@ -163,6 +194,38 @@ const messages = defineMessages({
 		id: 'app.instance.mods.bulk-update.finishing',
 		defaultMessage: 'Finishing update...',
 	},
+	newFolder: {
+		id: 'app.instance.mods.new-folder',
+		defaultMessage: 'New folder',
+	},
+	newFolderDescription: {
+		id: 'app.instance.mods.new-folder-description',
+		defaultMessage: 'Create a folder to organize your mods.',
+	},
+	folderCreated: {
+		id: 'app.instance.mods.folder-created',
+		defaultMessage: 'Folder "{name}" created',
+	},
+	removeFromFolder: {
+		id: 'app.instance.mods.remove-from-folder',
+		defaultMessage: 'Remove from folder',
+	},
+	moveToFolder: {
+		id: 'app.instance.mods.move-to-folder',
+		defaultMessage: 'Move to {name}',
+	},
+	newFolderWithMod: {
+		id: 'app.instance.mods.new-folder-with-mod',
+		defaultMessage: 'New folder with this mod...',
+	},
+	renameFolderTitle: {
+		id: 'app.instance.mods.rename-folder-title',
+		defaultMessage: 'Rename folder',
+	},
+	renameFolderDescription: {
+		id: 'app.instance.mods.rename-folder-description',
+		defaultMessage: 'Choose a new name for this folder.',
+	},
 })
 
 let savedModalState: ModpackContentModalState | null = null
@@ -185,6 +248,52 @@ const props = defineProps<{
 	openSettings?: () => void
 	preloadedContent?: InstanceContentData | null
 }>()
+
+const instanceId = computed(() => props.instance.id)
+const {
+	folders,
+	createFolder,
+	deleteFolder,
+	renameFolder,
+	toggleFolder,
+	moveModToFolder,
+	moveModToRoot,
+	getModId,
+} = useModFolders(instanceId)
+
+const createFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
+const renameFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
+const pendingModForFolder = ref<ContentItem | null>(null)
+const pendingRenameFolderId = ref<string | null>(null)
+const renamingFolderName = ref<string>('')
+
+const folderNames = computed(() => folders.value.map((f) => f.name))
+
+function handleCreateFolder(name: string) {
+	const folder = createFolder(name)
+	if (pendingModForFolder.value) {
+		moveModToFolder(pendingModForFolder.value, folder.id)
+		pendingModForFolder.value = null
+	}
+	addNotification({
+		type: 'success',
+		title: formatMessage(messages.folderCreated, { name }),
+	})
+}
+
+function showRenameFolder(folderId: string) {
+	const folder = folders.value.find((f) => f.id === folderId)
+	if (!folder) return
+	pendingRenameFolderId.value = folderId
+	renamingFolderName.value = folder.name
+	renameFolderModal.value?.show(folder.name)
+}
+
+function handleRenameFolder(name: string) {
+	if (!pendingRenameFolderId.value) return
+	renameFolder(pendingRenameFolderId.value, name)
+	pendingRenameFolderId.value = null
+}
 
 function hasPreloadedContent(contentData: InstanceContentData | null | undefined) {
 	return contentData?.path === props.instance.id
@@ -563,6 +672,7 @@ async function removeMod(mod: ContentItem) {
 	try {
 		const removedPath = mod.file_path
 		await remove_project(props.instance.id, removedPath)
+		moveModToRoot(mod)
 		projects.value = projects.value.filter((x) => removedPath !== x.file_path)
 
 		trackEvent('InstanceProjectRemove', {
@@ -741,7 +851,7 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 }
 
 async function handleUpdate(id: string) {
-	const item = projects.value.find((p) => getContentItemId(p) === id)
+	const item = projects.value.find((p) => getContentItemId(p) === id || p.project?.id === id)
 	if (!item || !canUpdateProject(item) || !item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
@@ -1183,6 +1293,41 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 				await navigator.clipboard.writeText(
 					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
 				)
+			},
+		})
+	}
+
+	// Folder options
+	{
+		options.push({ divider: true })
+
+		if (getModId(item)) {
+			const currentFolder = folders.value.find((f) => f.modIds.includes(getModId(item)))
+			if (currentFolder) {
+				options.push({
+					id: formatMessage(messages.removeFromFolder),
+					icon: FolderUpIcon,
+					action: () => moveModToRoot(item),
+				})
+			}
+
+			for (const folder of folders.value) {
+				if (folder.id !== currentFolder?.id) {
+					options.push({
+						id: formatMessage(messages.moveToFolder, { name: folder.name }),
+						icon: FolderIcon,
+						action: () => moveModToFolder(item, folder.id),
+					})
+				}
+			}
+		}
+
+		options.push({
+			id: formatMessage(messages.newFolderWithMod),
+			icon: PlusIcon,
+			action: () => {
+				pendingModForFolder.value = item
+				createFolderModal.value?.show()
 			},
 		})
 	}
