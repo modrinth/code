@@ -4,7 +4,6 @@ import {
 	BanIcon,
 	BugIcon,
 	CheckCheckIcon,
-	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ChevronRightIcon,
@@ -20,7 +19,6 @@ import {
 	ShieldCheckIcon,
 	SpinnerIcon,
 	TimerIcon,
-	TriangleAlertIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
@@ -615,6 +613,18 @@ const remainingUnmarkedCount = computed(() => {
 	return getFileDetailCount(selectedFile.value) - getFileMarkedCount(selectedFile.value)
 })
 
+function getSelectedFileFlags(): ClassGroup['flags'] {
+	if (!selectedFile.value) return []
+
+	return selectedFile.value.issues.flatMap((issue) =>
+		issue.details.map((detail) => ({
+			issueId: issue.id,
+			issueType: issue.issue_type,
+			detail,
+		})),
+	)
+}
+
 function getJarFlags(jarGroup: JarGroup): ClassGroup['flags'] {
 	return jarGroup.classes.flatMap((classItem) => classItem.flags)
 }
@@ -628,6 +638,74 @@ function getJarRemainingUnmarkedCount(jarGroup: JarGroup): number {
 }
 
 const isBatchUpdating = ref(false)
+
+function getRemainingGlobalDetailCount(flags: ClassGroup['flags']): number {
+	return new Set(
+		flags
+			.filter(
+				(flag) =>
+					getDetailDecision(flag.detail.id, flag.detail.status) === 'pending' &&
+					canUpdateGlobalDetail(flag.detail),
+			)
+			.map((flag) => flag.detail.key),
+	).size
+}
+
+async function batchMarkRemainingGlobally(flags: ClassGroup['flags'], verdict: 'safe' | 'unsafe') {
+	if (isBatchUpdating.value) return
+
+	const detailsByKey = new Map(
+		flags
+			.filter(
+				(flag) =>
+					getDetailDecision(flag.detail.id, flag.detail.status) === 'pending' &&
+					canUpdateGlobalDetail(flag.detail),
+			)
+			.map((flag) => [flag.detail.key, flag.detail]),
+	)
+	const details = [...detailsByKey.values()]
+
+	if (details.length === 0) return
+
+	isBatchUpdating.value = true
+	try {
+		await client.labrinth.tech_review_internal.updateGlobalIssueDetails(
+			details.map((detail) => ({ detail_key: detail.key, verdict })),
+		)
+
+		applyDecisionToRelatedDetails(
+			details.map((detail) => detail.id),
+			verdictToDecision(verdict),
+			'global',
+		)
+
+		addNotification({
+			type: 'success',
+			title: `Globally marked ${details.length} trace keys as ${verdict}`,
+			text: `All remaining eligible traces have been globally marked as ${
+				verdict === 'safe' ? 'false positives' : 'malicious'
+			}.`,
+		})
+
+		if (
+			selectedFile.value &&
+			getFileMarkedCount(selectedFile.value) === getFileDetailCount(selectedFile.value)
+		) {
+			backToFileList()
+		}
+
+		emit('refetch')
+	} catch (error) {
+		console.error('Failed to batch update global traces:', error)
+		addNotification({
+			type: 'error',
+			title: 'Global batch update failed',
+			text: 'An error occurred while globally updating traces.',
+		})
+	} finally {
+		isBatchUpdating.value = false
+	}
+}
 
 async function batchMarkRemaining(verdict: 'safe' | 'unsafe') {
 	if (!selectedFile.value || isBatchUpdating.value) return
@@ -1590,20 +1668,53 @@ function copyId() {
 			<template v-else-if="currentTab === 'File' && selectedFile">
 				<div
 					v-if="remainingUnmarkedCount > 0"
-					class="flex gap-2 border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 p-4"
+					class="flex border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 p-4"
 				>
-					<ButtonStyled color="brand" :disabled="isBatchUpdating">
-						<button @click="batchMarkRemaining('safe')">
-							<CheckCircleIcon class="size-5" />
-							Remaining safe ({{ remainingUnmarkedCount }})
+					<div class="detail-verdict-buttons" role="group" aria-label="Remaining issue actions">
+						<span class="remaining-verdict-label"
+							>Remaining issues ({{ remainingUnmarkedCount }})</span
+						>
+						<button
+							v-tooltip="'Remaining globally safe'"
+							class="detail-verdict-button detail-verdict-button--safe"
+							aria-label="Remaining globally safe"
+							:disabled="
+								isBatchUpdating || getRemainingGlobalDetailCount(getSelectedFileFlags()) === 0
+							"
+							@click="batchMarkRemainingGlobally(getSelectedFileFlags(), 'safe')"
+						>
+							<CheckCheckIcon aria-hidden="true" />
 						</button>
-					</ButtonStyled>
-					<ButtonStyled color="red" :disabled="isBatchUpdating">
-						<button @click="batchMarkRemaining('unsafe')">
-							<TriangleAlertIcon class="size-5" />
-							Remaining malware ({{ remainingUnmarkedCount }})
+						<button
+							v-tooltip="'Remaining safe'"
+							class="detail-verdict-button detail-verdict-button--safe"
+							aria-label="Remaining safe"
+							:disabled="isBatchUpdating"
+							@click="batchMarkRemaining('safe')"
+						>
+							<CheckIcon aria-hidden="true" />
 						</button>
-					</ButtonStyled>
+						<button
+							v-tooltip="'Remaining malware'"
+							class="detail-verdict-button detail-verdict-button--unsafe"
+							aria-label="Remaining malware"
+							:disabled="isBatchUpdating"
+							@click="batchMarkRemaining('unsafe')"
+						>
+							<BanIcon aria-hidden="true" />
+						</button>
+						<button
+							v-tooltip="'Remaining globally unsafe'"
+							class="detail-verdict-button detail-verdict-button--unsafe"
+							aria-label="Remaining globally unsafe"
+							:disabled="
+								isBatchUpdating || getRemainingGlobalDetailCount(getSelectedFileFlags()) === 0
+							"
+							@click="batchMarkRemainingGlobally(getSelectedFileFlags(), 'unsafe')"
+						>
+							<ShieldAlertIcon aria-hidden="true" />
+						</button>
+					</div>
 				</div>
 				<div
 					v-for="jarGroup in groupedByJar"
@@ -1637,25 +1748,55 @@ function copyId() {
 								</template>
 							</div>
 
-							<div v-if="getJarRemainingUnmarkedCount(jarGroup) > 0" class="flex gap-2">
-								<ButtonStyled color="brand" size="small">
-									<button
-										:disabled="isBatchUpdating"
-										@click="batchMarkRemainingInJar(jarGroup, 'safe')"
-									>
-										<CheckCircleIcon class="size-4" />
-										Remaining safe ({{ getJarRemainingUnmarkedCount(jarGroup) }})
-									</button>
-								</ButtonStyled>
-								<ButtonStyled color="red" size="small">
-									<button
-										:disabled="isBatchUpdating"
-										@click="batchMarkRemainingInJar(jarGroup, 'unsafe')"
-									>
-										<TriangleAlertIcon class="size-4" />
-										Remaining malware ({{ getJarRemainingUnmarkedCount(jarGroup) }})
-									</button>
-								</ButtonStyled>
+							<div
+								v-if="getJarRemainingUnmarkedCount(jarGroup) > 0"
+								class="detail-verdict-buttons"
+								role="group"
+								aria-label="Remaining JAR issue actions"
+							>
+								<span class="remaining-verdict-label">
+									Remaining issues ({{ getJarRemainingUnmarkedCount(jarGroup) }})
+								</span>
+								<button
+									v-tooltip="'Remaining globally safe'"
+									class="detail-verdict-button detail-verdict-button--safe"
+									aria-label="Remaining globally safe"
+									:disabled="
+										isBatchUpdating || getRemainingGlobalDetailCount(getJarFlags(jarGroup)) === 0
+									"
+									@click="batchMarkRemainingGlobally(getJarFlags(jarGroup), 'safe')"
+								>
+									<CheckCheckIcon aria-hidden="true" />
+								</button>
+								<button
+									v-tooltip="'Remaining safe'"
+									class="detail-verdict-button detail-verdict-button--safe"
+									aria-label="Remaining safe"
+									:disabled="isBatchUpdating"
+									@click="batchMarkRemainingInJar(jarGroup, 'safe')"
+								>
+									<CheckIcon aria-hidden="true" />
+								</button>
+								<button
+									v-tooltip="'Remaining malware'"
+									class="detail-verdict-button detail-verdict-button--unsafe"
+									aria-label="Remaining malware"
+									:disabled="isBatchUpdating"
+									@click="batchMarkRemainingInJar(jarGroup, 'unsafe')"
+								>
+									<BanIcon aria-hidden="true" />
+								</button>
+								<button
+									v-tooltip="'Remaining globally unsafe'"
+									class="detail-verdict-button detail-verdict-button--unsafe"
+									aria-label="Remaining globally unsafe"
+									:disabled="
+										isBatchUpdating || getRemainingGlobalDetailCount(getJarFlags(jarGroup)) === 0
+									"
+									@click="batchMarkRemainingGlobally(getJarFlags(jarGroup), 'unsafe')"
+								>
+									<ShieldAlertIcon aria-hidden="true" />
+								</button>
 							</div>
 						</div>
 					</div>
@@ -1966,6 +2107,14 @@ pre {
 	border: 1px solid var(--surface-5);
 	border-radius: var(--radius-md);
 	background: var(--surface-3);
+}
+
+.remaining-verdict-label {
+	padding-inline: 0.75rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	white-space: nowrap;
+	color: var(--color-secondary);
 }
 
 .detail-verdict-button {
