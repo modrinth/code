@@ -7,19 +7,6 @@ import { formatEnvironments } from '../../utils'
 const textSingle = md('checklist/text/environment/environment')
 const textMultiple = md('checklist/text/environment/environment-multiple')
 
-function envTypeToString(envType: string): string {
-	switch (envType) {
-		case 'client':
-			return 'Client-side Only'
-		case 'server':
-			return 'Server-side Only'
-		case 'mixed':
-			return 'Mixed'
-		default:
-			return 'Unknown'
-	}
-}
-
 export default stage(
 	'environment',
 	'Environment',
