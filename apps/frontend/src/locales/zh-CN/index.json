@@ -3221,9 +3221,6 @@
   "project.download.no-app": {
     "message": "还没有 Modrinth App 吗？"
   },
-  "project.download.no-versions-available": {
-    "message": "没有支持 {platform} {gameVersion} 的版本。"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支持 {gameVersion} 的 {platform}"
   },
@@ -4048,9 +4045,6 @@
   },
   "settings.account.security.email.title": {
     "message": "电子邮箱"
-  },
-  "settings.account.security.passkey.add": {
-    "message": "添加通行密钥"
   },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "请确保你选择的名称易于记忆，方便你日后辨认出该通行密钥。"

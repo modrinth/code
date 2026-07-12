@@ -372,6 +372,14 @@ const messages = defineMessages({
 	},
 })
 
+const advancedFiltersCollapsed = computed({
+	get: () => flags.value.advancedFiltersCollapsed,
+	set: (value) => {
+		flags.value.advancedFiltersCollapsed = value
+		saveFeatureFlags()
+	},
+})
+
 const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 
 debug('projectTypeId:', projectTypeId.value)
@@ -478,6 +486,7 @@ provideBrowseManager({
 	showServerOnly: showServerOnlyToggle,
 	serverOnlyLabel: computed(() => formatMessage(commonMessages.serverOnlyLabel)),
 	hiddenFilterTypes: computed(() => (showServerOnlyToggle.value ? ['environment'] : [])),
+	advancedFiltersCollapsed,
 	displayMode: resultsDisplayMode,
 	cycleDisplayMode: cycleSearchDisplayMode,
 	maxResultsOptions: currentMaxResultsOptions,

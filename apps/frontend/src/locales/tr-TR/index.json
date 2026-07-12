@@ -3167,9 +3167,6 @@
   "project.download.no-app": {
     "message": "Modrinth App Yok Mu?"
   },
-  "project.download.no-versions-available": {
-    "message": "{gameVersion} ve {platform} için sürüm mevcut değil."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}, {gameVersion} sürümünde {platform} desteklemiyor"
   },
@@ -3940,9 +3937,6 @@
   },
   "settings.account.security.email.title": {
     "message": "Eposta"
-  },
-  "settings.account.security.passkey.add": {
-    "message": "Giriş anahtarı ekle"
   },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Giriş anahtarınızı hatırlamanız için akılda kalıcı bir şey seçin."

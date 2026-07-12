@@ -385,7 +385,10 @@ export function flattenProjectVariables(
 	vars[`PROJECT_PERMISSIONS_LINK`] =
 		`https://modrinth.com/project/${project.id}/settings/permissions`
 	vars[`PROJECT_PERMISSIONS_FLINK`] =
-		`[Permissions dashboard](https://modrinth.com/project/${project.id}/settings/permissions)`
+		`[Permissions settings](https://modrinth.com/project/${project.id}/settings/permissions)`
+	vars[`PROJECT_MONETIZATION_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
+	vars[`PROJECT_MONETIZATION_SETTINGS_FLINK`] =
+		`[Monetization settings](https://modrinth.com/project/${project.id}/settings)`
 
 	return vars
 }

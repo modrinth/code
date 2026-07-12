@@ -478,7 +478,6 @@ import {
 	handleKeybind,
 	initializeActionState,
 	kebabToTitleCase,
-	keybinds,
 	type MultiSelectChipsAction,
 	processMessage,
 	type Stage,
@@ -533,6 +532,7 @@ import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
+const keybinds = useModerationKeybinds()
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
@@ -1266,7 +1266,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				},
 			},
 		},
-		keybinds,
+		Object.values(keybinds.value),
 	)
 }
 

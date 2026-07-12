@@ -3227,9 +3227,6 @@
   "project.download.no-app": {
     "message": "Du hast die Modrinth App nicht?"
   },
-  "project.download.no-versions-available": {
-    "message": "Keine Versionen für {gameVersion} und {platform} verfügbar."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} unterstützt {platform} für die {gameVersion} nicht"
   },
@@ -4054,9 +4051,6 @@
   },
   "settings.account.security.email.title": {
     "message": "E-Mail"
-  },
-  "settings.account.security.passkey.add": {
-    "message": "Passkey hinzufügen"
   },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Stell sicher, dass du etwas nimmst, was du dir gut merken kannst, damit du den Passkey später identifizieren kannst."

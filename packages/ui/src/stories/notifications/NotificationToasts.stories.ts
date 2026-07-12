@@ -1,7 +1,8 @@
-import { MinecraftServerIcon } from '@modrinth/assets'
+import { CopyIcon, MinecraftServerIcon, UpdatedIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import { NotificationToast } from '../../components/notifications'
+import type { PopupNotificationButton } from '../../providers'
 
 const avatarUrl =
 	'https://cdn.modrinth.com/user/6Qo4A5QT/9d81be1a9fb1afd163b7f2f05a791955e7693c90.png'
@@ -202,6 +203,46 @@ export const DownloadProgressLabels: Story = {
 					@dismiss="noop"
 				/>
 			</div>
+		`,
+	}),
+}
+
+export const FailedDownloadActions: Story = {
+	render: () => ({
+		components: { NotificationToast },
+		setup() {
+			return {
+				instanceIconUrl: MinecraftServerIcon,
+				actions: [
+					{
+						label: 'Retry',
+						icon: UpdatedIcon,
+						color: 'brand',
+						action: noop,
+					},
+					{
+						label: 'Copy details',
+						icon: CopyIcon,
+						color: 'standard',
+						action: noop,
+					},
+				] satisfies PopupNotificationButton[],
+				noop,
+			}
+		},
+		template: /* html */ `
+			<NotificationToast
+				type="instance-download"
+				entity-name="Cobblemon Official Modpack"
+				:entity-icon-url="instanceIconUrl"
+				status-text="Failed while downloading content."
+				:progress="0"
+				:show-progress="false"
+				wrap-text
+				:actions="actions"
+				@action="(index) => actions[index].action()"
+				@dismiss="noop"
+			/>
 		`,
 	}),
 }

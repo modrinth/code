@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
   },
-  "app.action-bar.install.failed": {
-    "message": "Instalace selhala"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Instalace selhala kvůli zavření aplikace."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Instalace selhala kvůli chybě sítě."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Instalace selhala kvůli neznámé chybě."
-  },
   "app.action-bar.install.open-instance": {
     "message": "Otevřít instanci"
   },

@@ -1,4 +1,4 @@
-import { UpdatedIcon } from '@modrinth/assets'
+import { CheckIcon, CopyIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	defineMessages,
 	type PopupNotificationButton,
@@ -15,9 +15,11 @@ import {
 	install_job_dismiss,
 	install_job_list,
 	install_job_retry,
+	install_job_support_details,
 	installJobInstanceId,
 	type InstallJobSnapshot,
 	type InstallJobStatus,
+	type InstallPhaseId,
 	type InstallProgress,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
@@ -31,6 +33,14 @@ const messages = defineMessages({
 		id: 'app.action-bar.install.retry',
 		defaultMessage: 'Retry',
 	},
+	copyDetails: {
+		id: 'app.action-bar.install.copy-details',
+		defaultMessage: 'Copy details',
+	},
+	copied: {
+		id: 'app.action-bar.install.copied-details',
+		defaultMessage: 'Copied',
+	},
 	dismiss: {
 		id: 'app.action-bar.install.dismiss',
 		defaultMessage: 'Dismiss',
@@ -38,22 +48,6 @@ const messages = defineMessages({
 	openInstance: {
 		id: 'app.action-bar.install.open-instance',
 		defaultMessage: 'Open instance',
-	},
-	installFailed: {
-		id: 'app.action-bar.install.failed',
-		defaultMessage: 'Install failed',
-	},
-	installFailedAppClosed: {
-		id: 'app.action-bar.install.failed-app-closed',
-		defaultMessage: 'Installation failed due to app closing.',
-	},
-	installFailedNetwork: {
-		id: 'app.action-bar.install.failed-network',
-		defaultMessage: 'Installation failed due to a network error.',
-	},
-	installFailedUnknown: {
-		id: 'app.action-bar.install.failed-unknown',
-		defaultMessage: 'Installation failed due to an unknown error.',
 	},
 	unknownInstance: {
 		id: 'app.action-bar.install.unknown-instance',
@@ -64,7 +58,7 @@ const messages = defineMessages({
 const phaseMessages = defineMessages({
 	preparing_instance: {
 		id: 'app.install.phase.preparing_instance',
-		defaultMessage: 'Preparing instance',
+		defaultMessage: 'Queued to install',
 	},
 	resolving_pack: {
 		id: 'app.install.phase.resolving_pack',
@@ -139,7 +133,97 @@ const javaStepMessages = defineMessages({
 	},
 })
 
+const failureSummaryMessages = defineMessages({
+	canceled: {
+		id: 'app.action-bar.install.summary.canceled',
+		defaultMessage: 'Canceled',
+	},
+	appClosed: {
+		id: 'app.action-bar.install.summary.app-closing',
+		defaultMessage: 'Canceled due to app closing',
+	},
+	downloadFailed: {
+		id: 'app.action-bar.install.summary.download-failed',
+		defaultMessage: "Download couldn't finish",
+	},
+	modrinthUnreachable: {
+		id: 'app.action-bar.install.summary.modrinth-unreachable',
+		defaultMessage: "Couldn't reach Modrinth",
+	},
+	packDownloadFailed: {
+		id: 'app.action-bar.install.summary.pack-download-failed',
+		defaultMessage: "Couldn't download pack",
+	},
+	badModpackFile: {
+		id: 'app.action-bar.install.summary.bad-modpack-file',
+		defaultMessage: "Couldn't read modpack",
+	},
+	invalidModpack: {
+		id: 'app.action-bar.install.summary.invalid-modpack',
+		defaultMessage: 'Modpack data invalid',
+	},
+	contentDownloadFailed: {
+		id: 'app.action-bar.install.summary.content-download-failed',
+		defaultMessage: "Couldn't download files",
+	},
+	corruptDownload: {
+		id: 'app.action-bar.install.summary.corrupt-download',
+		defaultMessage: 'Downloaded file is corrupt',
+	},
+	invalidModpackFiles: {
+		id: 'app.action-bar.install.summary.invalid-modpack-files',
+		defaultMessage: 'Modpack files have invalid metadata',
+	},
+	noWritePermission: {
+		id: 'app.action-bar.install.summary.no-write-permission',
+		defaultMessage: 'No permission to write',
+	},
+	couldNotSaveFiles: {
+		id: 'app.action-bar.install.summary.could-not-save-files',
+		defaultMessage: "Couldn't save files",
+	},
+	invalidFilePath: {
+		id: 'app.action-bar.install.summary.invalid-file-path',
+		defaultMessage: 'File path is invalid',
+	},
+	instanceNotFound: {
+		id: 'app.action-bar.install.summary.instance-not-found',
+		defaultMessage: "Instance couldn't be found",
+	},
+	cleanupIncomplete: {
+		id: 'app.action-bar.install.summary.cleanup-incomplete',
+		defaultMessage: "Cleanup didn't finish",
+	},
+	javaSetupFailed: {
+		id: 'app.action-bar.install.summary.java-setup-failed',
+		defaultMessage: "Java setup couldn't finish",
+	},
+	minecraftSetupFailed: {
+		id: 'app.action-bar.install.summary.minecraft-setup-failed',
+		defaultMessage: 'Minecraft setup failed',
+	},
+	loaderSetupFailed: {
+		id: 'app.action-bar.install.summary.loader-setup-failed',
+		defaultMessage: 'Loader setup failed',
+	},
+	localDataError: {
+		id: 'app.action-bar.install.summary.local-data-error',
+		defaultMessage: "Couldn't update local data",
+	},
+	unexpectedError: {
+		id: 'app.action-bar.install.summary.unexpected-error',
+		defaultMessage: 'Something went wrong',
+	},
+})
+
 const visibleJobStatuses = new Set<InstallJobStatus>(['queued', 'running', 'failed', 'interrupted'])
+const copyDetailsStallMs = 30_000
+
+interface ProgressSnapshot {
+	signature: string
+	changedAt: number
+	timeout: number | null
+}
 
 function getDisplayIconUrl(icon: string | null | undefined): string | null {
 	if (!icon) return null
@@ -156,10 +240,13 @@ export async function useInstallJobNotifications(opts: {
 	const jobs = ref<InstallJobSnapshot[]>([])
 	const iconUrls = ref<Record<string, string | null>>({})
 	const instanceNames = ref<Record<string, string>>({})
+	const copiedJobIds = ref<Set<string>>(new Set())
 	const jobOrder = new Map<string, number>()
 	let refreshRequest = 0
 	let metadataRequest = 0
 	let nextJobOrder = 0
+	const copiedResetTimeouts = new Map<string, number>()
+	const progressSnapshots = new Map<string, ProgressSnapshot>()
 
 	function getTitle(job: InstallJobSnapshot): string {
 		if (job.display?.title) return job.display.title
@@ -174,13 +261,7 @@ export async function useInstallJobNotifications(opts: {
 
 	function getText(job: InstallJobSnapshot): string {
 		if (job.status === 'failed' || job.status === 'interrupted') {
-			if (job.error?.code === 'interrupted') {
-				return formatMessage(messages.installFailedAppClosed)
-			}
-			if (job.error?.code === 'network_error') {
-				return formatMessage(messages.installFailedNetwork)
-			}
-			return formatMessage(messages.installFailedUnknown)
+			return getFailureSummary(job)
 		}
 		if (job.phase === 'preparing_java' && job.details.type === 'java') {
 			return formatMessage(javaStepMessages[job.details.step], {
@@ -188,6 +269,104 @@ export async function useInstallJobNotifications(opts: {
 			})
 		}
 		return formatMessage(phaseMessages[job.phase])
+	}
+
+	function getFailureSummary(job: InstallJobSnapshot): string {
+		const code = job.error?.code
+		const phase = job.error?.phase ?? job.phase
+
+		if (code === 'app_closed' || (job.status === 'interrupted' && code === 'interrupted')) {
+			return formatMessage(failureSummaryMessages.appClosed)
+		}
+		if (code === 'canceled') {
+			return formatMessage(failureSummaryMessages.canceled)
+		}
+		if (job.rollback_error || code === 'rollback_error') {
+			return formatMessage(failureSummaryMessages.cleanupIncomplete)
+		}
+		if (hasPermissionError(job)) {
+			return formatMessage(failureSummaryMessages.noWritePermission)
+		}
+
+		switch (code) {
+			case 'network_error':
+				return formatMessage(
+					phase === 'downloading_pack_file'
+						? failureSummaryMessages.packDownloadFailed
+						: failureSummaryMessages.downloadFailed,
+				)
+			case 'api_error':
+				return formatMessage(failureSummaryMessages.modrinthUnreachable)
+			case 'pack_error':
+				return formatMessage(
+					phase === 'downloading_pack_file'
+						? failureSummaryMessages.packDownloadFailed
+						: failureSummaryMessages.invalidModpack,
+				)
+			case 'archive_error':
+				return formatMessage(failureSummaryMessages.badModpackFile)
+			case 'parse_error':
+				return formatMessage(failureSummaryMessages.invalidModpack)
+			case 'content_error':
+				return formatMessage(failureSummaryMessages.invalidModpackFiles)
+			case 'hash_error':
+				return formatMessage(failureSummaryMessages.corruptDownload)
+			case 'filesystem_error':
+				return formatMessage(failureSummaryMessages.couldNotSaveFiles)
+			case 'path_error':
+				return formatMessage(failureSummaryMessages.invalidFilePath)
+			case 'instance_error':
+				return formatMessage(failureSummaryMessages.instanceNotFound)
+			case 'java_error':
+				return formatMessage(failureSummaryMessages.javaSetupFailed)
+			case 'loader_error':
+			case 'processor_error':
+				return formatMessage(failureSummaryMessages.loaderSetupFailed)
+			case 'database_error':
+				return formatMessage(failureSummaryMessages.localDataError)
+			case 'launcher_error':
+			case 'metadata_error':
+				return getFailureSummaryForPhase(phase)
+			default:
+				return getFailureSummaryForPhase(phase)
+		}
+	}
+
+	function getFailureSummaryForPhase(phase: InstallPhaseId): string {
+		switch (phase) {
+			case 'downloading_pack_file':
+				return formatMessage(failureSummaryMessages.packDownloadFailed)
+			case 'resolving_pack':
+			case 'reading_pack_manifest':
+				return formatMessage(failureSummaryMessages.invalidModpack)
+			case 'downloading_content':
+				return formatMessage(failureSummaryMessages.contentDownloadFailed)
+			case 'extracting_overrides':
+				return formatMessage(failureSummaryMessages.couldNotSaveFiles)
+			case 'resolving_minecraft':
+			case 'downloading_minecraft':
+				return formatMessage(failureSummaryMessages.minecraftSetupFailed)
+			case 'resolving_loader':
+			case 'running_loader_processors':
+				return formatMessage(failureSummaryMessages.loaderSetupFailed)
+			case 'preparing_java':
+				return formatMessage(failureSummaryMessages.javaSetupFailed)
+			case 'preparing_instance':
+				return formatMessage(failureSummaryMessages.instanceNotFound)
+			case 'rolling_back':
+				return formatMessage(failureSummaryMessages.cleanupIncomplete)
+			default:
+				return formatMessage(failureSummaryMessages.unexpectedError)
+		}
+	}
+
+	function hasPermissionError(job: InstallJobSnapshot): boolean {
+		const message = job.error?.message.toLowerCase() ?? ''
+		return (
+			message.includes('permission denied') ||
+			message.includes('access is denied') ||
+			message.includes('operation not permitted')
+		)
 	}
 
 	function getProgressType(job: InstallJobSnapshot): PopupNotificationProgressType | undefined {
@@ -235,11 +414,165 @@ export async function useInstallJobNotifications(opts: {
 		return job.status === 'failed' || job.status === 'interrupted'
 	}
 
-	function getTerminalButtons(job: InstallJobSnapshot): PopupNotificationButton[] | undefined {
-		if (!isTerminalJob(job)) return undefined
+	function canShowStalledProgressDetails(job: InstallJobSnapshot): boolean {
+		return (
+			job.status === 'running' &&
+			job.phase !== 'preparing_instance' &&
+			job.phase !== 'finalizing' &&
+			job.phase !== 'rolling_back'
+		)
+	}
 
+	function getJobSortRank(job: InstallJobSnapshot): number {
+		if (isTerminalJob(job)) return 0
+		if (job.status === 'queued' || job.phase === 'preparing_instance') return 2
+		return 1
+	}
+
+	function progressSignature(job: InstallJobSnapshot): string {
+		const progress = job.progress
+		const secondary = progress?.secondary
 		return [
-			{
+			job.status,
+			job.phase,
+			JSON.stringify(job.details),
+			progress?.current ?? '',
+			progress?.total ?? '',
+			secondary?.current ?? '',
+			secondary?.total ?? '',
+		].join(':')
+	}
+
+	function clearCopied(jobId: string) {
+		if (!copiedJobIds.value.has(jobId)) {
+			return
+		}
+
+		const timeout = copiedResetTimeouts.get(jobId)
+		if (timeout != null) {
+			window.clearTimeout(timeout)
+			copiedResetTimeouts.delete(jobId)
+		}
+
+		const nextCopiedJobIds = new Set(copiedJobIds.value)
+		nextCopiedJobIds.delete(jobId)
+		copiedJobIds.value = nextCopiedJobIds
+	}
+
+	function clearProgressSnapshot(jobId: string) {
+		const snapshot = progressSnapshots.get(jobId)
+		if (snapshot?.timeout != null) {
+			window.clearTimeout(snapshot.timeout)
+		}
+		progressSnapshots.delete(jobId)
+	}
+
+	function scheduleStaleProgressRefresh(jobId: string) {
+		const snapshot = progressSnapshots.get(jobId)
+		if (!snapshot) {
+			return
+		}
+
+		snapshot.timeout = window.setTimeout(() => {
+			const snapshot = progressSnapshots.get(jobId)
+			if (!snapshot) {
+				return
+			}
+
+			snapshot.timeout = null
+			opts.onChange()
+		}, copyDetailsStallMs)
+	}
+
+	function syncProgressSnapshots(nextJobs: InstallJobSnapshot[]) {
+		const trackedJobIds = new Set<string>()
+		const now = Date.now()
+
+		for (const job of nextJobs) {
+			if (!canShowStalledProgressDetails(job)) {
+				continue
+			}
+
+			trackedJobIds.add(job.job_id)
+			const signature = progressSignature(job)
+			const snapshot = progressSnapshots.get(job.job_id)
+			if (snapshot?.signature === signature) {
+				continue
+			}
+
+			clearProgressSnapshot(job.job_id)
+			clearCopied(job.job_id)
+			progressSnapshots.set(job.job_id, {
+				signature,
+				changedAt: now,
+				timeout: null,
+			})
+			scheduleStaleProgressRefresh(job.job_id)
+		}
+
+		for (const jobId of progressSnapshots.keys()) {
+			if (!trackedJobIds.has(jobId)) {
+				clearProgressSnapshot(jobId)
+			}
+		}
+	}
+
+	function hasStalledProgress(job: InstallJobSnapshot): boolean {
+		const snapshot = progressSnapshots.get(job.job_id)
+		return !!snapshot && Date.now() - snapshot.changedAt >= copyDetailsStallMs
+	}
+
+	function shouldShowCopyDetails(job: InstallJobSnapshot): boolean {
+		return isTerminalJob(job) || (canShowStalledProgressDetails(job) && hasStalledProgress(job))
+	}
+
+	function isCopied(job: InstallJobSnapshot): boolean {
+		return copiedJobIds.value.has(job.job_id)
+	}
+
+	function setCopied(job: InstallJobSnapshot) {
+		copiedJobIds.value = new Set([...copiedJobIds.value, job.job_id])
+		const existingTimeout = copiedResetTimeouts.get(job.job_id)
+		if (existingTimeout != null) {
+			window.clearTimeout(existingTimeout)
+		}
+		copiedResetTimeouts.set(
+			job.job_id,
+			window.setTimeout(() => {
+				copiedResetTimeouts.delete(job.job_id)
+				if (!copiedJobIds.value.has(job.job_id)) {
+					return
+				}
+				const nextCopiedJobIds = new Set(copiedJobIds.value)
+				nextCopiedJobIds.delete(job.job_id)
+				copiedJobIds.value = nextCopiedJobIds
+				opts.onChange()
+			}, 1_000),
+		)
+		opts.onChange()
+	}
+
+	async function copyJobDetails(job: InstallJobSnapshot) {
+		const details = await install_job_support_details(job.job_id).catch((error) => {
+			opts.handleError(error)
+			return null
+		})
+		if (!details) {
+			return
+		}
+		try {
+			await navigator.clipboard.writeText(details)
+			setCopied(job)
+		} catch (error) {
+			opts.handleError(error)
+		}
+	}
+
+	function getButtons(job: InstallJobSnapshot): PopupNotificationButton[] {
+		const buttons: PopupNotificationButton[] = []
+
+		if (isTerminalJob(job)) {
+			buttons.push({
 				label: formatMessage(messages.retry),
 				icon: UpdatedIcon,
 				color: 'brand',
@@ -248,8 +581,23 @@ export async function useInstallJobNotifications(opts: {
 					await install_job_retry(job.job_id).catch(opts.handleError)
 					await refresh()
 				},
-			},
-		]
+			})
+		}
+
+		if (shouldShowCopyDetails(job)) {
+			const copied = isCopied(job)
+			buttons.push({
+				label: formatMessage(copied ? messages.copied : messages.copyDetails),
+				icon: copied ? CheckIcon : CopyIcon,
+				color: 'standard',
+				keepOpen: true,
+				action: async () => {
+					await copyJobDetails(job)
+				},
+			})
+		}
+
+		return buttons
 	}
 
 	function setJobs(nextJobs: InstallJobSnapshot[]) {
@@ -259,13 +607,15 @@ export async function useInstallJobNotifications(opts: {
 			}
 		}
 
-		jobs.value = nextJobs
-			.filter((job) => visibleJobStatuses.has(job.status))
-			.sort(
-				(a, b) =>
-					a.created.localeCompare(b.created) ||
-					(jobOrder.get(a.job_id) ?? 0) - (jobOrder.get(b.job_id) ?? 0),
-			)
+		const visibleJobs = nextJobs.filter((job) => visibleJobStatuses.has(job.status))
+		syncProgressSnapshots(visibleJobs)
+
+		jobs.value = visibleJobs.sort(
+			(a, b) =>
+				getJobSortRank(a) - getJobSortRank(b) ||
+				a.created.localeCompare(b.created) ||
+				(jobOrder.get(a.job_id) ?? 0) - (jobOrder.get(b.job_id) ?? 0),
+		)
 	}
 
 	const progressItems = computed<PopupNotificationProgressItem[]>(() =>
@@ -284,7 +634,7 @@ export async function useInstallJobNotifications(opts: {
 				progressType: isTerminalJob(job) ? undefined : getProgressType(job),
 				progressCurrent: isTerminalJob(job) ? undefined : progress?.current,
 				progressTotal: isTerminalJob(job) ? undefined : progress?.total,
-				buttons: getTerminalButtons(job),
+				buttons: getButtons(job),
 				onDismiss: isTerminalJob(job)
 					? async () => {
 							await install_job_dismiss(job.job_id).catch(opts.handleError)
@@ -382,6 +732,14 @@ export async function useInstallJobNotifications(opts: {
 		progressItems,
 		buttons,
 		refresh,
-		dispose: () => unlisten(),
+		dispose: () => {
+			for (const timeout of copiedResetTimeouts.values()) {
+				window.clearTimeout(timeout)
+			}
+			for (const jobId of progressSnapshots.keys()) {
+				clearProgressSnapshot(jobId)
+			}
+			unlisten()
+		},
 	}
 }

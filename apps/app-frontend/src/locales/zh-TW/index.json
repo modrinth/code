@@ -14,18 +14,6 @@
   "app.action-bar.install.dismiss": {
     "message": "忽略"
   },
-  "app.action-bar.install.failed": {
-    "message": "無法安裝"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "由於應用程式關閉，無法安裝。"
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "由於網路錯誤，無法安裝。"
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "由於未知錯誤，無法安裝。"
-  },
   "app.action-bar.install.open-instance": {
     "message": "開啟實例"
   },

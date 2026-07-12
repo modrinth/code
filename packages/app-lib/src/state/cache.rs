@@ -101,6 +101,9 @@ impl CacheValueType {
             // ModpackFiles never expire - version_id is immutable so hashes never change
             // TODO: There has to be a way to exclude this from the "Purge cache" stuff?
             CacheValueType::ModpackFiles => 100 * 365 * 24 * 60 * 60, // 100 years (effectively never)
+            CacheValueType::SearchResults | CacheValueType::SearchResultsV3 => {
+                10 * 60 // 10 minutes
+            }
             _ => 30 * 60, // 30 minutes
         }
     }
@@ -1396,19 +1399,25 @@ impl CachedEntry {
                 let fetch_urls = keys
                     .iter()
                     .map(|x| {
+                        let metadata =
+                            daedalus::modded::loader_manifest_metadata_from_cache_key(
+                                &x.key().to_string(),
+                            );
+
                         (
-                            x.key().to_string(),
+                            metadata.cache_key,
+                            metadata.loader,
                             format!(
-                                "{}{}/v0/manifest.json",
+                                "{}{}",
                                 env!("MODRINTH_LAUNCHER_META_URL"),
-                                x.key()
+                                metadata.path,
                             ),
                         )
                     })
                     .collect::<Vec<_>>();
 
                 futures::future::try_join_all(fetch_urls.iter().map(
-                    |(_, url)| {
+                    |(_, _, url)| {
                         fetch_json(
                             Method::GET,
                             url,
@@ -1424,14 +1433,15 @@ impl CachedEntry {
                 .into_iter()
                 .enumerate()
                 .map(|(index, metadata)| {
-                    (
+                    let mut entry =
                         CacheValue::LoaderManifest(CachedLoaderManifest {
-                            loader: fetch_urls[index].0.to_string(),
+                            loader: fetch_urls[index].1.to_string(),
                             manifest: metadata,
                         })
-                        .get_entry(),
-                        true,
-                    )
+                        .get_entry();
+                    entry.id.clone_from(&fetch_urls[index].0);
+
+                    (entry, true)
                 })
                 .collect()
             }

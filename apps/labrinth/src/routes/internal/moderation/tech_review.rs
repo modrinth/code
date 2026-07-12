@@ -31,19 +31,29 @@ use crate::{
         threads::{MessageBody, Thread},
     },
     queue::session::AuthQueue,
-    routes::{ApiError, internal::moderation::Ownership},
+    routes::{
+        ApiError,
+        internal::{
+            delphi::tech_review_sync::{self, TechReviewExitReason},
+            moderation::Ownership,
+        },
+    },
     search::SearchState,
     util::error::Context,
 };
 use eyre::eyre;
 
+pub mod global;
+
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search_projects)
+        .configure(global::config)
         .service(get_project_report)
         .service(get_report)
         .service(get_issue)
         .service(submit_report)
         .service(update_issue_details)
+        .service(update_global_issue_details)
         .service(add_report);
 }
 
@@ -234,6 +244,8 @@ pub async fn get_issue(
                             'decompiled_source', didws.decompiled_source,
                             'data', didws.data,
                             'severity', didws.severity,
+                            'local_status', didws.local_status,
+                            'global_status', didws.global_status,
                             'status', didws.status
                         )
                     ), '[]'::jsonb)
@@ -309,6 +321,8 @@ pub async fn get_report(
                                         'decompiled_source', didws.decompiled_source,
                                         'data', didws.data,
                                         'severity', didws.severity,
+                                        'local_status', didws.local_status,
+                                        'global_status', didws.global_status,
                                         'status', didws.status
                                     )
                                 ), '[]'::jsonb)
@@ -502,23 +516,18 @@ async fn fetch_project_reports(
     let detail_rows = sqlx::query!(
         r#"
         SELECT
-            drid.id AS "id!: DelphiReportIssueDetailsId",
-            drid.issue_id AS "issue_id!: DelphiReportIssueId",
-            drid.key AS "key!: String",
-            drid.jar AS "jar?: String",
-            drid.file_path AS "file_path!: String",
-            drid.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
-            drid.severity AS "severity!: DelphiSeverity",
-            COALESCE(didv.verdict, 'pending'::delphi_report_issue_status) AS "status!: DelphiStatus"
-        FROM delphi_report_issue_details drid
-        INNER JOIN delphi_report_issues dri ON dri.id = drid.issue_id
-        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
-        INNER JOIN files f ON f.id = dr.file_id
-        INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN mods m ON m.id = v.mod_id
-        LEFT JOIN delphi_issue_detail_verdicts didv
-            ON m.id = didv.project_id AND drid.key = didv.detail_key
-        WHERE drid.issue_id = ANY($1::bigint[])
+            didws.id AS "id!: DelphiReportIssueDetailsId",
+            didws.issue_id AS "issue_id!: DelphiReportIssueId",
+            didws.key AS "key!: String",
+            didws.jar AS "jar?: String",
+            didws.file_path AS "file_path!: String",
+            didws.data AS "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
+            didws.severity AS "severity!: DelphiSeverity",
+            didws.local_status AS "local_status?: DelphiStatus",
+            didws.global_status AS "global_status?: DelphiStatus",
+            didws.status AS "status!: DelphiStatus"
+        FROM delphi_issue_details_with_statuses didws
+        WHERE didws.issue_id = ANY($1::bigint[])
         "#,
         &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
     )
@@ -574,6 +583,8 @@ async fn fetch_project_reports(
                 decompiled_source: None,
                 data: d.data.0,
                 severity: d.severity,
+                local_status: d.local_status,
+                global_status: d.global_status,
                 status: d.status,
             })
             .into_group_map_by(|d| d.issue_id);
@@ -718,10 +729,8 @@ pub async fn search_projects(
         INNER JOIN files f ON f.version_id = v.id
         INNER JOIN delphi_reports dr ON dr.file_id = f.id
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        INNER JOIN delphi_report_issue_details drid
-            ON drid.issue_id = dri.id
-        LEFT JOIN delphi_issue_detail_verdicts didv
-            ON m.id = didv.project_id AND drid.key = didv.detail_key
+        INNER JOIN delphi_issue_details_with_statuses didws
+            ON didws.issue_id = dri.id
         LEFT JOIN threads_messages tm_last
             ON tm_last.thread_id = t.id
             AND tm_last.id = (
@@ -766,7 +775,7 @@ pub async fn search_projects(
             AND m.status NOT IN ('draft', 'rejected', 'withheld')
             AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
             AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
-            AND (didv.verdict IS NULL OR didv.verdict = 'pending'::delphi_report_issue_status)
+            AND didws.status = 'pending'
             AND (
                 $5::text IS NULL
                 OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
@@ -1170,7 +1179,20 @@ pub struct UpdateIssue {
     /// ID of the issue detail to update.
     pub detail_id: DelphiReportIssueDetailsId,
     /// What the moderator has decided the outcome of this issue is.
-    pub verdict: DelphiVerdict,
+    ///
+    /// `pending` removes the project-local verdict for this issue detail.
+    pub verdict: DelphiStatus,
+}
+
+/// See [`update_global_issue_details`].
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UpdateGlobalIssue {
+    /// Key of the issue detail to update globally.
+    pub detail_key: String,
+    /// What the moderator has decided the outcome of this issue is globally.
+    ///
+    /// `pending` removes the global verdict for this issue detail key.
+    pub verdict: DelphiStatus,
 }
 
 /// Update technical review issue details.  
@@ -1210,8 +1232,9 @@ pub async fn update_issue_details(
     let verdicts = updates
         .iter()
         .map(|u| match u.verdict {
-            DelphiVerdict::Safe => "safe".to_string(),
-            DelphiVerdict::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Safe => "safe".to_string(),
+            DelphiStatus::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Pending => "pending".to_string(),
         })
         .collect::<Vec<_>>();
 
@@ -1227,7 +1250,7 @@ pub async fn update_issue_details(
                 i.ord,
                 didws.project_id,
                 didws.key AS detail_key,
-                i.verdict::delphi_report_issue_status AS verdict
+                i.verdict
             FROM incoming i
             INNER JOIN delphi_issue_details_with_statuses didws ON didws.id = i.detail_id
             INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
@@ -1240,18 +1263,35 @@ pub async fn update_issue_details(
                 (SELECT COUNT(*) FROM incoming) AS incoming_count,
                 (SELECT COUNT(*) FROM resolved) AS resolved_count
         ),
-        upserted AS (
-            INSERT INTO delphi_issue_detail_verdicts (
-                project_id,
-                detail_key,
-                verdict
-            )
+        latest AS (
             SELECT DISTINCT ON (project_id, detail_key)
                 project_id,
                 detail_key,
                 verdict
             FROM resolved
             ORDER BY project_id, detail_key, ord DESC
+        ),
+        deleted AS (
+            DELETE FROM delphi_issue_detail_verdicts didv
+            USING latest
+            WHERE
+                didv.project_id = latest.project_id
+                AND didv.detail_key = latest.detail_key
+                AND latest.verdict = 'pending'
+            RETURNING 1
+        ),
+        upserted AS (
+            INSERT INTO delphi_issue_detail_verdicts (
+                project_id,
+                detail_key,
+                verdict
+            )
+            SELECT
+                project_id,
+                detail_key,
+                verdict::delphi_report_issue_status
+            FROM latest
+            WHERE verdict != 'pending'
             ON CONFLICT (project_id, detail_key)
             DO UPDATE SET verdict = EXCLUDED.verdict
             RETURNING 1
@@ -1271,6 +1311,145 @@ pub async fn update_issue_details(
     if !record.all_found {
         return Err(ApiError::Request(eyre!("issue detail does not exist")));
     }
+
+    let affected_projects = sqlx::query!(
+        r#"
+        SELECT DISTINCT didws.project_id AS "project_id!: DBProjectId"
+        FROM delphi_issue_details_with_statuses didws
+        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+        WHERE
+            didws.id = ANY($1::bigint[])
+            AND dri.issue_type != '__dummy'
+        "#,
+        &detail_ids,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_internal_err(
+        "failed to fetch projects affected by issue detail updates",
+    )?;
+
+    let affected_project_ids = affected_projects
+        .into_iter()
+        .map(|row| row.project_id)
+        .collect::<Vec<_>>();
+
+    tech_review_sync::sync_project_tech_review_state(
+        &affected_project_ids,
+        TechReviewExitReason::Resolved,
+        &mut txn,
+    )
+    .await?;
+
+    txn.commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
+
+    Ok(())
+}
+
+/// Update global technical review issue detail verdicts.
+///
+/// This marks every issue detail with a matching key as safe or unsafe, or
+/// unsets the global verdict with `pending`.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = NO_CONTENT))
+)]
+#[post("/global-issue-detail")]
+pub async fn update_global_issue_details(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    update_reqs: web::Json<Vec<UpdateGlobalIssue>>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+
+    let updates = update_reqs.into_inner();
+
+    if updates.iter().any(|u| {
+        u.detail_key.is_empty() || u.detail_key.starts_with("<no-key-")
+    }) {
+        return Err(ApiError::Request(eyre!(
+            "detail key cannot be empty or generated fallback key"
+        )));
+    }
+
+    let detail_keys = updates
+        .iter()
+        .map(|u| u.detail_key.clone())
+        .collect::<Vec<_>>();
+    let verdicts = updates
+        .iter()
+        .map(|u| match u.verdict {
+            DelphiStatus::Safe => "safe".to_string(),
+            DelphiStatus::Unsafe => "unsafe".to_string(),
+            DelphiStatus::Pending => "pending".to_string(),
+        })
+        .collect::<Vec<_>>();
+
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to start transaction")?;
+
+    sqlx::query!(
+        r#"
+        WITH incoming AS (
+            SELECT *
+            FROM unnest($1::text[], $2::text[]) WITH ORDINALITY
+                AS u(detail_key, verdict, ord)
+        ),
+        latest AS (
+            SELECT DISTINCT ON (detail_key)
+                detail_key,
+                verdict
+            FROM incoming
+            ORDER BY detail_key, ord DESC
+        ),
+        deleted AS (
+            DELETE FROM delphi_global_detail_verdicts dgdv
+            USING latest
+            WHERE
+                dgdv.detail_key = latest.detail_key
+                AND latest.verdict = 'pending'
+            RETURNING 1
+        )
+        INSERT INTO delphi_global_detail_verdicts (
+            detail_key,
+            verdict
+        )
+        SELECT
+            detail_key,
+            verdict::delphi_report_issue_status
+        FROM latest
+        WHERE verdict != 'pending'
+        ON CONFLICT (detail_key)
+        DO UPDATE SET verdict = EXCLUDED.verdict
+        "#,
+        &detail_keys,
+        &verdicts,
+    )
+    .execute(&mut txn)
+    .await
+    .wrap_internal_err("failed to update global issue details")?;
+
+    tech_review_sync::sync_detail_key_tech_review_state(
+        &detail_keys,
+        TechReviewExitReason::Resolved,
+        &mut txn,
+    )
+    .await?;
 
     txn.commit()
         .await

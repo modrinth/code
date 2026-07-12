@@ -15,6 +15,8 @@ pub struct LegacySearchResults {
 pub struct LegacyResultSearchProject {
     pub project_id: String,
     pub project_type: String,
+    #[serde(default)]
+    pub all_project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     #[serde(default)]
@@ -136,6 +138,7 @@ impl LegacyResultSearchProject {
 
         Self {
             project_type,
+            all_project_types: result_search_project.all_project_types,
             client_side,
             server_side,
             versions,

@@ -3221,9 +3221,6 @@
   "project.download.no-app": {
     "message": "У вас нет Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Нет версий, доступных для {gameVersion} и {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не поддерживает {platform} для {gameVersion}"
   },
@@ -4024,9 +4021,6 @@
   },
   "settings.account.security.email.title": {
     "message": "Почта"
-  },
-  "settings.account.security.passkey.add": {
-    "message": "Добавить ключ доступа"
   },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Выберите что-то запоминающееся, чтобы потом опознать этот ключ доступа."
