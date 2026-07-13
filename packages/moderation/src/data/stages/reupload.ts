@@ -1,26 +1,23 @@
 import { CopyrightIcon } from '@modrinth/assets'
 
 import type { NodeContext } from '../../types/node'
-import { action, button, group, markdown, md, stage, text, toggle } from '../../types/node'
+import { action, check,group, markdown, md, stage, text, toggle } from '../../types/node'
 
 function isServerModpack({ project }: NodeContext): boolean {
 	return (
 		!!project.minecraft_server &&
 		project.minecraft_java_server?.content?.kind === 'modpack' &&
-		(project.minecraft_java_server?.content as Record<string, unknown>)?.project_id === project.id
+		project.minecraft_java_server?.content?.project_id === project.id
 	)
 }
 
-export default stage(
-	'reupload',
-	'Reupload',
-	'Does the author have proper permissions to post this project?',
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080d1a0a2cda3ff2ce997',
-)
+export default stage('reupload', 'Reupload')
+	.hint('Does the author have proper permissions to post this project?')
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080d1a0a2cda3ff2ce997')
 	.icon(CopyrightIcon)
 	.children(
 		group().children(
-			button('reupload', 'Re-upload')
+			toggle('reupload', 'Re-upload')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -38,7 +35,7 @@ export default stage(
 					text('original_author', 'Original project author').required(),
 				),
 
-			button('unclear_fork', 'Unclear Fork')
+			toggle('unclear_fork', 'Unclear Fork')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -47,7 +44,7 @@ export default stage(
 						.message(md('checklist/messages/reupload/fork')),
 				),
 
-			button('insufficient_fork', 'Insufficient Fork')
+			toggle('insufficient_fork', 'Insufficient Fork')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -56,7 +53,7 @@ export default stage(
 						.message(md('checklist/messages/reupload/insufficient_fork')),
 				),
 
-			button('request_proof', 'Proof of permissions')
+			toggle('request_proof', 'Proof of permissions')
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -64,7 +61,7 @@ export default stage(
 						.message(md('checklist/messages/reupload/proof_of_permissions')),
 				),
 
-			button('identity_verification', 'Verify Identity')
+			toggle('identity_verification', 'Verify Identity')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -78,7 +75,7 @@ export default stage(
 				)
 				.children(text('platform', 'Where else can the project be found?').required()),
 
-			button('identity_verification_server', 'Verify Identity')
+			toggle('identity_verification_server', 'Verify Identity')
 				.shown(({ project }) => !!project.minecraft_server)
 				.action(
 					action()
@@ -92,7 +89,7 @@ export default stage(
 				)
 				.children(text('contact', 'Known public contact method').required()),
 
-			button('request_proof_server', 'Reuploaded pack')
+			toggle('request_proof_server', 'Reuploaded pack')
 				.shown(isServerModpack)
 				.action(
 					action()
@@ -101,7 +98,7 @@ export default stage(
 						.message(md('checklist/messages/reupload/custom_server/custom_server_permissions')),
 				),
 
-			button('custom_pack_verification', 'Override verification')
+			toggle('custom_pack_verification', 'Override verification')
 				.shown(isServerModpack)
 				.action(
 					action()
@@ -110,7 +107,7 @@ export default stage(
 						.message(md('checklist/messages/reupload/custom_server/custom_server_overrides-verification')),
 				)
 				.children(
-					toggle('list', 'List overrides?')
+					check('list', 'List overrides?')
 						.action(
 							action()
 								.message(
@@ -122,7 +119,7 @@ export default stage(
 						.children(markdown('overrides', 'Add list of overrides.')),
 				),
 
-			button('custom_pack_prohibited', 'Forbidden Overrides')
+			toggle('custom_pack_prohibited', 'Forbidden Overrides')
 				.shown(isServerModpack)
 				.action(
 					action()

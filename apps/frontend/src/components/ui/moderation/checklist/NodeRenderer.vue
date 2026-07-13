@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type {
 	BooleanNodeBuilder,
+	ButtonNodeBuilder,
 	ContentFn,
 	DisplayNodeBuilder,
 	GroupNodeBuilder,
@@ -22,7 +23,11 @@ import {
 } from '@modrinth/moderation'
 import { ButtonStyled, Checkbox, Combobox, MarkdownEditor, StyledInput } from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
-import { reactive, watchEffect } from 'vue'
+import { inject, reactive, watchEffect } from 'vue'
+
+import { NODE_META_KEY } from './checklist-context'
+
+const nodeMetaMap = inject(NODE_META_KEY)
 
 const props = defineProps<{
 	nodes: NodeBuilder[]
@@ -41,6 +46,10 @@ function isEnabled(node: IdentifiedNodeBuilder): boolean {
 
 function asBool(node: NodeBuilder): BooleanNodeBuilder {
 	return node as BooleanNodeBuilder
+}
+
+function asButton(node: NodeBuilder): ButtonNodeBuilder {
+	return node as ButtonNodeBuilder
 }
 
 function asIdentified(node: NodeBuilder): IdentifiedNodeBuilder {
@@ -113,7 +122,8 @@ function getBooleanState(node: BooleanNodeBuilder): boolean {
 		const v = (state as NodeStateWithChildren).value
 		if (typeof v === 'boolean') return v
 	}
-	return (node._defaultValue as boolean | undefined) ?? false
+	const def = resolveDefault(node)
+	return (def as boolean | undefined) ?? false
 }
 
 function getMultiSelectState(node: IdentifiedNodeBuilder): Set<string> {
@@ -124,7 +134,7 @@ function getMultiSelectState(node: IdentifiedNodeBuilder): Set<string> {
 function getSelectState(node: IdentifiedNodeBuilder): string | undefined {
 	const state = getNodeState(node)
 	if (typeof state === 'string') return state
-	const def = (node as ValueNodeBuilder)._defaultValue
+	const def = resolveDefault(node as ValueNodeBuilder)
 	return typeof def === 'string' ? def : undefined
 }
 
@@ -147,15 +157,44 @@ function toggleSelect(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilde
 }
 
 
+function resolveDefault(node: ValueNodeBuilder): NodeState {
+	const d = node._defaultValue
+	return typeof d === 'function' ? d(props.showContext) : d
+}
+
 function getTextState(node: IdentifiedNodeBuilder): string {
 	const state = getNodeState(node)
-	return typeof state === 'string' ? state : ''
+	if (typeof state === 'string') return state
+	const def = resolveDefault(node as ValueNodeBuilder)
+	return typeof def === 'string' ? def : ''
+}
+
+function getPlaceholder(node: InputNodeBuilder): string | undefined {
+	if (node._placeholder) return node._placeholder
+	const def = resolveDefault(node)
+	if (typeof def === 'string') return def
+	return asIdentified(node).label || undefined
+}
+
+function hasActionableFixes(node: IdentifiedNodeBuilder): boolean {
+	return nodeMetaMap?.value.get(node)?.isFixActionable ?? false
+}
+
+function getBooleanColor(node: BooleanNodeBuilder): string {
+	if (!getBooleanState(node)) return 'standard'
+	return hasActionableFixes(node) ? 'blue' : 'brand'
+}
+
+function setTextState(node: IdentifiedNodeBuilder, v: string): void {
+	const def = resolveDefault(node as ValueNodeBuilder)
+	const defStr = typeof def === 'string' ? def : ''
+	setNodeState(node, v === defStr ? undefined : (defStr ? v : (v || undefined)))
 }
 
 function toggleBoolean(node: BooleanNodeBuilder) {
 	const raw = getNodeState(node)
 	const next = !getBooleanState(node)
-	const defaultVal = (node._defaultValue as boolean | undefined) ?? false
+	const defaultVal = (resolveDefault(node) as boolean | undefined) ?? false
 	const isDefault = next === defaultVal
 	if (raw && typeof raw === 'object' && !(raw instanceof Set)) {
 		const { value: _v, ...children } = raw as NodeStateWithChildren & Record<string, NodeState>
@@ -218,7 +257,7 @@ watchEffect(async () => {
 				asyncDisplayTasks.push({ node: display, ctx: props.showContext })
 			}
 		}
-		if (node.type === 'button' && isVisible(node)) {
+		if (node.type === 'toggle' && isVisible(node)) {
 			const boolNode = asBool(node)
 			if (boolNode._action?._message) {
 				const nodeState = getNodeState(boolNode)
@@ -256,21 +295,33 @@ watchEffect(async () => {
 
 <template>
 	<div :class="flex ? 'flex flex-wrap gap-2' : 'space-y-4'">
-		<template v-for="node in nodes" :key="asIdentified(node).id ?? node.type">
+		<template v-for="node in nodes" :key="node.type === 'button' ? `button-${asButton(node).label}` : (asIdentified(node).id ?? node.type)">
 			<template v-if="isVisible(node)">
 				<!-- group -->
-				<NodeRenderer
-					v-if="node.type === 'group'"
-					:nodes="getChildren(asIdentified(node))"
-					:show-context="showContext"
-					:on-image-upload="onImageUpload"
-					:flex="asGroup(node)._layout !== 'column'"
-				/>
+				<div v-if="node.type === 'group'">
+					<div v-if="asGroup(node)._title" class="mb-2 font-semibold">
+						{{ asGroup(node)._title }}<span v-if="asGroup(node)._required" class="text-red"> *</span>
+					</div>
+					<NodeRenderer
+						:nodes="getChildren(asIdentified(node))"
+						:show-context="showContext"
+						:on-image-upload="onImageUpload"
+						:flex="asGroup(node)._layout !== 'column'"
+					/>
+				</div>
 
 				<!-- button -->
+				<ButtonStyled v-else-if="node.type === 'button'">
+					<button
+						:disabled="asButton(node)._enabled ? !asButton(node)._enabled(showContext) : false"
+						@click="asButton(node)._onClick?.(showContext)"
+					>{{ asButton(node).label }}</button>
+				</ButtonStyled>
+
+				<!-- toggle -->
 				<ButtonStyled
-					v-else-if="node.type === 'button'"
-					:color="getBooleanState(asBool(node)) ? 'brand' : 'standard'"
+					v-else-if="node.type === 'toggle'"
+					:color="getBooleanColor(asBool(node))"
 				>
 					<button
 						v-tooltip="getNodeTooltipConfig(asBool(node))"
@@ -279,9 +330,9 @@ watchEffect(async () => {
 					>{{ asIdentified(node).label }}</button>
 				</ButtonStyled>
 
-				<!-- toggle -->
+				<!-- check -->
 				<Checkbox
-					v-else-if="node.type === 'toggle'"
+					v-else-if="node.type === 'check'"
 					:model-value="getBooleanState(asBool(node))"
 					:label="asIdentified(node).label"
 					:disabled="!isEnabled(asIdentified(node))"
@@ -326,7 +377,7 @@ watchEffect(async () => {
 					<div class="flex flex-wrap gap-2">
 						<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
 							<ButtonStyled
-								:color="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) ? 'brand' : 'standard'"
+								:color="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) ? (hasActionableFixes(asIdentified(child)) ? 'blue' : 'brand') : 'standard'"
 								@click="toggleChip(asIdentified(node), asIdentified(child))"
 							>
 								<button>{{ asIdentified(child).label }}</button>
@@ -345,39 +396,29 @@ watchEffect(async () => {
 				</div>
 
 				<!-- text -->
-				<div v-else-if="node.type === 'text'" class="inputs universal-labels">
-					<label :for="`node-${asIdentified(node).id}`">
-						<span class="label__title">
-							{{ asIdentified(node).label }}<span v-if="asValue(node)._required" class="required">*</span>
-						</span>
-					</label>
-					<StyledInput
-						:id="`node-${asIdentified(node).id}`"
-						:model-value="getTextState(asIdentified(node))"
-						:placeholder="asInput(node)._placeholder"
-						autocomplete="off"
-						@update:model-value="(v: string) => setNodeState(asIdentified(node), v || undefined)"
-					/>
-				</div>
+				<StyledInput
+					v-else-if="node.type === 'text'"
+					:id="`node-${asIdentified(node).id}`"
+					:aria-label="asIdentified(node).label || undefined"
+					:model-value="getTextState(asIdentified(node))"
+					:placeholder="getPlaceholder(asInput(node))"
+					autocomplete="off"
+					@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
+				/>
 
 				<!-- markdown -->
-				<div v-else-if="node.type === 'markdown'" class="inputs universal-labels">
-					<label :for="`node-${asIdentified(node).id}`">
-						<span class="label__title">
-							{{ asIdentified(node).label }}<span v-if="asValue(node)._required" class="required">*</span>
-						</span>
-					</label>
-					<MarkdownEditor
-						:id="`node-${asIdentified(node).id}`"
-						:model-value="getTextState(asIdentified(node))"
-						:placeholder="asInput(node)._placeholder"
-						:max-height="300"
-						:disabled="false"
-						:heading-buttons="false"
-						:on-image-upload="onImageUpload"
-						@update:model-value="(v: string) => setNodeState(asIdentified(node), v || undefined)"
-					/>
-				</div>
+				<MarkdownEditor
+					v-else-if="node.type === 'markdown'"
+					:id="`node-${asIdentified(node).id}`"
+					:aria-label="asIdentified(node).label || undefined"
+					:model-value="getTextState(asIdentified(node))"
+					:placeholder="getPlaceholder(asInput(node))"
+					:max-height="300"
+					:disabled="false"
+					:heading-buttons="false"
+					:on-image-upload="onImageUpload"
+					@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
+				/>
 
 				<!-- display (prose + label) -->
 				<div
@@ -389,9 +430,9 @@ watchEffect(async () => {
 		</template>
 
 		<!-- children of active boolean nodes, rendered after all siblings -->
-		<template v-for="node in nodes" :key="`children-${asIdentified(node).id ?? node.type}`">
+		<template v-for="node in nodes" :key="node.type === 'button' ? `children-button-${asButton(node).label}` : `children-${asIdentified(node).id ?? node.type}`">
 			<NodeRenderer
-				v-if="isVisible(node) && (node.type === 'button' || node.type === 'toggle') && getBooleanState(asBool(node)) && getChildren(asIdentified(node)).length"
+				v-if="isVisible(node) && (node.type === 'toggle' || node.type === 'check') && getBooleanState(asBool(node)) && getChildren(asIdentified(node)).length"
 				:nodes="getChildren(asIdentified(node))"
 				:show-context="showContext"
 				:on-image-upload="onImageUpload"

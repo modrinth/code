@@ -1,18 +1,15 @@
 import { ImageIcon } from '@modrinth/assets'
 
-import { action, button, group, md, stage } from '../../types/node'
+import { action, toggle, group, md, stage } from '../../types/node'
 
-export default stage(
-	'gallery',
-	'Gallery',
-	"Are this project's gallery images sufficient?",
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08096828bd1c3f24d8b8e',
-)
+export default stage('gallery', 'Gallery')
+	.hint("Are this project's gallery images sufficient?")
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf08096828bd1c3f24d8b8e')
 	.icon(ImageIcon)
 	.navigate('/gallery')
 	.children(
 		group().children(
-			button('insufficient', 'Insufficient')
+			toggle('insufficient', 'Insufficient')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -21,7 +18,7 @@ export default stage(
 						.message(md('checklist/messages/gallery/insufficient')),
 				),
 
-			button('not_relevant', 'Not relevant')
+			toggle('not_relevant', 'Not relevant')
 				.shown(({ project }) => project.gallery.length > 0)
 				.action(
 					action()

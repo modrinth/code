@@ -1,7 +1,19 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { BookOpenIcon } from '@modrinth/assets'
 
-import { action, button, chips, group, label, md, stage, toggle } from '../../types/node'
+import {
+	action,
+	toggle,
+	chips,
+	fix,
+	group,
+	label,
+	md,
+	stage,
+	text,
+	check,
+	button,
+} from '../../types/node'
 
 function hasCustomSlug(project: Labrinth.Projects.v3.Project): boolean {
 	return (
@@ -15,12 +27,9 @@ function hasCustomSlug(project: Labrinth.Projects.v3.Project): boolean {
 	)
 }
 
-export default stage(
-	'title-slug',
-	'Title & Slug',
-	'Are the Name and URL accurate and appropriate?',
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
-)
+export default stage('title-slug', 'Title & Slug')
+	.hint('Are the Name and URL accurate and appropriate?')
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705')
 	.icon(BookOpenIcon)
 	.children(
 		label(async (ctx) => {
@@ -30,23 +39,21 @@ export default stage(
 		}),
 
 		group('title').children(
-			button('useless_info', 'Contains Useless Info')
-				.action(
-					action()
-						.suggestedStatus('flagged')
-						.severity('low')
-						.message(md('checklist/messages/title/useless-info')),
-				),
+			toggle('useless_info', 'Contains Useless Info').action(
+				action()
+					.suggestedStatus('flagged')
+					.severity('low')
+					.message(md('checklist/messages/title/useless-info')),
+			),
 
-			button('minecraft_branding', 'Minecraft Title')
-				.action(
-					action()
-						.suggestedStatus('flagged')
-						.severity('medium')
-						.message(md('checklist/messages/title/minecraft-branding')),
-				),
+			toggle('minecraft_branding', 'Minecraft Title').action(
+				action()
+					.suggestedStatus('flagged')
+					.severity('medium')
+					.message(md('checklist/messages/title/minecraft-branding')),
+			),
 
-			button('similarities', 'Title Similarities')
+			toggle('similarities', 'Title Similarities')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -55,39 +62,38 @@ export default stage(
 				)
 				.children(
 					chips('options', 'Similarities Additional Info').children(
-						toggle('modpack_named_after_mod', 'Modpack Named After Mod')
+						check('modpack_named_after_mod', 'Modpack Named After Mod')
 							.shown(({ project }) => project.project_types.includes('modpack'))
-							.action(
-								action()
-									.message(md('checklist/messages/title/similarities-modpack')),
-							),
+							.action(action().message(md('checklist/messages/title/similarities-modpack'))),
 
-						toggle('forked_project', 'Forked Project')
+						check('forked_project', 'Forked Project')
 							.shown(({ project }) => !project?.minecraft_server)
-							.action(
-								action()
-									.message(md('checklist/messages/title/similarities-fork')),
-							),
+							.action(action().message(md('checklist/messages/title/similarities-fork'))),
 					),
 				),
 		),
 
 		group('slug')
-			.layout('column')
 			.shown(({ project }) => hasCustomSlug(project))
 			.children(
-				chips('options', 'Slug Issues?')
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('low'),
-					)
-					.children(
-						toggle('misused', 'Misused')
-							.action(
-								action()
-									.message(md('checklist/messages/slug/misused')),
-							),
-					),
+				chips('options', 'Slug Issues?').children(
+					check('misused', 'Misused')
+						.children(
+								text('correct_slug', 'Correct Slug')
+									.initial((ctx) => ctx.project.slug),
+								button('Auto')
+									.onClick(ctx => {}))
+						.action(
+							action()
+								.message(md('checklist/messages/slug/misused'))
+								.fix(
+									fix().project((patch, ctx) => {
+										const slug = ctx.state.correct_slug as string
+										if (!slug) return
+										patch.slug = slug
+									}),
+								),
+						),
+				),
 			),
 	)

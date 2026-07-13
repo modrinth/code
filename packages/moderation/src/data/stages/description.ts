@@ -1,18 +1,15 @@
 import { LibraryIcon } from '@modrinth/assets'
 
-import { action, button, group, markdown, md, select, stage, toggle } from '../../types/node'
+import { action, toggle, group, markdown, md, select, stage, check } from '../../types/node'
 
-export default stage(
-	'description',
-	'Description',
-	'Is the description sufficient, accurate, and accessible?',
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e',
-)
+export default stage('description', 'Description')
+	.hint('Is the description sufficient, accurate, and accessible?')
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e')
 	.icon(LibraryIcon)
 	.navigate('/')
 	.children(
 		group().children(
-			button('insufficient', 'Insufficient')
+			toggle('insufficient', 'Insufficient')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -36,8 +33,8 @@ export default stage(
 				)
 				.children(
 					select('reason', 'Specific reason?').children(
-						toggle('fork', 'Fork'),
-						toggle('custom', 'Custom').children(
+						check('fork', 'Fork'),
+						check('custom', 'Custom').children(
 							markdown(
 								'explainer',
 								'How can the author improve their description?',
@@ -46,7 +43,7 @@ export default stage(
 					),
 				),
 
-			button('non_english', 'Non-english')
+			toggle('non_english', 'Non-english')
 				.shown(({ project }) => !project.minecraft_java_server)
 				.action(
 					action()
@@ -55,7 +52,7 @@ export default stage(
 						.message(md('checklist/messages/description/accessability/non-english/non-english')),
 				),
 
-			button('non_english_server', 'Non-english')
+			toggle('non_english_server', 'Non-english')
 				.shown(({ project }) => !!project.minecraft_java_server)
 				.action(
 					action()
@@ -64,7 +61,7 @@ export default stage(
 						.message(md('checklist/messages/description/accessability/non-english/non-english-server')),
 				),
 
-			button('unfinished', 'Unfinished')
+			toggle('unfinished', 'Unfinished')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -72,7 +69,7 @@ export default stage(
 						.message(md('checklist/messages/description/unfinished')),
 				),
 
-			button('headers_as_body', 'Headers as body text')
+			toggle('headers_as_body', 'Headers as body text')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -80,7 +77,7 @@ export default stage(
 						.message(md('checklist/messages/description/accessability/headers-as-body')),
 				),
 
-			button('image_only', 'Image-only')
+			toggle('image_only', 'Image-only')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -88,7 +85,7 @@ export default stage(
 						.message(md('checklist/messages/description/accessability/image-only')),
 				),
 
-			button('non_standard_text', 'Non-standard text')
+			toggle('non_standard_text', 'Non-standard text')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -96,7 +93,7 @@ export default stage(
 						.message(md('checklist/messages/description/accessability/non-standard-text')),
 				),
 
-			button('clarity', 'Unclear / Misleading')
+			toggle('clarity', 'Unclear / Misleading')
 				.action(
 					action()
 						.suggestedStatus('rejected')

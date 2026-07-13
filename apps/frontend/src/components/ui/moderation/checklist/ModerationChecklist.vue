@@ -12,66 +12,79 @@
 	/>
 	<div
 		tabindex="0"
-		class="moderation-checklist flex w-[600px] max-w-full max-h-[calc(100vh-2rem)] overflow-hidden flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
+		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
 		:class="{ '!w-fit': collapsed, locked: lockStatus?.locked && !lockStatus?.isOwnLock }"
 	>
-		<div class="flex grow-0 items-center gap-2">
-			<h1 class="m-0 mr-auto">
-				<OverflowMenu
-					:options="stageOptions"
-					:disabled="!canOpenStageSelectorFromTitle"
-					placement="center"
-					dropdown-class="title-stage-selector-dropdown"
-					:class="{ 'title-stage-selector-disabled': !canOpenStageSelectorFromTitle }"
-					class="bg-transparent p-0"
-				>
-					<span
-						class="inline-flex items-center gap-2 text-2xl font-extrabold text-contrast"
-						:class="{
-							'cursor-pointer': canOpenStageSelectorFromTitle,
-							'cursor-default': !canOpenStageSelectorFromTitle,
-						}"
+		<div class="flex grow-0 flex-col gap-1">
+			<div class="flex items-center gap-2">
+				<h1 class="m-0 mr-auto">
+					<OverflowMenu
+						:options="stageOptions"
+						:disabled="!canOpenStageSelectorFromTitle"
+						placement="center"
+						dropdown-class="title-stage-selector-dropdown"
+						:class="{ 'title-stage-selector-disabled': !canOpenStageSelectorFromTitle }"
+						class="bg-transparent p-0"
 					>
-						<ScaleIcon class="text-orange" />
-						{{ checklistTitleText }}
-					</span>
+						<span
+							class="inline-flex items-center gap-2 text-2xl font-extrabold text-contrast"
+							:class="{
+								'cursor-pointer': canOpenStageSelectorFromTitle,
+								'cursor-default': !canOpenStageSelectorFromTitle,
+							}"
+						>
+							<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
+							{{ checklistTitleText }}
+						</span>
 
-					<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
-						<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-						<span>{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span>
-						<span v-if="opt.count" class="ml-auto pl-2 text-m font-semibold opacity-75">{{ opt.count }}</span>
-					</template>
-				</OverflowMenu>
-			</h1>
-			<ButtonStyled circular>
-				<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
-					<KeyboardIcon />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular>
-				<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj.guidanceUrl">
-					<FileTextIcon />
-				</a>
-			</ButtonStyled>
-			<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-				<button v-tooltip="`Reset progress`" @click="resetProgress">
-					<BrushCleaningIcon />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-				<button v-tooltip="`Exit moderation`" @click="handleExit">
-					<XIcon />
-				</button>
-			</ButtonStyled>
-			<ButtonStyled circular>
-				<button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
-					<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
-				</button>
-			</ButtonStyled>
+						<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
+							<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+							<span
+								>{{ opt.text
+								}}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span
+							>
+							<span v-if="opt.messages" class="text-m ml-auto pl-2 font-semibold opacity-75">{{
+								opt.messages
+							}}</span>
+						</template>
+					</OverflowMenu>
+				</h1>
+				<ButtonStyled circular>
+					<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
+						<KeyboardIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="currentStageObj._guidanceUrl" circular>
+					<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl">
+						<FileTextIcon />
+					</a>
+				</ButtonStyled>
+				<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
+					<button v-tooltip="`Reset progress`" @click="resetProgress">
+						<BrushCleaningIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
+					<button v-tooltip="`Exit moderation`" @click="handleExit">
+						<XIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular>
+					<button v-tooltip="collapsed ? `Expand` : `Collapse`" @click="emit('toggleCollapsed')">
+						<DropdownIcon class="transition-transform" :class="{ 'rotate-180': collapsed }" />
+					</button>
+				</ButtonStyled>
+			</div>
 		</div>
-
-		<Collapsible base-class="grow min-h-0" class="flex grow flex-col min-h-0" :collapsed="collapsed">
-			<div class="my-4 h-[1px] w-full bg-divider" />
+		<p v-if="currentStageObj._hint && !collapsed" class="m-0 text-sm text-secondary">
+			{{ currentStageObj._hint }}
+		</p>
+		<Collapsible
+			base-class="grow min-h-0"
+			class="flex min-h-0 grow flex-col"
+			:collapsed="collapsed"
+		>
+			<div class="mb-3 mt-2 h-[1px] w-full bg-divider" />
 
 			<div v-if="lockStatus?.locked && !lockStatus?.isOwnLock" class="flex flex-1 flex-col">
 				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
@@ -151,7 +164,7 @@
 			</div>
 
 			<template v-else>
-				<div class="flex flex-col flex-1 min-h-0">
+				<div class="flex min-h-0 flex-1 flex-col">
 					<div v-if="done">
 						<p>
 							You are done moderating this project!
@@ -161,20 +174,23 @@
 							</template>
 						</p>
 					</div>
-					<div v-else-if="generatedMessage">
+					<div
+						v-else-if="generatedMessage"
+						class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
+					>
+						<ButtonStyled class="shrink-0 self-start">
+							<button @click="useSimpleEditor = !useSimpleEditor">
+								<template v-if="!useSimpleEditor">
+									<ToggleLeftIcon aria-hidden="true" />
+									Use simple mode
+								</template>
+								<template v-else>
+									<ToggleRightIcon aria-hidden="true" />
+									Use advanced mode
+								</template>
+							</button>
+						</ButtonStyled>
 						<div>
-							<ButtonStyled>
-								<button class="mb-2" @click="useSimpleEditor = !useSimpleEditor">
-									<template v-if="!useSimpleEditor">
-										<ToggleLeftIcon aria-hidden="true" />
-										Use simple mode
-									</template>
-									<template v-else>
-										<ToggleRightIcon aria-hidden="true" />
-										Use advanced mode
-									</template>
-								</button>
-							</ButtonStyled>
 							<MarkdownEditor
 								v-if="!useSimpleEditor"
 								v-model="messageText"
@@ -204,11 +220,7 @@
 							@complete="handleModpackPermissionsComplete"
 						/>
 					</div>
-					<div v-else class="flex flex-col flex-1 min-h-0">
-						<h2 class="m-0 mb-2 shrink-0 text-lg font-extrabold">
-							{{ currentStageObj.hint }}
-						</h2>
-
+					<div v-else class="flex min-h-0 flex-1 flex-col">
 						<NodeRenderer
 							class="min-h-0 flex-1 overflow-y-auto"
 							:nodes="resolveChildren(currentStageObj, makeNodeContext(currentStageObj))"
@@ -249,10 +261,7 @@
 							</div>
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
-								<OverflowMenu
-									:options="stageOptions"
-									class="bg-transparent p-0"
-								>
+								<OverflowMenu :options="stageOptions" class="bg-transparent p-0">
 									<ButtonStyled circular>
 										<button v-tooltip="`Stages`">
 											<ListBulletedIcon />
@@ -368,6 +377,7 @@ import {
 } from '@modrinth/assets'
 import type {
 	ActionBuilder,
+	IdentifiedNodeBuilder,
 	NodeContext,
 	NodeState,
 	Priority,
@@ -406,7 +416,7 @@ import {
 import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import { toRaw } from 'vue'
+import { computed, provide, ref, toRaw } from 'vue'
 import type { Component } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -420,6 +430,7 @@ import {
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
+import { NODE_META_KEY, type ActiveAction, type LiveNode } from './checklist-context'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 import NodeRenderer from './NodeRenderer.vue'
@@ -473,7 +484,6 @@ const isPrefetching = ref(false)
 const PREFETCH_STALE_MS = 30_000 // 30 seconds
 const PREFETCH_TARGET_COUNT = 3 // Keep 3 unlocked projects ready
 const PREFETCH_BATCH_SIZE = 5 // Check 5 at a time in parallel
-
 
 async function handleVisibilityChange() {
 	if (document.visibilityState === 'visible' && lockStatus.value?.isOwnLock) {
@@ -622,15 +632,6 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 	)
 	return true
 }
-
-const variables = computed(() => {
-	return {
-		...flattenStaticVariables(),
-		...flattenProjectVariables(projectV2.value),
-		...flattenProjectV3Variables(projectV3.value),
-	}
-})
-
 
 const modpackPermissionsComplete = ref(false)
 const modpackJudgements = ref<ModerationJudgements>({})
@@ -1003,10 +1004,7 @@ function findFirstValidStage(): number {
 const currentStageObj = computed(() => stages[currentStage.value])
 const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
 const canOpenStageSelectorFromTitle = computed(
-	() =>
-		!alreadyReviewed.value &&
-		!done.value &&
-		!isLockedByOther.value,
+	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
 )
 const checklistTitleText = computed(() => {
 	if (alreadyReviewed.value || done.value) return 'Moderation'
@@ -1044,19 +1042,17 @@ const persistState = () => {
 watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
 watch(message, persistState)
-watch(() => props.collapsed, (collapsed) => {
-	if (!collapsed) hasMeaningfulState = true
-	persistState()
-})
+watch(
+	() => props.collapsed,
+	(collapsed) => {
+		if (!collapsed) hasMeaningfulState = true
+		persistState()
+	},
+)
 
 interface MessagePart {
 	priority?: Priority
 	content: string
-}
-
-interface ActiveAction {
-	action: ActionBuilder
-	ctx: NodeContext
 }
 
 function handleKeybinds(event: KeyboardEvent) {
@@ -1068,7 +1064,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				currentStage: currentStage.value,
 				totalStages: stages.length,
 				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value.hint,
+				currentStageTitle: currentStageObj.value._hint,
 
 				isCollapsed: props.collapsed,
 				isDone: done.value,
@@ -1212,7 +1208,6 @@ watch(
 	{ immediate: true },
 )
 
-
 function getModpackFilesFromStorage(): {
 	interactive: ModerationModpackItem[]
 	permanentNo: ModerationModpackItem[]
@@ -1238,40 +1233,100 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
+const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
+	const map = new Map<IdentifiedNodeBuilder, LiveNode>()
+
+	for (const stage of stages) {
+		const ctx = makeNodeContext(stage)
+
+		let isVisible = false
+		let messageCount = 0
+		let fixCount = 0
+		let hasRequiredMissing = false
+		const stageActiveActions: ActiveAction[] = []
+
+		if (!stage._shown || stage._shown(ctx)) {
+			walkNodes(
+				resolveChildren(stage, ctx),
+				(nodeStates.value[stage.id!] ?? {}) as Record<string, NodeState>,
+				ctx,
+				(node, state, nodeCtx) => {
+					isVisible = true
+					const active = isNodeActive(node, state)
+					const actionCtx =
+						node.type === 'toggle' || node.type === 'check'
+							? { ...nodeCtx, state: getBooleanChildState(state) as Record<string, NodeState> }
+							: nodeCtx
+					const isRequired = !!(node as ValueNodeBuilder)._required
+					const nodeActiveActions: ActiveAction[] = []
+
+					let isFixActionable = false
+					if (active) {
+						if (node._action) {
+							messageCount++
+							nodeActiveActions.push({ action: node._action, ctx: actionCtx })
+							stageActiveActions.push({ action: node._action, ctx: actionCtx })
+						}
+						isFixActionable = (node._action?._fixes ?? []).some((f) => {
+							if (f._projectFn) {
+								const { proxy, changes } = createTrackedPatch(nodeCtx.project as any)
+								f._projectFn(proxy as any, actionCtx)
+								return Object.keys(changes()).length > 0
+							}
+							if (f._versionFn) {
+								const version = versions.value?.[0]
+								if (!version) return true
+								const { proxy, changes } = createTrackedPatch(version as any)
+								f._versionFn(proxy as any, actionCtx)
+								return Object.keys(changes()).length > 0
+							}
+							return false
+						})
+						if (isFixActionable) fixCount++
+					}
+
+					if (isRequired && !active) hasRequiredMissing = true
+					map.set(node, {
+						isActive: active,
+						isVisible: !node._shown || node._shown(nodeCtx),
+						isFixActionable,
+						messageCount: active && node._action ? 1 : 0,
+						fixCount: isFixActionable ? 1 : 0,
+						hasRequiredMissing: isRequired && !active,
+						activeActions: nodeActiveActions,
+					})
+				},
+			)
+		}
+
+		map.set(stage, {
+			isActive: true,
+			isVisible,
+			isFixActionable: false,
+			messageCount,
+			fixCount,
+			hasRequiredMissing,
+			activeActions: stageActiveActions,
+		})
+	}
+
+	return map
+})
+
 function countStageActions(stage: StageNodeBuilder): number {
-	const ctx = makeNodeContext(stage)
-	let count = 0
-	walkNodes([stage], nodeStates.value as unknown as Record<string, NodeState>, ctx, (node, state) => {
-		if (node._action && isNodeActive(node, state)) count++
-	})
-	return count
+	return checklistLive.value.get(stage)?.messageCount ?? 0
+}
+
+function countStageFixes(stage: StageNodeBuilder): number {
+	return checklistLive.value.get(stage)?.fixCount ?? 0
 }
 
 function hasRequiredMissing(stage: StageNodeBuilder): boolean {
-	const ctx = makeNodeContext(stage)
-	let missing = false
-	walkNodes([stage], nodeStates.value as unknown as Record<string, NodeState>, ctx, (node, state) => {
-		if (!missing && (node as ValueNodeBuilder)._required && !isNodeActive(node, state)) missing = true
-	})
-	return missing
+	return checklistLive.value.get(stage)?.hasRequiredMissing ?? false
 }
 
 function collectActiveActions(): ActiveAction[] {
-	const result: ActiveAction[] = []
-	const rootCtx: NodeContext = {
-		project: projectV3.value,
-		projectV2: projectV2.value,
-		state: nodeStates.value as unknown as Record<string, NodeState>,
-		globalState: nodeStates.value,
-	}
-	walkNodes([checklist], nodeStates.value as unknown as Record<string, NodeState>, rootCtx, (node, state, ctx) => {
-		if (!node._action || !isNodeActive(node, state)) return
-		const localCtx = (node.type === 'button' || node.type === 'toggle')
-			? { ...ctx, state: getBooleanChildState(state) }
-			: ctx
-		result.push({ action: node._action, ctx: localCtx })
-	})
-	return result
+	return stages.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
 async function assembleFullMessage() {
@@ -1279,12 +1334,13 @@ async function assembleFullMessage() {
 	generatedActiveActions.value = active
 	const parts: MessagePart[] = []
 
-	await Promise.all(active
-		.filter(a => a.action._message)
-		.map(async (a) => {
-			const msg = await a.action._message!(a.ctx)
-			if (msg) parts.push({ priority: a.action._priority, content: msg })
-		}),
+	await Promise.all(
+		active
+			.filter((a) => a.action._message)
+			.map(async (a) => {
+				const msg = await a.action._message!(a.ctx)
+				if (msg) parts.push({ priority: a.action._priority, content: msg })
+			}),
 	)
 
 	parts.sort((a, b) => {
@@ -1313,12 +1369,10 @@ function makeNodeContext(stage: StageNodeBuilder): NodeContext {
 	}
 }
 
+provide(NODE_META_KEY, checklistLive)
+
 function shouldShowStage(stage: StageNodeBuilder): boolean {
-	const ctx = makeNodeContext(stage)
-	if (stage._shown && !stage._shown(ctx)) return false
-	let hasVisible = false
-	walkNodes([stage], nodeStates.value as unknown as Record<string, NodeState>, ctx, () => { hasVisible = true })
-	return hasVisible
+	return checklistLive.value.get(stage)?.isVisible ?? false
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
@@ -1511,10 +1565,12 @@ async function sendMessage(status: ProjectStatus) {
 	}
 
 	const active = generatedActiveActions.value ?? collectActiveActions()
-	const shouldApplyFixes = active.some(a => a.action._applyFixes)
+	const shouldApplyFixes = active.some((a) => a.action._applyFixes)
 
 	if (shouldApplyFixes) {
-		const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch({} as any)
+		const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
+			projectV3.value as any,
+		)
 		for (const { action, ctx } of active) {
 			for (const f of action._fixes) {
 				f._projectFn?.(projectProxy, ctx)
@@ -1535,19 +1591,21 @@ async function sendMessage(status: ProjectStatus) {
 
 		if (shouldApplyFixes && versions.value) {
 			const versionFixes = active.flatMap(({ action, ctx }) =>
-				action._fixes.filter(f => f._versionFn).map(f => ({ fix: f, ctx })),
+				action._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, ctx })),
 			)
 			if (versionFixes.length > 0) {
-				await Promise.all(versions.value.map(async (version) => {
-					const { proxy, changes } = createTrackedPatch({} as any)
-					for (const { fix, ctx } of versionFixes) {
-						fix._versionFn!(proxy, ctx)
-					}
-					const changed = changes()
-					if (Object.keys(changed).length > 0) {
-						await client.labrinth.versions_v3.modifyVersion(version.id, changed)
-					}
-				}))
+				await Promise.all(
+					versions.value.map(async (version) => {
+						const { proxy, changes } = createTrackedPatch(version as any)
+						for (const { fix, ctx } of versionFixes) {
+							fix._versionFn!(proxy, ctx)
+						}
+						const changed = changes()
+						if (Object.keys(changed).length > 0) {
+							await client.labrinth.versions_v3.modifyVersion(version.id, changed)
+						}
+					}),
+				)
 			}
 		}
 
@@ -1729,8 +1787,9 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
 				hoverFilled: true,
 				icon: stage._icon ?? undefined,
-				count: countStageActions(stage) || undefined,
-			requiredMissing: hasRequiredMissing(stage) || undefined,
+				messages: countStageActions(stage) || undefined,
+				fixes: countStageFixes(stage) || undefined,
+				requiredMissing: hasRequiredMissing(stage) || undefined,
 			} as OverflowMenuOption
 		})
 		.filter((opt): opt is OverflowMenuOption => opt !== null)
@@ -1747,7 +1806,14 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 	return options
 })
 
-type StageOverflowSlotOption = OverflowMenuOption & { id: string; text: string; icon?: Component; count?: number; requiredMissing?: boolean }
+type StageOverflowSlotOption = OverflowMenuOption & {
+	id: string
+	text: string
+	icon?: Component
+	messages?: number
+	fixes?: number
+	requiredMissing?: boolean
+}
 
 const stageOptionsForSlots = computed(() =>
 	stageOptions.value.filter((opt): opt is StageOverflowSlotOption => 'id' in opt && 'text' in opt),

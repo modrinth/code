@@ -36,8 +36,9 @@ export type ShowFn = (ctx: NodeContext) => boolean
 export type ChildrenFn = (ctx: NodeContext) => NodeBuilder[]
 
 export type NodeType =
-	| 'button'
 	| 'toggle'
+	| 'check'
+	| 'button'
 	| 'text'
 	| 'markdown'
 	| 'group'
@@ -90,7 +91,11 @@ export function createTrackedPatch<T extends object>(source: T): { proxy: T; cha
 	const data = { ...source }
 	const proxy = new Proxy(data, {
 		set(target, key, value) {
-			written.add(key)
+			if (value !== (source as Record<string | symbol, unknown>)[key]) {
+				written.add(key)
+			} else {
+				written.delete(key)
+			}
 			;(target as Record<string | symbol, unknown>)[key] = value
 			return true
 		},
@@ -187,6 +192,28 @@ export class DisplayNodeBuilder extends NodeBuilder {
 	}
 }
 
+export class ButtonNodeBuilder extends NodeBuilder {
+	readonly type = 'button' as const
+	readonly label: string
+	_onClick?: (ctx: NodeContext) => void
+	_enabled?: ShowFn
+
+	constructor(nodeLabel: string) {
+		super()
+		this.label = nodeLabel
+	}
+
+	onClick(fn: (ctx: NodeContext) => void): this {
+		this._onClick = fn
+		return this
+	}
+
+	enabled(fn: ShowFn): this {
+		this._enabled = fn
+		return this
+	}
+}
+
 export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 	readonly id: string | undefined
 	readonly label: string
@@ -231,10 +258,10 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 }
 
 export abstract class ValueNodeBuilder extends IdentifiedNodeBuilder {
-	_defaultValue?: NodeState
+	_defaultValue?: NodeState | ((ctx: NodeContext) => NodeState)
 	_required?: boolean
 
-	initial(v: NodeState): this {
+	initial(v: NodeState | ((ctx: NodeContext) => NodeState)): this {
 		this._defaultValue = v
 		return this
 	}
@@ -246,9 +273,9 @@ export abstract class ValueNodeBuilder extends IdentifiedNodeBuilder {
 }
 
 export class BooleanNodeBuilder extends ValueNodeBuilder {
-	readonly type: 'button' | 'toggle'
+	readonly type: 'toggle' | 'check'
 
-	constructor(id: string, nodeLabel: string, type: 'button' | 'toggle') {
+	constructor(id: string, nodeLabel: string, type: 'toggle' | 'check') {
 		super(id, nodeLabel)
 		this.type = type
 	}
@@ -292,6 +319,8 @@ export class ChipsNodeBuilder extends ValueNodeBuilder {
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type = 'group' as const
 	_layout?: 'flex' | 'column'
+	_title?: string
+	_required?: boolean
 
 	constructor(id?: string) {
 		super(id, '')
@@ -301,19 +330,33 @@ export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 		this._layout = l
 		return this
 	}
+
+	title(t: string): this {
+		this._title = t
+		return this
+	}
+
+	required(v = true): this {
+		this._required = v
+		return this
+	}
 }
 
 export class StageNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type = 'stage' as const
-	readonly hint: string
-	readonly guidanceUrl: string
+	_hint?: string
+	_guidanceUrl?: string
 	_icon?: FunctionalComponent<SVGAttributes>
 	_navigate?: string
 
-	constructor(id: string, title: string, hint: string, guidanceUrl: string) {
-		super(id, title)
-		this.hint = hint
-		this.guidanceUrl = guidanceUrl
+	hint(h: string): this {
+		this._hint = h
+		return this
+	}
+
+	guidance(url: string): this {
+		this._guidanceUrl = url
+		return this
 	}
 
 	icon(i: FunctionalComponent<SVGAttributes>): this {
@@ -347,8 +390,8 @@ export class StageNodeBuilder extends IdentifiedNodeBuilder {
 function childrenScopePath(node: IdentifiedNodeBuilder): string[] | null {
 	if (!node._statePath) return null
 	switch (node.type) {
-		case 'button':
 		case 'toggle':
+		case 'check':
 		case 'group':
 		case 'stage':
 			return node._statePath
@@ -379,8 +422,8 @@ function stampChildPaths(nodes: NodeBuilder[], scopePath: string[]): void {
 
 export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 	switch (node.type) {
-		case 'button':
-		case 'toggle': {
+		case 'toggle':
+		case 'check': {
 			if (typeof state === 'boolean') return state
 			if (state && typeof state === 'object' && !(state instanceof Set)) {
 				const v = (state as NodeStateWithChildren).value
@@ -440,7 +483,7 @@ export function walkNodes(
 			}
 			continue
 		}
-		if (node.type === 'display') continue
+		if (node.type === 'display' || node.type === 'button') continue
 
 		const identified = node as IdentifiedNodeBuilder
 		const nodeState = stageState[identified.id!]
@@ -455,10 +498,17 @@ export function walkNodes(
 			for (const child of children) {
 				const childId = child as IdentifiedNodeBuilder
 				if (!selected.has(childId.id!) || (child._shown && !child._shown(ctx))) continue
-				visitor(childId, stageState[childId.id!], ctx)
+				const rawChildState = stageState[childId.id!]
+				// Chip children are active by virtue of being in the selected Set, not by their own
+				// boolean state. If they have child state but no explicit value, inject value: true
+				// so isNodeActive returns true even after child state has been written to their path.
+				const childState: NodeState = (rawChildState !== null && rawChildState !== undefined && typeof rawChildState === 'object' && !(rawChildState instanceof Set) && (rawChildState as NodeStateWithChildren).value === undefined)
+					? { ...(rawChildState as NodeStateWithChildren), value: true }
+					: (rawChildState ?? true)
+				visitor(childId, childState, ctx)
 				walkNodes(resolveChildren(childId, ctx), stageState, ctx, visitor)
 			}
-		} else if (node.type === 'button' || node.type === 'toggle') {
+		} else if (node.type === 'toggle' || node.type === 'check') {
 			const childState = getBooleanChildState(nodeState)
 			walkNodes(children, childState, { ...ctx, state: childState }, visitor)
 		} else if (node.type === 'select') {
@@ -480,13 +530,14 @@ export function walkNodes(
 
 // ─── Factory functions ────────────────────────────────────────────────────────
 
-export const button = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'button')
 export const toggle = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'toggle')
+export const check = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'check')
+export const button = (nodeLabel: string) => new ButtonNodeBuilder(nodeLabel)
 export const text = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'text')
 export const markdown = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'markdown')
 export const group = (id?: string) => new GroupNodeBuilder(id)
 export const select = (id: string, nodeLabel: string) => new SelectNodeBuilder(id, nodeLabel)
 export const chips = (id: string, nodeLabel: string) => new ChipsNodeBuilder(id, nodeLabel)
 export const label = (content: string | ContentFn) => new DisplayNodeBuilder(content)
-export const stage = (id: string, title: string, hint: string, guidanceUrl: string) =>
-	new StageNodeBuilder(id, title, hint, guidanceUrl)
+export const stage = (id: string, title: string) =>
+	new StageNodeBuilder(id, title)

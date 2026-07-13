@@ -2,7 +2,7 @@ import type { StageNodeBuilder } from '../types/node'
 import { group } from '../types/node'
 import categories from './stages/categories'
 import description from './stages/description'
-import environment from './stages/environment'
+import metadata from './stages/metadata'
 import gallery from './stages/gallery'
 import license from './stages/license'
 import links from './stages/links'
@@ -23,7 +23,7 @@ export const stages = [
 	links,
 	license,
 	categories,
-	environment,
+	metadata,
 	gallery,
 	versions,
 	reupload,

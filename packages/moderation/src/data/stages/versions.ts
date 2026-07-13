@@ -1,6 +1,6 @@
 import { VersionIcon } from '@modrinth/assets'
 
-import { action, button, chips, group, md, select, stage, text, toggle } from '../../types/node'
+import { action, toggle, chips, group, md, select, stage, text, check } from '../../types/node'
 
 const loaderLabels: Record<string, string> = {
 	neoforge: 'NeoForge',
@@ -16,18 +16,15 @@ function formatLoaderLabel(id: string): string {
 		.join(' ')
 }
 
-export default stage(
-	'versions',
-	'Versions',
-	"Are this project's files correct?",
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31',
-)
+export default stage('versions','Versions')
+	.hint("Are this project's files correct?")
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31')
 	.icon(VersionIcon)
 	.navigate('/versions')
 	.shown(({ project }) => !project?.minecraft_server)
 	.children(
 		group().children(
-			button('incorrect_additional', 'Incorrect additional files')
+			toggle('incorrect_additional', 'Incorrect additional files')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -35,7 +32,7 @@ export default stage(
 						.message(md('checklist/messages/versions/incorrect_additional_files')),
 				),
 
-			button('incorrect_project_type', 'Incorrect Project Type')
+			toggle('incorrect_project_type', 'Incorrect Project Type')
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -43,19 +40,19 @@ export default stage(
 				)
 				.children(
 					select('type', 'What type should this project be?').children(
-						toggle('modpack', 'Modpack')
+						check('modpack', 'Modpack')
 							.shown(({ project }) => !project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/invalid-modpacks')),
 							),
-						toggle('resourcepack', 'Resource Pack')
+						check('resourcepack', 'Resource Pack')
 							.shown(({ project }) => !project.project_types.includes('resourcepack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/invalid-resourcepacks')),
 							),
-						toggle('datapack', 'Data Pack')
+						check('datapack', 'Data Pack')
 							.shown(({ project }) => !project.loaders.includes('datapack'))
 							.action(
 								action()
@@ -64,7 +61,7 @@ export default stage(
 					),
 				),
 
-			button('alternate_versions', 'Alternate Versions')
+			toggle('alternate_versions', 'Alternate Versions')
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -72,17 +69,17 @@ export default stage(
 				)
 				.children(
 					select('distribution', 'How are they distributed?').children(
-						toggle('primary', 'Primary Files')
+						check('primary', 'Primary Files')
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-primary')),
 							),
-						toggle('additional', 'Additional Files')
+						check('additional', 'Additional Files')
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-additional')),
 							),
-						toggle('mono', 'Monofile')
+						check('mono', 'Monofile')
 							.shown(
 								({ project }) =>
 									project.project_types.includes('resourcepack') ||
@@ -92,19 +89,19 @@ export default stage(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-mono')),
 							),
-						toggle('server', 'Server Files (Primary Files)')
+						check('server', 'Server Files (Primary Files)')
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-server')),
 							),
-						toggle('server_additional', 'Server Files (Additional Files)')
+						check('server_additional', 'Server Files (Additional Files)')
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-server-additional')),
 							),
-						toggle('zip', 'mods.zip')
+						check('zip', 'mods.zip')
 							.shown(({ project }) => project.project_types.includes('modpack'))
 							.action(
 								action()
@@ -113,7 +110,7 @@ export default stage(
 					),
 				),
 
-			button('incorrect_loader', 'Incorrect Loader')
+			toggle('incorrect_loader', 'Incorrect Loader')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -131,11 +128,11 @@ export default stage(
 				//TODO: different message for empty vs non empty + quick fix?
 				.children(
 					chips('loaders', 'Which loader labels are incorrect?').children(
-						({ project }) => project.loaders.map((id) => toggle(id, formatLoaderLabel(id))),
+						({ project }) => project.loaders.map((id) => check(id, formatLoaderLabel(id))),
 					),
 				),
 
-			button('vanilla_assets', 'Vanilla Assets')
+			toggle('vanilla_assets', 'Vanilla Assets')
 				.shown(({ project }) => project.project_types.includes('resourcepack'))
 				.action(
 					action()
@@ -144,7 +141,7 @@ export default stage(
 						.message(md('checklist/messages/versions/vanilla_assets')),
 				),
 
-			button('redist_libs', 'Packed Libs')
+			toggle('redist_libs', 'Packed Libs')
 				.shown(
 					({ project }) =>
 						project.project_types.includes('mod') || project.project_types.includes('plugin'),
@@ -156,7 +153,7 @@ export default stage(
 						.message(md('checklist/messages/versions/redist_libs')),
 				),
 
-			button('duplicate_primary_files', 'Duplicate Primary Files')
+			toggle('duplicate_primary_files', 'Duplicate Primary Files')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -164,7 +161,7 @@ export default stage(
 						.message(md('checklist/messages/versions/broken_version')),
 				),
 
-			button('unsupported', 'Unsupported')
+			toggle('unsupported', 'Unsupported')
 				.action(
 					action()
 						.suggestedStatus('rejected')

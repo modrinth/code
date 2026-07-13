@@ -1,22 +1,19 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 import type { NodeBuilder, NodeState } from '../../types/node'
-import { action, button, group, isNodeActive, label, md, stage, walkNodes } from '../../types/node'
+import { action, toggle, group, isNodeActive, label, md, stage, walkNodes } from '../../types/node'
 import checklist from '../checklist'
 
-export default stage(
-	'status-alerts',
-	'Status Alerts',
-	`Is anything else affecting this project's status?`,
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
-)
+export default stage('status-alerts', 'Status Alerts')
+	.hint(`Is anything else affecting this project's status?`)
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6')
 	.icon(TriangleAlertIcon)
 	.navigate('/moderation')
 	.children(
 		label(md('checklist/text/status-alerts/text')),
 
 		group().children(
-			button('corrections_applied', 'Corrections applied')
+			toggle('corrections_applied', 'Corrections applied')
 				.shown(({ project }) => project.status !== 'approved')
 				.action(
 					action()
@@ -34,7 +31,7 @@ export default stage(
 					return result
 				}),
 
-			button('corrections_applied_approved', 'Corrections applied')
+			toggle('corrections_applied_approved', 'Corrections applied')
 				.shown(({ project }) => project.status === 'approved')
 				.action(
 					action()
@@ -43,7 +40,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/fixed-approved')),
 				),
 
-			button('private_use', 'Private use')
+			toggle('private_use', 'Private use')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -52,7 +49,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/private/private')),
 				),
 
-			button('private_use_server', 'Private community')
+			toggle('private_use_server', 'Private community')
 				.shown(({ project }) => !!project.minecraft_server)
 				.action(
 					action()
@@ -61,7 +58,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/private/private-server')),
 				),
 
-			button('server_use', 'Server use')
+			toggle('server_use', 'Server use')
 				.shown(
 					({ project }) => project.project_types.includes('modpack') && !project.minecraft_server,
 				)
@@ -71,7 +68,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/serverpack')),
 				),
 
-			button('account_issues', 'Account issues')
+			toggle('account_issues', 'Account issues')
 				.action(
 					action()
 
@@ -79,7 +76,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/account_issues')),
 				),
 
-			button('automod_confusion', 'Automod confusion')
+			toggle('automod_confusion', 'Automod confusion')
 				.shown(({ project }) => !project.minecraft_server)
 				.action(
 					action()
@@ -87,7 +84,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/automod_confusion')),
 				),
 
-			button('demonetized', 'Demonetized')
+			toggle('demonetized', 'Demonetized')
 				.shown(
 					({ project }) =>
 						project.monetization_status === 'force-demonetized' &&
@@ -100,7 +97,7 @@ export default stage(
 						.message(md('checklist/messages/status-alerts/demonetized/demonetized')),
 				),
 
-			button('demonetized_modpack', 'Demonetized')
+			toggle('demonetized_modpack', 'Demonetized')
 				.shown(
 					({ project }) =>
 						project.monetization_status === 'force-demonetized' &&

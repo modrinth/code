@@ -1,18 +1,15 @@
 import { ScaleIcon } from '@modrinth/assets'
 
-import { action, button, group, md, stage, text } from '../../types/node'
+import { action, toggle, group, md, stage, text } from '../../types/node'
 
-export default stage(
-	'post-approval',
-	'Post-Approval',
-	'Issue warnings, notices, or takedowns?',
-	'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
-)
+export default stage('post-approval', 'Post-Approval')
+	.hint('Issue warnings, notices, or takedowns?')
+	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed')
 	.icon(ScaleIcon)
 	.shown(({ projectV2 }) => projectV2.status === 'approved')
 	.children(
 		group().children(
-			button('issue_warning', 'Issue warning')
+			toggle('issue_warning', 'Issue warning')
 				.action(
 					action()
 						.suggestedStatus('approved')
@@ -20,7 +17,7 @@ export default stage(
 						.message(md('checklist/messages/post-approval/issue-warning')),
 				),
 
-			button('missed_deadline', 'Missed due date')
+			toggle('missed_deadline', 'Missed due date')
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -29,7 +26,7 @@ export default stage(
 				)
 				.children(text('status', 'What status is the project being set to?').required()),
 
-			button('metadata_issue', 'Incorrect metadata')
+			toggle('metadata_issue', 'Incorrect metadata')
 				.action(
 					action()
 						.suggestedStatus('approved')
@@ -37,7 +34,7 @@ export default stage(
 						.message(md('checklist/messages/post-approval/metadata-issue')),
 				)
 				.children(
-					button('dependencies', 'Missing Dependencies')
+					toggle('dependencies', 'Missing Dependencies')
 						.action(
 							action()
 								.severity('low')
@@ -51,7 +48,7 @@ export default stage(
 							text('dependency_link', 'Dependency link').required(),
 						),
 
-					button('mc_versions', 'Game versions')
+					toggle('mc_versions', 'Game versions')
 						.action(
 							action()
 								.severity('low')
@@ -59,7 +56,7 @@ export default stage(
 						)
 						.children(text('specifics', 'More details about the game versions issue?')),
 
-					button('loaders', 'Loaders')
+					toggle('loaders', 'Loaders')
 						.action(
 							action()
 								.severity('low')
@@ -67,7 +64,7 @@ export default stage(
 						)
 						.children(text('specifics', 'More details about the loaders issue?')),
 
-					button('license', 'Inconsistent Licensing')
+					toggle('license', 'Inconsistent Licensing')
 						.action(
 							action()
 								.severity('low')
