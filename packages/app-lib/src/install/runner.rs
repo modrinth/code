@@ -332,10 +332,9 @@ async fn prepare_initial_instance(
                         data.instance_icon_url
                             .clone()
                             .or_else(|| {
-                                preview
-                                    .icon
-                                    .as_ref()
-                                    .map(|path| path.to_string_lossy().to_string())
+                                preview.icon.as_ref().map(|path| {
+                                    path.to_string_lossy().to_string()
+                                })
                             })
                             .or_else(|| preview.icon_url.clone()),
                     )
@@ -1282,9 +1281,7 @@ fn install_error_code(
         ErrorKind::FetchError(_)
         | ErrorKind::ApiIsDownError(_)
         | ErrorKind::WSError(_)
-        | ErrorKind::WSClosedError(_) => {
-            "network_error"
-        }
+        | ErrorKind::WSClosedError(_) => "network_error",
         ErrorKind::Any(_)
             if matches!(
                 phase,
@@ -1328,7 +1325,9 @@ fn current_instance_id(job_state: &InstallJobState) -> Option<String> {
     }
 }
 
-pub(super) fn modpack_details(location: &CreatePackLocation) -> InstallPhaseDetails {
+pub(super) fn modpack_details(
+    location: &CreatePackLocation,
+) -> InstallPhaseDetails {
     match location {
         CreatePackLocation::FromVersionId {
             project_id,

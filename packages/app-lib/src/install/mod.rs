@@ -1,9 +1,9 @@
 mod diagnostics;
-mod shared_instance;
 pub mod events;
 pub mod model;
 pub mod recovery;
 pub mod runner;
+mod shared_instance;
 pub mod store;
 
 pub use events::InstallProgressReporter;

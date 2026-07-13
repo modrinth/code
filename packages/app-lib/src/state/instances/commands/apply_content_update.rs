@@ -326,9 +326,7 @@ async fn plan_bulk_update(
     let updateable_paths = if shared_instance_member {
         let managed_paths = installed
             .iter()
-            .filter(|project| {
-                project.source_kind.is_shared_instance_managed()
-            })
+            .filter(|project| project.source_kind.is_shared_instance_managed())
             .map(|project| project.relative_path.clone())
             .collect::<HashSet<_>>();
 

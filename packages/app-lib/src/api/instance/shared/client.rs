@@ -24,7 +24,6 @@ impl SharedInstanceUnavailableReason {
             _ => None,
         }
     }
-
 }
 
 #[derive(Debug)]
@@ -241,14 +240,9 @@ pub(super) async fn update_remote_instance_icon(
     let bytes = crate::util::io::read(icon_path).await?;
     let operation = "upload_instance_icon";
     let method = Method::PUT;
-    let response = send_bytes_request(
-        operation,
-        method.clone(),
-        &path,
-        bytes,
-        state,
-    )
-    .await?;
+    let response =
+        send_bytes_request(operation, method.clone(), &path, bytes, state)
+            .await?;
 
     if response.status().is_success() {
         return Ok(());
@@ -482,14 +476,8 @@ pub(super) async fn request_json<T>(
 where
     T: DeserializeOwned,
 {
-    let response = request(
-        operation,
-        method.clone(),
-        path,
-        body,
-        state,
-    )
-    .await?;
+    let response =
+        request(operation, method.clone(), path, body, state).await?;
     decode_json_response(operation, method, path, response).await
 }
 
@@ -677,12 +665,10 @@ pub(super) async fn send_bytes_request(
     body: Vec<u8>,
     state: &State,
 ) -> crate::Result<reqwest::Response> {
-    let credentials = ModrinthCredentials::get_and_refresh(
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await?
-    .ok_or(crate::ErrorKind::NoCredentialsError)?;
+    let credentials =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+            .ok_or(crate::ErrorKind::NoCredentialsError)?;
     let _permit = state.api_semaphore.0.acquire().await?;
     let base_url = service_base_url();
     let url = service_url(base_url, path);
@@ -813,13 +799,15 @@ pub(super) async fn shared_instances_request_error<T>(
     .into())
 }
 
-pub(super) fn response_request_id(response: &reqwest::Response) -> Option<String> {
+pub(super) fn response_request_id(
+    response: &reqwest::Response,
+) -> Option<String> {
     let request_id = response.headers().get("x-request-id")?.to_str().ok()?;
     if request_id.is_empty()
         || request_id.len() > 128
-        || !request_id
-            .chars()
-            .all(|character| character.is_ascii_alphanumeric() || "-_.:".contains(character))
+        || !request_id.chars().all(|character| {
+            character.is_ascii_alphanumeric() || "-_.:".contains(character)
+        })
     {
         return None;
     }
@@ -835,7 +823,9 @@ pub(super) fn service_base_url() -> &'static str {
     env!("SHARED_INSTANCES_API_BASE_URL").trim_end_matches('/')
 }
 
-pub(super) fn shared_instances_client(base_url: &str) -> &'static reqwest::Client {
+pub(super) fn shared_instances_client(
+    base_url: &str,
+) -> &'static reqwest::Client {
     if base_url.starts_with("https://") {
         &REQWEST_CLIENT
     } else {

@@ -12,10 +12,7 @@
 				:offline="offline"
 				@unlinked="fetchInstance"
 			/>
-			<UpdateToPlayModal
-				ref="updateToPlayModal"
-				:instance="instance"
-			/>
+			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<SharedInstanceUpdateModal
 				ref="sharedInstanceUpdateModal"
 				@shared-instance-unavailable="handleSharedInstanceUnavailable"
@@ -367,8 +364,8 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceAdmonitions from '@/components/ui/instance/instance-admonitions/index.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
-import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
@@ -393,10 +390,7 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
 
-import {
-	provideSharedInstanceState,
-	useSharedInstanceState,
-} from './use-shared-instance-state'
+import { provideSharedInstanceState, useSharedInstanceState } from './use-shared-instance-state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)

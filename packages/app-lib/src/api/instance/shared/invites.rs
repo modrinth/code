@@ -2,10 +2,10 @@ const SHARED_INSTANCE_INVITE_MAX_AGE_SECONDS: i32 = 604800;
 const SHARED_INSTANCE_INVITE_MAX_USES: i32 = 10;
 
 use super::client::*;
-use super::types::*;
-use super::*;
 use super::install::*;
 use super::publish::*;
+use super::types::*;
+use super::*;
 
 #[tracing::instrument]
 pub async fn get_shared_instance_users(
@@ -185,5 +185,3 @@ pub async fn decline_pending_shared_instance_invite(
     let state = State::get().await?;
     decline_pending_remote_invite(shared_instance_id, &state).await
 }
-
-

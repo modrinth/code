@@ -1,7 +1,7 @@
 use super::client::*;
+use super::publish::*;
 use super::types::*;
 use super::*;
-use super::publish::*;
 
 pub(super) async fn shared_instance_update_diffs(
     metadata: &crate::state::InstanceMetadata,
@@ -192,9 +192,7 @@ pub(super) async fn shared_modpack_version_label(
     version_id: Option<&str>,
     state: &State,
 ) -> Option<String> {
-    let Some(version_id) = version_id else {
-        return None;
-    };
+    let version_id = version_id?;
     let details = shared_modpack_version_details(version_id, state).await?;
 
     Some(match details.project_name {
@@ -246,7 +244,9 @@ async fn shared_modpack_version_details(
     })
 }
 
-pub(super) fn normalized_loader_version(loader_version: Option<&str>) -> Option<&str> {
+pub(super) fn normalized_loader_version(
+    loader_version: Option<&str>,
+) -> Option<&str> {
     loader_version.filter(|version| !version.is_empty())
 }
 

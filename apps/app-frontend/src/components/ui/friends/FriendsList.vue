@@ -13,8 +13,8 @@ import {
 import { computed, ref } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
-import { useFriends } from '@/composables/use-friends'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { useFriends } from '@/composables/use-friends'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 

@@ -30,9 +30,7 @@ export function useSharedInstanceMembers(options: {
 	onHydrationError: (error: Error) => void
 }) {
 	const queryClient = useQueryClient()
-	const queryKey = computed(
-		() => ['sharedInstanceUsers', options.instance.value.id] as const,
-	)
+	const queryKey = computed(() => ['sharedInstanceUsers', options.instance.value.id] as const)
 	const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(options.instance.value.id))
 
 	async function usersToRows(users: SharedInstanceUsers): Promise<ShareRow[]> {
@@ -67,9 +65,7 @@ export function useSharedInstanceMembers(options: {
 
 	async function loadRows() {
 		if (options.actionsLocked.value) return []
-		const loadedRows = await usersToRows(
-			await get_shared_instance_users(options.instance.value.id),
-		)
+		const loadedRows = await usersToRows(await get_shared_instance_users(options.instance.value.id))
 		removePendingRows(loadedRows.map((row) => row.id))
 		return loadedRows
 	}

@@ -27,20 +27,19 @@ export function useSharedInstancePreviewContent() {
 		const deps = dependencies as VersionDependency[]
 		const projectIds = unique(deps.map((dep) => dep.project_id).filter((id): id is string => !!id))
 		const versionIds = unique(deps.map((dep) => dep.version_id).filter((id): id is string => !!id))
-		const [projects, versions]: [
-			Labrinth.Projects.v2.Project[],
-			Labrinth.Versions.v2.Version[],
-		] = await Promise.all([
-			projectIds.length ? get_project_many(projectIds, 'must_revalidate') : [],
-			versionIds.length ? get_version_many(versionIds, 'must_revalidate') : [],
-		])
+		const [projects, versions]: [Labrinth.Projects.v2.Project[], Labrinth.Versions.v2.Version[]] =
+			await Promise.all([
+				projectIds.length ? get_project_many(projectIds, 'must_revalidate') : [],
+				versionIds.length ? get_version_many(versionIds, 'must_revalidate') : [],
+			])
 		const projectMap = new Map(projects.map((project) => [project.id, project]))
 		const versionMap = new Map(versions.map((version) => [version.id, version]))
 
 		return deps.map((dependency): ContentItem => {
 			const project = dependency.project_id ? projectMap.get(dependency.project_id) : null
 			const version = dependency.version_id ? versionMap.get(dependency.version_id) : null
-			const fileName = version?.files?.[0]?.filename ?? dependency.file_name ?? project?.title ?? 'Unknown'
+			const fileName =
+				version?.files?.[0]?.filename ?? dependency.file_name ?? project?.title ?? 'Unknown'
 			return contentItem(
 				version?.id ?? project?.id ?? fileName,
 				fileName,
@@ -104,12 +103,21 @@ function contentItem(
 			icon_url: project?.icon_url ?? undefined,
 		},
 		...(version
-			? { version: { id: version.id, file_name: fileName, version_number: version.version_number ?? undefined, date_published: version.date_published ?? undefined } }
+			? {
+					version: {
+						id: version.id,
+						file_name: fileName,
+						version_number: version.version_number ?? undefined,
+						date_published: version.date_published ?? undefined,
+					},
+				}
 			: {}),
 	}
 }
 
-function externalFileContentItem(file: SharedInstanceInstallPreview['externalFiles'][number]): ContentItem {
+function externalFileContentItem(
+	file: SharedInstanceInstallPreview['externalFiles'][number],
+): ContentItem {
 	return contentItem(
 		`external:${file.fileType}:${file.fileName}`,
 		file.fileName,

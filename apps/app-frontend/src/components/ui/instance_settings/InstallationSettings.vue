@@ -34,8 +34,8 @@ import {
 } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
-import { injectInstanceSettings } from '@/providers/instance-settings'
 import { provideInstanceBackup } from '@/providers/instance-backup'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 import { useTheming } from '@/store/state'
 
 import type { Manifest } from '../../../helpers/types'

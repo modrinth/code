@@ -18,12 +18,7 @@
 				@mouseenter="link.onHover?.()"
 				@focus="link.onHover?.()"
 			>
-				<component
-					:is="link.icon"
-					v-if="link.icon"
-					class="size-5"
-					:class="getIconClasses(index)"
-				/>
+				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
 				<span class="text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>

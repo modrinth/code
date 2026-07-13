@@ -17,7 +17,13 @@
 
 <script setup lang="ts">
 import { DownloadIcon } from '@modrinth/assets'
-import { commonMessages, type ContentDiffItem, ContentDiffModal, defineMessages, useVIntl } from '@modrinth/ui'
+import {
+	commonMessages,
+	type ContentDiffItem,
+	ContentDiffModal,
+	defineMessages,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import {
@@ -44,14 +50,17 @@ const preview = ref<SharedInstanceUpdatePreview | null>(null)
 const onComplete = ref<UpdateCompleteCallback>(() => {})
 const { formatMessage } = useVIntl()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
-const diffs = computed<ContentDiffItem[]>(() => preview.value?.diffs.map((diff) => ({
-	type: diff.type,
-	projectName: diff.projectName ?? undefined,
-	fileName: diff.fileName ?? undefined,
-	currentVersionName: diff.currentVersionName ?? undefined,
-	newVersionName: diff.newVersionName ?? undefined,
-	disabled: diff.disabled,
-})) ?? [])
+const diffs = computed<ContentDiffItem[]>(
+	() =>
+		preview.value?.diffs.map((diff) => ({
+			type: diff.type,
+			projectName: diff.projectName ?? undefined,
+			fileName: diff.fileName ?? undefined,
+			currentVersionName: diff.currentVersionName ?? undefined,
+			newVersionName: diff.newVersionName ?? undefined,
+			disabled: diff.disabled,
+		})) ?? [],
+)
 
 async function update() {
 	try {
@@ -71,20 +80,40 @@ async function update() {
 	}
 }
 
-function show(instanceValue: GameInstance, previewValue: SharedInstanceUpdatePreview, callback: UpdateCompleteCallback = () => {}, event?: MouseEvent) {
+function show(
+	instanceValue: GameInstance,
+	previewValue: SharedInstanceUpdatePreview,
+	callback: UpdateCompleteCallback = () => {},
+	event?: MouseEvent,
+) {
 	instance.value = instanceValue
 	preview.value = previewValue
 	onComplete.value = callback
 	modal.value?.show(event)
 }
-function hide() { modal.value?.hide() }
+function hide() {
+	modal.value?.hide()
+}
 
 const messages = defineMessages({
 	updateToPlay: { id: 'app.modal.update-to-play.header', defaultMessage: 'Update to play' },
-	updateRequired: { id: 'app.modal.update-to-play.update-required', defaultMessage: 'Update required' },
-	description: { id: 'app.modal.update-to-play.update-required-description', defaultMessage: 'An update is required to play {name}. Please update to latest version to launch the game.' },
-	addedLabel: { id: 'app.modal.update-to-play.shared-instance-added-label', defaultMessage: 'Added' },
-	removedLabel: { id: 'app.modal.update-to-play.shared-instance-removed-label', defaultMessage: 'Removed' },
+	updateRequired: {
+		id: 'app.modal.update-to-play.update-required',
+		defaultMessage: 'Update required',
+	},
+	description: {
+		id: 'app.modal.update-to-play.update-required-description',
+		defaultMessage:
+			'An update is required to play {name}. Please update to latest version to launch the game.',
+	},
+	addedLabel: {
+		id: 'app.modal.update-to-play.shared-instance-added-label',
+		defaultMessage: 'Added',
+	},
+	removedLabel: {
+		id: 'app.modal.update-to-play.shared-instance-removed-label',
+		defaultMessage: 'Removed',
+	},
 })
 
 defineExpose({ show, hide })

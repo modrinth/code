@@ -147,7 +147,6 @@ import Combobox from '../../base/Combobox.vue'
 import NewModal from '../../modal/NewModal.vue'
 import InvitePlayersModalInviteLinkEditor from './invite-players-modal-invite-link-editor.vue'
 import InvitePlayersModalUserRow from './invite-players-modal-user-row.vue'
-import { useInvitePlayersSearch } from './use-invite-players-search'
 import type {
 	InviteLinkSettings,
 	InvitePlayersInvitePayload,
@@ -155,6 +154,7 @@ import type {
 	InvitePlayersUser,
 	InvitePlayersUserProfileLink,
 } from './types'
+import { useInvitePlayersSearch } from './use-invite-players-search'
 
 const props = withDefaults(
 	defineProps<{

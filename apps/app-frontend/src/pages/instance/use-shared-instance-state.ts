@@ -16,13 +16,13 @@ export type SharedInstanceManager =
 			name: string
 			avatarUrl?: string
 			tintBy: string
-		}
+	  }
 	| {
 			type: 'server'
 			name: string
 			avatarUrl?: string
 			tintBy: string
-		}
+	  }
 
 export function useSharedInstanceState(
 	instance: Ref<GameInstance | undefined>,
@@ -30,9 +30,8 @@ export function useSharedInstanceState(
 	notifyError: (error: unknown) => void,
 ) {
 	const auth = injectAuth()
-	const updatePreview = ref<
-		Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
-	>(null)
+	const updatePreview =
+		ref<Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>>(null)
 	const unavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
 	const availabilityCheckKey = ref<string | null>(null)
 	const availabilityRefresh = ref(0)
@@ -45,9 +44,7 @@ export function useSharedInstanceState(
 		return auth.user.value?.id !== expectedUserId.value
 	})
 	const actionsLocked = computed(() => wrongAccount.value)
-	const shareActionsLocked = computed(
-		() => actionsLocked.value || unavailableReason.value !== null,
-	)
+	const shareActionsLocked = computed(() => actionsLocked.value || unavailableReason.value !== null)
 	const signedOut = computed(() => !auth.session_token.value)
 	const managerUserId = computed(() => {
 		const attachment = instance.value?.shared_instance

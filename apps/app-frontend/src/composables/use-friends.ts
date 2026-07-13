@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onUnmounted, type MaybeRefOrGetter, toValue } from 'vue'
+import { computed, type MaybeRefOrGetter, onUnmounted, toValue } from 'vue'
 
 import { toError } from '@/helpers/errors'
 import { friend_listener } from '@/helpers/events.js'
@@ -8,8 +8,8 @@ import {
 	add_friend,
 	createPendingFriend,
 	type FriendCacheUser,
-	type FriendWithUserData,
 	friendsQueryKey,
+	type FriendWithUserData,
 	getFriendsWithUserData,
 	getFriendUserId,
 	matchesFriend,
@@ -94,12 +94,7 @@ export function useFriends(options: {
 			await queryClient.cancelQueries({ queryKey: activeQueryKey })
 			const previousFriends = queryClient.getQueryData<FriendWithUserData[]>(activeQueryKey)
 			queryClient.setQueryData<FriendWithUserData[]>(activeQueryKey, (cachedFriends = []) =>
-				removeCachedFriend(
-					cachedFriends,
-					userId,
-					user.username,
-					toValue(options.currentUserId),
-				),
+				removeCachedFriend(cachedFriends, userId, user.username, toValue(options.currentUserId)),
 			)
 			return { queryKey: activeQueryKey, previousFriends }
 		},
@@ -118,10 +113,7 @@ export function useFriends(options: {
 
 	function acceptFriend(friend: FriendWithUserData) {
 		const userId = getFriendUserId(friend, toValue(options.currentUserId))
-		requestFriend(
-			{ id: userId, username: friend.username, avatarUrl: friend.avatar },
-			true,
-		)
+		requestFriend({ id: userId, username: friend.username, avatarUrl: friend.avatar }, true)
 	}
 
 	function removeFriend(friend: FriendWithUserData) {

@@ -1,7 +1,9 @@
 <template>
 	<EmptyState type="empty-inbox">
 		<template #heading>{{ heading }}</template>
-		<template #description><slot name="description">{{ description }}</slot></template>
+		<template #description
+			><slot name="description">{{ description }}</slot></template
+		>
 		<template v-if="$slots.actions" #actions><slot name="actions" /></template>
 	</EmptyState>
 </template>

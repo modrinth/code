@@ -2,6 +2,7 @@ use super::content_set_diff::{
     ContentSetDiffEntry, ContentSetDiffKind, ContentSetDiffOptions,
     ContentSetSnapshot, ContentSetSnapshotVersion, diff_content_sets,
 };
+use crate::SharedInstanceUnavailableReason;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::install::{
@@ -15,7 +16,6 @@ use crate::state::{
     ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{INSECURE_REQWEST_CLIENT, REQWEST_CLIENT};
-use crate::SharedInstanceUnavailableReason;
 use chrono::{DateTime, Utc};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;

@@ -1,8 +1,8 @@
 use super::client::*;
-use super::types::*;
-use super::*;
 use super::diff::*;
 use super::install::*;
+use super::types::*;
+use super::*;
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -248,7 +248,9 @@ pub(super) async fn shared_instance_install_modpack(
     }))
 }
 
-pub(super) fn shared_instance_loader_version(loader_version: String) -> Option<String> {
+pub(super) fn shared_instance_loader_version(
+    loader_version: String,
+) -> Option<String> {
     (!loader_version.is_empty()).then_some(loader_version)
 }
 
@@ -866,7 +868,9 @@ pub(super) async fn shared_instance_for_invites(
     Ok((metadata, attachment))
 }
 
-pub(super) fn ensure_owner(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
+pub(super) fn ensure_owner(
+    attachment: &SharedInstanceAttachment,
+) -> crate::Result<()> {
     if attachment.role == SharedInstanceRole::Owner {
         return Ok(());
     }
@@ -877,7 +881,9 @@ pub(super) fn ensure_owner(attachment: &SharedInstanceAttachment) -> crate::Resu
     .into())
 }
 
-pub(super) fn ensure_member(attachment: &SharedInstanceAttachment) -> crate::Result<()> {
+pub(super) fn ensure_member(
+    attachment: &SharedInstanceAttachment,
+) -> crate::Result<()> {
     if attachment.role.is_member() {
         return Ok(());
     }

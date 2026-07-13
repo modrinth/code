@@ -92,14 +92,14 @@ pub(crate) async fn sync_instance_content_files(
         .count()
         != files.len()
         || files.iter().any(|file| {
-            existing_files_by_path
-                .get(&file.relative_path)
-                .is_none_or(|existing| {
+            existing_files_by_path.get(&file.relative_path).is_none_or(
+                |existing| {
                     existing.missing
                         || existing.enabled != file.enabled
                         || existing.sha1 != file.sha1
                         || existing.size != file.size
-                })
+                },
+            )
         });
 
     let mut tx = state.pool.begin().await?;

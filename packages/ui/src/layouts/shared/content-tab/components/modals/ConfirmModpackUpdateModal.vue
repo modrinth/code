@@ -19,11 +19,7 @@
 					})
 				}}
 			</Admonition>
-			<Admonition
-				v-if="managedWarning"
-				type="warning"
-				:header="managedWarning.header"
-			>
+			<Admonition v-if="managedWarning" type="warning" :header="managedWarning.header">
 				{{ managedWarning.body }}
 			</Admonition>
 			<InlineBackupCreator

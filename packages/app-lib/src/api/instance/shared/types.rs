@@ -18,7 +18,10 @@ impl SharedInstanceUsers {
         }
     }
 
-    pub(super) fn from_users(users: Vec<SharedInstanceUser>, tokens: i32) -> Self {
+    pub(super) fn from_users(
+        users: Vec<SharedInstanceUser>,
+        tokens: i32,
+    ) -> Self {
         let user_ids = users.iter().map(|user| user.id.clone()).collect();
 
         Self {
@@ -163,7 +166,6 @@ pub enum SharedInstanceUpdateDiffType {
     GameVersionUpdated,
     LoaderUpdated,
 }
-
 
 pub(super) fn is_false(value: &bool) -> bool {
     !*value

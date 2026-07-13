@@ -1,8 +1,8 @@
 use super::client::*;
-use super::types::*;
-use super::*;
 use super::diff::*;
 use super::publish::*;
+use super::types::*;
+use super::*;
 
 #[tracing::instrument]
 pub async fn install_shared_instance(
@@ -114,7 +114,7 @@ pub(super) async fn shared_instance_install_preview_from_version(
     let mut seen_content_version_ids = HashSet::new();
     content_version_ids
         .retain(|id| seen_content_version_ids.insert(id.clone()));
-    let modpack = shared_instance_install_modpack(&version, &state).await?;
+    let modpack = shared_instance_install_modpack(&version, state).await?;
     let modpack_dependency_count = modpack
         .as_ref()
         .map(|modpack| modpack.dependency_count)

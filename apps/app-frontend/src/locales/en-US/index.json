@@ -467,6 +467,12 @@
   "app.instance.share.sign-in.button": {
     "message": "Sign in"
   },
+  "app.instance.share.unlink.body": {
+    "message": "You must unlink this modpack to share your instance"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "Sharing requires unlinking"
+  },
   "app.instance.shared-instance-wrong-account.fallback-username": {
     "message": "the linked account"
   },
@@ -836,6 +842,39 @@
   "app.world.world-item.players-online": {
     "message": "{count} online"
   },
+  "content.shared-instance.change-version-body": {
+    "message": "Changing the version only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "Some selected projects are part of the shared instance. Deleting them only changes your local copy, and future shared instance updates may restore or change them again."
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Delete anyway"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "Delete {count, number} projects anyway"
+  },
+  "content.shared-instance.delete-single-body": {
+    "message": "Deleting it only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "Some selected projects are part of the shared instance. Disabling them only changes your local copy, and future shared instance updates may re-enable, restore, or change them again."
+  },
+  "content.shared-instance.disable-button": {
+    "message": "Disable anyway"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "Disable {count, number} projects anyway"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "Disabling it only changes your local copy. Future shared instance updates may re-enable, restore, or change it again."
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "Unlinking only changes your local copy. Future shared instance updates may restore or change it again."
+  },
+  "content.shared-instance.warning-header": {
+    "message": "This is part of the shared instance"
+  },
   "friends.action.add-friend": {
     "message": "Add a friend"
   },
@@ -898,6 +937,48 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
+  },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Linked shared instance"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "Shared instance"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Unlink shared instance"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "Disconnect this local instance from future shared updates."
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Unlinking..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Unpublish shared instance"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Stop sharing this instance and remove it from Modrinth."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Unpublishing..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "This only affects your local instance. Your installed content will stay on this device, and the shared instance and other people using it will not be affected."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "Unlinking shared instance"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "Unlink shared instance"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "This deletes the shared instance from Modrinth's servers. People using it in the Modrinth App will stop receiving updates, but your local instance and its content will stay on this device."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Unpublishing shared instance"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Unpublish shared instance"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"

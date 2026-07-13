@@ -144,12 +144,9 @@ impl SharedInstanceApplyPlan {
             .external_files
             .values()
             .filter(|current| {
-                desired
-                    .external_files
-                    .get(&current.file_name)
-                    .is_none_or(|desired| {
-                        desired.file_type != current.file_type
-                    })
+                desired.external_files.get(&current.file_name).is_none_or(
+                    |desired| desired.file_type != current.file_type,
+                )
             })
             .cloned()
             .collect();

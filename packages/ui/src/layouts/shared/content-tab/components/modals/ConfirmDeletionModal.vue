@@ -113,8 +113,8 @@ const formattedItemType = computed(() =>
 	formatContentTypeSentence(formatMessage, visibleItemType.value, visibleCount.value),
 )
 
-const admonitionHeader = computed(() =>
-	visibleWarning.value?.admonitionHeader ?? formatMessage(messages.admonitionHeader),
+const admonitionHeader = computed(
+	() => visibleWarning.value?.admonitionHeader ?? formatMessage(messages.admonitionHeader),
 )
 
 const admonitionBody = computed(() => {
@@ -122,10 +122,13 @@ const admonitionBody = computed(() => {
 })
 
 const deleteButtonLabel = computed(() => {
-	return visibleWarning.value?.actionLabel ?? formatMessage(messages.deleteButton, {
-		count: visibleCount.value,
-		itemType: formattedItemType.value,
-	})
+	return (
+		visibleWarning.value?.actionLabel ??
+		formatMessage(messages.deleteButton, {
+			count: visibleCount.value,
+			itemType: formattedItemType.value,
+		})
+	)
 })
 
 async function show() {

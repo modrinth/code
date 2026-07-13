@@ -537,14 +537,10 @@ pub(crate) async fn get_instance_metadata_by_id(
     id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<Option<InstanceMetadataRecord>> {
-    let row = query_instance_metadata!(
-        "",
-        "FROM instances i",
-        "WHERE i.id = ?",
-        id,
-    )
-    .fetch_optional(pool)
-    .await?;
+    let row =
+        query_instance_metadata!("", "FROM instances i", "WHERE i.id = ?", id,)
+            .fetch_optional(pool)
+            .await?;
 
     row.map(InstanceMetadataRow::into_record).transpose()
 }
@@ -584,14 +580,10 @@ pub(crate) async fn get_instance_metadata_many(
 pub(crate) async fn list_instance_metadata(
     pool: &SqlitePool,
 ) -> crate::Result<Vec<InstanceMetadataRecord>> {
-    let rows = query_instance_metadata!(
-        "",
-        "FROM instances i",
-        "WHERE 1 = ?",
-        1_i64,
-    )
-    .fetch_all(pool)
-    .await?;
+    let rows =
+        query_instance_metadata!("", "FROM instances i", "WHERE 1 = ?", 1_i64,)
+            .fetch_all(pool)
+            .await?;
 
     rows.into_iter()
         .map(InstanceMetadataRow::into_record)
