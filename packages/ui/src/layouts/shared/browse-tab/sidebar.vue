@@ -194,6 +194,8 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				v-model:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 				:provided-filters="ctx.providedFilters?.value ?? []"
 				:filter-type="filter"
+				:result-count="ctx.totalHits.value"
+				:refreshing="ctx.refreshing.value"
 				:class="filterClass"
 				:button-class="buttonClass"
 				:content-class="contentClass"

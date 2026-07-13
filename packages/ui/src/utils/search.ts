@@ -43,10 +43,11 @@ export type FilterType = {
 	}[]
 	searchable: boolean
 	allows_custom_options?: 'and' | 'or'
+	custom_option_field?: string
 	ordering?: number
 } & (
 	| {
-			display: 'all' | 'scrollable' | 'none' | 'toggle'
+			display: 'all' | 'scrollable' | 'none' | 'project' | 'toggle'
 	  }
 	| {
 			display: 'expandable'
@@ -473,6 +474,24 @@ export function useSearch(
 				allows_custom_options: 'and',
 			},
 			{
+				id: 'compatible_dependency_project_ids',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.compatible_dependency_project_ids',
+						defaultMessage: 'Depends on',
+					}),
+				),
+				supported_project_types: ALL_PROJECT_TYPES,
+				query_param: 'dep',
+				supports_negative_filter: false,
+				display: 'project',
+				searchable: false,
+				options: [],
+				allows_custom_options: 'and',
+				custom_option_field: 'compatible_dependency_project_ids',
+				ordering: -999,
+			},
+			{
 				id: 'advanced',
 				formatted_name: formatMessage(
 					defineMessage({
@@ -533,7 +552,9 @@ export function useSearch(
 					formatted_name: filterValue.option,
 					icon: undefined,
 					method: type.allows_custom_options,
-					value: filterValue.option,
+					value: type.custom_option_field
+						? `${type.custom_option_field}:${filterValue.option}`
+						: filterValue.option,
 				}
 			} else if (!option) {
 				console.error(`Filter option ${filterValue.option} not found`)
@@ -771,8 +792,8 @@ export function useSearch(
 		currentFilters.value.forEach((filterValue) => {
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			const option = type?.options.find((option) => option.id === filterValue.option)
-			if (type && option) {
-				const value = getOptionValue(option, filterValue.negative)
+			if (type && (option || type.allows_custom_options)) {
+				const value = option ? getOptionValue(option, filterValue.negative) : filterValue.option
 				if (items[type.query_param]) {
 					items[type.query_param].push(value)
 				} else {

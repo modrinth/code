@@ -3548,6 +3548,15 @@
   "s.bg": {
     "defaultMessage": "Background task running"
   },
+  "search.filter.clear": {
+    "defaultMessage": "Clear"
+  },
+  "search.filter.dependent_count": {
+    "defaultMessage": "{count, plural, one {# dependent} other {# dependents}}"
+  },
+  "search.filter.dependent_project": {
+    "defaultMessage": "Depends on: {project}"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
   },
@@ -3589,6 +3598,9 @@
   },
   "search.filter_type.advanced.exclude_plugin": {
     "defaultMessage": "Exclude plugins"
+  },
+  "search.filter_type.compatible_dependency_project_ids": {
+    "defaultMessage": "Depends on"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"

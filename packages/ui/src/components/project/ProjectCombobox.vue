@@ -32,12 +32,13 @@ export type ProjectType =
 	| 'plugin'
 	| 'server'
 
-interface SearchHit {
+export interface SearchHit {
 	project_id: string
 	title: string
 	icon_url?: string
 	project_type: string
 	slug: string
+	author?: string
 }
 
 const props = withDefaults(

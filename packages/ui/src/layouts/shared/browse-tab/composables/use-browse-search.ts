@@ -48,6 +48,7 @@ export interface BrowseSearchState {
 	effectiveCurrentSortType: Ref<SortType>
 
 	loading: Ref<boolean>
+	refreshing: Ref<boolean>
 	projectHits: ShallowRef<BrowseSearchResponse['projectHits']>
 	serverHits: ShallowRef<BrowseSearchResponse['serverHits']>
 	totalHits: Ref<number>
@@ -172,6 +173,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	])
 
 	const loading = ref(true)
+	const refreshing = ref(false)
 	const projectHits = shallowRef<BrowseSearchResponse['projectHits']>([])
 	const serverHits = shallowRef<BrowseSearchResponse['serverHits']>([])
 	const totalHits = ref(0)
@@ -205,6 +207,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	)
 
 	watch(effectiveRequestParams, (newVal, oldVal) => {
+		refreshing.value = true
 		debug('effectiveRequestParams changed', {
 			from: oldVal?.substring(0, 80),
 			to: newVal?.substring(0, 80),
@@ -217,6 +220,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 	async function refreshSearch() {
 		const version = ++searchVersion
+		refreshing.value = true
 		debug('refreshSearch start', {
 			version,
 			projectType: options.projectType.value,
@@ -253,11 +257,13 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 			updateUrlParams()
 			loading.value = false
+			refreshing.value = false
 		} catch (err) {
 			debug('refreshSearch error', err)
 			console.error('Browse search error:', err)
 			if (version === searchVersion) {
 				loading.value = false
+				refreshing.value = false
 			}
 		}
 	}
@@ -323,6 +329,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 		effectiveSortTypes,
 		effectiveCurrentSortType,
 		loading,
+		refreshing,
 		projectHits,
 		serverHits,
 		totalHits,
