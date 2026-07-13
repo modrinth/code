@@ -233,9 +233,6 @@
   "button.reinstall-modpack": {
     "defaultMessage": "Mod paketini yeniden kur"
   },
-  "button.remove": {
-    "defaultMessage": "Giriş anahtarını sil"
-  },
   "button.remove-image": {
     "defaultMessage": "Görseli kaldır"
   },
@@ -841,9 +838,6 @@
   },
   "external-files.permissions-card.add-files-modal.no-search-results": {
     "defaultMessage": "Aradığın sonuçla ilgili bir dosya yok."
-  },
-  "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Dosya ara…"
   },
   "external-files.permissions-card.add-files-to-group": {
     "defaultMessage": "Dosya ekle..."
@@ -2029,9 +2023,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Oyun sürümü"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "Zaten Yüklenmiş İçerikleri gizle"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Seçilmiş İçerikleri Gizle"
@@ -5434,5 +5425,8 @@
   },
   "version.content.name": {
     "defaultMessage": "İsim"
+  },
+  "version.content.version": {
+    "defaultMessage": "Sürüm"
   }
 }

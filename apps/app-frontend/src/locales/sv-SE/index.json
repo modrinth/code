@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Göm fler aktiva instanser"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopierat"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopiera detaljer"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Avvisa"
   },
@@ -19,6 +25,48 @@
   },
   "app.action-bar.install.retry": {
     "message": "Försök igen"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Avbröts på grund av att appen stängdes"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Kunde inte läsa modpaket"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Avbruten"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Kunde inte ladda ner filer"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Nedladdad fil är korrupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Kunde inte spara filer"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Nedladdning kunde inte slutföras"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instans kunde inte hittas"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Sökväg är ogiltig"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Kunde inte uppdatera lokal data"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Kunde inte nå Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Ingen behörighet att skriva"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Kunde inte ladda ner paket"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Någonting gick fel"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Okänd instans"
@@ -30,7 +78,7 @@
     "message": "Gör till primärinstans"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Ingen aktiva instans"
+    "message": "Inga aktiva instanser"
   },
   "app.action-bar.offline": {
     "message": "Offline"
@@ -168,7 +216,7 @@
     "message": "Upptäck servrar"
   },
   "app.browse.hide-added-servers": {
-    "message": "Dölj servrar som redan är tillagda"
+    "message": "Göm redan tillagda servrar"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpaket"
@@ -219,7 +267,7 @@
     "message": "Avslutar"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Förbereder instans"
+    "message": "Köad för installering"
   },
   "app.install.phase.preparing_java": {
     "message": "Förbereder Java"
@@ -243,19 +291,25 @@
     "message": "Läser pack information"
   },
   "app.install.phase.resolving_loader": {
-    "message": "Laddar ner loadern"
+    "message": "Fastställer loader"
   },
   "app.install.phase.resolving_minecraft": {
-    "message": "Laddar ner Minecraft"
+    "message": "Fastställer Minecraft"
   },
   "app.install.phase.resolving_pack": {
-    "message": "Laddar ner innehåll"
+    "message": "Fastställer innehåll"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Återställer"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Kör loader-processorer"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data från din instans kommer permanent raderas, däribland dina världar, konfigurationer samt allt installerat innehåll."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Detta kan inte ogöras"
+    "message": "Detta kan inte ångras"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Radera instans"
@@ -282,7 +336,7 @@
     "message": "Slutför uppdatering..."
   },
   "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Laddar versioner..."
+    "message": "Fastställer versioner..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -314,6 +368,9 @@
   "app.instance.worlds.delete-world-modal.title": {
     "message": "Ta bort värld"
   },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Denna värld kommer permanent raderas från instansen. Detta kan inte ångras."
+  },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "Raderar {name}"
   },
@@ -340,6 +397,9 @@
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Ta bort server"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Denna server kommer att tas bort från din serverlista och serverlistan i spelet. Du kan lägga till den igen senare om du känner till adressen."
   },
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Raderar {name}"
@@ -386,11 +446,26 @@
   "app.project.install-button.already-installed": {
     "message": "Detta projekt är redan installerat"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Byt version"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Tillbaka till upptäck"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installera innehåll till instans"
+  },
+  "app.project.version.all-versions": {
+    "message": "Alla versioner"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Ladda ner i webbläsare"
+  },
+  "app.project.version.installing": {
+    "message": "Installerar"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Redan installerat"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Utvecklarläge aktiverat."
@@ -504,10 +579,16 @@
     "message": "Sakta ner!"
   },
   "app.skins.reorder-error.text": {
-    "message": "Ditt utseende kunde inte sparas."
+    "message": "Din ordning av utseenden kunde inte sparas."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "Misslyckades med att ordna om utseenden"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -987,7 +1068,7 @@
     "message": "Spel version är tillhandahållet av instansen"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Laddaren tillhandahålls av instansen"
+    "message": "Loader tillhandahålls av instansen"
   },
   "search.filter.locked.instance.sync": {
     "message": "Synkronisera med instansen"

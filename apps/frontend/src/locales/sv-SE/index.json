@@ -632,11 +632,47 @@
   "auth.authorize.error.no-redirect-url": {
     "message": "Ingen omdirigeringsposition hittad i respons"
   },
+  "auth.authorize.errro-title": {
+    "message": "Ett fel inträffade"
+  },
   "auth.authorize.redirect-url": {
     "message": "Du kommer bli flyttad till <redirect-url>{url}</redirect-url>"
   },
+  "auth.continue-with-provider": {
+    "message": "Fortsätt med {provider}"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Avsluta registrering"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Vänligen skriv in ett giltligt födelsedatum. Året kan inte vara 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Ogiltligt födelsedatum"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Födelsedatum"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Välj ditt födelsedatum"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Vänligen skriv in ditt födelsedatum innan du fortsätter."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Födelsedatum behövs"
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Relevand källkod"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Vi lagrar inte ditt födelsedatum. Vi använder det endast under registreringen för att säkerställa COPPA efterlevnad"
+  },
   "auth.create-account.page-title": {
     "message": "Skapa konto"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Håll mig uppdaterad om de coola sakerna Modrinth arbetar på via e-post"
   },
   "auth.create-account.title": {
     "message": "Skapa ett konto"
@@ -2402,6 +2438,27 @@
   "moderation.page.reports": {
     "message": "Rapporter"
   },
+  "modpack-scan-modal.failed": {
+    "message": "Misslyckades"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Misslyckades att ladda versioner: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Laddar versioner..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "Nya filer"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "Nya grupper"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "Inga filer hittades"
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Inte skannad"
+  },
   "muralpay.account-type.checking": {
     "message": "Checkkonto"
   },
@@ -2513,6 +2570,9 @@
   "muralpay.pix-type.phone": {
     "message": "Telefonnummer"
   },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Skriv in kontonummer"
+  },
   "muralpay.placeholder.pix-phone": {
     "message": "+55..."
   },
@@ -2549,11 +2609,17 @@
   "muralpay.rail.fiat-zar.name": {
     "message": "Banköverföring (ZAR)"
   },
+  "organization.settings.projects.edit-links.affected-projects": {
+    "message": "Ändringar kommer tillämpas på {count} projekt."
+  },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth kreatör."
   },
   "profile.bio.fallback.user": {
     "message": "En Modrinth användare."
+  },
+  "profile.button.analytics": {
+    "message": "Visa användarstatistik"
   },
   "profile.button.billing": {
     "message": "Hantera användarfakturering"
@@ -2566,6 +2632,9 @@
   },
   "profile.button.manage-projects": {
     "message": "Hantera projekt"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count} projekt"
   },
   "profile.details.label.auth-providers": {
     "message": "Autentiseringsleverantörer"
@@ -2804,6 +2873,24 @@
   "project.details.licensed": {
     "message": "Licensierad"
   },
+  "project.download.dependency-download-file": {
+    "message": "Ladda ner {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Ladda ner {filename} ({size})"
+  },
+  "project.download.download": {
+    "message": "Ladda ner"
+  },
+  "project.download.download-as-zip": {
+    "message": "Ladda ner som .zip"
+  },
+  "project.download.download-version": {
+    "message": "Ladda ner {version}"
+  },
+  "project.download.file-unavailable": {
+    "message": "Denna fil kan inte laddas ner"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} stöttar inte {gameVersion} för {platform}"
   },
@@ -2812,9 +2899,6 @@
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} stöttar inte {platform} för {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Sök spelversioner..."
   },
   "project.download.select-game-version": {
     "message": "Välj spelversion"
@@ -2872,6 +2956,15 @@
   },
   "project.moderation.error.unauthorized": {
     "message": "Obehörig"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Denna tråd är inte aktivt följd, men kan bli undersökt för information om projektet om de behövs."
+  },
+  "project.moderation.thread.private-description": {
+    "message": "Det här är en privat konversationstråd med Modrinth-moderatorerna. De kan meddela dig om problem angående detta projekt."
+  },
+  "project.moderation.thread.title": {
+    "message": "Moderationsmeddelanden"
   },
   "project.moderation.title": {
     "message": "Moderering"
