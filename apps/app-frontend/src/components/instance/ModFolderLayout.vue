@@ -209,8 +209,7 @@
 									<FolderIcon class="size-5 text-secondary shrink-0" />
 									<span class="font-semibold text-contrast truncate">{{ folder.name }}</span>
 									<span class="text-secondary text-sm shrink-0">
-										{{ folderItems(folder).length }}
-										{{ folderItems(folder).length === 1 ? 'file' : 'files' }}
+										{{ formatMessage(messages.folderCount, { count: folderItems(folder).length }) }}
 									</span>
 									<div class="ml-auto flex items-center gap-1" @click.stop>
 										<OverflowMenu :options="getFolderMenuOptions(folder)">
@@ -243,7 +242,7 @@
 
 						<!-- Unassigned items -->
 						<ContentCardTable
-							v-if="unassignedTableItems.length > 0"
+							v-if="hasAnyFolders && unassignedTableItems.length > 0"
 							v-model:selected-ids="rootSelection"
 							:items="unassignedTableItems"
 							:show-selection="true"
@@ -408,6 +407,46 @@
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
+
+				<ButtonStyled
+					v-if="selectedItems.length > 0"
+					type="transparent"
+				>
+					<OverflowMenu
+						:options="[
+							...targetFolders.map((f) => ({
+								id: formatMessage(messages.moveToFolder, { name: f.name }),
+								icon: FolderIcon,
+								action: () => bulkMoveToFolder(f.id),
+							})),
+							...(selectedItemsInFolder && targetFolders.length > 0
+								? [{ divider: true }]
+								: []),
+							...(selectedItemsInFolder
+								? [
+										{
+											id: formatMessage(messages.removeFromFolder),
+											icon: FolderUpIcon,
+											action: () => bulkRemoveFromFolder(),
+										},
+									]
+								: []),
+							{ divider: true },
+							{
+								id: formatMessage(messages.newFolderWithMods),
+								icon: PlusIcon,
+								action: () => {
+									props.onBulkNewFolder(selectedItems)
+									clearSelection()
+								},
+							},
+						]"
+					>
+						<FolderIcon />
+						<span class="bar-label">{{ formatMessage(messages.moveToFolderMenu) }}</span>
+						<DropdownIcon />
+					</OverflowMenu>
+				</ButtonStyled>
 			</template>
 
 			<template #actions-end>
@@ -489,7 +528,9 @@ import {
 	FilterIcon,
 	FolderIcon,
 	FolderOpenIcon,
+	FolderUpIcon,
 	LinkIcon,
+	PlusIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
@@ -540,6 +581,9 @@ const props = withDefaults(
 		renameFolder: (id: string) => void
 		deleteFolder: (id: string) => void
 		getModId: (item: ContentItem) => string
+		moveModToFolder: (item: ContentItem, folderId: string) => void
+		moveModToRoot: (item: ContentItem) => void
+		onBulkNewFolder: (items: ContentItem[]) => void
 	}>(),
 	{
 		bottomPadding: true,
@@ -637,7 +681,23 @@ const messages = defineMessages({
 	},
 	folderCount: {
 		id: 'app.instance.mods.folder-count',
-		defaultMessage: '{count, number} {count, plural, one {file} other {files}}',
+		defaultMessage: '{count, number} {count, plural, one {project} other {projects}}',
+	},
+	moveToFolderMenu: {
+		id: 'app.instance.mods.move-to-folder-menu',
+		defaultMessage: 'Move to...',
+	},
+	moveToFolder: {
+		id: 'app.instance.mods.move-to-folder',
+		defaultMessage: 'Move to {name}',
+	},
+	removeFromFolder: {
+		id: 'app.instance.mods.remove-from-folder',
+		defaultMessage: 'Remove from folder',
+	},
+	newFolderWithMods: {
+		id: 'app.instance.mods.new-folder-with-mods',
+		defaultMessage: 'New folder with these mods...',
 	},
 })
 
@@ -754,6 +814,16 @@ function getFolderSelection(folder: ModFolder): WritableComputedRef<string[]> {
 	return cached
 }
 
+watch(
+	() => props.folders.map((f) => f.id),
+	(newIds) => {
+		const idSet = new Set(newIds)
+		for (const key of folderSelectionCache.keys()) {
+			if (!idSet.has(key)) folderSelectionCache.delete(key)
+		}
+	},
+)
+
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
 
 if (ctx.isBulkOperating) {
@@ -810,6 +880,33 @@ function mapItemToTable(item: ContentItem): ContentCardTableItem {
 }
 
 const hasAnyFolders = computed(() => props.folders.length > 0)
+
+const selectedItemsInFolder = computed(() =>
+	selectedItems.value.some((item) => {
+		const id = getItemId(item)
+		return props.folders.some((f) => f.modIds.includes(id))
+	}),
+)
+
+function bulkMoveToFolder(folderId: string) {
+	for (const item of selectedItems.value) {
+		props.moveModToFolder(item, folderId)
+	}
+	clearSelection()
+}
+
+function bulkRemoveFromFolder() {
+	for (const item of selectedItems.value) {
+		props.moveModToRoot(item)
+	}
+	clearSelection()
+}
+
+const targetFolders = computed(() =>
+	props.folders.filter(
+		(f) => !selectedItems.value.every((item) => f.modIds.includes(getItemId(item))),
+	),
+)
 
 const visibleFolders = computed(() => {
 	const hasSearch = searchQuery.value.trim().length > 0

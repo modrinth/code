@@ -6,6 +6,9 @@
 			:rename-folder="showRenameFolder"
 			:delete-folder="deleteFolder"
 			:get-mod-id="getModId"
+			:move-mod-to-folder="moveModToFolder"
+			:move-mod-to-root="moveModToRoot"
+			:on-bulk-new-folder="showBulkNewFolder"
 		>
 			<template #modals>
 				<ShareModalWrapper
@@ -264,6 +267,7 @@ const {
 const createFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
 const renameFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
 const pendingModForFolder = ref<ContentItem | null>(null)
+const pendingModsForFolder = ref<ContentItem[]>([])
 const pendingRenameFolderId = ref<string | null>(null)
 const renamingFolderName = ref<string>('')
 
@@ -271,7 +275,13 @@ const folderNames = computed(() => folders.value.map((f) => f.name))
 
 function handleCreateFolder(name: string) {
 	const folder = createFolder(name)
-	if (pendingModForFolder.value) {
+	const pendingItems = pendingModsForFolder.value
+	if (pendingItems && pendingItems.length > 0) {
+		for (const item of pendingItems) {
+			moveModToFolder(item, folder.id)
+		}
+		pendingModsForFolder.value = []
+	} else if (pendingModForFolder.value) {
 		moveModToFolder(pendingModForFolder.value, folder.id)
 		pendingModForFolder.value = null
 	}
@@ -279,6 +289,12 @@ function handleCreateFolder(name: string) {
 		type: 'success',
 		title: formatMessage(messages.folderCreated, { name }),
 	})
+}
+
+function showBulkNewFolder(items: ContentItem[]) {
+	pendingModForFolder.value = null
+	pendingModsForFolder.value = items
+	createFolderModal.value?.show()
 }
 
 function showRenameFolder(folderId: string) {
@@ -993,7 +1009,9 @@ async function handleModpackContentToggle(item: ContentItem, enabled: boolean) {
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[], enabled: boolean) {
-	await Promise.all(items.map((item) => toggleDisableMod(item, enabled)))
+	for (const item of items) {
+		await toggleDisableMod(item, enabled)
+	}
 }
 
 async function handleModpackContent() {
@@ -1326,6 +1344,7 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 			id: formatMessage(messages.newFolderWithMod),
 			icon: PlusIcon,
 			action: () => {
+				pendingModsForFolder.value = []
 				pendingModForFolder.value = item
 				createFolderModal.value?.show()
 			},
@@ -1459,17 +1478,22 @@ provideContentManager({
 	skipNonEssentialWarnings,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableDebounced,
-	bulkEnableItems: (items: ContentItem[]) =>
-		Promise.all(
-			items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item, true)),
-		).then(() => {}),
-	bulkDisableItems: (items: ContentItem[]) =>
-		Promise.all(
-			items.filter((item) => item.enabled).map((item) => toggleDisableMod(item, false)),
-		).then(() => {}),
+	bulkEnableItems: async (items: ContentItem[]) => {
+		for (const item of items.filter((item) => !item.enabled)) {
+			await toggleDisableMod(item, true)
+		}
+	},
+	bulkDisableItems: async (items: ContentItem[]) => {
+		for (const item of items.filter((item) => item.enabled)) {
+			await toggleDisableMod(item, false)
+		}
+	},
 	deleteItem: removeMod,
-	bulkDeleteItems: (items: ContentItem[]) =>
-		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+	bulkDeleteItems: async (items: ContentItem[]) => {
+		for (const item of items) {
+			await removeMod(item)
+		}
+	},
 	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,

@@ -363,7 +363,7 @@
     "message": "Delete folder"
   },
   "app.instance.mods.folder-count": {
-    "message": "{count, number} {count, plural, one {mod} other {mods}}"
+    "message": "{count, number} {count, plural, one {project} other {projects}}"
   },
   "app.instance.mods.folder-created": {
     "message": "Folder \"{name}\" created"
@@ -374,6 +374,9 @@
   "app.instance.mods.move-to-folder": {
     "message": "Move to {name}"
   },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Move to..."
+  },
   "app.instance.mods.new-folder": {
     "message": "New folder"
   },
@@ -382,6 +385,9 @@
   },
   "app.instance.mods.new-folder-with-mod": {
     "message": "New folder with this mod..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "New folder with these mods..."
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was added"

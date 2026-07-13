@@ -91,7 +91,7 @@ const nameError = computed(() => {
 	const name = folderName.value.trim()
 	if (!name) return ''
 	if (name === props.excludeName) return ''
-	if (props.existingNames.some((n) => n === name)) {
+	if (props.existingNames.some((n) => n.toLowerCase() === name.toLowerCase())) {
 		return formatMessage(messages.nameTakenError)
 	}
 	return ''
@@ -110,8 +110,11 @@ function hide() {
 function handleConfirm() {
 	const name = folderName.value.trim()
 	if (!name || nameError.value) return
-	emit('confirm', name)
-	hide()
+	try {
+		emit('confirm', name)
+	} finally {
+		hide()
+	}
 }
 
 defineExpose({ show, hide })
