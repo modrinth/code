@@ -393,6 +393,37 @@ pub(super) fn shared_instance_unavailable_message(
     }
 }
 
+fn shared_instance_external_file_data(
+    file: ExternalFileResponse,
+) -> crate::Result<SharedInstanceExternalFileData> {
+    let sha256 = file.sha256.ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Shared instance external file {} is missing its SHA-256 checksum",
+            file.file_name
+        ))
+    })?;
+    let file_size = file.file_size.ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Shared instance external file {} is missing its size",
+            file.file_name
+        ))
+    })?;
+    let file_size = u64::try_from(file_size).map_err(|_| {
+        crate::ErrorKind::InputError(format!(
+            "Shared instance external file {} has an invalid size",
+            file.file_name
+        ))
+    })?;
+
+    Ok(SharedInstanceExternalFileData {
+        file_name: file.file_name,
+        file_type: file.file_type,
+        url: file.url,
+        sha256,
+        file_size,
+    })
+}
+
 pub(super) async fn shared_instance_install_data(
     shared_instance_id: &str,
     manager_id: Option<String>,
@@ -434,12 +465,8 @@ pub(super) async fn shared_instance_install_data(
         external_files: version
             .external_files
             .into_iter()
-            .map(|file| SharedInstanceExternalFileData {
-                file_name: file.file_name,
-                file_type: file.file_type,
-                url: file.url,
-            })
-            .collect(),
+            .map(shared_instance_external_file_data)
+            .collect::<crate::Result<Vec<_>>>()?,
         modpack,
         game_version: version.game_version,
         loader: version.loader,
