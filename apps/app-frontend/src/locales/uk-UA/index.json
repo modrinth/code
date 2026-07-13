@@ -11,6 +11,81 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Приховати більше запущених профілів"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Скопійовано"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Скопіювати деталі"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Відхилити"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Відкрити екземпляр"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Спробувати знову"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Скасовано через закриття додатку"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Не вдалось прочитати збірку модів"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Скасовано"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Не вдалося завантажити файли"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Завантажений файл пошкоджений"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Не вдалося зберегти файли"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Завантаження не вдалося завершити"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Екземпляр не знайдено"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Шлях до файлу недійсний"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Дані збірки модів недійсні"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Файли збірки модів містять не дійсні метадані"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Не вдалося завершити встановлення Java"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Помилка встановлення завантажувача"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Не вдалося оновити локальні дані"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Не вдалося встановити Minecraft"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Не вдалося зʼєднатися з Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Немає прав для запису"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Не вдалося встановити збірку"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Щось пішло не так"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Невідомий екземпляр"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Зробити основним профілем"
   },
@@ -101,6 +176,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Час гри"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Автоматично пропускає підтвердження з низьким рівнем ризику, як-от повторне встановлення збірки модів, видалення звичайного вмісту, масові оновлення, відвʼязування збірки модів та записи на відновлення. Небезпечні попередження все одно зображуватимуться."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Пропустити несуттєві попередження"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Умикає можливість перемикання бокової панелі."
   },
@@ -147,7 +228,7 @@
     "message": "Дослідити сервера"
   },
   "app.browse.hide-added-servers": {
-    "message": "Сховати наявні сервери"
+    "message": "Приховати вже додані сервери"
   },
   "app.browse.project-type.modpacks": {
     "message": "Збірки"
@@ -171,7 +252,7 @@
     "message": "Експортувати збірку"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Назва збірки"
+    "message": "Назва збірки модів"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Назва збірки"
@@ -181,6 +262,60 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Завантаження вмісту"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Завантаження Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Завантаження файлу пакета"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Розпакування файлів заміщення"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Завершення"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "У черзі на встановлення"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Підготовка Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Завантаження Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Розпакування Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Отримання Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Підготовка Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Перевірка Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Читання маніфесту пакета"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Визначення завантажувача"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Узгодження версії Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Узгодження вмісту"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Повернення"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Запуск процесорів завантажувача"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Усі дані вашого профілю будуть видалені назавжди, включно з вашими світами, налаштуваннями та всім установленим умістом."
@@ -205,6 +340,9 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Профіль"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Завантаження проєктів: {current, number}/{total, number}..."
   },
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
@@ -669,7 +807,7 @@
     "message": "Додавання файлів ({completed}/{total})"
   },
   "instance.files.save-as": {
-    "message": "Зберегти як…"
+    "message": "Зберегти як..."
   },
   "instance.server-modal.address": {
     "message": "Адреса"

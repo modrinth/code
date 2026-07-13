@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Agrega una dirección de Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Añadir un URL y un nombre o identificador SPDX para tu licencia personalizada."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Añadir detalles de licencia"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Agrega cualquier enlace relevante que esté fuera de Modrinth, cómo un sitio web, tienda, o una invitación de Discord."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Agregar enlaces externos"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Has seleccionado todas las opciones de idioma disponibles. Por favor, indica solo los idiomas que tu servidor admite activamente."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correctos"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Has seleccionado las {totalAvailableTags, plural, one {# etiqueta disponible} other {# etiquetas disponibles}}. Esto va en contra del propósito de las etiquetas, que es ayudar a los usuarios a encontrar proyectos relevantes. Selecciona solo las etiquetas que sean relevantes para tu proyecto."
@@ -220,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Hacer el nombre más claro"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Has seleccionado {languageCount, plural, one {# idioma} other {# idiomas}}. Por favor, indica solo los idiomas que tu servidor admite activamente."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecciona los idiomas correctos"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Por favor, redúcelas a {maxTagCount} o menos para asegurarte de que tu servidor aparezca en resultados de búsqueda relevantes."

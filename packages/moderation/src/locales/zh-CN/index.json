@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "添加 Java 地址"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "为您的自定义许可证添加一个有效的 URL 和名称或 SPDX 标识符。"
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "添加许可证详细信息"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如一个网站、商店或 Discord 频道邀请。"
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "添加外部链接"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "你选择了所有可用的的语言选项，请仅列出你的服务器目前实际支持的语言。"
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "选择准确的语言"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "你已选择全部 {totalAvailableTags, plural, other {# 个可用标签}}。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
@@ -135,7 +147,7 @@
     "defaultMessage": "检查反馈"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}} ({tags})。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
+    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}}（{tags}）。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
@@ -220,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名称"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "你选择了 {languageCount, plural, other {# 个语言}}，请仅列出你的服务器目前实际支持的语言。"
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "选择准确的语言"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保你的服务器能正常出现在相关搜索结果中。"

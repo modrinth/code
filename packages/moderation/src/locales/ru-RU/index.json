@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Укажите адрес для Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Укажите URL и название (или идентификатор SPDX) у своей лицензии."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Дополните лицензию"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Добавьте ссылки на внешние ресурсы, например на сайт, магазин или сервер Discord."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Добавьте внешние ссылки"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Выбраны все доступные языки. Оставьте только те, которые сервер активно поддерживает."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Оставьте активные языки"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} other {# тегов}}. Не достигается их цель помогать искать релевантные проекты. Оставьте только относящиеся к проекту теги."
@@ -220,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Упростите название"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "{languageCount, plural, one {Выбран # язык} few {Выбрано # языка} other {Выбрано # языков}}. Оставьте только те, которые сервер активно поддерживает."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Оставьте активные языки"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}}. Оставьте не более {maxTagCount}, чтобы повысить релевантность сервера в поиске."
