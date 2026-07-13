@@ -24,7 +24,7 @@ export function useSharedInstanceInviteCandidates(options: {
 		getCredentials,
 		enabled: computed(
 			() =>
-			options.isSignedIn.value && !!options.currentUserId.value && !options.actionsLocked.value,
+				options.isSignedIn.value && !!options.currentUserId.value && !options.actionsLocked.value,
 		),
 		onError: handleError,
 	})

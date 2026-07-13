@@ -1,21 +1,19 @@
 import { useDebounceFn } from '@vueuse/core'
-import { computed, ref, type MaybeRefOrGetter, toValue, watch } from 'vue'
+import { computed, type MaybeRefOrGetter, ref, toValue, watch } from 'vue'
 
 import type { ComboboxOption } from '../../base/Combobox.vue'
 import {
-	normalizeInviteKey,
 	type InvitePlayersInvitePayload,
 	type InvitePlayersSearchUser,
 	type InvitePlayersUser,
 	type InvitePlayersUserStatus,
+	normalizeInviteKey,
 } from './types'
 
 export function useInvitePlayersSearch(options: {
 	friends: MaybeRefOrGetter<InvitePlayersUser[]>
 	suggestions: MaybeRefOrGetter<InvitePlayersSearchUser[]>
-	searchUsers: MaybeRefOrGetter<
-		((query: string) => Promise<InvitePlayersSearchUser[]>) | undefined
-	>
+	searchUsers: MaybeRefOrGetter<((query: string) => Promise<InvitePlayersSearchUser[]>) | undefined>
 	canInvite: MaybeRefOrGetter<boolean>
 	inviteDisabledMessage: MaybeRefOrGetter<string>
 	alreadyInvitedMessage: MaybeRefOrGetter<string>

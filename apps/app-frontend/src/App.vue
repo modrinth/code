@@ -870,7 +870,6 @@ async function handleLiveNotification(notification) {
 			},
 		})
 	}
-
 }
 
 async function handleCommand(e) {

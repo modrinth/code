@@ -1,9 +1,4 @@
-import {
-	defineMessages,
-	type ContentActionWarning,
-	type ContentItem,
-	useVIntl,
-} from '@modrinth/ui'
+import { type ContentActionWarning, type ContentItem, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, type Ref } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
@@ -30,7 +25,9 @@ export function useManagedContentPolicy(instance: Ref<GameInstance>) {
 	}
 
 	function canUpdateContent(item: ContentItem) {
-		return canMutateContent(item) && !!item.file_path && !!item.has_update && !!item.update_version_id
+		return (
+			canMutateContent(item) && !!item.file_path && !!item.has_update && !!item.update_version_id
+		)
 	}
 
 	function deleteWarning(items: ContentItem[]): ContentActionWarning | null {
@@ -81,30 +78,42 @@ const messages = defineMessages({
 	},
 	changeVersionBody: {
 		id: 'content.shared-instance.change-version-body',
-		defaultMessage: 'Changing the version only changes your local copy. Future shared instance updates may restore or change it again.',
+		defaultMessage:
+			'Changing the version only changes your local copy. Future shared instance updates may restore or change it again.',
 	},
 	unlinkBody: {
 		id: 'content.shared-instance.unlink-body',
-		defaultMessage: 'Unlinking only changes your local copy. Future shared instance updates may restore or change it again.',
+		defaultMessage:
+			'Unlinking only changes your local copy. Future shared instance updates may restore or change it again.',
 	},
 	deleteSingleBody: {
 		id: 'content.shared-instance.delete-single-body',
-		defaultMessage: 'Deleting it only changes your local copy. Future shared instance updates may restore or change it again.',
+		defaultMessage:
+			'Deleting it only changes your local copy. Future shared instance updates may restore or change it again.',
 	},
 	deleteBulkBody: {
 		id: 'content.shared-instance.delete-bulk-body',
-		defaultMessage: 'Some selected projects are part of the shared instance. Deleting them only changes your local copy, and future shared instance updates may restore or change them again.',
+		defaultMessage:
+			'Some selected projects are part of the shared instance. Deleting them only changes your local copy, and future shared instance updates may restore or change them again.',
 	},
 	deleteButton: { id: 'content.shared-instance.delete-button', defaultMessage: 'Delete anyway' },
-	deleteManyButton: { id: 'content.shared-instance.delete-many-button', defaultMessage: 'Delete {count, number} projects anyway' },
+	deleteManyButton: {
+		id: 'content.shared-instance.delete-many-button',
+		defaultMessage: 'Delete {count, number} projects anyway',
+	},
 	disableSingleBody: {
 		id: 'content.shared-instance.disable-single-body',
-		defaultMessage: 'Disabling it only changes your local copy. Future shared instance updates may re-enable, restore, or change it again.',
+		defaultMessage:
+			'Disabling it only changes your local copy. Future shared instance updates may re-enable, restore, or change it again.',
 	},
 	disableBulkBody: {
 		id: 'content.shared-instance.disable-bulk-body',
-		defaultMessage: 'Some selected projects are part of the shared instance. Disabling them only changes your local copy, and future shared instance updates may re-enable, restore, or change them again.',
+		defaultMessage:
+			'Some selected projects are part of the shared instance. Disabling them only changes your local copy, and future shared instance updates may re-enable, restore, or change them again.',
 	},
 	disableButton: { id: 'content.shared-instance.disable-button', defaultMessage: 'Disable anyway' },
-	disableManyButton: { id: 'content.shared-instance.disable-many-button', defaultMessage: 'Disable {count, number} projects anyway' },
+	disableManyButton: {
+		id: 'content.shared-instance.disable-many-button',
+		defaultMessage: 'Disable {count, number} projects anyway',
+	},
 })

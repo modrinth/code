@@ -75,21 +75,18 @@ export function useSharedInstanceInviteHandler(
 			)
 			if (invite.instanceIconUrl) preview.iconUrl = invite.instanceIconUrl
 
-			showInstall(
-				preview,
-				async () => {
-					await install_shared_instance(
-						invite.sharedInstanceId,
-						invite.sharedInstanceName,
-						invite.invitedById,
-						null,
-						null,
-						invite.instanceIconUrl,
-					)
-					await markNotificationRead(notification)
-					await queryClient.invalidateQueries({ queryKey: ['instances'] })
-				},
-			)
+			showInstall(preview, async () => {
+				await install_shared_instance(
+					invite.sharedInstanceId,
+					invite.sharedInstanceName,
+					invite.invitedById,
+					null,
+					null,
+					invite.instanceIconUrl,
+				)
+				await markNotificationRead(notification)
+				await queryClient.invalidateQueries({ queryKey: ['instances'] })
+			})
 		} catch (error) {
 			handleError(toError(error))
 		}
@@ -112,7 +109,8 @@ export function useSharedInstanceInviteHandler(
 				entityName: invite.sharedInstanceName,
 				entityIconUrl: invite.instanceIconUrl ?? undefined,
 				onAccept: () => acceptNotification(notification, invite),
-				onDecline: () => markNotificationRead(notification).catch((error) => handleError(toError(error))),
+				onDecline: () =>
+					markNotificationRead(notification).catch((error) => handleError(toError(error))),
 				onOpenActor: () => {
 					if (invite.invitedByUsername) {
 						openUrl(`${config.siteUrl}/user/${encodeURIComponent(invite.invitedByUsername)}`)

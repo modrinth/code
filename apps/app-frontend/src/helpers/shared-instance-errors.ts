@@ -1,9 +1,6 @@
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 
-import {
-	getErrorMessage,
-	type SharedInstanceUnavailableReason,
-} from '@/helpers/install'
+import { getErrorMessage, type SharedInstanceUnavailableReason } from '@/helpers/install'
 
 export const sharedInstanceErrorMessages = defineMessages({
 	unavailableTitle: {

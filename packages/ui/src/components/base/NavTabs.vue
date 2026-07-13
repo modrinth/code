@@ -18,12 +18,7 @@
 				@mouseenter="link.onHover?.()"
 				@focus="link.onHover?.()"
 			>
-				<component
-					:is="link.icon"
-					v-if="link.icon"
-					class="size-5"
-					:class="getIconClasses(index)"
-				/>
+				<component :is="link.icon" v-if="link.icon" class="size-5" :class="getIconClasses(index)" />
 				<span class="text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>
@@ -185,6 +180,14 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 		if (decodedPath === decodedHref) {
 			return { index: i, isSubpage: false }
 		}
+	}
+
+	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
+		const link = filteredLinks.value[i]
+		const decodedPath = decodeURIComponent(route.path)
+		const decodedHref = decodeURIComponent(link.href.split('?')[0])
+
+		if (props.query) continue
 
 		const isSubpageMatch =
 			(decodedPath.startsWith(decodedHref) &&

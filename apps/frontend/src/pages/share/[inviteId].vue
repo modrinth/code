@@ -68,12 +68,7 @@
 						<span
 							class="flex min-w-0 max-w-full items-center gap-1.5 whitespace-nowrap rounded-xl font-semibold text-contrast"
 						>
-							<Avatar
-								:src="instanceIcon"
-								:alt="invite.instance_name"
-								size="32px"
-								no-shadow
-							/>
+							<Avatar :src="instanceIcon" :alt="invite.instance_name" size="32px" no-shadow />
 							<span class="min-w-0 truncate whitespace-nowrap">{{ invite.instance_name }}</span>
 						</span>
 					</div>

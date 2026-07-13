@@ -42,6 +42,14 @@ export default new createRouter({
 			component: Hosting.Index,
 			children: [
 				{
+					path: 'play',
+					name: 'ServerManagePlay',
+					component: Hosting.Play,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
+				},
+				{
 					path: '',
 					name: 'ServerManageOverview',
 					component: Hosting.Overview,

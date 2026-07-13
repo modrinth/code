@@ -100,9 +100,7 @@ const admonitionBody = computed(() => {
 	if (props.warning) return props.warning.body
 	return formatMessage(messages.admonitionBody)
 })
-const actionMessage = computed(() =>
-	props.server ? messages.header : messages.unlinkButton,
-)
+const actionMessage = computed(() => (props.server ? messages.header : messages.unlinkButton))
 
 function show() {
 	debug('show: called', {

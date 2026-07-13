@@ -59,6 +59,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	versionDevInfoCollapsed: true,
 	alwaysShowVersionDevInfo: false,
 	advancedFiltersCollapsed: true,
+	ServerPlayFrontend: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
