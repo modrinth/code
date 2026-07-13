@@ -384,7 +384,7 @@
     "message": "Folder name..."
   },
   "app.instance.mods.folder-name-taken": {
-    "message": "A folder with this name already exists"
+    "message": "A folder with this name already exists."
   },
   "app.instance.mods.folder-no-color": {
     "message": "No color"

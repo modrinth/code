@@ -78,7 +78,7 @@
 					:existing-names="folderNames"
 					@confirm="handleCreateFolder"
 				/>
-			<CreateFolderModal
+				<CreateFolderModal
 					ref="editFolderModal"
 					:title="formatMessage(messages.editFolderTitle)"
 					:description="formatMessage(messages.editFolderDescription)"

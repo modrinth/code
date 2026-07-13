@@ -79,9 +79,7 @@ export function useModFolders(instanceId: Ref<string>) {
 	}
 
 	function isFolderNameTaken(name: string, excludeFolderId?: string): boolean {
-		return folders.value.some(
-			(f) => f.id !== excludeFolderId && f.name === name,
-		)
+		return folders.value.some((f) => f.id !== excludeFolderId && f.name === name)
 	}
 
 	function createFolder(name: string, color?: string): ModFolder {

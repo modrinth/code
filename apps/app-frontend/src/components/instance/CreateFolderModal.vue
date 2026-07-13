@@ -21,14 +21,14 @@
 				{{ nameError }}
 			</p>
 			<div v-if="showColor" class="flex flex-col gap-2">
-				<span class="text-sm font-semibold text-secondary">{{ formatMessage(messages.colorLabel) }}</span>
+				<span class="text-sm font-semibold text-secondary">{{
+					formatMessage(messages.colorLabel)
+				}}</span>
 				<div class="flex flex-wrap gap-2">
 					<button
 						class="flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all"
 						:class="
-							!selectedColor
-								? 'border-brand scale-110'
-								: 'border-surface-5 hover:border-surface-4'
+							!selectedColor ? 'border-brand scale-110' : 'border-surface-5 hover:border-surface-4'
 						"
 						:title="formatMessage(messages.noColor)"
 						@click="selectedColor = undefined"
