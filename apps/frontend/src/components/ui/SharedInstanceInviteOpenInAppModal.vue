@@ -51,7 +51,7 @@
 							<div class="flex min-w-0 flex-col gap-1">
 								<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
 								<span class="flex items-center gap-1.5 text-sm font-medium leading-4 text-primary">
-									<span>{{ formatMessage(messages.invitedBy) }}</span>
+									<span>{{ formatMessage(messages.managedBy) }}</span>
 									<Avatar
 										:src="instance.inviterAvatar"
 										:alt="instance.inviterName"
@@ -60,14 +60,6 @@
 										no-shadow
 									/>
 									<span>{{ instance.inviterName }}</span>
-								</span>
-								<span class="text-sm text-secondary">
-									{{
-										formatMessage(messages.instanceDetails, {
-											gameVersion: instance.gameVersion,
-											loaderVersion: instance.loaderVersion,
-										})
-									}}
 								</span>
 							</div>
 						</div>
@@ -145,17 +137,13 @@ const messages = defineMessages({
 		id: 'modal.shared-instance.open-in-app.title',
 		defaultMessage: 'Opening Modrinth App',
 	},
-	invitedBy: {
-		id: 'modal.shared-instance.open-in-app.invited-by',
-		defaultMessage: 'Invited by',
+	managedBy: {
+		id: 'modal.shared-instance.open-in-app.managed-by',
+		defaultMessage: 'Managed by',
 	},
 	whyUseApp: {
 		id: 'modal.shared-instance.open-in-app.why-use',
 		defaultMessage: 'Why use the Modrinth App',
-	},
-	instanceDetails: {
-		id: 'modal.shared-instance.open-in-app.instance-details',
-		defaultMessage: 'Minecraft {gameVersion} · Loader {loaderVersion}',
 	},
 	benefitJoin: {
 		id: 'modal.shared-instance.open-in-app.benefit.join',
@@ -185,8 +173,6 @@ export interface SharedInstanceInviteModalData {
 	icon?: string | null
 	inviterName: string
 	inviterAvatar?: string | null
-	gameVersion: string
-	loaderVersion: string
 }
 
 const open = ref(false)
@@ -199,8 +185,6 @@ const instance = ref<SharedInstanceInviteModalData>({
 	icon: null,
 	inviterName: '',
 	inviterAvatar: null,
-	gameVersion: '',
-	loaderVersion: '',
 })
 
 let countdownInterval: ReturnType<typeof setInterval> | null = null

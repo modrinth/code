@@ -45,7 +45,7 @@
 					:key="
 						diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)
 					"
-					class="grid items-center min-h-10 h-10 gap-2 grid-cols-[auto_auto_minmax(0,1fr)]"
+					class="grid items-center min-h-10 h-10 gap-2 grid-cols-[auto_minmax(0,1fr)]"
 				>
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
@@ -61,41 +61,61 @@
 						></div>
 					</div>
 
-					<span class="text-sm shrink-0 whitespace-nowrap">
-						{{ getDiffTypeLabel(diff) }}
-					</span>
-					<div
-						v-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
-						class="flex min-w-0 items-center justify-between gap-3"
-					>
+					<div class="flex min-w-0 items-center gap-1">
 						<span
-							v-if="diff.projectName"
-							class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+							:class="{ 'text-orange': diff.external }"
+							class="text-sm shrink-0 whitespace-nowrap"
 						>
-							{{ diff.projectName }}
+							{{ getDiffTypeLabel(diff) }}
 						</span>
-						<span
-							v-else-if="diff.fileName"
-							class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+						<div
+							v-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
+							class="flex min-w-0 flex-1 items-center justify-between gap-3"
 						>
-							{{ decodeURIComponent(diff.fileName) }}
-						</span>
-						<span
-							v-if="getDiffVersionName(diff)"
-							class="text-sm text-secondary text-right shrink-0 whitespace-nowrap max-w-[45%] overflow-hidden text-ellipsis"
-						>
-							{{ getDiffVersionName(diff) }}
-						</span>
-					</div>
-					<div v-else class="flex min-w-0 justify-end">
-						<span
-							v-if="getDiffVersionName(diff)"
-							class="truncate text-right text-sm font-medium text-contrast"
-						>
-							{{ getDiffVersionName(diff) }}
-						</span>
+							<span
+								v-if="diff.projectName"
+								class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+							>
+								{{ diff.projectName }}
+							</span>
+							<div v-else-if="diff.fileName" class="flex min-w-0 items-center gap-1.5">
+								<span
+									:class="diff.external ? 'text-orange' : 'text-contrast'"
+									class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis min-w-0"
+								>
+									{{ decodeURIComponent(diff.fileName) }}
+								</span>
+								<IssuesIcon
+									v-if="diff.external"
+									v-tooltip="externalFileTooltip"
+									class="h-4 w-4 flex-none text-orange"
+								/>
+							</div>
+							<span
+								v-if="getDiffVersionName(diff)"
+								class="text-sm text-secondary text-right shrink-0 whitespace-nowrap max-w-[45%] overflow-hidden text-ellipsis"
+							>
+								{{ getDiffVersionName(diff) }}
+							</span>
+						</div>
+						<div v-else class="flex min-w-0 flex-1 justify-end">
+							<span
+								v-if="getDiffVersionName(diff)"
+								class="truncate text-right text-sm font-medium text-contrast"
+							>
+								{{ getDiffVersionName(diff) }}
+							</span>
+						</div>
 					</div>
 				</div>
+			</div>
+
+			<div
+				v-if="externalDiffCount && externalFileWarning"
+				class="flex items-center gap-2 p-4 text-orange"
+			>
+				<IssuesIcon class="h-5 w-5 flex-none" />
+				<span>{{ externalFileWarning }}</span>
 			</div>
 
 			<div
@@ -141,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
+import { IssuesIcon, MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
 import { type Component, computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -166,6 +186,8 @@ const props = defineProps<{
 	addedLabel?: string
 	removedLabel?: string
 	disableClose?: boolean
+	externalFileWarning?: string
+	externalFileTooltip?: string
 }>()
 
 const emit = defineEmits<{
@@ -189,6 +211,7 @@ const removedDisabledCount = computed(
 )
 const addedCount = computed(() => props.diffs.filter((d) => d.type === 'added').length)
 const updatedCount = computed(() => props.diffs.filter((d) => d.type === 'updated').length)
+const externalDiffCount = computed(() => props.diffs.filter((d) => d.external).length)
 const showDiffSummary = computed(
 	() =>
 		removedCount.value > 0 ||

@@ -235,8 +235,6 @@ function acceptInvite() {
 			icon: invite.value.instance_icon,
 			inviterName: inviterName.value,
 			inviterAvatar: inviterAvatar.value,
-			gameVersion: invite.value.game_version,
-			loaderVersion: invite.value.loader_version,
 		},
 	})
 }

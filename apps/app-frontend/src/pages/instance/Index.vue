@@ -111,15 +111,21 @@
 
 							<div class="flex min-w-0 items-center gap-[5px] font-medium">
 								{{ sharedInstanceManager.type === 'server' ? 'Linked to' : 'Managed by' }}
-								<Avatar
-									:src="sharedInstanceManager.avatarUrl"
-									:alt="sharedInstanceManager.name"
-									:tint-by="sharedInstanceManager.tintBy"
-									size="24px"
-									:circle="sharedInstanceManager.type === 'user'"
-									no-shadow
-								/>
-								<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
+								<AutoLink
+									:to="sharedInstanceManagerLink"
+									class="flex min-w-0 items-center gap-[5px]"
+									:class="sharedInstanceManagerLink ? 'hover:underline' : ''"
+								>
+									<Avatar
+										:src="sharedInstanceManager.avatarUrl"
+										:alt="sharedInstanceManager.name"
+										:tint-by="sharedInstanceManager.tintBy"
+										size="24px"
+										:circle="sharedInstanceManager.type === 'user'"
+										no-shadow
+									/>
+									<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
+								</AutoLink>
 							</div>
 						</template>
 					</div>
@@ -338,6 +344,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	AutoLink,
 	Avatar,
 	ButtonStyled,
 	ContentPageHeader,
@@ -354,6 +361,7 @@ import {
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -476,11 +484,19 @@ const sharedInstanceTooltip = computed(() =>
 			: messages.sharedInstanceTooltip,
 	),
 )
+const sharedInstanceManagerLink = computed(() => {
+	const manager = sharedInstanceManager.value
+	if (manager?.type !== 'user') return undefined
+	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(manager.name)}`)
+})
 
 watch(
 	() => router.currentRoute.value,
 	(nextRoute) => {
-		if (nextRoute.path.startsWith('/instance')) {
+		if (
+			nextRoute.path.startsWith('/instance') &&
+			(!instance.value || nextRoute.params.id === instance.value.id)
+		) {
 			displayedInstanceRoute.value = nextRoute
 		}
 	},
@@ -506,18 +522,15 @@ function isContentSubpageRoute(routeName = displayedInstanceRoute.value.name) {
 }
 
 async function fetchInstance() {
-	isServerInstance.value = false
-	linkedProjectV3.value = undefined
-	preloadedContent.value = null
-	sharedInstanceState.reset()
-	resetServerStatus()
+	const requestedInstanceId = route.params.id as string
+	const requestedRouteName = route.name
 
-	const nextInstance = await get(route.params.id as string).catch(handleError)
+	const nextInstance = await get(requestedInstanceId).catch(handleError)
 	let nextLinkedProjectV3: Labrinth.Projects.v3.Project | undefined
 	let nextIsServerInstance = false
 
 	const contentPreloadPromise =
-		nextInstance && isContentSubpageRoute()
+		nextInstance && isContentSubpageRoute(requestedRouteName)
 			? loadInstanceContentData(nextInstance.id, undefined, handleError)
 			: Promise.resolve(null)
 
@@ -533,13 +546,25 @@ async function fetchInstance() {
 		}
 	}
 
-	const nextPreloadedContent = await contentPreloadPromise
+	let nextPreloadedContent = await contentPreloadPromise
+	let nextRoute = router.currentRoute.value
+	if (nextRoute.params.id !== requestedInstanceId) return
+
+	if (nextInstance && isContentSubpageRoute(nextRoute.name) && !nextPreloadedContent) {
+		nextPreloadedContent = await loadInstanceContentData(nextInstance.id, undefined, handleError)
+		nextRoute = router.currentRoute.value
+		if (nextRoute.params.id !== requestedInstanceId) return
+	}
+
 	instance.value = nextInstance ?? undefined
+	displayedInstanceRoute.value = nextRoute
+	sharedInstanceState.reset()
 	sharedInstanceState.refreshAvailability()
 	linkedProjectV3.value = nextLinkedProjectV3
 	isServerInstance.value = nextIsServerInstance
 	preloadedContent.value = nextPreloadedContent
 	activeInstanceId.value = nextInstance?.id
+	resetServerStatus()
 
 	fetchDeferredData(nextInstance?.id)
 

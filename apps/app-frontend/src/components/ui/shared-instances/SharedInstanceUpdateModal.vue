@@ -10,6 +10,12 @@
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
 		:show-report-button="false"
+		:external-file-warning="
+			externalFileCount
+				? formatMessage(messages.externalFileWarning, { count: externalFileCount })
+				: undefined
+		"
+		:external-file-tooltip="formatMessage(messages.externalFileTooltip)"
 		@confirm="update"
 		@cancel="emit('cancel')"
 	/>
@@ -59,8 +65,10 @@ const diffs = computed<ContentDiffItem[]>(
 			currentVersionName: diff.currentVersionName ?? undefined,
 			newVersionName: diff.newVersionName ?? undefined,
 			disabled: diff.disabled,
+			external: diff.type === 'added' && !diff.projectId && !!diff.fileName,
 		})) ?? [],
 )
+const externalFileCount = computed(() => diffs.value.filter((diff) => diff.external).length)
 
 async function update() {
 	try {
@@ -113,6 +121,15 @@ const messages = defineMessages({
 	removedLabel: {
 		id: 'app.modal.update-to-play.shared-instance-removed-label',
 		defaultMessage: 'Removed',
+	},
+	externalFileWarning: {
+		id: 'app.modal.update-to-play.external-file-warning',
+		defaultMessage:
+			'{count, plural, one {This update includes # file that is not from Modrinth.} other {This update includes # files that are not from Modrinth.}}',
+	},
+	externalFileTooltip: {
+		id: 'app.modal.update-to-play.external-file-tooltip',
+		defaultMessage: 'This file is not from Modrinth.',
 	},
 })
 
