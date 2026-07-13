@@ -126,7 +126,7 @@
     "defaultMessage": "你選取的專案尚未安裝"
   },
   "browse.view-prefix": {
-    "defaultMessage": "檢視模式："
+    "defaultMessage": "顯示數量："
   },
   "button.accept": {
     "defaultMessage": "接受"
@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "開啟資料夾"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "在瀏覽器中開啟"
+  },
   "button.open-in-folder": {
     "defaultMessage": "在資料夾中開啟"
   },
@@ -237,7 +240,7 @@
     "defaultMessage": "重新安裝模組包"
   },
   "button.remove": {
-    "defaultMessage": "刪除通行金鑰"
+    "defaultMessage": "移除"
   },
   "button.remove-image": {
     "defaultMessage": "移除圖片"
@@ -290,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "停止"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "切換到這個版本"
+  },
   "button.switch-version": {
     "defaultMessage": "切換版本"
   },
@@ -316,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "平臺"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "這個收藏是空的。"
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "正在載入專案..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "沒有專案符合你的搜尋字詞。"
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, other {# 個專案}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "搜尋專案"
   },
   "collections.label.private": {
     "defaultMessage": "私人"
@@ -1121,6 +1142,12 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "你取得了特別授權，允許你在模組包中重新發布這個作品。"
   },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "移除群組"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "無法移除群組"
+  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "從群組中移除"
   },
@@ -1185,7 +1212,7 @@
     "defaultMessage": "例如：config.yml"
   },
   "files.delete-modal.deleting-name": {
-    "defaultMessage": "正在刪除「{name}」"
+    "defaultMessage": "即將刪除「{name}」"
   },
   "files.delete-modal.header": {
     "defaultMessage": "刪除檔案"
@@ -1308,7 +1335,7 @@
     "defaultMessage": "沒有任何檔案或資料夾"
   },
   "files.layout.empty-folder-title": {
-    "defaultMessage": "此資料夾是空的"
+    "defaultMessage": "這個資料夾是空的"
   },
   "files.layout.error-message": {
     "defaultMessage": "該資料夾可能不存在"
@@ -1405,6 +1432,9 @@
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, other {# 個項目}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "父資料夾"
   },
   "files.table-header.created": {
     "defaultMessage": "建立時間"
@@ -2276,6 +2306,9 @@
   "label.server": {
     "defaultMessage": "伺服器"
   },
+  "label.server-only": {
+    "defaultMessage": "只顯示伺服器"
+  },
   "label.servers": {
     "defaultMessage": "伺服器"
   },
@@ -2403,7 +2436,7 @@
     "defaultMessage": "俄文"
   },
   "locale.sr-CS": {
-    "defaultMessage": "塞爾維亞文（拉丁）"
+    "defaultMessage": "塞爾維亞文（拉丁字母）"
   },
   "locale.sv-SE": {
     "defaultMessage": "瑞典文"
@@ -3455,6 +3488,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "切換篩選 {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "保留"
   },
@@ -3538,6 +3577,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "顯示更多內容"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "進階篩選"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "排除資料包"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "排除模組"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "排除插件"
   },
   "search.filter_type.environment": {
     "defaultMessage": "環境"
@@ -5622,7 +5673,7 @@
     "defaultMessage": "所需資源包"
   },
   "version.file-type.signature": {
-    "defaultMessage": "簽署文件"
+    "defaultMessage": "簽署檔案"
   },
   "version.file-type.sources-jar": {
     "defaultMessage": "原始碼 jar"

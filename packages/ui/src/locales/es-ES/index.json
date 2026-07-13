@@ -881,9 +881,6 @@
   "external-files.permissions-card.add-files-modal.no-search-results": {
     "defaultMessage": "No hay archivos que coincidan con tu búsqueda."
   },
-  "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Buscar archivos…"
-  },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# archivo seleccionado} other {# archivos seleccionados}}"
   },
@@ -2152,9 +2149,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Versión del juego"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "Ocultar contenido ya instalado"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Ocultar contenido seleccionado"

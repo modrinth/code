@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Abrir carpeta"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Abrir en el navegador"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Abrir en la carpeta"
   },
@@ -237,7 +240,7 @@
     "defaultMessage": "Reinstalar modpack"
   },
   "button.remove": {
-    "defaultMessage": "Eliminar clave de acceso"
+    "defaultMessage": "Eliminar"
   },
   "button.remove-image": {
     "defaultMessage": "Eliminar imagen"
@@ -290,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "Detener"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Cambiar a la versión"
+  },
   "button.switch-version": {
     "defaultMessage": "Cambiar versión"
   },
@@ -316,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Plataforma"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Esta colección está vacía."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Cargando proyectos..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "No hay proyectos que coincidan con tu búsqueda."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# proyecto} other {# proyectos}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Buscar proyectos"
   },
   "collections.label.private": {
     "defaultMessage": "Privado"
@@ -897,7 +918,7 @@
     "defaultMessage": "No hay archivos que coincidan con tu búsqueda."
   },
   "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Buscar archivos…"
+    "defaultMessage": "Buscar archivos..."
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# archivo seleccionado} other {# archivos seleccionados}}"
@@ -1120,6 +1141,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Has obtenido permiso especial para redistribuir este trabajo en tu modpack."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Eliminar grupo"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "No se pudo eliminar el grupo"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Eliminar del grupo"
@@ -1405,6 +1432,9 @@
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# elemento} other {# elementos}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "Carpeta principal"
   },
   "files.table-header.created": {
     "defaultMessage": "Creado"
@@ -2172,7 +2202,7 @@
     "defaultMessage": "Versión del juego"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Ocultar contenido ya instalado"
+    "defaultMessage": "Ocultar el contenido ya instalado"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Ocultar contenido seleccionado"
@@ -2275,6 +2305,9 @@
   },
   "label.server": {
     "defaultMessage": "Servidor"
+  },
+  "label.server-only": {
+    "defaultMessage": "Solo para servidores"
   },
   "label.servers": {
     "defaultMessage": "Servidores"
@@ -3455,6 +3488,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Activar/desactivar el filtro para {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "Retirado"
   },
@@ -3538,6 +3577,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Mostrar más"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Avanzado"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Excluir paquetes de datos"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Excluir mods"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Excluir complementos"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Entorno"

@@ -2432,9 +2432,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak mendukung {platform} untuk {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
-  },
   "project.download.select-game-version": {
     "message": "Pilih versi permainan"
   },
