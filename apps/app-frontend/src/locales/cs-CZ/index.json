@@ -293,11 +293,62 @@
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Smazat"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Upravit"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Změňte název a barvu této složky."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Upravit složku"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Barva"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {projekt} few {projekty} other {projektů}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Složka \"{name}\" byla vytvořena"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Název složky..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Složka s tímto názvem již existuje"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Bez barvy"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Přesunout do {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Přesunout do..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Nová složka"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Vytvořte složku pro uspořádání vašich módů."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Nová složka s tímto módem..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Nová složka s těmito módami..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" bylo přidáno"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projektů bylo přidáno"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Odebrat ze složky"
   },
   "app.instance.mods.share-text": {
     "message": "Podívejte se na projekty, které používám ve svém modpacku!"

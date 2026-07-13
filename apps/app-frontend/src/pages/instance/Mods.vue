@@ -82,7 +82,7 @@
 					ref="editFolderModal"
 					:title="formatMessage(messages.editFolderTitle)"
 					:description="formatMessage(messages.editFolderDescription)"
-					confirm-label="Rename"
+					confirm-label="Save"
 					:existing-names="folderNames"
 					:exclude-name="renamingFolderName"
 					@confirm="handleEditFolder"

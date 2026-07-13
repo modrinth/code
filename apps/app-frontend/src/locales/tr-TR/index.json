@@ -293,11 +293,62 @@
   "app.instance.mods.content-type-project": {
     "message": "proje"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Sil"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Düzenle"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Bu klasörün adını ve rengini değiştirin."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Klasörü düzenle"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Renk"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {proje} other {proje}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "\"{name}\" klasörü oluşturuldu"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Klasör adı..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Bu adda bir klasör zaten var"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Renk yok"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "{name}'e taşı"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Taşı..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Yeni klasör"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Modlarınızı düzenlemek için bir klasör oluşturun."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Bu modla yeni klasör..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Bu modlarla yeni klasör..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" eklendi"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projeler eklendi"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Klasörden kaldır"
   },
   "app.instance.mods.share-text": {
     "message": "Modpaketimde kullandığım projelere göz at!"

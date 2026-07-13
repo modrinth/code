@@ -209,11 +209,62 @@
   "app.instance.mods.content-type-project": {
     "message": "proyek"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Hapus"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Ubah"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Ubah nama dan warna folder ini."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Ubah folder"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Warna"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {proyek} other {proyek}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Folder \"{name}\" dibuat"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Nama folder..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Folder dengan nama ini sudah ada"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Tanpa warna"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Pindah ke {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Pindah ke..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Folder baru"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Buat folder untuk mengorganisasi mod Anda."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Folder baru dengan mod ini..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Folder baru dengan mod ini..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" telah ditambahkan"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} proyek telah ditambahkan"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Hapus dari folder"
   },
   "app.instance.mods.share-text": {
     "message": "Lihat proyek-proyek yang saya pakai di paket mod saya!"

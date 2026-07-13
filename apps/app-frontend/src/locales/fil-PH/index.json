@@ -203,11 +203,62 @@
   "app.instance.mods.content-type-project": {
     "message": "proyekto"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Tanggalin"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "I-edit"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Palitan ang pangalan at kulay ng folder na ito."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "I-edit ang folder"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Kulay"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {proyekto} other {proyekto}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Nagawa na ang folder na \"{name}\""
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Pangalan ng folder..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Mayroon nang folder na may pangalang ito"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Walang kulay"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Ilipat sa {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Ilipat sa..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Bagong folder"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Gumawa ng folder para ayusin ang iyong mga mod."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Bagong folder na may mod na ito..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Bagong folder na may mga mod na ito..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "Ang \"{name}\" ay nadagdag"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} proyekto ang nadagdag"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Alisin sa folder"
   },
   "app.instance.mods.share-text": {
     "message": "Tingnan ang mga proyektong ginagamit ko sa aking modpack!"

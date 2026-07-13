@@ -293,11 +293,62 @@
   "app.instance.mods.content-type-project": {
     "message": "projekti"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Poista"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Muokkaa"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Muuta tämän kansion nimi ja väri."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Muokkaa kansiota"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Väri"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {projekti} other {projektia}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Kansio \"{name}\" luotu"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Kansion nimi..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Tällä nimellä on jo olemassa kansio"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Ei väriä"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Siirrä kansioon {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Siirrä kansioon..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Uusi kansio"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Luo kansio modiasi järjestämistä varten."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Uusi kansio tällä modilla..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Uusi kansio näillä moodeilla..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" lisättiin"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projektia lisättiin"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Poista kansiosta"
   },
   "app.instance.mods.share-text": {
     "message": "Tsekkaa projektit joita käytän minun modipaketissani!"

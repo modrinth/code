@@ -209,11 +209,62 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Verwijderen"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Bewerken"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Wijzig de naam en kleur van deze map."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Map bewerken"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Kleur"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {project} other {projecten}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Map \"{name}\" aangemaakt"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Mapnaam..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Er bestaat al een map met deze naam"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Geen kleur"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Verplaatsen naar {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Verplaatsen naar..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Nieuwe map"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Maak een map om je mods te organiseren."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Nieuwe map met deze mod..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Nieuwe map met deze mods..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was toegevoegd"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} Projecten waren toegevoegd"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Verwijderen uit map"
   },
   "app.instance.mods.share-text": {
     "message": "Bekijk de projecten die ik in mijn modpack gebruik!"
@@ -249,7 +300,7 @@
     "message": "Noch servers noch werelden toegevoegd"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "Zoek werelden"
+    "message": "Zoek {count} werelden..."
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content vereist"

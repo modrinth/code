@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Șterge"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Editează"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Schimbă numele și culoarea acestui dosar."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Editează dosarul"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Culoare"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {proiect} few {proiecte} other {proiecte}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Dosarul \"{name}\" a fost creat"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Nume dosar..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Există deja un dosar cu acest nume"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Fără culoare"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Mută în {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Mută în..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Dosar nou"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Creează un dosar pentru a-ți organiza modurile."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Dosar nou cu acest mod..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Dosar nou cu aceste moduri..."
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Elimină din dosar"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Conținut necesar"
   },

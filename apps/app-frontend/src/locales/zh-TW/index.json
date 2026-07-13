@@ -293,11 +293,62 @@
   "app.instance.mods.content-type-project": {
     "message": "專案"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "刪除"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "編輯"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "變更此資料夾的名稱和顏色。"
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "編輯資料夾"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "顏色"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, other {個項目}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "資料夾「{name}」已建立"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "資料夾名稱..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "已存在同名資料夾"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "無顏色"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "移動到 {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "移動到..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "新建資料夾"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "建立一個資料夾來整理你的模組。"
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "包含此模組的新資料夾..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "包含這些模組的新資料夾..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "已新增「{name}」"
   },
   "app.instance.mods.projects-were-added": {
     "message": "已新增 {count} 個專案"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "從資料夾中移除"
   },
   "app.instance.mods.share-text": {
     "message": "快來看看我在模組包中使用的專案！"

@@ -287,11 +287,62 @@
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Ta bort"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Redigera"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Ändra namnet och färgen på den här mappen."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Redigera mapp"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Färg"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {projekt} other {projekt}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Mappen \"{name}\" skapades"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Mappnamn..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Det finns redan en mapp med det här namnet"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Ingen färg"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Flytta till {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Flytta till..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Ny mapp"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Skapa en mapp för att organisera dina modifikationer."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Ny mapp med den här modifikationen..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Ny mapp med dessa modifikationer..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" lades till"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projekt lades till"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Ta bort från mapp"
   },
   "app.instance.mods.share-text": {
     "message": "Kolla in projekten jag använder i mitt modpaket!"

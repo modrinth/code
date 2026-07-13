@@ -293,11 +293,62 @@
   "app.instance.mods.content-type-project": {
     "message": "proyecto"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Eliminar"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Editar"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Cambia el nombre y el color de esta carpeta."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Editar carpeta"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Color"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {proyecto} other {proyectos}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Carpeta \"{name}\" creada"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Nombre de la carpeta..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Ya existe una carpeta con este nombre"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Sin color"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Mover a {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Mover a..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Nueva carpeta"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Crea una carpeta para organizar tus mods."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Nueva carpeta con este mod..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Nueva carpeta con estos mods..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "Se añadió \"{name}\""
   },
   "app.instance.mods.projects-were-added": {
     "message": "Se añadieron {count} proyectos"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Quitar de la carpeta"
   },
   "app.instance.mods.share-text": {
     "message": "¡Mira los proyectos que estoy usando en mi modpack!"

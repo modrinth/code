@@ -209,11 +209,62 @@
   "app.instance.mods.content-type-project": {
     "message": "Dự án"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Xóa"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Chỉnh sửa"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Đổi tên và màu sắc của thư mục này."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Chỉnh sửa thư mục"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Màu sắc"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {dự án} other {dự án}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Thư mục \"{name}\" đã được tạo"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Tên thư mục..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Đã tồn tại thư mục với tên này"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Không có màu"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Chuyển đến {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Chuyển đến..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Thư mục mới"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Tạo thư mục để sắp xếp các mod của bạn."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Thư mục mới với mod này..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Thư mục mới với các mod này..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" đã được thêm"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} dự án đã được thêm"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Xóa khỏi thư mục"
   },
   "app.instance.mods.share-text": {
     "message": "Kiểm tra dự án tôi đang sử dụng trong modpack của mình!"

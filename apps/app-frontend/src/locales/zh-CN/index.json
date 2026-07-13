@@ -293,11 +293,62 @@
   "app.instance.mods.content-type-project": {
     "message": "项目"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "删除"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "编辑"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "更改此文件夹的名称和颜色。"
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "编辑文件夹"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "颜色"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, other {个项目}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "文件夹「{name}」已创建"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "文件夹名称..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "已存在同名文件夹"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "无颜色"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "移动到 {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "移动到..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "新建文件夹"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "创建一个文件夹来整理你的模组。"
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "包含此模组的新文件夹..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "包含这些模组的新文件夹..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "已添加 “{name}”"
   },
   "app.instance.mods.projects-were-added": {
     "message": "已添加 {count} 个项目"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "从文件夹中移除"
   },
   "app.instance.mods.share-text": {
     "message": "查看我在整合包中使用的项目！"

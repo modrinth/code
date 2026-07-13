@@ -203,11 +203,62 @@
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
+  "app.instance.mods.delete-folder": {
+    "message": "Slet"
+  },
+  "app.instance.mods.edit-folder": {
+    "message": "Rediger"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Skift navn og farve på denne mappe."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Rediger mappe"
+  },
+  "app.instance.mods.folder-color-label": {
+    "message": "Farve"
+  },
+  "app.instance.mods.folder-count": {
+    "message": "{count, number} {count, plural, one {projekt} other {projekter}}"
+  },
+  "app.instance.mods.folder-created": {
+    "message": "Mappen \"{name}\" blev oprettet"
+  },
+  "app.instance.mods.folder-name-placeholder": {
+    "message": "Mappenavn..."
+  },
+  "app.instance.mods.folder-name-taken": {
+    "message": "Der findes allerede en mappe med dette navn"
+  },
+  "app.instance.mods.folder-no-color": {
+    "message": "Ingen farve"
+  },
+  "app.instance.mods.move-to-folder": {
+    "message": "Flyt til {name}"
+  },
+  "app.instance.mods.move-to-folder-menu": {
+    "message": "Flyt til..."
+  },
+  "app.instance.mods.new-folder": {
+    "message": "Ny mappe"
+  },
+  "app.instance.mods.new-folder-description": {
+    "message": "Opret en mappe til at organisere dine modifikationer."
+  },
+  "app.instance.mods.new-folder-with-mod": {
+    "message": "Ny mappe med denne modifikation..."
+  },
+  "app.instance.mods.new-folder-with-mods": {
+    "message": "Ny mappe med disse modifikationer..."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" blev tilføjet"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projekter blev tilføjet"
+  },
+  "app.instance.mods.remove-from-folder": {
+    "message": "Fjern fra mappe"
   },
   "app.instance.mods.share-text": {
     "message": "Tjek ud disse projekter jeg bruger i min modpack!"
