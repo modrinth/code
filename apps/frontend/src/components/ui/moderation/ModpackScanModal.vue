@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { FolderSearchIcon, StarIcon } from '@modrinth/assets'
+import { FolderSearchIcon, StarIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
@@ -64,6 +64,10 @@ const messages = defineMessages({
 	scanError: {
 		id: 'modpack-scan-modal.scan-error',
 		defaultMessage: 'Some files failed to scan: {error}',
+	},
+	clearAllGroups: {
+		id: 'modpack-scan-modal.clear-all-groups',
+		defaultMessage: 'Clear All Groups',
 	},
 })
 
@@ -208,6 +212,11 @@ async function fetchAllScans() {
 	}
 }
 
+function clearAllGroups() {
+	// get all groups on the current project
+	// delete all (waiting for functionality)
+}
+
 function show() {
 	scanRequestId.value++
 	isScanning.value = false
@@ -240,7 +249,16 @@ defineExpose({ show, hide })
 						})
 					}}
 				</span>
-				<div>
+				<div class="flex items-center gap-2">
+					<ButtonStyled circular>
+						<button
+							v-tooltip="formatMessage(messages.clearAllGroups)"
+							:disabled="isBusy || rows.length === 0"
+							@click="clearAllGroups"
+						>
+							<TrashIcon aria-hidden="true" />
+						</button>
+					</ButtonStyled>
 					<ButtonStyled circular>
 						<button
 							v-tooltip="formatMessage(messages.scanAllFiles)"
