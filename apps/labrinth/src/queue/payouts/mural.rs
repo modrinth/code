@@ -104,9 +104,7 @@ impl PayoutsQueue {
         Ok(())
     }
 
-    pub async fn get_mural_balance(
-        &self,
-    ) -> eyre::Result<Option<AccountBalance>> {
+    pub async fn get_mural_balance(&self) -> eyre::Result<AccountBalance> {
         let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
@@ -131,10 +129,10 @@ impl PayoutsQueue {
                 }
             })
             .sum::<Decimal>();
-        Ok(Some(AccountBalance {
+        Ok(AccountBalance {
             available,
             pending: Decimal::ZERO,
-        }))
+        })
     }
 }
 
