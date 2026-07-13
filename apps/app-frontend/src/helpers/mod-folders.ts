@@ -6,7 +6,21 @@ export interface ModFolder {
 	name: string
 	expanded: boolean
 	modIds: string[]
+	color?: string
 }
+
+export const FOLDER_COLORS = [
+	'#ef4444',
+	'#f97316',
+	'#eab308',
+	'#1bd96a',
+	'#14b8a6',
+	'#3b82f6',
+	'#6366f1',
+	'#a855f7',
+	'#ec4899',
+	'#64748b',
+]
 
 export function getModFolderStorageKey(instanceId: string) {
 	return `instance-${instanceId}-mod-folders`
@@ -47,7 +61,11 @@ export function useModFolders(instanceId: Ref<string>) {
 	)
 
 	function getModId(item: ContentItem): string {
-		return item.project?.id ?? normalizeFileId(item.file_name ?? '') ?? item.id
+		const projectId = item.project?.id
+		if (projectId) return projectId
+		const fileId = normalizeFileId(item.file_name ?? '')
+		if (fileId) return fileId
+		return item.id
 	}
 
 	function isItemInAnyFolder(item: ContentItem): boolean {
@@ -66,12 +84,13 @@ export function useModFolders(instanceId: Ref<string>) {
 		)
 	}
 
-	function createFolder(name: string): ModFolder {
+	function createFolder(name: string, color?: string): ModFolder {
 		const folder: ModFolder = {
 			id: crypto.randomUUID(),
 			name,
 			expanded: true,
 			modIds: [],
+			...(color ? { color } : {}),
 		}
 		folders.value = [...folders.value, folder]
 		return folder
@@ -83,6 +102,10 @@ export function useModFolders(instanceId: Ref<string>) {
 
 	function renameFolder(folderId: string, newName: string) {
 		folders.value = folders.value.map((f) => (f.id === folderId ? { ...f, name: newName } : f))
+	}
+
+	function setFolderColor(folderId: string, color?: string) {
+		folders.value = folders.value.map((f) => (f.id === folderId ? { ...f, color } : f))
 	}
 
 	function toggleFolder(folderId: string) {
@@ -122,6 +145,7 @@ export function useModFolders(instanceId: Ref<string>) {
 		createFolder,
 		deleteFolder,
 		renameFolder,
+		setFolderColor,
 		toggleFolder,
 		moveModToFolder,
 		moveModToRoot,

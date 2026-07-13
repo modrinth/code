@@ -360,7 +360,13 @@
     "message": "project"
   },
   "app.instance.mods.delete-folder": {
-    "message": "Delete folder"
+    "message": "Delete"
+  },
+  "app.instance.mods.edit-folder-description": {
+    "message": "Change the name and color of this folder."
+  },
+  "app.instance.mods.edit-folder-title": {
+    "message": "Edit folder"
   },
   "app.instance.mods.folder-count": {
     "message": "{count, number} {count, plural, one {project} other {projects}}"
@@ -399,7 +405,7 @@
     "message": "Remove from folder"
   },
   "app.instance.mods.rename-folder": {
-    "message": "Rename"
+    "message": "Edit"
   },
   "app.instance.mods.share-text": {
     "message": "Check out the projects I'm using in my modpack!"

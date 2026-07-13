@@ -202,12 +202,19 @@
 									class="flex items-center gap-3 px-3 py-2.5 bg-surface-3 cursor-pointer select-none"
 									@click="toggleFolder(folder.id)"
 								>
-									<DropdownIcon
-										class="size-5 text-secondary transition-transform duration-200 shrink-0"
-										:class="folder.expanded ? 'rotate-0' : '-rotate-90'"
-									/>
-									<FolderIcon class="size-5 text-secondary shrink-0" />
-									<span class="font-semibold text-contrast truncate">{{ folder.name }}</span>
+								<DropdownIcon
+									class="size-5 transition-transform duration-200 shrink-0"
+									:class="folder.expanded ? 'rotate-0' : '-rotate-90'"
+									:style="folder.color ? { color: folder.color } : { color: 'var(--color-secondary)' }"
+								/>
+								<FolderIcon
+									class="size-5 shrink-0"
+									:style="folder.color ? { color: folder.color } : { color: 'var(--color-secondary)' }"
+								/>
+								<span
+									class="font-semibold truncate"
+									:style="folder.color ? { color: folder.color } : { color: 'var(--color-contrast)' }"
+								>{{ folder.name }}</span>
 									<span class="text-secondary text-sm shrink-0">
 										{{ formatMessage(messages.folderCount, { count: folderItems(folder).length }) }}
 									</span>
@@ -431,7 +438,7 @@
 										},
 									]
 								: []),
-							{ divider: true },
+							...(targetFolders.length > 0 ? [{ divider: true }] : []),
 							{
 								id: formatMessage(messages.newFolderWithMods),
 								icon: PlusIcon,
@@ -578,8 +585,9 @@ const props = withDefaults(
 		bottomPadding?: boolean
 		folders: ModFolder[]
 		toggleFolder: (id: string) => void
-		renameFolder: (id: string) => void
+		editFolder: (id: string) => void
 		deleteFolder: (id: string) => void
+		setFolderColor: (id: string, color?: string) => void
 		getModId: (item: ContentItem) => string
 		moveModToFolder: (item: ContentItem, folderId: string) => void
 		moveModToRoot: (item: ContentItem) => void
@@ -671,13 +679,13 @@ const messages = defineMessages({
 		id: 'content.page-layout.sort.label',
 		defaultMessage: 'Sort by {mode}',
 	},
-	renameFolder: {
-		id: 'app.instance.mods.rename-folder',
-		defaultMessage: 'Rename',
+	editFolder: {
+		id: 'app.instance.mods.edit-folder',
+		defaultMessage: 'Edit',
 	},
 	deleteFolder: {
 		id: 'app.instance.mods.delete-folder',
-		defaultMessage: 'Delete folder',
+		defaultMessage: 'Delete',
 	},
 	folderCount: {
 		id: 'app.instance.mods.folder-count',
@@ -938,12 +946,12 @@ const hasOutdatedProjects = computed(() => ctx.items.value.some((p) => p.has_upd
 function getFolderMenuOptions(folder: ModFolder): OverflowMenuOption[] {
 	return [
 		{
-			id: formatMessage(messages.renameFolder),
-			action: () => props.renameFolder(folder.id),
+			id: formatMessage(messages.editFolder),
+			action: () => props.editFolder(folder.id),
 		},
 		{
 			id: formatMessage(messages.deleteFolder),
-			color: 'red',
+			color: 'red' as const,
 			action: () => props.deleteFolder(folder.id),
 		},
 	]

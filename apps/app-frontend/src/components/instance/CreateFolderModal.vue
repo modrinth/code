@@ -20,6 +20,39 @@
 			<p v-if="nameError" class="m-0 text-sm text-red">
 				{{ nameError }}
 			</p>
+			<div v-if="showColor" class="flex flex-col gap-2">
+				<span class="text-sm font-semibold text-secondary">{{ formatMessage(messages.colorLabel) }}</span>
+				<div class="flex flex-wrap gap-2">
+					<button
+						class="flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all"
+						:class="
+							!selectedColor
+								? 'border-brand scale-110'
+								: 'border-surface-5 hover:border-surface-4'
+						"
+						:title="formatMessage(messages.noColor)"
+						@click="selectedColor = undefined"
+					>
+						<span class="block h-4 w-4 rounded-full bg-surface-5" />
+						<span class="absolute h-0.5 w-5 rotate-45 bg-red" />
+					</button>
+					<button
+						v-for="color in FOLDER_COLORS"
+						:key="color"
+						class="flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all"
+						:class="
+							selectedColor === color
+								? 'border-brand scale-110'
+								: 'border-transparent hover:scale-105'
+						"
+						:style="{ backgroundColor: color }"
+						:title="color"
+						@click="selectedColor = color"
+					>
+						<CheckIcon v-if="selectedColor === color" class="size-4 text-white" />
+					</button>
+				</div>
+			</div>
 			<div class="flex justify-end gap-2">
 				<ButtonStyled>
 					<button @click="hide()">
@@ -50,6 +83,8 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { FOLDER_COLORS } from '@/helpers/mod-folders'
+
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -61,6 +96,14 @@ const messages = defineMessages({
 		id: 'app.instance.mods.folder-name-taken',
 		defaultMessage: 'A folder with this name already exists.',
 	},
+	colorLabel: {
+		id: 'app.instance.mods.folder-color-label',
+		defaultMessage: 'Color',
+	},
+	noColor: {
+		id: 'app.instance.mods.folder-no-color',
+		defaultMessage: 'No color',
+	},
 })
 
 const props = withDefaults(
@@ -70,6 +113,7 @@ const props = withDefaults(
 		confirmLabel?: string
 		existingNames?: string[]
 		excludeName?: string
+		showColor?: boolean
 	}>(),
 	{
 		title: 'New folder',
@@ -77,15 +121,17 @@ const props = withDefaults(
 		confirmLabel: 'Create',
 		existingNames: () => [],
 		excludeName: '',
+		showColor: true,
 	},
 )
 
 const emit = defineEmits<{
-	confirm: [name: string]
+	confirm: [name: string, color?: string]
 }>()
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const folderName = ref('')
+const selectedColor = ref<string | undefined>()
 
 const nameError = computed(() => {
 	const name = folderName.value.trim()
@@ -97,21 +143,23 @@ const nameError = computed(() => {
 	return ''
 })
 
-function show(defaultName?: string) {
+function show(defaultName?: string, defaultColor?: string) {
 	folderName.value = defaultName ?? ''
+	selectedColor.value = defaultColor
 	modal.value?.show()
 }
 
 function hide() {
 	modal.value?.hide()
 	folderName.value = ''
+	selectedColor.value = undefined
 }
 
 function handleConfirm() {
 	const name = folderName.value.trim()
 	if (!name || nameError.value) return
 	try {
-		emit('confirm', name)
+		emit('confirm', name, selectedColor.value)
 	} finally {
 		hide()
 	}

@@ -3,8 +3,9 @@
 		<ModFolderLayout
 			:folders="folders"
 			:toggle-folder="toggleFolder"
-			:rename-folder="showRenameFolder"
+			:edit-folder="showEditFolder"
 			:delete-folder="deleteFolder"
+			:set-folder-color="setFolderColor"
 			:get-mod-id="getModId"
 			:move-mod-to-folder="moveModToFolder"
 			:move-mod-to-root="moveModToRoot"
@@ -77,14 +78,14 @@
 					:existing-names="folderNames"
 					@confirm="handleCreateFolder"
 				/>
-				<CreateFolderModal
-					ref="renameFolderModal"
-					:title="formatMessage(messages.renameFolderTitle)"
-					:description="formatMessage(messages.renameFolderDescription)"
+			<CreateFolderModal
+					ref="editFolderModal"
+					:title="formatMessage(messages.editFolderTitle)"
+					:description="formatMessage(messages.editFolderDescription)"
 					confirm-label="Rename"
 					:existing-names="folderNames"
 					:exclude-name="renamingFolderName"
-					@confirm="handleRenameFolder"
+					@confirm="handleEditFolder"
 				/>
 			</template>
 		</ModFolderLayout>
@@ -221,13 +222,13 @@ const messages = defineMessages({
 		id: 'app.instance.mods.new-folder-with-mod',
 		defaultMessage: 'New folder with this mod...',
 	},
-	renameFolderTitle: {
-		id: 'app.instance.mods.rename-folder-title',
-		defaultMessage: 'Rename folder',
+	editFolderTitle: {
+		id: 'app.instance.mods.edit-folder-title',
+		defaultMessage: 'Edit folder',
 	},
-	renameFolderDescription: {
-		id: 'app.instance.mods.rename-folder-description',
-		defaultMessage: 'Choose a new name for this folder.',
+	editFolderDescription: {
+		id: 'app.instance.mods.edit-folder-description',
+		defaultMessage: 'Change the name and color of this folder.',
 	},
 })
 
@@ -258,6 +259,7 @@ const {
 	createFolder,
 	deleteFolder,
 	renameFolder,
+	setFolderColor,
 	toggleFolder,
 	moveModToFolder,
 	moveModToRoot,
@@ -265,16 +267,16 @@ const {
 } = useModFolders(instanceId)
 
 const createFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
-const renameFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
+const editFolderModal = ref<InstanceType<typeof CreateFolderModal> | null>(null)
 const pendingModForFolder = ref<ContentItem | null>(null)
 const pendingModsForFolder = ref<ContentItem[]>([])
-const pendingRenameFolderId = ref<string | null>(null)
+const pendingEditFolderId = ref<string | null>(null)
 const renamingFolderName = ref<string>('')
 
 const folderNames = computed(() => folders.value.map((f) => f.name))
 
-function handleCreateFolder(name: string) {
-	const folder = createFolder(name)
+function handleCreateFolder(name: string, color?: string) {
+	const folder = createFolder(name, color)
 	const pendingItems = pendingModsForFolder.value
 	if (pendingItems && pendingItems.length > 0) {
 		for (const item of pendingItems) {
@@ -294,21 +296,26 @@ function handleCreateFolder(name: string) {
 function showBulkNewFolder(items: ContentItem[]) {
 	pendingModForFolder.value = null
 	pendingModsForFolder.value = items
+	pendingEditFolderId.value = null
 	createFolderModal.value?.show()
 }
 
-function showRenameFolder(folderId: string) {
+function showEditFolder(folderId: string) {
 	const folder = folders.value.find((f) => f.id === folderId)
 	if (!folder) return
-	pendingRenameFolderId.value = folderId
+	pendingEditFolderId.value = folderId
 	renamingFolderName.value = folder.name
-	renameFolderModal.value?.show(folder.name)
+	editFolderModal.value?.show(folder.name, folder.color)
 }
 
-function handleRenameFolder(name: string) {
-	if (!pendingRenameFolderId.value) return
-	renameFolder(pendingRenameFolderId.value, name)
-	pendingRenameFolderId.value = null
+function handleEditFolder(name: string, color?: string) {
+	if (!pendingEditFolderId.value) return
+	renameFolder(pendingEditFolderId.value, name)
+	const folder = folders.value.find((f) => f.id === pendingEditFolderId.value)
+	if (folder?.color !== color) {
+		setFolderColor(pendingEditFolderId.value, color)
+	}
+	pendingEditFolderId.value = null
 }
 
 function hasPreloadedContent(contentData: InstanceContentData | null | undefined) {
@@ -1346,6 +1353,7 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 			action: () => {
 				pendingModsForFolder.value = []
 				pendingModForFolder.value = item
+				pendingEditFolderId.value = null
 				createFolderModal.value?.show()
 			},
 		})
