@@ -80,7 +80,7 @@ export function useModFolders(instanceId: Ref<string>) {
 
 	function isFolderNameTaken(name: string, excludeFolderId?: string): boolean {
 		return folders.value.some(
-			(f) => f.id !== excludeFolderId && f.name.toLowerCase() === name.toLowerCase(),
+			(f) => f.id !== excludeFolderId && f.name === name,
 		)
 	}
 

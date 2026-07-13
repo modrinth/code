@@ -137,7 +137,7 @@ const nameError = computed(() => {
 	const name = folderName.value.trim()
 	if (!name) return ''
 	if (name === props.excludeName) return ''
-	if (props.existingNames.some((n) => n.toLowerCase() === name.toLowerCase())) {
+	if (props.existingNames.some((n) => n === name)) {
 		return formatMessage(messages.nameTakenError)
 	}
 	return ''
