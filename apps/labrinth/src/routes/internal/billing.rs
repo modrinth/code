@@ -113,7 +113,6 @@ struct UserSubscriptionWithNextChargeTaxAmount {
     pub next_charge_tax_amount: Option<i64>,
 }
 
-#[get("subscriptions")]
 /// List subscriptions.  
 #[utoipa::path(
 	context_path = "/billing",
