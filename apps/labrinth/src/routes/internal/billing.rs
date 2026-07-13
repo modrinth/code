@@ -106,6 +106,13 @@ struct SubscriptionsQuery {
     pub user_id: Option<ariadne::ids::UserId>,
 }
 
+#[derive(Serialize)]
+struct UserSubscriptionWithNextChargeTaxAmount {
+    #[serde(flatten)]
+    pub subscription: UserSubscription,
+    pub next_charge_tax_amount: Option<i64>,
+}
+
 /// List subscriptions.  
 #[utoipa::path(
 	context_path = "/billing",
@@ -131,7 +138,7 @@ pub async fn subscriptions(
     .await?
     .1;
 
-    let subscriptions =
+    let db_subscriptions =
         user_subscription_item::DBUserSubscription::get_all_user(
             if let Some(user_id) = query.user_id {
                 if user.role.is_admin() {
@@ -147,10 +154,20 @@ pub async fn subscriptions(
             },
             &**pool,
         )
-        .await?
-        .into_iter()
-        .map(UserSubscription::from)
-        .collect::<Vec<_>>();
+        .await?;
+
+    let mut subscriptions = Vec::with_capacity(db_subscriptions.len());
+    for subscription in db_subscriptions {
+        let next_charge_tax_amount =
+            DBCharge::get_open_subscription(subscription.id, &**pool)
+                .await?
+                .map(|charge| charge.tax_amount);
+
+        subscriptions.push(UserSubscriptionWithNextChargeTaxAmount {
+            subscription: UserSubscription::from(subscription),
+            next_charge_tax_amount,
+        });
+    }
 
     Ok(HttpResponse::Ok().json(subscriptions))
 }
