@@ -1,5 +1,6 @@
 <template>
 	<div class="md:pl-1">
+		<BreakdownGroupModal ref="breakdownGroupModal" @save="saveBreakdownGroup" />
 		<div class="flex flex-wrap items-center gap-2 md:hidden">
 			<MultiSelect
 				v-if="showProjectRow"
@@ -156,8 +157,8 @@
 				class="min-w-0 max-w-full"
 				:options="breakdownOptions"
 				:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-				:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-				:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+				:dropdown-width="'20rem'"
+				:dropdown-min-width="'20rem'"
 				:trigger-class="analyticsQueryChipTriggerClass"
 				fit-content
 				checkbox-position="right"
@@ -182,6 +183,24 @@
 							"
 						/>
 					</div>
+				</template>
+				<template #option="{ item, selected }">
+					<BreakdownGroupOptionMenu
+						:breakdown="item.value"
+						:selected="selected"
+						:active-group="draftActiveBreakdownGroup"
+						@activate="ensureBreakdownSelected"
+						@select-group="selectBreakdownGroup(item.value, $event)"
+						@create="openCreateBreakdownGroup"
+						@edit="openEditBreakdownGroup"
+					>
+						<span
+							class="min-w-0 flex-1 truncate font-semibold leading-tight"
+							:class="selected ? 'text-contrast' : 'text-primary'"
+						>
+							{{ item.label }}
+						</span>
+					</BreakdownGroupOptionMenu>
 				</template>
 			</MultiSelect>
 
@@ -401,8 +420,8 @@
 									v-model="selectedBreakdownValue"
 									:options="breakdownOptions"
 									:max-height="QUERY_BUILDER_DROPDOWN_MAX_HEIGHT"
-									:dropdown-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
-									:dropdown-min-width="QUERY_BUILDER_DROPDOWN_MIN_WIDTH"
+									:dropdown-width="'24rem'"
+									:dropdown-min-width="'24rem'"
 									checkbox-position="right"
 									:placeholder="formatMessage(analyticsMessages.none)"
 									show-selection-actions
@@ -428,6 +447,24 @@
 												"
 											/>
 										</div>
+									</template>
+									<template #option="{ item, selected }">
+										<BreakdownGroupOptionMenu
+											:breakdown="item.value"
+											:selected="selected"
+											:active-group="draftActiveBreakdownGroup"
+											@activate="ensureBreakdownSelected"
+											@select-group="selectBreakdownGroup(item.value, $event)"
+											@create="openCreateBreakdownGroup"
+											@edit="openEditBreakdownGroup"
+										>
+											<span
+												class="min-w-0 flex-1 truncate font-semibold leading-tight"
+												:class="selected ? 'text-contrast' : 'text-primary'"
+											>
+												{{ item.label }}
+											</span>
+										</BreakdownGroupOptionMenu>
 									</template>
 								</MultiSelect>
 							</div>
@@ -469,6 +506,8 @@ import {
 	MAX_ANALYTICS_BREAKDOWN_PRESETS,
 } from '~/components/analytics-dashboard/analytics-route-query'
 import {
+	type AnalyticsActiveBreakdownGroup,
+	type AnalyticsBreakdownGroup,
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardProject,
 	type AnalyticsDashboardStat,
@@ -486,6 +525,8 @@ import {
 	formatAnalyticsGroupByLabel,
 	formatAnalyticsGroupBySelectedLabel,
 } from '../analytics-messages.ts'
+import BreakdownGroupModal from './BreakdownGroupModal.vue'
+import BreakdownGroupOptionMenu from './BreakdownGroupOptionMenu.vue'
 import DownloadsThresholdInput from './DownloadsThresholdInput.vue'
 import {
 	getAnalyticsStatsForBreakdown,
@@ -526,6 +567,7 @@ const {
 	selectedCustomTimeframeEndDate,
 	selectedGroupBy,
 	selectedBreakdowns,
+	activeBreakdownGroup,
 	selectedFilters,
 	activeStat,
 	showPreviousPeriod,
@@ -534,11 +576,37 @@ const {
 	queryResetToken,
 	refreshAnalyticsQuery,
 	setFetchRequest,
+	upsertBreakdownGroup,
+	setActiveBreakdownGroup,
 } = injectAnalyticsDashboardContext()
 const route = useRoute()
 const { formatMessage } = useVIntl()
 const { selectedTimeRange, selectedTimeframeDurationMinutes } = useSelectedAnalyticsTimeRange()
 const defaultQueryState = buildDefaultAnalyticsQueryBuilderState([])
+const breakdownGroupModal = ref<InstanceType<typeof BreakdownGroupModal> | null>(null)
+
+function openCreateBreakdownGroup(
+	breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>,
+	event?: MouseEvent,
+) {
+	breakdownGroupModal.value?.show(breakdown, undefined, event)
+}
+
+function openEditBreakdownGroup(group: AnalyticsBreakdownGroup, event?: MouseEvent) {
+	breakdownGroupModal.value?.show(group.breakdown, group, event)
+}
+
+function saveBreakdownGroup(group: AnalyticsBreakdownGroup, activate: boolean) {
+	upsertBreakdownGroup(group)
+	if (activate) {
+		setActiveBreakdownGroup({ breakdown: group.breakdown, groupId: group.id })
+	}
+}
+
+function ensureBreakdownSelected(breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>) {
+	if (selectedBreakdownValue.value.includes(breakdown)) return
+	selectedBreakdownValue.value = [...selectedBreakdownValue.value, breakdown]
+}
 
 function getProjectOption(
 	project: AnalyticsDashboardProject,
@@ -810,15 +878,25 @@ function selectUserProjectsMode() {
 }
 
 const draftSelectedBreakdowns = ref<AnalyticsSelectedBreakdowns>([...selectedBreakdowns.value])
+const draftActiveBreakdownGroup = ref<AnalyticsActiveBreakdownGroup | null>(
+	activeBreakdownGroup.value ? { ...activeBreakdownGroup.value } : null,
+)
 const isBreakdownSelectOpen = ref(false)
 
 const selectedBreakdownValue = computed<AnalyticsSelectedBreakdowns>({
 	get: () => draftSelectedBreakdowns.value,
 	set: (nextBreakdowns) => {
-		draftSelectedBreakdowns.value = getAnalyticsBreakdownPresetsForProjectSelection(
+		const normalizedBreakdowns = getAnalyticsBreakdownPresetsForProjectSelection(
 			nextBreakdowns.slice(0, MAX_ANALYTICS_BREAKDOWN_PRESETS),
 			selectedProjectIds.value,
 		)
+		draftSelectedBreakdowns.value = normalizedBreakdowns
+		if (
+			draftActiveBreakdownGroup.value &&
+			!normalizedBreakdowns.includes(draftActiveBreakdownGroup.value.breakdown)
+		) {
+			draftActiveBreakdownGroup.value = null
+		}
 	},
 })
 
@@ -829,14 +907,23 @@ watch(selectedBreakdowns, (nextBreakdowns) => {
 	draftSelectedBreakdowns.value = [...nextBreakdowns]
 })
 
+watch(activeBreakdownGroup, (nextActiveGroup) => {
+	if (isBreakdownSelectOpen.value) return
+	draftActiveBreakdownGroup.value = nextActiveGroup ? { ...nextActiveGroup } : null
+})
+
 function handleBreakdownSelectOpen() {
 	isBreakdownSelectOpen.value = true
 	draftSelectedBreakdowns.value = [...selectedBreakdowns.value]
+	draftActiveBreakdownGroup.value = activeBreakdownGroup.value
+		? { ...activeBreakdownGroup.value }
+		: null
 }
 
 function handleBreakdownSelectClose() {
 	isBreakdownSelectOpen.value = false
 	commitDraftSelectedBreakdowns()
+	commitDraftActiveBreakdownGroup()
 }
 
 function commitDraftSelectedBreakdowns() {
@@ -845,6 +932,27 @@ function commitDraftSelectedBreakdowns() {
 		showPreviousPeriod.value = false
 		selectedBreakdowns.value = nextBreakdowns
 	}
+}
+
+function commitDraftActiveBreakdownGroup() {
+	const currentGroup = activeBreakdownGroup.value
+	const nextGroup = draftActiveBreakdownGroup.value
+	if (
+		currentGroup?.breakdown === nextGroup?.breakdown &&
+		currentGroup?.groupId === nextGroup?.groupId
+	) {
+		return
+	}
+	showPreviousPeriod.value = false
+	setActiveBreakdownGroup(nextGroup ? { ...nextGroup } : null)
+}
+
+function selectBreakdownGroup(
+	breakdown: Exclude<AnalyticsBreakdownPreset, 'none'>,
+	group: AnalyticsBreakdownGroup | null,
+) {
+	ensureBreakdownSelected(breakdown)
+	draftActiveBreakdownGroup.value = group ? { breakdown, groupId: group.id } : null
 }
 
 function areSelectedBreakdownsEqual(

@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 
 import {
+	type AnalyticsBreakdownGroup,
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardStat,
 	type AnalyticsSelectedFilters,
@@ -28,6 +29,10 @@ import {
 	isNoDependentAnalyticsBreakdownValue,
 	isUnknownAnalyticsBreakdownValue,
 } from '../breakdown'
+import {
+	applyAnalyticsBreakdownGroup,
+	getAnalyticsBreakdownGroupSeriesName,
+} from '../breakdown-groups'
 import { getAnalyticsTableBreakdownColumnKey } from './analytics-table-columns'
 import type {
 	AnalyticsTableBreakdownDisplayValues,
@@ -43,6 +48,7 @@ type BuildAnalyticsTableRowsOptions = {
 	fetchRequest: Labrinth.Analytics.v3.FetchRequest | null
 	timeSlices: Labrinth.Analytics.v3.TimeSlice[]
 	selectedBreakdowns: readonly AnalyticsTableBreakdownPreset[]
+	breakdownGroup: AnalyticsBreakdownGroup | null
 	selectedProjectIds: ReadonlySet<string>
 	selectedFilters: AnalyticsSelectedFilters
 	dependentProjectTypesById: ReadonlyMap<string, readonly string[]>
@@ -62,6 +68,7 @@ export function buildAnalyticsTableRows({
 	fetchRequest,
 	timeSlices,
 	selectedBreakdowns,
+	breakdownGroup,
 	selectedProjectIds,
 	selectedFilters,
 	dependentProjectTypesById,
@@ -94,6 +101,14 @@ export function buildAnalyticsTableRows({
 		breakdownValue: string,
 		breakdown: AnalyticsTableBreakdownPreset,
 	) {
+		if (breakdown === breakdownGroup?.breakdown) {
+			const seriesName = getAnalyticsBreakdownGroupSeriesName(
+				breakdownValue,
+				breakdownGroup,
+				formatMessage(analyticsMessages.other),
+			)
+			if (seriesName) return seriesName
+		}
 		const key = `${breakdown}:${breakdownValue}`
 		let displayValue = breakdownDisplayValues.get(key)
 		if (displayValue === undefined) {
@@ -112,7 +127,11 @@ export function buildAnalyticsTableRows({
 
 	function getProjectDisplayValueForBreakdownValues(breakdownValues: readonly string[]) {
 		const versionBreakdownIndex = selectedBreakdowns.indexOf('version_id')
-		if (versionBreakdownIndex === -1 || selectedBreakdowns.includes('project')) {
+		if (
+			versionBreakdownIndex === -1 ||
+			selectedBreakdowns.includes('project') ||
+			breakdownGroup?.breakdown === 'version_id'
+		) {
 			return ''
 		}
 
@@ -131,7 +150,7 @@ export function buildAnalyticsTableRows({
 
 	function getProjectVersionIdForBreakdownValues(breakdownValues: readonly string[]) {
 		const versionBreakdownIndex = selectedBreakdowns.indexOf('version_id')
-		if (versionBreakdownIndex === -1) {
+		if (versionBreakdownIndex === -1 || breakdownGroup?.breakdown === 'version_id') {
 			return ''
 		}
 
@@ -253,7 +272,12 @@ export function buildAnalyticsTableRows({
 		createRow(ALL_PROJECTS_BREAKDOWN_VALUE, [])
 	}
 
-	if (!includeDate && selectedBreakdowns.length === 1 && selectedBreakdowns[0] === 'project') {
+	if (
+		!includeDate &&
+		selectedBreakdowns.length === 1 &&
+		selectedBreakdowns[0] === 'project' &&
+		breakdownGroup?.breakdown !== 'project'
+	) {
 		for (const projectId of selectedProjectIds) {
 			createRow(projectId, [projectId])
 		}
@@ -285,10 +309,15 @@ export function buildAnalyticsTableRows({
 				continue
 			}
 
-			const breakdownValues =
+			const rawBreakdownValues =
 				selectedBreakdowns.length === 0
 					? []
 					: getAnalyticsBreakdownValues(point, selectedBreakdowns, formatMessage)
+			const breakdownValues = applyAnalyticsBreakdownGroup(
+				rawBreakdownValues,
+				selectedBreakdowns,
+				breakdownGroup,
+			)
 			if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
 				continue
 			}

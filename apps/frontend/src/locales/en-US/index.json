@@ -20,6 +20,81 @@
   "analytics.action.reset": {
     "message": "Reset"
   },
+  "analytics.action.save": {
+    "message": "Save"
+  },
+  "analytics.breakdown-groups.add-series": {
+    "message": "Add series"
+  },
+  "analytics.breakdown-groups.button": {
+    "message": "Group series"
+  },
+  "analytics.breakdown-groups.create": {
+    "message": "Create group"
+  },
+  "analytics.breakdown-groups.delete": {
+    "message": "Delete group"
+  },
+  "analytics.breakdown-groups.delete-description": {
+    "message": "This saved breakdown group will be permanently deleted from this browser."
+  },
+  "analytics.breakdown-groups.delete-title": {
+    "message": "Delete {name}?"
+  },
+  "analytics.breakdown-groups.edit": {
+    "message": "Edit group"
+  },
+  "analytics.breakdown-groups.group-name": {
+    "message": "Group name"
+  },
+  "analytics.breakdown-groups.group-name-placeholder": {
+    "message": "For example, Platform families"
+  },
+  "analytics.breakdown-groups.modal.create-title": {
+    "message": "Create breakdown group"
+  },
+  "analytics.breakdown-groups.modal.edit-title": {
+    "message": "Edit breakdown group"
+  },
+  "analytics.breakdown-groups.none": {
+    "message": "No grouping"
+  },
+  "analytics.breakdown-groups.other-description": {
+    "message": "{count, plural, one {# unassigned value} other {# unassigned values}}"
+  },
+  "analytics.breakdown-groups.remove-series": {
+    "message": "Remove series"
+  },
+  "analytics.breakdown-groups.select-values": {
+    "message": "Select values"
+  },
+  "analytics.breakdown-groups.series-name": {
+    "message": "Series name"
+  },
+  "analytics.breakdown-groups.series-values": {
+    "message": "Breakdown values"
+  },
+  "analytics.breakdown-groups.unavailable-value": {
+    "message": "{value} (not in current results)"
+  },
+  "analytics.breakdown-groups.validation.name-duplicate": {
+    "message": "A group with this name already exists for this breakdown."
+  },
+  "analytics.breakdown-groups.validation.name-required": {
+    "message": "Enter a group name."
+  },
+  "analytics.breakdown-groups.validation.series-name-duplicate": {
+    "message": "Custom series names must be unique."
+  },
+  "analytics.breakdown-groups.validation.series-name-required": {
+    "message": "Every custom series needs a name."
+  },
+  "analytics.breakdown-groups.validation.series-required": {
+    "message": "Add at least one custom series."
+  },
+  "analytics.breakdown-groups.validation.series-values-required": {
+    "message": "Assign at least one breakdown value to every custom series."
+  },
   "analytics.breakdown.country": {
     "message": "Country"
   },
