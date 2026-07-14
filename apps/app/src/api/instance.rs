@@ -635,9 +635,7 @@ pub async fn instance_add_project_from_path(
 }
 
 #[tauri::command]
-pub async fn instance_is_file_on_modrinth(
-    project_path: &Path,
-) -> Result<bool> {
+pub async fn instance_is_file_on_modrinth(project_path: &Path) -> Result<bool> {
     Ok(theseus::instance::is_file_on_modrinth(project_path).await?)
 }
 

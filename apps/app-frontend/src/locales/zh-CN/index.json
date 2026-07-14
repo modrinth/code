@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜索 {count} 个世界……"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "需求内容"
-  },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
   },
@@ -437,26 +434,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "需求整合包"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件，然后直接进入服务器。"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共享实例"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共享的服务端实例"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "查看内容"
   },
   "app.modal.update-to-play.header": {
     "message": "更新以游玩"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "需要更新"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
@@ -1102,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "加载器由服务器提供"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "不再显示此警告"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "确认安装"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "仍然安装"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "恶意软件常常通过整合包文件在 Discord 等平台上分享而传播。"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "我们在 Modrinth 上找不到此文件。强烈建议你仅从可信来源安装文件。"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "未知文件警告"
   }
 }

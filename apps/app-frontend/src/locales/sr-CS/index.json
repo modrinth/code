@@ -371,9 +371,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pretraži {count} svetova..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Potreban sadržaj"
-  },
   "app.modal.install-to-play.header": {
     "message": "Instaliraj da bi igrao"
   },
@@ -383,26 +380,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modova}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Potreban modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ovaj server zahteva modove za igranje. Klikni na Instaliraj da bi instalirao potrebne datoteke iz Modrintha, a zatim pokreni direktno na server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Deljena instanca"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Deljena instanca servera"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Pogledaj sadržaj"
   },
   "app.modal.update-to-play.header": {
     "message": "Ažuriraj da bi igrao"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Potrebno je ažuriranje"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Potrebno je ažuriranje da biste igrali {name}. Molimo te da ažuriraš na najnoviju verziju da bi pokrenuo igru."
@@ -1048,26 +1033,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Učitavač je obezbeđen od servera"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Ne prikazuj ovo upozorenje ponovo"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Potvrdi instalaciju"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Svejedno instalirati"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Zlonamerni softver se često distribuira putem modpacka datoteka deljenjem na platformama poput Discord-a."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Nismo mogli da pronađemo ovu datoteku na Modrinth-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Upozorenje nepoznatih datoteka"
   }
 }

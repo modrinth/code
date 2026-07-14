@@ -389,9 +389,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Потрібний уміст"
-  },
   "app.modal.install-to-play.header": {
     "message": "Установлення для гри"
   },
@@ -401,26 +398,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Потрібна збірка"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб налаштувати необхідні файли з Modrinth, а потім запустіть безпосередньо на сервері."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Профіль"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Серверний профіль"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Дивитися вміст"
   },
   "app.modal.update-to-play.header": {
     "message": "Оновлення для гри"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Необхідне оновлення"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть до останньої версії, щоб запустити гру."
@@ -1045,26 +1030,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Завантажувач наданий сервером"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Файл перевірятиметься лише, якщо його завантажено на Modrinth, незалежно від його формату (включно з .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Не показувати більше це попередження"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Підтвердити встановлення"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Усе одно встановити"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Шкідливе програмне забезпечення часто поширюють через файли збірок, які публікуються на таких платформах, як Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ми не змогли знайти цей файл на Modrinth. Ми рекомендуємо встановлювати файли лише з тих джерел яким ви довіряєте."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Попередження про невідомий файл"
   }
 }

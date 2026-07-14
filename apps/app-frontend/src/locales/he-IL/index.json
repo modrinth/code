@@ -137,9 +137,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "חיפוש ב-{count} עולמות..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "תוכן נדרש"
-  },
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
   },
@@ -149,26 +146,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "חבילת מודים נדרשת"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "שרת זה דורש מודים כדי לשחק. לחץ על \"התקן\" כדי להגדיר את הקבצים הנדרשים מ-Modrinth, ולאחר מכן הפעל ישירות לשרת."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "התקנה משותפת"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "התקנת שרת משותפת"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "הצג תוכן"
   },
   "app.modal.update-to-play.header": {
     "message": "צריך לעדכן כדי לשחק"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "עדכון נדרש"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "עדכון נדרש כדי לשחק ב{name}. ניתן להתחיל את המשחק רק לאחר עדכון לגרסה החדשה."

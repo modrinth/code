@@ -245,9 +245,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Content vereist"
-  },
   "app.modal.install-to-play.header": {
     "message": "Installeer om te spelen"
   },
@@ -257,26 +254,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Vereist modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Deze server vereist mods om te spelen. Klik op Installeer om de vereiste bestanden van Modrinth in te stellen, en start direct in de server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Gedeelde instantie"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Gedeelde server instantie"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Toon content"
   },
   "app.modal.update-to-play.header": {
     "message": "Update om te spelen"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Update vereist"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
@@ -901,26 +886,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is gegeven door de server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Een bestand wordt alleen beoordeeld als het naar Modrinth is geüpload, ongeacht het bestandsformaat (inclusief .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Toon deze waarschuwing niet opnieuw"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Bevestig installatie"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Installeer toch"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware wordt vaak verspreid via modpack-bestanden door ze te delen op platforms zoals Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "We konden dit bestand niet vinden op Modrinth. We raden ten zeerste aan om alleen bestanden te installeren van bronnen die u vertrouwt."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Waarschuwing voor onbekend bestand"
   }
 }

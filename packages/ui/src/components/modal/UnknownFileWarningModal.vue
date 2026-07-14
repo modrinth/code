@@ -27,10 +27,7 @@
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 
-			<div
-				v-if="mode === 'modpack'"
-				class="relative w-full"
-			>
+			<div v-if="mode === 'modpack'" class="relative w-full">
 				<div
 					ref="externalFileTableBody"
 					class="max-h-[242px] overflow-y-auto rounded-2xl"
@@ -59,7 +56,7 @@
 				>
 					<div
 						v-if="showTableTopFade"
-						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 rounded-t-2xl bg-gradient-to-b from-bg-raised to-transparent"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-b from-bg-raised to-transparent"
 					/>
 				</Transition>
 				<Transition

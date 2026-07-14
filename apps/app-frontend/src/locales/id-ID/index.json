@@ -245,9 +245,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Konten diperlukan"
-  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk memainkan"
   },
@@ -257,26 +254,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Paket mod yang diperlukan"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Mod diperlukan untuk bermain di server ini. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Modrinth, kemudian luncurkan langsung sari server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instans terbagi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instans server terbagi"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Lihat konten"
   },
   "app.modal.update-to-play.header": {
     "message": "Perbarui untuk memainkan"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Perlu diperbarui"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} perlu diperbarui sebelum dimainkan. Mohon perbarui ke versi terkini untuk meluncurkan permainan."
@@ -901,26 +886,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Pemuat disediakan oleh server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Berkas hanya akan ditinjau bila ia diunggah ke Modrinth, tak peduli format berkasnya (termasuk .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Jangan tampilkan peringatan ini lagi"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Konfirmasi pemasangan"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Tetap pasang"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Program jahat (malware) dibagikan melalui berkas paket mod dengan membagikannya melalui platform seperti Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Kami tidak dapat menemukan berkas ini di Modrinth. Kami sangat menyarankan Anda untuk hanya memasang berkas dari sumber-sumber terpercaya."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Peringatan berkas tidak dikenal"
   }
 }

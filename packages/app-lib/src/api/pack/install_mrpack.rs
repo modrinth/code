@@ -241,9 +241,11 @@ pub(crate) async fn get_external_files_from_mrpack(
     file: &CreatePackFile,
 ) -> crate::Result<Vec<String>> {
     let mut zip_reader = MrpackZipReader::new(file).await?;
-    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|entry| {
-        matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
-    }) else {
+    let Some(manifest_idx) =
+        zip_reader.file().entries().iter().position(|entry| {
+            matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
+        })
+    else {
         return Err(crate::Error::from(crate::ErrorKind::InputError(
             "No pack manifest found in mrpack".to_string(),
         )));

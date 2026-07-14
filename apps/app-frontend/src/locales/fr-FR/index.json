@@ -401,9 +401,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Contenu requis"
-  },
   "app.modal.install-to-play.header": {
     "message": "Installer pour jouer"
   },
@@ -413,26 +410,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpack requis"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ce serveur a besoin de mods pour jouer. Cliquez sur Installer pour mettre en place les fichiers requis depuis Modrinth, puis lancez directement dans le serveur."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instance partagée"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instance serveur partagée"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Voir le contenu"
   },
   "app.modal.update-to-play.header": {
     "message": "Mettre à jour pour jouer"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Mise à jour requise"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour à la dernière version pour lancer le jeu."
@@ -1075,26 +1060,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Le loader est procuré par le serveur"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Un fichier n’est révisé que s’il est téléchargé sur Modrinth, quel que soit son format de fichier (y compris .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Ne plus m'avertir à ce sujet"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Confirmer l'installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Installer tout de même"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Les logiciels malveillants sont souvent distribués via des fichiers modpack en les partageant sur des plateformes comme Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Nous ne pouvions pas trouver ce fichier sur Modrinth. Nous vous recommandons fortement de n'installer que des fichiers de sources de confiance."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Avertissement fichier inconnu"
   }
 }

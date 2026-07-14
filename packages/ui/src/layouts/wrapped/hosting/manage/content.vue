@@ -938,15 +938,10 @@ function handleUploadFiles() {
 
 		try {
 			const fileRecognition = await Promise.all(files.map(isFileOnModrinth))
-			const unrecognizedFileSet = new Set(
-				files.filter((_, index) => !fileRecognition[index]),
-			)
+			const unrecognizedFileSet = new Set(files.filter((_, index) => !fileRecognition[index]))
 			const confirmedFiles: File[] = []
 			for (const file of files) {
-				if (
-					!unrecognizedFileSet.has(file) ||
-					(await confirmUnknownFileInstallation(file.name))
-				) {
+				if (!unrecognizedFileSet.has(file) || (await confirmUnknownFileInstallation(file.name))) {
 					confirmedFiles.push(file)
 				}
 			}

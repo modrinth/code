@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "所需內容"
-  },
   "app.modal.install-to-play.header": {
     "message": "安裝以遊玩"
   },
@@ -437,26 +434,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# 個模組}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "所需模組包"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "這個伺服器需要模組才能遊玩。請點選「安裝」以從 Modrinth 設定所需的檔案，完成後即可直接加入伺服器。"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共用實例"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共用伺服器實例"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "檢視內容"
   },
   "app.modal.update-to-play.header": {
     "message": "更新以遊玩"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "需要更新"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
@@ -1102,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "載入器由伺服器提供"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "只有上傳至 Modrinth 的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "不要再顯示這則警告"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "確認安裝"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "仍要安裝"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "惡意軟體經常透過 Discord 等平臺分享模組包檔案來進行傳播。"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "我們在 Modrinth 上找不到這個檔案。強烈建議你僅安裝來自信任來源的檔案。"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "未知檔案警告"
   }
 }
