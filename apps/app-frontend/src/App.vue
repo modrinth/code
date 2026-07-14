@@ -1737,8 +1737,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
-	<InstallToPlayModal ref="installToPlayModal" />
-	<UpdateToPlayModal ref="updateToPlayModal" />
+	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
+	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
 </template>
 
 <style lang="scss" scoped>

@@ -200,6 +200,11 @@ const externalFiles = ref<string[]>([])
 const externalFileTable = ref<HTMLElement | null>(null)
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
+
+const props = defineProps<{
+	showExternalWarnings?: boolean
+}>()
+
 const { installServerProject, startInstallingServer, stopInstallingServer } = injectServerInstall()
 const {
 	showTopFade: showTableTopFade,
@@ -219,7 +224,9 @@ const loaderDisplay = computed(() => {
 })
 
 const modCount = computed(() => modpackVersion.value?.dependencies?.length)
-const hasExternalFiles = computed(() => externalFiles.value.length > 0)
+const hasExternalFiles = computed(
+	() => Boolean(props.showExternalWarnings) && externalFiles.value.length > 0,
+)
 const externalFileRows = computed<ExternalFileRow[]>(() =>
 	externalFiles.value.map((name, index) => ({
 		id: `${index}-${name}`,

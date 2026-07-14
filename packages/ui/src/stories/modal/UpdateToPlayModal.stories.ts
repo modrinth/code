@@ -81,7 +81,7 @@ export const ExternalFiles: Story = {
 				description="An update is required to play Epic Modrinth Pack. Please update to the latest version to launch the game."
 				:diffs="diffs"
 				version-date="November 25, 2025"
-				warn-on-external-files
+				show-external-warnings
 				confirm-label="Update"
 				:confirm-icon="DownloadIcon"
 				removed-label="Removed"

@@ -8,8 +8,8 @@
 		width="544px"
 		no-padding
 	>
-		<div class="flex flex-col gap-4" :class="warnOnExternalFiles ? 'px-6 py-4' : 'p-4'">
-			<template v-if="warnOnExternalFiles">
+		<div class="flex flex-col gap-4" :class="hasExternalDiffs ? 'px-6 py-4' : 'p-4'">
+			<template v-if="hasExternalDiffs">
 				<p v-if="description" class="m-0 text-primary">{{ description }}</p>
 				<Admonition
 					v-if="hasExternalDiffs"
@@ -53,9 +53,9 @@
 				v-for="(diff, index) in sortedDiffs"
 				:key="diff.projectName || diff.fileName || index"
 				class="flex h-10 min-h-10 items-center gap-2"
-				:class="diff.external ? '-mx-3 px-5' : 'px-2'"
+				:class="showExternalWarning(diff) ? '-mx-3 px-5' : 'px-2'"
 				:style="
-					diff.external
+					showExternalWarning(diff)
 						? {
 								backgroundColor: 'color-mix(in srgb, var(--color-orange) 10%, transparent)',
 							}
@@ -78,7 +78,7 @@
 
 				<div class="flex min-w-0 flex-1 items-center gap-1 text-sm">
 					<span class="shrink-0 whitespace-nowrap text-primary">{{ getDiffTypeLabel(diff) }}</span>
-					<template v-if="diff.external">
+					<template v-if="showExternalWarning(diff)">
 						<CircleAlertIcon class="size-4 shrink-0 text-orange" />
 						<span class="truncate font-medium text-orange">
 							{{ formatMessage(messages.unknownProject) }}
@@ -91,7 +91,7 @@
 				<span
 					v-if="getVersionLabel(diff)"
 					class="ml-2 max-w-[60%] min-w-0 shrink truncate text-right text-xs"
-					:class="diff.external ? 'text-orange' : 'text-primary'"
+					:class="showExternalWarning(diff) ? 'text-orange' : 'text-primary'"
 					:title="getVersionLabel(diff)"
 				>
 					{{ getVersionLabel(diff) }}
@@ -112,7 +112,7 @@
 		</div>
 
 		<template #actions>
-			<div v-if="warnOnExternalFiles && hasExternalDiffs" class="flex flex-col gap-6 p-2">
+			<div v-if="hasExternalDiffs" class="flex flex-col gap-6 p-2">
 				<p class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
 				<div class="flex justify-end gap-2">
 					<ButtonStyled type="transparent" color="orange">
@@ -189,7 +189,7 @@ const props = defineProps<{
 	showBackupCreator?: boolean
 	removedLabel?: string
 	disableClose?: boolean
-	warnOnExternalFiles?: boolean
+	showExternalWarnings?: boolean
 	versionDate?: string
 }>()
 
@@ -208,11 +208,13 @@ const buttonsDisabled = ref(false)
 const removedCount = computed(() => props.diffs.filter((d) => d.type === 'removed').length)
 const addedCount = computed(() => props.diffs.filter((d) => d.type === 'added').length)
 const updatedCount = computed(() => props.diffs.filter((d) => d.type === 'updated').length)
-const hasExternalDiffs = computed(() => props.diffs.some((diff) => diff.external))
+const hasExternalDiffs = computed(() => props.diffs.some(showExternalWarning))
 
 const sortedDiffs = computed(() =>
 	[...props.diffs].sort((a, b) => {
-		if (Boolean(a.external) !== Boolean(b.external)) return a.external ? -1 : 1
+		const aExternal = showExternalWarning(a)
+		const bExternal = showExternalWarning(b)
+		if (aExternal !== bExternal) return aExternal ? -1 : 1
 
 		const typeOrder = { added: 0, updated: 1, removed: 2 }
 		return typeOrder[a.type] - typeOrder[b.type]
@@ -220,14 +222,18 @@ const sortedDiffs = computed(() =>
 )
 
 function getDiffTypeLabel(diff: ContentDiffItem) {
-	if (props.warnOnExternalFiles) return formatMessage(externalDiffTypeMessages[diff.type])
+	if (showExternalWarning(diff)) return formatMessage(externalDiffTypeMessages[diff.type])
 	if (diff.type === 'removed' && props.removedLabel) return props.removedLabel
 	return formatMessage(diffTypeMessages[diff.type])
 }
 
 function getVersionLabel(diff: ContentDiffItem) {
-	if (diff.external && diff.fileName) return decodeURIComponent(diff.fileName)
+	if (showExternalWarning(diff) && diff.fileName) return decodeURIComponent(diff.fileName)
 	return diff.type === 'removed' ? diff.currentVersionName : diff.newVersionName
+}
+
+function showExternalWarning(diff: ContentDiffItem) {
+	return Boolean(props.showExternalWarnings && diff.external && diff.type !== 'removed')
 }
 
 function show(e?: MouseEvent) {
@@ -290,7 +296,7 @@ const messages = defineMessages({
 	},
 	dontInstall: {
 		id: 'content.diff-modal.dont-install',
-		defaultMessage: 'Dont install',
+		defaultMessage: "Don't install",
 	},
 })
 

@@ -7,7 +7,7 @@
 		"
 		:diffs="normalizedDiffs"
 		:version-date="versionDate"
-		warn-on-external-files
+		:show-external-warnings="showExternalWarnings"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:removed-label="formatMessage(messages.removed)"
@@ -75,6 +75,10 @@ type ProjectInfo = {
 const { formatMessage } = useVIntl()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
+
+defineProps<{
+	showExternalWarnings?: boolean
+}>()
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
