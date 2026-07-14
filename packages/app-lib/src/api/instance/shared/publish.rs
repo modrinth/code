@@ -729,6 +729,7 @@ pub(super) async fn upload_external_files(
         let checksum = BASE64_STANDARD.encode(Sha256::digest(&bytes));
         let response = REQWEST_CLIENT
             .put(&upload.url)
+            .header("x-amz-sdk-checksum-algorithm", "SHA256")
             .header("x-amz-checksum-sha256", checksum)
             .body(bytes)
             .send()
