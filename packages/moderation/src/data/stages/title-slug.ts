@@ -100,7 +100,6 @@ export default stageFn((project) =>
 										.children(
                       //TODO: probably make this reset to current slug if you clear it?
 											text('correct_slug')
-                        .title('Correct Slug')
                         .initial(project.slug),
 											button('Auto')
 												.enabled(project.slug !== generateUrlSlug(project.name))

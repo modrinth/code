@@ -34,7 +34,7 @@ export default stageFn((project) => stage('rule-following', 'Rule Following')
 						}),
 				)
 				.children(
-					group('options').multiSelect().children(
+					group('options').multiSelect().title('Which Prohibited Content rules does this project violate?').children(
 						option('objectionable', 'Objectionable'),
 						option('discriminatory', 'Discriminatory or Explicit'),
 						option('ip-infringement', 'IP Infringement'),
@@ -82,7 +82,7 @@ export default stageFn((project) => stage('rule-following', 'Rule Following')
 						}),
 				)
 				.children(
-					group('options').multiSelect().children(
+					group('options').multiSelect().title('Which features require a Server-side Opt-in?').children(
 						option('x-ray', 'X-ray'),
 						option('aim-bot', 'Aim Assist'),
 						option('movement', 'Movement'),
