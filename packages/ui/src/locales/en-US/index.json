@@ -456,7 +456,7 @@
     "defaultMessage": "Updated"
   },
   "content.diff-modal.dont-install": {
-    "defaultMessage": "Dont install"
+    "defaultMessage": "Don't install"
   },
   "content.diff-modal.external-diff-type.added": {
     "defaultMessage": "Added"
