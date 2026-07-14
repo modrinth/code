@@ -17,12 +17,14 @@
 					</template>
 					<template #header-select>
 						<Checkbox
+							class="h-full w-full justify-center"
 							:model-value="allTransferableProjectsSelected"
 							@update:model-value="toggleAllTransferableProjects()"
 						/>
 					</template>
 					<template #cell-select="{ row: project }">
 						<Checkbox
+							class="h-full w-full justify-center"
 							:disabled="isProjectTransferDisabled(project)"
 							:model-value="isProjectSelected(project)"
 							@update:model-value="toggleProjectSelection(project)"
@@ -117,8 +119,8 @@ const projectTableColumns = [
 	{
 		key: 'select',
 		width: '3rem',
-		headerClass: '!text-center',
-		cellClass: '!overflow-visible',
+		headerClass: '!p-0',
+		cellClass: '!overflow-visible !p-0',
 	},
 	{
 		key: 'name',
