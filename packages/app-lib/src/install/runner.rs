@@ -1,11 +1,11 @@
 use super::events::{InstallProgressReporter, emit_install_job};
 use super::model::{
-    InstallCleanup, InstallErrorView, InstallJobDisplay, InstallJobSnapshot,
-    InstallJobState, InstallJobStatus, InstallPhaseDetails, InstallPhaseId,
-    InstallPostInstallEdit, InstallRequest, InstallRollbackState,
-    InstallTarget,
+    InstallCleanup, InstallErrorContext, InstallErrorView, InstallJobDisplay,
+    InstallJobEventKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
+    InstallPhaseDetails, InstallPhaseId, InstallPostInstallEdit,
+    InstallRequest, InstallRollbackState, InstallTarget,
 };
-use super::{recovery, store};
+use super::{diagnostics, recovery, store};
 use crate::ErrorKind;
 use crate::api::pack::install_from::{
     CreatePackLocation, generate_pack_from_file,
@@ -108,6 +108,12 @@ pub async fn get_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     Ok(store::get_required(job_id, &state).await?.snapshot())
 }
 
+pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
+    let state = State::get().await?;
+    let job = store::get_required(job_id, &state).await?;
+    diagnostics::build_job_support_details(&job, &state).await
+}
+
 pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
@@ -127,10 +133,15 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.cleanup = job.state.request.cleanup();
     job.state.rollback = None;
     job.state.error = None;
+    job.state.rollback_error = None;
+    job.state.context = None;
     job.state.progress.phase = InstallPhaseId::PreparingInstance;
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
     prepare_initial_instance(&mut job.state, &state).await?;
+    job.state.record_event(InstallJobEventKind::JobQueued {
+        kind: job.state.request.kind(),
+    });
 
     let record = store::update_status(
         job_id,
@@ -156,11 +167,35 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .into());
     }
 
-    job.state.error = Some(InstallErrorView {
-        code: "canceled".to_string(),
-        message: "Install was canceled".to_string(),
+    let canceled_phase = job.state.progress.phase;
+    job.state.error = Some(InstallErrorView::from_message(
+        "canceled",
+        canceled_phase,
+        "Install was canceled",
+    ));
+    job.state.record_event(InstallJobEventKind::JobCanceled {
+        phase: canceled_phase,
     });
-    recovery::apply_cleanup(&job.state, &state).await?;
+    job.state
+        .record_event(InstallJobEventKind::RollbackStarted {
+            cleanup: job.state.cleanup.clone(),
+        });
+    match recovery::apply_cleanup(&job.state, &state).await {
+        Ok(()) => job
+            .state
+            .record_event(InstallJobEventKind::RollbackCompleted),
+        Err(error) => {
+            job.state.rollback_error = Some(InstallErrorView::from_error(
+                "rollback_error",
+                InstallPhaseId::RollingBack,
+                &error,
+                None,
+            ));
+            job.state.record_event(InstallJobEventKind::RollbackFailed {
+                message: error.to_string(),
+            });
+        }
+    }
     clear_deleted_new_instance_id(&mut job.state);
     let record = store::update_status(
         job_id,
@@ -328,13 +363,21 @@ fn spawn_job(job_id: Uuid) {
 
 async fn run_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-    let job = store::get_required(job_id, &state).await?;
+    let mut job = store::get_required(job_id, &state).await?;
+
+    if job.status != InstallJobStatus::Queued {
+        return Ok(());
+    }
+
+    let _install_permit = state.install_job_semaphore.acquire().await?;
+    job = store::get_required(job_id, &state).await?;
 
     if job.status != InstallJobStatus::Queued {
         return Ok(());
     }
 
     let mut job_state = job.state.clone();
+    job_state.record_event(InstallJobEventKind::JobStarted);
     let record = store::update_status(
         job_id,
         InstallJobStatus::Running,
@@ -345,16 +388,24 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
     emit_install_job(&record.snapshot()).await?;
 
     let result = run_request(job_id, &mut job_state, &state).await;
+    if let Ok(record) = store::get_required(job_id, &state).await {
+        job_state = record.state;
+    }
 
     match result {
         Ok(instance_id) => {
             if let Some(instance_id) = instance_id {
                 set_instance_id(&mut job_state, instance_id);
             }
+            job_state.record_event(InstallJobEventKind::JobSucceeded {
+                instance_id: current_instance_id(&job_state),
+            });
             job_state.progress.phase = InstallPhaseId::Finalizing;
             job_state.progress.progress = None;
             job_state.progress.details = InstallPhaseDetails::Empty;
             job_state.error = None;
+            job_state.rollback_error = None;
+            job_state.context = None;
             let record = store::update_status(
                 job_id,
                 InstallJobStatus::Succeeded,
@@ -365,11 +416,41 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             emit_install_job(&record.snapshot()).await?;
         }
         Err(error) => {
+            let failed_phase = job_state.progress.phase;
+            let error_view = install_error_view(
+                failed_phase,
+                &error,
+                job_state.context.clone(),
+            );
+            job_state.record_event(InstallJobEventKind::Failed {
+                phase: failed_phase,
+                code: error_view.code.clone(),
+                message: error_view.message.clone(),
+            });
+            job_state.error = Some(error_view);
             job_state.progress.phase = InstallPhaseId::RollingBack;
             job_state.progress.progress = None;
             job_state.progress.details = InstallPhaseDetails::Empty;
-            job_state.error = Some(install_error_view(&error));
-            recovery::apply_cleanup(&job_state, &state).await?;
+            job_state.record_event(InstallJobEventKind::RollbackStarted {
+                cleanup: job_state.cleanup.clone(),
+            });
+            if let Err(rollback_error) =
+                recovery::apply_cleanup(&job_state, &state).await
+            {
+                tracing::error!(
+                    "Error rolling back failed install job {job_id}: {rollback_error}"
+                );
+                job_state.rollback_error = Some(install_error_view(
+                    InstallPhaseId::RollingBack,
+                    &rollback_error,
+                    None,
+                ));
+                job_state.record_event(InstallJobEventKind::RollbackFailed {
+                    message: rollback_error.to_string(),
+                });
+            } else {
+                job_state.record_event(InstallJobEventKind::RollbackCompleted);
+            }
             clear_deleted_new_instance_id(&mut job_state);
             let record = store::update_status(
                 job_id,
@@ -812,6 +893,14 @@ async fn install_pack(
             title,
             icon_url,
         } => {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("download modpack file")
+                        .project_id(project_id.clone())
+                        .version_id(version_id.clone())
+                        .build(),
+                )
+                .await?;
             generate_pack_from_version_id_with_reporter(
                 project_id,
                 version_id,
@@ -824,6 +913,13 @@ async fn install_pack(
             .await?
         }
         CreatePackLocation::FromFile { path } => {
+            reporter
+                .set_context(
+                    InstallErrorContext::new("read local modpack file")
+                        .source_path(path.display().to_string())
+                        .build(),
+                )
+                .await?;
             generate_pack_from_file(path, instance_id.clone()).await?
         }
     };
@@ -887,9 +983,7 @@ async fn update_progress(
     phase: InstallPhaseId,
     details: InstallPhaseDetails,
 ) -> crate::Result<()> {
-    job_state.progress.phase = phase;
-    job_state.progress.progress = None;
-    job_state.progress.details = details;
+    job_state.set_progress(phase, None, details);
     let record = store::update_state(job_id, job_state, state).await?;
     emit_install_job(&record.snapshot()).await?;
     Ok(())
@@ -934,19 +1028,86 @@ fn set_display(
     job_state.display = Some(InstallJobDisplay { title, icon });
 }
 
-fn install_error_view(error: &crate::Error) -> InstallErrorView {
+fn install_error_view(
+    phase: InstallPhaseId,
+    error: &crate::Error,
+    context: Option<InstallErrorContext>,
+) -> InstallErrorView {
+    InstallErrorView::from_error(
+        install_error_code(phase, error),
+        phase,
+        error,
+        context,
+    )
+}
+
+fn install_error_code(
+    phase: InstallPhaseId,
+    error: &crate::Error,
+) -> &'static str {
+    use InstallPhaseId::*;
+
     match error.raw.as_ref() {
-        ErrorKind::FetchError(_)
-        | ErrorKind::ApiIsDownError(_)
-        | ErrorKind::WSError(_)
-        | ErrorKind::WSClosedError(_) => InstallErrorView {
-            code: "network_error".to_string(),
-            message: "network_error".to_string(),
+        ErrorKind::InputError(_) => match phase {
+            PreparingInstance | Finalizing => "instance_error",
+            ResolvingPack | DownloadingPackFile | ReadingPackManifest => {
+                "pack_error"
+            }
+            DownloadingContent => "content_error",
+            ExtractingOverrides => "path_error",
+            PreparingJava => "java_error",
+            DownloadingMinecraft => "instance_error",
+            RollingBack => "rollback_error",
+            ResolvingMinecraft | ResolvingLoader | RunningLoaderProcessors => {
+                "launcher_error"
+            }
         },
-        _ => InstallErrorView {
-            code: "unknown_error".to_string(),
-            message: "unknown_error".to_string(),
+        ErrorKind::LauncherError(_) => match phase {
+            RunningLoaderProcessors => "processor_error",
+            PreparingJava => "java_error",
+            ResolvingLoader => "loader_error",
+            _ => "launcher_error",
         },
+        ErrorKind::JREError(_) => "java_error",
+        ErrorKind::NoValueFor(_) | ErrorKind::MetadataError(_) => match phase {
+            ResolvingLoader => "loader_error",
+            PreparingJava => "java_error",
+            _ => "metadata_error",
+        },
+        ErrorKind::FetchError(_) | ErrorKind::ApiIsDownError(_) => {
+            "network_error"
+        }
+        ErrorKind::Any(_)
+            if matches!(
+                phase,
+                DownloadingPackFile
+                    | DownloadingContent
+                    | ResolvingMinecraft
+                    | ResolvingLoader
+                    | PreparingJava
+                    | DownloadingMinecraft
+            ) =>
+        {
+            "network_error"
+        }
+        ErrorKind::LabrinthError(_) => "api_error",
+        ErrorKind::HashError(_, _) => "hash_error",
+        ErrorKind::ZipError(_) => "archive_error",
+        ErrorKind::DeserializationError(_) | ErrorKind::StripPrefixError(_) => {
+            "path_error"
+        }
+        ErrorKind::FSError(_)
+        | ErrorKind::IOError(_)
+        | ErrorKind::StdIOError(_)
+        | ErrorKind::UTFError(_) => "filesystem_error",
+        ErrorKind::INIError(_) | ErrorKind::JSONError(_) => "parse_error",
+        ErrorKind::Sqlx(_) | ErrorKind::SqlxMigrate(_) => "database_error",
+        ErrorKind::JoinError(_)
+        | ErrorKind::RecvError(_)
+        | ErrorKind::AcquireError(_)
+        | ErrorKind::EventError(_) => "internal_error",
+        ErrorKind::OtherError(_) | ErrorKind::Any(_) => "internal_error",
+        _ => "unknown_error",
     }
 }
 

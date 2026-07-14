@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Diğer çalışan kurulumları gizle"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopyalandı"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Detayları kopyala"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Reddet"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Yükleme yapılamadı"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Yükleme uygulama kapandığından yapılamadı."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Yükleme ağ hatasından dolayı yapılamadı."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Yükleme bilinmeyen bir hatadan yapılamadı."
   },
   "app.action-bar.install.open-instance": {
     "message": "Kurulumu aç"
   },
   "app.action-bar.install.retry": {
     "message": "Yeniden Dene"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Uygulama kapatıldığı için iptal edildi"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Mod paketi okunamadı"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "İptal edildi"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Temizleme bitmedi"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Dosyalar indirilemedi"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "İndirilmiş dosya bozuk"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Dosyalar kaydedilemedi"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "İndirme tamamlanamadı"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Kurulum bulunamadı"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Dosya yolu geçersiz"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Mod paketi verileri geçersiz"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Mod paketi dosyaları geçersiz meta verilere sahip"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java kurulumu bitirilemedi"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Yükleyici kurulumu başarısız oldu"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Yerel veriler güncellenemedi"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft kurulumu başarısız oldu"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth'e erişilemiyor"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Yazmak için yetkiniz yok"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Paket indirilemedi"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Bir sorun oluştu"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Bilinmeyen kurulum"
@@ -204,7 +258,7 @@
     "message": "Mod paketini dışa aktar"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Mod Paketi Adı"
+    "message": "Mod paketi adı"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Mod paketi adı"
@@ -231,7 +285,7 @@
     "message": "Tamamlanıyor"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Kurulum hazırlanıyor"
+    "message": "İndirmek için sıraya alındı"
   },
   "app.install.phase.preparing_java": {
     "message": "Java Hazırlanıyor"
@@ -410,11 +464,26 @@
   "app.project.install-button.already-installed": {
     "message": "Bu proje zaten kurulu"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Sürüm değiştir"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Keşfete geri dön"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "İçeriği kuruluma yükle"
+  },
+  "app.project.version.all-versions": {
+    "message": "Tüm sürümler"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Tarayıcıdan indir"
+  },
+  "app.project.version.installing": {
+    "message": "Yükleniyor"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Zaten yüklenmiş"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
@@ -535,6 +604,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "İnşaatçılar & Biyomlar"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Kaos Küpü"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Gökyüzünü kovala"

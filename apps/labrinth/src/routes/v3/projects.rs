@@ -2746,17 +2746,11 @@ pub async fn project_delete_internal(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
-    let was_in_tech_review =
-        delphi::is_project_in_tech_review(project.inner.id, &mut transaction)
-            .await?;
-
-    if was_in_tech_review {
-        delphi::send_tech_review_exit_file_deleted_message(
-            project.inner.id,
-            &mut transaction,
-        )
-        .await?;
-    }
+    delphi::tech_review_sync::sync_deleted_project_tech_review_exit(
+        project.inner.id,
+        &mut transaction,
+    )
+    .await?;
 
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),

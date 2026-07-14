@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Přidejte adresu Javy"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Přidejte platnou URL adresu a název nebo SPDX identifikátor pro vaší vlastní licenci."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Přidejte podrobnosti licence"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Přidejte jakékoli relevantní odkazy směřující mimo Modrinth, například na webové stránky, do obchodu nebo na pozvánku na Discord."
   },
@@ -28,6 +34,9 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Přidejte externí odkazy"
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Vyberte si přesné jazyky"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Vybrali jste {totalAvailableTags, plural, one {# dostupný tag} few {všechny # dostupné štítky} other {všech # dostupných štítků}}. Tím štítky ztrácejí účel, protože mají uživatelům pomáhat najít relevantní projekty. Vyberte prosím pouze štítky, které jsou pro váš projekt relevantní."
@@ -220,6 +229,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Odstraňte technické údaje z názvu"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Vyberte si přesné jazyky"
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Vyberte si přesné jazyky"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Vybrali jste {tagCount, plural, one {# štítek} few {# štítky} other {# štítků}}. Prosíme, snižte je na {maxTagCount} nebo méně, abyste zajistili, že se váš server zobrazí v relevantních výsledcích vyhledávání."

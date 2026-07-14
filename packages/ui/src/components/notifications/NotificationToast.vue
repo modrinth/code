@@ -138,13 +138,17 @@
 					</div>
 				</div>
 				<div
-					v-if="type === 'instance-download' && actionLabel"
-					class="col-start-1 row-start-3 mt-2 flex min-w-0 items-center gap-2"
+					v-if="type === 'instance-download' && actions?.length"
+					class="col-start-1 col-end-3 row-start-3 mt-2 flex min-w-0 flex-wrap items-center gap-2"
 				>
-					<ButtonStyled color="brand">
-						<button @click="$emit('action')">
-							<component :is="actionIcon" v-if="actionIcon" />
-							{{ actionLabel }}
+					<ButtonStyled
+						v-for="(action, index) in actions"
+						:key="index"
+						:color="action.color || (index === 0 ? 'brand' : undefined)"
+					>
+						<button class="!shadow-none" @click="$emit('action', index)">
+							<component :is="action.icon" v-if="action.icon" />
+							{{ action.label }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -172,10 +176,10 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { type Component, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
-import type { PopupNotificationProgressType } from '../../providers'
+import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
 import { truncatedTooltip } from '../../utils/truncate'
 import Avatar from '../base/Avatar.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -202,8 +206,7 @@ const props = withDefaults(
 		progressType?: PopupNotificationProgressType
 		progressCurrent?: number
 		progressTotal?: number
-		actionLabel?: string
-		actionIcon?: Component
+		actions?: PopupNotificationButton[]
 	}>(),
 	{
 		actorName: null,
@@ -221,7 +224,7 @@ defineEmits<{
 	accept: []
 	decline: []
 	dismiss: []
-	action: []
+	action: [index: number]
 	launch: []
 	'open-actor': []
 	'open-instance': []

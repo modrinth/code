@@ -3,7 +3,7 @@
     "message": "Скачивание Java {version}"
   },
   "app.action-bar.downloading-update": {
-    "message": "Скачивание"
+    "message": "Скачивание обновления"
   },
   "app.action-bar.downloads": {
     "message": "Загрузки"
@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Скрыть другие активные сборки"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Скопировано"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Копировать"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Закрыть"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Установка не удалась"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Установка не удалась из-за закрытия приложения."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Установка не удалась из-за сетевой ошибки."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Установка не удалась из-за неизвестной ошибки."
   },
   "app.action-bar.install.open-instance": {
     "message": "Открыть сборку"
   },
   "app.action-bar.install.retry": {
     "message": "Повторить"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Отменено из‑за закрытия приложения"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Не удалось прочитать сборку"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Отменено"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Очистка прервана"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Не удалось скачать файлы"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Скачанный файл повреждён"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Не удалось сохранить файлы"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Скачивание прервано"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Сборка не найдена"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Неверный путь к файлу"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Неверные данные сборки"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Неверные метаданные в файлах сборки "
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Установка Java прервана"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Не удалось установить загрузчик"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Не удалось обновить локальные данные"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Не удалось установить Minecraft"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Не удалось подключиться к Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Нет разрешения на запись"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Не удалось скачать сборку"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Произошла ошибка"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Неизвестная сборка"
@@ -51,7 +105,7 @@
     "message": "Основная сборка"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Перезапустить"
+    "message": "Перезапустить и обновить"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Показать другие активные сборки"
@@ -129,10 +183,10 @@
     "message": "Время игры"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Автоматически пропускает подтверждения с низким уровнем риска, такие как установка дубликатов сборок, обычное удаление контента, массовые обновления, отключение сборок и запросы на восстановление. Опасные предупреждения по-прежнему будут отображаться."
+    "message": "Скрывать малозначимые подтверждения: установку копий сборок, обычное удаление контента, массовые обновления, отвязку и исправление сборок. Критические предупреждения останутся."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Пропустить несущественные предупреждения"
+    "message": "Только опасные предупреждения"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Показывать кнопку скрытия боковой панели."
@@ -225,13 +279,13 @@
     "message": "Скачивание файла сборки"
   },
   "app.install.phase.extracting_overrides": {
-    "message": "Извлечение переопределений"
+    "message": "Распаковка переопределений"
   },
   "app.install.phase.finalizing": {
     "message": "Завершение"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Подготовка сборки"
+    "message": "В очереди на установку"
   },
   "app.install.phase.preparing_java": {
     "message": "Подготовка Java"
@@ -254,11 +308,14 @@
   "app.install.phase.reading_pack_manifest": {
     "message": "Чтение манифеста сборки"
   },
+  "app.install.phase.resolving_loader": {
+    "message": "Разрешение загрузчика"
+  },
   "app.install.phase.resolving_minecraft": {
-    "message": "Загрузка версий"
+    "message": "Разрешение Minecraft"
   },
   "app.install.phase.resolving_pack": {
-    "message": "Загрузка контента"
+    "message": "Разрешение контента"
   },
   "app.install.phase.rolling_back": {
     "message": "Откат"
@@ -291,13 +348,13 @@
     "message": "Сборка"
   },
   "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Скачивание {current, number}/{total, number} проектов..."
+    "message": "Скачивание проектов: {current, number}/{total, number}..."
   },
   "app.instance.mods.bulk-update.finishing": {
     "message": "Завершение обновления..."
   },
   "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Загрузка версий..."
+    "message": "Разрешение версий..."
   },
   "app.instance.mods.content-type-project": {
     "message": "проект"
@@ -321,7 +378,7 @@
     "message": "Найти серверы"
   },
   "app.instance.worlds.delete-world-modal.delete-button": {
-    "message": "Удалить"
+    "message": "Удалить мир"
   },
   "app.instance.worlds.delete-world-modal.title": {
     "message": "Удаление мира"
@@ -351,7 +408,7 @@
     "message": "Нет серверов и миров"
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
-    "message": "Удалить"
+    "message": "Удалить сервер"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Удаление сервера"
@@ -401,11 +458,26 @@
   "app.project.install-button.already-installed": {
     "message": "Этот проект уже установлен"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Сменить версию"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Вернуться к поиску"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Установка контента в сборку"
+  },
+  "app.project.version.all-versions": {
+    "message": "Все версии"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Скачать в браузере"
+  },
+  "app.project.version.installing": {
+    "message": "Установка"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Уже установлено"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
@@ -519,13 +591,16 @@
     "message": "Не так быстро!"
   },
   "app.skins.reorder-error.text": {
-    "message": "Ваш порядок скинов не удалось сохранить."
+    "message": "Порядок скинов не сохранился."
   },
   "app.skins.reorder-error.title": {
     "message": "Не удалось изменить порядок скинов"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -900,7 +975,7 @@
     "message": "Выделенная память"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/path/to/java"
+    "message": "/путь/к/java"
   },
   "instance.settings.tabs.window": {
     "message": "Окно"

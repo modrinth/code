@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Ocultar mais instâncias em execução"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Copiado"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copiar detalhes"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Dispensar"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Instalação falha"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "A instalação falhou devido ao aplicativo ter fechado."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "A instalação falhou devido a um erro na rede."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "A instalação falhou devido a um erro desconhecido."
   },
   "app.action-bar.install.open-instance": {
     "message": "Abrir instância"
   },
   "app.action-bar.install.retry": {
     "message": "Tentar novamente"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Cancelado devido ao aplicativo ter fechado"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Não foi possível ler o pacote de mods"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Cancelado"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "A limpeza não foi finalizada"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Não foi possível baixar os arquivos"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "O arquivo baixado é corrupto"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Não foi possível salvar os arquivos"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "A transferência não foi finalizada"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instância não encontrada"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "O caminho do arquivo é inválido"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Os dados do pacote de mods é inválido"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Os arquivos do pacote de mods possui metadados inválidos"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Configuração Java não foi finalizada"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Falha na configuração do loader"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Não foi atualizar os dados locais"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Falha na configuração do Minecraft"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Não foi possível alcançar o Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Sem permissão para escrita"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Não foi possível baixar o pacote"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Algo deu errado"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Instância desconhecida"
@@ -231,7 +285,7 @@
     "message": "Finalizando"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Preparando instância"
+    "message": "Na fila"
   },
   "app.install.phase.preparing_java": {
     "message": "Preparando Java"
@@ -410,11 +464,26 @@
   "app.project.install-button.already-installed": {
     "message": "Este projeto já foi instalado"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Trocar versão"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Voltar a descobrir"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Instalar conteúdo para a instância"
+  },
+  "app.project.version.all-versions": {
+    "message": "Todas as versões"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Baixar no navegador"
+  },
+  "app.project.version.installing": {
+    "message": "Instalando"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Já instalado"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desenvolvedor ativado."
@@ -536,6 +605,9 @@
   "app.skins.section.builders-and-biomes": {
     "message": "Construtores & Biomas"
   },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
+  },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
   },
@@ -600,7 +672,7 @@
     "message": "Mudanças"
   },
   "app.update-popup.download": {
-    "message": "Baixar ({size})"
+    "message": "Instalar ({size})"
   },
   "app.update-popup.download-complete": {
     "message": "Instalação concluída"

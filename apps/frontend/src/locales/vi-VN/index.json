@@ -3071,14 +3071,8 @@
   "project.download.no-app": {
     "message": "Chưa có Ứng dụng Modrinth?"
   },
-  "project.download.no-versions-available": {
-    "message": "Không có phiên bản khả dụng cho {gameVersion} và {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {platform} cho {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Tìm kiếm phiên bản game..."
   },
   "project.download.select-game-version": {
     "message": "Chọn phiên bản game"

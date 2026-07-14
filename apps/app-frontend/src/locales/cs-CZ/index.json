@@ -11,26 +11,20 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Skrýt více spuštěných instancí"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Zkopírováno"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Instalace selhala"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Instalace selhala kvůli zavření aplikace."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Instalace selhala kvůli chybě sítě."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Instalace selhala kvůli neznámé chybě."
   },
   "app.action-bar.install.open-instance": {
     "message": "Otevřít instanci"
   },
   "app.action-bar.install.retry": {
     "message": "Zkusit znovu"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Zrušeno"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Neznámá instance"
@@ -179,9 +173,6 @@
   "app.browse.discover-servers": {
     "message": "Objevit servery"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Skrýt již přidané servery"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacky"
   },
@@ -231,7 +222,7 @@
     "message": "Dokončení instalace"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Příprava instance"
+    "message": "Ve frontě na instalaci"
   },
   "app.install.phase.preparing_java": {
     "message": "Příprava Javy"
@@ -410,11 +401,23 @@
   "app.project.install-button.already-installed": {
     "message": "Tento projekt je již nainstalován"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Změnit verzi"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Zpět k Objevování"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Nainstalovat obsah do instance"
+  },
+  "app.project.version.all-versions": {
+    "message": "Všechny verze"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Stáhnout v prohlížeči"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Již staženo"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
@@ -535,6 +538,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"

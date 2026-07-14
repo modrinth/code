@@ -61,11 +61,16 @@ pub async fn edit(
     let state = State::get().await?;
     crate::state::edit_instance(instance_id, patch, &state.pool).await?;
 
-    crate::state::get_instance(instance_id, &state.pool)
+    let instance = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string()).into()
-        })
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+                .as_error()
+        })?;
+
+    emit_instance(&instance.instance.id, InstancePayloadType::Edited).await?;
+
+    Ok(instance)
 }
 
 pub async fn edit_icon(

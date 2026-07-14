@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "新增 Java 位址"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "為你的自訂授權條款新增有效的網址，以及名稱或 SPDX 識別碼。"
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "新增授權條款詳細資訊"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "新增 Modrinth 以外的任何相關連結，例如網站、商店或 Discord 邀請連結。"
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "你選擇了所有可用的語言選項。請只列出你的伺服器目前實際支援的語言。"
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "選擇精確的語言"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "你選擇了全部 {totalAvailableTags, plural, other {# 個可用標籤}}。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
@@ -221,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "你選擇了 {languageCount, plural, other {# 種語言}}。請只列出你的伺服器目前實際支援的語言。"
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "選擇精確的語言"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "你選擇了 {tagCount, plural, other {# 個標籤}}。請減少到 {maxTagCount} 個或更少，以確保你的伺服器出現在相關的搜尋結果中。"
   },
@@ -234,10 +252,10 @@
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "你的{type}至少需要一張圖庫圖片，以展示其內容。"
+    "defaultMessage": "需要至少一張圖庫圖片來展示你的{type}。"
   },
   "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "資源包（音效包或在地化語言包除外）。如果你的資源包屬於此類，請選擇對應的標籤"
+    "defaultMessage": "資源包（音效包或在地化語言包除外）。如果你的資源包屬於上述類型，請選擇對應的標籤"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

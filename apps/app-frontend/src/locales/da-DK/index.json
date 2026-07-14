@@ -11,6 +11,18 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Gem flere kørende instances"
   },
+  "app.action-bar.install.dismiss": {
+    "message": "Tilsidesæt"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Åben instance"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Prøv igen"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Ukendt instance"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Gør til primære instance"
   },
@@ -141,7 +153,7 @@
     "message": "Opdag servere"
   },
   "app.browse.hide-added-servers": {
-    "message": "Gem allerede tilføjet til servere"
+    "message": "Gem servere som allerede er tilføjet"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -165,7 +177,7 @@
     "message": "Eksporter modpack"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpack Navn"
+    "message": "Modpack navn"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack navn"
@@ -175,6 +187,15 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Downloader indhold"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Downloader Minecraft"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Downloader Java {version}"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
@@ -199,6 +220,9 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Downloader {current, number}/{total, number} projekter..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -289,6 +313,9 @@
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Installer indhold til instance"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Allerede installeret"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Udvikler-tilstand aktiveret."
@@ -395,6 +422,9 @@
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
+  },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
   },
@@ -463,6 +493,9 @@
   },
   "app.update-popup.download-complete": {
     "message": "Download færdiggjort"
+  },
+  "app.update-popup.reload": {
+    "message": "Genindlæs for at opdater"
   },
   "app.update-popup.title": {
     "message": "Opdatering tilgængelig"
@@ -661,6 +694,12 @@
   },
   "instance.settings.tabs.general.name": {
     "message": "Navn"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "Alpha"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "Beta"
   },
   "instance.settings.tabs.hooks": {
     "message": "Startkommandoer"

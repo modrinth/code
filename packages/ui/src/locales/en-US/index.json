@@ -240,7 +240,7 @@
     "defaultMessage": "Re-install modpack"
   },
   "button.remove": {
-    "defaultMessage": "Delete passkey"
+    "defaultMessage": "Remove"
   },
   "button.remove-image": {
     "defaultMessage": "Remove image"
@@ -1141,6 +1141,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Remove group"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Could not remove group"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remove from group"
@@ -3571,6 +3577,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Show more"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Advanced"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Exclude data packs"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Exclude mods"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Exclude plugins"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"

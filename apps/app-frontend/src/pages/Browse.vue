@@ -49,6 +49,7 @@ import {
 	get_installed_project_ids as getInstalledProjectIds,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_instance_worlds } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
@@ -883,7 +884,7 @@ async function search(requestParams: string) {
 	const rawResults = await queryClient.fetchQuery({
 		queryKey: ['search', 'v3', requestParams],
 		queryFn: () =>
-			get_search_results_v3(requestParams) as Promise<{
+			get_search_results_v3(requestParams, 'must_revalidate') as Promise<{
 				result: Labrinth.Search.v3.SearchResults & {
 					hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
 				}
@@ -1041,10 +1042,24 @@ function getProjectBrowseQuery() {
 	}
 }
 
+const advancedFiltersCollapsed = computed({
+	get: () => themeStore.getFeatureFlag('advanced_filters_collapsed'),
+	set: (value) => {
+		themeStore.featureFlags['advanced_filters_collapsed'] = value
+		getSettings()
+			.then((settings) => {
+				settings.feature_flags['advanced_filters_collapsed'] = value
+				return setSettings(settings)
+			})
+			.catch(handleError)
+	},
+})
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
+	advancedFiltersCollapsed,
 	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),

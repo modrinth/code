@@ -2855,14 +2855,8 @@
   "project.download.no-app": {
     "message": "Не маєте Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Немає доступних версій для {gameVersion} та {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не підтримує {platform} для {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Пошук версій гри…"
   },
   "project.download.select-game-version": {
     "message": "Виберіть версію гри"
