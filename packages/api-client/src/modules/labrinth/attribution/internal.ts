@@ -1,5 +1,5 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { Labrinth } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { Labrinth } from '../types'
 
 const BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
@@ -61,6 +61,21 @@ export class LabrinthAttributionInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'PATCH',
 			body,
+		})
+	}
+
+	/**
+	 * Delete an attribution group and all files inside it.
+	 * DELETE /_internal/attribution/group/{group_id}
+	 *
+	 * @param groupId - The base62 attribution group id (as returned from listProjectAttribution).
+	 */
+	public async deleteGroup(groupId: string): Promise<void> {
+		const numericId = decodeBase62Id(groupId)
+		return this.client.request<void>(`/attribution/group/${numericId}`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
 		})
 	}
 

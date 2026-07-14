@@ -1,5 +1,5 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { Archon } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { Archon } from '../types'
 
 /**
  * @deprecated Use `client.archon.backups_queue_v1` (Backups Queue API) instead.

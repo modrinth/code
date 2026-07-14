@@ -1,4 +1,4 @@
-import type { Archon } from '../modules/archon/types.js'
+import type { Archon } from '../modules/archon/types'
 
 export type ParsedSseEvent = {
 	kind: 'event'

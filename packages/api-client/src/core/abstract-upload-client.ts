@@ -1,4 +1,4 @@
-import type { UploadHandle, UploadRequestOptions } from '../types/upload.js'
+import type { UploadHandle, UploadRequestOptions } from '../types/upload'
 
 /**
  * Abstract base class defining upload capability

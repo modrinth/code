@@ -1,4 +1,4 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
+import { AbstractModule } from '../../../core/abstract-module'
 
 export class KyrosLogsV1Module extends AbstractModule {
 	public getModuleID(): string {

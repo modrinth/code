@@ -1,4 +1,4 @@
-import type { RequestOptions } from '../types/request.js'
+import type { RequestOptions } from '../types/request'
 
 export function appendRequestParams(url: string, params?: RequestOptions['params']): string {
 	if (!params) return url

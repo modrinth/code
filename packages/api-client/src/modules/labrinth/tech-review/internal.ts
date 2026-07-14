@@ -1,5 +1,5 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { Labrinth } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { Labrinth } from '../types'
 
 export class LabrinthTechReviewInternalModule extends AbstractModule {
 	public getModuleID(): string {
@@ -100,14 +100,59 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 */
 	public async updateIssueDetail(
 		detailId: string,
-		data: Labrinth.TechReview.Internal.UpdateIssueRequest,
+		data: Labrinth.TechReview.Internal.UpdateIssueDetailRequest,
 	): Promise<void> {
-		return this.client.request<void>(`/moderation/tech-review/issue-detail/${detailId}`, {
+		return this.updateIssueDetails([{ detail_id: detailId, verdict: data.verdict }])
+	}
+
+	public async updateIssueDetails(
+		data: Labrinth.TechReview.Internal.UpdateIssueRequest[],
+	): Promise<void> {
+		return this.client.request<void>('/moderation/tech-review/issue-detail', {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'PATCH',
 			body: data,
 		})
+	}
+
+	public async updateGlobalIssueDetails(
+		data: Labrinth.TechReview.Internal.UpdateGlobalIssueRequest[],
+	): Promise<void> {
+		return this.client.request<void>('/moderation/tech-review/global-issue-detail', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	public async searchGlobalIssueDetails(
+		params: Labrinth.TechReview.Internal.SearchGlobalIssueDetailsRequest,
+	): Promise<Labrinth.TechReview.Internal.SearchGlobalIssueDetailsResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.SearchGlobalIssueDetailsResponse>(
+			'/moderation/tech-review/global-issue-detail/search',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: params,
+			},
+		)
+	}
+
+	public async getGlobalIssueDetail(
+		params: Labrinth.TechReview.Internal.GetGlobalIssueDetailRequest,
+	): Promise<Labrinth.TechReview.Internal.GetGlobalIssueDetailResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.GetGlobalIssueDetailResponse>(
+			'/moderation/tech-review/global-issue-detail/local-traces',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: params,
+			},
+		)
 	}
 
 	public async submitProject(

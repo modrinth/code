@@ -1,8 +1,8 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { UploadHandle, UploadProgress } from '../../../types/upload.js'
-import { getNodeBaseUrl } from '../../../utils/node-url.js'
-import type { Archon } from '../../archon/types.js'
-import type { Kyros } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import { getNodeBaseUrl } from '../../../utils/node-url'
+import type { Archon } from '../../archon/types'
+import type { Kyros } from '../types'
 
 type NodeFsAuth = Pick<Archon.Servers.v0.JWTAuth, 'url' | 'token'>
 

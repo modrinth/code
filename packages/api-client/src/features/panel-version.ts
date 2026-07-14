@@ -1,5 +1,5 @@
-import { AbstractFeature } from '../core/abstract-feature.js'
-import type { RequestContext } from '../types/request.js'
+import { AbstractFeature } from '../core/abstract-feature'
+import type { RequestContext } from '../types/request'
 
 export const PANEL_VERSION = 1
 

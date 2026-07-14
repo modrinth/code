@@ -1,7 +1,7 @@
-import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature.js'
-import { ModrinthApiError } from '../core/errors.js'
-import type { RequestContext } from '../types/request.js'
-import { getNodeBaseUrl } from '../utils/node-url.js'
+import { AbstractFeature, type FeatureConfig } from '../core/abstract-feature'
+import { ModrinthApiError } from '../core/errors'
+import type { RequestContext } from '../types/request'
+import { getNodeBaseUrl } from '../utils/node-url'
 
 /**
  * Node authentication credentials

@@ -1,5 +1,5 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { Archon } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { Archon } from '../types'
 
 export class ArchonServerUsersV1Module extends AbstractModule {
 	public getModuleID(): string {

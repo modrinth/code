@@ -1,12 +1,12 @@
 import { $fetch, FetchError } from 'ofetch'
 
-import { ModrinthApiError } from '../core/errors.js'
-import type { ClientConfig } from '../types/client.js'
-import type { RequestOptions } from '../types/request.js'
-import { appendRequestParams, parseResponseErrorData, toFetchBody } from '../utils/fetch.js'
-import { GenericSyncClient } from './sync-generic.js'
-import { GenericWebSocketClient } from './websocket-generic.js'
-import { XHRUploadClient } from './xhr-upload-client.js'
+import { ModrinthApiError } from '../core/errors'
+import type { ClientConfig } from '../types/client'
+import type { RequestOptions } from '../types/request'
+import { appendRequestParams, parseResponseErrorData, toFetchBody } from '../utils/fetch'
+import { GenericSyncClient } from './sync-generic'
+import { GenericWebSocketClient } from './websocket-generic'
+import { XHRUploadClient } from './xhr-upload-client'
 
 /**
  * Generic platform client using ofetch

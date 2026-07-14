@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { UploadHandle, UploadProgress } from '../../../types/upload.js'
-import type { Kyros } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import type { Kyros } from '../types'
 
 export type UploadSessionFile = {
 	file: File | Blob

@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { UploadHandle, UploadProgress } from '../../../types/upload.js'
-import type { Archon } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle, UploadProgress } from '../../../types/upload'
+import type { Archon } from '../types'
 
 export class ArchonServersV0Module extends AbstractModule {
 	public getModuleID(): string {

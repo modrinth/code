@@ -1,5 +1,5 @@
-import type { AbstractFeature } from '../core/abstract-feature.js'
-import type { RequestContext } from './request.js'
+import type { AbstractFeature } from '../core/abstract-feature'
+import type { RequestContext } from './request'
 
 export type MaybePromise<T> = T | Promise<T>
 export type UserAgentProvider = string | (() => MaybePromise<string | undefined>)

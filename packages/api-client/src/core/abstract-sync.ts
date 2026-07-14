@@ -1,7 +1,7 @@
 import type mitt from 'mitt'
 
-import type { Archon } from '../modules/archon/types.js'
-import type { RequestOptions } from '../types/request.js'
+import type { Archon } from '../modules/archon/types'
+import type { RequestOptions } from '../types/request'
 
 export type SyncEventType = Archon.Sync.v1.SyncEvent['type']
 

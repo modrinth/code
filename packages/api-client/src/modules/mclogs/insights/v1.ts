@@ -1,5 +1,5 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import type { Mclogs } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import type { Mclogs } from '../types'
 
 export class MclogsInsightsV1Module extends AbstractModule {
 	public getModuleID(): string {

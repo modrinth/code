@@ -1,4 +1,4 @@
-import type { NodeAuth } from '../features/node-auth.js'
+import type { NodeAuth } from '../features/node-auth'
 
 /**
  * Global node auth state.

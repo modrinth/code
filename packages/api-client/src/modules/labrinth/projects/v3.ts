@@ -1,6 +1,6 @@
-import { AbstractModule } from '../../../core/abstract-module.js'
-import { ModrinthApiError } from '../../../core/errors.js'
-import type { Labrinth } from '../types.js'
+import { AbstractModule } from '../../../core/abstract-module'
+import { ModrinthApiError } from '../../../core/errors'
+import type { Labrinth } from '../types'
 
 export class LabrinthProjectsV3Module extends AbstractModule {
 	public getModuleID(): string {
