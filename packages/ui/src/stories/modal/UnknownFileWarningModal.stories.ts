@@ -33,6 +33,10 @@ export const Modpack: Story = {
 				:external-files-in-modpack="[
 					'voicechat-fabric-1.20.1-2.5.26.jar',
 					'xaeros-minimap-24.6.1_Fabric_1.20.jar',
+					'InventoryProfilesNext-forge-1.20.1-1.10.12.jar',
+					'MouseTweaks-forge-mc1.20.1-2.25.jar',
+					'Terralith_1.20.x_v2.5.4.jar',
+					'YungsApi-1.20-Forge-4.0.5.jar',
 				]"
 			/>
 		`,

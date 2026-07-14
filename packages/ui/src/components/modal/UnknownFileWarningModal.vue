@@ -3,6 +3,7 @@
 		ref="modal"
 		:header="formatMessage(messages.header)"
 		:on-hide="handleHide"
+		:on-after-hide="handleAfterHide"
 		max-width="544px"
 		width="544px"
 	>
@@ -28,28 +29,52 @@
 
 			<div
 				v-if="mode === 'modpack'"
-				class="w-full overflow-hidden rounded-2xl border border-solid border-surface-4 shadow-sm"
+				class="relative w-full"
 			>
-				<table class="w-full border-collapse text-left">
-					<thead class="bg-surface-3 text-contrast">
-						<tr>
-							<th class="p-3 font-medium">
-								{{ formatMessage(messages.unrecognizedFiles) }}
-							</th>
-						</tr>
-					</thead>
-					<tbody class="text-primary">
-						<tr
-							v-for="(externalFile, index) in externalFilesInModpack"
-							:key="`${externalFile}-${index}`"
-							:class="index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
-						>
-							<td class="break-words border-0 border-t border-solid border-surface-4 p-3">
-								{{ externalFile }}
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<div
+					ref="externalFileTableBody"
+					class="max-h-[242px] overflow-y-auto rounded-2xl"
+					@scroll="checkTableScrollState"
+				>
+					<Table
+						:columns="externalFileColumns"
+						:data="externalFileRows"
+						row-key="id"
+						virtualized
+						:virtual-row-height="48"
+						class="shadow-sm"
+					>
+						<template #cell-name="{ value }">
+							<span class="block truncate" :title="String(value)">{{ value }}</span>
+						</template>
+					</Table>
+				</div>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-2"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-2"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showTableTopFade"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 rounded-t-2xl bg-gradient-to-b from-bg-raised to-transparent"
+					/>
+				</Transition>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-2"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-2"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showTableBottomFade"
+						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-2 bg-gradient-to-t from-bg-raised to-transparent"
+					/>
+				</Transition>
 			</div>
 
 			<p class="m-0 w-full font-medium leading-6 text-orange">
@@ -82,15 +107,17 @@
 
 <script setup lang="ts">
 import { BanIcon } from '@modrinth/assets'
-import { ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { useScrollIndicator } from '../../composables/scroll-indicator'
 import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
+import Table, { type TableColumn } from '../base/Table.vue'
 import NewModal from './NewModal.vue'
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		mode: 'modpack' | 'mod'
 		fileName: string
@@ -108,8 +135,15 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 const modal = useTemplateRef('modal')
+const externalFileTableBody = ref<HTMLElement | null>(null)
 const dontShowAgain = ref(false)
-let closingWithAction = false
+let pendingAction: { type: 'cancel' } | { type: 'continue'; dontShowAgain: boolean } | null = null
+const {
+	showTopFade: showTableTopFade,
+	showBottomFade: showTableBottomFade,
+	checkScrollState: checkTableScrollState,
+	forceCheck: forceCheckTableScroll,
+} = useScrollIndicator(externalFileTableBody)
 
 const messages = defineMessages({
 	header: {
@@ -162,9 +196,32 @@ const messages = defineMessages({
 	},
 })
 
-function show() {
+type ExternalFileColumn = 'name'
+type ExternalFileRow = {
+	id: string
+	name: string
+}
+
+const externalFileColumns = computed<TableColumn<ExternalFileColumn>[]>(() => [
+	{
+		key: 'name',
+		label: formatMessage(messages.unrecognizedFiles),
+		cellClass: '!h-12',
+	},
+])
+const externalFileRows = computed<ExternalFileRow[]>(() =>
+	props.externalFilesInModpack.map((name, index) => ({
+		id: `${index}-${name}`,
+		name,
+	})),
+)
+
+async function show() {
 	dontShowAgain.value = false
+	pendingAction = null
 	modal.value?.show()
+	await nextTick()
+	forceCheckTableScroll()
 }
 
 function hide() {
@@ -172,25 +229,29 @@ function hide() {
 }
 
 function handleHide() {
+	pendingAction ??= { type: 'cancel' }
+}
+
+function handleAfterHide() {
+	const action = pendingAction
+	pendingAction = null
 	dontShowAgain.value = false
-	if (closingWithAction) {
-		closingWithAction = false
-		return
+
+	if (action?.type === 'continue') {
+		emit('continue', action.dontShowAgain)
+	} else {
+		emit('cancel')
 	}
-	emit('cancel')
 }
 
 function cancelInstallation() {
-	closingWithAction = true
+	pendingAction = { type: 'cancel' }
 	modal.value?.hide()
-	emit('cancel')
 }
 
 function continueInstallation() {
-	const shouldSkipNextTime = dontShowAgain.value
-	closingWithAction = true
+	pendingAction = { type: 'continue', dontShowAgain: dontShowAgain.value }
 	modal.value?.hide()
-	emit('continue', shouldSkipNextTime)
 }
 
 defineExpose({ show, hide })
