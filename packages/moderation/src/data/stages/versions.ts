@@ -1,23 +1,6 @@
 import { VersionIcon } from '@modrinth/assets'
 
-import { action, toggle, dropdown, group, md, option, stage, stageFn, text } from '../../types/node'
-
-const loaderLabels: Record<string, string> = {
-	neoforge: 'NeoForge',
-	liteloader: 'LiteLoader',
-	datapack: 'Data Pack',
-	resourcepack: 'Resource Pack',
-}
-
-function formatLoaderLabel(id: string): string {
-	return (
-		loaderLabels[id] ??
-		id
-			.split(/[-_]/g)
-			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-			.join(' ')
-	)
-}
+import { action, dropdown, group, md, option, stage, stageFn, text,toggle } from '../../types/node'
 
 export default stageFn((project) =>
 	stage('versions', 'Versions')
@@ -97,29 +80,6 @@ export default stageFn((project) =>
 										action().message(md('checklist/messages/versions/alternate_versions-zip')),
 									),
 							),
-					),
-
-				toggle('incorrect_loader', 'Incorrect Loader')
-					.action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('medium')
-							.message(async (ctx) => {
-								const header = await md('checklist/messages/versions/incorrect_loader')(ctx)
-								const selected = ctx.state.loaders
-								if (selected instanceof Set && selected.size > 0) {
-									const list = [...selected].map((id) => `- ${formatLoaderLabel(id)}`).join('\n')
-									return `${header}\n${list}`
-								}
-								return header
-							}),
-					)
-					//TODO: different message for empty vs non empty + quick fix?
-					.children(
-						group('loaders')
-							.title('Incorrect Loaders')
-							.multiSelect()
-							.children(...project.loaders.map((id) => option(id, formatLoaderLabel(id)))),
 					),
 
 				toggle('vanilla_assets', 'Vanilla Assets')
