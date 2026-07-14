@@ -1,5 +1,5 @@
 use {
-    crate::{Blockchain, FiatAmount, TokenAmount, WalletDetails},
+	crate::{Blockchain, FiatAmount, UsdSymbol, WalletDetails},
     chrono::{DateTime, Utc},
     derive_more::{Deref, Display},
     rust_decimal::Decimal,
@@ -124,8 +124,29 @@ pub enum AccountStatus {
 #[serde(rename_all = "camelCase")]
 pub struct AccountDetails {
     pub wallet_details: WalletDetails,
-    pub balances: Vec<TokenAmount>,
+    pub balances_v2: Vec<Balance>,
     pub payin_methods: Vec<PayinMethod>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum Balance {
+    #[serde(rename_all = "camelCase")]
+	Blockchain {
+		token_symbol: String,
+		exponent: u32,
+        #[serde(with = "rust_decimal::serde::str")]
+        value: Decimal,
+        blockchain: Blockchain,
+    },
+    #[serde(rename_all = "camelCase")]
+	Fiat {
+		currency_symbol: UsdSymbol,
+		exponent: u32,
+        #[serde(with = "rust_decimal::serde::str")]
+        value: Decimal,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
