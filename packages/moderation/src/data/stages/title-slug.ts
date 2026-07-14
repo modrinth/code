@@ -4,14 +4,14 @@ import { BookOpenIcon } from '@modrinth/assets'
 import {
 	action,
 	toggle,
-	chips,
 	fix,
 	group,
 	label,
 	md,
+	option,
 	stage,
+	stageFn,
 	text,
-	check,
 	button,
 } from '../../types/node'
 
@@ -27,7 +27,7 @@ function hasCustomSlug(project: Labrinth.Projects.v3.Project): boolean {
 	)
 }
 
-export default stage('title-slug', 'Title & Slug')
+export default stageFn((project) => stage('title-slug', 'Title & Slug')
 	.hint('Are the Name and URL accurate and appropriate?')
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705')
 	.icon(BookOpenIcon)
@@ -61,23 +61,23 @@ export default stage('title-slug', 'Title & Slug')
 						.message(md('checklist/messages/title/similarities')),
 				)
 				.children(
-					chips('options', 'Similarities Additional Info').children(
-						check('modpack_named_after_mod', 'Modpack Named After Mod')
-							.shown(({ project }) => project.project_types.includes('modpack'))
+					group('options').multiSelect().children(
+						option('modpack_named_after_mod', 'Modpack Named After Mod')
+							.shown(project.project_types.includes('modpack'))
 							.action(action().message(md('checklist/messages/title/similarities-modpack'))),
 
-						check('forked_project', 'Forked Project')
-							.shown(({ project }) => !project?.minecraft_server)
+						option('forked_project', 'Forked Project')
+							.shown(!project?.minecraft_server)
 							.action(action().message(md('checklist/messages/title/similarities-fork'))),
 					),
 				),
 		),
 
 		group('slug')
-			.shown(({ project }) => hasCustomSlug(project))
+			.shown(hasCustomSlug(project))
 			.children(
-				chips('options', 'Slug Issues?').children(
-					check('misused', 'Misused')
+				group('options').multiSelect().children(
+					option('misused', 'Misused')
 						.children(
 								text('correct_slug', 'Correct Slug')
 									.initial((ctx) => ctx.project.slug),
@@ -96,4 +96,5 @@ export default stage('title-slug', 'Title & Slug')
 						),
 				),
 			),
-	)
+	),
+)

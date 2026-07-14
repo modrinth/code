@@ -1,16 +1,13 @@
 import { TagsIcon } from '@modrinth/assets'
 
-import { action, toggle, group, label, md, stage } from '../../types/node'
+import { action, toggle, group, label, md, stage, stageFn } from '../../types/node'
 
-export default stage('tags', 'Tags')
+export default stageFn((project) => stage('tags', 'Tags')
 	.hint("Are the project's tags accurate?")
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0802f96aafc0397a9f6d3')
 	.icon(TagsIcon)
 	.navigate('/settings/tags')
-	.shown(
-		({ project }) =>
-			project.categories.length > 0 || project.additional_categories.length > 0,
-	)
+	.shown(project.categories.length > 0 || project.additional_categories.length > 0)
 	.children(
 		label(md('checklist/text/categories')),
 
@@ -24,7 +21,7 @@ export default stage('tags', 'Tags')
 				),
 
 			toggle('optimization_misused', 'Optimization')
-				.shown(({ project }) =>
+				.shown(
 					project.categories.includes('optimization') ||
 					project.additional_categories.includes('optimization'),
 				)
@@ -40,7 +37,7 @@ export default stage('tags', 'Tags')
 				),
 
 			toggle('resolutions_misused', 'Resolutions')
-				.shown(({ project }) => project.project_types.includes('resourcepack'))
+				.shown(project.project_types.includes('resourcepack'))
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -52,4 +49,5 @@ export default stage('tags', 'Tags')
 						}),
 				),
 		),
-	)
+	),
+)

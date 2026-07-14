@@ -1,8 +1,8 @@
 import { ListBulletedIcon } from '@modrinth/assets'
 
-import { action, toggle, chips, group, markdown, md, stage, check } from '../../types/node'
+import { action, toggle, group, markdown, md, option, stage, stageFn } from '../../types/node'
 
-export default stage('rule-following', 'Rule Following')
+export default stageFn((project) => stage('rule-following', 'Rule Following')
 	.hint('Does this project violate the rules?')
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f')
 	.icon(ListBulletedIcon)
@@ -10,7 +10,7 @@ export default stage('rule-following', 'Rule Following')
 	.children(
 		group().children(
 			toggle('paid_access_server', 'Paid access server')
-				.shown(({ project }) => !!project.minecraft_server)
+				.shown(!!project.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -34,19 +34,19 @@ export default stage('rule-following', 'Rule Following')
 						}),
 				)
 				.children(
-					chips('options', 'Which Prohibited Content rules does this project violate?').children(
-						check('objectionable', 'Objectionable'),
-						check('discriminatory', 'Discriminatory or Explicit'),
-						check('ip-infringement', 'IP Infringement'),
-						check('legal-rights', 'Rights Violation'),
-						check('illegal-activity', 'Illegal Activity'),
-						check('harmful', 'Harmful or Deceptive'),
-						check('misleading', 'Misleading claims'),
-						check('impersonation', 'Impersonation'),
-						check('false-endorsement', 'False Endorsement'),
-						check('profanity', 'Profanity'),
-						check('undisclosed-upload', 'Undisclosed Data Upload'),
-						check('mojang-bypass', 'Mojang Bypass'),
+					group('options').multiSelect().children(
+						option('objectionable', 'Objectionable'),
+						option('discriminatory', 'Discriminatory or Explicit'),
+						option('ip-infringement', 'IP Infringement'),
+						option('legal-rights', 'Rights Violation'),
+						option('illegal-activity', 'Illegal Activity'),
+						option('harmful', 'Harmful or Deceptive'),
+						option('misleading', 'Misleading claims'),
+						option('impersonation', 'Impersonation'),
+						option('false-endorsement', 'False Endorsement'),
+						option('profanity', 'Profanity'),
+						option('undisclosed-upload', 'Undisclosed Data Upload'),
+						option('mojang-bypass', 'Mojang Bypass'),
 					),
 				),
 
@@ -82,18 +82,18 @@ export default stage('rule-following', 'Rule Following')
 						}),
 				)
 				.children(
-					chips('options', 'Which features require a Server-side Opt-in?').children(
-						check('x-ray', 'X-ray'),
-						check('aim-bot', 'Aim Assist'),
-						check('movement', 'Movement'),
-						check('pvp', 'PvP'),
-						check('hiding-mods', 'Anti 3.x'),
-						check('item-duplication', 'Dupe'),
+					group('options').multiSelect().children(
+						option('x-ray', 'X-ray'),
+						option('aim-bot', 'Aim Assist'),
+						option('movement', 'Movement'),
+						option('pvp', 'PvP'),
+						option('hiding-mods', 'Anti 3.x'),
+						option('item-duplication', 'Dupe'),
 					),
 				),
 
 			toggle('excessive_languages', 'Excessive languages')
-				.shown(({ project }) =>
+				.shown(
 					!!project.minecraft_server &&
 					!!project.minecraft_server?.languages?.length &&
 					project.minecraft_server.languages.length > 4,
@@ -116,4 +116,5 @@ export default stage('rule-following', 'Rule Following')
 					markdown('message', 'Explain how it infringes on content rules.').required(),
 				),
 		),
-	)
+	),
+)

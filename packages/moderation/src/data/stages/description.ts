@@ -1,8 +1,8 @@
 import { LibraryIcon } from '@modrinth/assets'
 
-import { action, toggle, group, markdown, md, select, stage, check } from '../../types/node'
+import { action, toggle, group, markdown, md, option, stage, stageFn } from '../../types/node'
 
-export default stage('description', 'Description')
+export default stageFn((project) => stage('description', 'Description')
 	.hint('Is the description sufficient, accurate, and accessible?')
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080508042e70089dd787e')
 	.icon(LibraryIcon)
@@ -32,9 +32,9 @@ export default stage('description', 'Description')
 						}),
 				)
 				.children(
-					select('reason', 'Specific reason?').children(
-						check('fork', 'Fork'),
-						check('custom', 'Custom').children(
+					group('reason').singleSelect().children(
+						option('fork', 'Fork'),
+						option('custom', 'Custom').children(
 							markdown(
 								'explainer',
 								'How can the author improve their description?',
@@ -44,7 +44,7 @@ export default stage('description', 'Description')
 				),
 
 			toggle('non_english', 'Non-english')
-				.shown(({ project }) => !project.minecraft_java_server)
+				.shown(!project.minecraft_java_server)
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -53,7 +53,7 @@ export default stage('description', 'Description')
 				),
 
 			toggle('non_english_server', 'Non-english')
-				.shown(({ project }) => !!project.minecraft_java_server)
+				.shown(!!project.minecraft_java_server)
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -101,4 +101,5 @@ export default stage('description', 'Description')
 						.message(md('checklist/messages/description/clarity')),
 				),
 		),
-	)
+	),
+)

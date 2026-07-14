@@ -1,10 +1,10 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 
 import type { NodeBuilder, NodeState } from '../../types/node'
-import { action, toggle, group, isNodeActive, label, md, stage, walkNodes } from '../../types/node'
-import checklist from '../checklist'
+import { action, toggle, group, isNodeActive, label, md, stage, stageFn, walkNodes } from '../../types/node'
+import { stages } from '../checklist'
 
-export default stage('status-alerts', 'Status Alerts')
+export default stageFn((project) => stage('status-alerts', 'Status Alerts')
 	.hint(`Is anything else affecting this project's status?`)
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6')
 	.icon(TriangleAlertIcon)
@@ -14,7 +14,7 @@ export default stage('status-alerts', 'Status Alerts')
 
 		group().children(
 			toggle('corrections_applied', 'Corrections applied')
-				.shown(({ project }) => project.status !== 'approved')
+				.shown(project.status !== 'approved')
 				.action(
 					action()
 
@@ -23,8 +23,10 @@ export default stage('status-alerts', 'Status Alerts')
 						.applyFixes(),
 				)
 				.children(ctx => {
+					const stageBuilders = stages.map(fn => fn(ctx.project, ctx.projectV2))
+					const fakeChecklist = group().children(...stageBuilders)
 					const result: NodeBuilder[] = []
-					walkNodes([checklist], ctx.globalState as unknown as Record<string, NodeState>, ctx, (node, state) => {
+					walkNodes([fakeChecklist], ctx.globalState as unknown as Record<string, NodeState>, ctx, (node, state) => {
 						if (!node._action?._fixes?.length || !isNodeActive(node, state)) return
 						result.push(...node._children)
 					})
@@ -32,7 +34,7 @@ export default stage('status-alerts', 'Status Alerts')
 				}),
 
 			toggle('corrections_applied_approved', 'Corrections applied')
-				.shown(({ project }) => project.status === 'approved')
+				.shown(project.status === 'approved')
 				.action(
 					action()
 
@@ -41,7 +43,7 @@ export default stage('status-alerts', 'Status Alerts')
 				),
 
 			toggle('private_use', 'Private use')
-				.shown(({ project }) => !project.minecraft_server)
+				.shown(!project.minecraft_server)
 				.action(
 					action()
 
@@ -50,7 +52,7 @@ export default stage('status-alerts', 'Status Alerts')
 				),
 
 			toggle('private_use_server', 'Private community')
-				.shown(({ project }) => !!project.minecraft_server)
+				.shown(!!project.minecraft_server)
 				.action(
 					action()
 
@@ -59,9 +61,7 @@ export default stage('status-alerts', 'Status Alerts')
 				),
 
 			toggle('server_use', 'Server use')
-				.shown(
-					({ project }) => project.project_types.includes('modpack') && !project.minecraft_server,
-				)
+				.shown(project.project_types.includes('modpack') && !project.minecraft_server)
 				.action(
 					action()
 
@@ -77,7 +77,7 @@ export default stage('status-alerts', 'Status Alerts')
 				),
 
 			toggle('automod_confusion', 'Automod confusion')
-				.shown(({ project }) => !project.minecraft_server)
+				.shown(!project.minecraft_server)
 				.action(
 					action()
 
@@ -86,10 +86,9 @@ export default stage('status-alerts', 'Status Alerts')
 
 			toggle('demonetized', 'Demonetized')
 				.shown(
-					({ project }) =>
-						project.monetization_status === 'force-demonetized' &&
-						!project.project_types.includes('modpack') &&
-						!project.minecraft_server,
+					project.monetization_status === 'force-demonetized' &&
+					!project.project_types.includes('modpack') &&
+					!project.minecraft_server,
 				)
 				.action(
 					action()
@@ -99,10 +98,9 @@ export default stage('status-alerts', 'Status Alerts')
 
 			toggle('demonetized_modpack', 'Demonetized')
 				.shown(
-					({ project }) =>
-						project.monetization_status === 'force-demonetized' &&
-						project.project_types.includes('modpack') &&
-						!project.minecraft_server,
+					project.monetization_status === 'force-demonetized' &&
+					project.project_types.includes('modpack') &&
+					!project.minecraft_server,
 				)
 				.action(
 					action()
@@ -110,4 +108,5 @@ export default stage('status-alerts', 'Status Alerts')
 						.message(md('checklist/messages/status-alerts/demonetized/demonetized-modpack')),
 				),
 		),
-	)
+	),
+)

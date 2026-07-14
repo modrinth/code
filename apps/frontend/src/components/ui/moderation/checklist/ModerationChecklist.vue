@@ -385,7 +385,6 @@ import type {
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
-	checklist,
 	createTrackedPatch,
 	expandVariables,
 	flattenProjectV3Variables,
@@ -395,6 +394,7 @@ import {
 	handleKeybind,
 	isNodeActive,
 	kebabToTitleCase,
+	resolve,
 	resolveChildren,
 	stages,
 	walkNodes,
@@ -448,6 +448,7 @@ const props = defineProps<{
 }>()
 
 const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
+const resolvedStages = computed(() => stages.map(fn => fn(projectV3.value, projectV2.value)))
 const client = injectModrinthClient()
 
 const moderationQueue = useModerationQueue()
@@ -993,7 +994,7 @@ function resetProgress() {
 }
 
 function findFirstValidStage(): number {
-	for (let i = 0; i < stages.length; i++) {
+	for (let i = 0; i < resolvedStages.value.length; i++) {
 		if (shouldShowStageIndex(i)) {
 			return i
 		}
@@ -1001,7 +1002,7 @@ function findFirstValidStage(): number {
 	return 0
 }
 
-const currentStageObj = computed(() => stages[currentStage.value])
+const currentStageObj = computed(() => resolvedStages.value[currentStage.value])
 const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
 const canOpenStageSelectorFromTitle = computed(
 	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
@@ -1014,7 +1015,7 @@ const checklistTitleText = computed(() => {
 })
 const nodeStates = ref<Record<string, Record<string, NodeState>>>(persistedState?.state ?? {})
 
-const restoredStage = persistedState ? stages.findIndex((s) => s.id === persistedState.stage) : -1
+const restoredStage = persistedState ? resolvedStages.value.findIndex((s) => s.id === persistedState.stage) : -1
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
 
 const router = useRouter()
@@ -1062,7 +1063,7 @@ function handleKeybinds(event: KeyboardEvent) {
 			project: projectV2.value,
 			state: {
 				currentStage: currentStage.value,
-				totalStages: stages.length,
+				totalStages: resolvedStages.value.length,
 				currentStageId: currentStageObj.value.id,
 				currentStageTitle: currentStageObj.value._hint,
 
@@ -1189,7 +1190,7 @@ onUnmounted(() => {
 watch(
 	currentStage,
 	(newIndex, oldIndex) => {
-		const stage = stages[newIndex]
+		const stage = resolvedStages.value[newIndex]
 		// only navigate when the stage actually changes (not on initial mount/remount)
 		if (oldIndex !== undefined && newIndex !== oldIndex && stage?._navigate) {
 			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage._navigate}`)
@@ -1236,7 +1237,7 @@ function getModpackFilesFromStorage(): {
 const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 	const map = new Map<IdentifiedNodeBuilder, LiveNode>()
 
-	for (const stage of stages) {
+	for (const stage of resolvedStages.value) {
 		const ctx = makeNodeContext(stage)
 
 		let isVisible = false
@@ -1245,7 +1246,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 		let hasRequiredMissing = false
 		const stageActiveActions: ActiveAction[] = []
 
-		if (!stage._shown || stage._shown(ctx)) {
+		if (stage._shown === undefined || resolve(stage._shown, ctx)) {
 			walkNodes(
 				resolveChildren(stage, ctx),
 				(nodeStates.value[stage.id!] ?? {}) as Record<string, NodeState>,
@@ -1254,7 +1255,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 					isVisible = true
 					const active = isNodeActive(node, state)
 					const actionCtx =
-						node.type === 'toggle' || node.type === 'check'
+						node.type === 'toggle' || node.type === 'check' || node.type === 'option'
 							? { ...nodeCtx, state: getBooleanChildState(state) as Record<string, NodeState> }
 							: nodeCtx
 					const isRequired = !!(node as ValueNodeBuilder)._required
@@ -1288,7 +1289,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 					if (isRequired && !active) hasRequiredMissing = true
 					map.set(node, {
 						isActive: active,
-						isVisible: !node._shown || node._shown(nodeCtx),
+						isVisible: node._shown === undefined || resolve(node._shown, nodeCtx),
 						isFixActionable,
 						messageCount: active && node._action ? 1 : 0,
 						fixCount: isFixActionable ? 1 : 0,
@@ -1326,7 +1327,7 @@ function hasRequiredMissing(stage: StageNodeBuilder): boolean {
 }
 
 function collectActiveActions(): ActiveAction[] {
-	return stages.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
+	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
 async function assembleFullMessage() {
@@ -1376,7 +1377,7 @@ function shouldShowStage(stage: StageNodeBuilder): boolean {
 }
 
 function shouldShowStageIndex(stageIndex: number): boolean {
-	return shouldShowStage(stages[stageIndex])
+	return shouldShowStage(resolvedStages.value[stageIndex])
 }
 
 function previousStage() {
@@ -1404,7 +1405,7 @@ function nextStage() {
 
 	let targetStage = currentStage.value + 1
 
-	while (targetStage < stages.length) {
+	while (targetStage < resolvedStages.value.length) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
 			if (!isModpackPermissionsStage.value) {
@@ -1420,7 +1421,7 @@ function nextStage() {
 function goBackToStages() {
 	clearGeneratedMessageState()
 
-	let targetStage = stages.length - 1
+	let targetStage = resolvedStages.value.length - 1
 	while (targetStage >= 0) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
@@ -1755,7 +1756,7 @@ function clearProjectLocalStorage() {
 }
 
 const isLastVisibleStage = computed(() => {
-	for (let i = currentStage.value + 1; i < stages.length; i++) {
+	for (let i = currentStage.value + 1; i < resolvedStages.value.length; i++) {
 		if (shouldShowStageIndex(i)) {
 			return false
 		}
@@ -1773,7 +1774,7 @@ const hasValidPreviousStage = computed(() => {
 })
 
 const stageOptions = computed<OverflowMenuOption[]>(() => {
-	const options = stages
+	const options = resolvedStages.value
 		.map((stage, index) => {
 			if (!shouldShowStage(stage)) return null
 

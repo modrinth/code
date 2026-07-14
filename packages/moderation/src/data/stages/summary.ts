@@ -1,8 +1,8 @@
 import { AlignLeftIcon } from '@modrinth/assets'
 
-import { action, toggle, group, label, md, stage } from '../../types/node'
+import { action, toggle, group, label, md, stage, stageFn } from '../../types/node'
 
-export default stage('summary', 'Summary')
+export default stageFn((project) => stage('summary', 'Summary')
 	.hint("Is the project's summary sufficient?")
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080bfb5e5c7c6211c693b')
 	.icon(AlignLeftIcon)
@@ -45,7 +45,7 @@ export default stage('summary', 'Summary')
 				),
 
 			toggle('repeat_ip', 'Repeat of IP')
-				.shown(({ project }) => !!project?.minecraft_server)
+				.shown(!!project?.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -53,4 +53,5 @@ export default stage('summary', 'Summary')
 						.message(md('checklist/messages/summary/repeat-ip')),
 				),
 		),
-	)
+	),
+)

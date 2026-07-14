@@ -1,6 +1,6 @@
 import { VersionIcon } from '@modrinth/assets'
 
-import { action, toggle, chips, group, md, select, stage, text, check } from '../../types/node'
+import { action, toggle, group, md, option, stage, stageFn, text } from '../../types/node'
 
 const loaderLabels: Record<string, string> = {
 	neoforge: 'NeoForge',
@@ -16,12 +16,12 @@ function formatLoaderLabel(id: string): string {
 		.join(' ')
 }
 
-export default stage('versions','Versions')
+export default stageFn((project) => stage('versions', 'Versions')
 	.hint("Are this project's files correct?")
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0804bad38e9055951ff31')
 	.icon(VersionIcon)
 	.navigate('/versions')
-	.shown(({ project }) => !project?.minecraft_server)
+	.shown(!project?.minecraft_server)
 	.children(
 		group().children(
 			toggle('incorrect_additional', 'Incorrect additional files')
@@ -39,21 +39,21 @@ export default stage('versions','Versions')
 						.severity('medium'),
 				)
 				.children(
-					select('type', 'What type should this project be?').children(
-						check('modpack', 'Modpack')
-							.shown(({ project }) => !project.project_types.includes('modpack'))
+					group('type').singleSelect().children(
+						option('modpack', 'Modpack')
+							.shown(!project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/invalid-modpacks')),
 							),
-						check('resourcepack', 'Resource Pack')
-							.shown(({ project }) => !project.project_types.includes('resourcepack'))
+						option('resourcepack', 'Resource Pack')
+							.shown(!project.project_types.includes('resourcepack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/invalid-resourcepacks')),
 							),
-						check('datapack', 'Data Pack')
-							.shown(({ project }) => !project.loaders.includes('datapack'))
+						option('datapack', 'Data Pack')
+							.shown(!project.loaders.includes('datapack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/invalid-datapacks')),
@@ -68,41 +68,40 @@ export default stage('versions','Versions')
 						.severity('high'),
 				)
 				.children(
-					select('distribution', 'How are they distributed?').children(
-						check('primary', 'Primary Files')
+					group('distribution').singleSelect().children(
+						option('primary', 'Primary Files')
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-primary')),
 							),
-						check('additional', 'Additional Files')
+						option('additional', 'Additional Files')
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-additional')),
 							),
-						check('mono', 'Monofile')
+						option('mono', 'Monofile')
 							.shown(
-								({ project }) =>
-									project.project_types.includes('resourcepack') ||
-									project.loaders.includes('datapack'),
+								project.project_types.includes('resourcepack') ||
+								project.loaders.includes('datapack'),
 							)
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-mono')),
 							),
-						check('server', 'Server Files (Primary Files)')
-							.shown(({ project }) => project.project_types.includes('modpack'))
+						option('server', 'Server Files (Primary Files)')
+							.shown(project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-server')),
 							),
-						check('server_additional', 'Server Files (Additional Files)')
-							.shown(({ project }) => project.project_types.includes('modpack'))
+						option('server_additional', 'Server Files (Additional Files)')
+							.shown(project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-server-additional')),
 							),
-						check('zip', 'mods.zip')
-							.shown(({ project }) => project.project_types.includes('modpack'))
+						option('zip', 'mods.zip')
+							.shown(project.project_types.includes('modpack'))
 							.action(
 								action()
 									.message(md('checklist/messages/versions/alternate_versions-zip')),
@@ -127,13 +126,13 @@ export default stage('versions','Versions')
 				)
 				//TODO: different message for empty vs non empty + quick fix?
 				.children(
-					chips('loaders', 'Which loader labels are incorrect?').children(
-						({ project }) => project.loaders.map((id) => check(id, formatLoaderLabel(id))),
+					group('loaders').multiSelect().children(
+						...project.loaders.map((id) => option(id, formatLoaderLabel(id))),
 					),
 				),
 
 			toggle('vanilla_assets', 'Vanilla Assets')
-				.shown(({ project }) => project.project_types.includes('resourcepack'))
+				.shown(project.project_types.includes('resourcepack'))
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -143,8 +142,7 @@ export default stage('versions','Versions')
 
 			toggle('redist_libs', 'Packed Libs')
 				.shown(
-					({ project }) =>
-						project.project_types.includes('mod') || project.project_types.includes('plugin'),
+					project.project_types.includes('mod') || project.project_types.includes('plugin'),
 				)
 				.action(
 					action()
@@ -174,4 +172,5 @@ export default stage('versions','Versions')
 				)
 				.children(text('invalid_type', 'Project type').required()),
 		),
-	)
+	),
+)

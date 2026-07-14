@@ -1,6 +1,6 @@
 import { BookTextIcon } from '@modrinth/assets'
 
-import { action, toggle, group, label, md, stage, check } from '../../types/node'
+import { action, toggle, group, label, md, stage, stageFn, check } from '../../types/node'
 
 const licensesNotRequiringSource: string[] = [
 	'LicenseRef-All-Rights-Reserved',
@@ -19,18 +19,18 @@ const licensesNotRequiringSource: string[] = [
 	'Zlib',
 ]
 
-export default stage('license', 'License')
+export default stageFn((project) => stage('license', 'License')
 	.hint('Is this license and link valid?')
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf080f8805df7d012a8f770')
 	.icon(BookTextIcon)
 	.navigate('/settings/license')
-	.shown(({ project }) => !project?.minecraft_server)
+	.shown(!project?.minecraft_server)
 	.children(
 		label(md('checklist/text/licensing')),
 
 		group().children(
 			toggle('invalid_link', 'Invalid Link')
-				.shown(({ project }) => !!project.license?.url)
+				.shown(!!project.license?.url)
 				.action(
 					action()
 						.suggestedStatus('flagged')
@@ -46,7 +46,7 @@ export default stage('license', 'License')
 				),
 
 			toggle('no_source', 'No Source')
-				.shown(({ project }) => !licensesNotRequiringSource.includes(project.license?.id ?? ''))
+				.shown(!licensesNotRequiringSource.includes(project.license?.id ?? ''))
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -61,4 +61,5 @@ export default stage('license', 'License')
 						.action(action().severity('high')),
 				),
 		),
-	)
+	),
+)

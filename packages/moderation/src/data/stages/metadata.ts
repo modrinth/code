@@ -1,28 +1,25 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { TagIcon } from '@modrinth/assets'
+import { ENVIRONMENTS_COPY } from '@modrinth/ui'
 
-import { action, check,fix, label, md, select, stage, toggle } from '../../types/node'
+import { action, dropdown, fix, group, label, md, option, stage, stageFn, toggle } from '../../types/node'
 import { formatEnvironments } from '../../utils'
 
-const textSingle = md('checklist/text/environment/environment')
-const textMultiple = md('checklist/text/environment/environment-multiple')
-
-export default stage('metadata', 'Metadata',)
-	.hint("Is this project's metadata accurate?")
+export default stageFn((project) => stage('metadata', 'Metadata')
+	.hint("Are there any issues with this project's metadata?")
 	//TODO: update guidance here
-	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb')
+	.guidance(
+		'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
+	)
 	.icon(TagIcon)
 	.navigate('/settings/versions')
-	.shown(({ project }) => !project?.minecraft_server)
+	.shown(!project?.minecraft_server)
 	.children(
-		label((ctx) =>
-			(ctx.project.environment?.length ?? 0) === 1 ? textSingle(ctx) : textMultiple(ctx),
-		),
+		label(md(`checklist/text/metadata/environment/${(project.environment?.length ?? 0) === 1 ? 'single' : 'multiple'}`)),
 
 		toggle('environment', 'Environment')
 			.shown(
-				({ project }) =>
-					project.project_types.includes('mod') || project.project_types.includes('modpack'),
+				project.project_types.includes('mod') || project.project_types.includes('modpack'),
 			)
 			.action(
 				action()
@@ -50,23 +47,17 @@ export default stage('metadata', 'Metadata',)
 					),
 			)
 			.children(
-				select('correct_environment', 'Correct environment')
+				group()
+					.title('Correct Environment')
 					.children(
-						check('client_only', 'Client-side Only'),
-
-						check('server_only', 'Server-side + Singleplayer'),
-						check('dedicated_server_only', 'Dedicated Server Only'),
-
-						check('client_and_server', 'Required on Both'),
-						check('server_only_client_optional', 'Client Optional'),
-						check('client_only_server_optional', 'Server Optional'),
-						check('client_or_server', 'Client or Server'),
-						check('client_or_server_prefers_both', 'Client or Server, Prefers Both'),
-
-						check('singleplayer_only', 'Singleplayer'),
-
-						check('mixed', 'Mixed'),
-					)
-					.dropdown('Unknown'),
+						dropdown('correct_environment')
+							.children(
+								...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
+									.filter((id) => id !== 'unknown')
+									.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
+							)
+							.none('Unknown'),
+					),
 			),
-	)
+	),
+)

@@ -4,14 +4,15 @@ import type {
 	ButtonNodeBuilder,
 	ContentFn,
 	DisplayNodeBuilder,
+	DropdownNodeBuilder,
 	GroupNodeBuilder,
 	IdentifiedNodeBuilder,
 	InputNodeBuilder,
+	LabeledNodeBuilder,
 	NodeBuilder,
 	NodeContext,
 	NodeState,
 	NodeStateWithChildren,
-	SelectNodeBuilder,
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
@@ -19,6 +20,7 @@ import {
 	flattenProjectV3Variables,
 	flattenProjectVariables,
 	flattenStaticVariables,
+	resolve,
 	resolveChildren,
 } from '@modrinth/moderation'
 import { ButtonStyled, Checkbox, Combobox, MarkdownEditor, StyledInput } from '@modrinth/ui'
@@ -37,11 +39,11 @@ const props = defineProps<{
 }>()
 
 function isVisible(node: NodeBuilder): boolean {
-	return !node._shown || node._shown(props.showContext)
+	return node._shown === undefined || resolve(node._shown, props.showContext)
 }
 
 function isEnabled(node: IdentifiedNodeBuilder): boolean {
-	return !node._enabled || node._enabled(props.showContext)
+	return node._enabled === undefined || resolve(node._enabled, props.showContext)
 }
 
 function asBool(node: NodeBuilder): BooleanNodeBuilder {
@@ -56,8 +58,16 @@ function asIdentified(node: NodeBuilder): IdentifiedNodeBuilder {
 	return node as IdentifiedNodeBuilder
 }
 
+function asLabeled(node: NodeBuilder): LabeledNodeBuilder {
+	return node as LabeledNodeBuilder
+}
+
 function asGroup(node: NodeBuilder): GroupNodeBuilder {
 	return node as GroupNodeBuilder
+}
+
+function asDropdown(node: NodeBuilder): DropdownNodeBuilder {
+	return node as DropdownNodeBuilder
 }
 
 function asDisplay(node: NodeBuilder): DisplayNodeBuilder {
@@ -70,10 +80,6 @@ function asValue(node: NodeBuilder): ValueNodeBuilder {
 
 function asInput(node: NodeBuilder): InputNodeBuilder {
 	return node as InputNodeBuilder
-}
-
-function asSelect(node: NodeBuilder): SelectNodeBuilder {
-	return node as SelectNodeBuilder
 }
 
 function getAtPath(path: string[]): NodeState {
@@ -138,17 +144,15 @@ function getSelectState(node: IdentifiedNodeBuilder): string | undefined {
 	return typeof def === 'string' ? def : undefined
 }
 
-function getDropdownOptions(node: SelectNodeBuilder) {
-	const none = typeof node._dropdown === 'object' ? node._dropdown.none : undefined
+function getDropdownOptions(node: DropdownNodeBuilder) {
 	return [
-		...(none !== undefined ? [{ value: '', label: none }] : []),
-		...visibleChildren(node).map((c) => ({ value: asIdentified(c).id!, label: asIdentified(c).label })),
+		...(node._none !== undefined ? [{ value: '', label: node._none }] : []),
+		...visibleChildren(node).map((c) => ({ value: asIdentified(c).id!, label: asLabeled(c).label })),
 	]
 }
 
-function getDropdownModelValue(node: SelectNodeBuilder) {
-	const none = typeof node._dropdown === 'object' ? node._dropdown.none : undefined
-	return getSelectState(node) ?? (none !== undefined ? '' : undefined)
+function getDropdownModelValue(node: DropdownNodeBuilder) {
+	return getSelectState(node) ?? (node._none !== undefined ? '' : undefined)
 }
 
 function toggleSelect(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder) {
@@ -169,11 +173,16 @@ function getTextState(node: IdentifiedNodeBuilder): string {
 	return typeof def === 'string' ? def : ''
 }
 
+function getGroupTitle(node: GroupNodeBuilder): string | undefined {
+	if (node._title === undefined) return undefined
+	return resolve(node._title, props.showContext) || undefined
+}
+
 function getPlaceholder(node: InputNodeBuilder): string | undefined {
-	if (node._placeholder) return node._placeholder
+	if (node._placeholder !== undefined) return resolve(node._placeholder, props.showContext)
 	const def = resolveDefault(node)
 	if (typeof def === 'string') return def
-	return asIdentified(node).label || undefined
+	return asLabeled(node).label || undefined
 }
 
 function hasActionableFixes(node: IdentifiedNodeBuilder): boolean {
@@ -299,10 +308,53 @@ watchEffect(async () => {
 			<template v-if="isVisible(node)">
 				<!-- group -->
 				<div v-if="node.type === 'group'">
-					<div v-if="asGroup(node)._title" class="mb-2 font-semibold">
-						{{ asGroup(node)._title }}<span v-if="asGroup(node)._required" class="text-red"> *</span>
+					<div v-if="getGroupTitle(asGroup(node))" class="mb-2 font-semibold">
+						{{ getGroupTitle(asGroup(node)) }}<span v-if="asGroup(node)._required" class="text-red"> *</span>
 					</div>
+					<!-- multi-select (chips) mode -->
+					<template v-if="asGroup(node)._selectMode === 'multi'">
+						<div class="flex flex-wrap gap-2">
+							<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
+								<ButtonStyled
+									:color="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) ? (hasActionableFixes(asIdentified(child)) ? 'blue' : 'brand') : 'standard'"
+									@click="toggleChip(asIdentified(node), asIdentified(child))"
+								>
+									<button>{{ asLabeled(child).label }}</button>
+								</ButtonStyled>
+							</template>
+						</div>
+						<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
+							<NodeRenderer
+								v-if="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) && getChildren(asIdentified(child)).length"
+								:nodes="getChildren(asIdentified(child))"
+								:show-context="showContext"
+								:on-image-upload="onImageUpload"
+								class="mt-2"
+							/>
+						</template>
+					</template>
+					<!-- single-select (button-style) mode -->
+					<template v-else-if="asGroup(node)._selectMode === 'single'">
+						<div class="flex flex-wrap gap-2">
+							<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
+								<ButtonStyled :color="getSelectState(asIdentified(node)) === asIdentified(child).id ? 'brand' : 'standard'">
+									<button @click="toggleSelect(asIdentified(node), asIdentified(child))">{{ asLabeled(child).label }}</button>
+								</ButtonStyled>
+							</template>
+						</div>
+						<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
+							<NodeRenderer
+								v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
+								:nodes="getChildren(asIdentified(child))"
+								:show-context="showContext"
+								:on-image-upload="onImageUpload"
+								class="mt-2"
+							/>
+						</template>
+					</template>
+					<!-- plain container mode -->
 					<NodeRenderer
+						v-else
 						:nodes="getChildren(asIdentified(node))"
 						:show-context="showContext"
 						:on-image-upload="onImageUpload"
@@ -310,10 +362,31 @@ watchEffect(async () => {
 					/>
 				</div>
 
+				<!-- dropdown -->
+				<div v-else-if="node.type === 'dropdown'">
+					<Combobox
+						class="!w-80"
+						:options="getDropdownOptions(asDropdown(node))"
+						:model-value="getDropdownModelValue(asDropdown(node))"
+						trigger-class="!bg-[var(--color-button-bg)] !rounded-[var(--radius-md)] !shadow-[var(--shadow-inset-sm),0_0_0_0_transparent]"
+						dropdown-class="!rounded-[var(--radius-md)] !bg-[var(--color-button-bg)] !border-0"
+						@update:model-value="(v) => setNodeState(asIdentified(node), v || undefined)"
+					/>
+					<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
+						<NodeRenderer
+							v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
+							:nodes="getChildren(asIdentified(child))"
+							:show-context="showContext"
+							:on-image-upload="onImageUpload"
+							class="mt-2"
+						/>
+					</template>
+				</div>
+
 				<!-- button -->
 				<ButtonStyled v-else-if="node.type === 'button'">
 					<button
-						:disabled="asButton(node)._enabled ? !asButton(node)._enabled(showContext) : false"
+						:disabled="asButton(node)._enabled !== undefined && !resolve(asButton(node)._enabled, showContext)"
 						@click="asButton(node)._onClick?.(showContext)"
 					>{{ asButton(node).label }}</button>
 				</ButtonStyled>
@@ -327,79 +400,23 @@ watchEffect(async () => {
 						v-tooltip="getNodeTooltipConfig(asBool(node))"
 						:disabled="!isEnabled(asIdentified(node))"
 						@click="toggleBoolean(asBool(node))"
-					>{{ asIdentified(node).label }}</button>
+					>{{ asLabeled(node).label }}</button>
 				</ButtonStyled>
 
 				<!-- check -->
 				<Checkbox
 					v-else-if="node.type === 'check'"
 					:model-value="getBooleanState(asBool(node))"
-					:label="asIdentified(node).label"
+					:label="asLabeled(node).label"
 					:disabled="!isEnabled(asIdentified(node))"
 					@update:model-value="isEnabled(asIdentified(node)) && toggleBoolean(asBool(node))"
 				/>
-
-				<!-- select (single-choice) -->
-				<div v-else-if="node.type === 'select'">
-					<div class="mb-2 font-semibold">{{ asIdentified(node).label }}<span v-if="asValue(node)._required" class="text-red"> *</span></div>
-					<Combobox
-						v-if="asSelect(node)._dropdown !== false"
-						:class="asSelect(node)._fullWidth ? 'w-full' : '!w-80'"
-						:options="getDropdownOptions(asSelect(node))"
-						:model-value="getDropdownModelValue(asSelect(node))"
-						trigger-class="!bg-[var(--color-button-bg)] !rounded-[var(--radius-md)] !shadow-[var(--shadow-inset-sm),0_0_0_0_transparent]"
-						dropdown-class="!rounded-[var(--radius-md)] !bg-[var(--color-button-bg)] !border-0"
-						@update:model-value="(v) => setNodeState(asIdentified(node), v || undefined)"
-					/>
-					<div v-else class="flex flex-wrap gap-2">
-						<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
-							<ButtonStyled :color="getSelectState(asIdentified(node)) === asIdentified(child).id ? 'brand' : 'standard'">
-								<button
-									@click="toggleSelect(asIdentified(node), asIdentified(child))"
-								>{{ asIdentified(child).label }}</button>
-							</ButtonStyled>
-						</template>
-					</div>
-					<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
-						<NodeRenderer
-							v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
-							:nodes="getChildren(asIdentified(child))"
-							:show-context="showContext"
-							:on-image-upload="onImageUpload"
-							class="mt-2"
-						/>
-					</template>
-				</div>
-
-				<!-- multi-select (chips) -->
-				<div v-else-if="node.type === 'multi-select'">
-					<div class="mb-2 font-semibold">{{ asIdentified(node).label }}<span v-if="asValue(node)._required" class="text-red"> *</span></div>
-					<div class="flex flex-wrap gap-2">
-						<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
-							<ButtonStyled
-								:color="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) ? (hasActionableFixes(asIdentified(child)) ? 'blue' : 'brand') : 'standard'"
-								@click="toggleChip(asIdentified(node), asIdentified(child))"
-							>
-								<button>{{ asIdentified(child).label }}</button>
-							</ButtonStyled>
-						</template>
-					</div>
-					<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
-						<NodeRenderer
-							v-if="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) && getChildren(asIdentified(child)).length"
-							:nodes="getChildren(asIdentified(child))"
-							:show-context="showContext"
-							:on-image-upload="onImageUpload"
-							class="mt-2"
-						/>
-					</template>
-				</div>
 
 				<!-- text -->
 				<StyledInput
 					v-else-if="node.type === 'text'"
 					:id="`node-${asIdentified(node).id}`"
-					:aria-label="asIdentified(node).label || undefined"
+					:aria-label="asLabeled(node).label || undefined"
 					:model-value="getTextState(asIdentified(node))"
 					:placeholder="getPlaceholder(asInput(node))"
 					autocomplete="off"
@@ -410,7 +427,7 @@ watchEffect(async () => {
 				<MarkdownEditor
 					v-else-if="node.type === 'markdown'"
 					:id="`node-${asIdentified(node).id}`"
-					:aria-label="asIdentified(node).label || undefined"
+					:aria-label="asLabeled(node).label || undefined"
 					:model-value="getTextState(asIdentified(node))"
 					:placeholder="getPlaceholder(asInput(node))"
 					:max-height="300"

@@ -1,12 +1,12 @@
 import { ScaleIcon } from '@modrinth/assets'
 
-import { action, toggle, group, md, stage, text } from '../../types/node'
+import { action, toggle, group, md, stage, stageFn, text } from '../../types/node'
 
-export default stage('post-approval', 'Post-Approval')
+export default stageFn((_project, projectV2) => stage('post-approval', 'Post-Approval')
 	.hint('Issue warnings, notices, or takedowns?')
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed')
 	.icon(ScaleIcon)
-	.shown(({ projectV2 }) => projectV2.status === 'approved')
+	.shown(projectV2.status === 'approved')
 	.children(
 		group().children(
 			toggle('issue_warning', 'Issue warning')
@@ -72,4 +72,5 @@ export default stage('post-approval', 'Post-Approval')
 						),
 				),
 		),
-	)
+	),
+)

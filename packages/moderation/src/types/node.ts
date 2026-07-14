@@ -35,6 +35,12 @@ export type ContentFn = (ctx: NodeContext) => string | Promise<string>
 export type ShowFn = (ctx: NodeContext) => boolean
 export type ChildrenFn = (ctx: NodeContext) => NodeBuilder[]
 
+export type Reactive<T> = T | ((ctx: NodeContext) => T)
+
+export function resolve<T>(value: Reactive<T>, ctx: NodeContext): T {
+	return typeof value === 'function' ? (value as (ctx: NodeContext) => T)(ctx) : value
+}
+
 export type NodeType =
 	| 'toggle'
 	| 'check'
@@ -42,8 +48,8 @@ export type NodeType =
 	| 'text'
 	| 'markdown'
 	| 'group'
-	| 'select'
-	| 'multi-select'
+	| 'dropdown'
+	| 'option'
 	| 'display'
 	| 'stage'
 
@@ -61,11 +67,12 @@ export function mdEscape(text: string): string {
 const USER_CONTENT_KEYS = ['PROJECT_TITLE', 'PROJECT_SLUG', 'PROJECT_SUMMARY', 'PROJECT_TYPE', 'PROJECT_STATUS']
 
 export function md(
-	path: string,
+	path: string | ((ctx: NodeContext) => string),
 	getVars?: (ctx: NodeContext) => Record<string, NodeState>,
 ): MessageFn {
 	return async (ctx) => {
-		const loader = messageFiles[`../data/messages/${path}.md`]
+		const resolvedPath = typeof path === 'function' ? path(ctx) : path
+		const loader = messageFiles[`../data/messages/${resolvedPath}.md`]
 		if (!loader) return ''
 		const raw = (await loader()) as string
 		const vars: Record<string, string> = {
@@ -174,10 +181,10 @@ export function action(): ActionBuilder {
 
 export abstract class NodeBuilder {
 	abstract readonly type: NodeType
-	_shown?: ShowFn
+	_shown?: Reactive<boolean>
 
-	shown(fn: ShowFn): this {
-		this._shown = fn
+	shown(condition: Reactive<boolean>): this {
+		this._shown = condition
 		return this
 	}
 }
@@ -196,7 +203,7 @@ export class ButtonNodeBuilder extends NodeBuilder {
 	readonly type = 'button' as const
 	readonly label: string
 	_onClick?: (ctx: NodeContext) => void
-	_enabled?: ShowFn
+	_enabled?: Reactive<boolean>
 
 	constructor(nodeLabel: string) {
 		super()
@@ -208,26 +215,24 @@ export class ButtonNodeBuilder extends NodeBuilder {
 		return this
 	}
 
-	enabled(fn: ShowFn): this {
-		this._enabled = fn
+	enabled(condition: Reactive<boolean>): this {
+		this._enabled = condition
 		return this
 	}
 }
 
 export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 	readonly id: string | undefined
-	readonly label: string
 	_children: NodeBuilder[] = []
 	_childrenFn?: ChildrenFn
 	_computingChildren = false
 	_action?: ActionBuilder
-	_enabled?: ShowFn
+	_enabled?: Reactive<boolean>
 	_statePath?: string[]
 
-	constructor(id: string | undefined, label: string) {
+	constructor(id: string | undefined) {
 		super()
 		this.id = id
-		this.label = label
 	}
 
 	children(...nodes: NodeBuilder[]): this
@@ -246,8 +251,8 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 		return this
 	}
 
-	enabled(fn: ShowFn): this {
-		this._enabled = fn
+	enabled(condition: Reactive<boolean>): this {
+		this._enabled = condition
 		return this
 	}
 
@@ -257,7 +262,16 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 	}
 }
 
-export abstract class ValueNodeBuilder extends IdentifiedNodeBuilder {
+export abstract class LabeledNodeBuilder extends IdentifiedNodeBuilder {
+	readonly label: string
+
+	constructor(id: string, label: string) {
+		super(id)
+		this.label = label
+	}
+}
+
+export abstract class ValueNodeBuilder extends LabeledNodeBuilder {
 	_defaultValue?: NodeState | ((ctx: NodeContext) => NodeState)
 	_required?: boolean
 
@@ -283,47 +297,28 @@ export class BooleanNodeBuilder extends ValueNodeBuilder {
 
 export class InputNodeBuilder extends ValueNodeBuilder {
 	readonly type: 'text' | 'markdown'
-	_placeholder?: string
+	_placeholder?: Reactive<string>
 
 	constructor(id: string, nodeLabel: string, type: 'text' | 'markdown') {
 		super(id, nodeLabel)
 		this.type = type
 	}
 
-	placeholder(p: string): this {
+	placeholder(p: Reactive<string>): this {
 		this._placeholder = p
 		return this
 	}
 }
 
-export class SelectNodeBuilder extends ValueNodeBuilder {
-	readonly type = 'select' as const
-	_dropdown: false | { none?: string } = false
-	_fullWidth = false
-
-	dropdown(none?: string): this {
-		this._dropdown = none !== undefined ? { none } : {}
-		return this
-	}
-
-	fullWidth(): this {
-		this._fullWidth = true
-		return this
-	}
-}
-
-export class ChipsNodeBuilder extends ValueNodeBuilder {
-	readonly type = 'multi-select' as const
-}
-
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type = 'group' as const
 	_layout?: 'flex' | 'column'
-	_title?: string
+	_title?: Reactive<string>
 	_required?: boolean
+	_selectMode?: 'single' | 'multi'
 
 	constructor(id?: string) {
-		super(id, '')
+		super(id)
 	}
 
 	layout(l: 'flex' | 'column'): this {
@@ -331,7 +326,7 @@ export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 		return this
 	}
 
-	title(t: string): this {
+	title(t: Reactive<string>): this {
 		this._title = t
 		return this
 	}
@@ -340,9 +335,53 @@ export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 		this._required = v
 		return this
 	}
+
+	singleSelect(): this {
+		this._selectMode = 'single'
+		return this
+	}
+
+	multiSelect(): this {
+		this._selectMode = 'multi'
+		return this
+	}
 }
 
-export class StageNodeBuilder extends IdentifiedNodeBuilder {
+export class DropdownNodeBuilder extends IdentifiedNodeBuilder {
+	readonly type = 'dropdown' as const
+	declare _children: OptionNodeBuilder[]
+	_none?: string
+
+	constructor(id: string) {
+		super(id)
+	}
+
+	override children(...nodes: OptionNodeBuilder[]): this
+	override children(fn: ChildrenFn): this
+	override children(...args: OptionNodeBuilder[] | [ChildrenFn]): this {
+		if (args.length === 1 && typeof args[0] === 'function') {
+			super.children(args[0] as ChildrenFn)
+		} else {
+			super.children(...(args as OptionNodeBuilder[]))
+		}
+		return this
+	}
+
+	none(text: string): this {
+		this._none = text
+		return this
+	}
+}
+
+export class OptionNodeBuilder extends LabeledNodeBuilder {
+	readonly type = 'option' as const
+
+	constructor(id: string, nodeLabel: string) {
+		super(id, nodeLabel)
+	}
+}
+
+export class StageNodeBuilder extends LabeledNodeBuilder {
 	readonly type = 'stage' as const
 	_hint?: string
 	_guidanceUrl?: string
@@ -392,13 +431,19 @@ function childrenScopePath(node: IdentifiedNodeBuilder): string[] | null {
 	switch (node.type) {
 		case 'toggle':
 		case 'check':
-		case 'group':
+		case 'option':
 		case 'stage':
 			return node._statePath
-		case 'select':
-		case 'multi-select':
-			// Option nodes act as namespaces for sub-children state but aren't boolean
-			// containers themselves — use parent scope so option id becomes the namespace
+		case 'group': {
+			const g = node as GroupNodeBuilder
+			if (g._selectMode) {
+				// Option ids become namespaces at the same level as the group
+				return node._statePath.slice(0, -1)
+			}
+			return node._statePath
+		}
+		case 'dropdown':
+			// Option ids become namespaces at the same level as the dropdown
 			return node._statePath.slice(0, -1)
 		default:
 			return null
@@ -431,8 +476,13 @@ export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 			}
 			return (node as BooleanNodeBuilder)._defaultValue === true
 		}
-		case 'multi-select': return state instanceof Set && state.size > 0
-		case 'select': return typeof state === 'string' && state !== ''
+		case 'group': {
+			const g = node as GroupNodeBuilder
+			if (g._selectMode === 'single') return typeof state === 'string' && state !== ''
+			if (g._selectMode === 'multi') return state instanceof Set && state.size > 0
+			return false
+		}
+		case 'dropdown': return typeof state === 'string' && state !== ''
 		case 'text':
 		case 'markdown': return typeof state === 'string' && state !== ''
 		default: return false
@@ -469,8 +519,9 @@ export function walkNodes(
 	visitor: (node: IdentifiedNodeBuilder, state: NodeState, ctx: NodeContext) => void,
 ): void {
 	for (const node of nodes) {
-		if (node._shown && !node._shown(ctx)) continue
-		if (node.type === 'group' || node.type === 'stage') {
+		if (node._shown !== undefined && !resolve(node._shown, ctx)) continue
+
+		if (node.type === 'stage') {
 			const identified = node as IdentifiedNodeBuilder
 			if (identified.id) {
 				const raw = stageState[identified.id]
@@ -483,6 +534,25 @@ export function walkNodes(
 			}
 			continue
 		}
+
+		if (node.type === 'group') {
+			const g = node as GroupNodeBuilder
+			if (!g._selectMode) {
+				// Plain container: traverse children in group's own state scope
+				if (g.id) {
+					const raw = stageState[g.id]
+					const childState = (raw && typeof raw === 'object' && !(raw instanceof Set))
+						? (raw as Record<string, NodeState>)
+						: {}
+					walkNodes(resolveChildren(g, ctx), childState, { ...ctx, state: childState }, visitor)
+				} else {
+					walkNodes(resolveChildren(g, ctx), stageState, ctx, visitor)
+				}
+				continue
+			}
+			// Fall through to value-node path for groups with selectMode
+		}
+
 		if (node.type === 'display' || node.type === 'button') continue
 
 		const identified = node as IdentifiedNodeBuilder
@@ -493,13 +563,13 @@ export function walkNodes(
 		const children = resolveChildren(identified, ctx)
 		if (children.length === 0 || !active) continue
 
-		if (node.type === 'multi-select') {
+		if (node.type === 'group' && (node as GroupNodeBuilder)._selectMode === 'multi') {
 			const selected = nodeState instanceof Set ? nodeState : new Set<string>()
 			for (const child of children) {
 				const childId = child as IdentifiedNodeBuilder
-				if (!selected.has(childId.id!) || (child._shown && !child._shown(ctx))) continue
+				if (!selected.has(childId.id!) || (child._shown !== undefined && !resolve(child._shown, ctx))) continue
 				const rawChildState = stageState[childId.id!]
-				// Chip children are active by virtue of being in the selected Set, not by their own
+				// Option children are active by virtue of being in the selected Set, not by their own
 				// boolean state. If they have child state but no explicit value, inject value: true
 				// so isNodeActive returns true even after child state has been written to their path.
 				const childState: NodeState = (rawChildState !== null && rawChildState !== undefined && typeof rawChildState === 'object' && !(rawChildState instanceof Set) && (rawChildState as NodeStateWithChildren).value === undefined)
@@ -511,12 +581,15 @@ export function walkNodes(
 		} else if (node.type === 'toggle' || node.type === 'check') {
 			const childState = getBooleanChildState(nodeState)
 			walkNodes(children, childState, { ...ctx, state: childState }, visitor)
-		} else if (node.type === 'select') {
+		} else if (
+			(node.type === 'group' && (node as GroupNodeBuilder)._selectMode === 'single') ||
+			node.type === 'dropdown'
+		) {
 			const selectedId = typeof nodeState === 'string' ? nodeState : undefined
 			if (selectedId) {
 				for (const child of children) {
 					const childId = child as IdentifiedNodeBuilder
-					if (childId.id !== selectedId || (child._shown && !child._shown(ctx))) continue
+					if (childId.id !== selectedId || (child._shown !== undefined && !resolve(child._shown, ctx))) continue
 					visitor(childId, stageState[childId.id!], ctx)
 					walkNodes(resolveChildren(childId, ctx), stageState, ctx, visitor)
 					break
@@ -530,14 +603,23 @@ export function walkNodes(
 
 // ─── Factory functions ────────────────────────────────────────────────────────
 
+export type StageFn = (project: Labrinth.Projects.v3.Project, projectV2: Labrinth.Projects.v2.Project) => StageNodeBuilder
+
+export function stageFn(factory: StageFn): StageFn {
+	const cache = new WeakMap<object, StageNodeBuilder>()
+	return (project, projectV2) => {
+		if (!cache.has(project)) cache.set(project, factory(project, projectV2))
+		return cache.get(project)!
+	}
+}
+
 export const toggle = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'toggle')
 export const check = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'check')
 export const button = (nodeLabel: string) => new ButtonNodeBuilder(nodeLabel)
 export const text = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'text')
 export const markdown = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'markdown')
 export const group = (id?: string) => new GroupNodeBuilder(id)
-export const select = (id: string, nodeLabel: string) => new SelectNodeBuilder(id, nodeLabel)
-export const chips = (id: string, nodeLabel: string) => new ChipsNodeBuilder(id, nodeLabel)
+export const dropdown = (id: string) => new DropdownNodeBuilder(id)
+export const option = (id: string, nodeLabel: string) => new OptionNodeBuilder(id, nodeLabel)
 export const label = (content: string | ContentFn) => new DisplayNodeBuilder(content)
-export const stage = (id: string, title: string) =>
-	new StageNodeBuilder(id, title)
+export const stage = (id: string, title: string) => new StageNodeBuilder(id, title)

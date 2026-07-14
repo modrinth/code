@@ -1,7 +1,7 @@
 import { CopyrightIcon } from '@modrinth/assets'
 
 import type { NodeContext } from '../../types/node'
-import { action, check,group, markdown, md, stage, text, toggle } from '../../types/node'
+import { action, check, group, markdown, md, stage, stageFn, text, toggle } from '../../types/node'
 
 function isServerModpack({ project }: NodeContext): boolean {
 	return (
@@ -11,14 +11,14 @@ function isServerModpack({ project }: NodeContext): boolean {
 	)
 }
 
-export default stage('reupload', 'Reupload')
+export default stageFn((project) => stage('reupload', 'Reupload')
 	.hint('Does the author have proper permissions to post this project?')
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080d1a0a2cda3ff2ce997')
 	.icon(CopyrightIcon)
 	.children(
 		group().children(
 			toggle('reupload', 'Re-upload')
-				.shown(({ project }) => !project.minecraft_server)
+				.shown(!project.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -36,7 +36,7 @@ export default stage('reupload', 'Reupload')
 				),
 
 			toggle('unclear_fork', 'Unclear Fork')
-				.shown(({ project }) => !project.minecraft_server)
+				.shown(!project.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -45,7 +45,7 @@ export default stage('reupload', 'Reupload')
 				),
 
 			toggle('insufficient_fork', 'Insufficient Fork')
-				.shown(({ project }) => !project.minecraft_server)
+				.shown(!project.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -62,7 +62,7 @@ export default stage('reupload', 'Reupload')
 				),
 
 			toggle('identity_verification', 'Verify Identity')
-				.shown(({ project }) => !project.minecraft_server)
+				.shown(!project.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -76,7 +76,7 @@ export default stage('reupload', 'Reupload')
 				.children(text('platform', 'Where else can the project be found?').required()),
 
 			toggle('identity_verification_server', 'Verify Identity')
-				.shown(({ project }) => !!project.minecraft_server)
+				.shown(!!project.minecraft_server)
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -133,4 +133,5 @@ export default stage('reupload', 'Reupload')
 				)
 				.children(markdown('overrides', 'Forbidden overrides list').required()),
 		),
-	)
+	),
+)

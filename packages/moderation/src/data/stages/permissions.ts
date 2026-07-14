@@ -1,16 +1,13 @@
 import { SignatureIcon } from '@modrinth/assets'
 
-import { action, toggle, group, md, stage } from '../../types/node'
+import { action, toggle, group, md, stage, stageFn } from '../../types/node'
 
-export default stage('permissions', 'Modpack Permissions')
+export default stageFn((project) => stage('permissions', 'Modpack Permissions')
 	.hint("Does this project's external content have any issues?")
 	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892')
 	.icon(SignatureIcon)
 	.navigate('/settings/permissions')
-	.shown(
-		({ project }) =>
-			(project.project_types?.includes('modpack') ?? false) && !project.minecraft_server,
-	)
+	.shown((project.project_types?.includes('modpack') ?? false) && !project.minecraft_server)
 	.children(
 		group().children(
 			toggle('invalid_permissions', 'Invalid permissions')
@@ -38,7 +35,7 @@ export default stage('permissions', 'Modpack Permissions')
 				),
 
 			toggle('non-commercial-external-content', 'Non-commercial externals')
-				.shown(({ project }) => project.monetization_status === 'monetized')
+				.shown(project.monetization_status === 'monetized')
 				.action(
 					action()
 						.suggestedStatus('rejected')
@@ -46,4 +43,5 @@ export default stage('permissions', 'Modpack Permissions')
 						.message(md('checklist/messages/externals-permissions/non-commercial')),
 				),
 		),
-	)
+	),
+)

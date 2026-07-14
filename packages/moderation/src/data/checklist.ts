@@ -1,4 +1,4 @@
-import type { StageNodeBuilder } from '../types/node'
+import type { StageFn } from '../types/node'
 import { group } from '../types/node'
 import categories from './stages/categories'
 import description from './stages/description'
@@ -32,6 +32,6 @@ export const stages = [
 	statusAlerts,
 	undefinedProject,
 	postApproval,
-] as ReadonlyArray<StageNodeBuilder>
+] as ReadonlyArray<StageFn>
 
-export default group().children(...stages)
+export default group()
