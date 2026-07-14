@@ -54,7 +54,7 @@ const selectableProjectTypes = [
 				v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
 				:links="selectableProjectTypes"
 				replace
-				class="hidden md:flex"
+				class="flex"
 			/>
 		</section>
 		<NuxtPage />
