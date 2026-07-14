@@ -54,7 +54,7 @@
 				</span>
 			</template>
 			<template v-else>
-				<div v-if="vsPrevPeriodPercent" class="flex items-center gap-1 text-sm">
+				<div v-if="vsPrevPeriodPercent" class="flex flex-wrap items-center gap-x-1 text-sm">
 					<span
 						class="inline-flex items-center gap-1 font-semibold"
 						:class="{
@@ -79,7 +79,7 @@
 							'text-primary': !disabled,
 						}"
 					>
-						{{ formatMessage(analyticsStatCardMessages.previousPeriodComparison) }}
+						{{ formatMessage(comparisonMessage) }}
 					</span>
 					<span
 						class="visible mt-px text-xs sm:hidden"
@@ -88,7 +88,7 @@
 							'text-primary': !disabled,
 						}"
 					>
-						{{ formatMessage(analyticsStatCardMessages.previousPeriodComparisonShort) }}
+						{{ formatMessage(comparisonMessageShort) }}
 					</span>
 				</div>
 			</template>
@@ -117,6 +117,7 @@ const props = defineProps<{
 	statLabel: string
 	statTooltip?: string
 	vsPrevPeriodPercent: string | null
+	isSameDayLastWeekComparison?: boolean
 	icon: string
 	active?: boolean
 	disabled?: boolean
@@ -127,6 +128,16 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const comparisonMessage = computed(() =>
+	props.isSameDayLastWeekComparison
+		? analyticsStatCardMessages.sameDayLastWeekComparison
+		: analyticsStatCardMessages.previousPeriodComparison,
+)
+const comparisonMessageShort = computed(() =>
+	props.isSameDayLastWeekComparison
+		? analyticsStatCardMessages.sameDayLastWeekComparisonShort
+		: analyticsStatCardMessages.previousPeriodComparisonShort,
+)
 const statCardIconMap: Record<string, IconComponent> = {
 	clock: ClockIcon,
 	timer: TimerIcon,

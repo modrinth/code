@@ -27,6 +27,7 @@ export function useAnalyticsChartInteractions({
 	allChartDatasets,
 	chartRangeBounds,
 	shouldShowPreviousPeriod,
+	isSameDayLastWeekComparison,
 	onRangeSelected,
 }: {
 	isDataLoading: ComputedRef<boolean>
@@ -36,6 +37,7 @@ export function useAnalyticsChartInteractions({
 	allChartDatasets: ComputedRef<ChartDataset[]>
 	chartRangeBounds: ComputedRef<AnalyticsChartRangeBounds | null>
 	shouldShowPreviousPeriod: ComputedRef<boolean>
+	isSameDayLastWeekComparison: ComputedRef<boolean>
 	onRangeSelected: (start: Date, end: Date, groupBy: AnalyticsGroupByPreset) => void
 }) {
 	const chartContainer = ref<HTMLElement | null>(null)
@@ -226,7 +228,9 @@ export function useAnalyticsChartInteractions({
 		const rangeBounds = chartRangeBounds.value
 		if (!bucketRange || !rangeBounds) return null
 
-		const periodMs = rangeBounds.end.getTime() - rangeBounds.start.getTime()
+		const periodMs = isSameDayLastWeekComparison.value
+			? 7 * 24 * 60 * 60 * 1000
+			: rangeBounds.end.getTime() - rangeBounds.start.getTime()
 		if (!Number.isFinite(periodMs) || periodMs <= 0) return null
 
 		return {
