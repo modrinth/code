@@ -1,7 +1,9 @@
 <template>
 	<div class="flex flex-col gap-1">
 		<div class="flex justify-between items-center">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.sharedInstance) }}</span>
+			<span class="font-semibold text-contrast">{{
+				heading ?? formatMessage(messages.sharedInstance)
+			}}</span>
 			<ButtonStyled type="transparent">
 				<button @click="emit('viewContents')">
 					<EyeIcon />
@@ -35,15 +37,16 @@ import {
 	formatLoader,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, toRefs } from 'vue'
 
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
 
-const props = defineProps<{ preview: SharedInstanceInstallPreview }>()
+const props = defineProps<{ preview: SharedInstanceInstallPreview; heading?: string }>()
+const { preview, heading } = toRefs(props)
 const emit = defineEmits<{ viewContents: [] }>()
 const { formatMessage } = useVIntl()
 const loaderDisplay = computed(() =>
-	props.preview.loader ? formatLoader(formatMessage, props.preview.loader) : '',
+	preview.value.loader ? formatLoader(formatMessage, preview.value.loader) : '',
 )
 const messages = defineMessages({
 	sharedInstance: {
