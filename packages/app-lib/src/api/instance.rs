@@ -26,7 +26,7 @@ pub use self::paths::{get_full_path, get_mod_full_path};
 pub use self::projects::{
     InstallProjectWithDependenciesRequest, add_project_from_path,
     add_project_from_version, install_project_with_dependencies,
-    remove_project, repair_managed_modrinth,
+    is_file_on_modrinth, remove_project, repair_managed_modrinth,
     switch_project_version_with_dependencies, toggle_disable_project,
     update_all_projects, update_managed_modrinth_version, update_project,
 };
