@@ -751,8 +751,16 @@ pub(crate) async fn rename_project_companion_file(
             new_project_path.trim_end_matches(".disabled")
         ));
 
-        if old_txt_path.exists() && !new_txt_path.exists() {
-            io::rename_or_move(&old_txt_path, &new_txt_path).await?;
+        if old_txt_path.exists() {
+            if new_txt_path.exists()
+                && io::canonicalize(&old_txt_path)?
+                    == io::canonicalize(&new_txt_path)?
+            {
+                return Ok(());
+            }
+
+            io::copy(&old_txt_path, &new_txt_path).await?;
+            io::remove_file(&old_txt_path).await?;
         }
     }
 
