@@ -71,48 +71,14 @@
 		</template>
 		<template v-else #default>
 			<slot name="prefix" />
-			<div
-				v-if="filterType.display === 'project'"
-				:class="innerPanelClass ? innerPanelClass : ''"
-				class="flex flex-col gap-3"
-			>
-				<ProjectCombobox
-					v-show="!selectedProjectId || refreshing"
-					ref="projectCombobox"
-					search-placeholder="Search for a project..."
-					:model-value="selectedProjectId"
-					:project-types="selectableProjectTypes"
-					@update:model-value="setSelectedProjectId"
-				/>
-				<template v-if="selectedProjectId && !refreshing">
-					<div class="flex items-center justify-between gap-3 px-2 text-secondary">
-						<span>{{ formatMessage(messages.dependentCount, { count: resultCount ?? 0 }) }}</span>
-						<button
-							class="border-none bg-transparent p-0 text-secondary cursor-pointer hover:text-contrast"
-							@click="setSelectedProjectId(undefined)"
-						>
-							{{ formatMessage(messages.clearFilter) }}
-						</button>
-					</div>
-					<div class="flex items-center gap-3 rounded-2xl bg-surface-1 p-3">
-						<img
-							v-if="selectedProject?.icon_url"
-							:src="selectedProject.icon_url"
-							:alt="selectedProject.title"
-							class="size-14 shrink-0 rounded-xl object-cover"
-						/>
-						<PackageIcon v-else class="size-14 shrink-0 text-secondary" />
-						<div class="min-w-0">
-							<div class="truncate text-base font-bold text-contrast">
-								{{ selectedProject?.title ?? selectedProjectId }}
-							</div>
-							<div v-if="selectedProject?.author" class="truncate text-sm text-secondary">
-								{{ selectedProject.author }}
-							</div>
-						</div>
-					</div>
-				</template>
-			</div>
+			<SearchDependsOnFilter
+				v-if="filterType.display === 'depends-on-project'"
+				v-model:selected-filters="selectedFilters"
+				:project-type="projectType"
+				:inner-panel-class="innerPanelClass"
+				:result-count="resultCount"
+				:refreshing="refreshing"
+			/>
 			<div
 				v-if="filterType.display === 'toggle'"
 				:class="innerPanelClass ? innerPanelClass : ''"
@@ -132,7 +98,9 @@
 					/>
 				</label>
 			</div>
-			<template v-if="filterType.display !== 'toggle' && filterType.display !== 'project'">
+			<template
+				v-if="filterType.display !== 'toggle' && filterType.display !== 'depends-on-project'"
+			>
 				<StyledInput
 					v-if="filterType.searchable"
 					:id="`search-${filterType.id}`"
@@ -248,14 +216,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	BanIcon,
-	DropdownIcon,
-	LockOpenIcon,
-	PackageIcon,
-	SearchIcon,
-	UpdatedIcon,
-} from '@modrinth/assets'
+import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -264,10 +225,7 @@ import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Toggle from '../base/Toggle.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
-import ProjectCombobox, {
-	type ProjectType as ProjectComboboxProjectType,
-	type SearchHit,
-} from '../project/ProjectCombobox.vue'
+import SearchDependsOnFilter from './SearchDependsOnFilter.vue'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'
 
@@ -282,6 +240,7 @@ const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedF
 
 const props = defineProps<{
 	filterType: FilterType
+	projectType: string
 	buttonClass?: string
 	contentClass?: string
 	innerPanelClass?: string
@@ -299,26 +258,6 @@ const query = ref('')
 const showMore = ref(false)
 
 const accordion = ref<InstanceType<typeof Accordion> | null>()
-const projectCombobox = ref<{ selectedProject: SearchHit | null } | null>(null)
-const selectableProjectTypes: ProjectComboboxProjectType[] = [
-	'mod',
-	'modpack',
-	'resourcepack',
-	'shader',
-	'datapack',
-	'plugin',
-]
-const selectedProject = computed(() => projectCombobox.value?.selectedProject ?? null)
-const selectedProjectId = computed(
-	() => selectedFilters.value.find((filter) => filter.type === props.filterType.id)?.option,
-)
-
-function setSelectedProjectId(projectId: string | undefined) {
-	const otherFilters = selectedFilters.value.filter((filter) => filter.type !== props.filterType.id)
-	selectedFilters.value = projectId
-		? [...otherFilters, { type: props.filterType.id, option: projectId }]
-		: otherFilters
-}
 
 const selectedFilterOptions = computed(() =>
 	props.filterType.options.filter((option) =>
@@ -472,14 +411,6 @@ function clearFilters() {
 }
 
 const messages = defineMessages({
-	clearFilter: {
-		id: 'search.filter.clear',
-		defaultMessage: 'Clear',
-	},
-	dependentCount: {
-		id: 'search.filter.dependent_count',
-		defaultMessage: '{count, plural, one {# dependent} other {# dependents}}',
-	},
 	searchPlaceholder: {
 		id: 'search.filter.option.search.placeholder',
 		defaultMessage: 'Search...',

@@ -63,6 +63,9 @@ function getFilterOpenByDefault(filterId: string): boolean {
 	if (hasProvidedFilter(filterId)) {
 		return true
 	}
+	if (filterId === 'compatible_dependency_project_ids') {
+		return ctx.projectType.value === 'modpack'
+	}
 	if (ctx.isServerType.value) {
 		return ![
 			'server_category_minecraft_server_meta',
@@ -170,6 +173,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				v-model:toggled-groups="ctx.serverToggledGroups.value"
 				:provided-filters="[]"
 				:filter-type="filterType"
+				:project-type="ctx.projectType.value"
 				:class="filterClass"
 				:button-class="buttonClass"
 				:content-class="contentClass"
@@ -194,6 +198,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				v-model:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 				:provided-filters="ctx.providedFilters?.value ?? []"
 				:filter-type="filter"
+				:project-type="ctx.projectType.value"
 				:result-count="ctx.totalHits.value"
 				:refreshing="ctx.refreshing.value"
 				:class="filterClass"

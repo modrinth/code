@@ -47,7 +47,7 @@ export type FilterType = {
 	ordering?: number
 } & (
 	| {
-			display: 'all' | 'scrollable' | 'none' | 'project' | 'toggle'
+			display: 'all' | 'scrollable' | 'none' | 'depends-on-project' | 'toggle'
 	  }
 	| {
 			display: 'expandable'
@@ -146,6 +146,14 @@ export function useSearch(
 	const overriddenProvidedFilterTypes = ref<string[]>([])
 
 	const { formatMessage, locale } = useVIntl()
+	const dependsOnFilterName = defineMessage({
+		id: 'search.filter_type.compatible_dependency_project_ids',
+		defaultMessage: 'Depends on',
+	})
+	const includedContentFilterName = defineMessage({
+		id: 'search.filter_type.included_content',
+		defaultMessage: 'Included content',
+	})
 	const formatCategoryName = (categoryName: string) => {
 		return formatCategory(formatMessage, categoryName)
 	}
@@ -434,6 +442,21 @@ export function useSearch(
 					}),
 			},
 			{
+				id: 'compatible_dependency_project_ids',
+				formatted_name: formatMessage(
+					projectTypes.value.includes('modpack') ? includedContentFilterName : dependsOnFilterName,
+				),
+				supported_project_types: ALL_PROJECT_TYPES,
+				query_param: 'dep',
+				supports_negative_filter: false,
+				display: 'depends-on-project',
+				searchable: false,
+				options: [],
+				allows_custom_options: 'and',
+				custom_option_field: 'compatible_dependency_project_ids',
+				ordering: projectTypes.value.includes('modpack') ? undefined : -999,
+			},
+			{
 				id: 'license',
 				formatted_name: formatMessage(
 					defineMessage({ id: 'search.filter_type.license', defaultMessage: 'License' }),
@@ -472,24 +495,6 @@ export function useSearch(
 				searchable: false,
 				options: [],
 				allows_custom_options: 'and',
-			},
-			{
-				id: 'compatible_dependency_project_ids',
-				formatted_name: formatMessage(
-					defineMessage({
-						id: 'search.filter_type.compatible_dependency_project_ids',
-						defaultMessage: 'Depends on',
-					}),
-				),
-				supported_project_types: ALL_PROJECT_TYPES,
-				query_param: 'dep',
-				supports_negative_filter: false,
-				display: 'project',
-				searchable: false,
-				options: [],
-				allows_custom_options: 'and',
-				custom_option_field: 'compatible_dependency_project_ids',
-				ordering: -999,
 			},
 			{
 				id: 'advanced',

@@ -3551,11 +3551,47 @@
   "search.filter.clear": {
     "defaultMessage": "Clear"
   },
+  "search.filter.dependency_type.any": {
+    "defaultMessage": "Any dependency type"
+  },
+  "search.filter.dependency_type.embedded": {
+    "defaultMessage": "Embedded"
+  },
+  "search.filter.dependency_type.optional": {
+    "defaultMessage": "Optional"
+  },
+  "search.filter.dependency_type.optional_or_embedded": {
+    "defaultMessage": "Optional or embedded"
+  },
+  "search.filter.dependency_type.required": {
+    "defaultMessage": "Required"
+  },
+  "search.filter.dependency_type.required_or_embedded": {
+    "defaultMessage": "Required or embedded"
+  },
+  "search.filter.dependency_type.required_or_optional": {
+    "defaultMessage": "Required or optional"
+  },
   "search.filter.dependent_count": {
     "defaultMessage": "{count, plural, one {# dependent} other {# dependents}}"
   },
   "search.filter.dependent_project": {
     "defaultMessage": "Depends on: {project}"
+  },
+  "search.filter.dependent_project.search_placeholder": {
+    "defaultMessage": "Search for a project..."
+  },
+  "search.filter.included_content.exclude": {
+    "defaultMessage": "Exclude"
+  },
+  "search.filter.included_content.excluded": {
+    "defaultMessage": "Excluded"
+  },
+  "search.filter.included_content.remove_project": {
+    "defaultMessage": "Remove {project}"
+  },
+  "search.filter.included_content.search_placeholder": {
+    "defaultMessage": "Search content..."
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
@@ -3616,6 +3652,9 @@
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Show all versions"
+  },
+  "search.filter_type.included_content": {
+    "defaultMessage": "Included content"
   },
   "search.filter_type.license": {
     "defaultMessage": "License"
