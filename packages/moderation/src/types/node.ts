@@ -26,6 +26,7 @@ export interface NodeContext {
 	projectV2: Labrinth.Projects.v2.Project
 	state: Record<string, NodeState>
 	globalState: Record<string, Record<string, NodeState>>
+	parent?: NodeContext
 }
 
 // ─── Function types ───────────────────────────────────────────────────────────
@@ -182,9 +183,15 @@ export function action(): ActionBuilder {
 export abstract class NodeBuilder {
 	abstract readonly type: NodeType
 	_shown?: Reactive<boolean>
+	_title?: Reactive<string>
 
 	shown(condition: Reactive<boolean>): this {
 		this._shown = condition
+		return this
+	}
+
+	title(t: Reactive<string>): this {
+		this._title = t
 		return this
 	}
 }
@@ -295,12 +302,14 @@ export class BooleanNodeBuilder extends ValueNodeBuilder {
 	}
 }
 
-export class InputNodeBuilder extends ValueNodeBuilder {
+export class InputNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type: 'text' | 'markdown'
 	_placeholder?: Reactive<string>
+	_defaultValue?: NodeState | ((ctx: NodeContext) => NodeState)
+	_required?: boolean
 
-	constructor(id: string, nodeLabel: string, type: 'text' | 'markdown') {
-		super(id, nodeLabel)
+	constructor(id: string, type: 'text' | 'markdown') {
+		super(id)
 		this.type = type
 	}
 
@@ -308,12 +317,21 @@ export class InputNodeBuilder extends ValueNodeBuilder {
 		this._placeholder = p
 		return this
 	}
+
+	initial(v: NodeState | ((ctx: NodeContext) => NodeState)): this {
+		this._defaultValue = v
+		return this
+	}
+
+	required(v = true): this {
+		this._required = v
+		return this
+	}
 }
 
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type = 'group' as const
 	_layout?: 'flex' | 'column'
-	_title?: Reactive<string>
 	_required?: boolean
 	_selectMode?: 'single' | 'multi'
 
@@ -323,11 +341,6 @@ export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 
 	layout(l: 'flex' | 'column'): this {
 		this._layout = l
-		return this
-	}
-
-	title(t: Reactive<string>): this {
-		this._title = t
 		return this
 	}
 
@@ -468,7 +481,8 @@ function stampChildPaths(nodes: NodeBuilder[], scopePath: string[]): void {
 export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 	switch (node.type) {
 		case 'toggle':
-		case 'check': {
+		case 'check':
+		case 'option': {
 			if (typeof state === 'boolean') return state
 			if (state && typeof state === 'object' && !(state instanceof Set)) {
 				const v = (state as NodeStateWithChildren).value
@@ -616,8 +630,8 @@ export function stageFn(factory: StageFn): StageFn {
 export const toggle = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'toggle')
 export const check = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel, 'check')
 export const button = (nodeLabel: string) => new ButtonNodeBuilder(nodeLabel)
-export const text = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'text')
-export const markdown = (id: string, nodeLabel: string) => new InputNodeBuilder(id, nodeLabel, 'markdown')
+export const text = (id: string) => new InputNodeBuilder(id, 'text')
+export const markdown = (id: string) => new InputNodeBuilder(id, 'markdown')
 export const group = (id?: string) => new GroupNodeBuilder(id)
 export const dropdown = (id: string) => new DropdownNodeBuilder(id)
 export const option = (id: string, nodeLabel: string) => new OptionNodeBuilder(id, nodeLabel)

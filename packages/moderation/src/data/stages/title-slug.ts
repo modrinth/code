@@ -3,7 +3,7 @@ import { BookOpenIcon } from '@modrinth/assets'
 
 import {
 	action,
-	toggle,
+	button,
 	fix,
 	group,
 	label,
@@ -12,89 +12,113 @@ import {
 	stage,
 	stageFn,
 	text,
-	button,
+	toggle,
 } from '../../types/node'
 
-function hasCustomSlug(project: Labrinth.Projects.v3.Project): boolean {
-	return (
-		project.slug !==
-		project.name
-			.trim()
-			.toLowerCase()
-			.replaceAll(' ', '-')
-			.replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-			.replaceAll(/--+/gm, '-')
-	)
+//TODO: make this not a copy of frontend/src/utils/slugs.generateUrlSlug
+// (as in move the other one so we can use it here)
+function generateUrlSlug(value: string) {
+	return value
+		.trim()
+		.toLowerCase()
+		.replaceAll(' ', '-')
+		.replaceAll(/[^a-zA-Z0-9._-]/g, '')
+		.replaceAll(/--+/gm, '-')
 }
 
-export default stageFn((project) => stage('title-slug', 'Title & Slug')
-	.hint('Are the Name and URL accurate and appropriate?')
-	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705')
-	.icon(BookOpenIcon)
-	.children(
-		label(async (ctx) => {
-			const title = await md('checklist/text/title-slug/title')(ctx)
-			if (!hasCustomSlug(ctx.project)) return title
-			return title + (await md('checklist/text/title-slug/slug')(ctx))
-		}),
+function hasCustomSlug(project: Labrinth.Projects.v3.Project) {
+	return generateUrlSlug(project.name) !== project.slug
+}
 
-		group('title').children(
-			toggle('useless_info', 'Contains Useless Info').action(
-				action()
-					.suggestedStatus('flagged')
-					.severity('low')
-					.message(md('checklist/messages/title/useless-info')),
-			),
+//TODO:some sort of input somewhere had placeholders but i forgot so probably figure out which that one was
 
-			toggle('minecraft_branding', 'Minecraft Title').action(
-				action()
-					.suggestedStatus('flagged')
-					.severity('medium')
-					.message(md('checklist/messages/title/minecraft-branding')),
-			),
+export default stageFn((project) =>
+	stage('title-slug', 'Title & Slug')
+		.hint('Are the Name and URL accurate and appropriate?')
+		.guidance(
+			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
+		)
+		.icon(BookOpenIcon)
+		.children(
+			label(async (ctx) => {
+				const title = await md('checklist/text/title-slug/title')(ctx)
+				if (!hasCustomSlug(ctx.project)) return title
+				return title + (await md('checklist/text/title-slug/slug')(ctx))
+			}),
 
-			toggle('similarities', 'Title Similarities')
-				.action(
-					action()
-						.suggestedStatus('flagged')
-						.severity('medium')
-						.message(md('checklist/messages/title/similarities')),
-				)
+			group('title')
+				.title('Title Issues?')
 				.children(
-					group('options').multiSelect().children(
-						option('modpack_named_after_mod', 'Modpack Named After Mod')
-							.shown(project.project_types.includes('modpack'))
-							.action(action().message(md('checklist/messages/title/similarities-modpack'))),
-
-						option('forked_project', 'Forked Project')
-							.shown(!project?.minecraft_server)
-							.action(action().message(md('checklist/messages/title/similarities-fork'))),
+					toggle('useless_info', 'Contains Useless Info').action(
+						action()
+							.suggestedStatus('flagged')
+							.severity('low')
+							.message(md('checklist/messages/title/useless-info')),
 					),
-				),
-		),
 
-		group('slug')
-			.shown(hasCustomSlug(project))
-			.children(
-				group('options').multiSelect().children(
-					option('misused', 'Misused')
-						.children(
-								text('correct_slug', 'Correct Slug')
-									.initial((ctx) => ctx.project.slug),
-								button('Auto')
-									.onClick(ctx => {}))
+					toggle('minecraft_branding', 'Minecraft Title').action(
+						action()
+							.suggestedStatus('flagged')
+							.severity('medium')
+							.message(md('checklist/messages/title/minecraft-branding')),
+					),
+
+					toggle('similarities', 'Title Similarities')
 						.action(
 							action()
-								.message(md('checklist/messages/slug/misused'))
-								.fix(
-									fix().project((patch, ctx) => {
-										const slug = ctx.state.correct_slug as string
-										if (!slug) return
-										patch.slug = slug
-									}),
+								.suggestedStatus('flagged')
+								.severity('medium')
+								.message(md('checklist/messages/title/similarities')),
+						)
+						.children(
+							group('options')
+								.title('Similarities Additional Info')
+								.multiSelect()
+								.children(
+									option('modpack_named_after_mod', 'Modpack Named After Mod')
+										.shown(project.project_types.includes('modpack'))
+										.action(action().message(md('checklist/messages/title/similarities-modpack'))),
+
+									option('forked_project', 'Forked Project')
+										.shown(!project?.minecraft_server)
+										.action(action().message(md('checklist/messages/title/similarities-fork'))),
 								),
 						),
 				),
-			),
-	),
+
+			group('slug')
+				.title('Slug Issues')
+				.shown(hasCustomSlug(project))
+				.children(
+					group('options')
+						.multiSelect()
+						.children(
+							option('misused', 'Misused')
+								.children(
+									group()
+										.title('Correct Slug')
+										.children(
+                      //TODO: probably make this reset to current slug if you clear it?
+											text('correct_slug')
+                        .title('Correct Slug')
+                        .initial(project.slug),
+											button('Auto')
+												.enabled(project.slug !== generateUrlSlug(project.name))
+												.onClick((ctx) => (ctx.state.correct_slug = generateUrlSlug(project.name))),
+										),
+								)
+								.action(
+									action()
+										.message(md('checklist/messages/slug/misused'))
+										.fix(
+											fix().project((patch, ctx) => {
+												const slug = ctx.state.correct_slug as string
+												if (!slug) return
+												patch.slug = slug
+											}),
+										),
+								),
+						),
+				),
+		),
 )

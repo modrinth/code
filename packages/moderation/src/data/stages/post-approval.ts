@@ -24,7 +24,7 @@ export default stageFn((_project, projectV2) => stage('post-approval', 'Post-App
 						.severity('high')
 						.message(md('checklist/messages/post-approval/missed-deadline', (ctx) => ({ STATUS: ctx.state.status }))),
 				)
-				.children(text('status', 'What status is the project being set to?').required()),
+				.children(text('status').title('What status is the project being set to?').required()),
 
 			toggle('metadata_issue', 'Incorrect metadata')
 				.action(
@@ -44,8 +44,8 @@ export default stageFn((_project, projectV2) => stage('post-approval', 'Post-App
 								}))),
 						)
 						.children(
-							text('dependency_name', 'Dependency name').required(),
-							text('dependency_link', 'Dependency link').required(),
+							text('dependency_name').title('Dependency name').required(),
+							text('dependency_link').title('Dependency link').required(),
 						),
 
 					toggle('mc_versions', 'Game versions')
@@ -54,7 +54,7 @@ export default stageFn((_project, projectV2) => stage('post-approval', 'Post-App
 								.severity('low')
 								.message(md('checklist/messages/misc-metadata/mc-versions', (ctx) => ({ SPECIFICS: ctx.state.specifics }))),
 						)
-						.children(text('specifics', 'More details about the game versions issue?')),
+						.children(text('specifics').title('More details about the game versions issue?')),
 
 					toggle('loaders', 'Loaders')
 						.action(
@@ -62,7 +62,7 @@ export default stageFn((_project, projectV2) => stage('post-approval', 'Post-App
 								.severity('low')
 								.message(md('checklist/messages/misc-metadata/loaders', (ctx) => ({ SPECIFICS: ctx.state.specifics }))),
 						)
-						.children(text('specifics', 'More details about the loaders issue?')),
+						.children(text('specifics').title('More details about the loaders issue?')),
 
 					toggle('license', 'Inconsistent Licensing')
 						.action(

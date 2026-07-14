@@ -1,6 +1,6 @@
 import { ListBulletedIcon } from '@modrinth/assets'
 
-import { action, toggle, group, markdown, md, option, stage, stageFn } from '../../types/node'
+import { action, group, markdown, md, option, stage, stageFn,toggle } from '../../types/node'
 
 export default stageFn((project) => stage('rule-following', 'Rule Following')
 	.hint('Does this project violate the rules?')
@@ -113,7 +113,7 @@ export default stageFn((project) => stage('rule-following', 'Rule Following')
 						.message(md('checklist/messages/rule-breaking', (ctx) => ({ MESSAGE: ctx.state.message }))),
 				)
 				.children(
-					markdown('message', 'Explain how it infringes on content rules.').required(),
+					markdown('message').title('Explain how it infringes on content rules.').required(),
 				),
 		),
 	),

@@ -36,7 +36,15 @@ const props = defineProps<{
 	showContext: NodeContext
 	onImageUpload?: (file: File) => Promise<string>
 	flex?: boolean
+	titleDepth?: number
 }>()
+
+function titleClass(depth: number): string {
+	if (depth === 0) return 'text-lg font-extrabold text-contrast'
+	if (depth === 1) return 'text-base font-semibold'
+	if (depth === 2) return 'text-sm font-semibold'
+	return ''
+}
 
 function isVisible(node: NodeBuilder): boolean {
 	return node._shown === undefined || resolve(node._shown, props.showContext)
@@ -157,6 +165,9 @@ function getDropdownModelValue(node: DropdownNodeBuilder) {
 
 function toggleSelect(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder) {
 	const current = getSelectState(parent)
+	if (current !== child.id && child._statePath && getAtPath(child._statePath) === undefined) {
+		setAtPath(child._statePath, {})
+	}
 	setNodeState(parent, current === child.id ? undefined : child.id)
 }
 
@@ -173,7 +184,7 @@ function getTextState(node: IdentifiedNodeBuilder): string {
 	return typeof def === 'string' ? def : ''
 }
 
-function getGroupTitle(node: GroupNodeBuilder): string | undefined {
+function getNodeTitle(node: NodeBuilder): string | undefined {
 	if (node._title === undefined) return undefined
 	return resolve(node._title, props.showContext) || undefined
 }
@@ -182,7 +193,7 @@ function getPlaceholder(node: InputNodeBuilder): string | undefined {
 	if (node._placeholder !== undefined) return resolve(node._placeholder, props.showContext)
 	const def = resolveDefault(node)
 	if (typeof def === 'string') return def
-	return asLabeled(node).label || undefined
+	return undefined
 }
 
 function hasActionableFixes(node: IdentifiedNodeBuilder): boolean {
@@ -220,6 +231,9 @@ function toggleChip(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder)
 		selected.delete(child.id!)
 	} else {
 		selected.add(child.id!)
+		if (child._statePath && getAtPath(child._statePath) === undefined) {
+			setAtPath(child._statePath, {})
+		}
 	}
 	setNodeState(parent, selected.size > 0 ? selected : undefined)
 }
@@ -228,9 +242,19 @@ function getChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
 	return resolveChildren(node, props.showContext)
 }
 
+function childScopedContext(child: IdentifiedNodeBuilder): NodeContext {
+	if (!child._statePath) return props.showContext
+	const state = getAtPath(child._statePath)
+	const childState = (state && typeof state === 'object' && !(state instanceof Set))
+		? (state as Record<string, NodeState>)
+		: {} as Record<string, NodeState>
+	return { ...props.showContext, state: childState, parent: props.showContext }
+}
+
 function visibleChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
 	return getChildren(node).filter(isVisible)
 }
+
 
 function renderProse(content: string): string {
 	return renderString(content).replace(/<a /g, '<a target="_blank" ')
@@ -308,8 +332,8 @@ watchEffect(async () => {
 			<template v-if="isVisible(node)">
 				<!-- group -->
 				<div v-if="node.type === 'group'">
-					<div v-if="getGroupTitle(asGroup(node))" class="mb-2 font-semibold">
-						{{ getGroupTitle(asGroup(node)) }}<span v-if="asGroup(node)._required" class="text-red"> *</span>
+					<div v-if="getNodeTitle(node)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
+						{{ getNodeTitle(node) }}<span v-if="asGroup(node)._required" class="text-red"> *</span>
 					</div>
 					<!-- multi-select (chips) mode -->
 					<template v-if="asGroup(node)._selectMode === 'multi'">
@@ -327,8 +351,9 @@ watchEffect(async () => {
 							<NodeRenderer
 								v-if="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) && getChildren(asIdentified(child)).length"
 								:nodes="getChildren(asIdentified(child))"
-								:show-context="showContext"
+								:show-context="childScopedContext(asIdentified(child))"
 								:on-image-upload="onImageUpload"
+								:title-depth="titleDepth"
 								class="mt-2"
 							/>
 						</template>
@@ -346,8 +371,9 @@ watchEffect(async () => {
 							<NodeRenderer
 								v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
 								:nodes="getChildren(asIdentified(child))"
-								:show-context="showContext"
+								:show-context="childScopedContext(asIdentified(child))"
 								:on-image-upload="onImageUpload"
+								:title-depth="titleDepth"
 								class="mt-2"
 							/>
 						</template>
@@ -359,11 +385,13 @@ watchEffect(async () => {
 						:show-context="showContext"
 						:on-image-upload="onImageUpload"
 						:flex="asGroup(node)._layout !== 'column'"
+						:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
 					/>
 				</div>
 
 				<!-- dropdown -->
-				<div v-else-if="node.type === 'dropdown'">
+				<div v-else-if="node.type === 'dropdown'" :class="node._title !== undefined ? undefined : 'contents'">
+					<div v-if="node._title !== undefined" class="mb-2" :class="titleClass(titleDepth ?? 0)">{{ getNodeTitle(node) }}</div>
 					<Combobox
 						class="!w-80"
 						:options="getDropdownOptions(asDropdown(node))"
@@ -376,66 +404,75 @@ watchEffect(async () => {
 						<NodeRenderer
 							v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
 							:nodes="getChildren(asIdentified(child))"
-							:show-context="showContext"
+							:show-context="childScopedContext(asIdentified(child))"
 							:on-image-upload="onImageUpload"
+							:title-depth="titleDepth"
 							class="mt-2"
 						/>
 					</template>
 				</div>
 
 				<!-- button -->
-				<ButtonStyled v-else-if="node.type === 'button'">
-					<button
-						:disabled="asButton(node)._enabled !== undefined && !resolve(asButton(node)._enabled, showContext)"
-						@click="asButton(node)._onClick?.(showContext)"
-					>{{ asButton(node).label }}</button>
-				</ButtonStyled>
+				<div v-else-if="node.type === 'button'" :class="node._title !== undefined ? undefined : 'contents'">
+					<div v-if="node._title !== undefined" class="mb-2" :class="titleClass(titleDepth ?? 0)">{{ getNodeTitle(node) }}</div>
+					<ButtonStyled>
+						<button
+							:disabled="asButton(node)._enabled !== undefined && !resolve(asButton(node)._enabled, showContext)"
+							@click="asButton(node)._onClick?.(showContext)"
+						>{{ asButton(node).label }}</button>
+					</ButtonStyled>
+				</div>
 
 				<!-- toggle -->
-				<ButtonStyled
-					v-else-if="node.type === 'toggle'"
-					:color="getBooleanColor(asBool(node))"
-				>
-					<button
-						v-tooltip="getNodeTooltipConfig(asBool(node))"
-						:disabled="!isEnabled(asIdentified(node))"
-						@click="toggleBoolean(asBool(node))"
-					>{{ asLabeled(node).label }}</button>
-				</ButtonStyled>
+				<div v-else-if="node.type === 'toggle'" :class="node._title !== undefined ? undefined : 'contents'">
+					<div v-if="node._title !== undefined" class="mb-2" :class="titleClass(titleDepth ?? 0)">{{ getNodeTitle(node) }}</div>
+					<ButtonStyled :color="getBooleanColor(asBool(node))">
+						<button
+							v-tooltip="getNodeTooltipConfig(asBool(node))"
+							:disabled="!isEnabled(asIdentified(node))"
+							@click="toggleBoolean(asBool(node))"
+						>{{ asLabeled(node).label }}</button>
+					</ButtonStyled>
+				</div>
 
 				<!-- check -->
-				<Checkbox
-					v-else-if="node.type === 'check'"
-					:model-value="getBooleanState(asBool(node))"
-					:label="asLabeled(node).label"
-					:disabled="!isEnabled(asIdentified(node))"
-					@update:model-value="isEnabled(asIdentified(node)) && toggleBoolean(asBool(node))"
-				/>
+				<div v-else-if="node.type === 'check'" :class="node._title !== undefined ? undefined : 'contents'">
+					<div v-if="node._title !== undefined" class="mb-2" :class="titleClass(titleDepth ?? 0)">{{ getNodeTitle(node) }}</div>
+					<Checkbox
+						:model-value="getBooleanState(asBool(node))"
+						:label="asLabeled(node).label"
+						:disabled="!isEnabled(asIdentified(node))"
+						@update:model-value="isEnabled(asIdentified(node)) && toggleBoolean(asBool(node))"
+					/>
+				</div>
 
 				<!-- text -->
-				<StyledInput
-					v-else-if="node.type === 'text'"
-					:id="`node-${asIdentified(node).id}`"
-					:aria-label="asLabeled(node).label || undefined"
-					:model-value="getTextState(asIdentified(node))"
-					:placeholder="getPlaceholder(asInput(node))"
-					autocomplete="off"
-					@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
-				/>
+				<div v-else-if="node.type === 'text'" :class="node._title !== undefined ? undefined : 'contents'">
+					<div v-if="node._title !== undefined" class="mb-2" :class="titleClass(titleDepth ?? 0)">{{ getNodeTitle(node) }}</div>
+					<StyledInput
+						:id="`node-${asIdentified(node).id}`"
+						:model-value="getTextState(asIdentified(node))"
+						:placeholder="getPlaceholder(asInput(node))"
+						autocomplete="off"
+						@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
+					/>
+				</div>
 
 				<!-- markdown -->
-				<MarkdownEditor
-					v-else-if="node.type === 'markdown'"
-					:id="`node-${asIdentified(node).id}`"
-					:aria-label="asLabeled(node).label || undefined"
-					:model-value="getTextState(asIdentified(node))"
-					:placeholder="getPlaceholder(asInput(node))"
-					:max-height="300"
-					:disabled="false"
-					:heading-buttons="false"
-					:on-image-upload="onImageUpload"
-					@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
-				/>
+				<div v-else-if="node.type === 'markdown'" :class="node._title !== undefined ? undefined : 'contents'">
+					<div v-if="node._title !== undefined" class="mb-2" :class="titleClass(titleDepth ?? 0)">{{ getNodeTitle(node) }}</div>
+					<MarkdownEditor
+						:id="`node-${asIdentified(node).id}`"
+						:aria-label="asLabeled(node).label || undefined"
+						:model-value="getTextState(asIdentified(node))"
+						:placeholder="getPlaceholder(asInput(node))"
+						:max-height="300"
+						:disabled="false"
+						:heading-buttons="false"
+						:on-image-upload="onImageUpload"
+						@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
+					/>
+				</div>
 
 				<!-- display (prose + label) -->
 				<div
@@ -453,6 +490,7 @@ watchEffect(async () => {
 				:nodes="getChildren(asIdentified(node))"
 				:show-context="showContext"
 				:on-image-upload="onImageUpload"
+				:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
 				class="w-full"
 			/>
 		</template>
