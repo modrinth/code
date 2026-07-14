@@ -34,6 +34,12 @@ export default [
 		private: false,
 	},
 	{
+		label: '🚫 Misused Obfuscation',
+		message: async () =>
+			(await import('../messages/quick-replies/tech-review/misused-obfuscation.md?raw')).default,
+		private: false,
+	},
+	{
 		label: '🚫 Malware',
 		message: async () =>
 			(await import('../messages/quick-replies/tech-review/malware.md?raw')).default,
