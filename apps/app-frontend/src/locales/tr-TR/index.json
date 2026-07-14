@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "İçerik gerekli"
-  },
   "app.modal.install-to-play.header": {
     "message": "Oynamak için yükleyin"
   },
@@ -437,26 +434,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {#mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Gerekli mod paketi"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Bu sunucuya girebilmek için modlar gereklidir. Gerekli dosyaları Modrinth üzerinden kurmak için Yükle butonuna tıkla, ardından doğrudan sunucuya başlat."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Paylaşılan Kurulum"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Paylaşılan Sunucu Kurulumu"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "İçeriği görüntüle"
   },
   "app.modal.update-to-play.header": {
     "message": "Oynamak için güncelle"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Güncelleme gerekli"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
@@ -1102,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Yükleyici sunucu tarafından sağlanıyor"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Bu uyarıyı tekrar gösterme"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "İndirmeyi onayla"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Yine de indir"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Kötü amaçlı yazılımlar genellikle Discord gibi platformlarda paylaşılan mod paketi dosyaları aracılığıyla yayılır."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Bu dosyayı Modrinth üzerinde bulamadık. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle öneririz."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Bilinmeyen dosya uyarısı"
   }
 }

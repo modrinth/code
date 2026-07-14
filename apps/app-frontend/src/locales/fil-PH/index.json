@@ -242,9 +242,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hanapin sa {count} mundo..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Nangangailangan ng kontento"
-  },
   "app.modal.install-to-play.header": {
     "message": "Mag-install upang malaro"
   },
@@ -254,26 +251,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# na mod}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Kinailangan na modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ang server rna ito ay nangangailangan ng mga mod upang makalaro. Pindutin ang install upang maihanda ang mga kinakailangang file galing sa Modrinth, matapos ay ilunsad nang diretso sa server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Binahaging instansiya"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Binahaging instansiyang pang-server"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tingnan ang mga kontento"
   },
   "app.modal.update-to-play.header": {
     "message": "Mag-update upang malaro"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Kailangang mag-update"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
@@ -736,26 +721,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Ang loader ay handog na ng server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Ang file ay nasusuri lamang kapag ito ay na-upload sa Modrinth, walang pili sa file format nito (kabilang na ang .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Huwag ipakita ang babalang ito ulit"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Kumpirmahin ang installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "I-install pa rin"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Ang malware ay madalas naidadala sa mga modpack files sa pamamagitan ng pag-bigay ng mga ito sa mga platforms kagaya ng Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Hindi namin mahanap ang file na ito sa Modrinth. Mahalagang mag-install ka lamang ng files galing sa mga mapagkakatiwalang sources."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Hindi kilalang file"
   }
 }

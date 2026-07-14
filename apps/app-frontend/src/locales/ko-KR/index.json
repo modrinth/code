@@ -356,9 +356,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count}개의 세계 검색..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "콘텐츠 설치 필요"
-  },
   "app.modal.install-to-play.header": {
     "message": "설치하고 플레이"
   },
@@ -368,26 +365,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {모드 #개} other {모드 #개}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "필요한 모드팩"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "이 서버를 플레이하려면 모드가 필요합니다. '설치'를 클릭하여 Modrinth에서 필수 파일을 내려받은 후, 서버에 바로 접속하세요."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "인스턴스 공유됨"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "서버 인스턴스 공유됨"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "구성 요소 보기"
   },
   "app.modal.update-to-play.header": {
     "message": "업데이트하고 플레이"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "업데이트 필요"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}을(를) 플레이하려면 업데이트가 필요합니다. 게임을 실행하려면 최신 버전으로 업데이트해 주세요."
@@ -1018,26 +1003,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "로더가 서버에 의해 제공됩니다"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "모든 파일은 형식(.mrpack 포함)에 무관하게 Modrinth에 업로드되어야만 검수를 거칩니다."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "이 경고를 다시 표시하지 않음"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "설치 확인"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "무시하고 설치"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "악성코드는 흔히 디스코드와 같은 플랫폼을 통해 모드팩 파일을 공유하는 방식으로 유포됩니다."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "이 파일을 Modrinth에서 찾을 수 없습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 권장합니다."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "출처를 알 수 없는 파일 경고"
   }
 }

@@ -242,6 +242,10 @@ export async function add_project_from_path(
 	})
 }
 
+export async function is_file_on_modrinth(projectPath: string): Promise<boolean> {
+	return await invoke('plugin:instance|instance_is_file_on_modrinth', { projectPath })
+}
+
 // Toggle disabling a project
 export async function toggle_disable_project(
 	instanceId: string,

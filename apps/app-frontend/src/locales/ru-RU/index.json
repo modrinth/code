@@ -419,9 +419,6 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Требуется дополнительный контент"
-  },
   "app.modal.install-to-play.header": {
     "message": "Установка перед запуском"
   },
@@ -431,26 +428,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Необходимая сборка"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth, чтобы подключиться."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Сборка"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Общая сборка сервера"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Посмотреть содержимое"
   },
   "app.modal.update-to-play.header": {
     "message": "Обновление перед запуском"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Требуется обновление"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Обновите {name} до последней версии, чтобы запустить игру."
@@ -1093,26 +1078,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Загрузчик управляется сервером"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Файл проверяется только в том случае, если он загружен на Modrinth, независимо от его формата (включая .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Больше не предупреждать"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Подтверждение установки"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Всё равно установить"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Вредоносное ПО часто распространяется через сборки на таких платформах, как Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Этот файл не найден на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Предупреждение о неизвестном файле"
   }
 }

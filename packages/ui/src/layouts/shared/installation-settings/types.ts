@@ -37,6 +37,7 @@ export interface LoaderVersionEntry {
 
 export interface ContentDiffItem {
 	type: 'added' | 'removed' | 'updated'
+	external?: boolean
 	projectName?: string
 	fileName?: string
 	currentVersionName?: string

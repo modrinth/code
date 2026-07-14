@@ -362,9 +362,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hledat v {count} světech..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Požadovaný obsah"
-  },
   "app.modal.install-to-play.header": {
     "message": "Nainstaluj pro hraní"
   },
@@ -374,26 +371,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mód} few {# módy} other {# módů}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Požadovaný modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth a poté se rovnou připoj na server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Sdílená instance"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Sdílená serverová instance"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Zobrazit obsah"
   },
   "app.modal.update-to-play.header": {
     "message": "Aktualizuj pro hraní"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Je vyžadována aktualizace"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Pro hraní {name} je vyžadována aktualizace. Prosím aktualizuj na nejnovější verzi, abys mohl hru spustit."
@@ -1036,26 +1021,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader zprostředkovává server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Soubor je zkontrolován pouze v případě, že je nahrán na Modrinth, bez ohledu na jeho formát (včetně formátu .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Toto varování znovu nezobrazovat"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Potvrdit instalaci"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Přesto nainstalovat"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware se často šíří prostřednictvím souborů s modpacky, které se sdílejí na platformách jako Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Tento soubor jsme na Modrinthu nenašli. Důrazně doporučujeme instalovat pouze soubory z důvěryhodných zdrojů."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Upozornění na neznámý soubor"
   }
 }

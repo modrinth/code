@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ابحث بين ال{count} عوالم..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "المحتوى مطلوب"
-  },
   "app.modal.install-to-play.header": {
     "message": "نزل للعب"
   },
@@ -437,26 +434,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "حُزْمَة التعديل مطلوبة"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "النماذج المشتركة"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "نماذج الخادم مشتركة"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "عرض المحتويات"
   },
   "app.modal.update-to-play.header": {
     "message": "حدث للعب"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "يلزم التحديث"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "هناك تحديث مطلوب للعب بـ {name}. الرجاء التحديث إلى أحدث اصدار لتشغيل اللعبة."
@@ -1102,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "يتم توفير المحمّل من قبل الخادم"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "لا تتم مراجعة الملف إلا إذا تم تحميله على Modrinth، بغض النظر عن تنسيق الملف (بما في ذلك .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "لا تعرض هذا التحذير مجددا"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "تأكيد التثبيت"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "التثبيت على أي حال"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "غالبًا ما يتم توزيع البرامج الضارة عبر ملفات الحزم المعدلة من خلال مشاركتها على منصات مثل Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "لم نتمكن من العثور على هذا الملف على موقع Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر موثوقة."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "تحذير بشأن ملف مجهول"
   }
 }

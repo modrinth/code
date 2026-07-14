@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Szükséges tartalom"
-  },
   "app.modal.install-to-play.header": {
     "message": "Telepítés a játékhoz"
   },
@@ -437,26 +434,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Szükséges modcsomag"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Modrinth-ról, majd indítsd el közvetlenül a szervert."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Megosztott profil"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Megosztott szerverpéldány"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tartalom megtekintése"
   },
   "app.modal.update-to-play.header": {
     "message": "Frissítsd a játékhoz"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Frissítés szükséges"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Frissítés szükséges ehhez: {name}. Kérlek, frissíts a legújabb verzióra a játék elindításához."
@@ -1102,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "A betöltő a szerver által van megadva"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Egy fájlt csak akkor vizsgálunk meg, ha azt feltöltik a Modrinthra, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Ne mutasd újra ezt a figyelmeztetést"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Telepítés megerősítése"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Letöltés mindenképpen"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "A rosszindulatú programokat gyakran modcsomag-fájlokon keresztül terjesztik, például a Discordhoz hasonló platformokon történő megosztás révén."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ezt a fájlt nem találtuk meg a Modrinthon. Határozottan javasoljuk, hogy kizárólag megbízható forrásokból származó fájlokat telepíts."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Figyelmeztetés ismeretlen fájlról"
   }
 }

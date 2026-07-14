@@ -278,9 +278,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} 個のワールドを検索…"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "必須コンテンツ"
-  },
   "app.modal.install-to-play.header": {
     "message": "インストールしてプレイ"
   },
@@ -290,26 +287,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {#個のMod}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "必須のModパック"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "このサーバーをプレイするにはModが必要です。インストールをクリックしてModrinthから必要なファイルを設定し、サーバーに接続してください。"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共有インスタンス"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共有サーバーインスタンス"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "コンテンツを見る"
   },
   "app.modal.update-to-play.header": {
     "message": "更新してプレイ"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "更新が必要です"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
@@ -811,26 +796,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "ローダーはサーバーによる条件です"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "ファイル形式に関わらず、Modrinthにアップロードされたファイルのみが確認されます。(.mrpackを含む)"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "この警告を次回から表示しない"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "インストールの確認"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "インストールを続行"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "一般的にマルウェアは、Discord等のプラットフォーム上でModパックファイルを配布して拡散されます"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "このファイルをModrinth上で見つけることができませんでした。信頼できるソースからインストールすることを強くお勧めします。"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "不明なファイルの警告"
   }
 }

@@ -227,14 +227,8 @@
   "app.modal.install-to-play.shared-instance": {
     "message": "Delt tilfelle"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Delt servertilfelle"
-  },
   "app.modal.update-to-play.header": {
     "message": "Oppdater for å spille"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Krever oppdatering"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Ei oppdatering er påkrevd for å spille {name}. Vær så snill å oppdater til den siste versjonen av spillet for å spille det."

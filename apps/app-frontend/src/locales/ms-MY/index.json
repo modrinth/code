@@ -260,9 +260,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cari {count} dunia..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Kandungan yang diperlukan"
-  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk mainkan"
   },
@@ -272,26 +269,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pek mod yang diperlukan"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Pelayan ini memerlukan mod untuk dimainkan. Klik Pasang untuk menyediakan fail yang diperlukan daripada Modrinth, kemudian lancarkan permainan terus ke dalam pelayan."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Pemasangan yang dikongsi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Pemasangan pelayan yang dikongsi"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Lihat kandungan"
   },
   "app.modal.update-to-play.header": {
     "message": "Kemas kini untuk mainkan"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Kemas kini diperlukan"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Kemas kini diperlukan untuk memainkan {name}. Sila kemas kini kepada versi terkini untuk melancarkan permainan."
@@ -856,26 +841,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Pemuat adalah disediakan oleh pelayan"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Sesuatu fail hanya disemak jika ia dimuat naik ke Modrinth, tanpa mengira format failnya (termasuk .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Jangan tunjukkan amaran ini lagi"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Sahkan pemasangan"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Pasangkan juga"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Perisian hasad sering diedarkan melalui fail pek mod dengan berkongsinya di platform seperti Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Kami tidak dapat menemui fail ini di Modrinth. Kami sangat mengesyorkan anda untuk hanya memasang fail daripada sumber yang anda percayai."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Amaran fail tidak diketahui"
   }
 }

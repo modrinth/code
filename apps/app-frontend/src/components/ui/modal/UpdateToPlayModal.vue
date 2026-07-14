@@ -2,17 +2,17 @@
 	<ContentDiffModal
 		ref="diffModal"
 		:header="formatMessage(messages.updateToPlay)"
-		:admonition-header="formatMessage(messages.updateRequired)"
 		:description="
 			instance ? formatMessage(messages.updateRequiredDescription, { name: instance.name }) : ''
 		"
 		:diffs="normalizedDiffs"
+		:version-date="versionDate"
+		:show-external-warnings="showExternalWarnings"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
-		:show-report-button="true"
+		:removed-label="formatMessage(messages.removed)"
 		@confirm="handleUpdate"
 		@cancel="handleDecline"
-		@report="handleReport"
 	/>
 </template>
 
@@ -26,9 +26,8 @@ import {
 	defineMessages,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { wait_for_install_job } from '@/helpers/install'
@@ -77,6 +76,10 @@ const { formatMessage } = useVIntl()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
+defineProps<{
+	showExternalWarnings?: boolean
+}>()
+
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const instance = ref<GameInstance | null>(null)
 const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
@@ -87,11 +90,18 @@ const modpackVersion = ref<Version | null>(null)
 const normalizedDiffs = computed<ContentDiffItem[]>(() =>
 	diffs.value.map((diff) => ({
 		type: diff.type,
+		external: Boolean(diff.fileName && !diff.project),
 		projectName: diff.project?.title,
 		fileName: diff.fileName,
 		currentVersionName: diff.currentVersion?.version_number,
 		newVersionName: diff.newVersion?.version_number,
 	})),
+)
+
+const versionDate = computed(() =>
+	modpackVersion.value?.date_published
+		? dayjs(modpackVersion.value.date_published).format('MMMM D, YYYY')
+		: undefined,
 )
 
 async function computeDependencyDiffs(
@@ -190,6 +200,10 @@ async function computeDependencyDiffs(
 			}
 		})
 		.sort((a, b) => {
+			const aExternal = Boolean(a.fileName && !a.project)
+			const bExternal = Boolean(b.fileName && !b.project)
+			if (aExternal !== bExternal) return aExternal ? -1 : 1
+
 			const typeOrder = { added: 0, updated: 1, removed: 2 }
 			const typeCompare = typeOrder[a.type] - typeOrder[b.type]
 			if (typeCompare !== 0) return typeCompare
@@ -227,16 +241,6 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 	return null
 }
 
-watch(
-	() => instance.value,
-	async (newInstance) => {
-		if (!newInstance) return
-		const result = await checkUpdateAvailable(newInstance)
-		diffs.value = result || []
-	},
-	{ immediate: true, deep: true },
-)
-
 async function handleUpdate() {
 	hide()
 	const serverProjectId = instance.value?.link?.project_id
@@ -254,12 +258,6 @@ async function handleUpdate() {
 	}
 }
 
-function handleReport() {
-	if (instance.value?.link?.project_id) {
-		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.value.link.project_id}`)
-	}
-}
-
 function handleDecline() {
 	hide()
 }
@@ -272,8 +270,15 @@ function show(
 ) {
 	instance.value = instanceVal
 	modpackVersionId.value = modpackVersionIdVal
+	modpackVersion.value = null
+	diffs.value = []
 	onUpdateComplete.value = callback
 	diffModal.value?.show(e)
+	void checkUpdateAvailable(instanceVal).then((result) => {
+		if (instance.value?.id === instanceVal.id && modpackVersionId.value === modpackVersionIdVal) {
+			diffs.value = result || []
+		}
+	})
 }
 
 function hide() {
@@ -285,14 +290,14 @@ const messages = defineMessages({
 		id: 'app.modal.update-to-play.header',
 		defaultMessage: 'Update to play',
 	},
-	updateRequired: {
-		id: 'app.modal.update-to-play.update-required',
-		defaultMessage: 'Update required',
-	},
 	updateRequiredDescription: {
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
 			'An update is required to play {name}. Please update to the latest version to launch the game.',
+	},
+	removed: {
+		id: 'app.modal.update-to-play.removed',
+		defaultMessage: 'Removed',
 	},
 })
 
