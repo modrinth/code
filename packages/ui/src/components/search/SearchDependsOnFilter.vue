@@ -11,7 +11,7 @@
 			<div
 				v-for="projectId in dependencyProjectIds"
 				:key="projectId"
-				class="group flex min-w-0 items-center gap-2 rounded-xl px-1 py-1 text-primary"
+				class="group flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-primary"
 			>
 				<img
 					v-if="dependentProjectMap.get(projectId)?.icon_url"
@@ -25,11 +25,11 @@
 				</span>
 				<button
 					type="button"
-					class="shrink-0 cursor-pointer border-0 bg-transparent p-0 text-sm transition-opacity"
+					class="shrink-0 cursor-pointer border-0 bg-transparent p-0 text-sm transition-all"
 					:class="
 						excludedProjectIds.has(projectId)
 							? 'text-secondary opacity-100'
-							: 'text-secondary opacity-0 underline decoration-1 underline-offset-2 group-hover:opacity-100 group-focus-within:opacity-100 hover:text-contrast'
+							: 'text-secondary opacity-0 decoration-1 underline-offset-2 group-hover:opacity-100 group-focus-within:opacity-100 hover:text-contrast'
 					"
 					@click="toggleProjectExcluded(projectId)"
 				>
@@ -42,6 +42,7 @@
 				<button
 					type="button"
 					class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0 text-secondary hover:text-contrast"
+					v-tooltip="formatMessage(messages.removeIncludedProjectTooltip)"
 					:aria-label="
 						formatMessage(messages.removeIncludedProject, {
 							project: dependentProjectMap.get(projectId)?.title ?? projectId,
@@ -73,12 +74,12 @@
 					{{ formatMessage(messages.clearFilter) }}
 				</button>
 			</div>
-			<div class="flex items-center gap-3 rounded-2xl bg-surface-1 p-3">
+			<div class="flex items-center gap-2 rounded-2xl bg-surface-1 p-2.5">
 				<img
 					v-if="selectedProject?.icon_url"
 					:src="selectedProject.icon_url"
 					:alt="selectedProject.title"
-					class="size-14 shrink-0 rounded-xl object-cover"
+					class="size-12 shrink-0 rounded-xl object-cover"
 				/>
 				<PackageIcon v-else class="size-14 shrink-0 text-secondary" />
 				<div class="min-w-0 flex-1">
@@ -97,7 +98,7 @@
 						@update:model-value="setDependencyTypes"
 					>
 						<template #input-content="{ isOpen }">
-							<span class="flex items-center gap-1 text-sm text-secondary">
+							<span class="flex items-center gap-0.5 text-sm text-secondary">
 								{{ dependencyTypeLabel }}
 								<DropdownIcon
 									class="size-4 transition-transform"
@@ -277,6 +278,10 @@ const messages = defineMessages({
 	removeIncludedProject: {
 		id: 'search.filter.included_content.remove_project',
 		defaultMessage: 'Remove {project}',
+	},
+	removeIncludedProjectTooltip: {
+		id: 'search.filter.included_content.remove_project.tooltip',
+		defaultMessage: 'Remove project',
 	},
 	required: {
 		id: 'search.filter.dependency_type.required',
