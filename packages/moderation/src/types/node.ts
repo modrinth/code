@@ -45,7 +45,7 @@ export type ChildEntry =
 	| NodeBuilder
 	| null
 	| Ref<NodeBuilder | null>
-	| ((state?: Record<string, NodeState>) => NodeBuilder | null)
+	| ((state?: Record<string, NodeState>) => NodeBuilder | NodeBuilder[] | null)
 
 export type NodeType =
 	| 'toggle'
@@ -623,6 +623,15 @@ export function resolveChildren(
 		const resolved =
 			typeof entry === 'function' ? entry(state) : toValue(entry as Ref<NodeBuilder | null>)
 		if (resolved == null) continue
+		if (Array.isArray(resolved)) {
+			for (const r of resolved) {
+				if (r == null) continue
+				if (r._shown !== undefined && !resolve(r._shown)) continue
+				if (scopePath) stampChildPaths([r], scopePath)
+				result.push(r)
+			}
+			continue
+		}
 		if (resolved._shown !== undefined && !resolve(resolved._shown)) continue
 		if (scopePath) stampChildPaths([resolved], scopePath)
 		result.push(resolved)

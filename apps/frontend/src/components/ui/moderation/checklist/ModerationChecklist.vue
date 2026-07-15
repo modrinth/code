@@ -1037,6 +1037,11 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 		const stageActiveActions: ActiveAction[] = []
 
 		if (stage._shown === undefined || resolve(stage._shown)) {
+			if (stage._action) {
+				messageCount++
+				stageActiveActions.push({ action: stage._action, state: stageState, statePath: [] })
+			}
+
 			walkNodes(
 				resolveChildren(stage, stageState),
 				stageState,

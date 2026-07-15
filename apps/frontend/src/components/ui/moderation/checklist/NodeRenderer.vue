@@ -381,7 +381,7 @@ watchEffect(async () => {
 			<template v-if="isVisible(node)">
 				<div :class="node.type !== 'group' && !getNodeTitle(node) ? 'contents' : undefined">
 					<div v-if="getNodeTitle(node)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
-						{{ getNodeTitle(node) }}<span v-if="nodeHasRequiredMissing(asIdentified(node))" class="text-red">*</span>
+						<span v-html="renderString(getNodeTitle(node)!)" /><span v-if="nodeHasRequiredMissing(asIdentified(node))" class="text-red">*</span>
 					</div>
 
 					<!-- group -->
