@@ -479,9 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Keşfete geri dön"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "İçeriği kuruluma yükle"
-  },
   "app.project.version.all-versions": {
     "message": "Tüm sürümler"
   },
