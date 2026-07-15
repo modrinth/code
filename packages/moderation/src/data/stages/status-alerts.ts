@@ -6,6 +6,7 @@ import { computed } from 'vue'
 import type { NodeBuilder, NodeState, StageNodeBuilder } from '../../types/node'
 import {
 	action,
+	getBooleanChildState,
 	group,
 	isNodeActive,
 	label,
@@ -22,6 +23,21 @@ export default function (
 ) {
 	const { projectV3: project } = injectProjectPageContext()
 
+	const fixNodesGroup = computed<NodeBuilder | null>(() => {
+		const fixNodes: NodeBuilder[] = []
+		walkNodes(
+			[group().children(...mainStages)],
+			(globalState.value ?? {}) as unknown as Record<string, NodeState>,
+			(node, nodeState) => {
+				if (!node._action?._fixes?.length) return
+				if (!isNodeActive(node, nodeState)) return
+				const childState = getBooleanChildState(nodeState)
+				fixNodes.push(...resolveChildren(node, childState))
+			},
+		)
+		return fixNodes.length > 0 ? group().children(...fixNodes) : null
+	})
+
 	return stage('status-alerts', 'Status Alerts')
 		.hint(`Is anything else affecting this project's status?`)
 		.guidance(
@@ -37,19 +53,7 @@ export default function (
 				toggle('corrections_applied', 'Corrections applied')
 					.shown(computed(() => project.value.status !== 'approved'))
 					.action(action().suggestedStatus('approved').message().applyFixes())
-					.children((_state) => {
-						const fakeChecklist = group().children(...mainStages)
-						const result: NodeBuilder[] = []
-						walkNodes(
-							[fakeChecklist],
-							(globalState.value ?? {}) as unknown as Record<string, NodeState>,
-							(node, nodeState, localState) => {
-								if (!node._action?._fixes?.length || !isNodeActive(node, nodeState)) return
-								result.push(...resolveChildren(node, localState))
-							},
-						)
-						return result
-					}),
+					.children(fixNodesGroup),
 
 				toggle('corrections_applied_approved', 'Corrections applied')
 					.shown(computed(() => project.value.status === 'approved'))
