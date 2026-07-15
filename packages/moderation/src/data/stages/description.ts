@@ -79,17 +79,30 @@ export default function () {
 								),
 						),
 
-					toggle('non_english', 'Non-english').action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('medium')
-							.message(
-								md(
-									() =>
-										`checklist/messages/description/non_english${project.value.minecraft_java_server ? '_server' : ''}`,
+					toggle('non_english', 'Non-english')
+						.action(
+							action()
+								.suggestedStatus('flagged')
+								.severity('medium')
+								.message(
+									md(
+										() =>
+											`checklist/messages/description/non_english${project.value.minecraft_java_server ? '_server' : ''}`,
+									),
 								),
-							),
-					),
+						)
+						.shown(
+							computed(() => {
+								if (
+									!!project.value?.minecraft_java_server &&
+									!project.value.minecraft_server?.languages?.includes('en')
+								) {
+									return false
+								} else {
+									return true
+								}
+							}),
+						),
 
 					toggle('headers_as_body', 'Headers as body text').action(
 						action().suggestedStatus('flagged').severity('low').message(),

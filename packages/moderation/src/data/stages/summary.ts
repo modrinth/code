@@ -31,9 +31,20 @@ export default function () {
 						action().suggestedStatus('flagged').severity('low').message(),
 					),
 
-					toggle('non_english', 'Non-english').action(
-						action().suggestedStatus('flagged').severity('medium').message(),
-					),
+					toggle('non_english', 'Non-english')
+						.action(action().suggestedStatus('flagged').severity('medium').message())
+						.shown(
+							computed(() => {
+								if (
+									!!project.value?.minecraft_java_server &&
+									!project.value.minecraft_server?.languages?.includes('en')
+								) {
+									return false
+								} else {
+									return true
+								}
+							}),
+						),
 
 					toggle('repeat_ip', 'Repeat of IP')
 						.shown(computed(() => !!project.value?.minecraft_server))
