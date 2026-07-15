@@ -110,7 +110,9 @@
 							<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
 
 							<div class="flex min-w-0 items-center gap-[5px] font-medium">
-								{{ sharedInstanceManager.type === 'server' ? 'Linked to' : 'Managed by' }}
+								<span class="shrink-0 whitespace-nowrap">
+									{{ sharedInstanceManager.type === 'server' ? 'Linked to' : 'Managed by' }}
+								</span>
 								<AutoLink
 									:to="sharedInstanceManagerLink"
 									class="flex min-w-0 items-center gap-[5px]"
