@@ -83,7 +83,7 @@ export async function loadMd(
 	state: Record<string, NodeState>,
 	project: Labrinth.Projects.v3.Project,
 	projectV2: Labrinth.Projects.v2.Project,
-	getVars?: (state: Record<string, NodeState>) => Record<string, NodeState>,
+	getVars?: (state: Record<string, any>) => Record<string, any>,
 ): Promise<string> {
 	const loader = messageFiles[`../data/messages/${path}.md`]
 	if (!loader) return ''
@@ -126,7 +126,7 @@ export function setMessageProject(
 
 export function md(
 	path: string | ((state: Record<string, NodeState>) => string),
-	getVars?: (state: Record<string, NodeState>) => Record<string, NodeState>,
+	getVars?: (state: Record<string, any>) => Record<string, any>,
 ): MessageFn {
 	return makeMessageFn(async (state) => {
 		const resolvedPath = typeof path === 'function' ? path(state) : path
