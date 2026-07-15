@@ -35,10 +35,10 @@ export default function () {
 				.severity('low')
 				.message(async (state) => {
 					const LINK_NAMES: Record<string, string> = {
-						issues: 'Issues',
-						source: 'Source',
-						wiki: 'Wiki',
-						discord: 'Discord',
+						issues: 'Issue tracker',
+						source: 'Source code',
+						wiki: 'Wiki page',
+						discord: 'Discord invite',
 						site: 'Website',
 						store: 'Store',
 						...Object.fromEntries(
@@ -155,28 +155,19 @@ export default function () {
 
 			() =>
 				project.value.link_urls.site?.url
-					? linkSection(
-							'site',
-							`**Website:** <${project.value.link_urls.site.url}>`,
-						)
+					? linkSection('site', `**Website:** <${project.value.link_urls.site.url}>`)
 					: null,
 
 			() =>
 				project.value.link_urls.store?.url
-					? linkSection(
-							'store',
-							`**Store:** <${project.value.link_urls.store.url}>`,
-						)
+					? linkSection('store', `**Store:** <${project.value.link_urls.store.url}>`)
 					: null,
 
 			() =>
 				Object.entries(project.value.link_urls)
 					.filter(([, l]) => l.donation)
 					.map(([, l]) =>
-						linkSection(
-							`donation_${l.platform}`,
-							`**${mdEscape(l.platform)}:** <${l.url}>`,
-						),
+						linkSection(`donation_${l.platform}`, `**${mdEscape(l.platform)}:** <${l.url}>`),
 					),
 		)
 }
