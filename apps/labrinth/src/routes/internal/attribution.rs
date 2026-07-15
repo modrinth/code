@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::{
-    DBFileId, DBOrganization, DBTeamMember, DBVersion,
+    DBFileId, DBOrganization, DBProject, DBTeamMember, DBVersion,
     ids::{
         DBAttributionGroupId, DBProjectId, DBVersionId,
         generate_attribution_group_id,
@@ -312,16 +312,39 @@ pub async fn list(
     path: web::Path<ProjectId>,
 ) -> Result<web::Json<Vec<AttributionGroupResponse>>, ApiError> {
     let project_id: DBProjectId = path.into_inner().into();
-    let requester_is_mod = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::VERSION_READ,
     )
-    .await
-    .ok()
-    .is_some_and(|(_, user)| user.role.is_mod());
+    .await?
+    .1;
+    let requester_is_mod = user.role.is_mod();
+
+    let project = DBProject::get_id(project_id, pool.as_ref(), redis.as_ref())
+        .await?
+        .ok_or(ApiError::NotFound)?;
+    let (team_member, organization_team_member) =
+        DBTeamMember::get_for_project_permissions(
+            &project.inner,
+            user.id.into(),
+            pool.as_ref(),
+        )
+        .await
+        .wrap_internal_err("failed to fetch project permissions")?;
+    if ProjectPermissions::get_permissions_by_role(
+        &user.role,
+        &team_member,
+        &organization_team_member,
+    )
+    .is_none()
+    {
+        return Err(ApiError::Auth(eyre!(
+            "you do not have permission to read versions for this project"
+        )));
+    }
 
     let groups = sqlx::query!(
         r#"
