@@ -21,13 +21,13 @@
     "defaultMessage": "用于创建推广代码的用户名"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "输入用户名…"
+    "defaultMessage": "输入用户名……"
   },
   "affiliate.createdBy": {
     "defaultMessage": "由 {user} 创建"
   },
   "affiliate.creating.button": {
-    "defaultMessage": "创建推广链接…"
+    "defaultMessage": "创建推广链接……"
   },
   "affiliate.revoke": {
     "defaultMessage": "撤销推广链接"
@@ -39,13 +39,13 @@
     "defaultMessage": "加载服务器设置失败"
   },
   "badge.alpha": {
-    "defaultMessage": "早期预览版"
+    "defaultMessage": "Alpha 早期预览版"
   },
   "badge.beta": {
-    "defaultMessage": "测试版"
+    "defaultMessage": "Beta 测试版"
   },
   "badge.beta-release": {
-    "defaultMessage": "Beta 发行版"
+    "defaultMessage": "Beta 测试发行版"
   },
   "badge.new": {
     "defaultMessage": "新"
@@ -102,19 +102,19 @@
     "defaultMessage": "你目前处于离线状态。连接互联网来浏览Modrinth！"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "搜索{projectType}……"
+    "defaultMessage": "搜索 {projectType}..."
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "选定的项目"
   },
   "browse.selected-projects-floating-bar.install": {
-    "defaultMessage": "安装{count, plural, other {#个项目}}"
+    "defaultMessage": "安装 {count, plural, other {# 个项目}}"
   },
   "browse.selected-projects-floating-bar.selected-count": {
-    "defaultMessage": "{count, plural, other {#个已选择的项目}}"
+    "defaultMessage": "{count, plural, other {# 个已选择的项目}}"
   },
   "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "你已经选择了{count, plural, other {#个}}要安装的项目。立即安装它们，或不安装并返回。"
+    "defaultMessage": "你已经选择了 {count, plural, other {# 个}}要安装的项目。立即安装它们，或不安装并返回。"
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "选定的项目尚未安装"
@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "打开文件夹"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "在浏览器中打开"
+  },
   "button.open-in-folder": {
     "defaultMessage": "在文件夹中打开"
   },
@@ -237,7 +240,7 @@
     "defaultMessage": "重新安装整合包"
   },
   "button.remove": {
-    "defaultMessage": "删除通行密钥"
+    "defaultMessage": "移除"
   },
   "button.remove-image": {
     "defaultMessage": "移除图片"
@@ -290,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "停止"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "切换到版本"
+  },
   "button.switch-version": {
     "defaultMessage": "切换版本"
   },
@@ -316,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "平台"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "此收藏夹为空。"
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "加载项目中……"
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "没有符合搜索条件的项目。"
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, other {# 个项目}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "搜索项目"
   },
   "collections.label.private": {
     "defaultMessage": "私有"
@@ -888,7 +909,7 @@
     "defaultMessage": "没有符合搜索条件的文件。"
   },
   "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "搜索文件…"
+    "defaultMessage": "搜索文件……"
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, other {已选择 # 个文件}}"
@@ -957,13 +978,13 @@
     "defaultMessage": "许可证"
   },
   "external-files.permissions-card.editor.link-label": {
-    "defaultMessage": "工作链接"
+    "defaultMessage": "作品链接"
   },
   "external-files.permissions-card.editor.link-to-license-url-placeholder": {
     "defaultMessage": "许可证链接"
   },
   "external-files.permissions-card.editor.link-to-work-url-placeholder": {
-    "defaultMessage": "工作链接"
+    "defaultMessage": "作品链接"
   },
   "external-files.permissions-card.editor.modrinth-link-to-work": {
     "defaultMessage": "这看起来像是一个Modrinth链接，如果这个内容存在于Modrinrh平台上，你的包很可能导出不正确。如果你是从其他网站下载的，尝试下载Modrinth版本的文件，有时它们不是相同文件。"
@@ -975,16 +996,16 @@
     "defaultMessage": "在这里写些东西"
   },
   "external-files.permissions-card.editor.proof-image-alt": {
-    "defaultMessage": "校样截图 {n}"
+    "defaultMessage": "证据截图 {n}"
   },
   "external-files.permissions-card.editor.proof-image-remove": {
     "defaultMessage": "移除图像"
   },
   "external-files.permissions-card.editor.proof-images-label": {
-    "defaultMessage": "校样图像"
+    "defaultMessage": "证明图片"
   },
   "external-files.permissions-card.editor.proof-images-upload-prompt": {
-    "defaultMessage": "拖放操作以上传图片或是选择一个图像"
+    "defaultMessage": "拖放上传或单击选择一张图片"
   },
   "external-files.permissions-card.editor.proof-warning.body": {
     "defaultMessage": "如果您被发现造假或者篡改上传的图像，您的项目和帐户可能会被终止。"
@@ -1111,6 +1132,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "您已获得特殊许可，可将本作品再分发至您的整合包中。"
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "移除组"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "未能移除组"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "从组中移除"
@@ -1396,6 +1423,9 @@
   },
   "files.row.item-count": {
     "defaultMessage": "{count} 项"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "父文件夹"
   },
   "files.table-header.created": {
     "defaultMessage": "创建时间"
@@ -2163,7 +2193,7 @@
     "defaultMessage": "游戏版本"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "隐藏已安装内容"
+    "defaultMessage": "隐藏已安装的内容"
   },
   "label.hide-selected-content": {
     "defaultMessage": "隐藏所选内容"
@@ -2266,6 +2296,9 @@
   },
   "label.server": {
     "defaultMessage": "服务端"
+  },
+  "label.server-only": {
+    "defaultMessage": "仅服务端"
   },
   "label.servers": {
     "defaultMessage": "服务器"
@@ -2394,7 +2427,7 @@
     "defaultMessage": "俄语"
   },
   "locale.sr-CS": {
-    "defaultMessage": "塞尔维亚语（拉丁语）"
+    "defaultMessage": "塞尔维亚语（拉丁文）"
   },
   "locale.sv-SE": {
     "defaultMessage": "瑞典语"
@@ -3446,6 +3479,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "切换 {filter} 筛选器"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "模组加载器"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "保留"
   },
@@ -3529,6 +3568,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "显示更多"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "高级"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "排除数据包"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "排除模组"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "排除插件"
   },
   "search.filter_type.environment": {
     "defaultMessage": "运行环境"
@@ -3837,7 +3888,7 @@
     "defaultMessage": "可启动、停止并查看服务器状态，但无法进行更改。"
   },
   "servers.access-page.search-users-placeholder": {
-    "defaultMessage": "搜索 {count} {count, plural, one {用户} other {用户}}..."
+    "defaultMessage": "搜索 {count} {count, plural, one {用户} other {用户}}………"
   },
   "servers.access-role.editor": {
     "defaultMessage": "编辑"
@@ -4218,10 +4269,10 @@
     "defaultMessage": "已选择 {count} 个备份的批量操作"
   },
   "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在删除 {total} 个备份……"
+    "defaultMessage": "正在删除 {total, plural,one {#个备份}other {#个备份}}……"
   },
   "servers.backups.bulk-bar.selected-count": {
-    "defaultMessage": "{count} 个备份被选中"
+    "defaultMessage": "{count,plural,one {#个备份被选中} other {个备份被选中}}"
   },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦删除， {count, plural, one {这个备份将不能} other {这些备份将不能}}被恢复。删除是永久性的。"
@@ -4233,10 +4284,10 @@
     "defaultMessage": "{count, plural, one {备份} other {备份 ({count})}}"
   },
   "servers.backups.delete-modal.confirm": {
-    "defaultMessage": "删除{count, plural, one {备份} other { # 个备份}}"
+    "defaultMessage": "删除{count, plural, one{备份} other{#个备份}}"
   },
   "servers.backups.delete-modal.header": {
-    "defaultMessage": "删除备份"
+    "defaultMessage": "删除{count, plural,one {备份}other {备份}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "创建你的第一个备份"

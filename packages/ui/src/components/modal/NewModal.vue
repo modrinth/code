@@ -297,7 +297,7 @@ function hide() {
 	hideTimeout = setTimeout(() => {
 		open.value = false
 		hideTimeout = null
-		props.onAfterHide?.()
+		nextTick(() => props.onAfterHide?.())
 	}, 300)
 }
 

@@ -6,7 +6,7 @@
     "defaultMessage": "Criar link de afiliado"
   },
   "affiliate.create.header": {
-    "defaultMessage": "Criando novo código de afiliado"
+    "defaultMessage": "Criando código de afiliado"
   },
   "affiliate.create.title.description": {
     "defaultMessage": "Dar a seu link afiliado um nome para que saiba de onde as pessoas estão vindo!"
@@ -51,7 +51,7 @@
     "defaultMessage": "Novo"
   },
   "badge.release": {
-    "defaultMessage": "Lançar"
+    "defaultMessage": "Estável"
   },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
@@ -96,7 +96,7 @@
     "defaultMessage": "Filtrar resultados..."
   },
   "browse.no-results": {
-    "defaultMessage": "Sem resultados encontrados para sua consulta!"
+    "defaultMessage": "Sem resultados encontrados para sua busca!"
   },
   "browse.offline": {
     "defaultMessage": "Você está offline. Conecte a internet para navegar no Modrinth!"
@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Abrir pasta"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Abrir no navegador"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Abrir na pasta"
   },
@@ -237,7 +240,7 @@
     "defaultMessage": "Reinstalar pacote de mods"
   },
   "button.remove": {
-    "defaultMessage": "Excluir chave de acesso"
+    "defaultMessage": "Remover"
   },
   "button.remove-image": {
     "defaultMessage": "Remover imagem"
@@ -290,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "Parar"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Trocar para versão"
+  },
   "button.switch-version": {
     "defaultMessage": "Trocar versão"
   },
@@ -316,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Plataforma"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Esta coleção está vazia."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Carregando projetos..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Nenhum projeto corresponde à sua busca."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# projeto} other {# projetos}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Buscar projetos"
   },
   "collections.label.private": {
     "defaultMessage": "Privado"
@@ -630,7 +651,7 @@
     "defaultMessage": "Procurar número da build..."
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
-    "defaultMessage": "Carregador de conteúdo"
+    "defaultMessage": "Loader de conteúdo"
   },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Selecionar versão de jogo"
@@ -654,7 +675,7 @@
     "defaultMessage": "Estável"
   },
   "creation-flow.modal.custom-setup.loader-version.label": {
-    "defaultMessage": "Versão do carregador"
+    "defaultMessage": "Versão do loader"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
     "defaultMessage": "Selecionar versão do loader"
@@ -819,10 +840,10 @@
     "defaultMessage": "Buscar pacotes de mods"
   },
   "creation-flow.modal.setup-type.instance.description": {
-    "defaultMessage": "Uma instância é uma configuração do Minecraft com um carregador, versão e mods específicos."
+    "defaultMessage": "Uma instância é uma configuração do Minecraft com um loader, versão e mods específicos."
   },
   "creation-flow.modal.setup-type.option.custom-setup.description": {
-    "defaultMessage": "Comece do zero, escolhendo um carregador e uma versão do jogo."
+    "defaultMessage": "Comece do zero, escolhendo um loader e uma versão do jogo."
   },
   "creation-flow.modal.setup-type.option.custom-setup.title": {
     "defaultMessage": "Configuração personalizada"
@@ -888,7 +909,7 @@
     "defaultMessage": "Nenhum arquivo corresponde à sua busca."
   },
   "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Buscar arquivos…"
+    "defaultMessage": "Buscar arquivos..."
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# Arquivo selecionado} other {# Arquivos selecionados}}"
@@ -1111,6 +1132,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Você obteve permissão especial para redistribuir este trabalho em seu pacote de mods."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Remover grupo"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Não foi possível remover o grupo"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remover do grupo"
@@ -1396,6 +1423,9 @@
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, =0 {Nenhum item} one {# item} other {# itens}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "Pasta parente"
   },
   "files.table-header.created": {
     "defaultMessage": "Criado"
@@ -1695,7 +1725,7 @@
     "defaultMessage": "Falha ao desvincular o pacote de mods"
   },
   "hosting.loader.loader-version": {
-    "defaultMessage": "{loader, select, null {Carregador} other {{loader}}} versão"
+    "defaultMessage": "{loader, select, null {Loader} other {{loader}}} versão"
   },
   "hosting.loader.repair-started-text": {
     "defaultMessage": "A instalação do seu servidor foi reparada."
@@ -1803,7 +1833,7 @@
     "defaultMessage": "Auto corrigir"
   },
   "installation-settings.incompatible-content.change-loader-button": {
-    "defaultMessage": "Alterar carregador"
+    "defaultMessage": "Alterar loader"
   },
   "installation-settings.incompatible-content.disable-conflicts-button": {
     "defaultMessage": "Desativar conflitos"
@@ -2163,7 +2193,7 @@
     "defaultMessage": "Versão do jogo"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Esconder conteúdo instalado"
+    "defaultMessage": "Ocultar conteúdo já instalado"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Esconder conteúdo selecionado"
@@ -2266,6 +2296,9 @@
   },
   "label.server": {
     "defaultMessage": "Servidor"
+  },
+  "label.server-only": {
+    "defaultMessage": "Apenas servidor"
   },
   "label.servers": {
     "defaultMessage": "Servidores"
@@ -3443,6 +3476,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Alternar filtro para {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "Retido"
   },
@@ -3526,6 +3565,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Mostrar mais"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Avançado"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Excluir pacotes de dados"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Excluir mods"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Excluir plugins"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"

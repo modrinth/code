@@ -23,6 +23,12 @@
   "analytics.breakdown.country": {
     "message": "ประเทศ"
   },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "โปรเจกต์ที่นำไปใช้"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "ประเภทของโปรเจกต์ที่นำไปใช้"
+  },
   "analytics.breakdown.download-reason": {
     "message": "เหตุผลในการดาวน์โหลด"
   },
@@ -37,6 +43,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "โหลดเดอร์"
+  },
+  "analytics.breakdown.members": {
+    "message": "สมาชิก"
   },
   "analytics.breakdown.monetization": {
     "message": "การสร้างรายได้"
@@ -184,6 +193,45 @@
   },
   "analytics.download-source.website": {
     "message": "เว็ปไซต์ Modrinth"
+  },
+  "analytics.downloads.suffix": {
+    "message": "ดาวน์โหลด"
+  },
+  "analytics.empty.no-data": {
+    "message": "ไม่มีข้อมูล"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "ไม่มีข้อมูลสำหรับการวิเคราะห์"
+  },
+  "analytics.empty.no-projects": {
+    "message": "ไม่มีโปรเจกต์ที่พร้อมใช้งาน"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "ไม่มีโปรเจกต์สำหรับการวิเคราะห์"
+  },
+  "analytics.empty.select-project": {
+    "message": "เลือกอย่างน้อยหนึ่งโปรเจกต์เพื่อดูข้อมูล"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "ทั้งหมด"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "ตัวเต็ม"
+  },
+  "analytics.filter.search.countries": {
+    "message": "ค้นหาประเทศ"
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "ค้นหาโปรเจกต์"
+  },
+  "analytics.group-by.date": {
+    "message": "วันที่"
+  },
+  "analytics.group-by.day": {
+    "message": "วัน"
+  },
+  "analytics.group-by.month": {
+    "message": "เดือน"
   },
   "analytics.project.user": {
     "message": "โปรเจกต์ของ {username}"

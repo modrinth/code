@@ -1205,9 +1205,6 @@
   "label.game-version": {
     "defaultMessage": "Versiune joc"
   },
-  "label.hide-installed-content": {
-    "defaultMessage": "Ascunde conținutul deja instalat"
-  },
   "label.hide-selected-content": {
     "defaultMessage": "Ascunde conținutul selectat"
   },
@@ -1377,7 +1374,7 @@
     "defaultMessage": "Germană (Germania)"
   },
   "locale.en-US": {
-    "defaultMessage": "Engleză(Statele Unite)"
+    "defaultMessage": "Engleză (Statele Unite)"
   },
   "locale.es-419": {
     "defaultMessage": "Spaniolă(America Latină)"

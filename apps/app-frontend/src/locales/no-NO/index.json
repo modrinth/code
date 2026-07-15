@@ -1,9 +1,219 @@
 {
+  "app.action-bar.downloading-java": {
+    "message": "Laster ned Java {version}"
+  },
+  "app.action-bar.downloading-update": {
+    "message": "Laster ned oppdatering"
+  },
+  "app.action-bar.downloads": {
+    "message": "Nedlastninger"
+  },
+  "app.action-bar.hide-more-running-instances": {
+    "message": "Skjul flere kjørende tilfeller"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Åpne tilfelle"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Prøv igjen"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Ukjent tilfelle"
+  },
+  "app.action-bar.installs": {
+    "message": "Installeringer"
+  },
+  "app.action-bar.make-primary-instance": {
+    "message": "Gjør om til primærtilfelle"
+  },
+  "app.action-bar.no-instances-running": {
+    "message": "Ingen kjørende tilfeller"
+  },
+  "app.action-bar.offline": {
+    "message": "Uten nett"
+  },
+  "app.action-bar.primary-instance": {
+    "message": "Primærtilfelle"
+  },
+  "app.action-bar.reload-to-update": {
+    "message": "Last inn på nytt for å oppdatere"
+  },
+  "app.action-bar.show-more-running-instances": {
+    "message": "Vis flere kjørende tilfeller"
+  },
+  "app.action-bar.stop-instance": {
+    "message": "Stopp tilfelle"
+  },
+  "app.action-bar.update": {
+    "message": "Oppdater"
+  },
+  "app.action-bar.view-active-downloads": {
+    "message": "Vis aktive nedlastninger"
+  },
+  "app.action-bar.view-instance": {
+    "message": "Vis tilfelle"
+  },
+  "app.action-bar.view-logs": {
+    "message": "Vis logger"
+  },
+  "app.appearance-settings.advanced-rendering.description": {
+    "message": "Skrur på avansert rendering, som for eksempel uskarphetseffekter, som kan forårsake ytelsesproblemer om man ikke har maskinvareaksellerert rendering."
+  },
+  "app.appearance-settings.advanced-rendering.title": {
+    "message": "Avansert rendering"
+  },
+  "app.appearance-settings.color-theme.description": {
+    "message": "Velg ditt foretrukne fargetema for Modrinth App."
+  },
+  "app.appearance-settings.color-theme.title": {
+    "message": "Fargetema"
+  },
+  "app.appearance-settings.default-landing-page.description": {
+    "message": "Endre sida som vises når launcheren åpnes."
+  },
+  "app.appearance-settings.default-landing-page.home": {
+    "message": "Hjem"
+  },
+  "app.appearance-settings.default-landing-page.library": {
+    "message": "Bibliotek"
+  },
+  "app.appearance-settings.default-landing-page.title": {
+    "message": "Åpningsside"
+  },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "Skjuler navnelappen over din spiller på utseende siden."
+  },
+  "app.appearance-settings.hide-nametag.title": {
+    "message": "Gjøm navnelapp"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "Minimer launcheren"
+  },
+  "app.appearance-settings.select-option": {
+    "message": "Velg et alternativ"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Viser hvor lenge du har spilt et tilfelle."
+  },
+  "app.appearance-settings.show-play-time.title": {
+    "message": "Vis spilletid"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Hopper automatisk over lav-rissiko fastslåelser som modpakkeinstalasjonsduplikat, vanlig innholdsletting, bolkoppdateringer, avkoble modpakker, og reparasjonsprompter. Farlige advarsler vil fortsatt vises."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Hopp over mindre viktige advarsler"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Aktiverer evnen til å skru sidefeltet av/på."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Sidefeltsveksling"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Hvis du prøver å laste ned en Modrinth Pakke fil (.mrpack) som er ukjent for Modrinth så kommer vi til å forsikre oss om at du forstår risikoene før du installerer den."
+  },
+  "app.appearance-settings.unknown-pack-warning.title": {
+    "message": "Advar meg før jeg installerer ukjente modpakker"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft-autentiseringsservere kan være nede for øyeblikket. Kontroller internettforbindelsen din og prøv igjen senere."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentiseringsservere"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Legger til server til tilfelle"
+  },
+  "app.browse.add-to-an-instance": {
+    "message": "Legg til til et tilfelle"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Legg til til tilfelle"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Legg til til {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Lagt til"
+  },
+  "app.browse.already-added": {
+    "message": "Allerede lagt til"
+  },
+  "app.browse.back-to-instance": {
+    "message": "Tilbake til tilfelle"
+  },
+  "app.browse.discover-content": {
+    "message": "Oppdag innhold"
+  },
+  "app.browse.discover-servers": {
+    "message": "Oppdag servere"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Gjem servere som allerede er lagt til"
+  },
+  "app.browse.project-type.modpacks": {
+    "message": "Modpakker"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Å legge til innhold kan ødelegge komatibilitet når du blir med i serveren. Alt tilleggsinnhold vil også forsvinne når du oppdaterer servertilfelleinnholdet."
+  },
+  "app.browse.server.installing": {
+    "message": "Installerer"
+  },
+  "app.content-install.no-compatible-versions": {
+    "message": "Ingen tilgjengelige versjoner matcher {compatibilityLabel}. Velg en versjon for å installere uansett. Avhengigheter vil ikke bli installert automatisk."
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Skriv en modpakkebeskrivelse..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Eksperter"
+  },
+  "app.export-modal.header": {
+    "message": "Eksperter modpakke"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Navn på modpakke"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Validerer Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Leser pakkemanifest"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Slett tilfelle"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Slett tilfelle"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Opprett"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpakka er allerede installert"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Tilfelle"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Laster ned {current, number}/{total, number} prosjekter..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Fullfører oppdatering..."
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "prosjekt"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" ble lagt til"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} prosjekter ble lagt til"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Sjekk ut prosjektene jeg bruker i min modpakke!"
   },
   "app.modal.install-to-play.header": {
     "message": "Installer for å spille"
@@ -12,19 +222,13 @@
     "message": "Installer"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, one {#mod} other {# mods}}"
+    "message": "{count, plural, one {#mod} other {# modder}}"
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "Delt instans"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Delt serverinstans"
+    "message": "Delt tilfelle"
   },
   "app.modal.update-to-play.header": {
     "message": "Oppdater for å spille"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Krever oppdatering"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Ei oppdatering er påkrevd for å spille {name}. Vær så snill å oppdater til den siste versjonen av spillet for å spille det."
@@ -39,7 +243,7 @@
     "message": "Utseende"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Standard instansinstillinger"
+    "message": "Vanlige tilfelleinstillinger"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installasjoner"
@@ -102,10 +306,10 @@
     "message": "Aktiv"
   },
   "friends.heading.offline": {
-    "message": "Offline"
+    "message": "Av"
   },
   "friends.heading.online": {
-    "message": "Online"
+    "message": "På"
   },
   "friends.heading.pending": {
     "message": "Ventende"
@@ -246,10 +450,10 @@
     "message": "Før oppstart"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Kørt før instansen startes."
+    "message": "Kjøres før tilfellet startes."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Skriv inn kommando før start..."
+    "message": "Skriv inn forstartskommando..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Spillstartkroker"
@@ -258,7 +462,7 @@
     "message": "Wrapper"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Wrapper-kommando for å starte Minecraft."
+    "message": "Innpakningskommando for å starte Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "Skriv inn wrapper-kommando..."
@@ -271,6 +475,9 @@
   },
   "instance.settings.tabs.java": {
     "message": "Java og minne"
+  },
+  "instance.settings.tabs.java.custom-memory-allocation": {
+    "message": "Egendefinert minneallokasjon"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Miljøvariabler"
@@ -303,7 +510,7 @@
     "message": "Høyde"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Høyde av spillvindu når spillet startes."
+    "message": "Høyden til spillvinduet når spillet startes."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Angi høyde..."
@@ -312,7 +519,7 @@
     "message": "Bredde"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Bredde av spillvindu når spillet startes."
+    "message": "Bredden til spillvinduet når spillet startes."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Angi bredde..."
@@ -330,7 +537,7 @@
     "message": "Ikke vis på Hjem"
   },
   "instance.worlds.game_already_open": {
-    "message": "Instansen er allerede open"
+    "message": "Tilfellet er allerede open"
   },
   "instance.worlds.hardcore": {
     "message": "Hardbarket modus"
@@ -348,7 +555,7 @@
     "message": "Du kan bare hoppe rett inn i enkeltspiller-verdener på Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
-    "message": "Spill instans"
+    "message": "Spill tilfelle"
   },
   "instance.worlds.view_instance": {
     "message": "Vis instans"

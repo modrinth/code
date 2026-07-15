@@ -483,7 +483,7 @@
     "defaultMessage": "Назви проєктів"
   },
   "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "За алфавітом"
+    "defaultMessage": "За абеткою"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Спочатку новіші"
@@ -1819,9 +1819,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Версія гри"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "Приховати вже встановлений вміст"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Приховати обраний вміст"

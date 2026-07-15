@@ -218,6 +218,9 @@
   "button.open-folder": {
     "defaultMessage": "Apri cartella"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Apri nel browser"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Apri nella cartella"
   },
@@ -234,7 +237,7 @@
     "defaultMessage": "Reinstalla pacchetto di mod"
   },
   "button.remove": {
-    "defaultMessage": "Elimina passkey"
+    "defaultMessage": "Rimuovi"
   },
   "button.remove-image": {
     "defaultMessage": "Rimuovi immagine"
@@ -287,6 +290,9 @@
   "button.stop": {
     "defaultMessage": "Interrompi"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Passa alla versione"
+  },
   "button.switch-version": {
     "defaultMessage": "Cambia versione"
   },
@@ -313,6 +319,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Piattaforma"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Questa raccolta è vuota."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Caricamento progetti..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Nessun progetto corrisponde alla tua ricerca."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# progetto} other {# progetti}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Cerca tra i progetti"
   },
   "collections.label.private": {
     "defaultMessage": "Privata"
@@ -864,7 +885,7 @@
     "defaultMessage": "Nessun file corrisponde alla tua ricerca."
   },
   "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Cerca tra i file…"
+    "defaultMessage": "Cerca tra i file..."
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# file selezionato} other {# file selezionati}}"
@@ -1087,6 +1108,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Hai ottenuto dei permessi speciali per ridistribuire questo lavoro nel tuo pacchetto di mod."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Rimuovi gruppo"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Impossibile rimuovere il gruppo"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Rimuovi dal gruppo"
@@ -1363,6 +1390,9 @@
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "Indietro"
   },
   "files.table-header.created": {
     "defaultMessage": "Creazione"
@@ -2121,7 +2151,7 @@
     "defaultMessage": "Versione del gioco"
   },
   "label.hide-installed-content": {
-    "defaultMessage": "Nascondi contenuti installati"
+    "defaultMessage": "Nascondi contenuti già installati"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Nascondi contenuti selezionati"
@@ -2224,6 +2254,9 @@
   },
   "label.server": {
     "defaultMessage": "Server"
+  },
+  "label.server-only": {
+    "defaultMessage": "Solo server"
   },
   "label.servers": {
     "defaultMessage": "Server"
@@ -3404,6 +3437,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "R"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Abilita filtro per {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "Sospesa"
   },
@@ -3487,6 +3526,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Mostra altro"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Avanzate"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Escludi pacchetti di dati"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Escludi mod"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Escludi plugin"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Ambiente"

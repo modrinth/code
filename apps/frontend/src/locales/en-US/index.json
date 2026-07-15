@@ -4235,9 +4235,6 @@
   "settings.account.security.email.title": {
     "message": "Email"
   },
-  "settings.account.security.passkey.add": {
-    "message": "Add passkey"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Make sure to pick something memorable, so you can identify this passkey later."
   },
@@ -4246,6 +4243,15 @@
   },
   "settings.account.security.passkey.add-modal.name.placeholder": {
     "message": "My passkey"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Add passkey"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Add passkey"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Manage passkeys"
   },
   "settings.account.security.passkey.description": {
     "message": "Manage your registered passkeys, or add a new one."
@@ -4264,6 +4270,9 @@
   },
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "You do not have any passkeys registered."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Delete passkey"
   },
   "settings.account.security.passkey.remove.description": {
     "message": "This will permanently remove the passkey \"{name}\". You will no longer be able to sign in with it."

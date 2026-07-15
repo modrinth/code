@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Otevřit složku"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Otevřít v prohlížeči"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Otevřít ve složce"
   },
@@ -235,9 +238,6 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Znovunainstalovat modpack"
-  },
-  "button.remove": {
-    "defaultMessage": "Smazat passkey"
   },
   "button.remove-image": {
     "defaultMessage": "Odstranit obrázek"
@@ -290,6 +290,9 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Změnit na verzi"
+  },
   "button.switch-version": {
     "defaultMessage": "Změnit verzi"
   },
@@ -316,6 +319,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Platforma"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Tato kolekce je prázdná."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Načítání projektů..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Žádné projekty neodpovídají tvému vyhledávání."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# projekt} few {# projekty} other {# projektů}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Hledat projekty"
   },
   "collections.label.private": {
     "defaultMessage": "Soukromé"
@@ -841,9 +859,6 @@
   },
   "external-files.permissions-card.add-files-modal.no-search-results": {
     "defaultMessage": "Žádné soubory neodpovídají tvému vyhledávání."
-  },
-  "external-files.permissions-card.add-files-modal.search-placeholder": {
-    "defaultMessage": "Hledat soubory…"
   },
   "external-files.permissions-card.add-files-modal.selected-count": {
     "defaultMessage": "{count, plural, one {# soubor vybrán} few {# soubory vybrány} other {# souborů vybráno}}"
@@ -1969,9 +1984,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Verze hry"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "Skrýt již nainstalovaný obsah"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Skrýt vybraný obsah"

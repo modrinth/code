@@ -1329,7 +1329,7 @@
     "defaultMessage": "Nhập bang/tỉnh"
   },
   "format.bytes.0": {
-    "defaultMessage": "{count, plural, other {byte}}"
+    "defaultMessage": "{count, plural, other {# byte}}"
   },
   "format.bytes.1": {
     "defaultMessage": "{count, number} KiB"
@@ -1891,9 +1891,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Phiên bản trò chơi"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "Che nội dung đã tải"
   },
   "label.hide-selected-content": {
     "defaultMessage": "Che nội dung được chọn"

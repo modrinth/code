@@ -5,9 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Conținut necesar"
-  },
   "app.modal.install-to-play.header": {
     "message": "Instalați pentru a juca"
   },
@@ -17,26 +14,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {#mod} other {# moduri}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pachet de mod necesar"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Acest server necesită modificări pentru a juca. Faceți clic pe Instalare pentru a configura fișierele necesare din Modrinth, apoi lansați direct pe server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instanță comună"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instanță de server partajată"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Vizualizați conținutul"
   },
   "app.modal.update-to-play.header": {
     "message": "Actualizați pentru a juca"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Actualizare necesară"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Este necesară o actualizare pentru a juca {name}. Vă rugăm să actualizați la cea mai recentă versiune pentru a lansa jocul."

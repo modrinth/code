@@ -221,6 +221,9 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "I-unlink"
   },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "server"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dinagdag (dependency)"
   },
@@ -284,8 +287,17 @@
   "creation-flow.button.import": {
     "defaultMessage": "I-angkat"
   },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Bago"
+  },
   "creation-flow.modal.custom-setup.loader-version-type.other": {
     "defaultMessage": "Iba pa"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Matatag"
+  },
+  "creation-flow.modal.custom-setup.loader.label": {
+    "defaultMessage": "Loader"
   },
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Pangalan"
@@ -316,6 +328,12 @@
   },
   "creation-flow.modal.import-instance.launcher-path.add": {
     "defaultMessage": "Magdagdag ng launcher path"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "Iba pa"
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "Wala"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Hindi"
@@ -2130,7 +2148,7 @@
     "defaultMessage": "Paraan ng pagbabayad"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Pumili ng pinasadyang plan sa specs na kailangan mo."
+    "defaultMessage": "Pumili ng pasadya na plan na may specs na kailangan mo."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Magsimula"
@@ -2737,6 +2755,18 @@
   },
   "user.profile.badge.staff.name": {
     "defaultMessage": "Koponan ng Modrinth"
+  },
+  "version.content.name": {
+    "defaultMessage": "Pangalan"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "Iba pa"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Talaksan"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Uri"
   }
 }
 

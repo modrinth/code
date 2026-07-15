@@ -2,6 +2,13 @@
 	<ReadyTransition :pending="loading">
 		<ContentPageLayout>
 			<template #modals>
+				<UnknownFileWarningModal
+					ref="unknownFileWarningModal"
+					mode="mod"
+					:file-name="unknownFileName"
+					@cancel="resolveUnknownFileWarning(false)"
+					@continue="handleUnknownFileContinue"
+				/>
 				<ShareModalWrapper
 					ref="shareModal"
 					:share-title="formatMessage(messages.shareTitle)"
@@ -97,6 +104,7 @@ import {
 	type OverflowMenuOption,
 	provideContentManager,
 	ReadyTransition,
+	UnknownFileWarningModal,
 	useDebugLogger,
 	useVIntl,
 	versionChangesGameVersion,
@@ -123,6 +131,7 @@ import {
 	add_project_from_path,
 	edit,
 	get_linked_modpack_content,
+	is_file_on_modrinth,
 	remove_project,
 	switch_project_version_with_dependencies,
 	toggle_disable_project,
@@ -130,11 +139,13 @@ import {
 	update_managed_modrinth_version,
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
+import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 import { useTheming } from '@/store/state'
+import type { FeatureFlag } from '@/store/theme'
 
 const messages = defineMessages({
 	shareTitle: {
@@ -185,6 +196,7 @@ const router = useRouter()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
 const themeStore = useTheming()
+const skipUnknownFileWarningFeatureFlag = 'skip_unknown_pack_warning' as FeatureFlag
 const skipNonEssentialWarnings = computed(() =>
 	themeStore.getFeatureFlag('skip_non_essential_warnings'),
 )
@@ -302,6 +314,9 @@ const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
 const sharedDisableConfirmModal = ref<InstanceType<typeof ConfirmDisableModal> | null>()
 const pendingModpackDisableItems = ref<ContentItem[]>([])
+const unknownFileWarningModal = ref<InstanceType<typeof UnknownFileWarningModal> | null>()
+const unknownFileName = ref('')
+let resolveUnknownFileConfirmation: ((confirmed: boolean) => void) | null = null
 
 const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.instance.id])
 const modpackContentQuery = useQuery({
@@ -500,14 +515,34 @@ async function handleUploadFiles() {
 	if (!props.instance) return
 	const files = await open({ multiple: true })
 	if (!files) return
-
-	const addedFiles: string[] = []
+	const selectedFiles: Array<{ path: string; filename: string }> = []
 	for (const file of files) {
 		const path = (file as { path?: string }).path ?? file
-		const fileName = typeof path === 'string' ? (path.split('/').pop() ?? path) : String(path)
+		if (typeof path !== 'string') continue
+		selectedFiles.push({
+			path,
+			filename: path.split(/[\\/]/).pop() ?? path,
+		})
+	}
+
+	const fileRecognition = await Promise.all(
+		selectedFiles.map(async ({ path }) => {
+			try {
+				return await is_file_on_modrinth(path)
+			} catch {
+				return true
+			}
+		}),
+	)
+
+	const addedFiles: string[] = []
+	for (const [index, { path, filename }] of selectedFiles.entries()) {
+		if (!fileRecognition[index] && !(await confirmUnknownFileInstallation(filename))) {
+			continue
+		}
 		try {
 			await add_project_from_path(props.instance.id, path)
-			addedFiles.push(fileName)
+			addedFiles.push(filename)
 		} catch (e) {
 			handleError(e as Error)
 		}
@@ -530,6 +565,39 @@ async function handleUploadFiles() {
 					: formatMessage(messages.projectsWereAdded, { count: names.length }),
 		})
 	}
+}
+
+function confirmUnknownFileInstallation(fileName: string) {
+	if (themeStore.getFeatureFlag(skipUnknownFileWarningFeatureFlag)) {
+		return Promise.resolve(true)
+	}
+
+	unknownFileName.value = fileName
+	return new Promise<boolean>((resolve) => {
+		resolveUnknownFileConfirmation = resolve
+		void nextTick(() => unknownFileWarningModal.value?.show())
+	})
+}
+
+function resolveUnknownFileWarning(confirmed: boolean) {
+	const resolve = resolveUnknownFileConfirmation
+	resolveUnknownFileConfirmation = null
+	unknownFileName.value = ''
+	resolve?.(confirmed)
+}
+
+async function handleUnknownFileContinue(dontShowAgain: boolean) {
+	if (dontShowAgain) {
+		themeStore.featureFlags[skipUnknownFileWarningFeatureFlag] = true
+		try {
+			const settings = await getSettings()
+			settings.feature_flags[skipUnknownFileWarningFeatureFlag] = true
+			await setSettings(settings)
+		} catch (error) {
+			handleError(error as Error)
+		}
+	}
+	resolveUnknownFileWarning(true)
 }
 
 async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
