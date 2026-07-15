@@ -68,9 +68,10 @@ export default function () {
 									else if (correct_environment === 'Mixed')
 										correct_output = `It looks like some %PROJECT_VERSIONS_FLINK% of your project should have unique environments from other versions, please ensure *each version* is set correctly.`
 
-									return md('checklist/messages/environment/inaccurate', () => ({
-										CORRECT: correct_output,
-									}))(state)
+									return md(
+										'checklist/messages/environment/inaccurate',
+										() => ({ CORRECT: correct_output }),
+									)(state)
 								})
 								.fix(
 									fix().project((patch, state) => {

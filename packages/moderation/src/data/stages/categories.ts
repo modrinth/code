@@ -10,8 +10,8 @@ export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
 	const inaccurateMsg = md('checklist/messages/tags/inaccurate')
-	const optimizationMisusedMsg = md('checklist/messages/tags/optimization_misused')
-	const resolutionsMisusedMsg = md('checklist/messages/tags/resolutions_misused')
+	const optimizationMsg = inaccurateMsg.concat(md('checklist/messages/tags/optimization_misused'))
+	const resolutionsMsg = inaccurateMsg.concat(md('checklist/messages/tags/resolutions_misused'))
 
 	return stage('tags', 'Tags')
 		.hint("Are the project's tags accurate?")
@@ -45,11 +45,7 @@ export default function () {
 						action()
 							.suggestedStatus('flagged')
 							.severity('low')
-							.message(async (state) => {
-								const base = await inaccurateMsg(state)
-								const extra = await optimizationMisusedMsg(state)
-								return base + extra
-							})
+							.message(optimizationMsg)
   						.fix(fix().project((patch) => {
 							patch.categories = project.value.categories.filter((c) => c !== 'optimization')
 							patch.additional_categories = project.value.additional_categories.filter((c) => c !== 'optimization',)
@@ -62,11 +58,7 @@ export default function () {
 						action()
 							.suggestedStatus('flagged')
 							.severity('low')
-							.message(async (state) => {
-								const base = await inaccurateMsg(state)
-								const extra = await resolutionsMisusedMsg(state)
-								return base + extra
-							})
+							.message(resolutionsMsg)
 							.fix(fix().project((patch) => {
 								patch.categories = project.value.categories.filter((c) => !resolutionTags.has(c),)
 								patch.additional_categories = project.value.additional_categories.filter((c) => !resolutionTags.has(c),)

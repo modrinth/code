@@ -393,6 +393,7 @@ import {
 	loadMd,
 	resolve,
 	resolveChildren,
+	setMessageProject,
 	useStages,
 	walkNodes,
 } from '@modrinth/moderation'
@@ -445,6 +446,7 @@ const props = defineProps<{
 }>()
 
 const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
+setMessageProject(projectV3, projectV2)
 
 const nodeStates = ref<Record<string, Record<string, NodeState>>>({})
 const resolvedStages = ref(useStages(nodeStates))

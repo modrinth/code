@@ -23,6 +23,7 @@ import {
 	loadMd,
 	resolve,
 	resolveChildren,
+	setMessageProject,
 } from '@modrinth/moderation'
 import { ButtonStyled, Checkbox, Combobox, injectProjectPageContext, MarkdownEditor, StyledInput } from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
@@ -34,6 +35,7 @@ const nodeMetaMap = inject(NODE_META_KEY)
 const injectedGlobalState = inject(STATE_KEY)
 
 const { projectV3: project, projectV2 } = injectProjectPageContext()
+setMessageProject(project, projectV2)
 
 const props = defineProps<{
 	nodes: NodeBuilder[]

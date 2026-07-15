@@ -1,5 +1,4 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { injectProjectPageContext } from '@modrinth/ui'
 import type { FunctionalComponent, InjectionKey, Ref, SVGAttributes } from 'vue'
 import { markRaw, toValue } from 'vue'
 
@@ -114,14 +113,24 @@ function makeMessageFn(fn: (state: Record<string, NodeState>) => Promise<string>
 	return rich
 }
 
+let _project: Ref<Labrinth.Projects.v3.Project> | null = null
+let _projectV2: Ref<Labrinth.Projects.v2.Project> | null = null
+
+export function setMessageProject(
+	project: Ref<Labrinth.Projects.v3.Project>,
+	projectV2: Ref<Labrinth.Projects.v2.Project>,
+) {
+	_project = project
+	_projectV2 = projectV2
+}
+
 export function md(
 	path: string | ((state: Record<string, NodeState>) => string),
 	getVars?: (state: Record<string, NodeState>) => Record<string, NodeState>,
 ): MessageFn {
-	const { projectV3: project, projectV2 } = injectProjectPageContext()
 	return makeMessageFn(async (state) => {
 		const resolvedPath = typeof path === 'function' ? path(state) : path
-		return loadMd(resolvedPath, state, project.value, projectV2.value, getVars)
+		return loadMd(resolvedPath, state, _project!.value, _projectV2!.value, getVars)
 	})
 }
 // ─── Fix builder ──────────────────────────────────────────────────────────────
@@ -194,7 +203,10 @@ export class ActionBuilder {
 	_applyFixes = false
 
 	message(
-		fn?: MessageFn | ((state: Record<string, NodeState>) => Record<string, NodeState>),
+		fn?:
+			| MessageFn
+			| ((state: Record<string, NodeState>) => Promise<string>)
+			| ((state: Record<string, NodeState>) => Record<string, NodeState>),
 	): this {
 		if (!fn) {
 			this._autoMessage = true

@@ -2,22 +2,10 @@ import { LibraryIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, group, markdown, md, option, stage, toggle } from '../../types/node'
+import { action, group, markdown, md, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
-
-	const insufficientCustomMsg = md(
-		'checklist/messages/description/insufficient/custom',
-		(state) => ({
-			EXPLAINER: state.explainer,
-		}),
-	)
-	const insufficientHeaderMsg = md('checklist/messages/description/insufficient/header')
-	const insufficientForkMsg = md('checklist/messages/description/insufficient/fork')
-	const insufficientServersMsg = md('checklist/messages/description/insufficient/servers')
-	const insufficientPacksMsg = md('checklist/messages/description/insufficient/packs')
-	const insufficientProjectsMsg = md('checklist/messages/description/insufficient/projects')
 
 	return stage('description', 'Description')
 		.hint('Is the description sufficient, accurate, and accessible?')
@@ -27,7 +15,6 @@ export default function () {
 		.icon(LibraryIcon)
 		.navigate('/')
 		.children(
-			//TODO: coolbot which parts of this go in insufficient vs top level
 			group()
 				.title('Description Issues?')
 				.children(
@@ -37,29 +24,42 @@ export default function () {
 								.suggestedStatus('flagged')
 								.severity('medium')
 								.message(async (state) => {
-									const reason = state?.reason as string | undefined
-									if (reason === 'custom') {
-										return insufficientCustomMsg(state)
+									const reasons =
+										state?.reason instanceof Set ? state.reason : new Set<string>()
+
+									let message = await md('checklist/messages/description/insufficient/header')(state)
+
+									if (reasons.size === 0) {
+										const typePath = project.value?.minecraft_java_server
+											? 'servers'
+											: project.value?.project_types?.includes('modpack')
+												? 'packs'
+												: 'projects'
+										message += await md(
+											`checklist/messages/description/insufficient/${typePath}`,
+										)(state)
 									}
-									if (reason === 'fork') {
-										const header = await insufficientHeaderMsg(state)
-										const detail = await insufficientForkMsg(state)
-										return `${header}\n\n${detail}`
-									}
-									if (project.value?.minecraft_java_server) return insufficientServersMsg(state)
-									if (project.value?.project_types?.includes('modpack'))
-										return insufficientPacksMsg(state)
-									return insufficientProjectsMsg(state)
+
+									if (reasons.has('fork'))
+										message += await md('checklist/messages/description/insufficient/fork')(state)
+
+									if (reasons.has('custom'))
+										message += await md(
+											'checklist/messages/description/insufficient/custom',
+											(s) => ({ EXPLAINER: s.explainer }),
+										)(state)
+
+									return message
 								}),
 						)
 						.children(
 							group()
 								.title('Why is this Description Insufficient?')
-								//TODO: coolbot should multiple be allowed here an we just make 1 message with all issues?
-								.singleSelect('reason')
+								.multiSelect('reason')
 								.children(
-									option('fork', 'Fork'),
-									option('custom', 'Custom').children(
+									toggle('fork', 'Fork'),
+									toggle('unfinished', 'Unfinished'),
+									toggle('custom', 'Custom').children(
 										markdown('explainer')
 											.title('How can the author improve their description?')
 											.required(),
@@ -67,7 +67,7 @@ export default function () {
 								),
 						),
 
-					//TODO chyz combine these 2 non-englishes
+					//TODO: combine these 2 non-englishes
 					toggle('non_english', 'Non-english')
 						.shown(computed(() => !project.value.minecraft_java_server))
 						.action(action().suggestedStatus('flagged').severity('medium').message()),
@@ -75,10 +75,6 @@ export default function () {
 					toggle('non_english_server', 'Non-english')
 						.shown(computed(() => !!project.value.minecraft_java_server))
 						.action(action().suggestedStatus('flagged').severity('medium').message()),
-
-					toggle('unfinished', 'Unfinished').action(
-						action().suggestedStatus('flagged').severity('low').message(),
-					),
 
 					toggle('headers_as_body', 'Headers as body text').action(
 						action().suggestedStatus('flagged').severity('low').message(),
