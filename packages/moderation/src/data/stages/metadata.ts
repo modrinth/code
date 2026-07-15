@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { TagIcon } from '@modrinth/assets'
+import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -33,7 +33,7 @@ export default function () {
 			.guidance(
 				'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
 			)
-			.icon(TagIcon)
+			.icon(DatabaseIcon)
 			.navigate('/settings/versions')
 			.shown(computed(() => !project.value?.minecraft_server))
 			.children(
@@ -91,7 +91,7 @@ export default function () {
 								.children(
 									dropdown('correct_environment')
 										.children(
-											//TODO: Chyz add mixed option.
+											//TODO: Chyz add back mixed option.
 											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
 												.filter((id) => id !== 'unknown')
 												.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
@@ -99,66 +99,67 @@ export default function () {
 										.none('Unknown'),
 								),
 						),
-
-					toggle('loader', `Loader${project.value.loaders.length > 1 ? 's' : ''}`).children(
-						group()
-							.title('Loader Issues?')
-							.action(
-								action()
-									.suggestedStatus('flagged')
-									.severity('medium')
-									.message(async (state) => {
-										//TODO: chyz
-										//TODO: coolbot this one is a bit of a doozy
-										const header = await md('checklist/messages/metadata/loader/incorrect')(state)
-										const selected = state.loaders
-										if (selected instanceof Set && selected.size > 0) {
-											const list = [...selected]
-												.map((id) => `- ${formatLoaderLabel(id)}`)
-												.join('\n')
-											return `${header}\n${list}`
-										}
-										return header
-									}),
-							)
-							.children(
-								toggle('incorrect', 'Incorrect').children(
-									group()
-										.title('Incorrect Loaders')
-										.multiSelect('loaders')
-										.children(
-											...project.value.loaders.map((id) => option(id, formatLoaderLabel(id))),
-										),
-								),
-								toggle('missing', 'Missing').children(
-									group()
-										.title('Missing Loaders')
-										.multiSelect('loaders')
-										.children(
-											...(() => {
-												//TODO: chyz maybe this can be done better
-												// (plugin loaders and datapack are marked as valid for mods which makes this suck)
-												const existingTypes = new Set(
-													loaders.value
-														.filter((l) => project.value.loaders.includes(l.name))
-														.flatMap((l) => l.supported_project_types),
-												)
-												const referenceTypes =
-													existingTypes.size > 0
-														? existingTypes
-														: new Set(project.value.project_types)
-												return loaders.value
-													.filter(
-														(loader) =>
-															loader.supported_project_types.every((t) => referenceTypes.has(t)) &&
-															!project.value.loaders.includes(loader.name),
-													)
-													.map((loader) => option(loader.name, formatLoaderLabel(loader.name)))
-											})(),
-										),
-								),
-							),
-					),
+					// TODO: chyz, fix pls
+					//					toggle('loader', `Loader${project.value.loaders.length > 1 ? 's' : ''}`).children(
+					//						group()
+					//							.title('Loader Issues?')
+					//							.action(
+					//								action()
+					//									.suggestedStatus('flagged')
+					//									.severity('medium')
+					//									.message(async (state) => {
+					//										//TODO: chyz
+					//										//TODO: coolbot this one is a bit of a doozy
+					//										const header = await md('checklist/messages/metadata/loader/incorrect')(state)
+					//										const selected = state.loaders
+					//										if (selected instanceof Set && selected.size > 0) {
+					//											const list = [...selected]
+					//												.map((id) => `- ${formatLoaderLabel(id)}`)
+					//												.join('\n')
+					//											return `${header}\n${list}`
+					//										}
+					//										return header
+					//									}),
+					//							)
+					//							.children(
+					//								toggle('incorrect', 'Incorrect').children(
+					//									group()
+					//										.title('Incorrect Loaders')
+					//										.multiSelect('loaders')
+					//										.children(
+					//											...project.value.loaders.map((id) => option(id, formatLoaderLabel(id))),
+					//										),
+					//								),
+					// TODO: chyz, this should be the same interface as incorrect, as a corrections scheme, with selected loaders default on.
+					//								toggle('missing', 'Missing').children(
+					//									group()
+					//										.title('Missing Loaders')
+					//										.multiSelect('loaders')
+					//										.children(
+					//											...(() => {
+					//												//TODO: chyz maybe this can be done better
+					//												// (plugin loaders and datapack are marked as valid for mods which makes this suck)
+					//												const existingTypes = new Set(
+					//													loaders.value
+					//														.filter((l) => project.value.loaders.includes(l.name))
+					//														.flatMap((l) => l.supported_project_types),
+					//												)
+					//												const referenceTypes =
+					//													existingTypes.size > 0
+					//														? existingTypes
+					//														: new Set(project.value.project_types)
+					//												return loaders.value
+					//													.filter(
+					//														(loader) =>
+					//															loader.supported_project_types.every((t) => referenceTypes.has(t)) &&
+					//															!project.value.loaders.includes(loader.name),
+					//													)
+					//													.map((loader) => option(loader.name, formatLoaderLabel(loader.name)))
+					//											})(),
+					//									)/
+					// ),
+					//							),
+					//					),
 				),
 			)
 	)
