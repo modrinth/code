@@ -449,6 +449,9 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} added"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Updated config files"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Added (dependency)"
   },
@@ -460,21 +463,6 @@
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Updated"
-  },
-  "content.diff-modal.game-version-updated": {
-    "defaultMessage": "Game version"
-  },
-  "content.diff-modal.loader-updated": {
-    "defaultMessage": "Loader"
-  },
-  "content.diff-modal.modpack-linked": {
-    "defaultMessage": "Linked modpack"
-  },
-  "content.diff-modal.modpack-unlinked": {
-    "defaultMessage": "Unlinked modpack"
-  },
-  "content.diff-modal.modpack-updated": {
-    "defaultMessage": "Updated modpack"
   },
   "content.diff-modal.dont-install": {
     "defaultMessage": "Don't install"
@@ -488,8 +476,26 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Updated"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# file} other {# files}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Game version"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Install anyway"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Linked modpack"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Unlinked modpack"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Updated modpack"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removed"

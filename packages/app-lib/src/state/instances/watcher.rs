@@ -1,7 +1,6 @@
 use crate::State;
 use crate::api::instance::{
-    CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    is_excluded_config_path,
+    CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS, is_excluded_config_path,
 };
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
@@ -189,8 +188,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                             && (*x != CONFIG_DIRECTORY
                                                 || should_sync_config_change)
                                     },
-                                )
-                                {
+                                ) {
                                     Some(InstancePayloadType::Synced)
                                 } else {
                                     None
@@ -271,10 +269,11 @@ pub(crate) async fn watch_instance_folder(
     }
 
     let mut to_watch = Vec::new();
-    for sub_path in ProjectType::iterator()
-        .map(|x| x.get_folder())
-        .chain(["crash-reports", "saves", CONFIG_DIRECTORY])
-    {
+    for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
+        "crash-reports",
+        "saves",
+        CONFIG_DIRECTORY,
+    ]) {
         let full_path = full_instance_path.join(sub_path);
 
         let meta = tokio::fs::symlink_metadata(&full_path).await;
@@ -339,7 +338,8 @@ fn is_excluded_config_file(path: &std::path::Path) -> bool {
     while components
         .next()
         .is_some_and(|component| component.as_os_str() != CONFIG_DIRECTORY)
-    {}
+    {
+    }
 
     is_excluded_config_path(&components.collect::<std::path::PathBuf>())
 }

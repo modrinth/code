@@ -172,8 +172,7 @@ pub(super) async fn shared_instance_publish_diffs(
                 .await
         }
     };
-    let ((latest_version_ids, latest_external_files), disabled_versions) =
-        tokio::try_join!(
+    let ((latest_version_ids, latest_external_files), disabled_versions) = tokio::try_join!(
         remote_publish_content(version, modpack_unlinked, state),
         disabled_versions,
     )?;

@@ -2684,11 +2684,8 @@
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Get Modrinth App"
   },
-  "modal.shared-instance.open-in-app.instance-details": {
-    "message": "Minecraft {gameVersion} · Loader {loaderVersion}"
-  },
-  "modal.shared-instance.open-in-app.invited-by": {
-    "message": "Invited by"
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Managed by"
   },
   "modal.shared-instance.open-in-app.opening-automatically": {
     "message": "The Modrinth App will open automatically..."

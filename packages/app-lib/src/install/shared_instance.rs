@@ -7,6 +7,10 @@ use super::model::{
 use super::runner::{
     install_pack, modpack_details, update_content_progress, update_progress,
 };
+use crate::api::instance::{
+    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
+    CONFIG_SYNC_ENABLED, is_excluded_config_path,
+};
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::{
@@ -14,10 +18,6 @@ use crate::state::{
     ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
-use crate::api::instance::{
-    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, is_excluded_config_path,
-};
 use async_walkdir::{Filtering, WalkDir};
 use futures::StreamExt;
 use std::collections::{HashMap, HashSet};
@@ -806,8 +806,12 @@ async fn install_shared_instance_external_file(
     }
 
     if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
-        return install_shared_instance_config_bundle(instance_id, bytes, state)
-            .await;
+        return install_shared_instance_config_bundle(
+            instance_id,
+            bytes,
+            state,
+        )
+        .await;
     }
 
     let project_type =
@@ -839,10 +843,9 @@ async fn install_shared_instance_config_bundle(
     bytes: bytes::Bytes,
     state: &State,
 ) -> crate::Result<()> {
-    let files = tokio::task::spawn_blocking(move || {
-        read_config_bundle(bytes.as_ref())
-    })
-    .await??;
+    let files =
+        tokio::task::spawn_blocking(move || read_config_bundle(bytes.as_ref()))
+            .await??;
     let metadata = crate::state::instances::commands::get_instance_metadata(
         instance_id,
         &state.pool,

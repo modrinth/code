@@ -52,9 +52,7 @@
 		>
 			<div
 				v-for="(diff, index) in sortedDiffs"
-				:key="
-					diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)
-				"
+				:key="diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)"
 				class="flex h-10 min-h-10 items-center gap-2"
 				:class="showExternalWarning(diff) ? '-mx-3 px-5' : 'px-2'"
 				:style="
@@ -229,9 +227,8 @@ const removedDisabledCount = computed(
 const addedCount = computed(() => props.diffs.filter((diff) => diff.type === 'added').length)
 const updatedCount = computed(
 	() =>
-		props.diffs.filter(
-			(diff) => diff.type === 'updated' || diff.type === 'config_files_updated',
-		).length,
+		props.diffs.filter((diff) => diff.type === 'updated' || diff.type === 'config_files_updated')
+			.length,
 )
 const hasExternalDiffs = computed(() => props.diffs.some(showExternalWarning))
 
@@ -262,9 +259,9 @@ function isConfigurationDiff(
 function showExternalWarning(diff: ContentDiffItem) {
 	return Boolean(
 		props.showExternalWarnings &&
-			diff.external &&
-			isDependencyDiff(diff) &&
-			diff.type !== 'removed',
+		diff.external &&
+		isDependencyDiff(diff) &&
+		diff.type !== 'removed',
 	)
 }
 

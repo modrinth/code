@@ -506,15 +506,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "Twój świat"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Informacje o zawartości Twojej paczki modów możesz teraz znaleźć tutaj!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Zawartość paczek modów została przeniesiona"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Nie pokazuj ponownie"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatkowa zawartość"
   },

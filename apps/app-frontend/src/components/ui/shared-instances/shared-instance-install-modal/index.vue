@@ -84,10 +84,7 @@
 						<span class="font-semibold text-contrast">
 							{{ formatMessage(messages.reportReason) }}
 						</span>
-						<Combobox
-							v-model="reportReason"
-							:options="reportReasonOptions"
-						/>
+						<Combobox v-model="reportReason" :options="reportReasonOptions" />
 					</div>
 					<div class="flex flex-col gap-2.5">
 						<label for="shared-instance-report-context" class="font-semibold text-contrast">
@@ -180,9 +177,7 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-if="reportMode" color="brand">
-						<button>
-							<SendIcon />{{ formatMessage(commonMessages.reportButton) }}
-						</button>
+						<button><SendIcon />{{ formatMessage(commonMessages.reportButton) }}</button>
 					</ButtonStyled>
 					<template v-else-if="hasExternalFiles">
 						<ButtonStyled type="transparent" color="orange">

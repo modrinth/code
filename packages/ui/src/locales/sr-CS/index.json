@@ -506,15 +506,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "svet"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Sadržaj tvog modpacka sada možeš pronaći ovde!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Sadržaj modpacka pomeren"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Ne prikazuj ponovo"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatni sadržaj"
   },
@@ -5736,4 +5727,3 @@
     "defaultMessage": "Tip"
   }
 }
-

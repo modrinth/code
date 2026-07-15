@@ -542,11 +542,20 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Dont install"
+  "app.modal.install-to-play.additional-context": {
+    "message": "Additional context"
   },
-  "app.modal.install-to-play.external-file-warning": {
-    "message": "{count, plural, one {This instance includes # file that is not from Modrinth.} other {This instance includes # files that are not from Modrinth.}}"
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "Include links and images if possible and relevant"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Block this user"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Content you’re reporting"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "Don't install"
   },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
@@ -563,6 +572,27 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "Use this form to report content that may violate our <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>."
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "For DMCA notices or other legal claims, see our <copyright-link>Copyright Policy</copyright-link>."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Which rule does this content violate?"
+  },
+  "app.modal.install-to-play.report-reason.illegal": {
+    "message": "Illegal"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "Malicious"
+  },
+  "app.modal.install-to-play.report-reason.other": {
+    "message": "Other"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "For support requests, contact our <support-link>support team</support-link>. For bug reports, open a <github-link>GitHub issue</github-link>."
+  },
   "app.modal.install-to-play.reviewed-files": {
     "message": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
   },
@@ -572,8 +602,14 @@
   "app.modal.install-to-play.shared-instance-content": {
     "message": "Shared instance content"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Shared server instance"
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "This shared instance contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "app.modal.install-to-play.trust-warning-description": {
+    "message": "A shared instance will install files on your computer and may include content not from Modrinth."
+  },
+  "app.modal.install-to-play.trust-warning-header": {
+    "message": "Do you trust this user?"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
@@ -584,17 +620,17 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Unrecognized files"
   },
-  "app.modal.install-to-play.trust-warning-description": {
-    "message": "A shared instance will install files on your computer and may include content not from Modrinth."
-  },
-  "app.modal.install-to-play.trust-warning-header": {
-    "message": "Do you trust this user?"
-  },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
   },
   "app.modal.update-to-play.header": {
     "message": "Update to play"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Removed"
+  },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "This server modpack update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
   },
   "app.modal.update-to-play.shared-instance-added-label": {
     "message": "Added"
@@ -602,11 +638,11 @@
   "app.modal.update-to-play.shared-instance-removed-label": {
     "message": "Removed"
   },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "This shared instance update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
   "app.modal.update-to-play.update-required": {
     "message": "Update required"
-  },
-  "app.modal.update-to-play.removed": {
-    "message": "Removed"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to latest version to launch the game."

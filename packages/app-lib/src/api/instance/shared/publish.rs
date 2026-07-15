@@ -124,10 +124,7 @@ pub async fn get_shared_instance_publish_preview(
     ensure_owner(&attachment)?;
 
     let (version, snapshot) = tokio::try_join!(
-        get_latest_remote_version_optional_unavailable(
-            &attachment.id,
-            &state,
-        ),
+        get_latest_remote_version_optional_unavailable(&attachment.id, &state,),
         collect_publish_snapshot(&metadata, &state),
     )?;
     let version = match version {
@@ -142,13 +139,9 @@ pub async fn get_shared_instance_publish_preview(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
-    let diffs = shared_instance_publish_diffs(
-        &metadata,
-        &version,
-        &snapshot,
-        &state,
-    )
-    .await?;
+    let diffs =
+        shared_instance_publish_diffs(&metadata, &version, &snapshot, &state)
+            .await?;
     set_shared_instance_publish_status(
         instance_id,
         &attachment,
@@ -199,8 +192,8 @@ pub(crate) async fn should_surface_config_only_push(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<bool> {
-    let Some(metadata) = crate::state::get_instance(instance_id, &state.pool)
-        .await?
+    let Some(metadata) =
+        crate::state::get_instance(instance_id, &state.pool).await?
     else {
         return Ok(false);
     };
@@ -211,11 +204,9 @@ pub(crate) async fn should_surface_config_only_push(
         return Ok(false);
     }
 
-    let version = get_latest_remote_version_optional_unavailable(
-        &attachment.id,
-        state,
-    )
-    .await?;
+    let version =
+        get_latest_remote_version_optional_unavailable(&attachment.id, state)
+            .await?;
     let SharedInstanceRemoteResponse::Available(version) = version else {
         return Ok(false);
     };
@@ -863,11 +854,8 @@ pub(super) async fn upload_external_files(
                 config_bundle_bytes(&config_path, files).await?
             }
         };
-        let response = REQWEST_CLIENT
-            .put(&upload.url)
-            .body(bytes)
-            .send()
-            .await?;
+        let response =
+            REQWEST_CLIENT.put(&upload.url).body(bytes).send().await?;
 
         if !response.status().is_success() {
             return Err(crate::ErrorKind::OtherError(format!(
