@@ -1,5 +1,6 @@
 import type { AbstractPopupNotificationManager, AbstractWebNotificationManager } from '@modrinth/ui'
 
+import { setupOnboardingChecklistProvider } from './onboarding-checklist'
 import { setupCreationModal } from './setup/creation-modal'
 import { setupFileDropProvider } from './setup/file-drop'
 import { setupFilePickerProvider } from './setup/file-picker'
@@ -14,8 +15,10 @@ export function setupProviders(
 	setupFileDropProvider()
 	setupFilePickerProvider()
 	setupInstanceImportProvider(notificationManager)
+	const onboardingChecklist = setupOnboardingChecklistProvider()
 
 	return {
 		...setupCreationModal(notificationManager),
+		onboardingChecklist,
 	}
 }

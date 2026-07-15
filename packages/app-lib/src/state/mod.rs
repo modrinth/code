@@ -20,6 +20,9 @@ pub use self::instances::*;
 mod settings;
 pub use self::settings::*;
 
+mod onboarding_checklist;
+pub use self::onboarding_checklist::*;
+
 mod process;
 pub use self::process::*;
 

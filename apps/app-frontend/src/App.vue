@@ -246,6 +246,7 @@ const {
 	setModpackAlreadyInstalledModal,
 	handleModpackDuplicateCreateAnyway,
 	handleModpackDuplicateGoToInstance,
+	onboardingChecklist,
 } = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
@@ -334,6 +335,8 @@ const messages = defineMessages({
 })
 
 async function setupApp() {
+	await onboardingChecklist.initialize()
+
 	const {
 		native_decorations,
 		theme,

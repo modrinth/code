@@ -49,6 +49,12 @@ pub(crate) async fn create(
 
     if result.is_err() {
         let _ = crate::state::remove_instance(&instance.id, &state).await;
+    } else if let Err(error) =
+        crate::onboarding_checklist::mark_created_instance().await
+    {
+        tracing::warn!(
+            "Failed to mark instance creation in onboarding checklist: {error}"
+        );
     }
 
     result

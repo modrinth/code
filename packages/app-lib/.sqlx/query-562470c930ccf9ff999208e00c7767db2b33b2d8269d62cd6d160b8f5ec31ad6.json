@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            has_created_instance,\n            has_logged_into_minecraft,\n            has_logged_into_modrinth\n        FROM onboarding_checklist\n        WHERE id = 0\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "has_created_instance",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "has_logged_into_minecraft",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "has_logged_into_modrinth",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "562470c930ccf9ff999208e00c7767db2b33b2d8269d62cd6d160b8f5ec31ad6"
+}

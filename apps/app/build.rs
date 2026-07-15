@@ -142,6 +142,14 @@ fn main() {
                     ),
             )
             .plugin(
+                "onboarding-checklist",
+                InlinedPlugin::new()
+                    .commands(&["get_onboarding_checklist"])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "install",
                 InlinedPlugin::new()
                     .commands(&[
