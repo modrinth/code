@@ -396,12 +396,6 @@ pub(super) fn shared_instance_unavailable_message(
 fn shared_instance_external_file_data(
     file: ExternalFileResponse,
 ) -> crate::Result<SharedInstanceExternalFileData> {
-    let sha256 = file.sha256.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Shared instance external file {} is missing its SHA-256 checksum",
-            file.file_name
-        ))
-    })?;
     let file_size = file.file_size.ok_or_else(|| {
         crate::ErrorKind::InputError(format!(
             "Shared instance external file {} is missing its size",
@@ -419,7 +413,6 @@ fn shared_instance_external_file_data(
         file_name: file.file_name,
         file_type: file.file_type,
         url: file.url,
-        sha256,
         file_size,
     })
 }

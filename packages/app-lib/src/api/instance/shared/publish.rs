@@ -3,8 +3,6 @@ use super::diff::*;
 use super::install::*;
 use super::types::*;
 use super::*;
-use base64::prelude::{BASE64_STANDARD, Engine as _};
-use sha2::{Digest, Sha256};
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -726,11 +724,8 @@ pub(super) async fn upload_external_files(
             .join(instance_path)
             .join(&candidate.file_path);
         let bytes = crate::util::io::read(path).await?;
-        let checksum = BASE64_STANDARD.encode(Sha256::digest(&bytes));
         let response = REQWEST_CLIENT
             .put(&upload.url)
-            .header("x-amz-sdk-checksum-algorithm", "SHA256")
-            .header("x-amz-checksum-sha256", checksum)
             .body(bytes)
             .send()
             .await?;

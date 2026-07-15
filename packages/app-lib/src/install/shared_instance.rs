@@ -14,7 +14,6 @@ use crate::state::{
     ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
-use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
@@ -768,14 +767,6 @@ async fn install_shared_instance_external_file(
     if bytes.len() as u64 != file.file_size {
         return Err(crate::ErrorKind::OtherError(format!(
             "Shared instance external file {} has an unexpected size",
-            file.file_name
-        ))
-        .into());
-    }
-    let sha256 = format!("{:x}", Sha256::digest(&bytes));
-    if sha256 != file.sha256 {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance external file {} failed checksum verification",
             file.file_name
         ))
         .into());

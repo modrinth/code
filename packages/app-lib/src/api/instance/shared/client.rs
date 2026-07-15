@@ -94,8 +94,6 @@ pub(super) struct ExternalFileResponse {
     pub(super) file_type: String,
     pub(super) url: String,
     #[serde(default)]
-    pub(super) sha256: Option<String>,
-    #[serde(default)]
     pub(super) file_size: Option<i64>,
 }
 
