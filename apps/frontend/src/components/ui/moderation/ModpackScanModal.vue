@@ -11,8 +11,8 @@ import {
 	type TableColumn,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
-import {useQueryClient} from "@tanstack/vue-query";
 
 const messages = defineMessages({
 	title: {
@@ -222,7 +222,7 @@ async function clearAllGroups() {
 		return
 	}
 
-	let failed = false;
+	let failed = false
 
 	try {
 		isClearing.value = true
@@ -230,13 +230,13 @@ async function clearAllGroups() {
 			props.project_id,
 		)
 
-		for (let group of groups) {
+		for (const group of groups) {
 			await client.labrinth.attribution_internal.deleteGroup(group.id)
 		}
 
 		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.project_id] })
 	} catch (error) {
-		failed = true;
+		failed = true
 		addNotification({
 			type: 'error',
 			title: 'An error occurred',
