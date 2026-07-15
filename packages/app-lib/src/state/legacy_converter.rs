@@ -63,7 +63,6 @@ where
         settings.telemetry = !legacy_settings.opt_out_analytics;
         settings.discord_rpc = !legacy_settings.disable_discord_rpc;
         settings.developer_mode = legacy_settings.developer_mode;
-        settings.onboarded = legacy_settings.fully_onboarded;
         settings.extra_launch_args = legacy_settings.custom_java_args;
         settings.custom_env_vars = legacy_settings.custom_env_args;
         settings.memory.maximum = legacy_settings.memory.maximum;
@@ -655,8 +654,6 @@ struct LegacySettings {
     pub opt_out_analytics: bool,
     #[serde(default)]
     pub advanced_rendering: bool,
-    #[serde(default)]
-    pub fully_onboarded: bool,
     #[serde(default = "default_settings_dir")]
     pub loaded_config_dir: Option<PathBuf>,
 }

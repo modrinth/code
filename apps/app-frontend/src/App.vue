@@ -260,7 +260,6 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
 const os = ref('')
@@ -343,7 +342,6 @@ async function setupApp() {
 		collapsed_navigation,
 		hide_nametag_skins_page,
 		advanced_rendering,
-		onboarded,
 		default_page,
 		toggle_sidebar,
 		developer_mode,
@@ -364,8 +362,6 @@ async function setupApp() {
 	const dev = await isDev()
 	isDevEnvironment.value = dev
 	const version = await getVersion()
-	showOnboarding.value = !onboarded
-
 	nativeDecorations.value = native_decorations
 	if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
@@ -387,7 +383,7 @@ async function setupApp() {
 	if (telemetry) {
 		initAnalytics()
 		if (dev) debugAnalytics()
-		trackEvent('Launched', { version, dev, onboarded })
+		trackEvent('Launched', { version, dev })
 	}
 
 	if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
