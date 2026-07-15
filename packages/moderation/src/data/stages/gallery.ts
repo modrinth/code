@@ -16,13 +16,17 @@ export default function () {
 		.navigate('/gallery')
 		.children(
 			group().children(
-				toggle('insufficient', 'Insufficient')
-					.shown(computed(() => !project.value.minecraft_server))
-					.action(action().suggestedStatus('flagged').severity('low').message()),
+				toggle('insufficient', 'Insufficient').action(
+					action().suggestedStatus('flagged').severity('low').message(),
+				),
 
 				toggle('not_relevant', 'Not relevant')
 					.shown(computed(() => project.value.gallery.length > 0))
 					.action(action().suggestedStatus('flagged').severity('low').message()),
+
+				toggle('showcase_clarity', 'Showcase Clarity').action(
+					action().suggestedStatus('rejected').severity('high').message(),
+				),
 			),
 		)
 }

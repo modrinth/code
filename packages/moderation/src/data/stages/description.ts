@@ -2,7 +2,10 @@ import { LibraryIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import type { NodeState } from '../../types/node'
 import { action, group, markdown, md, stage, toggle } from '../../types/node'
+
+const SHOW_SPOILER_ADVICE = ['horror']
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -24,29 +27,37 @@ export default function () {
 								.suggestedStatus('flagged')
 								.severity('medium')
 								.message(async (state) => {
-									const reasons =
-										state?.reason instanceof Set ? state.reason : new Set<string>()
+									const reasons = state?.reason instanceof Set ? state.reason : new Set<string>()
 
-									let message = await md('checklist/messages/description/insufficient/header')(state)
+									let message = await md(
+										'checklist/messages/description/insufficient/header',
+										(s) => ({ CUSTOM_ADVICE: s.custom?.explainer }),
+									)(state)
 
-									if (reasons.size === 0) {
-										const typePath = project.value?.minecraft_java_server
-											? 'servers'
-											: project.value?.project_types?.includes('modpack')
-												? 'packs'
-												: 'projects'
+									if (reasons.size === 0)
 										message += await md(
-											`checklist/messages/description/insufficient/${typePath}`,
+											`checklist/messages/description/insufficient/default/${project.value?.minecraft_java_server ? 'servers' : project.value?.project_types?.includes('modpack') ? 'packs' : 'projects'}`,
 										)(state)
-									}
 
 									if (reasons.has('fork'))
-										message += await md('checklist/messages/description/insufficient/fork')(state)
+										message += await md('checklist/messages/description/insufficient/piece/fork')(
+											state,
+										)
 
-									if (reasons.has('custom'))
+									if (reasons.has('unfinished'))
 										message += await md(
-											'checklist/messages/description/insufficient/custom',
-											(s) => ({ EXPLAINER: s.explainer }),
+											'checklist/messages/description/insufficient/piece/unfinished',
+										)(state)
+
+									if (reasons.has('horror'))
+										message += await md('checklist/messages/description/insufficient/piece/horror')(
+											state,
+										)
+
+									// Always put this at bottom
+									if (SHOW_SPOILER_ADVICE.some((reason) => reasons.has(reason)))
+										message += await md(
+											'checklist/messages/description/insufficient/piece/spoiler-guide',
 										)(state)
 
 									return message
@@ -59,6 +70,7 @@ export default function () {
 								.children(
 									toggle('fork', 'Fork'),
 									toggle('unfinished', 'Unfinished'),
+									toggle('horror', 'Horror'),
 									toggle('custom', 'Custom').children(
 										markdown('explainer')
 											.title('How can the author improve their description?')
@@ -67,14 +79,17 @@ export default function () {
 								),
 						),
 
-					//TODO: combine these 2 non-englishes
-					toggle('non_english', 'Non-english')
-						.shown(computed(() => !project.value.minecraft_java_server))
-						.action(action().suggestedStatus('flagged').severity('medium').message()),
-
-					toggle('non_english_server', 'Non-english')
-						.shown(computed(() => !!project.value.minecraft_java_server))
-						.action(action().suggestedStatus('flagged').severity('medium').message()),
+					toggle('non_english', 'Non-english').action(
+						action()
+							.suggestedStatus('flagged')
+							.severity('medium')
+							.message(
+								md(
+									() =>
+										`checklist/messages/description/non_english${project.value.minecraft_java_server ? '_server' : ''}`,
+								),
+							),
+					),
 
 					toggle('headers_as_body', 'Headers as body text').action(
 						action().suggestedStatus('flagged').severity('low').message(),
