@@ -374,6 +374,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type {
+	ActionBuilder,
 	IdentifiedNodeBuilder,
 	NodeState,
 	Priority,
@@ -412,7 +413,7 @@ import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from 
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
-import { computed, nextTick, provide, ref, toRaw } from 'vue'
+import { computed, nextTick, provide, ref, toRaw, watch } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -655,6 +656,7 @@ nodeStates.value = persistedState?.state ?? {}
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction[] | null>(null)
+const resolvedMessageAvailability = ref<Map<ActionBuilder, boolean>>(new Map())
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
@@ -1147,6 +1149,36 @@ watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
 watch(message, persistState)
 
+watch(
+	nodeStates,
+	async () => {
+		const active = collectActiveActions()
+		const newMap = new Map<ActionBuilder, boolean>()
+		await Promise.all(
+			active
+				.filter((a) => a.action._message || a.action._autoMessage)
+				.map(async ({ action, state, statePath }) => {
+					try {
+						const msg = action._autoMessage
+							? await loadMd(
+									`checklist/messages/${statePath.join('/')}`,
+									state,
+									projectV3.value,
+									projectV2.value,
+									action._autoMessageVars,
+								)
+							: await action._message!(state)
+						newMap.set(action, !!(msg?.trim()))
+					} catch {
+						newMap.set(action, false)
+					}
+				}),
+		)
+		resolvedMessageAvailability.value = newMap
+	},
+	{ deep: true, immediate: true },
+)
+
 interface MessagePart {
 	priority?: Priority
 	content: string
@@ -1366,7 +1398,12 @@ function getModpackFilesFromStorage(): {
 }
 
 function countStageActions(stage: StageNodeBuilder): number {
-	return checklistLive.value.get(stage)?.messageCount ?? 0
+	const actions = checklistLive.value.get(stage)?.activeActions ?? []
+	const resolved = resolvedMessageAvailability.value
+	return actions.filter((a) => {
+		if (!a.action._message && !a.action._autoMessage) return false
+		return resolved.get(a.action) ?? true
+	}).length
 }
 
 function countStageFixes(stage: StageNodeBuilder): number {
