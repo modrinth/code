@@ -1284,6 +1284,11 @@ onMounted(async () => {
 		return
 	}
 
+	const initialStage = resolvedStages.value[currentStage.value]
+	if (initialStage?._navigate) {
+		router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${initialStage._navigate}`)
+	}
+
 	const result = await moderationQueue.acquireLock(projectV2.value.id)
 
 	if (result.success) {

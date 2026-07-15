@@ -1351,6 +1351,12 @@ const { data: organizationRaw } = useQuery({
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
+const { data: thread } = useQuery({
+	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
+	queryFn: () => client.labrinth.threads_v3.getThread(projectRaw.value.thread_id),
+	enabled: computed(() => !!projectRaw.value?.thread_id),
+})
+
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
@@ -2166,6 +2172,8 @@ provideProjectPageContext({
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
 	cdnDownloadReason: readonly(downloadReason),
+
+	thread,
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: invalidateProject,
