@@ -1,8 +1,6 @@
 import { LibraryIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
-import { computed } from 'vue'
 
-import type { NodeState } from '../../types/node'
 import { action, group, markdown, md, stage, toggle } from '../../types/node'
 
 const SHOW_SPOILER_ADVICE = ['horror']

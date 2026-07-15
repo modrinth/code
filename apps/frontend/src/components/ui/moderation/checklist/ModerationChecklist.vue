@@ -1,5 +1,33 @@
 <template>
 	<KeybindsModal ref="keybindsModal" />
+	<Teleport to="body">
+		<div
+			v-if="stageDropdownOpen"
+			ref="stageDropdownMenuRef"
+			class="stage-selector-portal"
+			:class="{ 'stage-selector-portal--visible': stageDropdownVisible }"
+			:style="stageDropdownMenuStyle"
+		>
+			<button
+				v-for="opt in stageOptionsForSlots"
+				:key="opt.id"
+				class="btn btn-transparent"
+				:class="[
+					opt.color ? `btn-${opt.color}` : '',
+					opt.hoverFilled ? 'btn-hover-filled' : '',
+					opt.hoverFilledOnly ? 'btn-hover-filled-only' : '',
+					opt.disabled ? 'disabled' : '',
+				]"
+				style="white-space: nowrap; width: 100%; box-shadow: none; justify-content: flex-start; padding: 0.55rem 0.625rem;"
+				:disabled="opt.disabled"
+				@click="opt.action?.($event); closeStageDropdown()"
+			>
+				<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+				<span>{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span>
+				<span v-if="opt.messages" class="text-m ml-auto pl-2 font-semibold opacity-75">{{ opt.messages }}</span>
+			</button>
+		</div>
+	</Teleport>
 	<ConfirmModal
 		v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
 		ref="takeOverModal"
@@ -18,36 +46,19 @@
 		<div class="flex grow-0 flex-col gap-1">
 			<div class="flex items-center gap-2">
 				<h1 class="m-0 mr-auto">
-					<OverflowMenu
-						:options="stageOptions"
+					<button
+						ref="stageTitleBtnRef"
+						class="inline-flex items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
+						:class="{
+							'cursor-pointer': canOpenStageSelectorFromTitle,
+							'cursor-default': !canOpenStageSelectorFromTitle,
+						}"
 						:disabled="!canOpenStageSelectorFromTitle"
-						placement="bottom"
-						dropdown-class="title-stage-selector-dropdown"
-						:class="{ 'title-stage-selector-disabled': !canOpenStageSelectorFromTitle }"
-						class="bg-transparent p-0"
+						@click="openStageSelector($event)"
 					>
-						<span
-							class="inline-flex items-center gap-2 text-2xl font-extrabold text-contrast"
-							:class="{
-								'cursor-pointer': canOpenStageSelectorFromTitle,
-								'cursor-default': !canOpenStageSelectorFromTitle,
-							}"
-						>
-							<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
-							{{ checklistTitleText }}
-						</span>
-
-						<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
-							<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-							<span
-								>{{ opt.text
-								}}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span
-							>
-							<span v-if="opt.messages" class="text-m ml-auto pl-2 font-semibold opacity-75">{{
-								opt.messages
-							}}</span>
-						</template>
-					</OverflowMenu>
+						<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
+						{{ checklistTitleText }}
+					</button>
 				</h1>
 				<ButtonStyled circular>
 					<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
@@ -245,6 +256,12 @@
 						</div>
 
 						<div class="flex items-center gap-2">
+							<ButtonStyled v-if="!done" circular>
+							<button ref="stageBottomBtnRef" v-tooltip="`Stages`" @click="openStageSelector($event)">
+								<ListBulletedIcon />
+							</button>
+						</ButtonStyled>
+
 							<div v-if="done">
 								<ButtonStyled color="brand">
 									<button @click="endChecklist(undefined)">
@@ -261,18 +278,6 @@
 							</div>
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
-								<OverflowMenu :options="stageOptions" class="bg-transparent p-0">
-									<ButtonStyled circular>
-										<button v-tooltip="`Stages`">
-											<ListBulletedIcon />
-										</button>
-									</ButtonStyled>
-
-									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
-										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-										{{ opt.text }}
-									</template>
-								</OverflowMenu>
 								<ButtonStyled>
 									<button :disabled="loadingModerationDecision" @click="goBackToStages">
 										<LeftArrowIcon aria-hidden="true" />
@@ -318,22 +323,6 @@
 							</div>
 
 							<div v-else class="flex items-center gap-2">
-								<OverflowMenu
-									v-if="!generatedMessage"
-									:options="stageOptions"
-									class="bg-transparent p-0"
-								>
-									<ButtonStyled circular>
-										<button v-tooltip="`Stages`">
-											<ListBulletedIcon />
-										</button>
-									</ButtonStyled>
-
-									<template v-for="opt in stageOptionsForSlots" #[opt.id] :key="opt.id">
-										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-										{{ opt.text }}
-									</template>
-								</OverflowMenu>
 								<ButtonStyled>
 									<button :disabled="!hasValidPreviousStage" @click="previousStage">
 										<LeftArrowIcon aria-hidden="true" /> Previous
@@ -407,14 +396,13 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	MarkdownEditor,
-	OverflowMenu,
 	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
 import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import { computed, provide, ref, toRaw } from 'vue'
+import { computed, nextTick, provide, ref, toRaw } from 'vue'
 import type { Component } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
@@ -1018,6 +1006,113 @@ const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.v
 const canOpenStageSelectorFromTitle = computed(
 	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
 )
+
+const stageDropdownMenuRef = ref<HTMLElement | null>(null)
+const stageDropdownMenuStyle = ref<Record<string, string>>({})
+const stageDropdownOpen = ref(false)
+const stageDropdownVisible = ref(false)
+const stageDropdownTriggerEl = ref<HTMLElement | null>(null)
+const stageTitleBtnRef = ref<HTMLElement | null>(null)
+const stageBottomBtnRef = ref<HTMLElement | null>(null)
+
+let positionToken = 0
+let closeTimer: ReturnType<typeof setTimeout> | null = null
+
+function closeStageDropdown() {
+	stageDropdownVisible.value = false
+	if (closeTimer !== null) clearTimeout(closeTimer)
+	closeTimer = setTimeout(() => {
+		closeTimer = null
+		stageDropdownOpen.value = false
+		stageDropdownTriggerEl.value = null
+	}, 70)
+}
+
+function onStageDropdownExternalClose(e: MouseEvent) {
+	if (!stageDropdownOpen.value) return
+	if (stageTitleBtnRef.value?.contains(e.target as Node)) return
+	if (stageBottomBtnRef.value?.contains(e.target as Node)) return
+	closeStageDropdown()
+}
+
+async function positionStageDropdown(triggerRect: DOMRect) {
+	const token = ++positionToken
+	await nextTick()
+	const menu = stageDropdownMenuRef.value
+	if (token !== positionToken || !menu || !stageDropdownOpen.value) return
+
+	const menuW = menu.offsetWidth
+	const menuH = menu.offsetHeight
+	const vw = window.innerWidth
+	const vh = window.innerHeight
+
+	// Center horizontally with the trigger button
+	const cx = triggerRect.left + triggerRect.width / 2
+	let left = cx - menuW / 2
+	left = Math.max(4, Math.min(left, vw - menuW - 4))
+
+	const spaceBelow = vh - triggerRect.bottom
+	const spaceAbove = triggerRect.top
+
+	let top: number
+	let maxH: string | undefined
+	let openAbove = false
+
+	if (menuH <= spaceBelow) {
+		top = triggerRect.bottom
+	} else if (menuH <= spaceAbove) {
+		top = triggerRect.top - menuH
+		openAbove = true
+	} else if (spaceBelow >= spaceAbove) {
+		top = Math.max(4, Math.min(triggerRect.bottom, vh - menuH - 4))
+		if (menuH > vh - 8) { top = 4; maxH = `${vh - 8}px` }
+	} else {
+		top = Math.max(4, triggerRect.top - menuH)
+		openAbove = true
+		if (menuH > vh - 8) { top = 4; maxH = `${vh - 8}px` }
+	}
+
+	stageDropdownMenuStyle.value = {
+		position: 'fixed',
+		left: `${left}px`,
+		top: `${top}px`,
+		zIndex: '9999',
+		transformOrigin: openAbove ? 'center bottom' : 'center top',
+		...(maxH ? { maxHeight: maxH, overflowY: 'auto' } : {}),
+	}
+
+	await nextTick()
+	if (token !== positionToken || !stageDropdownOpen.value) return
+	stageDropdownVisible.value = true
+}
+
+function openStageSelector(event: MouseEvent) {
+	const triggerEl = event.currentTarget as HTMLElement
+	const isSameTrigger = stageDropdownTriggerEl.value === triggerEl
+	const wasOpen = stageDropdownOpen.value
+
+	if (closeTimer !== null) {
+		clearTimeout(closeTimer)
+		closeTimer = null
+	}
+
+	if (wasOpen) {
+		stageDropdownVisible.value = false
+		if (isSameTrigger) {
+			closeTimer = setTimeout(() => {
+				closeTimer = null
+				stageDropdownOpen.value = false
+				stageDropdownTriggerEl.value = null
+			}, 70)
+			return
+		}
+	}
+
+	stageDropdownTriggerEl.value = triggerEl
+	stageDropdownMenuStyle.value = { position: 'fixed', top: '-9999px', left: '-9999px', zIndex: '9999' }
+	stageDropdownOpen.value = true
+	positionStageDropdown(triggerEl.getBoundingClientRect())
+}
 const checklistTitleText = computed(() => {
 	if (alreadyReviewed.value || done.value) return 'Moderation'
 	if (generatedMessage.value) return 'Generated Message'
@@ -1207,6 +1302,10 @@ watch(currentStage, () => {
 	}
 })
 
+onMounted(() => {
+	document.addEventListener('click', onStageDropdownExternalClose)
+})
+
 onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
@@ -1257,6 +1356,10 @@ function handleBeforeUnload() {
 		new Blob([token], { type: 'text/plain' }),
 	)
 }
+
+onUnmounted(() => {
+	document.removeEventListener('click', onStageDropdownExternalClose)
+})
 
 onUnmounted(() => {
 	window.removeEventListener('beforeunload', handleBeforeUnload)
@@ -1867,15 +1970,8 @@ const stageOptionsForSlots = computed(() =>
 		}
 	}
 
-	:deep(.title-stage-selector-dropdown .v-popper__inner) {
-		max-height: min(70vh, 28rem) !important;
-		overflow-y: auto;
-	}
-
-	:deep(.title-stage-selector-disabled > button) {
-		cursor: default;
-	}
 }
+
 
 // Tooltip styling for button action message previews.
 // Must use :global since floating-vue teleports tooltips outside the component DOM.
@@ -1921,5 +2017,27 @@ const stageOptionsForSlots = computed(() =>
 
 :global(.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
 	font-style: italic;
+}
+
+.stage-selector-portal {
+	border: 1px solid var(--surface-5);
+	padding: var(--gap-sm);
+	width: fit-content;
+	border-radius: 12px;
+	background-color: var(--surface-3);
+	box-shadow: 3px 3px 0.8rem rgba(0, 0, 0, 0.3);
+	opacity: 0;
+	transform: scale(0.85);
+	transition:
+		transform 0.0625s ease-in-out,
+		opacity 0.0625s ease-in-out;
+
+	&.stage-selector-portal--visible {
+		opacity: 1;
+		transform: scale(1);
+		transition:
+			transform 0.125s ease-in-out,
+			opacity 0.125s ease-in-out;
+	}
 }
 </style>

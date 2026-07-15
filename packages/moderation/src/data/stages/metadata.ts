@@ -99,7 +99,7 @@ export default function () {
 										.none('Unknown'),
 								),
 						),
-					// TODO: chyz, fix pls
+					// TODO: chyz, fix pls (make into single set of buttons where current loaders start selected and non current start non selected
 					//					toggle('loader', `Loader${project.value.loaders.length > 1 ? 's' : ''}`).children(
 					//						group()
 					//							.title('Loader Issues?')
