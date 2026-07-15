@@ -340,7 +340,7 @@ import ButtonStyled from './ButtonStyled.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
 import IntlFormatted from './IntlFormatted.vue'
-import StyledInput from './StyledInput.vue'
+import StyledInput from './inputs/StyledInput.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()

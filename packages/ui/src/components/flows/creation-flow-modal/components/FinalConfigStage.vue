@@ -107,10 +107,9 @@
 						:options="generatorSettingsOptions"
 						:placeholder="formatMessage(messages.generatorSettingsPlaceholder)"
 					/>
-					<StyledInput
+					<StyledTextarea
 						v-if="generatorSettingsMode === 'custom'"
 						v-model="generatorSettingsCustom"
-						multiline
 						:rows="4"
 						:placeholder="formatMessage(messages.generatorSettingsJsonPlaceholder)"
 						input-class="font-mono"
@@ -144,7 +143,8 @@ import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
 import Combobox, { type ComboboxOption } from '../../../base/Combobox.vue'
-import StyledInput from '../../../base/StyledInput.vue'
+import StyledInput from '../../../base/inputs/StyledInput.vue'
+import StyledTextarea from '../../../base/inputs/StyledTextarea.vue'
 import Toggle from '../../../base/Toggle.vue'
 import type { Difficulty, Gamemode, GeneratorSettingsMode } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'

@@ -14,7 +14,14 @@ import { builtinLicenses } from '@modrinth/utils'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import { ButtonStyled, Chips, Combobox, type ComboboxOption, StyledInput } from '#ui/components'
+import {
+	ButtonStyled,
+	Chips,
+	Combobox,
+	type ComboboxOption,
+	StyledInput,
+	StyledTextarea,
+} from '#ui/components'
 import { FileInput } from '#ui/components/base'
 import { commonMessages } from '#ui/utils'
 
@@ -542,11 +549,9 @@ function cancelEditing() {
 							formatMessage(selectedPermissionReason.notesDescription)
 						}}</span>
 					</div>
-					<StyledInput
+					<StyledTextarea
 						v-model="notesInput"
-						type="text"
 						resize="both"
-						multiline
 						:rows="notesInputRows"
 						class="max-w-[40rem]"
 						:placeholder="formatMessage(messages.notesPlaceholder)"

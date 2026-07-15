@@ -51,7 +51,7 @@ import { RightArrowIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatFileItemType } from '#ui/utils/common-messages'

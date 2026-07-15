@@ -11,7 +11,7 @@ import {
 } from '../../composables/i18n'
 import { metaLocaleModules } from '../../locales.ts'
 import { isModifierKeyDown } from '../../utils/events'
-import StyledInput from '../base/StyledInput.vue'
+import StyledInput from '../base/inputs/StyledInput.vue'
 
 const { formatMessage } = useVIntl()
 

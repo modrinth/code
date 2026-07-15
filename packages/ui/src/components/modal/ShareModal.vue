@@ -14,7 +14,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import { injectNotificationManager } from '#ui/providers'
 
-import { ButtonStyled, NewModal, StyledInput } from '../index'
+import { ButtonStyled, NewModal, StyledTextarea } from '../index'
 
 const props = defineProps({
 	header: {
@@ -167,27 +167,25 @@ defineExpose({
 						</button>
 					</ButtonStyled>
 				</div>
-				<StyledInput
+				<StyledTextarea
 					v-else
 					v-model="content"
-					multiline
 					resize="vertical"
 					wrapper-class="h-full w-[30rem]"
 				>
-					<template #right>
+					<template #trailing>
 						<ButtonStyled circular type="transparent">
 							<button
 								v-tooltip="'Copy Text'"
 								type="button"
 								aria-label="Copy Text"
-								class="absolute top-0 right-0 m-2"
 								@click="copyText"
 							>
 								<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
 							</button>
 						</ButtonStyled>
 					</template>
-				</StyledInput>
+				</StyledTextarea>
 				<div
 					v-if="link || socialButtons"
 					:class="['flex flex-col justify-center gap-2', link ? 'w-64 max-w-full' : 'flex-grow']"

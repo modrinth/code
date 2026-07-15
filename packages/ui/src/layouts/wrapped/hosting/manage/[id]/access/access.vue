@@ -6,7 +6,7 @@
 				:icon="SearchIcon"
 				:placeholder="formatMessage(messages.searchUsersPlaceholder, { count: members.length })"
 				wrapper-class="min-w-0 flex-1"
-				input-class="!h-10"
+				size="medium"
 				clearable
 			/>
 			<div class="flex shrink-0 items-center gap-2 flex-wrap md:flex-nowrap">
@@ -116,7 +116,7 @@ import { computed, ref, watch } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
 import {
 	AccessTable,
 	apiPermissionsToAccessRole,

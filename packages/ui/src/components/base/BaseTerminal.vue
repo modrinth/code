@@ -31,7 +31,7 @@
 				:placeholder="disableInput ? disabledInputPlaceholder : 'Send a command'"
 				:disabled="disableInput"
 				wrapper-class="w-full"
-				input-class="!h-10"
+				size="medium"
 				@keydown.enter="submitCommand"
 			/>
 		</div>
@@ -44,7 +44,7 @@ import type { Terminal } from '@xterm/xterm'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
 import { useTerminal } from '#ui/composables/terminal'
 
 const props = withDefaults(

@@ -12,7 +12,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { injectI18nDebug } from '../../composables/i18n-debug'
 import ButtonStyled from './ButtonStyled.vue'
-import StyledInput from './StyledInput.vue'
+import StyledInput from './inputs/StyledInput.vue'
 
 const debugContext = injectI18nDebug()
 

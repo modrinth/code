@@ -101,7 +101,7 @@
 					autocomplete="off"
 					clearable
 					size="small"
-					input-class="!bg-button-bg"
+					appearance="button"
 					wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 				/>
 				<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">

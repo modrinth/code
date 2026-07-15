@@ -81,7 +81,7 @@ import {
 } from '../../../providers'
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
-import StyledInput from '../../base/StyledInput.vue'
+import StyledInput from '../../base/inputs/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()

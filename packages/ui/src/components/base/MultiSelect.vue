@@ -133,8 +133,7 @@
 								:icon="SearchIcon"
 								type="text"
 								:placeholder="searchPlaceholder"
-								wrapper-class="grow bg-surface-4 mx-0"
-								input-class="ps-9 mx-1.5"
+								wrapper-class="grow"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
@@ -415,7 +414,7 @@ import {
 } from 'vue'
 
 import { useVirtualScroll } from '../../composables/virtual-scroll'
-import StyledInput from './StyledInput.vue'
+import StyledInput from './inputs/StyledInput.vue'
 
 export interface MultiSelectOption<T> {
 	value: T

@@ -20,7 +20,7 @@
 				:icon="SearchIcon"
 				placeholder="Search logs"
 				wrapper-class="flex-1"
-				input-class="!h-10"
+				size="medium"
 				clearable
 			/>
 			<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
@@ -107,7 +107,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import type { CollapsibleAdmonitionItem } from '#ui/components/base/CollapsibleAdmonition.vue'
 import CollapsibleAdmonition from '#ui/components/base/CollapsibleAdmonition.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModrinthClient } from '#ui/providers'

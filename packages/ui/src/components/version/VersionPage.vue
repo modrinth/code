@@ -25,7 +25,7 @@ import {
 
 import AutoLink from '../base/AutoLink.vue'
 import Avatar from '../base/Avatar.vue'
-import StyledInput from '../base/StyledInput.vue'
+import StyledInput from '../base/inputs/StyledInput.vue'
 import Table from '../base/Table.vue'
 import TagItem from '../base/TagItem.vue'
 import TagTagItem from '../base/TagTagItem.vue'

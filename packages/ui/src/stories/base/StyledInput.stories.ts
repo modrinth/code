@@ -2,7 +2,7 @@ import { KeyIcon, LinkIcon, MailIcon, SearchIcon, UserIcon } from '@modrinth/ass
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
-import StyledInput from '../../components/base/StyledInput.vue'
+import StyledInput from '../../components/base/inputs/StyledInput.vue'
 
 const meta = {
 	title: 'Base/StyledInput',
@@ -10,15 +10,11 @@ const meta = {
 	argTypes: {
 		size: {
 			control: 'select',
-			options: ['standard', 'small'],
+			options: ['small', 'standard', 'medium', 'large'],
 		},
 		type: {
 			control: 'select',
-			options: ['text', 'email', 'password', 'number', 'url', 'search', 'date', 'datetime-local'],
-		},
-		resize: {
-			control: 'select',
-			options: ['none', 'vertical', 'both'],
+			options: ['text', 'email', 'password', 'number', 'url', 'search'],
 		},
 	},
 } satisfies Meta<typeof StyledInput>
@@ -102,18 +98,6 @@ export const Search: Story = {
 	},
 }
 
-export const Date: Story = {
-	args: {
-		type: 'date',
-	},
-}
-
-export const DatetimeLocal: Story = {
-	args: {
-		type: 'datetime-local',
-	},
-}
-
 export const Small: Story = {
 	args: {
 		icon: SearchIcon,
@@ -191,127 +175,20 @@ export const AllSizes: StoryObj = {
 						size="small"
 					/>
 				</div>
-			</div>
-		`,
-	}),
-}
-
-export const Multiline: Story = {
-	args: {
-		multiline: true,
-		placeholder: 'Enter a description...',
-	},
-}
-
-export const MultilineWithRows: Story = {
-	render: () => ({
-		components: { StyledInput },
-		setup() {
-			const value = ref('This textarea has 5 rows configured for longer content entry.')
-			return { value }
-		},
-		template: `
-			<StyledInput
-				v-model="value"
-				multiline
-				:rows="5"
-				placeholder="Enter details..."
-			/>
-		`,
-	}),
-}
-
-export const MultilineResizable: Story = {
-	args: {
-		multiline: true,
-		resize: 'vertical',
-		placeholder: 'Drag the bottom-right corner to resize...',
-	},
-}
-
-export const MultilineError: Story = {
-	render: () => ({
-		components: { StyledInput },
-		setup() {
-			const value = ref('Invalid content')
-			return { value }
-		},
-		template: `
-			<StyledInput
-				v-model="value"
-				multiline
-				placeholder="Enter text..."
-				error
-			/>
-		`,
-	}),
-}
-
-export const MultilineDisabled: Story = {
-	args: {
-		multiline: true,
-		placeholder: 'Disabled textarea',
-		disabled: true,
-	},
-}
-
-export const MultilineAllStates: StoryObj = {
-	render: () => ({
-		components: { StyledInput },
-		setup() {
-			const normalValue = ref('')
-			const filledValue = ref('Some content that has been entered into the textarea.')
-			const errorValue = ref('Invalid content')
-			const readonlyValue = ref('This content is readonly')
-			return { normalValue, filledValue, errorValue, readonlyValue }
-		},
-		template: /*html*/ `
-			<div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
 				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
+					<p style="margin-bottom: 0.5rem; font-weight: 600;">Medium (40px)</p>
 					<StyledInput
-						v-model="normalValue"
-						multiline
-						placeholder="Enter text..."
+						:icon="SearchIcon"
+						placeholder="Medium size..."
+						size="medium"
 					/>
 				</div>
 				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">With Value</p>
+					<p style="margin-bottom: 0.5rem; font-weight: 600;">Large (48px)</p>
 					<StyledInput
-						v-model="filledValue"
-						multiline
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Error State</p>
-					<StyledInput
-						v-model="errorValue"
-						multiline
-						error
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Disabled</p>
-					<StyledInput
-						multiline
-						placeholder="Disabled..."
-						disabled
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Readonly</p>
-					<StyledInput
-						v-model="readonlyValue"
-						multiline
-						readonly
-					/>
-				</div>
-				<div>
-					<p style="margin-bottom: 0.5rem; font-weight: 600;">Resizable (vertical)</p>
-					<StyledInput
-						multiline
-						resize="vertical"
-						placeholder="Drag to resize..."
+						:icon="SearchIcon"
+						placeholder="Large size..."
+						size="large"
 					/>
 				</div>
 			</div>
