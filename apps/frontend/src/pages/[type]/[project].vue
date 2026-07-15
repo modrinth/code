@@ -134,7 +134,6 @@
 						v-if="projectV3Loaded"
 						:project="project"
 						:project-v3="projectV3"
-						:is-server-project="isServerProject"
 						:show-status-badge="!!currentMember || project.status !== 'approved'"
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>

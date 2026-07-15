@@ -14,7 +14,7 @@
 
 		<template #metadata>
 			<PageHeaderMetadata>
-				<template v-if="isServerProject">
+				<template v-if="projectV3?.minecraft_server != null">
 					<ServerDetails
 						v-if="projectV3?.status !== 'draft'"
 						:online-players="projectV3?.minecraft_java_server?.ping?.data?.players_online ?? 0"
@@ -28,14 +28,12 @@
 						:value="project.downloads"
 						:label="formatMessage(messages.downloadsStat, { count: project.downloads })"
 						:tooltip="formatNumber(project.downloads)"
-						class="cursor-help"
 					/>
 					<PageHeaderMetadataNumberItem
 						:icon="HeartIcon"
 						:value="project.followers"
 						:label="formatMessage(messages.followersStat, { count: project.followers })"
 						:tooltip="formatNumber(project.followers)"
-						class="cursor-help"
 					/>
 				</template>
 				<PageHeaderMetadataTagsItem v-if="project.categories.length > 0" class="hidden md:flex">
@@ -81,18 +79,19 @@ type HeaderProject = Pick<
 	icon_url?: string | null
 }
 
-type HeaderProjectV3 = Pick<Labrinth.Projects.v3.Project, 'status' | 'minecraft_java_server'>
+type HeaderProjectV3 = Pick<
+	Labrinth.Projects.v3.Project,
+	'status' | 'minecraft_server' | 'minecraft_java_server'
+>
 
 withDefaults(
 	defineProps<{
 		project: HeaderProject
 		projectV3?: HeaderProjectV3 | null
-		isServerProject?: boolean
 		showStatusBadge?: boolean
 	}>(),
 	{
 		projectV3: null,
-		isServerProject: false,
 		showStatusBadge: false,
 	},
 )
