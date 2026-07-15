@@ -2030,7 +2030,7 @@ function consumeShowChecklistHistoryState() {
 	return true
 }
 
-function setModerationChecklistOpen(open, projectId = project.value?.id) {
+function setModerationChecklistOpen(open) {
 	showModerationChecklist.value = open
 }
 

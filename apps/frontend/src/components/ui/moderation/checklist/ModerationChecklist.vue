@@ -1,46 +1,5 @@
 <template>
 	<KeybindsModal ref="keybindsModal" />
-	<Teleport to="body">
-		<div
-			v-if="stageDropdownOpen"
-			ref="stageDropdownMenuRef"
-			class="stage-selector-portal"
-			:class="{ 'stage-selector-portal--visible': stageDropdownVisible }"
-			:style="stageDropdownMenuStyle"
-		>
-			<button
-				v-for="opt in stageOptionsForSlots"
-				:key="opt.id"
-				class="btn btn-transparent"
-				:class="[
-					opt.color ? `btn-${opt.color}` : '',
-					opt.hoverFilled ? 'btn-hover-filled' : '',
-					opt.hoverFilledOnly ? 'btn-hover-filled-only' : '',
-					opt.disabled ? 'disabled' : '',
-				]"
-				style="
-					white-space: nowrap;
-					width: 100%;
-					box-shadow: none;
-					justify-content: flex-start;
-					padding: 0.55rem 0.625rem;
-				"
-				:disabled="opt.disabled"
-				@click="
-					opt.action?.($event)
-					closeStageDropdown()
-				"
-			>
-				<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-				<span
-					>{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span
-				>
-				<span v-if="opt.messages" class="text-m ml-auto pl-2 font-semibold opacity-75">{{
-					opt.messages
-				}}</span>
-			</button>
-		</div>
-	</Teleport>
 	<ConfirmModal
 		v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
 		ref="takeOverModal"
@@ -59,15 +18,28 @@
 		<div class="flex grow-0 flex-col gap-1">
 			<div class="flex items-center gap-2">
 				<h1 class="m-0 mr-auto">
+					<TeleportOverflowMenu
+						v-if="canOpenStageSelectorFromTitle"
+						:options="stageOptions"
+						btn-class="inline-flex items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
+					>
+						<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
+						{{ checklistTitleText }}
+						<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
+							<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+							<span>
+								{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
+							</span>
+							<span v-if="opt.messages" class="ml-auto pl-2 font-semibold opacity-75">{{
+								opt.messages
+							}}</span>
+							<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{ opt.fixes }}</span>
+						</template>
+					</TeleportOverflowMenu>
 					<button
-						ref="stageTitleBtnRef"
-						class="inline-flex items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
-						:class="{
-							'cursor-pointer': canOpenStageSelectorFromTitle,
-							'cursor-default': !canOpenStageSelectorFromTitle,
-						}"
-						:disabled="!canOpenStageSelectorFromTitle"
-						@click="openStageSelector($event)"
+						v-else
+						disabled
+						class="inline-flex cursor-default items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
 						<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
 						{{ checklistTitleText }}
@@ -230,7 +202,6 @@
 								:disabled="false"
 								:heading-buttons="false"
 								:on-image-upload="onUploadHandler"
-								@input="persistState"
 							/>
 							<StyledInput
 								v-else
@@ -239,7 +210,6 @@
 								placeholder="No message generated."
 								autocomplete="off"
 								input-class="h-[400px] font-mono"
-								@input="persistState"
 							/>
 						</div>
 					</div>
@@ -282,13 +252,23 @@
 
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="!done" circular>
-								<button
-									ref="stageBottomBtnRef"
-									v-tooltip="`Stages`"
-									@click="openStageSelector($event)"
-								>
+								<TeleportOverflowMenu :options="stageOptions">
 									<ListBulletedIcon />
-								</button>
+									<span class="sr-only">Stages</span>
+									<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
+										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
+										<span>
+											{{ opt.text
+											}}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
+										</span>
+										<span v-if="opt.messages" class="ml-auto pl-2 font-semibold opacity-75">{{
+											opt.messages
+										}}</span>
+										<span v-if="opt.fixes" class="pl-2 font-semibold text-blue">{{
+											opt.fixes
+										}}</span>
+									</template>
+								</TeleportOverflowMenu>
 							</ButtonStyled>
 
 							<div v-if="done">
@@ -415,7 +395,6 @@ import {
 	useStages,
 	walkNodes,
 } from '@modrinth/moderation'
-import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -428,6 +407,7 @@ import {
 	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
+import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
 import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
@@ -655,7 +635,7 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 const modpackPermissionsComplete = ref(false)
 const modpackJudgements = ref<ModerationJudgements>({})
 const isModpackPermissionsStage = computed(() => {
-	return currentStageObj.value.id === 'modpack-permissions'
+	return currentStageObj.value.id === 'permissions'
 })
 
 async function onUploadHandler(file: File) {
@@ -714,15 +694,8 @@ async function handleExit() {
 			console.warn('Failed to release moderation lock for project:', projectId)
 		}
 	}
-	if (hasMeaningfulState) {
-		await saveChecklistState(checklistPersistenceProjectId, {
-			open: false,
-			reviewAnyway: undefined,
-			stage: currentStageObj.value.id,
-			message: message.value,
-			state: toRaw(nodeStates.value),
-		})
-	}
+	await persistStateImmediately(false, true)
+	persistenceEnabled = false
 	emit('exit')
 }
 
@@ -768,7 +741,6 @@ async function confirmTakeOverOverride() {
 function reviewAnyway() {
 	alreadyReviewed.value = false
 	reviewedAnyway.value = true
-	hasMeaningfulState = true
 	persistState()
 	// Start prefetching the next project in the background
 	maintainPrefetchQueue()
@@ -1036,123 +1008,6 @@ const canOpenStageSelectorFromTitle = computed(
 	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
 )
 
-const stageDropdownMenuRef = ref<HTMLElement | null>(null)
-const stageDropdownMenuStyle = ref<Record<string, string>>({})
-const stageDropdownOpen = ref(false)
-const stageDropdownVisible = ref(false)
-const stageDropdownTriggerEl = ref<HTMLElement | null>(null)
-const stageTitleBtnRef = ref<HTMLElement | null>(null)
-const stageBottomBtnRef = ref<HTMLElement | null>(null)
-
-let positionToken = 0
-let closeTimer: ReturnType<typeof setTimeout> | null = null
-
-function closeStageDropdown() {
-	stageDropdownVisible.value = false
-	if (closeTimer !== null) clearTimeout(closeTimer)
-	closeTimer = setTimeout(() => {
-		closeTimer = null
-		stageDropdownOpen.value = false
-		stageDropdownTriggerEl.value = null
-	}, 70)
-}
-
-function onStageDropdownExternalClose(e: MouseEvent) {
-	if (!stageDropdownOpen.value) return
-	if (stageTitleBtnRef.value?.contains(e.target as Node)) return
-	if (stageBottomBtnRef.value?.contains(e.target as Node)) return
-	closeStageDropdown()
-}
-
-async function positionStageDropdown(triggerRect: DOMRect) {
-	const token = ++positionToken
-	await nextTick()
-	const menu = stageDropdownMenuRef.value
-	if (token !== positionToken || !menu || !stageDropdownOpen.value) return
-
-	const menuW = menu.offsetWidth
-	const menuH = menu.offsetHeight
-	const vw = window.innerWidth
-	const vh = window.innerHeight
-
-	// Center horizontally with the trigger button
-	const cx = triggerRect.left + triggerRect.width / 2
-	let left = cx - menuW / 2
-	left = Math.max(4, Math.min(left, vw - menuW - 4))
-
-	const spaceBelow = vh - triggerRect.bottom
-	const spaceAbove = triggerRect.top
-
-	let top: number
-	let maxH: string | undefined
-	let openAbove = false
-
-	if (menuH <= spaceBelow) {
-		top = triggerRect.bottom
-	} else if (menuH <= spaceAbove) {
-		top = triggerRect.top - menuH
-		openAbove = true
-	} else if (spaceBelow >= spaceAbove) {
-		top = Math.max(4, Math.min(triggerRect.bottom, vh - menuH - 4))
-		if (menuH > vh - 8) {
-			top = 4
-			maxH = `${vh - 8}px`
-		}
-	} else {
-		top = Math.max(4, triggerRect.top - menuH)
-		openAbove = true
-		if (menuH > vh - 8) {
-			top = 4
-			maxH = `${vh - 8}px`
-		}
-	}
-
-	stageDropdownMenuStyle.value = {
-		position: 'fixed',
-		left: `${left}px`,
-		top: `${top}px`,
-		zIndex: '9999',
-		transformOrigin: openAbove ? 'center bottom' : 'center top',
-		...(maxH ? { maxHeight: maxH, overflowY: 'auto' } : {}),
-	}
-
-	await nextTick()
-	if (token !== positionToken || !stageDropdownOpen.value) return
-	stageDropdownVisible.value = true
-}
-
-function openStageSelector(event: MouseEvent) {
-	const triggerEl = event.currentTarget as HTMLElement
-	const isSameTrigger = stageDropdownTriggerEl.value === triggerEl
-	const wasOpen = stageDropdownOpen.value
-
-	if (closeTimer !== null) {
-		clearTimeout(closeTimer)
-		closeTimer = null
-	}
-
-	if (wasOpen) {
-		stageDropdownVisible.value = false
-		if (isSameTrigger) {
-			closeTimer = setTimeout(() => {
-				closeTimer = null
-				stageDropdownOpen.value = false
-				stageDropdownTriggerEl.value = null
-			}, 70)
-			return
-		}
-	}
-
-	stageDropdownTriggerEl.value = triggerEl
-	stageDropdownMenuStyle.value = {
-		position: 'fixed',
-		top: '-9999px',
-		left: '-9999px',
-		zIndex: '9999',
-	}
-	stageDropdownOpen.value = true
-	positionStageDropdown(triggerEl.getBoundingClientRect())
-}
 const checklistTitleText = computed(() => {
 	if (alreadyReviewed.value || done.value) return 'Moderation'
 	if (generatedMessage.value) return 'Generated Message'
@@ -1254,40 +1109,51 @@ const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStag
 
 const router = useRouter()
 
-const initialStage = currentStage.value
-let hasMeaningfulState = persistedState !== null
+let persistenceEnabled = true
+let persistenceTimer: ReturnType<typeof setTimeout> | null = null
 
-const persistState = () => {
-	if (!hasMeaningfulState) {
-		hasMeaningfulState =
-			currentStage.value !== initialStage ||
-			message.value !== null ||
-			Object.values(toRaw(nodeStates.value)).some((s) => Object.keys(s).length > 0)
-		if (!hasMeaningfulState) return
-	}
-	void saveChecklistState(checklistPersistenceProjectId, {
-		open: !props.collapsed,
-		reviewAnyway: reviewedAnyway.value || undefined,
+function cancelPendingPersistence() {
+	if (persistenceTimer === null) return
+	clearTimeout(persistenceTimer)
+	persistenceTimer = null
+}
+
+function savePersistedState(open: boolean, resetReviewAnyway = false) {
+	return saveChecklistState(checklistPersistenceProjectId, {
+		open,
+		reviewAnyway: resetReviewAnyway ? undefined : reviewedAnyway.value || undefined,
 		stage: currentStageObj.value.id,
 		message: message.value,
 		state: toRaw(nodeStates.value),
 	})
 }
 
+function persistState() {
+	if (!persistenceEnabled || !import.meta.client) return
+	cancelPendingPersistence()
+	persistenceTimer = setTimeout(() => {
+		persistenceTimer = null
+		void savePersistedState(true)
+	}, 150)
+}
+
+async function persistStateImmediately(open: boolean, resetReviewAnyway = false) {
+	if (!import.meta.client) return
+	cancelPendingPersistence()
+	await savePersistedState(open, resetReviewAnyway)
+}
+
 watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
 watch(message, persistState)
-watch(
-	() => props.collapsed,
-	(collapsed) => {
-		if (!collapsed) hasMeaningfulState = true
-		persistState()
-	},
-)
 
 interface MessagePart {
 	priority?: Priority
 	content: string
+}
+
+function ignoreLegacyActionKeybind() {
+	return undefined
 }
 
 function handleKeybinds(event: KeyboardEvent) {
@@ -1299,7 +1165,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				currentStage: currentStage.value,
 				totalStages: resolvedStages.value.length,
 				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value._hint,
+				currentStageTitle: currentStageObj.value.label,
 
 				isCollapsed: props.collapsed,
 				isDone: done.value,
@@ -1308,7 +1174,10 @@ function handleKeybinds(event: KeyboardEvent) {
 				isModpackPermissionsStage: isModpackPermissionsStage.value,
 
 				futureProjectCount: moderationQueue.queueLength,
-				visibleActionsCount: currentStageObj.value._children.length,
+				visibleActionsCount: resolveChildren(
+					currentStageObj.value,
+					nodeStates.value[currentStageObj.value.id!] ?? {},
+				).length,
 
 				focusedActionIndex: null,
 				focusedActionType: null,
@@ -1351,63 +1220,12 @@ function handleKeybinds(event: KeyboardEvent) {
 
 				tryCopyId: async () => await navigator.clipboard.writeText(projectV2.value.id),
 
-				tryToggleAction: (actionIndex: number) => {
-					const action = visibleActions.value[actionIndex]
-					if (action) {
-						toggleAction(action)
-					}
-				},
-				trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
-					const action = visibleActions.value[actionIndex] as DropdownAction
-					if (action && action.type === 'dropdown') {
-						const visibleOptions = getVisibleDropdownOptions(action)
-						if (optionIndex < visibleOptions.length) {
-							selectDropdownOption(action, visibleOptions[optionIndex])
-						}
-					}
-				},
-				tryToggleChip: (actionIndex: number, chipIndex: number) => {
-					const action = visibleActions.value[actionIndex] as MultiSelectChipsAction
-					if (action && action.type === 'multi-select-chips') {
-						const visibleOptions = getVisibleMultiSelectOptions(action)
-						if (chipIndex < visibleOptions.length) {
-							toggleChip(action, chipIndex)
-						}
-					}
-				},
-
-				tryFocusNextAction: () => {
-					if (visibleActions.value.length === 0) return
-					if (focusedActionIndex.value === null) {
-						focusedActionIndex.value = 0
-					} else {
-						focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length
-					}
-				},
-				tryFocusPreviousAction: () => {
-					if (visibleActions.value.length === 0) return
-					if (focusedActionIndex.value === null) {
-						focusedActionIndex.value = visibleActions.value.length - 1
-					} else {
-						focusedActionIndex.value =
-							focusedActionIndex.value === 0
-								? visibleActions.value.length - 1
-								: focusedActionIndex.value - 1
-					}
-				},
-				tryActivateFocusedAction: () => {
-					if (focusedActionIndex.value === null) return
-					const action = visibleActions.value[focusedActionIndex.value]
-					if (!action) return
-
-					if (
-						action.type === 'button' ||
-						action.type === 'conditional-button' ||
-						action.type === 'toggle'
-					) {
-						toggleAction(action)
-					}
-				},
+				tryToggleAction: ignoreLegacyActionKeybind,
+				trySelectDropdownOption: ignoreLegacyActionKeybind,
+				tryToggleChip: ignoreLegacyActionKeybind,
+				tryFocusNextAction: ignoreLegacyActionKeybind,
+				tryFocusPreviousAction: ignoreLegacyActionKeybind,
+				tryActivateFocusedAction: ignoreLegacyActionKeybind,
 			},
 		},
 		Object.values(keybinds.value),
@@ -1422,11 +1240,8 @@ watch(currentStage, () => {
 	}
 })
 
-onMounted(() => {
-	document.addEventListener('click', onStageDropdownExternalClose)
-})
-
 onMounted(async () => {
+	void persistStateImmediately(true)
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -1478,10 +1293,10 @@ function handleBeforeUnload() {
 }
 
 onUnmounted(() => {
-	document.removeEventListener('click', onStageDropdownExternalClose)
-})
-
-onUnmounted(() => {
+	cancelPendingPersistence()
+	if (persistenceEnabled) {
+		void savePersistedState(true)
+	}
 	window.removeEventListener('beforeunload', handleBeforeUnload)
 	window.removeEventListener('keydown', handleKeybinds)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -1569,24 +1384,24 @@ function collectActiveActions(): ActiveAction[] {
 async function assembleFullMessage() {
 	const active = collectActiveActions()
 	generatedActiveActions.value = active
-	const parts: MessagePart[] = []
-
-	await Promise.all(
-		active
-			.filter((a) => a.action._message || a.action._autoMessage)
-			.map(async (a) => {
-				const msg = a.action._autoMessage
-					? await loadMd(
-							`checklist/messages/${a.statePath.join('/')}`,
-							a.state,
-							projectV3.value,
-							projectV2.value,
-							a.action._autoMessageVars,
-						)
-					: await a.action._message!(a.state)
-				if (msg) parts.push({ priority: a.action._priority, content: msg })
-			}),
-	)
+	const parts = (
+		await Promise.all(
+			active
+				.filter((a) => a.action._message || a.action._autoMessage)
+				.map(async (a) => {
+					const msg = a.action._autoMessage
+						? await loadMd(
+								`checklist/messages/${a.statePath.join('/')}`,
+								a.state,
+								projectV3.value,
+								projectV2.value,
+								a.action._autoMessageVars,
+							)
+						: await a.action._message!(a.state)
+					return msg ? { priority: a.action._priority, content: msg } : null
+				}),
+		)
+	).filter((part): part is MessagePart => part !== null)
 
 	parts.sort((a, b) => {
 		if (!a.priority && !b.priority) return 0
@@ -1805,23 +1620,23 @@ async function sendMessage(status: ProjectStatus) {
 	const active = generatedActiveActions.value ?? collectActiveActions()
 	const shouldApplyFixes = active.some((a) => a.action._applyFixes)
 
-	if (shouldApplyFixes) {
-		const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
-			projectV3.value as any,
-		)
-		for (const { action, state } of active) {
-			for (const f of action._fixes) {
-				f._projectFn?.(projectProxy, state)
-			}
-		}
-		const projectFixChanges = projectChanges()
-		if (Object.keys(projectFixChanges).length > 0) {
-			await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
-		}
-	}
-
 	moderationDecision.value = status
 	try {
+		if (shouldApplyFixes) {
+			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
+				projectV3.value as any,
+			)
+			for (const { action, state } of active) {
+				for (const f of action._fixes) {
+					f._projectFn?.(projectProxy, state)
+				}
+			}
+			const projectFixChanges = projectChanges()
+			if (Object.keys(projectFixChanges).length > 0) {
+				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
+			}
+		}
+
 		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
 			body: { status },
@@ -1894,7 +1709,7 @@ async function sendMessage(status: ProjectStatus) {
 }
 
 async function endChecklist(status?: string) {
-	clearProjectLocalStorage()
+	await clearProjectLocalStorage()
 
 	if (!hasNextProject.value) {
 		await navigateTo({
@@ -1979,7 +1794,10 @@ async function skipCurrentProject() {
 	await endChecklist('skipped')
 }
 
-function clearProjectLocalStorage() {
+async function clearProjectLocalStorage() {
+	persistenceEnabled = false
+	cancelPendingPersistence()
+
 	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
 	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
 
@@ -1987,9 +1805,9 @@ function clearProjectLocalStorage() {
 	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
 	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
-	void clearChecklistState(checklistPersistenceProjectId)
 	nodeStates.value = {}
 	message.value = null
+	await clearChecklistState(checklistPersistenceProjectId)
 }
 
 const isLastVisibleStage = computed(() => {
@@ -2010,7 +1828,18 @@ const hasValidPreviousStage = computed(() => {
 	return false
 })
 
-const stageOptions = computed<OverflowMenuOption[]>(() => {
+interface StageOption {
+	id: string
+	action: () => void
+	text: string
+	color?: 'green'
+	icon?: Component
+	messages?: number
+	fixes?: number
+	requiredMissing?: boolean
+}
+
+const stageOptions = computed<StageOption[]>(() => {
 	const options = resolvedStages.value
 		.map((stage, index) => {
 			if (!shouldShowStage(stage)) return null
@@ -2023,39 +1852,24 @@ const stageOptions = computed<OverflowMenuOption[]>(() => {
 				},
 				text: stage.label ?? kebabToTitleCase(stage.id),
 				color: index === currentStage.value && !generatedMessage.value ? 'green' : undefined,
-				hoverFilled: true,
 				icon: stage._icon ?? undefined,
 				messages: countStageActions(stage) || undefined,
 				fixes: countStageFixes(stage) || undefined,
 				requiredMissing: hasRequiredMissing(stage) || undefined,
-			} as OverflowMenuOption
+			}
 		})
-		.filter((opt): opt is OverflowMenuOption => opt !== null)
+		.filter((opt): opt is StageOption => opt !== null)
 
 	options.push({
 		id: 'generate-message',
 		action: () => generateMessage(),
 		text: 'Generate Message',
 		color: generatedMessage.value ? 'green' : undefined,
-		hoverFilled: true,
 		icon: CheckIcon,
-	} as OverflowMenuOption)
+	})
 
 	return options
 })
-
-type StageOverflowSlotOption = OverflowMenuOption & {
-	id: string
-	text: string
-	icon?: Component
-	messages?: number
-	fixes?: number
-	requiredMissing?: boolean
-}
-
-const stageOptionsForSlots = computed(() =>
-	stageOptions.value.filter((opt): opt is StageOverflowSlotOption => 'id' in opt && 'text' in opt),
-)
 </script>
 
 <style scoped lang="scss">
@@ -2141,27 +1955,5 @@ const stageOptionsForSlots = computed(() =>
 
 :global(.v-popper--theme-tooltip .moderation-tooltip-markdown em) {
 	font-style: italic;
-}
-
-.stage-selector-portal {
-	border: 1px solid var(--surface-5);
-	padding: var(--gap-sm);
-	width: fit-content;
-	border-radius: 12px;
-	background-color: var(--surface-3);
-	box-shadow: 3px 3px 0.8rem rgba(0, 0, 0, 0.3);
-	opacity: 0;
-	transform: scale(0.85);
-	transition:
-		transform 0.0625s ease-in-out,
-		opacity 0.0625s ease-in-out;
-
-	&.stage-selector-portal--visible {
-		opacity: 1;
-		transform: scale(1);
-		transition:
-			transform 0.125s ease-in-out,
-			opacity 0.125s ease-in-out;
-	}
 }
 </style>

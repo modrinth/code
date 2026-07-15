@@ -17,5 +17,7 @@ export interface LiveNode {
 	activeActions: ActiveAction[]
 }
 
-export const NODE_META_KEY: InjectionKey<ComputedRef<Map<IdentifiedNodeBuilder, LiveNode>>> = Symbol('nodeMeta')
-export const STATE_KEY: InjectionKey<Ref<Record<string, Record<string, NodeState>>>> = Symbol('checklistState')
+export const NODE_META_KEY: InjectionKey<ComputedRef<Map<IdentifiedNodeBuilder, LiveNode>>> =
+	Symbol('nodeMeta')
+export const STATE_KEY: InjectionKey<Ref<Record<string, Record<string, NodeState>>>> =
+	Symbol('checklistState')

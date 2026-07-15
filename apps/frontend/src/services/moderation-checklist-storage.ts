@@ -72,7 +72,9 @@ async function enqueueOp(projectId: string, op: () => Promise<void>): Promise<vo
 	return result
 }
 
-export async function loadChecklistState(projectId: string): Promise<PersistedChecklistState | null> {
+export async function loadChecklistState(
+	projectId: string,
+): Promise<PersistedChecklistState | null> {
 	if (!import.meta.client) return null
 	scheduleStaleChecklistCleanup()
 

@@ -25,7 +25,14 @@ import {
 	resolveChildren,
 	setMessageProject,
 } from '@modrinth/moderation'
-import { ButtonStyled, Checkbox, Combobox, injectProjectPageContext, MarkdownEditor, StyledInput } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	Checkbox,
+	Combobox,
+	injectProjectPageContext,
+	MarkdownEditor,
+	StyledInput,
+} from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
 import { inject, reactive, watchEffect } from 'vue'
 
@@ -63,6 +70,13 @@ function isEnabled(node: IdentifiedNodeBuilder): boolean {
 	return resolve(e)
 }
 
+function isButtonEnabled(node: ButtonNodeBuilder): boolean {
+	const enabled = node._enabled
+	if (enabled === undefined) return true
+	if (typeof enabled === 'function') return enabled(props.showContext)
+	return resolve(enabled)
+}
+
 function asBool(node: NodeBuilder): BooleanNodeBuilder {
 	return node as BooleanNodeBuilder
 }
@@ -91,10 +105,6 @@ function asDisplay(node: NodeBuilder): DisplayNodeBuilder {
 	return node as DisplayNodeBuilder
 }
 
-function asValue(node: NodeBuilder): ValueNodeBuilder {
-	return node as ValueNodeBuilder
-}
-
 function asInput(node: NodeBuilder): InputNodeBuilder {
 	return node as InputNodeBuilder
 }
@@ -118,7 +128,7 @@ function setAtPath(path: string[], value: NodeState): void {
 		const next = current[key]
 		if (!next || typeof next !== 'object' || next instanceof Set) {
 			if (value === undefined) return
-			current[key] = (next !== null && next !== undefined) ? { value: next } : {}
+			current[key] = next !== null && next !== undefined ? { value: next } : {}
 			current = current[key] as Record<string, unknown>
 		} else {
 			stack.push([current, key])
@@ -127,12 +137,17 @@ function setAtPath(path: string[], value: NodeState): void {
 	}
 	const lastKey = path[path.length - 1]
 	if (value === undefined) {
-		delete current[lastKey]
+		Reflect.deleteProperty(current, lastKey)
 		for (let i = stack.length - 1; i >= 0; i--) {
 			const [parent, key] = stack[i]
 			const child = parent[key]
-			if (child && typeof child === 'object' && !(child instanceof Set) && Object.keys(child as object).length === 0) {
-				delete parent[key]
+			if (
+				child &&
+				typeof child === 'object' &&
+				!(child instanceof Set) &&
+				Object.keys(child as object).length === 0
+			) {
+				Reflect.deleteProperty(parent, key)
 			} else {
 				break
 			}
@@ -176,7 +191,10 @@ function getSelectState(node: IdentifiedNodeBuilder): string | undefined {
 function getDropdownOptions(node: DropdownNodeBuilder) {
 	return [
 		...(node._none !== undefined ? [{ value: '', label: node._none }] : []),
-		...visibleChildren(node).map((c) => ({ value: asIdentified(c).id!, label: asLabeled(c).label })),
+		...visibleChildren(node).map((c) => ({
+			value: asIdentified(c).id!,
+			label: asLabeled(c).label,
+		})),
 	]
 }
 
@@ -188,7 +206,6 @@ function toggleSelect(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilde
 	const current = getSelectState(parent)
 	setNodeState(parent, current === child.id ? undefined : child.id)
 }
-
 
 function resolveDefault(node: ValueNodeBuilder): NodeState {
 	const d = node._defaultValue
@@ -228,7 +245,7 @@ function hasRequiredMissingDescendants(node: IdentifiedNodeBuilder): boolean {
 }
 
 function nodeHasRequiredMissing(node: IdentifiedNodeBuilder): boolean {
-	return !!(nodeMetaMap?.value.get(node)?.hasRequiredMissing) || hasRequiredMissingDescendants(node)
+	return !!nodeMetaMap?.value.get(node)?.hasRequiredMissing || hasRequiredMissingDescendants(node)
 }
 
 function getBooleanColor(node: BooleanNodeBuilder): string {
@@ -240,7 +257,7 @@ function getBooleanColor(node: BooleanNodeBuilder): string {
 function setTextState(node: IdentifiedNodeBuilder, v: string): void {
 	const def = resolveDefault(node as ValueNodeBuilder)
 	const defStr = typeof def === 'string' ? def : ''
-	setNodeState(node, v === defStr ? undefined : (defStr ? v : (v || undefined)))
+	setNodeState(node, v === defStr ? undefined : defStr ? v : v || undefined)
 }
 
 function toggleBoolean(node: BooleanNodeBuilder) {
@@ -251,7 +268,12 @@ function toggleBoolean(node: BooleanNodeBuilder) {
 	if (raw && typeof raw === 'object' && !(raw instanceof Set)) {
 		const { value: _v, ...children } = raw as NodeStateWithChildren & Record<string, NodeState>
 		const hasChildren = Object.keys(children).length > 0
-		setNodeState(node, isDefault && !hasChildren ? undefined : { ...children, ...(isDefault ? {} : { value: next }) } as NodeState)
+		setNodeState(
+			node,
+			isDefault && !hasChildren
+				? undefined
+				: ({ ...children, ...(isDefault ? {} : { value: next }) } as NodeState),
+		)
 	} else {
 		setNodeState(node, isDefault ? undefined : next)
 	}
@@ -270,9 +292,7 @@ function toggleChip(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder)
 	setNodeState(parent, selected.size > 0 ? selected : undefined)
 }
 
-function getChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
-	return resolveChildren(node, props.showContext)
-}
+const scopedContextFallbacks = new WeakMap<IdentifiedNodeBuilder, Record<string, NodeState>>()
 
 function childScopedContext(child: IdentifiedNodeBuilder): Record<string, NodeState> {
 	if (!child._statePath) return props.showContext
@@ -281,18 +301,31 @@ function childScopedContext(child: IdentifiedNodeBuilder): Record<string, NodeSt
 	if (state && typeof state === 'object' && !(state instanceof Set)) {
 		return state as Record<string, NodeState>
 	}
-	return new Proxy({} as Record<string, NodeState>, {
+	const existing = scopedContextFallbacks.get(child)
+	if (existing) return existing
+	const fallback = new Proxy({} as Record<string, NodeState>, {
 		set(_target, key, value) {
 			setAtPath([...basePath, key as string], value as NodeState)
 			return true
 		},
 	})
+	scopedContextFallbacks.set(child, fallback)
+	return fallback
+}
+
+function getChildrenContext(node: IdentifiedNodeBuilder): Record<string, NodeState> {
+	if (node.type === 'dropdown') return props.showContext
+	if (node.type === 'group' && asGroup(node)._selectMode) return props.showContext
+	return childScopedContext(node)
+}
+
+function getChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
+	return resolveChildren(node, getChildrenContext(node))
 }
 
 function visibleChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
 	return getChildren(node).filter(isVisible)
 }
-
 
 function renderProse(content: string): string {
 	return renderString(content).replace(/<a /g, '<a target="_blank" ')
@@ -316,7 +349,8 @@ const proseContents = reactive(new Map<NodeBuilder, string | null>())
 
 watchEffect(async () => {
 	// Read all reactive state synchronously before any await so Vue tracks dependencies
-	const asyncDisplayTasks: Array<{ node: DisplayNodeBuilder; state: Record<string, NodeState> }> = []
+	const asyncDisplayTasks: Array<{ node: DisplayNodeBuilder; state: Record<string, NodeState> }> =
+		[]
 	const buttonTasks: Array<{ node: BooleanNodeBuilder; state: Record<string, NodeState> }> = []
 
 	for (const node of props.nodes) {
@@ -332,9 +366,14 @@ watchEffect(async () => {
 			const boolNode = asBool(node)
 			if (boolNode._action?._message || boolNode._action?._autoMessage) {
 				const nodeState = getNodeState(boolNode)
-				const childState = (nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set))
-					? (() => { const { value: _v, ...rest } = nodeState as NodeStateWithChildren & Record<string, NodeState>; return rest })()
-					: {}
+				const childState =
+					nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set)
+						? (() => {
+								const { value: _v, ...rest } = nodeState as NodeStateWithChildren &
+									Record<string, NodeState>
+								return rest
+							})()
+						: {}
 				buttonTasks.push({ node: boolNode, state: childState })
 			}
 		}
@@ -356,7 +395,13 @@ watchEffect(async () => {
 	for (const { node, state } of buttonTasks) {
 		try {
 			const raw = node._action!._autoMessage
-				? await loadMd(`checklist/messages/${node._statePath!.join('/')}`, state, project.value, projectV2.value, node._action!._autoMessageVars)
+				? await loadMd(
+						`checklist/messages/${node._statePath!.join('/')}`,
+						state,
+						project.value,
+						projectV2.value,
+						node._action!._autoMessageVars,
+					)
 				: await node._action!._message!(state)
 			const expanded = expandVariables(raw, projectV2.value, project.value, {
 				...flattenStaticVariables(),
@@ -364,9 +409,11 @@ watchEffect(async () => {
 				...flattenProjectV3Variables(project.value),
 			})
 			const trimmed = expanded.trim()
-			tooltipHtml.set(node, trimmed
-				? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(trimmed)}</div>`
-				: '',
+			tooltipHtml.set(
+				node,
+				trimmed
+					? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(trimmed)}</div>`
+					: '',
 			)
 		} catch {
 			tooltipHtml.set(node, '')
@@ -377,11 +424,20 @@ watchEffect(async () => {
 
 <template>
 	<div :class="flex ? 'flex flex-wrap gap-2' : 'space-y-4'">
-		<template v-for="node in nodes" :key="node.type === 'button' ? `button-${asButton(node).label}` : (asIdentified(node).id ?? node.type)">
+		<template
+			v-for="node in nodes"
+			:key="
+				node.type === 'button'
+					? `button-${asButton(node).label}`
+					: (asIdentified(node).id ?? node.type)
+			"
+		>
 			<template v-if="isVisible(node)">
 				<div :class="node.type !== 'group' && !getNodeTitle(node) ? 'contents' : undefined">
 					<div v-if="getNodeTitle(node)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
-						<span v-html="renderString(getNodeTitle(node)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')" /><span v-if="nodeHasRequiredMissing(asIdentified(node))" class="text-red">*</span>
+						<span
+							v-html="renderString(getNodeTitle(node)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
+						/><span v-if="nodeHasRequiredMissing(asIdentified(node))" class="text-red">*</span>
 					</div>
 
 					<!-- group -->
@@ -389,20 +445,39 @@ watchEffect(async () => {
 						<!-- multi-select (chips) mode -->
 						<template v-if="asGroup(node)._selectMode === 'multi'">
 							<div class="flex flex-wrap gap-2">
-								<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
+								<template
+									v-for="child in visibleChildren(asIdentified(node))"
+									:key="asIdentified(child).id"
+								>
 									<ButtonStyled
-										:color="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) ? (hasActionableFixes(asIdentified(child)) ? 'blue' : 'brand') : 'standard'"
+										:color="
+											getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!)
+												? hasActionableFixes(asIdentified(child))
+													? 'blue'
+													: 'brand'
+												: 'standard'
+										"
 										@click="toggleChip(asIdentified(node), asIdentified(child))"
 									>
-										<button v-tooltip="getNodeTooltipConfig(asIdentified(child) as BooleanNodeBuilder)">{{ asLabeled(child).label }}</button>
+										<button
+											v-tooltip="getNodeTooltipConfig(asIdentified(child) as BooleanNodeBuilder)"
+										>
+											{{ asLabeled(child).label }}
+										</button>
 									</ButtonStyled>
 								</template>
 							</div>
-							<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
+							<template
+								v-for="child in visibleChildren(asIdentified(node))"
+								:key="`sub-${asIdentified(child).id}`"
+							>
 								<NodeRenderer
-									v-if="getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) && getChildren(asIdentified(child)).length"
+									v-if="
+										getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) &&
+										getChildren(asIdentified(child)).length
+									"
 									:nodes="getChildren(asIdentified(child))"
-									:show-context="childScopedContext(asIdentified(child))"
+									:show-context="getChildrenContext(asIdentified(child))"
 									:on-image-upload="onImageUpload"
 									:title-depth="titleDepth"
 									class="mt-2"
@@ -412,17 +487,34 @@ watchEffect(async () => {
 						<!-- single-select (button-style) mode -->
 						<template v-else-if="asGroup(node)._selectMode === 'single'">
 							<div class="flex flex-wrap gap-2">
-								<template v-for="child in visibleChildren(asIdentified(node))" :key="asIdentified(child).id">
-									<ButtonStyled :color="getSelectState(asIdentified(node)) === asIdentified(child).id ? 'brand' : 'standard'">
-										<button @click="toggleSelect(asIdentified(node), asIdentified(child))">{{ asLabeled(child).label }}</button>
+								<template
+									v-for="child in visibleChildren(asIdentified(node))"
+									:key="asIdentified(child).id"
+								>
+									<ButtonStyled
+										:color="
+											getSelectState(asIdentified(node)) === asIdentified(child).id
+												? 'brand'
+												: 'standard'
+										"
+									>
+										<button @click="toggleSelect(asIdentified(node), asIdentified(child))">
+											{{ asLabeled(child).label }}
+										</button>
 									</ButtonStyled>
 								</template>
 							</div>
-							<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
+							<template
+								v-for="child in visibleChildren(asIdentified(node))"
+								:key="`sub-${asIdentified(child).id}`"
+							>
 								<NodeRenderer
-									v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
+									v-if="
+										getSelectState(asIdentified(node)) === asIdentified(child).id &&
+										getChildren(asIdentified(child)).length
+									"
 									:nodes="getChildren(asIdentified(child))"
-									:show-context="childScopedContext(asIdentified(child))"
+									:show-context="getChildrenContext(asIdentified(child))"
 									:on-image-upload="onImageUpload"
 									:title-depth="titleDepth"
 									class="mt-2"
@@ -433,7 +525,7 @@ watchEffect(async () => {
 						<NodeRenderer
 							v-else
 							:nodes="getChildren(asIdentified(node))"
-							:show-context="showContext"
+							:show-context="getChildrenContext(asIdentified(node))"
 							:on-image-upload="onImageUpload"
 							:flex="asGroup(node)._layout !== 'column'"
 							:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
@@ -450,11 +542,17 @@ watchEffect(async () => {
 							dropdown-class="!rounded-[var(--radius-md)] !bg-[var(--color-button-bg)] !border-0"
 							@update:model-value="(v) => setNodeState(asIdentified(node), v || undefined)"
 						/>
-						<template v-for="child in visibleChildren(asIdentified(node))" :key="`sub-${asIdentified(child).id}`">
+						<template
+							v-for="child in visibleChildren(asIdentified(node))"
+							:key="`sub-${asIdentified(child).id}`"
+						>
 							<NodeRenderer
-								v-if="getSelectState(asIdentified(node)) === asIdentified(child).id && getChildren(asIdentified(child)).length"
+								v-if="
+									getSelectState(asIdentified(node)) === asIdentified(child).id &&
+									getChildren(asIdentified(child)).length
+								"
 								:nodes="getChildren(asIdentified(child))"
-								:show-context="childScopedContext(asIdentified(child))"
+								:show-context="getChildrenContext(asIdentified(child))"
 								:on-image-upload="onImageUpload"
 								:title-depth="titleDepth"
 								class="mt-2"
@@ -466,9 +564,11 @@ watchEffect(async () => {
 					<template v-else-if="node.type === 'button'">
 						<ButtonStyled>
 							<button
-								:disabled="asButton(node)._enabled !== undefined && !resolve(asButton(node)._enabled)"
+								:disabled="!isButtonEnabled(asButton(node))"
 								@click="asButton(node)._onClick?.(showContext)"
-							>{{ asButton(node).label }}</button>
+							>
+								{{ asButton(node).label }}
+							</button>
 						</ButtonStyled>
 					</template>
 
@@ -479,7 +579,9 @@ watchEffect(async () => {
 								v-tooltip="getNodeTooltipConfig(asBool(node))"
 								:disabled="!isEnabled(asIdentified(node))"
 								@click="toggleBoolean(asBool(node))"
-							>{{ asLabeled(node).label }}</button>
+							>
+								{{ asLabeled(node).label }}
+							</button>
 						</ButtonStyled>
 					</template>
 
@@ -521,18 +623,30 @@ watchEffect(async () => {
 
 					<!-- display (prose + label) -->
 					<template v-else-if="node.type === 'display' && proseContents.get(node) != null">
-						<div class="markdown-body" v-html="renderProse(proseContents.get(node)!)"/>
+						<div class="markdown-body" v-html="renderProse(proseContents.get(node)!)" />
 					</template>
 				</div>
 			</template>
 		</template>
 
 		<!-- children of active boolean nodes, rendered after all siblings -->
-		<template v-for="node in nodes" :key="node.type === 'button' ? `children-button-${asButton(node).label}` : `children-${asIdentified(node).id ?? node.type}`">
+		<template
+			v-for="node in nodes"
+			:key="
+				node.type === 'button'
+					? `children-button-${asButton(node).label}`
+					: `children-${asIdentified(node).id ?? node.type}`
+			"
+		>
 			<NodeRenderer
-				v-if="isVisible(node) && (node.type === 'toggle' || node.type === 'check') && getBooleanState(asBool(node)) && getChildren(asIdentified(node)).length"
+				v-if="
+					isVisible(node) &&
+					(node.type === 'toggle' || node.type === 'check') &&
+					getBooleanState(asBool(node)) &&
+					getChildren(asIdentified(node)).length
+				"
 				:nodes="getChildren(asIdentified(node))"
-				:show-context="showContext"
+				:show-context="getChildrenContext(asIdentified(node))"
 				:on-image-upload="onImageUpload"
 				:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
 				class="w-full"
