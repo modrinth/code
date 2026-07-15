@@ -338,15 +338,28 @@ pub(super) async fn collect_publish_snapshot(
         .directories
         .instances_dir()
         .join(&metadata.instance.path);
-    let (items, config_files) = tokio::try_join!(
-        crate::state::list_content(
-            &metadata.instance.id,
-            None,
-            None,
-            state,
-        ),
-        collect_config_files(&instance_path),
-    )?;
+    let (items, config_files) = if CONFIG_SYNC_ENABLED {
+        tokio::try_join!(
+            crate::state::list_content(
+                &metadata.instance.id,
+                None,
+                None,
+                state,
+            ),
+            collect_config_files(&instance_path),
+        )?
+    } else {
+        (
+            crate::state::list_content(
+                &metadata.instance.id,
+                None,
+                None,
+                state,
+            )
+            .await?,
+            Vec::new(),
+        )
+    };
     let modpack_id = shared_modpack_id(&metadata.link);
     let mut version_ids = Vec::new();
     let mut seen_version_ids = HashSet::new();
@@ -591,11 +604,13 @@ pub(super) async fn publish_current_content(
     let snapshot = collect_publish_snapshot(&metadata, state).await?;
     let modrinth_ids = snapshot.version_ids;
     let mut external_files = snapshot.external_files;
-    external_files.push(ExternalFileCandidate {
-        file_name: CONFIG_BUNDLE_FILE_NAME.to_string(),
-        file_type: CONFIG_BUNDLE_FILE_TYPE.to_string(),
-        source: ExternalFileSource::ConfigBundle(snapshot.config_files),
-    });
+    if CONFIG_SYNC_ENABLED {
+        external_files.push(ExternalFileCandidate {
+            file_name: CONFIG_BUNDLE_FILE_NAME.to_string(),
+            file_type: CONFIG_BUNDLE_FILE_TYPE.to_string(),
+            source: ExternalFileSource::ConfigBundle(snapshot.config_files),
+        });
+    }
     tracing::debug!(
         instance_id,
         shared_instance_id,

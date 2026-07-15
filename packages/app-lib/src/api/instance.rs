@@ -37,7 +37,7 @@ pub use self::run::{
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    is_excluded_config_path,
+    CONFIG_SYNC_ENABLED, is_excluded_config_path,
 };
 pub use self::shared::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,

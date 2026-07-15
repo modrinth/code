@@ -101,19 +101,8 @@ pub(super) async fn shared_instance_update_diffs(
     let current_modpack_id = shared_modpack_id(&metadata.link);
     let modpack_unlinked =
         current_modpack_id.is_some() && remote_modpack_id.is_none();
-    let instance_path = state
-        .directories
-        .instances_dir()
-        .join(&metadata.instance.path);
-    let (
-        (current_version_ids, current_external_files),
-        local_config_files,
-        remote_config_files,
-    ) = tokio::try_join!(
-        current_shared_content(metadata, modpack_unlinked, state),
-        collect_config_files(&instance_path),
-        remote_config_files(version),
-    )?;
+    let (current_version_ids, current_external_files) =
+        current_shared_content(metadata, modpack_unlinked, state).await?;
     let (latest_version_ids, latest_external_files) =
         remote_shared_content(version);
     let removed_disabled_project_ids = HashSet::new();
@@ -129,11 +118,21 @@ pub(super) async fn shared_instance_update_diffs(
         state,
     )
     .await?;
-    diffs.extend(shared_config_diffs(
-        &local_config_files,
-        &remote_config_files,
-        ConfigDiffDirection::Update,
-    ));
+    if CONFIG_SYNC_ENABLED {
+        let instance_path = state
+            .directories
+            .instances_dir()
+            .join(&metadata.instance.path);
+        let (local_config_files, remote_config_files) = tokio::try_join!(
+            collect_config_files(&instance_path),
+            remote_config_files(version),
+        )?;
+        diffs.extend(shared_config_diffs(
+            &local_config_files,
+            &remote_config_files,
+            ConfigDiffDirection::Update,
+        ));
+    }
 
     let mut configuration_diffs = shared_instance_configuration_diffs(
         current_modpack_id.as_deref(),
@@ -171,14 +170,10 @@ pub(super) async fn shared_instance_publish_diffs(
                 .await
         }
     };
-    let (
-        (latest_version_ids, latest_external_files),
-        disabled_versions,
-        remote_config_files,
-    ) = tokio::try_join!(
+    let ((latest_version_ids, latest_external_files), disabled_versions) =
+        tokio::try_join!(
         remote_publish_content(version, modpack_unlinked, state),
         disabled_versions,
-        remote_config_files(version),
     )?;
     let current_external_files = snapshot
         .external_files
@@ -205,11 +200,13 @@ pub(super) async fn shared_instance_publish_diffs(
         state,
     )
     .await?;
-    diffs.extend(shared_config_diffs(
-        &snapshot.config_files,
-        &remote_config_files,
-        ConfigDiffDirection::Publish,
-    ));
+    if CONFIG_SYNC_ENABLED {
+        diffs.extend(shared_config_diffs(
+            &snapshot.config_files,
+            &remote_config_files(version).await?,
+            ConfigDiffDirection::Publish,
+        ));
+    }
 
     let mut configuration_diffs = shared_instance_configuration_diffs(
         remote_modpack_id,

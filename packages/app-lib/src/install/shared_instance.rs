@@ -16,7 +16,7 @@ use crate::state::{
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    is_excluded_config_path,
+    CONFIG_SYNC_ENABLED, is_excluded_config_path,
 };
 use async_walkdir::{Filtering, WalkDir};
 use futures::StreamExt;
@@ -497,7 +497,9 @@ async fn desired_shared_instance_content(
 
     for file in &data.external_files {
         if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
-            content.config_bundle = Some(file.clone());
+            if CONFIG_SYNC_ENABLED {
+                content.config_bundle = Some(file.clone());
+            }
             continue;
         }
         let file_type =
@@ -780,6 +782,10 @@ async fn install_shared_instance_external_file(
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<()> {
+    if file.file_type == CONFIG_BUNDLE_FILE_TYPE && !CONFIG_SYNC_ENABLED {
+        return Ok(());
+    }
+
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
 
     if !response.status().is_success() {
