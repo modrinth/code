@@ -1,6 +1,5 @@
 use std::sync::LazyLock;
 
-use ariadne::ids::base62_impl::to_base62;
 use async_trait::async_trait;
 use eyre::{Result, eyre};
 use itertools::Itertools;
@@ -13,7 +12,6 @@ use tracing::{debug, info};
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::models::ids::{ProjectId, VersionId};
 use crate::routes::ApiError;
 use crate::search::backend::{
     SearchIndex, combined_search_filters, parse_search_index,
@@ -21,8 +19,9 @@ use crate::search::backend::{
 };
 use crate::search::indexing::index_local;
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchField, SearchRequest,
-    SearchResults, TasksCancelFilter, UploadSearchProject, UploadSearchVersion,
+    ResultSearchProject, SearchBackend, SearchField, SearchIndexUpdate,
+    SearchRequest, SearchResults, TasksCancelFilter, UploadSearchProject,
+    UploadSearchVersion,
 };
 use crate::util::error::Context;
 
@@ -959,6 +958,19 @@ impl Typesense {
         Ok(())
     }
 
+    async fn delete_ids_from_write_collections(
+        &self,
+        alias: &str,
+        field: &str,
+        ids: &[String],
+    ) -> Result<()> {
+        for ids in ids.chunks(DELETE_FILTER_ID_BATCH_SIZE) {
+            let filter = format!("{field}:[{}]", ids.iter().join(", "));
+            self.delete_from_write_collections(alias, &filter).await?;
+        }
+        Ok(())
+    }
+
     async fn delete_legacy_filtered_collections(&self) -> Result<()> {
         let alias = self.config.get_alias_name("projects_filtered");
         let live = self.client.get_alias(&alias).await?;
@@ -1265,101 +1277,94 @@ impl SearchBackend for Typesense {
         Ok(())
     }
 
-    async fn index_documents(
+    async fn apply_update(
         &self,
-        documents: &[UploadSearchProject],
+        update: SearchIndexUpdate<'_>,
     ) -> eyre::Result<()> {
-        if documents.is_empty() {
-            return Ok(());
-        }
-
-        let alias = self.config.get_alias_name("projects");
-        let collections = self.existing_write_collections(&alias).await?;
-        debug!(
-            ?collections,
-            num_documents = documents.len(),
-            "Inserting into collections",
-        );
-        self.import_document_batches(&collections, documents)
-            .await?;
-
-        debug!("Done importing");
-        Ok(())
-    }
-
-    async fn index_version_documents(
-        &self,
-        documents: &[UploadSearchVersion],
-    ) -> eyre::Result<()> {
-        if documents.is_empty() {
-            return Ok(());
-        }
-
-        let alias = self.config.get_alias_name("versions");
-        let collections = self.existing_write_collections(&alias).await?;
-        debug!(
-            ?collections,
-            num_documents = documents.len(),
-            "Inserting version documents into collections",
-        );
-        self.import_version_document_batches(&collections, documents)
-            .await?;
-
-        debug!("Done importing version documents");
-        Ok(())
-    }
-
-    async fn remove_project_documents(
-        &self,
-        ids: &[ProjectId],
-    ) -> eyre::Result<()> {
-        if ids.is_empty() {
-            return Ok(());
-        }
-
-        let id_list = ids
-            .iter()
-            .map(|id| to_base62(id.0))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let filter = format!("project_id:[{id_list}]");
-
         let projects_alias = self.config.get_alias_name("projects");
-        self.delete_from_write_collections(&projects_alias, &filter)
+        let versions_alias = self.config.get_alias_name("versions");
+
+        let removed_project_ids = update
+            .removed_projects
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        if !removed_project_ids.is_empty() {
+            self.delete_ids_from_write_collections(
+                &versions_alias,
+                "project_id",
+                &removed_project_ids,
+            )
             .await?;
-
-        debug!("Done");
-        Ok(())
-    }
-
-    async fn remove_project_version_documents(
-        &self,
-        ids: &[ProjectId],
-    ) -> eyre::Result<()> {
-        if ids.is_empty() {
-            return Ok(());
+            self.delete_ids_from_write_collections(
+                &projects_alias,
+                "project_id",
+                &removed_project_ids,
+            )
+            .await?;
         }
 
-        let id_list = ids.iter().map(ToString::to_string).join(", ");
-        let filter = format!("project_id:[{id_list}]");
-        let alias = self.config.get_alias_name("versions");
-        self.delete_from_write_collections(&alias, &filter).await
-    }
-
-    async fn remove_version_documents(
-        &self,
-        ids: &[VersionId],
-    ) -> eyre::Result<()> {
-        if ids.is_empty() {
-            return Ok(());
+        let version_ids = update
+            .removed_versions
+            .iter()
+            .map(ToString::to_string)
+            .chain(
+                update
+                    .versions
+                    .iter()
+                    .map(|document| document.version_id.clone()),
+            )
+            .unique()
+            .collect::<Vec<_>>();
+        if !version_ids.is_empty() {
+            self.delete_ids_from_write_collections(
+                &versions_alias,
+                "id",
+                &version_ids,
+            )
+            .await?;
         }
 
-        let alias = self.config.get_alias_name("versions");
-        for ids in ids.chunks(DELETE_FILTER_ID_BATCH_SIZE) {
-            let id_list = ids.iter().map(ToString::to_string).join(", ");
-            let filter = format!("id:[{id_list}]");
-            self.delete_from_write_collections(&alias, &filter).await?;
+        let project_ids = update
+            .projects
+            .iter()
+            .map(|document| document.project_id.clone())
+            .unique()
+            .collect::<Vec<_>>();
+        if !project_ids.is_empty() {
+            self.delete_ids_from_write_collections(
+                &projects_alias,
+                "project_id",
+                &project_ids,
+            )
+            .await?;
         }
+
+        if !update.projects.is_empty() {
+            let collections =
+                self.existing_write_collections(&projects_alias).await?;
+            debug!(
+                ?collections,
+                num_documents = update.projects.len(),
+                "Replacing project documents in collections",
+            );
+            self.import_document_batches(&collections, update.projects)
+                .await?;
+        }
+
+        if !update.versions.is_empty() {
+            let collections =
+                self.existing_write_collections(&versions_alias).await?;
+            debug!(
+                ?collections,
+                num_documents = update.versions.len(),
+                "Replacing version documents in collections",
+            );
+            self.import_version_document_batches(&collections, update.versions)
+                .await?;
+        }
+
+        debug!("Done applying search index update");
         Ok(())
     }
 

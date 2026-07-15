@@ -17,7 +17,8 @@ use crate::{
     env::ENV,
     models::ids::{ProjectId, VersionId},
     search::{
-        SearchBackend,
+        SearchBackend, SearchDocumentBatch, SearchIndexUpdate,
+        UploadSearchProject,
         incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
         indexing::{index_project_documents, index_project_version_documents},
     },
@@ -214,56 +215,24 @@ async fn consume_batch(
         project_ids_to_remove.len(),
     );
     let start = Instant::now();
-
-    if !project_ids_to_remove.is_empty() {
-        let operation_start = Instant::now();
-        info!(
-            project_count = project_ids_to_remove.len(),
-            "Removing project documents"
-        );
-        search_backend
-            .remove_project_version_documents(&project_ids_to_remove)
-            .await
-            .wrap_err("failed to remove project version documents")?;
-        search_backend
-            .remove_project_documents(&project_ids_to_remove)
-            .await
-            .wrap_err("failed to remove project documents")?;
-        info!(
-            project_count = project_ids_to_remove.len(),
-            "Removed project documents in {:.2?}",
-            operation_start.elapsed()
-        );
-    }
-
-    if !version_ids_to_change.is_empty() {
-        let operation_start = Instant::now();
-        search_backend
-            .remove_version_documents(&version_ids_to_change)
-            .await
-            .wrap_err("failed to remove changed version documents")?;
-        info!(
-            version_count = version_ids_to_change.len(),
-            "Removed changed version documents in {:.2?}",
-            operation_start.elapsed()
-        );
-    }
+    let mut documents = SearchDocumentBatch::default();
 
     if !project_ids_with_version_changes.is_empty() {
         let operation_start = Instant::now();
-        reindex_changed_project_versions(
+        let changed_documents = build_changed_project_versions(
             ro_pool,
             redis_pool,
-            search_backend,
             &project_ids_with_version_changes,
             &version_ids_to_change,
         )
         .await
-        .wrap_err("failed to reindex changed project versions")?;
+        .wrap_err("failed to build changed project versions")?;
+        documents.projects.extend(changed_documents.projects);
+        documents.versions.extend(changed_documents.versions);
         info!(
             project_count = project_ids_with_version_changes.len(),
             version_count = version_ids_to_change.len(),
-            "Reindexed changed project versions in {:.2?}",
+            "Built changed project versions in {:.2?}",
             operation_start.elapsed()
         );
     }
@@ -272,22 +241,38 @@ async fn consume_batch(
         let operation_start = Instant::now();
         info!(
             project_count = project_ids_to_change.len(),
-            "Reindexing changed projects"
+            "Building changed projects"
         );
-        reindex_projects(
-            ro_pool,
-            redis_pool,
-            search_backend,
-            &project_ids_to_change,
-        )
-        .await
-        .wrap_err("failed to reindex changed project batch")?;
+        documents.projects.extend(
+            build_changed_projects(ro_pool, redis_pool, &project_ids_to_change)
+                .await
+                .wrap_err("failed to build changed projects")?,
+        );
         info!(
             project_count = project_ids_to_change.len(),
-            "Reindexed changed projects in {:.2?}",
+            "Built changed projects in {:.2?}",
             operation_start.elapsed()
         );
     }
+
+    let operation_start = Instant::now();
+    search_backend
+        .apply_update(SearchIndexUpdate {
+            projects: &documents.projects,
+            versions: &documents.versions,
+            removed_projects: &project_ids_to_remove,
+            removed_versions: &version_ids_to_change,
+        })
+        .await
+        .wrap_err("failed to apply search index update")?;
+    info!(
+        project_count = documents.projects.len(),
+        version_count = documents.versions.len(),
+        removed_project_count = project_ids_to_remove.len(),
+        removed_version_count = version_ids_to_change.len(),
+        "Applied search index update in {:.2?}",
+        operation_start.elapsed()
+    );
 
     for message in messages_to_commit {
         consumer
@@ -320,22 +305,24 @@ pub async fn reindex_projects(
     search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
 ) -> eyre::Result<()> {
-    info!("Removing documents for batch");
-    search_backend.remove_project_documents(project_ids).await?;
-
     info!("Creating project documents");
-    index_changed_projects(ro_pool, redis_pool, search_backend, project_ids)
+    let projects =
+        build_changed_projects(ro_pool, redis_pool, project_ids).await?;
+    search_backend
+        .apply_update(SearchIndexUpdate {
+            projects: &projects,
+            ..SearchIndexUpdate::default()
+        })
         .await?;
 
     Ok(())
 }
 
-async fn index_changed_projects(
+async fn build_changed_projects(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
-    search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
-) -> eyre::Result<()> {
+) -> eyre::Result<Vec<UploadSearchProject>> {
     let documents = index_project_documents(ro_pool, redis_pool, project_ids)
         .instrument(info_span!("index", batch_size = project_ids.len()))
         .await
@@ -346,20 +333,16 @@ async fn index_changed_projects(
             )
         })?;
 
-    info!("Fetched all project documents, indexing into backend");
-
-    search_backend.index_documents(&documents).await?;
-
-    Ok(())
+    info!("Fetched all project documents");
+    Ok(documents)
 }
 
-async fn reindex_changed_project_versions(
+async fn build_changed_project_versions(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
-    search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
     version_ids: &[VersionId],
-) -> eyre::Result<()> {
+) -> eyre::Result<SearchDocumentBatch> {
     let documents = index_project_version_documents(
         ro_pool,
         redis_pool,
@@ -380,13 +363,31 @@ async fn reindex_changed_project_versions(
         )
     })?;
 
-    search_backend.remove_project_documents(project_ids).await?;
-    search_backend.index_documents(&documents.projects).await?;
-    search_backend
-        .index_version_documents(&documents.versions)
-        .await?;
+    Ok(documents)
+}
 
-    Ok(())
+pub async fn reindex_project_versions(
+    ro_pool: &PgPool,
+    redis_pool: &RedisPool,
+    search_backend: &dyn SearchBackend,
+    project_ids: &[ProjectId],
+    version_ids: &[VersionId],
+) -> eyre::Result<()> {
+    let documents = build_changed_project_versions(
+        ro_pool,
+        redis_pool,
+        project_ids,
+        version_ids,
+    )
+    .await?;
+    search_backend
+        .apply_update(SearchIndexUpdate {
+            projects: &documents.projects,
+            versions: &documents.versions,
+            removed_versions: version_ids,
+            ..SearchIndexUpdate::default()
+        })
+        .await
 }
 
 #[derive(Debug, Deserialize)]

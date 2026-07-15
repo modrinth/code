@@ -27,7 +27,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
-use crate::search::incremental::consume::reindex_project;
+use crate::search::incremental::consume::reindex_project_versions;
 use crate::search::{SearchBackend, SearchState};
 use crate::util::error::Context;
 use crate::util::img;
@@ -1257,18 +1257,17 @@ pub async fn version_delete(
         [VersionId::from(version.inner.id)],
     )
     .await?;
-    search_backend
-        .remove_version_documents(&[version.inner.id.into()])
-        .await
-        .wrap_internal_err("failed to remove version search document")?;
-    reindex_project(
+    let project_id = version.inner.project_id.into();
+    let version_id = version.inner.id.into();
+    reindex_project_versions(
         &pool,
         &redis,
         search_backend.as_ref(),
-        version.inner.project_id.into(),
+        std::slice::from_ref(&project_id),
+        std::slice::from_ref(&version_id),
     )
     .await
-    .wrap_internal_err("failed to reindex project")?;
+    .wrap_internal_err("failed to update search index after version removal")?;
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {

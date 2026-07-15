@@ -111,29 +111,9 @@ pub trait SearchBackend: Send + Sync {
         redis: RedisPool,
     ) -> eyre::Result<()>;
 
-    async fn index_documents(
+    async fn apply_update(
         &self,
-        documents: &[UploadSearchProject],
-    ) -> eyre::Result<()>;
-
-    async fn index_version_documents(
-        &self,
-        documents: &[UploadSearchVersion],
-    ) -> eyre::Result<()>;
-
-    async fn remove_project_documents(
-        &self,
-        ids: &[ProjectId],
-    ) -> eyre::Result<()>;
-
-    async fn remove_project_version_documents(
-        &self,
-        ids: &[ProjectId],
-    ) -> eyre::Result<()>;
-
-    async fn remove_version_documents(
-        &self,
-        ids: &[VersionId],
+        update: SearchIndexUpdate<'_>,
     ) -> eyre::Result<()>;
 
     async fn tasks(&self) -> eyre::Result<Value>;
@@ -326,6 +306,17 @@ pub struct UploadSearchVersion {
 pub struct SearchDocumentBatch {
     pub projects: Vec<UploadSearchProject>,
     pub versions: Vec<UploadSearchVersion>,
+}
+
+/// A logical search index mutation. Removals are applied before replacements,
+/// so a document may be present in both a removed and replacement field.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SearchIndexUpdate<'a> {
+    pub projects: &'a [UploadSearchProject],
+    pub versions: &'a [UploadSearchVersion],
+    /// Projects and all of their version documents to remove.
+    pub removed_projects: &'a [ProjectId],
+    pub removed_versions: &'a [VersionId],
 }
 
 /// Nullable fields in Typesense-bound documents should use
