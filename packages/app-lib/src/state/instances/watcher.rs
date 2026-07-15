@@ -9,16 +9,9 @@ use crate::state::{
     DirectoryInfo, InstanceInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
-use async_walkdir::{Filtering, WalkDir};
-use futures::StreamExt;
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
-use std::{
-    collections::{HashMap, HashSet},
-    path::{Path, PathBuf},
-    sync::Arc,
-    time::Duration,
-};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::sync::{RwLock, mpsc::channel};
 
 use super::adapters::sqlite::instance_rows;
@@ -26,15 +19,12 @@ use super::adapters::sqlite::instance_rows;
 pub struct FileWatcher {
     watcher: RwLock<Debouncer<RecommendedWatcher>>,
     instance_ids: Arc<RwLock<HashMap<String, String>>>,
-    known_config_files: Arc<RwLock<HashSet<PathBuf>>>,
 }
 
 pub async fn init_watcher() -> crate::Result<FileWatcher> {
     let (tx, mut rx) = channel(1);
     let instance_ids = Arc::new(RwLock::new(HashMap::new()));
     let event_instance_ids = instance_ids.clone();
-    let known_config_files = Arc::new(RwLock::new(HashSet::new()));
-    let event_known_config_files = known_config_files.clone();
 
     let file_watcher = new_debouncer(
         Duration::from_secs_f32(1.0),
@@ -85,21 +75,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 .skip_while(|x| x.as_os_str() != instance_path)
                                 .nth(1)
                                 .map(|x| x.as_os_str());
-                            let is_config_path = first_file_name
-                                .as_ref()
-                                .is_some_and(|x| *x == CONFIG_DIRECTORY);
-                            let is_new_config_file = if is_config_path
-                                && e.path.is_file()
-                                && is_supported_config_file(&e.path)
-                                && !is_excluded_config_file(&e.path)
-                            {
-                                event_known_config_files
-                                    .write()
-                                    .await
-                                    .insert(e.path.clone())
-                            } else {
-                                false
-                            };
                             if first_file_name
                                 .as_ref()
                                 .is_some_and(|x| *x == "crash-reports")
@@ -161,7 +136,11 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     |x| {
                                         *x != "saves"
                                             && (*x != CONFIG_DIRECTORY
-                                                || is_new_config_file)
+                                                || is_supported_config_file(
+                                                    &e.path,
+                                                ) && !is_excluded_config_file(
+                                                    &e.path,
+                                                ))
                                     },
                                 )
                                 {
@@ -210,7 +189,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
     Ok(FileWatcher {
         watcher: RwLock::new(file_watcher),
         instance_ids,
-        known_config_files,
     })
 }
 
@@ -270,12 +248,6 @@ pub(crate) async fn watch_instance_folder(
         to_watch.push(full_path);
     }
 
-    remember_existing_config_files(
-        &full_instance_path.join(CONFIG_DIRECTORY),
-        &watcher.known_config_files,
-    )
-    .await;
-
     let mut debouncer = watcher.watcher.write().await;
     for full_path in &to_watch {
         if let Err(e) = debouncer
@@ -303,42 +275,6 @@ pub(crate) async fn watch_instance_folder(
         .write()
         .await
         .insert(instance_path.to_string(), instance_id.to_string());
-}
-
-async fn remember_existing_config_files(
-    config_path: &Path,
-    known_config_files: &RwLock<HashSet<PathBuf>>,
-) {
-    let filter_root = config_path.to_path_buf();
-    let mut walker = WalkDir::new(config_path).filter(move |entry| {
-        let filter_root = filter_root.clone();
-        async move {
-            let excluded = entry
-                .path()
-                .strip_prefix(&filter_root)
-                .is_ok_and(is_excluded_config_path);
-            if excluded {
-                Filtering::IgnoreDir
-            } else {
-                Filtering::Continue
-            }
-        }
-    });
-    let mut paths = Vec::new();
-
-    while let Some(entry) = walker.next().await {
-        let Ok(entry) = entry else {
-            continue;
-        };
-        let Ok(file_type) = entry.file_type().await else {
-            continue;
-        };
-        if file_type.is_file() && is_supported_config_file(&entry.path()) {
-            paths.push(entry.path());
-        }
-    }
-
-    known_config_files.write().await.extend(paths);
 }
 
 fn is_supported_config_file(path: &std::path::Path) -> bool {

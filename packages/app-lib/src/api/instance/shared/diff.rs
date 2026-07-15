@@ -60,31 +60,13 @@ async fn remote_config_files(
     else {
         return Ok(Vec::new());
     };
-    let response = REQWEST_CLIENT.get(&bundle.url).send().await?;
-    if !response.status().is_success() {
-        return Err(crate::ErrorKind::OtherError(format!(
-            "Shared instance config metadata request failed with status {}",
-            response.status()
-        ))
-        .into());
-    }
-    let metadata = response
-        .headers()
-        .get(CONFIG_BUNDLE_METADATA_HEADER)
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Shared instance config bundle is missing file metadata"
-                    .to_string(),
-            )
-        })?
-        .to_str()
-        .map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Shared instance config metadata is invalid: {error}"
-            ))
-        })?;
-
-    let mut files = serde_json::from_str::<Vec<ConfigFile>>(metadata)?;
+    let metadata = bundle.metadata.clone().ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Shared instance config bundle is missing file metadata"
+                .to_string(),
+        )
+    })?;
+    let mut files = serde_json::from_value::<Vec<ConfigFile>>(metadata)?;
     files.retain(|file| {
         !is_excluded_config_path(std::path::Path::new(&file.path))
     });

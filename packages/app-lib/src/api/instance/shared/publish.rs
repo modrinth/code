@@ -673,6 +673,7 @@ pub(super) async fn publish_current_content(
         mark_external_files_ready(
             shared_instance_id,
             response.version,
+            &external_files,
             &response.external_files,
             state,
         )
@@ -813,14 +814,14 @@ pub(super) async fn upload_external_files(
                     upload.file_name
                 ))
             })?;
-        let (bytes, config_files) = match &candidate.source {
+        let bytes = match &candidate.source {
             ExternalFileSource::InstanceFile(file_path) => {
                 let path = state
                     .directories
                     .instances_dir()
                     .join(instance_path)
                     .join(file_path);
-                (crate::util::io::read(path).await?, None)
+                crate::util::io::read(path).await?
             }
             ExternalFileSource::ConfigBundle(files) => {
                 let config_path = state
@@ -828,22 +829,14 @@ pub(super) async fn upload_external_files(
                     .instances_dir()
                     .join(instance_path)
                     .join(CONFIG_DIRECTORY);
-                (
-                    config_bundle_bytes(&config_path, files).await?,
-                    Some(files),
-                )
+                config_bundle_bytes(&config_path, files).await?
             }
         };
-        let mut request = REQWEST_CLIENT.put(&upload.url);
-        if let Some(files) = config_files {
-            request = request
-                .header(reqwest::header::CONTENT_TYPE, "application/zip")
-                .header(
-                    CONFIG_BUNDLE_METADATA_HEADER,
-                    serde_json::to_string(files)?,
-                );
-        }
-        let response = request.body(bytes).send().await?;
+        let response = REQWEST_CLIENT
+            .put(&upload.url)
+            .body(bytes)
+            .send()
+            .await?;
 
         if !response.status().is_success() {
             return Err(crate::ErrorKind::OtherError(format!(
@@ -860,17 +853,34 @@ pub(super) async fn upload_external_files(
 pub(super) async fn mark_external_files_ready(
     shared_instance_id: &str,
     version: i32,
+    candidates: &[ExternalFileCandidate],
     uploads: &[ExternalFileResponse],
     state: &State,
 ) -> crate::Result<()> {
     for upload in uploads {
+        let metadata = candidates
+            .iter()
+            .find(|candidate| {
+                candidate.file_name == upload.file_name
+                    && candidate.file_type == upload.file_type
+            })
+            .and_then(|candidate| match &candidate.source {
+                ExternalFileSource::ConfigBundle(files) => {
+                    Some(serde_json::to_value(files))
+                }
+                ExternalFileSource::InstanceFile(_) => None,
+            })
+            .transpose()?;
         request_empty(
             "mark_version_file_ready",
             Method::POST,
             &format!(
                 "/instances/{shared_instance_id}/versions/{version}/files"
             ),
-            Some(json!({ "file_name": &upload.file_name })),
+            Some(json!({
+                "file_name": &upload.file_name,
+                "metadata": metadata,
+            })),
             state,
         )
         .await?;

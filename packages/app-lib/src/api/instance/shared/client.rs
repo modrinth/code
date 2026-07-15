@@ -107,6 +107,8 @@ pub(super) struct ExternalFileResponse {
     pub(super) url: String,
     #[serde(default)]
     pub(super) file_size: Option<i64>,
+    #[serde(default)]
+    pub(super) metadata: Option<serde_json::Value>,
 }
 
 #[derive(Clone, Debug, Deserialize)]

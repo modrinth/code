@@ -25,8 +25,7 @@ use std::collections::{HashMap, HashSet};
 
 pub(crate) const CONFIG_BUNDLE_FILE_NAME: &str = "configs.zip";
 pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
-pub(crate) const CONFIG_BUNDLE_METADATA_HEADER: &str = "x-amz-meta-files";
-pub(crate) const CONFIG_SYNC_ENABLED: bool = false;
+pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
 pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 13] = [
     "json",
