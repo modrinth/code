@@ -218,7 +218,7 @@ pub(super) async fn shared_instance_install_modpack(
     };
     let modpack_version = CachedEntry::get_version(
         modpack_id,
-        Some(CacheBehaviour::Bypass),
+        Some(CacheBehaviour::MustRevalidate),
         &state.pool,
         &state.api_semaphore,
     )
@@ -230,7 +230,7 @@ pub(super) async fn shared_instance_install_modpack(
     })?;
     let project = CachedEntry::get_project(
         &modpack_version.project_id,
-        Some(CacheBehaviour::Bypass),
+        Some(CacheBehaviour::MustRevalidate),
         &state.pool,
         &state.api_semaphore,
     )
