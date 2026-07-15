@@ -60,18 +60,22 @@ export default function () {
 								.message(async (state) => {
 									const correct_environment = state?.correct_environment as string | undefined
 
-									//TODO: chyz
-									//TODO: coolbot this should be in markdown files
-									let correct_output = ''
-									if (correct_environment)
-										correct_output = `It looks like this project is probably "${ENVIRONMENTS_COPY[String(state?.correct_environment)].title.default_message}"`
-									else if (correct_environment === 'Mixed')
-										correct_output = `It looks like some %PROJECT_VERSIONS_FLINK% of your project should have unique environments from other versions, please ensure *each version* is set correctly.`
+									let correct = ''
+									if (correct_environment === 'Mixed')
+										correct = await md('checklist/messages/metadata/environment/mixed')(state)
+									else if (correct_environment)
+										correct = await md(
+											'checklist/messages/metadata/environment/correction',
+											() => ({
+												SUGGESTED_ENVIRONMENT:
+													ENVIRONMENTS_COPY[correct_environment]?.title.defaultMessage ??
+													correct_environment,
+											}),
+										)(state)
 
-									return md(
-										'checklist/messages/environment/inaccurate',
-										() => ({ CORRECT: correct_output }),
-									)(state)
+									return md('checklist/messages/metadata/environment/inaccurate', () => ({
+										CORRECT: correct,
+									}))(state)
 								})
 								.fix(
 									fix().project((patch, state) => {
@@ -87,6 +91,7 @@ export default function () {
 								.children(
 									dropdown('correct_environment')
 										.children(
+											//TODO: Chyz add mixed option.
 											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
 												.filter((id) => id !== 'unknown')
 												.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),

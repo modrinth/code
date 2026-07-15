@@ -1,1 +1,0 @@
-Currently, your **Store** link is inaccessible. Make sure it points to a publicly accessible storefront before resubmitting your project.

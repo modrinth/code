@@ -1,1 +1,0 @@
-Currently, your **Issues** link is inaccessible. Make sure it points to a publicly accessible issue tracker before resubmitting your project.

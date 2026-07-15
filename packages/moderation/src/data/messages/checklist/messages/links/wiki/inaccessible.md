@@ -1,1 +1,0 @@
-Currently, your **Wiki** link is inaccessible. Make sure it points to a publicly accessible documentation page before resubmitting your project.
