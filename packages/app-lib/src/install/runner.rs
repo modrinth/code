@@ -423,7 +423,7 @@ async fn prepare_initial_instance(
 
 fn spawn_job(job_id: Uuid) {
     tokio::spawn(async move {
-        if let Err(error) = run_job(job_id).await {
+        if let Err(error) = Box::pin(run_job(job_id)).await {
             tracing::error!(
                 "Install job {job_id} failed to update state: {error}"
             );
@@ -457,7 +457,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
     .await?;
     emit_install_job(&record.snapshot()).await?;
 
-    let result = run_request(job_id, &mut job_state, &state).await;
+    let result = Box::pin(run_request(job_id, &mut job_state, &state)).await;
     if let Ok(record) = store::get_required(job_id, &state).await {
         job_state = record.state;
     }
@@ -618,13 +618,13 @@ async fn run_request(
                 modpack_details(&location),
             )
             .await?;
-            install_pack(
+            Box::pin(install_pack(
                 job_id,
                 job_state,
                 location,
                 instance_id.clone(),
                 DownloadReason::Modpack,
-            )
+            ))
             .await?;
             apply_post_install_edit(&instance_id, post_install_edit).await?;
             Ok(Some(instance_id))
@@ -636,13 +636,13 @@ async fn run_request(
                 )
                 .into());
             };
-            apply_shared_instance_content(
+            Box::pin(apply_shared_instance_content(
                 job_id,
                 job_state,
                 state,
                 &instance_id,
                 &data,
-            )
+            ))
             .await?;
 
             finalize_shared_instance_attachment(&instance_id, &data, state)
@@ -768,13 +768,13 @@ async fn run_request(
                 &instance_id,
             )
             .await?;
-            install_pack(
+            Box::pin(install_pack(
                 job_id,
                 job_state,
                 location,
                 instance_id.clone(),
                 DownloadReason::Modpack,
-            )
+            ))
             .await?;
             restore_disabled_projects(
                 &instance_id,
@@ -790,13 +790,13 @@ async fn run_request(
             lock_existing_instance(&instance_id, state).await?;
             let disabled_project_ids =
                 disabled_project_ids(&instance_id, state).await?;
-            apply_shared_instance_update(
+            Box::pin(apply_shared_instance_update(
                 job_id,
                 job_state,
                 state,
                 &instance_id,
                 &data,
-            )
+            ))
             .await?;
             restore_disabled_projects(
                 &instance_id,
@@ -1063,12 +1063,12 @@ pub(super) async fn install_pack(
         }
     };
 
-    install_zipped_mrpack_files_with_reporter(
+    Box::pin(install_zipped_mrpack_files_with_reporter(
         create_pack,
         false,
         reason,
         reporter,
-    )
+    ))
     .await?;
 
     Ok(())

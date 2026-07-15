@@ -208,13 +208,13 @@ pub(super) async fn apply_shared_instance_update(
 
     if plan.configuration_changed {
         remove_existing_shared_instance_content(instance_id, state).await?;
-        apply_shared_instance_content(
+        Box::pin(apply_shared_instance_content(
             job_id,
             job_state,
             state,
             instance_id,
             data,
-        )
+        ))
         .await?;
         return Ok(());
     }
@@ -548,13 +548,13 @@ pub(super) async fn apply_shared_instance_content(
             modpack_details(&location),
         )
         .await?;
-        install_pack(
+        Box::pin(install_pack(
             job_id,
             job_state,
             location,
             instance_id.to_string(),
             DownloadReason::Modpack,
-        )
+        ))
         .await?;
     } else {
         crate::api::instance::edit(
