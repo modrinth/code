@@ -48,12 +48,29 @@ export default function () {
 						),
 					}
 
-					const LINK_EXTRAS: Record<string, { misused?: string; inaccessible?: string }> = {
+					const LINK_EXTRAS: Record<
+						string,
+						{
+							misused?: string
+							inaccessible?: string
+							disabled?: string
+							expiring?: string
+							empty?: string
+						}
+					> = {
+						issues: {
+							disabled: 'checklist/messages/links/note/issues_disabled',
+						},
+						wiki: {
+							disabled: 'checklist/messages/links/note/wiki_disabled',
+						},
 						source: {
 							inaccessible: 'checklist/messages/links/note/source_404',
+							empty: 'checklist/messages/links/note/source_empty',
 						},
 						discord: {
 							inaccessible: 'checklist/messages/links/note/discord_inaccessible',
+							expiring: 'checklist/messages/links/note/discord_expiring',
 						},
 					}
 
@@ -63,8 +80,18 @@ export default function () {
 
 					const misused = sections.filter(([, s]) => s.misused === true)
 					const inaccessible = sections.filter(([, s]) => s.inaccessible === true)
+					const disabled = sections.filter(([, s]) => s.disabled === true)
+					const expiring = sections.filter(([, s]) => s.expiring === true)
+					const empty = sections.filter(([, s]) => s.empty === true)
 
-					if (misused.length === 0 && inaccessible.length === 0) return ''
+					if (
+						misused.length === 0 &&
+						inaccessible.length === 0 &&
+						disabled.length === 0 &&
+						expiring.length === 0 &&
+						empty.length === 0
+					)
+						return ''
 
 					let message = await md('checklist/messages/links/header')(state)
 
@@ -95,7 +122,7 @@ export default function () {
 					? linkSection(
 							'issues',
 							`**Issues:** ${project.value.link_urls.issues.url}`,
-							toggle('disabled', 'Disabled'),
+							//							toggle('disabled', 'Disabled'),
 						)
 					: null,
 
@@ -104,7 +131,7 @@ export default function () {
 					? linkSection(
 							'source',
 							`**Source:** ${project.value.link_urls.source.url}`,
-							toggle('empty', 'Empty Repo'),
+							//							toggle('empty', 'Empty Repo'),
 						)
 					: null,
 
@@ -113,7 +140,7 @@ export default function () {
 					? linkSection(
 							'wiki',
 							`**Wiki:** ${project.value.link_urls.wiki.url}`,
-							toggle('disabled', 'Disabled'),
+							//							toggle('disabled', 'Disabled'),
 						)
 					: null,
 
@@ -122,7 +149,7 @@ export default function () {
 					? linkSection(
 							'discord',
 							`**Discord:** ${project.value.link_urls.discord.url}`,
-							toggle('expiring', 'Expiring'),
+							//							toggle('expiring', 'Expiring'),
 						)
 					: null,
 

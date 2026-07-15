@@ -12,7 +12,7 @@ import useMetadataStage from './stages/metadata'
 import usePermissionsStage from './stages/permissions'
 import usePostApprovalStage from './stages/post-approval'
 import useReuploadsStage from './stages/reupload'
-import useRuleFollowingStage from './stages/rule-following'
+import useOtherRulesStage from './stages/other-rules'
 import useStatusAlertsStage from './stages/status-alerts'
 import useSummaryStage from './stages/summary'
 import useTitleSlugStage from './stages/title-slug'
@@ -34,7 +34,7 @@ export function useStages(
 		useMetadataStage(),
 		useReuploadsStage(),
 		usePermissionsStage(),
-		useRuleFollowingStage(),
+		useOtherRulesStage(),
 		useUndefinedProjectStage(),
 		usePostApprovalStage(),
 	]

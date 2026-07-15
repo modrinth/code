@@ -18,39 +18,39 @@ export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
 	const prohibitedContentHeaderMsg: MessageFn = md(
-		'checklist/messages/rule-breaking/prohibited-content-header',
+		'checklist/messages/other-rules/prohibited-content-header',
 	)
 	const prohibitedContentMsgs: Record<string, MessageFn> = {
-		objectionable: md('checklist/messages/rule-breaking/prohibited-content/objectionable'),
-		discriminatory: md('checklist/messages/rule-breaking/prohibited-content/discriminatory'),
-		'ip-infringement': md('checklist/messages/rule-breaking/prohibited-content/ip-infringement'),
-		'legal-rights': md('checklist/messages/rule-breaking/prohibited-content/legal-rights'),
-		'illegal-activity': md('checklist/messages/rule-breaking/prohibited-content/illegal-activity'),
-		harmful: md('checklist/messages/rule-breaking/prohibited-content/harmful'),
-		misleading: md('checklist/messages/rule-breaking/prohibited-content/misleading'),
-		impersonation: md('checklist/messages/rule-breaking/prohibited-content/impersonation'),
+		objectionable: md('checklist/messages/other-rules/prohibited-content/objectionable'),
+		discriminatory: md('checklist/messages/other-rules/prohibited-content/discriminatory'),
+		'ip-infringement': md('checklist/messages/other-rules/prohibited-content/ip-infringement'),
+		'legal-rights': md('checklist/messages/other-rules/prohibited-content/legal-rights'),
+		'illegal-activity': md('checklist/messages/other-rules/prohibited-content/illegal-activity'),
+		harmful: md('checklist/messages/other-rules/prohibited-content/harmful'),
+		misleading: md('checklist/messages/other-rules/prohibited-content/misleading'),
+		impersonation: md('checklist/messages/other-rules/prohibited-content/impersonation'),
 		'false-endorsement': md(
-			'checklist/messages/rule-breaking/prohibited-content/false-endorsement',
+			'checklist/messages/other-rules/prohibited-content/false-endorsement',
 		),
-		profanity: md('checklist/messages/rule-breaking/prohibited-content/profanity'),
+		profanity: md('checklist/messages/other-rules/prohibited-content/profanity'),
 		'undisclosed-upload': md(
-			'checklist/messages/rule-breaking/prohibited-content/undisclosed-upload',
+			'checklist/messages/other-rules/prohibited-content/undisclosed-upload',
 		),
-		'mojang-bypass': md('checklist/messages/rule-breaking/prohibited-content/mojang-bypass'),
+		'mojang-bypass': md('checklist/messages/other-rules/prohibited-content/mojang-bypass'),
 	}
 	const serverSideOptInHeaderMsg: MessageFn = md(
-		'checklist/messages/rule-breaking/server-side-opt-in-header',
+		'checklist/messages/other-rules/server-side-opt-in-header',
 	)
 	const serverSideOptInMsgs: Record<string, MessageFn> = {
-		'x-ray': md('checklist/messages/rule-breaking/server-side-opt-in/x-ray'),
-		'aim-bot': md('checklist/messages/rule-breaking/server-side-opt-in/aim-bot'),
-		movement: md('checklist/messages/rule-breaking/server-side-opt-in/movement'),
-		pvp: md('checklist/messages/rule-breaking/server-side-opt-in/pvp'),
-		'hiding-mods': md('checklist/messages/rule-breaking/server-side-opt-in/hiding-mods'),
-		'item-duplication': md('checklist/messages/rule-breaking/server-side-opt-in/item-duplication'),
+		'x-ray': md('checklist/messages/other-rules/server-side-opt-in/x-ray'),
+		'aim-bot': md('checklist/messages/other-rules/server-side-opt-in/aim-bot'),
+		movement: md('checklist/messages/other-rules/server-side-opt-in/movement'),
+		pvp: md('checklist/messages/other-rules/server-side-opt-in/pvp'),
+		'hiding-mods': md('checklist/messages/other-rules/server-side-opt-in/hiding-mods'),
+		'item-duplication': md('checklist/messages/other-rules/server-side-opt-in/item-duplication'),
 	}
 
-	return stage('rule-following', 'Rule Following')
+	return stage('other-rules', 'Rule Following')
 		.hint('Does this project violate the rules?')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
@@ -63,6 +63,7 @@ export default function () {
 					.shown(computed(() => !!project.value.minecraft_server))
 					.action(action().suggestedStatus('rejected').severity('critical').message()),
 
+				// TODO: chyz, the lists built by these message have empty line gaps.
 				toggle('prohibited_content', 'Prohibited Content')
 					.action(
 						action()
@@ -151,6 +152,7 @@ export default function () {
 					.action(action().suggestedStatus('flagged').severity('low').message()),
 
 				toggle('rule_breaking_other', 'Other')
+					// TODO: chyz, the required asterisk is on a separate line
 					.action(
 						action()
 							.suggestedStatus('rejected')
