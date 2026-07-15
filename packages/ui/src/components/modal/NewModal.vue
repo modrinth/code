@@ -170,6 +170,7 @@ const props = withDefaults(
 		header?: string
 		hideHeader?: boolean
 		onHide?: () => void
+		onAfterHide?: () => void
 		onShow?: () => void
 		mergeHeader?: boolean
 		scrollable?: boolean
@@ -196,6 +197,7 @@ const props = withDefaults(
 		header: undefined,
 		hideHeader: false,
 		onHide: () => {},
+		onAfterHide: () => {},
 		onShow: () => {},
 		mergeHeader: false,
 		// TODO: migrate all modals to use scrollable and remove this prop
@@ -289,6 +291,7 @@ function hide() {
 	previousFocusEl = null
 	setTimeout(() => {
 		open.value = false
+		nextTick(() => props.onAfterHide?.())
 	}, 300)
 }
 

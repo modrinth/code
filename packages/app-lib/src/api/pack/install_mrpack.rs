@@ -1,23 +1,29 @@
 use crate::State;
 use crate::event::emit::loading_try_for_each_concurrent;
 use crate::install::{
-    InstallPhaseDetails, InstallPhaseId, InstallProgress,
-    InstallProgressReporter, InstallProgressSecondary,
+    InstallErrorContext, InstallJobEventKind, InstallPhaseDetails,
+    InstallPhaseId, InstallProgress, InstallProgressReporter,
+    InstallProgressSecondary,
 };
 use crate::pack::install_from::{
     EnvType, PackFile, PackFileHash, set_instance_information,
 };
 use crate::state::instances::ContentSourceKind;
 use crate::state::{
-    CachedEntry, EditInstance, InstanceInstallStage, SideType, cache_file_hash,
+    CachedEntry, CachedFile, EditInstance, InstanceInstallStage, SideType,
+    cache_file_hash,
 };
-use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors, write};
+use crate::util::fetch::{
+    DownloadMeta, DownloadReason, FetchProgressFn, fetch_mirrors_with_progress,
+    write,
+};
 use crate::util::io;
 use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
 use async_zip::base::read::{WithEntry, ZipEntryReader};
 use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
+use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{
@@ -28,12 +34,80 @@ use std::sync::{
 use super::install_from::{CreatePack, CreatePackFile, PackFormat};
 use crate::data::ProjectType;
 use std::io::{Cursor, ErrorKind};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tokio::io::AsyncWriteExt;
+use tokio::sync::Mutex;
 
 type ExtractProgressFn<'a> = dyn FnMut(u64) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
     + Send
     + 'a;
+const MODPACK_CONTENT_DOWNLOAD_CONCURRENCY: usize = 4;
+
+#[derive(Clone)]
+struct ModpackContentInstallContext {
+    instance_id: String,
+    instance_path: String,
+    instance_full_path: PathBuf,
+    download_meta: DownloadMeta,
+    pack_version_id: Option<String>,
+    pack_project_id: Option<String>,
+    reporter: InstallProgressReporter,
+    modpack_details: InstallPhaseDetails,
+    content_progress: Arc<AtomicU64>,
+    content_bytes_progress: Arc<AtomicU64>,
+    active_download_bytes: Arc<Mutex<HashMap<String, u64>>>,
+    file_infos_by_hash: Arc<HashMap<String, CachedFile>>,
+    num_files: usize,
+    content_total_bytes: u64,
+}
+
+impl ModpackContentInstallContext {
+    async fn mark_downloaded(
+        &self,
+        file_size: u64,
+        event: InstallJobEventKind,
+    ) -> crate::Result<()> {
+        let current = self.content_progress.fetch_add(1, Ordering::Relaxed) + 1;
+        let current_bytes = self
+            .content_bytes_progress
+            .fetch_add(file_size, Ordering::Relaxed)
+            + file_size;
+
+        self.reporter
+            .update_with_events(
+                InstallPhaseId::DownloadingContent,
+                Some(InstallProgress {
+                    current,
+                    total: self.num_files as u64,
+                    secondary: (self.content_total_bytes > 0).then_some(
+                        InstallProgressSecondary {
+                            current: current_bytes
+                                .min(self.content_total_bytes),
+                            total: self.content_total_bytes,
+                        },
+                    ),
+                }),
+                self.modpack_details.clone(),
+                vec![event],
+            )
+            .await
+    }
+
+    async fn remove_active_download(&self, path: &str) {
+        let mut active_download_bytes = self.active_download_bytes.lock().await;
+        active_download_bytes.remove(path);
+    }
+
+    async fn update_active_download(
+        &self,
+        path: String,
+        downloaded: u64,
+    ) -> u64 {
+        let mut active_download_bytes = self.active_download_bytes.lock().await;
+        active_download_bytes.insert(path, downloaded);
+        active_download_bytes.values().sum::<u64>()
+    }
+}
 
 enum MrpackZipReader {
     Memory(async_zip::tokio::read::seek::ZipFileReader<Cursor<bytes::Bytes>>),
@@ -163,6 +237,96 @@ where
     Ok((size, hasher.digest().to_string()))
 }
 
+pub(crate) async fn get_external_files_from_mrpack(
+    file: &CreatePackFile,
+) -> crate::Result<Vec<String>> {
+    let mut zip_reader = MrpackZipReader::new(file).await?;
+    let Some(manifest_idx) =
+        zip_reader.file().entries().iter().position(|entry| {
+            matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
+        })
+    else {
+        return Err(crate::Error::from(crate::ErrorKind::InputError(
+            "No pack manifest found in mrpack".to_string(),
+        )));
+    };
+
+    let manifest = zip_reader.read_entry_to_string(manifest_idx).await?;
+    let pack: PackFormat = serde_json::from_str(&manifest)?;
+    let mut candidates = pack
+        .files
+        .into_iter()
+        .filter_map(|file| {
+            let path = file.path.as_str();
+            let hash = file.hashes.get(&PackFileHash::Sha1)?.clone();
+            let file_name = path.rsplit('/').next()?.to_string();
+            Some((file_name, hash))
+        })
+        .collect::<Vec<_>>();
+
+    let override_entries = zip_reader
+        .file()
+        .entries()
+        .iter()
+        .enumerate()
+        .filter_map(|(index, entry)| {
+            let path = entry.filename().as_str().ok()?;
+            let relative_path = path
+                .strip_prefix("overrides/")
+                .or_else(|| path.strip_prefix("client-overrides/"))?;
+            if path.ends_with('/')
+                || ProjectType::get_from_parent_folder(relative_path).is_none()
+            {
+                return None;
+            }
+            let file_name = relative_path.rsplit('/').next()?.to_string();
+            Some((index, file_name))
+        })
+        .collect::<Vec<_>>();
+
+    for (index, file_name) in override_entries {
+        let (_, hash) = zip_reader.hash_entry(index).await?;
+        candidates.push((file_name, hash));
+    }
+
+    if candidates.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let state = State::get().await?;
+    let hashes = candidates
+        .iter()
+        .map(|(_, hash)| hash.as_str())
+        .collect::<Vec<_>>();
+    let recognized_hashes = match CachedEntry::get_file_many(
+        &hashes,
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await
+    {
+        Ok(files) => files
+            .into_iter()
+            .map(|file| file.hash)
+            .collect::<HashSet<_>>(),
+        Err(err) => {
+            tracing::warn!("Failed to look up files in imported mrpack: {err}");
+            HashSet::new()
+        }
+    };
+
+    let mut external_files = candidates
+        .into_iter()
+        .filter_map(|(file_name, hash)| {
+            (!recognized_hashes.contains(&hash)).then_some(file_name)
+        })
+        .collect::<Vec<_>>();
+    external_files.sort();
+    external_files.dedup();
+    Ok(external_files)
+}
+
 async fn extract_zip_entry<R>(
     mut reader: ZipEntryReader<'_, R, WithEntry<'_>>,
     path: &Path,
@@ -246,7 +410,17 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     let version_id = create_pack.description.version_id;
     let instance_id = create_pack.description.instance_id;
     let mut icon_exists = icon.is_some();
+    let source_path = pack_source_path(&file);
 
+    reporter
+        .set_context(
+            InstallErrorContext::new("read modpack archive")
+                .maybe_project_id(project_id.clone())
+                .maybe_version_id(version_id.clone())
+                .source_path(source_path.clone())
+                .build(),
+        )
+        .await?;
     let mut zip_reader = MrpackZipReader::new(&file).await?;
     let instance_full_path =
         crate::api::instance::get_full_path(&instance_id).await?;
@@ -260,6 +434,16 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
             InstallPhaseId::ReadingPackManifest,
             None,
             modpack_details.clone(),
+        )
+        .await?;
+    reporter
+        .set_context(
+            InstallErrorContext::new("read modpack manifest")
+                .maybe_project_id(project_id.clone())
+                .maybe_version_id(version_id.clone())
+                .source_path(source_path.clone())
+                .entry_path("modrinth.index.json")
+                .build(),
         )
         .await?;
 
@@ -413,7 +597,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .map(|file| file.file_size as u64)
         .sum::<u64>();
     reporter
-        .update(
+        .update_with_events(
             InstallPhaseId::DownloadingContent,
             Some(InstallProgress {
                 current: 0,
@@ -426,138 +610,276 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 ),
             }),
             modpack_details.clone(),
+            vec![InstallJobEventKind::ContentDownloadStarted {
+                files: num_files as u64,
+                bytes: (content_total_bytes > 0).then_some(content_total_bytes),
+            }],
         )
         .await?;
     let content_progress = Arc::new(AtomicU64::new(0));
     let content_bytes_progress = Arc::new(AtomicU64::new(0));
+    let active_download_bytes =
+        Arc::new(Mutex::new(HashMap::<String, u64>::new()));
+    let file_info_hashes = pack
+        .files
+        .iter()
+        .filter_map(|file| {
+            file.hashes.get(&PackFileHash::Sha1).map(String::as_str)
+        })
+        .collect::<Vec<_>>();
+    let file_infos_by_hash = Arc::new(
+        CachedEntry::get_file_many(
+            &file_info_hashes,
+            None,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        .into_iter()
+        .map(|file| (file.hash.clone(), file))
+        .collect::<HashMap<_, _>>(),
+    );
+    let content_context = ModpackContentInstallContext {
+        instance_id: instance_id.clone(),
+        instance_path: instance_path.clone(),
+        instance_full_path: instance_full_path.clone(),
+        download_meta,
+        pack_version_id: version_id.clone(),
+        pack_project_id: project_id.clone(),
+        reporter: reporter.clone(),
+        modpack_details: modpack_details.clone(),
+        content_progress,
+        content_bytes_progress,
+        active_download_bytes,
+        file_infos_by_hash,
+        num_files,
+        content_total_bytes,
+    };
     loading_try_for_each_concurrent(
         futures::stream::iter(pack.files).map(Ok::<PackFile, crate::Error>),
-        None,
+        Some(MODPACK_CONTENT_DOWNLOAD_CONCURRENCY),
         None,
         70.0,
         num_files,
         None,
         |project| {
-            let instance_id = instance_id.clone();
-            let instance_path = instance_path.clone();
-            let instance_full_path = instance_full_path.clone();
-            let download_meta = download_meta.clone();
-            let pack_version_id = version_id.clone();
-            let reporter = reporter.clone();
-            let modpack_details = modpack_details.clone();
-            let content_progress = content_progress.clone();
-            let content_bytes_progress = content_bytes_progress.clone();
+            let content_context = content_context.clone();
             async move {
-                let mark_downloaded = |file_size: u64| {
-                    let reporter = reporter.clone();
-                    let modpack_details = modpack_details.clone();
-                    let content_progress = content_progress.clone();
-                    let content_bytes_progress = content_bytes_progress.clone();
-                    async move {
-                        let current = content_progress
-                            .fetch_add(1, Ordering::Relaxed)
-                            + 1;
-                        let current_bytes = content_bytes_progress
-                            .fetch_add(file_size, Ordering::Relaxed)
-                            + file_size;
-                        reporter
-                            .update(
-                                InstallPhaseId::DownloadingContent,
-                                Some(InstallProgress {
-                                    current,
-                                    total: num_files as u64,
-                                    secondary: (content_total_bytes > 0)
-                                        .then_some(InstallProgressSecondary {
-                                            current: current_bytes
-                                                .min(content_total_bytes),
-                                            total: content_total_bytes,
-                                        }),
-                                }),
-                                modpack_details,
-                            )
-                            .await?;
-                        Ok::<(), crate::Error>(())
-                    }
-                };
+                let project_size = project.file_size as u64;
+                let project_path = project.path.as_str().to_string();
+                let target_path = content_context
+                    .instance_full_path
+                    .join(project.path.as_str());
 
                 //TODO: Future update: prompt user for optional files in a modpack
-                if let Some(env) = project.env
+                if let Some(env) = project.env.as_ref()
                     && env
                         .get(&EnvType::Client)
                         .is_some_and(|x| x == &SideType::Unsupported)
                 {
-                    mark_downloaded(project.file_size as u64).await?;
+                    content_context
+                        .mark_downloaded(
+                            project_size,
+                            InstallJobEventKind::ContentFileSkipped {
+                                path: project_path,
+                                reason: "unsupported on client".to_string(),
+                            },
+                        )
+                        .await?;
                     return Ok(());
                 }
 
-                let file = fetch_mirrors(
+                let context =
+                    InstallErrorContext::new("download modpack content file")
+                        .maybe_project_id(
+                            content_context.pack_project_id.clone(),
+                        )
+                        .maybe_version_id(
+                            content_context.pack_version_id.clone(),
+                        )
+                        .file_path(project_path.clone())
+                        .target_path(target_path.display().to_string())
+                        .urls(project.downloads.clone())
+                        .maybe_expected_hash(
+                            project.hashes.get(&PackFileHash::Sha1).cloned(),
+                        )
+                        .expected_size(project_size)
+                        .build();
+                content_context
+                    .reporter
+                    .set_transient_context(context.clone())
+                    .await?;
+
+                let progress_key = project_path.clone();
+                let progress_context = content_context.clone();
+                let min_download_progress_delta =
+                    (project_size / 200).max(256 * 1024);
+                let mut last_reported_downloaded = 0_u64;
+                let mut report_download_progress = move |downloaded: u64,
+                                                         _total_size: u64|
+                      -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send>> {
+                    if downloaded < project_size
+                        && downloaded.saturating_sub(last_reported_downloaded)
+                            < min_download_progress_delta
+                    {
+                        return Box::pin(async { Ok(()) });
+                    }
+
+                    last_reported_downloaded = downloaded;
+                    let progress_context = progress_context.clone();
+                    let progress_key = progress_key.clone();
+                    Box::pin(async move {
+                        let active_bytes = progress_context
+                            .update_active_download(progress_key, downloaded)
+                            .await;
+                        let current_bytes = progress_context
+                            .content_bytes_progress
+                            .load(Ordering::Relaxed)
+                            .saturating_add(active_bytes)
+                            .min(progress_context.content_total_bytes);
+                        progress_context
+                            .reporter
+                            .update(
+                                InstallPhaseId::DownloadingContent,
+                                Some(InstallProgress {
+                                    current: progress_context
+                                        .content_progress
+                                        .load(Ordering::Relaxed),
+                                    total: progress_context.num_files as u64,
+                                    secondary: (progress_context
+                                        .content_total_bytes
+                                        > 0)
+                                        .then_some(InstallProgressSecondary {
+                                            current: current_bytes,
+                                            total: progress_context
+                                                .content_total_bytes,
+                                        }),
+                                }),
+                                progress_context.modpack_details.clone(),
+                            )
+                            .await?;
+                        Ok(())
+                    })
+                };
+                let progress =
+                    &mut report_download_progress as &mut FetchProgressFn<'_>;
+                let file = match fetch_mirrors_with_progress(
                     &project
                         .downloads
                         .iter()
                         .map(|x| &**x)
                         .collect::<Vec<&str>>(),
                     project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                    Some(&download_meta),
+                    Some(&content_context.download_meta),
                     None,
                     &state.fetch_semaphore,
                     &state.pool,
+                    Some(progress),
                 )
-                .await?;
+                .await
+                {
+                    Ok(file) => {
+                        content_context
+                            .remove_active_download(&project_path)
+                            .await;
+                        file
+                    }
+                    Err(error) => {
+                        content_context
+                            .remove_active_download(&project_path)
+                            .await;
+                        content_context
+                            .reporter
+                            .persist_failure_context(context)
+                            .await;
+                        return Err(error);
+                    }
+                };
+                let downloaded_bytes = file.len() as u64;
 
-                let path = instance_full_path.join(project.path.as_str());
+                let path = target_path;
 
-                cache_file_hash(
-                    file.clone(),
-                    &instance_path,
-                    project.path.as_str(),
-                    project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                    ProjectType::get_from_parent_folder(&path),
-                    None,
-                    &state.pool,
-                )
-                .await?;
+                {
+                    let _permit = state.install_db_semaphore.acquire().await?;
+                    content_context
+                        .reporter
+                        .preserve_failure_context(
+                            context.clone(),
+                            cache_file_hash(
+                                file.clone(),
+                                &content_context.instance_path,
+                                project.path.as_str(),
+                                project
+                                    .hashes
+                                    .get(&PackFileHash::Sha1)
+                                    .map(|x| &**x),
+                                ProjectType::get_from_parent_folder(&path),
+                                None,
+                                &state.pool,
+                            )
+                            .await,
+                        )
+                        .await?;
+                }
 
-                write(&path, &file, &state.io_semaphore).await?;
+                content_context
+                    .reporter
+                    .preserve_failure_context(
+                        context.clone(),
+                        write(&path, &file, &state.io_semaphore).await,
+                    )
+                    .await?;
 
                 if let Some(project_type) =
                     ProjectType::get_from_parent_folder(project.path.as_str())
                 {
                     let hash =
                         project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
-                    let file_info = if let Some(hash) = hash {
-                        CachedEntry::get_file_many(
-                            &[hash],
-                            None,
-                            &state.pool,
-                            &state.api_semaphore,
-                        )
-                        .await?
-                        .into_iter()
-                        .next()
-                    } else {
-                        None
-                    };
+                    let file_info =
+                        hash.and_then(|hash| {
+                            content_context.file_infos_by_hash.get(hash)
+                        });
                     if let Some(hash) = hash {
-                        crate::state::instances::commands::record_project_file(
-                            &instance_id,
-                            project.path.as_str(),
-                            hash,
-                            project.file_size as u64,
-                            project_type,
-                            modpack_source_kind(pack_version_id.as_deref()),
-                            file_info
-                                .as_ref()
-                                .map(|file| file.project_id.as_str()),
-                            file_info
-                                .as_ref()
-                                .map(|file| file.version_id.as_str()),
-                            state,
-                        )
-                        .await?;
+                        let _permit =
+                            state.install_db_semaphore.acquire().await?;
+                        content_context
+                            .reporter
+                            .preserve_failure_context(
+                                context.clone(),
+                                crate::state::instances::commands::record_project_file(
+                                    &content_context.instance_id,
+                                    project.path.as_str(),
+                                    hash,
+                                    project.file_size as u64,
+                                    project_type,
+                                    modpack_source_kind(
+                                        content_context
+                                            .pack_version_id
+                                            .as_deref(),
+                                    ),
+                                    file_info.map(|file| {
+                                        file.project_id.as_str()
+                                    }),
+                                    file_info.map(|file| {
+                                        file.version_id.as_str()
+                                    }),
+                                    state,
+                                )
+                                .await,
+                            )
+                            .await?;
                     }
                 }
 
-                mark_downloaded(project.file_size as u64).await?;
+                content_context
+                    .mark_downloaded(
+                        project_size,
+                        InstallJobEventKind::ContentFileCompleted {
+                            path: project_path,
+                            bytes: downloaded_bytes,
+                        },
+                    )
+                    .await?;
                 Ok(())
             }
         },
@@ -646,7 +968,18 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
 
         let path =
             instance_full_path.join(relative_override_file_path.as_str());
-        let (size, hash) = if override_total_bytes > 0 {
+        let override_context =
+            InstallErrorContext::new("extract modpack override")
+                .maybe_project_id(project_id.clone())
+                .maybe_version_id(version_id.clone())
+                .source_path(source_path.clone())
+                .entry_path(file.filename().as_str().unwrap_or_default())
+                .target_path(path.display().to_string())
+                .build();
+        reporter
+            .set_transient_context(override_context.clone())
+            .await?;
+        let extract_result = if override_total_bytes > 0 {
             let progress =
                 &mut report_override_progress as &mut ExtractProgressFn<'_>;
             zip_reader
@@ -656,41 +989,65 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                     &state.io_semaphore,
                     Some(progress),
                 )
-                .await?
+                .await
         } else {
             zip_reader
                 .extract_entry(index, &path, &state.io_semaphore, None)
-                .await?
+                .await
         };
-
-        crate::state::cache_file_hash_metadata(
-            &instance_path,
-            relative_override_file_path.as_str(),
-            size,
-            hash.clone(),
-            ProjectType::get_from_parent_folder(
-                relative_override_file_path.as_str(),
-            ),
-            None,
-            &state.pool,
-        )
-        .await?;
-
-        if let Some(project_type) = ProjectType::get_from_parent_folder(
-            relative_override_file_path.as_str(),
-        ) {
-            crate::state::instances::commands::record_project_file(
-                &instance_id,
-                relative_override_file_path.as_str(),
-                &hash,
-                size,
-                project_type,
-                modpack_source_kind(version_id.as_deref()),
-                None,
-                None,
-                state,
-            )
+        let (size, hash) = reporter
+            .preserve_failure_context(override_context, extract_result)
             .await?;
+
+        {
+            let _permit = state.install_db_semaphore.acquire().await?;
+            let record_context =
+                InstallErrorContext::new("record modpack override")
+                    .maybe_project_id(project_id.clone())
+                    .maybe_version_id(version_id.clone())
+                    .source_path(source_path.clone())
+                    .entry_path(file.filename().as_str().unwrap_or_default())
+                    .target_path(path.display().to_string())
+                    .build();
+            reporter
+                .preserve_failure_context(
+                    record_context.clone(),
+                    crate::state::cache_file_hash_metadata(
+                        &instance_path,
+                        relative_override_file_path.as_str(),
+                        size,
+                        hash.clone(),
+                        ProjectType::get_from_parent_folder(
+                            relative_override_file_path.as_str(),
+                        ),
+                        None,
+                        &state.pool,
+                    )
+                    .await,
+                )
+                .await?;
+
+            if let Some(project_type) = ProjectType::get_from_parent_folder(
+                relative_override_file_path.as_str(),
+            ) {
+                reporter
+                    .preserve_failure_context(
+                        record_context,
+                        crate::state::instances::commands::record_project_file(
+                            &instance_id,
+                            relative_override_file_path.as_str(),
+                            &hash,
+                            size,
+                            project_type,
+                            modpack_source_kind(version_id.as_deref()),
+                            None,
+                            None,
+                            state,
+                        )
+                        .await,
+                    )
+                    .await?;
+            }
         }
     }
 
@@ -705,11 +1062,19 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     crate::launcher::install_minecraft_for_instance_id_with_reporter(
         &instance_id,
         false,
-        Some(reporter),
+        Some(reporter.clone()),
     )
     .await?;
+    reporter.clear_context().await?;
 
     Ok::<String, crate::Error>(instance_id.clone())
+}
+
+fn pack_source_path(file: &CreatePackFile) -> String {
+    match file {
+        CreatePackFile::Bytes(_) => "downloaded mrpack bytes".to_string(),
+        CreatePackFile::Path(path) => path.display().to_string(),
+    }
 }
 
 fn modpack_source_kind(version_id: Option<&str>) -> ContentSourceKind {

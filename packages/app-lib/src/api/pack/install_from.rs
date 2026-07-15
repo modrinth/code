@@ -1,7 +1,7 @@
 use crate::State;
 use crate::data::ModLoader;
 use crate::install::{
-    InstallPhaseDetails, InstallPhaseId, InstallProgress,
+    InstallErrorContext, InstallPhaseDetails, InstallPhaseId, InstallProgress,
     InstallProgressReporter,
 };
 use crate::state::{
@@ -113,7 +113,8 @@ pub struct CreatePackInstance {
     pub icon: Option<PathBuf>,          // the icon for the instance
     pub icon_url: Option<String>, // the URL icon for an instance during import
     pub link: Option<InstanceLink>,
-    pub unknown_file: bool, // true when pack file isn't found on Modrinth via hash lookup
+    pub unknown_file: bool, // true when the mrpack archive isn't found on Modrinth via hash lookup
+    pub external_files_in_modpack: Vec<String>,
     pub skip_install_profile: Option<bool>,
     pub no_watch: Option<bool>,
 }
@@ -130,6 +131,7 @@ impl Default for CreatePackInstance {
             icon_url: None,
             link: None,
             unknown_file: false,
+            external_files_in_modpack: Vec::new(),
             skip_install_profile: Some(true),
             no_watch: Some(false),
         }
@@ -149,7 +151,6 @@ pub struct CreatePack {
     pub description: CreatePackDescription,
 }
 
-// The hash lookup only gates the unknown-pack warning, so avoid a long blocking scan for huge local packs.
 const MAX_LOCAL_FILE_HASH_LOOKUP_SIZE: u64 = 1024 * 1024 * 1024;
 
 #[derive(Clone, Debug)]
@@ -214,9 +215,16 @@ pub async fn get_instance_from_pack(
                 false
             };
 
+            let external_files_in_modpack =
+                super::install_mrpack::get_external_files_from_mrpack(
+                    &CreatePackFile::Path(path),
+                )
+                .await?;
+
             Ok(CreatePackInstance {
                 name: file_name,
                 unknown_file: !is_known_file,
+                external_files_in_modpack,
                 ..Default::default()
             })
         }
@@ -343,6 +351,13 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         };
     let progress = Some(&mut progress as &mut FetchProgressFn<'_>);
 
+    let context = InstallErrorContext::new("download modpack file")
+        .urls(vec![url.clone()])
+        .maybe_expected_hash(hash.cloned())
+        .project_id(project_id.clone())
+        .version_id(version_id.clone())
+        .build();
+    reporter.set_context(context).await?;
     let file = fetch_advanced_with_progress(
         Method::GET,
         &url,
@@ -357,6 +372,10 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         progress,
     )
     .await?;
+
+    reporter
+        .update(InstallPhaseId::ResolvingPack, None, details.clone())
+        .await?;
 
     let project = CachedEntry::get_project(
         &version.project_id,
@@ -377,6 +396,15 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     let icon = if has_icon_url {
         if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
+            reporter
+                .set_context(
+                    InstallErrorContext::new("download modpack icon")
+                        .urls(vec![icon_url.clone()])
+                        .project_id(project_id.clone())
+                        .version_id(version_id.clone())
+                        .build(),
+                )
+                .await?;
             let icon_bytes = fetch(
                 &icon_url,
                 None,

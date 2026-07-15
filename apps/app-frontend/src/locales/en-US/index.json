@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Hide more running instances"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Copied"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copy details"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Dismiss"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Install failed"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installation failed due to app closing."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Installation failed due to a network error."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installation failed due to an unknown error."
   },
   "app.action-bar.install.open-instance": {
     "message": "Open instance"
   },
   "app.action-bar.install.retry": {
     "message": "Retry"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Canceled due to app closing"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Couldn't read modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Canceled"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Cleanup didn't finish"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Couldn't download files"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Downloaded file is corrupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Couldn't save files"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Download couldn't finish"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instance couldn't be found"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "File path is invalid"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Modpack data invalid"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpack files have invalid metadata"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java setup couldn't finish"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Loader setup failed"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Couldn't update local data"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft setup failed"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Couldn't reach Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "No permission to write"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Couldn't download pack"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Something went wrong"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Unknown instance"
@@ -231,7 +285,7 @@
     "message": "Finalizing"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Preparing instance"
+    "message": "Queued to install"
   },
   "app.install.phase.preparing_java": {
     "message": "Preparing Java"
@@ -371,29 +425,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Content required"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Dont install"
   },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Install anyway"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Install"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Required modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Shared server instance"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Unknown files warning"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Unrecognized files"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
@@ -401,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "Update to play"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Update required"
+  "app.modal.update-to-play.removed": {
+    "message": "Removed"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
@@ -410,11 +473,26 @@
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Switch version"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Install content to instance"
+  },
+  "app.project.version.all-versions": {
+    "message": "All versions"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Download in browser"
+  },
+  "app.project.version.installing": {
+    "message": "Installing"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Already installed"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
@@ -1063,26 +1141,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Don't show this warning again"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Confirm installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Install anyway"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Unknown file warning"
   }
 }

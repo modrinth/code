@@ -231,7 +231,7 @@ async fn scan_pending_files_chunk(
                 .await
                 .wrap_err("beginning file scan transaction")?;
 
-            let resolved = resolve_overrides(&overrides, redis, &mut txn)
+            let resolved = resolve_overrides(&overrides, &mut txn)
                 .await
                 .wrap_err_with(|| {
                     eyre!("resolving overrides for file {file_id:?}")
@@ -325,9 +325,8 @@ async fn scan_file_inner(
     if !overrides.is_empty() {
         let before = count_project_attributions(project_id, txn).await?;
 
-        let resolved = resolve_overrides(&overrides, redis, txn)
-            .await
-            .wrap_err_with(|| {
+        let resolved =
+            resolve_overrides(&overrides, txn).await.wrap_err_with(|| {
                 eyre!("resolving overrides for file {file_id:?}")
             })?;
 
@@ -494,7 +493,6 @@ pub struct OverrideFile {
 
 #[derive(Debug)]
 pub enum OverrideResolution {
-    OnModrinth,
     ExternalLicense {
         id: i64,
         status: ApprovalType,
@@ -518,8 +516,7 @@ fn log_marked_override_projects(
             | OverrideResolution::Flame(flame_project) => {
                 Some(format!("{} ({})", flame_project.title, flame_project.id))
             }
-            OverrideResolution::OnModrinth
-            | OverrideResolution::ExternalLicense { .. }
+            OverrideResolution::ExternalLicense { .. }
             | OverrideResolution::Unknown => None,
         })
         .collect::<Vec<_>>();
@@ -542,6 +539,26 @@ const OVERRIDE_PREFIXES: &[&str] = &[
     "client-overrides/resourcepacks",
 ];
 
+const OVERRIDE_ROOT_PREFIXES: &[&str] =
+    &["overrides/", "client-overrides/", "server-overrides/"];
+
+fn override_relative_name(name: &str) -> Option<&str> {
+    // strip the root prefix
+    let relative = OVERRIDE_ROOT_PREFIXES
+        .iter()
+        .find_map(|prefix| name.strip_prefix(prefix))?;
+
+    // check if it matches any of the whitelisted scan prefixes
+    OVERRIDE_PREFIXES
+        .iter()
+        .any(|prefix| {
+            name.strip_prefix(prefix)
+                // check the stripped prefix is actually a full segment, not something weird like "overrides/modsabce/file.jar"
+                .is_some_and(|suffix| suffix.starts_with('/'))
+        })
+        .then_some(relative)
+}
+
 fn should_scan(name: &str) -> bool {
     let name = name.to_lowercase();
     let should_skip = name.starts_with("mods/.connector/")
@@ -550,7 +567,7 @@ fn should_scan(name: &str) -> bool {
         || name.starts_with("mods/mcef-libraries/")
         || name.starts_with("mods/mcef-cache/")
         || name.starts_with("config/super_resolution/libraries/")
-        || name.starts_with("config/Veinminer/update/")
+        || name.starts_with("config/veinminer/update/")
         || name.starts_with("config/epicfight/native/")
         || name.starts_with("essential/")
         || name.ends_with(".rpo")
@@ -579,14 +596,11 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
             continue;
         }
 
-        if !OVERRIDE_PREFIXES
-            .iter()
-            .any(|prefix| name.starts_with(prefix))
-        {
+        let Some(relative_name) = override_relative_name(&name) else {
             continue;
-        }
+        };
 
-        if !should_scan(&name) {
+        if !should_scan(relative_name) {
             continue;
         }
 
@@ -654,7 +668,6 @@ async fn persist_attribution_results(
         }
 
         match resolved.get(&file.sha1) {
-            Some(OverrideResolution::OnModrinth) => continue,
             Some(OverrideResolution::ExternalLicense {
                 id,
                 status,
@@ -847,14 +860,19 @@ async fn persist_attribution_results(
     }
 
     if !all_sha1s.is_empty() {
+        let file_paths: Vec<String> =
+            overrides.iter().map(|f| f.path.clone()).collect();
+
         sqlx::query!(
             "
-            insert into override_file_sources (sha1, file_id)
-            select unnest($1::bytea[]), $2
-            on conflict do nothing
+            INSERT INTO override_file_sources (sha1, file_id, file_path)
+            SELECT source.sha1, $2, source.file_path
+            FROM UNNEST($1::BYTEA[], $3::TEXT[]) AS source(sha1, file_path)
+            ON CONFLICT DO NOTHING
             ",
             &all_sha1s,
             file_id as DBFileId,
+            &file_paths,
         )
         .execute(&mut *txn)
         .await
@@ -920,69 +938,12 @@ fn default_external_license_attribution(
 
 async fn resolve_overrides(
     overrides: &[OverrideFile],
-    redis: &RedisPool,
     txn: &mut PgTransaction<'_>,
 ) -> Result<HashMap<String, OverrideResolution>> {
     let mut results: HashMap<String, OverrideResolution> = HashMap::new();
     let mut remaining: Vec<usize> = (0..overrides.len()).collect();
 
     if overrides.is_empty() {
-        return Ok(results);
-    }
-
-    let hashes: Vec<String> =
-        overrides.iter().map(|x| x.sha1.clone()).collect();
-    let files = DBVersion::get_files_from_hash(
-        "sha1".to_string(),
-        &hashes,
-        &mut *txn,
-        redis,
-    )
-    .await
-    .wrap_err("fetching files on platform by hash")?;
-
-    let matching_project_ids: Vec<_> =
-        files.iter().map(|file| file.project_id.0).collect();
-    let valid_project_ids = sqlx::query_scalar!(
-        r#"
-        select id
-        from mods
-        where id = any($1)
-          and status not in ('rejected', 'draft', 'withheld', 'withdrawn')
-        "#,
-        &matching_project_ids,
-    )
-    .fetch_all(&mut *txn)
-    .await
-    .wrap_err("fetching matched file project statuses")?;
-
-    let version_ids: Vec<_> = files.iter().map(|x| x.version_id).collect();
-    let versions_data = DBVersion::get_many(&version_ids, &mut *txn, redis)
-        .await
-        .wrap_err("fetching versions")?;
-
-    for file in &files {
-        if !valid_project_ids.contains(&file.project_id.0) {
-            continue;
-        }
-
-        if !versions_data.iter().any(|v| v.inner.id == file.version_id) {
-            continue;
-        }
-
-        if let Some(hash) = file.hashes.get("sha1")
-            && let Some(pos) =
-                remaining.iter().position(|i| overrides[*i].sha1 == *hash)
-        {
-            let idx = remaining.remove(pos);
-            results.insert(
-                overrides[idx].sha1.clone(),
-                OverrideResolution::OnModrinth,
-            );
-        }
-    }
-
-    if remaining.is_empty() {
         return Ok(results);
     }
 

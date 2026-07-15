@@ -27,6 +27,7 @@ export interface InstallModpackPreview {
 	iconUrl?: string | null
 	link?: InstanceLink | null
 	unknownFile: boolean
+	externalFilesInModpack: string[]
 }
 
 export interface InstallCreateInstanceRequest {
@@ -85,6 +86,36 @@ export type InstallJavaStep =
 	| 'extracting'
 	| 'validating'
 
+export interface InstallErrorView {
+	code: string
+	phase?: InstallPhaseId | null
+	message: string
+	api?: {
+		error: string
+		status?: number | null
+		method?: string | null
+		url?: string | null
+		route?: string | null
+	} | null
+	context?: {
+		operation: string
+		source_path?: string | null
+		target_path?: string | null
+		file_path?: string | null
+		entry_path?: string | null
+		urls?: string[]
+		expected_hash?: string | null
+		expected_size?: number | null
+		project_id?: string | null
+		version_id?: string | null
+		minecraft_version?: string | null
+		loader?: string | null
+		java_version?: number | null
+		os?: string | null
+		arch?: string | null
+	} | null
+}
+
 export interface InstallJobSnapshot {
 	job_id: string
 	instance_id?: string | null
@@ -114,7 +145,8 @@ export interface InstallJobSnapshot {
 		  }
 		| { type: 'import'; launcher_type: string; instance_folder: string }
 	display?: { title: string; icon?: string | null } | null
-	error?: { code: string; message: string } | null
+	error?: InstallErrorView | null
+	rollback_error?: InstallErrorView | null
 	created: string
 	modified: string
 	finished?: string | null
@@ -195,6 +227,10 @@ export async function install_job_cancel(jobId: string) {
 
 export async function install_job_dismiss(jobId: string) {
 	return await invoke<void>('plugin:install|install_job_dismiss', { jobId })
+}
+
+export async function install_job_support_details(jobId: string) {
+	return await invoke<string>('plugin:install|install_job_support_details', { jobId })
 }
 
 export function installJobInstanceId(job: InstallJobSnapshot): string | null {

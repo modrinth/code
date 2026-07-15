@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "隐藏更多运行中的实例"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "已复制"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "复制详情"
+  },
   "app.action-bar.install.dismiss": {
     "message": "忽略"
-  },
-  "app.action-bar.install.failed": {
-    "message": "安装失败"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "由于应用关闭，安装失败。"
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "由于网络错误，安装失败。"
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "由于未知错误，安装失败。"
   },
   "app.action-bar.install.open-instance": {
     "message": "打开实例"
   },
   "app.action-bar.install.retry": {
     "message": "重试"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "由于应用关闭而取消"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "无法读取整合包"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "已取消"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "清理未完成"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "无法下载文件"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "下载的文件已损坏"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "无法保存文件"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "下载无法完成"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "无法找到实例"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "文件路径无效"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "整合包数据无效"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "整合包文件含有无效元数据"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "无法完成 Java 配置"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "加载器配置失败"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "无法更新本地数据"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft 配置失败"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "无法连接 Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "没有写入权限"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "无法下载包"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "出错了"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "未知的实例"
@@ -231,7 +285,7 @@
     "message": "完成"
   },
   "app.install.phase.preparing_instance": {
-    "message": "准备实例"
+    "message": "已加入安装队列"
   },
   "app.install.phase.preparing_java": {
     "message": "正在准备 Java"
@@ -339,7 +393,7 @@
     "message": "正在删除 {name}"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "模组适配"
+    "message": "含模组"
   },
   "app.instance.worlds.filter-offline": {
     "message": "离线"
@@ -371,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜索 {count} 个世界……"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "需求内容"
-  },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
   },
@@ -383,17 +434,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "需求整合包"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件，然后直接进入服务器。"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共享实例"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共享的服务端实例"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "查看内容"
@@ -401,20 +443,32 @@
   "app.modal.update-to-play.header": {
     "message": "更新以游玩"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "需要更新"
-  },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
   },
   "app.project.install-button.already-installed": {
     "message": "此项目已安装"
   },
+  "app.project.install-button.switch-version": {
+    "message": "切换版本"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "返回发现页"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "将内容安装到实例中"
+  },
+  "app.project.version.all-versions": {
+    "message": "所有版本"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "在浏览器中下载"
+  },
+  "app.project.version.installing": {
+    "message": "安装中"
+  },
+  "app.project.versions.already-installed": {
+    "message": "已安装"
   },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
@@ -535,6 +589,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "建造者与生物群系"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "混沌立方"
   },
   "app.skins.section.chase-the-skies": {
     "message": "追逐天空"
@@ -954,7 +1011,7 @@
     "message": "复制地址"
   },
   "instance.worlds.create_shortcut": {
-    "message": "创建快照"
+    "message": "创建快捷方式"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "在主界面隐藏"
@@ -1030,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "加载器由服务器提供"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "不再显示此警告"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "确认安装"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "仍然安装"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "恶意软件常常通过整合包文件在 Discord 等平台上分享而传播。"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "我们在 Modrinth 上找不到此文件。强烈建议你仅从可信来源安装文件。"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "未知文件警告"
   }
 }

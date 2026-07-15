@@ -38,6 +38,9 @@
   "analytics.breakdown.loader": {
     "message": "Pemuat"
   },
+  "analytics.breakdown.members": {
+    "message": "Ahli"
+  },
   "analytics.breakdown.monetization": {
     "message": "Pengewangan"
   },
@@ -127,6 +130,18 @@
   },
   "analytics.chart.legend.previous-period-suffix": {
     "message": "{name} (Sblm.)"
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "Menunjukkan kesemua {itemType, select, project {{count, plural, other {projek}}} country {{count, plural, other {negara}}} monetization {{count, plural, other {pengewangan}}} downloadSource {{count, plural, other {sumber muat turun}}} downloadReason {{count, plural, other {sebab muat turun}}} member {{count, plural, other {ahli}}} projectVersion {{count, plural, other {versi projek}}} loader {{count, plural, other {pemuat}}} gameVersion {{count, plural, other {versi permainan}}} other {{count, plural, other {item}}}} daripada jadual"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Menunjukkan {count} {itemType, select, project {{count, plural, other {projek}}} country {{count, plural, other {negara}}} monetization {{count, plural, other {pengewangan}}} downloadSource {{count, plural, other {sumber muat turun}}} downloadReason {{count, plural, other {sebab muat turun}}} member {{count, plural, other {ahli}}} projectVersion {{count, plural, other {versi projek}}} loader {{count, plural, other {pemuat}}} gameVersion {{count, plural, other {versi permainan}}} other {{count, plural, other {item}}}} daripada jadual"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Menunjukkan {limit} {itemType, select, project {{limit, plural, other {projek}}} country {{limit, plural, other {negara}}} monetization {{limit, plural, other {pengewangan}}} downloadSource {{limit, plural, other {sumber muat turun}}} downloadReason {{limit, plural, other {sebab muat turun}}} member {{limit, plural, other {ahli}}} projectVersion {{limit, plural, other {versi projek}}} loader {{limit, plural, other {pemuat}}} gameVersion {{limit, plural, other {versi permainan}}} other {{limit, plural, other {item}}}} daripada jadual"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Menunjukkan {count} {itemType, select, project {{count, plural, other {projek}}} country {{count, plural, other {negara}}} monetization {{count, plural, other {pengewangan}}} downloadSource {{count, plural, other {sumber muat turun}}} downloadReason {{count, plural, other {sebab muat turun}}} member {{count, plural, other {ahli}}} projectVersion {{count, plural, other {versi projek}}} loader {{count, plural, other {pemuat}}} gameVersion {{count, plural, other {versi permainan}}} other {{count, plural, other {item}}}} teratas daripada jadual"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, other {# hari}}"
@@ -395,6 +410,9 @@
   "analytics.value.monetized": {
     "message": "Dipengewangkan"
   },
+  "analytics.value.no-dependent": {
+    "message": "Tiada"
+  },
   "analytics.value.none": {
     "message": "Tiada"
   },
@@ -623,6 +641,9 @@
   "auth.authorize.redirect-url": {
     "message": "Anda akan diubah hala ke <redirect-url>{url}</redirect-url>"
   },
+  "auth.create-account.username.label": {
+    "message": "Nama pengguna"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Hantar e-mel pemulihan"
   },
@@ -658,6 +679,12 @@
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Masukkan kod..."
+  },
+  "auth.sign-in.create-account": {
+    "message": "Daftar"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Kali terakhir digunakan"
   },
   "auth.sign-in.title": {
     "message": "Daftar Masuk"
@@ -1324,6 +1351,12 @@
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Anda telah menggunakan had pengeluaran anda sebanyak <b>{withdrawLimit}</b>. Anda mesti melengkapkan borang cukai untuk mengeluarkan lebih banyak wang."
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1J+ Muat Turun"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Pencipta"
   },
   "dashboard.head-title": {
     "message": "Papan Pemuka"
@@ -2378,6 +2411,12 @@
   "moderation.page.technicalReview": {
     "message": "Semakan teknikal"
   },
+  "modpack-scan-modal.failed": {
+    "message": "Gagal"
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "Fail Baharu"
+  },
   "muralpay.account-type.checking": {
     "message": "Cek"
   },
@@ -2918,14 +2957,8 @@
   "project.download.no-app": {
     "message": "Tidak ada Modrinth App?"
   },
-  "project.download.no-versions-available": {
-    "message": "Tiada versi tersedia untuk {gameVersion} dan {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} tidak menyokong {platform} untuk {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Cari versi permainan..."
   },
   "project.download.select-game-version": {
     "message": "Pilih versi permainan"
@@ -3116,14 +3149,32 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Sila berikan bukti bahawa anda mempunyai kebenaran untuk mengedarkan semula semua fail berikut. Setelah selesai, sebarang versi yang ditahan akan diterbitkan secara automatik."
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Pasukan penyederhana Modrinth telah menolak maklumat kebenaran yang anda berikan untuk beberapa kandungan luaran. Sila semak item yang ditolak di bawah dan berikan bukti yang boleh diterima atau alih keluar kandungan tersebut."
+  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Semuanya sudah siap!"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Anda mungkin tidak mempunyai kebenaran untuk mengedarkan semula sebahagian daripada kandungan luaran dalam projek anda. Untuk menerbitkan projek ini di Modrinth, sila alih keluar kandungan ini atau berikan bukti bahawa anda mempunyai kebenaran untuk menggunakannya."
   },
   "project.settings.permissions.fail.title": {
     "message": "Sesetengah kandungan tidak boleh disertakan"
   },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Jika anda memasukkan kandungan yang tidak dihoskan di Modrinth, anda perlu memberitahu kami dari mana ia berasal dan mengesahkan bahawa anda mempunyai kebenaran untuk mengedarkan fail tersebut. Lihat <link>pengumuman kami tentang sistem baharu ini</link> untuk mengetahui lebih lanjut!"
+  },
   "project.settings.permissions.learn-more": {
     "message": "Ketahui lebih lanjut"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Ditolak"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
   },
   "project.settings.title": {
     "message": "Tetapan"
@@ -3649,6 +3700,9 @@
   },
   "settings.account.security.email.title": {
     "message": "E-mel"
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Nama"
   },
   "settings.account.security.password.action.add": {
     "message": "Tambah kata laluan"
@@ -4262,6 +4316,9 @@
   "ui.newsletter-button.tooltip": {
     "message": "Langgan surat berita Modrinth"
   },
+  "version.edit.button": {
+    "message": "Sunting"
+  },
   "version.environment.none.description": {
     "message": "Persekitaran untuk versi ini belum dinyatakan."
   },
@@ -4273,5 +4330,14 @@
   },
   "version.environment.unknown.title": {
     "message": "Persekitaran yang tidak diketahui"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projek di Modrinth tersedia secara automatik melalui repositori Maven untuk digunakan dengan alat binaan JVM seperti <gradle-link>Gradle</gradle-link>. Untuk mengetahui lebih lanjut tentang API Maven Modrinth, <article-link>klik di sini</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Nota: Apabila tersedia, anda harus menggunakan repo maven pencipta kerana ia akan mempunyai maklumat kebergantungan transitif yang tidak terdapat pada API Maven Modrinth. Anda juga mungkin akan mendapat kebergantungan pendua jika anda menggunakan campuran repositori Maven Modrinth dan bukan Modrinth untuk kebergantungan anda, kerana pengecam kumpulan akan berbeza apabila disampaikan melalui API Maven Modrinth."
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Salin SHA-1"
   }
 }

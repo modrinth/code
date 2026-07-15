@@ -3101,14 +3101,8 @@
   "project.download.no-app": {
     "message": "¿No tienes la aplicación Modrinth?"
   },
-  "project.download.no-versions-available": {
-    "message": "No hay versiones disponibles para {gameVersion} y {platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} no está soportado para {platform} en la {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Buscar versiones del juego..."
   },
   "project.download.select-game-version": {
     "message": "Selecciona la versión del juego"
@@ -4552,9 +4546,6 @@
   },
   "version.dependency.view-version": {
     "message": "Ver versión"
-  },
-  "version.download.download-dependency": {
-    "message": "Descargar dependencia"
   },
   "version.download.no-primary-file": {
     "message": "Error: No se encontró el archivo principal"

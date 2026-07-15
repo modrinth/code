@@ -2027,14 +2027,8 @@
   "project.download.no-app": {
     "message": "אין לכם את אפליקציית Modrinth?"
   },
-  "project.download.no-versions-available": {
-    "message": "אין גרסאות זמינות עבור {gameVersion} ו-{platform}."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{platform} עבור {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "חיפוש גרסאות משחק..."
   },
   "project.download.select-game-version": {
     "message": "בחירת גרסת משחק"

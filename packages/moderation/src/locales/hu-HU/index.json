@@ -140,6 +140,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Győződj meg arról, hogy rendelkezésre áll-e az a bizonyíték, amely igazolja, hogy jogosult vagy a modcsomagodban szereplő bármely külső tartalom terjesztésére."
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Válaszd ki, hogy a szervered mely verziókat támogatja, válassz egy modcsomagot, vagy tölts fel sajátot."
   },
@@ -211,6 +214,9 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Tisztítsd meg a nevet"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "{languageCount} nyelvet választottál ki. Kérlek csak azokat a nyelveket válaszd ki, amelyeket a szerver aktívan támogat."
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "{tagCount} címkét választottál ki. Fontold meg {maxTagCount} vagy annál kevesebb címke kiválasztását, hogy szervered biztosan megjelenjen a releváns keresési eredmények között."

@@ -30,7 +30,7 @@
     "message": "依存プロジェクトの種類"
   },
   "analytics.breakdown.download-reason": {
-    "message": "理由"
+    "message": "きっかけ"
   },
   "analytics.breakdown.download-source": {
     "message": "ソース"
@@ -48,7 +48,7 @@
     "message": "メンバー"
   },
   "analytics.breakdown.monetization": {
-    "message": "収益の発生"
+    "message": "収益"
   },
   "analytics.breakdown.none.selected": {
     "message": "分析 - デフォルト"
@@ -67,6 +67,9 @@
   },
   "analytics.chart.action.show-all": {
     "message": "すべて表示"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "一部のみ表示"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "上位8件を表示"
@@ -109,6 +112,12 @@
   },
   "analytics.chart.controls.ratio": {
     "message": ""
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "テーブル内の{itemType, select, project {{count, plural, other {プロジェクト}}} country {{count, plural, other {国}}} monetization {{count, plural, other {収益}}} downloadSource {{count, plural, other {ダウンロード元}}} downloadReason {{count, plural, other {ダウンロード理由}}} member {{count, plural, other {メンバー}}} projectVersion {{count, plural, other {プロジェクトバージョン}}} loader {{count, plural, other {ローダー}}} gameVersion {{count, plural, other {ゲームバージョン}}} other {{count, plural, other {項目}}}}上位 {count} 件を表示"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "{project} に依存"
   },
   "analytics.chart.tooltip.total": {
     "message": "合計"
@@ -186,19 +195,19 @@
     "message": "表示の推移"
   },
   "analytics.group-by.1h": {
-    "message": "1時間"
+    "message": "1 時間"
   },
   "analytics.group-by.6h": {
-    "message": "6時間"
+    "message": "6 時間"
   },
   "analytics.group-by.date": {
     "message": "日付"
   },
   "analytics.group-by.day": {
-    "message": "1日"
+    "message": "1 日"
   },
   "analytics.group-by.month": {
-    "message": "1月"
+    "message": "1 月"
   },
   "analytics.group-by.selected.day": {
     "message": "日足"
@@ -219,10 +228,10 @@
     "message": "年足"
   },
   "analytics.group-by.week": {
-    "message": "1週"
+    "message": "1 週"
   },
   "analytics.group-by.year": {
-    "message": "1年"
+    "message": "1 年"
   },
   "analytics.loading.fetching-results": {
     "message": "データを取得中..."
@@ -244,6 +253,9 @@
   },
   "analytics.project.all": {
     "message": "全てのプロジェクト"
+  },
+  "analytics.query.filter.add": {
+    "message": "条件を追加"
   },
   "analytics.query.label.breakdown": {
     "message": "分析"
@@ -324,7 +336,7 @@
     "message": "アナリティクス"
   },
   "analytics.value.monetized": {
-    "message": "発生済み"
+    "message": "収益対象"
   },
   "analytics.value.no-dependent": {
     "message": "なし"
@@ -339,7 +351,7 @@
     "message": "不明"
   },
   "analytics.value.unmonetized": {
-    "message": "未発生"
+    "message": "収益対象外"
   },
   "app-marketing.download.description": {
     "message": "我々のデスクトップアプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
@@ -474,7 +486,7 @@
     "message": "RAM"
   },
   "app-marketing.features.performance.small": {
-    "message": "小さい"
+    "message": "低い"
   },
   "app-marketing.features.performance.title": {
     "message": "効率的"
@@ -557,6 +569,15 @@
   "auth.authorize.redirect-url": {
     "message": "<redirect-url>{url}</redirect-url> に自動的に転送されます"
   },
+  "auth.create-account.title": {
+    "message": "アカウントを作成"
+  },
+  "auth.create-account.username.label": {
+    "message": "ユーザー名"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "ユーザー名を入れてください"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "再設定用メールを送信"
   },
@@ -592,6 +613,15 @@
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "コードを入力…"
+  },
+  "auth.sign-in.create-account": {
+    "message": "サインアップ"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "パスワードを忘れた場合"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "最後に使用"
   },
   "auth.sign-in.title": {
     "message": "ログイン"
@@ -700,6 +730,9 @@
   },
   "conversation-thread.action.approve-with-reply": {
     "message": "送信して承認"
+  },
+  "conversation-thread.action.send": {
+    "message": "送信"
   },
   "conversation-thread.reply-editor.placeholder.send": {
     "message": "メッセージを送る…"
@@ -1169,6 +1202,12 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "出金限度額の <b>{withdrawLimit}</b> に達しました。これ以上の額を出金するには、納税申告書類を記入する必要があります。"
   },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Discordをリンクする"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "クリエイター"
+  },
   "dashboard.head-title": {
     "message": "ダッシュボード"
   },
@@ -1499,6 +1538,12 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "納税申告書に記入して下さい"
   },
+  "discover.install.back-to-server": {
+    "message": "サーバーに戻る"
+  },
+  "discover.install.back-to-setup": {
+    "message": "セットアップに戻る"
+  },
   "error.collection.404.list_item.1": {
     "message": "コレクションのURLを誤って入力した可能性があります。"
   },
@@ -1601,6 +1646,9 @@
   "frog.title": {
     "message": "カエル"
   },
+  "hosting-marketing.available-locations": {
+    "message": "北米、ヨーロッパ、東南アジア、オーストラリアで利用可能で、幅広い地域をカバーしています。"
+  },
   "hosting-marketing.billing.monthly": {
     "message": "毎月で払う"
   },
@@ -1660,6 +1708,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Modrinthでホストするサーバーはどこにありますか？地域を選択できますか？"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "現時点では、北アメリカ、ヨーロッパ、東南アジア、オーストラリアのサーバーを購入時に選択できます。今後、より多くの地域に対応予定です！地域を変更したい場合はサポートまでお問い合わせください。"
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "どのMinecraftのバージョンとローダーが使えますか？"
@@ -2201,6 +2252,9 @@
   "moderation.page.technicalReview": {
     "message": "技術評価"
   },
+  "modpack-scan-modal.loading-versions": {
+    "message": "バージョンを読み込んでいます…"
+  },
   "muralpay.account-type.checking": {
     "message": "チェック中"
   },
@@ -2723,20 +2777,17 @@
   "project.details.licensed": {
     "message": "ライセンス"
   },
+  "project.download.download": {
+    "message": "ダウンロード"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}は{platform}の{gameVersion}に対応していません"
   },
   "project.download.no-app": {
     "message": "Modrinth Appをお持ちでないですか？"
   },
-  "project.download.no-versions-available": {
-    "message": "{gameVersion}および{platform}向けのバージョンは利用できません。"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}は{gameVersion}の{platform}に対応していません"
-  },
-  "project.download.search-game-versions": {
-    "message": "ゲームバージョンを検索…"
   },
   "project.download.select-game-version": {
     "message": "ゲームバージョンを選択"
@@ -2794,6 +2845,9 @@
   },
   "project.moderation.admonition.draft.body": {
     "message": "これは下書きです。\nModrinthのモデレーターによって審査、承認されるまで、他のユーザーには表示されません。"
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "ドラフト"
   },
   "project.moderation.title": {
     "message": "管理"
@@ -2858,6 +2912,12 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.learn-more": {
+    "message": "もっと詳しく"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "ステータス"
+  },
   "project.settings.title": {
     "message": "設定"
   },
@@ -2872,6 +2932,9 @@
   },
   "report.already-reported": {
     "message": "既に {title} をレポートしています"
+  },
+  "report.back-to-item": {
+    "message": "{item}に戻る"
   },
   "report.body.description": {
     "message": "可能で関連性がある場合は、リンクと画像を追加してください。空または不十分な報告は閉じられ、無視されます。"
@@ -3209,6 +3272,9 @@
   "search.filter.locked.server.sync": {
     "message": "サーバーと同期"
   },
+  "servers.manage.content.title": {
+    "message": "コンテンツ - {serverName} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "アクション"
   },
@@ -3367,6 +3433,24 @@
   },
   "settings.account.security.email.title": {
     "message": "メールドレス"
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "名前"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "私のパスキー"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "パスキーを管理"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "パスキーを追加するか、パスキーを管理できます。"
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "パスキーを削除"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "パスキーを管理"
   },
   "settings.account.security.password.action.add": {
     "message": "パスワードを追加"
@@ -3965,6 +4049,27 @@
   "ui.newsletter-button.tooltip": {
     "message": "Modrinthのニュースレターに登録する"
   },
+  "version.all-versions": {
+    "message": "全てのバージョン"
+  },
+  "version.dependency.view-project": {
+    "message": "プロジェクトを見る"
+  },
+  "version.dependency.view-version": {
+    "message": "バージョンを見る"
+  },
+  "version.edit.button": {
+    "message": "編集"
+  },
+  "version.edit.details": {
+    "message": "詳細情報を編集"
+  },
+  "version.edit.files": {
+    "message": "ファイルを編集"
+  },
+  "version.edit.metadata": {
+    "message": "メタデータを編集"
+  },
   "version.environment.none.description": {
     "message": "このバージョンの環境設定は未指定です。"
   },
@@ -3976,5 +4081,8 @@
   },
   "version.environment.unknown.title": {
     "message": "不明な環境"
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "バージョンID："
   }
 }

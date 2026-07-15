@@ -20,6 +20,81 @@
   "analytics.action.reset": {
     "message": "리셋"
   },
+  "analytics.breakdown.country": {
+    "message": "국가"
+  },
+  "analytics.breakdown.loader": {
+    "message": "로더"
+  },
+  "analytics.breakdown.project": {
+    "message": "프로젝트"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "프로젝트 상태"
+  },
+  "analytics.breakdown.project-version": {
+    "message": "프로젝트 버전"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "모두 표시"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "적게 표시"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "상위 8 표시"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours}시간"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count}개 켜짐"
+  },
+  "analytics.chart.controls.display": {
+    "message": "표시"
+  },
+  "analytics.chart.controls.modrinth-events": {
+    "message": "Modrinth 이벤트"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "빈도"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "밑에 있는 표에서 아이템을 선택해 데이터를 시각화하세요."
+  },
+  "analytics.chart.events.see-announcement": {
+    "message": "공지사항 보기"
+  },
+  "analytics.empty.no-data": {
+    "message": "이용 가능한 데이터 없음"
+  },
+  "analytics.empty.no-data-for-analytics": {
+    "message": "통계에 이용 가능한 데이터 없음"
+  },
+  "analytics.empty.no-projects": {
+    "message": "이용 가능한 프로젝트 없음"
+  },
+  "analytics.empty.no-projects-for-analytics": {
+    "message": "통계에 이용 가능한 프로젝트 없음"
+  },
+  "analytics.empty.select-project": {
+    "message": "적어도 하나의 프로젝트를 선택해 데이터를 보세요"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "릴리스"
+  },
+  "analytics.group-by.1h": {
+    "message": "1시간"
+  },
+  "analytics.group-by.6h": {
+    "message": "6시간"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} 출시됨"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "일치하는 통계 행이 없습니다"
+  },
   "app-marketing.download.description": {
     "message": "데스크톱 앱은 모든 플랫폼에서 사용할 수 있습니다. 원하는 버전을 선택하세요."
   },
@@ -1626,7 +1701,7 @@
     "message": "탐색"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Minotaur를 통해 빌드 도구와 통합하여 새 버전을 출시하는 즉시 자동 업로드가 이루어지도록 하세요"
+    "message": "Minotaur로 자신의 빌드 도구를 통합하여 새 버전 출시와 동시에 자동으로 업로드시키세요"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "다양한 생태계"
@@ -2543,14 +2618,8 @@
   "project.download.no-app": {
     "message": "Modrinth 앱을 설치하지 않으셨나요?"
   },
-  "project.download.no-versions-available": {
-    "message": "{gameVersion} 및 {platform}용 버전이 없습니다."
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 은(는) {gameVersion} 용 {platform} 을(를) 지원하지 않습니다."
-  },
-  "project.download.search-game-versions": {
-    "message": "게임 버전 검색..."
   },
   "project.download.select-game-version": {
     "message": "게임 버전 선택"

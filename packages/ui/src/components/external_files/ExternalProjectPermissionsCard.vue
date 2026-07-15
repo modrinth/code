@@ -9,6 +9,7 @@ import {
 	ReportIcon,
 	ScaleIcon,
 	SpinnerIcon,
+	TrashIcon,
 	VersionIcon,
 	XCircleIcon,
 	XIcon,
@@ -135,6 +136,10 @@ const messages = defineMessages({
 		id: 'external-files.permissions-card.add-files-to-group',
 		defaultMessage: 'Add files...',
 	},
+	removeGroup: {
+		id: 'external-files.permissions-card.remove-group',
+		defaultMessage: 'Remove group',
+	},
 	moderationReasonLabel: {
 		id: 'external-files.permissions-card.moderation-reason',
 		defaultMessage: 'Reason',
@@ -248,6 +253,26 @@ const splitFileMutation = useMutation({
 	},
 })
 
+const deleteGroupMutation = useMutation({
+	mutationFn: () => client.labrinth.attribution_internal.deleteGroup(props.group.id),
+	onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.projectId] })
+		emit('updated')
+	},
+	onError: (error: Error) => {
+		addNotification({
+			type: 'error',
+			title: formatMessage(
+				defineMessage({
+					id: 'external-files.permissions-card.remove-group-error.title',
+					defaultMessage: 'Could not remove group',
+				}),
+			),
+			text: error.message,
+		})
+	},
+})
+
 function startEditingAttribution() {
 	editingMode.value = 'attribution'
 	collapsed.value = false
@@ -278,6 +303,10 @@ function handleSplitFile(sha1: string) {
 
 function handleConfirmAddFiles(sha1s: string[]) {
 	assignFilesMutation.mutate(sha1s)
+}
+
+function handleDeleteGroup() {
+	deleteGroupMutation.mutate()
 }
 
 async function handleAddFilesToGroup(event: MouseEvent) {
@@ -781,6 +810,18 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 						@saved="stopEditing"
 						@cancel="stopEditing"
 					/>
+				</div>
+				<div v-if="isModerator" class="flex justify-end pt-2">
+					<ButtonStyled color="red" type="outlined">
+						<button :disabled="deleteGroupMutation.isPending.value" @click="handleDeleteGroup">
+							<SpinnerIcon
+								v-if="deleteGroupMutation.isPending.value"
+								class="size-4 shrink-0 animate-spin"
+							/>
+							<TrashIcon v-else class="size-4 shrink-0" />
+							{{ formatMessage(messages.removeGroup) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 		</Collapsible>

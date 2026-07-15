@@ -77,6 +77,7 @@ export namespace Labrinth {
 				status: SubscriptionStatus
 				created: string
 				metadata?: SubscriptionMetadata
+				next_charge_tax_amount?: number | null
 			}
 
 			export type SubscriptionMetadata =
@@ -373,6 +374,14 @@ export namespace Labrinth {
 				date_created: string
 			}
 
+			export type OverrideFileOnPlatform = {
+				file_path: string
+				sha1: string
+				version_id: string
+				platform_version_id: string
+				platform_project_id: string
+			}
+
 			export type AttributionGroup = {
 				id: string
 				flame_project: FlameProject | null
@@ -381,6 +390,7 @@ export namespace Labrinth {
 				attributed_by: string | null
 				files: AttributionFile[]
 				versions: AttributionVersionInfo[]
+				override_files_on_platform: OverrideFileOnPlatform[]
 			}
 
 			export type UpdateGroupRequest = {
@@ -1742,6 +1752,7 @@ export namespace Labrinth {
 			export interface ResultSearchProject {
 				project_id: string
 				project_type: string
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1779,6 +1790,7 @@ export namespace Labrinth {
 				version_id: string
 				project_id: string
 				project_types: string[]
+				all_project_types: string[]
 				slug: string | null
 				author: string
 				author_id: string | null
@@ -1830,6 +1842,19 @@ export namespace Labrinth {
 						type: 'status_change'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
 				  }
 				| {
 						type: 'thread_closure'
@@ -2222,7 +2247,64 @@ export namespace Labrinth {
 				| 'severity_desc'
 
 			export type UpdateIssueRequest = {
-				verdict: 'safe' | 'unsafe'
+				detail_id: string
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateIssueDetailRequest = {
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type UpdateGlobalIssueRequest = {
+				detail_key: string
+				verdict: DelphiReportIssueStatus
+			}
+
+			export type SearchGlobalIssueDetailsRequest = {
+				limit?: number
+				page?: number
+				query?: string | null
+			}
+
+			export type SearchGlobalIssueDetailsResponse = {
+				total: number
+				traces: GlobalIssueDetail[]
+			}
+
+			export type GetGlobalIssueDetailRequest = {
+				detail_key: string
+				limit?: number
+				after_detail_id?: string | null
+			}
+
+			export type GetGlobalIssueDetailResponse = {
+				trace: GlobalIssueDetail
+				next_after_detail_id: string | null
+			}
+
+			export type GlobalIssueDetail = {
+				detail_key: string
+				verdict: DelphiReportIssueStatus
+				local_trace_count: number
+				local_traces: GlobalIssueDetailTrace[]
+			}
+
+			export type GlobalIssueDetailTrace = {
+				detail_id: string
+				issue_id: string
+				issue_type: string
+				project_id: string
+				project_slug: string | null
+				project_name: string
+				version_id: string
+				version_number: string
+				file_id: string
+				file_name: string
+				jar: string | null
+				file_path: string
+				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus
+				effective_status: DelphiReportIssueStatus
 			}
 
 			export type SubmitProjectRequest = {
@@ -2284,6 +2366,8 @@ export namespace Labrinth {
 				decompiled_source: string | null
 				data: Record<string, unknown>
 				severity: DelphiSeverity
+				local_status: DelphiReportIssueStatus | null
+				global_status: DelphiReportIssueStatus | null
 				status: DelphiReportIssueStatus
 			}
 
@@ -2331,6 +2415,19 @@ export namespace Labrinth {
 						type: 'status_change'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'tech_review'
+						verdict: 'safe' | 'unsafe'
+				  }
+				| {
+						type: 'tech_review_entered'
+				  }
+				| {
+						type: 'tech_review_exited'
+				  }
+				| {
+						type: 'tech_review_exit_file_deleted'
 				  }
 				| {
 						type: 'thread_closure'

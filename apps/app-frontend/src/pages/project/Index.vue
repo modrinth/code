@@ -63,7 +63,6 @@
 					v-else
 					:project="data"
 					:project-v3="projectV3"
-					:is-server-project="isServerProject"
 					:show-status-badge="data.status !== 'approved'"
 					@contextmenu.prevent.stop="handleRightClick"
 					@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
@@ -107,7 +106,19 @@
 							</ButtonStyled>
 						</template>
 						<template v-else>
-							<ButtonStyled color="brand" size="large">
+							<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
+								<button v-tooltip="formatMessage(messages.alreadyInstalled)" type="button" disabled>
+									<CheckIcon />
+									{{ formatMessage(commonMessages.installedLabel) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else-if="showSwitchVersion" size="large">
+								<button type="button" @click="goToVersions">
+									<SwapIcon />
+									{{ formatMessage(messages.switchVersion) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" size="large">
 								<button
 									v-tooltip="
 										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
@@ -257,6 +268,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { SwapIcon } from '@/assets/icons/index.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import {
@@ -311,6 +323,10 @@ const messages = defineMessages({
 	installContentToInstance: {
 		id: 'app.project.install-context.install-content-to-instance',
 		defaultMessage: 'Install content to instance',
+	},
+	switchVersion: {
+		id: 'app.project.install-button.switch-version',
+		defaultMessage: 'Switch version',
 	},
 })
 
@@ -537,6 +553,13 @@ const projectHeaderMoreActions = computed(() => [
 const projectSearchUrl = computed(
 	() => `/browse/${isServerProject.value ? 'server' : data.value?.project_type}`,
 )
+
+const showSwitchVersion = computed(() => !!instance.value && installed.value)
+const onVersionsPage = computed(() => route.name === 'Versions')
+
+function goToVersions() {
+	router.push(versionsHref.value)
+}
 
 const [allLoaders, allGameVersions] = await Promise.all([
 	get_loaders().catch(handleError).then(ref),

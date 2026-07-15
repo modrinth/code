@@ -6,7 +6,7 @@
 			:description="
 				formatMessage(messages.removePasskeyConfirmDescription, { name: passkeyToRemove?.name })
 			"
-			:proceed-label="formatMessage(commonMessages.removeButton)"
+			:proceed-label="formatMessage(messages.deletePasskeyButton)"
 			@proceed="removePasskey()"
 		/>
 
@@ -70,7 +70,7 @@
 							</ButtonStyled>
 							<ButtonStyled circular>
 								<button
-									v-tooltip="formatMessage(commonMessages.removeButton)"
+									v-tooltip="formatMessage(messages.deletePasskeyButton)"
 									@click="
 										() => {
 											passkeyToRemove = passkey
@@ -88,7 +88,7 @@
 					<ButtonStyled>
 						<button @click="registerPasskey()">
 							<PlusIcon />
-							{{ formatMessage(messages.managePasskeyAddPasskey) }}
+							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled>
@@ -104,7 +104,7 @@
 		<NewModal
 			ref="addPasskeyModal"
 			width="500px"
-			:header="formatMessage(messages.managePasskeyAddPasskey)"
+			:header="formatMessage(messages.passkeyAddModalTitle)"
 		>
 			<div class="flex flex-col gap-6">
 				<div class="flex flex-col gap-2.5">
@@ -133,7 +133,7 @@
 					<ButtonStyled color="brand">
 						<button :disabled="!pendingPasskeyName" @click="finishRegisterPasskey()">
 							<PlusIcon />
-							{{ formatMessage(messages.managePasskeyAddPasskey) }}
+							{{ formatMessage(messages.managePasskeyAddPasskeyButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -189,7 +189,7 @@
 			<div>
 				<ButtonStyled>
 					<button id="manage-passkeys" @click="showPasskeyModal">
-						<UserKeyIcon /> {{ formatMessage(messages.managePasskeyTitle) }}
+						<UserKeyIcon /> {{ formatMessage(messages.managePasskeyButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -247,17 +247,21 @@ const messages = defineMessages({
 		id: 'settings.account.security.passkey.title',
 		defaultMessage: 'Manage passkeys',
 	},
+	managePasskeyButton: {
+		id: 'settings.account.security.passkey.button',
+		defaultMessage: 'Manage passkeys',
+	},
 	managePasskeyDescription: {
 		id: 'settings.account.security.passkey.description',
 		defaultMessage: 'Manage your registered passkeys, or add a new one.',
 	},
-	managePasskeyAddPasskey: {
-		id: 'settings.account.security.passkey.add',
+	managePasskeyAddPasskeyButton: {
+		id: 'settings.account.security.passkey.add.button',
 		defaultMessage: 'Add passkey',
 	},
 	managePasskeyModalLoading: {
 		id: 'settings.account.security.passkey.modal.loading',
-		defaultMessage: 'Loading passkeys…',
+		defaultMessage: 'Loading passkeys...',
 	},
 	managePasskeyModalNoPasskeys: {
 		id: 'settings.account.security.passkey.modal.no-passkeys',
@@ -275,6 +279,10 @@ const messages = defineMessages({
 		id: 'settings.account.security.passkey.modal.never-used',
 		defaultMessage: 'Never used',
 	},
+	passkeyAddModalTitle: {
+		id: 'settings.account.security.passkey.add-modal.title',
+		defaultMessage: 'Add passkey',
+	},
 	passkeyNameLabel: {
 		id: 'settings.account.security.passkey.add-modal.name.label',
 		defaultMessage: 'Name',
@@ -291,6 +299,10 @@ const messages = defineMessages({
 	renamePasskeyModalHeader: {
 		id: 'settings.account.security.passkey.rename-modal.header',
 		defaultMessage: 'Rename passkey',
+	},
+	deletePasskeyButton: {
+		id: 'settings.account.security.passkey.remove.button',
+		defaultMessage: 'Delete passkey',
 	},
 	removePasskeyConfirmTitle: {
 		id: 'settings.account.security.passkey.remove.title',

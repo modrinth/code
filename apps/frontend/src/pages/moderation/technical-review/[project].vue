@@ -11,6 +11,7 @@ import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevC
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const route = useRoute()
 
 const projectId = String(useRouteId('project'))
 
@@ -245,6 +246,8 @@ const reviewItem = computed(() => {
 	}
 })
 
+const focusedDetailId = computed(() => route.query.detail?.toString() ?? null)
+
 async function handleMarkComplete(projectId: string) {
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: ['tech-reviews'] }),
@@ -299,6 +302,7 @@ function refetch() {
 		<ModerationTechRevCard
 			v-else
 			:item="reviewItem"
+			:focused-detail-id="focusedDetailId"
 			:loading-issues="loadingIssues"
 			:decompiled-sources="decompiledSources"
 			@refetch="refetch"

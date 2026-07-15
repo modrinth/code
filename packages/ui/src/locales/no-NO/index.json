@@ -1,4 +1,7 @@
 {
+  "action.no-permission": {
+    "defaultMessage": "Du mangler tillatelse."
+  },
   "affiliate.create.button": {
     "defaultMessage": "Oppretter ny affiliatkode"
   },
@@ -32,6 +35,12 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Vis statistikk"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Kunne ikke laste inn serverinnstillinger"
+  },
+  "badge.alpha": {
+    "defaultMessage": "Alfa"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -41,8 +50,56 @@
   "badge.new": {
     "defaultMessage": "Ny"
   },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Avbryt"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} Delte CPU-er"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Feil"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Kunne ikke laste inn abonnementsdetaljer."
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB RAM"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB Lagringsplass"
+  },
+  "browse.filter-results": {
+    "defaultMessage": "Filtrér resultater..."
+  },
+  "browse.no-results": {
+    "defaultMessage": "Ingen resultater funnet for ditt søk!"
+  },
+  "browse.offline": {
+    "defaultMessage": "Du er offline akkurat nå. Koble til internett for å surfe på Modrinth!"
+  },
+  "browse.search.placeholder": {
+    "defaultMessage": "Søk etter {projectType}..."
+  },
+  "browse.selected-projects-floating-bar.aria-label": {
+    "defaultMessage": "Valgte prosjekter"
+  },
+  "browse.selected-projects-floating-bar.install": {
+    "defaultMessage": "Installer {count, plural, one {# prosjekt} other {# prosjekter}}"
+  },
+  "browse.selected-projects-leave-modal.admonition-header": {
+    "defaultMessage": "Valgte prosjekter er ikke innstallert enda"
+  },
+  "browse.selected-projects-leave-modal.header": {
+    "defaultMessage": "Valgte prosjekter er ikke innstallert enda"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "Vis:"
+  },
   "button.accept": {
     "defaultMessage": "Aksepter"
+  },
+  "button.add-server-to-instance": {
+    "defaultMessage": "Legg til server i instansen"
   },
   "button.affiliate-links": {
     "defaultMessage": "Affiliatelenker"
@@ -54,7 +111,7 @@
     "defaultMessage": "Tilbake"
   },
   "button.cancel": {
-    "defaultMessage": "Kanseller"
+    "defaultMessage": "Avbryt"
   },
   "button.change-version": {
     "defaultMessage": "Endre versjonen"
@@ -68,8 +125,14 @@
   "button.continue": {
     "defaultMessage": "Fortsett"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Kopiér filnavn"
+  },
   "button.copy-id": {
     "defaultMessage": "Kopier ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Kopiér lenke"
   },
   "button.copy-permalink": {
     "defaultMessage": "Kopier permanent lenke"
@@ -80,6 +143,9 @@
   "button.decline": {
     "defaultMessage": "Avslå"
   },
+  "button.disable": {
+    "defaultMessage": "Deaktiver"
+  },
   "button.download": {
     "defaultMessage": "Nedlast"
   },
@@ -89,11 +155,17 @@
   "button.edit": {
     "defaultMessage": "Rediger"
   },
+  "button.enable": {
+    "defaultMessage": "Aktiver"
+  },
   "button.follow": {
     "defaultMessage": "Følg"
   },
   "button.hide-snapshots": {
     "defaultMessage": "Gjøm snapshots"
+  },
+  "button.install": {
+    "defaultMessage": "Installer"
   },
   "button.max": {
     "defaultMessage": "Maks"
@@ -101,11 +173,17 @@
   "button.more-options": {
     "defaultMessage": "Flere innstillinger"
   },
+  "button.move": {
+    "defaultMessage": "Flytt"
+  },
   "button.next": {
     "defaultMessage": "Neste"
   },
   "button.open-folder": {
     "defaultMessage": "Åpne mappe"
+  },
+  "button.open-in-modrinth": {
+    "defaultMessage": "Åpne i Modrinth"
   },
   "button.play": {
     "defaultMessage": "Spill"
@@ -118,6 +196,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Fjern bilde"
+  },
+  "button.rename": {
+    "defaultMessage": "Endre navn"
   },
   "button.repair": {
     "defaultMessage": "Reparer"
@@ -148,6 +229,9 @@
   },
   "button.show-all-versions": {
     "defaultMessage": "Vis alle versjonene"
+  },
+  "button.show-file": {
+    "defaultMessage": "Vis fil"
   },
   "button.sign-in": {
     "defaultMessage": "Logg inn"
@@ -191,23 +275,38 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "content-type.content.lowercase": {
+    "defaultMessage": "innhold"
+  },
+  "content.card.select-project": {
+    "defaultMessage": "Velg {project}"
+  },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Er du sikker på at du har lyst å oppdatere {count, plural, one {# prosjekt} other {# prosjekt}} til den siste kompatible versjonen deres? Det er anbefalt at du oppdaterer innhold en-etter-en."
+    "defaultMessage": "Er du sikker på at du har lyst å oppdatere {count, plural, one {# prosjekt} other {# prosjekter}} til den siste kompatible versjonen deres? Det er anbefalt at du oppdaterer innhold én etter én."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Oppdateringsadvarsel"
   },
   "content.confirm-bulk-update.header": {
-    "defaultMessage": "Oppdater prosjekt"
+    "defaultMessage": "Oppdater prosjekter"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Hold inne Shift mens du klikker \"Oppdater alle\" for å hoppe over denne bekreftelsen i framtida."
   },
   "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "Oppdater {count, plural, one {# prosjekt} other {# prosjekt}}"
+    "defaultMessage": "Oppdater {count, plural, one {# prosjekt} other {# prosjekter}}"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Hvis du sletter en mod, så kan det påvirke verda di for alltid og gjøre at innhold mangler eller det framkommer problem når det blir lasta inn igjen."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Slettingsadvarsel"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Slett {count, number} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Slett {itemType}"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Nedgrader} other {Oppdatering}} advarsel"
@@ -230,6 +329,12 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Kople fra"
   },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "Slett likevel"
+  },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "Slett {count, number} {itemType} likevel"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} lagt til"
   },
@@ -249,13 +354,13 @@
     "defaultMessage": "{count} oppdatert"
   },
   "content.inline-backup.backing-up": {
-    "defaultMessage": "Oppretter sikkerhetskopiering..."
+    "defaultMessage": "Oppretter sikkerhetskopi..."
   },
   "content.inline-backup.backup-complete": {
     "defaultMessage": "Suksessfult oppretta sikkerhetskopiering"
   },
   "content.inline-backup.backup-failed": {
-    "defaultMessage": "Oppretting av sikkerhetskopiering feila. Du kan fortsatt gå videre."
+    "defaultMessage": "Oppretting av sikkerhetskopi feila. Du kan fortsatt gå videre."
   },
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "Ei sikkerhetskopiering holder på, det er anbefalt at du venter til den er ferdig før du går videre med handlinga."
@@ -264,10 +369,19 @@
     "defaultMessage": "Å lage ei sikkerhetskopiering kan ta flere minutt, angående størrelsen på serveren din."
   },
   "content.inline-backup.create-backup": {
-    "defaultMessage": "Opprett sikkerhetskopiering"
+    "defaultMessage": "Opprett sikkerhetskopi"
+  },
+  "content.inline-backup.instance-label": {
+    "defaultMessage": "instans"
   },
   "content.inline-backup.shift-click-hint": {
     "defaultMessage": "Hold inne Skift mens du klikker for å hoppe over bekreftelse."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Vi anbefaler at du lager ei sikkerhetskopiering før du fortsetter, sånn at du kan få tilbake {type}-en din viss noe går galt."
+  },
+  "content.inline-backup.world-label": {
+    "defaultMessage": "verden"
   },
   "content.modpack-card.content-hint-description": {
     "defaultMessage": "Modpakkeinnholdet ditt kan nå bli funnet her!"
@@ -292,6 +406,186 @@
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Legg til yttligere innhold på toppen av denne modpakka"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Søk etter {count, number} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Filnavn"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Del"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Prosjektlenker"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Prosjektnavn"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alfabetisk"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Nyeste først"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Eldste først"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sorter etter {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Oppdater alle"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Last opp filer"
+  },
+  "creation-flow.button.create-instance": {
+    "defaultMessage": "Opprett instans"
+  },
+  "creation-flow.button.create-world": {
+    "defaultMessage": "Lag verden"
+  },
+  "creation-flow.button.finish": {
+    "defaultMessage": "Fullfør"
+  },
+  "creation-flow.button.import": {
+    "defaultMessage": "Importer"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "Importer {count, plural, one {# instans} other {# instanser}}"
+  },
+  "creation-flow.modal.custom-setup.game-version.search-placeholder": {
+    "defaultMessage": "Søk etter spillversjon..."
+  },
+  "creation-flow.modal.custom-setup.icon.remove": {
+    "defaultMessage": "Fjern ikon"
+  },
+  "creation-flow.modal.custom-setup.icon.select": {
+    "defaultMessage": "Velg ikon"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.latest": {
+    "defaultMessage": "Nyeste"
+  },
+  "creation-flow.modal.custom-setup.loader-version-type.stable": {
+    "defaultMessage": "Stabil"
+  },
+  "creation-flow.modal.custom-setup.name.label": {
+    "defaultMessage": "Navn"
+  },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Skriv inn instansnavn"
+  },
+  "creation-flow.modal.custom-setup.options.no-versions-available": {
+    "defaultMessage": "Ingen versjoner tilgjengelig"
+  },
+  "creation-flow.modal.import-instance.search.placeholder": {
+    "defaultMessage": "Søk etter instansnavn"
+  },
+  "creation-flow.modal.modpack.search.no-results": {
+    "defaultMessage": "Ingen resultater funnet"
+  },
+  "creation-flow.modal.modpack.search.placeholder": {
+    "defaultMessage": "Søk etter modpakke"
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count, plural, one {# fil} other {# filer}} valgt"
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "Legg til filer..."
+  },
+  "external-files.permissions-card.assign-files-error.title": {
+    "defaultMessage": "Kunne ikke legge til filer"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(valgfritt)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "Lisens"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "Skriv noe her..."
+  },
+  "external-files.permissions-card.editor.proof-image-remove": {
+    "defaultMessage": "Fjern bilde"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Overskriv"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Opprett {type}"
+  },
+  "files.item-type.file": {
+    "defaultMessage": "fil"
+  },
+  "files.item-type.files": {
+    "defaultMessage": "filer"
+  },
+  "files.item-type.folder": {
+    "defaultMessage": "mappe"
+  },
+  "files.item-type.folders": {
+    "defaultMessage": "mapper"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Filoperasjoner er deaktivert mens operasjonen pågår."
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "Det er ingen filer eller mapper."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "Denne mappa er tom"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "Mappa fins kanskje ikke."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Kunne ikke laste inn filer"
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Nåværende plassering"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Last opp fil"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Last opp fra .zip fil"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Last opp fra .zip URL"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Oppretta"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Endra"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Navn"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Størrelse"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Avbrutt"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Feila - Fil eksisterer allerede"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Feila - {error}"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Kunne ikke laste opp {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Fil"
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} igjen"
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Installer"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
@@ -380,6 +674,9 @@
   "header.category.performance-impact": {
     "defaultMessage": "Ytelsespåvirkning"
   },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Tilbakestill til onboarding"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Burst opp til {cpus} CPU-er"
   },
@@ -452,6 +749,15 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Vi anbefaler ikke at du endrer installeringsinstillingene dine etter installering av innhold. Viss du må endre dem, gjør omstart av serveren din."
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Auto-fiks"
+  },
+  "installation-settings.linked.modpack": {
+    "defaultMessage": "modpakke"
+  },
+  "installation-settings.linked.server-project": {
+    "defaultMessage": "serverprosjekt"
+  },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader}-versjon"
   },
@@ -484,6 +790,18 @@
   },
   "installation-settings.search-game-version": {
     "defaultMessage": "Søk opp spillversjon..."
+  },
+  "installation-settings.type.instance": {
+    "defaultMessage": "instans"
+  },
+  "installation-settings.type.instance-possessive": {
+    "defaultMessage": "instansens"
+  },
+  "installation-settings.type.server": {
+    "defaultMessage": "server"
+  },
+  "installation-settings.type.server-possessive": {
+    "defaultMessage": "servers"
   },
   "installation-settings.unlink": {
     "defaultMessage": "Kople fra"
@@ -545,17 +863,68 @@
   "instances.content-install.loader-label": {
     "defaultMessage": "Laster"
   },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Navn"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Skriv inn instansnavn"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "Ny instans"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Fjern ikon"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Søk etter instans"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Velg ikon"
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Ingen innhold funnet"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Laster inn innhold..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Ingen prosjekter samsvarte med søket ditt."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Søk etter {count, number} {count, plural, one {prosjekt} other {prosjekter}}"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Ikke kompatibel"
   },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Nedgrader til {version}"
+  },
   "instances.updater-modal.header": {
     "defaultMessage": "Oppdater versjon"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Bytt modpakkeversjon"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Bytt versjon"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Gjøm manglende kompatibilitet"
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "Velg versjon"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "Oppdater likevel"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "Installer likevel"
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Laster inn versjoner..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Denne versjonen har ingen endringslogg."
@@ -643,6 +1012,9 @@
   },
   "label.password": {
     "defaultMessage": "Passord"
+  },
+  "label.played": {
+    "defaultMessage": "Spilt {ago}"
   },
   "label.project": {
     "defaultMessage": "Prosjekt"
@@ -778,6 +1150,9 @@
   },
   "locale.zh-TW": {
     "defaultMessage": "Kinesisk (Tradisjonelt)"
+  },
+  "markdown-editor.insert-button": {
+    "defaultMessage": "Sett inn"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Legg til betalingsmetode"
@@ -1526,6 +1901,18 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Uoppført av stab"
   },
+  "report.item-type.content": {
+    "defaultMessage": "innhold"
+  },
+  "report.item-type.project": {
+    "defaultMessage": "prosjekt"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "bruker"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "versjon"
+  },
   "search.filter.locked.default": {
     "defaultMessage": "Filter lukket"
   },
@@ -1601,6 +1988,258 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Laster"
   },
+  "servers.access-page.activity-log-filter.action.addon-deleted": {
+    "defaultMessage": "Sletta innhold"
+  },
+  "servers.access-page.activity-log-filter.action.addon-updated": {
+    "defaultMessage": "Oppdaterte innhold"
+  },
+  "servers.access-page.activity-log-filter.action.addon-uploaded": {
+    "defaultMessage": "Lasta opp innhold"
+  },
+  "servers.access-page.activity-log-filter.action.backup-created": {
+    "defaultMessage": "Oppretta sikkerhetskopi"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "Sletta sikkerhetskopi"
+  },
+  "servers.access-page.activity-log-filter.action.backup-renamed": {
+    "defaultMessage": "Endra navn på sikkerhetskopi"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-name": {
+    "defaultMessage": "Endra servernavn"
+  },
+  "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
+    "defaultMessage": "Endra subdomene for server"
+  },
+  "servers.access-page.activity-log-filter.action.java-version-modified": {
+    "defaultMessage": "Endra Java-versjon"
+  },
+  "servers.access-page.activity-log-filter.action.modpack-changed": {
+    "defaultMessage": "Endra modpakke"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-added": {
+    "defaultMessage": "La til port-allokasjon"
+  },
+  "servers.access-page.activity-log-filter.action.port-allocation-removed": {
+    "defaultMessage": "Fjerna port-allokasjon"
+  },
+  "servers.access-page.activity-log-filter.action.server-created": {
+    "defaultMessage": "Oppretta server"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Reparerte server"
+  },
+  "servers.access-page.activity-log-filter.add": {
+    "defaultMessage": "Legg til filter"
+  },
+  "servers.access-page.activity-log-filter.clear": {
+    "defaultMessage": "Tøm filtre"
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Instanser"
+  },
+  "servers.access-page.notification.invite-resent.title": {
+    "defaultMessage": "Invitasjon sendt på nytt"
+  },
+  "servers.access-page.notification.invite-sent.text": {
+    "defaultMessage": "Inviterte {target} som {role}."
+  },
+  "servers.access-page.notification.invite-sent.title": {
+    "defaultMessage": "Invitasjon sendt"
+  },
+  "servers.access-page.notification.member-removed.text": {
+    "defaultMessage": "Fjerna tilgang for {target}."
+  },
+  "servers.access-page.notification.member-removed.title": {
+    "defaultMessage": "Tilgang fjerna"
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "Alle"
+  },
+  "servers.access-page.role-filter.selected": {
+    "defaultMessage": "Rolle: {role}"
+  },
+  "servers.audit-log.actor.support": {
+    "defaultMessage": "Støtte"
+  },
+  "servers.audit-log.column.event": {
+    "defaultMessage": "Handlinger"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Tid"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Bruker"
+  },
+  "servers.audit-log.column.world": {
+    "defaultMessage": "Instans"
+  },
+  "servers.audit-log.event.addon-added": {
+    "defaultMessage": "La til innhold <content></content>"
+  },
+  "servers.audit-log.event.addon-changed": {
+    "defaultMessage": "Endra innhold <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted": {
+    "defaultMessage": "Sletta innhold <content></content>"
+  },
+  "servers.audit-log.event.addon-deleted-label": {
+    "defaultMessage": "Sletta innhold"
+  },
+  "servers.audit-log.event.addon-disabled": {
+    "defaultMessage": "Sletta innhold <content></content>"
+  },
+  "servers.audit-log.event.addon-enabled": {
+    "defaultMessage": "Aktiverte innhold <content></content>"
+  },
+  "servers.audit-log.event.addon-updated": {
+    "defaultMessage": "Oppdaterte innhold <content></content>"
+  },
+  "servers.audit-log.event.addon-uploaded": {
+    "defaultMessage": "Lasta opp <files></files>"
+  },
+  "servers.audit-log.event.backup-changed": {
+    "defaultMessage": "Endra sikkerhetskopi <backup></backup>"
+  },
+  "servers.audit-log.event.backup-changed-fallback": {
+    "defaultMessage": "Endra sikkerhetskopi"
+  },
+  "servers.audit-log.event.backup-created": {
+    "defaultMessage": "Oppretta sikkerhetskopi <backup></backup>"
+  },
+  "servers.audit-log.event.backup-created-fallback": {
+    "defaultMessage": "Oppretta sikkerhetskopi"
+  },
+  "servers.audit-log.event.backup-deleted": {
+    "defaultMessage": "Sletta sikkerhetskopi <backup></backup>"
+  },
+  "servers.audit-log.event.backup-deleted-fallback": {
+    "defaultMessage": "Sletta sikkerhetskopi"
+  },
+  "servers.audit-log.event.backup-renamed": {
+    "defaultMessage": "Endra navn på <from></from> til <renamed-backup></renamed-backup>"
+  },
+  "servers.audit-log.event.backup-renamed-fallback": {
+    "defaultMessage": "Endra navn på sikkerhetskopi"
+  },
+  "servers.audit-log.event.backup-restored": {
+    "defaultMessage": "Gjenoppretta sikkerhetskopi <backup></backup>"
+  },
+  "servers.audit-log.event.backup-restored-fallback": {
+    "defaultMessage": "Gjenoppretta sikkerhetskopi"
+  },
+  "servers.audit-log.event.config-changed": {
+    "defaultMessage": "Endra serverkonfigurasjon"
+  },
+  "servers.audit-log.event.console-cleared": {
+    "defaultMessage": "Tømte konsollen"
+  },
+  "servers.audit-log.event.console-command-executed": {
+    "defaultMessage": "Kjørte konsollkommando <command></command>"
+  },
+  "servers.audit-log.event.entity-list.hidden-count": {
+    "defaultMessage": "+{count, number}"
+  },
+  "servers.audit-log.event.file-changed": {
+    "defaultMessage": "Endra fil <file></file>"
+  },
+  "servers.audit-log.event.file-deleted": {
+    "defaultMessage": "Sletta fil <file></file>"
+  },
+  "servers.audit-log.event.file-edited": {
+    "defaultMessage": "Redigerte fil <file></file>"
+  },
+  "servers.audit-log.event.file-renamed": {
+    "defaultMessage": "Endra navn på <from></from> til <to></to>"
+  },
+  "servers.audit-log.event.file-uploaded": {
+    "defaultMessage": "Lasta opp fil <file></file>"
+  },
+  "servers.audit-log.event.game-version-changed": {
+    "defaultMessage": "Endra Minecraft-versjon til <version></version>"
+  },
+  "servers.audit-log.event.java-runtime-modified": {
+    "defaultMessage": "Endra Java-runtime til <vendor></vendor>"
+  },
+  "servers.audit-log.event.java-version-modified": {
+    "defaultMessage": "Endra Java-versjon til <java-version></java-version>"
+  },
+  "servers.audit-log.event.modpack-changed": {
+    "defaultMessage": "Endra modpakke"
+  },
+  "servers.audit-log.event.modpack-changed-to-modpack": {
+    "defaultMessage": "Endra modpakke til <modpack></modpack>"
+  },
+  "servers.audit-log.event.modpack-changed-to-version": {
+    "defaultMessage": "Endra modpakke til versjon <version></version>"
+  },
+  "servers.audit-log.event.port-allocation-added": {
+    "defaultMessage": "La til port-allokasjon <port></port>"
+  },
+  "servers.audit-log.event.port-allocation-removed": {
+    "defaultMessage": "Fjerna port-allokasjon <port></port>"
+  },
+  "servers.audit-log.event.server-created": {
+    "defaultMessage": "Oppretta server"
+  },
+  "servers.audit-log.event.server-metadata-changed": {
+    "defaultMessage": "Endra server-metadata"
+  },
+  "servers.audit-log.event.server-name-changed": {
+    "defaultMessage": "Endra servernavn til <name></name>"
+  },
+  "servers.audit-log.event.server-plan.cpu": {
+    "defaultMessage": "{count, plural, one {# CPU} other {# CPUer}}"
+  },
+  "servers.audit-log.event.server-plan.ram-gb": {
+    "defaultMessage": "{amount, number} GB RAM"
+  },
+  "servers.audit-log.event.server-plan.ram-mb": {
+    "defaultMessage": "{amount, number} MB RAM"
+  },
+  "servers.audit-log.event.server-plan.storage-gb": {
+    "defaultMessage": "{amount, number} GB lagringsplass"
+  },
+  "servers.audit-log.event.server-plan.storage-mb": {
+    "defaultMessage": "{amount, number} MB lagringsplass"
+  },
+  "servers.audit-log.event.server-repaired": {
+    "defaultMessage": "Reparerte server"
+  },
+  "servers.audit-log.event.server-restarted": {
+    "defaultMessage": "Restarta server"
+  },
+  "servers.audit-log.event.server-started": {
+    "defaultMessage": "Starta server"
+  },
+  "servers.audit-log.event.server-stopped": {
+    "defaultMessage": "Stoppa server"
+  },
+  "servers.audit-log.event.server-subdomain-changed": {
+    "defaultMessage": "Endra server-subdomene til <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-login": {
+    "defaultMessage": "Logga inn via SFTP"
+  },
+  "servers.audit-log.event.startup-command-modified": {
+    "defaultMessage": "Endra oppstartskommando til <command></command>"
+  },
+  "servers.audit-log.event.unknown": {
+    "defaultMessage": "Ukjent hendelse"
+  },
+  "servers.audit-log.event.user-invited": {
+    "defaultMessage": "Inviterte <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified": {
+    "defaultMessage": "Endra tillatelser for <target-user></target-user>"
+  },
+  "servers.audit-log.event.user-permission-modified-with-permissions": {
+    "defaultMessage": "Endra tillatelser for <target-user></target-user> til <permission-label>{permissions}</permission-label>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Server"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisk"
   },
@@ -1615,6 +2254,24 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Gjenopprett"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Ny server"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Logg inn"
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Ditt abonnement ble kansellert."
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Ny server"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Last inn på nytt"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Oppgrader"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Avskjedige"

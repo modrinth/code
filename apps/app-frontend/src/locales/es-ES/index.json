@@ -14,14 +14,17 @@
   "app.action-bar.install.dismiss": {
     "message": "Descartar"
   },
-  "app.action-bar.install.failed": {
-    "message": "La instalación falló"
+  "app.action-bar.install.open-instance": {
+    "message": "Abrir instancia"
   },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "La instalación falló porque la aplicación se cerró."
+  "app.action-bar.install.retry": {
+    "message": "Reintentar"
   },
-  "app.action-bar.install.failed-network": {
-    "message": "La instalación falló debido a un error de red."
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instancia desconocida"
+  },
+  "app.action-bar.installs": {
+    "message": "Instalaciones"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Establecer como instancia principal"
@@ -113,6 +116,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Mostrar tiempo de juego"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Automáticamente omite confirmaciones de bajo riesgo como modpacks duplicados, eliminación de contenido normal, actualizaciones masivas, desvinculando modpacks, y mensajes de reparación. Advertencias importantes seguirán siendo mostradas."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Omitir advertencias no esenciales"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Activa la posibilidad de alternar la barra lateral."
   },
@@ -157,9 +166,6 @@
   },
   "app.browse.discover-servers": {
     "message": "Descubrir servidores"
-  },
-  "app.browse.hide-added-servers": {
-    "message": "Ocultar servidores ya añadidos"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -263,9 +269,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Buscar {count} mundos..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Contenido obligatorio"
-  },
   "app.modal.install-to-play.header": {
     "message": "Instala para jugar"
   },
@@ -275,26 +278,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpack requerido"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requiere ciertos mods. Pulsa Instalar para instalar los archivos requeridos de Modrinth y luego el launcher te enviara directo al servidor."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instancia compartida"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instancia de servidor compartida"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Ver contenido"
   },
   "app.modal.update-to-play.header": {
     "message": "Actualiza para jugar"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Actualización requerida"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Una actualización es requerida para jugar {name}. Por favor actualízala a la versión más reciente para ejecutar el juego."
@@ -919,26 +910,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader proporcionado por el servidor"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Un archivo solo es revisado si es subido a Modrinth, independientemente de su formato de archivo (incluyendo .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "No mostrar esta advertencia otra vez"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Confirmar instalación"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Instalar de todos modos"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "El malware es normalmente distribuido por archivos de modpack que son normalmente compartidas en aplicaciones como Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "No pudimos encontrar este archivo en Modrinth. Recomendamos solo instalar archivos de sitios de confianza."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Advertencia de archivo desconocido"
   }
 }

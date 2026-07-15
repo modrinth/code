@@ -11,6 +11,81 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-14T22:14:08+00:00`,
+		product: 'app',
+		version: '0.15.11',
+		body: `## Added
+- Added warning when installing unknown mods.
+
+## Changed
+- Enhanced the warning pop-up when installing unknown modpacks to help mitigate ongoing scams.
+  - The primary action is now to not install, to force users to actually read the message and not skip through it.
+  - It will no longer pop up for mrpacks that contain all Modrinth content.
+  - It will now show the external content so that the user is informed of what exactly they are installing.`,
+	},
+	{
+		date: `2026-07-13T19:00:42+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
+		date: `2026-07-10T17:38:17+00:00`,
+		product: 'app',
+		version: '0.15.10',
+		body: `## Added
+- Added new advanced filter category to Discover content.
+- Added options to exclude plugins and data packs from mod search
+- Added options to exclude mods and plugins from data pack search
+
+## Fixed
+- Instance edits not appearing to be immediately saved.
+- Fixed search cache being way longer than intended. Search results should now be cached for no more than 10 minutes, making it more possible to find newer or more recently updated content.
+- Fixed it being impossible to respond to the ad consent banner.
+- Improved installation issues
+  - Added better error handling, with a "Copy details" button on the frontend for the failure notifications + shows up after 30 seconds of no recorded progress - so support can investigate failures and pass it on to us
+  - Changed "preparing instance" stage -> "Queued to  install" - now handles maximum three install jobs at a time to prevent install jobs from being bricked.
+  - Improves download tracking by reporting download progress live rather than after each modpack content file is downloaded`,
+	},
+	{
+		date: `2026-07-10T17:38:17+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed the empty state of the download modal when an unsupported combination of loaders and versions are selected.`,
+	},
+	{
+		date: `2026-07-08T22:58:25+00:00`,
+		product: 'web',
+		body: `## Changed
+- Revised design for the project download modal.`,
+	},
+	{
+		date: `2026-07-08T15:05:35+00:00`,
+		product: 'web',
+		body: `## Added
+- Added new advanced filter category to Discover content.
+- Added options to exclude plugins and data packs from mod search
+- Added options to exclude mods and data packs from plugin search
+- Added options to exclude mods and plugins from data pack search`,
+	},
+	{
+		date: `2026-07-06T22:19:13+00:00`,
+		product: 'app',
+		version: '0.15.8',
+		body: `## Changed
+- Updated the version pages to use the new design.
+
+## Fixed
+- Fixed project and version links from an instance not being aware of the instance you're coming from.
+- Fixed Files tab preloading files which weren't actually editable/viewable which caused a memory leak.`,
+	},
+	{
+		date: `2026-07-06T22:19:13+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed Files tab preloading files which weren't actually editable/viewable which caused a memory leak.`,
+	},
+	{
 		date: `2026-07-05T01:48:48+00:00`,
 		product: 'app',
 		version: '0.15.7',

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO override_file_sources (sha1, file_id, file_path)\n            SELECT source.sha1, $2, source.file_path\n            FROM UNNEST($1::BYTEA[], $3::TEXT[]) AS source(sha1, file_path)\n            ON CONFLICT DO NOTHING\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "ByteaArray",
+        "Int8",
+        "TextArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c1482e5ded6536a24937a9396a3f141270b3acf96ec832a50b5f7c572e255947"
+}

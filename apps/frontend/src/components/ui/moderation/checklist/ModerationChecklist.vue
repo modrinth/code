@@ -478,7 +478,6 @@ import {
 	handleKeybind,
 	initializeActionState,
 	kebabToTitleCase,
-	keybinds,
 	type MultiSelectChipsAction,
 	processMessage,
 	type Stage,
@@ -533,6 +532,7 @@ import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
+const keybinds = useModerationKeybinds()
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
@@ -1207,6 +1207,29 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryWithhold: () => sendMessage('withheld'),
 				tryEditMessage: goBackToStages,
 
+				tryCopyLink: async (permalink: boolean, relative: boolean, page: boolean) => {
+					let url = ``
+					if (relative) {
+						url += `${globalThis.location.origin}`
+					} else {
+						url += `https://modrinth.com`
+					}
+
+					if (permalink) {
+						url += `/project/${projectV2.value.id}`
+					} else {
+						url += `/${projectV2.value.project_type}/${projectV2.value.slug}`
+					}
+
+					if (page) {
+						url += `/${globalThis.location.pathname.split('/').slice(3).join('/')}`
+					}
+
+					await navigator.clipboard.writeText(url)
+				},
+
+				tryCopyId: async () => await navigator.clipboard.writeText(projectV2.value.id),
+
 				tryToggleAction: (actionIndex: number) => {
 					const action = visibleActions.value[actionIndex]
 					if (action) {
@@ -1266,7 +1289,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				},
 			},
 		},
-		keybinds,
+		Object.values(keybinds.value),
 	)
 }
 

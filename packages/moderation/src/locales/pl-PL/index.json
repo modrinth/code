@@ -17,17 +17,29 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Dodaj adres Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Dodaj prawidłowy adres URL i nazwę lub identyfikator SPDX dla swojej niestandardowej licencji."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Dodaj szczegóły dotyczące licencji"
+  },
   "nags.add-links-server.description": {
-    "defaultMessage": "Dodaj wszelkie odpowiednie linki skierowane poza Modrinth, takie jak strona, sklep lub zaproszenie Discord."
+    "defaultMessage": "Dodaj wszelkie odpowiednie linki skierowane poza Modrinth, takie jak strona internetowa projektu, sklep lub zaproszenie Discord."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Dodaj zewnętrzne linki"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Dodaj wszelkie odpowiednie linki skierowane poza Modrinth, takie jak kod źródłowy, śledzenie problemu lub zaproszenie Discord."
+    "defaultMessage": "Dodaj wszelkie odpowiednie linki skierowane poza Modrinth, takie jak kod źródłowy, śledzenie problemów lub zaproszenie Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Dodaj zewnętrzne linki"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Wybrano wszystkie możliwe języki. Podaj tylko języki, które są faktycznie wspierane przez Twój serwer."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Wybierz odpowiednie języki"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Wybrano {totalAvailableTags, plural, one {jedyny dostępny tag} other {wszystkie z # dostępnych tagów}}. To mija się z celem tagów, które mają pomóc użytkownikom znaleźć to, czego szukają. Wybierz tylko te tagi, które opisują Twój projekt."
@@ -51,13 +63,13 @@
     "defaultMessage": "Edytuj podsumowanie"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Edytuj etykiety"
+    "defaultMessage": "Edytuj tagi"
   },
   "nags.edit-title.title": {
     "defaultMessage": "Edytuj tytuł"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "Wyróżniony obraz galerii jest często tym, co robi pierwsze wrażenie dla twojego projektu."
+    "defaultMessage": "Wyróżniony obraz galerii często definiuje jakie pierwsze wrażenie zrobi twój projekt."
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Wyróżnij obraz z galerii"
@@ -69,7 +81,7 @@
     "defaultMessage": "Twój {type} używa licencji, która wymaga dostępności kodu źródłowego. Podaj link do kodu źródłowego lub plik ze źródłami dla każdej dodatkowej wersji albo rozważ użycie innej licencji."
   },
   "nags.gpl-license-source-required.title": {
-    "defaultMessage": "Podaj kod źródłowy"
+    "defaultMessage": "Udostępnij kod źródłowy"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Niektóre z Twoich linków zewnętrznych są identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
@@ -171,10 +183,10 @@
     "defaultMessage": "Wybierz licencję"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "Wybierz tagi, które dotyczą twojego projektu, żeby ułatwić znalezienie użytkownikom."
+    "defaultMessage": "Wybierz tagi, które dotyczą twojego projektu, żeby ułatwić znalezienie go użytkownikom."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Wybierz etykiety"
+    "defaultMessage": "Wybierz tagi"
   },
   "nags.server.title": {
     "defaultMessage": "Odwiedź ustawienia serwera"
@@ -192,7 +204,7 @@
     "defaultMessage": "Odwiedź pulpit uprawnień"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Odwiedź ustawienia etykiet"
+    "defaultMessage": "Odwiedź ustawienia tagów"
   },
   "nags.settings.title": {
     "defaultMessage": "Odwiedź ogólne ustawienia"
@@ -207,7 +219,7 @@
     "defaultMessage": "Twoje podsumowanie nie powinno zawierać formatowania, podziałów wiersza, specjalnych znaków lub linków, ponieważ podsumowanie wyświetla tylko prosty tekst."
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "Wyjaśnij podsumowanie"
+    "defaultMessage": "Uporządkuj podsumowanie"
   },
   "nags.summary-too-short.description": {
     "defaultMessage": "Twoje podsumowanie składa się z {length, plural, one {# znaku} other {# znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć informatywne i ciekawe podsumowanie."
@@ -220,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Oczyść nazwę"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Wybrano {languageCount, plural, one {# język} few {# języki} other {# języków}}. Podaj tylko języki, które są faktycznie wspierane przez Twój serwer."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Wybierz odpowiednie języki"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój serwer był łatwiejszy do znalezienia."
