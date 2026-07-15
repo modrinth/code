@@ -46,10 +46,14 @@ export default function () {
 							.suggestedStatus('flagged')
 							.severity('low')
 							.message(optimizationMsg)
-  						.fix(fix().project((patch) => {
-							patch.categories = project.value.categories.filter((c) => c !== 'optimization')
-							patch.additional_categories = project.value.additional_categories.filter((c) => c !== 'optimization',)
-						})),
+							.fix(
+								fix().project((patch) => {
+									patch.categories = project.value.categories.filter((c) => c !== 'optimization')
+									patch.additional_categories = project.value.additional_categories.filter(
+										(c) => c !== 'optimization',
+									)
+								}),
+							),
 					),
 
 				toggle('resolutions_misused', 'Resolutions')
@@ -59,10 +63,14 @@ export default function () {
 							.suggestedStatus('flagged')
 							.severity('low')
 							.message(resolutionsMsg)
-							.fix(fix().project((patch) => {
-								patch.categories = project.value.categories.filter((c) => !resolutionTags.has(c),)
-								patch.additional_categories = project.value.additional_categories.filter((c) => !resolutionTags.has(c),)
-							})),
+							.fix(
+								fix().project((patch) => {
+									patch.categories = project.value.categories.filter((c) => !resolutionTags.has(c))
+									patch.additional_categories = project.value.additional_categories.filter(
+										(c) => !resolutionTags.has(c),
+									)
+								}),
+							),
 					),
 			),
 		)

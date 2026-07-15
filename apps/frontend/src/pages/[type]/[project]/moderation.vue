@@ -133,8 +133,6 @@
 	</template>
 </template>
 <script setup lang="ts">
-defineEmits(['on-download', 'delete-version'])
-
 import type { Labrinth } from '@modrinth/api-client'
 import { IssuesIcon, SpinnerIcon } from '@modrinth/assets'
 import {
@@ -157,6 +155,8 @@ import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
+
+defineEmits(['on-download', 'delete-version'])
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()

@@ -29,9 +29,7 @@ export default function () {
 		harmful: md('checklist/messages/other-rules/prohibited-content/harmful'),
 		misleading: md('checklist/messages/other-rules/prohibited-content/misleading'),
 		impersonation: md('checklist/messages/other-rules/prohibited-content/impersonation'),
-		'false-endorsement': md(
-			'checklist/messages/other-rules/prohibited-content/false-endorsement',
-		),
+		'false-endorsement': md('checklist/messages/other-rules/prohibited-content/false-endorsement'),
 		profanity: md('checklist/messages/other-rules/prohibited-content/profanity'),
 		'undisclosed-upload': md(
 			'checklist/messages/other-rules/prohibited-content/undisclosed-upload',

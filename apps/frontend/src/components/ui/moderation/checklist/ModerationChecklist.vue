@@ -402,8 +402,8 @@ import {
 import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import { computed, nextTick, provide, ref, toRaw } from 'vue'
 import type { Component } from 'vue'
+import { computed, nextTick, provide, ref, toRaw } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -416,7 +416,7 @@ import {
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
-import { NODE_META_KEY, STATE_KEY, type ActiveAction, type LiveNode } from './checklist-context'
+import { type ActiveAction, type LiveNode,NODE_META_KEY, STATE_KEY } from './checklist-context'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 import NodeRenderer from './NodeRenderer.vue'
