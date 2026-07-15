@@ -150,6 +150,8 @@ pub struct SharedInstanceUpdateDiff {
     pub file_name: Option<String>,
     pub current_version_name: Option<String>,
     pub new_version_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub config_file_count: Option<usize>,
     #[serde(default, skip_serializing_if = "is_false")]
     pub disabled: bool,
 }
@@ -165,6 +167,7 @@ pub enum SharedInstanceUpdateDiffType {
     ModpackUnlinked,
     GameVersionUpdated,
     LoaderUpdated,
+    ConfigFilesUpdated,
 }
 
 pub(super) fn is_false(value: &bool) -> bool {

@@ -3,6 +3,10 @@ use super::diff::*;
 use super::install::*;
 use super::types::*;
 use super::*;
+use async_walkdir::{Filtering, WalkDir};
+use async_zip::{Compression, ZipEntryBuilder};
+use futures::StreamExt;
+use sha1_smol::Sha1;
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -119,12 +123,14 @@ pub async fn get_shared_instance_publish_preview(
     };
     ensure_owner(&attachment)?;
 
-    let version = match get_latest_remote_version_optional_unavailable(
-        &attachment.id,
-        &state,
-    )
-    .await?
-    {
+    let (version, snapshot) = tokio::try_join!(
+        get_latest_remote_version_optional_unavailable(
+            &attachment.id,
+            &state,
+        ),
+        collect_publish_snapshot(&metadata, &state),
+    )?;
+    let version = match version {
         SharedInstanceRemoteResponse::Available(version) => version,
         SharedInstanceRemoteResponse::Unavailable(reason) => {
             clear_shared_instance_if_current_user(
@@ -136,8 +142,13 @@ pub async fn get_shared_instance_publish_preview(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
-    let diffs =
-        shared_instance_publish_diffs(&metadata, &version, &state).await?;
+    let diffs = shared_instance_publish_diffs(
+        &metadata,
+        &version,
+        &snapshot,
+        &state,
+    )
+    .await?;
     set_shared_instance_publish_status(
         instance_id,
         &attachment,
@@ -178,6 +189,7 @@ pub(super) async fn remote_publish_content(
         version
             .external_files
             .iter()
+            .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
             .map(|file| file.file_name.clone())
             .collect(),
     ))
@@ -309,41 +321,64 @@ pub(super) async fn current_shared_content(
     Ok((version_ids, external_files))
 }
 
-pub(super) async fn current_publish_content(
-    metadata: &crate::state::InstanceMetadata,
-    state: &State,
-) -> crate::Result<(Vec<String>, HashSet<String>)> {
-    let (mut version_ids, external_files) =
-        collect_publish_content(&metadata.instance.id, state).await?;
-    if let Some(modpack_id) = shared_modpack_id(&metadata.link) {
-        version_ids.retain(|id| id != &modpack_id);
-    }
-    dedupe_strings(&mut version_ids);
-
-    Ok((
-        version_ids,
-        external_files
-            .into_iter()
-            .map(|file| file.file_name)
-            .collect(),
-    ))
+pub(super) struct CurrentPublishSnapshot {
+    pub(super) version_ids: Vec<String>,
+    pub(super) external_files: Vec<ExternalFileCandidate>,
+    pub(super) disabled_project_ids: HashSet<String>,
+    pub(super) disabled_version_ids: Vec<String>,
+    pub(super) disabled_external_files: HashSet<String>,
+    pub(super) config_files: Vec<ConfigFile>,
 }
 
-pub(super) async fn current_publish_disabled_content(
+pub(super) async fn collect_publish_snapshot(
     metadata: &crate::state::InstanceMetadata,
     state: &State,
-) -> crate::Result<(HashSet<String>, HashSet<String>)> {
-    let items =
-        crate::state::list_content(&metadata.instance.id, None, None, state)
-            .await?;
+) -> crate::Result<CurrentPublishSnapshot> {
+    let instance_path = state
+        .directories
+        .instances_dir()
+        .join(&metadata.instance.path);
+    let (items, config_files) = tokio::try_join!(
+        crate::state::list_content(
+            &metadata.instance.id,
+            None,
+            None,
+            state,
+        ),
+        collect_config_files(&instance_path),
+    )?;
     let modpack_id = shared_modpack_id(&metadata.link);
-    let mut project_ids = HashSet::new();
     let mut version_ids = Vec::new();
     let mut seen_version_ids = HashSet::new();
-    let mut external_files = HashSet::new();
+    let mut external_files = Vec::new();
+    let mut seen_external_files = HashSet::new();
+    let mut disabled_project_ids = HashSet::new();
+    let mut disabled_version_ids = Vec::new();
+    let mut seen_disabled_version_ids = HashSet::new();
+    let mut disabled_external_files = HashSet::new();
 
     for item in items {
         if item.enabled {
+            if let Some(version) = item.version {
+                if seen_version_ids.insert(version.id.clone()) {
+                    version_ids.push(version.id);
+                }
+                continue;
+            }
+
+            if item.file_path.is_empty() {
+                continue;
+            }
+
+            let file_type = file_type(item.project_type);
+            let external_key = format!("{}:{file_type}", item.file_path);
+            if seen_external_files.insert(external_key) {
+                external_files.push(ExternalFileCandidate {
+                    file_name: item.file_name,
+                    file_type,
+                    source: ExternalFileSource::InstanceFile(item.file_path),
+                });
+            }
             continue;
         }
 
@@ -355,12 +390,12 @@ pub(super) async fn current_publish_disabled_content(
         }
 
         if let Some(project) = item.project.as_ref() {
-            project_ids.insert(project.id.clone());
+            disabled_project_ids.insert(project.id.clone());
         }
 
         if let Some(version) = item.version {
-            if seen_version_ids.insert(version.id.clone()) {
-                version_ids.push(version.id);
+            if seen_disabled_version_ids.insert(version.id.clone()) {
+                disabled_version_ids.push(version.id);
             }
             continue;
         }
@@ -369,16 +404,17 @@ pub(super) async fn current_publish_disabled_content(
             continue;
         }
 
-        external_files.insert(enabled_file_name(&item.file_name));
+        disabled_external_files.insert(enabled_file_name(&item.file_name));
     }
 
-    project_ids.extend(
-        shared_versions_by_project(&version_ids, state)
-            .await?
-            .into_keys(),
-    );
-
-    Ok((project_ids, external_files))
+    Ok(CurrentPublishSnapshot {
+        version_ids,
+        external_files,
+        disabled_project_ids,
+        disabled_version_ids,
+        disabled_external_files,
+        config_files,
+    })
 }
 
 pub(super) async fn shared_versions_by_project(
@@ -552,8 +588,14 @@ pub(super) async fn publish_current_content(
     )
     .await?;
     let modpack_id = shared_modpack_id(&metadata.link);
-    let (modrinth_ids, external_files) =
-        collect_publish_content(instance_id, state).await?;
+    let snapshot = collect_publish_snapshot(&metadata, state).await?;
+    let modrinth_ids = snapshot.version_ids;
+    let mut external_files = snapshot.external_files;
+    external_files.push(ExternalFileCandidate {
+        file_name: CONFIG_BUNDLE_FILE_NAME.to_string(),
+        file_type: CONFIG_BUNDLE_FILE_TYPE.to_string(),
+        source: ExternalFileSource::ConfigBundle(snapshot.config_files),
+    });
     tracing::debug!(
         instance_id,
         shared_instance_id,
@@ -630,46 +672,84 @@ pub(super) async fn publish_current_content(
     Ok(response.version)
 }
 
-pub(super) async fn collect_publish_content(
-    instance_id: &str,
-    state: &State,
-) -> crate::Result<(Vec<String>, Vec<ExternalFileCandidate>)> {
-    let items =
-        crate::state::list_content(instance_id, None, None, state).await?;
-
-    let mut modrinth_ids = Vec::new();
-    let mut seen_modrinth_ids = HashSet::new();
-    let mut external_files = Vec::new();
-    let mut seen_external_files = HashSet::new();
-
-    for item in items {
-        if !item.enabled {
-            continue;
-        }
-
-        if let Some(version) = item.version {
-            if seen_modrinth_ids.insert(version.id.clone()) {
-                modrinth_ids.push(version.id);
+pub(super) async fn collect_config_files(
+    instance_path: &std::path::Path,
+) -> crate::Result<Vec<ConfigFile>> {
+    let config_path = instance_path.join(CONFIG_DIRECTORY);
+    crate::util::io::create_dir_all(&config_path).await?;
+    let mut files = Vec::new();
+    let filter_root = config_path.clone();
+    let mut walker = WalkDir::new(&config_path).filter(move |entry| {
+        let filter_root = filter_root.clone();
+        async move {
+            let excluded = entry
+                .path()
+                .strip_prefix(&filter_root)
+                .is_ok_and(is_excluded_config_path);
+            if excluded {
+                Filtering::IgnoreDir
+            } else {
+                Filtering::Continue
             }
+        }
+    });
+
+    while let Some(entry) = walker.next().await {
+        let entry = entry.map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Failed to read config directory: {error}"
+            ))
+        })?;
+        if !entry.file_type().await?.is_file()
+            || !is_supported_config_file(&entry.path())
+        {
             continue;
         }
 
-        if item.file_path.is_empty() {
+        let entry_path = entry.path();
+        let relative_path = entry_path.strip_prefix(&config_path)?;
+        if is_excluded_config_path(relative_path) {
             continue;
         }
-
-        let file_type = file_type(item.project_type);
-        let external_key = format!("{}:{file_type}", item.file_path);
-        if seen_external_files.insert(external_key) {
-            external_files.push(ExternalFileCandidate {
-                file_name: item.file_name,
-                file_type,
-                file_path: item.file_path,
-            });
-        }
+        let path = relative_path.to_string_lossy().replace('\\', "/");
+        let bytes = crate::util::io::read(entry_path).await?;
+        let hash = Sha1::from(&bytes).hexdigest();
+        files.push(ConfigFile { path, hash });
     }
 
-    Ok((modrinth_ids, external_files))
+    files.sort_by(|left, right| left.path.cmp(&right.path));
+    Ok(files)
+}
+
+fn is_supported_config_file(path: &std::path::Path) -> bool {
+    path.extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
+}
+
+async fn config_bundle_bytes(
+    config_path: &std::path::Path,
+    files: &[ConfigFile],
+) -> crate::Result<Vec<u8>> {
+    let mut writer = async_zip::base::write::ZipFileWriter::new(Vec::new());
+    for file in files {
+        let bytes = crate::util::io::read(config_path.join(&file.path)).await?;
+        writer
+            .write_entry_whole(
+                ZipEntryBuilder::new(
+                    file.path.clone().into(),
+                    Compression::Deflate,
+                ),
+                &bytes,
+            )
+            .await?;
+    }
+
+    Ok(writer.close().await?)
 }
 
 pub(super) fn shared_modpack_id(link: &InstanceLink) -> Option<String> {
@@ -718,17 +798,37 @@ pub(super) async fn upload_external_files(
                     upload.file_name
                 ))
             })?;
-        let path = state
-            .directories
-            .instances_dir()
-            .join(instance_path)
-            .join(&candidate.file_path);
-        let bytes = crate::util::io::read(path).await?;
-        let response = REQWEST_CLIENT
-            .put(&upload.url)
-            .body(bytes)
-            .send()
-            .await?;
+        let (bytes, config_files) = match &candidate.source {
+            ExternalFileSource::InstanceFile(file_path) => {
+                let path = state
+                    .directories
+                    .instances_dir()
+                    .join(instance_path)
+                    .join(file_path);
+                (crate::util::io::read(path).await?, None)
+            }
+            ExternalFileSource::ConfigBundle(files) => {
+                let config_path = state
+                    .directories
+                    .instances_dir()
+                    .join(instance_path)
+                    .join(CONFIG_DIRECTORY);
+                (
+                    config_bundle_bytes(&config_path, files).await?,
+                    Some(files),
+                )
+            }
+        };
+        let mut request = REQWEST_CLIENT.put(&upload.url);
+        if let Some(files) = config_files {
+            request = request
+                .header(reqwest::header::CONTENT_TYPE, "application/zip")
+                .header(
+                    CONFIG_BUNDLE_METADATA_HEADER,
+                    serde_json::to_string(files)?,
+                );
+        }
+        let response = request.body(bytes).send().await?;
 
         if !response.status().is_success() {
             return Err(crate::ErrorKind::OtherError(format!(

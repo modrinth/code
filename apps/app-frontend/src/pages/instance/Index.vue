@@ -383,8 +383,10 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { instance_listener, process_listener } from '@/helpers/events'
 import {
+	getSharedInstanceUnavailableReason,
 	install_existing_instance,
 	install_pack_to_existing_instance,
+	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
 import { get, get_full_path, kill, run } from '@/helpers/instance'
@@ -427,6 +429,7 @@ const instance = ref<GameInstance>()
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)
 const loading = ref(false)
+const checkingSharedInstanceLaunch = ref(false)
 const subpagePending = ref(false)
 const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
@@ -470,11 +473,11 @@ const {
 	actionsLocked: sharedInstanceActionsLocked,
 	expectedUserId: sharedInstanceExpectedUserId,
 	manager: sharedInstanceManager,
+	refreshUpdatePreview: refreshSharedInstanceUpdatePreview,
 	setUnavailable: setSharedInstanceUnavailable,
 	signedOut: sharedInstanceSignedOut,
 	unavailableManager: sharedInstanceUnavailableManager,
 	unavailableReason: sharedInstanceUnavailableReason,
-	updatePreview: sharedInstanceUpdatePreview,
 	wrongAccount: sharedInstanceWrongAccount,
 } = sharedInstanceState
 const sharedInstanceTooltip = computed(() =>
@@ -737,14 +740,30 @@ async function handleSharedInstanceUnavailable(
 
 const startInstance = async (context: string) => {
 	if (!instance.value) return
-	if (loading.value || playing.value) return
+	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
 
+	const instanceId = instance.value.id
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
 	const canCheckSharedInstanceUpdate =
 		isSharedInstanceMember && !sharedInstanceActionsLocked.value && !offline.value
 
 	if (canCheckSharedInstanceUpdate) {
-		const preview = sharedInstanceUpdatePreview.value
+		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>>
+		checkingSharedInstanceLaunch.value = true
+		try {
+			preview = await refreshSharedInstanceUpdatePreview()
+		} catch (error) {
+			if (isSharedInstanceUnavailableError(error)) {
+				await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
+			} else {
+				notifySharedInstanceError(error)
+			}
+			return
+		} finally {
+			checkingSharedInstanceLaunch.value = false
+		}
+
+		if (instance.value?.id !== instanceId) return
 
 		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
 			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {

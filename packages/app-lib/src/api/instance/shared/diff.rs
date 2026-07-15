@@ -3,6 +3,94 @@ use super::publish::*;
 use super::types::*;
 use super::*;
 
+#[derive(Clone, Copy)]
+enum ConfigDiffDirection {
+    Update,
+    Publish,
+}
+
+fn shared_config_diffs(
+    local: &[ConfigFile],
+    remote: &[ConfigFile],
+    direction: ConfigDiffDirection,
+) -> Vec<SharedInstanceUpdateDiff> {
+    let (current, latest) = match direction {
+        ConfigDiffDirection::Update => (local, remote),
+        ConfigDiffDirection::Publish => (remote, local),
+    };
+    let current = current
+        .iter()
+        .map(|file| (file.path.clone(), file.hash.clone()))
+        .collect::<HashMap<_, _>>();
+    let latest = latest
+        .iter()
+        .map(|file| (file.path.clone(), file.hash.clone()))
+        .collect::<HashMap<_, _>>();
+    let changed_file_count = latest
+        .iter()
+        .filter(|(path, hash)| current.get(*path) != Some(*hash))
+        .count()
+        + current
+            .keys()
+            .filter(|path| !latest.contains_key(*path))
+            .count();
+    if changed_file_count == 0 {
+        return Vec::new();
+    }
+
+    vec![SharedInstanceUpdateDiff {
+        type_: SharedInstanceUpdateDiffType::ConfigFilesUpdated,
+        project_id: None,
+        project_name: None,
+        file_name: None,
+        current_version_name: None,
+        new_version_name: None,
+        config_file_count: Some(changed_file_count),
+        disabled: false,
+    }]
+}
+
+async fn remote_config_files(
+    version: &InstanceVersionResponse,
+) -> crate::Result<Vec<ConfigFile>> {
+    let Some(bundle) = version
+        .external_files
+        .iter()
+        .find(|file| file.file_type == CONFIG_BUNDLE_FILE_TYPE)
+    else {
+        return Ok(Vec::new());
+    };
+    let response = REQWEST_CLIENT.get(&bundle.url).send().await?;
+    if !response.status().is_success() {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance config metadata request failed with status {}",
+            response.status()
+        ))
+        .into());
+    }
+    let metadata = response
+        .headers()
+        .get(CONFIG_BUNDLE_METADATA_HEADER)
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance config bundle is missing file metadata"
+                    .to_string(),
+            )
+        })?
+        .to_str()
+        .map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Shared instance config metadata is invalid: {error}"
+            ))
+        })?;
+
+    let mut files = serde_json::from_str::<Vec<ConfigFile>>(metadata)?;
+    files.retain(|file| {
+        !is_excluded_config_path(std::path::Path::new(&file.path))
+    });
+    Ok(files)
+}
+
 pub(super) async fn shared_instance_update_diffs(
     metadata: &crate::state::InstanceMetadata,
     version: &InstanceVersionResponse,
@@ -13,8 +101,19 @@ pub(super) async fn shared_instance_update_diffs(
     let current_modpack_id = shared_modpack_id(&metadata.link);
     let modpack_unlinked =
         current_modpack_id.is_some() && remote_modpack_id.is_none();
-    let (current_version_ids, current_external_files) =
-        current_shared_content(metadata, modpack_unlinked, state).await?;
+    let instance_path = state
+        .directories
+        .instances_dir()
+        .join(&metadata.instance.path);
+    let (
+        (current_version_ids, current_external_files),
+        local_config_files,
+        remote_config_files,
+    ) = tokio::try_join!(
+        current_shared_content(metadata, modpack_unlinked, state),
+        collect_config_files(&instance_path),
+        remote_config_files(version),
+    )?;
     let (latest_version_ids, latest_external_files) =
         remote_shared_content(version);
     let removed_disabled_project_ids = HashSet::new();
@@ -30,6 +129,11 @@ pub(super) async fn shared_instance_update_diffs(
         state,
     )
     .await?;
+    diffs.extend(shared_config_diffs(
+        &local_config_files,
+        &remote_config_files,
+        ConfigDiffDirection::Update,
+    ));
 
     let mut configuration_diffs = shared_instance_configuration_diffs(
         current_modpack_id.as_deref(),
@@ -51,6 +155,7 @@ pub(super) async fn shared_instance_update_diffs(
 pub(super) async fn shared_instance_publish_diffs(
     metadata: &crate::state::InstanceMetadata,
     version: &InstanceVersionResponse,
+    snapshot: &CurrentPublishSnapshot,
     state: &State,
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let remote_modpack_id =
@@ -58,23 +163,53 @@ pub(super) async fn shared_instance_publish_diffs(
     let current_modpack_id = shared_modpack_id(&metadata.link);
     let modpack_unlinked =
         remote_modpack_id.is_some() && current_modpack_id.is_none();
-    let (latest_version_ids, latest_external_files) =
-        remote_publish_content(version, modpack_unlinked, state).await?;
-    let (current_version_ids, current_external_files) =
-        current_publish_content(metadata, state).await?;
-    let (removed_disabled_project_ids, removed_disabled_external_files) =
-        current_publish_disabled_content(metadata, state).await?;
+    let disabled_versions = async {
+        if snapshot.disabled_version_ids.is_empty() {
+            Ok(HashMap::new())
+        } else {
+            shared_versions_by_project(&snapshot.disabled_version_ids, state)
+                .await
+        }
+    };
+    let (
+        (latest_version_ids, latest_external_files),
+        disabled_versions,
+        remote_config_files,
+    ) = tokio::try_join!(
+        remote_publish_content(version, modpack_unlinked, state),
+        disabled_versions,
+        remote_config_files(version),
+    )?;
+    let current_external_files = snapshot
+        .external_files
+        .iter()
+        .map(|file| file.file_name.clone())
+        .collect::<HashSet<_>>();
+    let current_version_ids = snapshot
+        .version_ids
+        .iter()
+        .filter(|id| current_modpack_id.as_deref() != Some(id.as_str()))
+        .cloned()
+        .collect::<Vec<_>>();
+    let mut removed_disabled_project_ids =
+        snapshot.disabled_project_ids.clone();
+    removed_disabled_project_ids.extend(disabled_versions.into_keys());
     let mut diffs = shared_content_diffs(
         &latest_version_ids,
         &latest_external_files,
         &current_version_ids,
         &current_external_files,
         &removed_disabled_project_ids,
-        &removed_disabled_external_files,
+        &snapshot.disabled_external_files,
         false,
         state,
     )
     .await?;
+    diffs.extend(shared_config_diffs(
+        &snapshot.config_files,
+        &remote_config_files,
+        ConfigDiffDirection::Publish,
+    ));
 
     let mut configuration_diffs = shared_instance_configuration_diffs(
         remote_modpack_id,
@@ -141,6 +276,7 @@ pub(super) async fn shared_instance_configuration_diffs(
                     current_version_name: current
                         .map(|details| details.version_name),
                     new_version_name: new.map(|details| details.version_name),
+                    config_file_count: None,
                     disabled: false,
                 });
             }
@@ -184,6 +320,7 @@ pub(super) fn configuration_diff(
         file_name: None,
         current_version_name,
         new_version_name,
+        config_file_count: None,
         disabled: false,
     }
 }
@@ -331,6 +468,7 @@ pub(super) async fn shared_content_diffs(
                     file_name: None,
                     current_version_name,
                     new_version_name,
+                    config_file_count: None,
                     disabled,
                 });
             }
@@ -346,6 +484,7 @@ pub(super) async fn shared_content_diffs(
                     file_name: Some(file_name),
                     current_version_name: None,
                     new_version_name: None,
+                    config_file_count: None,
                     disabled,
                 });
             }
@@ -402,6 +541,7 @@ pub(super) fn remote_shared_content(
         version
             .external_files
             .iter()
+            .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
             .map(|file| file.file_name.clone())
             .collect(),
     )

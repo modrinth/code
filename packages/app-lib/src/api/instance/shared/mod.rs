@@ -23,13 +23,41 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 
+pub(crate) const CONFIG_BUNDLE_FILE_NAME: &str = "configs.zip";
+pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
+pub(crate) const CONFIG_BUNDLE_METADATA_HEADER: &str = "x-amz-meta-files";
+pub(crate) const CONFIG_DIRECTORY: &str = "config";
+pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 13] = [
+    "json",
+    "json5",
+    "jsonc",
+    "yml",
+    "yaml",
+    "css",
+    "toml",
+    "txt",
+    "ini",
+    "cfg",
+    "conf",
+    "properties",
+    "xml",
+];
+
+pub(crate) fn is_excluded_config_path(path: &std::path::Path) -> bool {
+    EXCLUDED_CONFIG_FOLDERS
+        .iter()
+        .any(|folder| path.starts_with(folder))
+}
+
 mod client;
 mod diff;
+mod excluded_configs;
 mod install;
 mod invites;
 mod publish;
 mod types;
 
+pub(crate) use self::excluded_configs::EXCLUDED_CONFIG_FOLDERS;
 pub(crate) use self::publish::sync_shared_instance_icon;
 
 pub use self::install::{

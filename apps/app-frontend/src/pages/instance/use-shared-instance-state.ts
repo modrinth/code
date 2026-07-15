@@ -32,10 +32,18 @@ export function useSharedInstanceState(
 	const auth = injectAuth()
 	const updatePreview =
 		ref<Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>>(null)
+	const updatePreviewLoaded = ref(false)
 	const unavailableReason = ref<SharedInstanceUnavailableReason | null>(null)
 	const availabilityCheckKey = ref<string | null>(null)
 	const availabilityRefresh = ref(0)
 	let availabilityRequestId = 0
+	let availabilityRequest: {
+		key: string
+		promise: Promise<{
+			preview: Awaited<ReturnType<typeof install_get_shared_instance_update_preview>>
+			error: unknown | null
+		}>
+	} | null = null
 
 	const expectedUserId = computed(() => instance.value?.shared_instance?.linked_user_id ?? null)
 	const wrongAccount = computed(() => {
@@ -81,38 +89,77 @@ export function useSharedInstanceState(
 
 	function reset() {
 		availabilityRequestId++
+		availabilityRequest = null
 		availabilityCheckKey.value = null
 		updatePreview.value = null
+		updatePreviewLoaded.value = false
 		unavailableReason.value = null
 	}
 
 	function refreshAvailability() {
+		availabilityCheckKey.value = null
+		updatePreviewLoaded.value = false
 		availabilityRefresh.value++
 	}
 
 	function setUnavailable(reason: SharedInstanceUnavailableReason | null) {
 		availabilityRequestId++
+		availabilityRequest = null
 		availabilityCheckKey.value = null
 		updatePreview.value = null
+		updatePreviewLoaded.value = false
 		unavailableReason.value = reason
 	}
 
-	async function checkAvailability(instanceId: string, key: string) {
+	async function checkAvailability(instanceId: string, key: string, throwError = false) {
 		const requestId = ++availabilityRequestId
-		try {
-			const preview = await install_get_shared_instance_update_preview(instanceId)
-			if (!isCurrentRequest(requestId, instanceId, key)) return
-			updatePreview.value = preview
-			unavailableReason.value = null
-		} catch (error) {
-			if (!isCurrentRequest(requestId, instanceId, key)) return
-			if (isSharedInstanceUnavailableError(error)) {
-				updatePreview.value = null
-				unavailableReason.value = getSharedInstanceUnavailableReason(error)
-				return
-			}
-			notifyError(error)
+		let request = availabilityRequest
+		if (!request || request.key !== key) {
+			const promise = install_get_shared_instance_update_preview(instanceId).then(
+				(preview) => ({ preview, error: null }),
+				(error: unknown) => ({ preview: null, error }),
+			)
+			request = { key, promise }
+			availabilityRequest = request
+			void promise.finally(() => {
+				if (availabilityRequest?.promise === promise) availabilityRequest = null
+			})
 		}
+
+		const result = await request.promise
+		if (!isCurrentRequest(requestId, instanceId, key)) return null
+
+		if (result.error !== null) {
+			updatePreviewLoaded.value = false
+			if (isSharedInstanceUnavailableError(result.error)) {
+				updatePreview.value = null
+				unavailableReason.value = getSharedInstanceUnavailableReason(result.error)
+			} else if (!throwError) {
+				notifyError(result.error)
+			}
+
+			if (throwError) throw result.error
+			return null
+		}
+
+		updatePreview.value = result.preview
+		updatePreviewLoaded.value = true
+		unavailableReason.value = null
+		return result.preview
+	}
+
+	async function refreshUpdatePreview() {
+		const instanceId = instance.value?.id
+		const userId = auth.user.value?.id
+		if (!instanceId || !userId) return null
+
+		const key = `${instanceId}:${userId}`
+		if (availabilityCheckKey.value === key && updatePreviewLoaded.value) {
+			return updatePreview.value
+		}
+
+		availabilityCheckKey.value = key
+		return await checkAvailability(instanceId, key, true)
 	}
 
 	function isCurrentRequest(requestId: number, instanceId: string, key: string) {
@@ -145,8 +192,10 @@ export function useSharedInstanceState(
 				!userId
 			) {
 				availabilityRequestId++
+				availabilityRequest = null
 				availabilityCheckKey.value = null
 				updatePreview.value = null
+				updatePreviewLoaded.value = false
 				if (instanceId && role) unavailableReason.value = null
 				return
 			}
@@ -171,6 +220,7 @@ export function useSharedInstanceState(
 		signedOut,
 		reset,
 		refreshAvailability,
+		refreshUpdatePreview,
 		setUnavailable,
 	}
 }

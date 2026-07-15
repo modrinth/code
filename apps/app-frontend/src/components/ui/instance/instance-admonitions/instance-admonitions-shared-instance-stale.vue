@@ -8,7 +8,12 @@
 		<template #actions>
 			<ButtonStyled color="orange">
 				<button class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewChanges">
-					<UploadIcon aria-hidden="true" />
+					<SpinnerIcon
+						v-if="isReviewingPublish || isPublishing"
+						class="animate-spin"
+						aria-hidden="true"
+					/>
+					<UploadIcon v-else aria-hidden="true" />
 					{{
 						isPublishing
 							? formatMessage(messages.sharedInstancePublishingButton)
@@ -32,11 +37,12 @@
 		:added-label="formatMessage(messages.sharedInstanceAddedLabel)"
 		:removed-label="formatMessage(messages.sharedInstanceRemovedLabel)"
 		@confirm="publishChanges"
+		@cancel="finishReview"
 	/>
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
+import { SpinnerIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
@@ -77,6 +83,7 @@ async function reviewChanges(e?: MouseEvent) {
 	if (isPublishButtonDisabled.value) return
 
 	isReviewingPublish.value = true
+	let reviewOpened = false
 	try {
 		const preview = await get_shared_instance_publish_preview(props.instance.id)
 		if (!preview) {
@@ -95,9 +102,13 @@ async function reviewChanges(e?: MouseEvent) {
 			fileName: diff.fileName ?? undefined,
 			currentVersionName: diff.currentVersionName ?? undefined,
 			newVersionName: diff.newVersionName ?? undefined,
+			fileCount: diff.configFileCount ?? undefined,
 			disabled: diff.disabled,
 		}))
-		publishReviewModal.value?.show(e)
+		if (!publishReviewModal.value) return
+
+		publishReviewModal.value.show(e)
+		reviewOpened = true
 	} catch (err) {
 		if (isSharedInstanceUnavailableError(err)) {
 			notifySharedInstanceUnavailable(getSharedInstanceUnavailableReason(err))
@@ -107,11 +118,12 @@ async function reviewChanges(e?: MouseEvent) {
 
 		notifySharedInstanceError(err)
 	} finally {
-		isReviewingPublish.value = false
+		if (!reviewOpened) finishReview()
 	}
 }
 
 async function publishChanges() {
+	finishReview()
 	if (isPublishing.value) return
 
 	isPublishing.value = true
@@ -129,5 +141,9 @@ async function publishChanges() {
 	} finally {
 		isPublishing.value = false
 	}
+}
+
+function finishReview() {
+	isReviewingPublish.value = false
 }
 </script>

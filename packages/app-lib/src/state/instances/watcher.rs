@@ -1,4 +1,8 @@
 use crate::State;
+use crate::api::instance::{
+    CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
+    is_excluded_config_path,
+};
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
 use crate::state::{
@@ -128,9 +132,17 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     Some(InstancePayloadType::WorldUpdated {
                                         world,
                                     })
-                                } else if first_file_name
-                                    .as_ref()
-                                    .is_none_or(|x| *x != "saves")
+                                } else if first_file_name.as_ref().is_none_or(
+                                    |x| {
+                                        *x != "saves"
+                                            && (*x != CONFIG_DIRECTORY
+                                                || is_supported_config_file(
+                                                    &e.path,
+                                                ) && !is_excluded_config_file(
+                                                    &e.path,
+                                                ))
+                                    },
+                                )
                                 {
                                     Some(InstancePayloadType::Synced)
                                 } else {
@@ -214,7 +226,7 @@ pub(crate) async fn watch_instance_folder(
     let mut to_watch = Vec::new();
     for sub_path in ProjectType::iterator()
         .map(|x| x.get_folder())
-        .chain(["crash-reports", "saves"])
+        .chain(["crash-reports", "saves", CONFIG_DIRECTORY])
     {
         let full_path = full_instance_path.join(sub_path);
 
@@ -263,6 +275,26 @@ pub(crate) async fn watch_instance_folder(
         .write()
         .await
         .insert(instance_path.to_string(), instance_id.to_string());
+}
+
+fn is_supported_config_file(path: &std::path::Path) -> bool {
+    path.extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
+}
+
+fn is_excluded_config_file(path: &std::path::Path) -> bool {
+    let mut components = path.components();
+    while components
+        .next()
+        .is_some_and(|component| component.as_os_str() != CONFIG_DIRECTORY)
+    {}
+
+    is_excluded_config_path(&components.collect::<std::path::PathBuf>())
 }
 
 fn crash_task(instance_id: String) {

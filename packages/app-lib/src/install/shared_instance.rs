@@ -14,7 +14,15 @@ use crate::state::{
     ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
+use crate::api::instance::{
+    CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
+    is_excluded_config_path,
+};
+use async_walkdir::{Filtering, WalkDir};
+use futures::StreamExt;
 use std::collections::{HashMap, HashSet};
+use std::io::Read;
+use std::path::PathBuf;
 use uuid::Uuid;
 
 pub(super) async fn attach_pending_shared_instance(
@@ -99,6 +107,7 @@ struct DesiredSharedInstanceExternalFile {
 struct DesiredSharedInstanceContent {
     projects: HashMap<String, DesiredSharedInstanceProject>,
     external_files: HashMap<String, DesiredSharedInstanceExternalFile>,
+    config_bundle: Option<SharedInstanceExternalFileData>,
 }
 
 struct SharedInstanceProjectUpdate {
@@ -115,6 +124,7 @@ struct SharedInstanceApplyPlan {
     external_removals: Vec<CurrentSharedInstanceExternalFile>,
     external_updates: Vec<DesiredSharedInstanceExternalFile>,
     external_additions: Vec<DesiredSharedInstanceExternalFile>,
+    config_bundle: Option<SharedInstanceExternalFileData>,
 }
 
 impl SharedInstanceApplyPlan {
@@ -153,6 +163,7 @@ impl SharedInstanceApplyPlan {
         let mut plan = Self {
             project_removals,
             external_removals,
+            config_bundle: desired.config_bundle,
             ..Default::default()
         };
 
@@ -185,7 +196,8 @@ impl SharedInstanceApplyPlan {
         (self.project_updates.len()
             + self.project_additions.len()
             + self.external_updates.len()
-            + self.external_additions.len()) as u64
+            + self.external_additions.len()
+            + usize::from(self.config_bundle.is_some())) as u64
     }
 }
 
@@ -320,6 +332,24 @@ pub(super) async fn apply_shared_instance_update(
     {
         install_shared_instance_external_file(instance_id, &file.file, state)
             .await?;
+        completed_content_changes += 1;
+        update_content_progress(
+            job_id,
+            job_state,
+            state,
+            completed_content_changes,
+            content_change_count,
+        )
+        .await?;
+    }
+
+    if let Some(config_bundle) = plan.config_bundle {
+        install_shared_instance_external_file(
+            instance_id,
+            &config_bundle,
+            state,
+        )
+        .await?;
         completed_content_changes += 1;
         update_content_progress(
             job_id,
@@ -466,6 +496,10 @@ async fn desired_shared_instance_content(
     }
 
     for file in &data.external_files {
+        if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
+            content.config_bundle = Some(file.clone());
+            continue;
+        }
         let file_type =
             ProjectType::from_name(&file.file_type).ok_or_else(|| {
                 crate::ErrorKind::InputError(format!(
@@ -746,13 +780,6 @@ async fn install_shared_instance_external_file(
     file: &SharedInstanceExternalFileData,
     state: &State,
 ) -> crate::Result<()> {
-    let project_type =
-        ProjectType::from_name(&file.file_type).ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Unknown shared instance file type {}",
-                file.file_type
-            ))
-        })?;
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
 
     if !response.status().is_success() {
@@ -772,6 +799,19 @@ async fn install_shared_instance_external_file(
         .into());
     }
 
+    if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
+        return install_shared_instance_config_bundle(instance_id, bytes, state)
+            .await;
+    }
+
+    let project_type =
+        ProjectType::from_name(&file.file_type).ok_or_else(|| {
+            crate::ErrorKind::InputError(format!(
+                "Unknown shared instance file type {}",
+                file.file_type
+            ))
+        })?;
+
     crate::state::instances::commands::add_project_bytes(
         instance_id,
         &file.file_name,
@@ -786,4 +826,133 @@ async fn install_shared_instance_external_file(
     .await?;
 
     Ok(())
+}
+
+async fn install_shared_instance_config_bundle(
+    instance_id: &str,
+    bytes: bytes::Bytes,
+    state: &State,
+) -> crate::Result<()> {
+    let files = tokio::task::spawn_blocking(move || {
+        read_config_bundle(bytes.as_ref())
+    })
+    .await??;
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError("Unknown instance".to_string())
+    })?;
+    let config_path = state
+        .directories
+        .instances_dir()
+        .join(metadata.instance.path)
+        .join(CONFIG_DIRECTORY);
+    crate::util::io::create_dir_all(&config_path).await?;
+
+    let desired_paths = files
+        .iter()
+        .map(|(path, _)| path.clone())
+        .collect::<HashSet<_>>();
+    let filter_root = config_path.clone();
+    let mut walker = WalkDir::new(&config_path).filter(move |entry| {
+        let filter_root = filter_root.clone();
+        async move {
+            let excluded = entry
+                .path()
+                .strip_prefix(&filter_root)
+                .is_ok_and(is_excluded_config_path);
+            if excluded {
+                Filtering::IgnoreDir
+            } else {
+                Filtering::Continue
+            }
+        }
+    });
+    while let Some(entry) = walker.next().await {
+        let entry = entry.map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Failed to read config directory: {error}"
+            ))
+        })?;
+        if entry.file_type().await?.is_file()
+            && is_supported_config_file(&entry.path())
+        {
+            let entry_path = entry.path();
+            let relative_path = entry_path.strip_prefix(&config_path)?;
+            if !is_excluded_config_path(relative_path)
+                && !desired_paths.contains(relative_path)
+            {
+                crate::util::io::remove_file(entry_path).await?;
+            }
+        }
+    }
+
+    for (relative_path, bytes) in files {
+        let path = config_path.join(relative_path);
+        if let Some(parent) = path.parent() {
+            crate::util::io::create_dir_all(parent).await?;
+        }
+        crate::util::io::write(path, bytes).await?;
+    }
+
+    Ok(())
+}
+
+fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes))
+        .map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Invalid shared instance config bundle: {error}"
+            ))
+        })?;
+    let mut files = Vec::new();
+
+    for index in 0..archive.len() {
+        let mut file = archive.by_index(index).map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Invalid shared instance config bundle entry: {error}"
+            ))
+        })?;
+        if file.is_dir() {
+            continue;
+        }
+        let path = file.enclosed_name().ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance config bundle contains an unsafe path"
+                    .to_string(),
+            )
+        })?;
+        if is_excluded_config_path(&path) {
+            continue;
+        }
+        if !is_supported_config_file(&path) {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Shared instance config bundle contains unsupported file {}",
+                path.display()
+            ))
+            .into());
+        }
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes).map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Failed to read shared instance config bundle: {error}"
+            ))
+        })?;
+        files.push((path.to_path_buf(), bytes));
+    }
+
+    Ok(files)
+}
+
+fn is_supported_config_file(path: &std::path::Path) -> bool {
+    path.extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            CONFIG_FILE_EXTENSIONS
+                .iter()
+                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
+        })
 }

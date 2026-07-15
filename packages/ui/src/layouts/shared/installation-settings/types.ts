@@ -45,10 +45,12 @@ export interface ContentDiffItem {
 		| 'modpack_unlinked'
 		| 'game_version_updated'
 		| 'loader_updated'
+		| 'config_files_updated'
 	projectName?: string
 	fileName?: string
 	currentVersionName?: string
 	newVersionName?: string
+	fileCount?: number
 	disabled?: boolean
 	external?: boolean
 }

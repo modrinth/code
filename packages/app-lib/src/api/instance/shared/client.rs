@@ -36,7 +36,19 @@ pub(super) enum SharedInstanceRemoteResponse<T> {
 pub(super) struct ExternalFileCandidate {
     pub(super) file_name: String,
     pub(super) file_type: String,
-    pub(super) file_path: String,
+    pub(super) source: ExternalFileSource,
+}
+
+#[derive(Clone, Debug)]
+pub(super) enum ExternalFileSource {
+    InstanceFile(String),
+    ConfigBundle(Vec<ConfigFile>),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub(super) struct ConfigFile {
+    pub(super) path: String,
+    pub(super) hash: String,
 }
 
 #[derive(Clone, Debug, Serialize)]

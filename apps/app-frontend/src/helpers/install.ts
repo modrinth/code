@@ -89,11 +89,13 @@ export interface SharedInstanceUpdateDiff {
 		| 'modpack_unlinked'
 		| 'game_version_updated'
 		| 'loader_updated'
+		| 'config_files_updated'
 	projectId?: string | null
 	projectName?: string | null
 	fileName?: string | null
 	currentVersionName?: string | null
 	newVersionName?: string | null
+	configFileCount?: number | null
 	disabled?: boolean
 }
 

@@ -227,7 +227,12 @@ const removedDisabledCount = computed(
 	() => props.diffs.filter((diff) => diff.type === 'removed' && diff.disabled).length,
 )
 const addedCount = computed(() => props.diffs.filter((diff) => diff.type === 'added').length)
-const updatedCount = computed(() => props.diffs.filter((diff) => diff.type === 'updated').length)
+const updatedCount = computed(
+	() =>
+		props.diffs.filter(
+			(diff) => diff.type === 'updated' || diff.type === 'config_files_updated',
+		).length,
+)
 const hasExternalDiffs = computed(() => props.diffs.some(showExternalWarning))
 
 type DependencyDiffType = Extract<ContentDiffItem['type'], 'added' | 'removed' | 'updated'>
@@ -239,6 +244,7 @@ const configurationDiffTypes = new Set<ConfigurationDiffType>([
 	'modpack_unlinked',
 	'game_version_updated',
 	'loader_updated',
+	'config_files_updated',
 ])
 
 function isDependencyDiff(
@@ -274,9 +280,10 @@ const sortedDiffs = computed(() =>
 			modpack_unlinked: 0,
 			game_version_updated: 1,
 			loader_updated: 2,
-			added: 3,
-			updated: 4,
-			removed: 5,
+			config_files_updated: 3,
+			added: 4,
+			updated: 5,
+			removed: 6,
 		}
 		return typeOrder[a.type] - typeOrder[b.type]
 	}),
@@ -298,6 +305,9 @@ function getDiffTypeLabel(diff: ContentDiffItem) {
 
 function getVersionLabel(diff: ContentDiffItem) {
 	if (showExternalWarning(diff) && diff.fileName) return decodeURIComponent(diff.fileName)
+	if (diff.type === 'config_files_updated' && diff.fileCount !== undefined) {
+		return formatMessage(messages.fileCount, { count: diff.fileCount })
+	}
 	if (diff.type === 'modpack_updated') return diff.newVersionName
 	if (isConfigurationDiff(diff)) {
 		if (diff.currentVersionName && diff.newVersionName) {
@@ -355,6 +365,10 @@ const messages = defineMessages({
 		id: 'content.diff-modal.updated-count',
 		defaultMessage: '{count} updated',
 	},
+	fileCount: {
+		id: 'content.diff-modal.file-count',
+		defaultMessage: '{count, plural, one {# file} other {# files}}',
+	},
 	unknownContentBody: {
 		id: 'content.diff-modal.unknown-content-body',
 		defaultMessage:
@@ -408,6 +422,10 @@ const configurationDiffMessages = defineMessages({
 	loader_updated: {
 		id: 'content.diff-modal.loader-updated',
 		defaultMessage: 'Loader',
+	},
+	config_files_updated: {
+		id: 'content.diff-modal.config-files-updated',
+		defaultMessage: 'Updated config files',
 	},
 })
 
