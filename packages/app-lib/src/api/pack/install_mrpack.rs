@@ -43,6 +43,13 @@ type ExtractProgressFn<'a> = dyn FnMut(u64) -> Pin<Box<dyn Future<Output = crate
     + 'a;
 const MODPACK_CONTENT_DOWNLOAD_CONCURRENCY: usize = 4;
 
+fn is_override_content_file(path: &str) -> bool {
+    Path::new(path)
+        .parent()
+        .is_some_and(|parent| parent.components().count() == 1)
+        && ProjectType::get_from_parent_folder(path).is_some()
+}
+
 #[derive(Clone)]
 struct ModpackContentInstallContext {
     instance_id: String,
@@ -274,9 +281,7 @@ pub(crate) async fn get_external_files_from_mrpack(
             let relative_path = path
                 .strip_prefix("overrides/")
                 .or_else(|| path.strip_prefix("client-overrides/"))?;
-            if path.ends_with('/')
-                || ProjectType::get_from_parent_folder(relative_path).is_none()
-            {
+            if path.ends_with('/') || !is_override_content_file(relative_path) {
                 return None;
             }
             let file_name = relative_path.rsplit('/').next()?.to_string();
