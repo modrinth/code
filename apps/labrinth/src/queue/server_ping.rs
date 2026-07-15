@@ -1,9 +1,9 @@
 use crate::database::DBProject;
-use crate::database::models::{DBProjectId, DBVersionId};
+use crate::database::models::DBProjectId;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::exp;
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::ProjectId;
 use crate::models::projects::ProjectStatus;
 use crate::search::incremental::IncrementalSearchQueue;
 use crate::{database::PgPool, util::error::Context};
@@ -175,26 +175,14 @@ impl ServerPingQueue {
                 }
 
                 if updated_project {
-                    let version_ids = sqlx::query_scalar!(
-                        "SELECT id FROM versions WHERE mod_id = $1",
-                        DBProjectId::from(*project_id) as DBProjectId,
-                    )
-                    .fetch_all(&self.db)
-                    .await
-                    .wrap_err("failed to fetch project version IDs")?
-                    .into_iter()
-                    .map(|version_id| VersionId::from(DBVersionId(version_id)))
-                    .collect::<Vec<_>>();
-
                     let clear_cache = DBProject::clear_cache(
                         (*project_id).into(),
                         None,
                         None,
                         &self.redis,
                     );
-                    let queue_search = self
-                        .incremental_search_queue
-                        .push(*project_id, version_ids);
+                    let queue_search =
+                        self.incremental_search_queue.push(*project_id);
 
                     let (clear_cache_result, _) =
                         join(clear_cache, queue_search).await;

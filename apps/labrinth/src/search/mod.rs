@@ -116,12 +116,25 @@ pub trait SearchBackend: Send + Sync {
         documents: &[UploadSearchProject],
     ) -> eyre::Result<()>;
 
+    async fn index_version_documents(
+        &self,
+        documents: &[UploadSearchVersion],
+    ) -> eyre::Result<()>;
+
     async fn remove_project_documents(
         &self,
         ids: &[ProjectId],
     ) -> eyre::Result<()>;
 
-    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
+    async fn remove_project_version_documents(
+        &self,
+        ids: &[ProjectId],
+    ) -> eyre::Result<()>;
+
+    async fn remove_version_documents(
+        &self,
+        ids: &[VersionId],
+    ) -> eyre::Result<()>;
 
     async fn tasks(&self) -> eyre::Result<Value>;
 
@@ -238,6 +251,7 @@ impl FromStr for SearchBackendKind {
 /// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
+    /// ID of the most recently published version.
     pub version_id: String,
     pub project_id: String,
     //
@@ -256,6 +270,7 @@ pub struct UploadSearchProject {
     pub indexed_name: String,
     pub summary: String,
     pub categories: Vec<String>,
+    pub project_categories: Vec<String>,
     pub display_categories: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
@@ -274,7 +289,7 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
-    /// Unix timestamp of the publication date of the version
+    /// Unix timestamp of the most recently published version.
     pub version_published_timestamp: i64,
     pub open_source: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -294,6 +309,23 @@ pub struct UploadSearchProject {
     pub components: exp::ProjectQuery,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct UploadSearchVersion {
+    pub version_id: String,
+    pub project_id: String,
+    pub categories: Vec<String>,
+    pub project_types: Vec<String>,
+    pub version_published_timestamp: i64,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+}
+
+#[derive(Debug, Default)]
+pub struct SearchDocumentBatch {
+    pub projects: Vec<UploadSearchProject>,
+    pub versions: Vec<UploadSearchVersion>,
 }
 
 /// Nullable fields in Typesense-bound documents should use
@@ -320,6 +352,7 @@ pub struct SearchResults {
 
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
+    /// ID of the most recently published version.
     pub version_id: String,
     pub project_id: String,
     pub project_types: Vec<String>,

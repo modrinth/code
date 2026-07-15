@@ -36,7 +36,11 @@ impl IncrementalSearchQueue {
         }
     }
 
-    pub async fn push(
+    pub async fn push(&self, project_id: ProjectId) {
+        self.operations.lock().await.push_project_change(project_id);
+    }
+
+    pub async fn push_versions(
         &self,
         project_id: ProjectId,
         version_ids: impl IntoIterator<Item = VersionId>,
@@ -44,7 +48,7 @@ impl IncrementalSearchQueue {
         self.operations
             .lock()
             .await
-            .push_project_change(project_id, version_ids);
+            .push_version_change(project_id, version_ids);
     }
 
     pub async fn push_project_removal(&self, project_id: ProjectId) {
@@ -123,22 +127,27 @@ impl PendingSearchIndexOperations {
             && self.removed_project_ids.is_empty()
     }
 
-    fn push_project_change(
+    fn push_project_change(&mut self, project_id: ProjectId) {
+        if !self.removed_project_ids.contains(&project_id) {
+            self.changed_project_ids.insert(project_id);
+        }
+    }
+
+    fn push_version_change(
         &mut self,
         project_id: ProjectId,
         version_ids: impl IntoIterator<Item = VersionId>,
     ) {
-        if !self.removed_project_ids.contains(&project_id) {
-            let version_ids = version_ids.into_iter().collect::<HashSet<_>>();
-            if version_ids.is_empty() {
-                self.changed_project_versions.remove(&project_id);
-                self.changed_project_ids.insert(project_id);
-            } else if !self.changed_project_ids.contains(&project_id) {
-                self.changed_project_versions
-                    .entry(project_id)
-                    .or_default()
-                    .extend(version_ids);
-            }
+        if self.removed_project_ids.contains(&project_id) {
+            return;
+        }
+
+        let version_ids = version_ids.into_iter().collect::<HashSet<_>>();
+        if !version_ids.is_empty() {
+            self.changed_project_versions
+                .entry(project_id)
+                .or_default()
+                .extend(version_ids);
         }
     }
 
@@ -151,16 +160,12 @@ impl PendingSearchIndexOperations {
     fn push_event(&mut self, event: SearchProjectIndexQueueEventData) {
         match event {
             SearchProjectIndexQueueEventData::Change { project_id } => {
-                self.push_project_change(project_id, [])
+                self.push_project_change(project_id)
             }
             SearchProjectIndexQueueEventData::VersionChange {
                 project_id,
                 version_ids,
-            } => {
-                if !version_ids.is_empty() {
-                    self.push_project_change(project_id, version_ids)
-                }
-            }
+            } => self.push_version_change(project_id, version_ids),
             SearchProjectIndexQueueEventData::Removal { project_id } => {
                 self.push_project_removal(project_id)
             }
@@ -188,7 +193,6 @@ impl PendingSearchIndexOperations {
                 }
             },
         ));
-
         events
     }
 }

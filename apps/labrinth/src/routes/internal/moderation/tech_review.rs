@@ -1161,7 +1161,6 @@ pub async fn submit_report(
 
     if verdict == DelphiVerdict::Unsafe {
         crate::routes::v3::projects::clear_project_cache_and_queue_search(
-            &pool,
             &redis,
             &search_state,
             project_id,

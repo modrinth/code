@@ -358,7 +358,6 @@ pub async fn project_create_internal(
     } else {
         transaction.commit().await?;
         super::projects::clear_project_cache_and_queue_search(
-            &client,
             &redis,
             &search_state,
             project_id.into(),
@@ -425,7 +424,6 @@ pub async fn project_create_with_id(
     } else {
         transaction.commit().await?;
         super::projects::clear_project_cache_and_queue_search(
-            &client,
             &redis,
             &search_state,
             project_id.into(),

@@ -72,33 +72,40 @@ pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
 }
 
 pub async fn clear_project_cache_and_queue_search(
-    pool: &PgPool,
     redis: &RedisPool,
     search_state: &SearchState,
     project_id: db_ids::DBProjectId,
     slug: Option<String>,
     clear_dependencies: Option<bool>,
 ) -> Result<(), ApiError> {
-    let version_ids = sqlx::query_scalar!(
-        "SELECT id FROM versions WHERE mod_id = $1",
-        project_id as db_ids::DBProjectId,
-    )
-    .fetch_all(pool)
-    .await
-    .wrap_internal_err("failed to fetch project version IDs")?
-    .into_iter()
-    .map(|version_id| VersionId::from(db_ids::DBVersionId(version_id)))
-    .collect::<Vec<_>>();
-
-    clear_project_cache_and_queue_search_versions(
+    clear_project_cache_and_queue_search_inner(
         redis,
         search_state,
         project_id,
         slug,
         clear_dependencies,
-        version_ids,
     )
     .await
+}
+
+pub async fn clear_project_cache_and_queue_search_inner(
+    redis: &RedisPool,
+    search_state: &SearchState,
+    project_id: db_ids::DBProjectId,
+    slug: Option<String>,
+    clear_dependencies: Option<bool>,
+) -> Result<(), ApiError> {
+    db_models::DBProject::clear_cache(
+        project_id,
+        slug,
+        clear_dependencies,
+        redis,
+    )
+    .await?;
+
+    search_state.queue.push(project_id.into()).await;
+
+    Ok(())
 }
 
 pub async fn clear_project_cache_and_queue_search_versions(
@@ -119,7 +126,7 @@ pub async fn clear_project_cache_and_queue_search_versions(
 
     search_state
         .queue
-        .push(project_id.into(), version_ids)
+        .push_versions(project_id.into(), version_ids)
         .await;
 
     Ok(())
@@ -1133,6 +1140,9 @@ pub async fn project_edit_internal(
         Ok(())
     }
 
+    let reindex_version_project_types =
+        new_project.minecraft_java_server.is_some();
+
     update(
         &mut transaction,
         id,
@@ -1202,15 +1212,26 @@ pub async fn project_edit_internal(
 
     transaction.commit().await?;
 
-    clear_project_cache_and_queue_search(
-        &pool,
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await?;
+    if reindex_version_project_types {
+        clear_project_cache_and_queue_search_versions(
+            &redis,
+            &search_state,
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+            project_item.versions.iter().copied().map(VersionId::from),
+        )
+        .await?;
+    } else {
+        clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+        )
+        .await?;
+    }
 
     // Remove no longer searchable projects from search index
     if let (true, Some(false)) = (
@@ -1764,7 +1785,6 @@ pub async fn projects_edit(
 
     for (project_id, slug) in changed_projects {
         clear_project_cache_and_queue_search(
-            &pool,
             &redis,
             &search_state,
             project_id,
@@ -1996,7 +2016,6 @@ pub async fn project_icon_edit_internal(
 
     transaction.commit().await?;
     clear_project_cache_and_queue_search(
-        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2116,7 +2135,6 @@ pub async fn delete_project_icon_internal(
 
     transaction.commit().await?;
     clear_project_cache_and_queue_search(
-        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2317,7 +2335,6 @@ pub async fn add_gallery_item_internal(
 
     transaction.commit().await?;
     clear_project_cache_and_queue_search(
-        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2536,7 +2553,6 @@ pub async fn edit_gallery_item_internal(
     transaction.commit().await?;
 
     clear_project_cache_and_queue_search(
-        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2685,7 +2701,6 @@ pub async fn delete_gallery_item_internal(
     transaction.commit().await?;
 
     clear_project_cache_and_queue_search(
-        &pool,
         &redis,
         &search_state,
         project_item.inner.id,
@@ -2834,6 +2849,13 @@ pub async fn project_delete_internal(
             &redis,
         )
         .await?;
+        search_state
+            .backend
+            .remove_project_version_documents(&[project.inner.id.into()])
+            .await
+            .wrap_internal_err(
+                "failed to remove project versions from search index",
+            )?;
         search_state
             .backend
             .remove_project_documents(&[project.inner.id.into()])

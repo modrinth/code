@@ -191,7 +191,9 @@ async fn consume_batch(
         .retain(|project_id| !project_ids_to_remove.contains(project_id));
     project_ids_with_version_changes
         .retain(|project_id| !project_ids_to_remove.contains(project_id));
-
+    project_ids_to_change.retain(|project_id| {
+        !project_ids_with_version_changes.contains(project_id)
+    });
     let project_ids_to_change =
         project_ids_to_change.into_iter().collect::<Vec<_>>();
     let project_ids_with_version_changes = project_ids_with_version_changes
@@ -204,7 +206,7 @@ async fn consume_batch(
 
     info!(
         kafka.message_count = messages_to_commit.len(),
-        "Read all Kafka messages in {:.2?}, found {} projects to change, {} projects with version changes, {} versions to change, and {} projects to remove",
+        "Read all Kafka messages in {:.2?}, found {} projects to change, {} projects with {} version changes, and {} projects to remove",
         start.elapsed(),
         project_ids_to_change.len(),
         project_ids_with_version_changes.len(),
@@ -220,6 +222,10 @@ async fn consume_batch(
             "Removing project documents"
         );
         search_backend
+            .remove_project_version_documents(&project_ids_to_remove)
+            .await
+            .wrap_err("failed to remove project version documents")?;
+        search_backend
             .remove_project_documents(&project_ids_to_remove)
             .await
             .wrap_err("failed to remove project documents")?;
@@ -232,12 +238,8 @@ async fn consume_batch(
 
     if !version_ids_to_change.is_empty() {
         let operation_start = Instant::now();
-        info!(
-            version_count = version_ids_to_change.len(),
-            "Removing changed version documents",
-        );
         search_backend
-            .remove_documents(&version_ids_to_change)
+            .remove_version_documents(&version_ids_to_change)
             .await
             .wrap_err("failed to remove changed version documents")?;
         info!(
@@ -249,12 +251,7 @@ async fn consume_batch(
 
     if !project_ids_with_version_changes.is_empty() {
         let operation_start = Instant::now();
-        info!(
-            project_count = project_ids_with_version_changes.len(),
-            version_count = version_ids_to_change.len(),
-            "Indexing changed project versions"
-        );
-        index_changed_project_versions(
+        reindex_changed_project_versions(
             ro_pool,
             redis_pool,
             search_backend,
@@ -262,11 +259,11 @@ async fn consume_batch(
             &version_ids_to_change,
         )
         .await
-        .wrap_err("failed to index changed project version batch")?;
+        .wrap_err("failed to reindex changed project versions")?;
         info!(
             project_count = project_ids_with_version_changes.len(),
             version_count = version_ids_to_change.len(),
-            "Indexed changed project versions in {:.2?}",
+            "Reindexed changed project versions in {:.2?}",
             operation_start.elapsed()
         );
     }
@@ -275,19 +272,19 @@ async fn consume_batch(
         let operation_start = Instant::now();
         info!(
             project_count = project_ids_to_change.len(),
-            "Indexing changed projects"
+            "Reindexing changed projects"
         );
-        index_changed_projects(
+        reindex_projects(
             ro_pool,
             redis_pool,
             search_backend,
             &project_ids_to_change,
         )
         .await
-        .wrap_err("failed to index changed project batch")?;
+        .wrap_err("failed to reindex changed project batch")?;
         info!(
             project_count = project_ids_to_change.len(),
-            "Indexed changed projects in {:.2?}",
+            "Reindexed changed projects in {:.2?}",
             operation_start.elapsed()
         );
     }
@@ -356,7 +353,7 @@ async fn index_changed_projects(
     Ok(())
 }
 
-async fn index_changed_project_versions(
+async fn reindex_changed_project_versions(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
@@ -383,9 +380,11 @@ async fn index_changed_project_versions(
         )
     })?;
 
-    info!("Fetched all project version documents, indexing into backend");
-
-    search_backend.index_documents(&documents).await?;
+    search_backend.remove_project_documents(project_ids).await?;
+    search_backend.index_documents(&documents.projects).await?;
+    search_backend
+        .index_version_documents(&documents.versions)
+        .await?;
 
     Ok(())
 }
