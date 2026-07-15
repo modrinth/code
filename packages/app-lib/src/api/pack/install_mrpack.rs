@@ -23,7 +23,7 @@ use async_zip::base::read::{WithEntry, ZipEntryReader};
 use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{
@@ -235,6 +235,96 @@ where
     }
 
     Ok((size, hasher.digest().to_string()))
+}
+
+pub(crate) async fn get_external_files_from_mrpack(
+    file: &CreatePackFile,
+) -> crate::Result<Vec<String>> {
+    let mut zip_reader = MrpackZipReader::new(file).await?;
+    let Some(manifest_idx) =
+        zip_reader.file().entries().iter().position(|entry| {
+            matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
+        })
+    else {
+        return Err(crate::Error::from(crate::ErrorKind::InputError(
+            "No pack manifest found in mrpack".to_string(),
+        )));
+    };
+
+    let manifest = zip_reader.read_entry_to_string(manifest_idx).await?;
+    let pack: PackFormat = serde_json::from_str(&manifest)?;
+    let mut candidates = pack
+        .files
+        .into_iter()
+        .filter_map(|file| {
+            let path = file.path.as_str();
+            let hash = file.hashes.get(&PackFileHash::Sha1)?.clone();
+            let file_name = path.rsplit('/').next()?.to_string();
+            Some((file_name, hash))
+        })
+        .collect::<Vec<_>>();
+
+    let override_entries = zip_reader
+        .file()
+        .entries()
+        .iter()
+        .enumerate()
+        .filter_map(|(index, entry)| {
+            let path = entry.filename().as_str().ok()?;
+            let relative_path = path
+                .strip_prefix("overrides/")
+                .or_else(|| path.strip_prefix("client-overrides/"))?;
+            if path.ends_with('/')
+                || ProjectType::get_from_parent_folder(relative_path).is_none()
+            {
+                return None;
+            }
+            let file_name = relative_path.rsplit('/').next()?.to_string();
+            Some((index, file_name))
+        })
+        .collect::<Vec<_>>();
+
+    for (index, file_name) in override_entries {
+        let (_, hash) = zip_reader.hash_entry(index).await?;
+        candidates.push((file_name, hash));
+    }
+
+    if candidates.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let state = State::get().await?;
+    let hashes = candidates
+        .iter()
+        .map(|(_, hash)| hash.as_str())
+        .collect::<Vec<_>>();
+    let recognized_hashes = match CachedEntry::get_file_many(
+        &hashes,
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await
+    {
+        Ok(files) => files
+            .into_iter()
+            .map(|file| file.hash)
+            .collect::<HashSet<_>>(),
+        Err(err) => {
+            tracing::warn!("Failed to look up files in imported mrpack: {err}");
+            HashSet::new()
+        }
+    };
+
+    let mut external_files = candidates
+        .into_iter()
+        .filter_map(|(file_name, hash)| {
+            (!recognized_hashes.contains(&hash)).then_some(file_name)
+        })
+        .collect::<Vec<_>>();
+    external_files.sort();
+    external_files.dedup();
+    Ok(external_files)
 }
 
 async fn extract_zip_entry<R>(

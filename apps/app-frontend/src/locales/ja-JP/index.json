@@ -11,6 +11,51 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "実行中のインスタンスの一部を非表示"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "コピーしました"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "詳細をコピー"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "閉じる"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "インスタンスを表示"
+  },
+  "app.action-bar.install.retry": {
+    "message": "再試行"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "アプリの終了によりキャンセルされました"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "ModPackを読み込むことができませんでした"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "キャンセルしました"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "クリーンアップが完了しませんでした"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "ファイルをダウンロードできませんでした"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "ダウンロードしたファイルが破損しています"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "ファイルを保存できませんでした"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "ダウンロードを完了することができませんでした"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "不明なインスタンス"
+  },
+  "app.action-bar.installs": {
+    "message": "インストール数"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "デフォルトのインスタンスを作成"
   },
@@ -28,6 +73,9 @@
   },
   "app.action-bar.stop-instance": {
     "message": "インスタンスを停止"
+  },
+  "app.action-bar.update": {
+    "message": "アップデート"
   },
   "app.action-bar.view-active-downloads": {
     "message": "進行中のダウンロードを表示"
@@ -131,9 +179,6 @@
   "app.browse.discover-servers": {
     "message": "サーバーを探す"
   },
-  "app.browse.hide-added-servers": {
-    "message": "既に追加済みのサーバーを非表示にする"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modパック"
   },
@@ -149,9 +194,6 @@
   "app.export-modal.header": {
     "message": "Modパックを書き出す"
   },
-  "app.export-modal.modpack-name-label": {
-    "message": "Modパック名"
-  },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modパック名"
   },
@@ -160,6 +202,9 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Java {version} をダウンロードしています"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "インスタンス内のすべてのデータは、ワールド、設定、インストール済みのコンテンツを含め、完全に削除されます。"
@@ -209,6 +254,9 @@
   "app.instance.worlds.browse-servers": {
     "message": "サーバーを探す"
   },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "{name} を削除します"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Mod導入済み"
   },
@@ -230,9 +278,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} 個のワールドを検索…"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "必須コンテンツ"
-  },
   "app.modal.install-to-play.header": {
     "message": "インストールしてプレイ"
   },
@@ -242,17 +287,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {#個のMod}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "必須のModパック"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "このサーバーをプレイするにはModが必要です。インストールをクリックしてModrinthから必要なファイルを設定し、サーバーに接続してください。"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共有インスタンス"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共有サーバーインスタンス"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "コンテンツを見る"
@@ -260,11 +296,11 @@
   "app.modal.update-to-play.header": {
     "message": "更新してプレイ"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "更新が必要です"
-  },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
+  },
+  "app.project.version.all-versions": {
+    "message": "すべてのバージョン"
   },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
@@ -305,8 +341,17 @@
   "app.skins.modal.no-cape-tooltip": {
     "message": "マントなし"
   },
+  "app.skins.modal.none-cape-option": {
+    "message": "無し"
+  },
   "app.skins.modal.replace-texture-button": {
     "message": "アップロード"
+  },
+  "app.skins.modal.save-skin-button": {
+    "message": "スキンを保存する"
+  },
+  "app.skins.modal.saving-tooltip": {
+    "message": "保存しています…"
   },
   "app.skins.modal.texture-section": {
     "message": "テクスチャ"
@@ -566,6 +611,12 @@
   "instance.settings.tabs.general.name": {
     "message": "名前"
   },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "ベータ"
+  },
+  "instance.settings.tabs.general.update-channel.release": {
+    "message": "リリース"
+  },
   "instance.settings.tabs.hooks": {
     "message": "起動フック"
   },
@@ -745,26 +796,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "ローダーはサーバーによる条件です"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "ファイル形式に関わらず、Modrinthにアップロードされたファイルのみが確認されます。(.mrpackを含む)"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "この警告を次回から表示しない"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "インストールの確認"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "インストールを続行"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "一般的にマルウェアは、Discord等のプラットフォーム上でModパックファイルを配布して拡散されます"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "このファイルをModrinth上で見つけることができませんでした。信頼できるソースからインストールすることを強くお勧めします。"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "不明なファイルの警告"
   }
 }

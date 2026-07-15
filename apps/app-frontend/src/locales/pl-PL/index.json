@@ -9,7 +9,13 @@
     "message": "Pobrania"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Ukryj włączone instancje"
+    "message": "Ukryj aktywne instancje"
+  },
+  "app.action-bar.install.copied-details": {
+    "message": "Skopiowano"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopiuj szczegóły"
   },
   "app.action-bar.install.dismiss": {
     "message": "Odrzuć"
@@ -19,6 +25,66 @@
   },
   "app.action-bar.install.retry": {
     "message": "Spróbuj ponownie"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Anulowano z powodu zamknięcia aplikacji"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Nie można było odczytać paczki modów"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Anulowano"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Czyszczenie nie powiodło się"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Nie udało się pobrać plików"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Pobrany plik jest uszkodzony"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Nie udało się zapisać plików"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Nie można było ukończyć pobierania"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Nie znaleziono instancji"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Ścieżka plików jest niewłaściwa"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Niewłaściwe dane paczki modów"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Pliki paczki modów zawierają niewłaściwe metadane"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Ustawianie Javy nie powiodło się"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Ustawianie loadera nie powiodło się"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Nie udało się zaktualizować danych lokalnych"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Ustawianie Minecraft nie powiodło się"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Nie udało się połączyć z serwerami Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Brak permisji, aby zapisać pliki"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Pobieranie paczki nie powiodło się"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Coś poszło nie tak"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Nieznana instancja"
@@ -30,7 +96,7 @@
     "message": "Ustaw jako główną instancję"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Żadna instancja nie jest włączona"
+    "message": "Brak włączonych instancji"
   },
   "app.action-bar.offline": {
     "message": "Offline"
@@ -39,7 +105,7 @@
     "message": "Główna instancja"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Załaduj ponownie, by zaktualizować"
+    "message": "Załaduj ponownie, aby zaktualizować"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Pokaż więcej włączonych instancji"
@@ -66,7 +132,7 @@
     "message": "Zaawansowane renderowanie"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Wybierz preferowany motyw w Modrinth app."
+    "message": "Wybierz preferowany motyw kolorystyczny dla Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Motyw"
@@ -84,10 +150,10 @@
     "message": "Domyślna strona główna"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Wyłącza nazwę użytkownika na stronie skórek."
+    "message": "Wyłącza nazwę użytkownika nad modelem gracza na stronie skórek."
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "Schowaj nazwę"
+    "message": "Ukryj nazwę"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
     "message": "Pokazuje ostatnie światy w sekcji \"Wskocz z powrotem do światów\" na stronie głównej."
@@ -219,7 +285,7 @@
     "message": "Finalizowanie"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Przygotowywanie instancji"
+    "message": "Oczekuje na instalację"
   },
   "app.install.phase.preparing_java": {
     "message": "Przygotowywanie środowiska Java"
@@ -228,10 +294,10 @@
     "message": "Pobieranie Java {version}"
   },
   "app.install.phase.preparing_java.extracting": {
-    "message": "Wypakowywanie Javy {version}"
+    "message": "Wypakowywanie Java {version}"
   },
   "app.install.phase.preparing_java.fetching-metadata": {
-    "message": "Pobieranie Javy {version}"
+    "message": "Pobieranie Java {version}"
   },
   "app.install.phase.preparing_java.resolving": {
     "message": "Przygotowywanie Java {version}"
@@ -240,10 +306,10 @@
     "message": "Sprawdzanie Java {version}"
   },
   "app.install.phase.reading_pack_manifest": {
-    "message": "Ustalanie manifestu paczki"
+    "message": "Sprawdzanie manifestu paczki"
   },
   "app.install.phase.resolving_loader": {
-    "message": "Ustalanie programu ładującego"
+    "message": "Ustalanie loadera"
   },
   "app.install.phase.resolving_minecraft": {
     "message": "Ustalanie wersji Minecraft"
@@ -255,13 +321,13 @@
     "message": "Przywracanie"
   },
   "app.install.phase.running_loader_processors": {
-    "message": "Uruchamianie procesorów programu ładującego"
+    "message": "Uruchamianie procesorów loadera"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Tej akcji nie można odwrócić"
+    "message": "Tej akcji nie można cofnąć"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Usuń instancję"
@@ -297,13 +363,13 @@
     "message": "Dodano \"{name}\""
   },
   "app.instance.mods.share-text": {
-    "message": "Sprawdź projekty, które używam w mojej paczce modów!"
+    "message": "Sprawdź projekty, których używam w mojej paczce modów!"
   },
   "app.instance.mods.share-title": {
     "message": "Udostępnianie zawartości paczki modów"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "Przesyłanie powiodło się"
+    "message": "Przesyłanie zakończone sukcesem"
   },
   "app.instance.worlds.add-server": {
     "message": "Dodaj serwer"
@@ -356,9 +422,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Szukaj wśród {count} światów..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Wymagana zawartość"
-  },
   "app.modal.install-to-play.header": {
     "message": "Zainstaluj, aby grać"
   },
@@ -368,17 +431,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Wymagana paczka modów"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ten serwer wymaga modów, aby na nim grać. Kliknij \"Zainstaluj\" aby otrzymać potrzebne pliki z Modrinth, a potem dołącz bezpośrednio do serwera."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Wspólna instancja"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Wspólna instancja serwera"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Pokaż zawartość"
@@ -386,20 +440,32 @@
   "app.modal.update-to-play.header": {
     "message": "Zaktualizuj, by grać"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Wymagana jest aktualizacja"
-  },
   "app.modal.update-to-play.update-required-description": {
     "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
   },
   "app.project.install-button.already-installed": {
     "message": "Ten projekt jest już zainstalowany"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Zmień wersję"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Powróć do odkrywania"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Zainstaluj zasoby do instancji"
+  },
+  "app.project.version.all-versions": {
+    "message": "Wszystkie wersje"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Pobierz w przeglądarce"
+  },
+  "app.project.version.installing": {
+    "message": "Instalowanie"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Już zainstalowano"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
@@ -438,25 +504,25 @@
     "message": "Usuń skórkę"
   },
   "app.skins.delete-modal.description": {
-    "message": "To trwale usunie wybraną skórkę. Tej akcji nie można odwrócić."
+    "message": "To trwale usunie wybraną skórkę. Tej akcji nie można cofnąć."
   },
   "app.skins.delete-modal.title": {
     "message": "Czy na pewno chcesz usunąć tę skórkę?"
   },
   "app.skins.dropped-file-error.text": {
-    "message": "Nie udało się odczytać wybranego pliku."
+    "message": "Nie udało się odczytać upuszczonego pliku."
   },
   "app.skins.dropped-file-error.title": {
     "message": "Błąd podczas przetwarzania pliku"
   },
   "app.skins.edit-button": {
-    "message": "Edytuj skina"
+    "message": "Edytuj skórkę"
   },
   "app.skins.modal.add-skin-button": {
-    "message": "Dodaj skina"
+    "message": "Dodaj skórkę"
   },
   "app.skins.modal.add-title": {
-    "message": "Dodawanie skina"
+    "message": "Dodawanie skórki"
   },
   "app.skins.modal.arm-style-section": {
     "message": "Styl ramion"
@@ -474,10 +540,10 @@
     "message": "Peleryny"
   },
   "app.skins.modal.edit-title": {
-    "message": "Edytuj skina"
+    "message": "Edytowanie skórki"
   },
   "app.skins.modal.make-edit-first-tooltip": {
-    "message": "Wpierw zmień jakoś skórkę!"
+    "message": "Zmodyfikuj najpierw skórkę!"
   },
   "app.skins.modal.no-cape-tooltip": {
     "message": "Brak peleryny"
@@ -489,7 +555,7 @@
     "message": "Zamień teksturę"
   },
   "app.skins.modal.save-skin-button": {
-    "message": "Zapisz skina"
+    "message": "Zapisz skórkę"
   },
   "app.skins.modal.saving-tooltip": {
     "message": "Zapisywanie..."
@@ -520,6 +586,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -570,7 +639,7 @@
     "message": "Zaloguj się"
   },
   "app.skins.title": {
-    "message": "Wybierz skórkę"
+    "message": "Wybór skórki"
   },
   "app.update-popup.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
@@ -870,7 +939,7 @@
     "message": "Niestandardowe argumenty Java"
   },
   "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Niestandardowa instalacja Javy"
+    "message": "Niestandardowa instalacja Java"
   },
   "instance.settings.tabs.java.custom-memory-allocation": {
     "message": "Niestandardowa alokacja pamięci"
@@ -879,7 +948,7 @@
     "message": "Zmienne środowiskowe..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Argumenty Javy..."
+    "message": "Argumenty Java..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Zmienne środowiskowe"
@@ -1015,26 +1084,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader jest dostarczony przez serwer"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Plik jest sprawdzony tylko, jeżeli został przesłany na Modrinth, niezależnie od formatu (w tym pliki .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Nie pokazuj ponownie"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Potwierdź instalację"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Instaluj mimo to"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Wirusy są często kryte w plikach paczek modów przesyłanych na platformach takich jak Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Nie mogliśmy znaleźć tego pliku na Modrinth. Stanowczo zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Ostrzeżenie o nieznanym pliku"
   }
 }

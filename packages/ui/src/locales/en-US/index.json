@@ -455,11 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Updated"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Don't install"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Added"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Removed"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Updated"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Install anyway"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removed"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "This update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Unknown files warning"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Unknown"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
@@ -5554,6 +5581,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Dismiss all"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Dont install"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Don’t show this warning again"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Confirm installation"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Install anyway"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Malware is often distributed through mod files by sharing them on platforms like Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " isn’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Unknown file warning"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Unknown files warning"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Unrecognized files"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "This user has been around since Modrinth Alpha, which ended in November 2020."
