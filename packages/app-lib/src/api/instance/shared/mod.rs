@@ -58,7 +58,9 @@ mod publish;
 mod types;
 
 pub(crate) use self::excluded_configs::EXCLUDED_CONFIG_FOLDERS;
-pub(crate) use self::publish::sync_shared_instance_icon;
+pub(crate) use self::publish::{
+    should_surface_config_only_push, sync_shared_instance_icon,
+};
 
 pub use self::install::{
     accept_shared_instance_invite_for_install,

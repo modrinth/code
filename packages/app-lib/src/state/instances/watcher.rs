@@ -43,6 +43,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                 Ok(events) => {
                     let instance_ids = event_instance_ids.read().await;
                     let mut visited_instances = Vec::new();
+                    let mut config_push_decisions = HashMap::new();
 
                     for e in &events {
                         let mut instance_path = None;
@@ -86,6 +87,56 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 crash_task(instance_id);
                             } else if !visited_instances.contains(&instance_id)
                             {
+                                let is_supported_config_change = first_file_name
+                                    .as_ref()
+                                    .is_some_and(|x| *x == CONFIG_DIRECTORY)
+                                    && is_supported_config_file(&e.path)
+                                    && !is_excluded_config_file(&e.path);
+                                let should_sync_config_change =
+                                    if is_supported_config_change {
+                                        if let Some(decision) =
+                                            config_push_decisions
+                                                .get(&instance_id)
+                                        {
+                                            *decision
+                                        } else {
+                                            let decision = match State::get()
+                                                .await
+                                            {
+                                                Ok(state) => match crate::api::instance::should_surface_config_only_push(
+                                                    &instance_id,
+                                                    &state,
+                                                )
+                                                .await
+                                                {
+                                                    Ok(decision) => decision,
+                                                    Err(error) => {
+                                                        tracing::warn!(
+                                                            instance_id,
+                                                            %error,
+                                                            "Failed to determine whether config changes need an initial push"
+                                                        );
+                                                        false
+                                                    }
+                                                },
+                                                Err(error) => {
+                                                    tracing::warn!(
+                                                        instance_id,
+                                                        %error,
+                                                        "Failed to load state while reviewing a config change"
+                                                    );
+                                                    false
+                                                }
+                                            };
+                                            config_push_decisions.insert(
+                                                instance_id.clone(),
+                                                decision,
+                                            );
+                                            decision
+                                        }
+                                    } else {
+                                        false
+                                    };
                                 let event = if first_file_name
                                     .as_ref()
                                     .is_some_and(|x| *x == "servers.dat")
@@ -136,11 +187,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                     |x| {
                                         *x != "saves"
                                             && (*x != CONFIG_DIRECTORY
-                                                || is_supported_config_file(
-                                                    &e.path,
-                                                ) && !is_excluded_config_file(
-                                                    &e.path,
-                                                ))
+                                                || should_sync_config_change)
                                     },
                                 )
                                 {

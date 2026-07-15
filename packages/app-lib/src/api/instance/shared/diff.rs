@@ -26,17 +26,37 @@ fn shared_config_diffs(
         .iter()
         .map(|file| (file.path.clone(), file.hash.clone()))
         .collect::<HashMap<_, _>>();
-    let changed_file_count = latest
+    let mut changed_files = latest
         .iter()
-        .filter(|(path, hash)| current.get(*path) != Some(*hash))
-        .count()
-        + current
-            .keys()
-            .filter(|path| !latest.contains_key(*path))
-            .count();
+        .filter_map(|(path, hash)| match current.get(path) {
+            None => Some((path.clone(), "added")),
+            Some(current_hash) if current_hash != hash => {
+                Some((path.clone(), "updated"))
+            }
+            Some(_) => None,
+        })
+        .chain(
+            current
+                .keys()
+                .filter(|path| !latest.contains_key(*path))
+                .map(|path| (path.clone(), "removed")),
+        )
+        .collect::<Vec<_>>();
+    changed_files.sort_by(|left, right| left.0.cmp(&right.0));
+    let changed_file_count = changed_files.len();
     if changed_file_count == 0 {
         return Vec::new();
     }
+
+    tracing::info!(
+        direction = match direction {
+            ConfigDiffDirection::Update => "update",
+            ConfigDiffDirection::Publish => "publish",
+        },
+        changed_file_count,
+        ?changed_files,
+        "Reviewed shared instance config changes"
+    );
 
     vec![SharedInstanceUpdateDiff {
         type_: SharedInstanceUpdateDiffType::ConfigFilesUpdated,

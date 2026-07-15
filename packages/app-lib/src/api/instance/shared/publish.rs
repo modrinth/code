@@ -195,6 +195,37 @@ pub(super) async fn remote_publish_content(
     ))
 }
 
+pub(crate) async fn should_surface_config_only_push(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<bool> {
+    let Some(metadata) = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+    else {
+        return Ok(false);
+    };
+    let Some(attachment) = metadata.shared_instance else {
+        return Ok(false);
+    };
+    if attachment.role != SharedInstanceRole::Owner {
+        return Ok(false);
+    }
+
+    let version = get_latest_remote_version_optional_unavailable(
+        &attachment.id,
+        state,
+    )
+    .await?;
+    let SharedInstanceRemoteResponse::Available(version) = version else {
+        return Ok(false);
+    };
+
+    Ok(!version
+        .external_files
+        .iter()
+        .any(|file| file.file_type == CONFIG_BUNDLE_FILE_TYPE))
+}
+
 pub(super) async fn modpack_dependency_version_ids(
     modpack_id: &str,
     state: &State,
