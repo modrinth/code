@@ -50,7 +50,6 @@ export default function () {
 
 					const LINK_EXTRAS: Record<string, { misused?: string; inaccessible?: string }> = {
 						source: {
-							misused: 'checklist/messages/links/note/source_empty',
 							inaccessible: 'checklist/messages/links/note/source_404',
 						},
 						discord: {
@@ -93,17 +92,29 @@ export default function () {
 		.children(
 			() =>
 				project.value.link_urls.issues?.url
-					? linkSection('issues', `**Issues:** ${project.value.link_urls.issues.url}`)
+					? linkSection(
+							'issues',
+							`**Issues:** ${project.value.link_urls.issues.url}`,
+							toggle('disabled', 'Disabled'),
+						)
 					: null,
 
 			() =>
 				project.value.link_urls.source?.url
-					? linkSection('source', `**Source:** ${project.value.link_urls.source.url}`)
+					? linkSection(
+							'source',
+							`**Source:** ${project.value.link_urls.source.url}`,
+							toggle('empty', 'Empty Repo'),
+						)
 					: null,
 
 			() =>
 				project.value.link_urls.wiki?.url
-					? linkSection('wiki', `**Wiki:** ${project.value.link_urls.wiki.url}`)
+					? linkSection(
+							'wiki',
+							`**Wiki:** ${project.value.link_urls.wiki.url}`,
+							toggle('disabled', 'Disabled'),
+						)
 					: null,
 
 			() =>
