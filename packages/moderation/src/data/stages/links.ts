@@ -121,7 +121,7 @@ export default function () {
 				project.value.link_urls.issues?.url
 					? linkSection(
 							'issues',
-							`**Issues:** ${project.value.link_urls.issues.url}`,
+							`**Issues:** <${project.value.link_urls.issues.url}>`,
 							//							toggle('disabled', 'Disabled'),
 						)
 					: null,
@@ -130,7 +130,7 @@ export default function () {
 				project.value.link_urls.source?.url
 					? linkSection(
 							'source',
-							`**Source:** ${project.value.link_urls.source.url}`,
+							`**Source:** <${project.value.link_urls.source.url}>`,
 							//							toggle('empty', 'Empty Repo'),
 						)
 					: null,
@@ -139,7 +139,7 @@ export default function () {
 				project.value.link_urls.wiki?.url
 					? linkSection(
 							'wiki',
-							`**Wiki:** ${project.value.link_urls.wiki.url}`,
+							`**Wiki:** <${project.value.link_urls.wiki.url}>`,
 							//							toggle('disabled', 'Disabled'),
 						)
 					: null,
@@ -148,26 +148,35 @@ export default function () {
 				project.value.link_urls.discord?.url
 					? linkSection(
 							'discord',
-							`**Discord:** ${project.value.link_urls.discord.url}`,
+							`**Discord:** <${project.value.link_urls.discord.url}>`,
 							//							toggle('expiring', 'Expiring'),
 						)
 					: null,
 
 			() =>
 				project.value.link_urls.site?.url
-					? linkSection('site', `**Website:** ${project.value.link_urls.site.url}`)
+					? linkSection(
+							'site',
+							`**Website:** <${project.value.link_urls.site.url}>`,
+						)
 					: null,
 
 			() =>
 				project.value.link_urls.store?.url
-					? linkSection('store', `**Store:** ${project.value.link_urls.store.url}`)
+					? linkSection(
+							'store',
+							`**Store:** <${project.value.link_urls.store.url}>`,
+						)
 					: null,
 
 			() =>
 				Object.entries(project.value.link_urls)
 					.filter(([, l]) => l.donation)
 					.map(([, l]) =>
-						linkSection(`donation_${l.platform}`, `**${mdEscape(l.platform)}:** ${l.url}`),
+						linkSection(
+							`donation_${l.platform}`,
+							`**${mdEscape(l.platform)}:** <${l.url}>`,
+						),
 					),
 		)
 }
