@@ -4,7 +4,7 @@ import { FolderSearchIcon, StarIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
-	injectModrinthClient,
+	injectModrinthClient, injectNotificationManager,
 	NewModal,
 	Table,
 	type TableColumn,
@@ -89,12 +89,14 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const { formatMessage } = useVIntl()
 
 const rows = ref<ScanRow[]>([])
 const isLoadingVersions = ref(false)
 const isScanning = ref(false)
+const isClearing = ref(false)
 const versionLoadError = ref<string | null>(null)
 const scanError = ref<string | null>(null)
 const requestId = ref(0)
@@ -107,7 +109,7 @@ const columns = computed<TableColumn<ScanTableColumn>[]>(() => [
 ])
 
 const scannedCount = computed(() => rows.value.filter((row) => row.scan || row.error).length)
-const isBusy = computed(() => isLoadingVersions.value || isScanning.value)
+const isBusy = computed(() => isLoadingVersions.value || isScanning.value || isClearing.value)
 
 function getErrorMessage(error: unknown) {
 	if (error instanceof Error) {
@@ -212,9 +214,27 @@ async function fetchAllScans() {
 	}
 }
 
-function clearAllGroups() {
-	// get all groups on the current project
-	// delete all (waiting for functionality)
+async function clearAllGroups() {
+	if (isBusy.value) {
+		return
+	}
+
+	try {
+		isClearing.value = true
+		const groups = await client.labrinth.attribution_internal.listProjectAttribution(props.project_id);
+
+		for (let group of groups) {
+			await client.labrinth.attribution_internal.deleteGroup(group.id)
+		}
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'An error occurred',
+			text: `Failed to clear all groups: ${getErrorMessage(error)}`,
+		})
+	} finally {
+		isClearing.value = false
+	}
 }
 
 function show() {
