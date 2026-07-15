@@ -12,6 +12,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref, useTemplateRef } from 'vue'
+import {useQueryClient} from "@tanstack/vue-query";
 
 const messages = defineMessages({
 	title: {
@@ -90,6 +91,7 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const { formatMessage } = useVIntl()
@@ -220,6 +222,8 @@ async function clearAllGroups() {
 		return
 	}
 
+	let failed = false;
+
 	try {
 		isClearing.value = true
 		const groups = await client.labrinth.attribution_internal.listProjectAttribution(
@@ -229,7 +233,10 @@ async function clearAllGroups() {
 		for (let group of groups) {
 			await client.labrinth.attribution_internal.deleteGroup(group.id)
 		}
+
+		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.project_id] })
 	} catch (error) {
+		failed = true;
 		addNotification({
 			type: 'error',
 			title: 'An error occurred',
@@ -237,6 +244,14 @@ async function clearAllGroups() {
 		})
 	} finally {
 		isClearing.value = false
+	}
+
+	if (!failed) {
+		addNotification({
+			type: 'success',
+			title: 'Success',
+			text: 'All groups cleared successfully.',
+		})
 	}
 }
 
