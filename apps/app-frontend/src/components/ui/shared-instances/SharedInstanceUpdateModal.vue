@@ -11,6 +11,7 @@
 		:removed-label="formatMessage(messages.removedLabel)"
 		:show-report-button="false"
 		show-external-warnings
+		:external-warning-description="formatMessage(messages.externalWarningDescription)"
 		@confirm="update"
 		@cancel="emit('cancel')"
 	/>
@@ -115,6 +116,11 @@ const messages = defineMessages({
 	removedLabel: {
 		id: 'app.modal.update-to-play.shared-instance-removed-label',
 		defaultMessage: 'Removed',
+	},
+	externalWarningDescription: {
+		id: 'app.modal.update-to-play.shared-instance-unknown-files-description',
+		defaultMessage:
+			'This shared instance update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust.',
 	},
 })
 

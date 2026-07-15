@@ -13,7 +13,7 @@
 			<template v-if="hasExternalDiffs">
 				<p v-if="description" class="m-0 text-primary">{{ description }}</p>
 				<Admonition type="warning" :header="formatMessage(messages.unknownFilesWarning)">
-					{{ formatMessage(messages.unknownFilesDescription) }}
+					{{ externalWarningDescription || formatMessage(messages.unknownFilesDescription) }}
 				</Admonition>
 			</template>
 			<Admonition v-else :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
@@ -203,6 +203,7 @@ const props = defineProps<{
 	removedLabel?: string
 	disableClose?: boolean
 	showExternalWarnings?: boolean
+	externalWarningDescription?: string
 	versionDate?: string
 }>()
 

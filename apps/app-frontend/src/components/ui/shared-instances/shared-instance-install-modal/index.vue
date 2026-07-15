@@ -4,9 +4,11 @@
 		:header="formatMessage(messages.installToPlay)"
 		:closable="true"
 		:on-hide="handleHide"
+		max-width="544px"
+		width="544px"
 		no-padding
 	>
-		<div v-if="preview" class="flex flex-col gap-6 max-w-[500px] p-6 pb-2">
+		<div v-if="preview" class="flex w-full flex-col gap-6 p-6 pb-2">
 			<Admonition
 				:type="reportMode ? 'info' : 'warning'"
 				:header="reportMode ? undefined : formatMessage(messages.trustWarningHeader)"
@@ -103,15 +105,64 @@
 					<Checkbox v-model="blockUser" :label="formatMessage(messages.blockUser)" />
 				</div>
 			</Transition>
-			<div
-				v-if="!reportMode && preview.externalFileCount"
-				class="flex items-center gap-2 text-orange"
+			<Admonition
+				v-if="!reportMode && hasExternalFiles"
+				type="warning"
+				:header="formatMessage(messages.unknownFilesWarning)"
 			>
-				<IssuesIcon class="h-5 w-5 flex-none" />
-				<span>{{
-					formatMessage(messages.externalFileWarning, { count: preview.externalFileCount })
-				}}</span>
+				{{ formatMessage(messages.unknownFilesDescription) }}
+			</Admonition>
+
+			<div v-if="!reportMode && hasExternalFiles" class="relative w-full">
+				<div
+					ref="externalFileTable"
+					class="max-h-[242px] overflow-y-auto rounded-2xl"
+					@scroll="checkTableScrollState"
+				>
+					<Table
+						:columns="externalFileColumns"
+						:data="externalFileRows"
+						row-key="id"
+						virtualized
+						:virtual-row-height="48"
+						class="shadow-sm"
+					>
+						<template #cell-name="{ value }">
+							<span class="block truncate" :title="String(value)">{{ value }}</span>
+						</template>
+					</Table>
+				</div>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-2"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-2"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showTableTopFade"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-b from-bg-raised to-transparent"
+					/>
+				</Transition>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-2"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-2"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showTableBottomFade"
+						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-2 bg-gradient-to-t from-bg-raised to-transparent"
+					/>
+				</Transition>
 			</div>
+
+			<p v-if="!reportMode && hasExternalFiles" class="m-0 text-primary">
+				{{ formatMessage(messages.reviewedFiles) }}
+			</p>
 		</div>
 		<template #actions>
 			<div class="flex justify-between gap-2">
@@ -123,7 +174,7 @@
 					</ButtonStyled>
 				</div>
 				<div class="flex gap-2">
-					<ButtonStyled type="outlined">
+					<ButtonStyled v-if="reportMode" type="outlined">
 						<button class="!border" @click="handleCancel">
 							<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
@@ -133,11 +184,30 @@
 							<SendIcon />{{ formatMessage(commonMessages.reportButton) }}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else color="brand">
-						<button @click="accept">
-							<DownloadIcon />{{ formatMessage(messages.installButton) }}
-						</button>
-					</ButtonStyled>
+					<template v-else-if="hasExternalFiles">
+						<ButtonStyled type="transparent" color="orange">
+							<button @click="accept">
+								{{ formatMessage(messages.installAnyway) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleCancel">
+								<BanIcon />{{ formatMessage(messages.dontInstall) }}
+							</button>
+						</ButtonStyled>
+					</template>
+					<template v-else>
+						<ButtonStyled type="outlined">
+							<button class="!border" @click="handleCancel">
+								<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="accept">
+								<DownloadIcon />{{ formatMessage(messages.installButton) }}
+							</button>
+						</ButtonStyled>
+					</template>
 				</div>
 			</div>
 		</template>
@@ -151,7 +221,7 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, IssuesIcon, ReportIcon, SendIcon, XIcon } from '@modrinth/assets'
+import { BanIcon, DownloadIcon, ReportIcon, SendIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	AutoLink,
@@ -165,9 +235,12 @@ import {
 	ModpackContentModal,
 	NewModal,
 	StyledInput,
+	Table,
+	type TableColumn,
+	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
@@ -175,8 +248,15 @@ import type { SharedInstanceInstallPreview } from '@/helpers/install'
 import SharedInstanceInstallSummary from './shared-instance-install-summary.vue'
 import { useSharedInstancePreviewContent } from './use-shared-instance-preview-content'
 
+type ExternalFileColumn = 'name'
+type ExternalFileRow = {
+	id: string
+	name: string
+}
+
 const modal = ref<InstanceType<typeof NewModal>>()
 const contentModal = ref<InstanceType<typeof ModpackContentModal>>()
+const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
@@ -186,6 +266,21 @@ const additionalContext = ref('')
 const blockUser = ref(false)
 const { formatMessage } = useVIntl()
 const { load } = useSharedInstancePreviewContent()
+const {
+	showTopFade: showTableTopFade,
+	showBottomFade: showTableBottomFade,
+	checkScrollState: checkTableScrollState,
+	forceCheck: forceCheckTableScroll,
+} = useScrollIndicator(externalFileTable)
+const hasExternalFiles = computed(() => Boolean(preview.value?.externalFiles.length))
+const externalFileRows = computed<ExternalFileRow[]>(() =>
+	(preview.value?.externalFiles ?? [])
+		.map((file, index) => ({
+			id: `${index}-${file.fileType}-${file.fileName}`,
+			name: file.fileName,
+		}))
+		.sort((left, right) => left.name.localeCompare(right.name)),
+)
 const reportReasonOptions = computed<ComboboxOption<ReportReason>[]>(() => [
 	{ value: 'malicious', label: formatMessage(messages.maliciousReason) },
 	{ value: 'illegal', label: formatMessage(messages.illegalReason) },
@@ -213,6 +308,7 @@ async function openViewContents() {
 function handleCancel() {
 	if (reportMode.value) {
 		reportMode.value = false
+		void nextTick(() => forceCheckTableScroll())
 		return
 	}
 	hide()
@@ -237,6 +333,7 @@ function show(
 	install.value = installValue
 	hide_ads_window()
 	modal.value?.show(event)
+	void nextTick(() => forceCheckTableScroll())
 }
 function hide() {
 	modal.value?.hide()
@@ -304,13 +401,42 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.block-user',
 		defaultMessage: 'Block this user',
 	},
-	externalFileWarning: {
-		id: 'app.modal.install-to-play.external-file-warning',
+	unknownFilesWarning: {
+		id: 'app.modal.install-to-play.unknown-files-warning',
+		defaultMessage: 'Unknown files warning',
+	},
+	unknownFilesDescription: {
+		id: 'app.modal.install-to-play.shared-instance-unknown-files-description',
 		defaultMessage:
-			'{count, plural, one {This instance includes # file that is not from Modrinth.} other {This instance includes # files that are not from Modrinth.}}',
+			'This shared instance contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust.',
+	},
+	unrecognizedFiles: {
+		id: 'app.modal.install-to-play.unrecognized-files',
+		defaultMessage: 'Unrecognized files',
+	},
+	reviewedFiles: {
+		id: 'app.modal.install-to-play.reviewed-files',
+		defaultMessage:
+			'A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack).',
+	},
+	installAnyway: {
+		id: 'app.modal.install-to-play.install-anyway',
+		defaultMessage: 'Install anyway',
+	},
+	dontInstall: {
+		id: 'app.modal.install-to-play.external-files-dont-install',
+		defaultMessage: "Don't install",
 	},
 	installButton: { id: 'app.modal.install-to-play.install-button', defaultMessage: 'Install' },
 })
+
+const externalFileColumns = computed<TableColumn<ExternalFileColumn>[]>(() => [
+	{
+		key: 'name',
+		label: formatMessage(messages.unrecognizedFiles),
+		cellClass: '!h-12',
+	},
+])
 
 defineExpose({ show, hide })
 </script>

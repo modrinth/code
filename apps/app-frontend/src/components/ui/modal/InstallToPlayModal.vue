@@ -4,8 +4,8 @@
 		:header="formatMessage(messages.installToPlay)"
 		:closable="true"
 		:on-hide="show_ads_window"
-		max-width="640px"
-		width="640px"
+		max-width="544px"
+		width="544px"
 	>
 		<div v-if="requiredContentProject" class="flex w-full flex-col gap-6">
 			<p class="m-0 text-primary">
@@ -423,8 +423,8 @@ const messages = defineMessages({
 		defaultMessage: 'Install anyway',
 	},
 	dontInstall: {
-		id: 'app.modal.install-to-play.dont-install',
-		defaultMessage: 'Dont install',
+		id: 'app.modal.install-to-play.external-files-dont-install',
+		defaultMessage: "Don't install",
 	},
 })
 

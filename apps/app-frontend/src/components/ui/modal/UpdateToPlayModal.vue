@@ -8,6 +8,7 @@
 		:diffs="normalizedDiffs"
 		:version-date="versionDate"
 		:show-external-warnings="showExternalWarnings"
+		:external-warning-description="formatMessage(messages.externalWarningDescription)"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:removed-label="formatMessage(messages.removed)"
@@ -303,6 +304,11 @@ const messages = defineMessages({
 	removed: {
 		id: 'app.modal.update-to-play.removed',
 		defaultMessage: 'Removed',
+	},
+	externalWarningDescription: {
+		id: 'app.modal.update-to-play.server-modpack-unknown-files-description',
+		defaultMessage:
+			'This server modpack update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust.',
 	},
 })
 
