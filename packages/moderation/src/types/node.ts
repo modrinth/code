@@ -1,7 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { injectProjectPageContext } from '@modrinth/ui'
 import type { FunctionalComponent, InjectionKey, Ref, SVGAttributes } from 'vue'
-import { toValue } from 'vue'
+import { markRaw, toValue } from 'vue'
 
 import {
 	expandVariables,
@@ -30,7 +30,9 @@ export interface NodeStateWithChildren {
 
 // ─── Function types ───────────────────────────────────────────────────────────
 
-export type MessageFn = (state: Record<string, NodeState>) => Promise<string>
+export type MessageFn = ((state: Record<string, NodeState>) => Promise<string>) & {
+	concat(...others: MessageFn[]): MessageFn
+}
 export type ContentFn = (state: Record<string, NodeState>) => string | Promise<string>
 export type ChildrenFn = (state: Record<string, NodeState>) => ChildEntry[]
 
@@ -103,15 +105,24 @@ export async function loadMd(
 	return expandVariables(raw, projectV2, project, vars)
 }
 
+function makeMessageFn(fn: (state: Record<string, NodeState>) => Promise<string>): MessageFn {
+	const rich = fn as MessageFn
+	rich.concat = (...others) =>
+		makeMessageFn(async (state) =>
+			(await Promise.all([rich, ...others].map((f) => f(state)))).join(''),
+		)
+	return rich
+}
+
 export function md(
 	path: string | ((state: Record<string, NodeState>) => string),
 	getVars?: (state: Record<string, NodeState>) => Record<string, NodeState>,
 ): MessageFn {
 	const { projectV3: project, projectV2 } = injectProjectPageContext()
-	return async (state) => {
+	return makeMessageFn(async (state) => {
 		const resolvedPath = typeof path === 'function' ? path(state) : path
 		return loadMd(resolvedPath, state, project.value, projectV2.value, getVars)
-	}
+	})
 }
 // ─── Fix builder ──────────────────────────────────────────────────────────────
 
@@ -451,7 +462,7 @@ export class StageNodeBuilder extends LabeledNodeBuilder {
 	}
 
 	icon(i: FunctionalComponent<SVGAttributes>): this {
-		this._icon = i
+		this._icon = markRaw(i)
 		return this
 	}
 

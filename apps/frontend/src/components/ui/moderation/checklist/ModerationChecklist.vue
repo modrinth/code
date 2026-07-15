@@ -21,7 +21,7 @@
 					<OverflowMenu
 						:options="stageOptions"
 						:disabled="!canOpenStageSelectorFromTitle"
-						placement="center"
+						placement="bottom"
 						dropdown-class="title-stage-selector-dropdown"
 						:class="{ 'title-stage-selector-disabled': !canOpenStageSelectorFromTitle }"
 						class="bg-transparent p-0"

@@ -133,6 +133,8 @@
 	</template>
 </template>
 <script setup lang="ts">
+defineEmits(['on-download', 'delete-version'])
+
 import type { Labrinth } from '@modrinth/api-client'
 import { IssuesIcon, SpinnerIcon } from '@modrinth/assets'
 import {
