@@ -23,6 +23,8 @@ export function useStages(
 	globalState: Ref<Record<string, Record<string, NodeState>>>,
 ): StageNodeBuilder[] {
 	const mainStages: StageNodeBuilder[] = [
+		usePostApprovalStage(),
+		useUndefinedProjectStage(),
 		useTitleSlugStage(),
 		useSummaryStage(),
 		useDescriptionStage(),
@@ -35,8 +37,6 @@ export function useStages(
 		useReuploadsStage(),
 		usePermissionsStage(),
 		useOtherRulesStage(),
-		useUndefinedProjectStage(),
-		usePostApprovalStage(),
 	]
 	provide(STAGES_KEY, ref(mainStages))
 	return [...mainStages, useStatusAlertsStage(mainStages, globalState)]
