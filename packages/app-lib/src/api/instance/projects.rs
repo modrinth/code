@@ -1,7 +1,7 @@
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
 use crate::state::instances::adapters::sqlite::instance_rows;
-use crate::state::{ProjectType, State};
+use crate::state::{CacheBehaviour, CachedEntry, ProjectType, State};
 use crate::util::fetch;
 use modrinth_content_management::{
     ContentType, ResolutionPreferences, ResolveContentPlan,
@@ -211,6 +211,21 @@ pub async fn add_project_from_path(
         &state,
     )
     .await
+}
+
+#[tracing::instrument]
+pub async fn is_file_on_modrinth(path: &Path) -> crate::Result<bool> {
+    let state = State::get().await?;
+    let (_, hash) = fetch::sha1_file_async(path).await?;
+    let files = CachedEntry::get_file_many(
+        &[&hash],
+        Some(CacheBehaviour::Bypass),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+
+    Ok(!files.is_empty())
 }
 
 #[tracing::instrument]

@@ -18,13 +18,26 @@
 					opt.hoverFilledOnly ? 'btn-hover-filled-only' : '',
 					opt.disabled ? 'disabled' : '',
 				]"
-				style="white-space: nowrap; width: 100%; box-shadow: none; justify-content: flex-start; padding: 0.55rem 0.625rem;"
+				style="
+					white-space: nowrap;
+					width: 100%;
+					box-shadow: none;
+					justify-content: flex-start;
+					padding: 0.55rem 0.625rem;
+				"
 				:disabled="opt.disabled"
-				@click="opt.action?.($event); closeStageDropdown()"
+				@click="
+					opt.action?.($event)
+					closeStageDropdown()
+				"
 			>
 				<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-				<span>{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span>
-				<span v-if="opt.messages" class="text-m ml-auto pl-2 font-semibold opacity-75">{{ opt.messages }}</span>
+				<span
+					>{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span></span
+				>
+				<span v-if="opt.messages" class="text-m ml-auto pl-2 font-semibold opacity-75">{{
+					opt.messages
+				}}</span>
 			</button>
 		</div>
 	</Teleport>
@@ -87,7 +100,17 @@
 				</ButtonStyled>
 			</div>
 		</div>
-		<p v-if="currentStageObj._hint && !collapsed && !alreadyReviewed && !done && !generatedMessage && !(lockStatus?.locked && !lockStatus?.isOwnLock)" class="m-0 text-sm text-secondary">
+		<p
+			v-if="
+				currentStageObj._hint &&
+				!collapsed &&
+				!alreadyReviewed &&
+				!done &&
+				!generatedMessage &&
+				!(lockStatus?.locked && !lockStatus?.isOwnLock)
+			"
+			class="m-0 text-sm text-secondary"
+		>
 			{{ currentStageObj._hint }}
 		</p>
 		<Collapsible
@@ -185,10 +208,7 @@
 							</template>
 						</p>
 					</div>
-					<div
-						v-else-if="generatedMessage"
-						class="flex min-h-0 flex-1 flex-col gap-2"
-					>
+					<div v-else-if="generatedMessage" class="flex min-h-0 flex-1 flex-col gap-2">
 						<ButtonStyled class="shrink-0 self-start">
 							<button @click="useSimpleEditor = !useSimpleEditor">
 								<template v-if="!useSimpleEditor">
@@ -234,7 +254,12 @@
 					<div v-else class="flex min-h-0 flex-1 flex-col">
 						<NodeRenderer
 							class="min-h-0 flex-1 overflow-y-auto"
-							:nodes="resolveChildren(currentStageObj, (nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>)"
+							:nodes="
+								resolveChildren(
+									currentStageObj,
+									(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
+								)
+							"
 							:show-context="(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>"
 							:on-image-upload="onUploadHandler"
 						/>
@@ -257,10 +282,14 @@
 
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="!done" circular>
-							<button ref="stageBottomBtnRef" v-tooltip="`Stages`" @click="openStageSelector($event)">
-								<ListBulletedIcon />
-							</button>
-						</ButtonStyled>
+								<button
+									ref="stageBottomBtnRef"
+									v-tooltip="`Stages`"
+									@click="openStageSelector($event)"
+								>
+									<ListBulletedIcon />
+								</button>
+							</ButtonStyled>
 
 							<div v-if="done">
 								<ButtonStyled color="brand">
@@ -416,7 +445,7 @@ import {
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
-import { type ActiveAction, type LiveNode,NODE_META_KEY, STATE_KEY } from './checklist-context'
+import { type ActiveAction, type LiveNode, NODE_META_KEY, STATE_KEY } from './checklist-context'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 import NodeRenderer from './NodeRenderer.vue'
@@ -1065,11 +1094,17 @@ async function positionStageDropdown(triggerRect: DOMRect) {
 		openAbove = true
 	} else if (spaceBelow >= spaceAbove) {
 		top = Math.max(4, Math.min(triggerRect.bottom, vh - menuH - 4))
-		if (menuH > vh - 8) { top = 4; maxH = `${vh - 8}px` }
+		if (menuH > vh - 8) {
+			top = 4
+			maxH = `${vh - 8}px`
+		}
 	} else {
 		top = Math.max(4, triggerRect.top - menuH)
 		openAbove = true
-		if (menuH > vh - 8) { top = 4; maxH = `${vh - 8}px` }
+		if (menuH > vh - 8) {
+			top = 4
+			maxH = `${vh - 8}px`
+		}
 	}
 
 	stageDropdownMenuStyle.value = {
@@ -1109,7 +1144,12 @@ function openStageSelector(event: MouseEvent) {
 	}
 
 	stageDropdownTriggerEl.value = triggerEl
-	stageDropdownMenuStyle.value = { position: 'fixed', top: '-9999px', left: '-9999px', zIndex: '9999' }
+	stageDropdownMenuStyle.value = {
+		position: 'fixed',
+		top: '-9999px',
+		left: '-9999px',
+		zIndex: '9999',
+	}
 	stageDropdownOpen.value = true
 	positionStageDropdown(triggerEl.getBoundingClientRect())
 }
@@ -1137,56 +1177,60 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 				stageActiveActions.push({ action: stage._action, state: stageState, statePath: [] })
 			}
 
-			walkNodes(
-				resolveChildren(stage, stageState),
-				stageState,
-				(node, nodeState, localState) => {
-					isVisible = true
-					const active = isNodeActive(node, nodeState)
-					const actionState =
-						node.type === 'toggle' || node.type === 'check' || node.type === 'option'
-							? (getBooleanChildState(nodeState) as Record<string, NodeState>)
-							: localState
-					const isRequired = !!(node as ValueNodeBuilder)._required
-					const nodeActiveActions: ActiveAction[] = []
+			walkNodes(resolveChildren(stage, stageState), stageState, (node, nodeState, localState) => {
+				isVisible = true
+				const active = isNodeActive(node, nodeState)
+				const actionState =
+					node.type === 'toggle' || node.type === 'check' || node.type === 'option'
+						? (getBooleanChildState(nodeState) as Record<string, NodeState>)
+						: localState
+				const isRequired = !!(node as ValueNodeBuilder)._required
+				const nodeActiveActions: ActiveAction[] = []
 
-					let isFixActionable = false
-					if (active) {
-						if (node._action) {
-							messageCount++
-							nodeActiveActions.push({ action: node._action, state: actionState, statePath: node._statePath ?? [] })
-							stageActiveActions.push({ action: node._action, state: actionState, statePath: node._statePath ?? [] })
-						}
-						isFixActionable = (node._action?._fixes ?? []).some((f) => {
-							if (f._projectFn) {
-								const { proxy, changes } = createTrackedPatch(projectV3.value as any)
-								f._projectFn(proxy as any, actionState)
-								return Object.keys(changes()).length > 0
-							}
-							if (f._versionFn) {
-								const version = versions.value?.[0]
-								if (!version) return true
-								const { proxy, changes } = createTrackedPatch(version as any)
-								f._versionFn(proxy as any, actionState)
-								return Object.keys(changes()).length > 0
-							}
-							return false
+				let isFixActionable = false
+				if (active) {
+					if (node._action) {
+						messageCount++
+						nodeActiveActions.push({
+							action: node._action,
+							state: actionState,
+							statePath: node._statePath ?? [],
 						})
-						if (isFixActionable) fixCount++
+						stageActiveActions.push({
+							action: node._action,
+							state: actionState,
+							statePath: node._statePath ?? [],
+						})
 					}
-
-					if (isRequired && !active) hasRequiredMissing = true
-					map.set(node, {
-						isActive: active,
-						isVisible: node._shown === undefined || resolve(node._shown),
-						isFixActionable,
-						messageCount: active && node._action ? 1 : 0,
-						fixCount: isFixActionable ? 1 : 0,
-						hasRequiredMissing: isRequired && !active,
-						activeActions: nodeActiveActions,
+					isFixActionable = (node._action?._fixes ?? []).some((f) => {
+						if (f._projectFn) {
+							const { proxy, changes } = createTrackedPatch(projectV3.value as any)
+							f._projectFn(proxy as any, actionState)
+							return Object.keys(changes()).length > 0
+						}
+						if (f._versionFn) {
+							const version = versions.value?.[0]
+							if (!version) return true
+							const { proxy, changes } = createTrackedPatch(version as any)
+							f._versionFn(proxy as any, actionState)
+							return Object.keys(changes()).length > 0
+						}
+						return false
 					})
-				},
-			)
+					if (isFixActionable) fixCount++
+				}
+
+				if (isRequired && !active) hasRequiredMissing = true
+				map.set(node, {
+					isActive: active,
+					isVisible: node._shown === undefined || resolve(node._shown),
+					isFixActionable,
+					messageCount: active && node._action ? 1 : 0,
+					fixCount: isFixActionable ? 1 : 0,
+					hasRequiredMissing: isRequired && !active,
+					activeActions: nodeActiveActions,
+				})
+			})
 		}
 
 		map.set(stage, {
@@ -1203,7 +1247,9 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 	return map
 })
 
-const restoredStage = persistedState ? resolvedStages.value.findIndex((s) => s.id === persistedState.stage) : -1
+const restoredStage = persistedState
+	? resolvedStages.value.findIndex((s) => s.id === persistedState.stage)
+	: -1
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
 
 const router = useRouter()
@@ -1282,12 +1328,86 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryWithhold: () => sendMessage('withheld'),
 				tryEditMessage: goBackToStages,
 
-				tryToggleAction: () => {},
-				trySelectDropdownOption: () => {},
-				tryToggleChip: () => {},
-				tryFocusNextAction: () => {},
-				tryFocusPreviousAction: () => {},
-				tryActivateFocusedAction: () => {},
+				tryCopyLink: async (permalink: boolean, relative: boolean, page: boolean) => {
+					let url = ``
+					if (relative) {
+						url += `${globalThis.location.origin}`
+					} else {
+						url += `https://modrinth.com`
+					}
+
+					if (permalink) {
+						url += `/project/${projectV2.value.id}`
+					} else {
+						url += `/${projectV2.value.project_type}/${projectV2.value.slug}`
+					}
+
+					if (page) {
+						url += `/${globalThis.location.pathname.split('/').slice(3).join('/')}`
+					}
+
+					await navigator.clipboard.writeText(url)
+				},
+
+				tryCopyId: async () => await navigator.clipboard.writeText(projectV2.value.id),
+
+				tryToggleAction: (actionIndex: number) => {
+					const action = visibleActions.value[actionIndex]
+					if (action) {
+						toggleAction(action)
+					}
+				},
+				trySelectDropdownOption: (actionIndex: number, optionIndex: number) => {
+					const action = visibleActions.value[actionIndex] as DropdownAction
+					if (action && action.type === 'dropdown') {
+						const visibleOptions = getVisibleDropdownOptions(action)
+						if (optionIndex < visibleOptions.length) {
+							selectDropdownOption(action, visibleOptions[optionIndex])
+						}
+					}
+				},
+				tryToggleChip: (actionIndex: number, chipIndex: number) => {
+					const action = visibleActions.value[actionIndex] as MultiSelectChipsAction
+					if (action && action.type === 'multi-select-chips') {
+						const visibleOptions = getVisibleMultiSelectOptions(action)
+						if (chipIndex < visibleOptions.length) {
+							toggleChip(action, chipIndex)
+						}
+					}
+				},
+
+				tryFocusNextAction: () => {
+					if (visibleActions.value.length === 0) return
+					if (focusedActionIndex.value === null) {
+						focusedActionIndex.value = 0
+					} else {
+						focusedActionIndex.value = (focusedActionIndex.value + 1) % visibleActions.value.length
+					}
+				},
+				tryFocusPreviousAction: () => {
+					if (visibleActions.value.length === 0) return
+					if (focusedActionIndex.value === null) {
+						focusedActionIndex.value = visibleActions.value.length - 1
+					} else {
+						focusedActionIndex.value =
+							focusedActionIndex.value === 0
+								? visibleActions.value.length - 1
+								: focusedActionIndex.value - 1
+					}
+				},
+				tryActivateFocusedAction: () => {
+					if (focusedActionIndex.value === null) return
+					const action = visibleActions.value[focusedActionIndex.value]
+					if (!action) return
+
+					if (
+						action.type === 'button' ||
+						action.type === 'conditional-button' ||
+						action.type === 'toggle'
+					) {
+						toggleAction(action)
+					}
+				},
 			},
 		},
 		Object.values(keybinds.value),
@@ -1456,7 +1576,13 @@ async function assembleFullMessage() {
 			.filter((a) => a.action._message || a.action._autoMessage)
 			.map(async (a) => {
 				const msg = a.action._autoMessage
-					? await loadMd(`checklist/messages/${a.statePath.join('/')}`, a.state, projectV3.value, projectV2.value, a.action._autoMessageVars)
+					? await loadMd(
+							`checklist/messages/${a.statePath.join('/')}`,
+							a.state,
+							projectV3.value,
+							projectV2.value,
+							a.action._autoMessageVars,
+						)
 					: await a.action._message!(a.state)
 				if (msg) parts.push({ priority: a.action._priority, content: msg })
 			}),
@@ -1969,9 +2095,7 @@ const stageOptionsForSlots = computed(() =>
 			transform: translateY(0);
 		}
 	}
-
 }
-
 
 // Tooltip styling for button action message previews.
 // Must use :global since floating-vue teleports tooltips outside the component DOM.

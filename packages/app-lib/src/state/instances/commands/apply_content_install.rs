@@ -285,6 +285,13 @@ pub(crate) async fn switch_project_version_with_dependencies(
     }
 
     if new_path != project_path {
+        rename_project_companion_file(
+            instance_id,
+            project_path,
+            &new_path,
+            state,
+        )
+        .await?;
         remove_project(instance_id, project_path, state).await?;
     }
 
@@ -719,6 +726,42 @@ pub(crate) async fn remove_project(
             &state.pool,
         )
         .await?;
+    }
+
+    Ok(())
+}
+
+pub(crate) async fn rename_project_companion_file(
+    instance_id: &str,
+    old_project_path: &str,
+    new_project_path: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let project_type = ProjectType::get_from_parent_folder(new_project_path);
+    if project_type == Some(ProjectType::ShaderPack) {
+        let scope = resolve_content_scope(instance_id, None, state).await?;
+        let base = instance_full_path(state, &scope.instance);
+
+        let old_txt_path = base.join(format!(
+            "{}.txt",
+            old_project_path.trim_end_matches(".disabled")
+        ));
+        let new_txt_path = base.join(format!(
+            "{}.txt",
+            new_project_path.trim_end_matches(".disabled")
+        ));
+
+        if old_txt_path.exists() {
+            if new_txt_path.exists()
+                && io::canonicalize(&old_txt_path)?
+                    == io::canonicalize(&new_txt_path)?
+            {
+                return Ok(());
+            }
+
+            io::copy(&old_txt_path, &new_txt_path).await?;
+            io::remove_file(&old_txt_path).await?;
+        }
     }
 
     Ok(())

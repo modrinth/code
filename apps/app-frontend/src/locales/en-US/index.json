@@ -425,29 +425,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Content required"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Dont install"
   },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Install anyway"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Install"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Required modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Shared server instance"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Unknown files warning"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Unrecognized files"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
@@ -455,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "Update to play"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Update required"
+  "app.modal.update-to-play.removed": {
+    "message": "Removed"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
@@ -1102,26 +1111,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Don't show this warning again"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Confirm installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Install anyway"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Unknown file warning"
   }
 }

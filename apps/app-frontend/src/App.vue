@@ -855,12 +855,13 @@ async function handleCommand(e) {
 		if (e.path.endsWith('.mrpack')) {
 			const location = { type: 'fromFile', path: e.path }
 			const preview = await install_get_modpack_preview(location).catch(handleError)
-			if (preview?.unknownFile) {
+			if (preview?.unknownFile || preview?.externalFilesInModpack.length > 0) {
 				const splitPath = e.path.split(/[\\/]/)
 				const fileName = splitPath ? splitPath[splitPath.length - 1] : e.path
 				unknownPackWarningModal.value?.show(
 					() => install_create_modpack_instance(location).then(() => undefined),
 					fileName,
+					preview.externalFilesInModpack,
 				)
 			} else {
 				await install_create_modpack_instance(location).catch(handleError)
@@ -1736,8 +1737,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
-	<InstallToPlayModal ref="installToPlayModal" />
-	<UpdateToPlayModal ref="updateToPlayModal" />
+	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
+	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
 </template>
 
 <style lang="scss" scoped>
