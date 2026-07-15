@@ -48,6 +48,10 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 	provide('showCreationModal', () => {
 		installationModal.value?.show()
 	})
+	provide('showImportModal', async () => {
+		await installationModal.value?.show()
+		installationModal.value?.ctx.setImportMode()
+	})
 
 	async function proceedWithModpackCreation(
 		projectId: string,
