@@ -317,11 +317,12 @@ pub async fn list(
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::VERSION_READ,
     )
-    .await
-    .ok()
-    .is_some_and(|(_, user)| user.role.is_mod());
+    .await?
+    .1
+    .role
+    .is_mod();
 
     let groups = sqlx::query!(
         r#"
