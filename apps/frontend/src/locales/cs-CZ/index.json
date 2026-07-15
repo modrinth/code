@@ -89,6 +89,9 @@
   "analytics.chart.controls.button": {
     "message": "Ovládání"
   },
+  "analytics.chart.controls.display": {
+    "message": "Zobrazit"
+  },
   "analytics.chart.controls.modrinth-events": {
     "message": "Události Modrinthu"
   },
@@ -136,6 +139,9 @@
   },
   "analytics.chart.tooltip.hide-entry": {
     "message": "Skrýt {name} v grafu"
+  },
+  "analytics.chart.tooltip.pinned-aria": {
+    "message": "Připnuto"
   },
   "analytics.chart.tooltip.previous-period-short": {
     "message": "(předch.)"
@@ -289,6 +295,9 @@
   },
   "analytics.project-status.private": {
     "message": "Soukromý"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Zamítnuto"
   },
   "analytics.project-status.unlisted": {
     "message": "Neveřejný"
@@ -1268,6 +1277,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Odměny"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Vyhledat množství"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Neověřený e-mail"
   },
@@ -1524,7 +1536,7 @@
     "message": "Peněženka"
   },
   "dashboard.withdraw.error.email-verification.title": {
-    "message": "Ověření e-mailu je povinné"
+    "message": "Požadováno ověření emailu"
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Nedostatečný zůstatek"
@@ -2366,9 +2378,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nepodporuje {platform} pro {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Hledat verze hry..."
-  },
   "project.download.select-game-version": {
     "message": "Vybrat verzi hry"
   },
@@ -3139,9 +3148,6 @@
   },
   "version.dependency.view-version": {
     "message": "Zobrazit verzi"
-  },
-  "version.download.download-dependency": {
-    "message": "Stáhnout vyžadovaný obsah"
   },
   "version.download.optional-resource-pack": {
     "message": "Nepovinný resource pack"

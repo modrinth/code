@@ -221,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "Öppna mapp"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Öppna i webbläsare"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Öppna i mapp"
   },
@@ -235,6 +238,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Ominstallera modpaket"
+  },
+  "button.remove": {
+    "defaultMessage": "Ta bort"
   },
   "button.remove-image": {
     "defaultMessage": "Ta bort bild"
@@ -287,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "Stoppa"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Byt till version"
+  },
   "button.switch-version": {
     "defaultMessage": "Byt versioner"
   },
@@ -313,6 +322,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Plattform"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Den här samlingen är tom."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Laddar projekt..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Inga projekt matchar din sökning."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# project} other {# projects}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Sök efter projekt"
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
@@ -400,6 +424,21 @@
   },
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "Raderar"
+  },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "Inaktivera anhöriga efter borttagning"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "Beroende innehåll kan misslyckas med att ladda eller kan inaktivera sig själv"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Din {context} kan krascha, vägra starta eller bete sig oväntat"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "Beroendevarning"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} Är installerat som ett beroende. Om du tar bort det kan du bryta {context} eller förhindra att beroende innehåll laddas korrekt."
   },
   "content.dependency-warning.what-happens-label": {
     "defaultMessage": "Vad händer?"
@@ -611,6 +650,18 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Initiera server"
   },
+  "creation-flow.modal.custom-setup.build-number.label": {
+    "defaultMessage": "Byggnummer"
+  },
+  "creation-flow.modal.custom-setup.build-number.placeholder": {
+    "defaultMessage": "Välj byggnummer"
+  },
+  "creation-flow.modal.custom-setup.build-number.search-placeholder": {
+    "defaultMessage": "Sök byggnummer..."
+  },
+  "creation-flow.modal.custom-setup.content-loader.label": {
+    "defaultMessage": "Innehållsladdning"
+  },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
     "defaultMessage": "Välj spelversion"
   },
@@ -638,11 +689,17 @@
   "creation-flow.modal.custom-setup.name.label": {
     "defaultMessage": "Namn"
   },
+  "creation-flow.modal.custom-setup.name.placeholder": {
+    "defaultMessage": "Ange instansnamn"
+  },
   "creation-flow.modal.custom-setup.options.no-versions-available": {
     "defaultMessage": "Ingen version tillgänglig"
   },
   "creation-flow.modal.final-config.additional-settings.title": {
     "defaultMessage": "Ytterligare inställningar"
+  },
+  "creation-flow.modal.final-config.backup.before-reset-server.name": {
+    "defaultMessage": "Före serveromställning"
   },
   "creation-flow.modal.final-config.difficulty.easy": {
     "defaultMessage": "Lätt"
@@ -758,6 +815,9 @@
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importera instans"
   },
+  "creation-flow.modal.setup-type.option.modpack-base.title": {
+    "defaultMessage": "Installera modpaket"
+  },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Klassiska Minecraft, utan moddar eller plugin."
   },
@@ -766,6 +826,9 @@
   },
   "creation-flow.title.create-world": {
     "defaultMessage": "Skapa värld"
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "Mina projekt"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Nej"
@@ -1556,6 +1619,12 @@
   "label.details": {
     "defaultMessage": "Detaljer"
   },
+  "label.done": {
+    "defaultMessage": "Klart"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Nedladdning misslyckades"
+  },
   "label.email": {
     "defaultMessage": "E-post"
   },
@@ -2048,6 +2117,9 @@
   "payment-method.jcb": {
     "defaultMessage": "JCB"
   },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
   },
@@ -2202,7 +2274,7 @@
     "defaultMessage": "Projektägare"
   },
   "project.about.creators.title": {
-    "defaultMessage": "Kreatörer"
+    "defaultMessage": "Skapare"
   },
   "project.about.details.created": {
     "defaultMessage": "Skapad {date}"
@@ -2906,6 +2978,30 @@
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
     "defaultMessage": "Avlänkat modpaket"
   },
+  "servers.access-page.role.owner": {
+    "defaultMessage": "Ägare"
+  },
+  "servers.access-role.owner": {
+    "defaultMessage": "Ägare"
+  },
+  "servers.access-table.column.role": {
+    "defaultMessage": "Roll"
+  },
+  "servers.access-table.column.user": {
+    "defaultMessage": "Användare"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "--"
+  },
+  "servers.audit-log.column.time": {
+    "defaultMessage": "Tid"
+  },
+  "servers.audit-log.column.user": {
+    "defaultMessage": "Användare"
+  },
+  "servers.audit-log.column.world.tooltip-title": {
+    "defaultMessage": "Kommer snart!"
+  },
   "servers.audit-log.event.modpack-unlinked": {
     "defaultMessage": "Avlänkat modpaket"
   },
@@ -2914,6 +3010,9 @@
   },
   "servers.audit-log.event.modpack-unlinked-version": {
     "defaultMessage": "Avlänkat modpaket version <version></version>"
+  },
+  "servers.audit-log.scope.server": {
+    "defaultMessage": "Server"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Något gick fel när säkerhetskopian {backupName} skapades. Vänligen försök igen eller kontakta support om felet återkommer."
@@ -2978,6 +3077,33 @@
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen."
   },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Logga in"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Kopierat"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Kopiera ID"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Hantera användarfakturering"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Ny"
+  },
+  "servers.listing.owner-tooltip": {
+    "defaultMessage": "Ägs av {username}"
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Prenumerera igen"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Server icon"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Support"
+  },
   "servers.manage.error.details": {
     "defaultMessage": "Feldetaljer:"
   },
@@ -2990,8 +3116,26 @@
   "servers.manage.resubscribe-error.title": {
     "defaultMessage": "Fel vid återprenumerering"
   },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Lyckades"
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Visa inte igen"
+  },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "Dina servrar"
+  },
   "servers.medal-listing.new-server-label": {
     "defaultMessage": "Ny server"
+  },
+  "servers.medal-listing.owner-tooltip": {
+    "defaultMessage": "Ägs av {username}"
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Server icon"
   },
   "servers.medal-listing.upgrade-button": {
     "defaultMessage": "Uppgradera"
@@ -3038,8 +3182,14 @@
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Kom igång"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Stor"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Ideal för 15–25 spelare, modpaket, eller tungt moddande."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Medel"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Bra för 6–15 spelare och flera moddar."
@@ -3050,11 +3200,17 @@
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Välj plan"
   },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Liten"
+  },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfekt för 1–5 vänner med några få lätta moddar."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Din nuvarande prenumeration"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Region"
@@ -3062,11 +3218,23 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Granska"
   },
+  "servers.region.australia": {
+    "defaultMessage": "Australien"
+  },
   "servers.region.central-europe": {
     "defaultMessage": "Centraleuropa"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Hur mycket RAM vill du att din server ska ha?"
+  },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "RAM"
+  },
+  "servers.region.north-america-central": {
+    "defaultMessage": "Centrala Nordamerika"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "Östra Nordamerika"
   },
   "servers.region.prompt": {
     "defaultMessage": "Vart vill du att din server ska vara placerad?"
@@ -3079,6 +3247,9 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Västeuropa"
+  },
+  "servers.remove-access-modal.what-happens-label": {
+    "defaultMessage": "Vad händer?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen. Vänligen försök igen senare."
@@ -3344,6 +3515,9 @@
   "tag.category.management": {
     "defaultMessage": "Hantering"
   },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
   "tag.category.medium": {
     "defaultMessage": "Medel"
   },
@@ -3578,8 +3752,65 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Tillämpa"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Avbryt"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Rensa"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Idag"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Igår"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "dagar"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "timmar"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "månader"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "veckor"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Du har osparade ändringar."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Du har osparade ändringar"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Lämna sida"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Stanna på sidan"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Lämna sidan?"
+  },
+  "version.content.name": {
+    "defaultMessage": "Namn"
+  },
+  "version.content.version": {
+    "defaultMessage": "Version"
+  },
+  "version.section.files": {
+    "defaultMessage": "Filer"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "Fil"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "Storlek"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "Typ"
   }
 }
 

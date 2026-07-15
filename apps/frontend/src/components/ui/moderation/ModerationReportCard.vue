@@ -37,21 +37,22 @@
 					>
 						{{ formatRelativeTime(report.created) }}
 					</span>
-					<ButtonStyled circular>
-						<OverflowMenu :options="quickActions">
-							<template #default>
-								<EllipsisVerticalIcon class="size-4" />
-							</template>
-							<template #copy-id>
+					<div class="flex items-center gap-2">
+						<ButtonStyled circular>
+							<button v-tooltip="'Copy ID'" @click="copyId">
 								<ClipboardCopyIcon />
-								<span class="hidden sm:inline">Copy ID</span>
-							</template>
-							<template #copy-link>
-								<LinkIcon />
-								<span class="hidden sm:inline">Copy link</span>
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
+							</button>
+						</ButtonStyled>
+						<ButtonStyled circular>
+							<a
+								v-tooltip="'Open in new tab'"
+								:href="`/moderation/reports/${props.report.id}`"
+								target="_blank"
+							>
+								<ExternalIcon />
+							</a>
+						</ButtonStyled>
+					</div>
 				</div>
 			</div>
 
@@ -183,12 +184,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import {
-	CheckCircleIcon,
-	ClipboardCopyIcon,
-	EllipsisVerticalIcon,
-	LinkIcon,
-} from '@modrinth/assets'
+import { CheckCircleIcon, ClipboardCopyIcon, ExternalIcon } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
@@ -196,8 +192,6 @@ import {
 	CollapsibleRegion,
 	getProjectTypeIcon,
 	injectNotificationManager,
-	OverflowMenu,
-	type OverflowMenuOption,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
@@ -328,35 +322,6 @@ function updateThread(newThread: any) {
 	}
 }
 
-const quickActions: OverflowMenuOption[] = [
-	{
-		id: 'copy-link',
-		action: () => {
-			const base = window.location.origin
-			const reportUrl = `${base}/moderation/reports/${props.report.id}`
-			navigator.clipboard.writeText(reportUrl).then(() => {
-				addNotification({
-					type: 'success',
-					title: 'Report link copied',
-					text: 'The link to this report has been copied to your clipboard.',
-				})
-			})
-		},
-	},
-	{
-		id: 'copy-id',
-		action: () => {
-			navigator.clipboard.writeText(props.report.id).then(() => {
-				addNotification({
-					type: 'success',
-					title: 'Report ID copied',
-					text: 'The ID of this report has been copied to your clipboard.',
-				})
-			})
-		},
-	},
-]
-
 const reportItemAvatarUrl = computed(() => {
 	switch (props.report.item_type) {
 		case 'project':
@@ -395,4 +360,14 @@ const formattedReportType = computed(() => {
 	const words = reportType.includes('-') ? reportType.split('-') : reportType.split(' ')
 	return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 })
+
+function copyId() {
+	navigator.clipboard.writeText(props.report.id).then(() => {
+		addNotification({
+			type: 'success',
+			title: 'Report ID copied',
+			text: 'The ID of this report has been copied to your clipboard.',
+		})
+	})
+}
 </script>

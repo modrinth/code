@@ -38,6 +38,9 @@
   "analytics.breakdown.loader": {
     "message": "Loader"
   },
+  "analytics.breakdown.members": {
+    "message": "Miyembro"
+  },
   "analytics.breakdown.monetization": {
     "message": "Monetisasyon"
   },
@@ -133,6 +136,9 @@
   },
   "analytics.stat.views": {
     "message": "Pagtingin"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Wala"
   },
   "analytics.value.none": {
     "message": "Wala"
@@ -1428,7 +1434,7 @@
     "message": "Alok sa limitadong oras. Walang kakailanganing credit card. Magagamit para sa mga server sa US."
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "Pumili ng sinadyang plan na may specs na kakailanganin mo."
+    "message": "Pumili ng pasadya na plan na may specs na kailangan mo."
   },
   "hosting-marketing.server-for-everyone": {
     "message": "May server para sa lahat"
@@ -1876,6 +1882,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tech review"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Nabigo"
   },
   "muralpay.account-type.checking": {
     "message": "Sinusuri"
@@ -2417,9 +2426,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "Hindi masuport ng {title} ang {platform} para sa {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Maghanap ng mga bersiyon ng laro..."
-  },
   "project.download.select-game-version": {
     "message": "Piliin ang lahat ng bersiyon ng laro"
   },
@@ -2533,6 +2539,9 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Estado"
   },
   "project.settings.title": {
     "message": "Mga Setting"
@@ -2941,6 +2950,9 @@
   },
   "settings.account.security.email.title": {
     "message": "Email"
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Pangalan"
   },
   "settings.account.security.password.action.add": {
     "message": "Magdagdag ng password"
@@ -3355,6 +3367,9 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Mag-subscribe sa Modrinth newsletter"
+  },
+  "version.edit.button": {
+    "message": "Baguhin"
   },
   "version.environment.none.description": {
     "message": "Wala pang itinakdang environment para sa bersiyong ito."

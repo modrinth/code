@@ -1424,9 +1424,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {platform} pentru {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Caută versiuni ale jocului..."
-  },
   "project.download.select-game-version": {
     "message": "Selectează versiunea jocului"
   },

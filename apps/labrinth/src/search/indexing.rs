@@ -674,8 +674,10 @@ async fn build_search_documents(
                 }
             }));
 
-            let project_categories = categories.clone();
-            let mut categories = categories;
+            let mut project_categories = categories;
+            project_categories.sort();
+            project_categories.dedup();
+            let mut categories = project_categories.clone();
             categories.extend(project_loaders.iter().cloned());
 
             let mrpack_loaders = loader_fields

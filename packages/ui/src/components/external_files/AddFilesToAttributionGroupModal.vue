@@ -65,6 +65,7 @@ const assignableEntries = ref<AssignableFileEntry[]>([])
 const searchQuery = ref('')
 const searchInputRef = ref<{ focus: () => void } | null>(null)
 const selectedSha1s = ref<Set<string>>(new Set())
+const selectionAnchorSha1 = ref<string | null>(null)
 
 const filteredEntries = computed(() => {
 	const q = searchQuery.value.trim().toLowerCase()
@@ -85,18 +86,35 @@ function isFileSelected(sha1: string) {
 	return selectedSha1s.value.has(sha1)
 }
 
-function toggleFileSelection(sha1: string) {
+function toggleFileSelection(sha1: string, event: MouseEvent) {
 	const next = new Set(selectedSha1s.value)
-	if (next.has(sha1)) {
-		next.delete(sha1)
-	} else {
-		next.add(sha1)
+	const shouldSelect = !next.has(sha1)
+	const entryIndex = filteredEntries.value.findIndex((entry) => entry.sha1 === sha1)
+	const anchorIndex = filteredEntries.value.findIndex(
+		(entry) => entry.sha1 === selectionAnchorSha1.value,
+	)
+
+	const sha1sToToggle =
+		event.shiftKey && entryIndex !== -1 && anchorIndex !== -1
+			? filteredEntries.value
+					.slice(Math.min(entryIndex, anchorIndex), Math.max(entryIndex, anchorIndex) + 1)
+					.map((entry) => entry.sha1)
+			: [sha1]
+
+	for (const sha1ToToggle of sha1sToToggle) {
+		if (shouldSelect) {
+			next.add(sha1ToToggle)
+		} else {
+			next.delete(sha1ToToggle)
+		}
 	}
 	selectedSha1s.value = next
+	selectionAnchorSha1.value = sha1
 }
 
 function clearSelectedFiles() {
 	selectedSha1s.value = new Set()
+	selectionAnchorSha1.value = null
 }
 
 function focusSearchOnOpen() {
@@ -208,7 +226,7 @@ defineExpose({ show, hide })
 						class="w-full text-left p-3 flex flex-col gap-1 appearance-none bg-transparent 3 transition-colors disabled:opacity-50"
 						:disabled="pending"
 						:aria-pressed="isFileSelected(entry.sha1)"
-						@click="toggleFileSelection(entry.sha1)"
+						@click="toggleFileSelection(entry.sha1, $event)"
 					>
 						<span class="flex gap-2 font-medium">
 							<span

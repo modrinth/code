@@ -26,6 +26,8 @@ use crate::search::{
 };
 use crate::util::error::Context;
 
+const DELETE_FILTER_ID_BATCH_SIZE: usize = 256;
+
 #[derive(Debug, Clone)]
 pub struct TypesenseConfig {
     pub url: String,
@@ -1352,10 +1354,13 @@ impl SearchBackend for Typesense {
             return Ok(());
         }
 
-        let id_list = ids.iter().map(ToString::to_string).join(", ");
-        let filter = format!("id:[{id_list}]");
         let alias = self.config.get_alias_name("versions");
-        self.delete_from_write_collections(&alias, &filter).await
+        for ids in ids.chunks(DELETE_FILTER_ID_BATCH_SIZE) {
+            let id_list = ids.iter().map(ToString::to_string).join(", ");
+            let filter = format!("id:[{id_list}]");
+            self.delete_from_write_collections(&alias, &filter).await?;
+        }
+        Ok(())
     }
 
     async fn tasks(&self) -> eyre::Result<Value> {

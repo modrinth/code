@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Java adresleri ekle"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Özel lisansınız için geçerli bir URL ve isim veya SPDX tanımlayıcısı ekleyin."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Lisans detaylarını ekleyin"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Modrinth'in dışında herhangi ilgili bağlantı ekleyin, website, mağaza veya Discord daveti gibi."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Mevcut olan bütün dilleri seçtiniz. Lütfen sadece sunucunuzun desteklediği dilleri seçin."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Doğru dilleri seçin"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Bütün {totalAvailableTags} alınabilecek etiketi seçtin. Bu etiketlerin amacına uygun değil. Etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmalıdır. Lütfen sadece projenle ilgili etiketleri seç."
@@ -220,6 +232,9 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "İsmi düzenle"
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Doğru dilleri seçin"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "{tagCount,plural,one {#etiket}other {#etiketler}} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
