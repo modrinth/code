@@ -3,7 +3,7 @@ import { injectProjectPageContext } from '@modrinth/ui'
 
 import { action, group, markdown, md, stage, toggle } from '../../types/node'
 
-const SHOW_SPOILER_ADVICE = ['horror']
+const SHOW_SPOILER_ADVICE = ['spoilers']
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -47,10 +47,10 @@ export default function () {
 											'checklist/messages/description/insufficient/piece/unfinished',
 										)(state)
 
-									if (reasons.has('horror'))
-										message += await md('checklist/messages/description/insufficient/piece/horror')(
-											state,
-										)
+									if (reasons.has('spoilers'))
+										message += await md(
+											'checklist/messages/description/insufficient/piece/spoilers',
+										)(state)
 
 									// Always put this at bottom
 									if (SHOW_SPOILER_ADVICE.some((reason) => reasons.has(reason)))
@@ -68,7 +68,7 @@ export default function () {
 								.children(
 									toggle('fork', 'Fork'),
 									toggle('unfinished', 'Unfinished'),
-									toggle('horror', 'Horror'),
+									toggle('spoilers', 'Spoilers'),
 									toggle('custom', 'Custom').children(
 										markdown('explainer')
 											.title('How can the author improve their description?')
