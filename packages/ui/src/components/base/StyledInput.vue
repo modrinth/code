@@ -34,11 +34,13 @@
 			:spellcheck="spellcheck"
 			:maxlength="maxlength"
 			:rows="rows"
-			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow border border-solid rounded-xl"
 			:class="[
 				inputClass,
 				'pl-3 pr-3 py-2 text-base',
-				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				error
+					? 'outline-none border-red bg-highlight-red'
+					: 'outline-none border-surface-5 bg-surface-4',
 				disabled ? 'cursor-not-allowed' : '',
 				resizeClass,
 			]"
@@ -72,24 +74,35 @@
 			:class="[
 				inputClass,
 				variant === 'filled' && icon ? 'pl-10' : 'pl-3',
-				clearable && model && variant === 'filled' ? 'pr-8' : 'pr-3',
+				showClearButton || isDateInput ? 'pr-10' : 'pr-3',
+				isDateInput ? '[&::-webkit-calendar-picker-indicator]:opacity-0' : '',
 				size === 'small' ? 'h-8 py-1.5 text-sm' : 'h-9 py-2 text-base',
-				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				'outline-none',
 				disabled ? 'cursor-not-allowed' : '',
+				error ? 'bg-highlight-red' : variant === 'outlined' ? 'bg-transparent' : 'bg-surface-4',
+				error ? 'border-red' : variant === 'outlined' ? 'border-button-bg' : 'border-surface-5',
 				variant === 'outlined'
-					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
-					: 'bg-surface-4 border-none rounded-xl',
+					? 'border border-solid rounded-l-xl border-r-0'
+					: 'border border-solid rounded-xl',
 			]"
 			@input="onInput"
 			@focus="isFocused = true"
 			@blur="isFocused = false"
 		/>
 
+		<CalendarIcon
+			v-if="isDateInput && !showClearButton"
+			class="pointer-events-none absolute right-3 top-1/2 z-[1] h-5 w-5 -translate-y-1/2 transition-colors"
+			:class="[isFocused ? 'opacity-100 text-contrast' : 'opacity-60 text-secondary']"
+			aria-hidden="true"
+		/>
+
 		<!-- Clear button (right side, filled variant, single-line only) -->
 		<button
-			v-if="!multiline && clearable && model && !disabled && !readonly && variant === 'filled'"
+			v-if="showClearButton"
 			type="button"
-			class="absolute right-0.5 z-[1] p-2 touch-manipulation bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
+			class="absolute right-0.5 top-1/2 z-[1] flex h-full w-10 -translate-y-1/2 touch-manipulation items-center justify-center border-none bg-transparent p-0 transition-colors cursor-pointer select-none hover:opacity-100 hover:text-contrast"
+			:class="[isFocused ? 'opacity-100 text-contrast' : 'opacity-60 text-secondary']"
 			aria-label="Clear input"
 			@click="clear"
 		>
@@ -100,7 +113,8 @@
 		<button
 			v-if="!multiline && variant === 'outlined'"
 			type="button"
-			class="flex touch-manipulation items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
+			class="flex touch-manipulation items-center justify-center px-2 bg-transparent border border-solid rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
+			:class="error ? 'border-red' : 'border-button-bg'"
 			:aria-label="clearable && model ? 'Clear input' : 'Search'"
 			:tabindex="clearable && model ? undefined : -1"
 			@click="clearable && model ? clear() : undefined"
@@ -116,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { SearchIcon, XIcon } from '@modrinth/assets'
+import { CalendarIcon, SearchIcon, XIcon } from '@modrinth/assets'
 import { type Component, computed, ref } from 'vue'
 
 const model = defineModel<string | number | undefined>()
@@ -170,6 +184,18 @@ const emit = defineEmits<{
 
 const inputRef = ref<HTMLInputElement | HTMLTextAreaElement>()
 const isFocused = ref(false)
+const isDateInput = computed(
+	() => !props.multiline && (props.type === 'date' || props.type === 'datetime-local'),
+)
+const showClearButton = computed(
+	() =>
+		!props.multiline &&
+		props.clearable &&
+		Boolean(model.value) &&
+		!props.disabled &&
+		!props.readonly &&
+		props.variant === 'filled',
+)
 const resizeClass = computed(
 	() => ({ none: 'resize-none', vertical: 'resize-y', both: 'resize' })[props.resize ?? 'none'],
 )
