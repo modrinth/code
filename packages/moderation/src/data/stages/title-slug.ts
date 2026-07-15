@@ -1,5 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { BookOpenIcon } from '@modrinth/assets'
+import { injectProjectPageContext } from '@modrinth/ui'
+import { computed } from 'vue'
 
 import {
 	action,
@@ -10,7 +12,6 @@ import {
 	md,
 	option,
 	stage,
-	stageFn,
 	text,
 	toggle,
 } from '../../types/node'
@@ -30,88 +31,88 @@ function hasCustomSlug(project: Labrinth.Projects.v3.Project) {
 	return generateUrlSlug(project.name) !== project.slug
 }
 
-//TODO:some sort of input somewhere had placeholders but i forgot so probably figure out which that one was
+export default function () {
+	const { projectV3: project } = injectProjectPageContext()
 
-export default stageFn((project) =>
-	stage('title-slug', 'Title & Slug')
+	const titleMsg = md('checklist/text/title-slug/title')
+	const slugMsg = md('checklist/text/title-slug/slug')
+
+	return stage('title-slug', 'Title & Slug')
 		.hint('Are the Name and URL accurate and appropriate?')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
 		)
 		.icon(BookOpenIcon)
 		.children(
-			label(async (ctx) => {
-				const title = await md('checklist/text/title-slug/title')(ctx)
-				if (!hasCustomSlug(ctx.project)) return title
-				return title + (await md('checklist/text/title-slug/slug')(ctx))
+			label(async (state) => {
+				const title = await titleMsg(state)
+				if (!hasCustomSlug(project.value)) return title
+				return title + (await slugMsg(state))
 			}),
 
 			group('title')
 				.title('Title Issues?')
 				.children(
-					toggle('useless_info', 'Contains Useless Info').action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('low')
-							.message(md('checklist/messages/title/useless-info')),
+					toggle('useless-info', 'Contains Useless Info').action(
+						action().suggestedStatus('flagged').severity('low').message(),
 					),
 
-					toggle('minecraft_branding', 'Minecraft Title').action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('medium')
-							.message(md('checklist/messages/title/minecraft-branding')),
+					toggle('minecraft-branding', 'Minecraft Title').action(
+						action().suggestedStatus('flagged').severity('medium').message(),
 					),
 
 					toggle('similarities', 'Title Similarities')
-						.action(
-							action()
-								.suggestedStatus('flagged')
-								.severity('medium')
-								.message(md('checklist/messages/title/similarities')),
-						)
+						.action(action().suggestedStatus('flagged').severity('medium').message())
 						.children(
-							group('options')
+							group()
 								.title('Similarities Additional Info')
-								.multiSelect()
+								.multiSelect('options')
 								.children(
-									option('modpack_named_after_mod', 'Modpack Named After Mod')
-										.shown(project.project_types.includes('modpack'))
-										.action(action().message(md('checklist/messages/title/similarities-modpack'))),
+									option('modpack', 'Modpack Named After Mod')
+										.shown(computed(() => project.value.project_types.includes('modpack')))
+										.action(action().message()),
 
-									option('forked_project', 'Forked Project')
-										.shown(!project?.minecraft_server)
-										.action(action().message(md('checklist/messages/title/similarities-fork'))),
+									option('fork', 'Forked Project')
+										.shown(computed(() => !project.value?.minecraft_server))
+										.action(action().message()),
 								),
 						),
 				),
 
 			group('slug')
 				.title('Slug Issues')
-				.shown(hasCustomSlug(project))
+				.shown(computed(() => hasCustomSlug(project.value)))
 				.children(
-					group('options')
-						.multiSelect()
+					group()
+						.multiSelect('issues')
 						.children(
-							option('misused', 'Misused')
+							toggle('misused', 'Misused')
 								.children(
 									group()
 										.title('Correct Slug')
 										.children(
-                      //TODO: probably make this reset to current slug if you clear it?
-											text('correct_slug')
-                        .initial(project.slug),
+											//TODO: chyz probably make this reset to current slug if you clear it?
+											//TODO: chyz make this validate slugs are free
+											text('correct_slug').initial(project.value.slug),
+
 											button('Auto')
-												.enabled(project.slug !== generateUrlSlug(project.name))
-												.onClick((ctx) => (ctx.state.correct_slug = generateUrlSlug(project.name))),
+												.enabled(
+													computed(
+														() => project.value.slug !== generateUrlSlug(project.value.name),
+													),
+												)
+												.onClick(
+													(state) => (state.correct_slug = generateUrlSlug(project.value.name)),
+												),
 										),
 								)
 								.action(
 									action()
-										.message(md('checklist/messages/slug/misused'))
+										//TODO: coolbot variant for when we suggest a better slug (also used when quick fix is applied)
+										.message()
 										.fix(
-											fix().project((patch, ctx) => {
-												const slug = ctx.state.correct_slug as string
+											fix().project((patch, state) => {
+												const slug = state.correct_slug as string
 												if (!slug) return
 												patch.slug = slug
 											}),
@@ -119,5 +120,5 @@ export default stageFn((project) =>
 								),
 						),
 				),
-		),
-)
+		)
+}

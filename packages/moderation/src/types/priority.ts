@@ -1,4 +1,3 @@
-
 // Very cool Priority system I made -chyz
 export class Priority {
 	private _beforeCount = 0
@@ -11,8 +10,12 @@ export class Priority {
 		private readonly _index: number = 0,
 	) {}
 
-	before(): Priority { return new Priority(this, -1, ++this._beforeCount) }
-	after():  Priority { return new Priority(this, 1,  ++this._afterCount) }
+	before(): Priority {
+		return new Priority(this, -1, ++this._beforeCount)
+	}
+	after(): Priority {
+		return new Priority(this, 1, ++this._afterCount)
+	}
 
 	compareTo(other: Priority): number {
 		const ra = this._resolve()

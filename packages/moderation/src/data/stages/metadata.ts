@@ -1,19 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { TagIcon } from '@modrinth/assets'
-import { ENVIRONMENTS_COPY } from '@modrinth/ui'
+import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
+import { computed } from 'vue'
 
-import {
-	action,
-	dropdown,
-	fix,
-	group,
-	label,
-	md,
-	option,
-	stage,
-	stageFn,
-	toggle,
-} from '../../types/node'
+import { action, dropdown, fix, group, label, md, option, stage, toggle } from '../../types/node'
 
 const loaderLabels: Record<string, string> = {
 	neoforge: 'NeoForge',
@@ -32,93 +22,138 @@ function formatLoaderLabel(id: string): string {
 	)
 }
 
-export default stageFn((project) =>
-	stage('metadata', 'Metadata')
-		.hint("Are there any issues with this project's metadata?")
-		//TODO: update guidance here
-		.guidance(
-			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
-		)
-		.icon(TagIcon)
-		.navigate('/settings/versions')
-		.shown(!project?.minecraft_server)
-		.children(
-			label(
-				md(
-					`checklist/text/metadata/environment/${(project.environment?.length ?? 0) === 1 ? 'single' : 'multiple'}`,
-				),
-			),
+export default function () {
+	const { projectV3: project } = injectProjectPageContext()
+	const { loaders } = injectTags()
 
-			group().children(
-				toggle('environment', 'Environment')
-					.shown(project.project_types.includes('mod') || project.project_types.includes('modpack'))
-					.action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('low')
-							.message(async (ctx) => {
-								const correct_environment = ctx?.state.correct_environment as string | undefined
-
-								//TODO: this should be in markdown files
-								let correct_output = ''
-								if (correct_environment)
-									correct_output = `It looks like this project is probably "${ENVIRONMENTS_COPY[String(ctx?.state.correct_environment)].title.default_message}"`
-								else if (correct_environment === 'Mixed')
-									correct_output = `It looks like some %PROJECT_VERSIONS_FLINK% of your project should have unique environments from other versions, please ensure *each version* is set correctly.`
-
-								return md('checklist/messages/environment/inaccurate', () => ({
-									CORRECT: correct_output,
-								}))(ctx)
-							})
-							.fix(
-								fix().project((patch, ctx) => {
-									const env = ctx.state.correct_environment as Labrinth.Projects.v3.Environment
-									if (!env) return
-									patch.environment = env
-								}),
-							),
-					)
-					.children(
-						group()
-							.title('Correct Environment')
-							.children(
-								dropdown('correct_environment')
-									.children(
-										...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
-											.filter((id) => id !== 'unknown')
-											.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
-									)
-									.none('Unknown'),
-							),
+	return (
+		stage('metadata', 'Metadata')
+			.hint("Are there any issues with this project's metadata?")
+			//TODO: update guidance here
+			.guidance(
+				'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
+			)
+			.icon(TagIcon)
+			.navigate('/settings/versions')
+			.shown(computed(() => !project.value?.minecraft_server))
+			.children(
+				label(
+					md(
+						() =>
+							`checklist/text/metadata/environment/${(project.value.environment?.length ?? 0) === 1 ? 'single' : 'multiple'}`,
 					),
+				),
 
-				toggle('loader', `Loader${project.loaders.length > 1 ? "s" : ""}`).children(
-					group()
-						.title('Loader Issues?')
+				group().children(
+					toggle('environment', 'Environment')
+						.shown(
+							computed(
+								() =>
+									project.value.project_types.includes('mod') ||
+									project.value.project_types.includes('modpack'),
+							),
+						)
 						.action(
 							action()
 								.suggestedStatus('flagged')
-								.severity('medium')
-								.message(async (ctx) => {
-									const header = await md('checklist/messages/metadata/loader/incorrect')(ctx)
-									const selected = ctx.state.loaders
-									if (selected instanceof Set && selected.size > 0) {
-										const list = [...selected].map((id) => `- ${formatLoaderLabel(id)}`).join('\n')
-										return `${header}\n${list}`
-									}
-									return header
-								}),
+								.severity('low')
+								.message(async (state) => {
+									const correct_environment = state?.correct_environment as string | undefined
+
+									//TODO: chyz
+									//TODO: coolbot this should be in markdown files
+									let correct_output = ''
+									if (correct_environment)
+										correct_output = `It looks like this project is probably "${ENVIRONMENTS_COPY[String(state?.correct_environment)].title.default_message}"`
+									else if (correct_environment === 'Mixed')
+										correct_output = `It looks like some %PROJECT_VERSIONS_FLINK% of your project should have unique environments from other versions, please ensure *each version* is set correctly.`
+
+									return md('checklist/messages/environment/inaccurate', () => ({
+										CORRECT: correct_output,
+									}))(state)
+								})
+								.fix(
+									fix().project((patch, state) => {
+										const env = state.correct_environment as Labrinth.Projects.v3.Environment
+										if (!env) return
+										patch.environment = env
+									}),
+								),
 						)
 						.children(
-							toggle('incorrect', 'Incorrect').children(
-								group('loaders')
-									.title('Incorrect Loaders')
-									.multiSelect()
-									.children(...project.loaders.map((id) => option(id, formatLoaderLabel(id)))),
-							),
-              //TODO: missing?
+							group()
+								.title('Correct Environment')
+								.children(
+									dropdown('correct_environment')
+										.children(
+											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
+												.filter((id) => id !== 'unknown')
+												.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
+										)
+										.none('Unknown'),
+								),
 						),
+
+					toggle('loader', `Loader${project.value.loaders.length > 1 ? 's' : ''}`).children(
+						group()
+							.title('Loader Issues?')
+							.action(
+								action()
+									.suggestedStatus('flagged')
+									.severity('medium')
+									.message(async (state) => {
+										//TODO: chyz
+										//TODO: coolbot this one is a bit of a doozy
+										const header = await md('checklist/messages/metadata/loader/incorrect')(state)
+										const selected = state.loaders
+										if (selected instanceof Set && selected.size > 0) {
+											const list = [...selected]
+												.map((id) => `- ${formatLoaderLabel(id)}`)
+												.join('\n')
+											return `${header}\n${list}`
+										}
+										return header
+									}),
+							)
+							.children(
+								toggle('incorrect', 'Incorrect').children(
+									group()
+										.title('Incorrect Loaders')
+										.multiSelect('loaders')
+										.children(
+											...project.value.loaders.map((id) => option(id, formatLoaderLabel(id))),
+										),
+								),
+								toggle('missing', 'Missing').children(
+									group()
+										.title('Missing Loaders')
+										.multiSelect('loaders')
+										.children(
+											...(() => {
+												//TODO: chyz maybe this can be done better
+												// (plugin loaders and datapack are marked as valid for mods which makes this suck)
+												const existingTypes = new Set(
+													loaders.value
+														.filter((l) => project.value.loaders.includes(l.name))
+														.flatMap((l) => l.supported_project_types),
+												)
+												const referenceTypes =
+													existingTypes.size > 0
+														? existingTypes
+														: new Set(project.value.project_types)
+												return loaders.value
+													.filter(
+														(loader) =>
+															loader.supported_project_types.every((t) => referenceTypes.has(t)) &&
+															!project.value.loaders.includes(loader.name),
+													)
+													.map((loader) => option(loader.name, formatLoaderLabel(loader.name)))
+											})(),
+										),
+								),
+							),
+					),
 				),
-			),
-		),
-)
+			)
+	)
+}

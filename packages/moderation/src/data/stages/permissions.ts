@@ -1,47 +1,41 @@
 import { SignatureIcon } from '@modrinth/assets'
+import { injectProjectPageContext } from '@modrinth/ui'
+import { computed } from 'vue'
 
-import { action, toggle, group, md, stage, stageFn } from '../../types/node'
+import { action, group, stage, toggle } from '../../types/node'
 
-export default stageFn((project) => stage('permissions', 'Modpack Permissions')
-	.hint("Does this project's external content have any issues?")
-	.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892')
-	.icon(SignatureIcon)
-	.navigate('/settings/permissions')
-	.shown((project.project_types?.includes('modpack') ?? false) && !project.minecraft_server)
-	.children(
-		group().children(
-			toggle('invalid_permissions', 'Invalid permissions')
-				.action(
-					action()
-						.suggestedStatus('rejected')
-						.severity('high')
-						.message(md('checklist/messages/externals-permissions/invalid')),
+export default function () {
+	const { projectV3: project } = injectProjectPageContext()
+
+	return stage('permissions', 'Modpack Permissions')
+		.hint("Does this project's external content have any issues?")
+		.guidance('https://www.notion.so/2e15ee711bf080e4a41df61bbab49892')
+		.icon(SignatureIcon)
+		.navigate('/settings/permissions')
+		.shown(
+			computed(
+				() =>
+					(project.value.project_types?.includes('modpack') ?? false) &&
+					!project.value.minecraft_server,
+			),
+		)
+		.children(
+			group().children(
+				toggle('invalid_permissions', 'Invalid permissions').action(
+					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-			toggle('prohibited_external_content', 'Prohibited externals')
-				.action(
-					action()
-						.suggestedStatus('rejected')
-						.severity('high')
-						.message(md('checklist/messages/externals-permissions/prohibited')),
+				toggle('prohibited_external_content', 'Prohibited externals').action(
+					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-			toggle('missing_permissions', 'Missing permissions')
-				.action(
-					action()
-						.suggestedStatus('rejected')
-						.severity('high')
-						.message(md('checklist/messages/externals-permissions/missing')),
+				toggle('missing_permissions', 'Missing permissions').action(
+					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-			toggle('non-commercial-external-content', 'Non-commercial externals')
-				.shown(project.monetization_status === 'monetized')
-				.action(
-					action()
-						.suggestedStatus('rejected')
-						.severity('high')
-						.message(md('checklist/messages/externals-permissions/non-commercial')),
-				),
-		),
-	),
-)
+				toggle('non-commercial-external-content', 'Non-commercial externals')
+					.shown(computed(() => project.value.monetization_status === 'monetized'))
+					.action(action().suggestedStatus('rejected').severity('high').message()),
+			),
+		)
+}

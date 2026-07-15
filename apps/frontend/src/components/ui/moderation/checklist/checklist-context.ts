@@ -1,9 +1,10 @@
-import type { ActionBuilder, IdentifiedNodeBuilder, NodeContext } from '@modrinth/moderation'
-import type { ComputedRef, InjectionKey } from 'vue'
+import type { ActionBuilder, IdentifiedNodeBuilder, NodeState } from '@modrinth/moderation'
+import type { ComputedRef, InjectionKey, Ref } from 'vue'
 
 export interface ActiveAction {
 	action: ActionBuilder
-	ctx: NodeContext
+	state: Record<string, NodeState>
+	statePath: string[]
 }
 
 export interface LiveNode {
@@ -17,3 +18,4 @@ export interface LiveNode {
 }
 
 export const NODE_META_KEY: InjectionKey<ComputedRef<Map<IdentifiedNodeBuilder, LiveNode>>> = Symbol('nodeMeta')
+export const STATE_KEY: InjectionKey<Ref<Record<string, Record<string, NodeState>>>> = Symbol('checklistState')

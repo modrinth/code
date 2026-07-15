@@ -76,7 +76,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-		<p v-if="currentStageObj._hint && !collapsed" class="m-0 text-sm text-secondary">
+		<p v-if="currentStageObj._hint && !collapsed && !alreadyReviewed && !done && !generatedMessage && !(lockStatus?.locked && !lockStatus?.isOwnLock)" class="m-0 text-sm text-secondary">
 			{{ currentStageObj._hint }}
 		</p>
 		<Collapsible
@@ -176,7 +176,7 @@
 					</div>
 					<div
 						v-else-if="generatedMessage"
-						class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
+						class="flex min-h-0 flex-1 flex-col gap-2"
 					>
 						<ButtonStyled class="shrink-0 self-start">
 							<button @click="useSimpleEditor = !useSimpleEditor">
@@ -190,7 +190,7 @@
 								</template>
 							</button>
 						</ButtonStyled>
-						<div>
+						<div class="min-h-0 flex-1 overflow-y-auto">
 							<MarkdownEditor
 								v-if="!useSimpleEditor"
 								v-model="messageText"
@@ -223,8 +223,8 @@
 					<div v-else class="flex min-h-0 flex-1 flex-col">
 						<NodeRenderer
 							class="min-h-0 flex-1 overflow-y-auto"
-							:nodes="resolveChildren(currentStageObj, makeNodeContext(currentStageObj))"
-							:show-context="makeNodeContext(currentStageObj)"
+							:nodes="resolveChildren(currentStageObj, (nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>)"
+							:show-context="(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>"
 							:on-image-upload="onUploadHandler"
 						/>
 					</div>
@@ -376,9 +376,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type {
-	ActionBuilder,
 	IdentifiedNodeBuilder,
-	NodeContext,
 	NodeState,
 	Priority,
 	StageNodeBuilder,
@@ -387,16 +385,15 @@ import type {
 import {
 	createTrackedPatch,
 	expandVariables,
-	flattenProjectV3Variables,
-	flattenProjectVariables,
-	flattenStaticVariables,
 	getBooleanChildState,
+	GLOBAL_STATE_KEY,
 	handleKeybind,
 	isNodeActive,
 	kebabToTitleCase,
+	loadMd,
 	resolve,
 	resolveChildren,
-	stages,
+	useStages,
 	walkNodes,
 } from '@modrinth/moderation'
 import type { OverflowMenuOption } from '@modrinth/ui'
@@ -430,7 +427,7 @@ import {
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
-import { NODE_META_KEY, type ActiveAction, type LiveNode } from './checklist-context'
+import { NODE_META_KEY, STATE_KEY, type ActiveAction, type LiveNode } from './checklist-context'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 import NodeRenderer from './NodeRenderer.vue'
@@ -448,7 +445,9 @@ const props = defineProps<{
 }>()
 
 const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
-const resolvedStages = computed(() => stages.map(fn => fn(projectV3.value, projectV2.value)))
+
+const nodeStates = ref<Record<string, Record<string, NodeState>>>({})
+const resolvedStages = ref(useStages(nodeStates))
 const client = injectModrinthClient()
 
 const moderationQueue = useModerationQueue()
@@ -653,6 +652,7 @@ const checklistPersistenceProjectId = projectV2.value.id
 const persistedState = import.meta.client
 	? await loadChecklistState(checklistPersistenceProjectId)
 	: null
+nodeStates.value = persistedState?.state ?? {}
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction[] | null>(null)
@@ -694,6 +694,15 @@ async function handleExit() {
 		if (!released && lockStatus.value?.isOwnLock) {
 			console.warn('Failed to release moderation lock for project:', projectId)
 		}
+	}
+	if (hasMeaningfulState) {
+		await saveChecklistState(checklistPersistenceProjectId, {
+			open: false,
+			reviewAnyway: undefined,
+			stage: currentStageObj.value.id,
+			message: message.value,
+			state: toRaw(nodeStates.value),
+		})
 	}
 	emit('exit')
 }
@@ -1013,7 +1022,84 @@ const checklistTitleText = computed(() => {
 
 	return currentStageObj.value.label ?? kebabToTitleCase(currentStageObj.value.id)
 })
-const nodeStates = ref<Record<string, Record<string, NodeState>>>(persistedState?.state ?? {})
+const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
+	const map = new Map<IdentifiedNodeBuilder, LiveNode>()
+
+	for (const stage of resolvedStages.value) {
+		const stageState = (nodeStates.value[stage.id!] ?? {}) as Record<string, NodeState>
+
+		let isVisible = false
+		let messageCount = 0
+		let fixCount = 0
+		let hasRequiredMissing = false
+		const stageActiveActions: ActiveAction[] = []
+
+		if (stage._shown === undefined || resolve(stage._shown)) {
+			walkNodes(
+				resolveChildren(stage, stageState),
+				stageState,
+				(node, nodeState, localState) => {
+					isVisible = true
+					const active = isNodeActive(node, nodeState)
+					const actionState =
+						node.type === 'toggle' || node.type === 'check' || node.type === 'option'
+							? (getBooleanChildState(nodeState) as Record<string, NodeState>)
+							: localState
+					const isRequired = !!(node as ValueNodeBuilder)._required
+					const nodeActiveActions: ActiveAction[] = []
+
+					let isFixActionable = false
+					if (active) {
+						if (node._action) {
+							messageCount++
+							nodeActiveActions.push({ action: node._action, state: actionState, statePath: node._statePath ?? [] })
+							stageActiveActions.push({ action: node._action, state: actionState, statePath: node._statePath ?? [] })
+						}
+						isFixActionable = (node._action?._fixes ?? []).some((f) => {
+							if (f._projectFn) {
+								const { proxy, changes } = createTrackedPatch(projectV3.value as any)
+								f._projectFn(proxy as any, actionState)
+								return Object.keys(changes()).length > 0
+							}
+							if (f._versionFn) {
+								const version = versions.value?.[0]
+								if (!version) return true
+								const { proxy, changes } = createTrackedPatch(version as any)
+								f._versionFn(proxy as any, actionState)
+								return Object.keys(changes()).length > 0
+							}
+							return false
+						})
+						if (isFixActionable) fixCount++
+					}
+
+					if (isRequired && !active) hasRequiredMissing = true
+					map.set(node, {
+						isActive: active,
+						isVisible: node._shown === undefined || resolve(node._shown),
+						isFixActionable,
+						messageCount: active && node._action ? 1 : 0,
+						fixCount: isFixActionable ? 1 : 0,
+						hasRequiredMissing: isRequired && !active,
+						activeActions: nodeActiveActions,
+					})
+				},
+			)
+		}
+
+		map.set(stage, {
+			isActive: true,
+			isVisible,
+			isFixActionable: false,
+			messageCount,
+			fixCount,
+			hasRequiredMissing,
+			activeActions: stageActiveActions,
+		})
+	}
+
+	return map
+})
 
 const restoredStage = persistedState ? resolvedStages.value.findIndex((s) => s.id === persistedState.stage) : -1
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
@@ -1234,86 +1320,6 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
-const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
-	const map = new Map<IdentifiedNodeBuilder, LiveNode>()
-
-	for (const stage of resolvedStages.value) {
-		const ctx = makeNodeContext(stage)
-
-		let isVisible = false
-		let messageCount = 0
-		let fixCount = 0
-		let hasRequiredMissing = false
-		const stageActiveActions: ActiveAction[] = []
-
-		if (stage._shown === undefined || resolve(stage._shown, ctx)) {
-			walkNodes(
-				resolveChildren(stage, ctx),
-				(nodeStates.value[stage.id!] ?? {}) as Record<string, NodeState>,
-				ctx,
-				(node, state, nodeCtx) => {
-					isVisible = true
-					const active = isNodeActive(node, state)
-					const actionCtx =
-						node.type === 'toggle' || node.type === 'check' || node.type === 'option'
-							? { ...nodeCtx, state: getBooleanChildState(state) as Record<string, NodeState> }
-							: nodeCtx
-					const isRequired = !!(node as ValueNodeBuilder)._required
-					const nodeActiveActions: ActiveAction[] = []
-
-					let isFixActionable = false
-					if (active) {
-						if (node._action) {
-							messageCount++
-							nodeActiveActions.push({ action: node._action, ctx: actionCtx })
-							stageActiveActions.push({ action: node._action, ctx: actionCtx })
-						}
-						isFixActionable = (node._action?._fixes ?? []).some((f) => {
-							if (f._projectFn) {
-								const { proxy, changes } = createTrackedPatch(nodeCtx.project as any)
-								f._projectFn(proxy as any, actionCtx)
-								return Object.keys(changes()).length > 0
-							}
-							if (f._versionFn) {
-								const version = versions.value?.[0]
-								if (!version) return true
-								const { proxy, changes } = createTrackedPatch(version as any)
-								f._versionFn(proxy as any, actionCtx)
-								return Object.keys(changes()).length > 0
-							}
-							return false
-						})
-						if (isFixActionable) fixCount++
-					}
-
-					if (isRequired && !active) hasRequiredMissing = true
-					map.set(node, {
-						isActive: active,
-						isVisible: node._shown === undefined || resolve(node._shown, nodeCtx),
-						isFixActionable,
-						messageCount: active && node._action ? 1 : 0,
-						fixCount: isFixActionable ? 1 : 0,
-						hasRequiredMissing: isRequired && !active,
-						activeActions: nodeActiveActions,
-					})
-				},
-			)
-		}
-
-		map.set(stage, {
-			isActive: true,
-			isVisible,
-			isFixActionable: false,
-			messageCount,
-			fixCount,
-			hasRequiredMissing,
-			activeActions: stageActiveActions,
-		})
-	}
-
-	return map
-})
-
 function countStageActions(stage: StageNodeBuilder): number {
 	return checklistLive.value.get(stage)?.messageCount ?? 0
 }
@@ -1337,9 +1343,11 @@ async function assembleFullMessage() {
 
 	await Promise.all(
 		active
-			.filter((a) => a.action._message)
+			.filter((a) => a.action._message || a.action._autoMessage)
 			.map(async (a) => {
-				const msg = await a.action._message!(a.ctx)
+				const msg = a.action._autoMessage
+					? await loadMd(`checklist/messages/${a.statePath.join('/')}`, a.state, projectV3.value, projectV2.value, a.action._autoMessageVars)
+					: await a.action._message!(a.state)
 				if (msg) parts.push({ priority: a.action._priority, content: msg })
 			}),
 	)
@@ -1361,16 +1369,9 @@ async function assembleFullMessage() {
 	)
 }
 
-function makeNodeContext(stage: StageNodeBuilder): NodeContext {
-	return {
-		project: projectV3.value,
-		projectV2: projectV2.value,
-		state: nodeStates.value[stage.id] ?? {},
-		globalState: nodeStates.value,
-	}
-}
-
 provide(NODE_META_KEY, checklistLive)
+provide(STATE_KEY, nodeStates)
+provide(GLOBAL_STATE_KEY, nodeStates)
 
 function shouldShowStage(stage: StageNodeBuilder): boolean {
 	return checklistLive.value.get(stage)?.isVisible ?? false
@@ -1572,9 +1573,9 @@ async function sendMessage(status: ProjectStatus) {
 		const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
 			projectV3.value as any,
 		)
-		for (const { action, ctx } of active) {
+		for (const { action, state } of active) {
 			for (const f of action._fixes) {
-				f._projectFn?.(projectProxy, ctx)
+				f._projectFn?.(projectProxy, state)
 			}
 		}
 		const projectFixChanges = projectChanges()
@@ -1591,15 +1592,15 @@ async function sendMessage(status: ProjectStatus) {
 		})
 
 		if (shouldApplyFixes && versions.value) {
-			const versionFixes = active.flatMap(({ action, ctx }) =>
-				action._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, ctx })),
+			const versionFixes = active.flatMap(({ action, state }) =>
+				action._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, state })),
 			)
 			if (versionFixes.length > 0) {
 				await Promise.all(
 					versions.value.map(async (version) => {
 						const { proxy, changes } = createTrackedPatch(version as any)
-						for (const { fix, ctx } of versionFixes) {
-							fix._versionFn!(proxy, ctx)
+						for (const { fix, state } of versionFixes) {
+							fix._versionFn!(proxy, state)
 						}
 						const changed = changes()
 						if (Object.keys(changed).length > 0) {

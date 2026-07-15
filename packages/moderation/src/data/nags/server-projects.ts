@@ -93,9 +93,9 @@ export const serverProjectsNags: Nag[] = [
 			)
 		},
 		status: 'required',
-		shouldShow: (context: NagContext) => {
-			// const languageCount = context.projectV3?.minecraft_server?.languages?.length || 0
-			return false //languageCount >= ALL_LANGUAGE_COUNT && context.projectV3?.minecraft_server != null
+		shouldShow: (_context: NagContext) => {
+			// const languageCount = _context.projectV3?.minecraft_server?.languages?.length || 0
+			return false //languageCount >= ALL_LANGUAGE_COUNT && _context.projectV3?.minecraft_server != null
 		},
 		link: {
 			path: 'settings/server',
