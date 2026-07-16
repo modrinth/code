@@ -8,6 +8,7 @@ extend-exclude = [
   "packages/blog/",
   # contains licenses like `CC-BY-ND-4.0`
   "packages/moderation/src/data/stages/license.ts",
+  "packages/moderation/src/utils.ts",
   # contains payment card IDs like `IY1VMST1MOXS` which are flagged
   "apps/labrinth/src/queue/payouts/mod.rs",
 ]
