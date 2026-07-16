@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-16T19:36:45+00:00`,
+		product: 'app',
+		version: '0.15.12',
+		body: `## Fixed
+- Fixed issue with some modpacks failing to install due to file mismatches.
+- Fixed hardcore worlds generated in 26.1+ not being recognised as hardcore in the Jump back in and Worlds tab.`,
+	},
+	{
 		date: `2026-07-14T22:14:08+00:00`,
 		product: 'app',
 		version: '0.15.11',
