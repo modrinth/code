@@ -9,7 +9,7 @@ import { action, group, stage, text, toggle } from '../../types/node'
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
-	return stage('post-approval', 'Post-Approval')
+	return stage('postApproval', 'Post-Approval')
 		.hint('Issue warnings, notices, or takedowns?')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
@@ -18,11 +18,11 @@ export default function () {
 		.shown(computed(() => project.value.status === 'approved'))
 		.children(
 			group().children(
-				toggle('issue_warning', 'Issue warning').action(
+				toggle('issueWarning', 'Issue warning').action(
 					action().suggestedStatus('approved').severity('low').message(),
 				),
 
-				toggle('missed_deadline', 'Missed due date')
+				toggle('missedDeadline', 'Missed due date')
 					.action(
 						action()
 							.suggestedStatus('flagged')
@@ -36,7 +36,7 @@ export default function () {
 						text('status').title('What status is the project being set to?').required(),
 					),
 
-				toggle('metadata_issue', 'Incorrect metadata')
+				toggle('metadataIssue', 'Incorrect metadata')
 					.action(action().suggestedStatus('approved').severity('low').message())
 					.children(
 						toggle('dependencies', 'Missing Dependencies')
@@ -44,16 +44,16 @@ export default function () {
 								action()
 									.severity('low')
 									.message((state) => ({
-										DEPENDENCY_NAME: state.dependency_name,
-										DEPENDENCY_LINK: state.dependency_link,
+										DEPENDENCY_NAME: state.dependencyName,
+										DEPENDENCY_LINK: state.dependencyLink,
 									})),
 							)
 							.children(
-								text('dependency_name').title('Dependency name').required(),
-								text('dependency_link').title('Dependency link').required(),
+								text('dependencyName').title('Dependency name').required(),
+								text('dependencyLink').title('Dependency link').required(),
 							),
 
-						toggle('mc_versions', 'Game versions')
+						toggle('mcVersions', 'Game versions')
 							.action(
 								action()
 									.severity('low')

@@ -196,6 +196,7 @@ export class ActionBuilder {
 	_message?: MessageFn
 	_autoMessage = false
 	_autoMessageVars?: (state: Record<string, NodeState>) => Record<string, NodeState>
+	_messagePath?: string | (() => string)
 	_priority?: Priority
 	_suggestedStatus?: ModerationStatus
 	_severity?: ModerationSeverity
@@ -204,12 +205,18 @@ export class ActionBuilder {
 
 	message(
 		fn?:
+			| string
+			| (() => string)
 			| MessageFn
 			| ((state: Record<string, NodeState>) => Promise<string>)
 			| ((state: Record<string, NodeState>) => Record<string, NodeState>),
 	): this {
 		if (!fn) {
 			this._autoMessage = true
+		} else if (typeof fn === 'string') {
+			this._messagePath = fn
+		} else if (typeof fn === 'function' && fn.length === 0 && fn.constructor.name !== 'AsyncFunction') {
+			this._messagePath = fn as () => string
 		} else if (fn.constructor.name === 'AsyncFunction') {
 			this._message = fn as MessageFn
 		} else {

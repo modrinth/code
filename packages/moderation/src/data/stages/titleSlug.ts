@@ -34,10 +34,10 @@ function hasCustomSlug(project: Labrinth.Projects.v3.Project) {
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
-	const titleMsg = md('checklist/text/title-slug/title')
-	const slugMsg = md('checklist/text/title-slug/slug')
+	const titleMsg = md('checklist/text/titleSlug/title')
+	const slugMsg = md('checklist/text/titleSlug/slug')
 
-	return stage('title-slug', 'Title & Slug')
+	return stage('titleSlug', 'Title & Slug')
 		.hint('Are the Name and URL accurate and appropriate?')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e15ee711bf0803c9660e90f0fead705',
@@ -53,11 +53,11 @@ export default function () {
 			group('title')
 				.title('Title Issues?')
 				.children(
-					toggle('useless-info', 'Contains Useless Info').action(
+					toggle('uselessInfo', 'Contains Useless Info').action(
 						action().suggestedStatus('flagged').severity('low').message(),
 					),
 
-					toggle('minecraft-branding', 'Minecraft Title').action(
+					toggle('minecraftBranding', 'Minecraft Title').action(
 						action().suggestedStatus('flagged').severity('medium').message(),
 					),
 
@@ -93,7 +93,7 @@ export default function () {
 										.children(
 											//TODO: chyz probably make this reset to current slug if you clear it?
 											//TODO: chyz make this validate slugs are free
-											text('correct_slug').initial(project.value.slug),
+											text('correctSlug').initial(project.value.slug),
 
 											button('Auto')
 												.enabled(
@@ -102,7 +102,7 @@ export default function () {
 													),
 												)
 												.onClick(
-													(state) => (state.correct_slug = generateUrlSlug(project.value.name)),
+													(state) => (state.correctSlug = generateUrlSlug(project.value.name)),
 												),
 										),
 								)
@@ -112,7 +112,7 @@ export default function () {
 										.message()
 										.fix(
 											fix().project((patch, state) => {
-												const slug = state.correct_slug as string
+												const slug = state.correctSlug as string
 												if (!slug) return
 												patch.slug = slug
 											}),

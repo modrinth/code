@@ -77,7 +77,7 @@ export default function () {
 								),
 						),
 
-					toggle('non_english', 'Non-english')
+					toggle('nonEnglish', 'Non-english')
 						.action(
 							action()
 								.suggestedStatus('flagged')
@@ -85,7 +85,7 @@ export default function () {
 								.message(
 									md(
 										() =>
-											`checklist/messages/description/non_english${project.value.minecraft_java_server ? '_server' : ''}`,
+											`checklist/messages/description/nonEnglish${project.value.minecraft_java_server ? '-server' : ''}`,
 									),
 								),
 						)
@@ -102,15 +102,15 @@ export default function () {
 							}),
 						),
 
-					toggle('headers_as_body', 'Headers as body text').action(
+					toggle('headersAsBody', 'Headers as body text').action(
 						action().suggestedStatus('flagged').severity('low').message(),
 					),
 
-					toggle('image_only', 'Image-only').action(
+					toggle('imageOnly', 'Image-only').action(
 						action().suggestedStatus('flagged').severity('medium').message(),
 					),
 
-					toggle('non_standard_text', 'Non-standard text').action(
+					toggle('nonStandardText', 'Non-standard text').action(
 						action().suggestedStatus('flagged').severity('medium').message(),
 					),
 

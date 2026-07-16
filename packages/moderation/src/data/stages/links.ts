@@ -44,7 +44,7 @@ export default function () {
 						...Object.fromEntries(
 							Object.values(project.value.link_urls)
 								.filter((l) => l.donation)
-								.map((l) => [`donation_${l.platform}`, l.platform]),
+								.map((l) => [`donation-${l.platform}`, l.platform]),
 						),
 					}
 
@@ -59,18 +59,18 @@ export default function () {
 						}
 					> = {
 						issues: {
-							disabled: 'checklist/messages/links/note/issues_disabled',
+							disabled: 'checklist/messages/links/note/issuesDisabled',
 						},
 						wiki: {
-							disabled: 'checklist/messages/links/note/wiki_disabled',
+							disabled: 'checklist/messages/links/note/wikiDisabled',
 						},
 						source: {
-							inaccessible: 'checklist/messages/links/note/source_404',
-							empty: 'checklist/messages/links/note/source_empty',
+							inaccessible: 'checklist/messages/links/note/source404',
+							empty: 'checklist/messages/links/note/sourceEmpty',
 						},
 						discord: {
-							inaccessible: 'checklist/messages/links/note/discord_inaccessible',
-							expiring: 'checklist/messages/links/note/discord_expiring',
+							inaccessible: 'checklist/messages/links/note/discordInaccessible',
+							expiring: 'checklist/messages/links/note/discordExpiring',
 						},
 					}
 
@@ -96,7 +96,7 @@ export default function () {
 					let message = await md('checklist/messages/links/header')(state)
 
 					if (misused.length > 0) {
-						message += await md('checklist/messages/links/misused_header')(state)
+						message += await md('checklist/messages/links/misusedHeader')(state)
 						for (const [id] of misused) {
 							message += `- ${LINK_NAMES[id] ?? id}\n`
 							const extraPath = LINK_EXTRAS[id]?.misused
@@ -105,7 +105,7 @@ export default function () {
 					}
 
 					if (inaccessible.length > 0) {
-						message += await md('checklist/messages/links/inaccessible_header')(state)
+						message += await md('checklist/messages/links/inaccessibleHeader')(state)
 						for (const [id] of inaccessible) {
 							message += `- ${LINK_NAMES[id] ?? id}\n`
 							const extraPath = LINK_EXTRAS[id]?.inaccessible
@@ -167,7 +167,7 @@ export default function () {
 				Object.entries(project.value.link_urls)
 					.filter(([, l]) => l.donation)
 					.map(([, l]) =>
-						linkSection(`donation_${l.platform}`, `**${mdEscape(l.platform)}:** <${l.url}>`),
+						linkSection(`donation-${l.platform}`, `**${mdEscape(l.platform)}:** <${l.url}>`),
 					),
 		)
 }

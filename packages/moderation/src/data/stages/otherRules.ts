@@ -18,37 +18,35 @@ export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
 	const prohibitedContentHeaderMsg: MessageFn = md(
-		'checklist/messages/other-rules/prohibited-content-header',
+		'checklist/messages/otherRules/prohibitedContentHeader',
 	)
 	const prohibitedContentMsgs: Record<string, MessageFn> = {
-		objectionable: md('checklist/messages/other-rules/prohibited-content/objectionable'),
-		discriminatory: md('checklist/messages/other-rules/prohibited-content/discriminatory'),
-		'ip-infringement': md('checklist/messages/other-rules/prohibited-content/ip-infringement'),
-		'legal-rights': md('checklist/messages/other-rules/prohibited-content/legal-rights'),
-		'illegal-activity': md('checklist/messages/other-rules/prohibited-content/illegal-activity'),
-		harmful: md('checklist/messages/other-rules/prohibited-content/harmful'),
-		misleading: md('checklist/messages/other-rules/prohibited-content/misleading'),
-		impersonation: md('checklist/messages/other-rules/prohibited-content/impersonation'),
-		'false-endorsement': md('checklist/messages/other-rules/prohibited-content/false-endorsement'),
-		profanity: md('checklist/messages/other-rules/prohibited-content/profanity'),
-		'undisclosed-upload': md(
-			'checklist/messages/other-rules/prohibited-content/undisclosed-upload',
-		),
-		'mojang-bypass': md('checklist/messages/other-rules/prohibited-content/mojang-bypass'),
+		objectionable: md('checklist/messages/otherRules/prohibitedContent/objectionable'),
+		discriminatory: md('checklist/messages/otherRules/prohibitedContent/discriminatory'),
+		ipInfringement: md('checklist/messages/otherRules/prohibitedContent/ipInfringement'),
+		legalRights: md('checklist/messages/otherRules/prohibitedContent/legalRights'),
+		illegalActivity: md('checklist/messages/otherRules/prohibitedContent/illegalActivity'),
+		harmful: md('checklist/messages/otherRules/prohibitedContent/harmful'),
+		misleading: md('checklist/messages/otherRules/prohibitedContent/misleading'),
+		impersonation: md('checklist/messages/otherRules/prohibitedContent/impersonation'),
+		falseEndorsement: md('checklist/messages/otherRules/prohibitedContent/falseEndorsement'),
+		profanity: md('checklist/messages/otherRules/prohibitedContent/profanity'),
+		undisclosedUpload: md('checklist/messages/otherRules/prohibitedContent/undisclosedUpload'),
+		mojangBypass: md('checklist/messages/otherRules/prohibitedContent/mojangBypass'),
 	}
 	const serverSideOptInHeaderMsg: MessageFn = md(
-		'checklist/messages/other-rules/server-side-opt-in-header',
+		'checklist/messages/otherRules/serverSideOptInHeader',
 	)
 	const serverSideOptInMsgs: Record<string, MessageFn> = {
-		'x-ray': md('checklist/messages/other-rules/server-side-opt-in/x-ray'),
-		'aim-bot': md('checklist/messages/other-rules/server-side-opt-in/aim-bot'),
-		movement: md('checklist/messages/other-rules/server-side-opt-in/movement'),
-		pvp: md('checklist/messages/other-rules/server-side-opt-in/pvp'),
-		'hiding-mods': md('checklist/messages/other-rules/server-side-opt-in/hiding-mods'),
-		'item-duplication': md('checklist/messages/other-rules/server-side-opt-in/item-duplication'),
+		xRay: md('checklist/messages/otherRules/serverSideOptIn/xRay'),
+		aimBot: md('checklist/messages/otherRules/serverSideOptIn/aimBot'),
+		movement: md('checklist/messages/otherRules/serverSideOptIn/movement'),
+		pvp: md('checklist/messages/otherRules/serverSideOptIn/pvp'),
+		hidingMods: md('checklist/messages/otherRules/serverSideOptIn/hidingMods'),
+		itemDuplication: md('checklist/messages/otherRules/serverSideOptIn/itemDuplication'),
 	}
 
-	return stage('other-rules', 'Rule Following')
+	return stage('otherRules', 'Rule Following')
 		.hint('Does this project violate the rules?')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080709084f6269835607f',
@@ -57,12 +55,12 @@ export default function () {
 		.navigate('/moderation')
 		.children(
 			group().children(
-				toggle('paid_access_server', 'Paid access server')
+				toggle('paidAccessServer', 'Paid access server')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.action(action().suggestedStatus('rejected').severity('critical').message()),
 
 				// TODO: chyz, the lists built by these message have empty line gaps.
-				toggle('prohibited_content', 'Prohibited Content')
+				toggle('prohibitedContent', 'Prohibited Content')
 					.action(
 						action()
 							.suggestedStatus('rejected')
@@ -86,28 +84,28 @@ export default function () {
 							.children(
 								option('objectionable', 'Objectionable'),
 								option('discriminatory', 'Discriminatory or Explicit'),
-								option('ip-infringement', 'IP Infringement'),
-								option('legal-rights', 'Rights Violation'),
-								option('illegal-activity', 'Illegal Activity'),
+								option('ipInfringement', 'IP Infringement'),
+								option('legalRights', 'Rights Violation'),
+								option('illegalActivity', 'Illegal Activity'),
 								option('harmful', 'Harmful or Deceptive'),
 								option('misleading', 'Misleading claims'),
 								option('impersonation', 'Impersonation'),
-								option('false-endorsement', 'False Endorsement'),
+								option('falseEndorsement', 'False Endorsement'),
 								option('profanity', 'Profanity'),
-								option('undisclosed-upload', 'Undisclosed Data Upload'),
-								option('mojang-bypass', 'Mojang Bypass'),
+								option('undisclosedUpload', 'Undisclosed Data Upload'),
+								option('mojangBypass', 'Mojang Bypass'),
 							),
 					),
 
-				toggle('cheat_or_hack_advertising', 'Hacks').action(
+				toggle('cheatOrHackAdvertising', 'Hacks').action(
 					action().suggestedStatus('rejected').severity('critical').message(),
 				),
 
-				toggle('server_side_opt_out', 'Opt-out').action(
+				toggle('serverSideOptOut', 'Opt-out').action(
 					action().suggestedStatus('flagged').severity('high').message(),
 				),
 
-				toggle('server_side_opt_in', 'Opt-in')
+				toggle('serverSideOptIn', 'Opt-in')
 					.action(
 						action()
 							.suggestedStatus('flagged')
@@ -129,16 +127,16 @@ export default function () {
 							.multiSelect('options')
 							.title('Which features require a Server-side Opt-in?')
 							.children(
-								option('x-ray', 'X-ray'),
-								option('aim-bot', 'Aim Assist'),
+								option('xRay', 'X-ray'),
+								option('aimBot', 'Aim Assist'),
 								option('movement', 'Movement'),
 								option('pvp', 'PvP'),
-								option('hiding-mods', 'Anti 3.x'),
-								option('item-duplication', 'Dupe'),
+								option('hidingMods', 'Anti 3.x'),
+								option('itemDuplication', 'Dupe'),
 							),
 					),
 
-				toggle('excessive_languages', 'Excessive languages')
+				toggle('excessiveLanguages', 'Excessive languages')
 					.shown(
 						computed(
 							() =>
@@ -149,7 +147,7 @@ export default function () {
 					)
 					.action(action().suggestedStatus('flagged').severity('low').message()),
 
-				toggle('rule_breaking_other', 'Other')
+				toggle('ruleBreakingOther', 'Other')
 					// TODO: chyz, the required asterisk is on a separate line
 					.action(
 						action()

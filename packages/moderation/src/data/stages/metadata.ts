@@ -58,18 +58,18 @@ export default function () {
 								.suggestedStatus('flagged')
 								.severity('low')
 								.message(async (state) => {
-									const correct_environment = state?.correct_environment as string | undefined
+									const correctEnvironment = state?.correctEnvironment as string | undefined
 
 									let correct = ''
-									if (correct_environment === 'Mixed')
+									if (correctEnvironment === 'Mixed')
 										correct = await md('checklist/messages/metadata/environment/mixed')(state)
-									else if (correct_environment)
+									else if (correctEnvironment)
 										correct = await md(
 											'checklist/messages/metadata/environment/correction',
 											() => ({
 												SUGGESTED_ENVIRONMENT:
-													ENVIRONMENTS_COPY[correct_environment]?.title.defaultMessage ??
-													correct_environment,
+													ENVIRONMENTS_COPY[correctEnvironment]?.title.defaultMessage ??
+													correctEnvironment,
 											}),
 										)(state)
 
@@ -79,7 +79,7 @@ export default function () {
 								})
 								.fix(
 									fix().project((patch, state) => {
-										const env = state.correct_environment as Labrinth.Projects.v3.Environment
+										const env = state.correctEnvironment as Labrinth.Projects.v3.Environment
 										if (!env) return
 										patch.environment = env
 									}),
@@ -89,7 +89,7 @@ export default function () {
 							group()
 								.title('Correct Environment')
 								.children(
-									dropdown('correct_environment')
+									dropdown('correctEnvironment')
 										.children(
 											//TODO: Chyz add back mixed option.
 											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])

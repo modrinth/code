@@ -23,22 +23,7 @@ export default function (
 ) {
 	const { projectV3: project } = injectProjectPageContext()
 
-	const fixNodesGroup = computed<NodeBuilder | null>(() => {
-		const fixNodes: NodeBuilder[] = []
-		walkNodes(
-			[group().children(...mainStages)],
-			(globalState.value ?? {}) as unknown as Record<string, NodeState>,
-			(node, nodeState) => {
-				if (!node._action?._fixes?.length) return
-				if (!isNodeActive(node, nodeState)) return
-				const childState = getBooleanChildState(nodeState)
-				fixNodes.push(...resolveChildren(node, childState))
-			},
-		)
-		return fixNodes.length > 0 ? group().children(...fixNodes) : null
-	})
-
-	return stage('status-alerts', 'Status Alerts')
+	return stage('statusAlerts', 'Status Alerts')
 		.hint(`Is anything else affecting this project's status?`)
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
@@ -46,29 +31,43 @@ export default function (
 		.icon(TriangleAlertIcon)
 		.navigate('/moderation')
 		.children(
-			label(md('checklist/text/status-alerts/text')),
+			label(md('checklist/text/statusAlerts/text')),
 
-			//TODO: chyz combine these?
 			group().children(
-				toggle('corrections_applied', 'Corrections applied')
-					.shown(computed(() => project.value.status !== 'approved'))
-					.action(action().suggestedStatus('approved').message().applyFixes())
-					.children(fixNodesGroup),
-
-				toggle('corrections_applied_approved', 'Corrections applied')
-					.shown(computed(() => project.value.status === 'approved'))
-					.action(action().suggestedStatus('approved').message()),
+				toggle('correctionsApplied', 'Corrections applied')
+					.action(
+						action()
+							.suggestedStatus('approved')
+							.message(() => `correctionsApplied${project.value.status === 'approved' ? '-approved' : ''}`)
+							.applyFixes(),
+					)
+					.children(
+						computed<NodeBuilder | null>(() => {
+							const fixNodes: NodeBuilder[] = []
+							walkNodes(
+								[group().children(...mainStages)],
+								(globalState.value ?? {}) as unknown as Record<string, NodeState>,
+								(node, nodeState) => {
+									if (!node._action?._fixes?.length) return
+									if (!isNodeActive(node, nodeState)) return
+									const childState = getBooleanChildState(nodeState)
+									fixNodes.push(...resolveChildren(node, childState))
+								},
+							)
+							return fixNodes.length > 0 ? group().children(...fixNodes) : null
+						}),
+					),
 
 				//TODO: chyz combine these
-				toggle('private_use', 'Private use')
+				toggle('privateUse', 'Private use')
 					.shown(computed(() => !project.value.minecraft_server))
 					.action(action().suggestedStatus('flagged').message()),
 
-				toggle('private_use_server', 'Private community')
+				toggle('privateUse-server', 'Private community')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.action(action().suggestedStatus('flagged').message()),
 
-				toggle('server_use', 'Server use')
+				toggle('serverUse', 'Server use')
 					.shown(
 						computed(
 							() =>
@@ -77,13 +76,9 @@ export default function (
 					)
 					.action(action().message()),
 
-				toggle('account_issues', 'Account issues').action(
+				toggle('accountIssues', 'Account issues').action(
 					action().suggestedStatus('rejected').message(),
 				),
-
-				toggle('automod_confusion', 'Automod confusion')
-					.shown(computed(() => !project.value.minecraft_server))
-					.action(action().message()),
 
 				toggle('demonetized', 'Demonetized')
 					.shown(
@@ -96,7 +91,7 @@ export default function (
 					)
 					.action(action().message()),
 
-				toggle('demonetized_modpack', 'Demonetized')
+				toggle('demonetized-modpack', 'Demonetized')
 					.shown(
 						computed(
 							() =>

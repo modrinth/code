@@ -444,7 +444,7 @@ const props = defineProps<{
 	collapsed: boolean
 }>()
 
-const { projectV2, projectV3, versions, loadVersions, invalidate } = injectProjectPageContext()
+const { projectV2, projectV3, versions, loadVersions, invalidate, thread } = injectProjectPageContext()
 setMessageProject(projectV3, projectV2)
 
 const nodeStates = ref<Record<string, Record<string, NodeState>>>({})
@@ -1109,6 +1109,21 @@ const restoredStage = persistedState
 	? resolvedStages.value.findIndex((s) => s.id === persistedState.stage)
 	: -1
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
+const initialAutoStage = currentStage.value
+
+// Thread data may not be loaded when currentStage is first set, so stages that depend on it
+// (like re-review) may be invisible initially. Re-evaluate once thread loads.
+if (!persistedState) {
+	watch(thread, () => {
+		if (thread.value === undefined) return
+		if (currentStage.value === initialAutoStage) {
+			const firstValid = findFirstValidStage()
+			if (firstValid !== currentStage.value) {
+				currentStage.value = firstValid
+			}
+		}
+	}, { once: true })
+}
 
 const router = useRouter()
 
@@ -1157,10 +1172,17 @@ watch(
 		const newMap = new Map<ActionBuilder, boolean>()
 		await Promise.all(
 			active
-				.filter((a) => a.action._message || a.action._autoMessage)
+				.filter((a) => a.action._message || a.action._autoMessage || a.action._messagePath)
 				.map(async ({ action, state, statePath }) => {
 					try {
-						const msg = action._autoMessage
+						const msg = action._messagePath
+							? await loadMd(
+									resolveRelativeMessagePath(action._messagePath, statePath),
+									state,
+									projectV3.value,
+									projectV2.value,
+								)
+							: action._autoMessage
 							? await loadMd(
 									`checklist/messages/${statePath.join('/')}`,
 									state,
@@ -1403,11 +1425,17 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
+function resolveRelativeMessagePath(messagePath: string | (() => string), statePath: string[]): string {
+	const name = typeof messagePath === 'function' ? messagePath() : messagePath
+	const dir = statePath.slice(0, -1).join('/')
+	return `checklist/messages/${dir ? `${dir}/` : ''}${name}`
+}
+
 function countStageActions(stage: StageNodeBuilder): number {
 	const actions = checklistLive.value.get(stage)?.activeActions ?? []
 	const resolved = resolvedMessageAvailability.value
 	return actions.filter((a) => {
-		if (!a.action._message && !a.action._autoMessage) return false
+		if (!a.action._message && !a.action._autoMessage && !a.action._messagePath) return false
 		return resolved.get(a.action) ?? true
 	}).length
 }
@@ -1430,9 +1458,16 @@ async function assembleFullMessage() {
 	const parts = (
 		await Promise.all(
 			active
-				.filter((a) => a.action._message || a.action._autoMessage)
+				.filter((a) => a.action._message || a.action._autoMessage || a.action._messagePath)
 				.map(async (a) => {
-					const msg = a.action._autoMessage
+					const msg = a.action._messagePath
+						? await loadMd(
+								resolveRelativeMessagePath(a.action._messagePath, a.statePath),
+								a.state,
+								projectV3.value,
+								projectV2.value,
+							)
+						: a.action._autoMessage
 						? await loadMd(
 								`checklist/messages/${a.statePath.join('/')}`,
 								a.state,
@@ -1677,6 +1712,10 @@ async function sendMessage(status: ProjectStatus) {
 			const projectFixChanges = projectChanges()
 			if (Object.keys(projectFixChanges).length > 0) {
 				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
+				if (projectFixChanges.slug) {
+					const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
+					window.history.replaceState(history.state, '', `/${urlType}/${projectFixChanges.slug}/moderation`)
+				}
 			}
 		}
 
