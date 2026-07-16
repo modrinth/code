@@ -16,6 +16,7 @@ import {
 	toggle,
 	walkNodes,
 } from '../../types/node'
+import {Priorities} from "../priorities.ts";
 
 export default function (
 	mainStages: StageNodeBuilder[],
@@ -39,6 +40,8 @@ export default function (
 						action()
 							.suggestedStatus('approved')
 							.message(() => `corrections-applied${project.value.status === 'approved' ? '-approved' : ''}`)
+              //TODO this is temporary
+              .priority(Priorities.rules)
 							.applyFixes(),
 					)
 					.children(
