@@ -34,7 +34,7 @@ export default function () {
 				'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e25ee711bf0802d9a9bdb82dce040eb',
 			)
 			.icon(DatabaseIcon)
-			.navigate('/settings/versions')
+			.navigate('/versions')
 			.shown(computed(() => !project.value?.minecraft_server))
 			.children(
 				label(
