@@ -439,11 +439,11 @@ async fn read_singleplayer_world_maybe_locked(
 }
 
 fn read_hardcore(data: &NbtCompound) -> bool {
-	data.get::<_, &NbtCompound>("difficulty_settings")
-		.and_then(|settings| settings.get::<_, i8>("hardcore"))
-		.or_else(|_| data.get::<_, i8>("hardcore"))
-		.unwrap_or(0)
-		!= 0
+    data.get::<_, &NbtCompound>("difficulty_settings")
+        .and_then(|settings| settings.get::<_, i8>("hardcore"))
+        .or_else(|_| data.get::<_, i8>("hardcore"))
+        .unwrap_or(0)
+        != 0
 }
 
 async fn get_server_worlds_in_instance(
