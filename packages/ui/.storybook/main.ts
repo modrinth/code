@@ -1,4 +1,4 @@
-import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import type { StorybookConfig } from '@storybook/vue3-vite'
 import { mergeConfig } from 'vite'
@@ -16,7 +16,9 @@ const config: StorybookConfig = {
 		mergeConfig(config, {
 			resolve: {
 				alias: {
-					'@modrinth/api-client': path.resolve(__dirname, '../../api-client/src/index.ts'),
+					'@modrinth/api-client': fileURLToPath(
+						new URL('../../api-client/src/index.ts', import.meta.url),
+					),
 				},
 			},
 		}),
