@@ -36,7 +36,7 @@ export default function () {
 				toggle('ignored', 'Yes')
 					.action(action().suggestedStatus('flagged').severity('medium').message())
 					.children(
-						toggle('warning', 'Also Warn them').action(
+						toggle('warning', 'Multiple times in a row').action(
 							action().suggestedStatus('rejected').severity('high').message(),
 						),
 					),
