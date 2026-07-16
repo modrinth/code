@@ -31,6 +31,7 @@
 					role="menu"
 					tabindex="-1"
 					@mousedown.stop
+					@wheel.stop
 					@mouseleave="handleMouseLeave"
 				>
 					<template
@@ -164,10 +165,11 @@ const calculateMenuPosition = () => {
 	if (!triggerRef.value || !menuRef.value) return null
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
-	// offsetWidth/offsetHeight are not affected by CSS transforms (unlike getBoundingClientRect),
-	// so scale transitions on the menu element don't corrupt the measurement
+	// offsetWidth is not affected by CSS transforms (unlike getBoundingClientRect)
+	// scrollHeight gives the full content height regardless of any maxHeight constraint,
+	// preventing a feedback loop where clamped offsetHeight makes it look like the menu fits
 	const menuWidth = menuRef.value.offsetWidth
-	const menuHeight = menuRef.value.offsetHeight
+	const menuHeight = menuRef.value.scrollHeight
 	const margin = 8
 
 	let top: number
@@ -384,11 +386,25 @@ const handleKeydown = (event: KeyboardEvent) => {
 	}
 }
 
-const handleResizeOrScroll = (event?: Event) => {
+const handleResize = () => {
 	if (!isOpen.value) return
-	if (event instanceof Event && menuRef.value?.contains(event.target as Node)) return
 	const pos = calculateMenuPosition()
 	if (pos) menuStyle.value = pos
+}
+
+const handleScroll = () => {
+	if (!isOpen.value) return
+	const pos = calculateMenuPosition()
+	if (!pos) return
+	// On scroll only the vertical position changes — don't update left, which would shift
+	// the menu horizontally due to scrollbar appearing/disappearing changing offsetWidth
+	const updated: Record<string, string> = { ...menuStyle.value, top: pos.top }
+	if (pos.maxHeight) {
+		updated.maxHeight = pos.maxHeight
+	} else {
+		delete updated.maxHeight
+	}
+	menuStyle.value = updated
 }
 
 const throttle = <T extends unknown[]>(
@@ -405,19 +421,19 @@ const throttle = <T extends unknown[]>(
 	}
 }
 
-const throttledHandleResizeOrScroll = throttle(handleResizeOrScroll, 100)
+const throttledHandleResize = throttle(handleResize, 100)
+const throttledHandleScroll = throttle(handleScroll, 100)
 
 onMounted(() => {
 	triggerRef.value?.addEventListener('keydown', handleKeydown)
-	window.addEventListener('resize', throttledHandleResizeOrScroll)
-	// capture: true catches scroll events on any scrollable ancestor, not just window
-	window.addEventListener('scroll', throttledHandleResizeOrScroll, { capture: true })
+	window.addEventListener('resize', throttledHandleResize)
+	window.addEventListener('scroll', throttledHandleScroll)
 })
 
 onUnmounted(() => {
 	triggerRef.value?.removeEventListener('keydown', handleKeydown)
-	window.removeEventListener('resize', throttledHandleResizeOrScroll)
-	window.removeEventListener('scroll', throttledHandleResizeOrScroll, { capture: true })
+	window.removeEventListener('resize', throttledHandleResize)
+	window.removeEventListener('scroll', throttledHandleScroll)
 	document.removeEventListener('mousemove', handleMouseMove)
 	if (typeAheadTimeout.value) {
 		clearTimeout(typeAheadTimeout.value)
