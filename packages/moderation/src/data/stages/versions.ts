@@ -15,13 +15,13 @@ import {
 } from '../../types/node'
 
 const IncorrectProjectTypeDatapackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrect-project-type/datapack',
+	'checklist/messages/versions/incorrectProjectType/datapack',
 )
 const IncorrectProjectTypeModpackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrect-project-type/modpack',
+	'checklist/messages/versions/incorrectProjectType/modpack',
 )
 const IncorrectProjectTypeResourcepackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrect-project-type/resourcepack',
+	'checklist/messages/versions/incorrectProjectType/resourcepack',
 )
 
 export default function () {
@@ -37,12 +37,12 @@ export default function () {
 		.shown(computed(() => !project.value?.minecraft_server))
 		.children(
 			group().children(
-				toggle('incorrect_additional_files', 'Incorrect additional files').action(
+				toggle('incorrectAdditionalFiles', 'Incorrect additional files').action(
 					action().suggestedStatus('flagged').severity('medium').message(),
 				),
 
 				// TODO: borked
-				toggle('incorrect_project_type', 'Incorrect Project Type')
+				toggle('incorrectProjectType', 'Incorrect Project Type')
 					.action(action().suggestedStatus('rejected').severity('medium'))
 					.children(
 						dropdown('type')
@@ -62,7 +62,7 @@ export default function () {
 					),
 
 				// TODO: borked
-				toggle('alternate_versions', 'Alternate Versions')
+				toggle('alternateVersions', 'Alternate Versions')
 					.action(action().suggestedStatus('rejected').severity('high'))
 					.children(
 						dropdown('distribution')
@@ -83,7 +83,7 @@ export default function () {
 								option('server', 'Server Files (Primary Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.action(action().message()),
-								option('server_additional', 'Server Files (Additional Files)')
+								option('server-additional', 'Server Files (Additional Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.action(action().message()),
 								option('zip', 'mods.zip')
@@ -92,11 +92,11 @@ export default function () {
 							),
 					),
 
-				toggle('vanilla_assets', 'Vanilla Assets')
+				toggle('vanillaAssets', 'Vanilla Assets')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
 					.action(action().suggestedStatus('rejected').severity('medium').message()),
 
-				toggle('redist_libs', 'Packed Libs')
+				toggle('redistLibs', 'Packed Libs')
 					.shown(
 						computed(
 							() =>
@@ -106,7 +106,7 @@ export default function () {
 					)
 					.action(action().suggestedStatus('rejected').severity('medium').message()),
 
-				toggle('duplicate_primary_files', 'Duplicate Primary Files').action(
+				toggle('duplicatePrimaryFiles', 'Duplicate Primary Files').action(
 					action().suggestedStatus('flagged').severity('medium').message(),
 				),
 
@@ -116,10 +116,10 @@ export default function () {
 							.suggestedStatus('rejected')
 							.severity('medium')
 							.message((state) => ({
-								INVALID_TYPE: state.invalid_type,
+								INVALID_TYPE: state.invalidType,
 							})),
 					)
-					.children(text('invalid_type').title('Unsupported Type').required()),
+					.children(text('invalidType').title('Unsupported Type').required()),
 			),
 		)
 }

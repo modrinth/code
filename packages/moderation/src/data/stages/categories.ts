@@ -10,8 +10,8 @@ export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
 	const inaccurateMsg = md('checklist/messages/tags/inaccurate')
-	const optimizationMsg = inaccurateMsg.concat(md('checklist/messages/tags/optimization_misused'))
-	const resolutionsMsg = inaccurateMsg.concat(md('checklist/messages/tags/resolutions_misused'))
+	const optimizationMsg = inaccurateMsg.concat(md('checklist/messages/tags/optimizationMisused'))
+	const resolutionsMsg = inaccurateMsg.concat(md('checklist/messages/tags/resolutionsMisused'))
 
 	return stage('tags', 'Tags')
 		.hint("Are the project's tags accurate?")
@@ -33,7 +33,7 @@ export default function () {
 					action().suggestedStatus('flagged').severity('low').message(),
 				),
 
-				toggle('optimization_misused', 'Optimization')
+				toggle('optimizationMisused', 'Optimization')
 					.shown(
 						computed(
 							() =>
@@ -56,7 +56,7 @@ export default function () {
 							),
 					),
 
-				toggle('resolutions_misused', 'Resolutions')
+				toggle('resolutionsMisused', 'Resolutions')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
 					.action(
 						action()

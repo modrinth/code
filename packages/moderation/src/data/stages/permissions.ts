@@ -21,19 +21,19 @@ export default function () {
 		)
 		.children(
 			group().children(
-				toggle('invalid_permissions', 'Invalid permissions').action(
+				toggle('invalidPermissions', 'Invalid permissions').action(
 					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-				toggle('prohibited_external_content', 'Prohibited externals').action(
+				toggle('prohibitedExternalContent', 'Prohibited externals').action(
 					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-				toggle('missing_permissions', 'Missing permissions').action(
+				toggle('missingPermissions', 'Missing permissions').action(
 					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-				toggle('non-commercial-external-content', 'Non-commercial externals')
+				toggle('nonCommercialExternalContent', 'Non-commercial externals')
 					.shown(computed(() => project.value.monetization_status === 'monetized'))
 					.action(action().suggestedStatus('rejected').severity('high').message()),
 			),
