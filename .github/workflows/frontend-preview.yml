@@ -76,6 +76,8 @@ jobs:
 
       - name: Deploy Storybook preview
         uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
