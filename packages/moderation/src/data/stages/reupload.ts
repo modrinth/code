@@ -29,28 +29,28 @@ export default function () {
 							.suggestedStatus('rejected')
 							.severity('high')
 							.message((state) => ({
-								ORIGINAL_PROJECT: state.originalProject,
-								ORIGINAL_AUTHOR: state.originalAuthor,
+								ORIGINAL_PROJECT: state['original-project'],
+								ORIGINAL_AUTHOR: state['original-author'],
 							})),
 					)
 					.children(
-						text('originalProject').title('Original Project Title').required(),
-						text('originalAuthor').title('Original project Author').required(),
+						text('original-project').title('Original Project Title').required(),
+						text('original-author').title('Original project Author').required(),
 					),
 
-				toggle('unclearFork', 'Unclear Fork')
+				toggle('unclear-fork', 'Unclear Fork')
 					.shown(computed(() => !project.value.minecraft_server))
 					.action(action().suggestedStatus('rejected').severity('high').message()),
 
-				toggle('insufficientFork', 'Insufficient Fork')
+				toggle('insufficient-fork', 'Insufficient Fork')
 					.shown(computed(() => !project.value.minecraft_server))
 					.action(action().suggestedStatus('rejected').severity('high').message()),
 
-				toggle('requestProof', 'Proof of permissions').action(
+				toggle('request-proof', 'Proof of permissions').action(
 					action().suggestedStatus('rejected').severity('high').message(),
 				),
 
-				toggle('identityVerification', 'Verify Identity')
+				toggle('identity-verification', 'Verify Identity')
 					.shown(computed(() => !project.value.minecraft_server))
 					.action(
 						action()
@@ -62,7 +62,7 @@ export default function () {
 					)
 					.children(text('platform').title('Where else can the project be found?').required()),
 
-				toggle('identityVerification-server', 'Verify Identity')
+				toggle('identity-verification-server', 'Verify Identity')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.action(
 						action()
@@ -74,11 +74,11 @@ export default function () {
 					)
 					.children(text('contact').title('Known public contact method').required()),
 
-				toggle('requestProof-server', 'Reuploaded pack')
+				toggle('request-proof-server', 'Reuploaded pack')
 					.shown(isServerModpack)
 					.action(action().suggestedStatus('rejected').severity('high').message()),
 
-				toggle('customPackVerification', 'Override verification')
+				toggle('custom-pack-verification', 'Override verification')
 					.shown(isServerModpack)
 					.action(action().suggestedStatus('rejected').severity('high').message())
 					.children(
@@ -91,7 +91,7 @@ export default function () {
 							.children(markdown('overrides').title('Add list of overrides.')),
 					),
 
-				toggle('customPackProhibited', 'Forbidden Overrides')
+				toggle('custom-pack-prohibited', 'Forbidden Overrides')
 					.shown(isServerModpack)
 					.action(
 						action()

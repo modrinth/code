@@ -24,8 +24,8 @@ const licensesNotRequiringSource: string[] = [
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
-	const noSourceForkMsg: MessageFn = md('checklist/messages/license/noSource-fork')
-	const noSourceMsg: MessageFn = md('checklist/messages/license/noSource')
+	const noSourceForkMsg: MessageFn = md('checklist/messages/license/no-source-fork')
+	const noSourceMsg: MessageFn = md('checklist/messages/license/no-source')
 
 	return stage('license', 'License')
 		.hint('Is this license and link valid?')
@@ -39,14 +39,14 @@ export default function () {
 			label(md('checklist/text/licensing')),
 
 			group().children(
-				toggle('invalidLink', 'Invalid Link')
+				toggle('invalid-link', 'Invalid Link')
 					.shown(computed(() => !!project.value.license?.url))
 					.action(action().suggestedStatus('flagged').severity('medium').message())
 					.children(
-						check('customLicense', 'Invalid Link: Custom License').action(action().message()),
+						check('custom-license', 'Invalid Link: Custom License').action(action().message()),
 					),
 
-				toggle('noSource', 'No Source')
+				toggle('no-source', 'No Source')
 					.shown(
 						computed(() => !licensesNotRequiringSource.includes(project.value.license?.id ?? '')),
 					)

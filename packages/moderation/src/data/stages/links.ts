@@ -59,18 +59,18 @@ export default function () {
 						}
 					> = {
 						issues: {
-							disabled: 'checklist/messages/links/note/issuesDisabled',
+							disabled: 'checklist/messages/links/note/issues-disabled',
 						},
 						wiki: {
-							disabled: 'checklist/messages/links/note/wikiDisabled',
+							disabled: 'checklist/messages/links/note/wiki-disabled',
 						},
 						source: {
-							inaccessible: 'checklist/messages/links/note/source404',
-							empty: 'checklist/messages/links/note/sourceEmpty',
+							inaccessible: 'checklist/messages/links/note/source-404',
+							empty: 'checklist/messages/links/note/source-empty',
 						},
 						discord: {
-							inaccessible: 'checklist/messages/links/note/discordInaccessible',
-							expiring: 'checklist/messages/links/note/discordExpiring',
+							inaccessible: 'checklist/messages/links/note/discord-inaccessible',
+							expiring: 'checklist/messages/links/note/discord-expiring',
 						},
 					}
 
@@ -96,7 +96,7 @@ export default function () {
 					let message = await md('checklist/messages/links/header')(state)
 
 					if (misused.length > 0) {
-						message += await md('checklist/messages/links/misusedHeader')(state)
+						message += await md('checklist/messages/links/misused-header')(state)
 						for (const [id] of misused) {
 							message += `- ${LINK_NAMES[id] ?? id}\n`
 							const extraPath = LINK_EXTRAS[id]?.misused
@@ -105,7 +105,7 @@ export default function () {
 					}
 
 					if (inaccessible.length > 0) {
-						message += await md('checklist/messages/links/inaccessibleHeader')(state)
+						message += await md('checklist/messages/links/inaccessible-header')(state)
 						for (const [id] of inaccessible) {
 							message += `- ${LINK_NAMES[id] ?? id}\n`
 							const extraPath = LINK_EXTRAS[id]?.inaccessible

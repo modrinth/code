@@ -15,13 +15,13 @@ import {
 } from '../../types/node'
 
 const IncorrectProjectTypeDatapackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrectProjectType/datapack',
+	'checklist/messages/versions/incorrect-project-type/datapack',
 )
 const IncorrectProjectTypeModpackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrectProjectType/modpack',
+	'checklist/messages/versions/incorrect-project-type/modpack',
 )
 const IncorrectProjectTypeResourcepackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrectProjectType/resourcepack',
+	'checklist/messages/versions/incorrect-project-type/resourcepack',
 )
 
 export default function () {
@@ -37,12 +37,12 @@ export default function () {
 		.shown(computed(() => !project.value?.minecraft_server))
 		.children(
 			group().children(
-				toggle('incorrectAdditionalFiles', 'Incorrect additional files').action(
+				toggle('incorrect-additional-files', 'Incorrect additional files').action(
 					action().suggestedStatus('flagged').severity('medium').message(),
 				),
 
 				// TODO: borked
-				toggle('incorrectProjectType', 'Incorrect Project Type')
+				toggle('incorrect-project-type', 'Incorrect Project Type')
 					.action(action().suggestedStatus('rejected').severity('medium'))
 					.children(
 						dropdown('type')
@@ -62,7 +62,7 @@ export default function () {
 					),
 
 				// TODO: borked
-				toggle('alternateVersions', 'Alternate Versions')
+				toggle('alternate-versions', 'Alternate Versions')
 					.action(action().suggestedStatus('rejected').severity('high'))
 					.children(
 						dropdown('distribution')
@@ -92,11 +92,11 @@ export default function () {
 							),
 					),
 
-				toggle('vanillaAssets', 'Vanilla Assets')
+				toggle('vanilla-assets', 'Vanilla Assets')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
 					.action(action().suggestedStatus('rejected').severity('medium').message()),
 
-				toggle('redistLibs', 'Packed Libs')
+				toggle('redist-libs', 'Packed Libs')
 					.shown(
 						computed(
 							() =>
@@ -106,7 +106,7 @@ export default function () {
 					)
 					.action(action().suggestedStatus('rejected').severity('medium').message()),
 
-				toggle('duplicatePrimaryFiles', 'Duplicate Primary Files').action(
+				toggle('duplicate-primary-files', 'Duplicate Primary Files').action(
 					action().suggestedStatus('flagged').severity('medium').message(),
 				),
 
@@ -116,10 +116,10 @@ export default function () {
 							.suggestedStatus('rejected')
 							.severity('medium')
 							.message((state) => ({
-								INVALID_TYPE: state.invalidType,
+								INVALID_TYPE: state['invalid-type'],
 							})),
 					)
-					.children(text('invalidType').title('Unsupported Type').required()),
+					.children(text('invalid-type').title('Unsupported Type').required()),
 			),
 		)
 }

@@ -26,7 +26,7 @@ export default function () {
 			)
 	})
 
-	return stage('reReview', 'Re-Review')
+	return stage('re-review', 'Re-Review')
 		.hint('Did the author ignore previous review messages?')
 		.icon(RefreshCwIcon)
 		.navigate('/moderation')

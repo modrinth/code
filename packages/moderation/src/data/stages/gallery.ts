@@ -20,11 +20,11 @@ export default function () {
 					action().suggestedStatus('flagged').severity('low').message(),
 				),
 
-				toggle('notRelevant', 'Not relevant')
+				toggle('not-relevant', 'Not relevant')
 					.shown(computed(() => project.value.gallery.length > 0))
 					.action(action().suggestedStatus('flagged').severity('low').message()),
 
-				toggle('showcaseClarity', 'Showcase Clarity').action(
+				toggle('showcase-clarity', 'Showcase Clarity').action(
 					action().suggestedStatus('rejected').severity('high').message(),
 				),
 			),

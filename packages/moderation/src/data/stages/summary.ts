@@ -20,10 +20,10 @@ export default function () {
 				.title('Summary Issues?')
 				.children(
 					toggle('insufficient', 'Insufficient')
-						.enabled((state) => !state.repeatTitle)
+						.enabled((state) => !state['repeat-title'])
 						.action(action().suggestedStatus('flagged').severity('low').message()),
 
-					toggle('repeatTitle', 'Repeat of Title')
+					toggle('repeat-title', 'Repeat of Title')
 						.enabled((state) => !state.insufficient)
 						.action(action().suggestedStatus('flagged').severity('low').message()),
 
@@ -31,7 +31,7 @@ export default function () {
 						action().suggestedStatus('flagged').severity('low').message(),
 					),
 
-					toggle('nonEnglish', 'Non-english')
+					toggle('non-english', 'Non-english')
 						.action(action().suggestedStatus('flagged').severity('medium').message())
 						.shown(
 							computed(() => {
@@ -46,7 +46,7 @@ export default function () {
 							}),
 						),
 
-					toggle('repeatIp', 'Repeat of IP')
+					toggle('repeat-ip', 'Repeat of IP')
 						.shown(computed(() => !!project.value?.minecraft_server))
 						.action(action().suggestedStatus('flagged').severity('medium').message()),
 				),

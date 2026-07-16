@@ -7,7 +7,7 @@ import { action, group, stage, toggle } from '../../types/node'
 export default function () {
 	const { projectV3: project, projectV2 } = injectProjectPageContext()
 
-	return stage('undefinedProject', 'Undefined Project')
+	return stage('undefined-project', 'Undefined Project')
 		.hint('This project is undefined!')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080018bf3d822a2f51a35',
@@ -19,7 +19,7 @@ export default function () {
 		)
 		.children(
 			group().children(
-				toggle('noVersions', 'No Versions').action(action().suggestedStatus('rejected').message()),
+				toggle('no-versions', 'No Versions').action(action().suggestedStatus('rejected').message()),
 			),
 		)
 }

@@ -23,7 +23,7 @@ export default function (
 ) {
 	const { projectV3: project } = injectProjectPageContext()
 
-	return stage('statusAlerts', 'Status Alerts')
+	return stage('status-alerts', 'Status Alerts')
 		.hint(`Is anything else affecting this project's status?`)
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080968699c397e470eca6',
@@ -31,14 +31,14 @@ export default function (
 		.icon(TriangleAlertIcon)
 		.navigate('/moderation')
 		.children(
-			label(md('checklist/text/statusAlerts/text')),
+			label(md('checklist/text/status-alerts/text')),
 
 			group().children(
-				toggle('correctionsApplied', 'Corrections applied')
+				toggle('corrections-applied', 'Corrections applied')
 					.action(
 						action()
 							.suggestedStatus('approved')
-							.message(() => `correctionsApplied${project.value.status === 'approved' ? '-approved' : ''}`)
+							.message(() => `corrections-applied${project.value.status === 'approved' ? '-approved' : ''}`)
 							.applyFixes(),
 					)
 					.children(
@@ -59,15 +59,15 @@ export default function (
 					),
 
 				//TODO: chyz combine these
-				toggle('privateUse', 'Private use')
+				toggle('private-use', 'Private use')
 					.shown(computed(() => !project.value.minecraft_server))
 					.action(action().suggestedStatus('flagged').message()),
 
-				toggle('privateUse-server', 'Private community')
+				toggle('private-use-server', 'Private community')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.action(action().suggestedStatus('flagged').message()),
 
-				toggle('serverUse', 'Server use')
+				toggle('server-use', 'Server use')
 					.shown(
 						computed(
 							() =>
@@ -76,7 +76,7 @@ export default function (
 					)
 					.action(action().message()),
 
-				toggle('accountIssues', 'Account issues').action(
+				toggle('account-issues', 'Account issues').action(
 					action().suggestedStatus('rejected').message(),
 				),
 

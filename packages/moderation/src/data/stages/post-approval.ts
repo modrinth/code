@@ -9,7 +9,7 @@ import { action, group, stage, text, toggle } from '../../types/node'
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
-	return stage('postApproval', 'Post-Approval')
+	return stage('post-approval', 'Post-Approval')
 		.hint('Issue warnings, notices, or takedowns?')
 		.guidance(
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#3475ee711bf080c5a13cda0b1e4ae9ed',
@@ -18,11 +18,11 @@ export default function () {
 		.shown(computed(() => project.value.status === 'approved'))
 		.children(
 			group().children(
-				toggle('issueWarning', 'Issue warning').action(
+				toggle('issue-warning', 'Issue warning').action(
 					action().suggestedStatus('approved').severity('low').message(),
 				),
 
-				toggle('missedDeadline', 'Missed due date')
+				toggle('missed-deadline', 'Missed due date')
 					.action(
 						action()
 							.suggestedStatus('flagged')
@@ -36,7 +36,7 @@ export default function () {
 						text('status').title('What status is the project being set to?').required(),
 					),
 
-				toggle('metadataIssue', 'Incorrect metadata')
+				toggle('metadata-issue', 'Incorrect metadata')
 					.action(action().suggestedStatus('approved').severity('low').message())
 					.children(
 						toggle('dependencies', 'Missing Dependencies')
@@ -44,16 +44,16 @@ export default function () {
 								action()
 									.severity('low')
 									.message((state) => ({
-										DEPENDENCY_NAME: state.dependencyName,
-										DEPENDENCY_LINK: state.dependencyLink,
+										DEPENDENCY_NAME: state['dependency-name'],
+										DEPENDENCY_LINK: state['dependency-link'],
 									})),
 							)
 							.children(
-								text('dependencyName').title('Dependency name').required(),
-								text('dependencyLink').title('Dependency link').required(),
+								text('dependency-name').title('Dependency name').required(),
+								text('dependency-link').title('Dependency link').required(),
 							),
 
-						toggle('mcVersions', 'Game versions')
+						toggle('mc-versions', 'Game versions')
 							.action(
 								action()
 									.severity('low')
