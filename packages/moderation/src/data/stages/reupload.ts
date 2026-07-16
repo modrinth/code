@@ -20,6 +20,7 @@ export default function () {
 			'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892#2e35ee711bf080d1a0a2cda3ff2ce997',
 		)
 		.icon(CopyrightIcon)
+		.navigate('/')
 		.children(
 			group().children(
 				toggle('reupload', 'Re-upload')
