@@ -2,7 +2,27 @@ import { VersionIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, dropdown, group, option, stage, text, toggle } from '../../types/node'
+import {
+	action,
+	dropdown,
+	group,
+	md,
+	option,
+	stage,
+	text,
+	toggle,
+	type MessageFn,
+} from '../../types/node'
+
+const IncorrectProjectTypeDatapackMsg: MessageFn = md(
+	'checklist/messages/versions/incorrect-project-type/datapack',
+)
+const IncorrectProjectTypeModpackMsg: MessageFn = md(
+	'checklist/messages/versions/incorrect-project-type/modpack',
+)
+const IncorrectProjectTypeResourcepackMsg: MessageFn = md(
+	'checklist/messages/versions/incorrect-project-type/resourcepack',
+)
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -21,6 +41,7 @@ export default function () {
 					action().suggestedStatus('flagged').severity('medium').message(),
 				),
 
+				// TODO: borked
 				toggle('incorrect_project_type', 'Incorrect Project Type')
 					.action(action().suggestedStatus('rejected').severity('medium'))
 					.children(
@@ -30,16 +51,17 @@ export default function () {
 							.children(
 								option('modpack', 'Modpack')
 									.shown(computed(() => !project.value.project_types.includes('modpack')))
-									.action(action().message()),
+									.action(action().message(IncorrectProjectTypeModpackMsg)),
 								option('resourcepack', 'Resource Pack')
 									.shown(computed(() => !project.value.project_types.includes('resourcepack')))
-									.action(action().message()),
+									.action(action().message(IncorrectProjectTypeResourcepackMsg)),
 								option('datapack', 'Data Pack')
 									.shown(computed(() => !project.value.loaders.includes('datapack')))
-									.action(action().message()),
+									.action(action().message(IncorrectProjectTypeDatapackMsg)),
 							),
 					),
 
+				// TODO: borked
 				toggle('alternate_versions', 'Alternate Versions')
 					.action(action().suggestedStatus('rejected').severity('high'))
 					.children(
