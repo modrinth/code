@@ -2,7 +2,9 @@ import { ImageIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, group, stage, toggle } from '../../types/node'
+import { action, group, md, stage, toggle, type MessageFn } from '../../types/node'
+
+const ShowcaseClarityMsg: MessageFn = md('checklist/messages/gallery/clarity')
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -25,7 +27,7 @@ export default function () {
 					.action(action().suggestedStatus('flagged').severity('low').message()),
 
 				toggle('showcase_clarity', 'Showcase Clarity').action(
-					action().suggestedStatus('rejected').severity('high').message(),
+					action().suggestedStatus('rejected').severity('high').message(ShowcaseClarityMsg),
 				),
 			),
 		)
