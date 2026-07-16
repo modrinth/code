@@ -7,15 +7,6 @@ import { action, group, label, md, mdEscape, stage, toggle } from '../../types/n
 import { licensesNotRequiringSource } from '../../utils'
 
 function linkSection(id: string, urlLine: string, ...extra: NodeBuilder[]) {
-	const { projectV3: project } = injectProjectPageContext()
-	if (
-		id === 'source' &&
-		(project.value.project_types.includes('mod') ||
-			project.value.project_types.includes('plugin')) &&
-		!licensesNotRequiringSource.includes(project.value.license?.id ?? '')
-	) {
-		urlLine = `**[❗]** ${urlLine}`
-	}
 	return group(id)
 		.layout('column')
 		.children(
@@ -168,14 +159,22 @@ export default function () {
 						)
 					: null,
 
-			() =>
-				project.value.link_urls.source?.url
-					? linkSection(
-							'source',
-							`**Source:** <${project.value.link_urls.source.url}>`,
-							toggle('empty', 'Empty Repo'),
-						)
-					: null,
+			() => {
+				if (project.value.link_urls.source?.url) {
+					const showWarning =
+						(project.value.project_types.includes('mod') ||
+							project.value.project_types.includes('plugin')) &&
+						!licensesNotRequiringSource.includes(project.value.license?.id ?? '')
+
+					return linkSection(
+						'source',
+						`${showWarning ? '**[❗]** ' : ''}**Source:** <${project.value.link_urls.source.url}>`,
+						toggle('empty', 'Empty Repo'),
+					)
+				}
+
+				return null
+			},
 
 			() =>
 				project.value.link_urls.wiki?.url
