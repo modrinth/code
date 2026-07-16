@@ -11,6 +11,7 @@ import useLinksStage from './stages/links'
 import useMetadataStage from './stages/metadata'
 import usePermissionsStage from './stages/permissions'
 import usePostApprovalStage from './stages/post-approval'
+import useReReviewStage from './stages/re-review'
 import useReuploadsStage from './stages/reupload'
 import useOtherRulesStage from './stages/other-rules'
 import useStatusAlertsStage from './stages/status-alerts'
@@ -25,6 +26,7 @@ export function useStages(
 	const mainStages: StageNodeBuilder[] = [
 		usePostApprovalStage(),
 		useUndefinedProjectStage(),
+    useReReviewStage(),
 		useTitleSlugStage(),
 		useSummaryStage(),
 		useDescriptionStage(),

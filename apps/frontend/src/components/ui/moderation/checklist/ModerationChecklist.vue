@@ -21,6 +21,7 @@
 					<TeleportOverflowMenu
 						v-if="canOpenStageSelectorFromTitle"
 						:options="stageOptions"
+						placement="center"
 						btn-class="inline-flex items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
 						<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
@@ -252,7 +253,7 @@
 
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="!done" circular>
-								<TeleportOverflowMenu :options="stageOptions">
+								<TeleportOverflowMenu :options="stageOptions" placement="center">
 									<ListBulletedIcon />
 									<span class="sr-only">Stages</span>
 									<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
@@ -1282,6 +1283,11 @@ onMounted(async () => {
 	if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
 		alreadyReviewed.value = true
 		return
+	}
+
+	const initialStage = resolvedStages.value[currentStage.value]
+	if (initialStage?._navigate) {
+		router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${initialStage._navigate}`)
 	}
 
 	const result = await moderationQueue.acquireLock(projectV2.value.id)
