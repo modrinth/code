@@ -358,6 +358,11 @@ export interface SharedInstancePublishPreview {
 	diffs: SharedInstanceUpdateDiff[]
 }
 
+export interface SharedInstanceConfigFiles {
+	files: string[]
+	selected: string[]
+}
+
 export interface SharedInstanceInviteLink {
 	inviteId: string
 	expiresAt: string
@@ -400,6 +405,19 @@ export async function get_shared_instance_publish_preview(
 	instanceId: string,
 ): Promise<SharedInstancePublishPreview | null> {
 	return await invoke('plugin:instance|instance_share_get_publish_preview', { instanceId })
+}
+
+export async function get_shared_instance_config_files(
+	instanceId: string,
+): Promise<SharedInstanceConfigFiles> {
+	return await invoke('plugin:instance|instance_share_get_config_files', { instanceId })
+}
+
+export async function set_shared_instance_config_files(
+	instanceId: string,
+	selected: string[],
+): Promise<SharedInstanceConfigFiles> {
+	return await invoke('plugin:instance|instance_share_set_config_files', { instanceId, selected })
 }
 
 export async function publish_shared_instance(

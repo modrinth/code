@@ -10,17 +10,60 @@
 					input-class="!h-10"
 					clearable
 				/>
-				<ButtonStyled v-if="!actionsLocked" color="brand">
-					<button
-						class="flex !h-10 shrink-0 items-center gap-2"
-						:disabled="invitePending"
-						@click="emit('invite', $event)"
+				<template v-if="!actionsLocked">
+					<ButtonStyled color="brand">
+						<button
+							class="flex !h-10 shrink-0 items-center gap-2"
+							:disabled="invitePending"
+							@click="emit('invite', $event)"
+						>
+							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
+							<UserPlusIcon v-else aria-hidden="true" />
+							Invite friends
+						</button>
+					</ButtonStyled>
+					<Tooltip
+						theme="dismissable-prompt"
+						:triggers="[]"
+						:shown="showConfigSharingHint"
+						:auto-hide="false"
+						placement="bottom-end"
 					>
-						<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
-						<UserPlusIcon v-else aria-hidden="true" />
-						Invite friends
-					</button>
-				</ButtonStyled>
+						<ButtonStyled circular>
+							<button
+								v-tooltip="showConfigSharingHint ? undefined : formatMessage(messages.settings)"
+								class="!h-10 !min-h-10 !w-10 !min-w-10 shrink-0 !p-0"
+								:aria-label="formatMessage(messages.settings)"
+								@click="openSettings"
+							>
+								<Settings2Icon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
+						<template #popper>
+							<div
+								class="grid w-80 max-w-[calc(100vw-3rem)] grid-cols-[minmax(0,1fr)] gap-1"
+							>
+								<div class="flex items-center justify-between gap-8">
+									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+										{{ formatMessage(messages.configSharingHintTitle) }}
+									</h3>
+									<ButtonStyled size="small" circular>
+										<button
+											v-tooltip="formatMessage(messages.configSharingHintDismiss)"
+											class="!w-6 !min-w-6 shrink-0 !px-0"
+											@click="dismissConfigSharingHint"
+										>
+											<XIcon aria-hidden="true" />
+										</button>
+									</ButtonStyled>
+								</div>
+								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+									{{ formatMessage(messages.configSharingHintDescription) }}
+								</p>
+							</div>
+						</template>
+					</Tooltip>
+				</template>
 			</div>
 			<div class="flex flex-wrap items-center gap-1.5">
 				<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
@@ -125,6 +168,7 @@ import {
 	FilterIcon,
 	LinkIcon,
 	SearchIcon,
+	Settings2Icon,
 	SpinnerIcon,
 	UserPlusIcon,
 	XIcon,
@@ -133,15 +177,19 @@ import {
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	defineMessages,
 	type SortDirection,
 	StyledInput,
 	Table,
 	type TableColumn,
 	truncatedTooltip,
 	useFormatDateTime,
+	useVIntl,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { useStorage } from '@vueuse/core'
+import { Tooltip } from 'floating-vue'
 import { computed, ref } from 'vue'
 
 import {
@@ -153,12 +201,22 @@ import {
 } from './shared-instance-share-types'
 
 const props = defineProps<{ rows: ShareRow[]; actionsLocked?: boolean; invitePending?: boolean }>()
-const emit = defineEmits<{ invite: [event: MouseEvent]; remove: [row: ShareRow] }>()
+const emit = defineEmits<{
+	invite: [event: MouseEvent]
+	remove: [row: ShareRow]
+	settings: []
+}>()
 const search = ref('')
 const methodFilter = ref<MethodFilter>('all')
 const sortColumn = ref<string | undefined>('joined')
 const sortDirection = ref<SortDirection>('desc')
 const usernameRefs = ref<Record<string, HTMLElement | null>>({})
+const { formatMessage } = useVIntl()
+const configSharingHintDismissed = useStorage(
+	'shared-instance-config-sharing-hint-dismissed',
+	false,
+)
+const showConfigSharingHint = computed(() => !configSharingHintDismissed.value)
 const formatRelativeTime = useRelativeTime({ style: 'narrow' })
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 const methodFilterOptions: Array<{ id: ShareMethod; label: string }> = [
@@ -248,6 +306,13 @@ function handleSort(column: string, direction: SortDirection) {
 	sortColumn.value = column
 	sortDirection.value = direction
 }
+function dismissConfigSharingHint() {
+	configSharingHintDismissed.value = true
+}
+function openSettings() {
+	dismissConfigSharingHint()
+	emit('settings')
+}
 function toggleMethodFilter(filter: ShareMethod) {
 	methodFilter.value = methodFilter.value === filter ? 'all' : filter
 }
@@ -259,6 +324,25 @@ function filterClass(active: boolean) {
 			: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5',
 	]
 }
+
+const messages = defineMessages({
+	settings: {
+		id: 'app.instance.share.config-sharing-settings',
+		defaultMessage: 'Sharing settings',
+	},
+	configSharingHintTitle: {
+		id: 'instance.shared-instance.config-sharing-hint.title',
+		defaultMessage: 'Share config files',
+	},
+	configSharingHintDescription: {
+		id: 'instance.shared-instance.config-sharing-hint.description',
+		defaultMessage: 'You can select which config files to share in the instance settings',
+	},
+	configSharingHintDismiss: {
+		id: 'instance.shared-instance.config-sharing-hint.dismiss',
+		defaultMessage: "Don't show again",
+	},
+})
 function userProfileLink(username: string) {
 	return !username || username.includes('@')
 		? undefined

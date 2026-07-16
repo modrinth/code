@@ -73,11 +73,13 @@ pub use self::invites::{
     invite_shared_instance_users, remove_shared_instance_users,
 };
 pub use self::publish::{
-    get_shared_instance_publish_preview, publish_shared_instance,
+    get_shared_instance_config_files, get_shared_instance_publish_preview,
+    publish_shared_instance, set_shared_instance_config_files,
     unlink_shared_instance, unpublish_shared_instance,
 };
 pub use self::types::{
-    SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
+    SharedInstanceConfigFiles, SharedInstanceExternalFilePreview,
+    SharedInstanceInstallPreview,
     SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
     SharedInstanceJoinType, SharedInstancePublishPreview,
     SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,

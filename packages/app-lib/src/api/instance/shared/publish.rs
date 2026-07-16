@@ -7,6 +7,7 @@ use async_walkdir::{Filtering, WalkDir};
 use async_zip::{Compression, ZipEntryBuilder};
 use futures::StreamExt;
 use sha1_smol::Sha1;
+use std::path::PathBuf;
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -85,6 +86,8 @@ pub(super) async fn detach_local_shared_instance(
         .await?;
     }
 
+    crate::install::clear_installed_shared_config_hashes(instance_id, state)
+        .await?;
     crate::state::clear_shared_instance(instance_id, &state.pool).await?;
 
     Ok(())
@@ -156,6 +159,133 @@ pub async fn get_shared_instance_publish_preview(
         latest_version: version.version,
         diffs,
     }))
+}
+
+#[tracing::instrument]
+pub async fn get_shared_instance_config_files(
+    instance_id: &str,
+) -> crate::Result<SharedInstanceConfigFiles> {
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let attachment = metadata.shared_instance.as_ref().ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Instance is not attached to a shared instance".to_string(),
+        )
+    })?;
+    ensure_owner(attachment)?;
+
+    let instance_path = state
+        .directories
+        .instances_dir()
+        .join(&metadata.instance.path);
+    let files = collect_config_files(&instance_path)
+        .await?
+        .into_iter()
+        .map(|file| file.path)
+        .collect::<Vec<_>>();
+    let available = files.iter().cloned().collect::<HashSet<_>>();
+    let selected = selected_config_file_paths(&attachment.id, &state)
+        .await?
+        .into_iter()
+        .filter(|path| available.contains(path))
+        .collect();
+
+    Ok(SharedInstanceConfigFiles { files, selected })
+}
+
+#[tracing::instrument(skip(selected))]
+pub async fn set_shared_instance_config_files(
+    instance_id: &str,
+    selected: Vec<String>,
+) -> crate::Result<SharedInstanceConfigFiles> {
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let attachment = metadata.shared_instance.as_ref().ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Instance is not attached to a shared instance".to_string(),
+        )
+    })?;
+    ensure_owner(attachment)?;
+
+    let instance_path = state
+        .directories
+        .instances_dir()
+        .join(&metadata.instance.path);
+    let files = collect_config_files(&instance_path)
+        .await?
+        .into_iter()
+        .map(|file| file.path)
+        .collect::<Vec<_>>();
+    let available = files.iter().cloned().collect::<HashSet<_>>();
+    let mut selected = selected
+        .into_iter()
+        .filter(|path| available.contains(path))
+        .collect::<Vec<_>>();
+    selected.sort();
+    selected.dedup();
+    write_selected_config_file_paths(&attachment.id, &selected, &state)
+        .await?;
+
+    crate::state::set_shared_instance_sync_status(
+        instance_id,
+        ContentSetSyncStatus::Stale,
+        attachment.applied_version,
+        attachment.latest_version,
+        &state.pool,
+    )
+    .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+    Ok(SharedInstanceConfigFiles { files, selected })
+}
+
+fn selected_config_file_paths_path(
+    shared_instance_id: &str,
+    state: &State,
+) -> PathBuf {
+    state
+        .directories
+        .metadata_dir()
+        .join("shared_instance_config_files")
+        .join(format!(
+            "{}.json",
+            Sha1::from(shared_instance_id.as_bytes()).hexdigest()
+        ))
+}
+
+async fn selected_config_file_paths(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<Vec<String>> {
+    let path = selected_config_file_paths_path(shared_instance_id, state);
+    match crate::util::io::read(path).await {
+        Ok(bytes) => Ok(serde_json::from_slice(&bytes)?),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            Ok(Vec::new())
+        }
+        Err(error) => Err(error.into()),
+    }
+}
+
+async fn write_selected_config_file_paths(
+    shared_instance_id: &str,
+    selected: &[String],
+    state: &State,
+) -> crate::Result<()> {
+    let path = selected_config_file_paths_path(shared_instance_id, state);
+    if let Some(parent) = path.parent() {
+        crate::util::io::create_dir_all(parent).await?;
+    }
+    crate::util::io::write(path, serde_json::to_vec(selected)?).await?;
+    Ok(())
 }
 
 pub(super) async fn remote_publish_content(
@@ -360,7 +490,7 @@ pub(super) async fn collect_publish_snapshot(
         .directories
         .instances_dir()
         .join(&metadata.instance.path);
-    let (items, config_files) = if CONFIG_SYNC_ENABLED {
+    let (items, mut config_files) = if CONFIG_SYNC_ENABLED {
         tokio::try_join!(
             crate::state::list_content(
                 &metadata.instance.id,
@@ -382,6 +512,17 @@ pub(super) async fn collect_publish_snapshot(
             Vec::new(),
         )
     };
+    if CONFIG_SYNC_ENABLED {
+        let selected = match metadata.shared_instance.as_ref() {
+            Some(attachment) => {
+                selected_config_file_paths(&attachment.id, state).await?
+            }
+            None => Vec::new(),
+        }
+        .into_iter()
+        .collect::<HashSet<_>>();
+        config_files.retain(|file| selected.contains(&file.path));
+    }
     let modpack_id = shared_modpack_id(&metadata.link);
     let mut version_ids = Vec::new();
     let mut seen_version_ids = HashSet::new();
@@ -626,7 +767,33 @@ pub(super) async fn publish_current_content(
     let snapshot = collect_publish_snapshot(&metadata, state).await?;
     let modrinth_ids = snapshot.version_ids;
     let mut external_files = snapshot.external_files;
-    if CONFIG_SYNC_ENABLED {
+    let has_published_version = metadata
+        .shared_instance
+        .as_ref()
+        .and_then(|attachment| attachment.applied_version)
+        .is_some();
+    let remote_has_config_bundle = if CONFIG_SYNC_ENABLED
+        && has_published_version
+    {
+        match get_latest_remote_version_optional_unavailable(
+            shared_instance_id,
+            state,
+        )
+        .await?
+        {
+            SharedInstanceRemoteResponse::Available(version) => version
+                .external_files
+                .iter()
+                .any(|file| file.file_type == CONFIG_BUNDLE_FILE_TYPE),
+            SharedInstanceRemoteResponse::Unavailable(_) => false,
+        }
+    } else {
+        false
+    };
+    if CONFIG_SYNC_ENABLED
+        && has_published_version
+        && (!snapshot.config_files.is_empty() || remote_has_config_bundle)
+    {
         external_files.push(ExternalFileCandidate {
             file_name: CONFIG_BUNDLE_FILE_NAME.to_string(),
             file_type: CONFIG_BUNDLE_FILE_TYPE.to_string(),

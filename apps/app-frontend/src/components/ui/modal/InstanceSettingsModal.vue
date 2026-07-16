@@ -6,6 +6,7 @@ import {
 	CoffeeIcon,
 	InfoIcon,
 	MonitorIcon,
+	UsersIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
 import {
@@ -25,6 +26,7 @@ import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.v
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
 import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
+import SharingSettings from '@/components/ui/instance_settings/SharingSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info } from '@/helpers/instance'
@@ -96,6 +98,15 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.sharing',
+			defaultMessage: 'Sharing',
+		}),
+		icon: UsersIcon,
+		content: SharingSettings,
+		shown: props.instance.shared_instance?.role === 'owner',
 	},
 	{
 		name: defineMessage({
@@ -175,7 +186,11 @@ function show(tabIndex?: number) {
 	}
 }
 
-defineExpose({ show, hide })
+function showSharing() {
+	show(2)
+}
+
+defineExpose({ show, showSharing, hide })
 </script>
 <template>
 	<TabbedModal

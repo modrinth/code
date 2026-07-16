@@ -121,14 +121,17 @@ pub(super) async fn shared_instance_update_diffs(
     )
     .await?;
     if CONFIG_SYNC_ENABLED {
-        let instance_path = state
-            .directories
-            .instances_dir()
-            .join(&metadata.instance.path);
-        let (local_config_files, remote_config_files) = tokio::try_join!(
-            collect_config_files(&instance_path),
+        let (installed_config_hashes, remote_config_files) = tokio::try_join!(
+            crate::install::installed_shared_config_hashes(
+                &metadata.instance.id,
+                state,
+            ),
             remote_config_files(version),
         )?;
+        let local_config_files = installed_config_hashes
+            .into_iter()
+            .map(|(path, hash)| ConfigFile { path, hash })
+            .collect::<Vec<_>>();
         diffs.extend(shared_config_diffs(
             &local_config_files,
             &remote_config_files,

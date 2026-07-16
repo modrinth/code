@@ -220,6 +220,8 @@ fn main() {
                         "instance_share_invite_users",
                         "instance_share_create_invite_link",
                         "instance_share_remove_users",
+                        "instance_share_get_config_files",
+                        "instance_share_set_config_files",
                         "instance_share_get_publish_preview",
                         "instance_share_publish",
                         "instance_share_unlink",

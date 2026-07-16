@@ -287,6 +287,7 @@
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
 							:open-settings="() => settingsModal?.show(1)"
+							:open-sharing-settings="() => settingsModal?.showSharing()"
 							v-bind="contentSubpageProps"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
@@ -457,7 +458,6 @@ useLoadingBarToken(subpagePending)
 const isServerInstance = ref(false)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
 const selected = ref<unknown[]>([])
-
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
 const liveServerStatusOnline = ref(false)

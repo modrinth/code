@@ -18,8 +18,7 @@ use crate::state::{
     ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
-use async_walkdir::{Filtering, WalkDir};
-use futures::StreamExt;
+use sha1_smol::Sha1;
 use std::collections::{HashMap, HashSet};
 use std::io::Read;
 use std::path::PathBuf;
@@ -861,53 +860,174 @@ async fn install_shared_instance_config_bundle(
         .join(CONFIG_DIRECTORY);
     crate::util::io::create_dir_all(&config_path).await?;
 
-    let desired_paths = files
+    let desired_hashes = files
         .iter()
-        .map(|(path, _)| path.clone())
-        .collect::<HashSet<_>>();
-    let filter_root = config_path.clone();
-    let mut walker = WalkDir::new(&config_path).filter(move |entry| {
-        let filter_root = filter_root.clone();
-        async move {
-            let excluded = entry
-                .path()
-                .strip_prefix(&filter_root)
-                .is_ok_and(is_excluded_config_path);
-            if excluded {
-                Filtering::IgnoreDir
-            } else {
-                Filtering::Continue
-            }
+        .map(|(path, bytes)| {
+            (
+                path.to_string_lossy().replace('\\', "/"),
+                Sha1::from(bytes).hexdigest(),
+            )
+        })
+        .collect::<HashMap<_, _>>();
+    let installed_hashes = installed_shared_config_hashes(instance_id, state)
+        .await?;
+
+    for (relative_path, installed_hash) in &installed_hashes {
+        if desired_hashes.contains_key(relative_path) {
+            continue;
         }
-    });
-    while let Some(entry) = walker.next().await {
-        let entry = entry.map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to read config directory: {error}"
-            ))
-        })?;
-        if entry.file_type().await?.is_file()
-            && is_supported_config_file(&entry.path())
+        let relative_path = PathBuf::from(relative_path);
+        if !is_safe_config_relative_path(&relative_path)
+            || is_excluded_config_path(&relative_path)
+            || !is_supported_config_file(&relative_path)
         {
-            let entry_path = entry.path();
-            let relative_path = entry_path.strip_prefix(&config_path)?;
-            if !is_excluded_config_path(relative_path)
-                && !desired_paths.contains(relative_path)
-            {
-                crate::util::io::remove_file(entry_path).await?;
-            }
+            continue;
+        }
+        let path = config_path.join(relative_path);
+        let Some(local_hash) = config_file_hash(&path).await? else {
+            continue;
+        };
+        if &local_hash == installed_hash {
+            crate::util::io::remove_file(path).await?;
         }
     }
 
     for (relative_path, bytes) in files {
+        let normalized_path =
+            relative_path.to_string_lossy().replace('\\', "/");
+        let desired_hash = desired_hashes.get(&normalized_path).ok_or_else(|| {
+            crate::ErrorKind::OtherError(format!(
+                "Missing shared config hash for {normalized_path}"
+            ))
+        })?;
         let path = config_path.join(relative_path);
-        if let Some(parent) = path.parent() {
-            crate::util::io::create_dir_all(parent).await?;
+        let local_hash = config_file_hash(&path).await?;
+        let can_overwrite = match local_hash.as_ref() {
+            None => !installed_hashes.contains_key(&normalized_path),
+            Some(local_hash) if local_hash == desired_hash => false,
+            Some(local_hash) => installed_hashes
+                .get(&normalized_path)
+                .is_some_and(|installed_hash| installed_hash == local_hash),
+        };
+        if can_overwrite {
+            if let Some(parent) = path.parent() {
+                crate::util::io::create_dir_all(parent).await?;
+            }
+            crate::util::io::write(path, bytes).await?;
         }
-        crate::util::io::write(path, bytes).await?;
     }
+    write_installed_shared_config_hashes(instance_id, &desired_hashes, state)
+        .await?;
 
     Ok(())
+}
+
+fn installed_shared_config_paths_path(
+    instance_id: &str,
+    state: &State,
+) -> PathBuf {
+    state
+        .directories
+        .metadata_dir()
+        .join("installed_shared_instance_config_files")
+        .join(format!(
+            "{}.json",
+            Sha1::from(instance_id.as_bytes()).hexdigest()
+        ))
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+struct InstalledSharedConfigFile {
+    path: String,
+    hash: String,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(untagged)]
+enum InstalledSharedConfigManifest {
+    Current(Vec<InstalledSharedConfigFile>),
+    Legacy(Vec<String>),
+}
+
+pub(crate) async fn installed_shared_config_hashes(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<HashMap<String, String>> {
+    let path = installed_shared_config_paths_path(instance_id, state);
+    match crate::util::io::read(path).await {
+        Ok(bytes) => {
+            let manifest = serde_json::from_slice::<
+                InstalledSharedConfigManifest,
+            >(&bytes)?;
+            match manifest {
+                InstalledSharedConfigManifest::Current(files) => Ok(files
+                    .into_iter()
+                    .map(|file| (file.path, file.hash))
+                    .collect()),
+                InstalledSharedConfigManifest::Legacy(paths) => {
+                    tracing::debug!(
+                        path_count = paths.len(),
+                        "Ignoring legacy shared config manifest without hashes"
+                    );
+                    Ok(HashMap::new())
+                }
+            }
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            Ok(HashMap::new())
+        }
+        Err(error) => Err(error.into()),
+    }
+}
+
+pub(crate) async fn clear_installed_shared_config_hashes(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let path = installed_shared_config_paths_path(instance_id, state);
+    match crate::util::io::remove_file(path).await {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(error.into()),
+    }
+}
+
+async fn write_installed_shared_config_hashes(
+    instance_id: &str,
+    hashes: &HashMap<String, String>,
+    state: &State,
+) -> crate::Result<()> {
+    let path = installed_shared_config_paths_path(instance_id, state);
+    if let Some(parent) = path.parent() {
+        crate::util::io::create_dir_all(parent).await?;
+    }
+    let mut files = hashes
+        .iter()
+        .map(|(path, hash)| InstalledSharedConfigFile {
+            path: path.clone(),
+            hash: hash.clone(),
+        })
+        .collect::<Vec<_>>();
+    files.sort_by(|left, right| left.path.cmp(&right.path));
+    crate::util::io::write(path, serde_json::to_vec(&files)?).await?;
+    Ok(())
+}
+
+async fn config_file_hash(
+    path: &std::path::Path,
+) -> crate::Result<Option<String>> {
+    match crate::util::io::read(path).await {
+        Ok(bytes) => Ok(Some(Sha1::from(bytes).hexdigest())),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error.into()),
+    }
+}
+
+fn is_safe_config_relative_path(path: &std::path::Path) -> bool {
+    !path.as_os_str().is_empty()
+        && path.components().all(|component| {
+            matches!(component, std::path::Component::Normal(_))
+        })
 }
 
 fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {

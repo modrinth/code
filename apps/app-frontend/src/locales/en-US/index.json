@@ -993,7 +993,7 @@
     "message": "Linked shared instance"
   },
   "installation-settings.shared-instance.title": {
-    "message": "Shared instance"
+    "message": "Unpublish instance"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Unlink shared instance"
@@ -1008,7 +1008,7 @@
     "message": "Unpublish shared instance"
   },
   "installation-settings.shared-instance.unpublish-description": {
-    "message": "Stop sharing this instance and remove it from Modrinth."
+    "message": "Remove this shared instance from Modrinth and stop sending updates to anyone using it. Your local instance will not be affected."
   },
   "installation-settings.shared-instance.unpublishing-button": {
     "message": "Unpublishing..."
@@ -1247,6 +1247,24 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.sharing": {
+    "message": "Sharing"
+  },
+  "instance.settings.tabs.sharing.config-files.description": {
+    "message": "Choose which files are kept in sync for everyone using this shared instance."
+  },
+  "instance.settings.tabs.sharing.config-files.load-error": {
+    "message": "Failed to load config files."
+  },
+  "instance.settings.tabs.sharing.config-files.loading": {
+    "message": "Loading config files..."
+  },
+  "instance.settings.tabs.sharing.config-files.selection-description": {
+    "message": "New config files will not be shared unless you select them here."
+  },
+  "instance.settings.tabs.sharing.config-files.title": {
+    "message": "Shared config files"
+  },
   "instance.settings.tabs.window": {
     "message": "Window"
   },
@@ -1276,6 +1294,15 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
+  },
+  "instance.shared-instance.config-sharing-hint.description": {
+    "message": "You can select which config files to share in the instance settings"
+  },
+  "instance.shared-instance.config-sharing-hint.dismiss": {
+    "message": "Don't show again"
+  },
+  "instance.shared-instance.config-sharing-hint.title": {
+    "message": "Share config files"
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"

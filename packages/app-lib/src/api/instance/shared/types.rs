@@ -123,6 +123,13 @@ pub struct SharedInstancePublishPreview {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SharedInstanceConfigFiles {
+    pub files: Vec<String>,
+    pub selected: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInviteLink {
     pub invite_id: String,
     pub expires_at: DateTime<Utc>,

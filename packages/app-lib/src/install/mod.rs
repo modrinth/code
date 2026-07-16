@@ -6,6 +6,10 @@ pub mod runner;
 mod shared_instance;
 pub mod store;
 
+pub(crate) use shared_instance::{
+    clear_installed_shared_config_hashes, installed_shared_config_hashes,
+};
+
 pub use events::InstallProgressReporter;
 pub use model::{
     InstallErrorContext, InstallErrorView, InstallJavaStep,

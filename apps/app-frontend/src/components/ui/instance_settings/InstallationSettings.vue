@@ -28,7 +28,6 @@ import {
 	edit,
 	get_linked_modpack_info,
 	unlink_shared_instance,
-	unpublish_shared_instance,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
 } from '@/helpers/instance'
@@ -120,7 +119,6 @@ const isModrinthLinkedModpack = computed(
 )
 const isImportedModpack = computed(() => instance.value.link?.type === 'imported_modpack')
 const isSharedInstanceManagedModpack = managedContentPolicy.isManagedModpack
-const canUnpublishSharedInstance = managedContentPolicy.canUnpublish
 const canUnlinkSharedInstance = managedContentPolicy.canUnlink
 
 const modpackInfoQuery = useQuery({
@@ -132,22 +130,7 @@ const modpackInfo = modpackInfoQuery.data
 
 const repairing = ref(false)
 const reinstalling = ref(false)
-const unpublishingSharedInstance = ref(false)
 const unlinkingSharedInstance = ref(false)
-
-async function unpublishSharedInstance() {
-	unpublishingSharedInstance.value = true
-	try {
-		await unpublish_shared_instance(instance.value.id)
-		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
-		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
-		onUnlinked()
-	} catch (error) {
-		handleError(error)
-	} finally {
-		unpublishingSharedInstance.value = false
-	}
-}
 
 async function unlinkSharedInstance() {
 	unlinkingSharedInstance.value = true
@@ -238,7 +221,6 @@ provideInstallationSettings({
 			repairing.value ||
 			reinstalling.value ||
 			unlinkingSharedInstance.value ||
-			unpublishingSharedInstance.value ||
 			!!offline,
 	),
 	skipNonEssentialWarnings,
@@ -494,19 +476,15 @@ provideInstallationSettings({
 	<InstallationSettingsLayout>
 		<template #extra>
 			<SharedInstanceInstallationSettingsControls
-				:can-unpublish="canUnpublishSharedInstance"
 				:can-unlink="canUnlinkSharedInstance"
 				:busy="
 					instance.install_stage !== 'installed' ||
 					repairing ||
 					reinstalling ||
-					unpublishingSharedInstance ||
 					unlinkingSharedInstance ||
 					!!offline
 				"
-				:unpublishing="unpublishingSharedInstance"
 				:unlinking="unlinkingSharedInstance"
-				:unpublish="unpublishSharedInstance"
 				:unlink="unlinkSharedInstance"
 			/>
 		</template>

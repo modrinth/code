@@ -39,8 +39,8 @@
 		}}</Admonition>
 		<template #actions
 			><div class="flex justify-end gap-2">
-				<ButtonStyled
-					><button @click="unpublishModal?.hide()">
+				<ButtonStyled type="outlined"
+					><button class="!border" @click="unpublishModal?.hide()">
 						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 					</button></ButtonStyled
 				><ButtonStyled color="orange"
@@ -70,8 +70,8 @@
 		</div>
 		<template #actions
 			><div class="flex justify-end gap-2">
-				<ButtonStyled
-					><button @click="unlinkModal?.hide()">
+				<ButtonStyled type="outlined"
+					><button class="!border" @click="unlinkModal?.hide()">
 						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 					</button></ButtonStyled
 				><ButtonStyled color="orange"
@@ -97,15 +97,25 @@ import {
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
-const props = defineProps<{
-	canUnpublish: boolean
-	canUnlink: boolean
-	busy: boolean
-	unpublishing: boolean
-	unlinking: boolean
-	unpublish: () => Promise<void>
-	unlink: () => Promise<void>
-}>()
+const props = withDefaults(
+	defineProps<{
+		canUnpublish?: boolean
+		canUnlink?: boolean
+		busy: boolean
+		unpublishing?: boolean
+		unlinking?: boolean
+		unpublish?: () => Promise<void>
+		unlink?: () => Promise<void>
+	}>(),
+	{
+		canUnpublish: false,
+		canUnlink: false,
+		unpublishing: false,
+		unlinking: false,
+		unpublish: undefined,
+		unlink: undefined,
+	},
+)
 const { formatMessage } = useVIntl()
 const unpublishModal = ref<InstanceType<typeof NewModal>>()
 const unlinkModal = ref<InstanceType<typeof NewModal>>()
@@ -114,15 +124,18 @@ const backupBusy = ref(false)
 
 async function confirmUnpublish() {
 	unpublishModal.value?.hide()
-	await props.unpublish()
+	await props.unpublish?.()
 }
 async function confirmUnlink() {
 	unlinkModal.value?.hide()
-	await props.unlink()
+	await props.unlink?.()
 }
 
 const messages = defineMessages({
-	title: { id: 'installation-settings.shared-instance.title', defaultMessage: 'Shared instance' },
+	title: {
+		id: 'installation-settings.shared-instance.title',
+		defaultMessage: 'Unpublish instance',
+	},
 	linkedTitle: {
 		id: 'installation-settings.shared-instance.linked-title',
 		defaultMessage: 'Linked shared instance',
@@ -137,7 +150,8 @@ const messages = defineMessages({
 	},
 	unpublishDescription: {
 		id: 'installation-settings.shared-instance.unpublish-description',
-		defaultMessage: 'Stop sharing this instance and remove it from Modrinth.',
+		defaultMessage:
+			'Remove this shared instance from Modrinth and stop sending updates to anyone using it. Your local instance will not be affected.',
 	},
 	unlinkButton: {
 		id: 'installation-settings.shared-instance.unlink-button',

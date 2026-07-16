@@ -38,6 +38,7 @@
 			:invite-pending="inviteLink.pending.value"
 			@invite="showInvitePlayers"
 			@remove="showRemoveMemberModal"
+			@settings="openSharingSettings"
 		/>
 
 		<SharedInstanceShareEmptyState
@@ -154,7 +155,10 @@ import { useSharedInstanceInviteCandidates } from './use-shared-instance-invite-
 import { useSharedInstanceInviteLink } from './use-shared-instance-invite-link'
 import { useSharedInstanceMembers } from './use-shared-instance-members'
 
-const props = defineProps<{ instance: GameInstance }>()
+const props = defineProps<{
+	instance: GameInstance
+	openSharingSettings?: () => void
+}>()
 const auth = injectAuth()
 const queryClient = useQueryClient()
 const { handleError } = injectNotificationManager()
@@ -320,6 +324,9 @@ function showRemoveMemberModal(row: ShareRow) {
 		pendingRemovalRow.value = row
 		removeMemberModal.value?.show()
 	}
+}
+function openSharingSettings() {
+	props.openSharingSettings?.()
 }
 function removeMember(row: ShareRow) {
 	members.remove(row.id)
