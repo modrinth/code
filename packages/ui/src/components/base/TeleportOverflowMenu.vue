@@ -220,12 +220,14 @@ const openMenu = () => {
 	emit('open')
 	// nextTick lets Vue render the element, then requestAnimationFrame waits for the
 	// browser to complete layout so offsetWidth/offsetHeight are real values.
-	nextTick(() => requestAnimationFrame(() => {
-		const pos = calculateMenuPosition()
-		if (pos) menuStyle.value = pos
-		document.addEventListener('mousemove', handleMouseMove)
-		focusFirstMenuItem()
-	}))
+	nextTick(() =>
+		requestAnimationFrame(() => {
+			const pos = calculateMenuPosition()
+			if (pos) menuStyle.value = pos
+			document.addEventListener('mousemove', handleMouseMove)
+			focusFirstMenuItem()
+		}),
+	)
 }
 
 const closeMenu = () => {

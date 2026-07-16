@@ -444,7 +444,8 @@ const props = defineProps<{
 	collapsed: boolean
 }>()
 
-const { projectV2, projectV3, versions, loadVersions, invalidate, thread } = injectProjectPageContext()
+const { projectV2, projectV3, versions, loadVersions, invalidate, thread } =
+	injectProjectPageContext()
 setMessageProject(projectV3, projectV2)
 
 const nodeStates = ref<Record<string, Record<string, NodeState>>>({})
@@ -1114,15 +1115,19 @@ const initialAutoStage = currentStage.value
 // Thread data may not be loaded when currentStage is first set, so stages that depend on it
 // (like re-review) may be invisible initially. Re-evaluate once thread loads.
 if (!persistedState) {
-	watch(thread, () => {
-		if (thread.value === undefined) return
-		if (currentStage.value === initialAutoStage) {
-			const firstValid = findFirstValidStage()
-			if (firstValid !== currentStage.value) {
-				currentStage.value = firstValid
+	watch(
+		thread,
+		() => {
+			if (thread.value === undefined) return
+			if (currentStage.value === initialAutoStage) {
+				const firstValid = findFirstValidStage()
+				if (firstValid !== currentStage.value) {
+					currentStage.value = firstValid
+				}
 			}
-		}
-	}, { once: true })
+		},
+		{ once: true },
+	)
 }
 
 const router = useRouter()
@@ -1183,15 +1188,15 @@ watch(
 									projectV2.value,
 								)
 							: action._autoMessage
-							? await loadMd(
-									`checklist/messages/${statePath.join('/')}`,
-									state,
-									projectV3.value,
-									projectV2.value,
-									action._autoMessageVars,
-								)
-							: await action._message!(state)
-						newMap.set(action, !!(msg?.trim()))
+								? await loadMd(
+										`checklist/messages/${statePath.join('/')}`,
+										state,
+										projectV3.value,
+										projectV2.value,
+										action._autoMessageVars,
+									)
+								: await action._message!(state)
+						newMap.set(action, !!msg?.trim())
 					} catch {
 						newMap.set(action, false)
 					}
@@ -1425,7 +1430,10 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
-function resolveRelativeMessagePath(messagePath: string | (() => string), statePath: string[]): string {
+function resolveRelativeMessagePath(
+	messagePath: string | (() => string),
+	statePath: string[],
+): string {
 	const name = typeof messagePath === 'function' ? messagePath() : messagePath
 	const dir = statePath.slice(0, -1).join('/')
 	return `checklist/messages/${dir ? `${dir}/` : ''}${name}`
@@ -1468,14 +1476,14 @@ async function assembleFullMessage() {
 								projectV2.value,
 							)
 						: a.action._autoMessage
-						? await loadMd(
-								`checklist/messages/${a.statePath.join('/')}`,
-								a.state,
-								projectV3.value,
-								projectV2.value,
-								a.action._autoMessageVars,
-							)
-						: await a.action._message!(a.state)
+							? await loadMd(
+									`checklist/messages/${a.statePath.join('/')}`,
+									a.state,
+									projectV3.value,
+									projectV2.value,
+									a.action._autoMessageVars,
+								)
+							: await a.action._message!(a.state)
 					return msg ? { priority: a.action._priority, content: msg } : null
 				}),
 		)
@@ -1713,8 +1721,16 @@ async function sendMessage(status: ProjectStatus) {
 			if (Object.keys(projectFixChanges).length > 0) {
 				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
 				if (projectFixChanges.slug) {
-					const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
-					window.history.replaceState(history.state, '', `/${urlType}/${projectFixChanges.slug}/moderation`)
+					const urlType = getProjectTypeForUrlShorthand(
+						projectV2.value.project_type,
+						[],
+						tags.value,
+					)
+					window.history.replaceState(
+						history.state,
+						'',
+						`/${urlType}/${projectFixChanges.slug}/moderation`,
+					)
 				}
 			}
 		}

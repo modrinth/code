@@ -215,7 +215,11 @@ export class ActionBuilder {
 			this._autoMessage = true
 		} else if (typeof fn === 'string') {
 			this._messagePath = fn
-		} else if (typeof fn === 'function' && fn.length === 0 && fn.constructor.name !== 'AsyncFunction') {
+		} else if (
+			typeof fn === 'function' &&
+			fn.length === 0 &&
+			fn.constructor.name !== 'AsyncFunction'
+		) {
 			this._messagePath = fn as () => string
 		} else if (fn.constructor.name === 'AsyncFunction') {
 			this._message = fn as MessageFn

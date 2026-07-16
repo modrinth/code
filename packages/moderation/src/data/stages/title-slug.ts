@@ -102,8 +102,7 @@ export default function () {
 													),
 												)
 												.onClick(
-													(state) =>
-														(state['correct-slug'] = generateUrlSlug(project.value.name)),
+													(state) => (state['correct-slug'] = generateUrlSlug(project.value.name)),
 												),
 										),
 								)

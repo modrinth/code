@@ -209,7 +209,13 @@ const messages = defineMessages({
 })
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, invalidate, allMembers, thread } = injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember,
+	invalidate,
+	allMembers,
+	thread,
+} = injectProjectPageContext()
 
 const canAccess = computed(() => !!currentMember.value)
 const userFacingUiVisible = computed(() => !!currentMember.value && moderatorSeeUserUi.value)
