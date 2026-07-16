@@ -66,14 +66,14 @@ export default function () {
 								.title('Why is this Description Insufficient?')
 								.multiSelect('reason')
 								.children(
-									toggle('fork', 'Fork'),
-									toggle('unfinished', 'Unfinished'),
-									toggle('spoilers', 'Spoilers'),
 									toggle('custom', 'Custom').children(
 										markdown('explainer')
 											.title('How can the author improve their description?')
 											.required(),
 									),
+									toggle('fork', 'Fork'),
+									toggle('unfinished', 'Unfinished'),
+									toggle('spoilers', 'Spoilers'),
 								),
 						),
 
