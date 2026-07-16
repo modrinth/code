@@ -3,23 +3,7 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import { action, check, group, label, md, type MessageFn, stage, toggle } from '../../types/node'
-
-const licensesNotRequiringSource: string[] = [
-	'LicenseRef-All-Rights-Reserved',
-	'Apache-2.0',
-	'BSD-2-Clause',
-	'BSD-3-Clause',
-	'CC0-1.0',
-	'CC-BY-4.0',
-	'CC-BY-SA-4.0',
-	'CC-BY-NC-4.0',
-	'CC-BY-NC-SA-4.0',
-	'CC-BY-ND-4.0',
-	'CC-BY-NC-ND-4.0',
-	'ISC',
-	'MIT',
-	'Zlib',
-]
+import { licensesNotRequiringSource } from '../../utils'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()

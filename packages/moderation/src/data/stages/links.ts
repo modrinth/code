@@ -4,8 +4,18 @@ import { computed } from 'vue'
 
 import type { NodeBuilder } from '../../types/node'
 import { action, group, label, md, mdEscape, stage, toggle } from '../../types/node'
+import { licensesNotRequiringSource } from '../../utils'
 
 function linkSection(id: string, urlLine: string, ...extra: NodeBuilder[]) {
+	const { projectV3: project } = injectProjectPageContext()
+	if (
+		id === 'source' &&
+		(project.value.project_types.includes('mod') ||
+			project.value.project_types.includes('plugin')) &&
+		!licensesNotRequiringSource.includes(project.value.license?.id ?? '')
+	) {
+		urlLine = `**[❗]** ${urlLine}`
+	}
 	return group(id)
 		.layout('column')
 		.children(
@@ -95,21 +105,53 @@ export default function () {
 
 					let message = await md('checklist/messages/links/header')(state)
 
-					if (misused.length > 0) {
+					if (misused.length || empty.length > 0) {
 						message += await md('checklist/messages/links/misused-header')(state)
-						for (const [id] of misused) {
-							message += `- ${LINK_NAMES[id] ?? id}\n`
-							const extraPath = LINK_EXTRAS[id]?.misused
-							if (extraPath) message += await md(extraPath)(state)
+
+						if (misused.length > 0) {
+							for (const [id] of misused) {
+								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
+								const extraPath = `checklist/messages/links/note/${LINK_EXTRAS[id]}-expiring`
+								if (extraPath) message += await md(extraPath)(state)
+							}
+						}
+
+						if (empty.length > 0) {
+							for (const [id] of empty) {
+								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
+								const extraPath = LINK_EXTRAS[id]?.empty
+								//	log(extraPath?.toString())
+								if (extraPath) message += await md(extraPath)(state)
+								//	return extraPath?.toString()
+							}
 						}
 					}
 
-					if (inaccessible.length > 0) {
+					if (inaccessible.length > 0 || disabled.length > 0 || expiring.length > 0) {
 						message += await md('checklist/messages/links/inaccessible-header')(state)
-						for (const [id] of inaccessible) {
-							message += `- ${LINK_NAMES[id] ?? id}\n`
-							const extraPath = LINK_EXTRAS[id]?.inaccessible
-							if (extraPath) message += await md(extraPath)(state)
+
+						if (inaccessible.length > 0) {
+							for (const [id] of inaccessible) {
+								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
+								const extraPath = LINK_EXTRAS[id]?.disabled
+								if (extraPath) message += await md(extraPath)(state)
+							}
+						}
+
+						if (disabled.length > 0) {
+							for (const [id] of disabled) {
+								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
+								const extraPath = LINK_EXTRAS[id]?.disabled
+								if (extraPath) message += await md(extraPath)(state)
+							}
+						}
+
+						if (expiring.length > 0) {
+							for (const [id] of expiring) {
+								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
+								const extraPath = LINK_EXTRAS[id]?.expiring
+								if (extraPath) message += await md(extraPath)(state)
+							}
 						}
 					}
 
@@ -122,7 +164,7 @@ export default function () {
 					? linkSection(
 							'issues',
 							`**Issues:** <${project.value.link_urls.issues.url}>`,
-							//							toggle('disabled', 'Disabled'),
+							toggle('disabled', 'Disabled'),
 						)
 					: null,
 
@@ -131,7 +173,7 @@ export default function () {
 					? linkSection(
 							'source',
 							`**Source:** <${project.value.link_urls.source.url}>`,
-							//							toggle('empty', 'Empty Repo'),
+							toggle('empty', 'Empty Repo'),
 						)
 					: null,
 
@@ -140,7 +182,7 @@ export default function () {
 					? linkSection(
 							'wiki',
 							`**Wiki:** <${project.value.link_urls.wiki.url}>`,
-							//							toggle('disabled', 'Disabled'),
+							toggle('disabled', 'Disabled'),
 						)
 					: null,
 
@@ -149,7 +191,7 @@ export default function () {
 					? linkSection(
 							'discord',
 							`**Discord:** <${project.value.link_urls.discord.url}>`,
-							//							toggle('expiring', 'Expiring'),
+							toggle('expiring', 'Expiring'),
 						)
 					: null,
 
