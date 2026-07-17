@@ -395,10 +395,7 @@ watch(
 		allFiles.value = [...reports].sort((a, b) => {
 			const aComplete = getFileMarkedCount(a) === getFileDetailCount(a)
 			const bComplete = getFileMarkedCount(b) === getFileDetailCount(b)
-			if (aComplete !== bComplete) return aComplete ? 1 : -1
-			const aSeverity = getFileHighestSeverity(a)
-			const bSeverity = getFileHighestSeverity(b)
-			return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
+			return aComplete === bComplete ? 0 : aComplete ? 1 : -1
 		})
 	},
 	{ immediate: true },
@@ -1037,20 +1034,11 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 		classGroup.flags.sort((a, b) => {
 			const aPreReviewed = isPreReviewed(a.detail.id, a.detail.status)
 			const bPreReviewed = isPreReviewed(b.detail.id, b.detail.status)
-
-			if (aPreReviewed !== bPreReviewed) {
-				return aPreReviewed ? 1 : -1
-			}
-
-			return (severityOrder[b.detail.severity] ?? 0) - (severityOrder[a.detail.severity] ?? 0)
+			return aPreReviewed === bPreReviewed ? 0 : aPreReviewed ? 1 : -1
 		})
 	}
 
-	return Array.from(classMap.values()).sort((a, b) => {
-		const aSeverity = getHighestSeverityInClass(a.flags)
-		const bSeverity = getHighestSeverityInClass(b.flags)
-		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
-	})
+	return Array.from(classMap.values())
 })
 
 const groupedByJar = computed<JarGroup[]>(() => {
@@ -1072,11 +1060,7 @@ const groupedByJar = computed<JarGroup[]>(() => {
 	return Array.from(jarMap.values()).sort((a, b) => {
 		const aRoot = isRootJarGroup(a)
 		const bRoot = isRootJarGroup(b)
-		if (aRoot !== bRoot) return aRoot ? -1 : 1
-
-		const aSeverity = getHighestSeverityInClass(a.classes.flatMap((classItem) => classItem.flags))
-		const bSeverity = getHighestSeverityInClass(b.classes.flatMap((classItem) => classItem.flags))
-		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
+		return aRoot === bRoot ? 0 : aRoot ? -1 : 1
 	})
 })
 
