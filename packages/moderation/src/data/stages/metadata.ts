@@ -4,6 +4,7 @@ import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrin
 import { computed } from 'vue'
 
 import { dropdown, fix, group, label, md, option, stage, toggle } from '../../types/node'
+import { requiresEnvironmentInfo } from '../../utils'
 
 const loaderLabels: Record<string, string> = {
 	neoforge: 'NeoForge',
@@ -44,13 +45,7 @@ export default function () {
 
 				group().children(
 					toggle('environment', 'Environment')
-						.shown(
-							computed(
-								() =>
-									project.value.project_types.includes('mod') ||
-									project.value.project_types.includes('modpack'),
-							),
-						)
+						.shown(computed(() => requiresEnvironmentInfo(project.value.project_types)))
 						.suggestedStatus('flagged')
 						.severity('low')
 						.rawMessage(async (state) => {

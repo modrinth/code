@@ -287,7 +287,6 @@ export function formatEnvironments(environment: string, lower: boolean = false) 
 	let value = environment
 	try {
 		value = value
-			// These must have translatable strings somewhere right?
 			.replaceAll('client_only_server_optional', 'Client and server: Optional on server')
 			.replaceAll('client_and_server', 'Required on both')
 			.replaceAll('client_only', 'Client-side only')
@@ -311,6 +310,10 @@ export function formatEnvironments(environment: string, lower: boolean = false) 
 
 	if (lower === true) value = value.toLowerCase()
 	return value
+}
+
+export function requiresEnvironmentInfo(projectTypes): boolean {
+	return projectTypes.includes('mod') || projectTypes.includes('modpack')
 }
 
 export function flattenStaticVariables(): Record<string, string> {
