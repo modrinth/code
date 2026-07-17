@@ -366,30 +366,6 @@ async fn build_changed_project_versions(
     Ok(documents)
 }
 
-pub async fn reindex_project_versions(
-    ro_pool: &PgPool,
-    redis_pool: &RedisPool,
-    search_backend: &dyn SearchBackend,
-    project_ids: &[ProjectId],
-    version_ids: &[VersionId],
-) -> eyre::Result<()> {
-    let documents = build_changed_project_versions(
-        ro_pool,
-        redis_pool,
-        project_ids,
-        version_ids,
-    )
-    .await?;
-    search_backend
-        .apply_update(SearchIndexUpdate {
-            projects: &documents.projects,
-            versions: &documents.versions,
-            removed_versions: version_ids,
-            ..SearchIndexUpdate::default()
-        })
-        .await
-}
-
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum SearchProjectIndexQueueEvent {

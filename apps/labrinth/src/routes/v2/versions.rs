@@ -11,7 +11,7 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
-use crate::search::{SearchBackend, SearchState};
+use crate::search::SearchState;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -488,7 +488,6 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_backend: web::Data<dyn SearchBackend>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
@@ -498,7 +497,6 @@ pub async fn version_delete(
         pool,
         redis,
         session_queue,
-        search_backend,
         search_state,
     )
     .await

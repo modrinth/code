@@ -27,9 +27,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
-use crate::search::incremental::consume::reindex_project_versions;
-use crate::search::{SearchBackend, SearchState};
-use crate::util::error::Context;
+use crate::search::SearchState;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
@@ -1136,19 +1134,9 @@ pub async fn version_delete_route(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_backend: web::Data<dyn SearchBackend>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    version_delete(
-        req,
-        info,
-        pool,
-        redis,
-        session_queue,
-        search_backend,
-        search_state,
-    )
-    .await
+    version_delete(req, info, pool, redis, session_queue, search_state).await
 }
 
 pub async fn version_delete(
@@ -1157,7 +1145,6 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_backend: web::Data<dyn SearchBackend>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -1267,17 +1254,6 @@ pub async fn version_delete(
             [VersionId::from(version.inner.id)],
         )
         .await;
-    let project_id = version.inner.project_id.into();
-    let version_id = version.inner.id.into();
-    reindex_project_versions(
-        &pool,
-        &redis,
-        search_backend.as_ref(),
-        std::slice::from_ref(&project_id),
-        std::slice::from_ref(&version_id),
-    )
-    .await
-    .wrap_internal_err("failed to update search index after version removal")?;
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {

@@ -29,8 +29,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::search::{
-    SearchBackend, SearchIndexUpdate, SearchQuery, SearchRequest,
-    SearchResults, SearchState,
+    SearchBackend, SearchQuery, SearchRequest, SearchResults, SearchState,
 };
 use crate::util::error::Context;
 use crate::util::img;
@@ -2813,15 +2812,6 @@ pub async fn project_delete_internal(
             &redis,
         )
         .await?;
-        let project_id = project.inner.id.into();
-        search_state
-            .backend
-            .apply_update(SearchIndexUpdate {
-                removed_projects: std::slice::from_ref(&project_id),
-                ..SearchIndexUpdate::default()
-            })
-            .await
-            .wrap_internal_err("failed to remove project from search index")?;
         search_state
             .queue
             .push_project_removal(project.inner.id.into())
