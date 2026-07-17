@@ -39,7 +39,7 @@ export default function (
 						() => `corrections-applied${project.value.status === 'approved' ? '-approved' : ''}`,
 					)
 					//TODO this is temporary
-					.priority(Priorities.rules)
+					.priority(Priorities.alerts)
 					.applyFixes()
 					.children(
 						computed<NodeBuilder | null>(() => {
@@ -62,12 +62,14 @@ export default function (
 				toggle('private-use', 'Private use')
 					.shown(computed(() => !project.value.minecraft_server))
 					.suggestedStatus('flagged')
-					.message(),
+					.message()
+					.priority(Priorities.alerts),
 
 				toggle('private-use-server', 'Private community')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.suggestedStatus('flagged')
-					.message(),
+					.message()
+					.priority(Priorities.alerts),
 
 				toggle('server-use', 'Server use')
 					.shown(
@@ -89,7 +91,8 @@ export default function (
 								!project.value.minecraft_server,
 						),
 					)
-					.message(),
+					.message()
+					.priority(Priorities.alerts),
 
 				toggle('demonetized-modpack', 'Demonetized')
 					.shown(
@@ -100,7 +103,8 @@ export default function (
 								!project.value.minecraft_server,
 						),
 					)
-					.message(),
+					.message()
+					.priority(Priorities.alerts),
 			),
 		)
 }
