@@ -4,7 +4,7 @@ import { computed } from 'vue'
 
 import { group, md, rawLabel, stage, toggle } from '../../types/node'
 import type { ChildEntry, GroupNodeBuilder } from '../../types/node'
-import { licensesNotRequiringSource } from '../../utils'
+import { promptSourceRequired } from '../..'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -50,11 +50,8 @@ export default function () {
 		return builder
 	}
 
-	const showWarning = computed(
-		() =>
-			(project.value.project_types.includes('mod') ||
-				project.value.project_types.includes('plugin')) &&
-			!licensesNotRequiringSource.includes(project.value.license?.id ?? ''),
+	const showWarning = computed(() =>
+		promptSourceRequired(project.value.license.id, project.value.project_types),
 	)
 
 	const misusedKeys = new Set(['misused', 'empty'])
@@ -133,7 +130,7 @@ export default function () {
 			linkSection('issues', 'Issue tracker').children(toggle('disabled', 'Disabled')),
 
 			linkSection('source', 'Source code')
-				.label((line) => (showWarning.value ? `**[❗]** ${line}` : line))
+				.label((line) => (showWarning.value ? `**[📜]** ${line}` : line))
 				.children(toggle('empty', 'Empty Repo')),
 
 			linkSection('wiki', 'Wiki page').children(toggle('disabled', 'Disabled')),

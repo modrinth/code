@@ -211,6 +211,48 @@ export const licensesNotRequiringSource: string[] = [
 	'Zlib',
 ]
 
+export const licensesRequiringSource: string[] = [
+	'GPL-2.0',
+	'GPL-2.0+',
+	'GPL-2.0-only',
+	'GPL-2.0-or-later',
+	'GPL-3.0',
+	'GPL-3.0+',
+	'GPL-3.0-only',
+	'GPL-3.0-or-later',
+	'LGPL-2.1',
+	'LGPL-2.1+',
+	'LGPL-2.1-only',
+	'LGPL-2.1-or-later',
+	'LGPL-3.0',
+	'LGPL-3.0+',
+	'LGPL-3.0-only',
+	'LGPL-3.0-or-later',
+	'AGPL-3.0',
+	'AGPL-3.0+',
+	'AGPL-3.0-only',
+	'AGPL-3.0-or-later',
+	'MPL-2.0',
+]
+
+export function licenseDoesNotRequireSource(licenseId: string): boolean {
+	return licensesNotRequiringSource.includes(licenseId)
+}
+export function licenseMayRequireSource(licenseId: string): boolean {
+	return !licensesNotRequiringSource.includes(licenseId)
+}
+export function licenseRequiresSource(licenseId: string): boolean {
+	return licensesRequiringSource.includes(licenseId)
+}
+
+export function notSourceAsDistributed(projectTypes): boolean {
+	return projectTypes.includes('mod') || projectTypes.includes('plugin')
+}
+
+export function promptSourceRequired(licenseId: string, projectTypes): boolean {
+	return licenseRequiresSource(licenseId) && notSourceAsDistributed(projectTypes)
+}
+
 export function kebabToTitleCase(input: string): string {
 	return input
 		.split('-')
