@@ -20,7 +20,7 @@
 			heading="Failed to load global detail trace"
 		/>
 		<article v-else-if="trace" class="universal-card flex flex-col gap-3">
-			<div class="flex flex-wrap items-start justify-between gap-3">
+			<div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
 				<div class="min-w-0">
 					<div class="flex min-w-0 flex-wrap items-center gap-2">
 						<HashIcon class="shrink-0 text-secondary" aria-hidden="true" />
@@ -47,7 +47,7 @@
 						</p>
 					</div>
 				</div>
-				<div class="flex shrink-0 flex-wrap items-center gap-2">
+				<div class="flex shrink-0 flex-nowrap items-center gap-2">
 					<Badge :type="trace.verdict" />
 					<ButtonStyled color="red">
 						<button :disabled="isRemoving" @click="removeGlobalTrace">

@@ -1025,7 +1025,7 @@ interface JarGroup {
 function splitJarSegments(jar: string | null, currentFileName: string | null): string[] {
 	if (!jar) return []
 	const segments = jar
-		.split('#')
+		.split(/[/#]/)
 		.map((s) => decodeURIComponent(s.trim()))
 		.filter((s) => s.length > 0)
 	// Skip the first segment if it matches the current file tab (it's already shown in the file list)
