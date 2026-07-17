@@ -33,6 +33,7 @@ import {
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
+	Toggle,
 	type OverflowMenuOption,
 	useFormatBytes,
 	useFormatDateTime,
@@ -244,6 +245,42 @@ function verdictToDecision(
 function getAllDetails(): Labrinth.TechReview.Internal.ReportIssueDetail[] {
 	return props.item.reports.flatMap((report) => report.issues.flatMap((issue) => issue.details))
 }
+
+const hideGloballyPassed = ref(true)
+
+function isDetailGloballyPassed(detail: Labrinth.TechReview.Internal.ReportIssueDetail): boolean {
+	if (detailDecisionScopes.get(detail.id) === 'global') {
+		return detailDecisions.get(detail.id) === 'safe'
+	}
+
+	return detail.global_status === 'safe'
+}
+
+function isDetailGloballyResolved(detail: Labrinth.TechReview.Internal.ReportIssueDetail): boolean {
+	if (detailDecisionScopes.get(detail.id) === 'global') {
+		return detailDecisions.get(detail.id) !== 'pending'
+	}
+
+	return detail.global_status === 'safe' || detail.global_status === 'unsafe'
+}
+
+const globallyPassedSelectedFileCount = computed(() => {
+	if (!selectedFile.value) return 0
+
+	return selectedFile.value.issues.reduce(
+		(count, issue) => count + issue.details.filter(isDetailGloballyPassed).length,
+		0,
+	)
+})
+
+const globallyResolvedSelectedFileCount = computed(() => {
+	if (!selectedFile.value) return 0
+
+	return selectedFile.value.issues.reduce(
+		(count, issue) => count + issue.details.filter(isDetailGloballyResolved).length,
+		0,
+	)
+})
 
 function applyDecisionToRelatedDetails(
 	detailIds: string[],
@@ -1009,6 +1046,10 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 
 	for (const issue of selectedFile.value.issues) {
 		for (const detail of issue.details) {
+			if (hideGloballyPassed.value && isDetailGloballyPassed(detail)) {
+				continue
+			}
+
 			const classKey = `${detail.jar ?? ''}::${detail.file_path}`
 			if (!classMap.has(classKey)) {
 				classMap.set(classKey, {
@@ -1651,10 +1692,15 @@ function copyId() {
 
 			<template v-else-if="currentTab === 'File' && selectedFile">
 				<div
-					v-if="remainingUnmarkedCount > 0"
-					class="flex border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 p-4"
+					v-if="getFileDetailCount(selectedFile) > 0"
+					class="flex flex-wrap items-center justify-between gap-3 border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 p-4"
 				>
-					<div class="detail-verdict-buttons" role="group" aria-label="Remaining issue actions">
+					<div
+						v-if="remainingUnmarkedCount > 0"
+						class="detail-verdict-buttons"
+						role="group"
+						aria-label="Remaining issue actions"
+					>
 						<span class="remaining-verdict-label"
 							>Remaining issues ({{ remainingUnmarkedCount }})</span
 						>
@@ -1699,6 +1745,20 @@ function copyId() {
 							<ShieldAlertIcon aria-hidden="true" />
 						</button>
 					</div>
+					<label class="ml-auto flex cursor-pointer items-center gap-3 text-sm">
+						<span class="text-right text-secondary">
+							Hide globally passed
+							<span class="block text-xs text-tertiary">
+								{{ globallyResolvedSelectedFileCount }}/{{ getFileDetailCount(selectedFile) }}
+								traces globally resolved
+							</span>
+						</span>
+						<Toggle
+							v-model="hideGloballyPassed"
+							:disabled="globallyPassedSelectedFileCount === 0"
+							small
+						/>
+					</label>
 				</div>
 				<div
 					v-for="jarGroup in groupedByJar"
