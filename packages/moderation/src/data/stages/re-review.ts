@@ -35,7 +35,7 @@ export default function () {
 					.severity('medium')
 					.message()
 					.children(
-						toggle('warning', 'Also warn them')
+						toggle('warning', 'Multiple times in a row')
 							.suggestedStatus('rejected')
 							.severity('high')
 							.message(),

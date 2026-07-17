@@ -1,1 +1,1 @@
-Please address **ALL** moderation concerns before resubmitting this project.
+Please address all moderation concerns or correct all issues before resubmitting this project.
