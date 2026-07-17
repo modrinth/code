@@ -288,20 +288,20 @@ export function formatEnvironments(environment: string, lower: boolean = false) 
 	try {
 		value = value
 			// These must have translatable strings somewhere right?
+			.replaceAll('client_only_server_optional', 'Client and server: Optional on server')
 			.replaceAll('client_and_server', 'Required on both')
 			.replaceAll('client_only', 'Client-side only')
-			.replaceAll('client_only_server_optional', 'Client and server: Optional on server')
-			.replaceAll('singleplayer_only', 'Singleplayer only')
-			.replaceAll('server_only', 'Servers and Singleplayer')
 			.replaceAll('server_only_client_optional', 'Client optional')
 			.replaceAll('dedicated_server_only', 'Dedicated server only')
-			.replaceAll(
-				'client_or_server',
-				'Optional on both, works the same if installed on either side',
-			)
+			.replaceAll('server_only', 'Servers and Singleplayer')
+			.replaceAll('singleplayer_only', 'Singleplayer only')
 			.replaceAll(
 				'client_or_server_prefers_both',
 				'Optional on both, works best when installed on both sides',
+			)
+			.replaceAll(
+				'client_or_server',
+				'Optional on both, works the same if installed on either side',
 			)
 			// This shouldn't come up for this use but yk
 			.replaceAll('unknown', 'Unknown')
