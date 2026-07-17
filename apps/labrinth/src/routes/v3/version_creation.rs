@@ -186,15 +186,12 @@ pub async fn version_create(
         }
     } else if let Ok((_, project_id, version_id)) = &result {
         transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search_versions(
-            &redis,
-            &search_state,
-            *project_id,
-            None,
-            Some(true),
-            [VersionId::from(*version_id)],
-        )
-        .await?;
+        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
+            .await?;
+        search_state
+            .queue
+            .push_versions((*project_id).into(), [VersionId::from(*version_id)])
+            .await;
     }
 
     result.map(|(response, _, _)| response)
@@ -684,15 +681,12 @@ pub async fn upload_file_to_version(
         }
     } else if let Ok((_, project_id)) = &result {
         transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search_versions(
-            &redis,
-            &search_state,
-            *project_id,
-            None,
-            Some(true),
-            [version_id],
-        )
-        .await?;
+        models::DBProject::clear_cache(*project_id, None, Some(true), &redis)
+            .await?;
+        search_state
+            .queue
+            .push_versions((*project_id).into(), [version_id])
+            .await;
     }
 
     result.map(|(response, _)| response)

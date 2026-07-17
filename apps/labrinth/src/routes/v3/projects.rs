@@ -79,23 +79,6 @@ pub async fn clear_project_cache_and_queue_search(
     slug: Option<String>,
     clear_dependencies: Option<bool>,
 ) -> Result<(), ApiError> {
-    clear_project_cache_and_queue_search_inner(
-        redis,
-        search_state,
-        project_id,
-        slug,
-        clear_dependencies,
-    )
-    .await
-}
-
-pub async fn clear_project_cache_and_queue_search_inner(
-    redis: &RedisPool,
-    search_state: &SearchState,
-    project_id: db_ids::DBProjectId,
-    slug: Option<String>,
-    clear_dependencies: Option<bool>,
-) -> Result<(), ApiError> {
     db_models::DBProject::clear_cache(
         project_id,
         slug,
@@ -105,30 +88,6 @@ pub async fn clear_project_cache_and_queue_search_inner(
     .await?;
 
     search_state.queue.push(project_id.into()).await;
-
-    Ok(())
-}
-
-pub async fn clear_project_cache_and_queue_search_versions(
-    redis: &RedisPool,
-    search_state: &SearchState,
-    project_id: db_ids::DBProjectId,
-    slug: Option<String>,
-    clear_dependencies: Option<bool>,
-    version_ids: impl IntoIterator<Item = VersionId>,
-) -> Result<(), ApiError> {
-    db_models::DBProject::clear_cache(
-        project_id,
-        slug,
-        clear_dependencies,
-        redis,
-    )
-    .await?;
-
-    search_state
-        .queue
-        .push_versions(project_id.into(), version_ids)
-        .await;
 
     Ok(())
 }
@@ -1096,10 +1055,10 @@ pub async fn project_edit_internal(
         edit: Option<Option<E>>,
         mut component: &mut Option<E::Component>,
         perms: ProjectPermissions,
-    ) -> Result<(), ApiError> {
+    ) -> Result<bool, ApiError> {
         let Some(edit) = edit else {
             // component is not specified in the input JSON - leave alone
-            return Ok(());
+            return Ok(false);
         };
 
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -1138,13 +1097,12 @@ pub async fn project_edit_internal(
             }
         }
 
-        Ok(())
+        Ok(true)
     }
 
-    let reindex_version_project_types =
-        new_project.minecraft_java_server.is_some();
+    let mut reindex_versions = false;
 
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_server,
@@ -1152,7 +1110,7 @@ pub async fn project_edit_internal(
         perms,
     )
     .await?;
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_java_server,
@@ -1160,7 +1118,7 @@ pub async fn project_edit_internal(
         perms,
     )
     .await?;
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_bedrock_server,
@@ -1213,16 +1171,21 @@ pub async fn project_edit_internal(
 
     transaction.commit().await?;
 
-    if reindex_version_project_types {
-        clear_project_cache_and_queue_search_versions(
-            &redis,
-            &search_state,
+    if reindex_versions {
+        db_models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
             None,
-            project_item.versions.iter().copied().map(VersionId::from),
+            &redis,
         )
         .await?;
+        search_state
+            .queue
+            .push_versions(
+                project_item.inner.id.into(),
+                project_item.versions.iter().copied().map(VersionId::from),
+            )
+            .await;
     } else {
         clear_project_cache_and_queue_search(
             &redis,

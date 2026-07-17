@@ -854,15 +854,20 @@ pub async fn version_edit_helper(
             transaction.commit().await?;
             database::models::DBVersion::clear_cache(&version_item, &redis)
                 .await?;
-            super::projects::clear_project_cache_and_queue_search_versions(
-                &redis,
-                &search_state,
+            database::models::DBProject::clear_cache(
                 version_item.inner.project_id,
                 None,
                 Some(true),
-                [VersionId::from(version_item.inner.id)],
+                &redis,
             )
             .await?;
+            search_state
+                .queue
+                .push_versions(
+                    version_item.inner.project_id.into(),
+                    [VersionId::from(version_item.inner.id)],
+                )
+                .await;
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(
@@ -1248,15 +1253,20 @@ pub async fn version_delete(
 
     transaction.commit().await?;
 
-    super::projects::clear_project_cache_and_queue_search_versions(
-        &redis,
-        &search_state,
+    database::models::DBProject::clear_cache(
         version.inner.project_id,
         None,
         Some(true),
-        [VersionId::from(version.inner.id)],
+        &redis,
     )
     .await?;
+    search_state
+        .queue
+        .push_versions(
+            version.inner.project_id.into(),
+            [VersionId::from(version.inner.id)],
+        )
+        .await;
     let project_id = version.inner.project_id.into();
     let version_id = version.inner.id.into();
     reindex_project_versions(
