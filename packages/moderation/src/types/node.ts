@@ -104,7 +104,9 @@ export async function loadMd(
 			vars[k] = String(v ?? '')
 		}
 	}
-	return expandVariables(raw, projectV2, project, vars)
+	const expanded = expandVariables(raw, projectV2, project, vars)
+	// Code spans render literally — markdown escapes inside them show as-is, so strip them
+	return expanded.replace(/`[^`\n]*`/g, (match) => match.replace(/\\([\\*_`[~])/g, '$1'))
 }
 
 function makeMessageFn(fn: (state: Record<string, NodeState>) => Promise<string>): MessageFn {
