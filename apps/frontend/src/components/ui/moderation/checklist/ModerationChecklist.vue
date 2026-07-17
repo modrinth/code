@@ -1738,11 +1738,9 @@ async function sendMessage(status: ProjectStatus) {
 						[],
 						tags.value,
 					)
-					window.history.replaceState(
-						history.state,
-						'',
-						`/${urlType}/${projectFixChanges.slug}/moderation`,
-					)
+					await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, {
+						replace: true,
+					})
 				}
 			}
 		}
