@@ -22,7 +22,6 @@ export default function () {
 					.severity('medium')
 					.message(),
 
-				// TODO: borked
 				toggle('incorrect-project-type', 'Incorrect Project Type')
 					.suggestedStatus('rejected')
 					.severity('medium')
@@ -44,7 +43,6 @@ export default function () {
 					)
 					.collect(),
 
-				// TODO: borked
 				toggle('alternate-versions', 'Alternate Versions')
 					.suggestedStatus('rejected')
 					.severity('high')

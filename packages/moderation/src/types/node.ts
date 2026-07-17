@@ -808,7 +808,16 @@ export function walkNodes(
 					const childId = child as IdentifiedNodeBuilder
 					if (childId.id !== selectedId || (child._shown !== undefined && !resolve(child._shown)))
 						continue
-					visitor(childId, stageState[childId.id!], stageState)
+					const rawChildState = stageState[childId.id!]
+					const childState: NodeState =
+						rawChildState !== null &&
+						rawChildState !== undefined &&
+						typeof rawChildState === 'object' &&
+						!(rawChildState instanceof Set) &&
+						(rawChildState as NodeStateWithChildren).value === undefined
+							? { ...(rawChildState as NodeStateWithChildren), value: true }
+							: (rawChildState ?? true)
+					visitor(childId, childState, stageState)
 					walkNodes(resolveChildren(childId, stageState), stageState, visitor)
 					break
 				}
