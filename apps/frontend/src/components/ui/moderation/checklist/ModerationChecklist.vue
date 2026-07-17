@@ -56,8 +56,17 @@
 						<FileTextIcon />
 					</a>
 				</ButtonStyled>
-				<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
-					<button v-tooltip="`Reset progress`" @click="resetProgress">
+				<ButtonStyled
+					circular
+					:color="currentStageHasState ? 'orange' : 'red'"
+					color-fill="none"
+					hover-color-fill="background"
+				>
+					<button
+						v-tooltip="currentStageHasState ? 'Reset Stage' : 'Reset Checklist'"
+						:disabled="!checklistHasState"
+						@click="resetProgress"
+					>
 						<BrushCleaningIcon />
 					</button>
 				</ButtonStyled>
@@ -980,7 +989,24 @@ async function skipToNextProject() {
 	emit('exit')
 }
 
+const currentStageHasState = computed(() => {
+	const stageId = currentStageObj.value.id
+	if (!stageId) return false
+	const stageState = nodeStates.value[stageId]
+	return !!stageState && Object.keys(stageState).length > 0
+})
+
+const checklistHasState = computed(() =>
+	Object.values(nodeStates.value).some((s) => s && Object.keys(s).length > 0),
+)
+
 function resetProgress() {
+	if (currentStageHasState.value) {
+		delete nodeStates.value[currentStageObj.value.id!]
+		clearGeneratedMessageState()
+		return
+	}
+
 	currentStage.value = findFirstValidStage()
 	nodeStates.value = {}
 
