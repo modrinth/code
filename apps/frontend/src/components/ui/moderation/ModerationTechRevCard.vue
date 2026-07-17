@@ -33,8 +33,8 @@ import {
 	injectNotificationManager,
 	NavTabs,
 	OverflowMenu,
-	Toggle,
 	type OverflowMenuOption,
+	Toggle,
 	useFormatBytes,
 	useFormatDateTime,
 	useVIntl,
@@ -1748,7 +1748,7 @@ function copyId() {
 					<label class="ml-auto flex cursor-pointer items-center gap-3 text-sm">
 						<span class="text-right text-secondary">
 							Hide globally passed
-							<span class="block text-xs text-tertiary">
+							<span class="text-tertiary block text-xs">
 								{{ globallyResolvedSelectedFileCount }}/{{ getFileDetailCount(selectedFile) }}
 								traces globally resolved
 							</span>
