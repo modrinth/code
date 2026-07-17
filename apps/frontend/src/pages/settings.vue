@@ -78,6 +78,14 @@
 										icon: ServerIcon,
 									}
 								: null,
+							isStaff(auth.user) ? { type: 'heading', label: 'Staff' } : null,
+							isStaff(auth.user)
+								? {
+										link: '/settings/moderation',
+										label: 'Moderation',
+										icon: ScaleIcon,
+									}
+								: null,
 						].filter(Boolean)
 					"
 				/>
@@ -95,7 +103,7 @@ import {
 	KeyIcon,
 	LanguagesIcon,
 	MonitorSmartphoneIcon,
-	PaintbrushIcon,
+	PaintbrushIcon, ScaleIcon,
 	ServerIcon,
 	ShieldIcon,
 	ToggleRightIcon,
@@ -104,6 +112,7 @@ import {
 import { commonMessages, commonSettingsMessages, defineMessages, useVIntl } from '@modrinth/ui'
 
 import NavStack from '~/components/ui/NavStack.vue'
+import {isStaff} from "@modrinth/utils";
 
 const { formatMessage } = useVIntl()
 

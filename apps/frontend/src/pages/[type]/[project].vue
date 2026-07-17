@@ -469,16 +469,12 @@
 		</div>
 
 		<ClientOnly>
-			<div
+			<ModerationChecklist
 				v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-				class="moderation-checklist"
-			>
-				<ModerationChecklist
-					:collapsed="collapsedModerationChecklist"
-					@exit="setModerationChecklistOpen(false)"
-					@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
-				/>
-			</div>
+				:collapsed="collapsedModerationChecklist"
+				@exit="setModerationChecklistOpen(false)"
+				@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
+			/>
 		</ClientOnly>
 
 		<template v-if="hasEditDetailsPermission">
@@ -535,7 +531,8 @@ import {
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import {formatProjectType, isStaff} from '@modrinth/utils'
+import { moderationSettings } from '@modrinth/moderation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
@@ -572,6 +569,8 @@ const router = useRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
 const moderationQueue = useModerationQueue()
+const keybinds = useModerationKeybinds()
+const modSettings = useModerationSettings()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -1965,6 +1964,24 @@ async function deleteVersion(id) {
 	stopLoading()
 }
 
+// moderation project keybinds
+
+onMounted(() => window.addEventListener('keydown', handleKeybinds))
+onUnmounted(() => window.removeEventListener('keydown', handleKeybinds))
+
+function handleKeybinds(event) {
+	if (!isStaff(auth.value.user)) return
+	if (!showModerationChecklist.value && !modSettings.value.get(moderationSettings.General.ProjectKeybinds)) return
+
+	keybinds.value.handle(
+		event,
+		{
+			project: projectRaw.value,
+			scope: 'project',
+		},
+	)
+}
+
 const navLinks = computed(() => {
 	const routeType = route.params.type || project.value.project_type
 	const projectUrl = `/${routeType}/${project.value.slug ? project.value.slug : project.value.id}`
@@ -2189,26 +2206,7 @@ provideProjectPageContext({
 	}
 }
 
-.moderation-checklist {
-	position: fixed;
-	bottom: 1rem;
-	right: 1rem;
-	overflow-y: auto;
-	z-index: 50;
-	transition: bottom 0.25s ease-in-out;
-
-	> div {
-		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-	}
-}
-
 .new-page {
 	column-gap: 1.5rem;
-}
-</style>
-
-<style lang="scss">
-body.floating-action-bar-shown .moderation-checklist {
-	bottom: 6rem;
 }
 </style>

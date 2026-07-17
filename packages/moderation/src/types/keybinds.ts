@@ -14,17 +14,6 @@ export interface ModerationActions {
 	tryReject: () => void
 	tryWithhold: () => void
 	tryEditMessage: () => void
-
-	tryToggleAction: (actionIndex: number) => void
-	trySelectDropdownOption: (actionIndex: number, optionIndex: number) => void
-	tryToggleChip: (actionIndex: number, chipIndex: number) => void
-
-	tryFocusNextAction: () => void
-	tryFocusPreviousAction: () => void
-	tryActivateFocusedAction: () => void
-
-	tryCopyLink: (permalink: boolean, relative: boolean, page: boolean) => void
-	tryCopyId: () => void
 }
 
 export interface ModerationState {
@@ -41,16 +30,21 @@ export interface ModerationState {
 
 	futureProjectCount: number
 	visibleActionsCount: number
-
-	focusedActionIndex: number | null
-	focusedActionType: 'button' | 'toggle' | 'dropdown' | 'multi-select' | null
 }
 
-export interface ModerationContext {
+export type ModerationProjectContext = {
 	project: Labrinth.Projects.v2.Project
-	state: ModerationState
-	actions: ModerationActions
+	scope: 'project'
 }
+
+export type ModerationChecklistContext = {
+	project: Labrinth.Projects.v2.Project
+	scope: 'checklist'
+	state: ModerationState,
+	actions: ModerationActions,
+}
+
+export type ModerationContext = ModerationProjectContext | ModerationChecklistContext
 
 export interface KeybindDefinition {
 	key: string
@@ -61,12 +55,17 @@ export interface KeybindDefinition {
 	preventDefault?: boolean
 }
 
-export interface KeybindListener {
+export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
-	enabled?: (ctx: ModerationContext) => boolean
-	action: (ctx: ModerationContext) => void
+	scope: 'project' | 'checklist'
+	enabled?: (ctx: T) => boolean
+	action: (ctx: T) => void
 }
+
+export type KeybindProjectListener = BaseKeybindListener<ModerationProjectContext> & { scope: 'project' }
+export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistContext> & { scope: 'checklist' }
+export type KeybindListener = KeybindProjectListener | KeybindChecklistListener
 
 export function parseKeybind(keybindString: string): KeybindDefinition {
 	const parts = keybindString.split('+').map((p) => p.trim().toLowerCase())
@@ -105,46 +104,4 @@ export function toKeybindDefinition(event: KeyboardEvent): KeybindDefinition {
 		meta: event.metaKey,
 		preventDefault: true,
 	}
-}
-
-export function handleKeybind(
-	event: KeyboardEvent,
-	ctx: ModerationContext,
-	keybinds: KeybindListener[],
-): boolean {
-	if (
-		event.target instanceof HTMLInputElement ||
-		event.target instanceof HTMLTextAreaElement ||
-		(event.target as HTMLElement)?.closest('.cm-editor') ||
-		(event.target as HTMLElement)?.classList?.contains('cm-content') ||
-		(event.target as HTMLElement)?.classList?.contains('cm-line') ||
-		document.getElementById('moderation-checklist-keybinds-modal')
-	) {
-		return false
-	}
-
-	for (const keybind of keybinds) {
-		if (keybind.enabled && !keybind.enabled(ctx)) {
-			continue
-		}
-
-		const keybindDefs = Array.isArray(keybind.keybind)
-			? keybind.keybind.map(normalizeKeybind)
-			: [normalizeKeybind(keybind.keybind)]
-
-		const matches = keybindDefs.some((def) => matchesKeybind(event, def))
-
-		if (matches) {
-			keybind.action(ctx)
-
-			const shouldPrevent = keybindDefs.some((def) => def.preventDefault !== false)
-			if (shouldPrevent) {
-				event.preventDefault()
-			}
-
-			return true
-		}
-	}
-
-	return false
 }
