@@ -589,6 +589,12 @@ async fn build_search_documents(
                     &mut version_project_types,
                 );
 
+                // SPECIAL BEHAVIOUR
+                // Todo: revisit.
+                // For consistency with v2 searching, we consider the loader field 'mrpack_loaders' to be a category.
+                // These were previously considered the loader, and in v2, the loader is a category for searching.
+                // So to avoid breakage or awkward conversions, we just consider those loader_fields to be categories.
+                // The loaders are kept in the project document's aggregated loader fields as well, so that no information is lost on retrieval.
                 let mut version_categories = version.loaders.clone();
                 let mrpack_loaders = fields
                     .get("mrpack_loaders")
