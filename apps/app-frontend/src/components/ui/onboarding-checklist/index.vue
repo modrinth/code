@@ -12,8 +12,13 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const { hasCreatedInstance, hasLoggedIntoMinecraft, hasLoggedIntoModrinth, isReady } =
-	injectOnboardingChecklist()
+const {
+	hasCreatedInstance,
+	hasLoggedIntoMinecraft,
+	hasLoggedIntoModrinth,
+	isReady,
+	showChecklist,
+} = injectOnboardingChecklist()
 const collapsedCornersVisible = ref(false)
 let collapseTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -57,7 +62,6 @@ const steps = computed(() => [
 	},
 ])
 
-const isComplete = computed(() => steps.value.every((step) => step.complete))
 const accordionButtonClass = computed(
 	() =>
 		`flex w-full cursor-pointer items-center justify-between rounded-t-2xl border border-solid border-button-border bg-button-bg p-3 text-left text-contrast transition-[filter] hover:brightness-110${collapsedCornersVisible.value ? ' rounded-b-2xl' : ''}`,
@@ -80,7 +84,7 @@ onUnmounted(() => clearTimeout(collapseTimer))
 
 <template>
 	<div
-		v-if="isReady && !isComplete"
+		v-if="isReady && showChecklist"
 		class="border-0 border-b-[1px] border-solid border-[--brand-gradient-border] p-3"
 	>
 		<Accordion

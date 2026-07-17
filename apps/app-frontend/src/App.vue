@@ -249,6 +249,11 @@ const {
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
 } = setupProviders(notificationManager, popupNotificationManager)
+const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } =
+	onboardingChecklist
+const showFriendsList = computed(
+	() => !showChecklist.value || hasLoggedIntoModrinth.value,
+)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -1650,13 +1655,19 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						@login-minecraft="accounts?.login()"
 						@login-modrinth="signIn"
 					/>
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div
+						v-show="hasLoggedIntoMinecraft"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
 						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
 							<AccountsCard ref="accounts" />
 						</suspense>
 					</div>
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div
+						v-show="showFriendsList"
+						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
 						<suspense>
 							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
