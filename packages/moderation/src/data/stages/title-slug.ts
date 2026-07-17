@@ -100,8 +100,11 @@ export default function () {
 												),
 										),
 								)
-								//TODO: coolbot variant for when we suggest a better slug (also used when quick fix is applied)
-								.message()
+								.rawMessage(async (state) => {
+									return await md('checklist/messages/title-slug/slug/misused', () => ({
+										SUGGESTED_SLUG: state['correct-slug'],
+									}))(state)
+								})
 								.fix(
 									fix().project((patch, state) => {
 										const slug = state['correct-slug'] as string
