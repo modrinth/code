@@ -2,7 +2,7 @@ import { ImageIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, group, stage, toggle } from '../../types/node'
+import { group, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -16,17 +16,18 @@ export default function () {
 		.navigate('/gallery')
 		.children(
 			group().children(
-				toggle('insufficient', 'Insufficient').action(
-					action().suggestedStatus('flagged').severity('low').message(),
-				),
+				toggle('insufficient', 'Insufficient').suggestedStatus('flagged').severity('low').message(),
 
 				toggle('not-relevant', 'Not relevant')
 					.shown(computed(() => project.value.gallery.length > 0))
-					.action(action().suggestedStatus('flagged').severity('low').message()),
+					.suggestedStatus('flagged')
+					.severity('low')
+					.message(),
 
-				toggle('showcase-clarity', 'Showcase Clarity').action(
-					action().suggestedStatus('rejected').severity('high').message(),
-				),
+				toggle('showcase-clarity', 'Showcase Clarity')
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 			),
 		)
 }

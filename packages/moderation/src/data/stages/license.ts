@@ -2,7 +2,7 @@ import { BookTextIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, check, group, label, md, type MessageFn, stage, toggle } from '../../types/node'
+import { check, group, label, md, type MessageFn, stage, toggle } from '../../types/node'
 import { licensesNotRequiringSource } from '../../utils'
 
 export default function () {
@@ -20,30 +20,28 @@ export default function () {
 		.navigate('/settings/license')
 		.shown(computed(() => !project.value?.minecraft_server))
 		.children(
-			label(md('checklist/text/licensing')),
+			label('licensing'),
 
 			group().children(
 				toggle('invalid-link', 'Invalid Link')
 					.shown(computed(() => !!project.value.license?.url))
-					.action(action().suggestedStatus('flagged').severity('medium').message())
-					.children(
-						check('custom-license', 'Invalid Link: Custom License').action(action().message()),
-					),
+					.suggestedStatus('flagged')
+					.severity('medium')
+					.message()
+					.children(check('custom-license', 'Invalid Link: Custom License').message())
+					.collect(),
 
 				toggle('no-source', 'No Source')
 					.shown(
 						computed(() => !licensesNotRequiringSource.includes(project.value.license?.id ?? '')),
 					)
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('medium')
-							.message(async (state) => {
-								if (state.fork) return noSourceForkMsg(state)
-								return noSourceMsg(state)
-							}),
-					)
-					.children(check('fork', 'No Source: Fork').action(action().severity('high'))),
+					.suggestedStatus('rejected')
+					.severity('medium')
+					.rawMessage(async (state) => {
+						if (state.fork) return noSourceForkMsg(state)
+						return noSourceMsg(state)
+					})
+					.children(check('fork', 'No Source: Fork').severity('high')),
 			),
 		)
 }

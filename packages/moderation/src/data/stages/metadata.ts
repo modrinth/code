@@ -3,7 +3,7 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, dropdown, fix, group, label, md, option, stage, toggle } from '../../types/node'
+import { dropdown, fix, group, label, md, option, stage, toggle } from '../../types/node'
 
 const loaderLabels: Record<string, string> = {
 	neoforge: 'NeoForge',
@@ -38,10 +38,8 @@ export default function () {
 			.shown(computed(() => !project.value?.minecraft_server))
 			.children(
 				label(
-					md(
-						() =>
-							`checklist/text/metadata/environment/${(project.value.environment?.length ?? 0) === 1 ? 'single' : 'multiple'}`,
-					),
+					() =>
+						`environment/${(project.value.environment?.length ?? 0) === 1 ? 'single' : 'multiple'}`,
 				),
 
 				group().children(
@@ -53,37 +51,31 @@ export default function () {
 									project.value.project_types.includes('modpack'),
 							),
 						)
-						.action(
-							action()
-								.suggestedStatus('flagged')
-								.severity('low')
-								.message(async (state) => {
-									const correctEnvironment = state?.['correct-environment'] as string | undefined
+						.suggestedStatus('flagged')
+						.severity('low')
+						.rawMessage(async (state) => {
+							const correctEnvironment = state?.['correct-environment'] as string | undefined
 
-									let correct = ''
-									if (correctEnvironment === 'Mixed')
-										correct = await md('checklist/messages/metadata/environment/mixed')(state)
-									else if (correctEnvironment)
-										correct = await md(
-											'checklist/messages/metadata/environment/correction',
-											() => ({
-												SUGGESTED_ENVIRONMENT:
-													ENVIRONMENTS_COPY[correctEnvironment]?.title.defaultMessage ??
-													correctEnvironment,
-											}),
-										)(state)
+							let correct = ''
+							if (correctEnvironment === 'Mixed')
+								correct = await md('checklist/messages/metadata/environment/mixed')(state)
+							else if (correctEnvironment)
+								correct = await md('checklist/messages/metadata/environment/correction', () => ({
+									SUGGESTED_ENVIRONMENT:
+										ENVIRONMENTS_COPY[correctEnvironment]?.title.defaultMessage ??
+										correctEnvironment,
+								}))(state)
 
-									return md('checklist/messages/metadata/environment/inaccurate', () => ({
-										CORRECT: correct,
-									}))(state)
-								})
-								.fix(
-									fix().project((patch, state) => {
-										const env = state['correct-environment'] as Labrinth.Projects.v3.Environment
-										if (!env) return
-										patch.environment = env
-									}),
-								),
+							return md('checklist/messages/metadata/environment/inaccurate', () => ({
+								CORRECT: correct,
+							}))(state)
+						})
+						.fix(
+							fix().project((patch, state) => {
+								const env = state['correct-environment'] as Labrinth.Projects.v3.Environment
+								if (!env) return
+								patch.environment = env
+							}),
 						)
 						.children(
 							group()

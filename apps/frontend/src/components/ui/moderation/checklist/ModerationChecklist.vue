@@ -233,6 +233,7 @@
 							"
 							:show-context="(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>"
 							:on-image-upload="onUploadHandler"
+							:parent-state-path="currentStageObj._statePath ?? []"
 						/>
 					</div>
 				</div>
@@ -375,7 +376,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type {
-	ActionBuilder,
 	IdentifiedNodeBuilder,
 	NodeState,
 	Priority,
@@ -384,16 +384,17 @@ import type {
 } from '@modrinth/moderation'
 import {
 	createTrackedPatch,
+	evalSegment,
 	expandVariables,
 	getBooleanChildState,
 	GLOBAL_STATE_KEY,
 	handleKeybind,
 	isNodeActive,
 	kebabToTitleCase,
-	loadMd,
 	resolve,
 	resolveChildren,
 	setMessageProject,
+	setMissingMdHandler,
 	useStages,
 	walkNodes,
 } from '@modrinth/moderation'
@@ -447,6 +448,8 @@ const props = defineProps<{
 const { projectV2, projectV3, versions, loadVersions, invalidate, thread } =
 	injectProjectPageContext()
 setMessageProject(projectV3, projectV2)
+const missingMdPaths = new Set<string>()
+setMissingMdHandler((path) => missingMdPaths.add(path))
 
 const nodeStates = ref<Record<string, Record<string, NodeState>>>({})
 const resolvedStages = ref(useStages(nodeStates))
@@ -658,7 +661,7 @@ nodeStates.value = persistedState?.state ?? {}
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction[] | null>(null)
-const resolvedMessageAvailability = ref<Map<ActionBuilder, boolean>>(new Map())
+const resolvedMessageAvailability = ref<Map<IdentifiedNodeBuilder, boolean>>(new Map())
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
@@ -1031,9 +1034,9 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 		const stageActiveActions: ActiveAction[] = []
 
 		if (stage._shown === undefined || resolve(stage._shown)) {
-			if (stage._action) {
+			if (stage._segments.length > 0) {
 				messageCount++
-				stageActiveActions.push({ action: stage._action, state: stageState, statePath: [] })
+				stageActiveActions.push({ node: stage, state: stageState, statePath: stage._statePath ?? [] })
 			}
 
 			walkNodes(resolveChildren(stage, stageState), stageState, (node, nodeState, localState) => {
@@ -1048,20 +1051,12 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 
 				let isFixActionable = false
 				if (active) {
-					if (node._action) {
+					if (node._segments.length > 0) {
 						messageCount++
-						nodeActiveActions.push({
-							action: node._action,
-							state: actionState,
-							statePath: node._statePath ?? [],
-						})
-						stageActiveActions.push({
-							action: node._action,
-							state: actionState,
-							statePath: node._statePath ?? [],
-						})
+						nodeActiveActions.push({ node, state: actionState, statePath: node._statePath ?? [] })
+						stageActiveActions.push({ node, state: actionState, statePath: node._statePath ?? [] })
 					}
-					isFixActionable = (node._action?._fixes ?? []).some((f) => {
+					isFixActionable = node._fixes.some((f) => {
 						if (f._projectFn) {
 							const { proxy, changes } = createTrackedPatch(projectV3.value as any)
 							f._projectFn(proxy as any, actionState)
@@ -1084,7 +1079,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 					isActive: active,
 					isVisible: node._shown === undefined || resolve(node._shown),
 					isFixActionable,
-					messageCount: active && node._action ? 1 : 0,
+					messageCount: active && node._segments.some((s) => s.type !== 'collect') ? 1 : 0,
 					fixCount: isFixActionable ? 1 : 0,
 					hasRequiredMissing: isRequired && !active,
 					activeActions: nodeActiveActions,
@@ -1142,12 +1137,21 @@ function cancelPendingPersistence() {
 }
 
 function savePersistedState(open: boolean, resetReviewAnyway = false) {
+	const rawState = toRaw(nodeStates.value)
+	const openVal = open || undefined
+	const reviewAnywayVal = resetReviewAnyway ? undefined : reviewedAnyway.value || undefined
+	const stageVal = currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
+	const messageVal = message.value ?? undefined
+	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
+	if (!openVal && !reviewAnywayVal && !stageVal && !messageVal && !stateVal) {
+		return clearChecklistState(checklistPersistenceProjectId)
+	}
 	return saveChecklistState(checklistPersistenceProjectId, {
-		open,
-		reviewAnyway: resetReviewAnyway ? undefined : reviewedAnyway.value || undefined,
-		stage: currentStageObj.value.id,
-		message: message.value,
-		state: toRaw(nodeStates.value),
+		...(openVal && { open: openVal }),
+		...(reviewAnywayVal && { reviewAnyway: reviewAnywayVal }),
+		...(stageVal && { stage: stageVal }),
+		...(messageVal && { message: messageVal }),
+		...(stateVal && { state: stateVal }),
 	})
 }
 
@@ -1174,31 +1178,24 @@ watch(
 	nodeStates,
 	async () => {
 		const active = collectActiveActions()
-		const newMap = new Map<ActionBuilder, boolean>()
+		const newMap = new Map<IdentifiedNodeBuilder, boolean>()
 		await Promise.all(
 			active
-				.filter((a) => a.action._message || a.action._autoMessage || a.action._messagePath)
-				.map(async ({ action, state, statePath }) => {
+				.filter((a) => a.node._segments.some((s) => s.type !== 'collect'))
+				.map(async ({ node, state, statePath }) => {
 					try {
-						const msg = action._messagePath
-							? await loadMd(
-									resolveRelativeMessagePath(action._messagePath, statePath),
-									state,
-									projectV3.value,
-									projectV2.value,
-								)
-							: action._autoMessage
-								? await loadMd(
-										`checklist/messages/${statePath.join('/')}`,
-										state,
-										projectV3.value,
-										projectV2.value,
-										action._autoMessageVars,
-									)
-								: await action._message!(state)
-						newMap.set(action, !!msg?.trim())
+						let hasContent = false
+						for (const seg of node._segments) {
+							if (seg.type === 'collect') continue
+							const text = await evalSegment(seg, state, statePath)
+							if (text?.trim()) {
+								hasContent = true
+								break
+							}
+						}
+						newMap.set(node, hasContent)
 					} catch {
-						newMap.set(action, false)
+						newMap.set(node, false)
 					}
 				}),
 		)
@@ -1430,21 +1427,13 @@ function getModpackFilesFromStorage(): {
 	}
 }
 
-function resolveRelativeMessagePath(
-	messagePath: string | (() => string),
-	statePath: string[],
-): string {
-	const name = typeof messagePath === 'function' ? messagePath() : messagePath
-	const dir = statePath.slice(0, -1).join('/')
-	return `checklist/messages/${dir ? `${dir}/` : ''}${name}`
-}
 
 function countStageActions(stage: StageNodeBuilder): number {
 	const actions = checklistLive.value.get(stage)?.activeActions ?? []
 	const resolved = resolvedMessageAvailability.value
 	return actions.filter((a) => {
-		if (!a.action._message && !a.action._autoMessage && !a.action._messagePath) return false
-		return resolved.get(a.action) ?? true
+		if (a.node._segments.every((s) => s.type === 'collect')) return false
+		return resolved.get(a.node) ?? true
 	}).length
 }
 
@@ -1460,34 +1449,49 @@ function collectActiveActions(): ActiveAction[] {
 	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
+function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
+	return (
+		childPath.length > ancestorPath.length &&
+		ancestorPath.every((key, i) => childPath[i] === key)
+	)
+}
+
 async function assembleFullMessage() {
-	const active = collectActiveActions()
-	generatedActiveActions.value = active
-	const parts = (
-		await Promise.all(
-			active
-				.filter((a) => a.action._message || a.action._autoMessage || a.action._messagePath)
-				.map(async (a) => {
-					const msg = a.action._messagePath
-						? await loadMd(
-								resolveRelativeMessagePath(a.action._messagePath, a.statePath),
-								a.state,
-								projectV3.value,
-								projectV2.value,
-							)
-						: a.action._autoMessage
-							? await loadMd(
-									`checklist/messages/${a.statePath.join('/')}`,
-									a.state,
-									projectV3.value,
-									projectV2.value,
-									a.action._autoMessageVars,
-								)
-							: await a.action._message!(a.state)
-					return msg ? { priority: a.action._priority, content: msg } : null
-				}),
-		)
-	).filter((part): part is MessagePart => part !== null)
+	const allEntries = collectActiveActions()
+	generatedActiveActions.value = allEntries
+
+	const consumed = new Set<IdentifiedNodeBuilder>()
+
+	async function evalEntry(entry: ActiveAction): Promise<string> {
+		let result = ''
+		for (const seg of entry.node._segments) {
+			if (seg.type === 'collect') {
+				let collected = ''
+				for (const childEntry of allEntries) {
+					if (consumed.has(childEntry.node)) continue
+					if (!isDescendant(childEntry.statePath, entry.statePath)) continue
+					consumed.add(childEntry.node)
+					collected += await evalEntry(childEntry)
+				}
+				if (!collected.trim() && seg.fallback) {
+					collected = await evalSegment(seg.fallback, entry.state, entry.statePath)
+				}
+				result += collected
+			} else {
+				result += await evalSegment(seg, entry.state, entry.statePath)
+			}
+		}
+		return result
+	}
+
+	const parts: MessagePart[] = []
+	for (const entry of allEntries) {
+		if (consumed.has(entry.node)) continue
+		const content = await evalEntry(entry)
+		if (content.trim()) {
+			parts.push({ priority: entry.node._priority, content })
+		}
+	}
 
 	parts.sort((a, b) => {
 		if (!a.priority && !b.priority) return 0
@@ -1577,7 +1581,15 @@ async function generateMessage() {
 	router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}/moderation`)
 
 	try {
+		missingMdPaths.clear()
 		const baseMessage = await assembleFullMessage()
+		if (missingMdPaths.size > 0) {
+			addNotification({
+				title: 'Missing message files',
+				text: [...missingMdPaths].join('\n'),
+				type: 'warning',
+			})
+		}
 		let fullMessage = baseMessage
 
 		if (projectV2.value.project_type === 'modpack') {
@@ -1704,7 +1716,7 @@ async function sendMessage(status: ProjectStatus) {
 	}
 
 	const active = generatedActiveActions.value ?? collectActiveActions()
-	const shouldApplyFixes = active.some((a) => a.action._applyFixes)
+	const shouldApplyFixes = active.some((a) => a.node._applyFixes)
 
 	moderationDecision.value = status
 	try {
@@ -1712,8 +1724,8 @@ async function sendMessage(status: ProjectStatus) {
 			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
 				projectV3.value as any,
 			)
-			for (const { action, state } of active) {
-				for (const f of action._fixes) {
+			for (const { node, state } of active) {
+				for (const f of node._fixes) {
 					f._projectFn?.(projectProxy, state)
 				}
 			}
@@ -1741,8 +1753,8 @@ async function sendMessage(status: ProjectStatus) {
 		})
 
 		if (shouldApplyFixes && versions.value) {
-			const versionFixes = active.flatMap(({ action, state }) =>
-				action._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, state })),
+			const versionFixes = active.flatMap(({ node, state }) =>
+				node._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, state })),
 			)
 			if (versionFixes.length > 0) {
 				await Promise.all(

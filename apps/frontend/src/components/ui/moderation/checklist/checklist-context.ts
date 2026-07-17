@@ -1,8 +1,8 @@
-import type { ActionBuilder, IdentifiedNodeBuilder, NodeState } from '@modrinth/moderation'
+import type { IdentifiedNodeBuilder, NodeState } from '@modrinth/moderation'
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
 
 export interface ActiveAction {
-	action: ActionBuilder
+	node: IdentifiedNodeBuilder
 	state: Record<string, NodeState>
 	statePath: string[]
 }

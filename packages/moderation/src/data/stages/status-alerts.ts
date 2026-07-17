@@ -5,12 +5,10 @@ import { computed } from 'vue'
 
 import type { NodeBuilder, NodeState, StageNodeBuilder } from '../../types/node'
 import {
-	action,
 	getBooleanChildState,
 	group,
 	isNodeActive,
 	label,
-	md,
 	resolveChildren,
 	stage,
 	toggle,
@@ -32,21 +30,17 @@ export default function (
 		.icon(TriangleAlertIcon)
 		.navigate('/moderation')
 		.children(
-			label(md('checklist/text/status-alerts/text')),
+			label('text'),
 
 			group().children(
 				toggle('corrections-applied', 'Corrections applied')
-					.action(
-						action()
-							.suggestedStatus('approved')
-							.message(
-								() =>
-									`corrections-applied${project.value.status === 'approved' ? '-approved' : ''}`,
-							)
-							//TODO this is temporary
-							.priority(Priorities.rules)
-							.applyFixes(),
+					.suggestedStatus('approved')
+					.message(
+						() => `corrections-applied${project.value.status === 'approved' ? '-approved' : ''}`,
 					)
+					//TODO this is temporary
+					.priority(Priorities.rules)
+					.applyFixes()
 					.children(
 						computed<NodeBuilder | null>(() => {
 							const fixNodes: NodeBuilder[] = []
@@ -54,7 +48,7 @@ export default function (
 								[group().children(...mainStages)],
 								(globalState.value ?? {}) as unknown as Record<string, NodeState>,
 								(node, nodeState) => {
-									if (!node._action?._fixes?.length) return
+									if (!node._fixes.length) return
 									if (!isNodeActive(node, nodeState)) return
 									const childState = getBooleanChildState(nodeState)
 									fixNodes.push(...resolveChildren(node, childState))
@@ -67,11 +61,13 @@ export default function (
 				//TODO: chyz combine these
 				toggle('private-use', 'Private use')
 					.shown(computed(() => !project.value.minecraft_server))
-					.action(action().suggestedStatus('flagged').message()),
+					.suggestedStatus('flagged')
+					.message(),
 
 				toggle('private-use-server', 'Private community')
 					.shown(computed(() => !!project.value.minecraft_server))
-					.action(action().suggestedStatus('flagged').message()),
+					.suggestedStatus('flagged')
+					.message(),
 
 				toggle('server-use', 'Server use')
 					.shown(
@@ -80,11 +76,9 @@ export default function (
 								project.value.project_types.includes('modpack') && !project.value.minecraft_server,
 						),
 					)
-					.action(action().message()),
+					.message(),
 
-				toggle('account-issues', 'Account issues').action(
-					action().suggestedStatus('rejected').message(),
-				),
+				toggle('account-issues', 'Account issues').suggestedStatus('rejected').message(),
 
 				toggle('demonetized', 'Demonetized')
 					.shown(
@@ -95,7 +89,7 @@ export default function (
 								!project.value.minecraft_server,
 						),
 					)
-					.action(action().message()),
+					.message(),
 
 				toggle('demonetized-modpack', 'Demonetized')
 					.shown(
@@ -106,7 +100,7 @@ export default function (
 								!project.value.minecraft_server,
 						),
 					)
-					.action(action().message()),
+					.message(),
 			),
 		)
 }

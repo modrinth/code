@@ -6,9 +6,9 @@ export interface PersistedChecklistState {
 	savedAt: string
 	open?: boolean
 	reviewAnyway?: boolean
-	stage: string
-	message: string | null
-	state: Record<string, Record<string, NodeState>>
+	stage?: string
+	message?: string
+	state?: Record<string, Record<string, NodeState>>
 }
 
 const STORE = 'checklist'
@@ -22,9 +22,9 @@ function isPersistedChecklistState(value: unknown): value is PersistedChecklistS
 	if (!value || typeof value !== 'object') return false
 	const v = value as PersistedChecklistState
 	if (typeof v.savedAt !== 'string') return false
-	if (typeof v.stage !== 'string') return false
-	if (v.message !== null && typeof v.message !== 'string') return false
-	if (!v.state || typeof v.state !== 'object') return false
+	if (v.stage !== undefined && typeof v.stage !== 'string') return false
+	if (v.message !== undefined && typeof v.message !== 'string') return false
+	if (v.state !== undefined && typeof v.state !== 'object') return false
 	return true
 }
 

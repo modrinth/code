@@ -2,7 +2,6 @@
 import type {
 	BooleanNodeBuilder,
 	ButtonNodeBuilder,
-	ContentFn,
 	DisplayNodeBuilder,
 	DropdownNodeBuilder,
 	GroupNodeBuilder,
@@ -15,12 +14,12 @@ import type {
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
+	evalSegment,
 	expandVariables,
 	flattenProjectV3Variables,
 	flattenProjectVariables,
 	flattenStaticVariables,
 	getBooleanChildState,
-	loadMd,
 	resolve,
 	resolveChildren,
 	setMessageProject,
@@ -50,6 +49,7 @@ const props = defineProps<{
 	onImageUpload?: (file: File) => Promise<string>
 	flex?: boolean
 	titleDepth?: number
+	parentStatePath?: string[]
 }>()
 
 function titleClass(depth: number): string {
@@ -355,16 +355,11 @@ watchEffect(async () => {
 
 	for (const node of props.nodes) {
 		if (node.type === 'display' && isVisible(node)) {
-			const display = asDisplay(node)
-			if (typeof display._content === 'string') {
-				proseContents.set(node, display._content)
-			} else {
-				asyncDisplayTasks.push({ node: display, state: props.showContext })
-			}
+			asyncDisplayTasks.push({ node: asDisplay(node), state: props.showContext })
 		}
 		if (node.type === 'toggle' && isVisible(node)) {
 			const boolNode = asBool(node)
-			if (boolNode._action?._message || boolNode._action?._autoMessage) {
+			if (boolNode._segments.some((s) => s.type !== 'collect')) {
 				const nodeState = getNodeState(boolNode)
 				const childState =
 					nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set)
@@ -380,7 +375,7 @@ watchEffect(async () => {
 		if (node.type === 'group' && asGroup(node)._selectMode === 'multi' && isVisible(node)) {
 			for (const child of visibleChildren(asIdentified(node))) {
 				const opt = child as IdentifiedNodeBuilder
-				if (opt._action?._message || opt._action?._autoMessage) {
+				if (opt._segments.some((s) => s.type !== 'collect')) {
 					const childState = getBooleanChildState(getNodeState(opt)) as Record<string, NodeState>
 					buttonTasks.push({ node: opt as BooleanNodeBuilder, state: childState })
 				}
@@ -389,20 +384,73 @@ watchEffect(async () => {
 	}
 
 	for (const { node, state } of asyncDisplayTasks) {
-		proseContents.set(node, await (node._content as ContentFn)(state))
+		proseContents.set(node, await evalSegment(node._segment, state, props.parentStatePath ?? []))
+	}
+
+	async function evalCollectedChildren(node: IdentifiedNodeBuilder): Promise<string> {
+		let result = ''
+		for (const child of getChildren(node)) {
+			if (!isVisible(child)) continue
+			const childNode = asIdentified(child)
+			if (child.type === 'group') {
+				const grp = asGroup(childNode)
+				if (grp._selectMode === 'multi') {
+					const selected = getMultiSelectState(childNode)
+					for (const opt of getChildren(childNode)) {
+						if (!isVisible(opt)) continue
+						const optNode = asIdentified(opt)
+						if (!optNode.id || !selected.has(optNode.id)) continue
+						result += await evalNodeTooltip(optNode, getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>)
+					}
+				} else if (grp._selectMode === 'single') {
+					const selected = getSelectState(childNode)
+					for (const opt of getChildren(childNode)) {
+						if (!isVisible(opt)) continue
+						const optNode = asIdentified(opt)
+						if (optNode.id !== selected) continue
+						result += await evalNodeTooltip(optNode, getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>)
+					}
+				} else {
+					result += await evalCollectedChildren(childNode)
+				}
+			} else if (child.type === 'dropdown') {
+				const selected = getSelectState(childNode)
+				for (const opt of getChildren(childNode)) {
+					if (!isVisible(opt)) continue
+					const optNode = asIdentified(opt)
+					if (optNode.id !== selected) continue
+					result += await evalNodeTooltip(optNode, getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>)
+				}
+			} else if (child.type === 'toggle' || child.type === 'check') {
+				if (!getBooleanState(asBool(childNode))) continue
+				result += await evalNodeTooltip(childNode, getBooleanChildState(getNodeState(childNode)) as Record<string, NodeState>)
+			}
+		}
+		return result
+	}
+
+	async function evalNodeTooltip(
+		node: IdentifiedNodeBuilder,
+		state: Record<string, NodeState>,
+	): Promise<string> {
+		let result = ''
+		for (const seg of node._segments) {
+			if (seg.type === 'collect') {
+				let collected = await evalCollectedChildren(node)
+				if (!collected.trim() && seg.fallback) {
+					collected = await evalSegment(seg.fallback, state, node._statePath ?? [])
+				}
+				result += collected
+			} else {
+				result += await evalSegment(seg, state, node._statePath ?? [])
+			}
+		}
+		return result
 	}
 
 	for (const { node, state } of buttonTasks) {
 		try {
-			const raw = node._action!._autoMessage
-				? await loadMd(
-						`checklist/messages/${node._statePath!.join('/')}`,
-						state,
-						project.value,
-						projectV2.value,
-						node._action!._autoMessageVars,
-					)
-				: await node._action!._message!(state)
+			const raw = await evalNodeTooltip(node as unknown as IdentifiedNodeBuilder, state)
 			const expanded = expandVariables(raw, projectV2.value, project.value, {
 				...flattenStaticVariables(),
 				...flattenProjectVariables(projectV2.value),
@@ -429,7 +477,7 @@ watchEffect(async () => {
 			:key="
 				node.type === 'button'
 					? `button-${asButton(node).label}`
-					: (asIdentified(node).id ?? node.type)
+					: (asIdentified(node)._statePath?.join('/') ?? asIdentified(node).id ?? node.type)
 			"
 		>
 			<template v-if="isVisible(node)">
@@ -480,6 +528,7 @@ watchEffect(async () => {
 									:show-context="getChildrenContext(asIdentified(child))"
 									:on-image-upload="onImageUpload"
 									:title-depth="titleDepth"
+									:parent-state-path="asIdentified(child)._statePath ?? props.parentStatePath ?? []"
 									class="mt-2"
 								/>
 							</template>
@@ -517,6 +566,7 @@ watchEffect(async () => {
 									:show-context="getChildrenContext(asIdentified(child))"
 									:on-image-upload="onImageUpload"
 									:title-depth="titleDepth"
+									:parent-state-path="asIdentified(child)._statePath ?? props.parentStatePath ?? []"
 									class="mt-2"
 								/>
 							</template>
@@ -529,6 +579,7 @@ watchEffect(async () => {
 							:on-image-upload="onImageUpload"
 							:flex="asGroup(node)._layout !== 'column'"
 							:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
+							:parent-state-path="asIdentified(node)._statePath ?? props.parentStatePath ?? []"
 						/>
 					</template>
 
@@ -555,6 +606,7 @@ watchEffect(async () => {
 								:show-context="getChildrenContext(asIdentified(child))"
 								:on-image-upload="onImageUpload"
 								:title-depth="titleDepth"
+								:parent-state-path="asIdentified(child)._statePath ?? props.parentStatePath ?? []"
 								class="mt-2"
 							/>
 						</template>
@@ -635,7 +687,7 @@ watchEffect(async () => {
 			:key="
 				node.type === 'button'
 					? `children-button-${asButton(node).label}`
-					: `children-${asIdentified(node).id ?? node.type}`
+					: `children-${asIdentified(node)._statePath?.join('/') ?? asIdentified(node).id ?? node.type}`
 			"
 		>
 			<NodeRenderer
@@ -649,6 +701,7 @@ watchEffect(async () => {
 				:show-context="getChildrenContext(asIdentified(node))"
 				:on-image-upload="onImageUpload"
 				:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
+				:parent-state-path="asIdentified(node)._statePath ?? props.parentStatePath ?? []"
 				class="w-full"
 			/>
 		</template>

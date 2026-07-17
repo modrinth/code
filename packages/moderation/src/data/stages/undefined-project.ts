@@ -2,7 +2,7 @@ import { XIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, group, stage, toggle } from '../../types/node'
+import { group, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project, projectV2 } = injectProjectPageContext()
@@ -18,8 +18,6 @@ export default function () {
 			computed(() => projectV2.value.versions.length === 0 && !project.value?.minecraft_server),
 		)
 		.children(
-			group().children(
-				toggle('no-versions', 'No Versions').action(action().suggestedStatus('rejected').message()),
-			),
+			group().children(toggle('no-versions', 'No Versions').suggestedStatus('rejected').message()),
 		)
 }

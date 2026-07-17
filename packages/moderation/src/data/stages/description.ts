@@ -1,7 +1,8 @@
 import { LibraryIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
+import { computed } from 'vue'
 
-import { action, group, markdown, md, stage, toggle } from '../../types/node'
+import { group, markdown, md, stage, toggle } from '../../types/node'
 
 const SHOW_SPOILER_ADVICE = ['spoilers']
 
@@ -20,47 +21,9 @@ export default function () {
 				.title('Description Issues?')
 				.children(
 					toggle('insufficient', 'Insufficient')
-						.action(
-							action()
-								.suggestedStatus('flagged')
-								.severity('medium')
-								.message(async (state) => {
-									const reasons = state?.reason instanceof Set ? state.reason : new Set<string>()
-
-									let message = await md(
-										'checklist/messages/description/insufficient/header',
-										(s) => ({ CUSTOM_ADVICE: s.custom?.explainer }),
-									)(state)
-
-									if (reasons.size === 0)
-										message += await md(
-											`checklist/messages/description/insufficient/default/${project.value?.minecraft_java_server ? 'servers' : project.value?.project_types?.includes('modpack') ? 'packs' : 'projects'}`,
-										)(state)
-
-									if (reasons.has('fork'))
-										message += await md('checklist/messages/description/insufficient/piece/fork')(
-											state,
-										)
-
-									if (reasons.has('unfinished'))
-										message += await md(
-											'checklist/messages/description/insufficient/piece/unfinished',
-										)(state)
-
-									if (reasons.has('spoilers'))
-										message += await md(
-											'checklist/messages/description/insufficient/piece/spoilers',
-										)(state)
-
-									// Always put this at bottom
-									if (SHOW_SPOILER_ADVICE.some((reason) => reasons.has(reason)))
-										message += await md(
-											'checklist/messages/description/insufficient/piece/spoiler-guide',
-										)(state)
-
-									return message
-								}),
-						)
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message('insufficient/header', (s) => ({ CUSTOM_ADVICE: s.custom?.explainer }))
 						.children(
 							group()
 								.title('Why is this Description Insufficient?')
@@ -71,52 +34,54 @@ export default function () {
 											.title('How can the author improve their description?')
 											.required(),
 									),
-									toggle('fork', 'Fork'),
-									toggle('unfinished', 'Unfinished'),
-									toggle('spoilers', 'Spoilers'),
+									toggle('fork', 'Fork').message('piece/fork'),
+									toggle('unfinished', 'Unfinished').message('piece/unfinished'),
+									toggle('spoilers', 'Spoilers').message('piece/spoilers'),
 								),
-						),
+						)
+						.collect(
+							() =>
+								`insufficient/default/${project.value?.minecraft_java_server ? 'servers' : project.value?.project_types?.includes('modpack') ? 'packs' : 'projects'}`,
+						)
+						.rawMessage(async (state) => {
+							const reasons = state?.reason instanceof Set ? state.reason : new Set<string>()
+							return SHOW_SPOILER_ADVICE.some((reason) => reasons.has(reason))
+								? await md('checklist/messages/description/insufficient/piece/spoiler-guide')(state)
+								: ''
+						}),
 
 					toggle('non-english', 'Non-english')
-						.action(
-							action()
-								.suggestedStatus('flagged')
-								.severity('medium')
-								.message(
-									md(
-										() =>
-											`checklist/messages/description/non-english${project.value.minecraft_java_server ? '-server' : ''}`,
-									),
-								),
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(
+							() => `non-english${project.value.minecraft_java_server ? '-server' : ''}`,
 						)
 						.shown(
 							computed(() => {
-								if (
-									!!project.value?.minecraft_java_server &&
-									!project.value.minecraft_server?.languages?.includes('en')
-								) {
-									return false
-								} else {
-									return true
-								}
+								return !(!!project.value?.minecraft_java_server &&
+                  !project.value.minecraft_server?.languages?.includes('en'));
 							}),
 						),
 
-					toggle('headers-as-body', 'Headers as body text').action(
-						action().suggestedStatus('flagged').severity('low').message(),
-					),
+					toggle('headers-as-body', 'Headers as body text')
+						.suggestedStatus('flagged')
+						.severity('low')
+						.message(),
 
-					toggle('image-only', 'Image-only').action(
-						action().suggestedStatus('flagged').severity('medium').message(),
-					),
+					toggle('image-only', 'Image-only')
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(),
 
-					toggle('non-standard-text', 'Non-standard text').action(
-						action().suggestedStatus('flagged').severity('medium').message(),
-					),
+					toggle('non-standard-text', 'Non-standard text')
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(),
 
-					toggle('clarity', 'Unclear / Misleading').action(
-						action().suggestedStatus('rejected').severity('high').message(),
-					),
+					toggle('clarity', 'Unclear / Misleading')
+						.suggestedStatus('rejected')
+						.severity('high')
+						.message(),
 				),
 		)
 }

@@ -2,7 +2,7 @@ import { CopyrightIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, check, group, markdown, stage, text, toggle } from '../../types/node'
+import { check, group, markdown, stage, text, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -25,15 +25,12 @@ export default function () {
 			group().children(
 				toggle('reupload', 'Re-upload')
 					.shown(computed(() => !project.value.minecraft_server))
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('high')
-							.message((state) => ({
-								ORIGINAL_PROJECT: state['original-project'],
-								ORIGINAL_AUTHOR: state['original-author'],
-							})),
-					)
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(undefined, (state) => ({
+						ORIGINAL_PROJECT: state['original-project'],
+						ORIGINAL_AUTHOR: state['original-author'],
+					}))
 					.children(
 						text('original-project').title('Original Project Title').required(),
 						text('original-author').title('Original project Author').required(),
@@ -41,67 +38,66 @@ export default function () {
 
 				toggle('unclear-fork', 'Unclear Fork')
 					.shown(computed(() => !project.value.minecraft_server))
-					.action(action().suggestedStatus('rejected').severity('high').message()),
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
 				toggle('insufficient-fork', 'Insufficient Fork')
 					.shown(computed(() => !project.value.minecraft_server))
-					.action(action().suggestedStatus('rejected').severity('high').message()),
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
-				toggle('request-proof', 'Proof of permissions').action(
-					action().suggestedStatus('rejected').severity('high').message(),
-				),
+				toggle('request-proof', 'Proof of permissions')
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
 				toggle('identity-verification', 'Verify Identity')
 					.shown(computed(() => !project.value.minecraft_server))
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('high')
-							.message((state) => ({
-								PLATFORM: state.platform,
-							})),
-					)
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(undefined, (state) => ({
+						PLATFORM: state.platform,
+					}))
 					.children(text('platform').title('Where else can the project be found?').required()),
 
 				toggle('identity-verification-server', 'Verify Identity')
 					.shown(computed(() => !!project.value.minecraft_server))
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('high')
-							.message((state) => ({
-								CONTACT: state.contact,
-							})),
-					)
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(undefined, (state) => ({
+						CONTACT: state.contact,
+					}))
 					.children(text('contact').title('Known public contact method').required()),
 
 				toggle('request-proof-server', 'Reuploaded pack')
 					.shown(isServerModpack)
-					.action(action().suggestedStatus('rejected').severity('high').message()),
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
 				toggle('custom-pack-verification', 'Override verification')
 					.shown(isServerModpack)
-					.action(action().suggestedStatus('rejected').severity('high').message())
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message()
 					.children(
 						check('list', 'List overrides?')
-							.action(
-								action().message((state) => ({
-									OVERRIDES: state.overrides,
-								})),
-							)
+							.message(undefined, (state) => ({
+								OVERRIDES: state.overrides,
+							}))
 							.children(markdown('overrides').title('Add list of overrides.')),
-					),
+					)
+					.collect(),
 
 				toggle('custom-pack-prohibited', 'Forbidden Overrides')
 					.shown(isServerModpack)
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('high')
-							.message((state) => ({
-								OVERRIDES: state.overrides,
-							})),
-					)
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(undefined, (state) => ({
+						OVERRIDES: state.overrides,
+					}))
 					.children(markdown('overrides').title('Forbidden overrides list').required()),
 			),
 		)

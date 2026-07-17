@@ -2,7 +2,7 @@ import { TagsIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, fix, group, label, md, stage, toggle } from '../../types/node'
+import { fix, group, label, md, stage, toggle } from '../../types/node'
 
 const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'])
 
@@ -26,12 +26,10 @@ export default function () {
 			),
 		)
 		.children(
-			label(md('checklist/text/categories')),
+			label('categories'),
 
 			group().children(
-				toggle('inaccurate', 'Inaccurate').action(
-					action().suggestedStatus('flagged').severity('low').message(),
-				),
+				toggle('inaccurate', 'Inaccurate').suggestedStatus('flagged').severity('low').message(),
 
 				toggle('optimization-misused', 'Optimization')
 					.shown(
@@ -41,36 +39,30 @@ export default function () {
 								project.value.additional_categories.includes('optimization'),
 						),
 					)
-					.action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('low')
-							.message(optimizationMsg)
-							.fix(
-								fix().project((patch) => {
-									patch.categories = project.value.categories.filter((c) => c !== 'optimization')
-									patch.additional_categories = project.value.additional_categories.filter(
-										(c) => c !== 'optimization',
-									)
-								}),
-							),
+					.suggestedStatus('flagged')
+					.severity('low')
+					.rawMessage(optimizationMsg)
+					.fix(
+						fix().project((patch) => {
+							patch.categories = project.value.categories.filter((c) => c !== 'optimization')
+							patch.additional_categories = project.value.additional_categories.filter(
+								(c) => c !== 'optimization',
+							)
+						}),
 					),
 
 				toggle('resolutions-misused', 'Resolutions')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
-					.action(
-						action()
-							.suggestedStatus('flagged')
-							.severity('low')
-							.message(resolutionsMsg)
-							.fix(
-								fix().project((patch) => {
-									patch.categories = project.value.categories.filter((c) => !resolutionTags.has(c))
-									patch.additional_categories = project.value.additional_categories.filter(
-										(c) => !resolutionTags.has(c),
-									)
-								}),
-							),
+					.suggestedStatus('flagged')
+					.severity('low')
+					.rawMessage(resolutionsMsg)
+					.fix(
+						fix().project((patch) => {
+							patch.categories = project.value.categories.filter((c) => !resolutionTags.has(c))
+							patch.additional_categories = project.value.additional_categories.filter(
+								(c) => !resolutionTags.has(c),
+							)
+						}),
 					),
 			),
 		)

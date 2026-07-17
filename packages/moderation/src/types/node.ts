@@ -86,7 +86,10 @@ export async function loadMd(
 	getVars?: (state: Record<string, any>) => Record<string, any>,
 ): Promise<string> {
 	const loader = messageFiles[`../data/messages/${path}.md`]
-	if (!loader) return ''
+	if (!loader) {
+		_onMissingMd?.(path)
+		return ''
+	}
 	const raw = (await loader()) as string
 	const vars: Record<string, string> = {
 		...flattenStaticVariables(),
@@ -115,6 +118,11 @@ function makeMessageFn(fn: (state: Record<string, NodeState>) => Promise<string>
 
 let _project: Ref<Labrinth.Projects.v3.Project> | null = null
 let _projectV2: Ref<Labrinth.Projects.v2.Project> | null = null
+let _onMissingMd: ((path: string) => void) | null = null
+
+export function setMissingMdHandler(handler: (path: string) => void) {
+	_onMissingMd = handler
+}
 
 export function setMessageProject(
 	project: Ref<Labrinth.Projects.v3.Project>,
@@ -190,74 +198,77 @@ export function fix(): FixBuilder {
 	return new FixBuilder()
 }
 
-// ─── Action builder ───────────────────────────────────────────────────────────
+// ─── Message segments ─────────────────────────────────────────────────────────
 
-export class ActionBuilder {
-	_message?: MessageFn
-	_autoMessage = false
-	_autoMessageVars?: (state: Record<string, NodeState>) => Record<string, NodeState>
-	_messagePath?: string | (() => string)
-	_priority?: Priority
-	_suggestedStatus?: ModerationStatus
-	_severity?: ModerationSeverity
-	_fixes: FixBuilder[] = []
-	_applyFixes = false
+type GetVarsFn = (state: Record<string, any>) => Record<string, any>
 
-	message(
-		fn?:
-			| string
-			| (() => string)
-			| MessageFn
-			| ((state: Record<string, NodeState>) => Promise<string>)
-			| ((state: Record<string, NodeState>) => Record<string, NodeState>),
-	): this {
-		if (!fn) {
-			this._autoMessage = true
-		} else if (typeof fn === 'string') {
-			this._messagePath = fn
-		} else if (
-			typeof fn === 'function' &&
-			fn.length === 0 &&
-			fn.constructor.name !== 'AsyncFunction'
-		) {
-			this._messagePath = fn as () => string
-		} else if (fn.constructor.name === 'AsyncFunction') {
-			this._message = fn as MessageFn
-		} else {
-			this._autoMessage = true
-			this._autoMessageVars = fn as (state: Record<string, NodeState>) => Record<string, NodeState>
-		}
-		return this
-	}
+export type MessageSegment =
+	| { type: 'fn'; fn: ContentFn }
+	| { type: 'auto'; getVars?: GetVarsFn }
+	| { type: 'path'; path: string | (() => string); getVars?: GetVarsFn }
+	| { type: 'text-path'; path: string | (() => string); getVars?: GetVarsFn }
+	| { type: 'collect'; fallback?: MessageSegment }
 
-	priority(p: Priority): this {
-		this._priority = p
-		return this
-	}
-
-	suggestedStatus(s: ModerationStatus): this {
-		this._suggestedStatus = s
-		return this
-	}
-
-	severity(s: ModerationSeverity): this {
-		this._severity = s
-		return this
-	}
-
-	fix(f: FixBuilder): this {
-		this._fixes.push(f)
-		return this
-	}
-
-	applyFixes(): this {
-		this._applyFixes = true
-		return this
-	}
+export function resolveRelativeMessagePath(
+	messagePath: string | (() => string),
+	statePath: string[],
+): string {
+	const name = typeof messagePath === 'function' ? messagePath() : messagePath
+	if (name.startsWith('/')) return `checklist/messages${name}`
+	const parts = [...statePath.slice(0, -1), ...name.split('/')]
+	const normalized = parts.reduce<string[]>((acc, p) => {
+		if (p === '..') acc.pop()
+		else if (p) acc.push(p)
+		return acc
+	}, [])
+	return `checklist/messages/${normalized.join('/')}`
 }
 
-export function action(): ActionBuilder {
-	return new ActionBuilder()
+export function resolveRelativeLabelPath(
+	labelPath: string | (() => string),
+	statePath: string[],
+): string {
+	const name = typeof labelPath === 'function' ? labelPath() : labelPath
+	if (name.startsWith('/')) return `checklist/text${name}`
+	const parts = [...statePath, ...name.split('/')]
+	const normalized = parts.reduce<string[]>((acc, p) => {
+		if (p === '..') acc.pop()
+		else if (p) acc.push(p)
+		return acc
+	}, [])
+	return `checklist/text/${normalized.join('/')}`
+}
+
+export async function evalSegment(
+	seg: MessageSegment,
+	state: Record<string, NodeState>,
+	statePath: string[],
+): Promise<string> {
+	if (seg.type === 'collect') return ''
+	if (seg.type === 'fn') return String((await seg.fn(state)) ?? '')
+	if (seg.type === 'auto')
+		return loadMd(
+			`checklist/messages/${statePath.join('/')}`,
+			state,
+			_project!.value,
+			_projectV2!.value,
+			seg.getVars,
+		)
+	if (seg.type === 'text-path')
+		return loadMd(
+			resolveRelativeLabelPath(seg.path, statePath),
+			state,
+			_project!.value,
+			_projectV2!.value,
+			seg.getVars,
+		)
+	return loadMd(
+		resolveRelativeMessagePath(seg.path, statePath),
+		state,
+		_project!.value,
+		_projectV2!.value,
+		seg.getVars,
+	)
 }
 
 // ─── Node builders ────────────────────────────────────────────────────────────
@@ -280,11 +291,11 @@ export abstract class NodeBuilder {
 
 export class DisplayNodeBuilder extends NodeBuilder {
 	readonly type = 'display' as const
-	_content: string | ContentFn
+	_segment: MessageSegment
 
-	constructor(content: string | ContentFn) {
+	constructor(segment: MessageSegment) {
 		super()
-		this._content = content
+		this._segment = segment
 	}
 }
 
@@ -315,7 +326,12 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 	_children: ChildEntry[] = []
 	_childrenFn?: ChildrenFn
 	_computingChildren = false
-	_action?: ActionBuilder
+	_segments: MessageSegment[] = []
+	_suggestedStatus?: ModerationStatus
+	_severity?: ModerationSeverity
+	_priority?: Priority
+	_fixes: FixBuilder[] = []
+	_applyFixes = false
 	_enabled?: Reactive<boolean> | ((state: Record<string, NodeState>) => boolean)
 	_statePath?: string[]
 
@@ -328,7 +344,6 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 	children(...entries: ChildEntry[]): this
 	children(...args: [ChildrenFn] | ChildEntry[]): this {
 		if (args.length === 1 && typeof args[0] === 'function' && args[0].length >= 1) {
-			// Single function with ≥1 required param → ChildrenFn (e.g. (state) => [...])
 			this._childrenFn = args[0] as ChildrenFn
 		} else {
 			this._children.push(...(args as ChildEntry[]))
@@ -336,8 +351,54 @@ export abstract class IdentifiedNodeBuilder extends NodeBuilder {
 		return this
 	}
 
-	action(a: ActionBuilder): this {
-		this._action = a
+	message(path?: string | (() => string), getVars?: GetVarsFn): this {
+		const segment: MessageSegment =
+			path === undefined
+				? { type: 'auto', ...(getVars && { getVars }) }
+				: { type: 'path', path, ...(getVars && { getVars }) }
+		this._segments.push(segment)
+		return this
+	}
+
+	rawMessage(content: string | ContentFn): this {
+		const fn: ContentFn = typeof content === 'string' ? () => content : content
+		this._segments.push({ type: 'fn', fn })
+		return this
+	}
+
+	collect(path?: string | (() => string), getVars?: GetVarsFn): this {
+		const fallback =
+			path !== undefined || getVars !== undefined
+				? path === undefined
+					? { type: 'auto' as const, ...(getVars && { getVars }) }
+					: { type: 'path' as const, path, ...(getVars && { getVars }) }
+				: undefined
+		this._segments.push({ type: 'collect', ...(fallback && { fallback }) })
+		return this
+	}
+
+	suggestedStatus(s: ModerationStatus): this {
+		this._suggestedStatus = s
+		return this
+	}
+
+	severity(s: ModerationSeverity): this {
+		this._severity = s
+		return this
+	}
+
+	priority(p: Priority): this {
+		this._priority = p
+		return this
+	}
+
+	fix(f: FixBuilder): this {
+		this._fixes.push(f)
+		return this
+	}
+
+	applyFixes(): this {
+		this._applyFixes = true
 		return this
 	}
 
@@ -781,5 +842,11 @@ export const markdown = (id: string) => new InputNodeBuilder(id, 'markdown')
 export const group = (id?: string) => new GroupNodeBuilder(id)
 export const dropdown = (id: string) => new DropdownNodeBuilder(id)
 export const option = (id: string, nodeLabel: string) => new OptionNodeBuilder(id, nodeLabel)
-export const label = (content: string | ContentFn) => new DisplayNodeBuilder(content)
+export const label = (path: string | (() => string), getVars?: GetVarsFn) =>
+	new DisplayNodeBuilder({ type: 'text-path', path, ...(getVars && { getVars }) })
+export const rawLabel = (content: string | ContentFn) =>
+	new DisplayNodeBuilder({
+		type: 'fn',
+		fn: typeof content === 'string' ? () => content : content,
+	})
 export const stage = (id: string, title: string) => new StageNodeBuilder(id, title)

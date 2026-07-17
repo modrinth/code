@@ -2,7 +2,7 @@ import { SignatureIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, group, stage, toggle } from '../../types/node'
+import { group, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -21,21 +21,26 @@ export default function () {
 		)
 		.children(
 			group().children(
-				toggle('invalid-permissions', 'Invalid permissions').action(
-					action().suggestedStatus('rejected').severity('high').message(),
-				),
+				toggle('invalid-permissions', 'Invalid permissions')
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
-				toggle('prohibited-external-content', 'Prohibited externals').action(
-					action().suggestedStatus('rejected').severity('high').message(),
-				),
+				toggle('prohibited-external-content', 'Prohibited externals')
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
-				toggle('missing-permissions', 'Missing permissions').action(
-					action().suggestedStatus('rejected').severity('high').message(),
-				),
+				toggle('missing-permissions', 'Missing permissions')
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 
 				toggle('non-commercial-external-content', 'Non-commercial externals')
 					.shown(computed(() => project.value.monetization_status === 'monetized'))
-					.action(action().suggestedStatus('rejected').severity('high').message()),
+					.suggestedStatus('rejected')
+					.severity('high')
+					.message(),
 			),
 		)
 }

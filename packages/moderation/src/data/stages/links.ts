@@ -2,25 +2,62 @@ import { LinkIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import type { NodeBuilder } from '../../types/node'
-import { action, group, label, md, mdEscape, stage, toggle } from '../../types/node'
+import { group, md, rawLabel, stage, toggle } from '../../types/node'
+import type { ChildEntry, GroupNodeBuilder } from '../../types/node'
 import { licensesNotRequiringSource } from '../../utils'
-
-function linkSection(id: string, urlLine: string, ...extra: NodeBuilder[]) {
-	return group(id)
-		.layout('column')
-		.children(
-			label(urlLine),
-			group().children(
-				toggle('misused', 'Misused'),
-				toggle('inaccessible', 'Inaccessible'),
-				...extra,
-			),
-		)
-}
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
+	const linkNames: Record<string, string> = {}
+
+	type LinkSectionBuilder = (() => GroupNodeBuilder) & {
+		children(...extras: ChildEntry[]): LinkSectionBuilder
+		label(transform: (line: string) => string): LinkSectionBuilder
+	}
+
+	function linkSection(id: string, name: string): LinkSectionBuilder {
+		linkNames[id] = name
+		let labelTransform: ((line: string) => string) | undefined
+		const url = computed(() => project.value.link_urls[id]?.url)
+
+		const inner = group().children(
+			toggle('misused', 'Misused'),
+			toggle('inaccessible', 'Inaccessible'),
+		)
+
+		const outer = group(id)
+			.layout('column')
+			.shown(computed(() => !!url.value))
+			.children(
+				rawLabel(() => {
+					const base = `**${name}:** <${url.value}>`
+					return labelTransform ? labelTransform(base) : base
+				}),
+				inner,
+			)
+
+		const builder: LinkSectionBuilder = Object.assign(() => outer, {
+			children(...extras: ChildEntry[]) {
+				inner.children(...extras)
+				return builder
+			},
+			label(transform: (line: string) => string) {
+				labelTransform = transform
+				return builder
+			},
+		})
+
+		return builder
+	}
+
+	const showWarning = computed(
+		() =>
+			(project.value.project_types.includes('mod') ||
+				project.value.project_types.includes('plugin')) &&
+			!licensesNotRequiringSource.includes(project.value.license?.id ?? ''),
+	)
+
+	const misusedKeys = new Set(['misused', 'empty'])
 
 	return stage('links', 'Links')
 		.hint("Are the project's links accurate and accessible?")
@@ -30,185 +67,83 @@ export default function () {
 		.icon(LinkIcon)
 		.navigate('/settings/links')
 		.shown(computed(() => Object.keys(project.value.link_urls).length > 0))
-		.action(
-			action()
-				.suggestedStatus('flagged')
-				.severity('low')
-				.message(async (state) => {
-					const LINK_NAMES: Record<string, string> = {
-						issues: 'Issue tracker',
-						source: 'Source code',
-						wiki: 'Wiki page',
-						discord: 'Discord invite',
-						site: 'Website',
-						store: 'Store',
-						...Object.fromEntries(
-							Object.values(project.value.link_urls)
-								.filter((l) => l.donation)
-								.map((l) => [`donation-${l.platform}`, l.platform]),
-						),
-					}
+		.suggestedStatus('flagged')
+		.severity('low')
+		.rawMessage(async (state) => {
+			const sections = Object.entries(state).filter(
+				([, s]) => s && typeof s === 'object' && !(s instanceof Set),
+			) as [string, Record<string, unknown>][]
 
-					const LINK_EXTRAS: Record<
-						string,
-						{
-							misused?: string
-							inaccessible?: string
-							disabled?: string
-							expiring?: string
-							empty?: string
-						}
-					> = {
-						issues: {
-							disabled: 'checklist/messages/links/note/issues-disabled',
-						},
-						wiki: {
-							disabled: 'checklist/messages/links/note/wiki-disabled',
-						},
-						source: {
-							inaccessible: 'checklist/messages/links/note/source-404',
-							empty: 'checklist/messages/links/note/source-empty',
-						},
-						discord: {
-							inaccessible: 'checklist/messages/links/note/discord-inaccessible',
-							expiring: 'checklist/messages/links/note/discord-expiring',
-						},
-					}
+			const misused = sections.flatMap(([id, s]) =>
+				Object.keys(s)
+					.filter((t) => s[t] === true && misusedKeys.has(t))
+					.map((t) => [id, t] as const),
+			)
+			const inaccessible = sections.flatMap(([id, s]) =>
+				Object.keys(s)
+					.filter((t) => s[t] === true && !misusedKeys.has(t))
+					.map((t) => [id, t] as const),
+			)
 
-					const sections = Object.entries(state).filter(
-						([, s]) => s && typeof s === 'object' && !(s instanceof Set),
-					) as [string, Record<string, unknown>][]
+			if (!misused.length && !inaccessible.length) return ''
 
-					const misused = sections.filter(([, s]) => s.misused === true)
-					const inaccessible = sections.filter(([, s]) => s.inaccessible === true)
-					const disabled = sections.filter(([, s]) => s.disabled === true)
-					const expiring = sections.filter(([, s]) => s.expiring === true)
-					const empty = sections.filter(([, s]) => s.empty === true)
+			const linkLine = (id: string) =>
+				`- ${linkNames[id] ?? id}: \`${project.value.link_urls[id]?.url}\`\n`
 
-					if (
-						misused.length === 0 &&
-						inaccessible.length === 0 &&
-						disabled.length === 0 &&
-						expiring.length === 0 &&
-						empty.length === 0
-					)
-						return ''
-
-					let message = await md('checklist/messages/links/header')(state)
-
-					if (misused.length || empty.length > 0) {
-						message += await md('checklist/messages/links/misused-header')(state)
-
-						if (misused.length > 0) {
-							for (const [id] of misused) {
-								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
-								const extraPath = `checklist/messages/links/note/${LINK_EXTRAS[id]}-expiring`
-								if (extraPath) message += await md(extraPath)(state)
-							}
-						}
-
-						if (empty.length > 0) {
-							for (const [id] of empty) {
-								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
-								const extraPath = LINK_EXTRAS[id]?.empty
-								//	log(extraPath?.toString())
-								if (extraPath) message += await md(extraPath)(state)
-								//	return extraPath?.toString()
-							}
-						}
-					}
-
-					if (inaccessible.length > 0 || disabled.length > 0 || expiring.length > 0) {
-						message += await md('checklist/messages/links/inaccessible-header')(state)
-
-						if (inaccessible.length > 0) {
-							for (const [id] of inaccessible) {
-								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
-								const extraPath = LINK_EXTRAS[id]?.disabled
-								if (extraPath) message += await md(extraPath)(state)
-							}
-						}
-
-						if (disabled.length > 0) {
-							for (const [id] of disabled) {
-								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
-								const extraPath = LINK_EXTRAS[id]?.disabled
-								if (extraPath) message += await md(extraPath)(state)
-							}
-						}
-
-						if (expiring.length > 0) {
-							for (const [id] of expiring) {
-								message += `- ${LINK_NAMES[id] ?? id}: \`${project.value.link_urls[id.replace('donation-', '')]?.url}\`\n`
-								const extraPath = LINK_EXTRAS[id]?.expiring
-								if (extraPath) message += await md(extraPath)(state)
-							}
-						}
-					}
-
-					return message
-				}),
-		)
-		.children(
-			() =>
-				project.value.link_urls.issues?.url
-					? linkSection(
-							'issues',
-							`**Issues:** <${project.value.link_urls.issues.url}>`,
-							toggle('disabled', 'Disabled'),
-						)
-					: null,
-
-			() => {
-				if (project.value.link_urls.source?.url) {
-					const showWarning =
-						(project.value.project_types.includes('mod') ||
-							project.value.project_types.includes('plugin')) &&
-						!licensesNotRequiringSource.includes(project.value.license?.id ?? '')
-
-					return linkSection(
-						'source',
-						`${showWarning ? '**[❗]** ' : ''}**Source:** <${project.value.link_urls.source.url}>`,
-						toggle('empty', 'Empty Repo'),
-					)
+			const renderGroup = async (pairs: readonly (readonly [string, string])[]) => {
+				const byId = new Map<string, string[]>()
+				for (const [id, t] of pairs) {
+					if (!byId.has(id)) byId.set(id, [])
+					byId.get(id)!.push(t)
 				}
+				let out = ''
+				for (const [id, toggles] of byId) {
+					out += linkLine(id)
+					for (const t of toggles) {
+						if (t !== 'misused' && t !== 'inaccessible') {
+							const note = (await md(`checklist/messages/links/${id}/${t}`)(state)).trim()
+					if (note) out += `    - ${note}\n`
+						}
+					}
+				}
+				return out
+			}
 
-				return null
-			},
+			let message = await md('checklist/messages/links/header')(state)
 
-			() =>
-				project.value.link_urls.wiki?.url
-					? linkSection(
-							'wiki',
-							`**Wiki:** <${project.value.link_urls.wiki.url}>`,
-							toggle('disabled', 'Disabled'),
-						)
-					: null,
+			if (misused.length) {
+				message += await md('checklist/messages/links/misused-header')(state)
+				message += await renderGroup(misused)
+			}
 
-			() =>
-				project.value.link_urls.discord?.url
-					? linkSection(
-							'discord',
-							`**Discord:** <${project.value.link_urls.discord.url}>`,
-							toggle('expiring', 'Expiring'),
-						)
-					: null,
+			if (inaccessible.length) {
+				message += await md('checklist/messages/links/inaccessible-header')(state)
+				message += await renderGroup(inaccessible)
+			}
 
-			() =>
-				project.value.link_urls.site?.url
-					? linkSection('site', `**Website:** <${project.value.link_urls.site.url}>`)
-					: null,
+			return message
+		})
+		.children(
+			linkSection('issues', 'Issue tracker').children(toggle('disabled', 'Disabled')),
 
-			() =>
-				project.value.link_urls.store?.url
-					? linkSection('store', `**Store:** <${project.value.link_urls.store.url}>`)
-					: null,
+			linkSection('source', 'Source code')
+				.label((line) => (showWarning.value ? `**[❗]** ${line}` : line))
+				.children(toggle('empty', 'Empty Repo')),
 
-			() =>
-				Object.entries(project.value.link_urls)
-					.filter(([, l]) => l.donation)
-					.map(([, l]) =>
-						linkSection(`donation-${l.platform}`, `**${mdEscape(l.platform)}:** <${l.url}>`),
-					),
+			linkSection('wiki', 'Wiki page').children(toggle('disabled', 'Disabled')),
+
+			linkSection('discord', 'Discord invite').children(toggle('expiring', 'Expiring')),
+
+			linkSection('site', 'Website'),
+			linkSection('store', 'Store'),
+
+			group('donations').children(
+				linkSection('patreon', 'Patreon'),
+				linkSection('bmac', 'Buy Me A Coffee'),
+				linkSection('paypal', 'PayPal'),
+				linkSection('github', 'GitHub Sponsors'),
+				linkSection('ko-fi', 'Ko-fi'),
+				linkSection('other', 'Other'),
+			),
 		)
 }

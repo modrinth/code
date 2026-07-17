@@ -2,7 +2,7 @@ import { AlignLeftIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { action, group, label, md, stage, toggle } from '../../types/node'
+import { group, label, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -14,25 +14,29 @@ export default function () {
 		)
 		.icon(AlignLeftIcon)
 		.children(
-			label(md('checklist/text/summary/summary')),
+			label('summary'),
 
 			group()
 				.title('Summary Issues?')
 				.children(
 					toggle('insufficient', 'Insufficient')
 						.enabled((state) => !state['repeat-title'])
-						.action(action().suggestedStatus('flagged').severity('low').message()),
+						.suggestedStatus('flagged')
+						.severity('low')
+						.message(),
 
 					toggle('repeat-title', 'Repeat of Title')
 						.enabled((state) => !state.insufficient)
-						.action(action().suggestedStatus('flagged').severity('low').message()),
+						.suggestedStatus('flagged')
+						.severity('low')
+						.message(),
 
-					toggle('formatting', 'Formatting').action(
-						action().suggestedStatus('flagged').severity('low').message(),
-					),
+					toggle('formatting', 'Formatting').suggestedStatus('flagged').severity('low').message(),
 
 					toggle('non-english', 'Non-english')
-						.action(action().suggestedStatus('flagged').severity('medium').message())
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message()
 						.shown(
 							computed(() => {
 								if (
@@ -48,7 +52,9 @@ export default function () {
 
 					toggle('repeat-ip', 'Repeat of IP')
 						.shown(computed(() => !!project.value?.minecraft_server))
-						.action(action().suggestedStatus('flagged').severity('medium').message()),
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(),
 				),
 		)
 }

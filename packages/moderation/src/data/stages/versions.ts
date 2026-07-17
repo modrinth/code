@@ -2,27 +2,7 @@ import { VersionIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import {
-	action,
-	dropdown,
-	group,
-	md,
-	option,
-	stage,
-	text,
-	toggle,
-	type MessageFn,
-} from '../../types/node'
-
-const IncorrectProjectTypeDatapackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrect-project-type/datapack',
-)
-const IncorrectProjectTypeModpackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrect-project-type/modpack',
-)
-const IncorrectProjectTypeResourcepackMsg: MessageFn = md(
-	'checklist/messages/versions/incorrect-project-type/resourcepack',
-)
+import { dropdown, group, option, stage, text, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -37,13 +17,15 @@ export default function () {
 		.shown(computed(() => !project.value?.minecraft_server))
 		.children(
 			group().children(
-				toggle('incorrect-additional-files', 'Incorrect additional files').action(
-					action().suggestedStatus('flagged').severity('medium').message(),
-				),
+				toggle('incorrect-additional-files', 'Incorrect additional files')
+					.suggestedStatus('flagged')
+					.severity('medium')
+					.message(),
 
 				// TODO: borked
 				toggle('incorrect-project-type', 'Incorrect Project Type')
-					.action(action().suggestedStatus('rejected').severity('medium'))
+					.suggestedStatus('rejected')
+					.severity('medium')
 					.children(
 						dropdown('type')
 							.title('Correct Project Type')
@@ -51,26 +33,28 @@ export default function () {
 							.children(
 								option('modpack', 'Modpack')
 									.shown(computed(() => !project.value.project_types.includes('modpack')))
-									.action(action().message(IncorrectProjectTypeModpackMsg)),
+									.message(),
 								option('resourcepack', 'Resource Pack')
 									.shown(computed(() => !project.value.project_types.includes('resourcepack')))
-									.action(action().message(IncorrectProjectTypeResourcepackMsg)),
+									.message(),
 								option('datapack', 'Data Pack')
 									.shown(computed(() => !project.value.loaders.includes('datapack')))
-									.action(action().message(IncorrectProjectTypeDatapackMsg)),
+									.message(),
 							),
-					),
+					)
+					.collect(),
 
 				// TODO: borked
 				toggle('alternate-versions', 'Alternate Versions')
-					.action(action().suggestedStatus('rejected').severity('high'))
+					.suggestedStatus('rejected')
+					.severity('high')
 					.children(
 						dropdown('distribution')
 							.title('Distribution Type')
 							.none('Unknown')
 							.children(
-								option('primary', 'Primary Files').action(action().message()),
-								option('additional', 'Additional Files').action(action().message()),
+								option('primary', 'Primary Files').message(),
+								option('additional', 'Additional Files').message(),
 								option('mono', 'Monofile')
 									.shown(
 										computed(
@@ -79,22 +63,25 @@ export default function () {
 												project.value.loaders.includes('datapack'),
 										),
 									)
-									.action(action().message()),
+									.message(),
 								option('server', 'Server Files (Primary Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
-									.action(action().message()),
+									.message(),
 								option('server-additional', 'Server Files (Additional Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
-									.action(action().message()),
+									.message(),
 								option('zip', 'mods.zip')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
-									.action(action().message()),
+									.message(),
 							),
-					),
+					)
+					.collect(),
 
 				toggle('vanilla-assets', 'Vanilla Assets')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
-					.action(action().suggestedStatus('rejected').severity('medium').message()),
+					.suggestedStatus('rejected')
+					.severity('medium')
+					.message(),
 
 				toggle('redist-libs', 'Packed Libs')
 					.shown(
@@ -104,21 +91,21 @@ export default function () {
 								project.value.project_types.includes('plugin'),
 						),
 					)
-					.action(action().suggestedStatus('rejected').severity('medium').message()),
+					.suggestedStatus('rejected')
+					.severity('medium')
+					.message(),
 
-				toggle('duplicate-primary-files', 'Duplicate Primary Files').action(
-					action().suggestedStatus('flagged').severity('medium').message(),
-				),
+				toggle('duplicate-primary-files', 'Duplicate Primary Files')
+					.suggestedStatus('flagged')
+					.severity('medium')
+					.message(),
 
 				toggle('unsupported', 'Unsupported')
-					.action(
-						action()
-							.suggestedStatus('rejected')
-							.severity('medium')
-							.message((state) => ({
-								INVALID_TYPE: state['invalid-type'],
-							})),
-					)
+					.suggestedStatus('rejected')
+					.severity('medium')
+					.message(undefined, (state) => ({
+						INVALID_TYPE: state['invalid-type'],
+					}))
 					.children(text('invalid-type').title('Unsupported Type').required()),
 			),
 		)

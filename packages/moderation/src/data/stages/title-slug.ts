@@ -3,18 +3,7 @@ import { BookOpenIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import {
-	action,
-	button,
-	fix,
-	group,
-	label,
-	md,
-	option,
-	stage,
-	text,
-	toggle,
-} from '../../types/node'
+import { button, fix, group, md, option, rawLabel, stage, text, toggle } from '../../types/node'
 
 //TODO: make this not a copy of frontend/src/utils/slugs.generateUrlSlug
 // (as in move the other one so we can use it here)
@@ -44,7 +33,7 @@ export default function () {
 		)
 		.icon(BookOpenIcon)
 		.children(
-			label(async (state) => {
+			rawLabel(async (state) => {
 				const title = await titleMsg(state)
 				if (!hasCustomSlug(project.value)) return title
 				return title + (await slugMsg(state))
@@ -53,16 +42,20 @@ export default function () {
 			group('title')
 				.title('Title Issues?')
 				.children(
-					toggle('useless-info', 'Contains Useless Info').action(
-						action().suggestedStatus('flagged').severity('low').message(),
-					),
+					toggle('useless-info', 'Contains Useless Info')
+						.suggestedStatus('flagged')
+						.severity('low')
+						.message(),
 
-					toggle('minecraft-branding', 'Minecraft Title').action(
-						action().suggestedStatus('flagged').severity('medium').message(),
-					),
+					toggle('minecraft-branding', 'Minecraft Title')
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message(),
 
 					toggle('similarities', 'Title Similarities')
-						.action(action().suggestedStatus('flagged').severity('medium').message())
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.message()
 						.children(
 							group()
 								.title('Similarities Additional Info')
@@ -70,13 +63,14 @@ export default function () {
 								.children(
 									option('modpack', 'Modpack Named After Mod')
 										.shown(computed(() => project.value.project_types.includes('modpack')))
-										.action(action().message()),
+										.message(),
 
 									option('fork', 'Forked Project')
 										.shown(computed(() => !project.value?.minecraft_server))
-										.action(action().message()),
+										.message(),
 								),
-						),
+						)
+						.collect(),
 				),
 
 			group('slug')
@@ -106,17 +100,14 @@ export default function () {
 												),
 										),
 								)
-								.action(
-									action()
-										//TODO: coolbot variant for when we suggest a better slug (also used when quick fix is applied)
-										.message()
-										.fix(
-											fix().project((patch, state) => {
-												const slug = state['correct-slug'] as string
-												if (!slug) return
-												patch.slug = slug
-											}),
-										),
+								//TODO: coolbot variant for when we suggest a better slug (also used when quick fix is applied)
+								.message()
+								.fix(
+									fix().project((patch, state) => {
+										const slug = state['correct-slug'] as string
+										if (!slug) return
+										patch.slug = slug
+									}),
 								),
 						),
 				),
