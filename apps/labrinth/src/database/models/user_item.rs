@@ -631,19 +631,6 @@ impl DBUser {
             .await
             .wrap_err("failed to update versions author_id")?;
 
-            sqlx::query!(
-                "
-                UPDATE shared_instances
-                SET owner_id = $1
-                WHERE owner_id = $2
-                ",
-                deleted_user as DBUserId,
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to update shared_instances owner_id")?;
-
             use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
                 "
@@ -1008,28 +995,6 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to delete oauth_client_authorizations")?;
-
-            sqlx::query!(
-                "
-				DELETE FROM shared_instance_users
-				WHERE user_id = $1
-				",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete shared_instance_users")?;
-
-            sqlx::query!(
-                "
-				DELETE FROM shared_instance_invited_users
-				WHERE invited_user_id = $1
-				",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete shared_instance_invited_users")?;
 
             sqlx::query!(
                 "
