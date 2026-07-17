@@ -1,5 +1,4 @@
 <template>
-	<KeybindsModal ref="keybindsModal" />
 	<ConfirmModal
 		v-if="isLockedByOther"
 		ref="takeOverModal"
@@ -13,7 +12,12 @@
 	<div
 		tabindex="0"
 		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
-		:class="{ '!w-fit': collapsed, locked: isLockedByOther }"
+		:class="{
+		'!w-fit': collapsed,
+		 locked: isLockedByOther,
+		 'right-4': settings.get(moderationSettings.General.ChecklistPosition) === 'right',
+		 'left-4': settings.get(moderationSettings.General.ChecklistPosition) === 'left',
+	}"
 	>
 		<div class="flex grow-0 flex-col gap-1">
 			<div class="flex items-center gap-2">
@@ -52,11 +56,6 @@
 						{{ checklistTitleText }}
 					</button>
 				</h1>
-				<ButtonStyled circular>
-					<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
-						<KeyboardIcon />
-					</button>
-				</ButtonStyled>
 				<ButtonStyled v-if="!isPseudoStage && currentStageObj._guidanceUrl" circular>
 					<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl">
 						<FileTextIcon />
@@ -370,7 +369,6 @@ import {
 	CheckIcon,
 	DropdownIcon,
 	FileTextIcon,
-	KeyboardIcon,
 	LeftArrowIcon,
 	LinkIcon,
 	ListBulletedIcon,
@@ -383,12 +381,13 @@ import {
 	UndoIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type {
-	IdentifiedNodeBuilder,
-	NodeState,
-	Priority,
-	StageNodeBuilder,
-	ValueNodeBuilder,
+import {
+	moderationSettings,
+	type IdentifiedNodeBuilder,
+	type NodeState,
+	type Priority,
+	type StageNodeBuilder,
+	type ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
 	createTrackedPatch,
@@ -396,7 +395,6 @@ import {
 	expandVariables,
 	getBooleanChildState,
 	GLOBAL_STATE_KEY,
-	handleKeybind,
 	isNodeActive,
 	kebabToTitleCase,
 	NodeBuilder,
@@ -438,15 +436,14 @@ import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 import { type ActiveAction, type LiveNode, NODE_META_KEY, STATE_KEY } from './checklist-context'
-import KeybindsModal from './ChecklistKeybindsModal.vue'
 import NodeRenderer from './NodeRenderer.vue'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
 const keybinds = useModerationKeybinds()
+const settings = useModerationSettings()
 
-const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
 
 const props = defineProps<{
@@ -1223,15 +1220,12 @@ interface MessagePart {
 	content: string
 }
 
-function ignoreLegacyActionKeybind() {
-	return undefined
-}
-
 function handleKeybinds(event: KeyboardEvent) {
-	handleKeybind(
+	keybinds.value.handle(
 		event,
 		{
 			project: projectV2.value,
+			scope: 'checklist',
 			state: {
 				currentStage: currentStage.value,
 				totalStages: resolvedStages.value.length,
@@ -1248,9 +1242,6 @@ function handleKeybinds(event: KeyboardEvent) {
 					currentStageObj.value,
 					nodeStates.value[currentStageObj.value.id!] ?? {},
 				).filter((c) => c instanceof NodeBuilder).length,
-
-				focusedActionIndex: null,
-				focusedActionType: null,
 			},
 			actions: {
 				tryGoNext: nextStage,
@@ -1266,39 +1257,8 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryReject: () => sendMessage('rejected'),
 				tryWithhold: () => sendMessage('withheld'),
 				tryEditMessage: previousStage,
-
-				tryCopyLink: async (permalink: boolean, relative: boolean, page: boolean) => {
-					let url = ``
-					if (relative) {
-						url += `${globalThis.location.origin}`
-					} else {
-						url += `https://modrinth.com`
-					}
-
-					if (permalink) {
-						url += `/project/${projectV2.value.id}`
-					} else {
-						url += `/${projectV2.value.project_type}/${projectV2.value.slug}`
-					}
-
-					if (page) {
-						url += `/${globalThis.location.pathname.split('/').slice(3).join('/')}`
-					}
-
-					await navigator.clipboard.writeText(url)
-				},
-
-				tryCopyId: async () => await navigator.clipboard.writeText(projectV2.value.id),
-
-				tryToggleAction: ignoreLegacyActionKeybind,
-				trySelectDropdownOption: ignoreLegacyActionKeybind,
-				tryToggleChip: ignoreLegacyActionKeybind,
-				tryFocusNextAction: ignoreLegacyActionKeybind,
-				tryFocusPreviousAction: ignoreLegacyActionKeybind,
-				tryActivateFocusedAction: ignoreLegacyActionKeybind,
 			},
 		},
-		Object.values(keybinds.value),
 	)
 }
 
@@ -1315,7 +1275,9 @@ onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
-	notifications.setNotificationLocation('left')
+	if (settings.value.get(moderationSettings.General.ChecklistPosition) === 'right') {
+		notifications.setNotificationLocation('left')
+	}
 
 	const finishedId = localStorage.getItem('moderation-checklist-finished')
 	if (finishedId === projectV2.value.id) {
@@ -1870,6 +1832,12 @@ const stageOptions = computed<StageOption[]>(() => {
 
 <style scoped lang="scss">
 .moderation-checklist {
+	position: fixed;
+	bottom: 1rem;
+	overflow-y: auto;
+	z-index: 50;
+	transition: bottom 0.25s ease-in-out;
+
 	@media (prefers-reduced-motion) {
 		transition: none !important;
 	}
