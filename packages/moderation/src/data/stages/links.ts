@@ -140,13 +140,15 @@ export default function () {
 			linkSection('site', 'Website'),
 			linkSection('store', 'Store'),
 
-			group('donations').children(
-				linkSection('patreon', 'Patreon'),
-				linkSection('bmac', 'Buy Me A Coffee'),
-				linkSection('paypal', 'PayPal'),
-				linkSection('github', 'GitHub Sponsors'),
-				linkSection('ko-fi', 'Ko-fi'),
-				linkSection('other', 'Other'),
-			),
+			group('donations')
+				.layout('column')
+				.children(
+					linkSection('patreon', 'Patreon'),
+					linkSection('bmac', 'Buy Me A Coffee'),
+					linkSection('paypal', 'PayPal'),
+					linkSection('github', 'GitHub Sponsors'),
+					linkSection('ko-fi', 'Ko-fi'),
+					linkSection('other', 'Other'),
+				),
 		)
 }
