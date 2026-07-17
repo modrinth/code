@@ -1304,6 +1304,14 @@ onMounted(async () => {
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
 
+	const finishedId = localStorage.getItem('moderation-checklist-finished')
+	if (finishedId === projectV2.value.id) {
+		localStorage.removeItem('moderation-checklist-finished')
+		hasNextProject.value = moderationQueue.queueLength > 0
+		done.value = true
+		return
+	}
+
 	if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
 		alreadyReviewed.value = true
 		return
@@ -1720,55 +1728,10 @@ async function sendMessage(status: ProjectStatus) {
 
 	moderationDecision.value = status
 	try {
-		if (shouldApplyFixes) {
-			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
-				projectV3.value as any,
-			)
-			for (const { node, state } of active) {
-				for (const f of node._fixes) {
-					f._projectFn?.(projectProxy, state)
-				}
-			}
-			const projectFixChanges = projectChanges()
-			if (Object.keys(projectFixChanges).length > 0) {
-				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
-				if (projectFixChanges.slug) {
-					const urlType = getProjectTypeForUrlShorthand(
-						projectV2.value.project_type,
-						[],
-						tags.value,
-					)
-					await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, {
-						replace: true,
-					})
-				}
-			}
-		}
-
 		await useBaseFetch(`project/${projectId}`, {
 			method: 'PATCH',
 			body: { status },
 		})
-
-		if (shouldApplyFixes && versions.value) {
-			const versionFixes = active.flatMap(({ node, state }) =>
-				node._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, state })),
-			)
-			if (versionFixes.length > 0) {
-				await Promise.all(
-					versions.value.map(async (version) => {
-						const { proxy, changes } = createTrackedPatch(version as any)
-						for (const { fix, state } of versionFixes) {
-							fix._versionFn!(proxy, state)
-						}
-						const changed = changes()
-						if (Object.keys(changed).length > 0) {
-							await client.labrinth.versions_v3.modifyVersion(version.id, changed)
-						}
-					}),
-				)
-			}
-		}
 
 		if (message.value && threadId) {
 			await useBaseFetch(`thread/${threadId}`, {
@@ -1798,6 +1761,53 @@ async function sendMessage(status: ProjectStatus) {
 			moderationQueue.releaseLock(projectId),
 			new Promise((r) => setTimeout(r, 2000)),
 		])
+
+		if (shouldApplyFixes) {
+			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
+				projectV3.value as any,
+			)
+			for (const { node, state } of active) {
+				for (const f of node._fixes) {
+					f._projectFn?.(projectProxy, state)
+				}
+			}
+			const projectFixChanges = projectChanges()
+			if (Object.keys(projectFixChanges).length > 0) {
+				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
+			}
+
+			if (versions.value) {
+				const versionFixes = active.flatMap(({ node, state }) =>
+					node._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, state })),
+				)
+				if (versionFixes.length > 0) {
+					await Promise.all(
+						versions.value.map(async (version) => {
+							const { proxy, changes } = createTrackedPatch(version as any)
+							for (const { fix, state } of versionFixes) {
+								fix._versionFn!(proxy, state)
+							}
+							const changed = changes()
+							if (Object.keys(changed).length > 0) {
+								await client.labrinth.versions_v3.modifyVersion(version.id, changed)
+							}
+						}),
+					)
+				}
+			}
+
+			if (projectFixChanges?.slug) {
+				const urlType = getProjectTypeForUrlShorthand(
+					projectV2.value.project_type,
+					[],
+					tags.value,
+				)
+				localStorage.setItem('moderation-checklist-finished', projectId)
+				clearGeneratedMessageState()
+				await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, { replace: true })
+				return
+			}
+		}
 
 		// Set both states together - hasNextProject MUST be set before done
 		// to avoid the race condition where done=true renders with hasNextProject=false
