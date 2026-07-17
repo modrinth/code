@@ -168,7 +168,14 @@ async fn consume_batch(
             }
         };
 
-        match event.into_data() {
+        let event = match event {
+            SearchProjectIndexQueueEvent::Current(event) => event,
+            SearchProjectIndexQueueEvent::Legacy { project_id } => {
+                SearchProjectIndexQueueEventData::Change { project_id }
+            }
+        };
+
+        match event {
             SearchProjectIndexQueueEventData::Change { project_id } => {
                 project_ids_to_change.insert(project_id);
             }
@@ -200,7 +207,7 @@ async fn consume_batch(
     let project_ids_with_version_changes = project_ids_with_version_changes
         .into_iter()
         .collect::<Vec<_>>();
-    let project_ids_to_remove =
+    let mut project_ids_to_remove =
         project_ids_to_remove.into_iter().collect::<Vec<_>>();
     let version_ids_to_change =
         version_ids_to_change.into_iter().collect::<Vec<_>>();
@@ -238,6 +245,10 @@ async fn consume_batch(
                 version_ids_to_change.len()
             )
         })?;
+        project_ids_to_remove.extend(missing_project_document_ids(
+            &project_ids_with_version_changes,
+            &changed_documents.projects,
+        ));
         documents.projects.extend(changed_documents.projects);
         documents.versions.extend(changed_documents.versions);
         info!(
@@ -254,15 +265,27 @@ async fn consume_batch(
             project_count = project_ids_to_change.len(),
             "Building changed projects"
         );
-        documents.projects.extend(
-            build_changed_project_documents(
-                ro_pool,
-                redis_pool,
-                &project_ids_to_change,
+        let changed_project_documents = build_project_documents(
+            ro_pool,
+            redis_pool,
+            &project_ids_to_change,
+        )
+        .instrument(info_span!(
+            "index",
+            batch_size = project_ids_to_change.len()
+        ))
+        .await
+        .wrap_err_with(|| {
+            format!(
+                "failed to build search documents for {} projects",
+                project_ids_to_change.len()
             )
-            .await
-            .wrap_err("failed to build changed projects")?,
-        );
+        })?;
+        project_ids_to_remove.extend(missing_project_document_ids(
+            &project_ids_to_change,
+            &changed_project_documents,
+        ));
+        documents.projects.extend(changed_project_documents);
         info!(
             project_count = project_ids_to_change.len(),
             "Built changed projects in {:.2?}",
@@ -327,25 +350,7 @@ pub async fn reindex_project_documents(
     project_ids: &[ProjectId],
 ) -> eyre::Result<()> {
     info!("Creating project documents");
-    let projects =
-        build_changed_project_documents(ro_pool, redis_pool, project_ids)
-            .await?;
-    search_backend
-        .apply_update(SearchIndexUpdate {
-            projects: &projects,
-            ..SearchIndexUpdate::default()
-        })
-        .await?;
-
-    Ok(())
-}
-
-async fn build_changed_project_documents(
-    ro_pool: &PgPool,
-    redis_pool: &RedisPool,
-    project_ids: &[ProjectId],
-) -> eyre::Result<Vec<UploadSearchProject>> {
-    let documents = build_project_documents(ro_pool, redis_pool, project_ids)
+    let projects = build_project_documents(ro_pool, redis_pool, project_ids)
         .instrument(info_span!("index", batch_size = project_ids.len()))
         .await
         .wrap_err_with(|| {
@@ -354,9 +359,34 @@ async fn build_changed_project_documents(
                 project_ids.len()
             )
         })?;
+    let removed_projects = missing_project_document_ids(project_ids, &projects);
+    search_backend
+        .apply_update(SearchIndexUpdate {
+            projects: &projects,
+            removed_projects: &removed_projects,
+            ..SearchIndexUpdate::default()
+        })
+        .await?;
 
-    info!("Fetched all project documents");
-    Ok(documents)
+    Ok(())
+}
+
+fn missing_project_document_ids(
+    project_ids: &[ProjectId],
+    documents: &[UploadSearchProject],
+) -> Vec<ProjectId> {
+    let built_project_ids = documents
+        .iter()
+        .map(|project| project.project_id.as_str())
+        .collect::<HashSet<_>>();
+
+    project_ids
+        .iter()
+        .copied()
+        .filter(|project_id| {
+            !built_project_ids.contains(project_id.to_string().as_str())
+        })
+        .collect()
 }
 
 #[derive(Debug, Deserialize)]
@@ -364,17 +394,6 @@ async fn build_changed_project_documents(
 enum SearchProjectIndexQueueEvent {
     Current(SearchProjectIndexQueueEventData),
     Legacy { project_id: ProjectId },
-}
-
-impl SearchProjectIndexQueueEvent {
-    fn into_data(self) -> SearchProjectIndexQueueEventData {
-        match self {
-            Self::Current(data) => data,
-            Self::Legacy { project_id } => {
-                SearchProjectIndexQueueEventData::Change { project_id }
-            }
-        }
-    }
 }
 
 #[derive(Debug, Deserialize)]

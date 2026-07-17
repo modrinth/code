@@ -814,74 +814,16 @@ impl Typesense {
             .transpose()
     }
 
-    async fn ensure_collections(&self) -> Result<()> {
-        let projects_alias = self.config.get_alias_name("projects");
-        let projects_collection = if let Some(collection) =
-            self.client.get_alias(&projects_alias).await?
-        {
-            collection
-        } else {
-            let collection =
-                self.config.get_next_collection_name(&projects_alias, false);
-            if !self.client.collection_exists(&collection).await? {
-                self.client
-                    .create_collection(&Self::project_collection_schema(
-                        &collection,
-                    ))
-                    .await?;
-            }
-            self.client
-                .upsert_alias(&projects_alias, &collection)
-                .await?;
-            collection
-        };
-
-        let versions_alias = self.config.get_alias_name("versions");
-        if self.client.get_alias(&versions_alias).await?.is_none() {
-            let collection =
-                self.config.get_next_collection_name(&versions_alias, false);
-            if !self.client.collection_exists(&collection).await? {
-                self.client
-                    .create_collection(&Self::version_collection_schema(
-                        &collection,
-                        &projects_collection,
-                    ))
-                    .await?;
-            }
-            self.client
-                .upsert_alias(&versions_alias, &collection)
-                .await?;
-        }
-        Ok(())
-    }
-
-    async fn delete_documents_by_filter_if_exists(
-        &self,
-        collection: &str,
-        filter: &str,
-    ) -> Result<()> {
-        if self.client.collection_exists(collection).await? {
-            self.client
-                .delete_documents_by_filter(
-                    collection,
-                    filter,
-                    self.config.delete_batch_size,
-                )
-                .await?;
-        }
-
-        Ok(())
-    }
-
-    async fn import_document_batches(
+    async fn import_document_batches<T>(
         &self,
         collections: &[String],
-        documents: &[UploadSearchProject],
+        documents: &[T],
+        serialize: fn(&[T]) -> Result<String>,
     ) -> Result<()> {
         let batch_size = self.config.import_batch_size.max(1);
 
         for batch in documents.chunks(batch_size) {
-            let jsonl = documents_to_jsonl(batch)?;
+            let jsonl = serialize(batch)?;
 
             for collection in collections {
                 info!(
@@ -899,43 +841,21 @@ impl Typesense {
         Ok(())
     }
 
-    async fn import_version_document_batches(
-        &self,
-        collections: &[String],
-        documents: &[UploadSearchVersion],
-    ) -> Result<()> {
-        let batch_size = self.config.import_batch_size.max(1);
-
-        for batch in documents.chunks(batch_size) {
-            let jsonl = version_documents_to_jsonl(batch)?;
-
-            for collection in collections {
-                info!(
-                    collection,
-                    document_count = batch.len(),
-                    content_length_bytes = jsonl.len(),
-                    "sending Typesense version document import"
-                );
-                self.client
-                    .import_documents(collection, jsonl.clone())
-                    .await?;
-            }
-        }
-
-        Ok(())
-    }
-
     async fn existing_write_collections(
         &self,
         alias: &str,
     ) -> Result<Vec<String>> {
-        let mut collections = Vec::new();
+        let mut collections = self
+            .client
+            .get_alias(alias)
+            .await?
+            .into_iter()
+            .collect_vec();
 
-        let live = self.client.get_alias(alias).await?;
-        let shadow_alt = self.config.get_next_collection_name(alias, true);
-        let shadow_current = self.config.get_next_collection_name(alias, false);
-
-        for collection in live.into_iter().chain([shadow_alt, shadow_current]) {
+        for collection in [
+            self.config.get_next_collection_name(alias, true),
+            self.config.get_next_collection_name(alias, false),
+        ] {
             if !collections.contains(&collection)
                 && self.client.collection_exists(&collection).await?
             {
@@ -946,27 +866,24 @@ impl Typesense {
         Ok(collections)
     }
 
-    async fn delete_from_write_collections(
-        &self,
-        alias: &str,
-        filter: &str,
-    ) -> Result<()> {
-        for collection in self.existing_write_collections(alias).await? {
-            self.delete_documents_by_filter_if_exists(&collection, filter)
-                .await?;
-        }
-        Ok(())
-    }
-
     async fn delete_ids_from_write_collections(
         &self,
         alias: &str,
         field: &str,
         ids: &[String],
     ) -> Result<()> {
+        let collections = self.existing_write_collections(alias).await?;
         for ids in ids.chunks(DELETE_FILTER_ID_BATCH_SIZE) {
             let filter = format!("{field}:[{}]", ids.iter().join(", "));
-            self.delete_from_write_collections(alias, &filter).await?;
+            for collection in &collections {
+                self.client
+                    .delete_documents_by_filter(
+                        collection,
+                        &filter,
+                        self.config.delete_batch_size,
+                    )
+                    .await?;
+            }
         }
         Ok(())
     }
@@ -1177,8 +1094,6 @@ impl SearchBackend for Typesense {
         let projects_alias = self.config.get_alias_name("projects");
         let versions_alias = self.config.get_alias_name("versions");
 
-        self.ensure_collections().await?;
-
         let projects_current = self.client.get_alias(&projects_alias).await?;
         let versions_current = self.client.get_alias(&versions_alias).await?;
 
@@ -1246,11 +1161,13 @@ impl SearchBackend for Typesense {
             self.import_document_batches(
                 std::slice::from_ref(&projects_next),
                 &documents.projects,
+                documents_to_jsonl,
             )
             .await?;
-            self.import_version_document_batches(
+            self.import_document_batches(
                 std::slice::from_ref(&versions_next),
                 &documents.versions,
+                version_documents_to_jsonl,
             )
             .await?;
         }
@@ -1348,8 +1265,12 @@ impl SearchBackend for Typesense {
                 num_documents = update.projects.len(),
                 "Replacing project documents in collections",
             );
-            self.import_document_batches(&collections, update.projects)
-                .await?;
+            self.import_document_batches(
+                &collections,
+                update.projects,
+                documents_to_jsonl,
+            )
+            .await?;
         }
 
         if !update.versions.is_empty() {
@@ -1360,8 +1281,12 @@ impl SearchBackend for Typesense {
                 num_documents = update.versions.len(),
                 "Replacing version documents in collections",
             );
-            self.import_version_document_batches(&collections, update.versions)
-                .await?;
+            self.import_document_batches(
+                &collections,
+                update.versions,
+                version_documents_to_jsonl,
+            )
+            .await?;
         }
 
         debug!("Done applying search index update");
@@ -1540,15 +1465,10 @@ fn rewrite_filter_for_join(
 }
 
 fn is_version_filter_field(field: &str) -> bool {
-    matches!(
-        field,
-        "categories"
-            | "project_types"
-            | "environment"
-            | "game_versions"
-            | "client_side"
-            | "server_side"
-    )
+    <SearchField as strum::IntoEnumIterator>::iter().any(|search_field| {
+        search_field.is_version_field()
+            && search_field.typesense_spec().path == field
+    })
 }
 
 fn is_negative_filter(expression: &str) -> bool {

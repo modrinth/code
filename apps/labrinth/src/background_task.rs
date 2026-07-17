@@ -19,7 +19,7 @@ use crate::util::anrok;
 use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
-use tracing::{info, instrument};
+use tracing::info;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
