@@ -861,7 +861,7 @@ pub async fn version_edit_helper(
             .await?;
             search_state
                 .queue
-                .push_versions(
+                .push_version_changes(
                     version_item.inner.project_id.into(),
                     [VersionId::from(version_item.inner.id)],
                 )
@@ -1249,7 +1249,7 @@ pub async fn version_delete(
     .await?;
     search_state
         .queue
-        .push_versions(
+        .push_version_changes(
             version.inner.project_id.into(),
             [VersionId::from(version.inner.id)],
         )

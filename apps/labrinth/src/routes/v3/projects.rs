@@ -86,7 +86,10 @@ pub async fn clear_project_cache_and_queue_search(
     )
     .await?;
 
-    search_state.queue.push(project_id.into()).await;
+    search_state
+        .queue
+        .push_project_change(project_id.into())
+        .await;
 
     Ok(())
 }
@@ -1180,7 +1183,7 @@ pub async fn project_edit_internal(
         .await?;
         search_state
             .queue
-            .push_versions(
+            .push_version_changes(
                 project_item.inner.id.into(),
                 project_item.versions.iter().copied().map(VersionId::from),
             )

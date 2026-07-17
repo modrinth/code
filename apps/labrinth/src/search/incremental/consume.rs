@@ -20,7 +20,7 @@ use crate::{
         SearchBackend, SearchDocumentBatch, SearchIndexUpdate,
         UploadSearchProject,
         incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-        indexing::{index_project_documents, index_project_version_documents},
+        indexing::{build_project_documents, build_version_change_documents},
     },
     util::kafka::{
         INCREMENTAL_INDEX_SEARCH_TASK, KAFKA_OPERATION_INTERVAL,
@@ -219,14 +219,25 @@ async fn consume_batch(
 
     if !project_ids_with_version_changes.is_empty() {
         let operation_start = Instant::now();
-        let changed_documents = build_changed_project_versions(
+        let changed_documents = build_version_change_documents(
             ro_pool,
             redis_pool,
             &project_ids_with_version_changes,
             &version_ids_to_change,
         )
+        .instrument(info_span!(
+            "index",
+            batch_size = project_ids_with_version_changes.len(),
+            version_count = version_ids_to_change.len()
+        ))
         .await
-        .wrap_err("failed to build changed project versions")?;
+        .wrap_err_with(|| {
+            format!(
+                "failed to build search documents for {} projects and {} versions",
+                project_ids_with_version_changes.len(),
+                version_ids_to_change.len()
+            )
+        })?;
         documents.projects.extend(changed_documents.projects);
         documents.versions.extend(changed_documents.versions);
         info!(
@@ -244,9 +255,13 @@ async fn consume_batch(
             "Building changed projects"
         );
         documents.projects.extend(
-            build_changed_projects(ro_pool, redis_pool, &project_ids_to_change)
-                .await
-                .wrap_err("failed to build changed projects")?,
+            build_changed_project_documents(
+                ro_pool,
+                redis_pool,
+                &project_ids_to_change,
+            )
+            .await
+            .wrap_err("failed to build changed projects")?,
         );
         info!(
             project_count = project_ids_to_change.len(),
@@ -290,16 +305,22 @@ async fn consume_batch(
     Ok(())
 }
 
-pub async fn reindex_project(
+pub async fn reindex_project_document(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     project_id: ProjectId,
 ) -> eyre::Result<()> {
-    reindex_projects(ro_pool, redis_pool, search_backend, &[project_id]).await
+    reindex_project_documents(
+        ro_pool,
+        redis_pool,
+        search_backend,
+        &[project_id],
+    )
+    .await
 }
 
-pub async fn reindex_projects(
+pub async fn reindex_project_documents(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
@@ -307,7 +328,8 @@ pub async fn reindex_projects(
 ) -> eyre::Result<()> {
     info!("Creating project documents");
     let projects =
-        build_changed_projects(ro_pool, redis_pool, project_ids).await?;
+        build_changed_project_documents(ro_pool, redis_pool, project_ids)
+            .await?;
     search_backend
         .apply_update(SearchIndexUpdate {
             projects: &projects,
@@ -318,12 +340,12 @@ pub async fn reindex_projects(
     Ok(())
 }
 
-async fn build_changed_projects(
+async fn build_changed_project_documents(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     project_ids: &[ProjectId],
 ) -> eyre::Result<Vec<UploadSearchProject>> {
-    let documents = index_project_documents(ro_pool, redis_pool, project_ids)
+    let documents = build_project_documents(ro_pool, redis_pool, project_ids)
         .instrument(info_span!("index", batch_size = project_ids.len()))
         .await
         .wrap_err_with(|| {
@@ -334,35 +356,6 @@ async fn build_changed_projects(
         })?;
 
     info!("Fetched all project documents");
-    Ok(documents)
-}
-
-async fn build_changed_project_versions(
-    ro_pool: &PgPool,
-    redis_pool: &RedisPool,
-    project_ids: &[ProjectId],
-    version_ids: &[VersionId],
-) -> eyre::Result<SearchDocumentBatch> {
-    let documents = index_project_version_documents(
-        ro_pool,
-        redis_pool,
-        project_ids,
-        version_ids,
-    )
-    .instrument(info_span!(
-        "index",
-        batch_size = project_ids.len(),
-        version_count = version_ids.len()
-    ))
-    .await
-    .wrap_err_with(|| {
-        format!(
-            "failed to build search documents for {} projects and {} versions",
-            project_ids.len(),
-            version_ids.len()
-        )
-    })?;
-
     Ok(documents)
 }
 

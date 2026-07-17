@@ -8,7 +8,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchBackend;
-use crate::search::incremental::consume::reindex_project;
+use crate::search::incremental::consume::reindex_project_document;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
@@ -330,7 +330,7 @@ pub async fn force_reindex(
 ) -> Result<HttpResponse, ApiError> {
     let redis = redis.get_ref();
     search_backend
-        .index_projects(pool.as_ref().clone(), redis.clone())
+        .rebuild_index(pool.as_ref().clone(), redis.clone())
         .await
         .wrap_internal_err("failed to index projects")?;
     Ok(HttpResponse::NoContent().finish())
@@ -355,7 +355,7 @@ pub async fn force_reindex_project(
     search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id,) = path.into_inner();
-    reindex_project(
+    reindex_project_document(
         pool.as_ref(),
         redis.as_ref(),
         search_backend.as_ref(),

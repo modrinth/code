@@ -105,7 +105,7 @@ pub trait SearchBackend: Send + Sync {
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError>;
 
-    async fn index_projects(
+    async fn rebuild_index(
         &self,
         ro_pool: PgPool,
         redis: RedisPool,

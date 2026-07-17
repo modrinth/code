@@ -36,11 +36,11 @@ impl IncrementalSearchQueue {
         }
     }
 
-    pub async fn push(&self, project_id: ProjectId) {
+    pub async fn push_project_change(&self, project_id: ProjectId) {
         self.operations.lock().await.push_project_change(project_id);
     }
 
-    pub async fn push_versions(
+    pub async fn push_version_changes(
         &self,
         project_id: ProjectId,
         version_ids: impl IntoIterator<Item = VersionId>,

@@ -20,8 +20,8 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Dependency, FileType, Loader, ProjectStatus, Version, VersionFile,
-    VersionStatus, VersionType,
+    Dependency, FileType, Loader, Version, VersionFile, VersionStatus,
+    VersionType,
 };
 use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
@@ -190,7 +190,10 @@ pub async fn version_create(
             .await?;
         search_state
             .queue
-            .push_versions((*project_id).into(), [VersionId::from(*version_id)])
+            .push_version_changes(
+                (*project_id).into(),
+                [VersionId::from(*version_id)],
+            )
             .await;
     }
 
@@ -567,18 +570,6 @@ async fn version_create_inner(
         }
     }
 
-    sqlx::query!(
-        "
-        UPDATE mods
-        SET queued = NOW()
-        WHERE id = $1 AND status = $2
-        ",
-        project_id as models::DBProjectId,
-        ProjectStatus::Processing.as_str(),
-    )
-    .execute(&mut *transaction)
-    .await?;
-
     Ok((
         HttpResponse::Ok().json(response),
         project_id,
@@ -685,7 +676,7 @@ pub async fn upload_file_to_version(
             .await?;
         search_state
             .queue
-            .push_versions((*project_id).into(), [version_id])
+            .push_version_changes((*project_id).into(), [version_id])
             .await;
     }
 

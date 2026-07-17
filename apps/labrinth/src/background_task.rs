@@ -177,7 +177,7 @@ pub async fn index_search(
     search_backend: web::Data<dyn SearchBackend>,
 ) -> eyre::Result<()> {
     info!("Indexing local database");
-    search_backend.index_projects(ro_pool, redis_pool).await
+    search_backend.rebuild_index(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {

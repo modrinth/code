@@ -121,7 +121,7 @@ pub async fn index_local(
     Ok((documents, *largest))
 }
 
-pub async fn index_project_documents(
+pub async fn build_project_documents(
     pool: &PgPool,
     redis: &RedisPool,
     project_ids: &[ProjectId],
@@ -171,14 +171,14 @@ pub async fn index_project_documents(
         .projects)
 }
 
-pub async fn index_project_version_documents(
+pub async fn build_version_change_documents(
     pool: &PgPool,
     redis: &RedisPool,
     project_ids: &[ProjectId],
     version_ids: &[VersionId],
 ) -> eyre::Result<SearchDocumentBatch> {
     let projects =
-        index_project_document_batch(pool, redis, project_ids).await?;
+        build_search_document_batch(pool, redis, project_ids).await?;
     let version_ids = version_ids
         .iter()
         .map(ToString::to_string)
@@ -193,7 +193,7 @@ pub async fn index_project_version_documents(
     })
 }
 
-async fn index_project_document_batch(
+async fn build_search_document_batch(
     pool: &PgPool,
     redis: &RedisPool,
     project_ids: &[ProjectId],
@@ -359,7 +359,7 @@ async fn build_search_documents(
     .await?;
 
     info!("Indexing local versions!");
-    let mut versions = index_versions(pool, project_ids.clone()).await?;
+    let mut versions = load_project_versions(pool, project_ids.clone()).await?;
 
     info!("Indexing local org owners!");
 
@@ -780,7 +780,7 @@ struct PartialVersion {
     date_published: DateTime<Utc>,
 }
 
-async fn index_versions(
+async fn load_project_versions(
     pool: &PgPool,
     project_ids: Vec<i64>,
 ) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>> {

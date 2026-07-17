@@ -1167,7 +1167,7 @@ impl SearchBackend for Typesense {
         })
     }
 
-    async fn index_projects(
+    async fn rebuild_index(
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
