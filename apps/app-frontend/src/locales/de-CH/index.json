@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Weitere laufende Instanzen ausblenden"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopiert"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Details kopieren"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Ignorieren"
   },
@@ -19,6 +25,66 @@
   },
   "app.action-bar.install.retry": {
     "message": "Wiederholen"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Aufgrund von Schließung der App abgebrochen"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Modpack konnte nicht gelesen werden"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Abgebrochen"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Bereinigung konnte nicht abgeschlossen werden"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Dateien konnte nicht heruntergeladen werden"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Heruntergeladene Datei ist beschädigt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Dateien konnten nicht gespeichert werden"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Download konnte nicht abgeschlossen werden"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instanz konnte nicht gefunden werden"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Dateipfad ist ungültig"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Daten des Modpacks sind ungültig"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Dateien des Modpacks enthalten ungültige Metadaten"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Die Einrichtung von Java konnte nicht abgeschlossen werden"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Einrichtung des Loaders ist fehlgeschlagen"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Lokale Daten konnten nicht aktualisiert werden"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Einrichtung von Minecraft ist fehlgeschlagen"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth konnte nicht erreicht werden"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Keine Berechtigung zum Schreiben"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Das Pack konnte nicht heruntergeladen werden"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Irgendwas ist schiefgelaufen"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Unbekannte Instanz"
@@ -117,10 +183,10 @@
     "message": "Spielzeit anzeigen"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Überspringt automatisch Bestätigungen mit geringem Risiko, wie z. B. die doppelte Installation von Modpacks, das Löschen normaler Inhalte, Massenaktualisierungen, das Trennen von Modpacks und Reparaturen. Warnungen bei gefährlichen Aktionen werden weiterhin angezeigt."
+    "message": "Bestätigungen mit geringem Risiko, wie z. B. die Installation doppelter Modpacks, das Löschen normaler Inhalte, Massenaktualisierungen, das Aufheben von Verknüpfungen zu Modpacks und Reparaturaufrufe, werden automatisch übersprungen. Gefährliche Warnungen werden weiterhin angezeigt."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Nicht essenzielle Warnungen überspringen"
+    "message": "Unwichtige Warnungen überspringen"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Ermöglicht das Umschalten der Seitenleiste."
@@ -192,7 +258,7 @@
     "message": "Modpack exportieren"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpaketname"
+    "message": "Name des Modpacks"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketname"
@@ -204,40 +270,40 @@
     "message": "1.0.0"
   },
   "app.install.phase.downloading_content": {
-    "message": "Lade Inhalte herunter"
+    "message": "Inhalte werden heruntergeladen"
   },
   "app.install.phase.downloading_minecraft": {
-    "message": "Lade Minecraft herunter"
+    "message": "Minecraft wird heruntergeladen"
   },
   "app.install.phase.downloading_pack_file": {
-    "message": "Lade Packdatei herunter"
+    "message": "Paketdatei wird herunterladen"
   },
   "app.install.phase.extracting_overrides": {
-    "message": "Überschreibungen extrahieren"
+    "message": "Überschreibungen werden extrahiert"
   },
   "app.install.phase.finalizing": {
-    "message": "Abschliessen"
+    "message": "Wird finalisiert"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Instanz präparieren"
+    "message": "Installation in Warteschlange"
   },
   "app.install.phase.preparing_java": {
-    "message": "Java präparieren"
+    "message": "Java wird vorbereitet"
   },
   "app.install.phase.preparing_java.downloading": {
-    "message": "Java {version} herunterladen"
-  },
-  "app.install.phase.preparing_java.extracting": {
-    "message": "Java {version} extrahieren"
-  },
-  "app.install.phase.preparing_java.fetching-metadata": {
     "message": "Java {version} wird heruntergeladen"
   },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Java {version} wird extrahiert"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Java {version} wird abgerufen"
+  },
   "app.install.phase.preparing_java.resolving": {
-    "message": "Java {version} präparieren"
+    "message": "Java {version} wird vorbereitet"
   },
   "app.install.phase.preparing_java.validating": {
-    "message": "Java {version} validieren"
+    "message": "Java {version} wird validiert"
   },
   "app.install.phase.reading_pack_manifest": {
     "message": "Paketmanifest wird gelesen"
@@ -282,10 +348,10 @@
     "message": "Instanz"
   },
   "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Lade {current, number}/{total, number} Projekte..."
+    "message": "{current, number}/{total, number} Projekte werden heruntergeladen..."
   },
   "app.instance.mods.bulk-update.finishing": {
-    "message": "Update abschliessen..."
+    "message": "Update wird fertiggestellt..."
   },
   "app.instance.mods.bulk-update.resolving-versions": {
     "message": "Versionen werden ermittelt..."
@@ -321,7 +387,7 @@
     "message": "Welt löschen"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "Diese Welt wird permanent gelöscht von dieser Instanz, dies kann nicht rückgängig gemacht werden."
+    "message": "Diese Welt wird permanent von dieser Instanz gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "Lösche {name}"
@@ -359,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Durchsuche {count} Welten..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Inhalte benötigt"
-  },
   "app.modal.install-to-play.header": {
     "message": "Installieren zum Spielen"
   },
@@ -371,17 +434,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# Mod} other {# Mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Benötigtes Modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Dieser Server benötigt Mods zum spielen. Klicke auf Installieren um die nötigen Dateien von Modrinth herunterzuladen und dannach direkt dem Server beizutreten."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Geteilte Instanz"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Geteilte Server Instanz"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Inhalte ansehen"
@@ -389,20 +443,32 @@
   "app.modal.update-to-play.header": {
     "message": "Aktualisieren zum Spielen"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Aktualisierung benötigt"
-  },
   "app.modal.update-to-play.update-required-description": {
     "message": "Eine aktualisierung zum spielen von {name} ist benötigt. Bitte aktualisiere auf die neuste Version um das Spiel zu starten."
   },
   "app.project.install-button.already-installed": {
     "message": "Dieses Projekt ist bereits installiert"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Version wechseln"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Zurück zu Entdecken"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Inhalt in Instanz installieren"
+  },
+  "app.project.version.all-versions": {
+    "message": "Alle Versionen"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Im Browser herunterladen"
+  },
+  "app.project.version.installing": {
+    "message": "Wird installiert"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Bereits installiert"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."
@@ -523,6 +589,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -1018,26 +1087,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader wird vom Server bereitgestellt"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Eine Datei wird nur geprüft, wenn sie auf Modrinth hochgeladen wird, unabhängig von ihrem Dateiformat (auch .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Diese Warnung nicht mehr anzeigen"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Installation bestätigen"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Trotzdem installieren"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Schadsoftware wird häufig über Modpack-Dateien verbreitet, indem diese auf Plattformen wie Discord geteilt werden."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Wir konnten diese Datei auf Modrinth nicht finden. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Warnung vor unbekannter Datei"
   }
 }

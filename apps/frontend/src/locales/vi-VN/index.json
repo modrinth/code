@@ -3074,9 +3074,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {platform} cho {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Tìm kiếm phiên bản game..."
-  },
   "project.download.select-game-version": {
     "message": "Chọn phiên bản game"
   },

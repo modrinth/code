@@ -34,6 +34,46 @@ const keybinds: { [id: string]: KeybindListener } = {
 		enabled: (ctx) => ctx.state.futureProjectCount > 0 && !ctx.state.isDone,
 		action: (ctx) => ctx.actions.trySkipProject(),
 	},
+	'copy-permalink': {
+		keybind: 'Ctrl+Alt+C',
+		description: 'Copy permalink',
+		action: (ctx) => ctx.actions.tryCopyLink(true, false, false),
+	},
+	'copy-relative-permalink': {
+		keybind: 'Ctrl+Alt+R',
+		description: 'Copy relative permalink',
+		action: (ctx) => ctx.actions.tryCopyLink(true, true, false),
+	},
+	'copy-page-permalink': {
+		keybind: 'Shift+Ctrl+Alt+C',
+		description: 'Copy permalink with page',
+		action: (ctx) => ctx.actions.tryCopyLink(true, false, true),
+	},
+	'copy-page-relative-permalink': {
+		keybind: 'Shift+Ctrl+Alt+R',
+		description: 'Copy relative permalink with page',
+		action: (ctx) => ctx.actions.tryCopyLink(true, true, true),
+	},
+	'copy-id': {
+		keybind: 'Ctrl+Alt+D',
+		description: 'Copy Project ID',
+		action: (ctx) => ctx.actions.tryCopyId(),
+	},
+	'approve-project': {
+		keybind: 'Shift+Alt+A',
+		description: 'Approve project',
+		action: (ctx) => ctx.actions.tryApprove(),
+	},
+	'withhold-project': {
+		keybind: 'Shift+Alt+W',
+		description: 'Withhold project',
+		action: (ctx) => ctx.actions.tryWithhold(),
+	},
+	'reject-project': {
+		keybind: 'Shift+Alt+R',
+		description: 'Reject project',
+		action: (ctx) => ctx.actions.tryReject(),
+	},
 }
 
 export default keybinds

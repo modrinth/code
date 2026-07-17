@@ -2858,9 +2858,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не підтримує {platform} для {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Пошук версій гри…"
-  },
   "project.download.select-game-version": {
     "message": "Виберіть версію гри"
   },

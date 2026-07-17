@@ -11,6 +11,24 @@
   "nags.add-icon.title": {
     "defaultMessage": "Legg til et ikon"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Legg til IP adressen og porten som Java Edition spillere kan bruke for å bli med i din server."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Legg til en Java-adresse"
+  },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Legg til en gyldig URL og et navn eller en SPDX identifikator for din egendefinerte lisens."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Legg til lisensdetaljer"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Legg til relevante lenker målretta utenfor Modrinth, som en nettside, butikk, eller en Discord invitasjon."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Legg til eksterne lenker"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Legg til alle relevante lenker målrettet utenfor Modrinth, som kildekode, en problemssporingssystem, eller en Discord-invitasjon."
   },
@@ -53,8 +71,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Besøk galleriside"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Din {type} bruker en lisens som krever at kildekode er tilgjengelig. Vennligst oppgi ei lenke til kildekoden eller kildefila for hver ekstra versjon, eller vurder å bruke en annen lisens."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Oppgi kildekode"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Noen av dine eksterne lenker ser ut til å være like. Hver link må bare legges inn én gang, og med riktig lenketype."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Fjern identiske lenker"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Beskrivelsen din bør inneholde tilstrekkelig med ren tekst eller alternativ tekst til bilder, slik at den er tilgjengelig for personer som bruker skjermlesere eller har langsomme internettforbindelser."
@@ -66,7 +93,7 @@
     "defaultMessage": "Lisens-URL er ugyldig."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Linsensken din perker til {domain}, som ikke egner seg for lisensinformasjon. Linken skal peke direkte til lisensfilen, ikke til sosiale medier, spillplattformer eller lignende."
+    "defaultMessage": "Lisens-URL-en din peker på {domain}, som ikke egner seg for lisensinformasjon. Lenka skal peke direkte til lisensfila di, ikke til sosiale medier, spillplattformer eller lignende."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Lisenslenken ser ugyldig ut. Oppgi en gyldig lenke til lisens­teksten."
@@ -119,6 +146,33 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Velg riktig oppløsning"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Pass på at du har lagt ved bevis på at du har tillatelse til å distribuere eksternt innhold i modpakken din."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Gå gjennom eksterne tillatelser"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Velg hvilke versjoner serveren din støtter, velg en modpakke, eller last opp din egen."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Velg kompatibilitet"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "La spillere vite hvilken region serveren din befinner seg i."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Velg en region"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Velg språket eller språk serveren din støtter."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Velg et språk"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Velg lisensen din {type} er distribuert under."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Velg lisens"
   },
@@ -128,6 +182,9 @@
   "nags.select-tags.title": {
     "defaultMessage": "Velg tagger"
   },
+  "nags.server.title": {
+    "defaultMessage": "Gå til serverinnstillinger"
+  },
   "nags.settings.description.title": {
     "defaultMessage": "Gå til lisensinnstillinger"
   },
@@ -136,6 +193,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Gå til lenkeinnstillinger"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Gå til tillatelse-dashbordet"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Gå til tag-innstillinger"
@@ -166,6 +226,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rydd opp i navnet"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Du har valgt {tagCount, plural, one {# tagg} other {# tagger}}. Vennligst reduser antallet til {maxTagCount} eller færre for å sikre at serveren din vises i relevante søkeresultater."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Velg aktuelle tagger"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Du har valgt {tagCount, plural, one {# tagg} other {# tagger}}. Vurder å redusere antallet til {maxTagCount} eller færre for at prosjektet ditt skal vises i relevante søkeresultater."

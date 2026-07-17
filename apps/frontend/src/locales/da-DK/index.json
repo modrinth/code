@@ -1769,9 +1769,6 @@
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} understøtter ikke {platform} til {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Søg spil versioner..."
-  },
   "project.download.select-game-version": {
     "message": "Vælg spil version"
   },

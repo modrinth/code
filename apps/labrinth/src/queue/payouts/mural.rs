@@ -104,9 +104,7 @@ impl PayoutsQueue {
         Ok(())
     }
 
-    pub async fn get_mural_balance(
-        &self,
-    ) -> eyre::Result<Option<AccountBalance>> {
+    pub async fn get_mural_balance(&self) -> eyre::Result<AccountBalance> {
         let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
@@ -121,20 +119,29 @@ impl PayoutsQueue {
             .account_details
             .wrap_err("source account does not have details")?;
         let available = details
-            .balances
+            .balances_v2
             .iter()
-            .map(|balance| {
-                if balance.token_symbol == muralpay::USDC {
-                    balance.token_amount
-                } else {
-                    Decimal::ZERO
+            .map(|balance| match balance {
+                muralpay::Balance::Blockchain {
+                    token_symbol,
+                    exponent,
+                    value,
+                    ..
+                } if token_symbol == muralpay::USDC => {
+                    *value * Decimal::new(1, *exponent)
                 }
+                muralpay::Balance::Fiat {
+                    currency_symbol: muralpay::UsdSymbol::Usd,
+                    exponent,
+                    value,
+                } => *value * Decimal::new(1, *exponent),
+                _ => Decimal::ZERO,
             })
             .sum::<Decimal>();
-        Ok(Some(AccountBalance {
+        Ok(AccountBalance {
             available,
             pending: Decimal::ZERO,
-        }))
+        })
     }
 }
 
