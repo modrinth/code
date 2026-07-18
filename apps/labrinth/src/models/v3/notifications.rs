@@ -151,7 +151,9 @@ impl NotificationType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(
+    Serialize, Deserialize, Clone, cached_projection::CachedProjection,
+)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
     ProjectUpdate {

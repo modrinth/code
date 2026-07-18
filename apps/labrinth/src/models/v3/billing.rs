@@ -14,7 +14,7 @@ pub struct Product {
     pub unitary: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ProductMetadata {
     Midas,
@@ -55,7 +55,7 @@ pub struct ProductPrice {
     pub currency_code: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum Price {
     OneTime {

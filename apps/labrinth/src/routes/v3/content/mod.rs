@@ -22,7 +22,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
-const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v1";
+const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v2";
 const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v1";
 const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v1";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
@@ -90,9 +90,12 @@ struct ResolveContentTrace {
     project_versions: BTreeMap<String, String>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(
+    Clone, Debug, Deserialize, Serialize, cached_projection::CachedProjection,
+)]
 struct CachedResolveContentPlan {
     trace: ResolveContentTrace,
+    #[cached_projection(wrap)]
     plan: ResolveContentPlan,
 }
 

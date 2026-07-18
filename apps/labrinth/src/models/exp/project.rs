@@ -52,11 +52,12 @@ macro_rules! define_project_components {
 
         impl ComponentKind for ProjectComponentKind {}
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, cached_projection::CachedProjection)]
         pub struct ProjectSerial {
             $(
                 #[validate(nested)]
                 #[serde(default, skip_serializing_if = "Option::is_none")]
+                #[cached_projection(nested)]
                 pub $field_name: Option<$ty>,
             )*
         }
@@ -113,10 +114,11 @@ macro_rules! define_project_components {
             }
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema, cached_projection::CachedProjection)]
         pub struct ProjectQuery {
             $(
                 #[serde(skip_serializing_if = "Option::is_none")]
+                #[cached_projection(nested)]
                 pub $field_name: Option<Query<$ty>>,
             )*
         }

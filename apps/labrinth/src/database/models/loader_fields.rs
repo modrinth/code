@@ -14,14 +14,16 @@ use serde::{Deserialize, Serialize};
 
 const GAMES_LIST_NAMESPACE: &str = "games:v1";
 const LOADER_ID: &str = "loader_id:v1";
-const LOADERS_LIST_NAMESPACE: &str = "loaders:v1";
+const LOADERS_LIST_NAMESPACE: &str = "loaders:v2";
 const LOADER_FIELDS_NAMESPACE: &str = "loader_fields:v1";
 const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all:v1";
 const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v1";
 pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str =
-    "loader_field_enum_values:v1";
+    "loader_field_enum_values:v2";
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(
+    Clone, Serialize, Deserialize, Debug, cached_projection::CachedProjection,
+)]
 pub struct Game {
     pub id: GameId,
     pub slug: String,
@@ -88,13 +90,16 @@ impl Game {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(
+    Serialize, Deserialize, Clone, cached_projection::CachedProjection,
+)]
 pub struct Loader {
     pub id: LoaderId,
     pub loader: String,
     pub icon: String,
     pub supported_project_types: Vec<String>,
     pub supported_games: Vec<String>, // slugs
+    #[cached_projection(wrap)]
     pub metadata: serde_json::Value,
 }
 
@@ -196,7 +201,9 @@ impl Loader {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(
+    Clone, Serialize, Deserialize, Debug, cached_projection::CachedProjection,
+)]
 pub struct LoaderField {
     pub id: LoaderFieldId,
     pub field: String,
@@ -265,7 +272,9 @@ impl LoaderFieldType {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(
+    Clone, Serialize, Deserialize, Debug, cached_projection::CachedProjection,
+)]
 pub struct LoaderFieldEnum {
     pub id: LoaderFieldEnumId,
     pub enum_name: String,
@@ -273,7 +282,15 @@ pub struct LoaderFieldEnum {
     pub hidable: bool,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(
+    Clone,
+    Serialize,
+    Deserialize,
+    Debug,
+    PartialEq,
+    Eq,
+    cached_projection::CachedProjection,
+)]
 pub struct LoaderFieldEnumValue {
     pub id: LoaderFieldEnumValueId,
     pub enum_id: LoaderFieldEnumId,
@@ -281,6 +298,7 @@ pub struct LoaderFieldEnumValue {
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
     #[serde(flatten)]
+    #[cached_projection(wrap)]
     pub metadata: serde_json::Value,
 }
 
@@ -294,22 +312,47 @@ impl std::hash::Hash for LoaderFieldEnumValue {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
+#[derive(
+    Clone,
+    Serialize,
+    Deserialize,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    cached_projection::CachedProjection,
+)]
 pub struct VersionField {
     pub version_id: DBVersionId,
     pub field_id: LoaderFieldId,
     pub field_name: String,
+    #[cached_projection(nested)]
     pub value: VersionFieldValue,
 }
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
+#[derive(
+    Clone,
+    Serialize,
+    Deserialize,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    cached_projection::CachedProjection,
+)]
 pub enum VersionFieldValue {
     Integer(i32),
     Text(String),
-    Enum(LoaderFieldEnumId, LoaderFieldEnumValue),
+    Enum(
+        LoaderFieldEnumId,
+        #[cached_projection(nested)] LoaderFieldEnumValue,
+    ),
     Boolean(bool),
     ArrayInteger(Vec<i32>),
     ArrayText(Vec<String>),
-    ArrayEnum(LoaderFieldEnumId, Vec<LoaderFieldEnumValue>),
+    ArrayEnum(
+        LoaderFieldEnumId,
+        #[cached_projection(nested)] Vec<LoaderFieldEnumValue>,
+    ),
     ArrayBoolean(Vec<bool>),
 }
 

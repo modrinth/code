@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v1";
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
 pub struct NotificationTypeItem {
     pub name: NotificationType,
     pub delivery_priority: i32,

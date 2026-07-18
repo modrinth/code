@@ -60,15 +60,24 @@ struct TiltifyMeta {
     subscription_source_type: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
+)]
 pub struct CampaignInfo {
+    #[cached_projection(wrap)]
     total_donations_usd: Decimal,
+    #[cached_projection(wrap)]
     target_usd: Decimal,
     num_donators: usize,
     cached_at: DateTime<Utc>,
 }
 
-const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v1";
+const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v2";
 const CAMPAIGN_INFO_CACHE_STALE_SECONDS: i64 = 15 * 60;
 const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 24 * 60 * 60;
 

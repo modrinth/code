@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::convert::TryInto;
 
-const PRODUCTS_NAMESPACE: &str = "products:v1";
+const PRODUCTS_NAMESPACE: &str = "products:v2";
 
 pub struct DBProduct {
     pub id: DBProductId,
@@ -131,13 +131,15 @@ impl DBProduct {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
 pub struct QueryProductWithPrices {
     pub id: DBProductId,
+    #[cached_projection(nested)]
     pub metadata: ProductMetadata,
     pub unitary: bool,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub name: Option<String>,
+    #[cached_projection(nested)]
     pub prices: Vec<DBProductPrice>,
 }
 
@@ -242,10 +244,11 @@ impl QueryProductWithPrices {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
 pub struct DBProductPrice {
     pub id: DBProductPriceId,
     pub product_id: DBProductId,
+    #[cached_projection(nested)]
     pub prices: Price,
     pub currency_code: String,
 }

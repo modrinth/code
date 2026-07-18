@@ -13,9 +13,9 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 
-const FLOWS_NAMESPACE: &str = "flows:v1";
+const FLOWS_NAMESPACE: &str = "flows:v2";
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
 pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,
@@ -60,9 +60,11 @@ pub enum DBFlow {
     },
     RegisterPasskey {
         user_id: DBUserId,
+        #[cached_projection(wrap)]
         state: PasskeyRegistration,
     },
     AuthenticatePasskey {
+        #[cached_projection(wrap)]
         state: DiscoverableAuthentication,
     },
 }
@@ -80,7 +82,7 @@ impl DBFlow {
             .set_serialized(
                 FLOWS_NAMESPACE,
                 &state,
-                &self,
+                self,
                 Some(expires.num_seconds()),
             )
             .await?;

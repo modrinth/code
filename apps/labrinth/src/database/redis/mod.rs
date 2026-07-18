@@ -2,6 +2,7 @@ use crate::env::ENV;
 
 use super::models::DatabaseError;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
+use cached_projection::CachedProjection;
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
 use deadpool_redis::{Config, Runtime};
@@ -100,10 +101,15 @@ impl FromStr for EncodingFormat {
     }
 }
 
-fn encode_value<T: Serialize>(value: &T) -> Result<Vec<u8>, DatabaseError> {
+fn encode_value<T>(value: &T) -> Result<Vec<u8>, DatabaseError>
+where
+    T: CachedProjection + Serialize,
+{
     let mut value = match ENV.REDIS_ENCODING_FORMAT {
         EncodingFormat::Json => serde_json::to_vec(value)?,
-        EncodingFormat::Postcard => postcard::to_allocvec(value)?,
+        EncodingFormat::Postcard => {
+            postcard::to_allocvec(&value.project_ref())?
+        }
     };
 
     if ENV.REDIS_COMPRESSION_LEVEL > 0
@@ -131,7 +137,7 @@ fn encode_value<T: Serialize>(value: &T) -> Result<Vec<u8>, DatabaseError> {
 
 fn decode_value<T>(value: &[u8]) -> Option<T>
 where
-    T: for<'a> Deserialize<'a>,
+    T: CachedProjection + DeserializeOwned,
 {
     let (codec, value) = value.split_first()?;
     let value = match Codec::try_from(*codec).ok()? {
@@ -143,7 +149,11 @@ where
 
     match ENV.REDIS_ENCODING_FORMAT {
         EncodingFormat::Json => serde_json::from_slice(&value).ok(),
-        EncodingFormat::Postcard => postcard::from_bytes(&value).ok(),
+        EncodingFormat::Postcard => {
+            let projected =
+                postcard::from_bytes::<T::ProjectedType>(&value).ok()?;
+            Some(T::from_projected(projected))
+        }
     }
 }
 
@@ -295,7 +305,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
+        T: CachedProjection + Serialize + DeserializeOwned,
         K: Display
             + Hash
             + Eq
@@ -323,7 +333,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
+        T: CachedProjection + Serialize + DeserializeOwned,
         K: Display
             + Hash
             + Eq
@@ -361,7 +371,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
+        T: CachedProjection + Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
             + Hash
@@ -398,7 +408,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
-        T: Serialize + DeserializeOwned,
+        T: CachedProjection + Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
             + Hash
@@ -754,14 +764,14 @@ impl RedisConnection {
         &mut self,
         namespace: &str,
         id: Id,
-        data: D,
+        data: &D,
         expiry: Option<i64>,
     ) -> Result<(), DatabaseError>
     where
         Id: Display,
-        D: serde::Serialize,
+        D: CachedProjection + serde::Serialize,
     {
-        self.set(namespace, &id.to_string(), encode_value(&data)?, expiry)
+        self.set(namespace, &id.to_string(), encode_value(data)?, expiry)
             .await
     }
 
@@ -806,7 +816,7 @@ impl RedisConnection {
         id: &str,
     ) -> Result<Option<R>, DatabaseError>
     where
-        R: for<'a> serde::Deserialize<'a>,
+        R: CachedProjection + DeserializeOwned,
     {
         let mut cmd = cmd("GET");
         redis_args(
@@ -826,7 +836,7 @@ impl RedisConnection {
         ids: &[String],
     ) -> Result<Vec<Option<R>>, DatabaseError>
     where
-        R: for<'a> serde::Deserialize<'a>,
+        R: CachedProjection + DeserializeOwned,
     {
         Ok(self
             .get_many(namespace, ids)
@@ -929,11 +939,12 @@ impl RedisConnection {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(CachedProjection, Serialize, Deserialize)]
 pub struct RedisValue<T, K, S> {
     key: K,
     alias: Option<S>,
     iat: i64,
+    #[cached_projection(nested)]
     val: T,
 }
 

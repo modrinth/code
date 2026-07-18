@@ -14,7 +14,7 @@ pub struct ProjectType {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
 pub struct Category {
     pub id: CategoryId,
     pub category: String,
@@ -28,7 +28,7 @@ pub struct ReportType {
     pub report_type: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
 pub struct LinkPlatform {
     pub id: LinkPlatformId,
     pub name: String,

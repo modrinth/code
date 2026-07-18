@@ -20,7 +20,9 @@ const USERS_NAMESPACE: &str = "users:v1";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v1";
 const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v1";
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(
+    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
+)]
 pub struct DBUser {
     pub id: DBUserId,
 

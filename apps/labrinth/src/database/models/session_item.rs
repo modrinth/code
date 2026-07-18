@@ -74,7 +74,7 @@ impl SessionBuilder {
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
 pub struct DBSession {
     pub id: DBSessionId,
     pub session: String,

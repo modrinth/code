@@ -9,16 +9,17 @@ use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v1";
+const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v2";
 
 pub struct NotificationBuilder {
     pub body: NotificationBody,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
 pub struct DBNotification {
     pub id: DBNotificationId,
     pub user_id: DBUserId,
+    #[cached_projection(nested)]
     pub body: NotificationBody,
     pub read: bool,
     pub created: DateTime<Utc>,

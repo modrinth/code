@@ -15,7 +15,9 @@ use crate::{
 
 pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v1";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct MinecraftServerAnalytics {
     pub verified_plays_2w: u64,
     pub verified_plays_4w: u64,
@@ -120,7 +122,7 @@ pub async fn cache_analytics(
             .set_serialized(
                 MINECRAFT_SERVER_ANALYTICS,
                 project_id.to_string(),
-                analytics,
+                &analytics,
                 None,
             )
             .await

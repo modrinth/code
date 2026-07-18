@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v1";
+pub const PROJECTS_NAMESPACE: &str = "projects:v2";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v1";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v1";
 
@@ -276,7 +276,9 @@ impl ProjectBuilder {
         Ok(self.project_id)
     }
 }
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(
+    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct DBProject {
     pub id: DBProjectId,
     pub team_id: DBTeamId,
@@ -304,6 +306,7 @@ pub struct DBProject {
     pub monetization_status: MonetizationStatus,
     pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
     pub loaders: Vec<String>,
+    #[cached_projection(nested)]
     pub components: exp::ProjectSerial,
 }
 
@@ -1050,8 +1053,11 @@ impl DBProject {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(
+    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct ProjectQueryResult {
+    #[cached_projection(nested)]
     pub inner: DBProject,
     pub categories: Vec<String>,
     pub additional_categories: Vec<String>,
@@ -1061,7 +1067,9 @@ pub struct ProjectQueryResult {
     pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
+    #[cached_projection(nested)]
     pub aggregate_version_fields: Vec<VersionField>,
     #[serde(flatten)]
+    #[cached_projection(nested)]
     pub components: exp::ProjectQuery,
 }

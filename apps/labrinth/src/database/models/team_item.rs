@@ -9,7 +9,7 @@ use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-const TEAMS_NAMESPACE: &str = "teams:v1";
+const TEAMS_NAMESPACE: &str = "teams:v2";
 
 pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,
@@ -164,7 +164,9 @@ impl DBTeam {
 }
 
 /// A member of a team
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(
+    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
+)]
 pub struct DBTeamMember {
     pub id: DBTeamMemberId,
     pub team_id: DBTeamId,
@@ -183,6 +185,7 @@ pub struct DBTeamMember {
     pub organization_permissions: Option<OrganizationPermissions>,
 
     pub accepted: bool,
+    #[cached_projection(wrap)]
     pub payouts_split: Decimal,
     pub ordering: i64,
 }

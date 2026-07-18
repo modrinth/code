@@ -1,0 +1,16 @@
+[package]
+name = "cached-projection"
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+cached-projection-derive = { path = "../cached-projection-derive" }
+serde = { workspace = true, features = ["derive", "rc"] }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+postcard = { workspace = true }
+
+[lints]
+workspace = true

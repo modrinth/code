@@ -1796,6 +1796,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "cached-projection"
+version = "0.0.0"
+dependencies = [
+ "cached-projection-derive",
+ "postcard",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "cached-projection-derive"
+version = "0.0.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.106",
+]
+
+[[package]]
 name = "cairo-rs"
 version = "0.18.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5433,6 +5452,7 @@ dependencies = [
  "base64 0.22.1",
  "bitflags 2.9.4",
  "bytes",
+ "cached-projection",
  "censor",
  "chrono",
  "clap 4.5.48",

@@ -43,9 +43,10 @@ macro_rules! define_version_components {
             )*
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, cached_projection::CachedProjection)]
         pub struct VersionSerial {
             $(
+                #[cached_projection(nested)]
                 pub $field_name: Option<$ty>,
             )*
         }
@@ -71,9 +72,10 @@ macro_rules! define_version_components {
             }
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema, cached_projection::CachedProjection)]
         pub struct VersionQuery {
             $(
+                #[cached_projection(nested)]
                 pub $field_name: Option<Query<$ty>>,
             )*
         }

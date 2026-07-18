@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 
 const IMAGES_NAMESPACE: &str = "images:v1";
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(
+    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct DBImage {
     pub id: DBImageId,
     pub url: String,

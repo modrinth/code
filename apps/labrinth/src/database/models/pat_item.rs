@@ -15,7 +15,9 @@ const PATS_NAMESPACE: &str = "pats:v1";
 const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v1";
 const PATS_USERS_NAMESPACE: &str = "pats_users:v1";
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(
+    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
+)]
 pub struct DBPersonalAccessToken {
     pub id: DBPatId,
     pub name: String,

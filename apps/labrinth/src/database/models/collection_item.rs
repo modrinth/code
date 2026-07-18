@@ -43,7 +43,9 @@ impl CollectionBuilder {
         Ok(self.collection_id)
     }
 }
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(
+    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct DBCollection {
     pub id: DBCollectionId,
     pub user_id: DBUserId,

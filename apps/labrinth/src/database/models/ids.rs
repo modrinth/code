@@ -95,7 +95,7 @@ macro_rules! generate_bulk_ids {
 
 macro_rules! impl_db_id_interface {
     ($id_struct:ident, $db_id_struct:ident, $(, generator: $generator_function:ident @ $db_table:expr, $(bulk_generator: $bulk_generator_function:ident,)?)?) => {
-        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash, utoipa::ToSchema)]
+        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash, utoipa::ToSchema, cached_projection::CachedProjection)]
         #[sqlx(transparent)]
         pub struct $db_id_struct(pub i64);
 
@@ -154,6 +154,7 @@ macro_rules! id_type {
             PartialEq,
             Hash,
             utoipa::ToSchema,
+            cached_projection::CachedProjection,
         )]
         #[sqlx(transparent)]
         pub struct $name(pub $type);

@@ -109,11 +109,11 @@ pub enum Language {
 }
 
 component::define! {
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, cached_projection::CachedProjection)]
     pub struct ModProject {}
 
     /// Listing for a Minecraft server.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, cached_projection::CachedProjection)]
     pub struct ServerProject {
         #[base(serde(default))]
         #[edit(serde(
@@ -160,11 +160,11 @@ component::define! {
     }
 
     /// Version of a Minecraft Java server listing.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, cached_projection::CachedProjection)]
     pub struct JavaServerVersion {}
 
     /// Listing for a Minecraft Bedrock server.
-    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+    #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema, cached_projection::CachedProjection)]
     pub struct BedrockServerProject {
         #[base()]
         #[edit(serde(default))]
@@ -200,13 +200,22 @@ impl ProjectComponent for BedrockServerProject {
 }
 
 /// Listing for a Minecraft Java server.
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    Validate,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
+)]
 pub struct JavaServerProject {
     /// Address (IP or domain name) of the Java server, excluding port.
     #[validate(length(max = 255))]
     pub address: String,
     /// What game content this server is using.
     #[serde(default)]
+    #[cached_projection(nested)]
     pub content: ServerContent,
 }
 
@@ -219,9 +228,17 @@ pub struct JavaServerProjectEdit {
     pub content: Option<ServerContent>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
+)]
 pub struct JavaServerProjectQuery {
     pub address: String,
+    #[cached_projection(nested)]
     pub content: ServerContentQuery,
     pub ping: Option<JavaServerPing>,
     pub verified_plays_2w: Option<u64>,
@@ -324,7 +341,14 @@ impl ComponentEdit for JavaServerProjectEdit {
 }
 
 /// What game content a [`JavaServerProject`] is using.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
+)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ServerContent {
     /// Server runs modded content with a modpack found on the Modrinth platform.
@@ -346,7 +370,14 @@ pub enum ServerContent {
 }
 
 /// What game content a [`JavaServerProject`] is using.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
+)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ServerContentQuery {
     /// Server runs modded content with a modpack found on the Modrinth platform.
@@ -399,7 +430,14 @@ pub enum ServerRegion {
 }
 
 /// Recorded ping attempt that Labrinth made to a Minecraft Java server project.
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
+)]
 pub struct JavaServerPing {
     /// When the ping was performed.
     pub when: DateTime<Utc>,

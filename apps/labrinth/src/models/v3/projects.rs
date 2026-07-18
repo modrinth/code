@@ -676,7 +676,14 @@ pub struct FlameProject {
 }
 
 #[derive(
-    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+    Debug,
+    Serialize,
+    Deserialize,
+    Clone,
+    PartialEq,
+    Eq,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
 )]
 #[serde(untagged)]
 pub enum AttributionLicense {
@@ -685,11 +692,19 @@ pub enum AttributionLicense {
 }
 
 #[derive(
-    Debug, Serialize, Deserialize, Clone, PartialEq, Eq, utoipa::ToSchema,
+    Debug,
+    Serialize,
+    Deserialize,
+    Clone,
+    PartialEq,
+    Eq,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
 )]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum AttributionResolutionKind {
     License {
+        #[cached_projection(nested)]
         license: AttributionLicense,
         link_to_work: Url,
     },
@@ -697,6 +712,7 @@ pub enum AttributionResolutionKind {
         link_to_work: Url,
     },
     MyProject {
+        #[cached_projection(nested)]
         license: AttributionLicense,
     },
     SpecialPermissions {
@@ -1004,12 +1020,20 @@ pub struct Dependency {
 }
 
 #[derive(
-    Serialize, Deserialize, Clone, Debug, PartialEq, Eq, utoipa::ToSchema,
+    Serialize,
+    Deserialize,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    utoipa::ToSchema,
+    cached_projection::CachedProjection,
 )]
 pub struct DependencyAttribution {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flame_project: Option<FlameProject>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[cached_projection(nested)]
     pub resolution: Option<AttributionResolutionKind>,
 }
 

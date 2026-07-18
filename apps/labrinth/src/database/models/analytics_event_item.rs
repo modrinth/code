@@ -14,7 +14,9 @@ use serde::{Deserialize, Serialize};
 const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v1";
 const ANALYTICS_EVENTS_ALL_KEY: &str = "all";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct DBAnalyticsEvent {
     pub id: DBAnalyticsEventId,
     pub meta: AnalyticsEventMeta,

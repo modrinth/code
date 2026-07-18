@@ -11,7 +11,9 @@ const MODERATION_NOTES_USERS_NAMESPACE: &str = "moderation_notes_users:v1";
 const MODERATION_NOTES_ORGANIZATIONS_NAMESPACE: &str =
     "moderation_notes_organizations:v1";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, cached_projection::CachedProjection,
+)]
 pub struct DBModerationNote {
     pub user_id: Option<DBUserId>,
     pub organization_id: Option<DBOrganizationId>,

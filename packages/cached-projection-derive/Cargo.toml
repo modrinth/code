@@ -1,0 +1,16 @@
+[package]
+name = "cached-projection-derive"
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true, features = ["full"] }
+
+[lints]
+workspace = true

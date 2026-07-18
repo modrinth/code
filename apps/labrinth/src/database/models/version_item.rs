@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use std::iter;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v1";
+pub const VERSIONS_NAMESPACE: &str = "versions:v2";
 const VERSION_FILES_NAMESPACE: &str = "versions_files:v1";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
@@ -375,7 +375,9 @@ impl DBLoaderVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(
+    Clone, Deserialize, Serialize, cached_projection::CachedProjection,
+)]
 pub struct DBVersion {
     pub id: DBVersionId,
     pub project_id: DBProjectId,
@@ -390,6 +392,7 @@ pub struct DBVersion {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
+    #[cached_projection(nested)]
     pub components: exp::VersionSerial,
 }
 
@@ -1090,27 +1093,41 @@ impl DBVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(
+    Clone, Deserialize, Serialize, cached_projection::CachedProjection,
+)]
 pub struct VersionQueryResult {
+    #[cached_projection(nested)]
     pub inner: DBVersion,
 
     pub files: Vec<FileQueryResult>,
+    #[cached_projection(nested)]
     pub version_fields: Vec<VersionField>,
     pub loaders: Vec<String>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
+    #[cached_projection(nested)]
     pub dependencies: Vec<DependencyQueryResult>,
     #[serde(flatten)]
+    #[cached_projection(nested)]
     pub components: exp::VersionQuery,
 }
 
-#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(
+    Clone,
+    Deserialize,
+    Serialize,
+    PartialEq,
+    Eq,
+    cached_projection::CachedProjection,
+)]
 pub struct DependencyQueryResult {
     pub id: i32,
     pub project_id: Option<DBProjectId>,
     pub version_id: Option<DBVersionId>,
     pub file_name: Option<String>,
     pub dependency_type: String,
+    #[cached_projection(nested)]
     pub attribution: Option<crate::models::projects::DependencyAttribution>,
 }
 
@@ -1125,7 +1142,9 @@ pub struct FileQueryResult {
     pub file_type: Option<FileType>,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(
+    Clone, Deserialize, Serialize, cached_projection::CachedProjection,
+)]
 pub struct DBFile {
     pub id: DBFileId,
     pub version_id: DBVersionId,

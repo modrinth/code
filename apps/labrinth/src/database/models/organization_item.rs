@@ -12,7 +12,9 @@ use serde::{Deserialize, Serialize};
 const ORGANIZATIONS_NAMESPACE: &str = "organizations:v1";
 const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v1";
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(
+    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
+)]
 /// An organization of users who together control one or more projects and organizations.
 pub struct DBOrganization {
     /// The id of the organization
