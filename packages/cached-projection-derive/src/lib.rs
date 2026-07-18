@@ -277,7 +277,7 @@ fn projected_definition(
             })
         }
         Data::Union(data) => Err(syn::Error::new_spanned(
-            &data.union_token,
+            data.union_token,
             "CachedProjection cannot be derived for unions",
         )),
     }
@@ -382,11 +382,10 @@ fn definition_attributes(
             if serde_has_skip(attribute)? {
                 filtered.push(parse_quote!(#[serde(skip)]));
             }
-        } else if attribute.path().is_ident("cfg_attr") {
-            if let Some(attribute) = filter_cfg_attr(attribute, true)? {
+        } else if attribute.path().is_ident("cfg_attr")
+            && let Some(attribute) = filter_cfg_attr(attribute, true)? {
                 filtered.push(attribute);
             }
-        }
     }
     Ok(filtered)
 }
@@ -398,11 +397,10 @@ fn structural_attributes(
     for attribute in attributes {
         if attribute.path().is_ident("cfg") {
             filtered.push(attribute.clone());
-        } else if attribute.path().is_ident("cfg_attr") {
-            if let Some(attribute) = filter_cfg_attr(attribute, false)? {
+        } else if attribute.path().is_ident("cfg_attr")
+            && let Some(attribute) = filter_cfg_attr(attribute, false)? {
                 filtered.push(attribute);
             }
-        }
     }
     Ok(filtered)
 }
