@@ -100,88 +100,51 @@ impl FromStr for EncodingFormat {
     }
 }
 
-fn serialize_value<T: Serialize>(
-    value: &T,
-    encoding_format: EncodingFormat,
-) -> Result<Vec<u8>, DatabaseError> {
-    match encoding_format {
-        EncodingFormat::Json => Ok(serde_json::to_vec(value)?),
-        EncodingFormat::Postcard => Ok(postcard::to_allocvec(value)?),
-    }
-}
-
-fn deserialize_value<T>(
-    value: &[u8],
-    encoding_format: EncodingFormat,
-) -> Option<T>
-where
-    T: for<'a> Deserialize<'a>,
-{
-    match encoding_format {
-        EncodingFormat::Json => serde_json::from_slice(value).ok(),
-        EncodingFormat::Postcard => postcard::from_bytes(value).ok(),
-    }
-}
-
 fn encode_value<T: Serialize>(value: &T) -> Result<Vec<u8>, DatabaseError> {
-    let value = serialize_value(value, ENV.REDIS_ENCODING_FORMAT)?;
+    let mut value = match ENV.REDIS_ENCODING_FORMAT {
+        EncodingFormat::Json => serde_json::to_vec(value)?,
+        EncodingFormat::Postcard => postcard::to_allocvec(value)?,
+    };
 
-    Ok(encode_bytes(
-        value,
-        ENV.REDIS_COMPRESSION_LEVEL,
-        ENV.REDIS_COMPRESSION_ALGORITHM,
-        ENV.REDIS_COMPRESSION_THRESHOLD_BYTES,
-        ENV.REDIS_COMPRESSION_MIN_SAVINGS_RATIO,
-    ))
-}
-
-fn encode_bytes(
-    mut value: Vec<u8>,
-    compression_level: i32,
-    compression_algorithm: Codec,
-    compression_threshold_bytes: usize,
-    compression_min_savings_ratio: f64,
-) -> Vec<u8> {
-    if compression_level > 0
-        && compression_algorithm == Codec::Lz4
-        && value.len() >= compression_threshold_bytes
+    if ENV.REDIS_COMPRESSION_LEVEL > 0
+        && ENV.REDIS_COMPRESSION_ALGORITHM == Codec::Lz4
+        && value.len() >= ENV.REDIS_COMPRESSION_THRESHOLD_BYTES
     {
         let compressed = lz4_flex::block::compress_prepend_size(&value);
         let savings_ratio = value.len().saturating_sub(compressed.len()) as f64
             / value.len().max(1) as f64
             * 100.0;
 
-        if savings_ratio >= compression_min_savings_ratio {
+        if savings_ratio >= ENV.REDIS_COMPRESSION_MIN_SAVINGS_RATIO {
             let mut encoded = Vec::with_capacity(compressed.len() + 1);
             encoded.push(Codec::Lz4 as u8);
             encoded.extend(compressed);
-            return encoded;
+            return Ok(encoded);
         }
     }
 
     let mut encoded = Vec::with_capacity(value.len() + 1);
     encoded.push(Codec::Raw as u8);
     encoded.append(&mut value);
-    encoded
-}
-
-fn decode_bytes(value: &[u8]) -> Option<Cow<'_, [u8]>> {
-    let (codec, value) = value.split_first()?;
-
-    match Codec::try_from(*codec).ok()? {
-        Codec::Raw => Some(Cow::Borrowed(value)),
-        Codec::Lz4 => lz4_flex::block::decompress_size_prepended(value)
-            .ok()
-            .map(Cow::Owned),
-    }
+    Ok(encoded)
 }
 
 fn decode_value<T>(value: &[u8]) -> Option<T>
 where
     T: for<'a> Deserialize<'a>,
 {
-    let value = decode_bytes(value)?;
-    deserialize_value(&value, ENV.REDIS_ENCODING_FORMAT)
+    let (codec, value) = value.split_first()?;
+    let value = match Codec::try_from(*codec).ok()? {
+        Codec::Raw => Cow::Borrowed(value),
+        Codec::Lz4 => {
+            Cow::Owned(lz4_flex::block::decompress_size_prepended(value).ok()?)
+        }
+    };
+
+    match ENV.REDIS_ENCODING_FORMAT {
+        EncodingFormat::Json => serde_json::from_slice(&value).ok(),
+        EncodingFormat::Postcard => postcard::from_bytes(&value).ok(),
+    }
 }
 
 fn cache_expiries(namespace: &str) -> (i64, i64) {
