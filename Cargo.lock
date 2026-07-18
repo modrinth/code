@@ -5461,6 +5461,7 @@ dependencies = [
  "json-patch 4.1.0",
  "labrinth",
  "lettre",
+ "lz4_flex",
  "meilisearch-sdk",
  "modrinth-content-management",
  "modrinth-util",

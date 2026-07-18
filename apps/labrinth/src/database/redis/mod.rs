@@ -12,12 +12,15 @@ use prometheus::{IntGauge, Registry};
 use redis::ToRedisArgs;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
+use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
+use thiserror::Error;
 use tracing::{Instrument, info, info_span};
 use util::{cmd, redis_pipe};
 
@@ -41,9 +44,148 @@ const MGET_CHUNK_SIZE: usize = 32;
 // BytesMut peak capacity that builds up under steady load.
 const REDIS_MAX_CONN_AGE: Duration = Duration::from_secs(120);
 
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Codec {
+    Raw = 0,
+    Lz4 = 1,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EncodingFormat {
+    Json,
+    Postcard,
+}
+
+#[derive(Debug, Error)]
+#[error("invalid redis codec")]
+pub struct InvalidCodec;
+
+#[derive(Debug, Error)]
+#[error("invalid redis encoding format")]
+pub struct InvalidEncodingFormat;
+
+impl TryFrom<u8> for Codec {
+    type Error = InvalidCodec;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Raw),
+            1 => Ok(Self::Lz4),
+            _ => Err(InvalidCodec),
+        }
+    }
+}
+
+impl FromStr for Codec {
+    type Err = InvalidCodec;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "lz4" => Ok(Self::Lz4),
+            _ => Err(InvalidCodec),
+        }
+    }
+}
+
+impl FromStr for EncodingFormat {
+    type Err = InvalidEncodingFormat;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "json" => Ok(Self::Json),
+            "postcard" => Ok(Self::Postcard),
+            _ => Err(InvalidEncodingFormat),
+        }
+    }
+}
+
+fn serialize_value<T: Serialize>(
+    value: &T,
+    encoding_format: EncodingFormat,
+) -> Result<Vec<u8>, DatabaseError> {
+    match encoding_format {
+        EncodingFormat::Json => Ok(serde_json::to_vec(value)?),
+        EncodingFormat::Postcard => Ok(postcard::to_allocvec(value)?),
+    }
+}
+
+fn deserialize_value<T>(
+    value: &[u8],
+    encoding_format: EncodingFormat,
+) -> Option<T>
+where
+    T: for<'a> Deserialize<'a>,
+{
+    match encoding_format {
+        EncodingFormat::Json => serde_json::from_slice(value).ok(),
+        EncodingFormat::Postcard => postcard::from_bytes(value).ok(),
+    }
+}
+
+fn encode_value<T: Serialize>(value: &T) -> Result<Vec<u8>, DatabaseError> {
+    let value = serialize_value(value, ENV.REDIS_ENCODING_FORMAT)?;
+
+    Ok(encode_bytes(
+        value,
+        ENV.REDIS_COMPRESSION_LEVEL,
+        ENV.REDIS_COMPRESSION_ALGORITHM,
+        ENV.REDIS_COMPRESSION_THRESHOLD_BYTES,
+        ENV.REDIS_COMPRESSION_MIN_SAVINGS_RATIO,
+    ))
+}
+
+fn encode_bytes(
+    mut value: Vec<u8>,
+    compression_level: i32,
+    compression_algorithm: Codec,
+    compression_threshold_bytes: usize,
+    compression_min_savings_ratio: f64,
+) -> Vec<u8> {
+    if compression_level > 0
+        && compression_algorithm == Codec::Lz4
+        && value.len() >= compression_threshold_bytes
+    {
+        let compressed = lz4_flex::block::compress_prepend_size(&value);
+        let savings_ratio = value.len().saturating_sub(compressed.len()) as f64
+            / value.len().max(1) as f64
+            * 100.0;
+
+        if savings_ratio >= compression_min_savings_ratio {
+            let mut encoded = Vec::with_capacity(compressed.len() + 1);
+            encoded.push(Codec::Lz4 as u8);
+            encoded.extend(compressed);
+            return encoded;
+        }
+    }
+
+    let mut encoded = Vec::with_capacity(value.len() + 1);
+    encoded.push(Codec::Raw as u8);
+    encoded.append(&mut value);
+    encoded
+}
+
+fn decode_bytes(value: &[u8]) -> Option<Cow<'_, [u8]>> {
+    let (codec, value) = value.split_first()?;
+
+    match Codec::try_from(*codec).ok()? {
+        Codec::Raw => Some(Cow::Borrowed(value)),
+        Codec::Lz4 => lz4_flex::block::decompress_size_prepended(value)
+            .ok()
+            .map(Cow::Owned),
+    }
+}
+
+fn decode_value<T>(value: &[u8]) -> Option<T>
+where
+    T: for<'a> Deserialize<'a>,
+{
+    let value = decode_bytes(value)?;
+    deserialize_value(&value, ENV.REDIS_ENCODING_FORMAT)
+}
+
 fn cache_expiries(namespace: &str) -> (i64, i64) {
-    // Namespaces may embed a version suffix like `:v1` now due to postcard-encoding
-    // of Redis values, so split it out.
+    // Namespaces may embed a version suffix like `:v1`, so split it out.
     match namespace.split_once(':').map(|t| t.0).unwrap_or(namespace) {
         "versions" | "versions_files" => {
             (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
@@ -373,8 +515,7 @@ impl RedisPool {
                         .await?;
                     cached_values.extend(part.into_iter().filter_map(|x| {
                         x.and_then(|val| {
-                            postcard::from_bytes::<RedisValue<T, K, S>>(&val)
-                                .ok()
+                            decode_value::<RedisValue<T, K, S>>(&val)
                         })
                         .map(|val| (val.key.clone(), val))
                     }));
@@ -494,7 +635,7 @@ impl RedisPool {
                                 "{}_{namespace}:{key}",
                                 self.meta_namespace
                             ),
-                            postcard::to_allocvec(&value)?,
+                            encode_value(&value)?,
                             default_expiry as u64,
                         );
                         pipe_cmds += 1;
@@ -657,13 +798,8 @@ impl RedisConnection {
         Id: Display,
         D: serde::Serialize,
     {
-        self.set(
-            namespace,
-            &id.to_string(),
-            postcard::to_allocvec(&data)?,
-            expiry,
-        )
-        .await
+        self.set(namespace, &id.to_string(), encode_value(&data)?, expiry)
+            .await
     }
 
     #[tracing::instrument(skip(self))]
@@ -717,7 +853,7 @@ impl RedisConnection {
         );
         let value: Option<Vec<u8>> =
             redis_execute(&mut cmd, &mut self.connection).await?;
-        Ok(value.and_then(|value| postcard::from_bytes(&value).ok()))
+        Ok(value.and_then(|value| decode_value(&value)))
     }
 
     #[tracing::instrument(skip(self))]
@@ -733,9 +869,7 @@ impl RedisConnection {
             .get_many(namespace, ids)
             .await?
             .into_iter()
-            .map(|value| {
-                value.and_then(|value| postcard::from_bytes::<R>(&value).ok())
-            })
+            .map(|value| value.and_then(|value| decode_value::<R>(&value)))
             .collect())
     }
 

@@ -118,6 +118,12 @@ lettre = { version = "0.11.19", default-features = false, features = [
   "tokio1",
   "tokio1-rustls",
 ] }
+lz4_flex = { version = "0.11.5", default-features = false, features = [
+  "checked-decode",
+  "safe-decode",
+  "safe-encode",
+  "std",
+] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.30.0", default-features = false }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
