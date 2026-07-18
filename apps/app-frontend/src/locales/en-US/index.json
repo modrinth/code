@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "View logs"
   },
+  "app.ads-consent.accept": {
+    "message": "Accept all"
+  },
+  "app.ads-consent.body": {
+    "message": "Ads make Modrinth possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance."
+  },
+  "app.ads-consent.manage": {
+    "message": "Manage preferences"
+  },
+  "app.ads-consent.reject": {
+    "message": "Reject all"
+  },
+  "app.ads-consent.title": {
+    "message": "Your privacy and how ads support Modrinth"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
   },

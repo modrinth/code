@@ -27,6 +27,8 @@ window.open = (url, target, features) => {
 let modrinthAdsConsentOverlayShown = false
 let modrinthTcfListenerInstalled = false
 let modrinthTcfListenerAttempts = 0
+let modrinthAdsConsentActionRequestId = 0
+const modrinthAdsConsentActionResolvers = new Map()
 
 function installAdsConsentOverlayStyle() {
 	if (document.getElementById('modrinth-ads-consent-overlay-style')) {
@@ -35,8 +37,14 @@ function installAdsConsentOverlayStyle() {
 	const style = document.createElement('style')
 	style.id = 'modrinth-ads-consent-overlay-style'
 	style.textContent = `
-		html.modrinth-ads-consent-overlay #modrinth-rail-1 {
+		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #modrinth-rail-1 {
 			visibility: hidden !important;
+		}
+
+		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #qc-cmp2-container,
+		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #qc-cmp2-main {
+			visibility: hidden !important;
+			pointer-events: none !important;
 		}
 
 		.qc-cmp2-close-icon {
@@ -63,12 +71,213 @@ function invokeAdsConsentOverlayCommand(shown) {
 	invoke(`plugin:ads|${command}`, args).catch(() => {})
 }
 
+function revealAdsConsentPreferences() {
+	document.documentElement.classList.add('modrinth-ads-consent-preferences')
+	document.getElementById('modrinth-ads-consent-overlay-style')?.remove()
+}
+
+function concealAdsConsentPreferences() {
+	document.documentElement.classList.remove('modrinth-ads-consent-preferences')
+	installAdsConsentOverlayStyle()
+}
+
+async function expandAdsConsentWebview() {
+	const invoke = getTauriInvoke()
+	if (typeof invoke !== 'function') {
+		throw new Error('Tauri invoke is unavailable in the ads webview')
+	}
+
+	await invoke('plugin:ads|show_ads_consent_preferences')
+}
+
+function sendAdsConsentCommandToChildFrames(command) {
+	document.querySelectorAll('iframe').forEach((frame) => {
+		frame.contentWindow?.postMessage({ modrinthAdsConsentCommand: command }, '*')
+	})
+}
+
+function isDirectChildFrame(source) {
+	return Array.from(document.querySelectorAll('iframe')).some(
+		(frame) => frame.contentWindow === source,
+	)
+}
+
+function findAdsConsentButton(action) {
+	const container = document.querySelector('#qc-cmp2-container, #qc-cmp2-main')
+	if (!container) return null
+	const summaryButtons = Array.from(container.querySelectorAll('.qc-cmp2-summary-buttons button'))
+
+	if (action === 'accept') {
+		const explicitAcceptButton = container.querySelector('[data-testid="accept-all"]')
+		if (explicitAcceptButton) return explicitAcceptButton
+		if (summaryButtons.length >= 3) return summaryButtons[2]
+
+		return container.querySelector('.qc-cmp2-summary-buttons button[mode="primary"]')
+	}
+
+	if (action === 'reject') {
+		const explicitRejectButton = container.querySelector(
+			'[data-testid="reject-all"], #disagree-btn',
+		)
+		if (explicitRejectButton) return explicitRejectButton
+		if (summaryButtons.length >= 3) return summaryButtons[1]
+
+		const secondaryButtons = container.querySelectorAll(
+			'.qc-cmp2-summary-buttons button[mode="secondary"]',
+		)
+		if (secondaryButtons.length > 1) return secondaryButtons[1]
+
+		return summaryButtons.find(
+			(button) => button.textContent?.trim().toLowerCase() === 'reject all',
+		)
+	}
+
+	return (
+		container.querySelector(
+			'[data-testid="manage-preferences"], .qc-cmp2-summary-buttons > button[mode="secondary"]:first-of-type',
+		) ?? summaryButtons[0]
+	)
+}
+
+function clickAdsConsentButtonWhenReady(action, timeoutMs, onButtonFound) {
+	const deadline = Date.now() + timeoutMs
+
+	return new Promise((resolve) => {
+		function tryClick() {
+			const button = findAdsConsentButton(action)
+			if (button) {
+				// CMP navigation can replace this document during the click, so acknowledge it first.
+				onButtonFound?.()
+				resolve(true)
+				button.click()
+			} else if (Date.now() >= deadline) {
+				resolve(false)
+			} else {
+				setTimeout(tryClick, 50)
+			}
+		}
+
+		tryClick()
+	})
+}
+
+function performAdsConsentActionAcrossFrames(action, timeoutMs) {
+	const requestId = `${Date.now()}-${++modrinthAdsConsentActionRequestId}`
+
+	return new Promise((resolve) => {
+		let settled = false
+		const settle = (clicked) => {
+			if (settled) return
+			settled = true
+			clearTimeout(timeout)
+			modrinthAdsConsentActionResolvers.delete(requestId)
+			resolve(clicked)
+		}
+
+		const timeout = setTimeout(() => settle(false), timeoutMs)
+		modrinthAdsConsentActionResolvers.set(requestId, () => settle(true))
+		sendAdsConsentCommandToChildFrames({ type: 'perform', action, requestId, timeoutMs })
+		clickAdsConsentButtonWhenReady(action, timeoutMs, () => settle(true)).then((clicked) => {
+			if (!clicked) settle(false)
+		})
+	})
+}
+
+function waitForAdsConsentLayout() {
+	return new Promise((resolve) => setTimeout(resolve, 100))
+}
+
+async function restoreAdsConsentNotification() {
+	concealAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'conceal' })
+
+	const invoke = getTauriInvoke()
+	if (typeof invoke === 'function') {
+		await invoke('plugin:ads|hide_ads_consent_preferences')
+	}
+}
+
+async function openAdsConsentPreferences() {
+	revealAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
+	await expandAdsConsentWebview()
+	await waitForAdsConsentLayout()
+
+	window.dispatchEvent(new Event('resize'))
+	sendAdsConsentCommandToChildFrames({ type: 'resize' })
+
+	const clicked = await performAdsConsentActionAcrossFrames('manage', 2500)
+	if (!clicked) {
+		await restoreAdsConsentNotification()
+	}
+}
+
+async function performAdsConsentAction(action) {
+	if (!['accept', 'reject', 'manage'].includes(action)) return
+
+	if (action === 'manage') {
+		try {
+			await openAdsConsentPreferences()
+		} catch {
+			await restoreAdsConsentNotification()
+		}
+		return
+	}
+
+	await performAdsConsentActionAcrossFrames(action, 1000)
+}
+
+window.modrinthAdsConsentAction = (action) => {
+	void performAdsConsentAction(action)
+}
+
+window.addEventListener('message', (event) => {
+	const resultRequestId = event.data?.modrinthAdsConsentResult
+	if (typeof resultRequestId === 'string' && isDirectChildFrame(event.source)) {
+		if (window.top === window) {
+			modrinthAdsConsentActionResolvers.get(resultRequestId)?.()
+		} else {
+			window.parent.postMessage({ modrinthAdsConsentResult: resultRequestId }, '*')
+		}
+		return
+	}
+
+	if (window.top === window || event.source !== window.parent) return
+
+	const command = event.data?.modrinthAdsConsentCommand
+	if (!command || typeof command !== 'object') return
+
+	if (command.type === 'reveal') {
+		revealAdsConsentPreferences()
+		sendAdsConsentCommandToChildFrames(command)
+	} else if (command.type === 'conceal') {
+		concealAdsConsentPreferences()
+		sendAdsConsentCommandToChildFrames(command)
+	} else if (command.type === 'resize') {
+		window.dispatchEvent(new Event('resize'))
+		sendAdsConsentCommandToChildFrames(command)
+	} else if (
+		command.type === 'perform' &&
+		typeof command.action === 'string' &&
+		typeof command.requestId === 'string' &&
+		typeof command.timeoutMs === 'number'
+	) {
+		sendAdsConsentCommandToChildFrames(command)
+		clickAdsConsentButtonWhenReady(command.action, command.timeoutMs, () => {
+			window.parent.postMessage({ modrinthAdsConsentResult: command.requestId }, '*')
+		})
+	}
+})
+
 function setAdsConsentOverlay(shown) {
 	if (modrinthAdsConsentOverlayShown === shown) return
 
 	modrinthAdsConsentOverlayShown = shown
 	installAdsConsentOverlayStyle()
 	document.documentElement.classList.toggle('modrinth-ads-consent-overlay', shown)
+	if (!shown) {
+		document.documentElement.classList.remove('modrinth-ads-consent-preferences')
+	}
 
 	if (window.top === window) {
 		invokeAdsConsentOverlayCommand(shown)
@@ -93,7 +302,7 @@ function handleTcfConsentEvent(tcData, success) {
 
 	if (tcData.eventStatus === 'cmpuishown') {
 		setAdsConsentOverlay(true)
-	} else if (tcData.eventStatus === 'useractioncomplete' || tcData.eventStatus === 'tcloaded') {
+	} else if (tcData.eventStatus === 'useractioncomplete') {
 		setAdsConsentOverlay(false)
 	}
 }

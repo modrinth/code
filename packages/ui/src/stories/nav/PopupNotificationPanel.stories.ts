@@ -107,6 +107,37 @@ export const Default: StoryObj = {
 				})
 			}
 
+			const showBlocking = () => {
+				popupManager.addPopupNotification({
+					title: 'Your privacy and how ads support Modrinth',
+					text: 'Ads make Modrinth possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance.',
+					type: 'info',
+					autoCloseMs: null,
+					dismissible: false,
+					showOverModal: true,
+					buttons: [
+						{
+							label: 'Manage preferences',
+							action: () => console.log('Manage preferences clicked'),
+							color: 'standard',
+							keepOpen: true,
+						},
+						{
+							label: 'Reject all',
+							action: () => console.log('Reject all clicked'),
+							color: 'brand',
+							keepOpen: true,
+						},
+						{
+							label: 'Accept all',
+							action: () => console.log('Accept all clicked'),
+							color: 'brand',
+							keepOpen: true,
+						},
+					],
+				})
+			}
+
 			const showWaitingProgress = () => {
 				popupManager.addPopupNotification({
 					title: 'Installing modpack...',
@@ -169,6 +200,7 @@ export const Default: StoryObj = {
 				showInfo,
 				showNoButtons,
 				showPermanent,
+				showBlocking,
 				showWaitingProgress,
 				showDeterminateProgress,
 				showGroupedDownloads,
@@ -195,6 +227,9 @@ export const Default: StoryObj = {
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="showPermanent">Permanent</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="showBlocking">Blocking</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="showWaitingProgress">Waiting Progress</button>

@@ -89,7 +89,14 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
-import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
+import {
+	ads_consent_listener,
+	get_ads_consent_required,
+	hide_ads_window,
+	init_ads_window,
+	perform_ads_consent_action,
+	show_ads_window,
+} from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
@@ -184,6 +191,8 @@ const { handleError, addNotification } = notificationManager
 const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
+let adsConsentPopupId = null
+let unlistenAdsConsent
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
@@ -295,6 +304,12 @@ const authUnreachable = computed(() => {
 
 onMounted(async () => {
 	await useCheckDisableMouseover()
+	try {
+		unlistenAdsConsent = await ads_consent_listener(handleAdsConsentRequired)
+		handleAdsConsentRequired(await get_ads_consent_required())
+	} catch (error) {
+		handleError(error)
+	}
 
 	document.querySelector('body').addEventListener('click', handleClick)
 	document.querySelector('body').addEventListener('auxclick', handleAuxClick)
@@ -308,6 +323,7 @@ onUnmounted(async () => {
 	unsubscribeSidebarToggle()
 	clearDelayedUpdatePopup()
 
+	await unlistenAdsConsent?.()
 	await unlistenUpdateDownload?.()
 })
 
@@ -332,7 +348,76 @@ const messages = defineMessages({
 		defaultMessage:
 			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
 	},
+	adsConsentTitle: {
+		id: 'app.ads-consent.title',
+		defaultMessage: 'Your privacy and how ads support Modrinth',
+	},
+	adsConsentBody: {
+		id: 'app.ads-consent.body',
+		defaultMessage:
+			'Ads make Modrinth possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance.',
+	},
+	adsConsentManage: {
+		id: 'app.ads-consent.manage',
+		defaultMessage: 'Manage preferences',
+	},
+	adsConsentReject: {
+		id: 'app.ads-consent.reject',
+		defaultMessage: 'Reject all',
+	},
+	adsConsentAccept: {
+		id: 'app.ads-consent.accept',
+		defaultMessage: 'Accept all',
+	},
 })
+
+function handleAdsConsentRequired(required) {
+	if (!required) {
+		if (adsConsentPopupId !== null) {
+			popupNotificationManager.removeNotification(adsConsentPopupId)
+			adsConsentPopupId = null
+		}
+		return
+	}
+
+	if (
+		adsConsentPopupId !== null &&
+		popupNotificationManager.getNotifications().some((item) => item.id === adsConsentPopupId)
+	) {
+		return
+	}
+
+	const notification = addPopupNotification({
+		title: formatMessage(messages.adsConsentTitle),
+		text: formatMessage(messages.adsConsentBody),
+		type: 'info',
+		autoCloseMs: null,
+		dismissible: false,
+		showOverModal: true,
+		buttons: [
+			{
+				label: formatMessage(messages.adsConsentManage),
+				action: () => perform_ads_consent_action('manage').catch(handleError),
+				color: 'standard',
+				keepOpen: true,
+			},
+			{
+				label: formatMessage(messages.adsConsentReject),
+				action: () => perform_ads_consent_action('reject').catch(handleError),
+				color: 'brand',
+				keepOpen: true,
+			},
+			{
+				label: formatMessage(messages.adsConsentAccept),
+				action: () => perform_ads_consent_action('accept').catch(handleError),
+				color: 'brand',
+				keepOpen: true,
+			},
+		],
+	})
+
+	adsConsentPopupId = notification.id
+}
 
 async function setupApp() {
 	const {

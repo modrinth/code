@@ -70,6 +70,8 @@ export interface PopupNotification {
 	progressItems?: PopupNotificationProgressItem[]
 	buttons?: PopupNotificationButton[]
 	toast?: PopupNotificationToast
+	dismissible?: boolean
+	showOverModal?: boolean
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout
 }
