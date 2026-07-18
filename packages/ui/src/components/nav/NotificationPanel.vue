@@ -34,8 +34,8 @@
 						class="grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-1 py-2 pl-1 pr-3"
 					>
 						<div
-							class="flex items-center"
 							v-if="!item.noIcon"
+							class="flex items-center"
 							:class="{
 								'text-red': item.type === 'error',
 								'text-orange': item.type === 'warning',
@@ -75,7 +75,6 @@
 									<XIcon />
 								</button>
 							</ButtonStyled>
-							<component :is="item.rightSlot" v-if="item.rightSlot" />
 						</div>
 						<div v-if="item.type !== 'neutral'"></div>
 						<div class="col-span-2 text-sm text-primary">{{ item.text }}</div>

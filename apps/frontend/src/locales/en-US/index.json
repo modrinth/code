@@ -12,7 +12,7 @@
     "message": "Accept all"
   },
   "ads-consent.body": {
-    "message": "Ads make Modrinth possible and fund creator rewards. Our partners may store unique identifiers to personalize ads and measure performance."
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store unique identifiers to personalize ads and measure performance."
   },
   "ads-consent.manage": {
     "message": "Manage preferences"

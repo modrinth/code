@@ -1,6 +1,4 @@
-import { XIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { h } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import NotificationPanel from '../../components/nav/NotificationPanel.vue'
@@ -61,22 +59,6 @@ export const Default: StoryObj = {
 					dismissible: false,
 					copyable: false,
 					noIcon: true,
-					rightSlot: () =>
-						h(
-							ButtonStyled,
-							{ circular: true, size: 'small' },
-							{
-								default: () =>
-									h(
-										'button',
-										{
-											'aria-label': 'Reject all',
-											onClick: () => console.log('Reject all clicked'),
-										},
-										[h(XIcon)],
-									),
-							},
-						),
 					buttons: [
 						{
 							label: 'Manage preferences',

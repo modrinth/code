@@ -94,13 +94,8 @@
 									</div>
 								</template>
 							</div>
-							<ButtonStyled
-								v-if="item.dismissible !== false"
-								size="small"
-								type="transparent"
-								circular
-							>
-								<button @click="dismiss(item.id)">
+							<ButtonStyled v-if="item.dismissible !== false" type="transparent" circular>
+								<button class="-m-1.5" @click="dismiss(item.id)">
 									<XIcon />
 								</button>
 							</ButtonStyled>

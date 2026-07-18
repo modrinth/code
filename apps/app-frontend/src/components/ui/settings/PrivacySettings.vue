@@ -64,7 +64,7 @@ watch(
 				</div>
 			</div>
 			<ButtonStyled>
-				<button @click="manageAdsPreferences" class="!shadow-none">
+				<button class="!shadow-none" @click="manageAdsPreferences">
 					<Settings2Icon aria-hidden="true" />
 					{{ formatMessage(messages.adsConsentManage) }}
 				</button>

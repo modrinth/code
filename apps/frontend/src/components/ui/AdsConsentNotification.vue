@@ -5,9 +5,7 @@ import {
 	useVIntl,
 	type WebNotification,
 } from '@modrinth/ui'
-import { h, onBeforeUnmount, onMounted } from 'vue'
-
-import AdsConsentRejectButton from './AdsConsentRejectButton.vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 
 type ConsentAction = 'accept' | 'reject' | 'manage'
 
@@ -215,11 +213,6 @@ function showConsentNotification() {
 		copyable: false,
 		noIcon: true,
 		containerClass: 'py-2 !rounded-2xl',
-		rightSlot: () =>
-			h(AdsConsentRejectButton, {
-				label: formatMessage(messages.reject),
-				action: () => performConsentAction('reject'),
-			}),
 		buttons: [
 			{
 				label: formatMessage(messages.manage),

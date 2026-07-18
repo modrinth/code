@@ -21,7 +21,6 @@ export interface WebNotification {
 	timer?: NodeJS.Timeout
 	supportData?: Record<string, unknown>
 	containerClass?: string
-	rightSlot?: Component
 	noIcon?: boolean
 	buttons?: WebNotificationButton[]
 	dismissible?: boolean
