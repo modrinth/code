@@ -58,24 +58,26 @@ watch(
 </script>
 
 <template>
-	<div class="flex flex-col gap-2.5 items-start">
-		<div class="text-lg font-semibold text-contrast">
+	<div>
+		<h2 class="m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.adsConsentTitle) }}
-		</div>
-		<div class="flex flex-col gap-1">
-			<div class="leading-relaxed text-secondary">
-				{{ formatMessage(messages.adsConsentIntro) }}
+		</h2>
+		<div class="mt-1 flex flex-col gap-2.5 items-start">
+			<div class="flex flex-col gap-1 items-start">
+				<div class="text-sm">
+					{{ formatMessage(messages.adsConsentIntro) }}
+				</div>
+				<div class="text-sm">
+					{{ formatMessage(messages.adsConsentBody) }}
+				</div>
 			</div>
-			<div class="leading-relaxed text-secondary">
-				{{ formatMessage(messages.adsConsentBody) }}
-			</div>
+			<ButtonStyled>
+				<button @click="manageAdsPreferences" class="!shadow-none">
+					<Settings2Icon aria-hidden="true" />
+					{{ formatMessage(messages.adsConsentManage) }}
+				</button>
+			</ButtonStyled>
 		</div>
-		<ButtonStyled>
-			<button @click="manageAdsPreferences">
-				<Settings2Icon aria-hidden="true" />
-				{{ formatMessage(messages.adsConsentManage) }}
-			</button>
-		</ButtonStyled>
 	</div>
 
 	<div class="mt-8 flex items-center justify-between gap-4">
