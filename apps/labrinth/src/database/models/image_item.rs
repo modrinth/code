@@ -2,15 +2,14 @@ use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 
 const IMAGES_NAMESPACE: &str = "images:v1";
 
-#[derive(
-    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Debug, Serialize, Deserialize, CachedProjection)]
 pub struct DBImage {
     pub id: DBImageId,
     pub url: String,

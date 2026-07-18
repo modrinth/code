@@ -3,6 +3,7 @@ use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
@@ -43,9 +44,7 @@ impl CollectionBuilder {
         Ok(self.collection_id)
     }
 }
-#[derive(
-    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Debug, Serialize, Deserialize, CachedProjection)]
 pub struct DBCollection {
     pub id: DBCollectionId,
     pub user_id: DBUserId,

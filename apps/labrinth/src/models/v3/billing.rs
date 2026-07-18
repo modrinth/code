@@ -2,6 +2,7 @@ use crate::models::ids::{
     ChargeId, ProductId, ProductPriceId, UserSubscriptionId,
 };
 use ariadne::ids::UserId;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -14,7 +15,7 @@ pub struct Product {
     pub unitary: bool,
 }
 
-#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
+#[derive(Serialize, Deserialize, CachedProjection)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ProductMetadata {
     Midas,
@@ -55,7 +56,7 @@ pub struct ProductPrice {
     pub currency_code: String,
 }
 
-#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
+#[derive(Serialize, Deserialize, CachedProjection)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum Price {
     OneTime {

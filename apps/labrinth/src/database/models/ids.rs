@@ -10,6 +10,7 @@ use crate::models::ids::{
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
+use cached_projection::CachedProjection;
 use censor::Censor;
 use paste::paste;
 use rand::SeedableRng;
@@ -95,7 +96,7 @@ macro_rules! generate_bulk_ids {
 
 macro_rules! impl_db_id_interface {
     ($id_struct:ident, $db_id_struct:ident, $(, generator: $generator_function:ident @ $db_table:expr, $(bulk_generator: $bulk_generator_function:ident,)?)?) => {
-        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash, utoipa::ToSchema, cached_projection::CachedProjection)]
+        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash, utoipa::ToSchema, CachedProjection)]
         #[sqlx(transparent)]
         pub struct $db_id_struct(pub i64);
 
@@ -154,7 +155,7 @@ macro_rules! id_type {
             PartialEq,
             Hash,
             utoipa::ToSchema,
-            cached_projection::CachedProjection,
+            CachedProjection,
         )]
         #[sqlx(transparent)]
         pub struct $name(pub $type);

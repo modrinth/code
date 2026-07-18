@@ -4,6 +4,7 @@ use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
+use cached_projection::CachedProjection;
 use chrono::Duration;
 use rand::Rng;
 use rand::distributions::Alphanumeric;
@@ -15,7 +16,7 @@ use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 
 const FLOWS_NAMESPACE: &str = "flows:v2";
 
-#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
+#[derive(Deserialize, Serialize, CachedProjection)]
 pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use cached_projection::CachedProjection;
 use const_format::formatcp;
 use eyre::{Result, eyre};
 use serde::{Deserialize, Serialize};
@@ -15,9 +16,7 @@ use crate::{
 
 pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v1";
 
-#[derive(
-    Debug, Clone, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Debug, Clone, Serialize, Deserialize, CachedProjection)]
 pub struct MinecraftServerAnalytics {
     pub verified_plays_2w: u64,
     pub verified_plays_4w: u64,

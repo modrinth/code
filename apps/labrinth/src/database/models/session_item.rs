@@ -3,6 +3,7 @@ use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures_util::TryStreamExt;
@@ -74,7 +75,7 @@ impl SessionBuilder {
     }
 }
 
-#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
+#[derive(Deserialize, Serialize, CachedProjection)]
 pub struct DBSession {
     pub id: DBSessionId,
     pub session: String,

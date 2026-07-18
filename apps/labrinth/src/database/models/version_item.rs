@@ -12,6 +12,7 @@ use crate::models::exp;
 use crate::models::projects::{FileType, VersionStatus};
 use crate::queue::file_scan::scan_file;
 use crate::routes::internal::delphi::DelphiRunParameters;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -375,9 +376,7 @@ impl DBLoaderVersion {
     }
 }
 
-#[derive(
-    Clone, Deserialize, Serialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Deserialize, Serialize, CachedProjection)]
 pub struct DBVersion {
     pub id: DBVersionId,
     pub project_id: DBProjectId,
@@ -1093,9 +1092,7 @@ impl DBVersion {
     }
 }
 
-#[derive(
-    Clone, Deserialize, Serialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Deserialize, Serialize, CachedProjection)]
 pub struct VersionQueryResult {
     #[cached_projection(nested)]
     pub inner: DBVersion,
@@ -1113,14 +1110,7 @@ pub struct VersionQueryResult {
     pub components: exp::VersionQuery,
 }
 
-#[derive(
-    Clone,
-    Deserialize,
-    Serialize,
-    PartialEq,
-    Eq,
-    cached_projection::CachedProjection,
-)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq, CachedProjection)]
 pub struct DependencyQueryResult {
     pub id: i32,
     pub project_id: Option<DBProjectId>,
@@ -1142,9 +1132,7 @@ pub struct FileQueryResult {
     pub file_type: Option<FileType>,
 }
 
-#[derive(
-    Clone, Deserialize, Serialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Deserialize, Serialize, CachedProjection)]
 pub struct DBFile {
     pub id: DBFileId,
     pub version_id: DBVersionId,

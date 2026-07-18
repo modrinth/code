@@ -1,11 +1,12 @@
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationType;
+use cached_projection::CachedProjection;
 use serde::{Deserialize, Serialize};
 
 const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v1";
 
-#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
+#[derive(Serialize, Deserialize, CachedProjection)]
 pub struct NotificationTypeItem {
     pub name: NotificationType,
     pub delivery_priority: i32,

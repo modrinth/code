@@ -4,6 +4,7 @@ use crate::models::exp::{
     minecraft,
 };
 
+use cached_projection::CachedProjection;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use validator::Validate;
@@ -43,7 +44,7 @@ macro_rules! define_version_components {
             )*
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, cached_projection::CachedProjection)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, CachedProjection)]
         pub struct VersionSerial {
             $(
                 #[cached_projection(nested)]
@@ -72,7 +73,7 @@ macro_rules! define_version_components {
             }
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema, cached_projection::CachedProjection)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema, CachedProjection)]
         pub struct VersionQuery {
             $(
                 #[cached_projection(nested)]

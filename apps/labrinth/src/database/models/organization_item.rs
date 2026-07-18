@@ -1,6 +1,7 @@
 use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
+use cached_projection::CachedProjection;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
@@ -12,9 +13,7 @@ use serde::{Deserialize, Serialize};
 const ORGANIZATIONS_NAMESPACE: &str = "organizations:v1";
 const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v1";
 
-#[derive(
-    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Deserialize, Serialize, Clone, Debug, CachedProjection)]
 /// An organization of users who together control one or more projects and organizations.
 pub struct DBOrganization {
     /// The id of the organization

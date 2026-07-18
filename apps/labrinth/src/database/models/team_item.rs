@@ -3,6 +3,7 @@ use crate::{
     database::{PgTransaction, redis::RedisPool},
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
+use cached_projection::CachedProjection;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
@@ -164,9 +165,7 @@ impl DBTeam {
 }
 
 /// A member of a team
-#[derive(
-    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Deserialize, Serialize, Clone, Debug, CachedProjection)]
 pub struct DBTeamMember {
     pub id: DBTeamMemberId,
     pub team_id: DBTeamId,

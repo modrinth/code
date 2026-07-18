@@ -1,3 +1,4 @@
+use cached_projection::CachedProjection;
 use eyre::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -52,7 +53,7 @@ macro_rules! define_project_components {
 
         impl ComponentKind for ProjectComponentKind {}
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, cached_projection::CachedProjection)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, Validate, CachedProjection)]
         pub struct ProjectSerial {
             $(
                 #[validate(nested)]
@@ -114,7 +115,7 @@ macro_rules! define_project_components {
             }
         }
 
-        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema, cached_projection::CachedProjection)]
+        #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema, CachedProjection)]
         pub struct ProjectQuery {
             $(
                 #[serde(skip_serializing_if = "Option::is_none")]

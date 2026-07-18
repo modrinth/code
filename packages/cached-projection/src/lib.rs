@@ -1,3 +1,4 @@
+// for macro expansion
 extern crate self as cached_projection;
 
 use std::collections::{BTreeMap, HashMap};

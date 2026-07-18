@@ -14,6 +14,7 @@ use crate::queue::session::AuthQueue;
 use actix_web::{HttpRequest, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
+use cached_projection::CachedProjection;
 use modrinth_content_management::{
     ContentMetadataProvider, Error as ResolveError, ResolveContentPlan,
     ResolveContentRequest,
@@ -90,9 +91,7 @@ struct ResolveContentTrace {
     project_versions: BTreeMap<String, String>,
 }
 
-#[derive(
-    Clone, Debug, Deserialize, Serialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Debug, Deserialize, Serialize, CachedProjection)]
 struct CachedResolveContentPlan {
     trace: ResolveContentTrace,
     #[cached_projection(wrap)]

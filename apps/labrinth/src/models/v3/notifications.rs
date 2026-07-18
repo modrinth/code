@@ -10,6 +10,7 @@ use crate::models::ids::{
 use crate::models::projects::ProjectStatus;
 use crate::routes::ApiError;
 use ariadne::ids::UserId;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -151,9 +152,7 @@ impl NotificationType {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Clone, cached_projection::CachedProjection,
-)]
+#[derive(Serialize, Deserialize, Clone, CachedProjection)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
     ProjectUpdate {

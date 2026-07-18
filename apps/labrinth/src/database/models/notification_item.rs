@@ -5,6 +5,7 @@ use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
     NotificationType,
 };
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -15,7 +16,7 @@ pub struct NotificationBuilder {
     pub body: NotificationBody,
 }
 
-#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
+#[derive(Serialize, Deserialize, CachedProjection)]
 pub struct DBNotification {
     pub id: DBNotificationId,
     pub user_id: DBUserId,

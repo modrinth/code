@@ -9,6 +9,7 @@ use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use rust_decimal::Decimal;
@@ -20,9 +21,7 @@ const USERS_NAMESPACE: &str = "users:v1";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v1";
 const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v1";
 
-#[derive(
-    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Deserialize, Serialize, Clone, Debug, CachedProjection)]
 pub struct DBUser {
     pub id: DBUserId,
 

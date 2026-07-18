@@ -10,6 +10,7 @@ use crate::models::ids::{
 };
 use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -683,7 +684,7 @@ pub struct FlameProject {
     PartialEq,
     Eq,
     utoipa::ToSchema,
-    cached_projection::CachedProjection,
+    CachedProjection,
 )]
 #[serde(untagged)]
 pub enum AttributionLicense {
@@ -699,7 +700,7 @@ pub enum AttributionLicense {
     PartialEq,
     Eq,
     utoipa::ToSchema,
-    cached_projection::CachedProjection,
+    CachedProjection,
 )]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum AttributionResolutionKind {
@@ -1027,7 +1028,7 @@ pub struct Dependency {
     PartialEq,
     Eq,
     utoipa::ToSchema,
-    cached_projection::CachedProjection,
+    CachedProjection,
 )]
 pub struct DependencyAttribution {
     #[serde(skip_serializing_if = "Option::is_none")]

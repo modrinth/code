@@ -5,6 +5,7 @@ use super::DatabaseError;
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::redis::RedisPool;
+use cached_projection::CachedProjection;
 use chrono::DateTime;
 use chrono::Utc;
 use dashmap::DashMap;
@@ -21,9 +22,7 @@ const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v1";
 pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str =
     "loader_field_enum_values:v2";
 
-#[derive(
-    Clone, Serialize, Deserialize, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Serialize, Deserialize, Debug, CachedProjection)]
 pub struct Game {
     pub id: GameId,
     pub slug: String,
@@ -90,9 +89,7 @@ impl Game {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Clone, cached_projection::CachedProjection,
-)]
+#[derive(Serialize, Deserialize, Clone, CachedProjection)]
 pub struct Loader {
     pub id: LoaderId,
     pub loader: String,
@@ -201,9 +198,7 @@ impl Loader {
     }
 }
 
-#[derive(
-    Clone, Serialize, Deserialize, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Serialize, Deserialize, Debug, CachedProjection)]
 pub struct LoaderField {
     pub id: LoaderFieldId,
     pub field: String,
@@ -272,9 +267,7 @@ impl LoaderFieldType {
     }
 }
 
-#[derive(
-    Clone, Serialize, Deserialize, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Serialize, Deserialize, Debug, CachedProjection)]
 pub struct LoaderFieldEnum {
     pub id: LoaderFieldEnumId,
     pub enum_name: String,
@@ -283,13 +276,7 @@ pub struct LoaderFieldEnum {
 }
 
 #[derive(
-    Clone,
-    Serialize,
-    Deserialize,
-    Debug,
-    PartialEq,
-    Eq,
-    cached_projection::CachedProjection,
+    Clone, Serialize, Deserialize, Debug, PartialEq, Eq, CachedProjection,
 )]
 pub struct LoaderFieldEnumValue {
     pub id: LoaderFieldEnumValueId,
@@ -297,6 +284,7 @@ pub struct LoaderFieldEnumValue {
     pub value: String,
     pub ordering: Option<i32>,
     pub created: DateTime<Utc>,
+
     #[serde(flatten)]
     #[cached_projection(wrap)]
     pub metadata: serde_json::Value,
@@ -313,14 +301,7 @@ impl std::hash::Hash for LoaderFieldEnumValue {
 }
 
 #[derive(
-    Clone,
-    Serialize,
-    Deserialize,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash,
-    cached_projection::CachedProjection,
+    Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash, CachedProjection,
 )]
 pub struct VersionField {
     pub version_id: DBVersionId,
@@ -330,14 +311,7 @@ pub struct VersionField {
     pub value: VersionFieldValue,
 }
 #[derive(
-    Clone,
-    Serialize,
-    Deserialize,
-    Debug,
-    PartialEq,
-    Eq,
-    Hash,
-    cached_projection::CachedProjection,
+    Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash, CachedProjection,
 )]
 pub enum VersionFieldValue {
     Integer(i32),

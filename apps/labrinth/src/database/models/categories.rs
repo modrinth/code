@@ -4,6 +4,7 @@ use crate::database::redis::RedisPool;
 
 use super::DatabaseError;
 use super::ids::*;
+use cached_projection::CachedProjection;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +15,7 @@ pub struct ProjectType {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
+#[derive(Serialize, Deserialize, CachedProjection)]
 pub struct Category {
     pub id: CategoryId,
     pub category: String,
@@ -28,7 +29,7 @@ pub struct ReportType {
     pub report_type: String,
 }
 
-#[derive(Serialize, Deserialize, cached_projection::CachedProjection)]
+#[derive(Serialize, Deserialize, CachedProjection)]
 pub struct LinkPlatform {
     pub id: LinkPlatformId,
     pub name: String,

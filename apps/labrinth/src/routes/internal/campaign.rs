@@ -1,5 +1,6 @@
 use actix_web::{HttpRequest, get, post, web};
 use base64::Engine;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
 use hmac::{Hmac, Mac};
@@ -61,12 +62,7 @@ struct TiltifyMeta {
 }
 
 #[derive(
-    Clone,
-    Debug,
-    Serialize,
-    Deserialize,
-    utoipa::ToSchema,
-    cached_projection::CachedProjection,
+    Clone, Debug, Serialize, Deserialize, utoipa::ToSchema, CachedProjection,
 )]
 pub struct CampaignInfo {
     #[cached_projection(wrap)]

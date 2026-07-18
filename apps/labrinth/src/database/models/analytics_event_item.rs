@@ -1,3 +1,4 @@
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use futures::{StreamExt, TryStreamExt};
 use sqlx::types::Json;
@@ -14,9 +15,7 @@ use serde::{Deserialize, Serialize};
 const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v1";
 const ANALYTICS_EVENTS_ALL_KEY: &str = "all";
 
-#[derive(
-    Debug, Clone, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Debug, Clone, Serialize, Deserialize, CachedProjection)]
 pub struct DBAnalyticsEvent {
     pub id: DBAnalyticsEventId,
     pub meta: AnalyticsEventMeta,

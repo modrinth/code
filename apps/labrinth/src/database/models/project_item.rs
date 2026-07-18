@@ -15,6 +15,7 @@ use crate::models::projects::{
 use crate::routes::ApiError;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::parse_base62;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
@@ -276,9 +277,7 @@ impl ProjectBuilder {
         Ok(self.project_id)
     }
 }
-#[derive(
-    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Debug, Serialize, Deserialize, CachedProjection)]
 pub struct DBProject {
     pub id: DBProjectId,
     pub team_id: DBTeamId,
@@ -1053,9 +1052,7 @@ impl DBProject {
     }
 }
 
-#[derive(
-    Clone, Debug, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Clone, Debug, Serialize, Deserialize, CachedProjection)]
 pub struct ProjectQueryResult {
     #[cached_projection(nested)]
     pub inner: DBProject,

@@ -4,6 +4,7 @@ use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use ariadne::ids::base62_impl::parse_base62;
+use cached_projection::CachedProjection;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
@@ -15,9 +16,7 @@ const PATS_NAMESPACE: &str = "pats:v1";
 const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v1";
 const PATS_USERS_NAMESPACE: &str = "pats_users:v1";
 
-#[derive(
-    Deserialize, Serialize, Clone, Debug, cached_projection::CachedProjection,
-)]
+#[derive(Deserialize, Serialize, Clone, Debug, CachedProjection)]
 pub struct DBPersonalAccessToken {
     pub id: DBPatId,
     pub name: String,

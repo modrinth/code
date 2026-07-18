@@ -3,6 +3,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::billing::{Price, ProductMetadata};
+use cached_projection::CachedProjection;
 use dashmap::DashMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -131,7 +132,7 @@ impl DBProduct {
     }
 }
 
-#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
+#[derive(Deserialize, Serialize, CachedProjection)]
 pub struct QueryProductWithPrices {
     pub id: DBProductId,
     #[cached_projection(nested)]
@@ -244,7 +245,7 @@ impl QueryProductWithPrices {
     }
 }
 
-#[derive(Deserialize, Serialize, cached_projection::CachedProjection)]
+#[derive(Deserialize, Serialize, CachedProjection)]
 pub struct DBProductPrice {
     pub id: DBProductPriceId,
     pub product_id: DBProductId,

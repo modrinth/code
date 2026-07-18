@@ -2,6 +2,7 @@ use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
+use cached_projection::CachedProjection;
 use serde::{Deserialize, Serialize};
 
 const TEMPLATES_NAMESPACE: &str = "notifications_templates:v1";
@@ -13,9 +14,7 @@ const TEMPLATES_DYNAMIC_HTML_NAMESPACE: &str =
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
 const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes
 
-#[derive(
-    Debug, Clone, Serialize, Deserialize, cached_projection::CachedProjection,
-)]
+#[derive(Debug, Clone, Serialize, Deserialize, CachedProjection)]
 pub struct NotificationTemplate {
     pub id: i64,
     pub channel: NotificationChannel,
@@ -131,13 +130,7 @@ pub async fn get_or_set_cached_dynamic_html<F>(
 where
     F: Future<Output = Result<String, ApiError>>,
 {
-    #[derive(
-        Debug,
-        Clone,
-        Serialize,
-        Deserialize,
-        cached_projection::CachedProjection,
-    )]
+    #[derive(Debug, Clone, Serialize, Deserialize, CachedProjection)]
     struct HtmlBody {
         html: String,
     }
