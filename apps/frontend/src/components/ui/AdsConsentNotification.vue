@@ -1,3 +1,5 @@
+<template></template>
+
 <script setup lang="ts">
 import {
 	defineMessages,

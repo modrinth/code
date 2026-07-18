@@ -647,6 +647,10 @@ pub async fn init_ads_window<R: Runtime>(
         // });
     }
 
+    if state.shown && state.consent_required {
+        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, true).ok();
+    }
+
     Ok(())
 }
 
@@ -660,6 +664,8 @@ pub async fn show_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
     dpr: f32,
 ) -> crate::api::Result<()> {
+    let mut consent_required = false;
+
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
@@ -679,6 +685,12 @@ pub async fn show_ads_window<R: Runtime>(
             webview.show().ok();
             set_webview_visible_for_window(&app, webview, true);
         }
+
+        consent_required = state.shown && state.consent_required;
+    }
+
+    if consent_required {
+        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, true).ok();
     }
 
     Ok(())
@@ -697,7 +709,6 @@ pub async fn hide_ads_window<R: Runtime>(
 
         if reset {
             state.shown = false;
-            state.consent_required = false;
             state.consent_overlay_shown = false;
         } else {
             state.modal_shown = true;

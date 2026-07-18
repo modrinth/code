@@ -497,7 +497,7 @@ async function setupApp() {
 		addNotification({
 			title: 'Warning',
 			text: e.message,
-			type: 'warn',
+			type: 'warning',
 		}),
 	)
 
