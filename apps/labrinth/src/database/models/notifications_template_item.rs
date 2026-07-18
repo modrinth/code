@@ -4,10 +4,11 @@ use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
 use serde::{Deserialize, Serialize};
 
-const TEMPLATES_NAMESPACE: &str = "notifications_templates";
-const TEMPLATES_HTML_DATA_NAMESPACE: &str = "notifications_templates_html_data";
+const TEMPLATES_NAMESPACE: &str = "notifications_templates:v1";
+const TEMPLATES_HTML_DATA_NAMESPACE: &str =
+    "notifications_templates_html_data:v1";
 const TEMPLATES_DYNAMIC_HTML_NAMESPACE: &str =
-    "notifications_templates_dynamic_html";
+    "notifications_templates_dynamic_html:v1";
 
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
 const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes
@@ -56,10 +57,7 @@ impl NotificationTemplate {
             let mut redis = redis.connect().await?;
 
             let maybe_cached_templates = redis
-                .get_deserialized_from_json(
-                    TEMPLATES_NAMESPACE,
-                    channel.as_str(),
-                )
+                .get_deserialized(TEMPLATES_NAMESPACE, channel.as_str())
                 .await?;
 
             if let Some(cached) = maybe_cached_templates {
@@ -82,7 +80,7 @@ impl NotificationTemplate {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 TEMPLATES_NAMESPACE,
                 channel.as_str(),
                 &templates,
@@ -99,7 +97,7 @@ impl NotificationTemplate {
     ) -> Result<Option<String>, DatabaseError> {
         let mut redis = redis.connect().await?;
         redis
-            .get_deserialized_from_json(
+            .get_deserialized(
                 TEMPLATES_HTML_DATA_NAMESPACE,
                 &self.id.to_string(),
             )
@@ -113,7 +111,7 @@ impl NotificationTemplate {
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 TEMPLATES_HTML_DATA_NAMESPACE,
                 &self.id.to_string(),
                 &data,
@@ -138,10 +136,7 @@ where
 
     let mut redis_conn = redis.connect().await?;
     if let Some(body) = redis_conn
-        .get_deserialized_from_json::<HtmlBody>(
-            TEMPLATES_DYNAMIC_HTML_NAMESPACE,
-            key,
-        )
+        .get_deserialized::<HtmlBody>(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key)
         .await?
     {
         return Ok(body.html);
@@ -153,7 +148,7 @@ where
     let mut redis_conn = redis.connect().await?;
 
     redis_conn
-        .set_serialized_to_json(
+        .set_serialized(
             TEMPLATES_DYNAMIC_HTML_NAMESPACE,
             key,
             &cached,

@@ -22,8 +22,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
-const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve";
-const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat";
+const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v1";
+const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v1";
 const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v1";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
@@ -340,7 +340,7 @@ async fn get_cached_resolve_content_plan(
     };
 
     match redis
-        .get_deserialized_from_json(CONTENT_RESOLVE_CACHE_NAMESPACE, cache_key)
+        .get_deserialized(CONTENT_RESOLVE_CACHE_NAMESPACE, cache_key)
         .await
     {
         Ok(cached) => cached,
@@ -368,7 +368,7 @@ async fn set_cached_resolve_content_plan(
     };
 
     if let Err(error) = redis
-        .set_serialized_to_json(
+        .set_serialized(
             CONTENT_RESOLVE_CACHE_NAMESPACE,
             cache_key,
             cached,

@@ -151,7 +151,7 @@ async fn hydrate_search_results(
     } else {
         let mut redis = redis_pool.connect().await?;
         let ping_results = redis
-            .get_many_deserialized_from_json::<JavaServerPing>(
+            .get_many_deserialized::<JavaServerPing>(
                 server_ping::REDIS_NAMESPACE,
                 &project_ids
                     .iter()

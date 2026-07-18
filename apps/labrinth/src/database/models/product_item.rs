@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::convert::TryInto;
 
-const PRODUCTS_NAMESPACE: &str = "products";
+const PRODUCTS_NAMESPACE: &str = "products:v1";
 
 pub struct DBProduct {
     pub id: DBProductId,
@@ -153,9 +153,8 @@ impl QueryProductWithPrices {
         {
             let mut redis = redis.connect().await?;
 
-            let res: Option<Vec<QueryProductWithPrices>> = redis
-                .get_deserialized_from_json(PRODUCTS_NAMESPACE, "all")
-                .await?;
+            let res: Option<Vec<QueryProductWithPrices>> =
+                redis.get_deserialized(PRODUCTS_NAMESPACE, "all").await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -196,7 +195,7 @@ impl QueryProductWithPrices {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(PRODUCTS_NAMESPACE, "all", &products, None)
+            .set_serialized(PRODUCTS_NAMESPACE, "all", &products, None)
             .await?;
 
         Ok(products)

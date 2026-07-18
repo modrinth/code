@@ -12,13 +12,14 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-const GAMES_LIST_NAMESPACE: &str = "games";
-const LOADER_ID: &str = "loader_id";
-const LOADERS_LIST_NAMESPACE: &str = "loaders";
-const LOADER_FIELDS_NAMESPACE: &str = "loader_fields";
-const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all";
-const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums";
-pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str = "loader_field_enum_values";
+const GAMES_LIST_NAMESPACE: &str = "games:v1";
+const LOADER_ID: &str = "loader_id:v1";
+const LOADERS_LIST_NAMESPACE: &str = "loaders:v1";
+const LOADER_FIELDS_NAMESPACE: &str = "loader_fields:v1";
+const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all:v1";
+const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v1";
+pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str =
+    "loader_field_enum_values:v1";
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Game {
@@ -54,7 +55,7 @@ impl Game {
         {
             let mut redis = redis.connect().await?;
             let cached_games: Option<Vec<Game>> = redis
-                .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
+                .get_deserialized(GAMES_LIST_NAMESPACE, "games")
                 .await?;
             if let Some(cached_games) = cached_games {
                 return Ok(cached_games);
@@ -80,12 +81,7 @@ impl Game {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                GAMES_LIST_NAMESPACE,
-                "games",
-                &result,
-                None,
-            )
+            .set_serialized(GAMES_LIST_NAMESPACE, "games", &result, None)
             .await?;
 
         Ok(result)
@@ -114,7 +110,7 @@ impl Loader {
         {
             let mut redis = redis.connect().await?;
             let cached_id: Option<i32> =
-                redis.get_deserialized_from_json(LOADER_ID, name).await?;
+                redis.get_deserialized(LOADER_ID, name).await?;
             if let Some(cached_id) = cached_id {
                 return Ok(Some(LoaderId(cached_id)));
             }
@@ -134,7 +130,7 @@ impl Loader {
         if let Some(result) = result {
             let mut redis = redis.connect().await?;
             redis
-                .set_serialized_to_json(LOADER_ID, name, &result.0, None)
+                .set_serialized(LOADER_ID, name, &result.0, None)
                 .await?;
         }
 
@@ -151,7 +147,7 @@ impl Loader {
         {
             let mut redis = redis.connect().await?;
             let cached_loaders: Option<Vec<Loader>> = redis
-                .get_deserialized_from_json(LOADERS_LIST_NAMESPACE, "all")
+                .get_deserialized(LOADERS_LIST_NAMESPACE, "all")
                 .await?;
             if let Some(cached_loaders) = cached_loaders {
                 return Ok(cached_loaders);
@@ -193,12 +189,7 @@ impl Loader {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                LOADERS_LIST_NAMESPACE,
-                "all",
-                &result,
-                None,
-            )
+            .set_serialized(LOADERS_LIST_NAMESPACE, "all", &result, None)
             .await?;
 
         Ok(result)
@@ -470,10 +461,9 @@ impl LoaderField {
         {
             let mut redis = redis.connect().await?;
 
-            let cached_fields: Option<Vec<LoaderField>> =
-                redis.get(LOADER_FIELDS_NAMESPACE_ALL, "").await?.and_then(
-                    |x| serde_json::from_str::<Vec<LoaderField>>(&x).ok(),
-                );
+            let cached_fields: Option<Vec<LoaderField>> = redis
+                .get_deserialized(LOADER_FIELDS_NAMESPACE_ALL, "")
+                .await?;
 
             if let Some(cached_fields) = cached_fields {
                 return Ok(cached_fields);
@@ -506,12 +496,7 @@ impl LoaderField {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                LOADER_FIELDS_NAMESPACE_ALL,
-                "",
-                &result,
-                None,
-            )
+            .set_serialized(LOADER_FIELDS_NAMESPACE_ALL, "", &result, None)
             .await?;
 
         Ok(result)
@@ -530,10 +515,7 @@ impl LoaderFieldEnum {
             let mut redis = redis.connect().await?;
 
             let cached_enum = redis
-                .get_deserialized_from_json(
-                    LOADER_FIELD_ENUMS_ID_NAMESPACE,
-                    enum_name,
-                )
+                .get_deserialized(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name)
                 .await?;
             if let Some(cached_enum) = cached_enum {
                 return Ok(cached_enum);
@@ -561,7 +543,7 @@ impl LoaderFieldEnum {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 LOADER_FIELD_ENUMS_ID_NAMESPACE,
                 enum_name,
                 &result,

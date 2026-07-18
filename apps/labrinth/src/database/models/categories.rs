@@ -7,7 +7,7 @@ use super::ids::*;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const TAGS_NAMESPACE: &str = "tags";
+const TAGS_NAMESPACE: &str = "tags:v1";
 
 pub struct ProjectType {
     pub id: ProjectTypeId,
@@ -96,9 +96,8 @@ impl Category {
         {
             let mut redis = redis.connect().await?;
 
-            let res: Option<Vec<Category>> = redis
-                .get_deserialized_from_json(TAGS_NAMESPACE, "category")
-                .await?;
+            let res: Option<Vec<Category>> =
+                redis.get_deserialized(TAGS_NAMESPACE, "category").await?;
 
             if let Some(res) = res {
                 return Ok(res);
@@ -127,7 +126,7 @@ impl Category {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(TAGS_NAMESPACE, "category", &result, None)
+            .set_serialized(TAGS_NAMESPACE, "category", &result, None)
             .await?;
 
         Ok(result)
@@ -166,7 +165,7 @@ impl LinkPlatform {
             let mut redis = redis.connect().await?;
 
             let res: Option<Vec<LinkPlatform>> = redis
-                .get_deserialized_from_json(TAGS_NAMESPACE, "link_platform")
+                .get_deserialized(TAGS_NAMESPACE, "link_platform")
                 .await?;
 
             if let Some(res) = res {
@@ -191,12 +190,7 @@ impl LinkPlatform {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                TAGS_NAMESPACE,
-                "link_platform",
-                &result,
-                None,
-            )
+            .set_serialized(TAGS_NAMESPACE, "link_platform", &result, None)
             .await?;
 
         Ok(result)
@@ -235,7 +229,7 @@ impl ReportType {
             let mut redis = redis.connect().await?;
 
             let res: Option<Vec<String>> = redis
-                .get_deserialized_from_json(TAGS_NAMESPACE, "report_type")
+                .get_deserialized(TAGS_NAMESPACE, "report_type")
                 .await?;
 
             if let Some(res) = res {
@@ -256,12 +250,7 @@ impl ReportType {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                TAGS_NAMESPACE,
-                "report_type",
-                &result,
-                None,
-            )
+            .set_serialized(TAGS_NAMESPACE, "report_type", &result, None)
             .await?;
 
         Ok(result)
@@ -300,7 +289,7 @@ impl ProjectType {
             let mut redis = redis.connect().await?;
 
             let res: Option<Vec<String>> = redis
-                .get_deserialized_from_json(TAGS_NAMESPACE, "project_type")
+                .get_deserialized(TAGS_NAMESPACE, "project_type")
                 .await?;
 
             if let Some(res) = res {
@@ -321,12 +310,7 @@ impl ProjectType {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                TAGS_NAMESPACE,
-                "project_type",
-                &result,
-                None,
-            )
+            .set_serialized(TAGS_NAMESPACE, "project_type", &result, None)
             .await?;
 
         Ok(result)

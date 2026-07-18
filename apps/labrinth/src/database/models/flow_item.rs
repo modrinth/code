@@ -13,10 +13,9 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 
-const FLOWS_NAMESPACE: &str = "flows";
+const FLOWS_NAMESPACE: &str = "flows:v1";
 
 #[derive(Deserialize, Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
 pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,
@@ -78,7 +77,7 @@ impl DBFlow {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 FLOWS_NAMESPACE,
                 &state,
                 &self,
@@ -109,7 +108,7 @@ impl DBFlow {
     ) -> Result<Option<DBFlow>, DatabaseError> {
         let mut redis = redis.connect().await?;
 
-        redis.get_deserialized_from_json(FLOWS_NAMESPACE, id).await
+        redis.get_deserialized(FLOWS_NAMESPACE, id).await
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
