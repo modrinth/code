@@ -114,7 +114,6 @@ export const Default: StoryObj = {
 					type: 'info',
 					autoCloseMs: null,
 					dismissible: false,
-					showOverModal: true,
 					buttons: [
 						{
 							label: 'Manage preferences',

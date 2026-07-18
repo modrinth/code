@@ -6,8 +6,14 @@ document.addEventListener(
 		window.top.postMessage({ modrinthAdClick: true }, MODRINTH_ORIGIN)
 
 		let target = e.target
-		if (modrinthAdsConsentReprompt && target?.closest?.('.qc-cmp2-close-icon')) {
-			setTimeout(finishAdsConsentReprompt)
+		if (target?.closest?.('.qc-cmp2-close-icon')) {
+			if (modrinthAdsConsentReprompt) {
+				setTimeout(finishAdsConsentReprompt)
+			} else if (
+				document.documentElement.classList.contains('modrinth-ads-consent-preferences')
+			) {
+				setTimeout(() => void restoreAdsConsentNotification())
+			}
 		}
 
 		while (target != null) {

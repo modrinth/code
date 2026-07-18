@@ -72,7 +72,6 @@ export interface PopupNotification {
 	buttons?: PopupNotificationButton[]
 	toast?: PopupNotificationToast
 	dismissible?: boolean
-	showOverModal?: boolean
 	autoCloseMs?: number | null
 	timer?: NodeJS.Timeout
 }

@@ -4,6 +4,7 @@ import {
 	ButtonStyled,
 	defineMessages,
 	injectNotificationManager,
+	injectPageContext,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -15,6 +16,7 @@ import { get, set } from '@/helpers/settings.ts'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
+const { showAds } = injectPageContext()
 const settings = ref(await get())
 
 const messages = defineMessages({
@@ -53,7 +55,7 @@ watch(
 </script>
 
 <template>
-	<div>
+	<div v-if="showAds">
 		<h2 class="m-0 text-lg font-semibold text-contrast">
 			{{ formatMessage(messages.adsConsentTitle) }}
 		</h2>

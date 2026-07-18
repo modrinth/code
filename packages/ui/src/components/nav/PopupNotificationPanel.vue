@@ -3,7 +3,7 @@
 		class="popup-notification-group"
 		:class="{
 			'has-sidebar': hasSidebar,
-			'has-modal': hasModalActive && !hasModalOverride,
+			'has-modal': hasModalActive,
 		}"
 		:style="notificationGroupStyle"
 	>
@@ -12,7 +12,6 @@
 				v-for="item in notifications"
 				:key="item.id"
 				class="popup-notification-wrapper"
-				:class="{ 'hidden-by-modal': hasModalActive && !item.showOverModal }"
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
@@ -187,7 +186,6 @@ const notifications = computed<PopupNotification[]>(() =>
 )
 const { stackCount } = useModalStack()
 const hasModalActive = computed(() => stackCount.value > 0)
-const hasModalOverride = computed(() => notifications.value.some((item) => item.showOverModal))
 const notificationGroupStyle = computed(() => ({
 	zIndex: hasModalActive.value ? 100 + stackCount.value * 10 + 8 : 200,
 }))
@@ -327,10 +325,6 @@ withDefaults(
 
 .popup-notification-group .popup-notification-wrapper {
 	width: 100%;
-}
-
-.popup-notification-group .popup-notification-wrapper.hidden-by-modal {
-	display: none;
 }
 
 .popup-notifs-enter-active,

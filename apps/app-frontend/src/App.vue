@@ -222,9 +222,18 @@ const { data: authenticatedModrinthUser } = useQuery({
 	enabled: () => !!credentials.value?.session,
 	retry: false,
 })
+const hasPlus = computed(
+	() =>
+		!!credentials.value?.user &&
+		(hasMidasBadge(credentials.value.user) ||
+			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
+)
+const showAd = computed(
+	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
+)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
-	showAds: ref(false),
+	showAds: showAd,
 	floatingActionBarOffsets: {
 		left: ref(APP_LEFT_NAV_WIDTH),
 		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
@@ -394,7 +403,6 @@ function handleAdsConsentRequired(required) {
 		hideIcon: true,
 		autoCloseMs: null,
 		dismissible: false,
-		showOverModal: true,
 		buttons: [
 			{
 				label: formatMessage(messages.adsConsentManage),
@@ -788,17 +796,6 @@ async function logOut() {
 	await logout().catch(handleError)
 	await fetchCredentials()
 }
-
-const hasPlus = computed(
-	() =>
-		!!credentials.value?.user &&
-		(hasMidasBadge(credentials.value.user) ||
-			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
-)
-
-const showAd = computed(
-	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
-)
 
 async function fetchIntercomToken() {
 	const creds = await getCreds()
