@@ -25,12 +25,7 @@ const messages = defineMessages({
 	adsConsentIntro: {
 		id: 'app.settings.privacy.ads-consent.intro',
 		defaultMessage:
-			'Ads on certain pages allow us to keep Modrinth free and fund creator rewards. To provide these ads:',
-	},
-	adsConsentBody: {
-		id: 'app.settings.privacy.ads-consent.body',
-		defaultMessage:
-			'We and our 1019 partners store and access information on your device (e.g., cookies, device identifiers) and process personal data (e.g., unique identifiers, browsing data) for personalized advertising, content measurement, audience insights, and other specified purposes. With your consent, we may utilize precise geolocation and device scanning technologies. You may review and manage the purposes for which your data is processed in the settings. Certain partners may process your data based on legitimate interest rather than consent. You retain the right to object to such processing, with further details available in the relevant section of our Privacy Settings. You may withdraw your consent or update your preferences at any time via Privacy Settings. Your choices apply exclusively to this site and will be retained for 13 months.',
+			'Ads on certain pages make Modrinth possible and fund creator payouts. Our ad provider, Aditude, may use unique identifiers to personalize ads and measure performance. You can opt out or manage your preferences below.',
 	},
 	adsConsentManage: {
 		id: 'app.ads-consent.manage',
@@ -66,9 +61,6 @@ watch(
 			<div class="flex flex-col gap-1 items-start">
 				<div class="text-sm">
 					{{ formatMessage(messages.adsConsentIntro) }}
-				</div>
-				<div class="text-sm">
-					{{ formatMessage(messages.adsConsentBody) }}
 				</div>
 			</div>
 			<ButtonStyled>

@@ -1,4 +1,6 @@
+import { XIcon } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { h } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 import NotificationPanel from '../../components/nav/NotificationPanel.vue'
@@ -50,11 +52,55 @@ export const Default: StoryObj = {
 				})
 			}
 
+			const showActions = () => {
+				notificationManager.addNotification({
+					title: 'Your privacy and how ads support Modrinth',
+					text: 'Choose how our advertising partners may use your data.',
+					type: 'neutral',
+					autoCloseMs: null,
+					dismissible: false,
+					copyable: false,
+					noIcon: true,
+					rightSlot: () =>
+						h(
+							ButtonStyled,
+							{ circular: true, size: 'small' },
+							{
+								default: () =>
+									h(
+										'button',
+										{
+											'aria-label': 'Reject all',
+											onClick: () => console.log('Reject all clicked'),
+										},
+										[h(XIcon)],
+									),
+							},
+						),
+					buttons: [
+						{
+							label: 'Manage preferences',
+							action: () => console.log('Manage preferences clicked'),
+						},
+						{
+							label: 'Reject all',
+							action: () => console.log('Reject all clicked'),
+							color: 'brand',
+						},
+						{
+							label: 'Accept all',
+							action: () => console.log('Accept all clicked'),
+							color: 'brand',
+						},
+					],
+				})
+			}
+
 			const clearAll = () => {
 				notificationManager.clearAllNotifications()
 			}
 
-			return { showSuccess, showError, showWarning, showInfo, clearAll }
+			return { showSuccess, showError, showWarning, showInfo, showActions, clearAll }
 		},
 		template: /* html */ `
 			<div>
@@ -70,6 +116,9 @@ export const Default: StoryObj = {
 					</ButtonStyled>
 					<ButtonStyled color="blue">
 						<button @click="showInfo">Info</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button @click="showActions">Actions</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button @click="clearAll">Clear All</button>
