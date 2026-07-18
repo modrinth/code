@@ -729,17 +729,9 @@ impl RedisConnection {
     where
         R: for<'a> serde::Deserialize<'a>,
     {
-        let mut cmd = cmd("MGET");
-        redis_args(
-            &mut cmd,
-            ids.iter()
-                .map(|x| format!("{}_{}:{}", self.meta_namespace, namespace, x))
-                .collect::<Vec<_>>()
-                .as_slice(),
-        );
-        let values: Vec<Option<Vec<u8>>> =
-            redis_execute(&mut cmd, &mut self.connection).await?;
-        Ok(values
+        Ok(self
+            .get_many(namespace, ids)
+            .await?
             .into_iter()
             .map(|value| {
                 value.and_then(|value| postcard::from_bytes::<R>(&value).ok())
