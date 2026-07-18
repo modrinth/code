@@ -280,6 +280,7 @@ fn main() {
                         "show_ads_window",
                         "show_ads_consent_overlay",
                         "show_ads_consent_preferences",
+                        "open_ads_consent_preferences",
                         "hide_ads_consent_preferences",
                         "hide_ads_consent_overlay",
                         "get_ads_consent_required",

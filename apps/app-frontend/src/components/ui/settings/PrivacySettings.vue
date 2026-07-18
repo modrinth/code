@@ -1,11 +1,46 @@
 <script setup lang="ts">
-import { Toggle } from '@modrinth/ui'
+import { Settings2Icon } from '@modrinth/assets'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
+import { open_ads_consent_preferences } from '@/helpers/ads.js'
 import { optInAnalytics, optOutAnalytics } from '@/helpers/analytics'
 import { get, set } from '@/helpers/settings.ts'
 
+const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
 const settings = ref(await get())
+
+const messages = defineMessages({
+	adsConsentTitle: {
+		id: 'app.ads-consent.title',
+		defaultMessage: 'Your privacy and how ads support Modrinth',
+	},
+	adsConsentIntro: {
+		id: 'app.settings.privacy.ads-consent.intro',
+		defaultMessage:
+			'Ads on certain pages allow us to keep Modrinth free and fund creator rewards. To provide these ads:',
+	},
+	adsConsentBody: {
+		id: 'app.settings.privacy.ads-consent.body',
+		defaultMessage:
+			'We and our 1019 partners store and access information on your device (e.g., cookies, device identifiers) and process personal data (e.g., unique identifiers, browsing data) for personalized advertising, content measurement, audience insights, and other specified purposes. With your consent, we may utilize precise geolocation and device scanning technologies. You may review and manage the purposes for which your data is processed in the settings. Certain partners may process your data based on legitimate interest rather than consent. You retain the right to object to such processing, with further details available in the relevant section of our Privacy Settings. You may withdraw your consent or update your preferences at any time via Privacy Settings. Your choices apply exclusively to this site and will be retained for 13 months.',
+	},
+	adsConsentManage: {
+		id: 'app.ads-consent.manage',
+		defaultMessage: 'Manage preferences',
+	},
+})
+
+async function manageAdsPreferences() {
+	await open_ads_consent_preferences().catch(handleError)
+}
 
 watch(
 	settings,
@@ -23,18 +58,27 @@ watch(
 </script>
 
 <template>
-	<div class="flex items-center justify-between gap-4">
-		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">Personalized ads</h2>
-			<p class="m-0 mt-1 text-sm">
-				Modrinth's ad provider, Aditude, shows ads based on your preferences. By disabling this
-				option, you opt out and ads will no longer be shown based on your interests.
-			</p>
+	<div class="flex flex-col gap-2.5 items-start">
+		<div class="text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.adsConsentTitle) }}
 		</div>
-		<Toggle id="personalized-ads" v-model="settings.personalized_ads" />
+		<div class="flex flex-col gap-1">
+			<div class="leading-relaxed text-secondary">
+				{{ formatMessage(messages.adsConsentIntro) }}
+			</div>
+			<div class="leading-relaxed text-secondary">
+				{{ formatMessage(messages.adsConsentBody) }}
+			</div>
+		</div>
+		<ButtonStyled>
+			<button @click="manageAdsPreferences">
+				<Settings2Icon aria-hidden="true" />
+				{{ formatMessage(messages.adsConsentManage) }}
+			</button>
+		</ButtonStyled>
 	</div>
 
-	<div class="mt-4 flex items-center justify-between gap-4">
+	<div class="mt-8 flex items-center justify-between gap-4">
 		<div>
 			<h2 class="m-0 text-lg font-semibold text-contrast">Telemetry</h2>
 			<p class="m-0 mt-1 text-sm">

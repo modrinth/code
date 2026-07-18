@@ -6,6 +6,10 @@ document.addEventListener(
 		window.top.postMessage({ modrinthAdClick: true }, MODRINTH_ORIGIN)
 
 		let target = e.target
+		if (modrinthAdsConsentReprompt && target?.closest?.('.qc-cmp2-close-icon')) {
+			setTimeout(finishAdsConsentReprompt)
+		}
+
 		while (target != null) {
 			if (target.matches('a')) {
 				e.preventDefault()
@@ -27,8 +31,25 @@ window.open = (url, target, features) => {
 let modrinthAdsConsentOverlayShown = false
 let modrinthTcfListenerInstalled = false
 let modrinthTcfListenerAttempts = 0
+let modrinthAdsConsentReprompt = false
+let modrinthAdsConsentRepromptManaging = false
 let modrinthAdsConsentActionRequestId = 0
 const modrinthAdsConsentActionResolvers = new Map()
+
+function installAdsRailStyle() {
+	if (document.getElementById('modrinth-ads-rail-style')) {
+		return
+	}
+	const style = document.createElement('style')
+	style.id = 'modrinth-ads-rail-style'
+	style.textContent = `
+		html.modrinth-ads-consent-preferences #modrinth-rail-1 {
+			visibility: hidden !important;
+			pointer-events: none !important;
+		}
+	`
+	document.documentElement.appendChild(style)
+}
 
 function installAdsConsentOverlayStyle() {
 	if (document.getElementById('modrinth-ads-consent-overlay-style')) {
@@ -197,6 +218,16 @@ async function restoreAdsConsentNotification() {
 	}
 }
 
+function finishAdsConsentReprompt() {
+	modrinthAdsConsentReprompt = false
+	modrinthAdsConsentRepromptManaging = false
+	modrinthAdsConsentOverlayShown = false
+	document.documentElement.classList.remove('modrinth-ads-consent-overlay')
+	concealAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'conceal' })
+	invokeAdsConsentOverlayCommand(false)
+}
+
 async function openAdsConsentPreferences() {
 	revealAdsConsentPreferences()
 	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
@@ -229,6 +260,28 @@ async function performAdsConsentAction(action) {
 
 window.modrinthAdsConsentAction = (action) => {
 	void performAdsConsentAction(action)
+}
+
+window.modrinthAdsReopenConsentPreferences = async () => {
+	modrinthAdsConsentReprompt = true
+	modrinthAdsConsentRepromptManaging = false
+	revealAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
+
+	try {
+		await expandAdsConsentWebview()
+		await waitForAdsConsentLayout()
+		window.dispatchEvent(new Event('resize'))
+		sendAdsConsentCommandToChildFrames({ type: 'resize' })
+
+		if (typeof window.__tcfapi === 'function') {
+			window.__tcfapi('displayConsentUi', 2, () => {})
+		} else {
+			finishAdsConsentReprompt()
+		}
+	} catch {
+		finishAdsConsentReprompt()
+	}
 }
 
 window.addEventListener('message', (event) => {
@@ -301,8 +354,23 @@ function handleTcfConsentEvent(tcData, success) {
 	if (!success || !tcData) return
 
 	if (tcData.eventStatus === 'cmpuishown') {
+		if (modrinthAdsConsentReprompt) {
+			if (!modrinthAdsConsentRepromptManaging) {
+				modrinthAdsConsentRepromptManaging = true
+				window.dispatchEvent(new Event('resize'))
+				sendAdsConsentCommandToChildFrames({ type: 'resize' })
+				void performAdsConsentActionAcrossFrames('manage', 2500)
+			}
+			return
+		}
+
 		setAdsConsentOverlay(true)
 	} else if (tcData.eventStatus === 'useractioncomplete') {
+		if (modrinthAdsConsentReprompt) {
+			finishAdsConsentReprompt()
+			return
+		}
+
 		setAdsConsentOverlay(false)
 	}
 }
@@ -399,6 +467,7 @@ function muteVideos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	installAdsRailStyle()
 	installAdsConsentOverlayStyle()
 	muteVideos()
 	muteAudioContext()

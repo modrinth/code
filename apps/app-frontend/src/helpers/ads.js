@@ -24,6 +24,10 @@ export async function perform_ads_consent_action(action) {
 	return await invoke('plugin:ads|perform_ads_consent_action', { action })
 }
 
+export async function open_ads_consent_preferences() {
+	return await invoke('plugin:ads|open_ads_consent_preferences')
+}
+
 export async function ads_consent_listener(callback) {
 	return await listen('ads-consent-required', (event) => callback(event.payload))
 }

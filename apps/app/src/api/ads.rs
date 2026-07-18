@@ -363,6 +363,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             show_ads_window,
             show_ads_consent_overlay,
             show_ads_consent_preferences,
+            open_ads_consent_preferences,
             hide_ads_consent_preferences,
             hide_ads_consent_overlay,
             get_ads_consent_required,
@@ -581,6 +582,9 @@ pub async fn init_ads_window<R: Runtime>(
                 }
             })?;
 
+            #[cfg(debug_assertions)]
+            webview.open_devtools();
+
             Some(webview)
         } else {
             None
@@ -783,6 +787,26 @@ pub async fn show_ads_consent_preferences<R: Runtime>(
     Ok(())
 }
 
+#[tauri::command]
+pub async fn open_ads_consent_preferences<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> crate::api::Result<()> {
+    let Some(webview) = app.webviews().get("ads-window").cloned() else {
+        return Ok(());
+    };
+
+    {
+        let state = app.state::<RwLock<AdsState>>();
+        let mut state = state.write().await;
+        state.consent_required = true;
+        state.consent_overlay_shown = false;
+    }
+
+    webview.eval("window.modrinthAdsReopenConsentPreferences?.()")?;
+
+    Ok(())
+}
+
 /// Restores the ad inventory bounds without resolving the pending consent request.
 #[tauri::command]
 pub async fn hide_ads_consent_preferences<R: Runtime>(
@@ -827,6 +851,7 @@ pub async fn hide_ads_consent_overlay<R: Runtime>(
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
+        let should_reload_ads = state.consent_required;
 
         state.consent_required = false;
         state.consent_overlay_shown = false;
@@ -844,6 +869,12 @@ pub async fn hide_ads_consent_overlay<R: Runtime>(
                 .set_position(PhysicalPosition::new(-1000, -1000))
                 .ok();
             webview.hide().ok();
+        }
+
+        drop(state);
+
+        if should_reload_ads {
+            webview.navigate(AD_LINK.parse().unwrap()).ok();
         }
     }
 
