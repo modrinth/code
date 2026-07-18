@@ -145,7 +145,7 @@
 							:key="idx"
 							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
 						>
-							<button @click="handleButtonClick(item.id, btn)" class="!shadow-none">
+							<button class="!shadow-none" @click="handleButtonClick(item.id, btn)">
 								<component :is="btn.icon" v-if="btn.icon" />
 								{{ btn.label }}
 							</button>
