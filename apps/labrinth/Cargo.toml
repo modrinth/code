@@ -80,6 +80,7 @@ muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
+postcard = { workspace = true }
 prometheus = { workspace = true }
 quick-xml = { workspace = true }
 rand = { workspace = true }

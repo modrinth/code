@@ -68,7 +68,7 @@ pub struct CampaignInfo {
     cached_at: DateTime<Utc>,
 }
 
-const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info";
+const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v1";
 const CAMPAIGN_INFO_CACHE_STALE_SECONDS: i64 = 15 * 60;
 const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 24 * 60 * 60;
 
@@ -326,7 +326,7 @@ pub async fn pride_26(
         .wrap_internal_err("connecting to redis")?;
 
     let cached = redis_connection
-        .get_deserialized_from_json::<CampaignInfo>(
+        .get_deserialized::<CampaignInfo>(
             CAMPAIGN_INFO_CACHE_NAMESPACE,
             campaign_id,
         )
@@ -382,7 +382,7 @@ pub async fn pride_26(
         };
 
         redis_connection
-            .set_serialized_to_json(
+            .set_serialized(
                 CAMPAIGN_INFO_CACHE_NAMESPACE,
                 campaign_id,
                 &campaign_info,

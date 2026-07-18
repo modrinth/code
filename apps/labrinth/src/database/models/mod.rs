@@ -76,6 +76,8 @@ pub enum DatabaseError {
     RedisPool(#[from] deadpool_redis::PoolError),
     #[error("Error while serializing with the cache: {0}")]
     SerdeCacheError(#[from] serde_json::Error),
+    #[error("error while encoding or decoding the cache: {0}")]
+    PostcardCacheError(#[from] postcard::Error),
     #[error("Schema error: {0}")]
     SchemaError(String),
     #[error(

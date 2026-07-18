@@ -8,7 +8,7 @@ use dashmap::DashMap;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const COLLECTIONS_NAMESPACE: &str = "collections";
+const COLLECTIONS_NAMESPACE: &str = "collections:v1";
 
 #[derive(Clone)]
 pub struct CollectionBuilder {

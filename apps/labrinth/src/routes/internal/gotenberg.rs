@@ -70,11 +70,11 @@ pub async fn success_callback(
 
     let body = base64::engine::general_purpose::STANDARD.encode(&body);
 
-    let redis_msg = serde_json::to_string(&Ok::<
+    let redis_msg = postcard::to_allocvec(&Ok::<
         GotenbergDocument,
         GotenbergError,
     >(GotenbergDocument { body }))
-    .wrap_internal_err("failed to serialize document to JSON")?;
+    .wrap_internal_err("failed to serialize Redis document response")?;
 
     redis
         .lpush(
@@ -139,11 +139,11 @@ pub async fn error_callback(
         .await
         .wrap_internal_err("failed to get Redis connection")?;
 
-    let redis_msg = serde_json::to_string(&Err::<
+    let redis_msg = postcard::to_allocvec(&Err::<
         GotenbergDocument,
         GotenbergError,
     >(error_body))
-    .wrap_internal_err("failed to serialize error to JSON")?;
+    .wrap_internal_err("failed to serialize Redis error response")?;
 
     redis
         .lpush(

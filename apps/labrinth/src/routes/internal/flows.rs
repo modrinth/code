@@ -2126,7 +2126,7 @@ async fn validate_2fa_code(
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    const TOTP_NAMESPACE: &str = "used_totp";
+    const TOTP_NAMESPACE: &str = "used_totp:v1";
     let mut conn = redis.connect().await?;
 
     // Check if TOTP has already been used

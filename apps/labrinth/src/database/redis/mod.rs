@@ -43,7 +43,7 @@ const REDIS_MAX_CONN_AGE: Duration = Duration::from_secs(120);
 
 fn cache_expiries(namespace: &str) -> (i64, i64) {
     match namespace {
-        "versions" | "versions_files" => {
+        "versions:v1" | "versions_files:v1" => {
             (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
         }
         _ => (DEFAULT_EXPIRY, ACTUAL_EXPIRY),
@@ -367,11 +367,11 @@ impl RedisPool {
                 for chunk in args.chunks(MGET_CHUNK_SIZE) {
                     let part = cmd("MGET")
                         .arg(chunk)
-                        .query_async::<Vec<Option<String>>>(&mut connection)
+                        .query_async::<Vec<Option<Vec<u8>>>>(&mut connection)
                         .await?;
                     cached_values.extend(part.into_iter().filter_map(|x| {
                         x.and_then(|val| {
-                            serde_json::from_str::<RedisValue<T, K, S>>(&val)
+                            postcard::from_bytes::<RedisValue<T, K, S>>(&val)
                                 .ok()
                         })
                         .map(|val| (val.key.clone(), val))
@@ -492,7 +492,7 @@ impl RedisPool {
                                 "{}_{namespace}:{key}",
                                 self.meta_namespace
                             ),
-                            serde_json::to_string(&value)?,
+                            postcard::to_allocvec(&value)?,
                             default_expiry as u64,
                         );
                         pipe_cmds += 1;
@@ -624,30 +624,27 @@ impl<'a> Drop for LockSentinel<'a> {
 
 impl RedisConnection {
     #[tracing::instrument(skip(self))]
-    pub async fn set(
+    pub async fn set<D>(
         &mut self,
         namespace: &str,
         id: &str,
-        data: &str,
+        data: D,
         expiry: Option<i64>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<(), DatabaseError>
+    where
+        D: ToRedisArgs + Send + Sync + Debug,
+    {
         let mut cmd = cmd("SET");
-        redis_args(
-            &mut cmd,
-            vec![
-                format!("{}_{}:{}", self.meta_namespace, namespace, id),
-                data.to_string(),
-                "EX".to_string(),
-                expiry.unwrap_or(DEFAULT_EXPIRY).to_string(),
-            ]
-            .as_slice(),
-        );
+        cmd.arg(format!("{}_{}:{}", self.meta_namespace, namespace, id))
+            .arg(data)
+            .arg("EX")
+            .arg(expiry.unwrap_or(DEFAULT_EXPIRY));
         redis_execute::<()>(&mut cmd, &mut self.connection).await?;
         Ok(())
     }
 
     #[tracing::instrument(skip(self, id, data))]
-    pub async fn set_serialized_to_json<Id, D>(
+    pub async fn set_serialized<Id, D>(
         &mut self,
         namespace: &str,
         id: Id,
@@ -661,7 +658,7 @@ impl RedisConnection {
         self.set(
             namespace,
             &id.to_string(),
-            &serde_json::to_string(&data)?,
+            postcard::to_allocvec(&data)?,
             expiry,
         )
         .await
@@ -702,7 +699,7 @@ impl RedisConnection {
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn get_deserialized_from_json<R>(
+    pub async fn get_deserialized<R>(
         &mut self,
         namespace: &str,
         id: &str,
@@ -710,14 +707,19 @@ impl RedisConnection {
     where
         R: for<'a> serde::Deserialize<'a>,
     {
-        Ok(self
-            .get(namespace, id)
-            .await?
-            .and_then(|x| serde_json::from_str(&x).ok()))
+        let mut cmd = cmd("GET");
+        redis_args(
+            &mut cmd,
+            vec![format!("{}_{}:{}", self.meta_namespace, namespace, id)]
+                .as_slice(),
+        );
+        let value: Option<Vec<u8>> =
+            redis_execute(&mut cmd, &mut self.connection).await?;
+        Ok(value.and_then(|value| postcard::from_bytes(&value).ok()))
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn get_many_deserialized_from_json<R>(
+    pub async fn get_many_deserialized<R>(
         &mut self,
         namespace: &str,
         ids: &[String],
@@ -725,12 +727,22 @@ impl RedisConnection {
     where
         R: for<'a> serde::Deserialize<'a>,
     {
-        Ok(self
-            .get_many(namespace, ids)
-            .await?
+        let mut cmd = cmd("MGET");
+        redis_args(
+            &mut cmd,
+            ids.iter()
+                .map(|x| format!("{}_{}:{}", self.meta_namespace, namespace, x))
+                .collect::<Vec<_>>()
+                .as_slice(),
+        );
+        let values: Vec<Option<Vec<u8>>> =
+            redis_execute(&mut cmd, &mut self.connection).await?;
+        Ok(values
             .into_iter()
-            .map(|x| x.and_then(|val| serde_json::from_str::<R>(&val).ok()))
-            .collect::<Vec<_>>())
+            .map(|value| {
+                value.and_then(|value| postcard::from_bytes::<R>(&value).ok())
+            })
+            .collect())
     }
 
     #[tracing::instrument(skip(self, id))]
@@ -799,7 +811,7 @@ impl RedisConnection {
         namespace: &str,
         key: &str,
         timeout: Option<f64>,
-    ) -> Result<Option<[String; 2]>, DatabaseError> {
+    ) -> Result<Option<[Vec<u8>; 2]>, DatabaseError> {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
         // a timeout of 0 is infinite
         let timeout = timeout.unwrap_or(0.0);
@@ -829,7 +841,6 @@ impl RedisConnection {
 #[derive(Serialize, Deserialize)]
 pub struct RedisValue<T, K, S> {
     key: K,
-    #[serde(skip_serializing_if = "Option::is_none")]
     alias: Option<S>,
     iat: i64,
     val: T,
