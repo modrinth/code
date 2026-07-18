@@ -42,8 +42,10 @@ const MGET_CHUNK_SIZE: usize = 32;
 const REDIS_MAX_CONN_AGE: Duration = Duration::from_secs(120);
 
 fn cache_expiries(namespace: &str) -> (i64, i64) {
-    match namespace {
-        "versions:v1" | "versions_files:v1" => {
+    // Namespaces may embed a version suffix like `:v1` now due to postcard-encoding
+    // of Redis values, so split it out.
+    match namespace.split_once(':').map(|t| t.0).unwrap_or(namespace) {
+        "versions" | "versions_files" => {
             (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
         }
         _ => (DEFAULT_EXPIRY, ACTUAL_EXPIRY),
@@ -685,7 +687,7 @@ impl RedisConnection {
         &mut self,
         namespace: &str,
         ids: &[String],
-    ) -> Result<Vec<Option<String>>, DatabaseError> {
+    ) -> Result<Vec<Option<Vec<u8>>>, DatabaseError> {
         let mut cmd = cmd("MGET");
         redis_args(
             &mut cmd,
