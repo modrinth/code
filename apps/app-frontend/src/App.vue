@@ -391,6 +391,7 @@ function handleAdsConsentRequired(required) {
 		title: formatMessage(messages.adsConsentTitle),
 		text: formatMessage(messages.adsConsentBody),
 		type: 'info',
+		hideIcon: true,
 		autoCloseMs: null,
 		dismissible: false,
 		showOverModal: true,

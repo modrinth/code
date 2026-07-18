@@ -71,6 +71,7 @@
 								/>
 								<template v-else>
 									<div
+										v-if="!item.hideIcon"
 										class="flex items-center"
 										:class="{
 											'text-red': item.type === 'error',
@@ -150,7 +151,7 @@
 							:key="idx"
 							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
 						>
-							<button @click="handleButtonClick(item.id, btn)">
+							<button @click="handleButtonClick(item.id, btn)" class="!shadow-none">
 								<component :is="btn.icon" v-if="btn.icon" />
 								{{ btn.label }}
 							</button>
@@ -302,9 +303,9 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
 	right: 1.5rem;
 	z-index: 200;
-	width: min(420px, calc(100vw - 1.5rem));
-	min-width: min(420px, calc(100vw - 1.5rem));
-	max-width: min(420px, calc(100vw - 1.5rem));
+	width: min(440px, calc(100vw - 1.5rem));
+	min-width: min(440px, calc(100vw - 1.5rem));
+	max-width: min(440px, calc(100vw - 1.5rem));
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
