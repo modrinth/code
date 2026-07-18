@@ -17,8 +17,6 @@ pub mod payouts;
 pub mod project_creation;
 pub mod projects;
 pub mod reports;
-pub mod shared_instance_version_creation;
-pub mod shared_instances;
 pub mod statistics;
 pub mod tags;
 pub mod teams;
@@ -60,8 +58,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(payouts::tremendous_webhook)
             .configure(projects::config)
             .configure(reports::config)
-            .configure(shared_instance_version_creation::config)
-            .configure(shared_instances::config)
             .configure(statistics::config)
             .configure(tags::config)
             .configure(teams::config)
@@ -175,16 +171,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		reports::report_get_route,
 		reports::report_edit_route,
 		reports::report_delete_route,
-		shared_instance_version_creation::shared_instance_version_create,
-		shared_instances::shared_instance_create,
-		shared_instances::shared_instance_list,
-		shared_instances::shared_instance_get,
-		shared_instances::shared_instance_edit,
-		shared_instances::shared_instance_delete,
-		shared_instances::shared_instance_version_list,
-		shared_instances::shared_instance_version_get,
-		shared_instances::shared_instance_version_delete,
-		shared_instances::shared_instance_version_download,
 		statistics::get_stats_route,
 		tags::games_list_route,
 		tags::category_list_route,
