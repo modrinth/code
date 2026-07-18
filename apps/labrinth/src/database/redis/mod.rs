@@ -937,6 +937,12 @@ pub struct RedisValue<T, K, S> {
     val: T,
 }
 
+impl<T, K, S> RedisValue<T, K, S> {
+    pub fn value(&self) -> &T {
+        &self.val
+    }
+}
+
 pub fn redis_args(cmd: &mut util::InstrumentedCmd, args: &[String]) {
     for arg in args {
         cmd.arg(arg);
