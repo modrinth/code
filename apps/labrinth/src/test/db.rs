@@ -1,7 +1,7 @@
 use crate::database::Executor;
 use eyre::{Context, Result};
 
-use crate::database::{models::DBUserId, PgPool};
+use crate::database::{PgPool, models::DBUserId};
 
 /// Static personal access token for use in [`AppendPat`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,21 +38,18 @@ impl AppendPat for actix_web::test::TestRequest {
 /// # Errors
 ///
 /// Errors if the user does not exist or could not be updated.
-pub async fn mark_email_verified(
-	db: &PgPool,
-	user_id: DBUserId,
-) -> Result<()> {
-	let result = sqlx::query!(
-		"UPDATE users SET email_verified = TRUE WHERE id = $1",
-		user_id.0,
-	)
-	.execute(db)
-	.await
-	.wrap_err("failed to mark user email as verified")?;
+pub async fn mark_email_verified(db: &PgPool, user_id: DBUserId) -> Result<()> {
+    let result = sqlx::query!(
+        "UPDATE users SET email_verified = TRUE WHERE id = $1",
+        user_id.0,
+    )
+    .execute(db)
+    .await
+    .wrap_err("failed to mark user email as verified")?;
 
-	eyre::ensure!(result.rows_affected() == 1, "user does not exist");
+    eyre::ensure!(result.rows_affected() == 1, "user does not exist");
 
-	Ok(())
+    Ok(())
 }
 
 /// Dummy [`DBUserId`]s.
@@ -98,18 +95,18 @@ pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
             )
             .as_str(),
     )
-	.await
-	.wrap_err("failed to add dummy data")?;
+    .await
+    .wrap_err("failed to add dummy data")?;
 
-	for user_id in [
-		user_id::ADMIN,
-		user_id::MODERATOR,
-		user_id::USER,
-		user_id::FRIEND,
-		user_id::ENEMY,
-	] {
-		mark_email_verified(db, user_id).await?;
-	}
+    for user_id in [
+        user_id::ADMIN,
+        user_id::MODERATOR,
+        user_id::USER,
+        user_id::FRIEND,
+        user_id::ENEMY,
+    ] {
+        mark_email_verified(db, user_id).await?;
+    }
 
-	Ok(())
+    Ok(())
 }
