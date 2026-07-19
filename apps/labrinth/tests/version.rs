@@ -51,15 +51,16 @@ async fn test_get_version() {
         assert_eq!(&version.id.to_string(), alpha_version_id);
 
         let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
+        let version_key = redis_conn.keyspace().entity(
+            VERSIONS_NAMESPACE,
+            parse_base62(alpha_version_id).unwrap(),
+        );
         let cached_version: RedisValue<
             VersionQueryResult,
             DBVersionId,
             String,
         > = redis_conn
-            .get_deserialized(
-                VERSIONS_NAMESPACE,
-                &parse_base62(alpha_version_id).unwrap().to_string(),
-            )
+            .get_deserialized(&version_key)
             .await
             .unwrap()
             .unwrap();

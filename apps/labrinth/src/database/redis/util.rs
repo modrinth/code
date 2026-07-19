@@ -2,44 +2,12 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use derive_more::{Deref, DerefMut};
 use redis::{FromRedisValue, RedisResult, ToRedisArgs};
 use tokio::sync::Notify;
 use tokio::time::{Duration, timeout};
 use tracing::{Instrument, info_span};
 
 use crate::database::models::DatabaseError;
-
-pub fn redis_pipe() -> InstrumentedPipeline {
-    InstrumentedPipeline {
-        inner: redis::pipe(),
-    }
-}
-
-#[derive(Clone, Deref, DerefMut)]
-pub struct InstrumentedPipeline {
-    #[deref]
-    #[deref_mut]
-    inner: redis::Pipeline,
-}
-
-impl InstrumentedPipeline {
-    pub fn atomic(&mut self) -> &mut Self {
-        self.inner.atomic();
-        self
-    }
-
-    #[inline]
-    pub async fn query_async<T: FromRedisValue>(
-        &self,
-        con: &mut impl redis::aio::ConnectionLike,
-    ) -> RedisResult<T> {
-        self.inner
-            .query_async(con)
-            .instrument(info_span!("pipeline.query_async"))
-            .await
-    }
-}
 
 pub fn cmd(name: &str) -> InstrumentedCmd {
     InstrumentedCmd {

@@ -10,10 +10,9 @@ use actix_web::web::Data;
 use ariadne::ids::UserId;
 use ariadne::networking::message::ServerToClientMessage;
 use ariadne::users::UserStatus;
-use redis::aio::PubSub;
 use redis::{RedisWrite, ToRedisArgs, ToSingleRedisArg};
 use serde::{Deserialize, Serialize};
-use tokio_stream::StreamExt;
+use tokio::sync::mpsc;
 
 pub const FRIENDS_CHANNEL_NAME: &str = "friends:v1";
 
@@ -47,17 +46,12 @@ impl ToRedisArgs for RedisFriendsMessage {
 impl ToSingleRedisArg for RedisFriendsMessage {}
 
 pub async fn handle_pubsub(
-    mut pubsub: PubSub,
+    mut messages: mpsc::Receiver<Vec<u8>>,
     pool: PgPool,
     sockets: Data<ActiveSockets>,
 ) {
-    pubsub.subscribe(FRIENDS_CHANNEL_NAME).await.unwrap();
-    let mut stream = pubsub.into_on_message();
-    while let Some(message) = stream.next().await {
-        if message.get_channel_name() != FRIENDS_CHANNEL_NAME {
-            continue;
-        }
-        let payload = postcard::from_bytes(message.get_payload_bytes());
+    while let Some(message) = messages.recv().await {
+        let payload = postcard::from_bytes::<RedisFriendsMessage>(&message);
 
         let pool = pool.clone();
         let sockets = sockets.clone();

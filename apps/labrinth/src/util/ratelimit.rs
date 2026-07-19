@@ -68,9 +68,10 @@ impl AsyncRateLimiter {
 
         // Get current time in nanoseconds since UNIX epoch
         let now = Utc::now().timestamp_nanos_opt().unwrap_or(0);
+        let key = conn.keyspace().with_slot(RATE_LIMIT_NAMESPACE, key, key);
 
         // Get the current TAT from Redis (if it exists)
-        let tat_str = conn.get(RATE_LIMIT_NAMESPACE, key).await.ok().flatten();
+        let tat_str = conn.get(&key).await.ok().flatten();
 
         // Parse the TAT or use current time if not found
         let current_tat = match tat_str {
@@ -102,12 +103,7 @@ impl AsyncRateLimiter {
         let new_tat = std::cmp::max(current_tat + increment, now);
 
         let _ = conn
-            .set(
-                RATE_LIMIT_NAMESPACE,
-                key,
-                &new_tat.to_string(),
-                Some(RATE_LIMIT_EXPIRY),
-            )
+            .set(&key, &new_tat.to_string(), Some(RATE_LIMIT_EXPIRY))
             .await;
 
         let remaining_capacity =

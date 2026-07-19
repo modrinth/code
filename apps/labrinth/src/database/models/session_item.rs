@@ -224,13 +224,10 @@ impl DBSession {
     {
         {
             let mut redis = redis.connect().await?;
+            let key =
+                redis.keyspace().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
-            let res = redis
-                .get_deserialized::<Vec<i64>>(
-                    SESSIONS_USERS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let res = redis.get_deserialized::<Vec<i64>>(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res.into_iter().map(DBSessionId).collect());
@@ -253,15 +250,9 @@ impl DBSession {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized(
-                SESSIONS_USERS_NAMESPACE,
-                user_id.0,
-                &db_sessions,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &db_sessions, None).await?;
 
         Ok(db_sessions)
     }
@@ -280,20 +271,27 @@ impl DBSession {
             return Ok(());
         }
 
-        redis
-            .delete_many(clear_sessions.into_iter().flat_map(
-                |(id, session, user_id)| {
-                    [
-                        (SESSIONS_NAMESPACE, id.map(|i| i.0.to_string())),
-                        (SESSIONS_IDS_NAMESPACE, session),
-                        (
-                            SESSIONS_USERS_NAMESPACE,
-                            user_id.map(|i| i.0.to_string()),
-                        ),
-                    ]
-                },
-            ))
-            .await?;
+        let keys = clear_sessions
+            .into_iter()
+            .flat_map(|(id, session, user_id)| {
+                [
+                    id.map(|id| {
+                        redis.keyspace().entity(SESSIONS_NAMESPACE, id.0)
+                    }),
+                    session.map(|session| {
+                        redis.keyspace().entity(SESSIONS_IDS_NAMESPACE, session)
+                    }),
+                    user_id.map(|user_id| {
+                        redis
+                            .keyspace()
+                            .entity(SESSIONS_USERS_NAMESPACE, user_id.0)
+                    }),
+                ]
+                .into_iter()
+                .flatten()
+            })
+            .collect::<Vec<_>>();
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 

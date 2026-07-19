@@ -159,13 +159,9 @@ impl DBPersonalAccessToken {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis.keyspace().entity(PATS_USERS_NAMESPACE, user_id.0);
 
-            let res = redis
-                .get_deserialized::<Vec<i64>>(
-                    PATS_USERS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let res = redis.get_deserialized::<Vec<i64>>(&key).await?;
 
             if let Some(res) = res {
                 return Ok(res.into_iter().map(DBPatId).collect());
@@ -187,10 +183,9 @@ impl DBPersonalAccessToken {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(PATS_USERS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized(PATS_USERS_NAMESPACE, user_id.0, &db_pats, None)
-            .await?;
+        redis.set_serialized(&key, &db_pats, None).await?;
         Ok(db_pats)
     }
 
@@ -204,20 +199,23 @@ impl DBPersonalAccessToken {
             return Ok(());
         }
 
-        redis
-            .delete_many(clear_pats.into_iter().flat_map(
-                |(id, token, user_id)| {
-                    [
-                        (PATS_NAMESPACE, id.map(|i| i.0.to_string())),
-                        (PATS_TOKENS_NAMESPACE, token),
-                        (
-                            PATS_USERS_NAMESPACE,
-                            user_id.map(|i| i.0.to_string()),
-                        ),
-                    ]
-                },
-            ))
-            .await?;
+        let keys = clear_pats
+            .into_iter()
+            .flat_map(|(id, token, user_id)| {
+                [
+                    id.map(|id| redis.keyspace().entity(PATS_NAMESPACE, id.0)),
+                    token.map(|token| {
+                        redis.keyspace().entity(PATS_TOKENS_NAMESPACE, token)
+                    }),
+                    user_id.map(|user_id| {
+                        redis.keyspace().entity(PATS_USERS_NAMESPACE, user_id.0)
+                    }),
+                ]
+                .into_iter()
+                .flatten()
+            })
+            .collect::<Vec<_>>();
+        redis.delete_many(&keys).await?;
 
         Ok(())
     }

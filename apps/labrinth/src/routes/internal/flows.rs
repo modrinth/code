@@ -1440,7 +1440,7 @@ struct NewOAuthAccount {
     pub sign_up_newsletter: bool,
 }
 
-/// Create account with OAuth.  
+/// Create account with OAuth.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1527,7 +1527,7 @@ struct DiscordCommunityHandoffPayload {
     nonce: String,
 }
 
-/// Link Discord community.  
+/// Link Discord community.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1604,7 +1604,7 @@ pub async fn discord_community_link(
     Ok(web::Json(DiscordCommunityLinkResponse { url }))
 }
 
-/// Remove an auth provider.  
+/// Remove an auth provider.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1947,7 +1947,7 @@ impl ReadyAccountRegisterFlow {
     }
 }
 
-/// Validate password account creation.  
+/// Validate password account creation.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1975,7 +1975,7 @@ pub async fn validate_create_account_with_password(
     Ok(())
 }
 
-/// Create account with a password.  
+/// Create account with a password.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2024,7 +2024,7 @@ pub struct Login {
     pub challenge: String,
 }
 
-/// Log in with a password.  
+/// Log in with a password.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2128,13 +2128,13 @@ async fn validate_2fa_code(
 
     const TOTP_NAMESPACE: &str = "used_totp:v1";
     let mut conn = redis.connect().await?;
+    let logical_key = format!("{}-{}", input, user_id.0);
+    let key = redis
+        .key()
+        .with_slot(TOTP_NAMESPACE, &logical_key, &logical_key);
 
     // Check if TOTP has already been used
-    if conn
-        .get(TOTP_NAMESPACE, &format!("{}-{}", input, user_id.0))
-        .await?
-        .is_some()
-    {
+    if conn.get(&key).await?.is_some() {
         return Err(AuthenticationError::InvalidCredentials);
     }
 
@@ -2142,13 +2142,7 @@ async fn validate_2fa_code(
         .check_current(input.as_str())
         .map_err(|_| AuthenticationError::InvalidCredentials)?
     {
-        conn.set(
-            TOTP_NAMESPACE,
-            &format!("{}-{}", input, user_id.0),
-            "",
-            Some(60),
-        )
-        .await?;
+        conn.set(&key, "", Some(60)).await?;
 
         Ok(true)
     } else if allow_backup {
@@ -2185,7 +2179,7 @@ async fn validate_2fa_code(
     }
 }
 
-/// Complete login with 2FA.  
+/// Complete login with 2FA.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2245,7 +2239,7 @@ pub async fn login_2fa(
     }
 }
 
-/// Start 2FA setup.  
+/// Start 2FA setup.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2296,7 +2290,7 @@ pub async fn begin_2fa_flow(
     }
 }
 
-/// Finish 2FA setup.  
+/// Finish 2FA setup.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2431,7 +2425,7 @@ pub struct Remove2FA {
     pub code: String,
 }
 
-/// Remove 2FA.  
+/// Remove 2FA.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2531,7 +2525,7 @@ pub struct ResetPassword {
     pub challenge: String,
 }
 
-/// Start password reset.  
+/// Start password reset.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2637,7 +2631,7 @@ pub struct ChangePassword {
     pub new_password: Option<String>,
 }
 
-/// Change password.  
+/// Change password.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2803,7 +2797,7 @@ pub struct SetEmail {
     pub email: String,
 }
 
-/// Set email address.  
+/// Set email address.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2925,7 +2919,7 @@ pub async fn set_email(
     Ok(HttpResponse::Ok().finish())
 }
 
-/// Resend verification email.  
+/// Resend verification email.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3000,7 +2994,7 @@ pub struct VerifyEmail {
     pub flow: String,
 }
 
-/// Verify email address.  
+/// Verify email address.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3066,7 +3060,7 @@ pub async fn verify_email(
     }
 }
 
-/// Subscribe to the newsletter.  
+/// Subscribe to the newsletter.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3115,7 +3109,7 @@ pub async fn subscribe_newsletter(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Get newsletter subscription status.  
+/// Get newsletter subscription status.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3165,7 +3159,7 @@ pub struct RegisterPasskeyResponse {
     pub flow: String,
 }
 
-/// Start passkey registration.  
+/// Start passkey registration.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3265,7 +3259,7 @@ pub struct PasskeyResponse {
     pub last_used: Option<chrono::DateTime<Utc>>,
 }
 
-/// Finish passkey registration.  
+/// Finish passkey registration.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3374,7 +3368,7 @@ pub struct AuthenticatePasskeyResponse {
     pub flow: String,
 }
 
-/// Start passkey authentication.  
+/// Start passkey authentication.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3417,7 +3411,7 @@ pub struct AuthenticatePasskeyFinish {
     pub credential: PublicKeyCredential,
 }
 
-/// Finish passkey authentication.  
+/// Finish passkey authentication.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3534,7 +3528,7 @@ pub async fn authenticate_passkey_finish(
     }
 }
 
-/// List passkeys.  
+/// List passkeys.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3584,7 +3578,7 @@ pub struct RenamePasskey {
     pub name: String,
 }
 
-/// Rename a passkey.  
+/// Rename a passkey.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3639,7 +3633,7 @@ pub async fn rename_passkey(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Delete a passkey.  
+/// Delete a passkey.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",

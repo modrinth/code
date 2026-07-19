@@ -295,11 +295,13 @@ async fn increment_content_resolve_cache_heat(
             return None;
         }
     };
+    let key = redis.keyspace().with_slot(
+        CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE,
+        heat_key,
+        heat_key,
+    );
 
-    let count = match redis
-        .incr(CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE, heat_key)
-        .await
-    {
+    let count = match redis.incr(&key).await {
         Ok(Some(count)) => count,
         Ok(None) => 1,
         Err(error) => {
@@ -312,8 +314,7 @@ async fn increment_content_resolve_cache_heat(
 
     if let Err(error) = redis
         .set(
-            CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE,
-            heat_key,
+            &key,
             &count.to_string(),
             Some(CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS),
         )
@@ -338,11 +339,13 @@ async fn get_cached_resolve_content_plan(
             return None;
         }
     };
+    let key = redis.keyspace().with_slot(
+        CONTENT_RESOLVE_CACHE_NAMESPACE,
+        cache_key,
+        cache_key,
+    );
 
-    match redis
-        .get_deserialized(CONTENT_RESOLVE_CACHE_NAMESPACE, cache_key)
-        .await
-    {
+    match redis.get_deserialized(&key).await {
         Ok(cached) => cached,
         Err(error) => {
             tracing::warn!("failed to read content resolve cache: {error}");
@@ -366,14 +369,14 @@ async fn set_cached_resolve_content_plan(
             return;
         }
     };
+    let key = redis.keyspace().with_slot(
+        CONTENT_RESOLVE_CACHE_NAMESPACE,
+        cache_key,
+        cache_key,
+    );
 
     if let Err(error) = redis
-        .set_serialized(
-            CONTENT_RESOLVE_CACHE_NAMESPACE,
-            cache_key,
-            cached,
-            Some(expiry_seconds),
-        )
+        .set_serialized(&key, cached, Some(expiry_seconds))
         .await
     {
         tracing::warn!("failed to write content resolve cache: {error}");

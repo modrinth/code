@@ -82,6 +82,9 @@ jobs:
       SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      REDIS_MODE: cluster
+      REDIS_CONNECTION_TYPE: multiplexed
+      REDIS_URL: redis://127.0.0.1:7000,redis://127.0.0.1:7001,redis://127.0.0.1:7002,redis://127.0.0.1:7003,redis://127.0.0.1:7004,redis://127.0.0.1:7005
 
     steps:
       - name: Check out code
@@ -185,7 +188,7 @@ jobs:
 
       - name: Start services
         if: steps.check-labrinth.outputs.needs_services == 'true'
-        run: docker compose up --wait
+        run: docker compose --profile clustered-redis up --wait
 
       - name: Setup labrinth environment and database
         if: steps.check-labrinth.outputs.needs_services == 'true'

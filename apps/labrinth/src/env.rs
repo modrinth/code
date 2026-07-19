@@ -129,6 +129,8 @@ vars! {
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
+    REDIS_MODE: crate::database::redis::RedisMode = crate::database::redis::RedisMode::Standalone;
+    REDIS_CONNECTION_TYPE: crate::database::redis::RedisConnectionType = crate::database::redis::RedisConnectionType::Pooled;
     REDIS_URL: String = "redis://localhost";
     KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
     KAFKA_CLIENT_ID: String = "labrinth";
@@ -289,6 +291,9 @@ vars! {
     REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
     REDIS_MAX_CONNECTIONS: u32 = 10000u32;
     REDIS_MIN_CONNECTIONS: usize = 0usize;
+    REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;
+    REDIS_CLUSTER_MIN_CONNECTIONS: usize = 0usize;
+    REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 8u32;
     REDIS_ENCODING_FORMAT: crate::database::redis::EncodingFormat = crate::database::redis::EncodingFormat::Json;
     REDIS_COMPRESSION_LEVEL: i32 = 0i32;
     REDIS_COMPRESSION_ALGORITHM: crate::database::redis::Codec = crate::database::redis::Codec::Lz4;

@@ -229,8 +229,9 @@ impl DBImage {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(IMAGES_NAMESPACE, id.0);
 
-        redis.delete(IMAGES_NAMESPACE, id.0).await?;
+        redis.delete(&key).await?;
         Ok(())
     }
 }

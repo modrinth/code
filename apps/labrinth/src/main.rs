@@ -110,7 +110,7 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new("");
+    let redis_pool = RedisPool::new("").await;
 
     let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn FileHost> = match storage_backend {

@@ -75,14 +75,10 @@ impl DBFlow {
         state: &str,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(FLOWS_NAMESPACE, state);
 
         redis
-            .set_serialized(
-                FLOWS_NAMESPACE,
-                &state,
-                &self,
-                Some(expires.num_seconds()),
-            )
+            .set_serialized(&key, &self, Some(expires.num_seconds()))
             .await?;
         Ok(())
     }
@@ -107,8 +103,9 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<DBFlow>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(FLOWS_NAMESPACE, id);
 
-        redis.get_deserialized(FLOWS_NAMESPACE, id).await
+        redis.get_deserialized(&key).await
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
@@ -132,8 +129,9 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(FLOWS_NAMESPACE, id);
 
-        redis.delete(FLOWS_NAMESPACE, id).await?;
+        redis.delete(&key).await?;
         Ok(Some(()))
     }
 }

@@ -60,24 +60,28 @@ async fn test_get_project() {
 
         // Confirm that the request was cached
         let mut redis_pool = test_env.db.redis_pool.connect().await.unwrap();
+        let slug_key = redis_pool
+            .keyspace()
+            .entity(PROJECTS_SLUGS_NAMESPACE, alpha_project_slug);
         assert_eq!(
             redis_pool
-                .get(PROJECTS_SLUGS_NAMESPACE, alpha_project_slug)
+                .get(&slug_key)
                 .await
                 .unwrap()
                 .and_then(|x| x.parse::<i64>().ok()),
             Some(parse_base62(alpha_project_id).unwrap() as i64)
         );
 
+        let project_key = redis_pool.keyspace().entity(
+            PROJECTS_NAMESPACE,
+            parse_base62(alpha_project_id).unwrap(),
+        );
         let cached_project: RedisValue<
             ProjectQueryResult,
             DBProjectId,
             String,
         > = redis_pool
-            .get_deserialized(
-                PROJECTS_NAMESPACE,
-                &parse_base62(alpha_project_id).unwrap().to_string(),
-            )
+            .get_deserialized(&project_key)
             .await
             .unwrap()
             .unwrap();
@@ -283,9 +287,14 @@ async fn test_add_remove_project() {
             // Confirm that the project is gone from the cache
             let mut redis_pool =
                 test_env.db.redis_pool.connect().await.unwrap();
+            let slug_key = redis_pool
+                .keyspace()
+                .entity(PROJECTS_SLUGS_NAMESPACE, "demo");
+            let id_key =
+                redis_pool.keyspace().entity(PROJECTS_SLUGS_NAMESPACE, &id);
             assert_eq!(
                 redis_pool
-                    .get(PROJECTS_SLUGS_NAMESPACE, "demo")
+                    .get(&slug_key)
                     .await
                     .unwrap()
                     .and_then(|x| x.parse::<i64>().ok()),
@@ -293,7 +302,7 @@ async fn test_add_remove_project() {
             );
             assert_eq!(
                 redis_pool
-                    .get(PROJECTS_SLUGS_NAMESPACE, &id)
+                    .get(&id_key)
                     .await
                     .unwrap()
                     .and_then(|x| x.parse::<i64>().ok()),

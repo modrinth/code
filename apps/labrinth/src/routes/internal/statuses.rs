@@ -28,7 +28,6 @@ use chrono::Utc;
 use either::Either;
 use futures_util::future::select;
 use futures_util::{StreamExt, TryStreamExt};
-use redis::AsyncCommands;
 use serde::Deserialize;
 use std::pin::pin;
 use std::sync::atomic::Ordering;
@@ -393,13 +392,7 @@ pub async fn broadcast_friends_message(
     redis: &RedisPool,
     message: RedisFriendsMessage,
 ) -> Result<(), crate::database::models::DatabaseError> {
-    let _: () = redis
-        .pool
-        .get()
-        .await?
-        .publish(FRIENDS_CHANNEL_NAME, message)
-        .await?;
-    Ok(())
+    redis.publish(FRIENDS_CHANNEL_NAME, message).await
 }
 
 pub async fn broadcast_to_local_friends(

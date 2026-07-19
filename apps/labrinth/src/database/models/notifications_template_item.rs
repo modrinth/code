@@ -55,10 +55,11 @@ impl NotificationTemplate {
     ) -> Result<Vec<NotificationTemplate>, DatabaseError> {
         {
             let mut redis = redis.connect().await?;
+            let key = redis
+                .keyspace()
+                .metadata(TEMPLATES_NAMESPACE, channel.as_str());
 
-            let maybe_cached_templates = redis
-                .get_deserialized(TEMPLATES_NAMESPACE, channel.as_str())
-                .await?;
+            let maybe_cached_templates = redis.get_deserialized(&key).await?;
 
             if let Some(cached) = maybe_cached_templates {
                 return Ok(cached);
@@ -78,14 +79,12 @@ impl NotificationTemplate {
         let templates = results.into_iter().map(Into::into).collect();
 
         let mut redis = redis.connect().await?;
+        let key = redis
+            .keyspace()
+            .metadata(TEMPLATES_NAMESPACE, channel.as_str());
 
         redis
-            .set_serialized(
-                TEMPLATES_NAMESPACE,
-                channel.as_str(),
-                &templates,
-                Some(TEMPLATES_CACHE_EXPIRY),
-            )
+            .set_serialized(&key, &templates, Some(TEMPLATES_CACHE_EXPIRY))
             .await?;
 
         Ok(templates)
@@ -96,12 +95,10 @@ impl NotificationTemplate {
         redis: &RedisPool,
     ) -> Result<Option<String>, DatabaseError> {
         let mut redis = redis.connect().await?;
-        redis
-            .get_deserialized(
-                TEMPLATES_HTML_DATA_NAMESPACE,
-                &self.id.to_string(),
-            )
-            .await
+        let key = redis
+            .keyspace()
+            .metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
+        redis.get_deserialized(&key).await
     }
 
     pub async fn set_cached_html_data(
@@ -110,13 +107,11 @@ impl NotificationTemplate {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis
+            .keyspace()
+            .metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
         redis
-            .set_serialized(
-                TEMPLATES_HTML_DATA_NAMESPACE,
-                &self.id.to_string(),
-                &data,
-                Some(HTML_DATA_CACHE_EXPIRY),
-            )
+            .set_serialized(&key, &data, Some(HTML_DATA_CACHE_EXPIRY))
             .await
     }
 }
@@ -135,9 +130,11 @@ where
     }
 
     let mut redis_conn = redis.connect().await?;
-    if let Some(body) = redis_conn
-        .get_deserialized::<HtmlBody>(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key)
-        .await?
+    let redis_key = redis_conn
+        .keyspace()
+        .metadata(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key);
+    if let Some(body) =
+        redis_conn.get_deserialized::<HtmlBody>(&redis_key).await?
     {
         return Ok(body.html);
     }
@@ -146,14 +143,12 @@ where
 
     let cached = HtmlBody { html: get().await? };
     let mut redis_conn = redis.connect().await?;
+    let redis_key = redis_conn
+        .keyspace()
+        .metadata(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key);
 
     redis_conn
-        .set_serialized(
-            TEMPLATES_DYNAMIC_HTML_NAMESPACE,
-            key,
-            &cached,
-            Some(HTML_DATA_CACHE_EXPIRY),
-        )
+        .set_serialized(&redis_key, &cached, Some(HTML_DATA_CACHE_EXPIRY))
         .await?;
 
     Ok(cached.html)

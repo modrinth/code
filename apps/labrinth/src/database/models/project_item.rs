@@ -974,13 +974,12 @@ impl DBProject {
 
         {
             let mut redis = redis.connect().await?;
+            let key = redis
+                .keyspace()
+                .entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
-            let dependencies = redis
-                .get_deserialized::<Dependencies>(
-                    PROJECTS_DEPENDENCIES_NAMESPACE,
-                    &id.0.to_string(),
-                )
-                .await?;
+            let dependencies =
+                redis.get_deserialized::<Dependencies>(&key).await?;
             if let Some(dependencies) = dependencies {
                 return Ok(dependencies);
             }
@@ -1012,15 +1011,11 @@ impl DBProject {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis
+            .keyspace()
+            .entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
-        redis
-            .set_serialized(
-                PROJECTS_DEPENDENCIES_NAMESPACE,
-                id.0,
-                &dependencies,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &dependencies, None).await?;
         Ok(dependencies)
     }
 
@@ -1031,21 +1026,23 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let mut keys = vec![redis.keyspace().entity(PROJECTS_NAMESPACE, id.0)];
+        if let Some(slug) = slug {
+            keys.push(
+                redis
+                    .keyspace()
+                    .entity(PROJECTS_SLUGS_NAMESPACE, slug.to_lowercase()),
+            );
+        }
+        if clear_dependencies.unwrap_or(false) {
+            keys.push(
+                redis
+                    .keyspace()
+                    .entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0),
+            );
+        }
 
-        redis
-            .delete_many([
-                (PROJECTS_NAMESPACE, Some(id.0.to_string())),
-                (PROJECTS_SLUGS_NAMESPACE, slug.map(|x| x.to_lowercase())),
-                (
-                    PROJECTS_DEPENDENCIES_NAMESPACE,
-                    if clear_dependencies.unwrap_or(false) {
-                        Some(id.0.to_string())
-                    } else {
-                        None
-                    },
-                ),
-            ])
-            .await?;
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 }

@@ -143,7 +143,7 @@ impl CampaignDonation {
     }
 }
 
-/// Receive a Tiltify webhook.  
+/// Receive a Tiltify webhook.
 #[utoipa::path(
 	context_path = "/campaign",
 	tag = "campaigns",
@@ -307,7 +307,7 @@ fn verify_tiltify_webhook_signature(
     Ok(())
 }
 
-/// Get Pride campaign data.  
+/// Get Pride campaign data.
 #[utoipa::path(
 	context_path = "/campaign",
 	tag = "campaigns",
@@ -324,12 +324,12 @@ pub async fn pride_26(
         .connect()
         .await
         .wrap_internal_err("connecting to redis")?;
+    let cache_key = redis
+        .key()
+        .entity(CAMPAIGN_INFO_CACHE_NAMESPACE, campaign_id);
 
     let cached = redis_connection
-        .get_deserialized::<CampaignInfo>(
-            CAMPAIGN_INFO_CACHE_NAMESPACE,
-            campaign_id,
-        )
+        .get_deserialized::<CampaignInfo>(&cache_key)
         .await
         .wrap_internal_err("getting cached campaign info")?;
 
@@ -383,8 +383,7 @@ pub async fn pride_26(
 
         redis_connection
             .set_serialized(
-                CAMPAIGN_INFO_CACHE_NAMESPACE,
-                campaign_id,
+                &cache_key,
                 &campaign_info,
                 Some(CAMPAIGN_INFO_CACHE_TTL_SECONDS),
             )

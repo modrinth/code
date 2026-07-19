@@ -389,13 +389,11 @@ impl DBUser {
 
         {
             let mut redis = redis.connect().await?;
+            let key =
+                redis.keyspace().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
-            let cached_projects = redis
-                .get_deserialized::<Vec<DBProjectId>>(
-                    USERS_PROJECTS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let cached_projects =
+                redis.get_deserialized::<Vec<DBProjectId>>(&key).await?;
 
             if let Some(projects) = cached_projects {
                 return Ok(projects);
@@ -417,15 +415,9 @@ impl DBUser {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.keyspace().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized(
-                USERS_PROJECTS_NAMESPACE,
-                user_id.0,
-                &db_projects,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &db_projects, None).await?;
 
         Ok(db_projects)
     }
@@ -556,18 +548,24 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-
-        redis
-            .delete_many(user_ids.iter().flat_map(|(id, username)| {
+        let keys = user_ids
+            .iter()
+            .flat_map(|(id, username)| {
                 [
-                    (USERS_NAMESPACE, Some(id.0.to_string())),
-                    (
-                        USER_USERNAMES_NAMESPACE,
-                        username.clone().map(|i| i.to_lowercase()),
-                    ),
+                    Some(redis.keyspace().entity(USERS_NAMESPACE, id.0)),
+                    username.as_ref().map(|username| {
+                        redis.keyspace().entity(
+                            USER_USERNAMES_NAMESPACE,
+                            username.to_lowercase(),
+                        )
+                    }),
                 ]
-            }))
-            .await?;
+                .into_iter()
+                .flatten()
+            })
+            .collect::<Vec<_>>();
+
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 
@@ -576,14 +574,12 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let keys = user_ids
+            .iter()
+            .map(|id| redis.keyspace().entity(USERS_PROJECTS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
 
-        redis
-            .delete_many(
-                user_ids.iter().map(|id| {
-                    (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))
-                }),
-            )
-            .await?;
+        redis.delete_many(&keys).await?;
 
         Ok(())
     }

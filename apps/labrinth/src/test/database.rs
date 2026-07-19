@@ -90,7 +90,7 @@ impl TemporaryDatabase {
         println!("Migrations complete");
 
         // Gets new Redis pool
-        let redis_pool = RedisPool::new(temp_database_name.clone());
+        let redis_pool = RedisPool::new(temp_database_name.clone()).await;
 
         // Create search backend
         let search_backend = search::backend(Some(temp_database_name.clone()));
@@ -192,7 +192,7 @@ impl TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                        redis_pool: RedisPool::new(name.clone()),
+                        redis_pool: RedisPool::new(name.clone()).await,
                         search_backend: Arc::from(search::backend(Some(
                             name.clone(),
                         ))),

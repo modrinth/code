@@ -41,10 +41,11 @@ impl NotificationTypeItem {
     {
         {
             let mut redis = redis.connect().await?;
+            let key = redis
+                .keyspace()
+                .metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
-            let cached_types = redis
-                .get_deserialized(NOTIFICATION_TYPES_NAMESPACE, "all")
-                .await?;
+            let cached_types = redis.get_deserialized(&key).await?;
 
             if let Some(types) = cached_types {
                 return Ok(types);
@@ -61,10 +62,11 @@ impl NotificationTypeItem {
         let types = results.into_iter().map(Into::into).collect();
 
         let mut redis = redis.connect().await?;
+        let key = redis
+            .keyspace()
+            .metadata(NOTIFICATION_TYPES_NAMESPACE, "all");
 
-        redis
-            .set_serialized(NOTIFICATION_TYPES_NAMESPACE, "all", &types, None)
-            .await?;
+        redis.set_serialized(&key, &types, None).await?;
 
         Ok(types)
     }

@@ -13,7 +13,7 @@ use crate::routes::ApiError;
 use crate::util::error::Context;
 use crate::util::gotenberg::{
     GeneratedPdfType, MODRINTH_GENERATED_PDF_TYPE, MODRINTH_PAYMENT_ID,
-    PAYMENT_STATEMENTS_NAMESPACE,
+    payment_statement_key,
 };
 use crate::util::guards::internal_network_guard;
 
@@ -63,6 +63,7 @@ pub async fn success_callback(
         .0
         .0;
 
+    let response_key = payment_statement_key(redis.get_ref(), &payout_id);
     let mut redis = redis
         .connect()
         .await
@@ -77,11 +78,7 @@ pub async fn success_callback(
     .wrap_internal_err("failed to serialize Redis document response")?;
 
     redis
-        .lpush(
-            PAYMENT_STATEMENTS_NAMESPACE,
-            &payout_id.to_string(),
-            &redis_msg,
-        )
+        .lpush(&response_key, &redis_msg)
         .await
         .wrap_internal_err("failed to send document over Redis")?;
 
@@ -134,6 +131,7 @@ pub async fn error_callback(
         .wrap_request_err("no payout ID for document")?
         .0
         .0;
+    let response_key = payment_statement_key(redis.get_ref(), &payout_id);
     let mut redis = redis
         .connect()
         .await
@@ -146,11 +144,7 @@ pub async fn error_callback(
     .wrap_internal_err("failed to serialize Redis error response")?;
 
     redis
-        .lpush(
-            PAYMENT_STATEMENTS_NAMESPACE,
-            &payout_id.to_string(),
-            &redis_msg,
-        )
+        .lpush(&response_key, &redis_msg)
         .await
         .wrap_internal_err("failed to send error over Redis")?;
 

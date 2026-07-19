@@ -41,7 +41,7 @@ color-eyre = { workspace = true }
 color-thief = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
-deadpool-redis.workspace = true
+deadpool-redis = { workspace = true, features = ["cluster-async"] }
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
@@ -87,7 +87,13 @@ quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 rdkafka = { workspace = true }
-redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
+redis = { workspace = true, features = [
+  "ahash",
+  "cluster",
+  "cluster-async",
+  "r2d2",
+  "tokio-comp"
+] }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
   "http2",
