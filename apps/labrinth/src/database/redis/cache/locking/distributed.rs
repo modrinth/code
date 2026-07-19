@@ -159,7 +159,7 @@ impl DistributedLockManager {
         cancellation_token: CancellationToken,
     ) {
         let manager = self.clone();
-        let _ = tokio::spawn(async move {
+        tokio::spawn(async move {
             loop {
                 let result = tokio::select! {
                     biased;
