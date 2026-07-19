@@ -20,8 +20,8 @@ import {
 	loadTexture as loadSkinTexture,
 } from '#ui/utils/webgl/skin-rendering.ts'
 
-import { applyEarsMod, removeEarsMod } from './use-ears-mod-features'
 import type { SkinPreviewTuple } from './types'
+import { applyEarsMod, removeEarsMod } from './use-ears-mod-features'
 
 const SKIN_LAYER_DEPTH_BIAS = -1
 
