@@ -7,10 +7,16 @@ import {
 	UserPlusIcon,
 } from '@modrinth/assets'
 import { Alert, injectModrinthClient, injectProjectPageContext } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import type { NodeState } from '../../types/node'
 import { button, fix, group, option, stage, text, toggle } from '../../types/node'
+
+const STALE_TIME = 1000 * 60 * 5
+
+type AutoSlugStatus = 'loading' | 'available' | 'unavailable'
+type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | null
 
 //TODO: make this not a copy of frontend/src/utils/slugs.generateUrlSlug
 // (as in move the other one so we can use it here)
@@ -30,25 +36,27 @@ function hasCustomSlug(project: Labrinth.Projects.v3.Project) {
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 	const client = injectModrinthClient()
+	const queryClient = useQueryClient()
 
-	type AutoSlugStatus = 'loading' | 'available' | 'unavailable'
 	const autoSlugStatus = ref<AutoSlugStatus>('loading')
 	const resolvedAutoSlug = ref<string | null>(null)
-	const takenBy = ref<Labrinth.Projects.v3.Project | null>(null)
-	const autoSlugTakenBy = ref<Labrinth.Projects.v3.Project | null>(null)
+	const correctSlugConflict = ref<Labrinth.Projects.v3.Project | null>(null)
+	const autoSlugConflict = ref<Labrinth.Projects.v3.Project | null>(null)
 	const ownerUsername = ref<string | null>(null)
+	const slugValidation = ref<SlugValidation>(null)
+	let slugDebounceTimer: ReturnType<typeof setTimeout> | undefined
 
 	function currentSlug(state: Record<string, NodeState>) {
 		return (state['correct-slug'] as string | undefined) ?? project.value.slug
 	}
 
-	type SlugValidation = 'checking' | 'available' | 'unchanged' | 'taken' | null
-	const slugValidation = ref<SlugValidation>(null)
-	let slugDebounceTimer: ReturnType<typeof setTimeout> | undefined
-
 	async function checkSlugTaken(slug: string): Promise<Labrinth.Projects.v3.Project | null> {
 		try {
-			return await client.labrinth.projects_v3.get(slug)
+			return await queryClient.fetchQuery({
+				queryKey: ['project', 'v3', slug],
+				queryFn: () => client.labrinth.projects_v3.get(slug),
+				staleTime: STALE_TIME,
+			})
 		} catch (e) {
 			if (e instanceof ModrinthApiError && e.statusCode === 404) return null
 			throw e
@@ -76,7 +84,7 @@ export default function () {
 					Slug is available
 				</Alert>
 			)
-		const by = takenBy.value
+		const by = correctSlugConflict.value
 		return (
 			<Alert type="error" class="w-full">
 				Slug taken
@@ -96,10 +104,12 @@ export default function () {
 	watch(
 		[() => project.value.name, () => project.value.slug],
 		async ([name]) => {
+			clearTimeout(slugDebounceTimer)
 			autoSlugStatus.value = 'loading'
 			resolvedAutoSlug.value = null
-			takenBy.value = null
-			autoSlugTakenBy.value = null
+			correctSlugConflict.value = null
+			autoSlugConflict.value = null
+			slugValidation.value = null
 
 			if (!hasCustomSlug(project.value)) {
 				autoSlugStatus.value = 'available'
@@ -113,7 +123,11 @@ export default function () {
 				const [conflict, members] = await Promise.all([
 					checkSlugTaken(autoSlug),
 					ownerUsername.value === null
-						? client.labrinth.projects_v3.getMembers(project.value.id)
+						? queryClient.fetchQuery({
+								queryKey: ['project', project.value.id, 'members'],
+								queryFn: () => client.labrinth.projects_v3.getMembers(project.value.id),
+								staleTime: STALE_TIME,
+							})
 						: null,
 				])
 
@@ -130,7 +144,7 @@ export default function () {
 					return
 				}
 
-				autoSlugTakenBy.value = conflict
+				autoSlugConflict.value = conflict
 
 				if (ownerUsername.value) {
 					const withUser = `${autoSlug}-${ownerUsername.value}`
@@ -163,7 +177,7 @@ export default function () {
 						</div>
 					)
 				}
-				const by = autoSlugTakenBy.value
+				const by = autoSlugConflict.value
 				return (
 					<div class="markdown-body w-full">
 						<strong>Title:</strong> {project.value.name}
@@ -246,10 +260,10 @@ export default function () {
 													slugDebounceTimer = setTimeout(async () => {
 														const conflict = await checkSlugTaken(value).catch(() => null)
 														if (conflict !== null && conflict.id !== project.value.id) {
-															takenBy.value = conflict
+															correctSlugConflict.value = conflict
 															slugValidation.value = 'taken'
 														} else {
-															takenBy.value = null
+															correctSlugConflict.value = null
 															slugValidation.value = 'available'
 														}
 													}, 400)

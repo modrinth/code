@@ -3,7 +3,7 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import { group, md, stage, toggle } from '../../types/node'
+import { group, md, mdOptional, stage, toggle } from '../../types/node'
 import type { ChildEntry, GroupNodeBuilder } from '../../types/node'
 import { promptSourceRequired } from '../..'
 
@@ -107,15 +107,7 @@ export default function () {
 				for (const [id, toggles] of byId) {
 					out += linkLine(id)
 					for (const t of toggles) {
-						let note = (await md(`checklist/messages/links/${id}/${t}`)(state)).trim()
-						if (!note && (t === 'inaccessible' || t === 'misused')) {
-							note = (
-								await md(`checklist/messages/links/${t}`, () => ({
-									LINK_NAME: linkNames[id] ?? id,
-									LINK_URL: project.value.link_urls[id]?.url ?? '',
-								}))(state)
-							).trim()
-						}
+						const note = (await mdOptional(`checklist/messages/links/${id}/${t}`)(state)).trim()
 						if (note) out += `    - ${note}\n`
 					}
 				}
@@ -125,12 +117,12 @@ export default function () {
 			let message = await md('checklist/messages/links/header')(state)
 
 			if (misused.length) {
-				message += `</br>\n\n**These links appear to be misused or not related to your project:**\n\n`
+				message += await md('checklist/messages/links/misused-header')(state)
 				message += await renderGroup(misused)
 			}
 
 			if (inaccessible.length) {
-				message += `</br>\n\n**These links appear to be inaccessible:**\n\n`
+				message += await md('checklist/messages/links/inaccessible-header')(state)
 				message += await renderGroup(inaccessible)
 			}
 
@@ -150,7 +142,7 @@ export default function () {
 			linkSection('site', 'Website'),
 			linkSection('store', 'Store'),
 
-			group('donations')
+			group()
 				.layout('column')
 				.children(
 					linkSection('patreon', 'Patreon'),

@@ -69,6 +69,17 @@ const messageFiles = import.meta.glob('../data/messages/**/*.md', {
 	import: 'default',
 })
 
+export function mdOptional(
+	path: string,
+	getVars?: (state: Record<string, any>) => Record<string, any>,
+): MessageFn {
+	return makeMessageFn(async (state) => {
+		const loader = messageFiles[`../data/messages/${path}.md`]
+		if (!loader) return ''
+		return loadMd(path, state, _project!.value, _projectV2!.value, getVars)
+	})
+}
+
 export function mdEscape(text: string): string {
 	return text.replace(/[\\*_`[~]/g, '\\$&')
 }

@@ -1,7 +1,7 @@
 <template>
 	<KeybindsModal ref="keybindsModal" />
 	<ConfirmModal
-		v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
+		v-if="isLockedByOther"
 		ref="takeOverModal"
 		title="Override moderation lock"
 		description="Are you sure you want to override?"
@@ -13,7 +13,7 @@
 	<div
 		tabindex="0"
 		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
-		:class="{ '!w-fit': collapsed, locked: lockStatus?.locked && !lockStatus?.isOwnLock }"
+		:class="{ '!w-fit': collapsed, locked: isLockedByOther }"
 	>
 		<div class="flex grow-0 flex-col gap-1">
 			<div class="flex items-center gap-2">
@@ -24,7 +24,7 @@
 						placement="center"
 						btn-class="inline-flex items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
-						<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
+						<component :is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)" class="text-orange" />
 						{{ checklistTitleText }}
 						<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
 							<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
@@ -42,7 +42,7 @@
 						disabled
 						class="inline-flex cursor-default items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
-						<component :is="currentStageObj._icon ?? ScaleIcon" class="text-orange" />
+						<component :is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)" class="text-orange" />
 						{{ checklistTitleText }}
 					</button>
 				</h1>
@@ -51,19 +51,19 @@
 						<KeyboardIcon />
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-if="currentStageObj._guidanceUrl" circular>
+				<ButtonStyled v-if="!isPseudoStage && currentStageObj._guidanceUrl" circular>
 					<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl">
 						<FileTextIcon />
 					</a>
 				</ButtonStyled>
 				<ButtonStyled
 					circular
-					:color="currentStageHasState ? 'orange' : 'red'"
+					:color="!isPseudoStage && currentStageHasState ? 'orange' : 'red'"
 					color-fill="none"
 					hover-color-fill="background"
 				>
 					<button
-						v-tooltip="currentStageHasState ? 'Reset Stage' : 'Reset Checklist'"
+						v-tooltip="!isPseudoStage && currentStageHasState ? 'Reset Stage' : 'Reset Checklist'"
 						:disabled="!checklistHasState"
 						@click="resetProgress"
 					>
@@ -83,14 +83,7 @@
 			</div>
 		</div>
 		<p
-			v-if="
-				currentStageObj._hint &&
-				!collapsed &&
-				!alreadyReviewed &&
-				!done &&
-				!generatedMessage &&
-				!(lockStatus?.locked && !lockStatus?.isOwnLock)
-			"
+			v-if="currentStageObj._hint && !collapsed && !isPseudoStage"
 			class="m-0 text-sm text-secondary"
 		>
 			{{ currentStageObj._hint }}
@@ -102,7 +95,7 @@
 		>
 			<div class="mb-3 mt-2 h-[1px] w-full bg-divider" />
 
-			<div v-if="lockStatus?.locked && !lockStatus?.isOwnLock" class="flex flex-1 flex-col">
+			<div v-if="isLockedByOther" class="flex flex-1 flex-col">
 				<div class="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center">
 					<LockIcon class="size-8 text-orange" />
 					<span class="text-secondary">
@@ -983,7 +976,7 @@ const checklistHasState = computed(() =>
 )
 
 function resetProgress() {
-	if (currentStageHasState.value) {
+	if (!isPseudoStage.value && currentStageHasState.value) {
 		Reflect.deleteProperty(nodeStates.value, currentStageObj.value.id!)
 		clearGeneratedMessageState()
 		return
@@ -1009,6 +1002,9 @@ function findFirstValidStage(): number {
 
 const currentStageObj = computed(() => resolvedStages.value[currentStage.value])
 const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
+const isPseudoStage = computed(
+	() => alreadyReviewed.value || done.value || generatedMessage.value || isLockedByOther.value,
+)
 const canOpenStageSelectorFromTitle = computed(
 	() => !alreadyReviewed.value && !done.value && !isLockedByOther.value,
 )
