@@ -15,10 +15,7 @@ use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{app_data_config, app_fallback_config, env};
-use labrinth::{
-    app_routes_config_internal, app_routes_config_v2, app_routes_config_v3,
-};
+use labrinth::{app_data_config, app_fallback_config, app_routes_config, env};
 use labrinth::{clickhouse, database, file_hosting};
 use scalar_api_reference::actix_web::config as scalar_config;
 use serde_json::json;
@@ -275,11 +272,7 @@ async fn app() -> std::io::Result<()> {
             // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
             .configure(|cfg| app_data_config(cfg, labrinth_config.clone()))
-            .configure(|cfg| app_routes_config_v2(cfg, labrinth_config.clone()))
-            .configure(|cfg| app_routes_config_v3(cfg, labrinth_config.clone()))
-            .configure(|cfg| {
-                app_routes_config_internal(cfg, labrinth_config.clone())
-            });
+            .configure(|cfg| app_routes_config(cfg, labrinth_config.clone()));
 
         let scalar_configuration = json!({
             "sources": [

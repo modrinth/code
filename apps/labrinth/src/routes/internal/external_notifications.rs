@@ -427,7 +427,7 @@ async fn broadcast_notifications(
             redis,
             RedisFriendsMessage::Notification {
                 to_user,
-                notification,
+                notification_id,
             },
         )
         .await
