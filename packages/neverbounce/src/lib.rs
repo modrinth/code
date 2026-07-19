@@ -109,7 +109,7 @@ impl VerificationResult {
             VerificationResult::Disposable => "disposable",
             VerificationResult::CatchAll => "catchall",
             VerificationResult::Unknown => "unknown",
-            VerificationResult::Unrecognized(other) => &other,
+            VerificationResult::Unrecognized(other) => other,
         }
     }
 }
