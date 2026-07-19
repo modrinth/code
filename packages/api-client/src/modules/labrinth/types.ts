@@ -2226,6 +2226,26 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type DelphiRule = {
+				id: number
+				name: string
+				priority: number
+				expression: string
+				revision_id: number
+				created: string
+				updated: string
+				revision_created: string
+				created_by: number | null
+				updated_by: number | null
+				revision_created_by: number | null
+			}
+
+			export type WriteDelphiRule = {
+				name: string
+				priority: number
+				expression: string
+			}
+
 			export type SearchProjectsRequest = {
 				limit?: number
 				page?: number

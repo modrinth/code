@@ -1,0 +1,61 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tUPDATE delphi_rules\n\t\tSET\n\t\t\tname = $2,\n\t\t\tpriority = $3,\n\t\t\tupdated = CURRENT_TIMESTAMP,\n\t\t\tupdated_by = $4\n\t\tWHERE id = $1\n\t\tRETURNING id, name, priority, created, updated, created_by, updated_by\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "priority",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "3fd6d574c4feaec4b5116a43432a9ff55fc6dda4b154dc3136478d3772e06020"
+}

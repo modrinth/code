@@ -6,6 +6,54 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		return 'labrinth_tech_review_internal'
 	}
 
+	public async getRules(): Promise<Labrinth.TechReview.Internal.DelphiRule[]> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRule[]>(
+			'/moderation/tech-review/rules',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async createRule(
+		rule: Labrinth.TechReview.Internal.WriteDelphiRule,
+	): Promise<Labrinth.TechReview.Internal.DelphiRule> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRule>(
+			'/moderation/tech-review/rules',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: rule,
+			},
+		)
+	}
+
+	public async updateRule(
+		id: number,
+		rule: Labrinth.TechReview.Internal.WriteDelphiRule,
+	): Promise<Labrinth.TechReview.Internal.DelphiRule> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRule>(
+			`/moderation/tech-review/rules/${id}`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'PUT',
+				body: rule,
+			},
+		)
+	}
+
+	public async deleteRule(id: number): Promise<void> {
+		return this.client.request<void>(`/moderation/tech-review/rules/${id}`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+		})
+	}
+
 	/**
 	 * Search for projects awaiting technical review.
 	 *

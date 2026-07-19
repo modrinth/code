@@ -5,10 +5,12 @@ import {
 	ListFilterIcon,
 	LoaderCircleIcon,
 	SearchIcon,
+	SettingsIcon,
 	SortAscIcon,
 	SortDescIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
@@ -607,6 +609,13 @@ watch(totalPages, (pages) => {
 			<div
 				class="flex flex-col items-stretch justify-end gap-2 sm:flex-row sm:items-center lg:flex-shrink-0"
 			>
+				<ButtonStyled>
+					<NuxtLink to="/moderation/technical-review/rules">
+						<SettingsIcon class="size-5" />
+						Rules
+					</NuxtLink>
+				</ButtonStyled>
+
 				<Combobox
 					v-model="currentResponseFilter"
 					class="!w-full flex-grow sm:!w-[120px] sm:flex-grow-0"
