@@ -20,6 +20,7 @@ import {
 	loadTexture as loadSkinTexture,
 } from '#ui/utils/webgl/skin-rendering.ts'
 
+import { applyEarsMod, removeEarsMod } from './use-ears-mod-features'
 import type { SkinPreviewTuple } from './types'
 
 const SKIN_LAYER_DEPTH_BIAS = -1
@@ -147,6 +148,7 @@ export function useSkinPreviewScene({
 		}
 
 		applyTexture(scene.value, texture.value)
+		applyEarsMod(scene.value, texture.value)
 	}
 
 	function applyCapeTextureToLoadedModel() {
@@ -173,6 +175,7 @@ export function useSkinPreviewScene({
 
 			const previousScene = scene.value
 			cleanupAnimationState(previousScene)
+			removeEarsMod(previousScene)
 			disposeSceneMaterials(previousScene)
 			scene.value = clonedScene
 			loadedModelSrc.value = src
@@ -301,6 +304,7 @@ export function useSkinPreviewScene({
 		capeLoadVersion++
 
 		cleanupAnimationState(scene.value)
+		removeEarsMod(scene.value)
 		disposeSceneMaterials(scene.value)
 		scene.value = null
 		transparentTexture.dispose()
