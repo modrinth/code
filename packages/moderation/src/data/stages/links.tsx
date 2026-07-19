@@ -139,7 +139,9 @@ export default function () {
 		.children(
 			linkSection('issues', 'Issue tracker').children(toggle('disabled', 'Disabled')),
 
-			linkSection('source', 'Source code').label(showWarning).children(toggle('empty', 'Empty Repo')),
+			linkSection('source', 'Source code')
+				.label(showWarning)
+				.children(toggle('empty', 'Empty Repo')),
 
 			linkSection('wiki', 'Wiki page').children(toggle('disabled', 'Disabled')),
 

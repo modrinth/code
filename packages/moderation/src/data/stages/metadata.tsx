@@ -43,10 +43,7 @@ export default function () {
 					if (env.length === 1) {
 						return (
 							<div class="markdown-body w-full">
-								<strong>Environment:</strong>{' '}
-								<code>
-									{env[0]}
-								</code>
+								<strong>Environment:</strong> <code>{env[0]}</code>
 							</div>
 						)
 					}
@@ -54,10 +51,7 @@ export default function () {
 						<div class="markdown-body w-full">
 							<strong>Unique environments:</strong> {env.length}
 							<br />
-							<strong>Environments:</strong>{' '}
-							<code>
-								{env.join(', ')}
-							</code>
+							<strong>Environments:</strong> <code>{env.join(', ')}</code>
 						</div>
 					)
 				},

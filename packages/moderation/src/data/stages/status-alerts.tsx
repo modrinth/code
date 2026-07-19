@@ -32,8 +32,7 @@ export default function (
 		.children(
 			() => (
 				<div class="markdown-body w-full">
-					<strong>Applying for:</strong>{' '}
-					<code>{project.value.requested_status ?? 'unknown'}</code>
+					<strong>Applying for:</strong> <code>{project.value.requested_status ?? 'unknown'}</code>
 				</div>
 			),
 

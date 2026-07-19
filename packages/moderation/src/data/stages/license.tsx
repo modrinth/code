@@ -39,11 +39,7 @@ export default function () {
 							<br />
 							<strong>Source Link:</strong>{' '}
 							{project.value.link_urls?.source?.url ? (
-								<a
-									href={project.value.link_urls.source.url}
-									target="_blank"
-									class="underline"
-								>
+								<a href={project.value.link_urls.source.url} target="_blank" class="underline">
 									{project.value.link_urls.source.url}
 								</a>
 							) : (
