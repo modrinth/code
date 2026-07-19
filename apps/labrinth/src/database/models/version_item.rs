@@ -1050,14 +1050,11 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        let mut keys = vec![
-            redis
-                .keyspace()
-                .entity(VERSIONS_NAMESPACE, version.inner.id.0),
-        ];
+        let mut keys =
+            vec![redis.key().entity(VERSIONS_NAMESPACE, version.inner.id.0)];
         keys.extend(version.files.iter().flat_map(|file| {
             file.hashes.iter().map(|(algorithm, hash)| {
-                redis.keyspace().entity(
+                redis.key().entity(
                     VERSION_FILES_NAMESPACE,
                     format!("{algorithm}_{hash}"),
                 )
@@ -1075,7 +1072,7 @@ impl DBVersion {
         let mut redis = redis.connect().await?;
         let keys = version_ids
             .iter()
-            .map(|id| redis.keyspace().entity(VERSIONS_NAMESPACE, id.0))
+            .map(|id| redis.key().entity(VERSIONS_NAMESPACE, id.0))
             .collect::<Vec<_>>();
 
         redis.delete_many(&keys).await?;

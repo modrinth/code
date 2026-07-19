@@ -152,7 +152,7 @@ impl QueryProductWithPrices {
     {
         {
             let mut redis = redis.connect().await?;
-            let key = redis.keyspace().metadata(PRODUCTS_NAMESPACE, "all");
+            let key = redis.key().metadata(PRODUCTS_NAMESPACE, "all");
 
             let res: Option<Vec<QueryProductWithPrices>> =
                 redis.get_deserialized(&key).await?;
@@ -194,7 +194,7 @@ impl QueryProductWithPrices {
             .collect::<Vec<_>>();
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().metadata(PRODUCTS_NAMESPACE, "all");
+        let key = redis.key().metadata(PRODUCTS_NAMESPACE, "all");
 
         redis.set_serialized(&key, &products, None).await?;
 

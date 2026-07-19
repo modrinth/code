@@ -268,11 +268,9 @@ async fn test_add_remove_project() {
             // Confirm that the project is gone from the cache
             let mut redis_conn =
                 test_env.db.redis_pool.connect().await.unwrap();
-            let slug_key = redis_conn
-                .keyspace()
-                .entity(PROJECTS_SLUGS_NAMESPACE, "demo");
-            let id_key =
-                redis_conn.keyspace().entity(PROJECTS_SLUGS_NAMESPACE, &id);
+            let slug_key =
+                redis_conn.key().entity(PROJECTS_SLUGS_NAMESPACE, "demo");
+            let id_key = redis_conn.key().entity(PROJECTS_SLUGS_NAMESPACE, &id);
             assert_eq!(
                 redis_conn
                     .get(&slug_key)

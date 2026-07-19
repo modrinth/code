@@ -217,7 +217,7 @@ impl DBCollection {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(COLLECTIONS_NAMESPACE, id.0);
+        let key = redis.key().entity(COLLECTIONS_NAMESPACE, id.0);
 
         redis.delete(&key).await?;
         Ok(())

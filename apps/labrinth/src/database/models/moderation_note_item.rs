@@ -37,9 +37,7 @@ impl DBModerationNote {
             let keys = user_ids
                 .iter()
                 .map(|id| {
-                    redis
-                        .keyspace()
-                        .entity(MODERATION_NOTES_USERS_NAMESPACE, id.0)
+                    redis.key().entity(MODERATION_NOTES_USERS_NAMESPACE, id.0)
                 })
                 .collect::<Vec<_>>();
             redis.get_many_deserialized::<Self>(&keys).await?
@@ -85,7 +83,7 @@ impl DBModerationNote {
 
             if let Some(user_id) = note.user_id {
                 let key = redis
-                    .keyspace()
+                    .key()
                     .entity(MODERATION_NOTES_USERS_NAMESPACE, user_id.0);
                 redis.set_serialized(&key, &note, None).await?;
                 notes.insert(user_id, note);
@@ -122,7 +120,7 @@ impl DBModerationNote {
                 .iter()
                 .map(|id| {
                     redis
-                        .keyspace()
+                        .key()
                         .entity(MODERATION_NOTES_ORGANIZATIONS_NAMESPACE, id.0)
                 })
                 .collect::<Vec<_>>();
@@ -168,7 +166,7 @@ impl DBModerationNote {
             };
 
             if let Some(organization_id) = note.organization_id {
-                let key = redis.keyspace().entity(
+                let key = redis.key().entity(
                     MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
                     organization_id.0,
                 );
@@ -279,7 +277,7 @@ impl DBModerationNote {
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
         let key = redis
-            .keyspace()
+            .key()
             .entity(MODERATION_NOTES_USERS_NAMESPACE, user_id.0);
         redis.delete(&key).await
     }
@@ -289,7 +287,7 @@ impl DBModerationNote {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(
+        let key = redis.key().entity(
             MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
             organization_id.0,
         );

@@ -220,7 +220,7 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         .await?;
 
         let mut conn = redis.connect().await?;
-        let key = conn.keyspace().entity(
+        let key = conn.key().entity(
             crate::database::models::loader_fields::LOADER_FIELD_ENUM_VALUES_NAMESPACE,
             game_versions_enum.id.0,
         );

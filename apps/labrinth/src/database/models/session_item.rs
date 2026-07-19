@@ -224,8 +224,7 @@ impl DBSession {
     {
         {
             let mut redis = redis.connect().await?;
-            let key =
-                redis.keyspace().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
+            let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
             let res = redis.get_deserialized::<Vec<i64>>(&key).await?;
 
@@ -250,7 +249,7 @@ impl DBSession {
         .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
+        let key = redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0);
 
         redis.set_serialized(&key, &db_sessions, None).await?;
 
@@ -275,16 +274,12 @@ impl DBSession {
             .into_iter()
             .flat_map(|(id, session, user_id)| {
                 [
-                    id.map(|id| {
-                        redis.keyspace().entity(SESSIONS_NAMESPACE, id.0)
-                    }),
+                    id.map(|id| redis.key().entity(SESSIONS_NAMESPACE, id.0)),
                     session.map(|session| {
-                        redis.keyspace().entity(SESSIONS_IDS_NAMESPACE, session)
+                        redis.key().entity(SESSIONS_IDS_NAMESPACE, session)
                     }),
                     user_id.map(|user_id| {
-                        redis
-                            .keyspace()
-                            .entity(SESSIONS_USERS_NAMESPACE, user_id.0)
+                        redis.key().entity(SESSIONS_USERS_NAMESPACE, user_id.0)
                     }),
                 ]
                 .into_iter()

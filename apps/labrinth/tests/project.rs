@@ -61,7 +61,7 @@ async fn test_get_project() {
         // Confirm that the request was cached
         let mut redis_pool = test_env.db.redis_pool.connect().await.unwrap();
         let slug_key = redis_pool
-            .keyspace()
+            .key()
             .entity(PROJECTS_SLUGS_NAMESPACE, alpha_project_slug);
         assert_eq!(
             redis_pool
@@ -72,7 +72,7 @@ async fn test_get_project() {
             Some(parse_base62(alpha_project_id).unwrap() as i64)
         );
 
-        let project_key = redis_pool.keyspace().entity(
+        let project_key = redis_pool.key().entity(
             PROJECTS_NAMESPACE,
             parse_base62(alpha_project_id).unwrap(),
         );
@@ -287,11 +287,9 @@ async fn test_add_remove_project() {
             // Confirm that the project is gone from the cache
             let mut redis_pool =
                 test_env.db.redis_pool.connect().await.unwrap();
-            let slug_key = redis_pool
-                .keyspace()
-                .entity(PROJECTS_SLUGS_NAMESPACE, "demo");
-            let id_key =
-                redis_pool.keyspace().entity(PROJECTS_SLUGS_NAMESPACE, &id);
+            let slug_key =
+                redis_pool.key().entity(PROJECTS_SLUGS_NAMESPACE, "demo");
+            let id_key = redis_pool.key().entity(PROJECTS_SLUGS_NAMESPACE, &id);
             assert_eq!(
                 redis_pool
                     .get(&slug_key)

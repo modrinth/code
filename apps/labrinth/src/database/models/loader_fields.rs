@@ -54,7 +54,7 @@ impl Game {
     {
         {
             let mut redis = redis.connect().await?;
-            let key = redis.keyspace().metadata(GAMES_LIST_NAMESPACE, "games");
+            let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
             let cached_games: Option<Vec<Game>> =
                 redis.get_deserialized(&key).await?;
             if let Some(cached_games) = cached_games {
@@ -79,7 +79,7 @@ impl Game {
         .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().metadata(GAMES_LIST_NAMESPACE, "games");
+        let key = redis.key().metadata(GAMES_LIST_NAMESPACE, "games");
 
         redis.set_serialized(&key, &result, None).await?;
 
@@ -108,7 +108,7 @@ impl Loader {
     {
         {
             let mut redis = redis.connect().await?;
-            let key = redis.keyspace().metadata(LOADER_ID, name);
+            let key = redis.key().metadata(LOADER_ID, name);
             let cached_id: Option<i32> = redis.get_deserialized(&key).await?;
             if let Some(cached_id) = cached_id {
                 return Ok(Some(LoaderId(cached_id)));
@@ -128,7 +128,7 @@ impl Loader {
 
         if let Some(result) = result {
             let mut redis = redis.connect().await?;
-            let key = redis.keyspace().metadata(LOADER_ID, name);
+            let key = redis.key().metadata(LOADER_ID, name);
             redis.set_serialized(&key, &result.0, None).await?;
         }
 
@@ -144,7 +144,7 @@ impl Loader {
     {
         {
             let mut redis = redis.connect().await?;
-            let key = redis.keyspace().metadata(LOADERS_LIST_NAMESPACE, "all");
+            let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
             let cached_loaders: Option<Vec<Loader>> =
                 redis.get_deserialized(&key).await?;
             if let Some(cached_loaders) = cached_loaders {
@@ -185,7 +185,7 @@ impl Loader {
         .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().metadata(LOADERS_LIST_NAMESPACE, "all");
+        let key = redis.key().metadata(LOADERS_LIST_NAMESPACE, "all");
 
         redis.set_serialized(&key, &result, None).await?;
 
@@ -457,8 +457,7 @@ impl LoaderField {
     {
         {
             let mut redis = redis.connect().await?;
-            let key =
-                redis.keyspace().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
+            let key = redis.key().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
 
             let cached_fields: Option<Vec<LoaderField>> =
                 redis.get_deserialized(&key).await?;
@@ -492,7 +491,7 @@ impl LoaderField {
             .collect();
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
+        let key = redis.key().metadata(LOADER_FIELDS_NAMESPACE_ALL, "");
 
         redis.set_serialized(&key, &result, None).await?;
 
@@ -511,7 +510,7 @@ impl LoaderFieldEnum {
         {
             let mut redis = redis.connect().await?;
             let key = redis
-                .keyspace()
+                .key()
                 .metadata(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name);
 
             let cached_enum = redis.get_deserialized(&key).await?;
@@ -540,7 +539,7 @@ impl LoaderFieldEnum {
 
         let mut redis = redis.connect().await?;
         let key = redis
-            .keyspace()
+            .key()
             .metadata(LOADER_FIELD_ENUMS_ID_NAMESPACE, enum_name);
 
         redis.set_serialized(&key, &result, None).await?;

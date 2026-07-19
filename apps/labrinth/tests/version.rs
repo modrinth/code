@@ -51,7 +51,7 @@ async fn test_get_version() {
         assert_eq!(&version.id.to_string(), alpha_version_id);
 
         let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
-        let version_key = redis_conn.keyspace().entity(
+        let version_key = redis_conn.key().entity(
             VERSIONS_NAMESPACE,
             parse_base62(alpha_version_id).unwrap(),
         );

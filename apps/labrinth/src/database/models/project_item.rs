@@ -974,9 +974,7 @@ impl DBProject {
 
         {
             let mut redis = redis.connect().await?;
-            let key = redis
-                .keyspace()
-                .entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
+            let key = redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
             let dependencies =
                 redis.get_deserialized::<Dependencies>(&key).await?;
@@ -1011,9 +1009,7 @@ impl DBProject {
         .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis
-            .keyspace()
-            .entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
+        let key = redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0);
 
         redis.set_serialized(&key, &dependencies, None).await?;
         Ok(dependencies)
@@ -1026,19 +1022,17 @@ impl DBProject {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        let mut keys = vec![redis.keyspace().entity(PROJECTS_NAMESPACE, id.0)];
+        let mut keys = vec![redis.key().entity(PROJECTS_NAMESPACE, id.0)];
         if let Some(slug) = slug {
             keys.push(
                 redis
-                    .keyspace()
+                    .key()
                     .entity(PROJECTS_SLUGS_NAMESPACE, slug.to_lowercase()),
             );
         }
         if clear_dependencies.unwrap_or(false) {
             keys.push(
-                redis
-                    .keyspace()
-                    .entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0),
+                redis.key().entity(PROJECTS_DEPENDENCIES_NAMESPACE, id.0),
             );
         }
 

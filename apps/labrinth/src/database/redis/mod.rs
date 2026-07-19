@@ -227,7 +227,7 @@ impl ConnectionProvider for RedisPool {
 }
 
 impl RedisConnection {
-    pub fn keyspace(&self) -> &KeyBuilder {
+    pub fn key(&self) -> &KeyBuilder {
         &self.key_builder
     }
 

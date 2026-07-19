@@ -116,9 +116,7 @@ pub async fn cache_analytics(
         };
 
         debug!("Caching analytics for {project_id}: {analytics:?}");
-        let key = redis
-            .keyspace()
-            .entity(MINECRAFT_SERVER_ANALYTICS, project_id);
+        let key = redis.key().entity(MINECRAFT_SERVER_ANALYTICS, project_id);
         redis
             .set_serialized(&key, analytics, None)
             .await

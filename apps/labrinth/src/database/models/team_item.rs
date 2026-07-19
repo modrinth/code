@@ -265,7 +265,7 @@ impl DBTeamMember {
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(TEAMS_NAMESPACE, id.0);
+        let key = redis.key().entity(TEAMS_NAMESPACE, id.0);
         redis.delete(&key).await?;
         Ok(())
     }

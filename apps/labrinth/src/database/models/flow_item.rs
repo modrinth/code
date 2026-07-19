@@ -75,7 +75,7 @@ impl DBFlow {
         state: &str,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(FLOWS_NAMESPACE, state);
+        let key = redis.key().entity(FLOWS_NAMESPACE, state);
 
         redis
             .set_serialized(&key, &self, Some(expires.num_seconds()))
@@ -103,7 +103,7 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<DBFlow>, DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(FLOWS_NAMESPACE, id);
+        let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
         redis.get_deserialized(&key).await
     }
@@ -129,7 +129,7 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(FLOWS_NAMESPACE, id);
+        let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
         redis.delete(&key).await?;
         Ok(Some(()))

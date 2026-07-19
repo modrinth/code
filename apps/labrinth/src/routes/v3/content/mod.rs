@@ -295,7 +295,7 @@ async fn increment_content_resolve_cache_heat(
             return None;
         }
     };
-    let key = redis.keyspace().with_slot(
+    let key = redis.key().with_slot(
         CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE,
         heat_key,
         heat_key,
@@ -339,7 +339,7 @@ async fn get_cached_resolve_content_plan(
             return None;
         }
     };
-    let key = redis.keyspace().with_slot(
+    let key = redis.key().with_slot(
         CONTENT_RESOLVE_CACHE_NAMESPACE,
         cache_key,
         cache_key,
@@ -369,7 +369,7 @@ async fn set_cached_resolve_content_plan(
             return;
         }
     };
-    let key = redis.keyspace().with_slot(
+    let key = redis.key().with_slot(
         CONTENT_RESOLVE_CACHE_NAMESPACE,
         cache_key,
         cache_key,

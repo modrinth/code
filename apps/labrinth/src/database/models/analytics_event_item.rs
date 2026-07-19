@@ -87,7 +87,7 @@ impl DBAnalyticsEvent {
     ) -> Result<Vec<DBAnalyticsEvent>, DatabaseError> {
         let mut redis = redis.connect().await?;
         let key = redis
-            .keyspace()
+            .key()
             .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
 
         if let Some(events) = redis.get_deserialized(&key).await? {
@@ -123,7 +123,7 @@ impl DBAnalyticsEvent {
     pub async fn clear_cache(redis: &RedisPool) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
         let key = redis
-            .keyspace()
+            .key()
             .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
         redis.delete(&key).await?;
         Ok(())

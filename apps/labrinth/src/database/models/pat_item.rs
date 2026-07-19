@@ -159,7 +159,7 @@ impl DBPersonalAccessToken {
     {
         {
             let mut redis = redis.connect().await?;
-            let key = redis.keyspace().entity(PATS_USERS_NAMESPACE, user_id.0);
+            let key = redis.key().entity(PATS_USERS_NAMESPACE, user_id.0);
 
             let res = redis.get_deserialized::<Vec<i64>>(&key).await?;
 
@@ -183,7 +183,7 @@ impl DBPersonalAccessToken {
         .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(PATS_USERS_NAMESPACE, user_id.0);
+        let key = redis.key().entity(PATS_USERS_NAMESPACE, user_id.0);
 
         redis.set_serialized(&key, &db_pats, None).await?;
         Ok(db_pats)
@@ -203,12 +203,12 @@ impl DBPersonalAccessToken {
             .into_iter()
             .flat_map(|(id, token, user_id)| {
                 [
-                    id.map(|id| redis.keyspace().entity(PATS_NAMESPACE, id.0)),
+                    id.map(|id| redis.key().entity(PATS_NAMESPACE, id.0)),
                     token.map(|token| {
-                        redis.keyspace().entity(PATS_TOKENS_NAMESPACE, token)
+                        redis.key().entity(PATS_TOKENS_NAMESPACE, token)
                     }),
                     user_id.map(|user_id| {
-                        redis.keyspace().entity(PATS_USERS_NAMESPACE, user_id.0)
+                        redis.key().entity(PATS_USERS_NAMESPACE, user_id.0)
                     }),
                 ]
                 .into_iter()

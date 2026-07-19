@@ -55,9 +55,8 @@ impl NotificationTemplate {
     ) -> Result<Vec<NotificationTemplate>, DatabaseError> {
         {
             let mut redis = redis.connect().await?;
-            let key = redis
-                .keyspace()
-                .metadata(TEMPLATES_NAMESPACE, channel.as_str());
+            let key =
+                redis.key().metadata(TEMPLATES_NAMESPACE, channel.as_str());
 
             let maybe_cached_templates = redis.get_deserialized(&key).await?;
 
@@ -79,9 +78,7 @@ impl NotificationTemplate {
         let templates = results.into_iter().map(Into::into).collect();
 
         let mut redis = redis.connect().await?;
-        let key = redis
-            .keyspace()
-            .metadata(TEMPLATES_NAMESPACE, channel.as_str());
+        let key = redis.key().metadata(TEMPLATES_NAMESPACE, channel.as_str());
 
         redis
             .set_serialized(&key, &templates, Some(TEMPLATES_CACHE_EXPIRY))
@@ -95,9 +92,7 @@ impl NotificationTemplate {
         redis: &RedisPool,
     ) -> Result<Option<String>, DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis
-            .keyspace()
-            .metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
+        let key = redis.key().metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
         redis.get_deserialized(&key).await
     }
 
@@ -107,9 +102,7 @@ impl NotificationTemplate {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        let key = redis
-            .keyspace()
-            .metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
+        let key = redis.key().metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
         redis
             .set_serialized(&key, &data, Some(HTML_DATA_CACHE_EXPIRY))
             .await
@@ -131,7 +124,7 @@ where
 
     let mut redis_conn = redis.connect().await?;
     let redis_key = redis_conn
-        .keyspace()
+        .key()
         .metadata(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key);
     if let Some(body) =
         redis_conn.get_deserialized::<HtmlBody>(&redis_key).await?
@@ -144,7 +137,7 @@ where
     let cached = HtmlBody { html: get().await? };
     let mut redis_conn = redis.connect().await?;
     let redis_key = redis_conn
-        .keyspace()
+        .key()
         .metadata(TEMPLATES_DYNAMIC_HTML_NAMESPACE, key);
 
     redis_conn

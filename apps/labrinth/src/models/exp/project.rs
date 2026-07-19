@@ -260,9 +260,7 @@ pub async fn fetch_query_context(
         let ping_keys = minecraft_java_server_pings
             .iter()
             .map(|project_id| {
-                redis
-                    .keyspace()
-                    .entity(server_ping::REDIS_NAMESPACE, project_id)
+                redis.key().entity(server_ping::REDIS_NAMESPACE, project_id)
             })
             .collect::<Vec<_>>();
         redis
@@ -285,9 +283,7 @@ pub async fn fetch_query_context(
         let analytics_keys = minecraft_server_analytics
             .iter()
             .map(|project_id| {
-                redis
-                    .keyspace()
-                    .entity(MINECRAFT_SERVER_ANALYTICS, project_id)
+                redis.key().entity(MINECRAFT_SERVER_ANALYTICS, project_id)
             })
             .collect::<Vec<_>>();
         redis

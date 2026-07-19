@@ -433,9 +433,8 @@ impl DBNotification {
     {
         {
             let mut redis = redis.connect().await?;
-            let key = redis
-                .keyspace()
-                .entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
+            let key =
+                redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
 
             let cached_notifications: Option<Vec<DBNotification>> =
                 redis.get_deserialized(&key).await?;
@@ -490,9 +489,7 @@ impl DBNotification {
             .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis
-            .keyspace()
-            .entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
+        let key = redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, user_id.0);
 
         redis.set_serialized(&key, &db_notifications, None).await?;
 
@@ -635,9 +632,7 @@ impl DBNotification {
         let mut redis = redis.connect().await?;
         let keys = user_ids
             .into_iter()
-            .map(|id| {
-                redis.keyspace().entity(USER_NOTIFICATIONS_NAMESPACE, id.0)
-            })
+            .map(|id| redis.key().entity(USER_NOTIFICATIONS_NAMESPACE, id.0))
             .collect::<Vec<_>>();
 
         redis.delete_many(&keys).await?;

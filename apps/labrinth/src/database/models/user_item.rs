@@ -389,8 +389,7 @@ impl DBUser {
 
         {
             let mut redis = redis.connect().await?;
-            let key =
-                redis.keyspace().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
+            let key = redis.key().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
             let cached_projects =
                 redis.get_deserialized::<Vec<DBProjectId>>(&key).await?;
@@ -415,7 +414,7 @@ impl DBUser {
         .await?;
 
         let mut redis = redis.connect().await?;
-        let key = redis.keyspace().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
+        let key = redis.key().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
         redis.set_serialized(&key, &db_projects, None).await?;
 
@@ -552,9 +551,9 @@ impl DBUser {
             .iter()
             .flat_map(|(id, username)| {
                 [
-                    Some(redis.keyspace().entity(USERS_NAMESPACE, id.0)),
+                    Some(redis.key().entity(USERS_NAMESPACE, id.0)),
                     username.as_ref().map(|username| {
-                        redis.keyspace().entity(
+                        redis.key().entity(
                             USER_USERNAMES_NAMESPACE,
                             username.to_lowercase(),
                         )
@@ -576,7 +575,7 @@ impl DBUser {
         let mut redis = redis.connect().await?;
         let keys = user_ids
             .iter()
-            .map(|id| redis.keyspace().entity(USERS_PROJECTS_NAMESPACE, id.0))
+            .map(|id| redis.key().entity(USERS_PROJECTS_NAMESPACE, id.0))
             .collect::<Vec<_>>();
 
         redis.delete_many(&keys).await?;

@@ -256,11 +256,10 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
-        let mut keys =
-            vec![redis.keyspace().entity(ORGANIZATIONS_NAMESPACE, id.0)];
+        let mut keys = vec![redis.key().entity(ORGANIZATIONS_NAMESPACE, id.0)];
         if let Some(slug) = slug {
             keys.push(
-                redis.keyspace().entity(
+                redis.key().entity(
                     ORGANIZATIONS_TITLES_NAMESPACE,
                     slug.to_lowercase(),
                 ),
