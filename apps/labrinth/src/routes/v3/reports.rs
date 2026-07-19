@@ -6,6 +6,7 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
+use crate::database::models::SharedInstanceId;
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
@@ -103,6 +104,7 @@ pub async fn report_create(
         project_id: None,
         version_id: None,
         user_id: None,
+        shared_instance_id: None,
         body: new_report.body.clone(),
         reporter: current_user.id.into(),
         created: Utc::now(),
@@ -168,6 +170,15 @@ pub async fn report_create(
             }
 
             report.user_id = Some(user_id.into())
+        }
+        ItemType::SharedInstance => {
+            let shared_instance_id = SharedInstanceId(
+                parse_base62(new_report.item_id.as_str())? as i64,
+            );
+
+            // TODO: validate that the shared instance exists
+
+            report.shared_instance_id = Some(shared_instance_id)
         }
         ItemType::Unknown => {
             return Err(ApiError::InvalidInput(format!(
