@@ -3,7 +3,6 @@ mod local;
 
 use std::time::Duration;
 
-use redis::aio::ConnectionLike;
 use tokio::time::Instant;
 
 use crate::database::models::DatabaseError;
@@ -100,21 +99,6 @@ pub(super) enum OwnedLockGuard {
 }
 
 impl OwnedLockGuard {
-    pub(super) async fn validate_with_connection<C>(
-        &self,
-        connection: &mut C,
-    ) -> Result<bool, DatabaseError>
-    where
-        C: ConnectionLike,
-    {
-        match self {
-            Self::Local(_) => Ok(true),
-            Self::Distributed(guard) => {
-                guard.validate_with_connection(connection).await
-            }
-        }
-    }
-
     pub(super) async fn release(self) -> Result<ReleaseOutcome, DatabaseError> {
         match self {
             Self::Local(guard) => {

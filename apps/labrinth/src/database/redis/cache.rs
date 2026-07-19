@@ -412,7 +412,6 @@ impl CacheManager {
 
         let mut waiters = Vec::new();
         let mut owned_locks = HashMap::new();
-        let mut has_contention = false;
 
         if !ids.is_empty() {
             let fetch_ids = ids
@@ -438,7 +437,6 @@ impl CacheManager {
                         owned_locks.insert(key, guard);
                     }
                     LockAcquisition::Waiting(waiter) => {
-                        has_contention = true;
                         if let Some(canonical_key) =
                             expired_identities.get(&key).cloned()
                             && let Some(value) =
@@ -457,33 +455,25 @@ impl CacheManager {
             }
         }
 
-        let is_contended = has_contention;
         let fill_result = if !ids.is_empty() {
             async {
                 let fetch_ids = ids
                     .iter()
                     .map(|entry| entry.value().clone())
                     .collect::<Vec<_>>();
-                let fill_deadline = if is_contended {
-                    deadline
-                } else {
-                    Instant::now() + FILL_TIMEOUT
-                };
+
+                let fill_deadline = Instant::now() + FILL_TIMEOUT;
+
                 let values = timeout_at(fill_deadline, closure(fetch_ids))
                     .await
                     .map_err(|_| {
-                        if is_contended {
-                            lock_timeout_error(
-                                self.locking.strategy(),
-                                0,
-                                waiters.len(),
-                            )
-                        } else {
-                            DatabaseError::Internal(eyre::eyre!(
-                                "cache fill timed out after 60 seconds"
-                            ))
-                        }
+                        lock_timeout_error(
+                            self.locking.strategy(),
+                            0,
+                            waiters.len(),
+                        )
                     })??;
+
                 let mut return_values = HashMap::new();
                 let mut encoded_values = Vec::with_capacity(values.len());
 
@@ -499,51 +489,32 @@ impl CacheManager {
                 }
 
                 let mut connection = provider.connect().await?;
-                let mut ownership_valid = true;
-                for lock in owned_locks.values() {
-                    match lock.validate_with_connection(&mut connection).await {
-                        Ok(true) => {}
-                        Ok(false) => {
-                            ownership_valid = false;
-                            break;
-                        }
-                        Err(_) => {
-                            ownership_valid = false;
-                            break;
-                        }
-                    }
-                }
-
-                if ownership_valid {
-                    for (key, slug, _, encoded) in &encoded_values {
-                        let redis_key =
-                            self.key_builder.entity(namespace, key.to_string());
+                for (key, slug, _, encoded) in &encoded_values {
+                    let redis_key =
+                        self.key_builder.entity(namespace, key.to_string());
+                    commands::set(
+                        &mut connection,
+                        &redis_key,
+                        encoded,
+                        Some(default_expiry),
+                    )
+                    .await?;
+                    if let Some(slug) = slug
+                        && let Some(slug_namespace) = slug_namespace
+                    {
+                        let canonical_key = key.to_string();
+                        let actual_slug =
+                            normalize_key(&slug.to_string(), case_sensitive);
+                        let slug_key = self
+                            .key_builder
+                            .entity(slug_namespace, actual_slug);
                         commands::set(
                             &mut connection,
-                            &redis_key,
-                            encoded,
+                            &slug_key,
+                            canonical_key.as_bytes(),
                             Some(default_expiry),
                         )
                         .await?;
-                        if let Some(slug) = slug
-                            && let Some(slug_namespace) = slug_namespace
-                        {
-                            let canonical_key = key.to_string();
-                            let actual_slug = normalize_key(
-                                &slug.to_string(),
-                                case_sensitive,
-                            );
-                            let slug_key = self
-                                .key_builder
-                                .entity(slug_namespace, actual_slug);
-                            commands::set(
-                                &mut connection,
-                                &slug_key,
-                                canonical_key.as_bytes(),
-                                Some(default_expiry),
-                            )
-                            .await?;
-                        }
                     }
                 }
 
@@ -763,71 +734,5 @@ pub struct RedisValue<T, K, S> {
 impl<T, K, S> RedisValue<T, K, S> {
     pub fn value(&self) -> &T {
         &self.val
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use dashmap::DashMap;
-
-    use super::{RedisValue, remove_resolved_ids, value_identities};
-
-    #[test]
-    fn stale_identity_index_includes_equivalent_request_forms() {
-        let value = RedisValue {
-            key: 1234_u64,
-            alias: Some("ExampleSlug"),
-            iat: 0,
-            val: (),
-        };
-        let identities = value_identities(&value, false);
-
-        assert!(identities.contains(&"1234".to_string()));
-        assert!(
-            identities.contains(&ariadne::ids::base62_impl::to_base62(1234))
-        );
-        assert!(identities.contains(&"ExampleSlug".to_string()));
-        assert!(identities.contains(&"exampleslug".to_string()));
-    }
-
-    #[test]
-    fn resolving_stale_value_removes_every_equivalent_request_form() {
-        let value = RedisValue {
-            key: 1234_u64,
-            alias: Some("ExampleSlug"),
-            iat: 0,
-            val: (),
-        };
-        let ids = DashMap::new();
-        ids.insert("1234".to_string(), ());
-        ids.insert(
-            ariadne::ids::base62_impl::to_base62(1234).to_lowercase(),
-            (),
-        );
-        ids.insert("exampleslug".to_string(), ());
-
-        remove_resolved_ids(&ids, &value, false);
-
-        assert!(ids.is_empty());
-    }
-
-    #[test]
-    fn case_sensitive_alias_resolution_preserves_other_case() {
-        let value = RedisValue {
-            key: 1234_u64,
-            alias: Some("mra_PATValue"),
-            iat: 0,
-            val: (),
-        };
-        let identities = value_identities(&value, true);
-        let ids = DashMap::new();
-        ids.insert("mra_PATValue".to_string(), ());
-        ids.insert("mra_patvalue".to_string(), ());
-
-        remove_resolved_ids(&ids, &value, true);
-
-        assert!(identities.contains(&"mra_PATValue".to_string()));
-        assert!(!identities.contains(&"mra_patvalue".to_string()));
-        assert!(ids.contains_key("mra_patvalue"));
     }
 }

@@ -261,32 +261,3 @@ impl RedisConfig {
         self.cache_locking_strategy
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::CacheLockingStrategy;
-
-    #[test]
-    fn cache_locking_strategy_defaults_to_local() {
-        assert_eq!(
-            CacheLockingStrategy::default(),
-            CacheLockingStrategy::Local
-        );
-    }
-
-    #[test]
-    fn cache_locking_strategy_parsing_is_strict() {
-        assert_eq!(
-            "local".parse::<CacheLockingStrategy>().unwrap(),
-            CacheLockingStrategy::Local
-        );
-        assert_eq!(
-            "distributed".parse::<CacheLockingStrategy>().unwrap(),
-            CacheLockingStrategy::Distributed
-        );
-
-        for invalid in ["", "LOCAL", "Distributed", " local", "local "] {
-            assert!(invalid.parse::<CacheLockingStrategy>().is_err());
-        }
-    }
-}

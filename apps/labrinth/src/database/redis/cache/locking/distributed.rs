@@ -1,8 +1,5 @@
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-use redis::aio::ConnectionLike;
 use tokio::runtime::Handle;
 use tokio::time::{Instant, sleep, timeout_at};
 use tokio_util::sync::CancellationToken;
@@ -43,18 +40,15 @@ impl DistributedLockManager {
             )));
         }
 
-        let state = Arc::new(LeaseState::new());
         let renewal_cancellation_token = CancellationToken::new();
         self.spawn_renewal(
             lock_key.clone(),
-            state.clone(),
             renewal_cancellation_token.clone(),
         );
         Ok(LockAcquisition::Owned(OwnedLockGuard::Distributed(
             DistributedLockGuard {
                 manager: self.clone(),
                 lock_key,
-                state,
                 renewal_cancellation_token,
                 cleanup_complete: false,
             },
@@ -81,22 +75,6 @@ impl DistributedLockManager {
         .await
     }
 
-    async fn renew_with_connection<C>(
-        &self,
-        connection: &mut C,
-        lock_key: &str,
-    ) -> Result<bool, DatabaseError>
-    where
-        C: ConnectionLike,
-    {
-        commands::renew_lock(
-            connection,
-            lock_key,
-            duration_millis(self.timing.lease),
-        )
-        .await
-    }
-
     async fn release(&self, lock_key: &str) -> Result<bool, DatabaseError> {
         let mut connection = self.backend.connect().await?;
         commands::release_lock(&mut connection, lock_key).await
@@ -110,7 +88,6 @@ impl DistributedLockManager {
     fn spawn_renewal(
         &self,
         lock_key: String,
-        state: Arc<LeaseState>,
         cancellation_token: CancellationToken,
     ) {
         let manager = self.clone();
@@ -127,12 +104,8 @@ impl DistributedLockManager {
 
                 match result {
                     Ok(true) => {}
-                    Ok(false) => {
-                        state.mark_lost();
-                        break;
-                    }
+                    Ok(false) => break,
                     Err(_) => {
-                        state.mark_lost();
                         warn!("failed to renew distributed cache lease");
                         break;
                     }
@@ -157,47 +130,11 @@ impl DistributedLockManager {
 pub struct DistributedLockGuard {
     manager: DistributedLockManager,
     lock_key: String,
-    state: Arc<LeaseState>,
     renewal_cancellation_token: CancellationToken,
     cleanup_complete: bool,
 }
 
 impl DistributedLockGuard {
-    pub(super) async fn validate_with_connection<C>(
-        &self,
-        connection: &mut C,
-    ) -> Result<bool, DatabaseError>
-    where
-        C: ConnectionLike,
-    {
-        if !self.state.owned.load(Ordering::Acquire) {
-            return Ok(false);
-        }
-
-        let result = self
-            .manager
-            .renew_with_connection(connection, &self.lock_key)
-            .await;
-        self.handle_validation_result(result)
-    }
-
-    fn handle_validation_result(
-        &self,
-        result: Result<bool, DatabaseError>,
-    ) -> Result<bool, DatabaseError> {
-        match result {
-            Ok(true) => Ok(self.state.owned.load(Ordering::Acquire)),
-            Ok(false) => {
-                self.state.mark_lost();
-                Ok(false)
-            }
-            Err(error) => {
-                self.state.mark_lost();
-                Err(error)
-            }
-        }
-    }
-
     pub(super) async fn release(
         mut self,
     ) -> Result<ReleaseOutcome, DatabaseError> {
@@ -205,12 +142,10 @@ impl DistributedLockGuard {
         match self.manager.release(&self.lock_key).await {
             Ok(true) => {
                 self.cleanup_complete = true;
-                self.state.owned.store(false, Ordering::Release);
                 Ok(ReleaseOutcome::Released)
             }
             Ok(false) => {
                 self.cleanup_complete = true;
-                self.state.mark_lost();
                 Ok(ReleaseOutcome::NotOwner)
             }
             Err(error) => Err(error),
@@ -256,22 +191,6 @@ impl DistributedLockWaiter {
                 .map_err(|_| lock_timeout())?;
             attempt = attempt.saturating_add(1);
         }
-    }
-}
-
-struct LeaseState {
-    owned: AtomicBool,
-}
-
-impl LeaseState {
-    fn new() -> Self {
-        Self {
-            owned: AtomicBool::new(true),
-        }
-    }
-
-    fn mark_lost(&self) {
-        self.owned.store(false, Ordering::Release);
     }
 }
 
