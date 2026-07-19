@@ -4,7 +4,7 @@ use super::models::DatabaseError;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
-use deadpool_redis::{Config, Runtime};
+use deadpool_redis::Runtime;
 use futures::TryStreamExt;
 use futures::future::Either;
 use futures::stream::{FuturesUnordered, StreamExt};
@@ -178,9 +178,17 @@ impl RedisPool {
         let wait_timeout = Duration::from_millis(ENV.REDIS_WAIT_TIMEOUT_MS);
 
         let url = &ENV.REDIS_URL;
-        let pool = Config::from_url(url.clone())
-            .builder()
-            .expect("Error building Redis pool")
+        // Redis 1.x enables async connection and response timeouts by default.
+        // Preserve the previous behavior because this pool still serves BRPOP
+        let connection_config = redis::AsyncConnectionConfig::new()
+            .set_connection_timeout(None)
+            .set_response_timeout(None);
+        let manager = deadpool_redis::Manager::new_with_config(
+            url.clone(),
+            connection_config,
+        )
+        .expect("Error building Redis pool");
+        let pool = deadpool_redis::Pool::builder(manager)
             .max_size(ENV.REDIS_MAX_CONNECTIONS as usize)
             .wait_timeout(Some(wait_timeout))
             .runtime(Runtime::Tokio1)

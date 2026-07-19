@@ -18,7 +18,7 @@ pub async fn get_user_status(
     if let Ok(mut conn) = redis.pool.get().await
         && let Ok(mut statuses) =
             conn.sscan::<_, Vec<u8>>(get_field_name(user)).await
-        && let Some(status) = statuses.next_item().await
+        && let Some(Ok(status)) = statuses.next_item().await
     {
         return postcard::from_bytes::<UserStatus>(&status).ok();
     }

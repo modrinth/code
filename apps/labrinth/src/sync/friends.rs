@@ -11,7 +11,7 @@ use ariadne::ids::UserId;
 use ariadne::networking::message::ServerToClientMessage;
 use ariadne::users::UserStatus;
 use redis::aio::PubSub;
-use redis::{RedisWrite, ToRedisArgs};
+use redis::{RedisWrite, ToRedisArgs, ToSingleRedisArg};
 use serde::{Deserialize, Serialize};
 use tokio_stream::StreamExt;
 
@@ -43,6 +43,8 @@ impl ToRedisArgs for RedisFriendsMessage {
         out.write_arg(&postcard::to_allocvec(&self).unwrap())
     }
 }
+
+impl ToSingleRedisArg for RedisFriendsMessage {}
 
 pub async fn handle_pubsub(
     mut pubsub: PubSub,

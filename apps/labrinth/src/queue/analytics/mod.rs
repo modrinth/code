@@ -175,9 +175,11 @@ impl AnalyticsQueue {
                     MINECRAFT_SERVER_PLAYS_EXPIRY,
                 );
             }
-            pipe.query_async::<()>(&mut *redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
+            if !pipe.is_empty() {
+                pipe.query_async::<()>(&mut *redis)
+                    .await
+                    .map_err(DatabaseError::CacheError)?;
+            }
 
             let mut plays = client
                 .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
@@ -243,9 +245,11 @@ impl AnalyticsQueue {
                     6 * 60 * 60,
                 );
             }
-            pipe.query_async::<()>(&mut *redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
+            if !pipe.is_empty() {
+                pipe.query_async::<()>(&mut *redis)
+                    .await
+                    .map_err(DatabaseError::CacheError)?;
+            }
 
             let mut views = client.insert::<PageView>("views").await?;
 
@@ -311,9 +315,11 @@ impl AnalyticsQueue {
                     6 * 60 * 60,
                 );
             }
-            pipe.query_async::<()>(&mut *redis)
-                .await
-                .map_err(DatabaseError::CacheError)?;
+            if !pipe.is_empty() {
+                pipe.query_async::<()>(&mut *redis)
+                    .await
+                    .map_err(DatabaseError::CacheError)?;
+            }
 
             let mut transaction = pool.begin().await?;
             let mut downloads = client.insert::<Download>("downloads").await?;
