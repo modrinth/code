@@ -13,8 +13,5 @@ categories = ["api-bindings"]
 reqwest = { workspace = true, features = ["json"] }
 serde = { workspace = true, features = ["derive"] }
 
-[dev-dependencies]
-serde_json = { workspace = true }
-
 [lints]
 workspace = true
