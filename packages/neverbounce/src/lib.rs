@@ -2,10 +2,8 @@ use reqwest::Client;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::time::Duration;
 
-pub const API_URL: &str = "https://api.neverbounce.com";
+pub const DEFAULT_API_URL: &str = "https://api.neverbounce.com";
 pub const SINGLE_CHECK_PATH: &str = "/v4/single/check";
-pub const SINGLE_CHECK_URL: &str =
-    "https://api.neverbounce.com/v4/single/check";
 pub const TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Authentication and email parameters for a single verification.
@@ -22,7 +20,7 @@ impl<'a> SingleCheckParams<'a> {
     #[must_use]
     pub const fn new(api_key: &'a str, email: &'a str) -> Self {
         Self {
-            api_url: API_URL,
+            api_url: DEFAULT_API_URL,
             api_key,
             email,
         }

@@ -236,7 +236,7 @@ vars! {
     SENDY_API_KEY: String = "none";
 
     NEVERBOUNCE_API_KEY: String = "";
-    NEVERBOUNCE_BASE_URL: String = neverbounce::API_URL;
+    NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
 
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";
