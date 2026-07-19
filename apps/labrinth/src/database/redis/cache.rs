@@ -728,26 +728,31 @@ where
 {
     let mut identities = Vec::with_capacity(5);
     let canonical_key = value.key.to_string();
+
     push_identity(&mut identities, canonical_key.clone());
-    push_identity(
-        &mut identities,
-        normalize_key(&canonical_key, case_sensitive),
-    );
+    if !case_sensitive {
+        push_identity(&mut identities, canonical_key.to_lowercase());
+    }
+
     if let Ok(decimal_id) = canonical_key.parse::<u64>() {
         let base62_id = to_base62(decimal_id);
         push_identity(&mut identities, base62_id.clone());
-        push_identity(
-            &mut identities,
-            normalize_key(&base62_id, case_sensitive),
-        );
+
+        if !case_sensitive {
+            push_identity(&mut identities, base62_id.to_lowercase());
+        }
     } else if let Ok(decimal_id) = parse_base62(&canonical_key) {
         push_identity(&mut identities, decimal_id.to_string());
     }
+
     if let Some(alias) = &value.alias {
         let alias = alias.to_string();
         push_identity(&mut identities, alias.clone());
-        push_identity(&mut identities, normalize_key(&alias, case_sensitive));
+        if !case_sensitive {
+            push_identity(&mut identities, alias.to_lowercase());
+        }
     }
+
     identities
 }
 
