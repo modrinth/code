@@ -172,7 +172,7 @@ impl<'de> Deserialize<'de> for VerificationFlag {
             "role_account" => Self::RoleAccount,
             "disposable_email" => Self::DisposableEmail,
             "government_host" => Self::GovernmentHost,
-            "acedemic_host" | "academic_host" => Self::AcademicHost,
+            "academic_host" => Self::AcademicHost,
             "military_host" => Self::MilitaryHost,
             "international_host" => Self::InternationalHost,
             "squatter_host" => Self::SquatterHost,
