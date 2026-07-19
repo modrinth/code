@@ -1,16 +1,19 @@
 use std::fmt::Display;
 use std::sync::Arc;
 
-use super::RedisMode;
+use super::RedisTopology;
 
 #[derive(Debug, Clone)]
 pub struct KeyBuilder {
     meta_namespace: Arc<str>,
-    mode: RedisMode,
+    mode: RedisTopology,
 }
 
 impl KeyBuilder {
-    pub fn new(meta_namespace: impl Into<Arc<str>>, mode: RedisMode) -> Self {
+    pub fn new(
+        meta_namespace: impl Into<Arc<str>>,
+        mode: RedisTopology,
+    ) -> Self {
         Self {
             meta_namespace: meta_namespace.into(),
             mode,
@@ -40,10 +43,10 @@ impl KeyBuilder {
         slot_tag: impl Display,
     ) -> String {
         match self.mode {
-            RedisMode::Standalone => {
+            RedisTopology::Standalone => {
                 format!("{}_{}:{}", self.meta_namespace, namespace, logical_key)
             }
-            RedisMode::Cluster => format!(
+            RedisTopology::Cluster => format!(
                 "{}_{}:{{{}}}:{}",
                 self.meta_namespace,
                 namespace,
@@ -74,11 +77,11 @@ fn escape_slot_tag(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::KeyBuilder;
-    use crate::database::redis::RedisMode;
+    use crate::database::redis::RedisTopology;
 
     #[test]
     fn cluster_slot_tags_escape_braces_and_percent_signs() {
-        let builder = KeyBuilder::new("labrinth", RedisMode::Cluster);
+        let builder = KeyBuilder::new("labrinth", RedisTopology::Cluster);
         let entity = builder.entity("projects", "a{%}b");
 
         assert!(entity.contains("{a%7B%25%7Db}"));
@@ -86,7 +89,7 @@ mod tests {
 
     #[test]
     fn cluster_empty_slot_tag_is_nonempty() {
-        let builder = KeyBuilder::new("labrinth", RedisMode::Cluster);
+        let builder = KeyBuilder::new("labrinth", RedisTopology::Cluster);
         let entity = builder.entity("projects", "");
 
         assert!(entity.contains("{%00}"));

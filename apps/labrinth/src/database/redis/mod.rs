@@ -26,7 +26,7 @@ mod util;
 use cache::{CacheManager, CacheSettings, ConnectionProvider};
 pub use cache::{Codec, EncodingFormat, RedisValue};
 use config::RedisConfig;
-pub use config::{CacheLockingStrategy, RedisConnectionType, RedisMode};
+pub use config::{CacheLockingStrategy, RedisConnectionType, RedisTopology};
 use connection::RedisBackend;
 pub use key::KeyBuilder;
 

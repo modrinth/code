@@ -16,7 +16,7 @@ use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
-use labrinth::database::redis::{KeyBuilder, RedisMode, RedisPool};
+use labrinth::database::redis::{KeyBuilder, RedisPool, RedisTopology};
 use redis::cluster_routing::Slot;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -34,7 +34,7 @@ async fn isolated_redis_pool(label: &str) -> RedisPool {
 fn clustered_key_builder(label: &str) -> KeyBuilder {
     KeyBuilder::new(
         format!("redis_test_{label}_{}", Uuid::new_v4()),
-        RedisMode::Cluster,
+        RedisTopology::Cluster,
     )
 }
 

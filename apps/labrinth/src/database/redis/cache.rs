@@ -53,7 +53,6 @@ pub enum Codec {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncodingFormat {
     Json,
-    Postcard,
 }
 
 #[derive(Debug, Error)]
@@ -93,7 +92,6 @@ impl FromStr for EncodingFormat {
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "json" => Ok(Self::Json),
-            "postcard" => Ok(Self::Postcard),
             _ => Err(InvalidEncodingFormat),
         }
     }
@@ -115,7 +113,6 @@ impl CacheSettings {
     ) -> Result<Vec<u8>, DatabaseError> {
         let mut value = match self.encoding_format {
             EncodingFormat::Json => serde_json::to_vec(value)?,
-            EncodingFormat::Postcard => postcard::to_allocvec(value)?,
         };
 
         if self.compression_level > 0
@@ -156,7 +153,6 @@ impl CacheSettings {
 
         match self.encoding_format {
             EncodingFormat::Json => serde_json::from_slice(&value).ok(),
-            EncodingFormat::Postcard => postcard::from_bytes(&value).ok(),
         }
     }
 }

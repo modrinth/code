@@ -5,7 +5,7 @@ use prometheus::Registry;
 use crate::database::models::DatabaseError;
 
 use super::RedisPool;
-use super::config::{RedisConfig, RedisMode};
+use super::config::{RedisConfig, RedisTopology};
 use super::connection::RedisBackendBuildError;
 use super::metrics::{
     LogicalPoolStatus, LogicalPoolStatusProvider,
@@ -34,7 +34,7 @@ impl RedisBlockingPool {
     ) -> Result<Self, RedisBackendBuildError> {
         let pool_size = config.blocking_pool_size();
         let inner = match config.mode() {
-            RedisMode::Standalone => {
+            RedisTopology::Standalone => {
                 let connection_config = redis::AsyncConnectionConfig::new()
                     .set_connection_timeout(None)
                     .set_response_timeout(None);
@@ -52,7 +52,7 @@ impl RedisBlockingPool {
                 retain_standalone_pool(pool.clone());
                 RedisBlockingPoolInner::Standalone(pool)
             }
-            RedisMode::Cluster => {
+            RedisTopology::Cluster => {
                 let manager = deadpool_redis::cluster::Manager::new(
                     config.seed_urls().to_vec(),
                     false,

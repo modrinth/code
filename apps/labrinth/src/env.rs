@@ -5,6 +5,10 @@ use eyre::{Context, eyre};
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 
+use crate::database::redis::{
+    CacheLockingStrategy, RedisConnectionType, RedisTopology,
+};
+
 macro_rules! vars {
     (
         $(
@@ -129,10 +133,42 @@ vars! {
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
-    REDIS_MODE: crate::database::redis::RedisMode = crate::database::redis::RedisMode::Standalone;
-    REDIS_CONNECTION_TYPE: crate::database::redis::RedisConnectionType = crate::database::redis::RedisConnectionType::Pooled;
-    REDIS_CACHE_LOCKING_STRATEGY: crate::database::redis::CacheLockingStrategy = crate::database::redis::CacheLockingStrategy::Local;
+
+    // Redis
+    REDIS_TOPOLOGY: RedisTopology = RedisTopology::Standalone;
+    REDIS_CONNECTION_TYPE: RedisConnectionType = RedisConnectionType::Pooled;
+    REDIS_CACHE_LOCKING_STRATEGY: CacheLockingStrategy = CacheLockingStrategy::Local;
+    // URL(s) for Redis. Use comma-separated values for multiple URLs in Cluster topology.
     REDIS_URL: String = "redis://localhost";
+
+    // Configures the waiting timeout for Redis connection *pools*.
+    // This doesn't affect the bulk of Redis work in Multiplexed connection type.
+    REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
+
+    // Minimum and maximum number of connections when Redis is in Standalone topology.
+    REDIS_MAX_CONNECTIONS: u32 = 2048u32;
+    REDIS_MIN_CONNECTIONS: usize = 0usize;
+
+    // Minimum and maximum number of connections when Redis is in Cluster topology, Pooled connection type.
+    REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;
+    REDIS_CLUSTER_MIN_CONNECTIONS: usize = 0usize;
+
+    // The maximum number of connections of the Redis blocking pool. There's a blocking pool regardless of topology
+    // and main connection type.
+    REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 256u32;
+
+    // The encoding format used for Redis cache values.
+    REDIS_ENCODING_FORMAT: crate::database::redis::EncodingFormat = crate::database::redis::EncodingFormat::Json;
+    // The level of LZ4 compression used for Redis cache values. A value of 0 disables compression (supports 1-12)
+    REDIS_COMPRESSION_LEVEL: i32 = 0i32;
+    // The compression algorithm used for Redis cache values. Currently only LZ4 is supported.
+    REDIS_COMPRESSION_ALGORITHM: crate::database::redis::Codec = crate::database::redis::Codec::Lz4;
+    // The minimum number of bytes required to trigger compression for Redis cache values.
+    REDIS_COMPRESSION_THRESHOLD_BYTES: usize = 1024usize;
+    // The minimum savings ratio required to trigger compression for Redis cache values. If the savings ratio is lower than this,
+    // the compressed payload is discarded and the original payload is stored as-is.
+    REDIS_COMPRESSION_MIN_SAVINGS_RATIO: f64 = 12.5f64;
+
     KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
     KAFKA_CLIENT_ID: String = "labrinth";
     BIND_ADDR: String = "";
@@ -288,18 +324,6 @@ vars! {
     READONLY_DATABASE_URL: String = "";
     READONLY_DATABASE_MIN_CONNECTIONS: u32 = 0u32;
     READONLY_DATABASE_MAX_CONNECTIONS: u32 = 1u32;
-
-    REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
-    REDIS_MAX_CONNECTIONS: u32 = 10000u32;
-    REDIS_MIN_CONNECTIONS: usize = 0usize;
-    REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;
-    REDIS_CLUSTER_MIN_CONNECTIONS: usize = 0usize;
-    REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 8u32;
-    REDIS_ENCODING_FORMAT: crate::database::redis::EncodingFormat = crate::database::redis::EncodingFormat::Json;
-    REDIS_COMPRESSION_LEVEL: i32 = 0i32;
-    REDIS_COMPRESSION_ALGORITHM: crate::database::redis::Codec = crate::database::redis::Codec::Lz4;
-    REDIS_COMPRESSION_THRESHOLD_BYTES: usize = 1024usize;
-    REDIS_COMPRESSION_MIN_SAVINGS_RATIO: f64 = 12.5f64;
 
     SEARCH_OPERATION_TIMEOUT: u64 = 300000u64;
 

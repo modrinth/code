@@ -42,16 +42,16 @@ impl FromStr for CacheLockingStrategy {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RedisMode {
+pub enum RedisTopology {
     Standalone,
     Cluster,
 }
 
 #[derive(Debug, Error)]
-#[error("invalid Redis mode; expected `standalone` or `cluster`")]
+#[error("invalid Redis topology; expected `standalone` or `cluster`")]
 pub struct InvalidRedisMode;
 
-impl FromStr for RedisMode {
+impl FromStr for RedisTopology {
     type Err = InvalidRedisMode;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
@@ -122,7 +122,7 @@ pub(super) enum RedisBackendConfig {
 
 #[derive(Debug, Clone)]
 pub(super) struct RedisConfig {
-    mode: RedisMode,
+    mode: RedisTopology,
     backend: RedisBackendConfig,
     seed_urls: Vec<String>,
     wait_timeout_ms: u64,
@@ -140,7 +140,7 @@ pub(super) enum RedisConfigError {
         "unsupported Redis configuration: `{mode:?}` mode with `{connection_type:?}` connections"
     )]
     UnsupportedConnectionType {
-        mode: RedisMode,
+        mode: RedisTopology,
         connection_type: RedisConnectionType,
     },
     #[error(
@@ -156,7 +156,7 @@ pub(super) enum RedisConfigError {
 impl RedisConfig {
     pub(super) fn from_env() -> Result<Self, RedisConfigError> {
         Self::new(
-            ENV.REDIS_MODE,
+            ENV.REDIS_TOPOLOGY,
             ENV.REDIS_CONNECTION_TYPE,
             &ENV.REDIS_URL,
             ENV.REDIS_WAIT_TIMEOUT_MS,
@@ -178,7 +178,7 @@ impl RedisConfig {
     }
 
     fn new(
-        mode: RedisMode,
+        mode: RedisTopology,
         connection_type: RedisConnectionType,
         raw_urls: &str,
         wait_timeout_ms: u64,
@@ -199,7 +199,7 @@ impl RedisConfig {
         }
 
         let backend = match (mode, connection_type) {
-            (RedisMode::Standalone, RedisConnectionType::Pooled) => {
+            (RedisTopology::Standalone, RedisConnectionType::Pooled) => {
                 if seed_urls.len() != 1 {
                     return Err(RedisConfigError::MultipleStandaloneUrls);
                 }
@@ -209,14 +209,14 @@ impl RedisConfig {
                     standalone_pool_size.1,
                 )?)
             }
-            (RedisMode::Cluster, RedisConnectionType::Pooled) => {
+            (RedisTopology::Cluster, RedisConnectionType::Pooled) => {
                 RedisBackendConfig::ClusterPooled(RedisPoolSize::new(
                     "cluster",
                     cluster_pool_size.0,
                     cluster_pool_size.1,
                 )?)
             }
-            (RedisMode::Cluster, RedisConnectionType::Multiplexed) => {
+            (RedisTopology::Cluster, RedisConnectionType::Multiplexed) => {
                 RedisBackendConfig::ClusterMultiplexed
             }
             (mode, connection_type) => {
@@ -237,7 +237,7 @@ impl RedisConfig {
         })
     }
 
-    pub(super) fn mode(&self) -> RedisMode {
+    pub(super) fn mode(&self) -> RedisTopology {
         self.mode
     }
 
