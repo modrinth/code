@@ -68,11 +68,10 @@ impl LockCoordinator {
     pub(super) async fn acquire(
         &self,
         key: String,
-        deadline: Instant,
     ) -> Result<LockAcquisition, DatabaseError> {
         match self {
             Self::Local(manager) => Ok(manager.acquire(key).into()),
-            Self::Distributed(manager) => manager.acquire(key, deadline).await,
+            Self::Distributed(manager) => manager.acquire(key).await,
         }
     }
 }
@@ -104,7 +103,6 @@ impl OwnedLockGuard {
     pub(super) async fn validate_with_connection<C>(
         &self,
         connection: &mut C,
-        deadline: Instant,
     ) -> Result<bool, DatabaseError>
     where
         C: ConnectionLike,
@@ -112,21 +110,18 @@ impl OwnedLockGuard {
         match self {
             Self::Local(_) => Ok(true),
             Self::Distributed(guard) => {
-                guard.validate_with_connection(connection, deadline).await
+                guard.validate_with_connection(connection).await
             }
         }
     }
 
-    pub(super) async fn release(
-        self,
-        deadline: Instant,
-    ) -> Result<ReleaseOutcome, DatabaseError> {
+    pub(super) async fn release(self) -> Result<ReleaseOutcome, DatabaseError> {
         match self {
             Self::Local(guard) => {
                 guard.release();
                 Ok(ReleaseOutcome::Released)
             }
-            Self::Distributed(guard) => guard.release(deadline).await,
+            Self::Distributed(guard) => guard.release().await,
         }
     }
 }

@@ -325,99 +325,63 @@ impl CacheManager {
             return Ok(HashMap::new());
         }
 
-        let get_cached_values =
-            |ids: DashMap<String, I>,
-             deadline: Option<Instant>,
-             locks_released: usize,
-             locks_waiting: usize| {
-                async move {
-                    let slug_ids = if let Some(slug_namespace) = slug_namespace
-                    {
-                        async {
-                            let keys = ids
-                                .iter()
-                                .map(|entry| {
-                                    let logical_key = normalize_key(
-                                        &entry.value().to_string(),
-                                        case_sensitive,
-                                    );
-                                    self.key_builder
-                                        .entity(slug_namespace, logical_key)
-                                })
-                                .collect::<Vec<_>>();
-                            let mut connection = connect_before_deadline(
-                                provider,
-                                deadline,
-                                self.locking.strategy(),
-                                locks_released,
-                                locks_waiting,
-                            )
-                            .await?;
-                            Ok::<_, DatabaseError>(
-                                query_before_deadline(
-                                    deadline,
-                                    commands::get_many_strings(
-                                        &mut connection,
-                                        &keys,
-                                    ),
-                                    self.locking.strategy(),
-                                    locks_released,
-                                    locks_waiting,
-                                )
+        let get_cached_values = |ids: DashMap<String, I>| {
+            async move {
+                let slug_ids = if let Some(slug_namespace) = slug_namespace {
+                    async {
+                        let keys = ids
+                            .iter()
+                            .map(|entry| {
+                                let logical_key = normalize_key(
+                                    &entry.value().to_string(),
+                                    case_sensitive,
+                                );
+                                self.key_builder
+                                    .entity(slug_namespace, logical_key)
+                            })
+                            .collect::<Vec<_>>();
+                        let mut connection = provider.connect().await?;
+                        Ok::<_, DatabaseError>(
+                            commands::get_many_strings(&mut connection, &keys)
                                 .await?
                                 .into_iter()
                                 .flatten()
                                 .collect::<Vec<_>>(),
-                            )
-                        }
-                        .instrument(info_span!("get slug ids"))
-                        .await?
-                    } else {
-                        Vec::new()
-                    };
-
-                    let keys = ids
-                        .iter()
-                        .map(|entry| entry.value().to_string())
-                        .chain(ids.iter().filter_map(|entry| {
-                            parse_base62(&entry.value().to_string())
-                                .ok()
-                                .map(|value| value.to_string())
-                        }))
-                        .chain(slug_ids)
-                        .map(|key| self.key_builder.entity(namespace, key))
-                        .collect::<Vec<_>>();
-
-                    let mut connection = connect_before_deadline(
-                        provider,
-                        deadline,
-                        self.locking.strategy(),
-                        locks_released,
-                        locks_waiting,
-                    )
-                    .await?;
-                    let mut cached_values = HashMap::new();
-                    for value in query_before_deadline(
-                        deadline,
-                        commands::get_many(&mut connection, &keys),
-                        self.locking.strategy(),
-                        locks_released,
-                        locks_waiting,
-                    )
-                    .await?
-                    {
-                        if let Some(value) = value.and_then(|value| {
-                            self.settings
-                                .decode_value::<RedisValue<T, K, S>>(&value)
-                        }) {
-                            cached_values.insert(value.key.clone(), value);
-                        }
+                        )
                     }
+                    .instrument(info_span!("get slug ids"))
+                    .await?
+                } else {
+                    Vec::new()
+                };
 
-                    Ok::<_, DatabaseError>((cached_values, ids))
+                let keys = ids
+                    .iter()
+                    .map(|entry| entry.value().to_string())
+                    .chain(ids.iter().filter_map(|entry| {
+                        parse_base62(&entry.value().to_string())
+                            .ok()
+                            .map(|value| value.to_string())
+                    }))
+                    .chain(slug_ids)
+                    .map(|key| self.key_builder.entity(namespace, key))
+                    .collect::<Vec<_>>();
+
+                let mut connection = provider.connect().await?;
+                let mut cached_values = HashMap::new();
+                for value in commands::get_many(&mut connection, &keys).await? {
+                    if let Some(value) = value.and_then(|value| {
+                        self.settings
+                            .decode_value::<RedisValue<T, K, S>>(&value)
+                    }) {
+                        cached_values.insert(value.key.clone(), value);
+                    }
                 }
-                .instrument(info_span!("get cached values"))
-            };
+
+                Ok::<_, DatabaseError>((cached_values, ids))
+            }
+            .instrument(info_span!("get cached values"))
+        };
 
         let (default_expiry, actual_expiry) = cache_expiries(namespace);
         let current_time = Utc::now();
@@ -425,8 +389,7 @@ impl CacheManager {
         let mut expired_identities = HashMap::new();
         let deadline = Instant::now() + WAIT_TIMEOUT;
 
-        let (cached_values_raw, ids) =
-            get_cached_values(ids, Some(deadline), 0, 0).await?;
+        let (cached_values_raw, ids) = get_cached_values(ids).await?;
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, value)| {
@@ -456,28 +419,19 @@ impl CacheManager {
                 .iter()
                 .map(|entry| entry.key().clone())
                 .collect::<Vec<_>>();
-            let locks_total = fetch_ids.len();
-
             for key in fetch_ids {
                 if !ids.contains_key(&key) {
                     continue;
                 }
 
                 let lock_key = self.key_builder.entity(namespace, &key);
-                let acquisition =
-                    match self.locking.acquire(lock_key, deadline).await {
-                        Ok(acquisition) => acquisition,
-                        Err(error) => {
-                            let error = map_lock_operation_error(
-                                error,
-                                self.locking.strategy(),
-                                0,
-                                locks_total,
-                            );
-                            release_owned_locks(owned_locks, deadline).await;
-                            return Err(error);
-                        }
-                    };
+                let acquisition = match self.locking.acquire(lock_key).await {
+                    Ok(acquisition) => acquisition,
+                    Err(error) => {
+                        release_owned_locks(owned_locks).await;
+                        return Err(error);
+                    }
+                };
 
                 match acquisition {
                     LockAcquisition::Owned(guard) => {
@@ -544,28 +498,10 @@ impl CacheManager {
                     encoded_values.push((key, slug, value, encoded));
                 }
 
-                let publication_deadline = if is_contended {
-                    deadline
-                } else {
-                    Instant::now() + WAIT_TIMEOUT
-                };
-                let mut connection = connect_before_deadline(
-                    provider,
-                    Some(publication_deadline),
-                    self.locking.strategy(),
-                    0,
-                    waiters.len(),
-                )
-                .await?;
+                let mut connection = provider.connect().await?;
                 let mut ownership_valid = true;
                 for lock in owned_locks.values() {
-                    match lock
-                        .validate_with_connection(
-                            &mut connection,
-                            publication_deadline,
-                        )
-                        .await
-                    {
+                    match lock.validate_with_connection(&mut connection).await {
                         Ok(true) => {}
                         Ok(false) => {
                             ownership_valid = false;
@@ -582,14 +518,11 @@ impl CacheManager {
                     for (key, slug, _, encoded) in &encoded_values {
                         let redis_key =
                             self.key_builder.entity(namespace, key.to_string());
-                        publish_cache_value(
+                        commands::set(
                             &mut connection,
-                            self.locking.strategy(),
                             &redis_key,
                             encoded,
-                            default_expiry,
-                            publication_deadline,
-                            waiters.len(),
+                            Some(default_expiry),
                         )
                         .await?;
                         if let Some(slug) = slug
@@ -603,14 +536,11 @@ impl CacheManager {
                             let slug_key = self
                                 .key_builder
                                 .entity(slug_namespace, actual_slug);
-                            publish_cache_value(
+                            commands::set(
                                 &mut connection,
-                                self.locking.strategy(),
                                 &slug_key,
                                 canonical_key.as_bytes(),
-                                default_expiry,
-                                publication_deadline,
-                                waiters.len(),
+                                Some(default_expiry),
                             )
                             .await?;
                         }
@@ -629,19 +559,13 @@ impl CacheManager {
             Ok(HashMap::new())
         };
 
-        let release_deadline = if is_contended {
-            deadline
-        } else {
-            Instant::now() + WAIT_TIMEOUT
-        };
-        release_owned_locks(owned_locks, release_deadline).await;
+        release_owned_locks(owned_locks).await;
 
         let operation_result = match fill_result {
             Ok(mut values) => {
                 if waiters.is_empty() {
                     Ok(values)
                 } else {
-                    let total = waiters.len();
                     match wait_for_locks(
                         self.locking.strategy(),
                         waiters,
@@ -662,14 +586,7 @@ impl CacheManager {
                                     )
                                 })
                                 .collect::<DashMap<_, _>>();
-                            match get_cached_values(
-                                fetch_ids,
-                                Some(deadline),
-                                total,
-                                total,
-                            )
-                            .await
-                            {
+                            match get_cached_values(fetch_ids).await {
                                 Ok((released_values, _)) => {
                                     values.extend(released_values);
                                     Ok(values)
@@ -762,68 +679,6 @@ fn push_identity(identities: &mut Vec<String>, identity: String) {
     }
 }
 
-async fn connect_before_deadline<P>(
-    provider: &P,
-    deadline: Option<Instant>,
-    strategy: CacheLockingStrategy,
-    locks_released: usize,
-    locks_waiting: usize,
-) -> Result<P::Connection, DatabaseError>
-where
-    P: ConnectionProvider,
-{
-    if let Some(deadline) = deadline {
-        timeout_at(deadline, provider.connect())
-            .await
-            .map_err(|_| {
-                lock_timeout_error(strategy, locks_released, locks_waiting)
-            })?
-    } else {
-        provider.connect().await
-    }
-}
-
-async fn query_before_deadline<F, T>(
-    deadline: Option<Instant>,
-    query: F,
-    strategy: CacheLockingStrategy,
-    locks_released: usize,
-    locks_waiting: usize,
-) -> Result<T, DatabaseError>
-where
-    F: Future<Output = Result<T, DatabaseError>>,
-{
-    if let Some(deadline) = deadline {
-        timeout_at(deadline, query).await.map_err(|_| {
-            lock_timeout_error(strategy, locks_released, locks_waiting)
-        })?
-    } else {
-        query.await
-    }
-}
-
-async fn publish_cache_value<C>(
-    connection: &mut C,
-    strategy: CacheLockingStrategy,
-    key: &str,
-    data: &[u8],
-    expiry: i64,
-    deadline: Instant,
-    locks_waiting: usize,
-) -> Result<(), DatabaseError>
-where
-    C: ConnectionLike,
-{
-    query_before_deadline(
-        Some(deadline),
-        commands::set(connection, key, data, Some(expiry)),
-        strategy,
-        0,
-        locks_waiting,
-    )
-    .await
-}
-
 async fn wait_for_locks<I>(
     strategy: CacheLockingStrategy,
     waiters: Vec<(I, LockWaiter)>,
@@ -867,19 +722,6 @@ fn is_lock_timeout(error: &DatabaseError) -> bool {
     )
 }
 
-fn map_lock_operation_error(
-    error: DatabaseError,
-    strategy: CacheLockingStrategy,
-    locks_released: usize,
-    locks_waiting: usize,
-) -> DatabaseError {
-    if is_lock_timeout(&error) {
-        lock_timeout_error(strategy, locks_released, locks_waiting)
-    } else {
-        error
-    }
-}
-
 fn lock_timeout_error(
     strategy: CacheLockingStrategy,
     locks_released: usize,
@@ -899,12 +741,9 @@ fn lock_timeout_error(
     }
 }
 
-async fn release_owned_locks(
-    owned_locks: HashMap<String, OwnedLockGuard>,
-    deadline: Instant,
-) {
+async fn release_owned_locks(owned_locks: HashMap<String, OwnedLockGuard>) {
     for guard in owned_locks.into_values() {
-        if let Err(error) = guard.release(deadline).await {
+        if let Err(error) = guard.release().await {
             tracing::warn!(
                 error = ?error,
                 "failed to explicitly release cache lock",
@@ -929,106 +768,9 @@ impl<T, K, S> RedisValue<T, K, S> {
 
 #[cfg(test)]
 mod tests {
-    use std::future::{Future, pending};
-    use std::time::Duration;
-
     use dashmap::DashMap;
-    use redis::aio::ConnectionLike;
-    use tokio::time::{Instant, advance};
 
-    use super::{
-        ConnectionProvider, RedisValue, connect_before_deadline,
-        query_before_deadline, remove_resolved_ids, value_identities,
-    };
-    use crate::database::models::DatabaseError;
-    use crate::database::redis::CacheLockingStrategy;
-
-    struct NeverConnection;
-
-    impl ConnectionLike for NeverConnection {
-        fn req_packed_command<'a>(
-            &'a mut self,
-            _: &'a redis::Cmd,
-        ) -> redis::RedisFuture<'a, redis::Value> {
-            Box::pin(pending())
-        }
-
-        fn req_packed_commands<'a>(
-            &'a mut self,
-            _: &'a redis::Pipeline,
-            _: usize,
-            _: usize,
-        ) -> redis::RedisFuture<'a, Vec<redis::Value>> {
-            Box::pin(pending())
-        }
-
-        fn get_db(&self) -> i64 {
-            0
-        }
-    }
-
-    struct PendingProvider;
-
-    impl ConnectionProvider for PendingProvider {
-        type Connection = NeverConnection;
-
-        fn connect(
-            &self,
-        ) -> impl Future<Output = Result<Self::Connection, DatabaseError>> + Send
-        {
-            pending()
-        }
-    }
-
-    #[tokio::test(start_paused = true)]
-    async fn five_second_deadline_includes_hung_pool_acquisition() {
-        let deadline = Instant::now() + Duration::from_secs(5);
-        let task = tokio::spawn(async move {
-            connect_before_deadline(
-                &PendingProvider,
-                Some(deadline),
-                CacheLockingStrategy::Local,
-                0,
-                1,
-            )
-            .await
-        });
-
-        advance(Duration::from_millis(4_999)).await;
-        assert!(!task.is_finished());
-        advance(Duration::from_millis(1)).await;
-        assert!(matches!(
-            task.await.unwrap(),
-            Err(DatabaseError::LocalCacheTimeout {
-                released: 0,
-                total: 1,
-            })
-        ));
-    }
-
-    #[tokio::test(start_paused = true)]
-    async fn five_second_deadline_includes_hung_redis_query() {
-        let deadline = Instant::now() + Duration::from_secs(5);
-        let task = tokio::spawn(query_before_deadline(
-            Some(deadline),
-            pending::<Result<(), DatabaseError>>(),
-            CacheLockingStrategy::Distributed,
-            0,
-            1,
-        ));
-
-        advance(Duration::from_millis(4_999)).await;
-        assert!(!task.is_finished());
-        advance(Duration::from_millis(1)).await;
-        assert!(matches!(
-            task.await.unwrap(),
-            Err(DatabaseError::CacheTimeout {
-                locks_released: 0,
-                locks_waiting: 1,
-                ..
-            })
-        ));
-    }
+    use super::{RedisValue, remove_resolved_ids, value_identities};
 
     #[test]
     fn stale_identity_index_includes_equivalent_request_forms() {

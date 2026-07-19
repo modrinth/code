@@ -30,10 +30,9 @@ impl DistributedLockManager {
     pub(super) async fn acquire(
         &self,
         key: String,
-        deadline: Instant,
     ) -> Result<LockAcquisition, DatabaseError> {
         let lock_key = cache_lock_key(&key);
-        let acquired = self.try_acquire(&lock_key, deadline).await?;
+        let acquired = self.try_acquire(&lock_key).await?;
 
         if !acquired {
             return Ok(LockAcquisition::Waiting(LockWaiter::Distributed(
@@ -62,94 +61,50 @@ impl DistributedLockManager {
         )))
     }
 
-    async fn connect(
-        &self,
-        deadline: Instant,
-    ) -> Result<super::super::super::connection::RedisConnection, DatabaseError>
-    {
-        timeout_at(deadline, self.backend.connect())
-            .await
-            .map_err(|_| lock_timeout())?
-            .map_err(Into::into)
-    }
-
-    async fn try_acquire(
-        &self,
-        lock_key: &str,
-        deadline: Instant,
-    ) -> Result<bool, DatabaseError> {
-        let mut connection = self.connect(deadline).await?;
-        timeout_at(
-            deadline,
-            commands::acquire_lock(
-                &mut connection,
-                lock_key,
-                duration_millis(self.timing.lease),
-            ),
+    async fn try_acquire(&self, lock_key: &str) -> Result<bool, DatabaseError> {
+        let mut connection = self.backend.connect().await?;
+        commands::acquire_lock(
+            &mut connection,
+            lock_key,
+            duration_millis(self.timing.lease),
         )
         .await
-        .map_err(|_| lock_timeout())?
     }
 
-    async fn renew(
-        &self,
-        lock_key: &str,
-        deadline: Instant,
-    ) -> Result<bool, DatabaseError> {
-        let mut connection = self.connect(deadline).await?;
-        timeout_at(
-            deadline,
-            commands::renew_lock(
-                &mut connection,
-                lock_key,
-                duration_millis(self.timing.lease),
-            ),
+    async fn renew(&self, lock_key: &str) -> Result<bool, DatabaseError> {
+        let mut connection = self.backend.connect().await?;
+        commands::renew_lock(
+            &mut connection,
+            lock_key,
+            duration_millis(self.timing.lease),
         )
         .await
-        .map_err(|_| lock_timeout())?
     }
 
     async fn renew_with_connection<C>(
         &self,
         connection: &mut C,
         lock_key: &str,
-        deadline: Instant,
     ) -> Result<bool, DatabaseError>
     where
         C: ConnectionLike,
     {
-        timeout_at(
-            deadline,
-            commands::renew_lock(
-                connection,
-                lock_key,
-                duration_millis(self.timing.lease),
-            ),
+        commands::renew_lock(
+            connection,
+            lock_key,
+            duration_millis(self.timing.lease),
         )
         .await
-        .map_err(|_| lock_timeout())?
     }
 
-    async fn release(
-        &self,
-        lock_key: &str,
-        deadline: Instant,
-    ) -> Result<bool, DatabaseError> {
-        let mut connection = self.connect(deadline).await?;
-        timeout_at(deadline, commands::release_lock(&mut connection, lock_key))
-            .await
-            .map_err(|_| lock_timeout())?
+    async fn release(&self, lock_key: &str) -> Result<bool, DatabaseError> {
+        let mut connection = self.backend.connect().await?;
+        commands::release_lock(&mut connection, lock_key).await
     }
 
-    async fn exists(
-        &self,
-        lock_key: &str,
-        deadline: Instant,
-    ) -> Result<bool, DatabaseError> {
-        let mut connection = self.connect(deadline).await?;
-        timeout_at(deadline, commands::lock_exists(&mut connection, lock_key))
-            .await
-            .map_err(|_| lock_timeout())?
+    async fn exists(&self, lock_key: &str) -> Result<bool, DatabaseError> {
+        let mut connection = self.backend.connect().await?;
+        commands::lock_exists(&mut connection, lock_key).await
     }
 
     fn spawn_renewal(
@@ -166,8 +121,7 @@ impl DistributedLockManager {
                     _ = cancellation_token.cancelled() => break,
                     result = async {
                         sleep(manager.timing.renewal).await;
-                        let deadline = Instant::now() + manager.timing.renewal;
-                        manager.renew(&lock_key, deadline).await
+                        manager.renew(&lock_key).await
                     } => result,
                 };
 
@@ -193,8 +147,7 @@ impl DistributedLockManager {
         };
         let manager = self.clone();
         handle.spawn(async move {
-            let deadline = Instant::now() + manager.timing.renewal;
-            if manager.release(&lock_key, deadline).await.is_err() {
+            if manager.release(&lock_key).await.is_err() {
                 warn!("failed to clean up distributed cache lease");
             }
         });
@@ -213,7 +166,6 @@ impl DistributedLockGuard {
     pub(super) async fn validate_with_connection<C>(
         &self,
         connection: &mut C,
-        deadline: Instant,
     ) -> Result<bool, DatabaseError>
     where
         C: ConnectionLike,
@@ -224,7 +176,7 @@ impl DistributedLockGuard {
 
         let result = self
             .manager
-            .renew_with_connection(connection, &self.lock_key, deadline)
+            .renew_with_connection(connection, &self.lock_key)
             .await;
         self.handle_validation_result(result)
     }
@@ -248,10 +200,9 @@ impl DistributedLockGuard {
 
     pub(super) async fn release(
         mut self,
-        deadline: Instant,
     ) -> Result<ReleaseOutcome, DatabaseError> {
         self.stop_renewal();
-        match self.manager.release(&self.lock_key, deadline).await {
+        match self.manager.release(&self.lock_key).await {
             Ok(true) => {
                 self.cleanup_complete = true;
                 self.state.owned.store(false, Ordering::Release);
@@ -294,7 +245,7 @@ impl DistributedLockWaiter {
     ) -> Result<(), DatabaseError> {
         let mut attempt = 0;
         loop {
-            if !self.manager.exists(&self.lock_key, deadline).await? {
+            if !self.manager.exists(&self.lock_key).await? {
                 return Ok(());
             }
 
