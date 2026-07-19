@@ -83,7 +83,7 @@ jobs:
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
       # Redis config for tests
-      REDIS_MODE: cluster
+      REDIS_TOPOLOGY: cluster
       REDIS_CONNECTION_TYPE: multiplexed
       REDIS_URL: redis://127.0.0.1:7000,redis://127.0.0.1:7001,redis://127.0.0.1:7002,redis://127.0.0.1:7003,redis://127.0.0.1:7004,redis://127.0.0.1:7005
       # Avoid stack overflows in tests
@@ -214,7 +214,7 @@ jobs:
       - name: Test pooled standalone Redis backend
         if: steps.check-labrinth.outputs.needs_services == 'true'
         env:
-          REDIS_MODE: standalone
+          REDIS_TOPOLOGY: standalone
           REDIS_CONNECTION_TYPE: pooled
           REDIS_URL: redis://127.0.0.1:6379
         run: cargo nextest run --package labrinth --test redis --no-fail-fast
