@@ -6,7 +6,7 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 
-const IMAGES_NAMESPACE: &str = "images:v1";
+const IMAGES_NAMESPACE: &str = "images:v3";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DBImage {

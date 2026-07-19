@@ -16,9 +16,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-const USERS_NAMESPACE: &str = "users:v1";
-const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v1";
-const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v1";
+const USERS_NAMESPACE: &str = "users:v3";
+const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v3";
+const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v3";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBUser {

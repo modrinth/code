@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::convert::TryInto;
 
-const PRODUCTS_NAMESPACE: &str = "products:v1";
+const PRODUCTS_NAMESPACE: &str = "products:v3";
 
 pub struct DBProduct {
     pub id: DBProductId,

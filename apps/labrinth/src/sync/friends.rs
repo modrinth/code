@@ -14,7 +14,7 @@ use redis::{RedisWrite, ToRedisArgs, ToSingleRedisArg};
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
-pub const FRIENDS_CHANNEL_NAME: &str = "friends:v1";
+pub const FRIENDS_CHANNEL_NAME: &str = "friends:v3";
 
 #[derive(Serialize, Deserialize)]
 pub enum RedisFriendsMessage {

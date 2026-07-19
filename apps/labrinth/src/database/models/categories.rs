@@ -7,7 +7,7 @@ use super::ids::*;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const TAGS_NAMESPACE: &str = "tags:v1";
+const TAGS_NAMESPACE: &str = "tags:v3";
 
 pub struct ProjectType {
     pub id: ProjectTypeId,

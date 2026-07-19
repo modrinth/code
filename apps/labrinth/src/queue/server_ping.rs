@@ -26,9 +26,9 @@ pub struct ServerPingQueue {
     pub incremental_search_queue: IncrementalSearchQueue,
 }
 
-pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping:v1";
+pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping:v3";
 pub const REDIS_FAILURE_NAMESPACE: &str =
-    "minecraft_java_server_ping_failures:v1";
+    "minecraft_java_server_ping_failures:v3";
 pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
 
 impl ServerPingQueue {

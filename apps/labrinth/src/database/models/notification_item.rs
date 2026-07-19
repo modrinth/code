@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v1";
+const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v3";
 
 pub struct NotificationBuilder {
     pub body: NotificationBody,

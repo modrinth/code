@@ -4,11 +4,11 @@ use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
 use serde::{Deserialize, Serialize};
 
-const TEMPLATES_NAMESPACE: &str = "notifications_templates:v1";
+const TEMPLATES_NAMESPACE: &str = "notifications_templates:v3";
 const TEMPLATES_HTML_DATA_NAMESPACE: &str =
-    "notifications_templates_html_data:v1";
+    "notifications_templates_html_data:v3";
 const TEMPLATES_DYNAMIC_HTML_NAMESPACE: &str =
-    "notifications_templates_dynamic_html:v1";
+    "notifications_templates_dynamic_html:v3";
 
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
 const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes

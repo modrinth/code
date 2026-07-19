@@ -14,7 +14,7 @@ pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
 pub const MODRINTH_PAYMENT_ID: HeaderName =
     HeaderName::from_static("modrinth-payment-id");
-pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements:v1";
+pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements:v3";
 const REDIS_TIMEOUT_MARGIN_MS: u64 = 250;
 
 pub(crate) fn payment_statement_key(

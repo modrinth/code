@@ -11,9 +11,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-const PATS_NAMESPACE: &str = "pats:v1";
-const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v1";
-const PATS_USERS_NAMESPACE: &str = "pats_users:v1";
+const PATS_NAMESPACE: &str = "pats:v3";
+const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v3";
+const PATS_USERS_NAMESPACE: &str = "pats_users:v3";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBPersonalAccessToken {

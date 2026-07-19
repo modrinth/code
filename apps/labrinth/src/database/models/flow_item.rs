@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 
-const FLOWS_NAMESPACE: &str = "flows:v1";
+const FLOWS_NAMESPACE: &str = "flows:v3";
 
 #[derive(Deserialize, Serialize)]
 pub enum DBFlow {

@@ -13,7 +13,7 @@ use crate::{
     util::error::Context,
 };
 
-pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v1";
+pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v3";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MinecraftServerAnalytics {

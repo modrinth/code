@@ -21,8 +21,8 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v1";
-const VERSION_FILES_NAMESPACE: &str = "versions_files:v1";
+pub const VERSIONS_NAMESPACE: &str = "versions:v3";
+const VERSION_FILES_NAMESPACE: &str = "versions_files:v3";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
     transaction: &mut PgTransaction<'_>,

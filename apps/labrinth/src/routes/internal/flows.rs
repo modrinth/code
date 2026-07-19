@@ -2126,7 +2126,7 @@ async fn validate_2fa_code(
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    const TOTP_NAMESPACE: &str = "used_totp:v1";
+    const TOTP_NAMESPACE: &str = "used_totp:v3";
     let mut conn = redis.connect().await?;
     let logical_key = format!("{}-{}", input, user_id.0);
     let key = redis

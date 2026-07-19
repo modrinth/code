@@ -5,7 +5,7 @@ use ariadne::users::UserStatus;
 use redis::AsyncCommands;
 
 const EXPIRY_TIME_SECONDS: i64 = 60;
-const USER_STATUS_NAMESPACE: &str = "user_status:v1";
+const USER_STATUS_NAMESPACE: &str = "user_status:v3";
 
 pub async fn get_user_status(
     user: UserId,

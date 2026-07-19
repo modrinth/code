@@ -10,9 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-const SESSIONS_NAMESPACE: &str = "sessions:v1";
-const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v1";
-const SESSIONS_USERS_NAMESPACE: &str = "sessions_users:v1";
+const SESSIONS_NAMESPACE: &str = "sessions:v3";
+const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v3";
+const SESSIONS_USERS_NAMESPACE: &str = "sessions_users:v3";
 
 pub struct SessionBuilder {
     pub session: String,

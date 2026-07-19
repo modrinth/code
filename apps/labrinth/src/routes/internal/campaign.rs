@@ -68,7 +68,7 @@ pub struct CampaignInfo {
     cached_at: DateTime<Utc>,
 }
 
-const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v1";
+const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v3";
 const CAMPAIGN_INFO_CACHE_STALE_SECONDS: i64 = 15 * 60;
 const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 24 * 60 * 60;
 

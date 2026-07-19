@@ -22,9 +22,9 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
-const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v1";
-const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v1";
-const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v1";
+const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v3";
+const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v3";
+const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v3";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {

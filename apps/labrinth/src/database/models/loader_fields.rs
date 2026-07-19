@@ -12,14 +12,14 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-const GAMES_LIST_NAMESPACE: &str = "games:v1";
-const LOADER_ID: &str = "loader_id:v1";
-const LOADERS_LIST_NAMESPACE: &str = "loaders:v1";
-const LOADER_FIELDS_NAMESPACE: &str = "loader_fields:v1";
-const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all:v1";
-const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v1";
+const GAMES_LIST_NAMESPACE: &str = "games:v3";
+const LOADER_ID: &str = "loader_id:v3";
+const LOADERS_LIST_NAMESPACE: &str = "loaders:v3";
+const LOADER_FIELDS_NAMESPACE: &str = "loader_fields:v3";
+const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all:v3";
+const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums:v3";
 pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str =
-    "loader_field_enum_values:v1";
+    "loader_field_enum_values:v3";
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Game {
