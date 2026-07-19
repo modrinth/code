@@ -5467,6 +5467,7 @@ dependencies = [
  "modrinth-util",
  "muralpay",
  "murmur2",
+ "neverbounce",
  "paste",
  "path-util",
  "postcard",

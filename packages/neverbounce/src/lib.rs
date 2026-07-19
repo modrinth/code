@@ -101,6 +101,19 @@ pub enum VerificationResult {
     Unrecognized(String),
 }
 
+impl VerificationResult {
+    pub fn as_str(&self) -> &str {
+        match self {
+            VerificationResult::Valid => "valid",
+            VerificationResult::Invalid => "invalid",
+            VerificationResult::Disposable => "disposable",
+            VerificationResult::CatchAll => "catchall",
+            VerificationResult::Unknown => "unknown",
+            VerificationResult::Unrecognized(other) => &other,
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for VerificationResult {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
