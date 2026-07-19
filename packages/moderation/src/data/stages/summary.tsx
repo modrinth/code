@@ -2,7 +2,7 @@ import { AlignLeftIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { group, label, stage, toggle } from '../../types/node'
+import { group, stage, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -14,7 +14,16 @@ export default function () {
 		)
 		.icon(AlignLeftIcon)
 		.children(
-			label('summary'),
+			() => {
+				if (!project.value.summary) return null
+				return (
+					<div class="markdown-body w-full">
+						<strong>Summary:</strong>
+						<br />
+						<code>{project.value.summary}</code>
+					</div>
+				)
+			},
 
 			group()
 				.title('Summary Issues?')

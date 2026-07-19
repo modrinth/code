@@ -2,7 +2,7 @@ import { BookTextIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { check, group, label, md, type MessageFn, rawLabel, stage, toggle } from '../../types/node'
+import { check, group, md, type MessageFn, stage, toggle } from '../../types/node'
 import { promptSourceRequired } from '../../utils'
 
 export default function () {
@@ -10,9 +10,6 @@ export default function () {
 
 	const noSourceForkMsg: MessageFn = md('checklist/messages/license/no-source-fork')
 	const noSourceMsg: MessageFn = md('checklist/messages/license/no-source')
-
-	const licenseTxt = md('checklist/text/license/licensing')
-	const sourceDisclosureTxt = md('checklist/text/license/source-disclosure')
 
 	const needSource = promptSourceRequired(project.value.license.id, project.value.project_types)
 
@@ -25,11 +22,37 @@ export default function () {
 		.navigate('/settings/license')
 		.shown(computed(() => !project.value?.minecraft_server))
 		.children(
-			rawLabel(async (state) => {
-				const license = await licenseTxt(state)
-				if (!needSource) return license
-				return `${license}\n${await sourceDisclosureTxt(state)}`
-			}),
+			() => (
+				<div class="markdown-body w-full">
+					<strong>License id:</strong> {project.value.license?.id ?? 'None'}
+					<br />
+					<strong>License Link:</strong>{' '}
+					{project.value.license?.url ? (
+						<a href={project.value.license.url} target="_blank" class="underline">
+							{project.value.license.url}
+						</a>
+					) : (
+						'None'
+					)}
+					{needSource && (
+						<>
+							<br />
+							<strong>Source Link:</strong>{' '}
+							{project.value.link_urls?.source?.url ? (
+								<a
+									href={project.value.link_urls.source.url}
+									target="_blank"
+									class="underline"
+								>
+									{project.value.link_urls.source.url}
+								</a>
+							) : (
+								'None'
+							)}
+						</>
+					)}
+				</div>
+			),
 			group().children(
 				toggle('invalid-link', 'Invalid Link')
 					.shown(computed(() => !!project.value.license?.url))

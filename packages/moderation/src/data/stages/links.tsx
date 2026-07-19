@@ -1,8 +1,9 @@
 import { LinkIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
+import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import { group, md, rawLabel, stage, toggle } from '../../types/node'
+import { group, md, stage, toggle } from '../../types/node'
 import type { ChildEntry, GroupNodeBuilder } from '../../types/node'
 import { promptSourceRequired } from '../..'
 
@@ -10,14 +11,14 @@ export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 	const linkNames: Record<string, string> = {}
 
-	type LinkSectionBuilder = (() => GroupNodeBuilder) & {
+	type LinkSectionBuilder = GroupNodeBuilder & {
 		children(...extras: ChildEntry[]): LinkSectionBuilder
-		label(transform: (line: string) => string): LinkSectionBuilder
+		label(badge: Ref<boolean>): LinkSectionBuilder
 	}
 
 	function linkSection(id: string, name: string): LinkSectionBuilder {
 		linkNames[id] = name
-		let labelTransform: ((line: string) => string) | undefined
+		let showBadge: Ref<boolean> | undefined
 		const url = computed(() => project.value.link_urls[id]?.url)
 
 		const inner = group().children(
@@ -29,23 +30,32 @@ export default function () {
 			.layout('column')
 			.shown(computed(() => !!url.value))
 			.children(
-				rawLabel(() => {
-					const base = `**${name}:** <${url.value}>`
-					return labelTransform ? labelTransform(base) : base
-				}),
+				() => (
+					<div class="markdown-body w-full">
+						{showBadge?.value && (
+							<>
+								<strong>[📜]</strong>{' '}
+							</>
+						)}
+						<strong>{name}:</strong>{' '}
+						<a href={url.value} target="_blank" class="underline">
+							{url.value}
+						</a>
+					</div>
+				),
 				inner,
 			)
 
-		const builder: LinkSectionBuilder = Object.assign(() => outer, {
+		const builder = Object.assign(outer, {
 			children(...extras: ChildEntry[]) {
 				inner.children(...extras)
 				return builder
 			},
-			label(transform: (line: string) => string) {
-				labelTransform = transform
+			label(badge: Ref<boolean>) {
+				showBadge = badge
 				return builder
 			},
-		})
+		}) as LinkSectionBuilder
 
 		return builder
 	}
@@ -129,9 +139,7 @@ export default function () {
 		.children(
 			linkSection('issues', 'Issue tracker').children(toggle('disabled', 'Disabled')),
 
-			linkSection('source', 'Source code')
-				.label((line) => (showWarning.value ? `**[📜]** ${line}` : line))
-				.children(toggle('empty', 'Empty Repo')),
+			linkSection('source', 'Source code').label(showWarning).children(toggle('empty', 'Empty Repo')),
 
 			linkSection('wiki', 'Wiki page').children(toggle('disabled', 'Disabled')),
 

@@ -3,12 +3,12 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import type { NodeBuilder, NodeState, StageNodeBuilder } from '../../types/node'
+import type { NodeState, StageNodeBuilder } from '../../types/node'
 import {
+	NodeBuilder,
 	getBooleanChildState,
 	group,
 	isNodeActive,
-	label,
 	resolveChildren,
 	stage,
 	toggle,
@@ -30,7 +30,12 @@ export default function (
 		.icon(TriangleAlertIcon)
 		.navigate('/moderation')
 		.children(
-			label('text'),
+			() => (
+				<div class="markdown-body w-full">
+					<strong>Applying for:</strong>{' '}
+					<code>{project.value.requested_status ?? 'unknown'}</code>
+				</div>
+			),
 
 			group().children(
 				toggle('corrections-applied', 'Corrections applied')
@@ -51,7 +56,11 @@ export default function (
 									if (!node._fixes.length) return
 									if (!isNodeActive(node, nodeState)) return
 									const childState = getBooleanChildState(nodeState)
-									fixNodes.push(...resolveChildren(node, childState))
+									fixNodes.push(
+										...resolveChildren(node, childState).filter(
+											(c): c is NodeBuilder => c instanceof NodeBuilder,
+										),
+									)
 								},
 							)
 							return fixNodes.length > 0 ? group().children(...fixNodes) : null

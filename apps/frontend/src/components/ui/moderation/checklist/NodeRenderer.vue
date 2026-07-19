@@ -2,15 +2,15 @@
 import type {
 	BooleanNodeBuilder,
 	ButtonNodeBuilder,
-	DisplayNodeBuilder,
+	ChildNode,
 	DropdownNodeBuilder,
 	GroupNodeBuilder,
 	IdentifiedNodeBuilder,
 	InputNodeBuilder,
 	LabeledNodeBuilder,
-	NodeBuilder,
 	NodeState,
 	NodeStateWithChildren,
+	OverrideValue,
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
@@ -20,6 +20,7 @@ import {
 	flattenProjectVariables,
 	flattenStaticVariables,
 	getBooleanChildState,
+	NodeBuilder,
 	resolve,
 	resolveChildren,
 	setMessageProject,
@@ -33,7 +34,7 @@ import {
 	StyledInput,
 } from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
-import { inject, reactive, watchEffect } from 'vue'
+import { inject, nextTick, onMounted, reactive, watchEffect } from 'vue'
 
 import { NODE_META_KEY, STATE_KEY } from './checklist-context'
 
@@ -44,7 +45,7 @@ const { projectV3: project, projectV2 } = injectProjectPageContext()
 setMessageProject(project, projectV2)
 
 const props = defineProps<{
-	nodes: NodeBuilder[]
+	nodes: ChildNode[]
 	showContext: Record<string, NodeState>
 	onImageUpload?: (file: File) => Promise<string>
 	flex?: boolean
@@ -99,10 +100,6 @@ function asGroup(node: NodeBuilder): GroupNodeBuilder {
 
 function asDropdown(node: NodeBuilder): DropdownNodeBuilder {
 	return node as DropdownNodeBuilder
-}
-
-function asDisplay(node: NodeBuilder): DisplayNodeBuilder {
-	return node as DisplayNodeBuilder
 }
 
 function asInput(node: NodeBuilder): InputNodeBuilder {
@@ -237,6 +234,7 @@ function hasActionableFixes(node: IdentifiedNodeBuilder): boolean {
 
 function hasRequiredMissingDescendants(node: IdentifiedNodeBuilder): boolean {
 	for (const child of getChildren(node)) {
+		if (!(child instanceof NodeBuilder)) continue
 		const identified = child as IdentifiedNodeBuilder
 		if (nodeMetaMap?.value.get(identified)?.hasRequiredMissing) return true
 		if (identified.id !== undefined && hasRequiredMissingDescendants(identified)) return true
@@ -255,10 +253,40 @@ function getBooleanColor(node: BooleanNodeBuilder): string {
 }
 
 function setTextState(node: IdentifiedNodeBuilder, v: string): void {
+	const inputNode = node as InputNodeBuilder
+	const result = inputNode._onChange?.(v, overrideHelpers)
+
+	if (isOverrideValue(result)) {
+		const ov = result.__override
+		const def = resolveDefault(node as ValueNodeBuilder)
+		const defStr = typeof def === 'string' ? def : ''
+		setNodeState(node, ov === defStr ? undefined : ov || undefined)
+		nextTick(() => textInputRefs.get(node)?.setValue(ov))
+		return
+	}
+
 	const def = resolveDefault(node as ValueNodeBuilder)
 	const defStr = typeof def === 'string' ? def : ''
 	setNodeState(node, v === defStr ? undefined : defStr ? v : v || undefined)
 }
+
+function handleButtonClick(node: ButtonNodeBuilder): void {
+	const before = new Map<NodeBuilder, string>()
+	for (const inputNode of textInputRefs.keys()) {
+		before.set(inputNode, getTextState(asIdentified(inputNode)))
+	}
+	node._onClick?.(props.showContext)
+	for (const [inputNode, beforeVal] of before) {
+		const after = getTextState(asIdentified(inputNode))
+		if (after !== beforeVal) setTextState(asIdentified(inputNode), after)
+	}
+}
+
+onMounted(() => {
+	for (const inputNode of textInputRefs.keys()) {
+		setTextState(asIdentified(inputNode), getTextState(asIdentified(inputNode)))
+	}
+})
 
 function toggleBoolean(node: BooleanNodeBuilder) {
 	const raw = getNodeState(node)
@@ -292,6 +320,13 @@ function toggleChip(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder)
 	setNodeState(parent, selected.size > 0 ? selected : undefined)
 }
 
+const textInputRefs = new Map<NodeBuilder, { setValue: (v: string) => void }>()
+const overrideHelpers = { override: (v: string): OverrideValue => ({ __override: v }) }
+
+function isOverrideValue(v: unknown): v is OverrideValue {
+	return v !== null && typeof v === 'object' && '__override' in v
+}
+
 const scopedContextFallbacks = new WeakMap<IdentifiedNodeBuilder, Record<string, NodeState>>()
 
 function childScopedContext(child: IdentifiedNodeBuilder): Record<string, NodeState> {
@@ -319,21 +354,26 @@ function getChildrenContext(node: IdentifiedNodeBuilder): Record<string, NodeSta
 	return childScopedContext(node)
 }
 
-function getChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
+function getChildren(node: IdentifiedNodeBuilder): ChildNode[] {
 	return resolveChildren(node, getChildrenContext(node))
 }
 
 function visibleChildren(node: IdentifiedNodeBuilder): NodeBuilder[] {
-	return getChildren(node).filter(isVisible)
-}
-
-function renderProse(content: string): string {
-	return renderString(content).replace(/<a /g, '<a target="_blank" ')
+	return getChildren(node).filter((c): c is NodeBuilder => c instanceof NodeBuilder && isVisible(c))
 }
 
 const tooltipHtml = reactive(new Map<NodeBuilder, string>())
 
-function getNodeTooltipConfig(node: BooleanNodeBuilder) {
+function getTooltipConfig(node: NodeBuilder, state?: Record<string, NodeState>) {
+	const t = node._tooltip
+	const manual = t === undefined ? undefined : typeof t === 'function' ? t(state ?? {}) : resolve(t)
+	if (manual)
+		return {
+			content: manual,
+			delay: { show: 500, hide: 0 },
+			triggers: ['hover', 'focus'],
+			placement: 'top',
+		}
 	const html = tooltipHtml.get(node)
 	if (!html) return undefined
 	return {
@@ -345,18 +385,12 @@ function getNodeTooltipConfig(node: BooleanNodeBuilder) {
 	}
 }
 
-const proseContents = reactive(new Map<NodeBuilder, string | null>())
-
 watchEffect(async () => {
 	// Read all reactive state synchronously before any await so Vue tracks dependencies
-	const asyncDisplayTasks: Array<{ node: DisplayNodeBuilder; state: Record<string, NodeState> }> =
-		[]
 	const buttonTasks: Array<{ node: BooleanNodeBuilder; state: Record<string, NodeState> }> = []
 
 	for (const node of props.nodes) {
-		if (node.type === 'display' && isVisible(node)) {
-			asyncDisplayTasks.push({ node: asDisplay(node), state: props.showContext })
-		}
+		if (!(node instanceof NodeBuilder)) continue
 		if (node.type === 'toggle' && isVisible(node)) {
 			const boolNode = asBool(node)
 			if (boolNode._segments.some((s) => s.type !== 'collect')) {
@@ -383,13 +417,10 @@ watchEffect(async () => {
 		}
 	}
 
-	for (const { node, state } of asyncDisplayTasks) {
-		proseContents.set(node, await evalSegment(node._segment, state, props.parentStatePath ?? []))
-	}
-
 	async function evalCollectedChildren(node: IdentifiedNodeBuilder): Promise<string> {
 		let result = ''
 		for (const child of getChildren(node)) {
+			if (!(child instanceof NodeBuilder)) continue
 			if (!isVisible(child)) continue
 			const childNode = asIdentified(child)
 			if (child.type === 'group') {
@@ -397,18 +428,24 @@ watchEffect(async () => {
 				if (grp._selectMode === 'multi') {
 					const selected = getMultiSelectState(childNode)
 					for (const opt of getChildren(childNode)) {
-						if (!isVisible(opt)) continue
+						if (!(opt instanceof NodeBuilder) || !isVisible(opt)) continue
 						const optNode = asIdentified(opt)
 						if (!optNode.id || !selected.has(optNode.id)) continue
-						result += await evalNodeTooltip(optNode, getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>)
+						result += await evalNodeTooltip(
+							optNode,
+							getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>,
+						)
 					}
 				} else if (grp._selectMode === 'single') {
 					const selected = getSelectState(childNode)
 					for (const opt of getChildren(childNode)) {
-						if (!isVisible(opt)) continue
+						if (!(opt instanceof NodeBuilder) || !isVisible(opt)) continue
 						const optNode = asIdentified(opt)
 						if (optNode.id !== selected) continue
-						result += await evalNodeTooltip(optNode, getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>)
+						result += await evalNodeTooltip(
+							optNode,
+							getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>,
+						)
 					}
 				} else {
 					result += await evalCollectedChildren(childNode)
@@ -416,14 +453,20 @@ watchEffect(async () => {
 			} else if (child.type === 'dropdown') {
 				const selected = getSelectState(childNode)
 				for (const opt of getChildren(childNode)) {
-					if (!isVisible(opt)) continue
+					if (!(opt instanceof NodeBuilder) || !isVisible(opt)) continue
 					const optNode = asIdentified(opt)
 					if (optNode.id !== selected) continue
-					result += await evalNodeTooltip(optNode, getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>)
+					result += await evalNodeTooltip(
+						optNode,
+						getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>,
+					)
 				}
 			} else if (child.type === 'toggle' || child.type === 'check') {
 				if (!getBooleanState(asBool(childNode))) continue
-				result += await evalNodeTooltip(childNode, getBooleanChildState(getNodeState(childNode)) as Record<string, NodeState>)
+				result += await evalNodeTooltip(
+					childNode,
+					getBooleanChildState(getNodeState(childNode)) as Record<string, NodeState>,
+				)
 			}
 		}
 		return result
@@ -473,55 +516,68 @@ watchEffect(async () => {
 <template>
 	<div :class="flex ? 'flex flex-wrap gap-2' : 'space-y-4'">
 		<template
-			v-for="node in nodes"
+			v-for="(item, idx) in nodes"
 			:key="
-				node.type === 'button'
-					? `button-${asButton(node).label}`
-					: (asIdentified(node)._statePath?.join('/') ?? asIdentified(node).id ?? node.type)
+				item instanceof NodeBuilder
+					? item.type === 'button'
+						? `button-${asButton(item).label}`
+						: (asIdentified(item)._statePath?.join('/') ?? asIdentified(item).id ?? item.type)
+					: typeof item === 'string'
+						? `s-${item}`
+						: `display-${idx}`
 			"
 		>
-			<template v-if="isVisible(node)">
-				<div :class="node.type !== 'group' && !getNodeTitle(node) ? 'contents' : undefined">
-					<div v-if="getNodeTitle(node)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
+			<!-- Display items: plain strings or zero-arg render functions -->
+			<template v-if="!(item instanceof NodeBuilder)">
+				<template v-if="typeof item === 'string'">{{ item }}</template>
+				<component :is="item" v-else />
+			</template>
+
+			<template v-else-if="isVisible(item)">
+				<div :class="item.type !== 'group' && !getNodeTitle(item) ? 'contents' : undefined">
+					<div v-if="getNodeTitle(item)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
 						<span
-							v-html="renderString(getNodeTitle(node)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
-						/><span v-if="nodeHasRequiredMissing(asIdentified(node))" class="text-red">*</span>
+							v-html="renderString(getNodeTitle(item)!).replace(/^<p>([\s\S]*)<\/p>\n?$/, '$1')"
+						/><span v-if="nodeHasRequiredMissing(asIdentified(item))" class="text-red">*</span>
 					</div>
 
 					<!-- group -->
-					<template v-if="node.type === 'group'">
+					<template v-if="item.type === 'group'">
 						<!-- multi-select (chips) mode -->
-						<template v-if="asGroup(node)._selectMode === 'multi'">
+						<template v-if="asGroup(item)._selectMode === 'multi'">
 							<div class="flex flex-wrap gap-2">
 								<template
-									v-for="child in visibleChildren(asIdentified(node))"
+									v-for="child in visibleChildren(asIdentified(item))"
 									:key="asIdentified(child).id"
 								>
 									<ButtonStyled
 										:color="
-											getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!)
+											getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!)
 												? hasActionableFixes(asIdentified(child))
 													? 'blue'
 													: 'brand'
 												: 'standard'
 										"
-										@click="toggleChip(asIdentified(node), asIdentified(child))"
+										:circular="!!asIdentified(child)._icon"
+										@click="toggleChip(asIdentified(item), asIdentified(child))"
 									>
 										<button
-											v-tooltip="getNodeTooltipConfig(asIdentified(child) as BooleanNodeBuilder)"
+											v-tooltip="getTooltipConfig(asIdentified(child))"
+											:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
 										>
-											{{ asLabeled(child).label }}
+											<component :is="asIdentified(child)._icon" v-if="asIdentified(child)._icon" />
+											<template v-else>{{ asLabeled(child).label }}</template>
 										</button>
 									</ButtonStyled>
 								</template>
 							</div>
 							<template
-								v-for="child in visibleChildren(asIdentified(node))"
+								v-for="child in visibleChildren(asIdentified(item))"
 								:key="`sub-${asIdentified(child).id}`"
 							>
 								<NodeRenderer
 									v-if="
-										getMultiSelectState(asIdentified(node)).has(asIdentified(child).id!) &&
+										getMultiSelectState(asIdentified(item)).has(asIdentified(child).id!) &&
 										getChildren(asIdentified(child)).length
 									"
 									:nodes="getChildren(asIdentified(child))"
@@ -534,32 +590,37 @@ watchEffect(async () => {
 							</template>
 						</template>
 						<!-- single-select (button-style) mode -->
-						<template v-else-if="asGroup(node)._selectMode === 'single'">
+						<template v-else-if="asGroup(item)._selectMode === 'single'">
 							<div class="flex flex-wrap gap-2">
 								<template
-									v-for="child in visibleChildren(asIdentified(node))"
+									v-for="child in visibleChildren(asIdentified(item))"
 									:key="asIdentified(child).id"
 								>
 									<ButtonStyled
 										:color="
-											getSelectState(asIdentified(node)) === asIdentified(child).id
+											getSelectState(asIdentified(item)) === asIdentified(child).id
 												? 'brand'
 												: 'standard'
 										"
+										:circular="!!asIdentified(child)._icon"
 									>
-										<button @click="toggleSelect(asIdentified(node), asIdentified(child))">
-											{{ asLabeled(child).label }}
+										<button
+											:aria-label="asIdentified(child)._icon ? asLabeled(child).label : undefined"
+											@click="toggleSelect(asIdentified(item), asIdentified(child))"
+										>
+											<component :is="asIdentified(child)._icon" v-if="asIdentified(child)._icon" />
+											<template v-else>{{ asLabeled(child).label }}</template>
 										</button>
 									</ButtonStyled>
 								</template>
 							</div>
 							<template
-								v-for="child in visibleChildren(asIdentified(node))"
+								v-for="child in visibleChildren(asIdentified(item))"
 								:key="`sub-${asIdentified(child).id}`"
 							>
 								<NodeRenderer
 									v-if="
-										getSelectState(asIdentified(node)) === asIdentified(child).id &&
+										getSelectState(asIdentified(item)) === asIdentified(child).id &&
 										getChildren(asIdentified(child)).length
 									"
 									:nodes="getChildren(asIdentified(child))"
@@ -574,32 +635,32 @@ watchEffect(async () => {
 						<!-- plain container mode -->
 						<NodeRenderer
 							v-else
-							:nodes="getChildren(asIdentified(node))"
-							:show-context="getChildrenContext(asIdentified(node))"
+							:nodes="getChildren(asIdentified(item))"
+							:show-context="getChildrenContext(asIdentified(item))"
 							:on-image-upload="onImageUpload"
-							:flex="asGroup(node)._layout !== 'column'"
-							:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
-							:parent-state-path="asIdentified(node)._statePath ?? props.parentStatePath ?? []"
+							:flex="asGroup(item)._layout !== 'column'"
+							:title-depth="item._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
+							:parent-state-path="asIdentified(item)._statePath ?? props.parentStatePath ?? []"
 						/>
 					</template>
 
 					<!-- dropdown -->
-					<template v-else-if="node.type === 'dropdown'">
+					<template v-else-if="item.type === 'dropdown'">
 						<Combobox
 							class="!w-80"
-							:options="getDropdownOptions(asDropdown(node))"
-							:model-value="getDropdownModelValue(asDropdown(node))"
+							:options="getDropdownOptions(asDropdown(item))"
+							:model-value="getDropdownModelValue(asDropdown(item))"
 							trigger-class="!bg-[var(--color-button-bg)] !rounded-[var(--radius-md)] !shadow-[var(--shadow-inset-sm),0_0_0_0_transparent]"
 							dropdown-class="!rounded-[var(--radius-md)] !bg-[var(--color-button-bg)] !border-0"
-							@update:model-value="(v) => setNodeState(asIdentified(node), v || undefined)"
+							@update:model-value="(v) => setNodeState(asIdentified(item), v || undefined)"
 						/>
 						<template
-							v-for="child in visibleChildren(asIdentified(node))"
+							v-for="child in visibleChildren(asIdentified(item))"
 							:key="`sub-${asIdentified(child).id}`"
 						>
 							<NodeRenderer
 								v-if="
-									getSelectState(asIdentified(node)) === asIdentified(child).id &&
+									getSelectState(asIdentified(item)) === asIdentified(child).id &&
 									getChildren(asIdentified(child)).length
 								"
 								:nodes="getChildren(asIdentified(child))"
@@ -613,69 +674,71 @@ watchEffect(async () => {
 					</template>
 
 					<!-- button -->
-					<template v-else-if="node.type === 'button'">
-						<ButtonStyled>
+					<template v-else-if="item.type === 'button'">
+						<ButtonStyled :circular="!!item._icon && !asButton(item).label">
 							<button
-								:disabled="!isButtonEnabled(asButton(node))"
-								@click="asButton(node)._onClick?.(showContext)"
+								v-tooltip="getTooltipConfig(item, showContext)"
+								:disabled="!isButtonEnabled(asButton(item))"
+								:aria-label="item._icon && !asButton(item).label ? asButton(item).label : undefined"
+								@click="handleButtonClick(asButton(item))"
 							>
-								{{ asButton(node).label }}
+								<component :is="item._icon" v-if="item._icon" />
+								{{ asButton(item).label }}
 							</button>
 						</ButtonStyled>
 					</template>
 
 					<!-- toggle -->
-					<template v-else-if="node.type === 'toggle'">
-						<ButtonStyled :color="getBooleanColor(asBool(node))">
+					<template v-else-if="item.type === 'toggle'">
+						<ButtonStyled :color="getBooleanColor(asBool(item))" :circular="!!item._icon">
 							<button
-								v-tooltip="getNodeTooltipConfig(asBool(node))"
-								:disabled="!isEnabled(asIdentified(node))"
-								@click="toggleBoolean(asBool(node))"
+								v-tooltip="getTooltipConfig(asBool(item))"
+								:disabled="!isEnabled(asIdentified(item))"
+								:aria-label="item._icon ? asLabeled(item).label : undefined"
+								@click="toggleBoolean(asBool(item))"
 							>
-								{{ asLabeled(node).label }}
+								<component :is="item._icon" v-if="item._icon" />
+								<template v-else>{{ asLabeled(item).label }}</template>
 							</button>
 						</ButtonStyled>
 					</template>
 
 					<!-- check -->
-					<template v-else-if="node.type === 'check'">
+					<template v-else-if="item.type === 'check'">
 						<Checkbox
-							:model-value="getBooleanState(asBool(node))"
-							:label="asLabeled(node).label"
-							:disabled="!isEnabled(asIdentified(node))"
-							@update:model-value="isEnabled(asIdentified(node)) && toggleBoolean(asBool(node))"
+							:model-value="getBooleanState(asBool(item))"
+							:label="asLabeled(item).label"
+							:disabled="!isEnabled(asIdentified(item))"
+							@update:model-value="isEnabled(asIdentified(item)) && toggleBoolean(asBool(item))"
 						/>
 					</template>
 
 					<!-- text -->
-					<template v-else-if="node.type === 'text'">
+					<template v-else-if="item.type === 'text'">
 						<StyledInput
-							:id="`node-${asIdentified(node).id}`"
-							:model-value="getTextState(asIdentified(node))"
-							:placeholder="getPlaceholder(asInput(node))"
+							:id="`node-${asIdentified(item).id}`"
+							:ref="(el: any) => (el ? textInputRefs.set(item, el) : textInputRefs.delete(item))"
+							v-tooltip="getTooltipConfig(item, showContext)"
+							:model-value="getTextState(asIdentified(item))"
+							:placeholder="getPlaceholder(asInput(item))"
 							autocomplete="off"
-							@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
+							@update:model-value="(v: string) => setTextState(asIdentified(item), v)"
 						/>
 					</template>
 
 					<!-- markdown -->
-					<template v-else-if="node.type === 'markdown'">
+					<template v-else-if="item.type === 'markdown'">
 						<MarkdownEditor
-							:id="`node-${asIdentified(node).id}`"
-							:aria-label="asLabeled(node).label || undefined"
-							:model-value="getTextState(asIdentified(node))"
-							:placeholder="getPlaceholder(asInput(node))"
+							:id="`node-${asIdentified(item).id}`"
+							:aria-label="asLabeled(item).label || undefined"
+							:model-value="getTextState(asIdentified(item))"
+							:placeholder="getPlaceholder(asInput(item))"
 							:max-height="300"
 							:disabled="false"
 							:heading-buttons="false"
 							:on-image-upload="onImageUpload"
-							@update:model-value="(v: string) => setTextState(asIdentified(node), v)"
+							@update:model-value="(v: string) => setTextState(asIdentified(item), v)"
 						/>
-					</template>
-
-					<!-- display (prose + label) -->
-					<template v-else-if="node.type === 'display' && proseContents.get(node) != null">
-						<div class="markdown-body" v-html="renderProse(proseContents.get(node)!)" />
 					</template>
 				</div>
 			</template>
@@ -683,25 +746,28 @@ watchEffect(async () => {
 
 		<!-- children of active boolean nodes, rendered after all siblings -->
 		<template
-			v-for="node in nodes"
+			v-for="(item, idx) in nodes"
 			:key="
-				node.type === 'button'
-					? `children-button-${asButton(node).label}`
-					: `children-${asIdentified(node)._statePath?.join('/') ?? asIdentified(node).id ?? node.type}`
+				item instanceof NodeBuilder
+					? item.type === 'button'
+						? `children-button-${asButton(item).label}`
+						: `children-${asIdentified(item)._statePath?.join('/') ?? asIdentified(item).id ?? item.type}`
+					: `children-display-${idx}`
 			"
 		>
 			<NodeRenderer
 				v-if="
-					isVisible(node) &&
-					(node.type === 'toggle' || node.type === 'check') &&
-					getBooleanState(asBool(node)) &&
-					getChildren(asIdentified(node)).length
+					item instanceof NodeBuilder &&
+					isVisible(item) &&
+					(item.type === 'toggle' || item.type === 'check') &&
+					getBooleanState(asBool(item)) &&
+					getChildren(asIdentified(item)).length
 				"
-				:nodes="getChildren(asIdentified(node))"
-				:show-context="getChildrenContext(asIdentified(node))"
+				:nodes="getChildren(asIdentified(item))"
+				:show-context="getChildrenContext(asIdentified(item))"
 				:on-image-upload="onImageUpload"
-				:title-depth="node._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
-				:parent-state-path="asIdentified(node)._statePath ?? props.parentStatePath ?? []"
+				:title-depth="item._title !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
+				:parent-state-path="asIdentified(item)._statePath ?? props.parentStatePath ?? []"
 				class="w-full"
 			/>
 		</template>

@@ -41,8 +41,12 @@ export function resolve<T>(value: Reactive<T>): T {
 	return toValue(value as T | Ref<T>)
 }
 
+export type ChildNode = NodeBuilder | (() => unknown) | string
+
 export type ChildEntry =
 	| NodeBuilder
+	| string
+	| (() => unknown)
 	| null
 	| Ref<NodeBuilder | null>
 	| ((state?: Record<string, NodeState>) => NodeBuilder | NodeBuilder[] | null)
@@ -56,7 +60,6 @@ export type NodeType =
 	| 'group'
 	| 'dropdown'
 	| 'option'
-	| 'display'
 	| 'stage'
 
 // ─── Message helpers ──────────────────────────────────────────────────────────
@@ -85,6 +88,8 @@ export async function loadMd(
 	projectV2: Labrinth.Projects.v2.Project,
 	getVars?: (state: Record<string, any>) => Record<string, any>,
 ): Promise<string> {
+	// Call getVars before any await so Vue's watchEffect tracks reactive reads inside it
+	const extraVars = getVars ? getVars(state) : null
 	const loader = messageFiles[`../data/messages/${path}.md`]
 	if (!loader) {
 		_onMissingMd?.(path)
@@ -99,8 +104,8 @@ export async function loadMd(
 	for (const key of USER_CONTENT_KEYS) {
 		if (key in vars) vars[key] = mdEscape(vars[key])
 	}
-	if (getVars) {
-		for (const [k, v] of Object.entries(getVars(state))) {
+	if (extraVars) {
+		for (const [k, v] of Object.entries(extraVars)) {
 			vars[k] = String(v ?? '')
 		}
 	}
@@ -208,7 +213,6 @@ export type MessageSegment =
 	| { type: 'fn'; fn: ContentFn }
 	| { type: 'auto'; getVars?: GetVarsFn }
 	| { type: 'path'; path: string | (() => string); getVars?: GetVarsFn }
-	| { type: 'text-path'; path: string | (() => string); getVars?: GetVarsFn }
 	| { type: 'collect'; fallback?: MessageSegment }
 
 export function resolveRelativeMessagePath(
@@ -226,21 +230,6 @@ export function resolveRelativeMessagePath(
 	return `checklist/messages/${normalized.join('/')}`
 }
 
-export function resolveRelativeLabelPath(
-	labelPath: string | (() => string),
-	statePath: string[],
-): string {
-	const name = typeof labelPath === 'function' ? labelPath() : labelPath
-	if (name.startsWith('/')) return `checklist/text${name}`
-	const parts = [...statePath, ...name.split('/')]
-	const normalized = parts.reduce<string[]>((acc, p) => {
-		if (p === '..') acc.pop()
-		else if (p) acc.push(p)
-		return acc
-	}, [])
-	return `checklist/text/${normalized.join('/')}`
-}
-
 export async function evalSegment(
 	seg: MessageSegment,
 	state: Record<string, NodeState>,
@@ -251,14 +240,6 @@ export async function evalSegment(
 	if (seg.type === 'auto')
 		return loadMd(
 			`checklist/messages/${statePath.join('/')}`,
-			state,
-			_project!.value,
-			_projectV2!.value,
-			seg.getVars,
-		)
-	if (seg.type === 'text-path')
-		return loadMd(
-			resolveRelativeLabelPath(seg.path, statePath),
 			state,
 			_project!.value,
 			_projectV2!.value,
@@ -279,6 +260,8 @@ export abstract class NodeBuilder {
 	abstract readonly type: NodeType
 	_shown?: Reactive<boolean>
 	_title?: Reactive<string>
+	_icon?: FunctionalComponent<SVGAttributes>
+	_tooltip?: Reactive<string> | ((state: Record<string, NodeState>) => string)
 
 	shown(condition: Reactive<boolean>): this {
 		this._shown = condition
@@ -289,25 +272,25 @@ export abstract class NodeBuilder {
 		this._title = t
 		return this
 	}
-}
 
-export class DisplayNodeBuilder extends NodeBuilder {
-	readonly type = 'display' as const
-	_segment: MessageSegment
+	icon(i: FunctionalComponent<SVGAttributes>): this {
+		this._icon = markRaw(i)
+		return this
+	}
 
-	constructor(segment: MessageSegment) {
-		super()
-		this._segment = segment
+	tooltip(t: Reactive<string> | ((state: Record<string, NodeState>) => string)): this {
+		this._tooltip = t
+		return this
 	}
 }
 
 export class ButtonNodeBuilder extends NodeBuilder {
 	readonly type = 'button' as const
-	readonly label: string
+	readonly label?: string
 	_onClick?: (state: Record<string, NodeState>) => void
 	_enabled?: Reactive<boolean> | ((state: Record<string, NodeState>) => boolean)
 
-	constructor(nodeLabel: string) {
+	constructor(nodeLabel?: string) {
 		super()
 		this.label = nodeLabel
 	}
@@ -448,11 +431,19 @@ export class BooleanNodeBuilder extends ValueNodeBuilder {
 	}
 }
 
+export type OverrideValue = { readonly __override: string }
+
+export type OnChangeFn = (
+	value: string,
+	helpers: { override: (value: string) => OverrideValue },
+) => OverrideValue | void
+
 export class InputNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type: 'text' | 'markdown'
 	_placeholder?: Reactive<string>
 	_defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState)
 	_required?: boolean
+	_onChange?: OnChangeFn
 
 	constructor(id: string, type: 'text' | 'markdown') {
 		super(id)
@@ -471,6 +462,11 @@ export class InputNodeBuilder extends IdentifiedNodeBuilder {
 
 	required(v = true): this {
 		this._required = v
+		return this
+	}
+
+	onChange(fn: OnChangeFn): this {
+		this._onChange = fn
 		return this
 	}
 }
@@ -666,7 +662,7 @@ export function getBooleanChildState(nodeState: NodeState): Record<string, NodeS
 export function resolveChildren(
 	node: IdentifiedNodeBuilder,
 	state: Record<string, NodeState>,
-): NodeBuilder[] {
+): ChildNode[] {
 	let entries: ChildEntry[]
 	let stampStatic = false
 
@@ -684,7 +680,7 @@ export function resolveChildren(
 	}
 
 	const scopePath = childrenScopePath(node)
-	const result: NodeBuilder[] = []
+	const result: ChildNode[] = []
 
 	for (const entry of entries) {
 		if (entry == null) continue
@@ -694,18 +690,34 @@ export function resolveChildren(
 			result.push(entry)
 			continue
 		}
-		const resolved =
-			typeof entry === 'function' ? entry(state) : toValue(entry as Ref<NodeBuilder | null>)
-		if (resolved == null) continue
-		if (Array.isArray(resolved)) {
-			for (const r of resolved) {
-				if (r == null) continue
-				if (r._shown !== undefined && !resolve(r._shown)) continue
-				if (scopePath) stampChildPaths([r], scopePath)
-				result.push(r)
-			}
+		if (typeof entry === 'string') {
+			result.push(entry)
 			continue
 		}
+		if (typeof entry === 'function') {
+			if (entry.length === 0) {
+				result.push(entry as () => unknown)
+				continue
+			}
+			const resolved = entry(state)
+			if (resolved == null) continue
+			if (Array.isArray(resolved)) {
+				for (const r of resolved) {
+					if (r == null) continue
+					if (r._shown !== undefined && !resolve(r._shown)) continue
+					if (scopePath) stampChildPaths([r], scopePath)
+					result.push(r)
+				}
+				continue
+			}
+			if (resolved._shown !== undefined && !resolve(resolved._shown)) continue
+			if (scopePath) stampChildPaths([resolved], scopePath)
+			result.push(resolved)
+			continue
+		}
+		// Ref<NodeBuilder | null>
+		const resolved = toValue(entry as Ref<NodeBuilder | null>)
+		if (resolved == null) continue
 		if (resolved._shown !== undefined && !resolve(resolved._shown)) continue
 		if (scopePath) stampChildPaths([resolved], scopePath)
 		result.push(resolved)
@@ -715,7 +727,7 @@ export function resolveChildren(
 }
 
 export function walkNodes(
-	nodes: NodeBuilder[],
+	nodes: ChildNode[],
 	stageState: Record<string, NodeState>,
 	visitor: (
 		node: IdentifiedNodeBuilder,
@@ -724,6 +736,7 @@ export function walkNodes(
 	) => void,
 ): void {
 	for (const node of nodes) {
+		if (!(node instanceof NodeBuilder)) continue
 		if (node._shown !== undefined && !resolve(node._shown)) continue
 
 		if (node.type === 'stage') {
@@ -760,7 +773,7 @@ export function walkNodes(
 			// Fall through to value-node path for groups with selectMode
 		}
 
-		if (node.type === 'display' || node.type === 'button') continue
+		if (node.type === 'button') continue
 
 		const identified = node as IdentifiedNodeBuilder
 		const stateKey =
@@ -847,17 +860,10 @@ export const toggle = (id: string, nodeLabel: string) =>
 	new BooleanNodeBuilder(id, nodeLabel, 'toggle')
 export const check = (id: string, nodeLabel: string) =>
 	new BooleanNodeBuilder(id, nodeLabel, 'check')
-export const button = (nodeLabel: string) => new ButtonNodeBuilder(nodeLabel)
+export const button = (nodeLabel?: string) => new ButtonNodeBuilder(nodeLabel)
 export const text = (id: string) => new InputNodeBuilder(id, 'text')
 export const markdown = (id: string) => new InputNodeBuilder(id, 'markdown')
 export const group = (id?: string) => new GroupNodeBuilder(id)
 export const dropdown = (id: string) => new DropdownNodeBuilder(id)
 export const option = (id: string, nodeLabel: string) => new OptionNodeBuilder(id, nodeLabel)
-export const label = (path: string | (() => string), getVars?: GetVarsFn) =>
-	new DisplayNodeBuilder({ type: 'text-path', path, ...(getVars && { getVars }) })
-export const rawLabel = (content: string | ContentFn) =>
-	new DisplayNodeBuilder({
-		type: 'fn',
-		fn: typeof content === 'string' ? () => content : content,
-	})
 export const stage = (id: string, title: string) => new StageNodeBuilder(id, title)

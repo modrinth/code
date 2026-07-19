@@ -3,7 +3,7 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { dropdown, fix, group, label, md, option, stage, toggle } from '../../types/node'
+import { dropdown, fix, group, md, option, stage, toggle } from '../../types/node'
 import { requiresEnvironmentInfo } from '../../utils'
 
 const loaderLabels: Record<string, string> = {
@@ -38,10 +38,29 @@ export default function () {
 			.navigate('/versions')
 			.shown(computed(() => !project.value?.minecraft_server))
 			.children(
-				label(
-					() =>
-						`environment/${(project.value.environment?.length ?? 0) === 1 ? 'single' : 'multiple'}`,
-				),
+				() => {
+					const env = project.value.environment ?? []
+					if (env.length === 1) {
+						return (
+							<div class="markdown-body w-full">
+								<strong>Environment:</strong>{' '}
+								<code>
+									{env[0]}
+								</code>
+							</div>
+						)
+					}
+					return (
+						<div class="markdown-body w-full">
+							<strong>Unique environments:</strong> {env.length}
+							<br />
+							<strong>Environments:</strong>{' '}
+							<code>
+								{env.join(', ')}
+							</code>
+						</div>
+					)
+				},
 
 				group().children(
 					toggle('environment', 'Environment')

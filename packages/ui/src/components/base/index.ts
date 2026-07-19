@@ -1,5 +1,6 @@
 export { default as Accordion } from './Accordion.vue'
 export { default as Admonition } from './Admonition.vue'
+export { default as Alert } from './Alert.vue'
 export { default as AppearingProgressBar } from './AppearingProgressBar.vue'
 export { default as AutoBrandIcon } from './AutoBrandIcon.vue'
 export { default as AutoLink } from './AutoLink.vue'

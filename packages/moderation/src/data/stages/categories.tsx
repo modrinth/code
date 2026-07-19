@@ -2,7 +2,8 @@ import { TagsIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { fix, group, label, md, stage, toggle } from '../../types/node'
+import { fix, group, md, stage, toggle } from '../../types/node'
+import { arrayOrNone } from '../../utils'
 
 const resolutionTags = new Set(['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+'])
 
@@ -26,7 +27,13 @@ export default function () {
 			),
 		)
 		.children(
-			label('categories'),
+			() => (
+				<div class="markdown-body w-full">
+					<strong>Featured Tags:</strong> {arrayOrNone(project.value.categories)}
+					<br />
+					<strong>Additional Tags:</strong> {arrayOrNone(project.value.additional_categories)}
+				</div>
+			),
 
 			group().children(
 				toggle('inaccurate', 'Inaccurate').suggestedStatus('flagged').severity('low').message(),

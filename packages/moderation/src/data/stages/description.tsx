@@ -53,13 +53,13 @@ export default function () {
 					toggle('non-english', 'Non-english')
 						.suggestedStatus('flagged')
 						.severity('medium')
-						.message(
-							() => `non-english${project.value.minecraft_java_server ? '-server' : ''}`,
-						)
+						.message(() => `non-english${project.value.minecraft_java_server ? '-server' : ''}`)
 						.shown(
 							computed(() => {
-								return !(!!project.value?.minecraft_java_server &&
-                  !project.value.minecraft_server?.languages?.includes('en'));
+								return !(
+									!!project.value?.minecraft_java_server &&
+									!project.value.minecraft_server?.languages?.includes('en')
+								)
 							}),
 						),
 

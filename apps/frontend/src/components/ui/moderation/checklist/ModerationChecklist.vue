@@ -223,17 +223,9 @@
 							/>
 						</div>
 					</div>
-					<div v-else-if="isModpackPermissionsStage">
-						<ModpackPermissionsFlow
-							v-model="modpackJudgements"
-							:project-id="projectV2.id"
-							:project-updated="projectV2.updated"
-							@complete="handleModpackPermissionsComplete"
-						/>
-					</div>
 					<div v-else class="flex min-h-0 flex-1 flex-col">
 						<NodeRenderer
-							class="min-h-0 flex-1 overflow-y-auto"
+							class="min-h-0 flex-1 overflow-y-auto p-1"
 							:nodes="
 								resolveChildren(
 									currentStageObj,
@@ -400,6 +392,7 @@ import {
 	handleKeybind,
 	isNodeActive,
 	kebabToTitleCase,
+	NodeBuilder,
 	resolve,
 	resolveChildren,
 	setMessageProject,
@@ -420,7 +413,7 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
-import type { ModerationJudgements, ModerationModpackItem, ProjectStatus } from '@modrinth/utils'
+import type { ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
@@ -439,7 +432,6 @@ import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 import { type ActiveAction, type LiveNode, NODE_META_KEY, STATE_KEY } from './checklist-context'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
-import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 import NodeRenderer from './NodeRenderer.vue'
 
 const notifications = injectNotificationManager()
@@ -647,12 +639,6 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 	return true
 }
 
-const modpackPermissionsComplete = ref(false)
-const modpackJudgements = ref<ModerationJudgements>({})
-const isModpackPermissionsStage = computed(() => {
-	return currentStageObj.value.id === 'permissions'
-})
-
 async function onUploadHandler(file: File) {
 	const response = await useImageUpload(file, {
 		context: 'thread_message',
@@ -690,10 +676,6 @@ const messageText = computed({
 function clearGeneratedMessageState() {
 	message.value = null
 	generatedActiveActions.value = null
-}
-
-function handleModpackPermissionsComplete() {
-	modpackPermissionsComplete.value = true
 }
 
 const emit = defineEmits<{
@@ -1002,7 +984,7 @@ const checklistHasState = computed(() =>
 
 function resetProgress() {
 	if (currentStageHasState.value) {
-		delete nodeStates.value[currentStageObj.value.id!]
+		Reflect.deleteProperty(nodeStates.value, currentStageObj.value.id!)
 		clearGeneratedMessageState()
 		return
 	}
@@ -1014,16 +996,6 @@ function resetProgress() {
 	clearGeneratedMessageState()
 	loadingMessage.value = false
 	moderationDecision.value = null
-
-	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
-	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
-
-	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
-
-	modpackPermissionsComplete.value = false
-	modpackJudgements.value = {}
 }
 
 function findFirstValidStage(): number {
@@ -1062,7 +1034,11 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 		if (stage._shown === undefined || resolve(stage._shown)) {
 			if (stage._segments.length > 0) {
 				messageCount++
-				stageActiveActions.push({ node: stage, state: stageState, statePath: stage._statePath ?? [] })
+				stageActiveActions.push({
+					node: stage,
+					state: stageState,
+					statePath: stage._statePath ?? [],
+				})
 			}
 
 			walkNodes(resolveChildren(stage, stageState), stageState, (node, nodeState, localState) => {
@@ -1166,7 +1142,8 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 	const rawState = toRaw(nodeStates.value)
 	const openVal = open || undefined
 	const reviewAnywayVal = resetReviewAnyway ? undefined : reviewedAnyway.value || undefined
-	const stageVal = currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
+	const stageVal =
+		currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
 	const messageVal = message.value ?? undefined
 	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
 	if (!openVal && !reviewAnywayVal && !stageVal && !messageVal && !stateVal) {
@@ -1254,13 +1231,12 @@ function handleKeybinds(event: KeyboardEvent) {
 				isDone: done.value,
 				hasGeneratedMessage: generatedMessage.value,
 				isLoadingMessage: loadingMessage.value,
-				isModpackPermissionsStage: isModpackPermissionsStage.value,
 
 				futureProjectCount: moderationQueue.queueLength,
 				visibleActionsCount: resolveChildren(
 					currentStageObj.value,
 					nodeStates.value[currentStageObj.value.id!] ?? {},
-				).length,
+				).filter((c) => c instanceof NodeBuilder).length,
 
 				focusedActionIndex: null,
 				focusedActionType: null,
@@ -1436,32 +1412,6 @@ watch(
 	{ immediate: true },
 )
 
-function getModpackFilesFromStorage(): {
-	interactive: ModerationModpackItem[]
-	permanentNo: ModerationModpackItem[]
-} {
-	try {
-		const sessionData = sessionStorage.getItem(`modpack-permissions-data-${projectV2.value.id}`)
-		const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : []
-
-		const permanentNoData = sessionStorage.getItem(
-			`modpack-permissions-permanent-no-${projectV2.value.id}`,
-		)
-		const permanentNo = permanentNoData
-			? (JSON.parse(permanentNoData) as ModerationModpackItem[])
-			: []
-
-		return {
-			interactive: interactive || [],
-			permanentNo: permanentNo || [],
-		}
-	} catch (error) {
-		console.warn('Failed to parse session storage modpack data:', error)
-		return { interactive: [], permanentNo: [] }
-	}
-}
-
-
 function countStageActions(stage: StageNodeBuilder): number {
 	const actions = checklistLive.value.get(stage)?.activeActions ?? []
 	const resolved = resolvedMessageAvailability.value
@@ -1485,8 +1435,7 @@ function collectActiveActions(): ActiveAction[] {
 
 function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
 	return (
-		childPath.length > ancestorPath.length &&
-		ancestorPath.every((key, i) => childPath[i] === key)
+		childPath.length > ancestorPath.length && ancestorPath.every((key, i) => childPath[i] === key)
 	)
 }
 
@@ -1569,25 +1518,11 @@ function previousStage() {
 }
 
 function nextStage() {
-	if (isModpackPermissionsStage.value && !modpackPermissionsComplete.value) {
-		addNotification({
-			title: 'Modpack permissions stage unfinished',
-			text: 'Please complete the modpack permissions stage before proceeding.',
-			type: 'error',
-		})
-
-		return
-	}
-
 	let targetStage = currentStage.value + 1
 
 	while (targetStage < resolvedStages.value.length) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
-			if (!isModpackPermissionsStage.value) {
-				modpackPermissionsComplete.value = false
-			}
-
 			return
 		}
 		targetStage++
@@ -1624,20 +1559,7 @@ async function generateMessage() {
 				type: 'warning',
 			})
 		}
-		let fullMessage = baseMessage
-
-		if (projectV2.value.project_type === 'modpack') {
-			const modpackFilesData = getModpackFilesFromStorage()
-
-			if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
-				const modpackMessage = generateModpackMessage(modpackFilesData)
-				if (modpackMessage) {
-					fullMessage = baseMessage ? `${baseMessage}\n\n${modpackMessage}` : modpackMessage
-				}
-			}
-		}
-
-		message.value = fullMessage
+		message.value = baseMessage
 	} catch (error) {
 		console.error('Error generating message:', error)
 		addNotification({
@@ -1648,76 +1570,6 @@ async function generateMessage() {
 	} finally {
 		loadingMessage.value = false
 	}
-}
-
-const finalPermissionMessages = {
-	'with-attribution': `The following content has attribution requirements, meaning that you must link back to the page where you originally found this content in your Modpack's description or version changelog (e.g. linking a mod's CurseForge page if you got it from CurseForge):`,
-	no: 'The following content is not allowed in Modrinth modpacks due to licensing restrictions. Please contact the author(s) directly for permission or remove the content from your modpack:',
-	'permanent-no': `The following content is not allowed in Modrinth modpacks, regardless of permission obtained. This may be because it breaks Modrinth's content rules or because the authors, upon being contacted for permission, have declined. Please remove the content from your modpack:`,
-	unidentified: `The following content could not be identified. Please provide proof of its origin along with proof that you have permission to include it:`,
-}
-
-function generateModpackMessage(allFiles: {
-	interactive: ModerationModpackItem[]
-	permanentNo: ModerationModpackItem[]
-}) {
-	const issues = []
-
-	const attributeMods: string[] = []
-	const noMods: string[] = []
-	const permanentNoMods: string[] = []
-	const unidentifiedMods: string[] = []
-
-	allFiles.interactive.forEach((file) => {
-		if (file.status === 'unidentified') {
-			if (file.approved === 'no') {
-				unidentifiedMods.push(file.file_name)
-			}
-		} else if (file.status === 'with-attribution' && file.approved === 'no') {
-			attributeMods.push(file.file_name)
-		} else if (file.status === 'no' && file.approved === 'no') {
-			noMods.push(file.file_name)
-		} else if (file.status === 'permanent-no') {
-			permanentNoMods.push(file.file_name)
-		}
-	})
-
-	allFiles.permanentNo.forEach((file) => {
-		permanentNoMods.push(file.file_name)
-	})
-
-	if (
-		attributeMods.length > 0 ||
-		noMods.length > 0 ||
-		permanentNoMods.length > 0 ||
-		unidentifiedMods.length > 0
-	) {
-		issues.push('## Copyrighted content')
-
-		if (unidentifiedMods.length > 0) {
-			issues.push(
-				`${finalPermissionMessages.unidentified}\n${unidentifiedMods.map((mod) => `- ${mod}`).join('\n')}`,
-			)
-		}
-
-		if (attributeMods.length > 0) {
-			issues.push(
-				`${finalPermissionMessages['with-attribution']}\n${attributeMods.map((mod) => `- ${mod}`).join('\n')}`,
-			)
-		}
-
-		if (noMods.length > 0) {
-			issues.push(`${finalPermissionMessages.no}\n${noMods.map((mod) => `- ${mod}`).join('\n')}`)
-		}
-
-		if (permanentNoMods.length > 0) {
-			issues.push(
-				`${finalPermissionMessages['permanent-no']}\n${permanentNoMods.map((mod) => `- ${mod}`).join('\n')}`,
-			)
-		}
-	}
-
-	return issues.join('\n\n')
 }
 
 const hasNextProject = ref(false)
@@ -1738,7 +1590,6 @@ async function sendMessage(status: ProjectStatus) {
 	// Capture project data upfront to avoid null issues during async operations
 	const projectId = projectV2.value?.id
 	const threadId = projectV2.value?.thread_id
-	const projectType = projectV2.value?.project_type
 
 	if (!projectId) {
 		addNotification({
@@ -1768,14 +1619,6 @@ async function sendMessage(status: ProjectStatus) {
 						body: message.value,
 					},
 				},
-			})
-		}
-
-		if (projectType === 'modpack' && Object.keys(modpackJudgements.value).length > 0) {
-			await useBaseFetch(`moderation/project`, {
-				internal: true,
-				method: 'POST',
-				body: modpackJudgements.value,
 			})
 		}
 
@@ -1823,11 +1666,7 @@ async function sendMessage(status: ProjectStatus) {
 			}
 
 			if (projectFixChanges?.slug) {
-				const urlType = getProjectTypeForUrlShorthand(
-					projectV2.value.project_type,
-					[],
-					tags.value,
-				)
+				const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
 				localStorage.setItem('moderation-checklist-finished', projectId)
 				clearGeneratedMessageState()
 				await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, { replace: true })
@@ -1941,13 +1780,6 @@ async function skipCurrentProject() {
 async function clearProjectLocalStorage() {
 	persistenceEnabled = false
 	cancelPendingPersistence()
-
-	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
-	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
-
-	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
-	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
 	nodeStates.value = {}
 	message.value = null
