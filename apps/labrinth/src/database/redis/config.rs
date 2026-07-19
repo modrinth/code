@@ -1,7 +1,45 @@
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
 use crate::env::ENV;
 use thiserror::Error;
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub enum CacheLockingStrategy {
+    #[default]
+    Local,
+    Distributed,
+}
+
+impl CacheLockingStrategy {
+    pub(super) const fn as_str(self) -> &'static str {
+        match self {
+            Self::Local => "local",
+            Self::Distributed => "distributed",
+        }
+    }
+}
+
+impl fmt::Display for CacheLockingStrategy {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+
+#[derive(Debug, Error)]
+#[error("invalid cache locking strategy; expected `local` or `distributed`")]
+pub struct InvalidCacheLockingStrategy;
+
+impl FromStr for CacheLockingStrategy {
+    type Err = InvalidCacheLockingStrategy;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "local" => Ok(Self::Local),
+            "distributed" => Ok(Self::Distributed),
+            _ => Err(InvalidCacheLockingStrategy),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RedisMode {
@@ -89,6 +127,7 @@ pub(super) struct RedisConfig {
     seed_urls: Vec<String>,
     wait_timeout_ms: u64,
     blocking_pool_size: RedisPoolSize,
+    cache_locking_strategy: CacheLockingStrategy,
 }
 
 #[derive(Debug, Error)]
@@ -134,6 +173,7 @@ impl RedisConfig {
                 ENV.REDIS_BLOCKING_MAX_CONNECTIONS as usize,
                 0,
             )?,
+            ENV.REDIS_CACHE_LOCKING_STRATEGY,
         )
     }
 
@@ -145,6 +185,7 @@ impl RedisConfig {
         standalone_pool_size: (usize, usize),
         cluster_pool_size: (usize, usize),
         blocking_pool_size: RedisPoolSize,
+        cache_locking_strategy: CacheLockingStrategy,
     ) -> Result<Self, RedisConfigError> {
         let seed_urls = raw_urls
             .split(',')
@@ -192,6 +233,7 @@ impl RedisConfig {
             seed_urls,
             wait_timeout_ms,
             blocking_pool_size,
+            cache_locking_strategy,
         })
     }
 
@@ -213,5 +255,38 @@ impl RedisConfig {
 
     pub(super) fn blocking_pool_size(&self) -> RedisPoolSize {
         self.blocking_pool_size
+    }
+
+    pub(super) fn cache_locking_strategy(&self) -> CacheLockingStrategy {
+        self.cache_locking_strategy
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::CacheLockingStrategy;
+
+    #[test]
+    fn cache_locking_strategy_defaults_to_local() {
+        assert_eq!(
+            CacheLockingStrategy::default(),
+            CacheLockingStrategy::Local
+        );
+    }
+
+    #[test]
+    fn cache_locking_strategy_parsing_is_strict() {
+        assert_eq!(
+            "local".parse::<CacheLockingStrategy>().unwrap(),
+            CacheLockingStrategy::Local
+        );
+        assert_eq!(
+            "distributed".parse::<CacheLockingStrategy>().unwrap(),
+            CacheLockingStrategy::Distributed
+        );
+
+        for invalid in ["", "LOCAL", "Distributed", " local", "local "] {
+            assert!(invalid.parse::<CacheLockingStrategy>().is_err());
+        }
     }
 }

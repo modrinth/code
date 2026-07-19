@@ -29,6 +29,17 @@ impl RedisPool {
         receiver
     }
 
+    #[doc(hidden)]
+    #[cfg(feature = "test")]
+    pub fn subscribe_with_seed_urls(
+        seed_urls: Vec<String>,
+        channel: &'static str,
+    ) -> mpsc::Receiver<Vec<u8>> {
+        let (sender, receiver) = mpsc::channel(PUBSUB_BUFFER_SIZE);
+        tokio::spawn(run_subscription(seed_urls, channel, sender));
+        receiver
+    }
+
     pub async fn publish<M>(
         &self,
         channel: &str,

@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{
     AffiliateCodeClick, Download, MinecraftServerPlay, PageView, Playtime,
@@ -7,7 +6,6 @@ use crate::models::analytics::{
 use crate::routes::ApiError;
 use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 use dashmap::{DashMap, DashSet};
-use redis::cmd;
 use std::collections::HashMap;
 use tracing::trace;
 
@@ -146,11 +144,8 @@ impl AnalyticsQueue {
                 .collect::<Vec<_>>();
             let mut redis_connection = redis.connect().await?;
 
-            let results = cmd("MGET")
-                .arg(&redis_keys)
-                .query_async::<Vec<Option<u32>>>(&mut redis_connection)
-                .await
-                .map_err(DatabaseError::CacheError)?;
+            let results =
+                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count = if let Some(count) = count {
                     if count >= MINECRAFT_SERVER_PLAYS_LIMIT {
@@ -205,11 +200,8 @@ impl AnalyticsQueue {
                 .collect::<Vec<_>>();
             let mut redis_connection = redis.connect().await?;
 
-            let results = cmd("MGET")
-                .arg(&redis_keys)
-                .query_async::<Vec<Option<u32>>>(&mut redis_connection)
-                .await
-                .map_err(DatabaseError::CacheError)?;
+            let results =
+                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count =
                     if let Some((views, monetized)) = raw_views.get_mut(idx) {
@@ -277,11 +269,8 @@ impl AnalyticsQueue {
                 .collect::<Vec<_>>();
             let mut redis_connection = redis.connect().await?;
 
-            let results = cmd("MGET")
-                .arg(&redis_keys)
-                .query_async::<Vec<Option<u32>>>(&mut redis_connection)
-                .await
-                .map_err(DatabaseError::CacheError)?;
+            let results =
+                redis_connection.get_many_typed::<u32>(&redis_keys).await?;
             for (idx, count) in results.into_iter().enumerate() {
                 let new_count = if let Some(count) = count {
                     if count > 5 {

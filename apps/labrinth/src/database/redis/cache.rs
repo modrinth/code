@@ -4,27 +4,34 @@ use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
 use std::str::FromStr;
-use std::sync::Arc;
-use std::time::Duration;
 
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
 use dashmap::DashMap;
-use futures::future::Either;
 use futures::stream::{FuturesUnordered, StreamExt};
 use redis::aio::ConnectionLike;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use tokio::time::{Instant, timeout_at};
 use tracing::{Instrument, info_span};
 
 use crate::database::models::DatabaseError;
 
 use super::commands;
+use super::config::CacheLockingStrategy;
+use super::connection::RedisBackend;
 use super::key::KeyBuilder;
-use super::util;
+
+mod locking;
+
+use locking::{
+    LockAcquisition, LockCoordinator, LockWaiter, OwnedLockGuard, WAIT_TIMEOUT,
+    normalize_key,
+};
 
 const ACTUAL_EXPIRY: i64 = 60 * 30;
+const FILL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
 const VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 48;
 const VERSION_ACTUAL_EXPIRY: i64 = 60 * 60 * 24;
 
@@ -158,15 +165,20 @@ impl CacheSettings {
 pub struct CacheManager {
     key_builder: KeyBuilder,
     settings: CacheSettings,
-    cache_list: Arc<DashMap<String, util::CacheSubscriber>>,
+    locking: LockCoordinator,
 }
 
 impl CacheManager {
-    pub fn new(key_builder: KeyBuilder, settings: CacheSettings) -> Self {
+    pub fn new(
+        key_builder: KeyBuilder,
+        settings: CacheSettings,
+        locking_strategy: CacheLockingStrategy,
+        backend: RedisBackend,
+    ) -> Self {
         Self {
+            locking: LockCoordinator::new(locking_strategy, backend),
             key_builder,
             settings,
-            cache_list: Arc::new(DashMap::with_capacity(2048)),
         }
     }
 
@@ -174,7 +186,7 @@ impl CacheManager {
         &self.settings
     }
 
-    #[tracing::instrument(skip(self, provider, closure))]
+    #[tracing::instrument(skip(self, provider, keys, closure))]
     pub async fn get_cached_keys<P, F, Fut, T, K>(
         &self,
         provider: &P,
@@ -203,7 +215,7 @@ impl CacheManager {
             .collect())
     }
 
-    #[tracing::instrument(skip(self, provider, closure))]
+    #[tracing::instrument(skip(self, provider, keys, closure))]
     pub async fn get_cached_keys_raw<P, F, Fut, T, K>(
         &self,
         provider: &P,
@@ -242,7 +254,7 @@ impl CacheManager {
         .await
     }
 
-    #[tracing::instrument(skip(self, provider, closure))]
+    #[tracing::instrument(skip(self, provider, keys, closure))]
     pub async fn get_cached_keys_with_slug<P, F, Fut, T, I, K, S>(
         &self,
         provider: &P,
@@ -281,7 +293,7 @@ impl CacheManager {
             .collect())
     }
 
-    #[tracing::instrument(skip(self, provider, closure))]
+    #[tracing::instrument(skip(self, provider, keys, closure))]
     pub async fn get_cached_keys_raw_with_slug<P, F, Fut, T, I, K, S>(
         &self,
         provider: &P,
@@ -308,140 +320,222 @@ impl CacheManager {
     {
         let ids = keys
             .iter()
-            .map(|key| (key.to_string(), key.clone()))
+            .map(|key| {
+                (normalize_key(&key.to_string(), case_sensitive), key.clone())
+            })
             .collect::<DashMap<String, I>>();
 
         if ids.is_empty() {
             return Ok(HashMap::new());
         }
 
-        let get_cached_values = |ids: DashMap<String, I>| {
-            async move {
-                let slug_ids = if let Some(slug_namespace) = slug_namespace {
-                    async {
-                        let keys = ids
-                            .iter()
-                            .map(|entry| {
-                                let logical_key = if case_sensitive {
-                                    entry.value().to_string()
-                                } else {
-                                    entry.value().to_string().to_lowercase()
-                                };
-                                self.key_builder
-                                    .entity(slug_namespace, logical_key)
-                            })
-                            .collect::<Vec<_>>();
-                        let mut connection = provider.connect().await?;
-                        Ok::<_, DatabaseError>(
-                            commands::get_many_strings(&mut connection, &keys)
+        let get_cached_values =
+            |ids: DashMap<String, I>,
+             deadline: Option<Instant>,
+             locks_released: usize,
+             locks_waiting: usize| {
+                async move {
+                    let slug_ids = if let Some(slug_namespace) = slug_namespace
+                    {
+                        async {
+                            let keys = ids
+                                .iter()
+                                .map(|entry| {
+                                    let logical_key = normalize_key(
+                                        &entry.value().to_string(),
+                                        case_sensitive,
+                                    );
+                                    self.key_builder
+                                        .entity(slug_namespace, logical_key)
+                                })
+                                .collect::<Vec<_>>();
+                            let mut connection = connect_before_deadline(
+                                provider,
+                                deadline,
+                                self.locking.strategy(),
+                                locks_released,
+                                locks_waiting,
+                            )
+                            .await?;
+                            Ok::<_, DatabaseError>(
+                                query_before_deadline(
+                                    deadline,
+                                    commands::get_many_strings(
+                                        &mut connection,
+                                        &keys,
+                                    ),
+                                    self.locking.strategy(),
+                                    locks_released,
+                                    locks_waiting,
+                                )
                                 .await?
                                 .into_iter()
                                 .flatten()
                                 .collect::<Vec<_>>(),
-                        )
-                    }
-                    .instrument(info_span!("get slug ids"))
+                            )
+                        }
+                        .instrument(info_span!("get slug ids"))
+                        .await?
+                    } else {
+                        Vec::new()
+                    };
+
+                    let keys = ids
+                        .iter()
+                        .map(|entry| entry.value().to_string())
+                        .chain(ids.iter().filter_map(|entry| {
+                            parse_base62(&entry.value().to_string())
+                                .ok()
+                                .map(|value| value.to_string())
+                        }))
+                        .chain(slug_ids)
+                        .map(|key| self.key_builder.entity(namespace, key))
+                        .collect::<Vec<_>>();
+
+                    let mut connection = connect_before_deadline(
+                        provider,
+                        deadline,
+                        self.locking.strategy(),
+                        locks_released,
+                        locks_waiting,
+                    )
+                    .await?;
+                    let mut cached_values = HashMap::new();
+                    for value in query_before_deadline(
+                        deadline,
+                        commands::get_many(&mut connection, &keys),
+                        self.locking.strategy(),
+                        locks_released,
+                        locks_waiting,
+                    )
                     .await?
-                } else {
-                    Vec::new()
-                };
-
-                let keys = ids
-                    .iter()
-                    .map(|entry| entry.value().to_string())
-                    .chain(ids.iter().filter_map(|entry| {
-                        parse_base62(&entry.value().to_string())
-                            .ok()
-                            .map(|value| value.to_string())
-                    }))
-                    .chain(slug_ids)
-                    .map(|key| self.key_builder.entity(namespace, key))
-                    .collect::<Vec<_>>();
-
-                let mut connection = provider.connect().await?;
-                let mut cached_values = HashMap::new();
-                for value in commands::get_many(&mut connection, &keys).await? {
-                    if let Some(value) = value.and_then(|value| {
-                        self.settings
-                            .decode_value::<RedisValue<T, K, S>>(&value)
-                    }) {
-                        cached_values.insert(value.key.clone(), value);
+                    {
+                        if let Some(value) = value.and_then(|value| {
+                            self.settings
+                                .decode_value::<RedisValue<T, K, S>>(&value)
+                        }) {
+                            cached_values.insert(value.key.clone(), value);
+                        }
                     }
-                }
 
-                Ok::<_, DatabaseError>((cached_values, ids))
-            }
-            .instrument(info_span!("get cached values"))
-        };
+                    Ok::<_, DatabaseError>((cached_values, ids))
+                }
+                .instrument(info_span!("get cached values"))
+            };
 
         let (default_expiry, actual_expiry) = cache_expiries(namespace);
         let current_time = Utc::now();
         let mut expired_values = HashMap::new();
+        let mut expired_identities = HashMap::new();
+        let deadline = Instant::now() + WAIT_TIMEOUT;
 
-        let (cached_values_raw, ids) = get_cached_values(ids).await?;
+        let (cached_values_raw, ids) =
+            get_cached_values(ids, Some(deadline), 0, 0).await?;
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, value)| {
                 if Utc.timestamp_opt(value.iat + actual_expiry, 0).unwrap()
                     < current_time
                 {
-                    expired_values.insert(value.key.to_string(), value);
+                    let canonical_key = value.key.to_string();
+                    for identity in value_identities(&value, case_sensitive) {
+                        expired_identities
+                            .insert(identity, canonical_key.clone());
+                    }
+                    expired_values.insert(canonical_key, value);
                     None
                 } else {
-                    remove_resolved_ids(&ids, &value);
+                    remove_resolved_ids(&ids, &value, case_sensitive);
                     Some((key, value))
                 }
             })
             .collect::<HashMap<_, _>>();
 
-        let subscribe_ids = DashMap::new();
-        let mut cache_writers = HashMap::new();
+        let mut waiters = Vec::new();
+        let mut owned_locks = HashMap::new();
+        let mut has_contention = false;
 
         if !ids.is_empty() {
             let fetch_ids = ids
                 .iter()
                 .map(|entry| entry.key().clone())
                 .collect::<Vec<_>>();
+            let locks_total = fetch_ids.len();
 
             for key in fetch_ids {
-                let lock_key = self.key_builder.entity(
-                    namespace,
-                    if case_sensitive {
-                        key.to_lowercase()
-                    } else {
-                        key.clone()
-                    },
-                );
+                if !ids.contains_key(&key) {
+                    continue;
+                }
 
-                match self.acquire_lock(lock_key) {
-                    Either::Left(sentinel) => {
-                        cache_writers.insert(key, sentinel);
+                let lock_key = self.key_builder.entity(namespace, &key);
+                let acquisition =
+                    match self.locking.acquire(lock_key, deadline).await {
+                        Ok(acquisition) => acquisition,
+                        Err(error) => {
+                            let error = map_lock_operation_error(
+                                error,
+                                self.locking.strategy(),
+                                0,
+                                locks_total,
+                            );
+                            release_owned_locks(owned_locks, deadline).await;
+                            return Err(error);
+                        }
+                    };
+
+                match acquisition {
+                    LockAcquisition::Owned(guard) => {
+                        owned_locks.insert(key, guard);
                     }
-                    Either::Right(subscriber) => {
-                        if let Some((key, raw_key)) = ids.remove(&key) {
-                            if let Some(value) = expired_values.remove(&key) {
-                                remove_resolved_ids(&ids, &value);
-                                cached_values.insert(value.key.clone(), value);
-                            } else {
-                                subscribe_ids.insert(raw_key, subscriber);
-                            }
+                    LockAcquisition::Waiting(waiter) => {
+                        has_contention = true;
+                        if let Some(canonical_key) =
+                            expired_identities.get(&key).cloned()
+                            && let Some(value) =
+                                expired_values.remove(&canonical_key)
+                        {
+                            remove_resolved_ids(&ids, &value, case_sensitive);
+                            expired_identities.retain(|_, canonical| {
+                                canonical != &canonical_key
+                            });
+                            cached_values.insert(value.key.clone(), value);
+                        } else if let Some((_, raw_key)) = ids.remove(&key) {
+                            waiters.push((raw_key, waiter));
                         }
                     }
                 }
             }
         }
 
-        let mut fetch_tasks = Vec::new();
-
-        if !ids.is_empty() {
-            fetch_tasks.push(Either::Left(async {
+        let is_contended = has_contention;
+        let fill_result = if !ids.is_empty() {
+            async {
                 let fetch_ids = ids
                     .iter()
                     .map(|entry| entry.value().clone())
                     .collect::<Vec<_>>();
-                let values = closure(fetch_ids).await?;
+                let fill_deadline = if is_contended {
+                    deadline
+                } else {
+                    Instant::now() + FILL_TIMEOUT
+                };
+                let values = timeout_at(fill_deadline, closure(fetch_ids))
+                    .await
+                    .map_err(|_| {
+                        if is_contended {
+                            lock_timeout_error(
+                                self.locking.strategy(),
+                                0,
+                                waiters.len(),
+                            )
+                        } else {
+                            DatabaseError::Internal(eyre::eyre!(
+                                "cache fill timed out after 60 seconds"
+                            ))
+                        }
+                    })??;
                 let mut return_values = HashMap::new();
-                let mut connection = provider.connect().await?;
+                let mut encoded_values = Vec::with_capacity(values.len());
 
                 for (key, (slug, value)) in values {
                     let value = RedisValue {
@@ -450,109 +544,155 @@ impl CacheManager {
                         val: value,
                         alias: slug.clone(),
                     };
-                    let redis_key =
-                        self.key_builder.entity(namespace, key.to_string());
-                    commands::set(
-                        &mut connection,
-                        &redis_key,
-                        self.settings.encode_value(&value)?,
-                        Some(default_expiry),
-                    )
-                    .await?;
+                    let encoded = self.settings.encode_value(&value)?;
+                    encoded_values.push((key, slug, value, encoded));
+                }
 
-                    if let Some(slug) = slug {
-                        ids.remove(&slug.to_string());
-                        if let Some(slug_namespace) = slug_namespace {
-                            let actual_slug = if case_sensitive {
-                                slug.to_string()
-                            } else {
-                                slug.to_string().to_lowercase()
-                            };
+                let publication_deadline = if is_contended {
+                    deadline
+                } else {
+                    Instant::now() + WAIT_TIMEOUT
+                };
+                let mut connection = connect_before_deadline(
+                    provider,
+                    Some(publication_deadline),
+                    self.locking.strategy(),
+                    0,
+                    waiters.len(),
+                )
+                .await?;
+                let mut ownership_valid = true;
+                for lock in owned_locks.values() {
+                    match lock
+                        .validate_with_connection(
+                            &mut connection,
+                            publication_deadline,
+                        )
+                        .await
+                    {
+                        Ok(true) => {}
+                        Ok(false) => {
+                            ownership_valid = false;
+                            break;
+                        }
+                        Err(_) => {
+                            ownership_valid = false;
+                            break;
+                        }
+                    }
+                }
+
+                if ownership_valid {
+                    for (key, slug, _, encoded) in &encoded_values {
+                        let redis_key =
+                            self.key_builder.entity(namespace, key.to_string());
+                        publish_cache_value(
+                            &mut connection,
+                            self.locking.strategy(),
+                            &redis_key,
+                            encoded,
+                            default_expiry,
+                            publication_deadline,
+                            waiters.len(),
+                        )
+                        .await?;
+                        if let Some(slug) = slug
+                            && let Some(slug_namespace) = slug_namespace
+                        {
+                            let canonical_key = key.to_string();
+                            let actual_slug = normalize_key(
+                                &slug.to_string(),
+                                case_sensitive,
+                            );
                             let slug_key = self
                                 .key_builder
                                 .entity(slug_namespace, actual_slug);
-                            commands::set(
+                            publish_cache_value(
                                 &mut connection,
+                                self.locking.strategy(),
                                 &slug_key,
-                                key.to_string(),
-                                Some(default_expiry),
+                                canonical_key.as_bytes(),
+                                default_expiry,
+                                publication_deadline,
+                                waiters.len(),
                             )
                             .await?;
                         }
                     }
+                }
 
-                    let key_string = key.to_string();
-                    ids.remove(&key_string);
-                    if let Ok(value) = key_string.parse::<u64>() {
-                        ids.remove(&to_base62(value));
-                    }
+                for (key, _, value, _) in encoded_values {
+                    remove_resolved_ids(&ids, &value, case_sensitive);
                     return_values.insert(key, value);
                 }
 
-                drop(cache_writers);
                 Result::<_, DatabaseError>::Ok(return_values)
-            }));
-        }
-
-        if !subscribe_ids.is_empty() {
-            fetch_tasks.push(Either::Right(async move {
-                let mut futures = FuturesUnordered::new();
-                let len = subscribe_ids.len();
-
-                for (key, subscriber) in subscribe_ids {
-                    futures.push(async move {
-                        (
-                            key,
-                            subscriber
-                                .wait_timeout(Duration::from_secs(5))
-                                .await,
-                        )
-                    });
-                }
-
-                let fetch_ids = DashMap::with_capacity(len);
-                while let Some((key, result)) = futures.next().await {
-                    result?;
-                    fetch_ids.insert(key.to_string(), key);
-                }
-
-                let (return_values, _) = get_cached_values(fetch_ids).await?;
-                Ok(return_values)
-            }));
-        }
-
-        if !fetch_tasks.is_empty() {
-            for values in futures::future::try_join_all(fetch_tasks).await? {
-                cached_values.extend(values);
             }
-        }
+            .await
+        } else {
+            Ok(HashMap::new())
+        };
+
+        let release_deadline = if is_contended {
+            deadline
+        } else {
+            Instant::now() + WAIT_TIMEOUT
+        };
+        release_owned_locks(owned_locks, release_deadline).await;
+
+        let operation_result = match fill_result {
+            Ok(mut values) => {
+                if waiters.is_empty() {
+                    Ok(values)
+                } else {
+                    let total = waiters.len();
+                    match wait_for_locks(
+                        self.locking.strategy(),
+                        waiters,
+                        deadline,
+                    )
+                    .await
+                    {
+                        Ok(released_ids) => {
+                            let fetch_ids = released_ids
+                                .into_iter()
+                                .map(|key| {
+                                    (
+                                        normalize_key(
+                                            &key.to_string(),
+                                            case_sensitive,
+                                        ),
+                                        key,
+                                    )
+                                })
+                                .collect::<DashMap<_, _>>();
+                            match get_cached_values(
+                                fetch_ids,
+                                Some(deadline),
+                                total,
+                                total,
+                            )
+                            .await
+                            {
+                                Ok((released_values, _)) => {
+                                    values.extend(released_values);
+                                    Ok(values)
+                                }
+                                Err(error) => Err(error),
+                            }
+                        }
+                        Err(error) => Err(error),
+                    }
+                }
+            }
+            Err(error) => Err(error),
+        };
+        cached_values.extend(operation_result?);
 
         Ok(cached_values
             .into_iter()
             .map(|(key, value)| (key, value.val))
             .collect())
-    }
-
-    fn acquire_lock(
-        &self,
-        key: String,
-    ) -> Either<LockSentinel, util::CacheSubscriber> {
-        let mut writer = None;
-        let subscriber =
-            self.cache_list.entry(key.clone()).or_insert_with(|| {
-                let (new_writer, subscriber) = util::cache();
-                writer = Some(new_writer);
-                subscriber
-            });
-
-        match writer {
-            Some(writer) => Either::Left(LockSentinel {
-                cache_list: self.cache_list.clone(),
-                key,
-                writer,
-            }),
-            None => Either::Right(subscriber.clone()),
-        }
     }
 }
 
@@ -572,30 +712,203 @@ fn cache_expiries(namespace: &str) -> (i64, i64) {
 fn remove_resolved_ids<I, T, K, S>(
     ids: &DashMap<String, I>,
     value: &RedisValue<T, K, S>,
+    case_sensitive: bool,
 ) where
     K: Display,
     S: Display,
 {
-    let key = value.key.to_string();
-    ids.remove(&key);
-    if let Ok(value) = key.parse::<u64>() {
-        ids.remove(&to_base62(value));
+    for identity in value_identities(value, case_sensitive) {
+        ids.remove(&normalize_key(&identity, case_sensitive));
+    }
+}
+
+fn value_identities<T, K, S>(
+    value: &RedisValue<T, K, S>,
+    case_sensitive: bool,
+) -> Vec<String>
+where
+    K: Display,
+    S: Display,
+{
+    let mut identities = Vec::with_capacity(5);
+    let canonical_key = value.key.to_string();
+    push_identity(&mut identities, canonical_key.clone());
+    push_identity(
+        &mut identities,
+        normalize_key(&canonical_key, case_sensitive),
+    );
+    if let Ok(decimal_id) = canonical_key.parse::<u64>() {
+        let base62_id = to_base62(decimal_id);
+        push_identity(&mut identities, base62_id.clone());
+        push_identity(
+            &mut identities,
+            normalize_key(&base62_id, case_sensitive),
+        );
+    } else if let Ok(decimal_id) = parse_base62(&canonical_key) {
+        push_identity(&mut identities, decimal_id.to_string());
     }
     if let Some(alias) = &value.alias {
-        ids.remove(&alias.to_string());
+        let alias = alias.to_string();
+        push_identity(&mut identities, alias.clone());
+        push_identity(&mut identities, normalize_key(&alias, case_sensitive));
+    }
+    identities
+}
+
+fn push_identity(identities: &mut Vec<String>, identity: String) {
+    if !identities.contains(&identity) {
+        identities.push(identity);
     }
 }
 
-struct LockSentinel {
-    cache_list: Arc<DashMap<String, util::CacheSubscriber>>,
-    key: String,
-    writer: util::CacheWriter,
+async fn connect_before_deadline<P>(
+    provider: &P,
+    deadline: Option<Instant>,
+    strategy: CacheLockingStrategy,
+    locks_released: usize,
+    locks_waiting: usize,
+) -> Result<P::Connection, DatabaseError>
+where
+    P: ConnectionProvider,
+{
+    if let Some(deadline) = deadline {
+        timeout_at(deadline, provider.connect())
+            .await
+            .map_err(|_| {
+                lock_timeout_error(strategy, locks_released, locks_waiting)
+            })?
+    } else {
+        provider.connect().await
+    }
 }
 
-impl Drop for LockSentinel {
-    fn drop(&mut self) {
-        self.writer.write();
-        self.cache_list.remove(&self.key);
+async fn query_before_deadline<F, T>(
+    deadline: Option<Instant>,
+    query: F,
+    strategy: CacheLockingStrategy,
+    locks_released: usize,
+    locks_waiting: usize,
+) -> Result<T, DatabaseError>
+where
+    F: Future<Output = Result<T, DatabaseError>>,
+{
+    if let Some(deadline) = deadline {
+        timeout_at(deadline, query).await.map_err(|_| {
+            lock_timeout_error(strategy, locks_released, locks_waiting)
+        })?
+    } else {
+        query.await
+    }
+}
+
+async fn publish_cache_value<C>(
+    connection: &mut C,
+    strategy: CacheLockingStrategy,
+    key: &str,
+    data: &[u8],
+    expiry: i64,
+    deadline: Instant,
+    locks_waiting: usize,
+) -> Result<(), DatabaseError>
+where
+    C: ConnectionLike,
+{
+    query_before_deadline(
+        Some(deadline),
+        commands::set(connection, key, data, Some(expiry)),
+        strategy,
+        0,
+        locks_waiting,
+    )
+    .await
+}
+
+async fn wait_for_locks<I>(
+    strategy: CacheLockingStrategy,
+    waiters: Vec<(I, LockWaiter)>,
+    deadline: Instant,
+) -> Result<Vec<I>, DatabaseError> {
+    let total = waiters.len();
+    let mut released = Vec::with_capacity(total);
+    let mut futures = FuturesUnordered::new();
+    for (key, waiter) in waiters {
+        futures.push(async move {
+            let result = waiter.wait(deadline).await;
+            (key, result)
+        });
+    }
+
+    while let Some((key, result)) = futures.next().await {
+        match result {
+            Ok(()) => {
+                released.push(key);
+            }
+            Err(error)
+                if is_lock_timeout(&error) || Instant::now() >= deadline =>
+            {
+                return Err(lock_timeout_error(
+                    strategy,
+                    released.len(),
+                    total,
+                ));
+            }
+            Err(error) => return Err(error),
+        }
+    }
+    Ok(released)
+}
+
+fn is_lock_timeout(error: &DatabaseError) -> bool {
+    matches!(
+        error,
+        DatabaseError::CacheTimeout { .. }
+            | DatabaseError::LocalCacheTimeout { .. }
+    )
+}
+
+fn map_lock_operation_error(
+    error: DatabaseError,
+    strategy: CacheLockingStrategy,
+    locks_released: usize,
+    locks_waiting: usize,
+) -> DatabaseError {
+    if is_lock_timeout(&error) {
+        lock_timeout_error(strategy, locks_released, locks_waiting)
+    } else {
+        error
+    }
+}
+
+fn lock_timeout_error(
+    strategy: CacheLockingStrategy,
+    locks_released: usize,
+    locks_waiting: usize,
+) -> DatabaseError {
+    match strategy {
+        CacheLockingStrategy::Local => DatabaseError::LocalCacheTimeout {
+            released: locks_released,
+            total: locks_waiting,
+        },
+        CacheLockingStrategy::Distributed => DatabaseError::CacheTimeout {
+            locks_released,
+            locks_waiting,
+            time_spent_pool_wait_ms: 0,
+            time_spent_total_ms: WAIT_TIMEOUT.as_millis() as u64,
+        },
+    }
+}
+
+async fn release_owned_locks(
+    owned_locks: HashMap<String, OwnedLockGuard>,
+    deadline: Instant,
+) {
+    for guard in owned_locks.into_values() {
+        if let Err(error) = guard.release(deadline).await {
+            tracing::warn!(
+                error = ?error,
+                "failed to explicitly release cache lock",
+            );
+        }
     }
 }
 
@@ -610,5 +923,168 @@ pub struct RedisValue<T, K, S> {
 impl<T, K, S> RedisValue<T, K, S> {
     pub fn value(&self) -> &T {
         &self.val
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::future::{Future, pending};
+    use std::time::Duration;
+
+    use dashmap::DashMap;
+    use redis::aio::ConnectionLike;
+    use tokio::time::{Instant, advance};
+
+    use super::{
+        ConnectionProvider, RedisValue, connect_before_deadline,
+        query_before_deadline, remove_resolved_ids, value_identities,
+    };
+    use crate::database::models::DatabaseError;
+    use crate::database::redis::CacheLockingStrategy;
+
+    struct NeverConnection;
+
+    impl ConnectionLike for NeverConnection {
+        fn req_packed_command<'a>(
+            &'a mut self,
+            _: &'a redis::Cmd,
+        ) -> redis::RedisFuture<'a, redis::Value> {
+            Box::pin(pending())
+        }
+
+        fn req_packed_commands<'a>(
+            &'a mut self,
+            _: &'a redis::Pipeline,
+            _: usize,
+            _: usize,
+        ) -> redis::RedisFuture<'a, Vec<redis::Value>> {
+            Box::pin(pending())
+        }
+
+        fn get_db(&self) -> i64 {
+            0
+        }
+    }
+
+    struct PendingProvider;
+
+    impl ConnectionProvider for PendingProvider {
+        type Connection = NeverConnection;
+
+        fn connect(
+            &self,
+        ) -> impl Future<Output = Result<Self::Connection, DatabaseError>> + Send
+        {
+            pending()
+        }
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn five_second_deadline_includes_hung_pool_acquisition() {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        let task = tokio::spawn(async move {
+            connect_before_deadline(
+                &PendingProvider,
+                Some(deadline),
+                CacheLockingStrategy::Local,
+                0,
+                1,
+            )
+            .await
+        });
+
+        advance(Duration::from_millis(4_999)).await;
+        assert!(!task.is_finished());
+        advance(Duration::from_millis(1)).await;
+        assert!(matches!(
+            task.await.unwrap(),
+            Err(DatabaseError::LocalCacheTimeout {
+                released: 0,
+                total: 1,
+            })
+        ));
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn five_second_deadline_includes_hung_redis_query() {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        let task = tokio::spawn(query_before_deadline(
+            Some(deadline),
+            pending::<Result<(), DatabaseError>>(),
+            CacheLockingStrategy::Distributed,
+            0,
+            1,
+        ));
+
+        advance(Duration::from_millis(4_999)).await;
+        assert!(!task.is_finished());
+        advance(Duration::from_millis(1)).await;
+        assert!(matches!(
+            task.await.unwrap(),
+            Err(DatabaseError::CacheTimeout {
+                locks_released: 0,
+                locks_waiting: 1,
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn stale_identity_index_includes_equivalent_request_forms() {
+        let value = RedisValue {
+            key: 1234_u64,
+            alias: Some("ExampleSlug"),
+            iat: 0,
+            val: (),
+        };
+        let identities = value_identities(&value, false);
+
+        assert!(identities.contains(&"1234".to_string()));
+        assert!(
+            identities.contains(&ariadne::ids::base62_impl::to_base62(1234))
+        );
+        assert!(identities.contains(&"ExampleSlug".to_string()));
+        assert!(identities.contains(&"exampleslug".to_string()));
+    }
+
+    #[test]
+    fn resolving_stale_value_removes_every_equivalent_request_form() {
+        let value = RedisValue {
+            key: 1234_u64,
+            alias: Some("ExampleSlug"),
+            iat: 0,
+            val: (),
+        };
+        let ids = DashMap::new();
+        ids.insert("1234".to_string(), ());
+        ids.insert(
+            ariadne::ids::base62_impl::to_base62(1234).to_lowercase(),
+            (),
+        );
+        ids.insert("exampleslug".to_string(), ());
+
+        remove_resolved_ids(&ids, &value, false);
+
+        assert!(ids.is_empty());
+    }
+
+    #[test]
+    fn case_sensitive_alias_resolution_preserves_other_case() {
+        let value = RedisValue {
+            key: 1234_u64,
+            alias: Some("mra_PATValue"),
+            iat: 0,
+            val: (),
+        };
+        let identities = value_identities(&value, true);
+        let ids = DashMap::new();
+        ids.insert("mra_PATValue".to_string(), ());
+        ids.insert("mra_patvalue".to_string(), ());
+
+        remove_resolved_ids(&ids, &value, true);
+
+        assert!(identities.contains(&"mra_PATValue".to_string()));
+        assert!(!identities.contains(&"mra_patvalue".to_string()));
+        assert!(ids.contains_key("mra_patvalue"));
     }
 }

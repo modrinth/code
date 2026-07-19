@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use prometheus::Registry;
-use redis::ToRedisArgs;
 use redis::aio::ConnectionLike;
+use redis::{FromRedisValue, ToRedisArgs};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
@@ -26,7 +26,7 @@ mod util;
 use cache::{CacheManager, CacheSettings, ConnectionProvider};
 pub use cache::{Codec, EncodingFormat, RedisValue};
 use config::RedisConfig;
-pub use config::{RedisConnectionType, RedisMode};
+pub use config::{CacheLockingStrategy, RedisConnectionType, RedisMode};
 use connection::RedisBackend;
 pub use key::KeyBuilder;
 
@@ -49,6 +49,10 @@ impl RedisPool {
     pub async fn new(meta_namespace: impl Into<Arc<str>>) -> Self {
         let config =
             RedisConfig::from_env().expect("invalid Redis configuration");
+        tracing::info!(
+            strategy = %config.cache_locking_strategy(),
+            "configured Redis cache locking"
+        );
         let backend = RedisBackend::new(&config)
             .await
             .expect("failed to initialize Redis connections");
@@ -67,6 +71,8 @@ impl RedisPool {
                 compression_min_savings_ratio: ENV
                     .REDIS_COMPRESSION_MIN_SAVINGS_RATIO,
             },
+            config.cache_locking_strategy(),
+            backend.clone(),
         );
 
         Self {
@@ -274,6 +280,16 @@ impl RedisConnection {
         keys: &[String],
     ) -> Result<Vec<Option<Vec<u8>>>, DatabaseError> {
         commands::get_many(&mut self.inner, keys).await
+    }
+
+    pub async fn get_many_typed<R>(
+        &mut self,
+        keys: &[String],
+    ) -> Result<Vec<Option<R>>, DatabaseError>
+    where
+        R: FromRedisValue,
+    {
+        commands::get_many_as(&mut self.inner, keys).await
     }
 
     pub async fn get_deserialized<R>(

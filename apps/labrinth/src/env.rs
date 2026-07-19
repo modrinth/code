@@ -131,6 +131,7 @@ vars! {
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
     REDIS_MODE: crate::database::redis::RedisMode = crate::database::redis::RedisMode::Standalone;
     REDIS_CONNECTION_TYPE: crate::database::redis::RedisConnectionType = crate::database::redis::RedisConnectionType::Pooled;
+    REDIS_CACHE_LOCKING_STRATEGY: crate::database::redis::CacheLockingStrategy = crate::database::redis::CacheLockingStrategy::Local;
     REDIS_URL: String = "redis://localhost";
     KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
     KAFKA_CLIENT_ID: String = "labrinth";

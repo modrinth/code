@@ -70,3 +70,25 @@ fn escape_slot_tag(value: &str) -> String {
     }
     escaped
 }
+
+#[cfg(test)]
+mod tests {
+    use super::KeyBuilder;
+    use crate::database::redis::RedisMode;
+
+    #[test]
+    fn cluster_slot_tags_escape_braces_and_percent_signs() {
+        let builder = KeyBuilder::new("labrinth", RedisMode::Cluster);
+        let entity = builder.entity("projects", "a{%}b");
+
+        assert!(entity.contains("{a%7B%25%7Db}"));
+    }
+
+    #[test]
+    fn cluster_empty_slot_tag_is_nonempty() {
+        let builder = KeyBuilder::new("labrinth", RedisMode::Cluster);
+        let entity = builder.entity("projects", "");
+
+        assert!(entity.contains("{%00}"));
+    }
+}

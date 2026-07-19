@@ -82,9 +82,12 @@ jobs:
       SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      # Redis config for tests
       REDIS_MODE: cluster
       REDIS_CONNECTION_TYPE: multiplexed
       REDIS_URL: redis://127.0.0.1:7000,redis://127.0.0.1:7001,redis://127.0.0.1:7002,redis://127.0.0.1:7003,redis://127.0.0.1:7004,redis://127.0.0.1:7005
+      # Avoid stack overflows in tests
+      RUST_MIN_STACK: 16777216
 
     steps:
       - name: Check out code
@@ -199,6 +202,22 @@ jobs:
 
       - name: Lint and test
         run: pnpm run ci
+
+      # Test different Redis connection modes
+
+      - name: Test pooled Redis cluster backend
+        if: steps.check-labrinth.outputs.needs_services == 'true'
+        env:
+          REDIS_CONNECTION_TYPE: pooled
+        run: cargo nextest run --package labrinth --test redis --no-fail-fast
+
+      - name: Test pooled standalone Redis backend
+        if: steps.check-labrinth.outputs.needs_services == 'true'
+        env:
+          REDIS_MODE: standalone
+          REDIS_CONNECTION_TYPE: pooled
+          REDIS_URL: redis://127.0.0.1:6379
+        run: cargo nextest run --package labrinth --test redis --no-fail-fast
 
       - name: Verify intl:extract has been run
         run: |

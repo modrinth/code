@@ -131,6 +131,7 @@ strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
+tokio-util = { workspace = true, features = ["rt"] }
 totp-rs = { workspace = true, features = ["gen_secret"] }
 tracing = { workspace = true }
 tracing-actix-web = { workspace = true }
@@ -152,6 +153,7 @@ zxcvbn = { workspace = true }
 
 [dev-dependencies]
 labrinth = { path = ".", features = ["test"] }
+tokio = { workspace = true, features = ["test-util"] }
 
 [build-dependencies]
 chrono = { workspace = true }
