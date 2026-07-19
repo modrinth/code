@@ -9,9 +9,7 @@ document.addEventListener(
 		if (target?.closest?.('.qc-cmp2-close-icon')) {
 			if (modrinthAdsConsentReprompt) {
 				setTimeout(finishAdsConsentReprompt)
-			} else if (
-				document.documentElement.classList.contains('modrinth-ads-consent-preferences')
-			) {
+			} else if (document.documentElement.classList.contains('modrinth-ads-consent-preferences')) {
 				setTimeout(() => void restoreAdsConsentNotification())
 			}
 		}
@@ -135,7 +133,7 @@ function findAdsConsentButton(action) {
 	const summaryButtons = Array.from(container.querySelectorAll('.qc-cmp2-summary-buttons button'))
 
 	if (action === 'accept') {
-		const explicitAcceptButton = container.querySelector('[data-testid="accept-all"]')
+		const explicitAcceptButton = container.querySelector('#accept-btn')
 		if (explicitAcceptButton) return explicitAcceptButton
 		if (summaryButtons.length >= 3) return summaryButtons[2]
 
@@ -143,9 +141,7 @@ function findAdsConsentButton(action) {
 	}
 
 	if (action === 'reject') {
-		const explicitRejectButton = container.querySelector(
-			'[data-testid="reject-all"], #disagree-btn',
-		)
+		const explicitRejectButton = container.querySelector('#disagree-btn')
 		if (explicitRejectButton) return explicitRejectButton
 		if (summaryButtons.length >= 3) return summaryButtons[1]
 
@@ -161,7 +157,7 @@ function findAdsConsentButton(action) {
 
 	return (
 		container.querySelector(
-			'[data-testid="manage-preferences"], .qc-cmp2-summary-buttons > button[mode="secondary"]:first-of-type',
+			'#more-options-btn, .qc-cmp2-summary-buttons > button[mode="secondary"]:first-of-type',
 		) ?? summaryButtons[0]
 	)
 }
