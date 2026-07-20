@@ -1816,7 +1816,39 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
+/// Blacklist entries are matched literally, unless they begin with `*.`, in
+/// which case they match any subdomain of the remaining suffix.
+fn is_blacklisted_domain(domain: &str) -> bool {
+    let domain = domain.to_ascii_lowercase();
+
+    ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
+        let entry = entry.trim().to_ascii_lowercase();
+
+        match entry.strip_prefix("*.") {
+            Some(suffix) => domain
+                .strip_suffix(suffix)
+                .is_some_and(|subdomain| subdomain.ends_with('.')),
+            None => entry == domain,
+        }
+    })
+}
+
+fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return Err(ApiError::Request(email_check_error_generic()));
+    };
+
+    if is_blacklisted_domain(domain) {
+        info!(email.domain = domain, "blacklisted email domain, denying");
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
 async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
+    ensure_email_domain_is_allowed(email)?;
+
     let result = check_email(email).await.map_err(ApiError::Request)?;
 
     if matches!(
