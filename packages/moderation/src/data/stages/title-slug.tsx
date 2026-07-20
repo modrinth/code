@@ -304,7 +304,7 @@ export default function () {
 												.tooltip(computed(() => project.value.slug ?? ''))
 												.enabled((state) => currentSlug(state) !== project.value.slug)
 												.onClick((state) => {
-													state['correct-slug'] = undefined
+													state['correct-slug'] = project.value.slug
 												}),
 
 											SlugStatus,
