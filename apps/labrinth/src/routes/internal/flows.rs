@@ -1438,6 +1438,19 @@ struct NewOAuthAccount {
     pub state: String,
     pub challenge: String,
     pub sign_up_newsletter: bool,
+    #[serde(default)]
+    pub account_consent: bool,
+}
+
+fn validate_account_consent(account_consent: bool) -> Result<(), ApiError> {
+    if account_consent {
+        info!("account consent trigger, denying");
+        return Err(ApiError::Request(eyre!(
+            "Sorry, something went wrong. Please try again"
+        )));
+    }
+
+    Ok(())
 }
 
 /// Create account with OAuth.  
@@ -1462,6 +1475,8 @@ pub async fn create_oauth_account(
     new_account.validate().map_err(|err| {
         ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
+
+    validate_account_consent(new_account.account_consent)?;
 
     if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
@@ -1709,6 +1724,8 @@ pub struct NewAccount {
     pub email: String,
     pub challenge: Option<String>,
     pub sign_up_newsletter: Option<bool>,
+    #[serde(default)]
+    pub account_consent: bool,
 }
 
 #[derive(Debug, Validate)]
@@ -1995,6 +2012,8 @@ pub async fn create_account_with_password(
     email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let new_account = new_account.into_inner();
+
+    validate_account_consent(new_account.account_consent)?;
 
     if !check_hcaptcha(&req, new_account.challenge.as_deref().unwrap_or(""))
         .await?
