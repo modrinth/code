@@ -42,7 +42,10 @@ pub(super) struct ExternalFileCandidate {
 #[derive(Clone, Debug)]
 pub(super) enum ExternalFileSource {
     InstanceFile(String),
-    ConfigBundle(Vec<ConfigFile>),
+    ConfigBundle {
+        files: Vec<ConfigFile>,
+        bytes: Vec<u8>,
+    },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

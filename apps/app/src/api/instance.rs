@@ -56,8 +56,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_invite_users,
             instance_share_create_invite_link,
             instance_share_remove_users,
-            instance_share_get_config_files,
-            instance_share_set_config_files,
             instance_share_get_publish_preview,
             instance_share_publish,
             instance_share_unlink,
@@ -841,31 +839,11 @@ pub async fn instance_share_get_publish_preview(
 }
 
 #[tauri::command]
-pub async fn instance_share_get_config_files(
-    instance_id: &str,
-) -> Result<theseus::instance::SharedInstanceConfigFiles> {
-    Ok(theseus::instance::get_shared_instance_config_files(instance_id).await?)
-}
-
-#[tauri::command]
-pub async fn instance_share_set_config_files(
-    instance_id: &str,
-    selected: Vec<String>,
-) -> Result<theseus::instance::SharedInstanceConfigFiles> {
-    Ok(
-        theseus::instance::set_shared_instance_config_files(
-            instance_id,
-            selected,
-        )
-        .await?,
-    )
-}
-
-#[tauri::command]
 pub async fn instance_share_publish(
     instance_id: &str,
+    config_paths: Vec<String>,
 ) -> Result<SharedInstanceAttachment> {
-    Ok(theseus::instance::publish_shared_instance(instance_id)
+    Ok(theseus::instance::publish_shared_instance(instance_id, config_paths)
         .await?
         .into())
 }

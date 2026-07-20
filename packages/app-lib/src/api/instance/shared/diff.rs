@@ -3,26 +3,15 @@ use super::publish::*;
 use super::types::*;
 use super::*;
 
-#[derive(Clone, Copy)]
-enum ConfigDiffDirection {
-    Update,
-    Publish,
-}
-
 fn shared_config_diffs(
     local: &[ConfigFile],
     remote: &[ConfigFile],
-    direction: ConfigDiffDirection,
 ) -> Vec<SharedInstanceUpdateDiff> {
-    let (current, latest) = match direction {
-        ConfigDiffDirection::Update => (local, remote),
-        ConfigDiffDirection::Publish => (remote, local),
-    };
-    let current = current
+    let current = local
         .iter()
         .map(|file| (file.path.clone(), file.hash.clone()))
         .collect::<HashMap<_, _>>();
-    let latest = latest
+    let latest = remote
         .iter()
         .map(|file| (file.path.clone(), file.hash.clone()))
         .collect::<HashMap<_, _>>();
@@ -49,10 +38,7 @@ fn shared_config_diffs(
     }
 
     tracing::info!(
-        direction = match direction {
-            ConfigDiffDirection::Update => "update",
-            ConfigDiffDirection::Publish => "publish",
-        },
+        direction = "update",
         changed_file_count,
         ?changed_files,
         "Reviewed shared instance config changes"
@@ -70,7 +56,7 @@ fn shared_config_diffs(
     }]
 }
 
-async fn remote_config_files(
+pub(super) async fn remote_config_files(
     version: &InstanceVersionResponse,
 ) -> crate::Result<Vec<ConfigFile>> {
     let Some(bundle) = version
@@ -135,7 +121,6 @@ pub(super) async fn shared_instance_update_diffs(
         diffs.extend(shared_config_diffs(
             &local_config_files,
             &remote_config_files,
-            ConfigDiffDirection::Update,
         ));
     }
 
@@ -204,14 +189,6 @@ pub(super) async fn shared_instance_publish_diffs(
         state,
     )
     .await?;
-    if CONFIG_SYNC_ENABLED {
-        diffs.extend(shared_config_diffs(
-            &snapshot.config_files,
-            &remote_config_files(version).await?,
-            ConfigDiffDirection::Publish,
-        ));
-    }
-
     let mut configuration_diffs = shared_instance_configuration_diffs(
         remote_modpack_id,
         current_modpack_id.as_deref(),

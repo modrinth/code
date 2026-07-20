@@ -336,7 +336,7 @@ const messages = defineMessages({
 	},
 	configSharingHintDescription: {
 		id: 'instance.shared-instance.config-sharing-hint.description',
-		defaultMessage: 'You can select which config files to share in the instance settings',
+		defaultMessage: 'You can manually push updates and choose config files in the instance settings',
 	},
 	configSharingHintDismiss: {
 		id: 'instance.shared-instance.config-sharing-hint.dismiss',

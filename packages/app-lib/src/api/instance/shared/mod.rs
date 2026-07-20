@@ -58,9 +58,7 @@ mod publish;
 mod types;
 
 pub(crate) use self::excluded_configs::EXCLUDED_CONFIG_FOLDERS;
-pub(crate) use self::publish::{
-    should_surface_config_only_push, sync_shared_instance_icon,
-};
+pub(crate) use self::publish::sync_shared_instance_icon;
 
 pub use self::install::{
     accept_shared_instance_invite_for_install,
@@ -73,15 +71,13 @@ pub use self::invites::{
     invite_shared_instance_users, remove_shared_instance_users,
 };
 pub use self::publish::{
-    get_shared_instance_config_files, get_shared_instance_publish_preview,
-    publish_shared_instance, set_shared_instance_config_files,
+    get_shared_instance_publish_preview, publish_shared_instance,
     unlink_shared_instance, unpublish_shared_instance,
 };
 pub use self::types::{
-    SharedInstanceConfigFiles, SharedInstanceExternalFilePreview,
-    SharedInstanceInstallPreview,
+    SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
-    SharedInstanceJoinType, SharedInstancePublishPreview,
-    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
-    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
+    SharedInstanceJoinType, SharedInstancePublishPreview, SharedInstanceUpdateDiff,
+    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
+    SharedInstanceUser, SharedInstanceUsers,
 };

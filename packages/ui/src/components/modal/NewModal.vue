@@ -86,11 +86,11 @@
 							ref="scrollContainer"
 							data-modal-content
 							:class="[
-								'flex-1 min-h-0',
-								props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
+								'flex-1 min-h-0 overflow-y-auto',
+								props.noPadding ? '' : 'p-6 !pb-1 sm:pb-6',
 								{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 							]"
-							:style="props.noPadding ? {} : { maxHeight: maxContentHeight }"
+							:style="{ maxHeight: maxContentHeight }"
 							@scroll="checkScrollState"
 						>
 							<slot> You just lost the game.</slot>

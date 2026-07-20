@@ -119,13 +119,7 @@ pub struct SharedInstancePublishPreview {
     pub shared_instance_id: String,
     pub latest_version: i32,
     pub diffs: Vec<SharedInstanceUpdateDiff>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SharedInstanceConfigFiles {
-    pub files: Vec<String>,
-    pub selected: Vec<String>,
+    pub config_files: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

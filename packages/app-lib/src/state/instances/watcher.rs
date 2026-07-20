@@ -1,7 +1,5 @@
 use crate::State;
-use crate::api::instance::{
-    CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS, is_excluded_config_path,
-};
+use crate::api::instance::CONFIG_DIRECTORY;
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
 use crate::state::{
@@ -42,7 +40,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                 Ok(events) => {
                     let instance_ids = event_instance_ids.read().await;
                     let mut visited_instances = Vec::new();
-                    let mut config_push_decisions = HashMap::new();
 
                     for e in &events {
                         let mut instance_path = None;
@@ -86,56 +83,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 crash_task(instance_id);
                             } else if !visited_instances.contains(&instance_id)
                             {
-                                let is_supported_config_change = first_file_name
-                                    .as_ref()
-                                    .is_some_and(|x| *x == CONFIG_DIRECTORY)
-                                    && is_supported_config_file(&e.path)
-                                    && !is_excluded_config_file(&e.path);
-                                let should_sync_config_change =
-                                    if is_supported_config_change {
-                                        if let Some(decision) =
-                                            config_push_decisions
-                                                .get(&instance_id)
-                                        {
-                                            *decision
-                                        } else {
-                                            let decision = match State::get()
-                                                .await
-                                            {
-                                                Ok(state) => match crate::api::instance::should_surface_config_only_push(
-                                                    &instance_id,
-                                                    &state,
-                                                )
-                                                .await
-                                                {
-                                                    Ok(decision) => decision,
-                                                    Err(error) => {
-                                                        tracing::warn!(
-                                                            instance_id,
-                                                            %error,
-                                                            "Failed to determine whether config changes need an initial push"
-                                                        );
-                                                        false
-                                                    }
-                                                },
-                                                Err(error) => {
-                                                    tracing::warn!(
-                                                        instance_id,
-                                                        %error,
-                                                        "Failed to load state while reviewing a config change"
-                                                    );
-                                                    false
-                                                }
-                                            };
-                                            config_push_decisions.insert(
-                                                instance_id.clone(),
-                                                decision,
-                                            );
-                                            decision
-                                        }
-                                    } else {
-                                        false
-                                    };
                                 let event = if first_file_name
                                     .as_ref()
                                     .is_some_and(|x| *x == "servers.dat")
@@ -185,8 +132,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 } else if first_file_name.as_ref().is_none_or(
                                     |x| {
                                         *x != "saves"
-                                            && (*x != CONFIG_DIRECTORY
-                                                || should_sync_config_change)
+                                            && *x != CONFIG_DIRECTORY
                                     },
                                 ) {
                                     Some(InstancePayloadType::Synced)
@@ -321,27 +267,6 @@ pub(crate) async fn watch_instance_folder(
         .write()
         .await
         .insert(instance_path.to_string(), instance_id.to_string());
-}
-
-fn is_supported_config_file(path: &std::path::Path) -> bool {
-    path.extension()
-        .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| {
-            CONFIG_FILE_EXTENSIONS
-                .iter()
-                .any(|candidate| extension.eq_ignore_ascii_case(candidate))
-        })
-}
-
-fn is_excluded_config_file(path: &std::path::Path) -> bool {
-    let mut components = path.components();
-    while components
-        .next()
-        .is_some_and(|component| component.as_os_str() != CONFIG_DIRECTORY)
-    {
-    }
-
-    is_excluded_config_path(&components.collect::<std::path::PathBuf>())
 }
 
 fn crash_task(instance_id: String) {

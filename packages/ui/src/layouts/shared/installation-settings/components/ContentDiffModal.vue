@@ -8,6 +8,7 @@
 		max-width="544px"
 		width="544px"
 		no-padding
+		scrollable
 	>
 		<div class="flex flex-col gap-4" :class="hasExternalDiffs ? 'px-6 py-4' : 'p-4'">
 			<template v-if="hasExternalDiffs">
@@ -48,7 +49,7 @@
 
 		<div
 			v-if="diffs.length"
-			class="flex max-h-[272px] flex-col overflow-y-auto border-0 border-y border-solid border-surface-5 bg-surface-2 px-3 py-4"
+			class="flex max-h-[272px] flex-col overflow-y-auto border-0 border-y border-solid border-surface-5 bg-surface-2 px-3 pb-4 pt-2"
 		>
 			<div
 				v-for="(diff, index) in sortedDiffs"
@@ -110,6 +111,13 @@
 		</div>
 
 		<div
+			v-if="$slots['additional-content']"
+			class="border-0 border-t border-solid border-surface-5 px-4 pt-4"
+		>
+			<slot name="additional-content" />
+		</div>
+
+		<div
 			v-if="showBackupCreator"
 			class="p-4 border-t border-solid border-surface-5 border-b-0 border-l-0 border-r-0"
 		>
@@ -138,7 +146,11 @@
 					</ButtonStyled>
 				</div>
 			</div>
-			<div v-else class="flex justify-between gap-2 pt-4">
+			<div
+				v-else
+				class="flex justify-between gap-2"
+				:class="{ 'pt-4': !$slots['additional-content'] }"
+			>
 				<div>
 					<ButtonStyled v-if="showReportButton" color="red" type="transparent">
 						<button @click="emit('report')">
