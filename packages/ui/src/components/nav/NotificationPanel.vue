@@ -16,26 +16,32 @@
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
-				<div class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl">
+				<div
+					class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl border border-solid border-surface-5"
+					:class="item.containerClass"
+				>
 					<div
 						class="w-2"
 						:class="{
 							'bg-red': item.type === 'error',
 							'bg-orange': item.type === 'warning',
 							'bg-green': item.type === 'success',
-							'bg-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
+							'bg-blue': !item.type || item.type === 'info',
+							'bg-transparent': item.type === 'neutral',
 						}"
 					></div>
 					<div
 						class="grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 gap-y-1 py-2 pl-1 pr-3"
 					>
 						<div
+							v-if="!item.noIcon"
 							class="flex items-center"
 							:class="{
 								'text-red': item.type === 'error',
 								'text-orange': item.type === 'warning',
 								'text-green': item.type === 'success',
-								'text-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
+								'text-blue': !item.type || item.type === 'info',
+								'text-contrast': item.type === 'neutral',
 							}"
 						>
 							<IssuesIcon v-if="item.type === 'warning'" class="h-6 w-6" />
@@ -43,12 +49,17 @@
 							<XCircleIcon v-else-if="item.type === 'error'" class="h-6 w-6" />
 							<InfoIcon v-else class="h-6 w-6" />
 						</div>
-						<div class="m-0 text-wrap font-bold text-contrast">{{ item.title }}</div>
+						<div
+							class="m-0 text-wrap font-bold text-contrast"
+							:class="{ 'col-span-2': item.noIcon }"
+						>
+							{{ item.title }}
+						</div>
 						<div class="flex items-center gap-1">
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
 								x{{ item.count }}
 							</div>
-							<ButtonStyled circular size="small">
+							<ButtonStyled v-if="item.copyable !== false" circular size="small">
 								<button
 									v-tooltip="
 										item.supportData ? 'Copy error details for support' : 'Copy to clipboard'
@@ -59,18 +70,32 @@
 									<CopyIcon v-else />
 								</button>
 							</ButtonStyled>
-							<ButtonStyled circular size="small">
+							<ButtonStyled v-if="item.dismissible !== false" circular size="small">
 								<button v-tooltip="`Dismiss`" @click="dismissNotification(index)">
 									<XIcon />
 								</button>
 							</ButtonStyled>
 						</div>
-						<div></div>
+						<div v-if="item.type !== 'neutral'"></div>
 						<div class="col-span-2 whitespace-pre-wrap text-sm text-primary">{{ item.text }}</div>
 						<template v-if="item.errorCode">
 							<div></div>
 							<div class="m-0 text-wrap text-xs font-medium text-secondary">
 								{{ item.errorCode }}
+							</div>
+						</template>
+						<template v-if="item.buttons?.length">
+							<div class="col-span-2 flex flex-wrap gap-1.5 pt-1">
+								<ButtonStyled
+									v-for="(button, buttonIndex) in item.buttons"
+									:key="buttonIndex"
+									:color="button.color"
+								>
+									<button class="!shadow-none" @click="handleButtonClick(item, button)">
+										<component :is="button.icon" v-if="button.icon" />
+										{{ button.label }}
+									</button>
+								</ButtonStyled>
 							</div>
 						</template>
 					</div>
@@ -94,7 +119,11 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { useModalStack } from '#ui/composables/modal-stack.ts'
 
-import { injectNotificationManager, type WebNotification } from '../../providers'
+import {
+	injectNotificationManager,
+	type WebNotification,
+	type WebNotificationButton,
+} from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
 const notificationManager = injectNotificationManager()
@@ -107,6 +136,13 @@ const copied = ref<Record<string, boolean>>({})
 const stopTimer = (n: WebNotification) => notificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: WebNotification) => notificationManager.setNotificationTimer(n)
 const dismissNotification = (n: number) => notificationManager.removeNotificationByIndex(n)
+
+async function handleButtonClick(item: WebNotification, button: WebNotificationButton) {
+	await button.action()
+	if (!button.keepOpen) {
+		notificationManager.removeNotification(item.id)
+	}
+}
 
 function createNotifText(notif: WebNotification): string {
 	return [notif.title, notif.text, notif.errorCode].filter(Boolean).join('\n')
@@ -170,7 +206,7 @@ withDefaults(
 	position: fixed;
 	bottom: 1.5rem;
 	z-index: 200;
-	width: 450px;
+	width: 460px;
 	transition: bottom 0.25s ease-in-out;
 
 	&.location-right {

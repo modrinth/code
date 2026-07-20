@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { FolderSearchIcon, StarIcon } from '@modrinth/assets'
+import { FolderSearchIcon, StarIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
 	injectModrinthClient,
+	injectNotificationManager,
 	NewModal,
 	Table,
 	type TableColumn,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
 const messages = defineMessages({
@@ -65,6 +67,10 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.scan-error',
 		defaultMessage: 'Some files failed to scan: {error}',
 	},
+	clearAllGroups: {
+		id: 'modpack-scan-modal.clear-all-groups',
+		defaultMessage: 'Clear All Groups',
+	},
 })
 
 type ScanTableColumn = 'filename' | 'newFiles' | 'newGroups'
@@ -85,12 +91,15 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const { formatMessage } = useVIntl()
 
 const rows = ref<ScanRow[]>([])
 const isLoadingVersions = ref(false)
 const isScanning = ref(false)
+const isClearing = ref(false)
 const versionLoadError = ref<string | null>(null)
 const scanError = ref<string | null>(null)
 const requestId = ref(0)
@@ -103,7 +112,7 @@ const columns = computed<TableColumn<ScanTableColumn>[]>(() => [
 ])
 
 const scannedCount = computed(() => rows.value.filter((row) => row.scan || row.error).length)
-const isBusy = computed(() => isLoadingVersions.value || isScanning.value)
+const isBusy = computed(() => isLoadingVersions.value || isScanning.value || isClearing.value)
 
 function getErrorMessage(error: unknown) {
 	if (error instanceof Error) {
@@ -208,6 +217,44 @@ async function fetchAllScans() {
 	}
 }
 
+async function clearAllGroups() {
+	if (isBusy.value) {
+		return
+	}
+
+	let failed = false
+
+	try {
+		isClearing.value = true
+		const groups = await client.labrinth.attribution_internal.listProjectAttribution(
+			props.project_id,
+		)
+
+		for (const group of groups) {
+			await client.labrinth.attribution_internal.deleteGroup(group.id)
+		}
+
+		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.project_id] })
+	} catch (error) {
+		failed = true
+		addNotification({
+			type: 'error',
+			title: 'An error occurred',
+			text: `Failed to clear all groups: ${getErrorMessage(error)}`,
+		})
+	} finally {
+		isClearing.value = false
+	}
+
+	if (!failed) {
+		addNotification({
+			type: 'success',
+			title: 'Success',
+			text: 'All groups cleared successfully.',
+		})
+	}
+}
+
 function show() {
 	scanRequestId.value++
 	isScanning.value = false
@@ -240,7 +287,16 @@ defineExpose({ show, hide })
 						})
 					}}
 				</span>
-				<div>
+				<div class="flex items-center gap-2">
+					<ButtonStyled circular>
+						<button
+							v-tooltip="formatMessage(messages.clearAllGroups)"
+							:disabled="isBusy || rows.length === 0"
+							@click="clearAllGroups"
+						>
+							<TrashIcon aria-hidden="true" />
+						</button>
+					</ButtonStyled>
 					<ButtonStyled circular>
 						<button
 							v-tooltip="formatMessage(messages.scanAllFiles)"
