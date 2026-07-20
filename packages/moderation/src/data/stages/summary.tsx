@@ -19,7 +19,7 @@ export default function () {
 				return (
 					<div class="markdown-body w-full">
 						<strong>Summary:</strong>
-						<br />
+						<br/>
 						<code>{project.value.summary}</code>
 					</div>
 				)

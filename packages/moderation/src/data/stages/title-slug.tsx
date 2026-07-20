@@ -181,9 +181,9 @@ export default function () {
 				return (
 					<div class="markdown-body w-full">
 						<strong>Title:</strong> {project.value.name}
-						<br />
+						<br/>
 						<strong>Slug:</strong> <code>{project.value.slug}</code>
-						<br />
+						<br/>
 						<strong>Slug Taken:</strong>{' '}
 						{autoSlugStatus.value === 'loading' ? (
 							'...'

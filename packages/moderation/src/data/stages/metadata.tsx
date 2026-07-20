@@ -43,15 +43,16 @@ export default function () {
 					if (env.length === 1) {
 						return (
 							<div class="markdown-body w-full">
-								<strong>Environment:</strong> <code>{env[0]}</code>
+								<strong>Environment:</strong>{' '}
+								<code>{ENVIRONMENTS_COPY[env[0]].title.defaultMessage ?? env[0]}</code>
 							</div>
 						)
 					}
 					return (
 						<div class="markdown-body w-full">
 							<strong>Unique environments:</strong> {env.length}
-							<br />
-							<strong>Environments:</strong> <code>{env.join(', ')}</code>
+							<br/>
+							<strong>Environments:</strong> <code>{env.map(id => ENVIRONMENTS_COPY[id].title.defaultMessage ?? id).join(', ')}</code>
 						</div>
 					)
 				},

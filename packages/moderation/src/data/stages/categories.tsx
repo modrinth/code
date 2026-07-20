@@ -30,7 +30,7 @@ export default function () {
 			() => (
 				<div class="markdown-body w-full">
 					<strong>Featured Tags:</strong> {arrayOrNone(project.value.categories)}
-					<br />
+					<br/>
 					<strong>Additional Tags:</strong> {arrayOrNone(project.value.additional_categories)}
 				</div>
 			),

@@ -25,7 +25,7 @@ export default function () {
 			() => (
 				<div class="markdown-body w-full">
 					<strong>License id:</strong> {project.value.license?.id ?? 'None'}
-					<br />
+					<br/>
 					<strong>License Link:</strong>{' '}
 					{project.value.license?.url ? (
 						<a href={project.value.license.url} target="_blank" class="underline">
@@ -36,7 +36,7 @@ export default function () {
 					)}
 					{needSource && (
 						<>
-							<br />
+							<br/>
 							<strong>Source Link:</strong>{' '}
 							{project.value.link_urls?.source?.url ? (
 								<a href={project.value.link_urls.source.url} target="_blank" class="underline">
