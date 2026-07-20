@@ -1,7 +1,7 @@
 import { ClassicPlayerModel, SlimPlayerModel } from '@modrinth/assets'
 import {
-	applyEarsMod,
 	applyCapeTexture,
+	applyEarsMod,
 	createTransparentTexture,
 	disposeCaches,
 	loadTexture,

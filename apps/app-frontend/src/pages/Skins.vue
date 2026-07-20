@@ -1196,6 +1196,7 @@ await loadSkins()
 									</button>
 								</ButtonStyled>
 								<Toggle
+									v-model="earsFeaturesEnabled"
 									v-tooltip="
 										formatMessage(
 											earsFeaturesEnabled
@@ -1203,7 +1204,6 @@ await loadSkins()
 												: messages.toggleEarsFeaturesOn,
 										)
 									"
-									v-model="earsFeaturesEnabled"
 									small
 									class="ears-feature-toggle-switch"
 									:aria-label="
