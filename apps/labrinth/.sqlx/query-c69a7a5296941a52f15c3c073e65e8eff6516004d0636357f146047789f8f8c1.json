@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            id AS \"id: DelphiReportIssueId\",\n            report_id AS \"report_id: DelphiReportId\",\n            issue_type\n        FROM delphi_report_issues\n        WHERE report_id = ANY($1::bigint[])\n        ",
+  "query": "\n        SELECT\n            id AS \"id: DelphiReportIssueId\",\n            report_id AS \"report_id: DelphiReportId\",\n            issue_type\n        FROM delphi_report_issues\n        WHERE report_id = ANY($1::bigint[])\n        ORDER BY report_id, id\n        ",
   "describe": {
     "columns": [
       {
@@ -30,5 +30,5 @@
       false
     ]
   },
-  "hash": "632b79f51dd39a75ebff838ca4beab463f84aa32246288cc251881ec41d207f5"
+  "hash": "c69a7a5296941a52f15c3c073e65e8eff6516004d0636357f146047789f8f8c1"
 }

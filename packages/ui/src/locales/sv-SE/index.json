@@ -747,10 +747,13 @@
     "defaultMessage": "Värld namn"
   },
   "creation-flow.modal.final-config.world-name.placeholder": {
-    "defaultMessage": "Skriva värld namn"
+    "defaultMessage": "Ange världnamn"
   },
   "creation-flow.modal.final-config.world-seed.description": {
     "defaultMessage": "Lämna tom för slumpmässig utsäde."
+  },
+  "creation-flow.modal.final-config.world-seed.placeholder": {
+    "defaultMessage": "Ange världsfrö"
   },
   "creation-flow.modal.final-config.world-type.amplified": {
     "defaultMessage": "Förstärkt"
@@ -1088,6 +1091,9 @@
   "files.validation.name-required": {
     "defaultMessage": "Namn krävs."
   },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Ange länk"
+  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL måste vara giltig."
   },
@@ -1173,7 +1179,7 @@
     "defaultMessage": "Välj land"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Ange e-post adress"
+    "defaultMessage": "Ange e-postadress"
   },
   "form.placeholder.first-name": {
     "defaultMessage": "Ange förnamn"
@@ -1895,8 +1901,17 @@
   "markdown-editor.image-modal.upload.prompt": {
     "defaultMessage": "Dra och släpp för att ladda upp eller klicka för att välja fil"
   },
+  "markdown-editor.image-modal.url-field.placeholder": {
+    "defaultMessage": "Ange bild-URL..."
+  },
+  "markdown-editor.link-modal.label-field.placeholder": {
+    "defaultMessage": "Ange etikett..."
+  },
   "markdown-editor.link-modal.label-field.title": {
     "defaultMessage": "Etikett"
+  },
+  "markdown-editor.link-modal.url-field.placeholder": {
+    "defaultMessage": "Ange länkens URL..."
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Obegränsad"
@@ -1972,6 +1987,12 @@
   },
   "markdown-editor.video-embed.title": {
     "defaultMessage": "YouTube videospelare"
+  },
+  "markdown-editor.video-modal.url-field.description": {
+    "defaultMessage": "Ange en giltig länk till en YouTube video."
+  },
+  "markdown-editor.video-modal.url-field.placeholder": {
+    "defaultMessage": "Ange YouTube video-URL"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Lägg till betalningsmetod"
@@ -3064,6 +3085,9 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Återställ"
+  },
+  "servers.grant-access-modal.target.placeholder": {
+    "defaultMessage": "Ange Modrinth-användarnamn"
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering misslyckades"

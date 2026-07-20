@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
-use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::auth::{
+    filter_visible_projects, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
@@ -130,6 +132,8 @@ pub async fn organization_create(
     )
     .await?
     .1;
+
+    require_verified_email(&current_user)?;
 
     let limits =
         UserLimits::get_for_organizations(&current_user, &pool).await?;

@@ -11,6 +11,33 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Đóng các phiên bản đang chạy"
   },
+  "app.action-bar.install.retry": {
+    "message": "Thử lại"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Đã hủy do đóng ứng dụng"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Không đọc được modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Đã hủy"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Dọn dẹp không hoàn thện"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Không tải được tệp"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Tệp được tải bị hỏng"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Không lưu được tệp"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Không hoàn tất tải xuống"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Đặt làm bản instance chính"
   },
@@ -224,6 +251,15 @@
   "app.instance.worlds.browse-servers": {
     "message": "Tìm kiếm máy chủ"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Xóa thế giới"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Xóa thế giới"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Đang xóa {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Modded"
   },
@@ -242,11 +278,26 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Không có máy chủ hay thế giới nào đã được thêm"
   },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Bỏ khỏi danh sách"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Xóa máy chủ"
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "{name} sẽ bị xóa"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Tìm kiếm {count} world..."
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Ngừng tải"
+  },
   "app.modal.install-to-play.header": {
     "message": "Tải xuống để chơi"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Tải tiếp"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Tải xuống"
@@ -263,17 +314,35 @@
   "app.modal.update-to-play.header": {
     "message": "Cập nhật và bắt đầu chơi"
   },
+  "app.modal.update-to-play.removed": {
+    "message": "Đã bỏ"
+  },
   "app.modal.update-to-play.update-required-description": {
     "message": "Bạn cần cập nhật {name} để có thể chơi. Vui lòng cập nhật lên bản mới nhất để khởi chạy trò chơi."
   },
   "app.project.install-button.already-installed": {
     "message": "Dự án này đã được cài đặt"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Đổi phiên bản"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Quay lại trang Khám Phá"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Cài đặt nội dung vào phiên bản"
+  },
+  "app.project.version.all-versions": {
+    "message": "Tất cả phiên bản"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Tải trong trình duyệt"
+  },
+  "app.project.version.installing": {
+    "message": "Đang tải"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Đã có sẵn"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Chế độ nhà phát triển đã được bật."
@@ -394,6 +463,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -811,6 +883,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Sao chép địa chỉ"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Tạo lối tắt"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Không hiện ở Trang chủ"

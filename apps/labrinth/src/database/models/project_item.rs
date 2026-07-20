@@ -23,9 +23,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-pub const PROJECTS_NAMESPACE: &str = "projects";
-pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
-const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies";
+pub const PROJECTS_NAMESPACE: &str = "projects:v1";
+pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v1";
+const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -976,7 +976,7 @@ impl DBProject {
             let mut redis = redis.connect().await?;
 
             let dependencies = redis
-                .get_deserialized_from_json::<Dependencies>(
+                .get_deserialized::<Dependencies>(
                     PROJECTS_DEPENDENCIES_NAMESPACE,
                     &id.0.to_string(),
                 )
@@ -1014,7 +1014,7 @@ impl DBProject {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 PROJECTS_DEPENDENCIES_NAMESPACE,
                 id.0,
                 &dependencies,
