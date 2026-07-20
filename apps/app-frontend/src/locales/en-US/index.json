@@ -129,7 +129,7 @@
     "message": "Accept all"
   },
   "app.ads-consent.body": {
-    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access information on your device to personalize ads and measure performance."
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
   },
   "app.ads-consent.manage": {
     "message": "Manage preferences"
@@ -516,7 +516,7 @@
     "message": "Downloading v{version}"
   },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access information on your device to personalize ads and measure performance. You can opt out or manage your preferences below."
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
