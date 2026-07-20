@@ -1618,14 +1618,7 @@ async function sendMessage(status: ProjectStatus) {
 			})
 		}
 
-		await refreshModerationCaches(threadId)
-
-		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
-
-		await Promise.race([
-			moderationQueue.releaseLock(projectId),
-			new Promise((r) => setTimeout(r, 2000)),
-		])
+		let projectFixChanges: Partial<typeof projectV3.value> = {}
 
 		if (shouldApplyFixes) {
 			const { proxy: projectProxy, changes: projectChanges } = createTrackedPatch(
@@ -1636,7 +1629,7 @@ async function sendMessage(status: ProjectStatus) {
 					f._projectFn?.(projectProxy, state)
 				}
 			}
-			const projectFixChanges = projectChanges()
+			projectFixChanges = projectChanges()
 			if (Object.keys(projectFixChanges).length > 0) {
 				await client.labrinth.projects_v3.edit(projectId, projectFixChanges)
 			}
@@ -1660,14 +1653,23 @@ async function sendMessage(status: ProjectStatus) {
 					)
 				}
 			}
+		}
 
-			if (projectFixChanges?.slug) {
-				const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
-				localStorage.setItem('moderation-checklist-finished', projectId)
-				clearGeneratedMessageState()
-				await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, { replace: true })
-				return
-			}
+		await refreshModerationCaches(threadId)
+
+		const willHaveNext = await moderationQueue.completeCurrentProject(projectId, 'completed')
+
+		await Promise.race([
+			moderationQueue.releaseLock(projectId),
+			new Promise((r) => setTimeout(r, 2000)),
+		])
+
+		if (projectFixChanges?.slug) {
+			const urlType = getProjectTypeForUrlShorthand(projectV2.value.project_type, [], tags.value)
+			localStorage.setItem('moderation-checklist-finished', projectId)
+			clearGeneratedMessageState()
+			await navigateTo(`/${urlType}/${projectFixChanges.slug}/moderation`, { replace: true })
+			return
 		}
 
 		// Set both states together - hasNextProject MUST be set before done
