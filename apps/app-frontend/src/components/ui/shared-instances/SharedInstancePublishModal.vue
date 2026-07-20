@@ -13,29 +13,39 @@
 		@cancel="finishReview"
 	>
 		<template #additional-content>
-			<div class="flex min-w-0 flex-col gap-3">
-				<div class="flex flex-col gap-1">
-					<span class="font-semibold text-contrast">{{ formatMessage(messages.configTitle) }}</span>
+			<Accordion
+				class="min-w-0"
+				overflow-visible
+				button-class="w-full bg-transparent m-0 p-0 border-none"
+			>
+				<template #title>
+					<FileCogIcon class="size-4 shrink-0 text-primary" />
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.configTitle) }}
+					</span>
+				</template>
+				<div class="flex min-w-0 flex-col gap-3 pt-4">
 					<span class="text-sm text-primary">
 						{{ formatMessage(messages.configDescription) }}
 					</span>
+					<div class="max-h-[292px] overflow-y-auto rounded-[20px]">
+						<FileTreeSelect
+							v-model="selectedConfigPaths"
+							:items="configFileItems"
+							:show-size="false"
+							:show-modified="false"
+						/>
+					</div>
 				</div>
-				<div class="max-h-[292px] overflow-y-auto rounded-[20px]">
-					<FileTreeSelect
-						v-model="selectedConfigPaths"
-						:items="configFileItems"
-						:show-size="false"
-						:show-modified="false"
-					/>
-				</div>
-			</div>
+			</Accordion>
 		</template>
 	</ContentDiffModal>
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
+import { FileCogIcon, UploadIcon } from '@modrinth/assets'
 import {
+	Accordion,
 	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
@@ -173,7 +183,7 @@ const messages = defineMessages({
 	},
 	configTitle: {
 		id: 'instance.shared-instance.publish-review.config-title',
-		defaultMessage: 'Config files',
+		defaultMessage: 'Select config files',
 	},
 	configDescription: {
 		id: 'instance.shared-instance.publish-review.config-description',
