@@ -1,12 +1,12 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
+use crate::database::models::SharedInstanceId;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
-use crate::database::models::SharedInstanceId;
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
@@ -172,9 +172,9 @@ pub async fn report_create(
             report.user_id = Some(user_id.into())
         }
         ItemType::SharedInstance => {
-            let shared_instance_id = SharedInstanceId(
-                parse_base62(new_report.item_id.as_str())? as i64,
-            );
+            let shared_instance_id = SharedInstanceId(parse_base62(
+                new_report.item_id.as_str(),
+            )? as i64);
 
             // TODO: validate that the shared instance exists
 
