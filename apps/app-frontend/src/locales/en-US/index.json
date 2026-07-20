@@ -788,6 +788,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Create shortcut"
+  },
+  "instance.action.export-modpack": {
+    "message": "Export modpack"
+  },
+  "instance.action.launch-instance": {
+    "message": "Launch instance"
+  },
+  "instance.action.more-actions": {
+    "message": "More actions"
+  },
+  "instance.action.open-folder": {
+    "message": "Open folder"
+  },
+  "instance.action.repair": {
+    "message": "Repair"
+  },
+  "instance.action.settings": {
+    "message": "Instance settings"
+  },
+  "instance.action.starting": {
+    "message": "Starting..."
+  },
+  "instance.action.stopping": {
+    "message": "Stopping..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
   },
@@ -829,6 +856,9 @@
   },
   "instance.files.save-as": {
     "message": "Save as..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Never played"
   },
   "instance.server-modal.address": {
     "message": "Address"

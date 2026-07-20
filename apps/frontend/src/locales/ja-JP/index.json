@@ -2597,9 +2597,6 @@
   "profile.label.collection": {
     "message": "コレクション"
   },
-  "profile.label.downloads": {
-    "message": "{count}件のダウンロード"
-  },
   "profile.label.joined": {
     "message": "参加: "
   },
@@ -2617,9 +2614,6 @@
   },
   "profile.label.organizations": {
     "message": "組織"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {プロジェクト} other {プロジェクト}}"
   },
   "profile.label.saving": {
     "message": "保存中…"

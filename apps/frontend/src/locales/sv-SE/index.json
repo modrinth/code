@@ -2738,9 +2738,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedladdning} other {nedladdningar}}"
-  },
   "profile.label.joined": {
     "message": "Gick med"
   },

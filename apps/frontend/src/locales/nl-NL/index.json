@@ -3065,9 +3065,6 @@
   "profile.label.collection": {
     "message": "Collectie"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
-  },
   "profile.label.joined": {
     "message": "Lid geworden"
   },
@@ -3085,9 +3082,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisaties"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {project} other {projecten}}"
   },
   "profile.label.saving": {
     "message": "Opslaan..."
