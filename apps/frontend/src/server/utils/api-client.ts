@@ -39,8 +39,7 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: apiBaseUrl,
-		sharedInstancesBaseUrl:
-			config.sharedInstancesBaseUrl || config.public.sharedInstancesBaseUrl,
+		sharedInstancesBaseUrl: config.sharedInstancesBaseUrl || config.public.sharedInstancesBaseUrl,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features,
 	}

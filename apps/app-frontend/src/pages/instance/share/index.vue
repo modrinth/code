@@ -38,7 +38,7 @@
 			:invite-pending="inviteLink.pending.value"
 			@invite="showInvitePlayers"
 			@remove="showRemoveMemberModal"
-			@settings="openSharingSettings"
+			@settings="handleOpenSharingSettings"
 		/>
 
 		<SharedInstanceShareEmptyState
@@ -325,7 +325,7 @@ function showRemoveMemberModal(row: ShareRow) {
 		removeMemberModal.value?.show()
 	}
 }
-function openSharingSettings() {
+function handleOpenSharingSettings() {
 	props.openSharingSettings?.()
 }
 function removeMember(row: ShareRow) {

@@ -7,9 +7,7 @@ use super::model::{
 use super::store;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
-use crate::state::instances::adapters::sqlite::{
-    content_rows, instance_rows,
-};
+use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::{
     ContentEntry, ContentSetRemoteRef, ContentSetRemoteRefType,
     ContentSetSyncProvider, ContentSetSyncState, InstanceFile,
@@ -48,9 +46,11 @@ pub(super) async fn prepare_shared_instance_update_backup(
     crate::util::io::create_dir_all(&staging_dir).await?;
 
     let result = async {
-        let files =
-            content_rows::get_instance_files(&metadata.instance.id, &state.pool)
-                .await?;
+        let files = content_rows::get_instance_files(
+            &metadata.instance.id,
+            &state.pool,
+        )
+        .await?;
         let entries = content_rows::get_content_entries(
             &metadata.applied_content_set.id,
             &state.pool,
@@ -61,16 +61,13 @@ pub(super) async fn prepare_shared_instance_update_backup(
                 &metadata.instance.id,
                 state,
             );
-        let config_manifest =
-            match crate::util::io::read(config_manifest_path).await {
-                Ok(bytes) => Some(bytes),
-                Err(error)
-                    if error.kind() == std::io::ErrorKind::NotFound =>
-                {
-                    None
-                }
-                Err(error) => return Err(error.into()),
-            };
+        let config_manifest = match crate::util::io::read(config_manifest_path)
+            .await
+        {
+            Ok(bytes) => Some(bytes),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+            Err(error) => return Err(error.into()),
+        };
         let snapshot = SharedInstanceUpdateRollback {
             files,
             entries,
@@ -123,10 +120,8 @@ async fn restore_shared_instance_update(
     state: &State,
 ) -> crate::Result<()> {
     let snapshot = serde_json::from_slice::<SharedInstanceUpdateRollback>(
-        &crate::util::io::read(
-            staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE),
-        )
-        .await?,
+        &crate::util::io::read(staging_dir.join(SHARED_INSTANCE_ROLLBACK_FILE))
+            .await?,
     )?;
     let instance_path = state
         .directories
@@ -178,11 +173,8 @@ async fn restore_instance_metadata(
     let content_set_id = metadata.applied_content_set.id.as_str();
     let mut tx = state.pool.begin().await?;
     instance_rows::update_instance(&metadata.instance, &mut tx).await?;
-    content_rows::update_content_set(
-        &metadata.applied_content_set,
-        &mut tx,
-    )
-    .await?;
+    content_rows::update_content_set(&metadata.applied_content_set, &mut tx)
+        .await?;
     instance_rows::upsert_instance_link(
         &metadata.instance.id,
         &metadata.link,

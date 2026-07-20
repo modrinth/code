@@ -130,10 +130,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         world,
                                     })
                                 } else if first_file_name.as_ref().is_none_or(
-                                    |x| {
-                                        *x != "saves"
-                                            && *x != CONFIG_DIRECTORY
-                                    },
+                                    |x| *x != "saves" && *x != CONFIG_DIRECTORY,
                                 ) {
                                     Some(InstancePayloadType::Synced)
                                 } else {

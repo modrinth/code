@@ -407,6 +407,9 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
+  "app.instance.share.config-sharing-settings": {
+    "message": "Sharing settings"
+  },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"
   },
@@ -1250,20 +1253,20 @@
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
   },
-  "instance.settings.tabs.sharing.config-files.description": {
-    "message": "Choose which files are kept in sync for everyone using this shared instance."
+  "instance.settings.tabs.sharing.manual-push.button": {
+    "message": "Manually push update"
   },
-  "instance.settings.tabs.sharing.config-files.load-error": {
-    "message": "Failed to load config files."
+  "instance.settings.tabs.sharing.manual-push.description": {
+    "message": "Review the current instance changes and choose any config files you want to send to everyone using it."
   },
-  "instance.settings.tabs.sharing.config-files.loading": {
-    "message": "Loading config files..."
+  "instance.settings.tabs.sharing.manual-push.pushing-button": {
+    "message": "Pushing"
   },
-  "instance.settings.tabs.sharing.config-files.selection-description": {
-    "message": "New config files will not be shared unless you select them here."
+  "instance.settings.tabs.sharing.manual-push.reviewing-button": {
+    "message": "Reviewing"
   },
-  "instance.settings.tabs.sharing.config-files.title": {
-    "message": "Shared config files"
+  "instance.settings.tabs.sharing.manual-push.title": {
+    "message": "Manual push update"
   },
   "instance.settings.tabs.window": {
     "message": "Window"
@@ -1296,7 +1299,7 @@
     "message": "Enter width..."
   },
   "instance.shared-instance.config-sharing-hint.description": {
-    "message": "You can select which config files to share in the instance settings"
+    "message": "You can manually push updates and choose config files in the instance settings"
   },
   "instance.shared-instance.config-sharing-hint.dismiss": {
     "message": "Don't show again"
@@ -1309,6 +1312,30 @@
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "This instance's content is being shared to other users."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Added"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Push update to players"
+  },
+  "instance.shared-instance.publish-review.config-description": {
+    "message": "Choose which config files to send with this update. Only selected files will be updated; everything else stays as it is."
+  },
+  "instance.shared-instance.publish-review.config-title": {
+    "message": "Config files"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "Review the content changes and choose any config files to include in this update."
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Review changes"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Push update"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Removed"
   },
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."

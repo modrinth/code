@@ -40,9 +40,7 @@
 							</button>
 						</ButtonStyled>
 						<template #popper>
-							<div
-								class="grid w-80 max-w-[calc(100vw-3rem)] grid-cols-[minmax(0,1fr)] gap-1"
-							>
+							<div class="grid w-80 max-w-[calc(100vw-3rem)] grid-cols-[minmax(0,1fr)] gap-1">
 								<div class="flex items-center justify-between gap-8">
 									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 										{{ formatMessage(messages.configSharingHintTitle) }}
@@ -184,8 +182,8 @@ import {
 	type TableColumn,
 	truncatedTooltip,
 	useFormatDateTime,
-	useVIntl,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useStorage } from '@vueuse/core'
@@ -336,7 +334,8 @@ const messages = defineMessages({
 	},
 	configSharingHintDescription: {
 		id: 'instance.shared-instance.config-sharing-hint.description',
-		defaultMessage: 'You can manually push updates and choose config files in the instance settings',
+		defaultMessage:
+			'You can manually push updates and choose config files in the instance settings',
 	},
 	configSharingHintDismiss: {
 		id: 'instance.shared-instance.config-sharing-hint.dismiss',

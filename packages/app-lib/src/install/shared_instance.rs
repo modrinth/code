@@ -9,8 +9,8 @@ use super::runner::{
 };
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    is_excluded_config_path, read_bounded_config_bundle_entry,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES, is_excluded_config_path,
+    read_bounded_config_bundle_entry,
 };
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -869,18 +869,19 @@ async fn install_shared_instance_config_bundle(
             )
         })
         .collect::<HashMap<_, _>>();
-    let installed_hashes = installed_shared_config_hashes(instance_id, state)
-        .await?;
+    let installed_hashes =
+        installed_shared_config_hashes(instance_id, state).await?;
 
     let mut next_installed_hashes = installed_hashes.clone();
     for (relative_path, bytes) in files {
         let normalized_path =
             relative_path.to_string_lossy().replace('\\', "/");
-        let desired_hash = desired_hashes.get(&normalized_path).ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Missing shared config hash for {normalized_path}"
-            ))
-        })?;
+        let desired_hash =
+            desired_hashes.get(&normalized_path).ok_or_else(|| {
+                crate::ErrorKind::OtherError(format!(
+                    "Missing shared config hash for {normalized_path}"
+                ))
+            })?;
         let path = config_path.join(relative_path);
         let local_hash = config_file_hash(&path).await?;
         let can_overwrite = match local_hash.as_ref() {
@@ -895,11 +896,9 @@ async fn install_shared_instance_config_bundle(
                 crate::util::io::create_dir_all(parent).await?;
             }
             crate::util::io::write(path, bytes).await?;
-            next_installed_hashes
-                .insert(normalized_path, desired_hash.clone());
+            next_installed_hashes.insert(normalized_path, desired_hash.clone());
         } else if local_hash.as_ref() == Some(desired_hash) {
-            next_installed_hashes
-                .insert(normalized_path, desired_hash.clone());
+            next_installed_hashes.insert(normalized_path, desired_hash.clone());
         }
     }
     write_installed_shared_config_hashes(

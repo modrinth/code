@@ -811,16 +811,14 @@ async fn run_request(
                             .to_string(),
                     )
                 })?;
-            let staging_dir =
-                recovery::prepare_shared_instance_update_backup(
-                    job_id,
-                    &rollback_instance,
-                    state,
-                )
-                .await?;
+            let staging_dir = recovery::prepare_shared_instance_update_backup(
+                job_id,
+                &rollback_instance,
+                state,
+            )
+            .await?;
             job_state.paths.staging_dir = Some(staging_dir);
-            let record =
-                store::update_state(job_id, job_state, state).await?;
+            let record = store::update_state(job_id, job_state, state).await?;
             emit_install_job(&record.snapshot()).await?;
             let disabled_project_ids =
                 disabled_project_ids(&instance_id, state).await?;

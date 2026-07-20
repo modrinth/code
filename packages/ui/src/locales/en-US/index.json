@@ -450,7 +450,7 @@
     "defaultMessage": "{count} added"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Updated config files"
+    "defaultMessage": "Changed config files"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Added (dependency)"

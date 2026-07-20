@@ -790,8 +790,10 @@ async fn build_config_bundle_candidate(
     previous_version: Option<&InstanceVersionResponse>,
     state: &State,
 ) -> crate::Result<Option<ExternalFileCandidate>> {
-    let selected_paths =
-        selected_paths.iter().map(String::as_str).collect::<HashSet<_>>();
+    let selected_paths = selected_paths
+        .iter()
+        .map(String::as_str)
+        .collect::<HashSet<_>>();
     let local_files_by_path = local_files
         .iter()
         .map(|file| (file.path.as_str(), file))
@@ -819,8 +821,7 @@ async fn build_config_bundle_candidate(
     if let (Some(previous_version), Some(previous_bundle)) =
         (previous_version, previous_bundle)
     {
-        let response =
-            REQWEST_CLIENT.get(&previous_bundle.url).send().await?;
+        let response = REQWEST_CLIENT.get(&previous_bundle.url).send().await?;
         if !response.status().is_success() {
             return Err(crate::ErrorKind::OtherError(format!(
                 "Previous config bundle download failed with status {}",
@@ -834,12 +835,13 @@ async fn build_config_bundle_candidate(
         })
         .await??;
         for file in remote_config_files(previous_version).await? {
-            let bytes = archived_entries.remove(&file.path).ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Previous config bundle is missing {}",
-                    file.path
-                ))
-            })?;
+            let bytes =
+                archived_entries.remove(&file.path).ok_or_else(|| {
+                    crate::ErrorKind::InputError(format!(
+                        "Previous config bundle is missing {}",
+                        file.path
+                    ))
+                })?;
             entries.insert(file.path, bytes);
         }
     }
@@ -853,8 +855,7 @@ async fn build_config_bundle_candidate(
         let file = local_files_by_path
             .get(selected_path)
             .expect("selected config paths were validated");
-        let bytes =
-            crate::util::io::read(config_path.join(&file.path)).await?;
+        let bytes = crate::util::io::read(config_path.join(&file.path)).await?;
         entries.insert(file.path.clone(), bytes);
     }
 

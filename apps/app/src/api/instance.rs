@@ -843,9 +843,11 @@ pub async fn instance_share_publish(
     instance_id: &str,
     config_paths: Vec<String>,
 ) -> Result<SharedInstanceAttachment> {
-    Ok(theseus::instance::publish_shared_instance(instance_id, config_paths)
-        .await?
-        .into())
+    Ok(
+        theseus::instance::publish_shared_instance(instance_id, config_paths)
+            .await?
+            .into(),
+    )
 }
 
 #[tauri::command]

@@ -44,7 +44,7 @@ import type { GameInstance } from '@/helpers/types'
 
 import { instanceAdmonitionsMessages as messages } from './instance-admonitions-messages'
 
-const props = defineProps<{
+defineProps<{
 	instance: GameInstance
 }>()
 
