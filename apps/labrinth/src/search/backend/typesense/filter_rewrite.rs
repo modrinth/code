@@ -63,33 +63,12 @@ pub(super) fn rewrite_filter_for_join(
             eyre!("could not determine filter field in `{expression}`")
         })?;
         let mut clause = JoinedFilterClause::default();
-        if field == "categories" {
-            let project_expression =
-                expression.replacen("categories", "project_categories", 1);
-            if is_negative_filter(expression) {
-                clause.project.push(project_expression);
-                clause.version.push(version_filter_expression(expression));
-                Ok(vec![clause])
-            } else {
-                Ok(vec![
-                    JoinedFilterClause {
-                        project: vec![project_expression],
-                        version: Vec::new(),
-                    },
-                    JoinedFilterClause {
-                        project: Vec::new(),
-                        version: vec![version_filter_expression(expression)],
-                    },
-                ])
-            }
+        if is_version_filter_field(field) {
+            clause.version.push(version_filter_expression(expression));
         } else {
-            if is_version_filter_field(field) {
-                clause.version.push(version_filter_expression(expression));
-            } else {
-                clause.project.push(expression.to_string());
-            }
-            Ok(vec![clause])
+            clause.project.push(expression.to_string());
         }
+        Ok(vec![clause])
     }
 
     let clauses = parse(filter)?;
@@ -127,12 +106,6 @@ fn version_filter_expression(expression: &str) -> String {
         return expression.to_string();
     };
     format!("{field}:{value}")
-}
-
-fn is_negative_filter(expression: &str) -> bool {
-    expression
-        .split_once(':')
-        .is_some_and(|(_, value)| value.trim_start().starts_with("!="))
 }
 
 fn filter_field(expression: &str) -> Option<&str> {
@@ -413,7 +386,7 @@ mod tests {
                 "versions",
             )
             .unwrap(),
-            "(project_categories:= fabric && $versions(game_versions: 1.21)) || $versions(categories: fabric && game_versions: 1.21)"
+            "$versions(categories: fabric && game_versions: 1.21)"
         );
     }
 
@@ -425,7 +398,7 @@ mod tests {
                 "versions",
             )
             .unwrap(),
-            "(license:= MIT && project_categories:= fabric) || (license:= MIT && $versions(categories: fabric))"
+            "(license:= MIT && $versions(categories: fabric))"
         );
     }
 
@@ -437,16 +410,16 @@ mod tests {
                 "versions",
             )
             .unwrap(),
-            "(license:= MIT && $versions(game_versions: 1.21)) || (project_categories:= fabric && $versions(game_versions: 1.21)) || $versions(categories: fabric && game_versions: 1.21)"
+            "(license:= MIT && $versions(game_versions: 1.21)) || $versions(categories: fabric && game_versions: 1.21)"
         );
     }
 
     #[test]
-    fn negative_categories_require_project_and_version_exclusion() {
+    fn negative_categories_use_inherited_version_categories() {
         assert_eq!(
             rewrite_filter_for_join("categories:!= fabric", "versions")
                 .unwrap(),
-            "(project_categories:!= fabric && $versions(categories:!= fabric))"
+            "$versions(categories:!= fabric)"
         );
     }
 }

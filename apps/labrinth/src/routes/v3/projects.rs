@@ -1102,7 +1102,8 @@ pub async fn project_edit_internal(
         Ok(true)
     }
 
-    let mut reindex_versions = false;
+    let mut reindex_versions = new_project.categories.is_some()
+        || new_project.additional_categories.is_some();
 
     reindex_versions |= update(
         &mut transaction,
@@ -1670,7 +1671,7 @@ pub async fn projects_edit(
             };
         }
 
-        bulk_edit_project_categories(
+        let mut reindex_versions = bulk_edit_project_categories(
             &categories,
             &project.categories,
             project.inner.id as db_ids::DBProjectId,
@@ -1685,7 +1686,7 @@ pub async fn projects_edit(
         )
         .await?;
 
-        bulk_edit_project_categories(
+        reindex_versions |= bulk_edit_project_categories(
             &categories,
             &project.additional_categories,
             project.inner.id as db_ids::DBProjectId,
@@ -1744,20 +1745,37 @@ pub async fn projects_edit(
             }
         }
 
-        changed_projects.push((project.inner.id, project.inner.slug));
+        changed_projects.push((
+            project.inner.id,
+            project.inner.slug,
+            project.versions,
+            reindex_versions,
+        ));
     }
 
     transaction.commit().await?;
 
-    for (project_id, slug) in changed_projects {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_id,
-            slug,
-            None,
-        )
-        .await?;
+    for (project_id, slug, versions, reindex_versions) in changed_projects {
+        if reindex_versions {
+            db_models::DBProject::clear_cache(project_id, slug, None, &redis)
+                .await?;
+            search_state
+                .queue
+                .push_version_changes(
+                    project_id.into(),
+                    versions.into_iter().map(VersionId::from),
+                )
+                .await;
+        } else {
+            clear_project_cache_and_queue_search(
+                &redis,
+                &search_state,
+                project_id,
+                slug,
+                None,
+            )
+            .await?;
+        }
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1771,7 +1789,7 @@ pub async fn bulk_edit_project_categories(
     max_num_categories: usize,
     is_additional: bool,
     transaction: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
+) -> Result<bool, ApiError> {
     let mut set_categories =
         if let Some(categories) = bulk_changes.categories.clone() {
             categories
@@ -1798,7 +1816,8 @@ pub async fn bulk_edit_project_categories(
         }
     }
 
-    if &set_categories != project_categories {
+    let changed = &set_categories != project_categories;
+    if changed {
         sqlx::query!(
             "
             DELETE FROM mods_categories
@@ -1831,7 +1850,7 @@ pub async fn bulk_edit_project_categories(
         DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
     }
 
-    Ok(())
+    Ok(changed)
 }
 
 #[derive(Serialize, Deserialize)]

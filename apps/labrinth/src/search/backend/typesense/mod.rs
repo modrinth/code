@@ -68,6 +68,11 @@
 //! We do also have the `index-search` task which does a full reindex, but this
 //! shouldn't be required in normal operation.
 //!
+//! Project categories are deliberately denormalized into every version
+//! document to avoid a second join when categories are combined with other
+//! version filters. Changing a project's categories must therefore reindex all
+//! of that project's version documents.
+//!
 //! When batching Typesense update operations, we batch by both project count
 //! and document count. Since a project can have an unbounded number of
 //! versions, we can (and will) have projects with thousands of versions. If we
@@ -88,6 +93,11 @@
 //!
 //! If you search for `categories = fabric AND game_versions = 1.21`, then
 //! you're searching for *one* project with *both* these conditions set.
+//! Project categories are inherited by every version document, while loaders
+//! remain specific to each version. This preserves the legacy behavior where
+//! `categories` can match either a project category or a loader, and allows
+//! both conditions to use one version join.
+//!
 //! Therefore, this uses *one* join over versions, rather than two joins
 //! each matching different versions of the same project. Using one join here
 //! is faster than two. It's even faster if you search for more facets like
@@ -100,7 +110,7 @@
 //! author), since the full set of categories, environments, etc. is known
 //! and finite. All of these values can be represented as whitespace-free,
 //! atomic, single tokens in Typesense, if we set
-//! `symbols_to_index = ["=", ".", "_"]`. This means that `fabric-api` is
+//! `symbols_to_index = ["-", ".", "_"]`. This means that `fabric-api` is
 //! treated as one token `fabric-api`, not as `fabric` and `api`. So if we use
 //! the filter `categories:fabric-api`, it will match for that *one token*
 //! `fabric-api` instead of full text search.

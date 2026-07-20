@@ -491,6 +491,9 @@ async fn build_search_documents(
             } else {
                 (vec![], vec![])
             };
+        let mut project_categories = categories;
+        project_categories.sort();
+        project_categories.dedup();
         let dependencies = dependencies
             .get(&project.id)
             .map(|x| x.clone())
@@ -595,7 +598,8 @@ async fn build_search_documents(
                 // These were previously considered the loader, and in v2, the loader is a category for searching.
                 // So to avoid breakage or awkward conversions, we just consider those loader_fields to be categories.
                 // The loaders are kept in the project document's aggregated loader fields as well, so that no information is lost on retrieval.
-                let mut version_categories = version.loaders.clone();
+                let mut version_categories = project_categories.clone();
+                version_categories.extend(version.loaders.iter().cloned());
                 let mrpack_loaders = fields
                     .get("mrpack_loaders")
                     .into_iter()
@@ -644,9 +648,6 @@ async fn build_search_documents(
                 })
             }));
 
-            let mut project_categories = categories;
-            project_categories.sort();
-            project_categories.dedup();
             let mut categories = project_categories.clone();
             categories.extend(project_loaders.iter().cloned());
 
