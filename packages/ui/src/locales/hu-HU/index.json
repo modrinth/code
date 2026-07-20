@@ -392,6 +392,9 @@
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "A szerverén található egyes tartalmakat nem sikerült elemezni, ezért előfordulhat, hogy ez a változás hatással lesz rájuk."
   },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Ismeretlen fájlok"
+  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
   },
@@ -814,6 +817,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count} fájl"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Ismeretlen"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Nem"
@@ -4436,6 +4442,87 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Alkalmaz"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Törlés"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": " Egyéni, rögzített dátumtartomány..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": " Az időtartam csökkentése"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": " Nincs kiválasztva dátumtartomány."
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": " Az időtartam növelése"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "Az elmúlt {amount} {unit, select,\nhours {órában}\ndays {napban}\nweeks {hétben}\nmonths {hónapban}\nother {napban}\n}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "Az elmúlt"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Teljes időszak"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Az elmúlt 14 nap"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Az elmúlt 180 nap"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Az elmúlt 30 nap"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Az elmúlt 7 nap"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Az elmúlt 90 nap"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Ma"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": " Az év eleje óta"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Tegnap"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Időkeret kiválasztása"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Kiválasztva"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Kiválasztás"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Az időkeret összege"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Az időkeret egysége"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "napban"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "órában"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "hónapban"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "hétben"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Vannak nem mentett módosítások."
   },
@@ -4456,6 +4543,9 @@
   },
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count} figyelmeztetés"
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Ismeretlen fájlok"
   },
   "user.profile.badge.downloads.about.1": {
     "defaultMessage": "Ennek a felhasználónak a projektjei összesen {download_sum} letöltést értek el."

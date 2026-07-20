@@ -84,13 +84,13 @@
     "message": "Megjegyzések"
   },
   "analytics.chart.controls.aria": {
-    "message": "Elemzési grafikonvezérlők, {activeCount}"
+    "message": "Statisztikai grafikonvezérlők, {activeCount}"
   },
   "analytics.chart.controls.button": {
-    "message": "Irányítások"
+    "message": "Vezérlők"
   },
   "analytics.chart.controls.dialog-aria": {
-    "message": "Elemzési grafikonok vezérlőelemei"
+    "message": "Statisztikai grafikonok vezérlőelemei"
   },
   "analytics.chart.controls.display": {
     "message": "Kijelző"
@@ -159,7 +159,7 @@
     "message": "{project}-tól/től függ"
   },
   "analytics.chart.tooltip.duration.days": {
-    "message": "{count, plural, one {#nap} other {#napok}}"
+    "message": "{count} nap"
   },
   "analytics.chart.tooltip.duration.hours": {
     "message": "{count, plural, one {#óra} other {# órák}}"
@@ -270,10 +270,10 @@
     "message": "Megtekintések alakulása"
   },
   "analytics.group-by.1h": {
-    "message": "1ó"
+    "message": "1 ó"
   },
   "analytics.group-by.6h": {
-    "message": "6ó"
+    "message": "6 ó"
   },
   "analytics.group-by.date": {
     "message": "Dátum"
@@ -381,7 +381,7 @@
     "message": "Lebontás:"
   },
   "analytics.query.label.grouped-by": {
-    "message": "Csoportosítás"
+    "message": "Csoportosítás:"
   },
   "analytics.query.label.project": {
     "message": "Projekt:"
@@ -408,7 +408,7 @@
     "message": "{hours} óra"
   },
   "analytics.stat.previous-period-comparison": {
-    "message": "az előző időszakhoz képes"
+    "message": "az előző időszakhoz képest"
   },
   "analytics.stat.previous-period-comparison-short": {
     "message": "az előzőhöz képest"
@@ -438,7 +438,7 @@
     "message": "Kiválasztott hossz"
   },
   "analytics.table.duration.days": {
-    "message": "{count, plural, one {# day} other {# days}}"
+    "message": "{count} nap"
   },
   "analytics.table.duration.hours": {
     "message": "{count, plural, one {# hour} other {# hours}}"
@@ -2039,6 +2039,9 @@
   "hosting-marketing.faq.location": {
     "message": "Hol találhatók a Modrinth Hosting szerverei? Kiválaszthatom a régiót?"
   },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Jelenleg Észak-Amerikában, Európában, Délkelet-Ázsiában és Ausztráliában rendelkezünk szerverekkel, amelyeket vásárláskor kiválaszthatsz. A jövőben további régiók érkeznek! Ha régiót szeretnél váltani, kérlek vedd fel a kapcsolatot az ügyfélszolgálattal."
+  },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Melyik Minecraft verziók és betöltők használhatók?"
   },
@@ -3440,6 +3443,9 @@
   "project.settings.permissions.completed.description": {
     "message": "Minden külső tartalomhoz megadva vannak a felhasználási engedélyek és a forrásmegjelölések."
   },
+  "project.settings.permissions.completed.title": {
+    "message": "Engedélyek beállítva!"
+  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Kész is van!"
   },
@@ -3451,6 +3457,18 @@
   },
   "project.settings.permissions.search-placeholder": {
     "message": "Keresés {count} projekt között..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Legtöbb fájl"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Nemrég szerkesztett"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Elutasítva"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Állapot"
   },
   "project.settings.title": {
     "message": "Beállítások"
@@ -3976,6 +3994,9 @@
   },
   "settings.account.security.email.title": {
     "message": "E-mail cím"
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Hozzá adva {ago}"
   },
   "settings.account.security.password.action.add": {
     "message": "Jelszó hozzáadása"
@@ -4580,6 +4601,9 @@
   "ui.newsletter-button.tooltip": {
     "message": "Feliratkozás a Modrinth hírlevelére"
   },
+  "version.confirm-delete.title": {
+    "message": "Biztos, hogy le akarod törölni ezt a verziót?"
+  },
   "version.download.no-primary-file": {
     "message": "Hiba: Nem található az elsődleges fájl"
   },
@@ -4594,5 +4618,14 @@
   },
   "version.environment.unknown.title": {
     "message": "Ismeretlen környezet"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "SHA-1 Másolása"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "SHA-512 Másolása"
   }
 }

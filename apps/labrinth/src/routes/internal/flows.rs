@@ -24,6 +24,7 @@ use crate::util::captcha::check_hcaptcha;
 use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
+use crate::util::neverbounce::{check_email, email_check_error_generic};
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
@@ -1438,6 +1439,19 @@ struct NewOAuthAccount {
     pub state: String,
     pub challenge: String,
     pub sign_up_newsletter: bool,
+    #[serde(default)]
+    pub account_consent: bool,
+}
+
+fn validate_account_consent(account_consent: bool) -> Result<(), ApiError> {
+    if account_consent {
+        info!("account consent trigger, denying");
+        return Err(ApiError::Request(eyre!(
+            "Sorry, something went wrong. Please try again"
+        )));
+    }
+
+    Ok(())
 }
 
 /// Create account with OAuth.
@@ -1463,6 +1477,8 @@ pub async fn create_oauth_account(
         ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
 
+    validate_account_consent(new_account.account_consent)?;
+
     if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
@@ -1480,6 +1496,10 @@ pub async fn create_oauth_account(
     else {
         return Err(ApiError::Internal(eyre!("invalid flow kind")));
     };
+
+    if let Some(email) = &user.email {
+        ensure_email_is_usable(email).await?;
+    }
 
     let mut txn = db
         .begin()
@@ -1709,6 +1729,8 @@ pub struct NewAccount {
     pub email: String,
     pub challenge: Option<String>,
     pub sign_up_newsletter: Option<bool>,
+    #[serde(default)]
+    pub account_consent: bool,
 }
 
 #[derive(Debug, Validate)]
@@ -1792,6 +1814,52 @@ impl From<NewAccount> for AccountRegisterFlow {
             sign_up_newsletter: account.sign_up_newsletter.unwrap_or(false),
         }
     }
+}
+
+/// Blacklist entries are matched literally, unless they begin with `*.`, in
+/// which case they match any subdomain of the remaining suffix.
+fn is_blacklisted_domain(domain: &str) -> bool {
+    let domain = domain.to_ascii_lowercase();
+
+    ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
+        let entry = entry.trim().to_ascii_lowercase();
+
+        match entry.strip_prefix("*.") {
+            Some(suffix) => domain
+                .strip_suffix(suffix)
+                .is_some_and(|subdomain| subdomain.ends_with('.')),
+            None => entry == domain,
+        }
+    })
+}
+
+fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return Err(ApiError::Request(email_check_error_generic()));
+    };
+
+    if is_blacklisted_domain(domain) {
+        info!(email.domain = domain, "blacklisted email domain, denying");
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
+async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
+    ensure_email_domain_is_allowed(email)?;
+
+    let result = check_email(email).await.map_err(ApiError::Request)?;
+
+    if matches!(
+        result,
+        neverbounce::VerificationResult::Invalid
+            | neverbounce::VerificationResult::Disposable
+    ) {
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
 }
 
 impl AccountRegisterFlow {
@@ -1996,11 +2064,15 @@ pub async fn create_account_with_password(
 ) -> Result<HttpResponse, ApiError> {
     let new_account = new_account.into_inner();
 
+    validate_account_consent(new_account.account_consent)?;
+
     if !check_hcaptcha(&req, new_account.challenge.as_deref().unwrap_or(""))
         .await?
     {
         return Err(ApiError::Turnstile);
     }
+
+    ensure_email_is_usable(&new_account.email).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -2849,6 +2921,8 @@ pub async fn set_email(
             "Email is already registered on Modrinth! Try 'Forgot password' in incognito to access and delete your other account.".to_string(),
         ));
     }
+
+    ensure_email_is_usable(&email_address.email).await?;
 
     let mut transaction = pool.begin().await?;
 

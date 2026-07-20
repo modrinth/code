@@ -14,6 +14,7 @@ pub mod http;
 pub mod img;
 pub mod ip;
 pub mod kafka;
+pub mod neverbounce;
 pub mod ratelimit;
 pub mod routes;
 pub mod sentry;

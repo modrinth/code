@@ -9,7 +9,7 @@
     "message": "Téléchargements"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Masquer plus d'instances en exécution"
+    "message": "Masquer plus d'instances en cours d'exécution"
   },
   "app.action-bar.install.copied-details": {
     "message": "Copié"
@@ -36,7 +36,7 @@
     "message": "Annulé"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Le nettoyage n'est pas terminé"
+    "message": "Le nettoyage n'a pas terminé"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Impossible de télécharger les fichiers"
@@ -65,6 +65,27 @@
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "L'installation de Java n'a pas pu se terminer"
   },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "La mise en place du loader a échoué"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Impossible de mettre à jour les données locales"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "La mise en place de Minecraft a échoué"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Impossible d'atteindre les serveurs Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Aucune permission d'écriture"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Impossible de télécharger le pack"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Quelque chose s'est mal passé"
+  },
   "app.action-bar.install.unknown-instance": {
     "message": "Instance inconnue"
   },
@@ -72,22 +93,22 @@
     "message": "Installations"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Définir en tante qu'instance première"
+    "message": "Définir en tant qu'instance principale"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Aucune instance en exécution"
+    "message": "Aucune instance en cours d'exécution"
   },
   "app.action-bar.offline": {
     "message": "Hors ligne"
   },
   "app.action-bar.primary-instance": {
-    "message": "Instance première"
+    "message": "Instance principale"
   },
   "app.action-bar.reload-to-update": {
     "message": "Recharger pour mettre à jour"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Montrer plus d'instances en exécution"
+    "message": "Montrer plus d'instances en cours d'exécution"
   },
   "app.action-bar.stop-instance": {
     "message": "Arrêter l'instance"
@@ -263,6 +284,9 @@
   "app.install.phase.finalizing": {
     "message": "Finalisation"
   },
+  "app.install.phase.preparing_instance": {
+    "message": "En attente d'installation"
+  },
   "app.install.phase.preparing_java": {
     "message": "Préparation de Java"
   },
@@ -401,23 +425,47 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Rechercher {count} mondes..."
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Ne pas installer"
+  },
   "app.modal.install-to-play.header": {
     "message": "Installer pour jouer"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installer quand même"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Installer"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Cette invitation a été crée par un autre utilisateur Modrinth, pas par Modrinth. N'acceptez seulement les invitations de personnes en qui vous avez confiance."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Un fichier est seulement examiné s'il est publié sur Modrinth, peu importe son extension (y compris .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instance partagée"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ce modpack de serveur contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons fortement de seulement installer des fichiers de sources en qui vous avez confiance."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Avertissement de fichiers inconnus"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Fichiers non reconnus"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Voir le contenu"
   },
   "app.modal.update-to-play.header": {
     "message": "Mettre à jour pour jouer"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Supprimé"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Une mise à jour est requise pour jouer à {name}. Veuillez mettre à jour à la dernière version pour lancer le jeu."
