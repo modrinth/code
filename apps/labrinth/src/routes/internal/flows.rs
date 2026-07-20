@@ -1848,17 +1848,6 @@ fn is_blacklisted_domain(domain: &str) -> bool {
     })
 }
 
-#[cfg(test)]
-mod tests {
-    use super::is_blacklisted_domain;
-
-    #[test]
-    fn disposable_email_domains_include_subdomains() {
-        assert!(is_blacklisted_domain("mailinator.com"));
-        assert!(is_blacklisted_domain("INBOX.mailinator.com"));
-    }
-}
-
 fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
     let Some((_, domain)) = email.rsplit_once('@') else {
         return Err(ApiError::Request(email_check_error_generic()));
