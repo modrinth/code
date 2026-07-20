@@ -77,7 +77,7 @@
 							</ButtonStyled>
 						</div>
 						<div v-if="item.type !== 'neutral'"></div>
-						<div class="col-span-2 text-sm text-primary">{{ item.text }}</div>
+						<div class="col-span-2 whitespace-pre-wrap text-sm text-primary">{{ item.text }}</div>
 						<template v-if="item.errorCode">
 							<div></div>
 							<div class="m-0 text-wrap text-xs font-medium text-secondary">

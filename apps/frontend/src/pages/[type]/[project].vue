@@ -665,10 +665,7 @@ import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
-import {
-	loadChecklistOpenState,
-	saveChecklistOpenState,
-} from '~/services/moderation-checklist-storage.ts'
+import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
@@ -1211,6 +1208,12 @@ const { data: organizationRaw } = useQuery({
 // When project is removed from org, enabled becomes false but TanStack keeps stale data.
 // Return null when the project no longer belongs to an organization.
 const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
+
+const { data: thread } = useQuery({
+	queryKey: computed(() => ['thread', projectRaw.value?.thread_id]),
+	queryFn: () => client.labrinth.threads_v3.getThread(projectRaw.value.thread_id),
+	enabled: computed(() => !!projectRaw.value?.thread_id),
+})
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
 
@@ -2001,11 +2004,8 @@ function consumeShowChecklistHistoryState() {
 	return true
 }
 
-function setModerationChecklistOpen(open, projectId = project.value?.id) {
+function setModerationChecklistOpen(open) {
 	showModerationChecklist.value = open
-	if (projectId) {
-		void saveChecklistOpenState(projectId, open)
-	}
 }
 
 function isProjectInActiveModerationQueue(projectId = project.value?.id) {
@@ -2047,21 +2047,17 @@ watch(
 			return
 		}
 
-		const storedOpen = await loadChecklistOpenState(projectId)
+		const storedState = await loadChecklistState(projectId)
 		if (cancelled) return
 
-		if (storedOpen !== null) {
-			showModerationChecklist.value = storedOpen
+		if (storedState !== null) {
+			showModerationChecklist.value = storedState.open ?? false
 			return
 		}
 
 		const shouldRecoverFromQueue =
 			moderationQueue.isQueueMode && moderationQueue.getCurrentProjectId() === projectId
 		showModerationChecklist.value = shouldRecoverFromQueue
-
-		if (shouldRecoverFromQueue) {
-			void saveChecklistOpenState(projectId, true)
-		}
 	},
 	{ immediate: true },
 )
@@ -2144,6 +2140,8 @@ provideProjectPageContext({
 	dependencies,
 	dependenciesLoading: computed(() => dependenciesLoading.value),
 	cdnDownloadReason: readonly(downloadReason),
+
+	thread,
 
 	// Invalidate all project queries (auto-refetches active ones)
 	invalidate: invalidateProject,

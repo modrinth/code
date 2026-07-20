@@ -8,9 +8,14 @@ import type { Action } from './actions'
  */
 export interface Stage {
 	/**
-	 * The title of the stage, displayed to the moderator.
+	 * The title of the stage, displayed in the checklist header.
 	 */
 	title: string
+
+	/**
+	 * The hint for this stage, tells the moderator what to do.
+	 */
+	hint: string
 
 	/**
 	 * An optional description or additional text for the stage.

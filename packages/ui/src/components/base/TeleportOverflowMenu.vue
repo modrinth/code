@@ -29,11 +29,12 @@
 					v-if="isOpen"
 					ref="menuRef"
 					data-pyro-telepopover-root
-					class="fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
+					class="fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-x-hidden overflow-y-auto rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
 					:style="menuStyle"
 					role="menu"
 					tabindex="-1"
 					@mousedown.stop
+					@wheel.stop
 					@mouseleave="handleMouseLeave"
 				>
 					<template
@@ -160,6 +161,7 @@ const props = withDefaults(
 		disabled?: boolean
 		tooltip?: string
 		ariaLabel?: string
+		placement?: 'right' | 'center'
 	}>(),
 	{
 		hoverable: false,
@@ -167,6 +169,7 @@ const props = withDefaults(
 		disabled: false,
 		tooltip: undefined,
 		ariaLabel: undefined,
+		placement: 'right',
 	},
 )
 
@@ -189,41 +192,52 @@ const hoveringMenu = useElementHover(menuRef)
 
 const hovering = computed(() => hoveringTrigger.value || hoveringMenu.value)
 
-const menuStyle = ref({
-	top: '0px',
-	left: '0px',
+const menuStyle = ref<Record<string, string>>({
+	top: '-9999px',
+	left: '-9999px',
 })
 
 const filteredOptions = computed(() => props.options.filter((option) => option.shown !== false))
 
 const calculateMenuPosition = () => {
-	if (!triggerRef.value || !menuRef.value) return { top: '0px', left: '0px' }
+	if (!triggerRef.value || !menuRef.value) return null
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
+	// offsetWidth is not affected by CSS transforms (unlike getBoundingClientRect)
+	// scrollHeight gives the full content height regardless of any maxHeight constraint,
+	// preventing a feedback loop where clamped offsetHeight makes it look like the menu fits
 	const menuWidth = menuRef.value.offsetWidth
-	const menuHeight = menuRef.value.offsetHeight
+	const menuHeight = menuRef.value.scrollHeight
 	const margin = 8
 
 	let top: number
-	let left: number
+	let maxHeight: number | null = null
 
-	if (triggerRect.bottom + menuHeight + margin <= window.innerHeight) {
+	const spaceBelow = window.innerHeight - triggerRect.bottom - margin
+	const spaceAbove = triggerRect.top - margin
+
+	if (menuHeight <= spaceBelow) {
 		top = triggerRect.bottom + margin
-	} else if (triggerRect.top - menuHeight - margin >= 0) {
+	} else if (menuHeight <= spaceAbove) {
 		top = triggerRect.top - menuHeight - margin
+	} else if (spaceBelow >= spaceAbove) {
+		top = triggerRect.bottom + margin
+		maxHeight = spaceBelow
 	} else {
-		top = Math.max(margin, window.innerHeight - menuHeight - margin)
+		maxHeight = spaceAbove
+		top = triggerRect.top - maxHeight - margin
 	}
 
-	if (triggerRect.right - menuWidth >= margin) {
-		left = triggerRect.right - menuWidth
-	} else {
-		left = Math.max(margin, triggerRect.left)
-	}
+	const preferredLeft =
+		props.placement === 'center'
+			? triggerRect.left + triggerRect.width / 2 - menuWidth / 2
+			: triggerRect.right - menuWidth
+	const left = Math.max(margin, Math.min(preferredLeft, window.innerWidth - menuWidth - margin))
 
 	return {
 		top: `${top}px`,
 		left: `${left}px`,
+		...(maxHeight !== null ? { maxHeight: `${maxHeight}px` } : {}),
 	}
 }
 
@@ -241,20 +255,24 @@ const toggleMenu = (event: MouseEvent) => {
 
 const openMenu = () => {
 	if (props.disabled) return
+	menuStyle.value = { top: '-9999px', left: '-9999px' }
 	isOpen.value = true
 	emit('open')
-	disableBodyScroll()
-	nextTick(() => {
-		menuStyle.value = calculateMenuPosition()
-		document.addEventListener('mousemove', handleMouseMove)
-		focusFirstMenuItem()
-	})
+	// nextTick lets Vue render the element, then requestAnimationFrame waits for the
+	// browser to complete layout so offsetWidth/offsetHeight are real values.
+	nextTick(() =>
+		requestAnimationFrame(() => {
+			const pos = calculateMenuPosition()
+			if (pos) menuStyle.value = pos
+			document.addEventListener('mousemove', handleMouseMove)
+			focusFirstMenuItem()
+		}),
+	)
 }
 
 const closeMenu = () => {
 	isOpen.value = false
 	selectedIndex.value = -1
-	enableBodyScroll()
 	document.removeEventListener('mousemove', handleMouseMove)
 }
 
@@ -322,14 +340,6 @@ const handleItemClick = (option: Option, index: number, event?: MouseEvent) => {
 const handleMouseOver = (index: number) => {
 	selectedIndex.value = index
 	menuItemsRef.value[selectedIndex.value]?.focus?.()
-}
-
-const disableBodyScroll = () => {
-	document.body.style.overflow = 'hidden'
-}
-
-const enableBodyScroll = () => {
-	document.body.style.overflow = ''
 }
 
 const focusFirstMenuItem = () => {
@@ -421,10 +431,25 @@ const handleKeydown = (event: KeyboardEvent) => {
 	}
 }
 
-const handleResizeOrScroll = () => {
-	if (isOpen.value) {
-		menuStyle.value = calculateMenuPosition()
+const handleResize = () => {
+	if (!isOpen.value) return
+	const pos = calculateMenuPosition()
+	if (pos) menuStyle.value = pos
+}
+
+const handleScroll = () => {
+	if (!isOpen.value) return
+	const pos = calculateMenuPosition()
+	if (!pos) return
+	// On scroll only the vertical position changes — don't update left, which would shift
+	// the menu horizontally due to scrollbar appearing/disappearing changing offsetWidth
+	const updated: Record<string, string> = { ...menuStyle.value, top: pos.top }
+	if (pos.maxHeight) {
+		updated.maxHeight = pos.maxHeight
+	} else {
+		delete updated.maxHeight
 	}
+	menuStyle.value = updated
 }
 
 const throttle = <T extends unknown[]>(
@@ -441,23 +466,23 @@ const throttle = <T extends unknown[]>(
 	}
 }
 
-const throttledHandleResizeOrScroll = throttle(handleResizeOrScroll, 100)
+const throttledHandleResize = throttle(handleResize, 100)
+const throttledHandleScroll = throttle(handleScroll, 100)
 
 onMounted(() => {
 	triggerRef.value?.addEventListener('keydown', handleKeydown)
-	window.addEventListener('resize', throttledHandleResizeOrScroll)
-	window.addEventListener('scroll', throttledHandleResizeOrScroll)
+	window.addEventListener('resize', throttledHandleResize)
+	window.addEventListener('scroll', throttledHandleScroll)
 })
 
 onUnmounted(() => {
 	triggerRef.value?.removeEventListener('keydown', handleKeydown)
-	window.removeEventListener('resize', throttledHandleResizeOrScroll)
-	window.removeEventListener('scroll', throttledHandleResizeOrScroll)
+	window.removeEventListener('resize', throttledHandleResize)
+	window.removeEventListener('scroll', throttledHandleScroll)
 	document.removeEventListener('mousemove', handleMouseMove)
 	if (typeAheadTimeout.value) {
 		clearTimeout(typeAheadTimeout.value)
 	}
-	enableBodyScroll()
 })
 
 watch(isOpen, (newValue) => {
