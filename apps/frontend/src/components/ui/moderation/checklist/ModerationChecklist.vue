@@ -291,7 +291,7 @@
 
 							<div v-else-if="generatedMessage" class="flex items-center gap-2">
 								<ButtonStyled>
-									<button :disabled="loadingModerationDecision" @click="goBackToStages">
+									<button :disabled="loadingModerationDecision" @click="previousStage">
 										<LeftArrowIcon aria-hidden="true" />
 										Edit
 									</button>
@@ -340,13 +340,15 @@
 										<LeftArrowIcon aria-hidden="true" /> Previous
 									</button>
 								</ButtonStyled>
-								<ButtonStyled v-if="!isLastVisibleStage" color="brand">
-									<button @click="nextStage"><RightArrowIcon aria-hidden="true" /> Next</button>
-								</ButtonStyled>
-								<ButtonStyled v-else color="brand" :disabled="loadingMessage">
-									<button @click="generateMessage">
-										<CheckIcon aria-hidden="true" />
-										{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
+								<ButtonStyled color="brand" :disabled="isLastVisibleStage && loadingMessage">
+									<button @click="nextStage">
+										<template v-if="isLastVisibleStage">
+											<CheckIcon aria-hidden="true" />
+											{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
+										</template>
+										<template v-else>
+											<RightArrowIcon aria-hidden="true" /> Next
+										</template>
 									</button>
 								</ButtonStyled>
 							</div>
@@ -1259,7 +1261,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryApprove: () => sendMessage(approveSendStatus.value),
 				tryReject: () => sendMessage('rejected'),
 				tryWithhold: () => sendMessage('withheld'),
-				tryEditMessage: goBackToStages,
+				tryEditMessage: previousStage,
 
 				tryCopyLink: async (permalink: boolean, relative: boolean, page: boolean) => {
 					let url = ``
@@ -1511,8 +1513,12 @@ function shouldShowStageIndex(stageIndex: number): boolean {
 }
 
 function previousStage() {
-	let targetStage = currentStage.value - 1
+	if (generatedMessage.value) {
+		goBackToStages()
+		return
+	}
 
+	let targetStage = currentStage.value - 1
 	while (targetStage >= 0) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
@@ -1523,8 +1529,9 @@ function previousStage() {
 }
 
 function nextStage() {
-	let targetStage = currentStage.value + 1
+	if (generatedMessage.value) return
 
+	let targetStage = currentStage.value + 1
 	while (targetStage < resolvedStages.value.length) {
 		if (shouldShowStageIndex(targetStage)) {
 			currentStage.value = targetStage
@@ -1532,6 +1539,8 @@ function nextStage() {
 		}
 		targetStage++
 	}
+
+	generateMessage()
 }
 
 function goBackToStages() {

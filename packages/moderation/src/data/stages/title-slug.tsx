@@ -47,7 +47,7 @@ export default function () {
 	let slugDebounceTimer: ReturnType<typeof setTimeout> | undefined
 
 	function currentSlug(state: Record<string, NodeState>) {
-		return (state['correct-slug'] as string | undefined) ?? project.value.slug
+		return (state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value ?? project.value.slug
 	}
 
 	async function checkSlugTaken(slug: string): Promise<Labrinth.Projects.v3.Project | null> {

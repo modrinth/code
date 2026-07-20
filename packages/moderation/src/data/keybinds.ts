@@ -4,13 +4,13 @@ const keybinds: { [id: string]: KeybindListener } = {
 	'next-stage': {
 		keybind: 'ArrowRight',
 		description: 'Go to next stage',
-		enabled: (ctx) => !ctx.state.isDone && !ctx.state.hasGeneratedMessage,
+		enabled: (ctx) => !ctx.state.isDone,
 		action: (ctx) => ctx.actions.tryGoNext(),
 	},
 	'previous-stage': {
 		keybind: 'ArrowLeft',
 		description: 'Go to previous stage',
-		enabled: (ctx) => !ctx.state.isDone && !ctx.state.hasGeneratedMessage,
+		enabled: (ctx) => !ctx.state.isDone,
 		action: (ctx) => ctx.actions.tryGoBack(),
 	},
 	'generate-message': {
