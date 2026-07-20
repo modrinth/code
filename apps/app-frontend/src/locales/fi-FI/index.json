@@ -350,9 +350,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hae {count} maailmasta..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Sisältö vaaditaan"
-  },
   "app.modal.install-to-play.header": {
     "message": "Asenna pelataksesi"
   },
@@ -362,26 +359,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modia}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Vaadittu modipaketti"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tämä palvelin vaatii modeja toimiakseen. Klikkaa Asenna ladataksesi vaaditut tiedostot Modrinthista, ja käynnistä peli suoraan palvelimelle."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Jaettu instanssi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Jaettu palvelininstanssi"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tarkastele sisältöä"
   },
   "app.modal.update-to-play.header": {
     "message": "Päivitä pelataksesi"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Päivitys vaaditaan"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Pävitys vaaditaan pelataksesi {name}. Päivitä viimeisimpään versioon pelataksesi."
@@ -1009,26 +994,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Modialusta on palvelimen tarjoama"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Tiedosto tarkistetaan vain jos se on ladattu Modrinthiin, riippumatta tiedoston muodosta (mukaanlukien .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Älä näytä tätä varoitusta uudestaan"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Vahvista asennus"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Asenna jokatapauksessa"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Haittaohjelmia levitetään usein modipaketti tiedostojen kautta jakamalla niitä alustoilla kuten Discordissa."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Emme löytäneet tätä tiedostoa Modrinthista. Suosittelemme vahvasti että asennat tiedostoja vain lähteistä joihin luotat."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Tuntematon tiedosto varoitus"
   }
 }

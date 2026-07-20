@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-16T19:36:45+00:00`,
+		product: 'app',
+		version: '0.15.12',
+		body: `## Fixed
+- Fixed issue with some modpacks failing to install due to file mismatches.
+- Fixed hardcore worlds generated in 26.1+ not being recognised as hardcore in the Jump back in and Worlds tab.`,
+	},
+	{
+		date: `2026-07-14T22:14:08+00:00`,
+		product: 'app',
+		version: '0.15.11',
+		body: `## Added
+- Added warning when installing unknown mods.
+
+## Changed
+- Enhanced the warning pop-up when installing unknown modpacks to help mitigate ongoing scams.
+  - The primary action is now to not install, to force users to actually read the message and not skip through it.
+  - It will no longer pop up for mrpacks that contain all Modrinth content.
+  - It will now show the external content so that the user is informed of what exactly they are installing.`,
+	},
+	{
 		date: `2026-07-13T19:00:42+00:00`,
 		product: 'web',
 		body: `## Changed

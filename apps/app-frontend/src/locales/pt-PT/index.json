@@ -188,9 +188,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pesquisar {count} mundos..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Conteúdo necessário"
-  },
   "app.modal.install-to-play.header": {
     "message": "Instala para jogar"
   },
@@ -200,26 +197,14 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {mod} other {mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpack requerido"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requer mods para jogares. Clica Instalar para transferir os ficheiros necessários do Modrinth, e então entrar diretamente no servidor."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância partilhada"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Instância de servidor partilhada"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Ver conteúdo"
   },
   "app.modal.update-to-play.header": {
     "message": "Atualiza para jogar"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "Atualização necessária"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Uma atualização é necessária para jogar {name}. Por favor atualiza para a versão mais recente para iniciar o jogo."

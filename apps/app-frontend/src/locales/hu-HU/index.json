@@ -51,7 +51,7 @@
     "message": "A letöltés nem sikerült"
   },
   "app.action-bar.install.summary.instance-not-found": {
-    "message": "A példány nem található"
+    "message": "A játékprofil nem található"
   },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "A fájl elérési útja érvénytelen"
@@ -87,7 +87,7 @@
     "message": "Valami hiba történt"
   },
   "app.action-bar.install.unknown-instance": {
-    "message": "Ismeretlen profil"
+    "message": "Ismeretlen játékprofil"
   },
   "app.action-bar.installs": {
     "message": "Telepítések"
@@ -240,7 +240,7 @@
     "message": "Modcsomagok"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "A tartalom hozzáadása ronthatja a kompatibilitást a szerverhez való csatlakozáskor. A hozzáadott tartalom elveszik, ha frissíted a szerverpéldány tartalmát."
+    "message": "A tartalom hozzáadása ronthatja a kompatibilitást a szerverhez való csatlakozáskor. A hozzáadott tartalom elveszik, ha frissíted a szerverprofil tartalmát."
   },
   "app.browse.server.installing": {
     "message": "Letöltés"
@@ -291,16 +291,16 @@
     "message": "Java előkészítése"
   },
   "app.install.phase.preparing_java.downloading": {
-    "message": "Java verzió {version} letöltése"
+    "message": "A Java {version} letöltése..."
   },
   "app.install.phase.preparing_java.extracting": {
-    "message": "Java verzió {version} kibontása"
+    "message": "A Java {version} kibontása..."
   },
   "app.install.phase.preparing_java.fetching-metadata": {
-    "message": "Java verzió ellőkészítése {version}"
+    "message": "A Java {version} előkészítése..."
   },
   "app.install.phase.preparing_java.resolving": {
-    "message": "Java verzió {version} előkészítése"
+    "message": "A Java {version} előkészítése..."
   },
   "app.install.phase.preparing_java.validating": {
     "message": "A Java {version} ellenőrzése"
@@ -324,7 +324,7 @@
     "message": "Betöltő folyamatok futtatása"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Az profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
+    "message": "A profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Ezt a műveletet nem lehet visszavonni"
@@ -425,29 +425,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Szükséges tartalom"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Ne töltse le"
   },
   "app.modal.install-to-play.header": {
     "message": "Telepítés a játékhoz"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Telepítés mindenképpen"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Ezt a meghívót nem a Modrinth, hanem egy másik Modrinth-felhasználó hozta létre. Csak olyan személyektől fogadd el a meghívásokat, akikben megbízol."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Szükséges modcsomag"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Modrinth-ról, majd indítsd el közvetlenül a szervert."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Egy fájlt csak akkor vizsgálnak meg, ha azt a Modrinth-en közzétették, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Megosztott profil"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Megosztott szerverpéldány"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ez a szerver-modpack olyan fájlokat tartalmaz, amelyek nem szerepelnek a Modrinth oldalon. Határozottan javasoljuk, hogy kizárólag olyan forrásokból telepíts fájlokat, amelyekben megbízol."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Figyelmeztetés ismeretlen fájlokról"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Felismerhetetlen fájlok"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tartalom megtekintése"
@@ -455,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "Frissítsd a játékhoz"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Frissítés szükséges"
+  "app.modal.update-to-play.removed": {
+    "message": "Törölve"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Frissítés szükséges ehhez: {name}. Kérlek, frissíts a legújabb verzióra a játék elindításához."
@@ -471,7 +480,7 @@
     "message": "Vissza a böngészéshez"
   },
   "app.project.install-context.install-content-to-instance": {
-    "message": "Tartalom telepítése a példányba"
+    "message": "Tartalom telepítése a profilba"
   },
   "app.project.version.all-versions": {
     "message": "Összes verzió"
@@ -1102,26 +1111,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "A betöltő a szerver által van megadva"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Egy fájlt csak akkor vizsgálunk meg, ha azt feltöltik a Modrinthra, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Ne mutasd újra ezt a figyelmeztetést"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Telepítés megerősítése"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Letöltés mindenképpen"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "A rosszindulatú programokat gyakran modcsomag-fájlokon keresztül terjesztik, például a Discordhoz hasonló platformokon történő megosztás révén."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ezt a fájlt nem találtuk meg a Modrinthon. Határozottan javasoljuk, hogy kizárólag megbízható forrásokból származó fájlokat telepíts."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Figyelmeztetés ismeretlen fájlról"
   }
 }

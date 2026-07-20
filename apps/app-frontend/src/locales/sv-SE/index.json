@@ -407,11 +407,14 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Sök {count} världar..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Innehåll krävs"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Installera inte"
   },
   "app.modal.install-to-play.header": {
     "message": "Installera för att spela"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installera andå"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Installera"
@@ -419,17 +422,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# moddar}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Modpaket som krävs"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Servern kräver moddar för att du ska kunna spela. Klicka på Installera för att sätta upp dem nödvändiga filerna från Modrinth, och starta sedan på servern direkt."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delad instans"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Delad serverinstans"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Visa innehåll"
@@ -437,8 +431,8 @@
   "app.modal.update-to-play.header": {
     "message": "Uppdatera för att spela"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Uppdatering krävs"
+  "app.modal.update-to-play.removed": {
+    "message": "Tog bort"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till senaste version för att starta spelet."
@@ -630,7 +624,7 @@
     "message": "Logga in"
   },
   "app.skins.sign-in.description": {
-    "message": "Snälla logga in din Minecraft konto att använda hud hantering förmågor i Modrinth appen."
+    "message": "Vänligen logga in på ditt Minecraft-konto för att använda utseendehanteringfunktioner i Modrinth appen."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Exalterad Modrinth bot"
@@ -672,7 +666,7 @@
     "message": "Version {version} har installerats!"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "exempel.modrinth.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Välj ett alternativ"
@@ -747,7 +741,7 @@
     "message": "Sök efter vänner..."
   },
   "friends.section.heading": {
-    "message": "{title}: {count}"
+    "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
@@ -867,19 +861,19 @@
     "message": "Alfa"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Utgåvor, beta och alfa versioner visas som tillgängliga uppdateringar."
+    "message": "Release-, beta- och alfaversioner kommer visas som tillgängliga uppdateringar."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Utgåvor och beta versioner visas som tillgängliga uppdateringar."
+    "message": "Release- och betaversioner kommer visas som tillgängliga uppdateringar."
   },
   "instance.settings.tabs.general.update-channel.release": {
-    "message": "Utgåva"
+    "message": "Release"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Endast utgivna versioner visas som tillgängliga uppdateringar."
+    "message": "Endast realeseversioner kommer visas som tillgängliga uppdateringar."
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Välj uppdateringskanal"
@@ -945,10 +939,10 @@
     "message": "Anpassad minnestilldelning"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "Skriv in miljövariabler..."
+    "message": "Ange miljövariabler..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Skriv in Java-argument..."
+    "message": "Ange Java-argument..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Miljövariabler"
@@ -1011,13 +1005,13 @@
     "message": "Skapa genväg"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Visa inte på Startsidan"
+    "message": "Visa inte på startsidan"
   },
   "instance.worlds.game_already_open": {
     "message": "Instans är redan öppen"
   },
   "instance.worlds.hardcore": {
-    "message": "Hardcore läge"
+    "message": "Hardcore-läge"
   },
   "instance.worlds.incompatible_server": {
     "message": "Servern är inkompatibel"
@@ -1029,10 +1023,10 @@
     "message": "Servern kunde inte kontaktas"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Du kan bara hoppa rakt in till servers på Minecraft Alfa 1.0.5+"
+    "message": "Du kan endast gå direkt in i servrar på Minecraft Alfa 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Du kan bara hoppa rakt in till enspelarläge världar på Minecraft 1,20+"
+    "message": "Du kan endast gå direkt in i enspelarläge världar på Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Spela instans"
@@ -1084,26 +1078,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader tillhandahålls av servern"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "En fil granskas bara om den laddas upp till Modrinth, oavsett dess filformat (däribland .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Visa inte denna varning igen"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Bekräfta installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Installera ändå"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Skadeprogram distribueras ofta via modpaketfiler genom att dela dem på plattformar som Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Vi kunde inte hitta filen på Modrinth. Vi rekommenderar starkt att endast installera filer från källor du litar på."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Okänd filvarning"
   }
 }

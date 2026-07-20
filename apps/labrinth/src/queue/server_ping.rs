@@ -26,8 +26,9 @@ pub struct ServerPingQueue {
     pub incremental_search_queue: IncrementalSearchQueue,
 }
 
-pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
-pub const REDIS_FAILURE_NAMESPACE: &str = "minecraft_java_server_ping_failures";
+pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping:v1";
+pub const REDIS_FAILURE_NAMESPACE: &str =
+    "minecraft_java_server_ping_failures:v1";
 pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
 
 impl ServerPingQueue {
@@ -133,12 +134,7 @@ impl ServerPingQueue {
                     // ping succeeded; immediately update its online status in redis
 
                     redis
-                        .set_serialized_to_json(
-                            REDIS_NAMESPACE,
-                            project_id,
-                            ping,
-                            None,
-                        )
+                        .set_serialized(REDIS_NAMESPACE, project_id, ping, None)
                         .await
                         .wrap_err("failed to set redis key")?;
                     updated_project = true;
@@ -160,7 +156,7 @@ impl ServerPingQueue {
                         && count >= ENV.SERVER_PING_MAX_FAIL_COUNT
                     {
                         redis
-                            .set_serialized_to_json(
+                            .set_serialized(
                                 REDIS_NAMESPACE,
                                 project_id,
                                 ping,
@@ -254,7 +250,7 @@ impl ServerPingQueue {
             .collect::<Vec<_>>();
 
         let all_server_last_pings = redis
-            .get_many_deserialized_from_json::<exp::minecraft::JavaServerPing>(
+            .get_many_deserialized::<exp::minecraft::JavaServerPing>(
                 REDIS_NAMESPACE,
                 &all_project_ids,
             )

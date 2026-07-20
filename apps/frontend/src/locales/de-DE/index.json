@@ -3068,9 +3068,6 @@
   "profile.label.collection": {
     "message": "Kollektion"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {Download} other {Downloads}}"
-  },
   "profile.label.joined": {
     "message": "Beigetreten"
   },
@@ -3088,9 +3085,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisationen"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {Projekt} other {Projekte}}"
   },
   "profile.label.saving": {
     "message": "Speichert..."
@@ -3655,12 +3649,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Projekt-Dashboard besuchen"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {Download} other {Downloads}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {Follower} other {Follower}}"
   },
   "project.status.archived.message": {
     "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheidet sich das Projekt zu dearchivieren."

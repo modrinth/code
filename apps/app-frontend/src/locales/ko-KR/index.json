@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "실행 중인 인스턴스 숨기기"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "복사됨"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "세부 정보 복사"
+  },
   "app.action-bar.install.dismiss": {
     "message": "무시"
   },
@@ -19,6 +25,66 @@
   },
   "app.action-bar.install.retry": {
     "message": "재시도"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "앱이 종료되어 취소되었습니다"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "모드팩을 읽을 수 없음"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "취소됨"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "파일 정리가 완료되지 않았습니다"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "파일을 다운로드할 수 없습니다"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "다운로드한 파일이 손상되었습니다"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "파일을 저장할 수 없습니다"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "다운로드를 완료할 수 없습니다"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "인스턴스를 찾을 수 없습니다"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "파일 경로가 올바르지 않습니다"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "모드팩 데이터가 올바르지 않습니다"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "모드팩 파일이 올바르지 않은 메타데이터를 가지고 있습니다"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java 설치를 완료할 수 없습니다"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "로더 설치에 실패했습니다"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "로컬 데이터를 업데이트할 수 없습니다"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft 설치에 실패했습니다"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth에 연결할 수 없습니다"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "쓰기 권한이 없습니다"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "팩을 다운로드할 수 없습니다"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "무언가 잘못되었습니다"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "알 수 없는 인스턴스"
@@ -218,6 +284,9 @@
   "app.install.phase.finalizing": {
     "message": "마무리 중"
   },
+  "app.install.phase.preparing_instance": {
+    "message": "설치 대기열에 추가됨"
+  },
   "app.install.phase.preparing_java": {
     "message": "Java 준비 중"
   },
@@ -356,29 +425,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count}개의 세계 검색..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "콘텐츠 설치 필요"
+  "app.modal.install-to-play.dont-install": {
+    "message": "설치하지 않음"
   },
   "app.modal.install-to-play.header": {
     "message": "설치하고 플레이"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "무시하고 설치"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "설치"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "이 초대장은 다른 Modrinth 사용자가 생성했으며, Modrinth에서 생성하지 않았습니다. 신뢰할 수 있는 초대장만 수락하십시오."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {모드 #개} other {모드 #개}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "필요한 모드팩"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "이 서버를 플레이하려면 모드가 필요합니다. '설치'를 클릭하여 Modrinth에서 필수 파일을 내려받은 후, 서버에 바로 접속하세요."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "모든 파일은 형식(.mrpack 포함)에 무관하게 Modrinth에 게시되어야만 검수를 거칩니다."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "인스턴스 공유됨"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "서버 인스턴스 공유됨"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "이 서버의 모드팩은 Modrinth에 게시되지 않은 파일을 포함하고 있습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 강력히 권장합니다."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "출처를 알 수 없는 파일"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "확인되지 않은 파일"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "구성 요소 보기"
@@ -386,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "업데이트하고 플레이"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "업데이트 필요"
+  "app.modal.update-to-play.removed": {
+    "message": "제거됨"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}을(를) 플레이하려면 업데이트가 필요합니다. 게임을 실행하려면 최신 버전으로 업데이트해 주세요."
@@ -395,11 +473,26 @@
   "app.project.install-button.already-installed": {
     "message": "이미 설치되어 있음"
   },
+  "app.project.install-button.switch-version": {
+    "message": "버전 변경"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "탐색으로 돌아가기"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "인스턴스에 콘텐츠 설치"
+  },
+  "app.project.version.all-versions": {
+    "message": "모든 버전"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "브라우저에서 다운로드"
+  },
+  "app.project.version.installing": {
+    "message": "설치 중"
+  },
+  "app.project.versions.already-installed": {
+    "message": "이미 설치됨"
   },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되었습니다."
@@ -594,7 +687,7 @@
     "message": "다운로드 완료"
   },
   "app.update-popup.reload": {
-    "message": "업데이트하려면 다시 로드"
+    "message": "새로고침하여 업데이트"
   },
   "app.update-popup.title": {
     "message": "업데이트 가능"
@@ -1018,26 +1111,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "로더가 서버에 의해 제공됩니다"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "모든 파일은 형식(.mrpack 포함)에 무관하게 Modrinth에 업로드되어야만 검수를 거칩니다."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "이 경고를 다시 표시하지 않음"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "설치 확인"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "무시하고 설치"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "악성코드는 흔히 디스코드와 같은 플랫폼을 통해 모드팩 파일을 공유하는 방식으로 유포됩니다."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "이 파일을 Modrinth에서 찾을 수 없습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 권장합니다."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "출처를 알 수 없는 파일 경고"
   }
 }

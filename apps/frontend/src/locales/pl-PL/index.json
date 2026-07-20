@@ -132,7 +132,7 @@
     "message": "Pokaż szczegóły analityki monetyzacji"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają, że użytkownik jest zalogowany."
+    "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają bycia zalogowanym."
   },
   "analytics.chart.legend.monetization-details.title": {
     "message": "Szczegóły analityki monetyzacji"
@@ -1029,7 +1029,7 @@
     "message": "Wyślij "
   },
   "conversation-thread.action.send-to-review": {
-    "message": "Wyślij do sprawdzenia"
+    "message": "Wyślij do przeglądu"
   },
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Wyślij do przeglądu z odpowiedzią"
@@ -3062,9 +3062,6 @@
   "profile.label.collection": {
     "message": "Kolekcja"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {pobranie} few {pobrania} other {pobrań}}"
-  },
   "profile.label.joined": {
     "message": "Dołączył(-a)"
   },
@@ -3082,9 +3079,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizacje"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} few {projekty} other {projektów}}"
   },
   "profile.label.saving": {
     "message": "Zapisywanie..."
@@ -3646,12 +3640,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Odwiedź pulpit projektów"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {pobranie} few {pobrania} other {pobrań}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {obserwujący} other {obserwujących}}"
   },
   "project.status.archived.message": {
     "message": "{title} zostało zarchiwizowane. {title} nie będzie otrzymywać żadnych dalszych aktualizacji, chyba że autor zdecyduje się przywrócić projekt."

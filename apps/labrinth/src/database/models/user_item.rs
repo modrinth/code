@@ -16,9 +16,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-const USERS_NAMESPACE: &str = "users";
-const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
-const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
+const USERS_NAMESPACE: &str = "users:v1";
+const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v1";
+const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v1";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBUser {
@@ -391,7 +391,7 @@ impl DBUser {
             let mut redis = redis.connect().await?;
 
             let cached_projects = redis
-                .get_deserialized_from_json::<Vec<DBProjectId>>(
+                .get_deserialized::<Vec<DBProjectId>>(
                     USERS_PROJECTS_NAMESPACE,
                     &user_id.0.to_string(),
                 )
@@ -419,7 +419,7 @@ impl DBUser {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 USERS_PROJECTS_NAMESPACE,
                 user_id.0,
                 &db_projects,
@@ -630,19 +630,6 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to update versions author_id")?;
-
-            sqlx::query!(
-                "
-                UPDATE shared_instances
-                SET owner_id = $1
-                WHERE owner_id = $2
-                ",
-                deleted_user as DBUserId,
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to update shared_instances owner_id")?;
 
             use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
@@ -1008,28 +995,6 @@ impl DBUser {
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to delete oauth_client_authorizations")?;
-
-            sqlx::query!(
-                "
-				DELETE FROM shared_instance_users
-				WHERE user_id = $1
-				",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete shared_instance_users")?;
-
-            sqlx::query!(
-                "
-				DELETE FROM shared_instance_invited_users
-				WHERE invited_user_id = $1
-				",
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to delete shared_instance_invited_users")?;
 
             sqlx::query!(
                 "
