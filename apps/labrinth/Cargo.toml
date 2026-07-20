@@ -131,7 +131,6 @@ strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
-tokio-util = { workspace = true, features = ["rt"] }
 totp-rs = { workspace = true, features = ["gen_secret"] }
 tracing = { workspace = true }
 tracing-actix-web = { workspace = true }

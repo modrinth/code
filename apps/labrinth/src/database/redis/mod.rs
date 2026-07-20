@@ -71,8 +71,6 @@ impl RedisPool {
                 compression_min_savings_ratio: ENV
                     .REDIS_COMPRESSION_MIN_SAVINGS_RATIO,
             },
-            config.cache_locking_strategy(),
-            backend.clone(),
         );
 
         Self {

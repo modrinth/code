@@ -19,15 +19,12 @@ use tracing::{Instrument, info_span};
 use crate::database::models::DatabaseError;
 
 use super::commands;
-use super::config::CacheLockingStrategy;
-use super::connection::RedisBackend;
 use super::key::KeyBuilder;
 
 mod locking;
 
 use locking::{
-    LockAcquisition, LockCoordinator, LockWaiter, OwnedLockGuard, WAIT_TIMEOUT,
-    normalize_key,
+    LockAcquisition, LockCoordinator, LockWaiter, WAIT_TIMEOUT, normalize_key,
 };
 
 const ACTUAL_EXPIRY: i64 = 60 * 30;
@@ -165,14 +162,9 @@ pub struct CacheManager {
 }
 
 impl CacheManager {
-    pub fn new(
-        key_builder: KeyBuilder,
-        settings: CacheSettings,
-        locking_strategy: CacheLockingStrategy,
-        backend: RedisBackend,
-    ) -> Self {
+    pub fn new(key_builder: KeyBuilder, settings: CacheSettings) -> Self {
         Self {
-            locking: LockCoordinator::new(locking_strategy, backend),
+            locking: LockCoordinator::new(),
             key_builder,
             settings,
         }
@@ -424,13 +416,7 @@ impl CacheManager {
                 }
 
                 let lock_key = self.key_builder.entity(namespace, &key);
-                let acquisition = match self.locking.acquire(lock_key).await {
-                    Ok(acquisition) => acquisition,
-                    Err(error) => {
-                        release_owned_locks(owned_locks).await;
-                        return Err(error);
-                    }
-                };
+                let acquisition = self.locking.acquire(lock_key);
 
                 match acquisition {
                     LockAcquisition::Owned(guard) => {
@@ -466,13 +452,7 @@ impl CacheManager {
 
                 let values = timeout_at(fill_deadline, closure(fetch_ids))
                     .await
-                    .map_err(|_| {
-                        lock_timeout_error(
-                            self.locking.strategy(),
-                            0,
-                            waiters.len(),
-                        )
-                    })??;
+                    .map_err(|_| lock_timeout_error(0, waiters.len()))??;
 
                 let mut return_values = HashMap::new();
                 let mut encoded_values = Vec::with_capacity(values.len());
@@ -530,20 +510,14 @@ impl CacheManager {
             Ok(HashMap::new())
         };
 
-        release_owned_locks(owned_locks).await;
+        drop(owned_locks);
 
         let operation_result = match fill_result {
             Ok(mut values) => {
                 if waiters.is_empty() {
                     Ok(values)
                 } else {
-                    match wait_for_locks(
-                        self.locking.strategy(),
-                        waiters,
-                        deadline,
-                    )
-                    .await
-                    {
+                    match wait_for_locks(waiters, deadline).await {
                         Ok(released_ids) => {
                             let fetch_ids = released_ids
                                 .into_iter()
@@ -651,7 +625,6 @@ fn push_identity(identities: &mut Vec<String>, identity: String) {
 }
 
 async fn wait_for_locks<I>(
-    strategy: CacheLockingStrategy,
     waiters: Vec<(I, LockWaiter)>,
     deadline: Instant,
 ) -> Result<Vec<I>, DatabaseError> {
@@ -673,11 +646,7 @@ async fn wait_for_locks<I>(
             Err(error)
                 if is_lock_timeout(&error) || Instant::now() >= deadline =>
             {
-                return Err(lock_timeout_error(
-                    strategy,
-                    released.len(),
-                    total,
-                ));
+                return Err(lock_timeout_error(released.len(), total));
             }
             Err(error) => return Err(error),
         }
@@ -686,40 +655,16 @@ async fn wait_for_locks<I>(
 }
 
 fn is_lock_timeout(error: &DatabaseError) -> bool {
-    matches!(
-        error,
-        DatabaseError::CacheTimeout { .. }
-            | DatabaseError::LocalCacheTimeout { .. }
-    )
+    matches!(error, DatabaseError::LocalCacheTimeout { .. })
 }
 
 fn lock_timeout_error(
-    strategy: CacheLockingStrategy,
     locks_released: usize,
     locks_waiting: usize,
 ) -> DatabaseError {
-    match strategy {
-        CacheLockingStrategy::Local => DatabaseError::LocalCacheTimeout {
-            released: locks_released,
-            total: locks_waiting,
-        },
-        CacheLockingStrategy::Distributed => DatabaseError::CacheTimeout {
-            locks_released,
-            locks_waiting,
-            time_spent_pool_wait_ms: 0,
-            time_spent_total_ms: WAIT_TIMEOUT.as_millis() as u64,
-        },
-    }
-}
-
-async fn release_owned_locks(owned_locks: HashMap<String, OwnedLockGuard>) {
-    for guard in owned_locks.into_values() {
-        if let Err(error) = guard.release().await {
-            tracing::warn!(
-                error = ?error,
-                "failed to explicitly release cache lock",
-            );
-        }
+    DatabaseError::LocalCacheTimeout {
+        released: locks_released,
+        total: locks_waiting,
     }
 }
 

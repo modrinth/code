@@ -151,6 +151,8 @@ pub(super) enum RedisConfigError {
         max: usize,
         min: usize,
     },
+    #[error("unsupported Redis cache locking strategy `{strategy}`")]
+    UnsupportedCacheLockingStrategy { strategy: CacheLockingStrategy },
 }
 
 impl RedisConfig {
@@ -187,6 +189,12 @@ impl RedisConfig {
         blocking_pool_size: RedisPoolSize,
         cache_locking_strategy: CacheLockingStrategy,
     ) -> Result<Self, RedisConfigError> {
+        if cache_locking_strategy == CacheLockingStrategy::Distributed {
+            return Err(RedisConfigError::UnsupportedCacheLockingStrategy {
+                strategy: cache_locking_strategy,
+            });
+        }
+
         let seed_urls = raw_urls
             .split(',')
             .map(str::trim)
