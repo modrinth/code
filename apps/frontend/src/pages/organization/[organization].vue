@@ -18,7 +18,7 @@
 							<Avatar size="sm" :src="organization.icon_url" />
 							<div class="flex flex-col justify-center gap-1">
 								<h2 class="m-0 text-base">
-									<nuxt-link :to="`/organization/${organization.slug}/settings`">
+									<nuxt-link :to="`/organization/${organization.slug}`">
 										{{ organization.name }}
 									</nuxt-link>
 								</h2>

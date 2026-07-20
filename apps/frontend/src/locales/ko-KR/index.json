@@ -2999,9 +2999,6 @@
   "muralpay.warning.wallet-address": {
     "message": "지갑 주소를 다시 확인하세요. 잘못된 주소로 송금된 자금은 복구할 수 없습니다."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "변경 사항이 {count, plural, one {# 개 프로젝트} other {# 개 프로젝트}}에 적용됩니다."
-  },
   "profile.bio.fallback.creator": {
     "message": "Modrinth 창작자입니다."
   },

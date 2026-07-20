@@ -3041,9 +3041,6 @@
   "organization.label.projects": {
     "message": "projects"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Changes will be applied to {count, plural, one {# project} other {# projects}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "A Modrinth creator."
   },

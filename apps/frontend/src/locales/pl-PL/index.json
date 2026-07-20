@@ -2993,9 +2993,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Sprawdź podwójnie adres portfela. Fundusze przesłane na nieprawidłowy portfel nie mogą być odzyskane."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Zmiany zostaną zastosowane dla {count, plural, one {# projektu} other {# projektów}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Twórca na Modrinth."
   },

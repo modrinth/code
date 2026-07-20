@@ -2999,9 +2999,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifica dos veces la dirección de tu billetera. Los fondos enviados a una dirección incorrecta no se pueden recuperar."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Estos cambios serán aplicados {count, plural, one {al proyecto} other {a los # proyectos}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Un creador de Modrinth."
   },

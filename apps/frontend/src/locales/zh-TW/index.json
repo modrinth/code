@@ -3005,9 +3005,6 @@
   "muralpay.warning.wallet-address": {
     "message": "請仔細檢查你的錢包帳戶。發送到錯誤帳戶的款項將無法追回。"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "變更將套用於 {count, plural, other {# 個專案}}。"
-  },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 創作者。"
   },

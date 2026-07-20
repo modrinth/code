@@ -3005,9 +3005,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifique novamente seu endereço da carteira. Fundos enviados para um endereço incorreto não podem ser recuperados."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "As alterações serão aplicadas a {count, plural, one {# projeto} other {# projetos}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Um criador Modrinth."
   },

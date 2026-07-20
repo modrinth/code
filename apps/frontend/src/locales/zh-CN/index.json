@@ -3002,9 +3002,6 @@
   "muralpay.warning.wallet-address": {
     "message": "请再次确认你的钱包地址。发送到错误地址的资金将无法追回。"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "将对{count, plural,one {# 项目}other {# 项目}}应用更改。"
-  },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 创作者。"
   },

@@ -2999,9 +2999,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Überprüfe deine Wallet-Adresse. An eine falsche Adresse gesendete Gelder können nicht wiederhergestellt werden."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Änderungen werden auf {count, plural, one {# Projekt} other {# Projekte}} angewendet."
-  },
   "profile.bio.fallback.creator": {
     "message": "Ein Modrinth-Ersteller."
   },
