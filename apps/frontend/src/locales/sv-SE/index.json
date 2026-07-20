@@ -2675,9 +2675,6 @@
   "muralpay.rail.fiat-zar.name": {
     "message": "Banköverföring (ZAR)"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Ändringar kommer tillämpas på {count} projekt."
-  },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth kreatör."
   },

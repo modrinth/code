@@ -2897,9 +2897,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Nézd át jól a pénztárca címedet. Az egyenleg rossz címre lesz küldve az nem szerezhető vissza."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "A módosítások {count, plural, one {# projktre} other {# projektekre}} fognak vonatkozni."
-  },
   "profile.bio.fallback.creator": {
     "message": "Egy Modrinth fejlesztő."
   },

@@ -3002,9 +3002,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Ще раз перевірте адресу свого гаманця. Кошти, надіслані на неправильну адресу, не можуть бути відновлені."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Зміни будуть застосовані для {count, plural, one {# проєкту} few {# проєктів} many {# проєктів} other {# проєктів}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Творець Modrinth."
   },

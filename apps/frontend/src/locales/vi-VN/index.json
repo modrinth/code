@@ -2792,9 +2792,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "{count, plural, other {# dự án}} sẽ được thay đổi."
-  },
   "profile.bio.fallback.creator": {
     "message": "Một nhà sáng tạo trên Modrinth."
   },

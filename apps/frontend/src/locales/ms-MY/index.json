@@ -2684,9 +2684,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Pemasangan akan diterapkan kepada {count, plural, other {# projek}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Seorang pencipta Modrinth."
   },
