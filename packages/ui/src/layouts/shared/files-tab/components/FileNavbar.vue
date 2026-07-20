@@ -11,8 +11,7 @@
 				name="search"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.searchFiles)"
-				class="!h-10"
-				input-class="!h-10"
+				size="medium"
 				wrapper-class="flex-1 min-w-0"
 				@update:model-value="$emit('update:searchQuery', $event)"
 			/>
@@ -105,8 +104,8 @@
 					name="search"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.searchFiles)"
-					class="!h-10 hidden @[800px]:inline-flex"
-					input-class="!h-10"
+					class="hidden @[800px]:inline-flex"
+					size="medium"
 					wrapper-class="w-full sm:w-[280px]"
 					@update:model-value="$emit('update:searchQuery', $event)"
 				/>
@@ -228,7 +227,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 

@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-import StyledInput from './StyledInput.vue'
+import StyledInput from './inputs/StyledInput.vue'
 
 const emit = defineEmits<{ 'update:modelValue': [number] }>()
 

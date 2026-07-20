@@ -21,7 +21,6 @@ export type { ComboboxOption } from './Combobox.vue'
 export { default as Combobox } from './Combobox.vue'
 export { default as ContentPageHeader } from './ContentPageHeader.vue'
 export { default as CopyCode } from './CopyCode.vue'
-export { default as DatePicker } from './DatePicker.vue'
 export { default as DoubleIcon } from './DoubleIcon.vue'
 export { default as DropArea } from './DropArea.vue'
 export type { DropdownFilterBarCategory, DropdownFilterBarOption } from './DropdownFilterBar.vue'
@@ -82,7 +81,15 @@ export { default as SmartClickable } from './SmartClickable.vue'
 export type { StackedAdmonitionItem, StackedAdmonitionType } from './StackedAdmonitions.vue'
 export { default as StackedAdmonitions } from './StackedAdmonitions.vue'
 export { default as StatItem } from './StatItem.vue'
-export { default as StyledInput } from './StyledInput.vue'
+export {
+	DatePicker,
+	InputClearButton,
+	InputFrame,
+	NativeDateInput,
+	StyledInput,
+	StyledTextarea,
+} from './inputs'
+export type { InputAppearance, InputSize } from './inputs'
 export type { SortDirection, TableColumn } from './Table.vue'
 export { default as Table } from './Table.vue'
 export type { TabsTab, TabsValue } from './Tabs.vue'

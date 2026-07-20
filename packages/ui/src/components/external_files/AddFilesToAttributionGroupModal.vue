@@ -197,7 +197,7 @@ defineExpose({ show, hide })
 				:placeholder="formatMessage(messages.addFilesModalSearchPlaceholder)"
 				:icon="SearchIcon"
 				:disabled="pending"
-				input-class="h-[40px]"
+				size="medium"
 				class="sticky top-0"
 				clearable
 			/>

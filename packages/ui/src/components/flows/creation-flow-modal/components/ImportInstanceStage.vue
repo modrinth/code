@@ -113,7 +113,7 @@ import type { ImportableLauncher } from '../../../../providers/instance-import'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
 import Collapsible from '../../../base/Collapsible.vue'
-import StyledInput from '../../../base/StyledInput.vue'
+import StyledInput from '../../../base/inputs/StyledInput.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()

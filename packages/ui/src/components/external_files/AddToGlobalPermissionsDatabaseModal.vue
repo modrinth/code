@@ -11,6 +11,7 @@ import {
 	type ComboboxOption,
 	NewModal,
 	StyledInput,
+	StyledTextarea,
 } from '#ui/components'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
@@ -175,7 +176,7 @@ defineExpose({ show, hide })
 						v-model="flameProjectId"
 						type="text"
 						placeholder="1234567"
-						input-class="h-[40px]"
+						size="medium"
 						:disabled="createMutation.isPending.value"
 					/>
 				</div>
@@ -193,11 +194,9 @@ defineExpose({ show, hide })
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="font-semibold text-contrast" for="add-global-proof">Proof or notes</label>
-				<StyledInput
+				<StyledTextarea
 					id="add-global-proof"
 					v-model="proof"
-					type="text"
-					multiline
 					input-class="min-h-[6rem]"
 					resize="vertical"
 					:disabled="createMutation.isPending.value"

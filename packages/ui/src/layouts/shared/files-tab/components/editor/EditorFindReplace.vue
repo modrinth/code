@@ -122,7 +122,7 @@ import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, XIcon } from '@modrin
 import { nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import StyledInput from '#ui/components/base/StyledInput.vue'
+import StyledInput from '#ui/components/base/inputs/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const props = defineProps<{

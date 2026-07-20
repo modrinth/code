@@ -54,7 +54,7 @@ import { renderString } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
-import StyledInput from '../base/StyledInput.vue'
+import StyledInput from '../base/inputs/StyledInput.vue'
 import NewModal from './NewModal.vue'
 
 const props = defineProps({

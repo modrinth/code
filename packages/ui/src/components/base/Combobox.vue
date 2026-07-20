@@ -2,15 +2,11 @@
 	<div ref="containerRef" class="relative inline-block w-full">
 		<!-- Searchable mode: input trigger -->
 		<div v-if="searchable" class="relative w-full rounded-xl bg-surface-4">
-			<!--
-				Selection mirror: horizontal padding must match StyledInput (filled + left icon uses `pl-10`,
-				else `pl-3`) and `searchableInputClass` when the chevron is shown (`!pr-9`), or the overlay
-				text will not line up with the transparent input text / caret.
-			-->
+			<!-- Selection mirror must match InputFrame's leading and trailing slot geometry. -->
 			<div
 				v-if="searchSelectionOverlayVisible"
-				class="pointer-events-none absolute inset-y-0 left-0 right-0 z-0 flex min-w-0 items-center gap-2 font-medium text-primary"
-				:class="[showSearchIcon ? 'pl-10' : 'pl-3', showChevron ? 'pr-9' : 'pr-3']"
+				class="pointer-events-none absolute inset-y-0 left-0 right-0 z-[2] flex min-w-0 items-center gap-2 font-medium text-primary"
+				:class="[showSearchIcon ? 'pl-10' : 'pl-3', showChevron ? 'pr-10' : 'pr-3']"
 				aria-hidden="true"
 			>
 				<span class="min-w-0 truncate">{{ searchQuery }}</span>
@@ -30,7 +26,7 @@
 				:spellcheck="searchSpellcheck"
 				:inputmode="searchInputmode"
 				:input-attrs="searchInputAttrs"
-				wrapper-class="w-full !bg-transparent"
+				wrapper-class="w-full"
 				:input-class="searchableInputClass"
 				class="relative z-[1]"
 				@input="handleSearchInput"
@@ -39,9 +35,9 @@
 				@focusout="handleSearchFocusout"
 				@click="handleSearchClick"
 			>
-				<template v-if="showChevron" #right>
+				<template v-if="showChevron" #trailing>
 					<ChevronLeftIcon
-						class="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-secondary transition-transform duration-150"
+						class="pointer-events-none size-5 text-secondary transition-transform duration-150"
 						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
 					/>
 				</template>
@@ -217,7 +213,7 @@ import {
 	watch,
 } from 'vue'
 
-import StyledInput from './StyledInput.vue'
+import StyledInput from './inputs/StyledInput.vue'
 
 export interface ComboboxOption<T> {
 	value: T
@@ -389,8 +385,7 @@ const searchSelectionOverlayVisible = computed(() => {
 })
 
 const searchableInputClass = computed(() => {
-	const parts = ['!bg-transparent']
-	if (props.showChevron) parts.push('!pr-9')
+	const parts: string[] = []
 	if (searchSelectionOverlayVisible.value) {
 		parts.push('!text-transparent [caret-color:var(--color-text-primary)] selection:bg-transparent')
 	}
