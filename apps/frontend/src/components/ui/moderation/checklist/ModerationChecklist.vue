@@ -63,11 +63,18 @@
 					hover-color-fill="background"
 				>
 					<button
-						v-tooltip="!isPseudoStage && currentStageHasState ? 'Reset Stage' : 'Reset Checklist'"
-						:disabled="!checklistHasState"
+						v-tooltip="
+							!isPseudoStage && currentStageHasState
+								? 'Reset Stage'
+								: !isPseudoStage && !checklistHasState
+									? 'Return to Start'
+									: 'Reset Checklist'
+						"
+						:disabled="!isPseudoStage && !checklistHasState && isOnFirstStage"
 						@click="resetProgress"
 					>
-						<BrushCleaningIcon />
+						<UndoIcon v-if="!isPseudoStage && !checklistHasState" />
+						<BrushCleaningIcon v-else />
 					</button>
 				</ButtonStyled>
 				<ButtonStyled circular color="red" color-fill="none" hover-color-fill="background">
@@ -367,6 +374,7 @@ import {
 	SpinnerIcon,
 	ToggleLeftIcon,
 	ToggleRightIcon,
+	UndoIcon,
 	XIcon,
 } from '@modrinth/assets'
 import type {
@@ -1001,6 +1009,7 @@ function findFirstValidStage(): number {
 }
 
 const currentStageObj = computed(() => resolvedStages.value[currentStage.value])
+const isOnFirstStage = computed(() => currentStage.value === findFirstValidStage())
 const isLockedByOther = computed(() => lockStatus.value?.locked && !lockStatus.value?.isOwnLock)
 const isPseudoStage = computed(
 	() => alreadyReviewed.value || done.value || generatedMessage.value || isLockedByOther.value,
