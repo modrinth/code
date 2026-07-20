@@ -29,11 +29,62 @@
   "app.action-bar.install.summary.app-closing": {
     "message": "Otkazano zbog zatvaranja aplikacije"
   },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Nije moglo pročitati modpack"
+  },
   "app.action-bar.install.summary.canceled": {
     "message": "Otkazano"
   },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Čišćenje nije završeno"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Nije bilo moguće instalirati datoteke"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Preuzeta datoteka je oštećena"
+  },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Nije bilo moguće spremiti datoteke"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Preuzimanje nije završeno"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instanca nije pronađena"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Put do datoteke nije ispravan"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Podaci modpaka su nevažeći"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Datoteke modpaka sadrže nevažeće metapodatke"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Podešavanje Jave nije moglo biti završeno"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Podešavanje učitavača nije uspelo"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Nije bilo moguće ažurirati lokalne podatke"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Podešavanje Minecrafta nije uspelo"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Nije bilo moguće povezati se sa Modrinth-om"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Nema dozvole za pisanje"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Nije bilo moguće instalirati datoteku"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Nešto je pošlo po zlu"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Nepoznata instanca"
@@ -233,6 +284,9 @@
   "app.install.phase.finalizing": {
     "message": "Finaliziranje"
   },
+  "app.install.phase.preparing_instance": {
+    "message": "Na čekanju za instalaciju"
+  },
   "app.install.phase.preparing_java": {
     "message": "Pripremanje Jave"
   },
@@ -371,23 +425,47 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pretraži {count} svetova..."
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Ne instaliraj"
+  },
   "app.modal.install-to-play.header": {
     "message": "Instaliraj da bi igrao"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Svejedno instaliraj"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Instaliraj"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Ovu pozivnicu je kreirao drugi korisnik Modrintha, a ne sam Modrinth. Prihvataj pozivnice samo od osoba kojima veruješ."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modova}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Deljena instanca"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ovaj modpack servera sadrži datoteke koje nisu postavljene na Modrinth-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Upozorenje nepoznatih datoteka"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Nepoznate datoteke"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Pogledaj sadržaj"
   },
   "app.modal.update-to-play.header": {
     "message": "Ažuriraj da bi igrao"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Smaknuto"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Potrebno je ažuriranje da biste igrali {name}. Molimo te da ažuriraš na najnoviju verziju da bi pokrenuo igru."

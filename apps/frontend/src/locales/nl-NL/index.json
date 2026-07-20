@@ -41,6 +41,9 @@
   "analytics.breakdown.game-version": {
     "message": "Spel versie"
   },
+  "analytics.breakdown.generic": {
+    "message": "Uitsplitsing"
+  },
   "analytics.breakdown.loader": {
     "message": "Lader"
   },
@@ -49,6 +52,9 @@
   },
   "analytics.breakdown.monetization": {
     "message": "Monetisatie"
+  },
+  "analytics.breakdown.none.selected": {
+    "message": "Geen uitsplitsing"
   },
   "analytics.breakdown.project": {
     "message": "Project"
@@ -59,8 +65,14 @@
   "analytics.breakdown.project-version": {
     "message": "Project versie"
   },
+  "analytics.breakdown.selected": {
+    "message": "Uitsplitsing naar {breakdown}"
+  },
   "analytics.chart.action.show-all": {
     "message": "Allemaal laten zien"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Beperkt weergeven"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Laat de top 8 zien"
@@ -73,6 +85,15 @@
   },
   "analytics.chart.controls.annotations": {
     "message": "Annotatie"
+  },
+  "analytics.chart.controls.aria": {
+    "message": "Statistiekinstellingen, {activeCount}"
+  },
+  "analytics.chart.controls.button": {
+    "message": "Instellingen"
+  },
+  "analytics.chart.controls.dialog-aria": {
+    "message": "Statistiekinstellingen"
   },
   "analytics.chart.controls.display": {
     "message": "Weergave"
@@ -98,17 +119,50 @@
   "analytics.chart.empty.select-table-items": {
     "message": "Selecteer een element uit de tabel beneden om jouw data te visualiseren."
   },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# statistiekgebeurtenis} other {# statistiekgebeurtenissen}}"
+  },
   "analytics.chart.events.project-title": {
     "message": "<project>{projectName}</project>: {title}"
   },
   "analytics.chart.events.see-announcement": {
     "message": "Zie aankondiging"
   },
+  "analytics.chart.legend.monetization-details.aria": {
+    "message": "Details van statistieken over inkomsten bekijken"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Alleen weergaven en downloads via Modrinth tellen mee voor het genereren van inkomsten, en voor downloads moeten gebruikers ingelogd zijn."
+  },
+  "analytics.chart.legend.monetization-details.title": {
+    "message": "Details over genereren van inkomsten"
+  },
+  "analytics.chart.legend.previous-period-suffix": {
+    "message": "{name} (vorige)"
+  },
   "analytics.chart.render-limit.description": {
     "message": "Het laten zien van alle lijnen in de grafiek kan de pagina slomer maken."
   },
   "analytics.chart.render-limit.header": {
     "message": "Alle {count} punten in de grafiek laten zien?"
+  },
+  "analytics.chart.table-selection.all": {
+    "message": "Alle weergegeven {itemType, select, project {{count, plural, one {project} other {projecten}}} country {{count, plural, one {land} other {landen}}} monetization {{count, plural, one {inkomstenwaarde} other {inkomstenwaarden}}} downloadSource {{count, plural, one {downloadbron} other {downloadbronnen}}} downloadReason {{count, plural, one {downloadreden} other {downloadredenen}}} member {{count, plural, one {lid} other {leden}}} projectVersion {{count, plural, one {projectversie} other {projectversies}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {spelversie} other {spelversies}}} other {{count, plural, one {item} other {items}}}} uit tabel"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "{count} {itemType, select, project {{count, plural, one {project} other {projecten}}} country {{count, plural, one {land} other {landen}}} monetization {{count, plural, one {inkomstenwaarde} other {inkomstenwaardes}}} downloadSource {{count, plural, one {downloadbron} other {downloadbronnen}}} downloadReason {{count, plural, one {downloadreden} other {downloadredenen}}} member {{count, plural, one {lid} other {leden}}} projectVersion {{count, plural, one {projectversie} other {projectversies}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {spelversie} other {spelversies}}} other {{count, plural, one {item} other {items}}}} uit tabel weergegeven"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "{limit} {itemType, select, project {{limit, plural, one {project} other {projecten}}} country {{limit, plural, one {land} other {landen}}} monetization {{limit, plural, one {inkomstenwaarde} other {inkomstenwaardes}}} downloadSource {{limit, plural, one {downloadbron} other {downloadbronnen}}} downloadReason {{limit, plural, one {downloadreden} other {downloadredenen}}} member {{limit, plural, one {lid} other {leden}}} projectVersion {{limit, plural, one {projectversie} other {projectversies}}} loader {{limit, plural, one {loader} other {loaders}}} gameVersion {{limit, plural, one {spelversie} other {spelversies}}} other {{limit, plural, one {item} other {items}}}} uit tabel weergegeven"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Top {count} {itemType, select, project {{count, plural, one {project} other {projecten}}} country {{count, plural, one {land} other {landen}}} monetization {{count, plural, one {inkomstenwaarde} other {inkomstenwaardes}}} downloadSource {{count, plural, one {downloadbron} other {downloadbronnen}}} downloadReason {{count, plural, one {downloadreden} other {downloadredenen}}} member {{count, plural, one {lid} other {leden}}} projectVersion {{count, plural, one {projectversie} other {projectversies}}} loader {{count, plural, one {loader} other {loaders}}} gameVersion {{count, plural, one {spelversie} other {spelversies}}} other {{count, plural, one {item} other {items}}}} uit tabel"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Afhankelijk van {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} is afhankelijk van {dependencyProject}, {version}"
   },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, one {# dag} other {# dagen}}"
@@ -128,6 +182,9 @@
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Vastgepind"
   },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(vorige)"
+  },
   "analytics.chart.tooltip.show-entry": {
     "message": "Laat {name} in de grafiek zien"
   },
@@ -142,6 +199,9 @@
   },
   "analytics.chart.view.line": {
     "message": "Lijn"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Afhankelijkheid"
   },
   "analytics.download-reason.modpack": {
     "message": "Modpack"
@@ -173,6 +233,9 @@
   "analytics.empty.no-projects-for-analytics": {
     "message": "Geen projecten beschikbaar voor analyse"
   },
+  "analytics.empty.select-project": {
+    "message": "Selecteer ten minste één project om de gegevens te bekijken"
+  },
   "analytics.filter.game-version-type": {
     "message": "Game versie typen"
   },
@@ -185,8 +248,14 @@
   "analytics.filter.search.countries": {
     "message": "Zoek landen..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Projecten zoeken..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Zoek download bron..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Leden zoeken..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Zoek project versies..."
@@ -202,6 +271,9 @@
   },
   "analytics.graph.title.revenue": {
     "message": "Inkomsten Over Tijd"
+  },
+  "analytics.graph.title.views": {
+    "message": "Ontwikkeling van aantal weergaven"
   },
   "analytics.group-by.1h": {
     "message": "1h"
@@ -287,6 +359,9 @@
   "analytics.project-status.unlisted": {
     "message": "Verborgen"
   },
+  "analytics.project-status.withheld": {
+    "message": "Niet weergegeven"
+  },
   "analytics.project.all": {
     "message": "Alle projecten"
   },
@@ -308,6 +383,9 @@
   "analytics.query.filter.add": {
     "message": "Filter toevoegen"
   },
+  "analytics.query.label.breakdown": {
+    "message": "Uitsplitsing:"
+  },
   "analytics.query.label.grouped-by": {
     "message": "Groepeer per"
   },
@@ -319,6 +397,9 @@
   },
   "analytics.stat.downloads": {
     "message": "Installaties"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Alleen weergaven en downloads die via Modrinth plaatsvinden, komen in aanmerking voor inkomsten en moeten de fraudepreventiefiltering doorstaan. Voor downloads van de Modrinth-app moet de gebruiker bovendien ingelogd zijn. Aangezien alle projecten een vergelijkbaar percentage aan downloads met inkomsten hebben, zouden je inkomsten niet wezenlijk veranderen als alle downloads zouden worden meegeteld."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Meer informatie"
@@ -332,6 +413,12 @@
   "analytics.stat.playtime-hours": {
     "message": "{hours} uur"
   },
+  "analytics.stat.previous-period-comparison": {
+    "message": "ten opzichte van vorige periode"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "ten opzichte van vorige"
+  },
   "analytics.stat.revenue": {
     "message": "Inkomsten"
   },
@@ -341,11 +428,29 @@
   "analytics.stat.unavailable": {
     "message": "n.v.t."
   },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Geen gegevens voor huidige zoekopdracht beschikbaar"
+  },
+  "analytics.stat.views": {
+    "message": "Weergaven"
+  },
   "analytics.table.csv.date-range": {
     "message": "{start} tot {end}"
   },
+  "analytics.table.csv.filename": {
+    "message": "Modrinth Analytics {breakdown} Uitsplitsing - {dateRange}"
+  },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Speeltijd (seconden)"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# dag} other {# dagen}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# uur} other {# uren}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minuut} other {# minuten}}"
   },
   "analytics.table.empty.no-matching-rows": {
     "message": "Geen passende gegevens"
@@ -371,11 +476,41 @@
   "analytics.threshold.country-downloads-aria": {
     "message": "Land download limiet"
   },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "Drempelwaarde voor aantal downloads van spelversies"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Spelversies met meer dan"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "Drempelwaarde voor projectdownloads"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "Drempelwaarde voor aantal downloads van projectversies"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Projectversies met meer dan"
+  },
   "analytics.threshold.projects-above": {
     "message": "Projecten boven"
   },
   "analytics.title": {
     "message": "Analytica"
+  },
+  "analytics.value.monetized": {
+    "message": "Gemonetiseerd"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Geen"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Gedownload om andere redenen dan dat het een afhankelijkheid is"
+  },
+  "analytics.value.none": {
+    "message": "Geen"
+  },
+  "analytics.value.other": {
+    "message": "Anders"
   },
   "analytics.value.unknown": {
     "message": "Onbekend"
@@ -1574,11 +1709,23 @@
   "dashboard.projects.selection-bar.aria-label": {
     "message": ""
   },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, one {# geselecteerd project} other {# geselecteerde projecten}}"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
   "dashboard.projects.table.name": {
     "message": "Naam"
   },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "Selecteer alle projecten die bulkbewerking ondersteunen"
+  },
   "dashboard.projects.table.status": {
     "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Type"
   },
   "dashboard.report.title": {
     "message": "{id} rapporteren"
@@ -2519,6 +2666,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade naar Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Je moet je e-mailadres verifiëren voordat je iets op Modrinth kunt publiceren."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-mailverificatie vereist"
+  },
   "moderation.exclude-technical-review": {
     "message": "TR uitsluiten"
   },
@@ -2852,6 +3005,9 @@
   "profile.bio.fallback.user": {
     "message": "Een Modrinth gebruiker."
   },
+  "profile.button.analytics": {
+    "message": "Gebruikersstatistieken bekijken"
+  },
   "profile.button.billing": {
     "message": "Gebruikers facturering beheren"
   },
@@ -2869,6 +3025,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Zet als partner"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# project} other {# projecten}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Beveiliging providers"
@@ -2938,6 +3097,12 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Download {username}'s projecten op Modrinth"
+  },
+  "profile.official-account": {
+    "message": "Officieel Modrinth-account"
+  },
+  "profile.official-account.bio": {
+    "message": "Het officiële gebruikersaccount van Modrinth. Neem contact op met het Helpcentrum via <support-link></support-link> of per e-mail via <email></email>"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> project volger}other {<stat>{count}</stat> project volgers}}"
@@ -3110,14 +3275,107 @@
   "project.details.licensed": {
     "message": "Gelicentieerd"
   },
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "Deze spelversie is niet compatibel met het basisproject."
+  },
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "Deze loader is niet compatibel met het basisproject."
+  },
+  "project.download.compatible-version-title": {
+    "message": "Compatibele versies"
+  },
+  "project.download.dependencies-title": {
+    "message": "Afhankelijkheden"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "Deze afhankelijkheid is al geïnstalleerd"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Elke compatibele"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "Deze afhankelijkheid is in conflict met een andere afhankelijkheid"
+  },
+  "project.download.dependency-download-file": {
+    "message": "{filename} downloaden"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "{filename} downloaden ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "Deze afhankelijkheid is al opgenomen"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "Deze versie van de afhankelijkheid is niet beschikbaar"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "Er is geen compatibele versie beschikbaar voor deze afhankelijkheid"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Fabric API wordt voor Quilt overgeslagen"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "Dit project is afhankelijk van een vereist bronpakket. Download het en plaats het in je {folder} map."
+  },
+  "project.download.dependency-unavailable": {
+    "message": "Deze afhankelijkheid kan niet worden gedownload"
+  },
+  "project.download.download": {
+    "message": "Downloaden"
+  },
+  "project.download.download-as-zip": {
+    "message": "Als .zip downloaden"
+  },
+  "project.download.download-version": {
+    "message": "{version} downloaden"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Downloaden met afhankelijkheden"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Met aanbevolen instellingen downloaden"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Met aanbevolen instellingen als .zip downloaden"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Dubbele afhankelijkheden worden verborgen"
+  },
+  "project.download.file-unavailable": {
+    "message": "Dit bestand kan niet worden gedownload"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} steunt niet {gameVersion} voor {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Via de Modrinth-app installeren"
+  },
+  "project.download.manually": {
+    "message": "Handmatig downloaden"
   },
   "project.download.no-app": {
     "message": "Heb je de Modrinth App niet?"
   },
+  "project.download.no-game-versions-found": {
+    "message": "Geen spelversies gevonden"
+  },
+  "project.download.no-versions-available": {
+    "message": "Geen versies beschikbaar voor {gameVersion} en {platform}."
+  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} steunt niet {platform} voor {gameVersion}"
+  },
+  "project.download.recommended-title": {
+    "message": "Aanbevolen"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "Voor dit gegevenspakket is ook een bronpakket nodig. Download het en plaats het in je {folder} map."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Bronpakket"
+  },
+  "project.download.search-game-versions": {
+    "message": "Spelversie kiezen"
   },
   "project.download.select-game-version": {
     "message": "Selecteer game-versie"
@@ -3257,6 +3515,15 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "Onbekende externe inhoud"
   },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Meeste bestanden"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Onlangs bewerkt"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Afgewezen"
+  },
   "project.settings.title": {
     "message": "Instellingen"
   },
@@ -3330,10 +3597,10 @@
     "message": "Melding indienen"
   },
   "scopes.analytics.description": {
-    "message": "Krijg toegang tot jouw analysegegevens"
+    "message": "Bekijk je analysegegevens"
   },
   "scopes.analytics.label": {
-    "message": "Lees analyses"
+    "message": "Analyses bekijken"
   },
   "scopes.category.analytics": {
     "message": "Statistieken"
@@ -3456,10 +3723,10 @@
     "message": "Schrijf betalingen"
   },
   "scopes.performAnalytics.description": {
-    "message": "Voer analyserende handelingen uit"
+    "message": "Analytische acties uitvoeren"
   },
   "scopes.performAnalytics.label": {
-    "message": "Voer analyses uit"
+    "message": "Analyses uitvoeren"
   },
   "scopes.projectCreate.description": {
     "message": "Nieuwe projecten aanmaken"
@@ -4357,5 +4624,8 @@
   },
   "version.environment.unknown.title": {
     "message": "Onbekende omgeving"
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Opmerking: Indien beschikbaar, raden we je aan om de Maven-repository van de maker te gebruiken, aangezien deze informatie over transitieve afhankelijkheden bevat die de Modrinth Maven API niet biedt. Bovendien kun je te maken krijgen met dubbele afhankelijkheden als je voor je afhankelijkheden zowel Modrinth- als niet-Modrinth-Maven-repositories gebruikt, omdat de groeps-ID anders zal zijn wanneer deze via de Modrinth Maven API wordt aangeboden."
   }
 }
