@@ -15,6 +15,16 @@ use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
 
+pub fn require_verified_email(user: &User) -> Result<(), ApiError> {
+    if !user.email_verified.unwrap_or(false) {
+        return Err(ApiError::Auth(eyre::eyre!(
+            "Please verify your email before publishing!"
+        )));
+    }
+
+    Ok(())
+}
+
 pub trait ValidateAuthorized {
     fn validate_authorized(
         &self,

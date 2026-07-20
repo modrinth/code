@@ -2687,6 +2687,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "You must verify your email before publishing on Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Email verification required"
+  },
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },

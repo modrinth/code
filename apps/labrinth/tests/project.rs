@@ -18,9 +18,11 @@ use common::environment::{
 use common::permissions::{PermissionsTest, PermissionsTestContext};
 use futures::StreamExt;
 use hex::ToHex;
+use labrinth::database::models::DBProjectId;
 use labrinth::database::models::project_item::{
-    PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
+    PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE, ProjectQueryResult,
 };
+use labrinth::database::redis::RedisValue;
 use labrinth::models::ids::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
@@ -67,19 +69,21 @@ async fn test_get_project() {
             Some(parse_base62(alpha_project_id).unwrap() as i64)
         );
 
-        let cached_project = redis_pool
-            .get(
+        let cached_project: RedisValue<
+            ProjectQueryResult,
+            DBProjectId,
+            String,
+        > = redis_pool
+            .get_deserialized(
                 PROJECTS_NAMESPACE,
                 &parse_base62(alpha_project_id).unwrap().to_string(),
             )
             .await
             .unwrap()
             .unwrap();
-        let cached_project: serde_json::Value =
-            serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
-            cached_project["val"]["inner"]["slug"],
-            json!(alpha_project_slug)
+            cached_project.value().inner.slug.as_ref(),
+            Some(alpha_project_slug)
         );
 
         // Make the request again, this time it should be cached

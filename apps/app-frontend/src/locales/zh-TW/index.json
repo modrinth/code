@@ -425,23 +425,47 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "不要安裝"
+  },
   "app.modal.install-to-play.header": {
     "message": "安裝以遊玩"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "仍要安裝"
   },
   "app.modal.install-to-play.install-button": {
     "message": "安裝"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "這份邀請是由另一位 Modrinth 使用者建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# 個模組}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共用實例"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "這個伺服器模組包中包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "未知檔案警告"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "無法辨識的檔案"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "檢視內容"
   },
   "app.modal.update-to-play.header": {
     "message": "更新以遊玩"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "已移除"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
