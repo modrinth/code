@@ -7,6 +7,10 @@ const labrinthBaseUrl = trimTrailingSlash(
 const archonBaseUrl = trimTrailingSlash(
 	import.meta.env.MODRINTH_ARCHON_BASE_URL || 'https://archon.modrinth.com',
 )
+const sharedInstancesBaseUrl = trimTrailingSlash(
+	import.meta.env.SHARED_INSTANCES_API_BASE_URL ||
+		'https://shared-instances.modrinth.com',
+)
 
 export const config = {
 	siteUrl,
@@ -15,4 +19,5 @@ export const config = {
 		'pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b',
 	labrinthBaseUrl,
 	archonBaseUrl,
+	sharedInstancesBaseUrl,
 }

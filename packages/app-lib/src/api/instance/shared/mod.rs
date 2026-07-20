@@ -22,11 +22,15 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
+use std::io::Read;
 
 pub(crate) const CONFIG_BUNDLE_FILE_NAME: &str = "configs.zip";
 pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
+pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
+pub(crate) const MAX_CONFIG_BUNDLE_FILE_SIZE: u64 = 16 * 1024 * 1024;
+pub(crate) const MAX_CONFIG_BUNDLE_TOTAL_SIZE: u64 = 128 * 1024 * 1024;
 pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 13] = [
     "json",
     "json5",
@@ -47,6 +51,52 @@ pub(crate) fn is_excluded_config_path(path: &std::path::Path) -> bool {
     EXCLUDED_CONFIG_FOLDERS
         .iter()
         .any(|folder| path.starts_with(folder))
+}
+
+pub(crate) fn read_bounded_config_bundle_entry(
+    reader: impl Read,
+    declared_size: u64,
+    total_size: &mut u64,
+) -> crate::Result<Vec<u8>> {
+    let remaining = MAX_CONFIG_BUNDLE_TOTAL_SIZE.saturating_sub(*total_size);
+    let entry_limit = MAX_CONFIG_BUNDLE_FILE_SIZE.min(remaining);
+    if declared_size > entry_limit {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance config bundle exceeds the uncompressed size limit"
+                .to_string(),
+        )
+        .into());
+    }
+
+    let capacity = usize::try_from(declared_size).map_err(|_| {
+        crate::ErrorKind::InputError(
+            "Shared instance config bundle entry is too large".to_string(),
+        )
+    })?;
+    let mut bytes = Vec::with_capacity(capacity);
+    reader
+        .take(entry_limit.saturating_add(1))
+        .read_to_end(&mut bytes)
+        .map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Failed to read shared instance config bundle: {error}"
+            ))
+        })?;
+    let actual_size = bytes.len() as u64;
+    if actual_size > entry_limit {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance config bundle exceeds the uncompressed size limit"
+                .to_string(),
+        )
+        .into());
+    }
+    *total_size = total_size.checked_add(actual_size).ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Shared instance config bundle size overflowed".to_string(),
+        )
+    })?;
+
+    Ok(bytes)
 }
 
 mod client;

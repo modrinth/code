@@ -8,7 +8,6 @@ use async_zip::{Compression, ZipEntryBuilder};
 use futures::StreamExt;
 use sha1_smol::Sha1;
 use std::collections::BTreeMap;
-use std::io::Read;
 
 #[tracing::instrument]
 pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
@@ -878,6 +877,37 @@ async fn build_config_bundle_candidate(
 async fn config_bundle_bytes(
     entries: &BTreeMap<String, Vec<u8>>,
 ) -> crate::Result<Vec<u8>> {
+    if entries.len() > MAX_CONFIG_BUNDLE_ENTRIES {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance config bundle contains too many entries"
+                .to_string(),
+        )
+        .into());
+    }
+    let mut total_size = 0_u64;
+    for bytes in entries.values() {
+        let size = bytes.len() as u64;
+        if size > MAX_CONFIG_BUNDLE_FILE_SIZE {
+            return Err(crate::ErrorKind::InputError(
+                "Shared instance config bundle contains a file that is too large"
+                    .to_string(),
+            )
+            .into());
+        }
+        total_size = total_size.checked_add(size).ok_or_else(|| {
+            crate::ErrorKind::InputError(
+                "Shared instance config bundle size overflowed".to_string(),
+            )
+        })?;
+        if total_size > MAX_CONFIG_BUNDLE_TOTAL_SIZE {
+            return Err(crate::ErrorKind::InputError(
+                "Shared instance config bundle exceeds the uncompressed size limit"
+                    .to_string(),
+            )
+            .into());
+        }
+    }
+
     let mut writer = async_zip::base::write::ZipFileWriter::new(Vec::new());
     for (path, bytes) in entries {
         writer
@@ -900,10 +930,18 @@ fn read_config_bundle(
                 "Invalid shared instance config bundle: {error}"
             ))
         })?;
+    if archive.len() > MAX_CONFIG_BUNDLE_ENTRIES {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance config bundle contains too many entries"
+                .to_string(),
+        )
+        .into());
+    }
     let mut entries = BTreeMap::new();
+    let mut total_size = 0;
 
     for index in 0..archive.len() {
-        let mut file = archive.by_index(index).map_err(|error| {
+        let file = archive.by_index(index).map_err(|error| {
             crate::ErrorKind::InputError(format!(
                 "Invalid shared instance config bundle entry: {error}"
             ))
@@ -928,12 +966,12 @@ fn read_config_bundle(
             .into());
         }
         let path = path.to_string_lossy().replace('\\', "/");
-        let mut bytes = Vec::new();
-        file.read_to_end(&mut bytes).map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to read shared instance config bundle: {error}"
-            ))
-        })?;
+        let declared_size = file.size();
+        let bytes = read_bounded_config_bundle_entry(
+            file,
+            declared_size,
+            &mut total_size,
+        )?;
         if entries.insert(path.clone(), bytes).is_some() {
             return Err(crate::ErrorKind::InputError(format!(
                 "Shared instance config bundle contains duplicate file {path}"

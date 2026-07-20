@@ -51,6 +51,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			timeout: 10000,
 			labrinthBaseUrl: 'https://api.modrinth.com',
 			archonBaseUrl: 'https://archon.modrinth.com',
+			sharedInstancesBaseUrl: 'https://shared-instances.modrinth.com',
 			...config,
 		}
 		this.features = config.features ?? []
@@ -124,6 +125,8 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
 			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+		} else if (options.api === 'sharedinstances') {
+			baseUrl = this.resolveBaseUrl(this.config.sharedInstancesBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}
@@ -171,6 +174,8 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
 			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+		} else if (options.api === 'sharedinstances') {
+			baseUrl = this.resolveBaseUrl(this.config.sharedInstancesBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}

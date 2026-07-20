@@ -1,8 +1,6 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { SharedInstances } from '../types'
 
-const SHARED_INSTANCES_BASE_URL = 'https://shared-instances.modrinth.com'
-
 export class SharedInstancesInvitesV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'sharedinstances_invites_v1'
@@ -12,7 +10,7 @@ export class SharedInstancesInvitesV1Module extends AbstractModule {
 		return this.client.request<SharedInstances.Invites.v1.Invite>(
 			`/invites/${encodeURIComponent(inviteId)}`,
 			{
-				api: SHARED_INSTANCES_BASE_URL,
+				api: 'sharedinstances',
 				version: 1,
 				method: 'GET',
 				skipAuth: true,

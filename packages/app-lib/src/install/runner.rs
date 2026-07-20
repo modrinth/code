@@ -148,9 +148,15 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .into());
     }
 
+    if job.state.rollback_error.is_some() {
+        recovery::apply_cleanup(&job.state, &state).await?;
+        recovery::clear_staging_dir(&job.state).await;
+    }
+
     job.state.target = job.state.request.target();
     job.state.cleanup = job.state.request.cleanup();
     job.state.rollback = None;
+    job.state.paths.staging_dir = None;
     job.state.error = None;
     job.state.rollback_error = None;
     job.state.context = None;
@@ -224,6 +230,9 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         &state,
     )
     .await?;
+    if job.state.rollback_error.is_none() {
+        recovery::clear_staging_dir(&job.state).await;
+    }
     emit_install_job(&record.snapshot()).await?;
 
     Ok(record.snapshot())
@@ -490,6 +499,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
                 &state,
             )
             .await?;
+            recovery::clear_staging_dir(&job_state).await;
             emit_install_job(&record.snapshot()).await?;
         }
         Err(error) => {
@@ -536,6 +546,9 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
                 &state,
             )
             .await?;
+            if job_state.rollback_error.is_none() {
+                recovery::clear_staging_dir(&job_state).await;
+            }
             emit_install_job(&record.snapshot()).await?;
             return Err(error);
         }
@@ -788,6 +801,27 @@ async fn run_request(
         InstallRequest::UpdateSharedInstance { instance_id, data } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
             lock_existing_instance(&instance_id, state).await?;
+            let rollback_instance = job_state
+                .rollback
+                .as_ref()
+                .map(|rollback| rollback.instance.clone())
+                .ok_or_else(|| {
+                    crate::ErrorKind::OtherError(
+                        "Shared instance update rollback state is missing"
+                            .to_string(),
+                    )
+                })?;
+            let staging_dir =
+                recovery::prepare_shared_instance_update_backup(
+                    job_id,
+                    &rollback_instance,
+                    state,
+                )
+                .await?;
+            job_state.paths.staging_dir = Some(staging_dir);
+            let record =
+                store::update_state(job_id, job_state, state).await?;
+            emit_install_job(&record.snapshot()).await?;
             let disabled_project_ids =
                 disabled_project_ids(&instance_id, state).await?;
             Box::pin(apply_shared_instance_update(

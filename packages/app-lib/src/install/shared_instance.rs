@@ -9,7 +9,8 @@ use super::runner::{
 };
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, is_excluded_config_path,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    is_excluded_config_path, read_bounded_config_bundle_entry,
 };
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -20,7 +21,6 @@ use crate::state::{
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
 use sha1_smol::Sha1;
 use std::collections::{HashMap, HashSet};
-use std::io::Read;
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -872,26 +872,7 @@ async fn install_shared_instance_config_bundle(
     let installed_hashes = installed_shared_config_hashes(instance_id, state)
         .await?;
 
-    for (relative_path, installed_hash) in &installed_hashes {
-        if desired_hashes.contains_key(relative_path) {
-            continue;
-        }
-        let relative_path = PathBuf::from(relative_path);
-        if !is_safe_config_relative_path(&relative_path)
-            || is_excluded_config_path(&relative_path)
-            || !is_supported_config_file(&relative_path)
-        {
-            continue;
-        }
-        let path = config_path.join(relative_path);
-        let Some(local_hash) = config_file_hash(&path).await? else {
-            continue;
-        };
-        if &local_hash == installed_hash {
-            crate::util::io::remove_file(path).await?;
-        }
-    }
-
+    let mut next_installed_hashes = installed_hashes.clone();
     for (relative_path, bytes) in files {
         let normalized_path =
             relative_path.to_string_lossy().replace('\\', "/");
@@ -914,15 +895,24 @@ async fn install_shared_instance_config_bundle(
                 crate::util::io::create_dir_all(parent).await?;
             }
             crate::util::io::write(path, bytes).await?;
+            next_installed_hashes
+                .insert(normalized_path, desired_hash.clone());
+        } else if local_hash.as_ref() == Some(desired_hash) {
+            next_installed_hashes
+                .insert(normalized_path, desired_hash.clone());
         }
     }
-    write_installed_shared_config_hashes(instance_id, &desired_hashes, state)
-        .await?;
+    write_installed_shared_config_hashes(
+        instance_id,
+        &next_installed_hashes,
+        state,
+    )
+    .await?;
 
     Ok(())
 }
 
-fn installed_shared_config_paths_path(
+pub(crate) fn installed_shared_config_paths_path(
     instance_id: &str,
     state: &State,
 ) -> PathBuf {
@@ -1023,13 +1013,6 @@ async fn config_file_hash(
     }
 }
 
-fn is_safe_config_relative_path(path: &std::path::Path) -> bool {
-    !path.as_os_str().is_empty()
-        && path.components().all(|component| {
-            matches!(component, std::path::Component::Normal(_))
-        })
-}
-
 fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
     let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes))
         .map_err(|error| {
@@ -1037,10 +1020,18 @@ fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
                 "Invalid shared instance config bundle: {error}"
             ))
         })?;
+    if archive.len() > MAX_CONFIG_BUNDLE_ENTRIES {
+        return Err(crate::ErrorKind::InputError(
+            "Shared instance config bundle contains too many entries"
+                .to_string(),
+        )
+        .into());
+    }
     let mut files = Vec::new();
+    let mut total_size = 0;
 
     for index in 0..archive.len() {
-        let mut file = archive.by_index(index).map_err(|error| {
+        let file = archive.by_index(index).map_err(|error| {
             crate::ErrorKind::InputError(format!(
                 "Invalid shared instance config bundle entry: {error}"
             ))
@@ -1064,12 +1055,12 @@ fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
             ))
             .into());
         }
-        let mut bytes = Vec::new();
-        file.read_to_end(&mut bytes).map_err(|error| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to read shared instance config bundle: {error}"
-            ))
-        })?;
+        let declared_size = file.size();
+        let bytes = read_bounded_config_bundle_entry(
+            file,
+            declared_size,
+            &mut total_size,
+        )?;
         files.push((path.to_path_buf(), bytes));
     }
 

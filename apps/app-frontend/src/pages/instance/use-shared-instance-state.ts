@@ -154,10 +154,6 @@ export function useSharedInstanceState(
 		if (!instanceId || !userId) return null
 
 		const key = `${instanceId}:${userId}`
-		if (availabilityCheckKey.value === key && updatePreviewLoaded.value) {
-			return updatePreview.value
-		}
-
 		availabilityCheckKey.value = key
 		return await checkAvailability(instanceId, key, true)
 	}

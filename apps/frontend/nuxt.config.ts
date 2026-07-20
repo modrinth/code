@@ -210,6 +210,7 @@ export default defineNuxtConfig({
 		// @ts-ignore
 		rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
 		pyroBaseUrl: process.env.PYRO_BASE_URL,
+		sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 		intercomIdentitySecret:
 			process.env.INTERCOM_IDENTITY_SECRET ??
 			// @ts-ignore
@@ -217,6 +218,7 @@ export default defineNuxtConfig({
 		public: {
 			apiBaseUrl: getApiUrl(),
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
+			sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 			siteUrl: getDomain(),
 			intercomAppId:
 				process.env.INTERCOM_APP_ID ||
@@ -352,6 +354,17 @@ export default defineNuxtConfig({
 function getApiUrl() {
 	// @ts-ignore
 	return process.env.BROWSER_BASE_URL ?? globalThis.BROWSER_BASE_URL ?? STAGING_API_URL
+}
+
+function getSharedInstancesApiUrl() {
+	const url =
+		process.env.SHARED_INSTANCES_API_BASE_URL ??
+		// @ts-ignore
+		globalThis.SHARED_INSTANCES_API_BASE_URL
+	if (!url) {
+		throw new Error('SHARED_INSTANCES_API_BASE_URL is not configured')
+	}
+	return url
 }
 
 function isProduction() {

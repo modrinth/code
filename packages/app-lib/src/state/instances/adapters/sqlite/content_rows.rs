@@ -607,6 +607,100 @@ pub(crate) async fn upsert_instance_file(
     Ok(())
 }
 
+async fn insert_content_entry(
+    entry: &ContentEntry,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    let id = entry.id.as_str();
+    let instance_id = entry.instance_id.as_str();
+    let content_set_id = entry.content_set_id.as_str();
+    let file_id = entry.file_id.as_deref();
+    let project_type = entry.project_type.get_name();
+    let project_id = entry.project_id.as_deref();
+    let version_id = entry.version_id.as_deref();
+    let source_kind = entry.source_kind.as_str();
+    let server_requirement = entry.server_requirement.as_str();
+    let client_requirement = entry.client_requirement.as_str();
+    let enabled = i64::from(entry.enabled);
+    let added_at = entry.added_at.timestamp();
+    let modified_at = entry.modified_at.timestamp();
+
+    sqlx::query(
+        "
+		INSERT INTO instance_content_entries (
+			id,
+			instance_id,
+			content_set_id,
+			file_id,
+			project_type,
+			project_id,
+			version_id,
+			source_kind,
+			server_requirement,
+			client_requirement,
+			enabled,
+			added_at,
+			modified_at
+		)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		",
+    )
+    .bind(id)
+    .bind(instance_id)
+    .bind(content_set_id)
+    .bind(file_id)
+    .bind(project_type)
+    .bind(project_id)
+    .bind(version_id)
+    .bind(source_kind)
+    .bind(server_requirement)
+    .bind(client_requirement)
+    .bind(enabled)
+    .bind(added_at)
+    .bind(modified_at)
+    .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn restore_instance_content_snapshot(
+    instance_id: &str,
+    files: &[InstanceFile],
+    entries: &[ContentEntry],
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let mut tx = pool.begin().await?;
+    sqlx::query(
+        "
+		DELETE FROM instance_content_entries
+		WHERE instance_id = ?
+		",
+    )
+    .bind(instance_id)
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query(
+        "
+		DELETE FROM instance_files
+		WHERE instance_id = ?
+		",
+    )
+    .bind(instance_id)
+    .execute(&mut *tx)
+    .await?;
+
+    for file in files {
+        upsert_instance_file(file, &mut tx).await?;
+    }
+    for entry in entries {
+        insert_content_entry(entry, &mut tx).await?;
+    }
+
+    tx.commit().await?;
+    Ok(())
+}
+
 pub(crate) async fn get_content_entries<'e, E>(
     content_set_id: &str,
     exec: E,

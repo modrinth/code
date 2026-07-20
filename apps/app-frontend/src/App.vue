@@ -193,6 +193,7 @@ const tauriApiClient = new TauriModrinthClient({
 	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
+	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
 	features: [
 		new NodeAuthFeature({
 			getAuth: () => nodeAuthState.getAuth?.() ?? null,
