@@ -542,6 +542,9 @@
   "app.skins.dropped-file-error.title": {
     "message": "Error processing file"
   },
+  "app.skins.ears-feature-notice": {
+    "message": "This skin uses features from the {ears} mod"
+  },
   "app.skins.edit-button": {
     "message": "Edit skin"
   },
@@ -667,6 +670,12 @@
   },
   "app.skins.title": {
     "message": "Skin selector"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Toggle off"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Toggle on"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
