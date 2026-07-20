@@ -3650,12 +3650,6 @@
   "project.settings.visit-dashboard": {
     "message": "프로젝트 대시보드 방문"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {{count}회 다운로드} other {{count}회 다운로드}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {팔로워} other {팔로워}}"
-  },
   "project.status.archived.message": {
     "message": "{title} 은(는) 보관되었습니다. 작성자가 프로젝트 보관 해제를 결정하지 않는 한 더 이상 업데이트가 제공되지 않습니다."
   },
