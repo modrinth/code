@@ -61,7 +61,12 @@ function titleClass(depth: number): string {
 }
 
 function isVisible(node: NodeBuilder): boolean {
-	return node._shown === undefined || resolve(node._shown)
+	if (node._shown !== undefined) return resolve(node._shown)
+	if (node.type === 'group') {
+		const children = getChildren(node as IdentifiedNodeBuilder)
+		return children.some((c) => !(c instanceof NodeBuilder) || isVisible(c))
+	}
+	return true
 }
 
 function isEnabled(node: IdentifiedNodeBuilder): boolean {
