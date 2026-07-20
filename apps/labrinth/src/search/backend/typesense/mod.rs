@@ -1,3 +1,113 @@
+//! Search implementation backed by a Typesense cluster.
+//!
+//! # Search behavior
+//!
+//! Users expect very specific behavior when searching for projects on the
+//! platform. When making changes to search, you must ensure that the query
+//! behavior is roughly the same as before your changes - that means test with
+//! strings like `sodi`, `sodiu`, `sodium`, `sodium `, etc. and make sure the
+//! same results still appear.
+//!
+//! Before submitting a document into Typesense, we normalize the project name
+//! and author using [`normalize_for_search`]. This turns a name like `My Cool
+//! Mod` into `my-cool-mod`, which lets us exactly define what we consider to
+//! be word separators, and fine-tune search behavior. The normalized/indexed
+//! name is never shown to users; it's just used for search ops.
+//!
+//! # Collections
+//!
+//! The approach we take is to have two collections in TS: a project and a
+//! version collection, which we index separately, and then join together when
+//! we query. Project documents contain project metadata like name, downloads,
+//! summary, etc.; version documents contain game versions, compatible loaders,
+//! etc. This lets us deduplicate large chunks of data (project descriptions),
+//! but keep each version doc separate for accurate filtering.
+//!
+//! If you're wondering why we can't just put all the info required for
+//! searching into the project document, it's because collating version info
+//! into the project doc will break filtering on multiple fields. Let's say for
+//! example we have a project with 2 versions:
+//! - NeoForge 1.21.1
+//! - Fabric 1.20.0
+//!
+//! If we put both of these versions into the project object, we'd end up with
+//! a document like:
+//! ```json
+//! {
+//!   "name": "My Project",
+//!   "game_versions": ["1.21.1", "1.20.0"],
+//!   "loaders": ["neoforge", "fabric"]
+//! }
+//! ```
+//!
+//! If a user now searches for a mod for NeoForge 1.20.0, this project will
+//! match - when in reality it shouldn't, because it has no versions compatible
+//! with NeoForge 1.20.0! Only either Neoforge 1.21.1, or Fabric 1.20.0.
+//! Keeping the projects/versions document split retains this behavior.
+//!
+//! What if we put a `versions` object into the project document? This is
+//! terrible because:
+//! - it makes project documents massive
+//! - it forces an entire project document to be rebuilt when one change to a
+//!   version is made
+//!
+//! # Performance
+//!
+//! Our collections are quite large for a platform of our size. To ensure
+//! indexing and query performance, we do a few things.
+//!
+//! ## Indexing
+//!
+//! We use incremental indexing to update projects and version documents when
+//! a user makes a change ASAP[^1]. When a project or version is updated, we
+//! push a message "update this project ID/this version ID" into a Kafka topic;
+//! the `incremental-index-search` task then consumes all the Kafka messages
+//! and applies the actual indexing updates to the Typesense cluster, and
+//! commits the Kafka messages.
+//!
+//! We do also have the `index-search` task which does a full reindex, but this
+//! shouldn't be required in normal operation.
+//!
+//! When batching Typesense update operations, we batch by both project count
+//! and document count. Since a project can have an unbounded number of
+//! versions, we can (and will) have projects with thousands of versions. If we
+//! were to send updates for just this project alone, we will be sending a lot
+//! more data in a single HTTP request, which could timeout the operation.
+//!
+//! [^1]: Okay, not exactly ASAP. Once the Kafka consumer receives the first
+//! message, it waits for a small configurable time to batch a bunch of changes
+//! together, and updates Typesense in bulk with those.
+//!
+//! ## Querying
+//!
+//! Having two collections is cool and all, but joins over such a large dataset
+//! causes queries to be a lot slower than if we're just querying one
+//! collection. To speed this up, we use some tricks.
+//!
+//! ### Filtering on multiple version fields
+//!
+//! If you search for `categories = fabric AND game_versions = 1.21`, then
+//! you're searching for *one* project with *both* these conditions set.
+//! Therefore, this uses *one* join over versions, rather than two joins
+//! each matching different versions of the same project. Using one join here
+//! is faster than two. It's even faster if you search for more facets like
+//! category, game version, loader, and environment.
+//!
+//! ### Whole-field tokenization
+//!
+//! For fields like a version's `categories`, `environment`, `game_versions`
+//! etc. it makes no sense to do full-text search on this (unlike name and
+//! author), since the full set of categories, environments, etc. is known
+//! and finite. All of these values can be represented as whitespace-free,
+//! atomic, single tokens in Typesense, if we set
+//! `symbols_to_index = ["=", ".", "_"]`. This means that `fabric-api` is
+//! treated as one token `fabric-api`, not as `fabric` and `api`. So if we use
+//! the filter `categories:fabric-api`, it will match for that *one token*
+//! `fabric-api` instead of full text search.
+//!
+//! For this, we use the `:` operator instead of `:=` to tell
+//! Typesense to treat this as an exact token match.
+
 use std::sync::LazyLock;
 
 use async_trait::async_trait;
@@ -577,6 +687,8 @@ impl SearchField {
     }
 }
 
+const VERSION_FILTER_SYMBOLS: &[&str] = &["-", ".", "_"];
+
 static TYPESENSE_SEARCH_FIELDS: LazyLock<Vec<Value>> = LazyLock::new(|| {
     use strum::IntoEnumIterator;
 
@@ -661,7 +773,7 @@ impl Typesense {
                     "type": spec.ty,
                     "facet": spec.facet,
                     "optional": spec.optional,
-                    "token_separators": spec.token_separators,
+                    "symbols_to_index": VERSION_FILTER_SYMBOLS,
                 })
             })
             .collect::<Vec<_>>();

@@ -68,7 +68,7 @@ pub(super) fn rewrite_filter_for_join(
                 expression.replacen("categories", "project_categories", 1);
             if is_negative_filter(expression) {
                 clause.project.push(project_expression);
-                clause.version.push(expression.to_string());
+                clause.version.push(version_filter_expression(expression));
                 Ok(vec![clause])
             } else {
                 Ok(vec![
@@ -78,13 +78,13 @@ pub(super) fn rewrite_filter_for_join(
                     },
                     JoinedFilterClause {
                         project: Vec::new(),
-                        version: vec![expression.to_string()],
+                        version: vec![version_filter_expression(expression)],
                     },
                 ])
             }
         } else {
             if is_version_filter_field(field) {
-                clause.version.push(expression.to_string());
+                clause.version.push(version_filter_expression(expression));
             } else {
                 clause.project.push(expression.to_string());
             }
@@ -117,6 +117,16 @@ fn is_version_filter_field(field: &str) -> bool {
         search_field.is_version_field()
             && search_field.typesense_spec().path == field
     })
+}
+
+fn version_filter_expression(expression: &str) -> String {
+    let Some((field, value)) = expression.split_once(':') else {
+        return expression.to_string();
+    };
+    let Some(value) = value.strip_prefix('=') else {
+        return expression.to_string();
+    };
+    format!("{field}:{value}")
 }
 
 fn is_negative_filter(expression: &str) -> bool {
@@ -403,7 +413,7 @@ mod tests {
                 "versions",
             )
             .unwrap(),
-            "(project_categories:= fabric && $versions(game_versions:= 1.21)) || $versions(categories:= fabric && game_versions:= 1.21)"
+            "(project_categories:= fabric && $versions(game_versions: 1.21)) || $versions(categories: fabric && game_versions: 1.21)"
         );
     }
 
@@ -415,7 +425,7 @@ mod tests {
                 "versions",
             )
             .unwrap(),
-            "(license:= MIT && project_categories:= fabric) || (license:= MIT && $versions(categories:= fabric))"
+            "(license:= MIT && project_categories:= fabric) || (license:= MIT && $versions(categories: fabric))"
         );
     }
 
@@ -427,7 +437,7 @@ mod tests {
                 "versions",
             )
             .unwrap(),
-            "(license:= MIT && $versions(game_versions:= 1.21)) || (project_categories:= fabric && $versions(game_versions:= 1.21)) || $versions(categories:= fabric && game_versions:= 1.21)"
+            "(license:= MIT && $versions(game_versions: 1.21)) || (project_categories:= fabric && $versions(game_versions: 1.21)) || $versions(categories: fabric && game_versions: 1.21)"
         );
     }
 
