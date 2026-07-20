@@ -48,9 +48,16 @@
 		</div>
 
 		<div
-			v-if="diffs.length"
-			class="flex max-h-[272px] flex-col overflow-y-auto border-0 border-y border-solid border-surface-5 bg-surface-2 px-3 pb-4 pt-2"
+			class="flex max-h-[272px] flex-col overflow-y-auto border-0 border-y border-solid border-surface-5 bg-surface-2 px-3 py-2"
 		>
+			<div v-if="!diffs.length" class="flex h-10 min-h-10 items-center gap-2 px-2">
+				<div class="flex w-4 shrink-0 items-center justify-center">
+					<MinusIcon class="size-4" />
+				</div>
+				<span class="text-sm font-medium text-contrast">
+					{{ formatMessage(messages.noContentChanges) }}
+				</span>
+			</div>
 			<div
 				v-for="(diff, index) in sortedDiffs"
 				:key="diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)"
@@ -112,7 +119,7 @@
 
 		<div
 			v-if="$slots['additional-content']"
-			class="border-0 border-t border-solid border-surface-5 px-4 pt-4"
+			class="px-4 pt-4"
 		>
 			<slot name="additional-content" />
 		</div>
@@ -134,7 +141,7 @@
 				<p class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
 				<div class="flex justify-end gap-2">
 					<ButtonStyled type="transparent" color="orange">
-						<button :disabled="buttonsDisabled" @click="handleConfirm">
+						<button :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
 							{{ formatMessage(messages.installAnyway) }}
 						</button>
 					</ButtonStyled>
@@ -160,14 +167,14 @@
 					</ButtonStyled>
 				</div>
 				<div class="flex gap-2">
-					<ButtonStyled>
-						<button @click="handleCancel">
+					<ButtonStyled type="outlined">
+						<button class="!border" @click="handleCancel">
 							<XIcon />
 							{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button :disabled="buttonsDisabled" @click="handleConfirm">
+						<button :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
 							<component :is="confirmIcon" v-if="confirmIcon" />
 							{{ confirmLabel || formatMessage(commonMessages.confirmButton) }}
 						</button>
@@ -211,6 +218,7 @@ const props = defineProps<{
 	showBackupCreator?: boolean
 	addedLabel?: string
 	removedLabel?: string
+	confirmDisabled?: boolean
 	disableClose?: boolean
 	showExternalWarnings?: boolean
 	externalWarningDescription?: string
@@ -373,6 +381,10 @@ const messages = defineMessages({
 	updatedCount: {
 		id: 'content.diff-modal.updated-count',
 		defaultMessage: '{count} updated',
+	},
+	noContentChanges: {
+		id: 'content.diff-modal.no-content-changes',
+		defaultMessage: 'No content changes',
 	},
 	fileCount: {
 		id: 'content.diff-modal.file-count',

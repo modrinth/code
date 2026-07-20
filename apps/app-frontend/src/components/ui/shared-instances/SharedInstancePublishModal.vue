@@ -7,6 +7,7 @@
 		:diffs="publishDiffs"
 		:confirm-label="formatMessage(messages.publishButton)"
 		:confirm-icon="UploadIcon"
+		:confirm-disabled="publishDiffs.length === 0 && selectedConfigPaths.length === 0"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
 		@confirm="publishChanges"
@@ -25,9 +26,6 @@
 					</span>
 				</template>
 				<div class="flex min-w-0 flex-col gap-3 pt-4">
-					<span class="text-sm text-primary">
-						{{ formatMessage(messages.configDescription) }}
-					</span>
 					<div class="max-h-[292px] overflow-y-auto rounded-[20px]">
 						<FileTreeSelect
 							v-model="selectedConfigPaths"
@@ -182,13 +180,8 @@ const messages = defineMessages({
 		defaultMessage: 'Removed',
 	},
 	configTitle: {
-		id: 'instance.shared-instance.publish-review.config-title',
+		id: 'instance.shared-instance.publish-review.config-title-v2',
 		defaultMessage: 'Select config files',
-	},
-	configDescription: {
-		id: 'instance.shared-instance.publish-review.config-description',
-		defaultMessage:
-			'Choose which config files to send with this update. Only selected files will be updated; everything else stays as it is.',
 	},
 })
 

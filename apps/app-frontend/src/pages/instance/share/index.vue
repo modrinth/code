@@ -30,15 +30,24 @@
 			@confirm="removeMember"
 			@clear="pendingRemovalRow = null"
 		/>
+		<SharedInstancePublishModal
+			ref="publishModal"
+			:instance="instance"
+			@state-change="publishState = $event"
+		/>
 
 		<SharedInstanceMembersTable
 			v-if="members.rows.value.length > 0"
 			:rows="members.rows.value"
 			:actions-locked="sharedInstanceActionsLocked"
 			:invite-pending="inviteLink.pending.value"
+			:push-update-disabled="
+				instance.install_stage !== 'installed' || publishState !== 'idle' || !!offline
+			"
+			:push-update-pending="publishState !== 'idle'"
 			@invite="showInvitePlayers"
 			@remove="showRemoveMemberModal"
-			@settings="handleOpenSharingSettings"
+			@push-update="reviewUpdate"
 		/>
 
 		<SharedInstanceShareEmptyState
@@ -133,6 +142,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, toRef, watch } from 'vue'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
+import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
 import {
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceUnavailableError,
@@ -157,7 +167,7 @@ import { useSharedInstanceMembers } from './use-shared-instance-members'
 
 const props = defineProps<{
 	instance: GameInstance
-	openSharingSettings?: () => void
+	offline?: boolean
 }>()
 const auth = injectAuth()
 const queryClient = useQueryClient()
@@ -178,6 +188,8 @@ const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModa
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const removeMemberModal = ref<InstanceType<typeof SharedInstanceRemoveMemberModal>>()
+const publishModal = ref<InstanceType<typeof SharedInstancePublishModal>>()
+const publishState = ref<'idle' | 'reviewing' | 'publishing'>('idle')
 const pendingRemovalRow = ref<ShareRow | null>(null)
 const importedModpackUnlinked = ref(false)
 
@@ -325,8 +337,8 @@ function showRemoveMemberModal(row: ShareRow) {
 		removeMemberModal.value?.show()
 	}
 }
-function handleOpenSharingSettings() {
-	props.openSharingSettings?.()
+function reviewUpdate(event: MouseEvent) {
+	publishModal.value?.show(event)
 }
 function removeMember(row: ShareRow) {
 	members.remove(row.id)

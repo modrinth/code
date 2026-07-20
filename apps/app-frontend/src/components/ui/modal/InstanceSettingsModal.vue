@@ -186,11 +186,7 @@ function show(tabIndex?: number) {
 	}
 }
 
-function showSharing() {
-	show(2)
-}
-
-defineExpose({ show, showSharing, hide })
+defineExpose({ show, hide })
 </script>
 <template>
 	<TabbedModal
