@@ -27,7 +27,7 @@ const messages = defineMessages({
 	adsConsentIntro: {
 		id: 'app.settings.privacy.ads-consent.intro',
 		defaultMessage:
-			'Ads on certain pages make Modrinth possible and fund creator payouts. Our ad provider, Aditude, may use unique identifiers to personalize ads and measure performance. You can opt out or manage your preferences below.',
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access information on your device to personalize ads and measure performance. You can opt out or manage your preferences below.',
 	},
 	adsConsentManage: {
 		id: 'app.ads-consent.manage',

@@ -29,7 +29,7 @@ const messages = defineMessages({
 	body: {
 		id: 'ads-consent.body',
 		defaultMessage:
-			'Ads make Modrinth possible and fund creator payouts. Our partners may store unique identifiers to personalize ads and measure performance.',
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access information on your device to personalize ads and measure performance.',
 	},
 	manage: {
 		id: 'ads-consent.manage',
