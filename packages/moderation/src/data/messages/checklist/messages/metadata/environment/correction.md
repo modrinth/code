@@ -1,1 +1,1 @@
-It looks like this project is probably %SUGGESTED_ENVIRONMENT%
+It looks like this project is probably "%SUGGESTED_ENVIRONMENT%".
