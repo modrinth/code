@@ -231,9 +231,11 @@ const hasPlus = computed(
 const showAd = computed(
 	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
+const adConsentAvailable = computed(() => credentials.value !== undefined && !hasPlus.value)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: showAd,
+	adConsentAvailable,
 	floatingActionBarOffsets: {
 		left: ref(APP_LEFT_NAV_WIDTH),
 		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
@@ -823,13 +825,21 @@ async function fetchIntercomToken() {
 	return await response.json()
 }
 
-watch(showAd, () => {
-	if (!showAd.value) {
-		hide_ads_window(true)
-	} else {
-		init_ads_window(true)
-	}
-})
+watch(
+	[showAd, adConsentAvailable],
+	async ([showAds, canManageConsent]) => {
+		if (showAds) {
+			await init_ads_window(true)
+			return
+		}
+
+		await hide_ads_window(true)
+		if (canManageConsent) {
+			await init_ads_window()
+		}
+	},
+	{ immediate: true },
+)
 
 onMounted(() => {
 	invoke('show_window')

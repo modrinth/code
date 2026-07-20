@@ -775,7 +775,7 @@ pub async fn show_ads_consent_preferences<R: Runtime>(
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
 
-        if !state.shown || !state.consent_required {
+        if !state.consent_required {
             return Ok(());
         }
 
