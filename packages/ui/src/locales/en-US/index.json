@@ -860,12 +860,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Clear all"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Browse modpacks"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Import modpack"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Already know the modpack you want to install?"
   },
@@ -891,10 +885,16 @@
     "defaultMessage": "Import instance"
   },
   "creation-flow.modal.setup-type.option.modpack-base.description": {
-    "defaultMessage": "Browse modpacks on Modrinth or import one from a file."
+    "defaultMessage": "Choose a project and we’ll use its latest version."
   },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
-    "defaultMessage": "Install modpack"
+    "defaultMessage": "Start from a mod or modpack"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Install a modpack from an .mrpack file on your device."
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.title": {
+    "defaultMessage": "Upload a modpack"
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.description": {
     "defaultMessage": "Classic Minecraft with no mods or plugins."
@@ -910,9 +910,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Select world type"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Choose modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Create instance"

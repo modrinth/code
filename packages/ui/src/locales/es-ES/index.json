@@ -797,12 +797,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Borrar todo"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Descubrir modpacks"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importar modpack"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "¿Ya sabes cuál es el modpack que quieres instalar?"
   },
@@ -847,9 +841,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Seleccione tipo de mundo"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Elige modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Crear instancia"

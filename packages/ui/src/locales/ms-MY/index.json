@@ -740,12 +740,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Kosongkan semua"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Layari pek mod"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Import pek mod"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Sudah tahu pek mod yang ingin anda pasang?"
   },
@@ -775,9 +769,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Pilih jenis dunia"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Pilih pek mod"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Cipta pemasangan"
@@ -5046,4 +5037,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

@@ -788,12 +788,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Zrušit vše"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Procházet modpacky"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importovat modpack"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Už víš modpack, který chceš nainstalovat?"
   },
@@ -838,9 +832,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Vyber typ světa"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Výběr modpacku"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Vytvoření instance"
@@ -4569,4 +4560,3 @@
     "defaultMessage": "Typ"
   }
 }
-

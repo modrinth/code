@@ -43,5 +43,5 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 			onClick: () => ctx.finish(),
 		}
 	},
-	maxWidth: '520px',
+	maxWidth: '560px',
 }

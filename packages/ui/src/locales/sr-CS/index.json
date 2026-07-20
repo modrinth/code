@@ -833,12 +833,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Obriši sve"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Pregledaj modpakove"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Uvezi modpack"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Već znaš koji modpak želiš da instaliraš?"
   },
@@ -883,9 +877,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Izaberi tip sveta"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Izaberi modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Kreiraj instancu"
@@ -5736,4 +5727,3 @@
     "defaultMessage": "Tip"
   }
 }
-

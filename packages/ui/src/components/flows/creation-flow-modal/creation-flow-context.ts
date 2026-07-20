@@ -81,10 +81,6 @@ export const creationFlowMessages = defineMessages({
 		id: 'creation-flow.button.import-instances',
 		defaultMessage: 'Import {count, plural, one {# instance} other {# instances}}',
 	},
-	chooseModpackTitle: {
-		id: 'creation-flow.title.choose-modpack',
-		defaultMessage: 'Choose modpack',
-	},
 })
 
 export const flowTypeHeadingMessages: Record<FlowType, MessageDescriptor> = {
@@ -479,7 +475,6 @@ export function createCreationFlowContext(
 			selectedLoader.value = null
 			selectedLoaderVersion.value = null
 			loaderVersionType.value = 'stable'
-			modal.value?.setStage('modpack')
 		} else {
 			modpackSelection.value = null
 			modpackFile.value = null

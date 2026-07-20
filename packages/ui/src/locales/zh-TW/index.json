@@ -833,12 +833,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除全部"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "瀏覽模組包"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "匯入模組包"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "已經選好想要安裝的模組包了嗎？"
   },
@@ -883,9 +877,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "選擇世界類型"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "選擇模組包"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "建立實例"
@@ -5742,4 +5733,3 @@
     "defaultMessage": "類型"
   }
 }
-

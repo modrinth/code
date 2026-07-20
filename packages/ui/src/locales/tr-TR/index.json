@@ -764,12 +764,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Tümünü temizle"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modpacklere göz atın"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Mod paketini dışa aktar"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Yüklemek istediğiniz mod paketini zaten biliyor musunuz?"
   },
@@ -814,9 +808,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Dünya Türünü Seçin"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modpack seçin"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Kurulum oluştur"

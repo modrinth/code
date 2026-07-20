@@ -833,12 +833,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "清除所有"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "浏览整合包"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "导入整合包"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "已经知道你想安装哪个整合包？"
   },
@@ -883,9 +877,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "选择世界类型"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "选择整合包"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "创建实例"
@@ -5742,4 +5733,3 @@
     "defaultMessage": "类型"
   }
 }
-

@@ -833,12 +833,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Wyczyść wszystko"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Przeglądaj paczki modów"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importuj paczkę modów"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Wiesz już którą paczkę modów chcesz zainstalować?"
   },
@@ -883,9 +877,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Wybierz typ świata"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Wybierz paczkę modów"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Utwórz instancję"

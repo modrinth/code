@@ -776,12 +776,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Очистить всë"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Найти сборки"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Импортировать сборку"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Уже знаете, какую сборку хотите скачать?"
   },
@@ -826,9 +820,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Выберите тип мира"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Выберите сборку"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Создание сборки"

@@ -785,12 +785,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "全ての選択を解除"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modパックを探す"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Modパックをインポート"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "インストールしたいMODパックは既に決まっていますか？"
   },
@@ -835,9 +829,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "ワールドタイプを選択してください"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "モッドパックを選択"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "インスタンスを作成する"

@@ -788,12 +788,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Töm allt"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Bläddra bland modpaket"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Importera modpaket"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Vet du redan modpaketet du vill installera?"
   },
@@ -3813,4 +3807,3 @@
     "defaultMessage": "Typ"
   }
 }
-

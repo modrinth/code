@@ -794,12 +794,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Xóa hết"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Duyệt modpack"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Thêm modpack"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Biết modpack bạn định cài là gì rồi?"
   },
@@ -844,9 +838,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Chọn loại thế giới"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Chọn modpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Tạo cấu hình"
@@ -5094,4 +5085,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

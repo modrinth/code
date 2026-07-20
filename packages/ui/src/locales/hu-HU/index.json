@@ -734,12 +734,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Minden törlése"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Modcsomagok böngészése"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Modcsomag importálása"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Már tudod, melyik modcsomagot szeretnéd telepíteni?"
   },
@@ -784,9 +778,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Világ típusa"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Modcsomag kiválasztása"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Profil létrehozása"

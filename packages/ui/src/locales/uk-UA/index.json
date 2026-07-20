@@ -722,12 +722,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "Очистити всі"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "Переглянути збірки"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "Імпортувати збірку"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "Уже знаєте яку збірку хочете встановити?"
   },
@@ -772,9 +766,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Виберіть тип світу"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Виберіть збірку"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Створити збірку"

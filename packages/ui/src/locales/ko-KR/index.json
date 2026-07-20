@@ -809,12 +809,6 @@
   "creation-flow.modal.import-instance.selection.clear-all": {
     "defaultMessage": "모두 해제"
   },
-  "creation-flow.modal.modpack.action.browse": {
-    "defaultMessage": "모드팩 둘러보기"
-  },
-  "creation-flow.modal.modpack.action.import": {
-    "defaultMessage": "모드팩 가져오기"
-  },
   "creation-flow.modal.modpack.known-modpack.prompt": {
     "defaultMessage": "설치하고 싶은 모드팩을 이미 알고 계신가요?"
   },
@@ -859,9 +853,6 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "세계 방식 선택"
-  },
-  "creation-flow.title.choose-modpack": {
-    "defaultMessage": "모드팩 선택"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "인스턴스 생성"

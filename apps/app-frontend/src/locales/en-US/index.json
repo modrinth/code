@@ -1088,6 +1088,18 @@
   "minecraft-account.sign-in": {
     "message": "Sign in to Minecraft"
   },
+  "onboarding-checklist.create-instance": {
+    "message": "Create first instance"
+  },
+  "onboarding-checklist.login-minecraft": {
+    "message": "Log in to Minecraft"
+  },
+  "onboarding-checklist.login-modrinth": {
+    "message": "Log in to Modrinth"
+  },
+  "onboarding-checklist.title": {
+    "message": "Getting started"
+  },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"
   },
