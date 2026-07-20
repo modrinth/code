@@ -10,7 +10,7 @@ import { Alert, injectModrinthClient, injectProjectPageContext } from '@modrinth
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
-import type { NodeState } from '../../types/node'
+import { md, type NodeState } from '../../types/node'
 import { button, fix, group, option, stage, text, toggle } from '../../types/node'
 
 const STALE_TIME = 1000 * 60 * 5
@@ -248,7 +248,7 @@ export default function () {
 										.title('Correct Slug')
 										.children(
 											text('correct-slug')
-												.initial(project.value.slug)
+												.initial(() => resolvedAutoSlug.value ?? project.value.slug)
 												.onChange((value, { override }) => {
 													if (!value) return override(project.value.slug ?? '')
 													clearTimeout(slugDebounceTimer)
@@ -310,9 +310,20 @@ export default function () {
 											SlugStatus,
 										),
 								)
-								.message(undefined, (state) => ({
-									SUGGESTED_SLUG: state['correct-slug'],
-								}))
+								.rawMessage(async (state) => {
+									let correct = ''
+									if (slugValidation.value === 'available') {
+										const slug = state['correct-slug'] as string | undefined
+										if (slug)
+											correct = await md(
+												'checklist/messages/title-slug/slug/correction',
+												() => ({ SUGGESTED_SLUG: slug }),
+											)(state)
+									}
+									return md('checklist/messages/title-slug/slug/misused', () => ({
+										CORRECT: correct,
+									}))(state)
+								})
 								.fix(
 									fix().project((patch, state) => {
 										const slug = state['correct-slug'] as string
