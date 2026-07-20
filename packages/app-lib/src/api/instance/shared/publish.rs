@@ -706,14 +706,6 @@ pub(super) async fn publish_current_content(
             state,
         )
         .await?;
-        mark_external_files_ready(
-            shared_instance_id,
-            response.version,
-            &external_files,
-            &response.external_files,
-            state,
-        )
-        .await?;
     } else if !response.ready {
         tracing::debug!(
             "Shared instance version {} was not ready but had no external files",
@@ -859,19 +851,12 @@ async fn build_config_bundle_candidate(
         entries.insert(file.path.clone(), bytes);
     }
 
-    let files = entries
-        .iter()
-        .map(|(path, bytes)| ConfigFile {
-            path: path.clone(),
-            hash: Sha1::from(bytes).hexdigest(),
-        })
-        .collect::<Vec<_>>();
     let bytes = config_bundle_bytes(&entries).await?;
 
     Ok(Some(ExternalFileCandidate {
         file_name: CONFIG_BUNDLE_FILE_NAME.to_string(),
         file_type: CONFIG_BUNDLE_FILE_TYPE.to_string(),
-        source: ExternalFileSource::ConfigBundle { files, bytes },
+        source: ExternalFileSource::ConfigBundle(bytes),
     }))
 }
 
@@ -1039,57 +1024,32 @@ pub(super) async fn upload_external_files(
                     .join(file_path);
                 crate::util::io::read(path).await?
             }
-            ExternalFileSource::ConfigBundle { bytes, .. } => bytes.clone(),
+            ExternalFileSource::ConfigBundle(bytes) => bytes.clone(),
         };
-        let response =
-            REQWEST_CLIENT.put(&upload.url).body(bytes).send().await?;
-
-        if !response.status().is_success() {
-            return Err(crate::ErrorKind::OtherError(format!(
-                "External file upload failed with status {}",
-                response.status()
+        let upload_url = url::Url::parse(&upload.url).map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Invalid shared instance external file upload URL: {error}"
             ))
-            .into());
-        }
-    }
-
-    Ok(())
-}
-
-pub(super) async fn mark_external_files_ready(
-    shared_instance_id: &str,
-    version: i32,
-    candidates: &[ExternalFileCandidate],
-    uploads: &[ExternalFileResponse],
-    state: &State,
-) -> crate::Result<()> {
-    for upload in uploads {
-        let metadata = candidates
-            .iter()
-            .find(|candidate| {
-                candidate.file_name == upload.file_name
-                    && candidate.file_type == upload.file_type
-            })
-            .and_then(|candidate| match &candidate.source {
-                ExternalFileSource::ConfigBundle { files, .. } => {
-                    Some(serde_json::to_value(files))
-                }
-                ExternalFileSource::InstanceFile(_) => None,
-            })
-            .transpose()?;
-        request_empty(
-            "mark_version_file_ready",
-            Method::POST,
-            &format!(
-                "/instances/{shared_instance_id}/versions/{version}/files"
-            ),
-            Some(json!({
-                "file_name": &upload.file_name,
-                "metadata": metadata,
-            })),
+        })?;
+        let response = send_bytes_request_to_url(
+            "upload_external_file",
+            Method::PUT,
+            upload_url.path(),
+            &upload.url,
+            bytes,
             state,
         )
         .await?;
+
+        if !response.status().is_success() {
+            return shared_instances_request_error(
+                "upload_external_file",
+                Method::PUT,
+                upload_url.path(),
+                response,
+            )
+            .await;
+        }
     }
 
     Ok(())

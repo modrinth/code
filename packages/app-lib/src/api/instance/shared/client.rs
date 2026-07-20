@@ -42,10 +42,7 @@ pub(super) struct ExternalFileCandidate {
 #[derive(Clone, Debug)]
 pub(super) enum ExternalFileSource {
     InstanceFile(String),
-    ConfigBundle {
-        files: Vec<ConfigFile>,
-        bytes: Vec<u8>,
-    },
+    ConfigBundle(Vec<u8>),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -684,13 +681,45 @@ pub(super) async fn send_bytes_request(
     body: Vec<u8>,
     state: &State,
 ) -> crate::Result<reqwest::Response> {
+    let base_url = service_base_url();
+    let url = service_url(base_url, path);
+    send_bytes_request_to_url(operation, method, path, &url, body, state).await
+}
+
+pub(super) async fn send_bytes_request_to_url(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    url: &str,
+    body: Vec<u8>,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let service_origin = url::Url::parse(service_base_url())
+        .map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Invalid shared instances API base URL: {error}"
+            ))
+        })?
+        .origin();
+    let upload_origin = url::Url::parse(url)
+        .map_err(|error| {
+            crate::ErrorKind::OtherError(format!(
+                "Invalid shared instances upload URL: {error}"
+            ))
+        })?
+        .origin();
+    if service_origin != upload_origin {
+        return Err(crate::ErrorKind::OtherError(
+            "Shared instances upload URL has an unexpected origin".to_string(),
+        )
+        .into());
+    }
+
     let credentials =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?
             .ok_or(crate::ErrorKind::NoCredentialsError)?;
     let _permit = state.api_semaphore.0.acquire().await?;
-    let base_url = service_base_url();
-    let url = service_url(base_url, path);
 
     tracing::debug!(
         operation,
@@ -703,8 +732,8 @@ pub(super) async fn send_bytes_request(
         "Sending shared instances API request"
     );
 
-    let response = shared_instances_client(base_url)
-        .request(method.clone(), &url)
+    let response = shared_instances_client(url)
+        .request(method.clone(), url)
         .bearer_auth(credentials.session)
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
         .body(body)
