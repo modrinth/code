@@ -711,7 +711,11 @@ pub(crate) async fn remove_project(
     )
     .await?;
 
-    io::remove_file(base.join(project_path)).await?;
+    match io::remove_file(base.join(project_path)).await {
+        Ok(()) => {}
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
+        Err(err) => return Err(err.into()),
+    }
 
     if let Some(file) = file {
         content_rows::remove_content_entries_for_file(

@@ -2681,6 +2681,9 @@
   "moderation.page.external-projects": {
     "message": "Harici projeler"
   },
+  "moderation.page.global-detail-traces": {
+    "message": "Global izler"
+  },
   "moderation.page.projects": {
     "message": "Projeler"
   },
@@ -3275,11 +3278,17 @@
   "project.download.base-loader-incompatible-tooltip": {
     "message": "Bu yükleyici bu proje ile uyumsuz."
   },
+  "project.download.compatible-version-title": {
+    "message": "Uyumlu sürümler"
+  },
   "project.download.dependencies-title": {
     "message": "Gerekliler"
   },
   "project.download.dependency-already-installed": {
     "message": "Gerekli proje zaten indirilmiş"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Herhangi uyumlu"
   },
   "project.download.dependency-conflicting": {
     "message": "Bu gerekli proje başka bir gerekli proje ile çatışıyor"
@@ -3302,11 +3311,29 @@
   "project.download.dependency-quilt-fabric-api": {
     "message": "Quilt'te Fabric API'ye gerek yok"
   },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "Bu proje bir kaynak paketine bağımlıdır. Kaynak paketini indirin ve {folder} klasörüne yerleştirin."
+  },
   "project.download.dependency-unavailable": {
     "message": "Bu bağımlılık indirilemez"
   },
+  "project.download.download": {
+    "message": "İndir"
+  },
+  "project.download.download-as-zip": {
+    "message": ".zip olarak indir"
+  },
   "project.download.download-version": {
     "message": "İndir {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Bağımlı olanlarla indir"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Tavsiye edilenle indir"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Tavsiye edilenle .zip olarak indir"
   },
   "project.download.duplicate-dependencies-hidden": {
     "message": "Yinelenen bağımlılıklar gizlendi."
@@ -3317,6 +3344,9 @@
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title}, {platform} için {gameVersion} sürümünü desteklemiyor"
   },
+  "project.download.install-with-app": {
+    "message": "Modrinth App'le indir"
+  },
   "project.download.manually": {
     "message": "Manuel Yükle"
   },
@@ -3326,8 +3356,20 @@
   "project.download.no-game-versions-found": {
     "message": "Oyun sürümleri bulunamadı"
   },
+  "project.download.no-versions-available": {
+    "message": "{gameVersion} ve {platform} için uyumlu sürüm yok."
+  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title}, {gameVersion} sürümünde {platform} desteklemiyor"
+  },
+  "project.download.recommended-title": {
+    "message": "Önerilen"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "Bu data paketi bir kaynak paketine bağımlıdır. Kaynak paketini indirin ve {folder} klasörüne yerleştirin."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Kaynak paketi"
   },
   "project.download.search-game-versions": {
     "message": "Oyun sürümü seç"
@@ -3346,6 +3388,12 @@
   },
   "project.download.unknown-loader": {
     "message": "Bilinmeyen yükleyici"
+  },
+  "project.download.zip-failed-text": {
+    "message": "Bir veya daha fazla dosya indirilemedi. Lütfen tekrar deneyin."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Dosyalar indirilemedi"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Daha yeni Modrinth'in Çevre sistemini yeniledik ve yeni seçenekler mevcut. Bu ayarları değiştirmek için yetkiniz yok ama projenin başka bir üyesine çevre meta verisinin doğrulanması gerektiği haberini verebilirsiniz."

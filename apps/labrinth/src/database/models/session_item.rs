@@ -10,9 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-const SESSIONS_NAMESPACE: &str = "sessions";
-const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids";
-const SESSIONS_USERS_NAMESPACE: &str = "sessions_users";
+const SESSIONS_NAMESPACE: &str = "sessions:v1";
+const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v1";
+const SESSIONS_USERS_NAMESPACE: &str = "sessions_users:v1";
 
 pub struct SessionBuilder {
     pub session: String,
@@ -226,7 +226,7 @@ impl DBSession {
             let mut redis = redis.connect().await?;
 
             let res = redis
-                .get_deserialized_from_json::<Vec<i64>>(
+                .get_deserialized::<Vec<i64>>(
                     SESSIONS_USERS_NAMESPACE,
                     &user_id.0.to_string(),
                 )
@@ -255,7 +255,7 @@ impl DBSession {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 SESSIONS_USERS_NAMESPACE,
                 user_id.0,
                 &db_sessions,

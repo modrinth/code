@@ -14,7 +14,11 @@ use common::asserts::assert_common_version_ids;
 use common::database::USER_USER_PAT;
 use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
-use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
+use labrinth::database::models::DBVersionId;
+use labrinth::database::models::version_item::{
+    VERSIONS_NAMESPACE, VersionQueryResult,
+};
+use labrinth::database::redis::RedisValue;
 use labrinth::models::ids::VersionId;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionStatus, VersionType,
@@ -47,18 +51,20 @@ async fn test_get_version() {
         assert_eq!(&version.id.to_string(), alpha_version_id);
 
         let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
-        let cached_project = redis_conn
-            .get(
+        let cached_version: RedisValue<
+            VersionQueryResult,
+            DBVersionId,
+            String,
+        > = redis_conn
+            .get_deserialized(
                 VERSIONS_NAMESPACE,
                 &parse_base62(alpha_version_id).unwrap().to_string(),
             )
             .await
             .unwrap()
             .unwrap();
-        let cached_project: serde_json::Value =
-            serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
-            cached_project["val"]["inner"]["project_id"],
+            cached_version.value().inner.project_id.0,
             json!(parse_base62(alpha_project_id).unwrap())
         );
 

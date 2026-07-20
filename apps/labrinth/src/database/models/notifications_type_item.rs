@@ -3,7 +3,7 @@ use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationType;
 use serde::{Deserialize, Serialize};
 
-const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types";
+const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v1";
 
 #[derive(Serialize, Deserialize)]
 pub struct NotificationTypeItem {
@@ -43,7 +43,7 @@ impl NotificationTypeItem {
             let mut redis = redis.connect().await?;
 
             let cached_types = redis
-                .get_deserialized_from_json(NOTIFICATION_TYPES_NAMESPACE, "all")
+                .get_deserialized(NOTIFICATION_TYPES_NAMESPACE, "all")
                 .await?;
 
             if let Some(types) = cached_types {
@@ -63,12 +63,7 @@ impl NotificationTypeItem {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
-                NOTIFICATION_TYPES_NAMESPACE,
-                "all",
-                &types,
-                None,
-            )
+            .set_serialized(NOTIFICATION_TYPES_NAMESPACE, "all", &types, None)
             .await?;
 
         Ok(types)

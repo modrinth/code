@@ -1,5 +1,7 @@
 use crate::auth::checks::is_visible_collection;
-use crate::auth::{filter_visible_collections, get_user_from_headers};
+use crate::auth::{
+    filter_visible_collections, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
@@ -75,6 +77,8 @@ pub async fn collection_create(
     )
     .await?
     .1;
+
+    require_verified_email(&current_user)?;
 
     let limits =
         UserLimits::get_for_collections(&current_user, &client).await?;

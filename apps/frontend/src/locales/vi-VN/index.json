@@ -134,6 +134,12 @@
   "analytics.chart.render-limit.header": {
     "message": "Hiện thị tất cả {count} đường trong biểu đồ?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Đang hiện mọi {itemType, select, project {{count, plural, other {dự án}}} country {{count, plural, other {quốc gia}}} monetization {{count, plural, other {giá trị doanh thu}}} downloadSource {{count, plural, other {nguồn tải}}} downloadReason {{count, plural, other {lý do tải}}} member {{count, plural, other {thành viên}}} projectVersion {{count, plural, other {phiên bản dự án}}} loader {{count, plural, other {mod loader}}} gameVersion {{count, plural, other {phiên bản trò chơi}}} other {{count, plural, other {vật phẩm}}}} từ bảng"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Đang hiện {count} {itemType, select, project {{count, plural, other {dự án}}} country {{count, plural, other {quốc gia}}} monetization {{count, plural, other {giá trị doanh thu}}} downloadSource {{count, plural, other {nguồn tải}}} downloadReason {{count, plural, other {lý do tải}}} member {{count, plural, other {thành viên}}} projectVersion {{count, plural, other {phiên bản dự án}}} loader {{count, plural, other {mod loader}}} gameVersion {{count, plural, other {phiên bản trò chơi}}} other {{count, plural, other {vật phẩm}}}} từ bảng"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, other {# ngày}}"
   },

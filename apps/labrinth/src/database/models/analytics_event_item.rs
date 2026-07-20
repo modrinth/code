@@ -11,7 +11,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 
-const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events";
+const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v1";
 const ANALYTICS_EVENTS_ALL_KEY: &str = "all";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -88,7 +88,7 @@ impl DBAnalyticsEvent {
         let mut redis = redis.connect().await?;
 
         if let Some(events) = redis
-            .get_deserialized_from_json(
+            .get_deserialized(
                 ANALYTICS_EVENTS_NAMESPACE,
                 ANALYTICS_EVENTS_ALL_KEY,
             )
@@ -119,7 +119,7 @@ impl DBAnalyticsEvent {
         .await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 ANALYTICS_EVENTS_NAMESPACE,
                 ANALYTICS_EVENTS_ALL_KEY,
                 &events,

@@ -9,7 +9,7 @@ use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-const TEAMS_NAMESPACE: &str = "teams";
+const TEAMS_NAMESPACE: &str = "teams:v1";
 
 pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,

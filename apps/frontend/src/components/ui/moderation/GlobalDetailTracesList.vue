@@ -42,20 +42,34 @@
 				:key="trace.detail_key"
 				class="universal-card flex flex-col gap-3"
 			>
-				<div class="flex flex-wrap items-start justify-between gap-3">
+				<div class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
 					<div class="min-w-0">
-						<div class="flex min-w-0 items-center gap-2">
+						<div class="flex min-w-0 flex-wrap items-center gap-2">
 							<HashIcon class="shrink-0 text-secondary" aria-hidden="true" />
 							<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
 								Trace
 								<span class="break-all font-mono text-base">{{ trace.detail_key }}</span>
 							</h2>
+							<span
+								v-if="getLatestLocalTrace(trace)"
+								class="rounded-full border border-solid px-2.5 py-1 text-sm font-medium capitalize"
+								:class="getSeverityBadgeColor(getLatestLocalTrace(trace)?.severity)"
+							>
+								{{ getLatestLocalTrace(trace)?.severity }}
+							</span>
 						</div>
-						<p class="m-0 mt-1 text-sm text-secondary">
-							{{ formatTraceCount(trace.local_trace_count) }}
-						</p>
+						<div v-if="getLatestLocalTrace(trace)" class="mt-1 flex flex-wrap gap-x-3 text-sm">
+							<p class="m-0 break-all text-secondary">
+								<span class="font-semibold text-contrast">Issue</span>
+								{{ getLatestLocalTrace(trace)?.issue_type }}
+							</p>
+							<p class="m-0 break-all text-secondary">
+								<span class="font-semibold text-contrast">Path</span>
+								{{ decodeTracePath(getLatestLocalTrace(trace)?.file_path ?? '') }}
+							</p>
+						</div>
 					</div>
-					<div class="flex shrink-0 flex-wrap items-center gap-2">
+					<div class="flex shrink-0 flex-nowrap items-center gap-2">
 						<Badge :type="trace.verdict" />
 						<ButtonStyled color="red">
 							<button
@@ -70,15 +84,14 @@
 				</div>
 
 				<div v-if="getPreviewLocalTraces(trace).length > 0" class="flex flex-col gap-2">
-					<div
-						v-if="getVisibleLocalTraceTotal(trace) > getPreviewLocalTraces(trace).length"
-						class="flex flex-wrap items-center justify-between gap-2"
-					>
+					<div class="flex flex-wrap items-center justify-between gap-2">
 						<p class="m-0 text-sm text-secondary">
-							Showing first {{ getPreviewLocalTraces(trace).length }} of
-							{{ getVisibleLocalTraceTotal(trace) }} local traces
+							Showing {{ getPreviewLocalTraces(trace).length }} of
+							{{ formatTraceCount(getVisibleLocalTraceTotal(trace)) }}
 						</p>
-						<ButtonStyled>
+						<ButtonStyled
+							v-if="getVisibleLocalTraceTotal(trace) > getPreviewLocalTraces(trace).length"
+						>
 							<NuxtLink :to="getGlobalTraceLink(trace)">
 								<ListIcon aria-hidden="true" />
 								View all
@@ -129,7 +142,7 @@ const isLoading = ref(false)
 const loadError = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = 20
-const localTracePreviewLimit = 10
+const localTracePreviewLimit = 3
 const total = ref(0)
 const traces = ref<Labrinth.TechReview.Internal.GlobalIssueDetail[]>([])
 const removingTraceKeys = reactive<Set<string>>(new Set())
@@ -146,6 +159,34 @@ function formatTraceCount(count: number) {
 
 function getPreviewLocalTraces(trace: Labrinth.TechReview.Internal.GlobalIssueDetail) {
 	return trace.local_traces.slice(0, localTracePreviewLimit)
+}
+
+function getLatestLocalTrace(trace: Labrinth.TechReview.Internal.GlobalIssueDetail) {
+	return trace.local_traces.at(-1)
+}
+
+function decodeTracePath(path: string): string {
+	try {
+		return decodeURIComponent(path)
+	} catch {
+		return path
+	}
+}
+
+function getSeverityBadgeColor(
+	severity: Labrinth.TechReview.Internal.DelphiSeverity | undefined,
+): string {
+	switch (severity) {
+		case 'severe':
+			return 'border-red/60 bg-highlight-red text-red'
+		case 'high':
+			return 'border-orange/60 bg-highlight-orange text-orange'
+		case 'medium':
+			return 'border-green/60 bg-highlight-green text-green'
+		case 'low':
+		default:
+			return 'border-blue/60 bg-highlight-blue text-blue'
+	}
 }
 
 function getVisibleLocalTraceTotal(trace: Labrinth.TechReview.Internal.GlobalIssueDetail) {

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::{
-    auth::get_user_from_headers,
+    auth::{get_user_from_headers, require_verified_email},
     database::{
         PgPool,
         models::{
@@ -139,6 +139,8 @@ pub async fn create(
     )
     .await
     .map_err(ApiError::from)?;
+
+    require_verified_email(&user)?;
 
     let limits = UserLimits::get_for_projects(&user, &db)
         .await

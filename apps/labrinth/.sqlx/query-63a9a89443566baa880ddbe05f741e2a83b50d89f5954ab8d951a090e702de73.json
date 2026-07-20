@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            didws.id AS \"id!: DelphiReportIssueDetailsId\",\n            didws.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            didws.key AS \"key!: String\",\n            didws.jar AS \"jar?: String\",\n            didws.file_path AS \"file_path!: String\",\n            didws.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            didws.severity AS \"severity!: DelphiSeverity\",\n            didws.local_status AS \"local_status?: DelphiStatus\",\n            didws.global_status AS \"global_status?: DelphiStatus\",\n            didws.status AS \"status!: DelphiStatus\"\n        FROM delphi_issue_details_with_statuses didws\n        WHERE didws.issue_id = ANY($1::bigint[])\n        ",
+  "query": "\n        SELECT\n            didws.id AS \"id!: DelphiReportIssueDetailsId\",\n            didws.issue_id AS \"issue_id!: DelphiReportIssueId\",\n            didws.key AS \"key!: String\",\n            didws.jar AS \"jar?: String\",\n            didws.file_path AS \"file_path!: String\",\n            didws.data AS \"data!: sqlx::types::Json<HashMap<String, serde_json::Value>>\",\n            didws.severity AS \"severity!: DelphiSeverity\",\n            didws.local_status AS \"local_status?: DelphiStatus\",\n            didws.global_status AS \"global_status?: DelphiStatus\",\n            didws.status AS \"status!: DelphiStatus\"\n        FROM delphi_issue_details_with_statuses didws\n        WHERE didws.issue_id = ANY($1::bigint[])\n        ORDER BY didws.issue_id, didws.id\n        ",
   "describe": {
     "columns": [
       {
@@ -117,5 +117,5 @@
       true
     ]
   },
-  "hash": "9070b1b6a5b1e93eb1fd1838c522fa6084ad6a5c86fafbfe8448ea7cc86f38ba"
+  "hash": "63a9a89443566baa880ddbe05f741e2a83b50d89f5954ab8d951a090e702de73"
 }
