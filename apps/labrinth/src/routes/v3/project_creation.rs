@@ -1,5 +1,7 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
-use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::auth::{
+    AuthenticationError, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
@@ -106,6 +108,9 @@ impl From<crate::routes::ApiError> for CreateError {
             }
             crate::routes::ApiError::CustomAuthentication(err) => {
                 Self::CustomAuthenticationError(err)
+            }
+            crate::routes::ApiError::Auth(err) => {
+                Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::InvalidInput(err)
             | crate::routes::ApiError::Validation(err) => {
@@ -490,6 +495,8 @@ async fn project_create_inner(
         Scopes::PROJECT_CREATE,
     )
     .await?;
+
+    require_verified_email(&current_user)?;
 
     let limits = UserLimits::get_for_projects(&current_user, pool).await?;
     if limits.current >= limits.max {

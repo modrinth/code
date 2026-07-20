@@ -24,6 +24,7 @@ use crate::util::captcha::check_hcaptcha;
 use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
+use crate::util::neverbounce::{check_email, email_check_error_generic};
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
@@ -59,6 +60,10 @@ use webauthn_rs::prelude::{
     Webauthn, WebauthnError,
 };
 use zxcvbn::Score;
+
+/// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
+const DISPOSABLE_EMAIL_BLOCKLIST: &str =
+    include_str!("../../../assets/disposable_email_blocklist.txt");
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
@@ -1453,7 +1458,7 @@ fn validate_account_consent(account_consent: bool) -> Result<(), ApiError> {
     Ok(())
 }
 
-/// Create account with OAuth.  
+/// Create account with OAuth.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1495,6 +1500,10 @@ pub async fn create_oauth_account(
     else {
         return Err(ApiError::Internal(eyre!("invalid flow kind")));
     };
+
+    if let Some(email) = &user.email {
+        ensure_email_is_usable(email).await?;
+    }
 
     let mut txn = db
         .begin()
@@ -1542,7 +1551,7 @@ struct DiscordCommunityHandoffPayload {
     nonce: String,
 }
 
-/// Link Discord community.  
+/// Link Discord community.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1619,7 +1628,7 @@ pub async fn discord_community_link(
     Ok(web::Json(DiscordCommunityLinkResponse { url }))
 }
 
-/// Remove an auth provider.  
+/// Remove an auth provider.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1811,6 +1820,63 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
+/// The bundled disposable domain list is checked first. Environment blacklist
+/// entries are matched literally, unless they begin with `*.`, in which case
+/// they match any subdomain of the remaining suffix.
+fn is_blacklisted_domain(domain: &str) -> bool {
+    let domain = domain.to_ascii_lowercase();
+
+    if DISPOSABLE_EMAIL_BLOCKLIST.lines().any(|entry| {
+        // The upstream list expects listed domains to match subdomains too.
+        domain == entry
+            || domain
+                .strip_suffix(entry)
+                .is_some_and(|subdomain| subdomain.ends_with('.'))
+    }) {
+        return true;
+    }
+
+    ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
+        let entry = entry.trim().to_ascii_lowercase();
+
+        match entry.strip_prefix("*.") {
+            Some(suffix) => domain
+                .strip_suffix(suffix)
+                .is_some_and(|subdomain| subdomain.ends_with('.')),
+            None => entry == domain,
+        }
+    })
+}
+
+fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return Err(ApiError::Request(email_check_error_generic()));
+    };
+
+    if is_blacklisted_domain(domain) {
+        info!(email.domain = domain, "blacklisted email domain, denying");
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
+async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
+    ensure_email_domain_is_allowed(email)?;
+
+    let result = check_email(email).await.map_err(ApiError::Request)?;
+
+    if matches!(
+        result,
+        neverbounce::VerificationResult::Invalid
+            | neverbounce::VerificationResult::Disposable
+    ) {
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
 impl AccountRegisterFlow {
     async fn validate(
         self,
@@ -1964,7 +2030,7 @@ impl ReadyAccountRegisterFlow {
     }
 }
 
-/// Validate password account creation.  
+/// Validate password account creation.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -1992,7 +2058,7 @@ pub async fn validate_create_account_with_password(
     Ok(())
 }
 
-/// Create account with a password.  
+/// Create account with a password.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2021,6 +2087,8 @@ pub async fn create_account_with_password(
         return Err(ApiError::Turnstile);
     }
 
+    ensure_email_is_usable(&new_account.email).await?;
+
     let mut transaction = pool.begin().await?;
 
     let ready_flow = AccountRegisterFlow::from(new_account)
@@ -2043,7 +2111,7 @@ pub struct Login {
     pub challenge: String,
 }
 
-/// Log in with a password.  
+/// Log in with a password.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2204,7 +2272,7 @@ async fn validate_2fa_code(
     }
 }
 
-/// Complete login with 2FA.  
+/// Complete login with 2FA.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2264,7 +2332,7 @@ pub async fn login_2fa(
     }
 }
 
-/// Start 2FA setup.  
+/// Start 2FA setup.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2315,7 +2383,7 @@ pub async fn begin_2fa_flow(
     }
 }
 
-/// Finish 2FA setup.  
+/// Finish 2FA setup.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2450,7 +2518,7 @@ pub struct Remove2FA {
     pub code: String,
 }
 
-/// Remove 2FA.  
+/// Remove 2FA.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2550,7 +2618,7 @@ pub struct ResetPassword {
     pub challenge: String,
 }
 
-/// Start password reset.  
+/// Start password reset.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2656,7 +2724,7 @@ pub struct ChangePassword {
     pub new_password: Option<String>,
 }
 
-/// Change password.  
+/// Change password.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2822,7 +2890,7 @@ pub struct SetEmail {
     pub email: String,
 }
 
-/// Set email address.  
+/// Set email address.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -2874,6 +2942,8 @@ pub async fn set_email(
             "Email is already registered on Modrinth! Try 'Forgot password' in incognito to access and delete your other account.".to_string(),
         ));
     }
+
+    ensure_email_is_usable(&email_address.email).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -2944,7 +3014,7 @@ pub async fn set_email(
     Ok(HttpResponse::Ok().finish())
 }
 
-/// Resend verification email.  
+/// Resend verification email.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3019,7 +3089,7 @@ pub struct VerifyEmail {
     pub flow: String,
 }
 
-/// Verify email address.  
+/// Verify email address.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3085,7 +3155,7 @@ pub async fn verify_email(
     }
 }
 
-/// Subscribe to the newsletter.  
+/// Subscribe to the newsletter.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3134,7 +3204,7 @@ pub async fn subscribe_newsletter(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Get newsletter subscription status.  
+/// Get newsletter subscription status.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3184,7 +3254,7 @@ pub struct RegisterPasskeyResponse {
     pub flow: String,
 }
 
-/// Start passkey registration.  
+/// Start passkey registration.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3284,7 +3354,7 @@ pub struct PasskeyResponse {
     pub last_used: Option<chrono::DateTime<Utc>>,
 }
 
-/// Finish passkey registration.  
+/// Finish passkey registration.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3393,7 +3463,7 @@ pub struct AuthenticatePasskeyResponse {
     pub flow: String,
 }
 
-/// Start passkey authentication.  
+/// Start passkey authentication.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3436,7 +3506,7 @@ pub struct AuthenticatePasskeyFinish {
     pub credential: PublicKeyCredential,
 }
 
-/// Finish passkey authentication.  
+/// Finish passkey authentication.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3553,7 +3623,7 @@ pub async fn authenticate_passkey_finish(
     }
 }
 
-/// List passkeys.  
+/// List passkeys.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3603,7 +3673,7 @@ pub struct RenamePasskey {
     pub name: String,
 }
 
-/// Rename a passkey.  
+/// Rename a passkey.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",
@@ -3658,7 +3728,7 @@ pub async fn rename_passkey(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Delete a passkey.  
+/// Delete a passkey.
 #[utoipa::path(
 	context_path = "/auth",
 	tag = "auth",

@@ -2561,9 +2561,6 @@
   "profile.label.collection": {
     "message": "Coleção"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {transferência} other {transferências}}"
-  },
   "profile.label.joined": {
     "message": "Entrou"
   },
@@ -2581,9 +2578,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizações"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural,one {projeto} other {projetos}}"
   },
   "profile.label.saving": {
     "message": "A guardar..."

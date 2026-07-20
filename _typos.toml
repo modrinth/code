@@ -11,6 +11,8 @@ extend-exclude = [
   "packages/moderation/src/utils.ts",
   # contains payment card IDs like `IY1VMST1MOXS` which are flagged
   "apps/labrinth/src/queue/payouts/mod.rs",
+  # contains domain names with deliberate typos
+  "apps/labrinth/assets/disposable_email_blocklist.txt"
 ]
 
 [default.extend-words]

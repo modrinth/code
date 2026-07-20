@@ -2672,6 +2672,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "You must verify your email before publishing on Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Email verification required"
+  },
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
@@ -2999,6 +3005,24 @@
   "muralpay.warning.wallet-address": {
     "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."
   },
+  "organization.button.manage": {
+    "message": "Manage"
+  },
+  "organization.button.manage-projects": {
+    "message": "Manage projects"
+  },
+  "organization.label.downloads": {
+    "message": "downloads"
+  },
+  "organization.label.members": {
+    "message": "members"
+  },
+  "organization.label.organization": {
+    "message": "Organization"
+  },
+  "organization.label.projects": {
+    "message": "projects"
+  },
   "organization.settings.projects.edit-links.affected-projects": {
     "message": "Changes will be applied to {count, plural, one {# project} other {# projects}}."
   },
@@ -3068,8 +3092,8 @@
   "profile.label.collection": {
     "message": "Collection"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
+  "profile.label.download-count": {
+    "message": "{count, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Joined"
@@ -3089,8 +3113,8 @@
   "profile.label.organizations": {
     "message": "Organizations"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {project} other {projects}}"
+  "profile.label.project-count": {
+    "message": "{count, plural, one {project} other {projects}}"
   },
   "profile.label.saving": {
     "message": "Saving..."
@@ -3253,6 +3277,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "Don't show again"
+  },
+  "project.actions.edit-project": {
+    "message": "Edit project"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Rescan modpack"
   },
   "project.actions.review-project": {
     "message": "Review project"
@@ -3655,12 +3685,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Visit projects dashboard"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {follower} other {followers}}"
   },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."

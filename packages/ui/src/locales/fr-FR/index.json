@@ -455,11 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Mis à jour"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Ne pas installer"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Ajouté"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Supprimé"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Mis à jour"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Installer quand même"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} retirés"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Un fichier est seulement examiné s'il est publié sur Modrinth, peu importe son format (y compris .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Certains contenus de votre serveur n’ont pas pu être analysés et peuvent être affectés par ce changement."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Cette mise à jour contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons de seulement installer des fichiers de sources en qui vous avez confiance."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Avertissement de fichiers inconnus"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Inconnu"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} mis à jour"
@@ -657,7 +684,7 @@
     "defaultMessage": "Sélectionner le numéro de build"
   },
   "creation-flow.modal.custom-setup.build-number.search-placeholder": {
-    "defaultMessage": "Rechercher un numéro de build"
+    "defaultMessage": "Rechercher un numéro de build..."
   },
   "creation-flow.modal.custom-setup.content-loader.label": {
     "defaultMessage": "Loader de contenu"
@@ -666,7 +693,7 @@
     "defaultMessage": "Sélectionner la version du jeu"
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
-    "defaultMessage": "Rechercher une version de jeu"
+    "defaultMessage": "Rechercher une version de jeu..."
   },
   "creation-flow.modal.custom-setup.icon.remove": {
     "defaultMessage": "Retirer l'icône"
@@ -690,7 +717,7 @@
     "defaultMessage": "Sélectionner la version du loader"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
-    "defaultMessage": "Rechercher une version de loader"
+    "defaultMessage": "Rechercher une version de loader..."
   },
   "creation-flow.modal.custom-setup.loader.label": {
     "defaultMessage": "Loader"
@@ -1221,7 +1248,7 @@
     "defaultMessage": "Ce dossier et tout son contenu seront définitivement supprimés. Cette action est irréversible."
   },
   "files.editor.failed-to-open-text": {
-    "defaultMessage": "Impossible de charger le contenu du fichier"
+    "defaultMessage": "Impossible de charger le contenu du fichier."
   },
   "files.editor.failed-to-open-title": {
     "defaultMessage": "Impossible d'ouvrir le fichier"
@@ -1236,7 +1263,7 @@
     "defaultMessage": "Votre fichier a été sauvegardé."
   },
   "files.editor.file-saved-title": {
-    "defaultMessage": "FIchier sauvegardé"
+    "defaultMessage": "Fichier sauvegardé"
   },
   "files.editor.find-close": {
     "defaultMessage": "Fermer"
@@ -2121,7 +2148,7 @@
     "defaultMessage": "Ce mod dépend d'un mod côté client et peut causer des problèmes lors du démarrage de votre serveur"
   },
   "label.client-only-warning": {
-    "defaultMessage": "Ce mod est côté client et peut causer des problèmes lors du démarrage de votre serveur."
+    "defaultMessage": "Ce mod est côté client et peut causer des problèmes lors du démarrage de votre serveur"
   },
   "label.client-retained-warning": {
     "defaultMessage": "Il s'agit d'un mod côté client qui a été installé en tant que dépendance et peut causer des problèmes lors du démarrage de votre serveur"
@@ -2484,7 +2511,7 @@
     "defaultMessage": "Tirer et déposer pour importer ou cliquer pour sélectionner le fichier"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
-    "defaultMessage": "Entrez l'URL de l'image"
+    "defaultMessage": "Entrez l'URL de l'image..."
   },
   "markdown-editor.insert-button": {
     "defaultMessage": "Insérer"
@@ -2493,16 +2520,16 @@
     "defaultMessage": "Insérer un lien"
   },
   "markdown-editor.link-modal.label-field.placeholder": {
-    "defaultMessage": "Entrez l'étiquette"
+    "defaultMessage": "Entrez l'étiquette..."
   },
   "markdown-editor.link-modal.label-field.title": {
-    "defaultMessage": "étiquette"
+    "defaultMessage": "Étiquette"
   },
   "markdown-editor.link-modal.url-field.placeholder": {
-    "defaultMessage": "Entrez l'URL"
+    "defaultMessage": "Entrez l'URL..."
   },
   "markdown-editor.markdown-formatting-support": {
-    "defaultMessage": "Cet éditeur supporte le <markdown-link>format Markdown.</markdown-link>"
+    "defaultMessage": "Cet éditeur supporte le <markdown-link>format Markdown.</markdown-link>."
   },
   "markdown-editor.max-length.label": {
     "defaultMessage": "Longueur Maximum :"
@@ -2580,7 +2607,7 @@
     "defaultMessage": "URL invalide. Soyez sûr(e) que l'URL est bien tapée."
   },
   "markdown-editor.url-validation-error.unsupported-protocol": {
-    "defaultMessage": "Protocole insupporté. Utilisez HTTP ou HTTPS."
+    "defaultMessage": "Protocole insupporté. Utilisez http ou https."
   },
   "markdown-editor.video-embed.title": {
     "defaultMessage": "Lanceur de vidéo YouTube"
@@ -3572,8 +3599,17 @@
   "search.filter.option.show_more": {
     "defaultMessage": "Voir plus"
   },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Avancé"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Exclure les data packs"
+  },
   "search.filter_type.advanced.exclude_mod": {
     "defaultMessage": "Exclure les mods"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Exclure les plugins"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environnement"
@@ -4191,7 +4227,7 @@
     "defaultMessage": "Sauvegarde annulée"
   },
   "servers.backups.admonition.backup-completed.description": {
-    "defaultMessage": "{backupName} terminée avec succès"
+    "defaultMessage": "{backupName} terminée avec succès."
   },
   "servers.backups.admonition.backup-completed.title": {
     "defaultMessage": "Sauvegarde terminée"
@@ -5539,6 +5575,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Ignorer tout"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Ne pas installer"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Ne plus afficher cet avertissement"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Confirmer l'installation"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Installer quand même"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Les logiciels malveillants sont souvent distribués à travers des mods en les partageant sur des plateformes comme Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " n'est pas publié sur Modrinth. Nous recommandons de seulement installer des fichiers de sources en qui vous avez confiance."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Avertissement de fichier inconnu"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons de seulement installer des fichiers de sources en qui vous avez confiance."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Avertissement de fichiers inconnus"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Un fichier est seulement examiné s'il est publié sur Modrinth, peu importe son format (y compris .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Fichiers non reconnus"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Cet utilisateur existe depuis Modrinth Alpha, qui s'est terminé en novembre 2020."
