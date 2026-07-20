@@ -24,7 +24,10 @@
 						placement="center"
 						btn-class="inline-flex items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
-						<component :is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)" class="text-orange" />
+						<component
+							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
+							class="text-orange"
+						/>
 						{{ checklistTitleText }}
 						<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
 							<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
@@ -42,7 +45,10 @@
 						disabled
 						class="inline-flex cursor-default items-center gap-2 bg-transparent p-0 text-2xl font-extrabold text-contrast"
 					>
-						<component :is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)" class="text-orange" />
+						<component
+							:is="isPseudoStage ? ScaleIcon : (currentStageObj._icon ?? ScaleIcon)"
+							class="text-orange"
+						/>
 						{{ checklistTitleText }}
 					</button>
 				</h1>
@@ -346,9 +352,7 @@
 											<CheckIcon aria-hidden="true" />
 											{{ loadingMessage ? 'Generating...' : 'Generate Message' }}
 										</template>
-										<template v-else>
-											<RightArrowIcon aria-hidden="true" /> Next
-										</template>
+										<template v-else> <RightArrowIcon aria-hidden="true" /> Next </template>
 									</button>
 								</ButtonStyled>
 							</div>

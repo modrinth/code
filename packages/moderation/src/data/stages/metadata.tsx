@@ -51,8 +51,11 @@ export default function () {
 					return (
 						<div class="markdown-body w-full">
 							<strong>Unique environments:</strong> {env.length}
-							<br/>
-							<strong>Environments:</strong> <code>{env.map(id => ENVIRONMENTS_COPY[id].title.defaultMessage ?? id).join(', ')}</code>
+							<br />
+							<strong>Environments:</strong>{' '}
+							<code>
+								{env.map((id) => ENVIRONMENTS_COPY[id].title.defaultMessage ?? id).join(', ')}
+							</code>
 						</div>
 					)
 				},

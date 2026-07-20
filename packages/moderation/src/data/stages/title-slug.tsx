@@ -47,7 +47,9 @@ export default function () {
 	let slugDebounceTimer: ReturnType<typeof setTimeout> | undefined
 
 	function currentSlug(state: Record<string, NodeState>) {
-		return (state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value ?? project.value.slug
+		return (
+			(state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value ?? project.value.slug
+		)
 	}
 
 	async function checkSlugTaken(slug: string): Promise<Labrinth.Projects.v3.Project | null> {
@@ -181,9 +183,9 @@ export default function () {
 				return (
 					<div class="markdown-body w-full">
 						<strong>Title:</strong> {project.value.name}
-						<br/>
+						<br />
 						<strong>Slug:</strong> <code>{project.value.slug}</code>
-						<br/>
+						<br />
 						<strong>Slug Taken:</strong>{' '}
 						{autoSlugStatus.value === 'loading' ? (
 							'...'
@@ -315,10 +317,9 @@ export default function () {
 									if (slugValidation.value === 'available') {
 										const slug = state['correct-slug'] as string | undefined
 										if (slug)
-											correct = await md(
-												'checklist/messages/title-slug/slug/correction',
-												() => ({ SUGGESTED_SLUG: slug }),
-											)(state)
+											correct = await md('checklist/messages/title-slug/slug/correction', () => ({
+												SUGGESTED_SLUG: slug,
+											}))(state)
 									}
 									return md('checklist/messages/title-slug/slug/misused', () => ({
 										CORRECT: correct,
