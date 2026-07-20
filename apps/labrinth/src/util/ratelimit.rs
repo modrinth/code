@@ -11,7 +11,7 @@ use chrono::Utc;
 use std::str::FromStr;
 use std::sync::Arc;
 
-const RATE_LIMIT_NAMESPACE: &str = "rate_limit";
+const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v1";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes
 const MINUTE_IN_NANOS: i64 = 60_000_000_000;
 

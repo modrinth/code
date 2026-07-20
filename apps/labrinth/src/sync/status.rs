@@ -17,10 +17,10 @@ pub async fn get_user_status(
 
     if let Ok(mut conn) = redis.pool.get().await
         && let Ok(mut statuses) =
-            conn.sscan::<_, String>(get_field_name(user)).await
-        && let Some(status_json) = statuses.next_item().await
+            conn.sscan::<_, Vec<u8>>(get_field_name(user)).await
+        && let Some(status) = statuses.next_item().await
     {
-        return serde_json::from_str::<UserStatus>(&status_json).ok();
+        return postcard::from_bytes::<UserStatus>(&status).ok();
     }
 
     None
@@ -40,11 +40,11 @@ pub async fn replace_user_status(
         let mut pipe = redis::pipe();
         pipe.atomic();
         if let Some(status) = old_status {
-            pipe.srem(&field_name, serde_json::to_string(&status).unwrap())
+            pipe.srem(&field_name, postcard::to_allocvec(status).unwrap())
                 .ignore();
         }
         if let Some(status) = new_status {
-            pipe.sadd(&field_name, serde_json::to_string(&status).unwrap())
+            pipe.sadd(&field_name, postcard::to_allocvec(status).unwrap())
                 .ignore();
             pipe.expire(&field_name, EXPIRY_TIME_SECONDS).ignore();
         }
@@ -65,5 +65,5 @@ pub async fn push_back_user_expiry(
 }
 
 fn get_field_name(user: UserId) -> String {
-    format!("user_status:{user}")
+    format!("user_status:v1:{user}")
 }

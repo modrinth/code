@@ -756,6 +756,7 @@ export namespace Labrinth {
 				email: string
 				challenge: string
 				sign_up_newsletter?: boolean
+				account_consent?: boolean
 			}
 
 			export type CreateAccountResponse = {
@@ -773,6 +774,7 @@ export namespace Labrinth {
 				state: string
 				challenge: string
 				sign_up_newsletter: boolean
+				account_consent?: boolean
 			}
 
 			export type CreateOAuthAccountResponse = {

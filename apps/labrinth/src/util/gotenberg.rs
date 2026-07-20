@@ -14,7 +14,7 @@ pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
 pub const MODRINTH_PAYMENT_ID: HeaderName =
     HeaderName::from_static("modrinth-payment-id");
-pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements";
+pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements:v1";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentStatement {
@@ -203,7 +203,7 @@ impl GotenbergClient {
         .wrap_internal_err("failed to get document over Redis")?
         .wrap_internal_err("no document was returned from Redis")?;
 
-        let document = serde_json::from_str::<
+        let document = postcard::from_bytes::<
             Result<GotenbergDocument, GotenbergError>,
         >(&document)
         .wrap_internal_err("failed to deserialize Redis document response")?

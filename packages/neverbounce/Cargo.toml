@@ -1,0 +1,17 @@
+[package]
+name = "neverbounce"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "NeverBounce API client"
+repository.workspace = true
+license = "MIT"
+keywords = []
+categories = ["api-bindings"]
+
+[dependencies]
+reqwest = { workspace = true, features = ["json"] }
+serde = { workspace = true, features = ["derive"] }
+
+[lints]
+workspace = true

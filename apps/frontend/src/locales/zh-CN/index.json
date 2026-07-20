@@ -81,7 +81,7 @@
     "message": "{hours}小时"
   },
   "analytics.chart.controls.active-count": {
-    "message": "在线{count}人"
+    "message": "显示{count}项"
   },
   "analytics.chart.controls.annotations": {
     "message": "注释"
@@ -2082,10 +2082,10 @@
     "message": "按年支付"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "CPU 突发线程是如何工作的？"
+    "message": "CPU 爆发线程是怎样运作的？"
   },
   "hosting-marketing.faq.burst-threads.answer": {
-    "message": "当您的服务器处于高负载状态时，我们会临时为其分配额外的 CPU 线程，以帮助缓解卡顿和性能不稳定。这有助于防止 TPS 降至 20 以下，从而尽确保玩家体验。由于这些额外的 CPU 线程仅会在高负载期间短暂提供，因此它们可能不会显示在 Spark 报告或其他性能分析工具中。"
+    "message": "当你的服务器负载过高时，我们会暂时让它使用额外的 CPU 线程，帮你缓解延迟飙升与不稳定的问题。这有助于防止 TPS 掉到 20 以下，尽可能确保你获得最流畅的体验。由于只有在高负载期间，这些额外 CPU 线程才会短暂出现，所以 Spark 等性能分析工具可能不会显示出这些线程。"
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Modrinth Hosting 服务器是在哪种 CPU 上运行的？"
@@ -2669,6 +2669,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升级至 Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "您必须先验证您的电子邮箱才能在 Modrinth 上发布内容。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "需要验证电子邮件"
+  },
   "moderation.exclude-technical-review": {
     "message": "排除技术评审"
   },
@@ -3062,9 +3068,6 @@
   "profile.label.collection": {
     "message": "收藏夹"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {次下载}}"
-  },
   "profile.label.joined": {
     "message": "加入于"
   },
@@ -3082,9 +3085,6 @@
   },
   "profile.label.organizations": {
     "message": "组织"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "profile.label.saving": {
     "message": "正在保存…"
@@ -3649,12 +3649,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "访问项目的控制面板"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {下载}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, other {关注者}}"
   },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
@@ -4566,7 +4560,7 @@
     "message": "{price} / {interval}"
   },
   "settings.billing.pyro.cpu": {
-    "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
+    "message": "{shared} 个共享 CPU（爆发时最多 {bursts} CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被停用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："

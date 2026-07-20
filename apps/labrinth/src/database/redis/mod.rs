@@ -12,12 +12,15 @@ use prometheus::{IntGauge, Registry};
 use redis::ToRedisArgs;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
+use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
+use thiserror::Error;
 use tracing::{Instrument, info, info_span};
 use util::{cmd, redis_pipe};
 
@@ -41,8 +44,112 @@ const MGET_CHUNK_SIZE: usize = 32;
 // BytesMut peak capacity that builds up under steady load.
 const REDIS_MAX_CONN_AGE: Duration = Duration::from_secs(120);
 
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Codec {
+    Raw = 0,
+    Lz4 = 1,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EncodingFormat {
+    Json,
+    Postcard,
+}
+
+#[derive(Debug, Error)]
+#[error("invalid redis codec")]
+pub struct InvalidCodec;
+
+#[derive(Debug, Error)]
+#[error("invalid redis encoding format")]
+pub struct InvalidEncodingFormat;
+
+impl TryFrom<u8> for Codec {
+    type Error = InvalidCodec;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Raw),
+            1 => Ok(Self::Lz4),
+            _ => Err(InvalidCodec),
+        }
+    }
+}
+
+impl FromStr for Codec {
+    type Err = InvalidCodec;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "lz4" => Ok(Self::Lz4),
+            _ => Err(InvalidCodec),
+        }
+    }
+}
+
+impl FromStr for EncodingFormat {
+    type Err = InvalidEncodingFormat;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "json" => Ok(Self::Json),
+            "postcard" => Ok(Self::Postcard),
+            _ => Err(InvalidEncodingFormat),
+        }
+    }
+}
+
+fn encode_value<T: Serialize>(value: &T) -> Result<Vec<u8>, DatabaseError> {
+    let mut value = match ENV.REDIS_ENCODING_FORMAT {
+        EncodingFormat::Json => serde_json::to_vec(value)?,
+        EncodingFormat::Postcard => postcard::to_allocvec(value)?,
+    };
+
+    if ENV.REDIS_COMPRESSION_LEVEL > 0
+        && ENV.REDIS_COMPRESSION_ALGORITHM == Codec::Lz4
+        && value.len() >= ENV.REDIS_COMPRESSION_THRESHOLD_BYTES
+    {
+        let compressed = lz4_flex::block::compress_prepend_size(&value);
+        let savings_ratio = value.len().saturating_sub(compressed.len()) as f64
+            / value.len().max(1) as f64
+            * 100.0;
+
+        if savings_ratio >= ENV.REDIS_COMPRESSION_MIN_SAVINGS_RATIO {
+            let mut encoded = Vec::with_capacity(compressed.len() + 1);
+            encoded.push(Codec::Lz4 as u8);
+            encoded.extend(compressed);
+            return Ok(encoded);
+        }
+    }
+
+    let mut encoded = Vec::with_capacity(value.len() + 1);
+    encoded.push(Codec::Raw as u8);
+    encoded.append(&mut value);
+    Ok(encoded)
+}
+
+fn decode_value<T>(value: &[u8]) -> Option<T>
+where
+    T: for<'a> Deserialize<'a>,
+{
+    let (codec, value) = value.split_first()?;
+    let value = match Codec::try_from(*codec).ok()? {
+        Codec::Raw => Cow::Borrowed(value),
+        Codec::Lz4 => {
+            Cow::Owned(lz4_flex::block::decompress_size_prepended(value).ok()?)
+        }
+    };
+
+    match ENV.REDIS_ENCODING_FORMAT {
+        EncodingFormat::Json => serde_json::from_slice(&value).ok(),
+        EncodingFormat::Postcard => postcard::from_bytes(&value).ok(),
+    }
+}
+
 fn cache_expiries(namespace: &str) -> (i64, i64) {
-    match namespace {
+    // Namespaces may embed a version suffix like `:v1`, so split it out.
+    match namespace.split_once(':').map(|t| t.0).unwrap_or(namespace) {
         "versions" | "versions_files" => {
             (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
         }
@@ -367,12 +474,11 @@ impl RedisPool {
                 for chunk in args.chunks(MGET_CHUNK_SIZE) {
                     let part = cmd("MGET")
                         .arg(chunk)
-                        .query_async::<Vec<Option<String>>>(&mut connection)
+                        .query_async::<Vec<Option<Vec<u8>>>>(&mut connection)
                         .await?;
                     cached_values.extend(part.into_iter().filter_map(|x| {
                         x.and_then(|val| {
-                            serde_json::from_str::<RedisValue<T, K, S>>(&val)
-                                .ok()
+                            decode_value::<RedisValue<T, K, S>>(&val)
                         })
                         .map(|val| (val.key.clone(), val))
                     }));
@@ -492,7 +598,7 @@ impl RedisPool {
                                 "{}_{namespace}:{key}",
                                 self.meta_namespace
                             ),
-                            serde_json::to_string(&value)?,
+                            encode_value(&value)?,
                             default_expiry as u64,
                         );
                         pipe_cmds += 1;
@@ -624,30 +730,27 @@ impl<'a> Drop for LockSentinel<'a> {
 
 impl RedisConnection {
     #[tracing::instrument(skip(self))]
-    pub async fn set(
+    pub async fn set<D>(
         &mut self,
         namespace: &str,
         id: &str,
-        data: &str,
+        data: D,
         expiry: Option<i64>,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<(), DatabaseError>
+    where
+        D: ToRedisArgs + Send + Sync + Debug,
+    {
         let mut cmd = cmd("SET");
-        redis_args(
-            &mut cmd,
-            vec![
-                format!("{}_{}:{}", self.meta_namespace, namespace, id),
-                data.to_string(),
-                "EX".to_string(),
-                expiry.unwrap_or(DEFAULT_EXPIRY).to_string(),
-            ]
-            .as_slice(),
-        );
+        cmd.arg(format!("{}_{}:{}", self.meta_namespace, namespace, id))
+            .arg(data)
+            .arg("EX")
+            .arg(expiry.unwrap_or(DEFAULT_EXPIRY));
         redis_execute::<()>(&mut cmd, &mut self.connection).await?;
         Ok(())
     }
 
     #[tracing::instrument(skip(self, id, data))]
-    pub async fn set_serialized_to_json<Id, D>(
+    pub async fn set_serialized<Id, D>(
         &mut self,
         namespace: &str,
         id: Id,
@@ -658,13 +761,8 @@ impl RedisConnection {
         Id: Display,
         D: serde::Serialize,
     {
-        self.set(
-            namespace,
-            &id.to_string(),
-            &serde_json::to_string(&data)?,
-            expiry,
-        )
-        .await
+        self.set(namespace, &id.to_string(), encode_value(&data)?, expiry)
+            .await
     }
 
     #[tracing::instrument(skip(self))]
@@ -688,7 +786,7 @@ impl RedisConnection {
         &mut self,
         namespace: &str,
         ids: &[String],
-    ) -> Result<Vec<Option<String>>, DatabaseError> {
+    ) -> Result<Vec<Option<Vec<u8>>>, DatabaseError> {
         let mut cmd = cmd("MGET");
         redis_args(
             &mut cmd,
@@ -702,7 +800,7 @@ impl RedisConnection {
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn get_deserialized_from_json<R>(
+    pub async fn get_deserialized<R>(
         &mut self,
         namespace: &str,
         id: &str,
@@ -710,14 +808,19 @@ impl RedisConnection {
     where
         R: for<'a> serde::Deserialize<'a>,
     {
-        Ok(self
-            .get(namespace, id)
-            .await?
-            .and_then(|x| serde_json::from_str(&x).ok()))
+        let mut cmd = cmd("GET");
+        redis_args(
+            &mut cmd,
+            vec![format!("{}_{}:{}", self.meta_namespace, namespace, id)]
+                .as_slice(),
+        );
+        let value: Option<Vec<u8>> =
+            redis_execute(&mut cmd, &mut self.connection).await?;
+        Ok(value.and_then(|value| decode_value(&value)))
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn get_many_deserialized_from_json<R>(
+    pub async fn get_many_deserialized<R>(
         &mut self,
         namespace: &str,
         ids: &[String],
@@ -729,8 +832,8 @@ impl RedisConnection {
             .get_many(namespace, ids)
             .await?
             .into_iter()
-            .map(|x| x.and_then(|val| serde_json::from_str::<R>(&val).ok()))
-            .collect::<Vec<_>>())
+            .map(|value| value.and_then(|value| decode_value::<R>(&value)))
+            .collect())
     }
 
     #[tracing::instrument(skip(self, id))]
@@ -799,7 +902,7 @@ impl RedisConnection {
         namespace: &str,
         key: &str,
         timeout: Option<f64>,
-    ) -> Result<Option<[String; 2]>, DatabaseError> {
+    ) -> Result<Option<[Vec<u8>; 2]>, DatabaseError> {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
         // a timeout of 0 is infinite
         let timeout = timeout.unwrap_or(0.0);
@@ -829,10 +932,15 @@ impl RedisConnection {
 #[derive(Serialize, Deserialize)]
 pub struct RedisValue<T, K, S> {
     key: K,
-    #[serde(skip_serializing_if = "Option::is_none")]
     alias: Option<S>,
     iat: i64,
     val: T,
+}
+
+impl<T, K, S> RedisValue<T, K, S> {
+    pub fn value(&self) -> &T {
+        &self.val
+    }
 }
 
 pub fn redis_args(cmd: &mut util::InstrumentedCmd, args: &[String]) {
