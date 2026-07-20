@@ -2672,6 +2672,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "在 Modrinth 上發行內容之前，你必須先驗證你的電子郵件地址。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "需要驗證電子郵件地址"
+  },
   "moderation.exclude-technical-review": {
     "message": "排除技術審查"
   },

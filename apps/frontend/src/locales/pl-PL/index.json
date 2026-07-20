@@ -132,7 +132,7 @@
     "message": "Pokaż szczegóły analityki monetyzacji"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają, że użytkownik jest zalogowany."
+    "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają bycia zalogowanym."
   },
   "analytics.chart.legend.monetization-details.title": {
     "message": "Szczegóły analityki monetyzacji"
@@ -1029,7 +1029,7 @@
     "message": "Wyślij "
   },
   "conversation-thread.action.send-to-review": {
-    "message": "Wyślij do sprawdzenia"
+    "message": "Wyślij do przeglądu"
   },
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Wyślij do przeglądu z odpowiedzią"

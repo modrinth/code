@@ -21,19 +21,19 @@
     "message": "リセット"
   },
   "analytics.breakdown.country": {
-    "message": "国"
+    "message": "国 / 地域"
   },
   "analytics.breakdown.dependent-project-download": {
     "message": "依存プロジェクト"
   },
   "analytics.breakdown.dependent-project-type": {
-    "message": "依存プロジェクトの種類"
+    "message": "依存プロジェクトのタイプ"
   },
   "analytics.breakdown.download-reason": {
-    "message": "きっかけ"
+    "message": "ダウンロードの追加情報"
   },
   "analytics.breakdown.download-source": {
-    "message": "ソース"
+    "message": "プラットフォーム"
   },
   "analytics.breakdown.game-version": {
     "message": "ゲームのバージョン"
@@ -42,13 +42,13 @@
     "message": "内訳"
   },
   "analytics.breakdown.loader": {
-    "message": "ローダー"
+    "message": "ゲームのローダー"
   },
   "analytics.breakdown.members": {
     "message": "メンバー"
   },
   "analytics.breakdown.monetization": {
-    "message": "収益"
+    "message": "マネタイズ"
   },
   "analytics.breakdown.none.selected": {
     "message": "分析 - デフォルト"
@@ -158,6 +158,9 @@
   "analytics.empty.no-data-for-analytics": {
     "message": "統計に使用可能なデータがありません"
   },
+  "analytics.filter.game-version-type": {
+    "message": "ゲームバージョンタイプ"
+  },
   "analytics.filter.game-version-type.all": {
     "message": "全て"
   },
@@ -245,6 +248,12 @@
   "analytics.project-status.approved": {
     "message": "承認済み"
   },
+  "analytics.project-status.draft": {
+    "message": "ドラフト"
+  },
+  "analytics.project-status.other": {
+    "message": "その他"
+  },
   "analytics.project-status.private": {
     "message": "非公開"
   },
@@ -253,6 +262,12 @@
   },
   "analytics.project.all": {
     "message": "全てのプロジェクト"
+  },
+  "analytics.project.select": {
+    "message": "プロジェクトを選択"
+  },
+  "analytics.project.your": {
+    "message": "あなたのプロジェクト"
   },
   "analytics.query.filter.add": {
     "message": "条件を追加"
@@ -336,7 +351,7 @@
     "message": "アナリティクス"
   },
   "analytics.value.monetized": {
-    "message": "収益対象"
+    "message": "収益の対象"
   },
   "analytics.value.no-dependent": {
     "message": "なし"
@@ -351,7 +366,7 @@
     "message": "不明"
   },
   "analytics.value.unmonetized": {
-    "message": "収益対象外"
+    "message": "収益の対象外"
   },
   "app-marketing.download.description": {
     "message": "我々のデスクトップアプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"

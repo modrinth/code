@@ -101,6 +101,12 @@
   "analytics.chart.controls.modrinth-events": {
     "message": "Modrinth događaji"
   },
+  "analytics.chart.controls.no-modrinth-events": {
+    "message": "Nema Modrinth događaja na grafu."
+  },
+  "analytics.chart.controls.no-project-events": {
+    "message": "Nema događaja projekta u grafu."
+  },
   "analytics.chart.controls.previous-period": {
     "message": "Prethodni period"
   },
@@ -109,6 +115,15 @@
   },
   "analytics.chart.controls.ratio": {
     "message": "Odnos"
+  },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Izaberi stavke iz tabele ispod da bi prikazao svoje podatke."
+  },
+  "analytics.chart.events.count-aria": {
+    "message": "{count, plural, one {# događaj analitike} other{# događaja analitike}}"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
   },
   "analytics.chart.events.see-announcement": {
     "message": "Pogledaj obaveštenje"
@@ -167,14 +182,47 @@
   "analytics.download-source.app": {
     "message": "Modrinth aplikacija"
   },
+  "analytics.download-source.website": {
+    "message": "Modrinth veb-stranica"
+  },
   "analytics.downloads.suffix": {
     "message": "preuzimanja"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Tip verzije igre"
   },
   "analytics.filter.game-version-type.all": {
     "message": "Sve"
   },
   "analytics.filter.game-version-type.release": {
     "message": "Izdanja"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Traži države..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Traži projekte..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Traži izvore preuzimanja..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Traži članove..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Traži verzije projekta..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Traži verzije..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Preuzimanja preko vremena"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Vreme igranja preko vremena"
+  },
+  "analytics.graph.title.views": {
+    "message": "Pregledi preko vremena"
   },
   "analytics.group-by.1h": {
     "message": "1 sat"
@@ -215,6 +263,51 @@
   "analytics.group-by.year": {
     "message": "Godina"
   },
+  "analytics.options.loading": {
+    "message": "Učitavanje..."
+  },
+  "analytics.project-event.project-approved": {
+    "message": "Projekat odobren"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Projekat nenaveden"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} izdana"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Verzija postavljena"
+  },
+  "analytics.project-status.approved": {
+    "message": "Odobreno"
+  },
+  "analytics.project-status.archived": {
+    "message": "Arhivirano"
+  },
+  "analytics.project-status.draft": {
+    "message": "Nacrt"
+  },
+  "analytics.project-status.other": {
+    "message": "Drugo"
+  },
+  "analytics.project-status.private": {
+    "message": "Privatno"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Odbijeno"
+  },
+  "analytics.project-status.unlisted": {
+    "message": "Nenavedeno"
+  },
+  "analytics.project-status.withheld": {
+    "message": "Zadržano"
+  },
+  "analytics.project.all": {
+    "message": "Svi projekati"
+  },
+  "analytics.project.count": {
+    "message": "{count, plural, one {# projekat} few {# projekta} other {# projekata}}"
+  },
   "analytics.project.icon-alt": {
     "message": "Ikona {name}"
   },
@@ -230,11 +323,20 @@
   "analytics.query.filter.add": {
     "message": "Dodaj filter"
   },
+  "analytics.query.label.breakdown": {
+    "message": "Raščlanjivanje:"
+  },
   "analytics.query.label.grouped-by": {
     "message": "Grupirano po"
   },
   "analytics.query.label.project": {
     "message": "Projekat:"
+  },
+  "analytics.query.label.timeframe": {
+    "message": "Okvir vremena:"
+  },
+  "analytics.stat.downloads": {
+    "message": "Preuzimanja"
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Saznaj više"
@@ -260,14 +362,29 @@
   "analytics.stat.unavailable": {
     "message": "N/A"
   },
+  "analytics.stat.views": {
+    "message": "Pogledi"
+  },
   "analytics.table.csv.date-range": {
     "message": "Od {start} do {end}"
   },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Vreme igranja (sekunde)"
   },
+  "analytics.table.csv.selected-range": {
+    "message": "Izabran okvir"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# dan} other {# dana}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# sat} few {# sata} other {# sati}}"
+  },
   "analytics.table.empty.no-matching-rows": {
     "message": "Nema odgovarajućih redova za analitiku"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Komulativno"
   },
   "analytics.table.export.grouped": {
     "message": "Grupirano po {groupBy}"
@@ -275,8 +392,17 @@
   "analytics.table.pagination.summary": {
     "message": "Pokazivanje ukupno od {start} do {end} od {total}"
   },
+  "analytics.table.search.placeholder": {
+    "message": "Pretraži..."
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Prag preuzimanja po državi"
+  },
   "analytics.title": {
     "message": "Analitike"
+  },
+  "analytics.value.monetized": {
+    "message": "Monetizovano"
   },
   "analytics.value.no-dependent": {
     "message": "Bez"
@@ -289,6 +415,9 @@
   },
   "analytics.value.unknown": {
     "message": "Nepoznato"
+  },
+  "analytics.value.unmonetized": {
+    "message": "Bez monetizacije"
   },
   "app-marketing.download.description": {
     "message": "Naša desktop aplikacija je dostupna na svim platformama, izaberi željenu verziju."
@@ -329,6 +458,15 @@
   "app-marketing.features.follow.title": {
     "message": "Prati projekte"
   },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth olakšava upravljanje svim tvojim modovima na jednom mestu. Modove možeš da instaliraš, uklanjaš i ažuriraš samo jednim klikom."
+  },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Instalirani modovi"
   },
@@ -347,14 +485,59 @@
   "app-marketing.features.offline.description": {
     "message": "Igraj svoje modove, bez obzira da li si povezani na internet ili ne."
   },
+  "app-marketing.features.offline.title": {
+    "message": "Oflajn režim"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Otvoreni kod"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Praćenje aktivnosti"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% procesora"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Dobar performanse"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
   },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ × ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth aplikacija"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 milijarda %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Ime procesa"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM / radna memorija"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Malo"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
   "app-marketing.features.sharing.share-button": {
     "message": "Deli"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Deli modpackove"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Snimak ekrana Modrinth aplikacije sa otvorenom instancom Cobblemona na stranici Sadržaja."
@@ -362,8 +545,23 @@
   "app-marketing.hero.download-button": {
     "message": "Preuzmi Modrinth aplikaciju"
   },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Preuzmi Modrinth aplikaciju"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Preuzmi Modrinth aplikaciju za {os}"
+  },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Snimak ekrana glavnog menija instance Cobblemona."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Više opcije preuzimanja"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Krij druge pakete"
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Pokazuj druge pakete"
   },
   "auth.authorize.action.authorize": {
     "message": "Odobri"
@@ -380,8 +578,35 @@
   "auth.authorize.error.no-redirect-url": {
     "message": "Nije pronađena lokacija za preusmeravanje u odgovoru"
   },
+  "auth.authorize.errro-title": {
+    "message": "Došlo je do greške"
+  },
   "auth.authorize.redirect-url": {
     "message": "Bićeš preusmeren na <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Nastavi sa {provider}"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Završi prijavu"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Molimo upiši važeći datum rođenja. Godina nemože biti 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Nevažeći datum rođenja"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Datum rođenja"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Ukucaj svoj datum rođenja"
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Potreban je datum rođenja"
+  },
+  "auth.create-account.page-title": {
+    "message": "Kreiraj račun"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Pošalji email za oporavak"
@@ -503,6 +728,12 @@
   "create.project.type-server": {
     "message": "Server"
   },
+  "dashboard.analytics.total-downloads": {
+    "message": "Ukupan broj preuzimanja"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Ukupan broj pratilaca"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Kreiraj novo"
   },
@@ -511,6 +742,12 @@
   },
   "dashboard.collections.long-title": {
     "message": "Tvoje kolekcije"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Izaberi svoju državu"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Traži države..."
   },
   "dashboard.projects.bulk-edit.server-disabled": {
     "message": "Serverski projekti ne podržavaju grupno uređivanje"
@@ -526,6 +763,15 @@
   },
   "dashboard.projects.links.placeholder.cleared": {
     "message": "Postojeća veza će biti uklonjena"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analitike"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "Molimo te da koristiš odgovarajuću opciju za PayPal transfer za tvoj region (SAD ili međunarodni)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "Nepoklapanje regiona PayPala"
   },
   "discover.install.back-to-server": {
     "message": "Nazad na server"
@@ -749,6 +995,9 @@
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "serveri"
   },
+  "layout.action.analytics-events": {
+    "message": "Analitički događaji"
+  },
   "layout.action.change-theme": {
     "message": "Promeni temu"
   },
@@ -910,6 +1159,69 @@
   },
   "moderation.page.reports": {
     "message": "Izvještaji"
+  },
+  "muralpay.country.at": {
+    "message": "Austrija"
+  },
+  "muralpay.country.be": {
+    "message": "Belgija"
+  },
+  "muralpay.country.cy": {
+    "message": "Kipar"
+  },
+  "muralpay.country.de": {
+    "message": "Nemačka"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonija"
+  },
+  "muralpay.country.es": {
+    "message": "Španija"
+  },
+  "muralpay.country.fi": {
+    "message": "Finska"
+  },
+  "muralpay.country.fr": {
+    "message": "Francuska"
+  },
+  "muralpay.country.gr": {
+    "message": "Grčka"
+  },
+  "muralpay.country.ie": {
+    "message": "Irska"
+  },
+  "muralpay.country.it": {
+    "message": "Italija"
+  },
+  "muralpay.country.lt": {
+    "message": "Litvanija"
+  },
+  "muralpay.country.lu": {
+    "message": "Luksemburg"
+  },
+  "muralpay.country.lv": {
+    "message": "Letonija"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Holandija"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovačka"
+  },
+  "muralpay.field.country": {
+    "message": "Država"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Broj telefona"
+  },
+  "profile.button.analytics": {
+    "message": "Pregled analitike korisnika"
   },
   "profile.button.billing": {
     "message": "Upravljaj naplatom korisnika"
@@ -1144,6 +1456,9 @@
   },
   "scopes.analytics.label": {
     "message": "Pristup analitici"
+  },
+  "scopes.category.analytics": {
+    "message": "Analitike"
   },
   "scopes.collectionCreate.description": {
     "message": "Omogućava kreiranje kolekcija"
@@ -1421,11 +1736,44 @@
   "settings.account.delete.section.description": {
     "message": "Kad obrišeš svoj račun, povratka nema. Brisanjem računa sa naših servera biće uklonjeni svi povezani podaci, izuzev projekata."
   },
+  "settings.applications.head-title": {
+    "message": "Aplikacije"
+  },
+  "settings.applications.modal.header": {
+    "message": "Informacije aplikacije"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "O ovoj aplikaciji"
+  },
+  "settings.authorizations.by": {
+    "message": "od"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Oduzmi"
+  },
   "settings.billing.charges.product.medal-trial": {
     "message": "Probna verzija Medal servera"
   },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.interval.month": {
+    "message": "mesec"
+  },
+  "settings.billing.interval.year": {
+    "message": "godina"
+  },
   "settings.billing.midas.benefits.ad-free": {
     "message": "Pregledavanje na modrinth.com i Modrinth aplikaciji bez reklama"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Modrinth+ oznaka na tvom profilu"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Uštedi {amount} godišnje prelaskom na godišnju naplatu!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Otkazali smo tvoju pretplatu."
   },
   "settings.billing.midas.upsell": {
     "message": "Postani pretplatnik na Modrinth Plus!"
@@ -1778,11 +2126,17 @@
   "version.dependency.view-version": {
     "message": "Vidi verziju"
   },
+  "version.download.download-dependency": {
+    "message": "Izaberi verziju za instalaciju"
+  },
   "version.download.optional-resource-pack": {
     "message": "Opcioni resurs paket"
   },
   "version.download.required-resource-pack": {
     "message": "Potreban paket resursa"
+  },
+  "version.download.version": {
+    "message": "Instaliraj {version} ({size})"
   },
   "version.edit.button": {
     "message": "Promeni"
