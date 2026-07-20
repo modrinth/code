@@ -1816,7 +1816,27 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
+fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return Err(ApiError::Request(email_check_error_generic()));
+    };
+
+    let is_blacklisted = ENV
+        .EMAIL_DOMAIN_BLACKLIST
+        .iter()
+        .any(|blacklisted| blacklisted.trim().eq_ignore_ascii_case(domain));
+
+    if is_blacklisted {
+        info!(email.domain = domain, "blacklisted email domain, denying");
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
 async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
+    ensure_email_domain_is_allowed(email)?;
+
     let result = check_email(email).await.map_err(ApiError::Request)?;
 
     if matches!(
