@@ -115,6 +115,7 @@ const SKIN_SIZE = 64
 const EARS_V0_MAGIC = 0x3f23d8
 const EARS_V1_MAGIC = 0xea2501
 const ALFALFA_MAGIC = 0xea1fa1fa
+const UV_TEXEL_INSET = 0.5
 
 const EAR_MODES: EarMode[] = [
 	'NONE',
@@ -759,10 +760,10 @@ function calculateUvs(
 	textureHeight: number,
 ) {
 	const transposed = rotation === 'CW' || rotation === 'CCW'
-	let minU = u / textureWidth
-	let minV = v / textureHeight
-	let maxU = (u + (transposed ? height : width)) / textureWidth
-	let maxV = (v + (transposed ? width : height)) / textureHeight
+	let minU = (u + UV_TEXEL_INSET) / textureWidth
+	let minV = (v + UV_TEXEL_INSET) / textureHeight
+	let maxU = (u + (transposed ? height : width) - UV_TEXEL_INSET) / textureWidth
+	let maxV = (v + (transposed ? width : height) - UV_TEXEL_INSET) / textureHeight
 	let resolvedFlip = flip
 
 	if (transposed) {
@@ -1577,13 +1578,14 @@ export function removeEarsMod(model: THREE.Object3D | null) {
 	registry.removeFromParent()
 }
 
-export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture) {
+export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture, enabled = true) {
 	removeEarsMod(model)
 
 	const sourceImage = readSkinImage(sourceTexture)
-	if (!sourceImage) return
+	if (!sourceImage) return false
 	const features = parseFeatures(sourceImage.data)
-	if (!features) return
+	if (!features) return false
+	if (!enabled) return true
 
 	const resources: EarsModResources = {
 		featureGroups: [],
@@ -1662,4 +1664,5 @@ export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture
 	renderChest(builder, features)
 	renderWings(builder, features)
 	renderCape(builder, features)
+	return true
 }

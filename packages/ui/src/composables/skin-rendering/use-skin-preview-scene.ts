@@ -110,13 +110,17 @@ type MaybeReadonlyRef<T> = Ref<T> | ComputedRef<T>
 export function useSkinPreviewScene({
 	selectedModelSrc,
 	textureSrc,
+	earsTextureSrc,
 	capeSrc,
+	earsEnabled,
 	initializeAnimations,
 	cleanupAnimationState,
 }: {
 	selectedModelSrc: MaybeReadonlyRef<string>
 	textureSrc: MaybeReadonlyRef<string>
+	earsTextureSrc: MaybeReadonlyRef<string | undefined>
 	capeSrc: MaybeReadonlyRef<string | undefined>
+	earsEnabled: MaybeReadonlyRef<boolean>
 	initializeAnimations: (loadedScene: THREE.Object3D, clips: THREE.AnimationClip[]) => void
 	cleanupAnimationState: (root: THREE.Object3D | null) => void
 }) {
@@ -124,16 +128,20 @@ export function useSkinPreviewScene({
 	const lastCapeSrc = ref<string | undefined>(undefined)
 	const loadedModelSrc = ref<string | undefined>(undefined)
 	const loadedTextureSrc = ref<string | undefined>(undefined)
+	const loadedEarsTextureSrc = ref<string | undefined>(undefined)
 	const loadedCapeSrc = ref<string | undefined>(undefined)
 	const texture = shallowRef<THREE.Texture | null>(null)
+	const earsTexture = shallowRef<THREE.Texture | null>(null)
 	const capeTexture = shallowRef<THREE.Texture | null>(null)
 	const transparentTexture = createTransparentTexture()
 	const modelCenter = ref<SkinPreviewTuple>([0, 1, 0])
 	const modelSize = ref<SkinPreviewTuple>([1, 2, 1])
 	const isModelLoaded = ref(false)
 	const isTextureLoaded = ref(false)
+	const hasEarsFeatures = ref(false)
 	let modelLoadVersion = 0
 	let textureLoadVersion = 0
+	let earsTextureLoadVersion = 0
 	let capeLoadVersion = 0
 	let isUnmounted = false
 
@@ -148,7 +156,18 @@ export function useSkinPreviewScene({
 		}
 
 		applyTexture(scene.value, texture.value)
-		applyEarsMod(scene.value, texture.value)
+		const featureTextureSrc = earsTextureSrc.value
+		const featureTexture = featureTextureSrc ? earsTexture.value : texture.value
+		if (
+			!featureTexture ||
+			(featureTextureSrc && loadedEarsTextureSrc.value !== featureTextureSrc)
+		) {
+			removeEarsMod(scene.value)
+			hasEarsFeatures.value = false
+			return
+		}
+
+		hasEarsFeatures.value = applyEarsMod(scene.value, featureTexture, earsEnabled.value)
 	}
 
 	function applyCapeTextureToLoadedModel() {
@@ -235,6 +254,19 @@ export function useSkinPreviewScene({
 		applyCapeTextureToLoadedModel()
 	}
 
+	async function loadAndApplyEarsTexture(src: string | undefined) {
+		const loadVersion = ++earsTextureLoadVersion
+		hasEarsFeatures.value = false
+
+		const loadedEarsTexture = src ? await loadAndApplyTexture(src) : null
+		if (isUnmounted || loadVersion !== earsTextureLoadVersion) return
+
+		earsTexture.value = loadedEarsTexture
+		loadedEarsTextureSrc.value = src
+		applyTextureToLoadedModel()
+		updateModelInfo()
+	}
+
 	function updateModelInfo() {
 		const box = scene.value ? getVisibleMeshBox(scene.value) : null
 
@@ -264,6 +296,7 @@ export function useSkinPreviewScene({
 			const loadVersion = ++textureLoadVersion
 
 			isTextureLoaded.value = false
+			hasEarsFeatures.value = false
 			const loadedTexture = await loadAndApplyTexture(newSrc)
 			if (isUnmounted || loadVersion !== textureLoadVersion) return
 
@@ -271,6 +304,19 @@ export function useSkinPreviewScene({
 			loadedTextureSrc.value = newSrc
 			applyTextureToLoadedModel()
 			isTextureLoaded.value = true
+		},
+	)
+	watch(
+		() => earsTextureSrc.value,
+		async (newEarsTextureSrc) => {
+			await loadAndApplyEarsTexture(newEarsTextureSrc)
+		},
+	)
+	watch(
+		() => earsEnabled.value,
+		() => {
+			applyTextureToLoadedModel()
+			updateModelInfo()
 		},
 	)
 	watch(
@@ -287,6 +333,7 @@ export function useSkinPreviewScene({
 			loadedTextureSrc.value = textureSrc.value
 			isTextureLoaded.value = true
 
+			await loadAndApplyEarsTexture(earsTextureSrc.value)
 			await loadModel(selectedModelSrc.value)
 
 			if (capeSrc.value) {
@@ -301,6 +348,7 @@ export function useSkinPreviewScene({
 		isUnmounted = true
 		modelLoadVersion++
 		textureLoadVersion++
+		earsTextureLoadVersion++
 		capeLoadVersion++
 
 		cleanupAnimationState(scene.value)
@@ -311,6 +359,7 @@ export function useSkinPreviewScene({
 	})
 
 	return {
+		hasEarsFeatures,
 		isModelLoaded,
 		isTextureLoaded,
 		modelCenter,
