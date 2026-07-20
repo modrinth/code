@@ -61,6 +61,10 @@ use webauthn_rs::prelude::{
 };
 use zxcvbn::Score;
 
+/// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
+const DISPOSABLE_EMAIL_BLOCKLIST: &str =
+    include_str!("../../../assets/disposable_email_blocklist.txt");
+
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         web::scope("/auth")
@@ -1816,10 +1820,21 @@ impl From<NewAccount> for AccountRegisterFlow {
     }
 }
 
-/// Blacklist entries are matched literally, unless they begin with `*.`, in
-/// which case they match any subdomain of the remaining suffix.
+/// The bundled disposable domain list is checked first. Environment blacklist
+/// entries are matched literally, unless they begin with `*.`, in which case
+/// they match any subdomain of the remaining suffix.
 fn is_blacklisted_domain(domain: &str) -> bool {
     let domain = domain.to_ascii_lowercase();
+
+    if DISPOSABLE_EMAIL_BLOCKLIST.lines().any(|entry| {
+        // The upstream list expects listed domains to match subdomains too.
+        domain == entry
+            || domain
+                .strip_suffix(entry)
+                .is_some_and(|subdomain| subdomain.ends_with('.'))
+    }) {
+        return true;
+    }
 
     ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
         let entry = entry.trim().to_ascii_lowercase();
@@ -1831,6 +1846,17 @@ fn is_blacklisted_domain(domain: &str) -> bool {
             None => entry == domain,
         }
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_blacklisted_domain;
+
+    #[test]
+    fn disposable_email_domains_include_subdomains() {
+        assert!(is_blacklisted_domain("mailinator.com"));
+        assert!(is_blacklisted_domain("INBOX.mailinator.com"));
+    }
 }
 
 fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
