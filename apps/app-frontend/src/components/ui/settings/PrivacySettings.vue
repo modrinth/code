@@ -1,11 +1,43 @@
 <script setup lang="ts">
-import { Toggle } from '@modrinth/ui'
+import { Settings2Icon } from '@modrinth/assets'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	injectPageContext,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
+import { open_ads_consent_preferences } from '@/helpers/ads.js'
 import { optInAnalytics, optOutAnalytics } from '@/helpers/analytics'
 import { get, set } from '@/helpers/settings.ts'
 
+const { formatMessage } = useVIntl()
+const { handleError } = injectNotificationManager()
+const { adConsentAvailable } = injectPageContext()
 const settings = ref(await get())
+
+const messages = defineMessages({
+	adsConsentTitle: {
+		id: 'app.ads-consent.title',
+		defaultMessage: 'Your privacy and how ads support Modrinth',
+	},
+	adsConsentIntro: {
+		id: 'app.settings.privacy.ads-consent.intro',
+		defaultMessage:
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below.',
+	},
+	adsConsentManage: {
+		id: 'app.ads-consent.manage',
+		defaultMessage: 'Manage preferences',
+	},
+})
+
+async function manageAdsPreferences() {
+	await open_ads_consent_preferences().catch(handleError)
+}
 
 watch(
 	settings,
@@ -23,18 +55,26 @@ watch(
 </script>
 
 <template>
-	<div class="flex items-center justify-between gap-4">
-		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">Personalized ads</h2>
-			<p class="m-0 mt-1 text-sm">
-				Modrinth's ad provider, Aditude, shows ads based on your preferences. By disabling this
-				option, you opt out and ads will no longer be shown based on your interests.
-			</p>
+	<div v-if="adConsentAvailable">
+		<h2 class="m-0 text-lg font-semibold text-contrast">
+			{{ formatMessage(messages.adsConsentTitle) }}
+		</h2>
+		<div class="mt-1 flex flex-col gap-2.5 items-start">
+			<div class="flex flex-col gap-1 items-start">
+				<div class="text-sm">
+					{{ formatMessage(messages.adsConsentIntro) }}
+				</div>
+			</div>
+			<ButtonStyled>
+				<button class="!shadow-none" @click="manageAdsPreferences">
+					<Settings2Icon aria-hidden="true" />
+					{{ formatMessage(messages.adsConsentManage) }}
+				</button>
+			</ButtonStyled>
 		</div>
-		<Toggle id="personalized-ads" v-model="settings.personalized_ads" />
 	</div>
 
-	<div class="mt-4 flex items-center justify-between gap-4">
+	<div class="mt-8 flex items-center justify-between gap-4">
 		<div>
 			<h2 class="m-0 text-lg font-semibold text-contrast">Telemetry</h2>
 			<p class="m-0 mt-1 text-sm">
