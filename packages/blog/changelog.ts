@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-21T19:36:51+00:00`,
+		product: 'app',
+		version: '0.15.15',
+		body: `## Changed
+- Updated the "Minecraft required" popup to a new style.
+
+## Fixed
+- Fixed devtools opening when ads are initialized.`,
+	},
+	{
 		date: `2026-07-21T18:43:00+00:00`,
 		product: 'web',
 		body: `## Changed
