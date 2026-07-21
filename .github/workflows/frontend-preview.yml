@@ -150,13 +150,13 @@ jobs:
           STAGING_BRANCH_URL="https://$BRANCH_ALIAS-frontend-staging.modrinth.workers.dev"
           PRODUCTION_BRANCH_URL="https://$BRANCH_ALIAS-frontend.modrinth.workers.dev"
 
-          STAGING_CELL="$STAGING_PREVIEW_URL<br><small><a href=\"$STAGING_BRANCH_URL\">$STAGING_BRANCH_URL</a></small>"
-          PRODUCTION_CELL="$PRODUCTION_PREVIEW_URL<br><small><a href=\"$PRODUCTION_BRANCH_URL\">$PRODUCTION_BRANCH_URL</a></small>"
+          STAGING_CELL="$STAGING_PREVIEW_URL<br><sub><a href=\"$STAGING_BRANCH_URL\">$STAGING_BRANCH_URL</a></sub>"
+          PRODUCTION_CELL="$PRODUCTION_PREVIEW_URL<br><sub><a href=\"$PRODUCTION_BRANCH_URL\">$PRODUCTION_BRANCH_URL</a></sub>"
 
           if [ "$STORYBOOK_RESULT" = "success" ]; then
             STORYBOOK_PREVIEW_URL="https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev"
             STORYBOOK_BRANCH_URL="https://$BRANCH_ALIAS-storybook.modrinth.workers.dev"
-            STORYBOOK_CELL="$STORYBOOK_PREVIEW_URL<br><small><a href=\"$STORYBOOK_BRANCH_URL\">$STORYBOOK_BRANCH_URL</a></small>"
+            STORYBOOK_CELL="$STORYBOOK_PREVIEW_URL<br><sub><a href=\"$STORYBOOK_BRANCH_URL\">$STORYBOOK_BRANCH_URL</a></sub>"
           else
             STORYBOOK_CELL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
           fi
