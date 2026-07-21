@@ -661,6 +661,7 @@ window.modrinthAdsReopenConsentPreferences = async () => {
 	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
 
 	try {
+		await waitForAdsConsentLayout()
 		await expandAdsConsentWebview()
 		await waitForAdsConsentLayout()
 		revealAdsConsentPreferences()
