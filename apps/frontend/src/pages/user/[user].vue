@@ -2,14 +2,10 @@
 	<div v-if="user">
 		<ModalCreation ref="modal_creation" />
 		<CollectionCreateModal ref="modal_collection_creation" />
-		<NewModal ref="editRoleModal" :header="formatMessage(messages.editRoleHeader)">
+		<NewModal ref="editRoleModal" header="Edit role">
 			<div class="flex w-80 flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<Combobox
-						v-model="selectedRole"
-						:options="roleOptions"
-						:placeholder="formatMessage(messages.selectRolePlaceholder)"
-					/>
+					<Combobox v-model="selectedRole" :options="roleOptions" placeholder="Select a role" />
 				</div>
 				<div class="flex justify-end gap-2">
 					<ButtonStyled>
@@ -421,22 +417,6 @@ const messages = defineMessages({
 		id: 'profile.label.saving',
 		defaultMessage: 'Saving...',
 	},
-	editRoleHeader: {
-		id: 'profile.admin.edit-role-header',
-		defaultMessage: 'Edit role',
-	},
-	selectRolePlaceholder: {
-		id: 'profile.admin.select-role-placeholder',
-		defaultMessage: 'Select a role',
-	},
-	updateRoleFailedTitle: {
-		id: 'profile.admin.update-role-failed-title',
-		defaultMessage: 'Failed to update role',
-	},
-	updateRoleFailedMessage: {
-		id: 'profile.admin.update-role-failed-message',
-		defaultMessage: 'An error occurred while updating the user role. Please try again.',
-	},
 	emailLabel: {
 		id: 'profile.details.label.email',
 		defaultMessage: 'Email',
@@ -766,8 +746,8 @@ function saveRoleEdit() {
 
 			addNotification({
 				type: 'error',
-				title: formatMessage(messages.updateRoleFailedTitle),
-				message: formatMessage(messages.updateRoleFailedMessage),
+				title: 'Failed to update role',
+				message: 'An error occurred while updating the user role. Please try again.',
 			})
 		})
 		.finally(() => {

@@ -2924,26 +2924,8 @@
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
-  "moderation.generic-projects-label": {
-    "message": "projects"
-  },
-  "moderation.items-per-page-placeholder": {
-    "message": "Items per page"
-  },
   "moderation.moderate": {
     "message": "Moderate"
-  },
-  "moderation.notification.no-projects-available-text": {
-    "message": "All projects in queue are already moderated or locked by others."
-  },
-  "moderation.notification.no-projects-available-title": {
-    "message": "No projects available"
-  },
-  "moderation.notification.skipped-projects-text": {
-    "message": "{count, plural, one {Skipped # project} other {Skipped # projects}} already moderated or locked by others."
-  },
-  "moderation.notification.skipped-projects-title": {
-    "message": "Skipped projects"
   },
   "moderation.page.external-projects": {
     "message": "External projects"
@@ -2959,9 +2941,6 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tech review"
-  },
-  "moderation.showing-projects-range": {
-    "message": "Showing {start}–{end} of {total} {type}"
   },
   "modpack-scan-modal.clear-all-groups": {
     "message": "Clear All Groups"
@@ -3316,18 +3295,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
-  },
-  "profile.admin.edit-role-header": {
-    "message": "Edit role"
-  },
-  "profile.admin.select-role-placeholder": {
-    "message": "Select a role"
-  },
-  "profile.admin.update-role-failed-message": {
-    "message": "An error occurred while updating the user role. Please try again."
-  },
-  "profile.admin.update-role-failed-title": {
-    "message": "Failed to update role"
   },
   "profile.bio.fallback.creator": {
     "message": "A Modrinth creator."
