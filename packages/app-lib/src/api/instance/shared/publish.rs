@@ -154,6 +154,7 @@ pub async fn get_shared_instance_publish_preview(
         &state,
     )
     .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(Some(SharedInstancePublishPreview {
         shared_instance_id: attachment.id,

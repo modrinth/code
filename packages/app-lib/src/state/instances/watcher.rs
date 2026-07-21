@@ -138,10 +138,15 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 };
                                 if let Some(event) = event {
                                     let emit_instance_id = instance_id.clone();
-                                    let mark_shared_stale = matches!(
-                                        &event,
-                                        InstancePayloadType::Synced
-                                    );
+                                    let mark_shared_stale = first_file_name
+                                        .as_ref()
+                                        .is_some_and(|name| {
+                                            ProjectType::iterator().any(
+                                                |project_type| {
+                                                    *name == project_type.get_folder()
+                                                },
+                                            )
+                                        });
                                     tokio::spawn(async move {
                                         if mark_shared_stale
                                             && let Ok(state) =
