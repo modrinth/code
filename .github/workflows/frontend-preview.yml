@@ -12,8 +12,30 @@ on:
       - '.github/workflows/frontend-preview.yml'
 
 jobs:
+  metadata:
+    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    outputs:
+      branch-alias: ${{ steps.meta.outputs.branch_alias }}
+    steps:
+      - name: Configure branch alias
+        id: meta
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          BRANCH_SLUG=$(sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' <<< "${HEAD_REF,,}")
+          BRANCH_SLUG="${BRANCH_SLUG:0:42}"
+          BRANCH_SLUG=$(sed -E 's/-+$//' <<< "$BRANCH_SLUG")
+
+          if [ -z "$BRANCH_SLUG" ]; then
+            BRANCH_SLUG="preview"
+          fi
+
+          echo "branch_alias=git-$BRANCH_SLUG" >> $GITHUB_OUTPUT
+
   deploy:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: metadata
     uses: ./.github/workflows/frontend-deploy.yml
     secrets: inherit
     concurrency:
@@ -26,9 +48,11 @@ jobs:
       environment: ${{ matrix.environment }}
       head_sha: ${{ github.event.pull_request.head.sha }}
       head_ref: ${{ github.event.pull_request.head.ref }}
+      branch_alias: ${{ needs.metadata.outputs.branch-alias }}
 
   deploy-storybook:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: metadata
     runs-on: blacksmith-2vcpu-ubuntu-2404
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-storybook
@@ -86,6 +110,18 @@ jobs:
           wranglerVersion: '4.54.0'
           command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
 
+      - name: Deploy persistent Storybook preview
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: ./packages/ui
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: versions upload --preview-alias ${{ needs.metadata.outputs.branch-alias }}
+
   comment:
     if: |
       !cancelled()
@@ -93,7 +129,7 @@ jobs:
       && github.event.pull_request.head.repo.full_name == github.repository
       && needs.deploy.result == 'success'
     runs-on: ubuntu-latest
-    needs: [deploy, deploy-storybook]
+    needs: [metadata, deploy, deploy-storybook]
     steps:
       - name: Download deployment URLs
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -105,25 +141,33 @@ jobs:
         id: urls
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BRANCH_ALIAS: ${{ needs.metadata.outputs.branch-alias }}
           STORYBOOK_RESULT: ${{ needs.deploy-storybook.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           STAGING_PREVIEW_URL=$(cat deployment-url-staging-preview.txt)
           PRODUCTION_PREVIEW_URL=$(cat deployment-url-production-preview.txt)
+          STAGING_BRANCH_URL="https://$BRANCH_ALIAS-frontend-staging.modrinth.workers.dev"
+          PRODUCTION_BRANCH_URL="https://$BRANCH_ALIAS-frontend.modrinth.workers.dev"
+
+          STAGING_CELL="$STAGING_PREVIEW_URL<br><small><a href=\"$STAGING_BRANCH_URL\">$STAGING_BRANCH_URL</a></small>"
+          PRODUCTION_CELL="$PRODUCTION_PREVIEW_URL<br><small><a href=\"$PRODUCTION_BRANCH_URL\">$PRODUCTION_BRANCH_URL</a></small>"
 
           if [ "$STORYBOOK_RESULT" = "success" ]; then
             STORYBOOK_PREVIEW_URL="https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev"
+            STORYBOOK_BRANCH_URL="https://$BRANCH_ALIAS-storybook.modrinth.workers.dev"
+            STORYBOOK_CELL="$STORYBOOK_PREVIEW_URL<br><small><a href=\"$STORYBOOK_BRANCH_URL\">$STORYBOOK_BRANCH_URL</a></small>"
           else
-            STORYBOOK_PREVIEW_URL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
+            STORYBOOK_CELL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
           fi
 
-          echo "Production preview URL: $PRODUCTION_PREVIEW_URL"
-          echo "Staging preview URL: $STAGING_PREVIEW_URL"
-          echo "Storybook preview URL: $STORYBOOK_PREVIEW_URL"
+          echo "Production preview URLs: $PRODUCTION_CELL"
+          echo "Staging preview URLs: $STAGING_CELL"
+          echo "Storybook preview URLs: $STORYBOOK_CELL"
 
-          echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
-          echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
-          echo "storybook-preview-url=$STORYBOOK_PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "staging-preview-cell=$STAGING_CELL" >> $GITHUB_OUTPUT
+          echo "production-preview-cell=$PRODUCTION_CELL" >> $GITHUB_OUTPUT
+          echo "storybook-preview-cell=$STORYBOOK_CELL" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
@@ -148,7 +192,7 @@ jobs:
 
             | Environment | URL |
             |-------------|-----|
-            | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
-            | production  | ${{ steps.urls.outputs.production-preview-url }} |
-            | storybook   | ${{ steps.urls.outputs.storybook-preview-url }} |
+            | staging     | ${{ steps.urls.outputs.staging-preview-cell }} |
+            | production  | ${{ steps.urls.outputs.production-preview-cell }} |
+            | storybook   | ${{ steps.urls.outputs.storybook-preview-cell }} |
           edit-mode: replace

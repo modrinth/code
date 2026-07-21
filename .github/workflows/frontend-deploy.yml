@@ -28,6 +28,10 @@ on:
         required: false
         type: string
         description: 'The branch name to deploy (defaults to github.ref_name)'
+      branch_alias:
+        required: false
+        type: string
+        description: 'The persistent preview alias for the branch'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.environment || 'push' }}
@@ -145,6 +149,18 @@ jobs:
           packageManager: pnpm
           wranglerVersion: '4.54.0'
           command: ${{ steps.meta.outputs.cmd }}
+
+      - name: Deploy persistent Cloudflare Worker preview
+        if: ${{ inputs.environment != '' && inputs.branch_alias != '' }}
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          environment: ${{ steps.meta.outputs.env != 'production' && steps.meta.outputs.env || '' }}
+          workingDirectory: ./apps/frontend
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true
 
       - name: Purge cache
         if: github.ref == 'refs/heads/prod'
