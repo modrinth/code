@@ -56,20 +56,29 @@ jobs:
           ENV_INPUT: ${{ inputs.environment }}
           REF: ${{ github.ref }}
           DEPLOY_SHA: ${{ inputs.head_sha || github.sha }}
+          BRANCH_ALIAS: ${{ inputs.branch_alias }}
         run: |
           echo "cmd=deploy" >> $GITHUB_OUTPUT
 
           SHA_SHORT="${DEPLOY_SHA::8}"
 
           if [ "$ENV_INPUT" = "staging-preview" ]; then
+            URL="https://git-$SHA_SHORT-frontend-staging.modrinth.workers.dev"
             echo "env=staging" >> $GITHUB_OUTPUT
-            echo "url=https://git-$SHA_SHORT-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
-            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true" >> $GITHUB_OUTPUT
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true --var CF_PAGES_URL:$URL" >> $GITHUB_OUTPUT
+            if [ -n "$BRANCH_ALIAS" ]; then
+              echo "branch_alias_url=https://$BRANCH_ALIAS-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
+            fi
 
           elif [ "$ENV_INPUT" = "production-preview" ]; then
+            URL="https://git-$SHA_SHORT-frontend.modrinth.workers.dev"
             echo "env=production" >> $GITHUB_OUTPUT
-            echo "url=https://git-$SHA_SHORT-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
-            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true" >> $GITHUB_OUTPUT
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true --var CF_PAGES_URL:$URL" >> $GITHUB_OUTPUT
+            if [ -n "$BRANCH_ALIAS" ]; then
+              echo "branch_alias_url=https://$BRANCH_ALIAS-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
+            fi
 
           elif [ "$REF" = "refs/heads/main" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
@@ -160,7 +169,7 @@ jobs:
           workingDirectory: ./apps/frontend
           packageManager: pnpm
           wranglerVersion: '4.54.0'
-          command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true
+          command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true --var CF_PAGES_URL:${{ steps.meta.outputs.branch_alias_url }}
 
       - name: Purge cache
         if: github.ref == 'refs/heads/prod'
