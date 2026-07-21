@@ -1,11 +1,10 @@
-export default defineNuxtPlugin(async (nuxtApp) => {
+export default defineEventHandler(async (event) => {
 	try {
 		const mod = 'cloudflare:workers'
 		const { env } = await import(/* @vite-ignore */ mod)
 		const url = (env as any).CF_PAGES_URL
 		if (url) {
-			nuxtApp.config.public.siteUrl = url
+			useRuntimeConfig(event).public.siteUrl = url
 		}
-	} catch {
-	}
+	} catch { /* empty */ }
 })
