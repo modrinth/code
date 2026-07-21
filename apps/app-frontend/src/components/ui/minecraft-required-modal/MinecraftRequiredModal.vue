@@ -70,7 +70,7 @@
 <script setup lang="ts">
 import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
-import { inject, ref, type Ref } from 'vue'
+import { inject, type Ref, ref } from 'vue'
 
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import { trackEvent } from '@/helpers/analytics'
