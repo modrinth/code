@@ -4073,9 +4073,6 @@
   "servers.plan.small.description": {
     "message": "適合 1 到 5 位好友及少量輕量模組。"
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "按{interval, select, monthly {月} quarterly {季} yearly {年} other {{interval}}}計費"
-  },
   "settings.account.button.complete-setup": {
     "message": "完成設定"
   },

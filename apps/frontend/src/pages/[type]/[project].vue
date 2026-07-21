@@ -98,6 +98,22 @@
 			<ModpackScanModal ref="scanModal" :project_id="project.id" />
 
 			<div
+				v-if="projectInstallContext && !isSettings"
+				ref="stickyInstallHeaderRef"
+				class="sticky top-0 z-20 mx-auto max-w-[80rem] border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
+				:class="[isInstallHeaderStuck ? 'border-t' : '']"
+			>
+				<BrowseInstallHeader
+					:install-context="projectHeaderInstallContext"
+					divider
+					bottom-padding
+				/>
+			</div>
+			<SelectedProjectsFloatingBar
+				v-if="projectInstallContext && !isSettings"
+				:install-context="projectInstallContext"
+			/>
+			<div
 				class="new-page sidebar"
 				:class="{
 					'alt-layout': cosmetics.leftContentLayout,
@@ -111,7 +127,10 @@
 						!flags.alwaysShowChecklistAsPopup,
 				}"
 			>
-				<div class="normal-page__header relative my-4">
+				<div
+					class="normal-page__header relative mb-4"
+					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
+				>
 					<div class="mb-6">
 						<ModerationProjectNags
 							v-if="
@@ -616,6 +635,7 @@ import {
 import {
 	Admonition,
 	Avatar,
+	BrowseInstallHeader,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
@@ -636,11 +656,13 @@ import {
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 	provideProjectPageContext,
+	SelectedProjectsFloatingBar,
 	TeleportOverflowMenu,
 	useDebugLogger,
 	useFormatDateTime,
 	useFormatPrice,
 	useRelativeTime,
+	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
@@ -663,6 +685,7 @@ import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
@@ -725,6 +748,11 @@ const scanModal = ref()
 
 const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+const stickyInstallHeaderRef = ref(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'ProjectInstallHeader',
+)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
@@ -779,6 +807,10 @@ const messages = defineMessages({
 		id: 'project.status.archived.message',
 		defaultMessage:
 			'{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project.',
+	},
+	backToDiscover: {
+		id: 'project.install-context.back-to-discover',
+		defaultMessage: 'Back to discover',
 	},
 	changelogTab: {
 		id: 'project.navigation.changelog',
@@ -1026,6 +1058,51 @@ const project = computed(() => {
 			projectRaw.value.loaders,
 			tags.value,
 		),
+	}
+})
+
+const routeProjectType = computed(() =>
+	Array.isArray(route.params.type) ? route.params.type[0] : route.params.type,
+)
+const projectInstallType = computed(() => ({
+	id: project.value?.actualProjectType ?? routeProjectType.value,
+}))
+const serverInstallModalRef = ref(null)
+const serverInstallDebug = useDebugLogger('ProjectServerInstall')
+const { installContext: serverBrowseInstallContext } = useServerInstallContent({
+	projectType: projectInstallType,
+	onboardingModalRef: serverInstallModalRef,
+	debug: serverInstallDebug,
+})
+const projectDiscoverBackUrl = computed(() => {
+	const discoverType =
+		routeProjectType.value === 'project'
+			? (project.value?.actualProjectType ?? project.value?.project_type ?? 'mod')
+			: (routeProjectType.value ?? project.value?.actualProjectType ?? 'mod')
+
+	return `/discover/${discoverType}s${getInstallContextQueryString(['sid', 'wid', 'from', 'shi'])}`
+})
+const projectInstallContext = computed(() => {
+	const context = serverBrowseInstallContext.value
+	if (!context) return null
+	return {
+		...context,
+		backUrl: projectDiscoverBackUrl.value,
+		backLabel: formatMessage(messages.backToDiscover),
+		discardSelectedAndBack: async () => {
+			await (context.clearSelected ?? context.clearQueued)?.()
+			await navigateTo(projectDiscoverBackUrl.value)
+		},
+	}
+})
+const projectHeaderInstallContext = computed(() => {
+	const context = projectInstallContext.value
+	if (!context) return null
+	return {
+		...context,
+		onBack: undefined,
+		selectedProjects: [],
+		isInstallingSelected: false,
 	}
 })
 
@@ -2067,6 +2144,32 @@ function triggerDownloadAnimation() {
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
+const INSTALL_CONTEXT_QUERY_KEYS = ['sid', 'wid', 'from', 'shi']
+
+function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
+	const params = new URLSearchParams()
+
+	for (const key of keys) {
+		const value = route.query[key]
+		if (Array.isArray(value)) {
+			for (const item of value) {
+				if (item != null) {
+					params.append(key, item)
+				}
+			}
+		} else if (value != null) {
+			params.append(key, value)
+		}
+	}
+
+	const queryString = params.toString()
+	return queryString ? `?${queryString}` : ''
+}
+
+function withInstallContextQuery(path) {
+	return `${path}${getInstallContextQueryString()}`
+}
+
 async function deleteVersion(id) {
 	if (!id) return
 
@@ -2091,16 +2194,16 @@ const navLinks = computed(() => {
 	return [
 		{
 			label: formatMessage(messages.descriptionTab),
-			href: projectUrl,
+			href: withInstallContextQuery(projectUrl),
 		},
 		{
 			label: formatMessage(messages.galleryTab),
-			href: `${projectUrl}/gallery`,
+			href: withInstallContextQuery(`${projectUrl}/gallery`),
 			shown: galleryCount > 0 || !!currentMember.value,
 		},
 		{
 			label: formatMessage(messages.changelogTab),
-			href: `${projectUrl}/changelog`,
+			href: withInstallContextQuery(`${projectUrl}/changelog`),
 			shown:
 				hasVersions.value &&
 				projectV3Loaded.value &&
@@ -2109,7 +2212,7 @@ const navLinks = computed(() => {
 		},
 		{
 			label: formatMessage(messages.versionsTab),
-			href: `${projectUrl}/versions`,
+			href: withInstallContextQuery(`${projectUrl}/versions`),
 			shown:
 				(hasVersions.value || !!currentMember.value) &&
 				projectV3Loaded.value &&
@@ -2119,7 +2222,7 @@ const navLinks = computed(() => {
 		},
 		{
 			label: formatMessage(messages.moderationTab),
-			href: `${projectUrl}/moderation`,
+			href: withInstallContextQuery(`${projectUrl}/moderation`),
 			shown: !!currentMember.value,
 		},
 	]

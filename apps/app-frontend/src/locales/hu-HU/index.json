@@ -479,9 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Vissza a böngészéshez"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Tartalom telepítése a profilba"
-  },
   "app.project.version.all-versions": {
     "message": "Összes verzió"
   },

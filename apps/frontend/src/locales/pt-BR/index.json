@@ -4073,9 +4073,6 @@
   "servers.plan.small.description": {
     "message": "Perfeito para 1–5 amigos e alguns mods leves."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "cobrado {interval, select, monthly {mensalmente} quarterly {trimestralmente} yearly {anualmente} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Terminar configuração"
   },

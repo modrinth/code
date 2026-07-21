@@ -4013,9 +4013,6 @@
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}} faturalandırıldı"
-  },
   "settings.account.button.complete-setup": {
     "message": "Kurulumu tamamla"
   },

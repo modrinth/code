@@ -479,9 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Volver al explorador"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Instalar contenido a la instancia"
-  },
   "app.project.version.all-versions": {
     "message": "Todas las versiones"
   },
