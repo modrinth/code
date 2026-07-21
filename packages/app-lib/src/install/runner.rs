@@ -1074,9 +1074,9 @@ fn install_error_code(
             PreparingJava => "java_error",
             _ => "metadata_error",
         },
-        ErrorKind::FetchError(_) | ErrorKind::ApiIsDownError(_) => {
-            "network_error"
-        }
+        ErrorKind::FetchError(_)
+        | ErrorKind::ApiIsDownError(_)
+        | ErrorKind::Ratelimited { .. } => "network_error",
         ErrorKind::Any(_)
             if matches!(
                 phase,

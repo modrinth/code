@@ -79,6 +79,9 @@ pub enum ErrorKind {
     #[error("Too many API errors, try again in {0} minutes")]
     ApiIsDownError(u32),
 
+    #[error("Too many requests, retry in {}", format_seconds(*.retry_in_seconds))]
+    Ratelimited { retry_in_seconds: u64 },
+
     #[error("{0}")]
     LabrinthError(LabrinthError),
 
@@ -190,6 +193,23 @@ pub enum ErrorKind {
 
     #[error("Discord IPC error: {0}")]
     DiscordRichPresenceError(#[from] discord_rich_presence::error::Error),
+}
+
+fn format_seconds(seconds: u64) -> String {
+    let plural = |unit: u64| if unit == 1 { "" } else { "s" };
+
+    if seconds <= 59 {
+        return format!("{seconds} second{}", plural(seconds));
+    }
+
+    let minutes = seconds / 60;
+    let rem_seconds = seconds % 60;
+
+    format!(
+        "{minutes} minute{} and {rem_seconds} second{}",
+        plural(minutes),
+        plural(rem_seconds)
+    )
 }
 
 #[derive(Debug)]
