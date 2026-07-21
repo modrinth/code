@@ -164,11 +164,7 @@
 									class="!text-primary"
 								>
 									Linked to
-									<Avatar
-										:src="serverProject.icon_url"
-										:alt="serverProject.title"
-										size="24px"
-									/>
+									<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
 									{{ serverProject.title }}
 								</PageHeaderMetadataItem>
 							</template>
@@ -772,9 +768,7 @@ const serverHeaderImage = computed(() =>
 	serverData.value?.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverImage.value,
 )
 
-const showServerUptime = computed(
-	() => props.showUptime && serverPowerState.value === 'running',
-)
+const showServerUptime = computed(() => props.showUptime && serverPowerState.value === 'running')
 
 const formattedUptime = computed(() => formatUptime(uptimeSeconds.value))
 
