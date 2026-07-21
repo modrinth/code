@@ -205,6 +205,10 @@ fn format_seconds(seconds: u64) -> String {
     let minutes = seconds / 60;
     let rem_seconds = seconds % 60;
 
+    if rem_seconds == 0 {
+        return format!("{minutes} minutes");
+    }
+
     format!(
         "{minutes} minute{} and {rem_seconds} second{}",
         plural(minutes),

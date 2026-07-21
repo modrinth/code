@@ -23,7 +23,7 @@ use std::sync::{Arc, LazyLock};
 use std::time::{self, Duration, Instant, SystemTime};
 use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncReadExt, io::AsyncWriteExt};
-use tracing::debug;
+use tracing::{debug, info};
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
 
@@ -194,30 +194,59 @@ static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
 
 const API_RETRY_AFTER_FALLBACK: Duration = Duration::from_secs(60);
 
-/// Implements request-rate-limit handling as well as a local rate limiter of 100 RPM + 50 burst.
+// This means the unit recovery time will be:
+// replenish one unit time in seconds = (60 / (units recovered per minute))
+// smooth recovery time = replenish one unit time in seconds * API_RATE_LIMIT_RECOVERY_SIZE.
+//
+// At 20 it means (60 / 120) * 20 = 10 seconds.
+const API_RATE_LIMIT_RECOVERY_SIZE: u32 = 20;
+
+/// Implements request-rate-limit handling as well as a local rate limiter of 120 RPM + 50 burst.
 struct ApiRateLimit {
     block_until: Mutex<Option<Instant>>,
+    check_lock: Mutex<()>,
     local: Arc<DefaultDirectRateLimiter>,
+    recovery_padding: Duration,
 }
 
 impl ApiRateLimit {
     fn new() -> Self {
-        let quota = Quota::per_minute(NonZeroU32::new(10).unwrap())
-            .allow_burst(NonZeroU32::new(10).unwrap());
+        let quota = Quota::per_minute(NonZeroU32::new(120).unwrap())
+            .allow_burst(NonZeroU32::new(50).unwrap());
+        let recovery_size =
+            API_RATE_LIMIT_RECOVERY_SIZE.min(quota.burst_size().get());
 
         Self {
             block_until: Mutex::new(None),
+            check_lock: Mutex::new(()),
             local: Arc::new(RateLimiter::direct(quota)),
+            recovery_padding: quota
+                .replenish_interval()
+                .saturating_mul(recovery_size.saturating_sub(1)),
         }
     }
 
     fn check(&self) -> crate::Result<()> {
+        let _check_guard = self.check_lock.lock();
         self.ensure_not_blocked()?;
 
         if let Err(not_until) = self.local.check() {
-            let retry_in_seconds = duration_seconds_ceil(
-                not_until.wait_time_from(DefaultClock::default().now()),
+            // Adds hysteresis to the rate limiting system, ensuring recovery happens
+            // for longer but for more units, avoiding the "flapping" effect when running
+            // out of units.
+
+            let retry_after = not_until
+                .wait_time_from(DefaultClock::default().now())
+                .saturating_add(self.recovery_padding);
+            info!(
+                ?retry_after,
+                "Hit builtin rate limiter; waiting for recovery"
             );
+            self.block_for(retry_after);
+
+            let retry_in_seconds = self
+                .retry_in_seconds()
+                .unwrap_or_else(|| duration_seconds_ceil(retry_after));
 
             return Err(ErrorKind::Ratelimited { retry_in_seconds }.into());
         }
