@@ -27,7 +27,7 @@ use crate::{
     util::{error::Context, http::HttpClient, tiltify::TiltifyClient},
 };
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(tiltify_webhook).service(pride_26);
 }
 
@@ -68,7 +68,7 @@ pub struct CampaignInfo {
     cached_at: DateTime<Utc>,
 }
 
-const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info";
+const CAMPAIGN_INFO_CACHE_NAMESPACE: &str = "campaign_info:v1";
 const CAMPAIGN_INFO_CACHE_STALE_SECONDS: i64 = 15 * 60;
 const CAMPAIGN_INFO_CACHE_TTL_SECONDS: i64 = 24 * 60 * 60;
 
@@ -143,7 +143,13 @@ impl CampaignDonation {
     }
 }
 
-#[utoipa::path]
+/// Receive a Tiltify webhook.  
+#[utoipa::path(
+	context_path = "/campaign",
+	tag = "campaigns",
+	request_body(content = String, content_type = "text/plain"),
+	responses((status = NO_CONTENT))
+)]
 #[post("/webhook")]
 pub async fn tiltify_webhook(
     req: HttpRequest,
@@ -301,7 +307,12 @@ fn verify_tiltify_webhook_signature(
     Ok(())
 }
 
-#[utoipa::path]
+/// Get Pride campaign data.  
+#[utoipa::path(
+	context_path = "/campaign",
+	tag = "campaigns",
+	responses((status = OK, body = CampaignInfo))
+)]
 #[get("/pride-26")]
 pub async fn pride_26(
     http: web::Data<HttpClient>,
@@ -315,7 +326,7 @@ pub async fn pride_26(
         .wrap_internal_err("connecting to redis")?;
 
     let cached = redis_connection
-        .get_deserialized_from_json::<CampaignInfo>(
+        .get_deserialized::<CampaignInfo>(
             CAMPAIGN_INFO_CACHE_NAMESPACE,
             campaign_id,
         )
@@ -371,7 +382,7 @@ pub async fn pride_26(
         };
 
         redis_connection
-            .set_serialized_to_json(
+            .set_serialized(
                 CAMPAIGN_INFO_CACHE_NAMESPACE,
                 campaign_id,
                 &campaign_info,

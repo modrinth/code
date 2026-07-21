@@ -49,13 +49,14 @@
 		row-key="id"
 		:row-class="getVersionRowClass"
 		:row-clickable="!!versionLink"
+		:row-below-visible="isFileRowVisible"
 		table-layout="auto"
 		@row-click="openVersionRow"
 	>
 		<template #cell-channel="{ row: version }">
 			<div class="flex items-center justify-center">
 				<VersionChannelIndicator
-					v-tooltip="`Toggle filter for ${version.version_type}`"
+					v-tooltip="getFilterTooltip(version.version_type)"
 					:channel="version.version_type"
 					class="cursor-pointer"
 					data-no-row-click
@@ -88,52 +89,62 @@
 								'--_color': 'var(--color-orange)',
 							}"
 						>
-							<TagItem> <CircleAlertIcon /> {{ formatMessage(messages.withheld) }}</TagItem>
+							<TagItem class="w-fit max-w-full truncate">
+								<CircleAlertIcon />
+								<span class="min-w-0 truncate">{{ formatMessage(messages.withheld) }}</span>
+							</TagItem>
 						</div>
 					</div>
 				</AutoLink>
-				<div v-if="showFiles" class="tag-list">
-					<div
-						v-for="(file, fileIdx) in version.files"
-						:key="`file-tag-${fileIdx}`"
-						:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
-					>
-						<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
-						{{ file.filename }} - {{ formatBytes(file.size) }}
-					</div>
+			</div>
+		</template>
+
+		<template #row-below="{ row: version }">
+			<div class="tag-list px-4 pb-3 -mt-0.5">
+				<div
+					v-for="(file, fileIdx) in version.files"
+					:key="`file-tag-${fileIdx}`"
+					:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'text-contrast' : 'text-primary'}`"
+				>
+					<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
+					{{ file.filename }} - {{ formatBytes(file.size) }}
 				</div>
 			</div>
 		</template>
 
 		<template #cell-gameVersions="{ row: version }">
-			<div class="flex flex-wrap gap-1 w-fit">
+			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
 					v-for="gameVersion in getDisplayGameVersions(version).slice(0, MAX_GAME_VERSION_TAGS)"
 					:key="`version-tag-${gameVersion}`"
-					v-tooltip="`Toggle filter for ${gameVersion}`"
+					v-tooltip="getFilterTooltip(gameVersion)"
 					data-no-row-click
+					class="w-fit max-w-full truncate"
 					:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 				>
-					{{ gameVersion }}
+					<span class="min-w-0 truncate">{{ gameVersion }}</span>
 				</TagItem>
 				<Menu
 					v-if="getDisplayGameVersions(version).length > MAX_GAME_VERSION_TAGS"
 					data-no-row-click
 					:delay="{ hide: 50, show: 0 }"
 					no-auto-focus
-					class="cursor-default"
+					class="w-full min-w-0 cursor-default"
 				>
-					<TagItem tabindex="0">
-						+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
+					<TagItem class="w-fit max-w-full truncate" tabindex="0">
+						<span class="min-w-0 truncate">
+							+{{ getDisplayGameVersions(version).length - MAX_GAME_VERSION_TAGS }}
+						</span>
 					</TagItem>
 					<template #popper>
 						<div class="flex max-w-[20rem] flex-wrap gap-1">
 							<TagItem
 								v-for="gameVersion in getDisplayGameVersions(version).slice(MAX_GAME_VERSION_TAGS)"
 								:key="`overflow-version-tag-${gameVersion}`"
+								class="w-fit max-w-full truncate"
 								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 							>
-								{{ gameVersion }}
+								<span class="min-w-0 truncate">{{ gameVersion }}</span>
 							</TagItem>
 						</div>
 					</template>
@@ -142,40 +153,49 @@
 		</template>
 
 		<template #cell-platforms="{ row: version }">
-			<div class="flex flex-wrap gap-1 w-fit">
+			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<template v-if="version.noModLoader">
-					<TagItem class="border !border-solid border-surface-5"> No mod loader </TagItem>
+					<TagItem class="w-fit max-w-full truncate border !border-solid border-surface-5">
+						<span class="min-w-0 truncate">No mod loader</span>
+					</TagItem>
 				</template>
 				<template v-else>
 					<TagItem
 						v-for="platform in version.loaders.slice(0, MAX_PLATFORM_TAGS)"
 						:key="`platform-tag-${platform}`"
-						v-tooltip="`Toggle filter for ${platform}`"
+						v-tooltip="getPlatformTooltip(platform)"
 						data-no-row-click
+						class="w-fit max-w-full truncate"
 						:style="`--_color: var(--color-platform-${platform})`"
 						:action="() => versionFilters?.toggleFilter('platform', platform)"
 					>
 						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-						<FormattedTag :tag="platform" enforce-type="loader" />
+						<span class="min-w-0 truncate">{{ getPlatformLabel(platform) }}</span>
 					</TagItem>
 					<Menu
 						v-if="version.loaders.length > MAX_PLATFORM_TAGS"
 						data-no-row-click
 						:delay="{ hide: 50, show: 0 }"
 						no-auto-focus
-						class="cursor-default"
+						class="w-full min-w-0 cursor-default"
 					>
-						<TagItem tabindex="0"> +{{ version.loaders.length - MAX_PLATFORM_TAGS }} </TagItem>
+						<TagItem class="w-fit max-w-full truncate" tabindex="0">
+							<span class="min-w-0 truncate">
+								+{{ version.loaders.length - MAX_PLATFORM_TAGS }}
+							</span>
+						</TagItem>
 						<template #popper>
 							<div class="flex max-w-[20rem] flex-wrap gap-1">
 								<TagItem
 									v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
 									:key="`overflow-platform-tag-${platform}`"
+									v-tooltip="getPlatformTooltip(platform)"
+									class="w-fit max-w-full truncate"
 									:style="`--_color: var(--color-platform-${platform})`"
 									:action="() => versionFilters?.toggleFilter('platform', platform)"
 								>
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-									<FormattedTag :tag="platform" enforce-type="loader" />
+									<span class="min-w-0 truncate">{{ getPlatformLabel(platform) }}</span>
 								</TagItem>
 							</div>
 						</template>
@@ -185,15 +205,15 @@
 		</template>
 
 		<template v-if="showEnvironmentColumn" #cell-environment="{ row: version }">
-			<div class="flex flex-wrap gap-1">
+			<div class="flex min-w-0 w-full max-w-[12rem] flex-wrap gap-1">
 				<TagItem
 					v-for="(tag, tagIdx) in getEnvironmentTags(version.environment)"
 					:key="`env-tag-${tagIdx}`"
 					data-no-row-click
-					class="text-center"
+					class="w-fit max-w-full truncate text-center"
 				>
 					<component :is="tag.icon" />
-					{{ formatMessage(tag.label).replace('and', '&') }}
+					<span class="min-w-0 truncate">{{ formatMessage(tag.label).replace('and', '&') }}</span>
 				</TagItem>
 			</div>
 		</template>
@@ -258,7 +278,7 @@
 						<div class="flex items-center gap-1.5">
 							<div class="self-center">
 								<VersionChannelIndicator
-									v-tooltip="`Toggle filter for ${version.version_type}`"
+									v-tooltip="getFilterTooltip(version.version_type)"
 									:channel="version.version_type"
 									class="cursor-pointer smart-clickable:allow-pointer-events"
 									size="sm"
@@ -282,7 +302,7 @@
 						</div>
 
 						<div
-							class="flex items-start justify-end gap-1 max-[400px]:flex-col max-[400px]:justify-start smart-clickable:allow-pointer-events"
+							class="flex items-start justify-end gap-1 max-[350px]:flex-col max-[350px]:justify-start smart-clickable:allow-pointer-events"
 						>
 							<slot name="actions" :version="version"></slot>
 						</div>
@@ -296,7 +316,7 @@
 									MAX_GAME_VERSION_TAGS,
 								)"
 								:key="`version-tag-${gameVersion}`"
-								v-tooltip="`Toggle filter for ${gameVersion}`"
+								v-tooltip="getFilterTooltip(gameVersion)"
 								class="smart-clickable:allow-pointer-events"
 								:action="() => versionFilters?.toggleFilters('gameVersion', version.game_versions)"
 							>
@@ -334,13 +354,13 @@
 								<TagItem
 									v-for="platform in version.loaders.slice(0, MAX_PLATFORM_TAGS)"
 									:key="`platform-tag-${platform}`"
-									v-tooltip="`Toggle filter for ${platform}`"
+									v-tooltip="getPlatformTooltip(platform)"
 									class="smart-clickable:allow-pointer-events"
 									:style="`--_color: var(--color-platform-${platform})`"
 									:action="() => versionFilters?.toggleFilter('platform', platform)"
 								>
 									<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-									<FormattedTag :tag="platform" enforce-type="loader" />
+									{{ getPlatformLabel(platform) }}
 								</TagItem>
 								<Menu
 									v-if="version.loaders.length > MAX_PLATFORM_TAGS"
@@ -356,11 +376,12 @@
 											<TagItem
 												v-for="platform in version.loaders.slice(MAX_PLATFORM_TAGS)"
 												:key="`overflow-platform-tag-${platform}`"
+												v-tooltip="getPlatformTooltip(platform)"
 												:style="`--_color: var(--color-platform-${platform})`"
 												:action="() => versionFilters?.toggleFilter('platform', platform)"
 											>
 												<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-												<FormattedTag :tag="platform" enforce-type="loader" />
+												{{ getPlatformLabel(platform) }}
 											</TagItem>
 										</div>
 									</template>
@@ -425,7 +446,6 @@ import {
 import {
 	AutoLink,
 	ButtonStyled,
-	FormattedTag,
 	Pagination,
 	SmartClickable,
 	Table,
@@ -444,6 +464,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
+import { formatTag } from '../../utils/tag-messages'
 import { getEnvironmentTags } from './settings/environment/environments'
 
 const { formatMessage } = useVIntl()
@@ -519,18 +540,18 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		},
 		{
 			key: 'name',
-			label: 'Name',
+			label: 'Version',
 			cellClass: '!overflow-visible py-3 pr-4 min-w-[7rem]',
 		},
 		{
 			key: 'gameVersions',
 			label: 'Game version',
-			cellClass: '!overflow-visible py-3 align-middle pr-2.5 w-fit max-w-[10rem]',
+			cellClass: '!overflow-visible py-3 align-middle pr-2.5 min-w-0 max-w-[12rem]',
 		},
 		{
 			key: 'platforms',
-			label: 'Platforms',
-			cellClass: '!overflow-visible py-3 align-middle pr-2.5 w-fit max-w-[10rem]',
+			label: 'Platform',
+			cellClass: '!overflow-visible py-3 align-middle pr-2.5 min-w-0 max-w-[12rem]',
 		},
 	]
 
@@ -538,7 +559,7 @@ const versionColumns = computed<TableColumn<VersionTableColumn>[]>(() => {
 		columns.push({
 			key: 'environment',
 			label: 'Environment',
-			cellClass: visibleCellClass,
+			cellClass: `${visibleCellClass} min-w-0 max-w-[12rem]`,
 		})
 	}
 
@@ -597,6 +618,26 @@ function hasNoModLoader(loaders: string[]): boolean {
 
 function getDisplayGameVersions(version: DisplayVersion): string[] {
 	return formatVersionsForDisplay(version.game_versions, props.gameVersions)
+}
+
+function getFilterTooltip(filter: string): string {
+	return formatMessage(messages.toggleFilterTooltip, { filter })
+}
+
+function getPlatformLabel(platform: string): string {
+	if (platform === 'modloader') {
+		return formatMessage(messages.modloaderShort)
+	}
+
+	return formatTag(formatMessage, platform, 'loader')
+}
+
+function getPlatformTooltip(platform: string): string {
+	return getFilterTooltip(formatTag(formatMessage, platform, 'loader'))
+}
+
+function isFileRowVisible(version: VersionTableRow): boolean {
+	return props.showFiles && Array.isArray(version.files) && version.files.length > 0
 }
 
 const normalizedVersions = computed<DisplayVersion[]>(() =>
@@ -674,9 +715,7 @@ function switchPage(page: number) {
 }
 
 function getVersionRowClass(): string {
-	return props.versionLink
-		? 'group version-row-link cursor-pointer transition-[filter] [&:hover:not(:has([data-no-row-click]:hover))]:brightness-[115%]'
-		: 'group'
+	return props.versionLink ? 'group version-row-link cursor-pointer transition-[filter]' : 'group'
 }
 
 function openVersionRow(version: VersionTableRow) {
@@ -709,11 +748,27 @@ const messages = defineMessages({
 		id: 'project.versions.version.withheld.tooltip',
 		defaultMessage: 'Version withheld due to missing permissions',
 	},
+	toggleFilterTooltip: {
+		id: 'project.versions.filter.toggle-tooltip',
+		defaultMessage: 'Toggle filter for {filter}',
+	},
+	modloaderShort: {
+		id: 'project.versions.platform.modloader.short',
+		defaultMessage: 'ModLoader',
+	},
 })
 </script>
 
 <style scoped>
-:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) .version-row-name) {
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover))),
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) + .table-row-below),
+:deep(.version-row-link:has(+ .table-row-below:hover)),
+:deep(.version-row-link:has(+ .table-row-below:hover) + .table-row-below) {
+	filter: brightness(115%);
+}
+
+:deep(.version-row-link:hover:not(:has([data-no-row-click]:hover)) .version-row-name),
+:deep(.version-row-link:has(+ .table-row-below:hover) .version-row-name) {
 	text-decoration-line: underline;
 }
 </style>

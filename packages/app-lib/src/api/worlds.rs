@@ -401,7 +401,7 @@ async fn read_singleplayer_world_maybe_locked(
         .to_string();
     let last_played = data.get::<_, i64>("LastPlayed").unwrap_or(0);
     let game_type = data.get::<_, i32>("GameType").unwrap_or(0);
-    let hardcore = data.get::<_, i8>("hardcore").unwrap_or(0) != 0;
+    let hardcore = read_hardcore(data);
 
     let icon = if tokio::fs::try_exists(world_path.join("icon.png"))
         .await
@@ -436,6 +436,14 @@ async fn read_singleplayer_world_maybe_locked(
             locked,
         },
     })
+}
+
+fn read_hardcore(data: &NbtCompound) -> bool {
+    data.get::<_, &NbtCompound>("difficulty_settings")
+        .and_then(|settings| settings.get::<_, i8>("hardcore"))
+        .or_else(|_| data.get::<_, i8>("hardcore"))
+        .unwrap_or(0)
+        != 0
 }
 
 async fn get_server_worlds_in_instance(

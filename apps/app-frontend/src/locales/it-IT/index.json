@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Mostra meno istanze in esecuzione"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Copiati"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Copia dettagli"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Ignora"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Installazione fallita"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Installazione fallita: l'app è stata chiusa."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Installazione fallita: errore di rete."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Installazione fallita: errore sconosciuto."
   },
   "app.action-bar.install.open-instance": {
     "message": "Apri istanza"
   },
   "app.action-bar.install.retry": {
     "message": "Riprova"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Annullato per app chiusa"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Impossibile leggere il pacchetto"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Annullato"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "La pulizia è stata interrotta"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Impossibile scaricare i file"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Il file scaricato è corrotto"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Impossibile salvare i file"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Il download è stato interrotto"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "L'istanza non è stata trovata"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Percorso del file errato"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Dati del pacchetto non validi"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Metadati del pacchetto non validi"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "La configurazione di Java è stata interrotta"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Il loader non è stato configurato"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Impossibile aggiornare i dati locali"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft non è stato configurato"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Impossibile collegarsi a Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Permessi di scrittura mancanti"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Impossibile scaricare il pacchetto"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Qualcosa è andato storto"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Istanza sconosciuta"
@@ -225,13 +279,13 @@
     "message": "Download del pacchetto"
   },
   "app.install.phase.extracting_overrides": {
-    "message": "Estrazione degli override"
+    "message": "Estrazione delle sovrascritture"
   },
   "app.install.phase.finalizing": {
     "message": "Finalizzazione"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Preparazione dell'istanza"
+    "message": "In coda per l'installazione"
   },
   "app.install.phase.preparing_java": {
     "message": "Preparazione di Java"
@@ -264,7 +318,7 @@
     "message": "Risoluzione dei contenuti"
   },
   "app.install.phase.rolling_back": {
-    "message": "Tornando indietro"
+    "message": "Annullamento"
   },
   "app.install.phase.running_loader_processors": {
     "message": "Esecuzione dei processori del loader"
@@ -368,29 +422,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cerca tra {count} mondi..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Contenuto richiesto"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Non installare"
   },
   "app.modal.install-to-play.header": {
     "message": "Installa per continuare"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installa comunque"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installa"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Questo invito è stato creato da un utente e non da Modrinth. Accetta solo gli inviti da persone fidate."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Pacchetto di mod richiesto"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Questo server richiede alcune mod. Clicca Installa per scaricarle direttamente da Modrinth, poi sarai pronto a giocare."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Solo i file pubblicati su Modrinth vengono esaminati, qualunque sia il loro formato (.mrpack inclusi)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Istanza condivisa"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Istanza del server condivisa"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Questo pacchetto contiene dei file che non sono su Modrinth. Consigliamo di installare file solo da fonti attendibili."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "File sconosciuti"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "File non riconosciuti"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Mostra contenuti"
@@ -398,8 +461,8 @@
   "app.modal.update-to-play.header": {
     "message": "Aggiorna per continuare"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Aggiornamento richiesto"
+  "app.modal.update-to-play.removed": {
+    "message": "Rimosso"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} richiede degli aggiornamenti. Installa l'ultima versione per poter giocare."
@@ -407,11 +470,23 @@
   "app.project.install-button.already-installed": {
     "message": "Questo progetto è già stato installato"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Cambia versione"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Torna a Esplora"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installa il contenuto nell'istanza"
+  "app.project.version.all-versions": {
+    "message": "Tutte le versioni"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Scarica col browser"
+  },
+  "app.project.version.installing": {
+    "message": "Installazione"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Già installate"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modalità sviluppatore attiva."
@@ -532,6 +607,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -1027,26 +1105,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Il loader è determinato dal server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Solo i file caricati su Modrinth vengono esaminati, qualunque sia il loro formato (.mrpack inclusi)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Non mostrare più questo avviso"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Conferma l'installazione"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Installa comunque"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Spesso i malware vengono nascosti nei pacchetti di mod, poi distribuiti su piattaforme come Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Non è stato possibile trovare questo file su Modrinth. Consigliamo di installare file solo da fonti attendibili."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Tipo di file sconosciuto"
   }
 }

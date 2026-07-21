@@ -246,7 +246,9 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 		const enrichmentPromise = enrichReportBatch(reports)
 		enrichmentPromises.push(enrichmentPromise)
 
-		currentOffset += reports.length
+		// this is explicitly not the length of the reports array, because the API may return fewer reports due to a report in the middle not being
+		// serializable if the offset is set to the reports array you can get the same report from the end multiple times.
+		currentOffset += REPORT_ENDPOINT_COUNT
 
 		if (enrichmentPromises.length >= 3) {
 			const completed = await Promise.all(enrichmentPromises.splice(0, 2))

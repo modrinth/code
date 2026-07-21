@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications";
+const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v1";
 
 pub struct NotificationBuilder {
     pub body: NotificationBody,
@@ -435,7 +435,7 @@ impl DBNotification {
             let mut redis = redis.connect().await?;
 
             let cached_notifications: Option<Vec<DBNotification>> = redis
-                .get_deserialized_from_json(
+                .get_deserialized(
                     USER_NOTIFICATIONS_NAMESPACE,
                     &user_id.0.to_string(),
                 )
@@ -493,7 +493,7 @@ impl DBNotification {
         let mut redis = redis.connect().await?;
 
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 USER_NOTIFICATIONS_NAMESPACE,
                 user_id.0,
                 &db_notifications,

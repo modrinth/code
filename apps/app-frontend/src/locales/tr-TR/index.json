@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Diğer çalışan kurulumları gizle"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopyalandı"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Detayları kopyala"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Reddet"
-  },
-  "app.action-bar.install.failed": {
-    "message": "Yükleme yapılamadı"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "Yükleme uygulama kapandığından yapılamadı."
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "Yükleme ağ hatasından dolayı yapılamadı."
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "Yükleme bilinmeyen bir hatadan yapılamadı."
   },
   "app.action-bar.install.open-instance": {
     "message": "Kurulumu aç"
   },
   "app.action-bar.install.retry": {
     "message": "Yeniden Dene"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Uygulama kapatıldığı için iptal edildi"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Mod paketi okunamadı"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "İptal edildi"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Temizleme bitmedi"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Dosyalar indirilemedi"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "İndirilmiş dosya bozuk"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Dosyalar kaydedilemedi"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "İndirme tamamlanamadı"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Kurulum bulunamadı"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Dosya yolu geçersiz"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Mod paketi verileri geçersiz"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Mod paketi dosyaları geçersiz meta verilere sahip"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java kurulumu bitirilemedi"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Yükleyici kurulumu başarısız oldu"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Yerel veriler güncellenemedi"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft kurulumu başarısız oldu"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth'e erişilemiyor"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Yazmak için yetkiniz yok"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Paket indirilemedi"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Bir sorun oluştu"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Bilinmeyen kurulum"
@@ -204,7 +258,7 @@
     "message": "Mod paketini dışa aktar"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Mod Paketi Adı"
+    "message": "Mod paketi adı"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Mod paketi adı"
@@ -231,7 +285,7 @@
     "message": "Tamamlanıyor"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Kurulum hazırlanıyor"
+    "message": "İndirmek için sıraya alındı"
   },
   "app.install.phase.preparing_java": {
     "message": "Java Hazırlanıyor"
@@ -371,29 +425,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "İçerik gerekli"
+  "app.modal.install-to-play.dont-install": {
+    "message": "İndirme"
   },
   "app.modal.install-to-play.header": {
     "message": "Oynamak için yükleyin"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Yine de indir"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Yükle"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Bu davetiye Modrinth tarafından değil, başka bir Modrinth kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {#mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Gerekli mod paketi"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Bu sunucuya girebilmek için modlar gereklidir. Gerekli dosyaları Modrinth üzerinden kurmak için Yükle butonuna tıkla, ardından doğrudan sunucuya başlat."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Paylaşılan Kurulum"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Paylaşılan Sunucu Kurulumu"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Bilinmeyen dosya uyarısı"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Tanımlanamayan dosyalar"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "İçeriği görüntüle"
@@ -401,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "Oynamak için güncelle"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Güncelleme gerekli"
+  "app.modal.update-to-play.removed": {
+    "message": "Silindi"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
@@ -410,11 +473,23 @@
   "app.project.install-button.already-installed": {
     "message": "Bu proje zaten kurulu"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Sürüm değiştir"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Keşfete geri dön"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "İçeriği kuruluma yükle"
+  "app.project.version.all-versions": {
+    "message": "Tüm sürümler"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Tarayıcıdan indir"
+  },
+  "app.project.version.installing": {
+    "message": "Yükleniyor"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Zaten yüklenmiş"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
@@ -535,6 +610,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "İnşaatçılar & Biyomlar"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Kaos Küpü"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Gökyüzünü kovala"
@@ -1030,26 +1108,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Yükleyici sunucu tarafından sağlanıyor"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Bu uyarıyı tekrar gösterme"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "İndirmeyi onayla"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Yine de indir"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Kötü amaçlı yazılımlar genellikle Discord gibi platformlarda paylaşılan mod paketi dosyaları aracılığıyla yayılır."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Bu dosyayı Modrinth üzerinde bulamadık. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle öneririz."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Bilinmeyen dosya uyarısı"
   }
 }

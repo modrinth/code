@@ -22,6 +22,8 @@ import {
 	preferencesDiffer,
 	provideBrowseManager,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useBrowseSearch,
 	useDebugLogger,
 	useVIntl,
@@ -47,6 +49,7 @@ import {
 	get_installed_project_ids as getInstalledProjectIds,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_instance_worlds } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
@@ -69,6 +72,7 @@ const debugLog = useDebugLogger('Browse')
 const router = useRouter()
 const route = useRoute()
 const themeStore = useTheming()
+const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
 provideServerInstallContent(serverInstallContent)
@@ -403,7 +407,7 @@ const messages = defineMessages({
 	},
 	hideAddedServers: {
 		id: 'app.browse.hide-added-servers',
-		defaultMessage: 'Hide already added servers',
+		defaultMessage: 'Hide servers already added',
 	},
 	installingToServer: {
 		id: 'app.browse.server.installing',
@@ -487,6 +491,9 @@ function resetInstanceContext() {
 watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
+		if (!browseRouteActive.value) {
+			return
+		}
 		if (isSetupServerContext.value) {
 			enforceSetupModpackRoute(newType)
 			if (newType !== 'modpack') return
@@ -680,7 +687,6 @@ async function chooseInstanceInstallVersion(
 	const selectedVersion = getLatestMatchingInstallVersion(
 		await getInstallProjectVersions(project.project_id),
 		selectedPreferences,
-		projectTypeValue,
 	)
 
 	if (!selectedVersion) {
@@ -763,11 +769,15 @@ function getCardActions(
 							project: projectResult,
 							contentType,
 							mode: isModpack ? 'immediate' : 'queue',
-							selectedFilters: isModpack ? [] : searchState.currentFilters.value,
+							selectedFilters: isModpack
+								? []
+								: stripServerRuntimeInstallFilters(searchState.currentFilters.value),
 							providedFilters: isModpack ? [] : combinedProvidedFilters.value,
 							overriddenProvidedFilterTypes: isModpack
 								? []
-								: searchState.overriddenProvidedFilterTypes.value,
+								: stripServerRuntimeInstallOverrides(
+										searchState.overriddenProvidedFilterTypes.value,
+									),
 							targetPreferences: getServerInstallTargetPreferences(contentType),
 							getProjectVersions: getInstallProjectVersions,
 							queue: serverInstallQueue,
@@ -878,7 +888,7 @@ async function search(requestParams: string) {
 	const rawResults = await queryClient.fetchQuery({
 		queryKey: ['search', 'v3', requestParams],
 		queryFn: () =>
-			get_search_results_v3(requestParams) as Promise<{
+			get_search_results_v3(requestParams, 'must_revalidate') as Promise<{
 				result: Labrinth.Search.v3.SearchResults & {
 					hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
 				}
@@ -954,6 +964,7 @@ const lockedFilterMessages = computed(() => ({
 const searchState = useBrowseSearch({
 	projectType,
 	tags,
+	active: browseRouteActive,
 	providedFilters: combinedProvidedFilters,
 	search,
 	persistentQueryParams: ['i', 'ai', 'shi', 'sid', 'wid', 'from'],
@@ -1029,6 +1040,9 @@ onUnmounted(() => {
 })
 
 function getProjectBrowseQuery() {
+	if (!browseRouteActive.value) {
+		return undefined
+	}
 	if (!installContext.value) return undefined
 	return {
 		...route.query,
@@ -1036,10 +1050,24 @@ function getProjectBrowseQuery() {
 	}
 }
 
+const advancedFiltersCollapsed = computed({
+	get: () => themeStore.getFeatureFlag('advanced_filters_collapsed'),
+	set: (value) => {
+		themeStore.featureFlags['advanced_filters_collapsed'] = value
+		getSettings()
+			.then((settings) => {
+				settings.feature_flags['advanced_filters_collapsed'] = value
+				return setSettings(settings)
+			})
+			.catch(handleError)
+	},
+})
+
 provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
+	advancedFiltersCollapsed,
 	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),
@@ -1119,7 +1147,7 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
-		<Teleport to="#sidebar-teleport-target">
+		<Teleport v-if="browseRouteActive" to="#sidebar-teleport-target">
 			<BrowseSidebar />
 		</Teleport>
 	</div>

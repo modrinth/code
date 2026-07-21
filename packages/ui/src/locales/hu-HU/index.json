@@ -57,7 +57,7 @@
     "defaultMessage": "{sharedCpus} Megosztott CPU-k"
   },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Ön újra elő fog fizetni  <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
+    "defaultMessage": "Ön újra elő fog fizetni <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Újrafeliratkozás sikertelen, nem sikerült betölteni az előfizetés adatait."
@@ -99,13 +99,13 @@
     "defaultMessage": "Kiválasztott projektek"
   },
   "browse.selected-projects-floating-bar.install": {
-    "defaultMessage": "{count} projekt letöltése"
+    "defaultMessage": "{count, plural, one {# projekt} other {# projektek}} letöltése"
   },
   "browse.selected-projects-floating-bar.selected-count": {
-    "defaultMessage": "{count} projekt kiválasztva"
+    "defaultMessage": "{count, plural, one {# projekt kiválasztva} other {# projektek kiválasztva}}"
   },
   "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "{count} projektet választottál ki telepítésre. Telepítsd őket most, vagy lépj vissza telepítés nélkül."
+    "defaultMessage": "A {count, plural, one {# projektet} other {# projekteket}} választottad a letöltéshez. Telepítsd őket most, vagy lépj vissza a telepítésük nélkül."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "A kiválasztott projektek nincsenek telepítve"
@@ -305,17 +305,23 @@
   "changelog.product.web": {
     "defaultMessage": "Platform"
   },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count} projekt"
+  },
   "collections.label.private": {
     "defaultMessage": "Privát"
   },
   "content-type.content.lowercase": {
     "defaultMessage": "tartalom"
   },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count} elem"
+  },
   "content.card.select-project": {
     "defaultMessage": "{project} kiválasztása"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Biztosan frissíteni szeretnél {count} projektet a legújabb kompatibilis verziójára? Javasoljuk, hogy a tartalmakat egyenként frissítsd."
+    "defaultMessage": "Biztosan frissíteni szeretnéd a {count, plural, one {# projektet} other {# projekteket}} a legfrissebb kompatibilis verziójára? Ajánlott, hogy mindegyiket egyesével frissítsd le."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Frissítési figyelmeztetés"
@@ -327,7 +333,7 @@
     "defaultMessage": "Tartsd lenyomva a Shift-et, miközben az „Összes frissítése” gombra kattintasz, hogy a jövőben elkerüld ezt a megerősítést."
   },
   "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "{count} projekt frissítése"
+    "defaultMessage": "{count, plural, one {# projekt} other {# projektek}} frissítése"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Egy mod törlése véglegesen befolyásolhatja a világodat, és tartalomhiányt vagy váratlanul problémákat okozhat a világ betöltésénél."
@@ -385,6 +391,9 @@
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "A szerverén található egyes tartalmakat nem sikerült elemezni, ezért előfordulhat, hogy ez a változás hatással lesz rájuk."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Ismeretlen fájlok"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
@@ -470,6 +479,9 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Kérjük, várjon"
   },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Keresés {count, number} {contentType} között..."
+  },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Fájlnevek"
   },
@@ -508,6 +520,30 @@
   },
   "content.selection-bar.all-already-enabled": {
     "defaultMessage": "Az összes kijelölt tartalom már engedélyezve lett"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "{progress}/{total} {contentType} törlése..."
+  },
+  "content.selection-bar.bulk.deleting-count": {
+    "defaultMessage": "{count, number} {contentType} törlése..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "{progress}/{total} {contentType} letiltása..."
+  },
+  "content.selection-bar.bulk.disabling-count": {
+    "defaultMessage": "{count, number} {contentType} letiltása..."
+  },
+  "content.selection-bar.bulk.enabling-count": {
+    "defaultMessage": "{count, number} {contentType} engedélyezése..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "{progress}/{total} {contentType} frisstése..."
+  },
+  "content.selection-bar.bulk.updating-count": {
+    "defaultMessage": "{count, number} {contentType} frissítése..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count, number} {contentType} kiválasztva"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} kiválasztva"
@@ -769,6 +805,21 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Szerver beállítása"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, one {Fájl hozzáadása} other {Fájlok hozzáadása}}"
+  },
+  "external-files.permissions-card.add-files-modal.search-placeholder": {
+    "defaultMessage": "Fájlok keresése..."
+  },
+  "external-files.permissions-card.add-files-modal.selected-count": {
+    "defaultMessage": "{count} fájl kiválasztva"
+  },
+  "external-files.permissions-card.file-count": {
+    "defaultMessage": "{count} fájl"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "Ismeretlen"
   },
   "external-project-license-status.no": {
     "defaultMessage": "Nem"
@@ -1693,9 +1744,6 @@
   },
   "label.game-version": {
     "defaultMessage": "Játékverzió"
-  },
-  "label.hide-installed-content": {
-    "defaultMessage": "A már telepített tartalmak elrejtése"
   },
   "label.hide-selected-content": {
     "defaultMessage": "A kijelölt tartalom elrejtése"
@@ -3152,6 +3200,12 @@
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
     "defaultMessage": "Leválasztott modcsomag"
   },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "Példányok"
+  },
+  "servers.access-page.activity-log-filter.server-scoped-instance": {
+    "defaultMessage": "Szerver"
+  },
   "servers.access-page.activity-log-filter.users": {
     "defaultMessage": "Felhasználó"
   },
@@ -3544,6 +3598,9 @@
   },
   "servers.installing-banner.error.internal-platform": {
     "defaultMessage": "Egy internal hiba történt a telepítés közben. Kérlek probáld újra."
+  },
+  "servers.installing-banner.error.no-primary-file": {
+    "defaultMessage": "Ez a modcsomag-verzió nem tartalmaz letölthető fájlt. Lehet, hogy hibásan lett összeállítva."
   },
   "servers.installing-banner.phase.installing-addons": {
     "defaultMessage": "Kiegészítők telepítése..."
@@ -4385,6 +4442,87 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "Alkalmaz"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "time-frame-picker.clear-range": {
+    "defaultMessage": "Törlés"
+  },
+  "time-frame-picker.custom-range": {
+    "defaultMessage": " Egyéni, rögzített dátumtartomány..."
+  },
+  "time-frame-picker.decrease-amount": {
+    "defaultMessage": " Az időtartam csökkentése"
+  },
+  "time-frame-picker.empty-range": {
+    "defaultMessage": " Nincs kiválasztva dátumtartomány."
+  },
+  "time-frame-picker.increase-amount": {
+    "defaultMessage": " Az időtartam növelése"
+  },
+  "time-frame-picker.last-timeframe": {
+    "defaultMessage": "Az elmúlt {amount} {unit, select,\nhours {órában}\ndays {napban}\nweeks {hétben}\nmonths {hónapban}\nother {napban}\n}"
+  },
+  "time-frame-picker.last-timeframe-prefix": {
+    "defaultMessage": "Az elmúlt"
+  },
+  "time-frame-picker.option.all-time": {
+    "defaultMessage": "Teljes időszak"
+  },
+  "time-frame-picker.option.last-14-days": {
+    "defaultMessage": "Az elmúlt 14 nap"
+  },
+  "time-frame-picker.option.last-180-days": {
+    "defaultMessage": "Az elmúlt 180 nap"
+  },
+  "time-frame-picker.option.last-30-days": {
+    "defaultMessage": "Az elmúlt 30 nap"
+  },
+  "time-frame-picker.option.last-7-days": {
+    "defaultMessage": "Az elmúlt 7 nap"
+  },
+  "time-frame-picker.option.last-90-days": {
+    "defaultMessage": "Az elmúlt 90 nap"
+  },
+  "time-frame-picker.option.today": {
+    "defaultMessage": "Ma"
+  },
+  "time-frame-picker.option.year-to-date": {
+    "defaultMessage": " Az év eleje óta"
+  },
+  "time-frame-picker.option.yesterday": {
+    "defaultMessage": "Tegnap"
+  },
+  "time-frame-picker.select-timeframe": {
+    "defaultMessage": "Időkeret kiválasztása"
+  },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "Kiválasztva"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "Kiválasztás"
+  },
+  "time-frame-picker.timeframe-amount": {
+    "defaultMessage": "Az időkeret összege"
+  },
+  "time-frame-picker.timeframe-unit": {
+    "defaultMessage": "Az időkeret egysége"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "napban"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "órában"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "hónapban"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "hétben"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Vannak nem mentett módosítások."
   },
@@ -4406,8 +4544,11 @@
   "ui.stacked-admonitions.alert-count": {
     "defaultMessage": "{count} figyelmeztetés"
   },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Ismeretlen fájlok"
+  },
   "user.profile.badge.downloads.about.1": {
-    "defaultMessage": "Ez a felhasználó projektjei összesen {download_sum} letöltést értek el."
+    "defaultMessage": "Ennek a felhasználónak a projektjei összesen {download_sum} letöltést értek el."
   },
   "user.profile.badge.downloads.name": {
     "defaultMessage": "{download_sum} letöltés"

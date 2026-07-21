@@ -2822,9 +2822,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifique la dirección de su billetera. Los fondos enviados a una dirección incorrecta no se pueden recuperar."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Estos cambios serán aplicados {count, plural, one {al proyecto} other {a los # proyectos}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Creador en Modrinth."
   },
@@ -2891,9 +2888,6 @@
   "profile.label.collection": {
     "message": "Colección"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {descarga} other {descargas}}"
-  },
   "profile.label.joined": {
     "message": "Se unió hace"
   },
@@ -2911,9 +2905,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."
@@ -3101,44 +3092,14 @@
   "project.details.licensed": {
     "message": "Con licencia"
   },
-  "project.download.game-version": {
-    "message": "Versión del juego: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "Error: no se han encontrado versiones del juego"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} solo está disponible para {version}"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} no está soportado para la versión {gameVersion} de {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "Instalar con la aplicación Modrinth"
   },
   "project.download.no-app": {
     "message": "¿No tienes la aplicación Modrinth?"
   },
-  "project.download.no-versions-available": {
-    "message": "No hay versiones disponibles para {gameVersion} y {platform}."
-  },
-  "project.download.platform": {
-    "message": "Plataforma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Error: plataforma no encontrada"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} olo está disponible para {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} no está soportado para {platform} en la {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Buscar versiones del juego..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "Buscar versiones del juego..."
   },
   "project.download.select-game-version": {
     "message": "Selecciona la versión del juego"
@@ -3406,12 +3367,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Visita el panel de proyectos"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {descarga} other {descargas}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {seguidor} other {seguidores}}"
   },
   "project.status.archived.message": {
     "message": "{title} ha sido archivado. {title} no recibirá ninguna futura actualización excepto que el autor decida desarchivar el proyecto."
@@ -3832,9 +3787,6 @@
   },
   "servers.plan.small.description": {
     "message": "Perfecto para 1–5 amigos con algunas modificaciones ligeras."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "facturado {interval, select, monthly {mensual} quarterly {trimestral} yearly {anual} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Configuración completa"
@@ -4588,9 +4540,6 @@
   },
   "version.dependency.view-version": {
     "message": "Ver versión"
-  },
-  "version.download.download-dependency": {
-    "message": "Descargar dependencia"
   },
   "version.download.no-primary-file": {
     "message": "Error: No se encontró el archivo principal"

@@ -13,26 +13,20 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
-use actix_web::{HttpRequest, HttpResponse, get, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("teams", web::get().to(teams_get));
-
-    cfg.service(
-        web::scope("team")
-            .route("{id}/members", web::get().to(team_members_get))
-            .route("{id}/members/{user_id}", web::patch().to(edit_team_member))
-            .route(
-                "{id}/members/{user_id}",
-                web::delete().to(remove_team_member),
-            )
-            .route("{id}/members", web::post().to(add_team_member))
-            .route("{id}/join", web::post().to(join_team))
-            .route("{id}/owner", web::patch().to(transfer_ownership)),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(teams_get_route)
+        .service(team_members_get_route)
+        .service(team_members_get_organization)
+        .service(edit_team_member_route)
+        .service(remove_team_member_route)
+        .service(add_team_member_route)
+        .service(join_team_route)
+        .service(transfer_ownership_route);
 }
 
 // Returns all members of a project,
@@ -40,9 +34,13 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
-#[utoipa::path]
+/// Get a project's team members.
+#[utoipa::path(
+	context_path = "/project",
+	tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>))
+)]
 #[get("/{project_id}/members")]
-async fn team_members_get_project(
+pub async fn team_members_get_project(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -136,6 +134,8 @@ pub async fn team_members_get_project_internal(
     }
 }
 
+#[utoipa::path(tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>)))]
+#[get("/organization/{id}/members")]
 pub async fn team_members_get_organization(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -213,6 +213,18 @@ pub async fn team_members_get_organization(
 }
 
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
+#[utoipa::path(tag = "teams", responses((status = OK, body = Vec<crate::models::teams::TeamMember>)))]
+#[get("/team/{id}/members")]
+pub async fn team_members_get_route(
+    req: HttpRequest,
+    info: web::Path<(TeamId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    team_members_get(req, info, pool, redis, session_queue).await
+}
+
 pub async fn team_members_get(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -276,6 +288,22 @@ pub async fn team_members_get(
 #[derive(Serialize, Deserialize)]
 pub struct TeamIds {
     pub ids: String,
+}
+
+#[utoipa::path(
+	tag = "teams",
+	params(("ids" = String, Query)),
+	responses((status = OK))
+)]
+#[get("/teams")]
+pub async fn teams_get_route(
+    req: HttpRequest,
+    ids: web::Query<TeamIds>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    teams_get(req, ids, pool, redis, session_queue).await
 }
 
 pub async fn teams_get(
@@ -348,6 +376,18 @@ pub async fn teams_get(
     Ok(HttpResponse::Ok().json(teams))
 }
 
+#[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
+#[post("/team/{id}/join")]
+pub async fn join_team_route(
+    req: HttpRequest,
+    info: web::Path<(TeamId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    join_team(req, info, pool, redis, session_queue).await
+}
+
 pub async fn join_team(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -417,7 +457,7 @@ fn default_ordering() -> i64 {
     0
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NewTeamMember {
     pub user_id: UserId,
     #[serde(default = "default_role")]
@@ -431,6 +471,19 @@ pub struct NewTeamMember {
     pub payouts_split: Decimal,
     #[serde(default = "default_ordering")]
     pub ordering: i64,
+}
+
+#[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
+#[post("/team/{id}/members")]
+pub async fn add_team_member_route(
+    req: HttpRequest,
+    info: web::Path<(TeamId,)>,
+    pool: web::Data<PgPool>,
+    new_member: web::Json<NewTeamMember>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    add_team_member(req, info, pool, new_member, redis, session_queue).await
 }
 
 pub async fn add_team_member(
@@ -678,13 +731,26 @@ pub async fn add_team_member(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct EditTeamMember {
     pub permissions: Option<ProjectPermissions>,
     pub organization_permissions: Option<OrganizationPermissions>,
     pub role: Option<String>,
     pub payouts_split: Option<Decimal>,
     pub ordering: Option<i64>,
+}
+
+#[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
+#[patch("/team/{id}/members/{user_id}")]
+pub async fn edit_team_member_route(
+    req: HttpRequest,
+    info: web::Path<(TeamId, String)>,
+    pool: web::Data<PgPool>,
+    edit_member: web::Json<EditTeamMember>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    edit_team_member(req, info, pool, edit_member, redis, session_queue).await
 }
 
 pub async fn edit_team_member(
@@ -882,9 +948,22 @@ pub async fn edit_team_member(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct TransferOwnership {
     pub user_id: UserId,
+}
+
+#[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
+#[patch("/team/{id}/owner")]
+pub async fn transfer_ownership_route(
+    req: HttpRequest,
+    info: web::Path<(TeamId,)>,
+    pool: web::Data<PgPool>,
+    new_owner: web::Json<TransferOwnership>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    transfer_ownership(req, info, pool, new_owner, redis, session_queue).await
 }
 
 pub async fn transfer_ownership(
@@ -1070,6 +1149,18 @@ pub async fn transfer_ownership(
     }
 
     Ok(HttpResponse::NoContent().body(""))
+}
+
+#[utoipa::path(tag = "teams", responses((status = NO_CONTENT)))]
+#[delete("/team/{id}/members/{user_id}")]
+pub async fn remove_team_member_route(
+    req: HttpRequest,
+    info: web::Path<(TeamId, UserId)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    remove_team_member(req, info, pool, redis, session_queue).await
 }
 
 pub async fn remove_team_member(

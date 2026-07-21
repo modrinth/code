@@ -11,26 +11,80 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "隱藏更多執行中的實例"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "已複製"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "複製詳細資訊"
+  },
   "app.action-bar.install.dismiss": {
     "message": "忽略"
-  },
-  "app.action-bar.install.failed": {
-    "message": "無法安裝"
-  },
-  "app.action-bar.install.failed-app-closed": {
-    "message": "由於應用程式關閉，無法安裝。"
-  },
-  "app.action-bar.install.failed-network": {
-    "message": "由於網路錯誤，無法安裝。"
-  },
-  "app.action-bar.install.failed-unknown": {
-    "message": "由於未知錯誤，無法安裝。"
   },
   "app.action-bar.install.open-instance": {
     "message": "開啟實例"
   },
   "app.action-bar.install.retry": {
     "message": "重試"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "由於應用程式關閉而取消"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "無法讀取模組包"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "已取消"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "未完成清理"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "無法下載檔案"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "下載的檔案已損毀"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "無法儲存檔案"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "無法完成下載"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "找不到實例"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "檔案路徑無效"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "模組包資料無效"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "模組包檔案的詮釋資料無效"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "無法完成 Java 設定"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "無法設定載入器"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "無法更新本地資料"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "無法設定 Minecraft"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "無法連線到 Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "沒有寫入權限"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "無法下載模組包"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "出了點狀況"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "未知的實例"
@@ -231,7 +285,7 @@
     "message": "即將完成"
   },
   "app.install.phase.preparing_instance": {
-    "message": "正在準備實例"
+    "message": "已排入安裝佇列"
   },
   "app.install.phase.preparing_java": {
     "message": "正在準備 Java"
@@ -333,10 +387,10 @@
     "message": "刪除世界"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "此世界將會被永久刪除，此操作無法復原。"
+    "message": "這個世界將會被永久刪除，此操作無法復原。"
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "正在刪除 {name}"
+    "message": "即將刪除 {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "模組"
@@ -366,34 +420,43 @@
     "message": "這個伺服器將從你的伺服器清單中移除。如果你記得伺服器位址，稍後可以將其重新新增回來。"
   },
   "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "正在移除 {name}"
+    "message": "即將移除 {name}"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "所需內容"
+  "app.modal.install-to-play.dont-install": {
+    "message": "不要安裝"
   },
   "app.modal.install-to-play.header": {
     "message": "安裝以遊玩"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "仍要安裝"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "安裝"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "這份邀請是由另一位 Modrinth 使用者建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# 個模組}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "所需模組包"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "這個伺服器需要模組才能遊玩。請點選「安裝」以從 Modrinth 設定所需的檔案，完成後即可直接加入伺服器。"
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共用實例"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "共用伺服器實例"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "這個伺服器模組包中包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "未知檔案警告"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "無法辨識的檔案"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "檢視內容"
@@ -401,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "更新以遊玩"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "需要更新"
+  "app.modal.update-to-play.removed": {
+    "message": "已移除"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新才能遊玩「{name}」。請更新至最新版本以啟動遊戲。"
@@ -410,11 +473,23 @@
   "app.project.install-button.already-installed": {
     "message": "這個專案已安裝"
   },
+  "app.project.install-button.switch-version": {
+    "message": "切換版本"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "返回瀏覽"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "將內容安裝至實例"
+  "app.project.version.all-versions": {
+    "message": "所有版本"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "在瀏覽器中下載"
+  },
+  "app.project.version.installing": {
+    "message": "正在安裝"
+  },
+  "app.project.versions.already-installed": {
+    "message": "已安裝"
   },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
@@ -535,6 +610,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "建造者＆生態域"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "混沌立方"
   },
   "app.skins.section.chase-the-skies": {
     "message": "追逐天空"
@@ -1030,26 +1108,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "載入器由伺服器提供"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "只有上傳至 Modrinth 的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "不要再顯示這則警告"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "確認安裝"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "仍要安裝"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "惡意軟體經常透過 Discord 等平臺分享模組包檔案來進行傳播。"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "我們在 Modrinth 上找不到這個檔案。強烈建議你僅安裝來自信任來源的檔案。"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "未知檔案警告"
   }
 }

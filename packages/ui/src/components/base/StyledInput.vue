@@ -34,11 +34,11 @@
 			:spellcheck="spellcheck"
 			:maxlength="maxlength"
 			:rows="rows"
-			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none bg-surface-4 border-none rounded-xl"
 			:class="[
 				inputClass,
 				'pl-3 pr-3 py-2 text-base',
-				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				feedbackRingClass,
 				disabled ? 'cursor-not-allowed' : '',
 				resizeClass,
 			]"
@@ -68,13 +68,13 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
+			class="w-full touch-manipulation text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none"
 			:class="[
 				inputClass,
 				variant === 'filled' && icon ? 'pl-10' : 'pl-3',
 				clearable && model && variant === 'filled' ? 'pr-8' : 'pr-3',
 				size === 'small' ? 'h-8 py-1.5 text-sm' : 'h-9 py-2 text-base',
-				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				feedbackRingClass,
 				disabled ? 'cursor-not-allowed' : '',
 				variant === 'outlined'
 					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
@@ -118,6 +118,11 @@
 <script setup lang="ts">
 import { SearchIcon, XIcon } from '@modrinth/assets'
 import { type Component, computed, ref } from 'vue'
+
+const RING = {
+	error: 'ring-4 ring-red focus:ring-4 focus:ring-red',
+	none: 'outline-none focus:ring-4 focus:ring-brand-shadow',
+} as const
 
 const model = defineModel<string | number | undefined>()
 
@@ -170,11 +175,17 @@ const emit = defineEmits<{
 
 const inputRef = ref<HTMLInputElement | HTMLTextAreaElement>()
 const isFocused = ref(false)
+const feedbackRingClass = computed(() => (props.error ? RING.error : RING.none))
 const resizeClass = computed(
 	() => ({ none: 'resize-none', vertical: 'resize-y', both: 'resize' })[props.resize ?? 'none'],
 )
 
-defineExpose({ focus: () => inputRef.value?.focus() })
+defineExpose({
+	focus: () => inputRef.value?.focus(),
+	setValue: (v: string) => {
+		if (inputRef.value) inputRef.value.value = v
+	},
+})
 
 function onInput(event: Event) {
 	const target = event.target as HTMLInputElement | HTMLTextAreaElement

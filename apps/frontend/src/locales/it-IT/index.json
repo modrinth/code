@@ -512,6 +512,9 @@
   "analytics.value.unknown": {
     "message": "Sconosciuto"
   },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "Questo download non dispone di metadati per associarlo a un progetto."
+  },
   "analytics.value.unmonetized": {
     "message": "Non monetizzato"
   },
@@ -1700,11 +1703,20 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Si prega di rivedere i metadati d'ambiente"
   },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Azioni dei progetti selezionati"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, one {# progetto selezionato} other {# progetti selezionati}}"
+  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
   "dashboard.projects.table.name": {
     "message": "Nome"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "Seleziona i progetti modificabili simultaneamente"
   },
   "dashboard.projects.table.status": {
     "message": "Stato"
@@ -2651,11 +2663,17 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Abbonati a Modrinth+"
   },
+  "moderation.exclude-technical-review": {
+    "message": "Escludi RT"
+  },
   "moderation.moderate": {
     "message": "Modera"
   },
   "moderation.page.external-projects": {
     "message": "Progetti esterni"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "Tracce globali"
   },
   "moderation.page.projects": {
     "message": "Progetti"
@@ -2665,6 +2683,45 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisione tecnica"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Errore"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Impossibile caricare le versioni: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Caricamento versioni..."
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "Nuovi file"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "Nuovi gruppi"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "Nessun file trovato."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Da scansionare"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "File sovrascritti ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Nome del file"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Scansiona tutto"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Alcuni file non sono stati scansionati: {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Scansione..."
+  },
+  "modpack-scan-modal.title": {
+    "message": "Scansione del pacchetto ({scanned}/{total} file)"
   },
   "muralpay.account-type.checking": {
     "message": "Conto corrente"
@@ -2933,9 +2990,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Controlla nuovamente il tuo conto. Fondi mandati a un conto errato non possono essere recuperati."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Le modifiche verranno applicate a {count, plural, one {# progetto} other {# progetti}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Creatore su Modrinth."
   },
@@ -3002,9 +3056,6 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
-  "profile.label.downloads": {
-    "message": "{count} download"
-  },
   "profile.label.joined": {
     "message": "Iscrizione"
   },
@@ -3022,9 +3073,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizzazioni"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -3212,14 +3260,74 @@
   "project.details.licensed": {
     "message": "Licenza"
   },
-  "project.download.game-version": {
-    "message": "Versione del gioco: {version}"
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "Questo progetto non è compatibile con questa versione del gioco."
   },
-  "project.download.game-version-error": {
-    "message": "Errore: nessuna versione del gioco trovata"
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "Questo loader non è compatibile con questa versione del gioco."
   },
-  "project.download.game-version-tooltip": {
-    "message": "{title} è disponibile solo per {version}"
+  "project.download.compatible-version-title": {
+    "message": "Versioni compatibili"
+  },
+  "project.download.dependencies-title": {
+    "message": "Dipendenze"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "Questa dipendenza è già stata installata"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Una compatibile"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "Questa dipendenza è in conflitto con un'altra"
+  },
+  "project.download.dependency-download-file": {
+    "message": "Scarica {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Scarica {filename} ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "Questa dipendenza è già inclusa"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "Questa versione non è disponibile"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "Non è disponibile alcuna versione compatibile per questa dipendenza"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Quilt non usa Fabric API"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "Questo progetto richiede l'installazione di un pacchetto di risorse. Scaricalo e posizionalo nella cartella {folder}."
+  },
+  "project.download.dependency-unavailable": {
+    "message": "Questa dipendenza non può essere scaricata"
+  },
+  "project.download.download": {
+    "message": "Scarica"
+  },
+  "project.download.download-as-zip": {
+    "message": "Scarica come .zip"
+  },
+  "project.download.download-version": {
+    "message": "Scarica {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Scarica con dipendenze"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Scarica con consigliati"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Scarica con consigliati come .zip"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Le dipendenze duplicate sono nascoste"
+  },
+  "project.download.file-unavailable": {
+    "message": "Questo file non può essere scaricato"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} non supporta {platform} per {gameVersion}"
@@ -3227,29 +3335,32 @@
   "project.download.install-with-app": {
     "message": "Installa con Modrinth App"
   },
+  "project.download.manually": {
+    "message": "Scarica manualmente"
+  },
   "project.download.no-app": {
     "message": "Non hai Modrinth App?"
+  },
+  "project.download.no-game-versions-found": {
+    "message": "Nessuna versione del gioco trovata"
   },
   "project.download.no-versions-available": {
     "message": "Nessuna versione disponibile per {gameVersion} e {platform}."
   },
-  "project.download.platform": {
-    "message": "Piattaforma: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "Errore: nessuna piattaforma trovata"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} è disponibile solo per {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} non supporta {platform} per {gameVersion}"
   },
-  "project.download.search-game-versions": {
-    "message": "Cerca versioni del gioco..."
+  "project.download.recommended-title": {
+    "message": "Consigliati"
   },
-  "project.download.search-game-versions-label": {
-    "message": "Cerca tra le versioni del gioco..."
+  "project.download.required-resource-pack-admonition": {
+    "message": "Questo progetto richiede l'installazione di un pacchetto di risorse. Scaricalo e posizionalo nella cartella {folder}."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Risorse"
+  },
+  "project.download.search-game-versions": {
+    "message": "Seleziona la versione del gioco"
   },
   "project.download.select-game-version": {
     "message": "Seleziona la versione del gioco"
@@ -3262,6 +3373,15 @@
   },
   "project.download.title": {
     "message": "Scarica {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Loader sconosciuto"
+  },
+  "project.download.zip-failed-text": {
+    "message": "Uno o più file non sono stati scaricati. Riprova più tardi."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Impossibile scaricare i file"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Abbiamo appena rivisto il sistema di ambienti su Modrinth e ora sono disponibili nuove opzioni. Non hai il permesso di modificare queste impostazioni; si prega di chiedere a un altro membro del progetto di verificare i metadati d'ambiente."
@@ -3517,12 +3637,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Visita bacheca del progetto"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count} download"
-  },
-  "project.stats.followers-label": {
-    "message": "{count} follower"
   },
   "project.status.archived.message": {
     "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."
@@ -3926,9 +4040,6 @@
   "servers.plan.small.description": {
     "message": "Perfetto per 1–5 giocatori e qualche mod leggera."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "addebitato {interval, select, monthly {mensilmente} quarterly {trimerstralmente} yearly {annualmente} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Completa la configurazione"
   },
@@ -4052,9 +4163,6 @@
   "settings.account.security.email.title": {
     "message": "Email"
   },
-  "settings.account.security.passkey.add": {
-    "message": "Aggiungi passkey"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "Assicurati di scegliere un nome facile da ricordare, così da poter identificare la passkey più tardi."
   },
@@ -4063,6 +4171,15 @@
   },
   "settings.account.security.passkey.add-modal.name.placeholder": {
     "message": "Passkey personale"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Aggiungi passkey"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Aggiungi passkey"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Gestisci passkey"
   },
   "settings.account.security.passkey.description": {
     "message": "Gestisci le tue passkey o aggiungine una nuova."
@@ -4074,13 +4191,16 @@
     "message": "Ultimo utilizzo {ago}"
   },
   "settings.account.security.passkey.modal.loading": {
-    "message": "Caricando le passkey…"
+    "message": "Caricamento passkey..."
   },
   "settings.account.security.passkey.modal.never-used": {
     "message": "Mai usata"
   },
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "Non hai passkey registrate."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Elimina passkey"
   },
   "settings.account.security.passkey.remove.description": {
     "message": "Questo rimuoverà la passkey \"{name}\" permanentemente. Non potrai più accedere con questa."
@@ -4725,7 +4845,7 @@
     "message": "Mostra versione"
   },
   "version.download.download-dependency": {
-    "message": "Scarica dipendenza"
+    "message": "Seleziona una versione da scaricare"
   },
   "version.download.no-primary-file": {
     "message": "Errore: nessun file primario trovato"
@@ -4735,6 +4855,9 @@
   },
   "version.download.required-resource-pack": {
     "message": "Pacchetto di risorse obbligatorio"
+  },
+  "version.download.version": {
+    "message": "Scarica {version} ({size})"
   },
   "version.edit.button": {
     "message": "Modifica"

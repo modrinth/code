@@ -110,6 +110,8 @@ export function useAnalyticsChartInteractions({
 
 	function onTouchDragEnd() {
 		ignoreUpcomingChartClick()
+		if (!hoverState.visible || hoverState.sliceIndex === null) return
+		isHoverPinned.value = true
 	}
 
 	function onChartGeometry(payload: AnalyticsChartGeometryPayload) {

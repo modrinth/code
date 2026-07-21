@@ -1,5 +1,7 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
-use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::auth::{
+    AuthenticationError, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
@@ -15,7 +17,7 @@ use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, ProjectStatus,
+    License, Link, MonetizationStatus, Project, ProjectStatus,
     SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
@@ -44,9 +46,9 @@ use std::collections::HashMap;
 use thiserror::Error;
 use validator::Validate;
 
-mod new;
+pub mod new;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create)
         .service(project_create_with_id)
         .configure(new::config);
@@ -106,6 +108,9 @@ impl From<crate::routes::ApiError> for CreateError {
             }
             crate::routes::ApiError::CustomAuthentication(err) => {
                 Self::CustomAuthenticationError(err)
+            }
+            crate::routes::ApiError::Auth(err) => {
+                Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::InvalidInput(err)
             | crate::routes::ApiError::Validation(err) => {
@@ -283,7 +288,16 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[utoipa::path]
+/// Create a project.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing project metadata and files"
+	),
+	responses((status = OK, body = Project))
+)]
 #[post("")]
 pub async fn project_create(
     req: HttpRequest,
@@ -361,10 +375,18 @@ pub async fn project_create_internal(
     result
 }
 
-/// Allows creating a project with a specific ID.
+/// Create a project with a specific ID.  
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path]
+#[utoipa::path(
+	context_path = "/project",
+	tag = "projects",
+	request_body(
+		content(("multipart/form-data")),
+		description = "Multipart payload containing project metadata and files"
+	),
+	responses((status = OK, body = Project))
+)]
 #[post("/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,
@@ -473,6 +495,8 @@ async fn project_create_inner(
         Scopes::PROJECT_CREATE,
     )
     .await?;
+
+    require_verified_email(&current_user)?;
 
     let limits = UserLimits::get_for_projects(&current_user, pool).await?;
     if limits.current >= limits.max {

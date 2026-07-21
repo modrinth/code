@@ -11,11 +11,86 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "További futó példányok elrejtése"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Másolva"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Részletek másolása"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Elutasítás"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Példány megnyitása"
+  },
   "app.action-bar.install.retry": {
     "message": "Újra"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Az alkalmazás bezárása miatt megszakítva"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Nem sikerült beolvasni a modcsomagot"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Megszakítva"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "A tisztítás nem fejeződött be"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Nem sikerült letölteni a fájlokat"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "A letöltött fájl sérült"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Nem sikerült elmenteni a fájlokat"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "A letöltés nem sikerült"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "A játékprofil nem található"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "A fájl elérési útja érvénytelen"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "A modcsomag adatai érvénytelenek"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "A modcsomag fájljainak metaadatai érvénytelenek"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "A Java telepítése nem sikerült"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "A betöltő beállítása sikertelen volt"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "A helyi adatok frissítése nem sikerült"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "A Minecraft telepítése sikertelen volt"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Nem sikerült elérni Modrinthot"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Nincs felülírási jogosultság"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Nem sikerült letölteni a csomagot"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Valami hiba történt"
+  },
   "app.action-bar.install.unknown-instance": {
-    "message": "Ismeretlen profil"
+    "message": "Ismeretlen játékprofil"
+  },
+  "app.action-bar.installs": {
+    "message": "Telepítések"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Beállítás elsődleges példányként"
@@ -48,13 +123,13 @@
     "message": "Példányok megtekintése"
   },
   "app.action-bar.view-logs": {
-    "message": "Naplók megtekintése"
+    "message": "Naplózások megtekintése"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Lehetővé teszi olyan speciális megjelenítési effektusok használatát, mint például az elmosódás, amelyek hardveres gyorsítás nélkül teljesítménycsökkenést okozhatnak."
   },
   "app.appearance-settings.advanced-rendering.title": {
-    "message": "Fejlett renderelés"
+    "message": "Haladó megjelenítési beállítások"
   },
   "app.appearance-settings.color-theme.description": {
     "message": "Válaszd ki a Modrinth Apphoz a kívánt színsémát."
@@ -84,7 +159,7 @@
     "message": "A kezdőlap „Folytasd itt” részében a legújabb világok is megtalálhatók."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Visszaugrás a világokba"
+    "message": "„Folytasd itt” a világokat is"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimalizáld az indítót a Minecraft indításakor."
@@ -102,10 +177,16 @@
     "message": "Válassz egy lehetőséget"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Megmutatja, mennyi időt töltöttél játszva egy profillal."
+    "message": "Megmutatja, mennyi időt töltöttél egy példányban."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Játékidő megjelenítése"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Az alacsony kockázatú megerősítéseket – például a modcsomagok ismételt telepítését, a szokásos tartalomtörlést, a tömeges frissítéseket, a modcsomagok kapcsolatának megszüntetését és a javítási felhívásokat – a rendszer automatikusan kihagyja. A veszélyes figyelmeztetéseket továbbra is megjeleníti."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Hagyd ki a lényegtelen figyelmeztetéseket"
   },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Lehetővé teszi az oldalsáv be- és kikapcsolását."
@@ -153,7 +234,7 @@
     "message": "Szerverek böngészése"
   },
   "app.browse.hide-added-servers": {
-    "message": "Már hozzáadott szerverek elrejtése"
+    "message": "A már hozzáadott szerverek elrejtése"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modcsomagok"
@@ -162,7 +243,7 @@
     "message": "A tartalom hozzáadása ronthatja a kompatibilitást a szerverhez való csatlakozáskor. A hozzáadott tartalom elveszik, ha frissíted a szerverprofil tartalmát."
   },
   "app.browse.server.installing": {
-    "message": "Letöltés..."
+    "message": "Letöltés"
   },
   "app.content-install.no-compatible-versions": {
     "message": "Nincs a(z) {compatibilityLabel} verziónak megfelelő elérhető verzió. Válassz ki egy verziót, ha mégis telepíteni szeretnéd. A függőségek nem települnek automatikusan."
@@ -177,7 +258,7 @@
     "message": "Modcsomag exportálása"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "A modcsomag neve"
+    "message": "Modcsamag neve"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "A modcsomag neve"
@@ -188,11 +269,62 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "Tartalom letöltése"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Minecraft letöltése"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Csomagfájlok letöltése"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Felülírások kibontása"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Befejezés"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Telepítésre vár"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Java előkészítése"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "A Java {version} letöltése..."
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "A Java {version} kibontása..."
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "A Java {version} előkészítése..."
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "A Java {version} előkészítése..."
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "A Java {version} ellenőrzése"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Csomag adati kiolvasása"
+  },
   "app.install.phase.resolving_loader": {
     "message": ""
   },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Minecraft Betöltése"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Tartalom betöltése"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Visszavonás"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Betöltő folyamatok futtatása"
+  },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Az profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
+    "message": "A profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Ezt a műveletet nem lehet visszavonni"
@@ -214,6 +346,15 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Példány"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "{current, number}/{total, number} projekt letöltése..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Frissítés befejezése..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Verziók meghatározása..."
   },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
@@ -239,6 +380,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Szerverek böngészése"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Törlés"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Világ törlése"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Ez a világ véglegesen törölve lesz ebből a példányból. Ezt NEM tudod visszavonni!"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "{name} törlése"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Modolt"
   },
@@ -257,32 +410,53 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Nincs szerver vagy világ"
   },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Szerver eltávolítása"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Szerver eltávolítása"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Ez a szerver el lesz távolítva a szerverlistádból és a játékbeli szerverlistából is. Később újra hozzáadhatod, ha tudod a címet."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "{name} eltávolítása"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Szükséges tartalom"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Ne töltse le"
   },
   "app.modal.install-to-play.header": {
     "message": "Telepítés a játékhoz"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Telepítés mindenképpen"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Ezt a meghívót nem a Modrinth, hanem egy másik Modrinth-felhasználó hozta létre. Csak olyan személyektől fogadd el a meghívásokat, akikben megbízol."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Szükséges modcsomag"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Modrinth-ról, majd indítsd el közvetlenül a szervert."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Egy fájlt csak akkor vizsgálnak meg, ha azt a Modrinth-en közzétették, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Megosztott profil"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Megosztott szerverprofil"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ez a szerver-modpack olyan fájlokat tartalmaz, amelyek nem szerepelnek a Modrinth oldalon. Határozottan javasoljuk, hogy kizárólag olyan forrásokból telepíts fájlokat, amelyekben megbízol."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Figyelmeztetés ismeretlen fájlokról"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Felismerhetetlen fájlok"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tartalom megtekintése"
@@ -290,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "Frissítsd a játékhoz"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Frissítés szükséges"
+  "app.modal.update-to-play.removed": {
+    "message": "Törölve"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Frissítés szükséges ehhez: {name}. Kérlek, frissíts a legújabb verzióra a játék elindításához."
@@ -299,11 +473,23 @@
   "app.project.install-button.already-installed": {
     "message": "Ez a projekt már telepítve van"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Verzió váltása"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Vissza a böngészéshez"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Tartalom telepítése a profilba"
+  "app.project.version.all-versions": {
+    "message": "Összes verzió"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Letöltés a böngészőben"
+  },
+  "app.project.version.installing": {
+    "message": "Telepítés..."
+  },
+  "app.project.versions.already-installed": {
+    "message": "Már le van töltve"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
@@ -416,8 +602,17 @@
   "app.skins.rate-limit.title": {
     "message": "Lassíts!"
   },
+  "app.skins.reorder-error.text": {
+    "message": "A kinézeted sorrendjét nem sikerült menteni."
+  },
+  "app.skins.reorder-error.title": {
+    "message": "A skinek átrendezése sikertelen"
+  },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -462,7 +657,7 @@
     "message": "Kérlek jelentkezz be a Minecraft-fiókodba, hogy használni tudd a Modrinth App kinézetkezelési funkcióit."
   },
   "app.skins.sign-in.rinthbot-alt": {
-    "message": "Izgatott Modrinth-bot"
+    "message": "Izgatott Modrinth bot"
   },
   "app.skins.sign-in.title": {
     "message": "Kérlek jelentkezz be"
@@ -708,7 +903,7 @@
     "message": "Kiadás"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Csak a release verziók fognak megjelenni az elérhető frissítések között."
+    "message": "Csak a 'kiadás' verziók fognak megjelenni az elérhető frissítések között."
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Válaszd ki a frissítési csatornát"
@@ -795,7 +990,7 @@
     "message": "Hozzárendelt memória"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/path/to/java"
+    "message": "/eleresi/ut/a/javahoz"
   },
   "instance.settings.tabs.window": {
     "message": "Ablak"
@@ -836,11 +1031,14 @@
   "instance.worlds.copy_address": {
     "message": "Cím másolása"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "Gyorshivatkozás létrehozása"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "Ne mutasd a kezdőlapon"
   },
   "instance.worlds.game_already_open": {
-    "message": "A példány már el van indítva"
+    "message": "A profil már el van indítva"
   },
   "instance.worlds.hardcore": {
     "message": "Hardcore mód"
@@ -858,7 +1056,7 @@
     "message": "Csak Minecraft Alpha 1.0.5+-tól tudsz egyből szerverhez csatlakozni"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Csak Minecraft 1.20+-tól tudsz egyből egyjátékos világba belépni"
+    "message": "Használj 1.20+ verziót az azonnali egyjátékos módba lépéshez"
   },
   "instance.worlds.play_instance": {
     "message": "Játék a profillal"
@@ -906,30 +1104,9 @@
     "message": "Csak kliensoldali modok adhatók hozzá a szerverprofilhoz"
   },
   "search.filter.locked.server-game-version.title": {
-    "message": "A játékverziót a szerver biztosítja"
+    "message": "A játékverzió a szerver által van megadva"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "A betöltőt a szerver biztosítja"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Egy fájlt csak akkor vizsgálunk meg, ha azt feltöltik a Modrinthra, függetlenül a fájlformátumtól (beleértve a .mrpack formátumot is)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Ne mutasd újra ezt a figyelmeztetést"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Telepítés megerősítése"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Letöltés mindenképpen"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "A rosszindulatú programokat gyakran modcsomag-fájlokon keresztül terjesztik, például a Discordhoz hasonló platformokon történő megosztás révén."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ezt a fájlt nem találtuk meg a Modrinthon. Határozottan javasoljuk, hogy kizárólag megbízható forrásokból származó fájlokat telepíts."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Figyelmeztetés ismeretlen fájlról"
+    "message": "A betöltő a szerver által van megadva"
   }
 }

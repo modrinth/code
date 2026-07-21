@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "משתמש לא קיים"
   },
+  "analytics.action.add": {
+    "message": "לְהוֹסִיף"
+  },
+  "analytics.action.cancel": {
+    "message": "ביטול"
+  },
+  "analytics.breakdown.project": {
+    "message": "פּרוֹיֶקט"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "רק צפיות והורדות שבוצעו דרך Modrinth נספרות לצורך מונטיזציה, והורדות מחייבות את המשתמשים להיות מחוברים לחשבונם."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "להציג את כל {count} הקווים בגרף?"
+  },
   "app-marketing.download.description": {
     "message": "היישום השולחני שלנו זמין לכל הפלטפורמות. אנא בחר את הגרסה הרצויה."
   },
@@ -1823,9 +1838,6 @@
   "profile.label.collection": {
     "message": "אוסף"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
-  },
   "profile.label.joined": {
     "message": "הצטרף ב-"
   },
@@ -1843,9 +1855,6 @@
   },
   "profile.label.organizations": {
     "message": "ארגונים"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "profile.label.saving": {
     "message": "שומר..."
@@ -2027,44 +2036,14 @@
   "project.details.licensed": {
     "message": "ברישיון"
   },
-  "project.download.game-version": {
-    "message": "גרסת המשחק: {version}"
-  },
-  "project.download.game-version-error": {
-    "message": "שגיאה: לא נמצאו גרסאות משחק"
-  },
-  "project.download.game-version-tooltip": {
-    "message": "{title} זמין עבור {version} בלבד"
-  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{gameVersion} עבור {platform}"
-  },
-  "project.download.install-with-app": {
-    "message": "התקן באמצעות Modrinth App"
   },
   "project.download.no-app": {
     "message": "אין לכם את אפליקציית Modrinth?"
   },
-  "project.download.no-versions-available": {
-    "message": "אין גרסאות זמינות עבור {gameVersion} ו-{platform}."
-  },
-  "project.download.platform": {
-    "message": "פלטפורמה: {platform}"
-  },
-  "project.download.platform-error": {
-    "message": "שגיאה: לא נמצאו פלטפורמות"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} זמין עבור {platform} בלבד"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{platform} עבור {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "חיפוש גרסאות משחק..."
-  },
-  "project.download.search-game-versions-label": {
-    "message": "חיפוש גרסאות משחק..."
   },
   "project.download.select-game-version": {
     "message": "בחירת גרסת משחק"

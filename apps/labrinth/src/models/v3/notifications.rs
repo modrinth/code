@@ -179,6 +179,8 @@ pub enum NotificationBody {
     SharedInstanceInvite {
         shared_instance_id: String,
         shared_instance_name: String,
+        shared_instance_icon: Option<String>,
+        invited_by: UserId,
     },
     StatusChange {
         project_id: ProjectId,
@@ -706,7 +708,7 @@ impl From<DBNotification> for Notification {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NotificationAction {
     pub name: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route

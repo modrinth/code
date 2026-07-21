@@ -10,7 +10,7 @@ use chrono::{Datelike, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_globals);
 }
 
@@ -89,8 +89,12 @@ pub fn tax_compliance_payout_threshold_for_year(
     value
 }
 
-/// Gets configured global non-secret variables for this backend instance.
-#[utoipa::path]
+/// Get backend globals.  
+#[utoipa::path(
+	context_path = "/globals",
+	tag = "globals",
+	responses((status = OK, body = Globals))
+)]
 #[get("")]
 pub async fn get_globals() -> web::Json<Globals> {
     web::Json(GLOBALS.clone())

@@ -23,6 +23,7 @@ async_zip = { workspace = true, features = [
   "zstd",
 ] }
 base64 = { workspace = true }
+bon = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 bytes = { workspace = true, features = ["serde"] }
 chardetng = { workspace = true }
@@ -42,8 +43,10 @@ flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
 futures-lite = { workspace = true }
+governor = { workspace = true }
 heck = { workspace = true }
 hickory-resolver = { workspace = true }
+httpdate = { workspace = true }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
 modrinth-content-management = { workspace = true }

@@ -4,6 +4,7 @@ import type {
 	BrowseInstallPlan,
 	BrowseSearchState,
 	CreationFlowContextValue,
+	EnvironmentSearchOverride,
 	FilterValue,
 	PendingServerContentInstall,
 	PendingServerContentInstallType,
@@ -21,6 +22,8 @@ import {
 	readStoredServerInstallQueue,
 	removePendingServerContentInstall,
 	requestInstall,
+	stripServerRuntimeInstallFilters,
+	stripServerRuntimeInstallOverrides,
 	useVIntl,
 	writePendingServerContentInstallBaseline,
 	writeStoredServerInstallQueue,
@@ -160,6 +163,7 @@ export function useServerInstallContent({
 	})
 
 	const serverHideInstalled = ref(false)
+	const serverContentServerOnly = ref(false)
 	const hideSelectedServerInstalls = ref(false)
 	const installingProjectIds = ref<Set<string>>(new Set())
 	const optimisticallyInstalledProjectIds = ref<Set<string>>(new Set())
@@ -348,10 +352,6 @@ export function useServerInstallContent({
 				filters.push({ type: 'plugin_loader', option: platform })
 			}
 
-			if (projectType.value?.id === 'mod') {
-				filters.push({ type: 'environment', option: 'server' })
-			}
-
 			if (serverHideInstalled.value && hiddenInstalledProjectIds.value.size > 0) {
 				for (const x of hiddenInstalledProjectIds.value) {
 					filters.push({
@@ -381,6 +381,28 @@ export function useServerInstallContent({
 		}
 		debug('serverFilters result:', filters)
 		return filters
+	})
+
+	const showServerOnlyToggle = computed(() => !!serverData.value && projectType.value?.id === 'mod')
+
+	const serverEnvironmentOverride = computed<EnvironmentSearchOverride | undefined>(() => {
+		if (!showServerOnlyToggle.value) return undefined
+		if (serverContentServerOnly.value) {
+			return {
+				mode: 'include',
+				values: [
+					'server_only',
+					'dedicated_server_only',
+					'server_only_client_optional',
+					'client_or_server_prefers_both',
+					'client_or_server',
+				],
+			}
+		}
+		return {
+			mode: 'exclude',
+			values: ['client_only', 'singleplayer_only'],
+		}
 	})
 
 	function getCurrentServerInstallType(): BrowseInstallContentType {
@@ -584,11 +606,15 @@ export function useServerInstallContent({
 				project,
 				contentType,
 				mode: isModpack ? 'immediate' : 'queue',
-				selectedFilters: isModpack ? [] : browseSearchState.currentFilters.value,
+				selectedFilters: isModpack
+					? []
+					: stripServerRuntimeInstallFilters(browseSearchState.currentFilters.value),
 				providedFilters: isModpack ? [] : serverFilters.value,
 				overriddenProvidedFilterTypes: isModpack
 					? []
-					: browseSearchState.overriddenProvidedFilterTypes.value,
+					: stripServerRuntimeInstallOverrides(
+							browseSearchState.overriddenProvidedFilterTypes.value,
+						),
 				targetPreferences: getServerInstallTargetPreferences(contentType),
 				getProjectVersions: getInstallProjectVersions,
 				queue: serverInstallQueue,
@@ -737,6 +763,10 @@ export function useServerInstallContent({
 		serverHideInstalled.value = route.query.shi === 'true'
 	}
 
+	if (route.query.so && projectType.value?.id === 'mod') {
+		serverContentServerOnly.value = route.query.so === 'true'
+	}
+
 	watch(serverHideInstalled, (hideInstalled) => {
 		if (hideInstalled) {
 			syncHiddenInstalledProjectIds()
@@ -763,6 +793,9 @@ export function useServerInstallContent({
 		serverContentData,
 		serverFilters,
 		serverHideInstalled,
+		serverContentServerOnly,
+		showServerOnlyToggle,
+		serverEnvironmentOverride,
 		hideSelectedServerInstalls,
 		installingProjectIds,
 		optimisticallyInstalledProjectIds,

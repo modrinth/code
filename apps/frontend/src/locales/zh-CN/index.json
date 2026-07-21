@@ -81,7 +81,7 @@
     "message": "{hours}小时"
   },
   "analytics.chart.controls.active-count": {
-    "message": "在线{count}人"
+    "message": "显示{count}项"
   },
   "analytics.chart.controls.annotations": {
     "message": "注释"
@@ -147,7 +147,7 @@
     "message": "是否在图中显示全部 {count} 行？"
   },
   "analytics.chart.table-selection.all": {
-    "message": "在表格中显示所有 {itemType, select, project {{count, plural, one {项目} other {项目}}} country {{count, plural, one {国家或地区} other {国家或地区}}} monetization {{count, plural, one {变现金额} other {变现金额}}} downloadSource {{count, plural, one {下载源} other {下载源}}} downloadReason {{count, plural, one {下载原因} other {下载原因}}} member {{count, plural, one {成员} other {成员}}} projectVersion {{count, plural, one {项目版本} other {项目版本}}} loader {{count, plural, one {加载器} other {加载器}}} gameVersion {{count, plural, one {游戏版本} other {游戏版本}}} other {{count, plural, one {物品} other {物品}}}}"
+    "message": "在表格中显示所有 {itemType, select, project {{count, plural, other {项目}}} country {{count, plural, other {国家或地区}}} monetization {{count, plural, other {变现金额}}} downloadSource {{count, plural, other {下载源}}} downloadReason {{count, plural, other {下载原因}}} member {{count, plural, other {成员}}} projectVersion {{count, plural, other {项目版本}}} loader {{count, plural, other {加载器}}} gameVersion {{count, plural, other {游戏版本}}} other {{count, plural, other {物品}}}}"
   },
   "analytics.chart.table-selection.count": {
     "message": "显示表格中的 {count} {itemType, select, project {{count, plural, one {项目} other {项目}}} country {{count, plural, one {国家或地区} other {国家或地区}}} monetization {{count, plural, one {变现价值} other {变现价值}}} downloadSource {{count, plural, one {下载来源} other {下载来源}}} downloadReason {{count, plural, one {下载原因} other {下载原因}}} member {{count, plural, one {成员} other {成员}}} projectVersion {{count, plural, one {项目版本} other {项目版本}}} loader {{count, plural, one {加载器} other {加载器}}} gameVersion {{count, plural, one {游戏版本} other {游戏版本}}} other {{count, plural, one {项} other {项}}}}"
@@ -514,6 +514,9 @@
   },
   "analytics.value.unknown": {
     "message": "未知"
+  },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "缺少元数据，无法判断该下载归属于哪个依赖项目。"
   },
   "analytics.value.unmonetized": {
     "message": "非商业化"
@@ -1706,11 +1709,20 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "请复核运行环境元数据"
   },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "选定项目操作"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count, plural, other {#个已选择的项目}}"
+  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
   "dashboard.projects.table.name": {
     "message": "名称"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "选择所有支持批量编辑的项目"
   },
   "dashboard.projects.table.status": {
     "message": "状态"
@@ -2070,7 +2082,7 @@
     "message": "按年支付"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "CPU burst 线程是怎样运作的？"
+    "message": "CPU 爆发线程是怎样运作的？"
   },
   "hosting-marketing.faq.burst-threads.answer": {
     "message": "当你的服务器负载过高时，我们会暂时让它使用额外的 CPU 线程，帮你缓解延迟飙升与不稳定的问题。这有助于防止 TPS 掉到 20 以下，尽可能确保你获得最流畅的体验。由于只有在高负载期间，这些额外 CPU 线程才会短暂出现，所以 Spark 等性能分析工具可能不会显示出这些线程。"
@@ -2139,7 +2151,7 @@
     "message": "开设你的服务器"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "你的下一个服务器，就交给 Modrinth Hosting"
+    "message": "要开新服务器，就交给 Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting 可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和整合包，全在 Modrinth 平台搞定。"
@@ -2625,7 +2637,7 @@
     "message": "首页"
   },
   "layout.nav.host-a-server": {
-    "message": "托管服务器"
+    "message": "租赁服务器"
   },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
@@ -2657,11 +2669,23 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升级至 Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "您必须先验证您的电子邮箱才能在 Modrinth 上发布内容。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "需要验证电子邮件"
+  },
+  "moderation.exclude-technical-review": {
+    "message": "排除技术评审"
+  },
   "moderation.moderate": {
     "message": "审核"
   },
   "moderation.page.external-projects": {
     "message": "外部项目"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "全局追踪"
   },
   "moderation.page.projects": {
     "message": "项目"
@@ -2671,6 +2695,45 @@
   },
   "moderation.page.technicalReview": {
     "message": "技术审查"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "失败"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "无法加载版本：{error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "加载版本中……"
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "新文件"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "新组"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "未找到文件。"
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "未扫描"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "覆盖文件 ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "模组包文件名称"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "扫描所有文件"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "一些文件扫描失败：{error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "扫描中……"
+  },
+  "modpack-scan-modal.title": {
+    "message": "模组包扫描 ({scanned}/{total} 个文件)"
   },
   "muralpay.account-type.checking": {
     "message": "支票账户"
@@ -2939,9 +3002,6 @@
   "muralpay.warning.wallet-address": {
     "message": "请再次确认你的钱包地址。发送到错误地址的资金将无法追回。"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "将对{count, plural,one {# 项目}other {# 项目}}应用更改。"
-  },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 创作者。"
   },
@@ -3005,9 +3065,6 @@
   "profile.label.collection": {
     "message": "收藏夹"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {次下载}}"
-  },
   "profile.label.joined": {
     "message": "加入于"
   },
@@ -3025,9 +3082,6 @@
   },
   "profile.label.organizations": {
     "message": "组织"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "profile.label.saving": {
     "message": "正在保存…"
@@ -3215,14 +3269,74 @@
   "project.details.licensed": {
     "message": "许可证"
   },
-  "project.download.game-version": {
-    "message": "游戏版本：{version}"
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "此游戏版本与基础项目不兼容。"
   },
-  "project.download.game-version-error": {
-    "message": "错误：没有合适的游戏版本"
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "此加载器与基础项目不兼容。"
   },
-  "project.download.game-version-tooltip": {
-    "message": "{title}仅适用于{version}"
+  "project.download.compatible-version-title": {
+    "message": "兼容版本"
+  },
+  "project.download.dependencies-title": {
+    "message": "依赖项"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "此依赖项已经安装"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "任何兼容版本"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "此依赖项与其他依赖项冲突"
+  },
+  "project.download.dependency-download-file": {
+    "message": "下载{filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "下载 {filename} ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "此依赖项已包含"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "次依赖项版本不可用"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "此依赖项无兼容版本可用"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Quilt 无需 Fabric API"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "该项目依赖一个必需的资源包。请下载并将其放入你的 {folder} 文件夹中。"
+  },
+  "project.download.dependency-unavailable": {
+    "message": "此依赖项无法下载"
+  },
+  "project.download.download": {
+    "message": "下载"
+  },
+  "project.download.download-as-zip": {
+    "message": "下载为 .zip 文件"
+  },
+  "project.download.download-version": {
+    "message": "下载 {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "与依赖项一并下载"
+  },
+  "project.download.download-with-recommended": {
+    "message": "与推荐内容一并下载"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "与推荐内容一并下载为 .zip 文件"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "已隐藏重复的依赖项"
+  },
+  "project.download.file-unavailable": {
+    "message": "此文件无法下载"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} 不支持 {platform} {gameVersion}"
@@ -3230,29 +3344,32 @@
   "project.download.install-with-app": {
     "message": "使用 Modrinth App 安装"
   },
+  "project.download.manually": {
+    "message": "手动下载"
+  },
   "project.download.no-app": {
     "message": "还没有 Modrinth App 吗？"
+  },
+  "project.download.no-game-versions-found": {
+    "message": "未找到游戏版本"
   },
   "project.download.no-versions-available": {
     "message": "没有支持 {platform} {gameVersion} 的版本。"
   },
-  "project.download.platform": {
-    "message": "平台：{platform}"
-  },
-  "project.download.platform-error": {
-    "message": "错误：没有合适的平台"
-  },
-  "project.download.platform-tooltip": {
-    "message": "{title} 仅适用于 {platform}"
-  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} 不支持 {gameVersion} 的 {platform}"
   },
-  "project.download.search-game-versions": {
-    "message": "搜索游戏版本…"
+  "project.download.recommended-title": {
+    "message": "推荐"
   },
-  "project.download.search-game-versions-label": {
-    "message": "搜索游戏版本…"
+  "project.download.required-resource-pack-admonition": {
+    "message": "该数据包还需要配合一个资源包使用。请下载并将其放入你的 {folder} 文件夹中。"
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "资源包"
+  },
+  "project.download.search-game-versions": {
+    "message": "选择游戏版本"
   },
   "project.download.select-game-version": {
     "message": "选择游戏版本"
@@ -3265,6 +3382,15 @@
   },
   "project.download.title": {
     "message": "下载 {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "未知加载器"
+  },
+  "project.download.zip-failed-text": {
+    "message": "一个或多个文件下载失败。请重试。"
+  },
+  "project.download.zip-failed-title": {
+    "message": "无法下载文件"
   },
   "project.environment.migration-no-permission.message": {
     "message": "我们最近升级了 Modrinth 的运行环境系统，引入了一些新选项。你没有权限修改这些设置，请通知项目其他成员核实运行环境元数据。"
@@ -3504,10 +3630,10 @@
     "message": "搜索 {count} {count, plural, one {项目} other {项目}}……"
   },
   "project.settings.permissions.sort.most-files": {
-    "message": "大多数文件"
+    "message": "文件数量"
   },
   "project.settings.permissions.sort.recently-edited": {
-    "message": "最近编辑过"
+    "message": "最近编辑时间"
   },
   "project.settings.permissions.sort.rejected": {
     "message": "已拒绝"
@@ -3520,12 +3646,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "访问项目的控制面板"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {下载}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, other {关注者}}"
   },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
@@ -3947,9 +4067,6 @@
   "servers.plan.small.description": {
     "message": "适合 1–5 位朋友使用，加少量轻量模组。"
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "计费{interval, select, monthly {按月} quarterly {按季度} yearly {按年} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "完成设置"
   },
@@ -4073,9 +4190,6 @@
   "settings.account.security.email.title": {
     "message": "电子邮箱"
   },
-  "settings.account.security.passkey.add": {
-    "message": "添加通行密钥"
-  },
   "settings.account.security.passkey.add-modal.name.description": {
     "message": "请确保你选择的名称易于记忆，方便你日后辨认出该通行密钥。"
   },
@@ -4084,6 +4198,15 @@
   },
   "settings.account.security.passkey.add-modal.name.placeholder": {
     "message": "我的通行密钥"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "添加通行密钥"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "添加通行密钥"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "管理通行密钥"
   },
   "settings.account.security.passkey.description": {
     "message": "管理已注册的通行密钥，或添加新的通行密钥。"
@@ -4095,13 +4218,16 @@
     "message": "上次使用于{ago}"
   },
   "settings.account.security.passkey.modal.loading": {
-    "message": "正在加载通行密钥…"
+    "message": "正在加载通行密钥……"
   },
   "settings.account.security.passkey.modal.never-used": {
     "message": "从未使用"
   },
   "settings.account.security.passkey.modal.no-passkeys": {
     "message": "你还没有注册任何通行密钥。"
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "删除通行密钥"
   },
   "settings.account.security.passkey.remove.description": {
     "message": "该操作会移除通行密钥“{name}”，此后你将无法使用其登录。"
@@ -4428,7 +4554,7 @@
     "message": "{price} / {interval}"
   },
   "settings.billing.pyro.cpu": {
-    "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
+    "message": "{shared} 个共享 CPU（爆发时最多 {bursts} CPU）"
   },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被停用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
@@ -4746,7 +4872,7 @@
     "message": "预览版本"
   },
   "version.download.download-dependency": {
-    "message": "下载依赖项"
+    "message": "选择要下载的版本"
   },
   "version.download.no-primary-file": {
     "message": "错误：找不到主文件"
@@ -4756,6 +4882,9 @@
   },
   "version.download.required-resource-pack": {
     "message": "必需的资源包"
+  },
+  "version.download.version": {
+    "message": "下载 {version} ({size})"
   },
   "version.edit.button": {
     "message": "编辑"

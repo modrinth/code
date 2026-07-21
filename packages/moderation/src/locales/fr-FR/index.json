@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Une description qui décrit précisément l'intérêt du projet et sa fonction est requise."
+    "defaultMessage": "Une description qui décrit clairement l'intérêt du projet et sa fonction est requise."
   },
   "nags.add-description.title": {
     "defaultMessage": "Ajouter une description"
@@ -12,10 +12,16 @@
     "defaultMessage": "Ajouter une icône"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Ajoutez l'adresse IP et le port que les joueurs Java Edition pourront utiliser pour rejoindre votre serveur."
+    "defaultMessage": "Ajoutez l'adresse IP et le port que les joueurs Édition Java peuvent utiliser pour rejoindre votre serveur."
   },
   "nags.add-java-address.title": {
     "defaultMessage": "Ajouter une adresse Java"
+  },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Ajoutez une URL et un nom valide ou un identifiant SPDX pour votre licence personnalisé."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Ajoutez-les détails de votre licence"
   },
   "nags.add-links-server.description": {
     "defaultMessage": "Ajoutez tous les liens pertinents destinés à des utilisateurs extérieurs à Modrinth, tels qu'un site web, une boutique ou une invitation Discord."
@@ -29,6 +35,12 @@
   "nags.add-links.title": {
     "defaultMessage": "Ajouter des liens externes"
   },
+  "nags.all-languages.description": {
+    "defaultMessage": "Vous avez sélectionné toutes les options linguistiques disponibles. Veuillez ne lister que les langues activement prises en charge par votre serveur."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Sélectionnez les langues appropriées"
+  },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Vous avez sélectionné {totalAvailableTags, plural, one {# le tag disponible} other {# tous les tags disponibles}}. Cela va à l'encontre de l'objectif des tags, qui sont destinés à aider les utilisateurs à trouver des projets pertinents. Veuillez ne sélectionner que les tags qui sont pertinents pour votre projet."
   },
@@ -39,16 +51,16 @@
     "defaultMessage": "Votre description contient {length, plural, one {# caractère lisible} other {# caractères lisibles}}. Il est recommandé d’en avoir au moins {minChars, plural, one {# caractère} other {# caractères}} pour obtenir une description claire et informative."
   },
   "nags.description-too-short.title": {
-    "defaultMessage": "Développer la description"
+    "defaultMessage": "Étendre la description"
   },
   "nags.edit-description.title": {
     "defaultMessage": "Modifier la description"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Modification de la licence"
+    "defaultMessage": "Modifier la licence"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Modifier le sommaire"
+    "defaultMessage": "Modifier le résumé"
   },
   "nags.edit-tags.title": {
     "defaultMessage": "Modifier les tags"
@@ -132,7 +144,7 @@
     "defaultMessage": "Examinez et traitez toutes les remarques de l’équipe de modération avant de soumettre à nouveau."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Retour de révision"
+    "defaultMessage": "Retour de revue"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Vous avez sélectionné {count, plural, one {# tag de résolution} other {# tags de résolution}} ({tags}). Les packs de ressources ne devraient généralement avoir qu’un seul tag de résolution correspondant à leur résolution principale."
@@ -221,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Nettoyer le nom"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Vous avez sélectionné {languageCount, plural, one {# langue} other {# langues}}. Veuillez indiquer uniquement les langues prises en charge par votre serveur."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Sélectionnez les langues appropriées"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Vous avez sélectionné {tagCount, plural, one {# tag} other {# tags}}. Veuillez réduire à {maxTagCount} ou moins pour garantir que votre serveur apparaisse dans les résultats de recherche pertinents."
   },
@@ -237,7 +255,7 @@
     "defaultMessage": "Au moins une image dans la galerie est nécessaire pour montrer le contenu de votre {type}."
   },
   "nags.upload-gallery-image.resourcepack-type": {
-    "defaultMessage": "Les Packs de ressources, sauf l'audio ou les packs de localisation. Si ceci décrit votre pack, merci d'utiliser des étiquettes appropriées"
+    "defaultMessage": "pack de ressource, sauf pour les packs d'audio ou de localisation. Si cela décrit votre pack, veuillez sélectionner les étiquettes appropriées"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Ajouter une image à la galerie"

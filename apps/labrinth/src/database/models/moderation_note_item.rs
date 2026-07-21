@@ -7,9 +7,9 @@ use crate::database::redis::RedisPool;
 
 use super::{DBOrganizationId, DBUserId, DatabaseError};
 
-const MODERATION_NOTES_USERS_NAMESPACE: &str = "moderation_notes_users";
+const MODERATION_NOTES_USERS_NAMESPACE: &str = "moderation_notes_users:v1";
 const MODERATION_NOTES_ORGANIZATIONS_NAMESPACE: &str =
-    "moderation_notes_organizations";
+    "moderation_notes_organizations:v1";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DBModerationNote {
@@ -40,7 +40,7 @@ impl DBModerationNote {
         let cached = {
             let mut redis = redis.connect().await?;
             redis
-                .get_many_deserialized_from_json::<Self>(
+                .get_many_deserialized::<Self>(
                     MODERATION_NOTES_USERS_NAMESPACE,
                     &ids,
                 )
@@ -87,7 +87,7 @@ impl DBModerationNote {
 
             if let Some(user_id) = note.user_id {
                 redis
-                    .set_serialized_to_json(
+                    .set_serialized(
                         MODERATION_NOTES_USERS_NAMESPACE,
                         user_id.0,
                         &note,
@@ -130,7 +130,7 @@ impl DBModerationNote {
         let cached = {
             let mut redis = redis.connect().await?;
             redis
-                .get_many_deserialized_from_json::<Self>(
+                .get_many_deserialized::<Self>(
                     MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
                     &ids,
                 )
@@ -177,7 +177,7 @@ impl DBModerationNote {
 
             if let Some(organization_id) = note.organization_id {
                 redis
-                    .set_serialized_to_json(
+                    .set_serialized(
                         MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
                         organization_id.0,
                         &note,

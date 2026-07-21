@@ -481,7 +481,7 @@ impl PayoutsQueue {
         Ok(options.options)
     }
 
-    pub async fn get_brex_balance() -> eyre::Result<Option<AccountBalance>> {
+    pub async fn get_brex_balance() -> eyre::Result<AccountBalance> {
         #[derive(Deserialize)]
         struct BrexBalance {
             pub amount: i64,
@@ -510,7 +510,7 @@ impl PayoutsQueue {
             .await
             .wrap_request_err("reading `accounts/cash` request")?;
 
-        Ok(Some(AccountBalance {
+        Ok(AccountBalance {
             available: Decimal::from(
                 res.items
                     .iter()
@@ -525,10 +525,10 @@ impl PayoutsQueue {
                     })
                     .sum::<i64>(),
             ) / Decimal::from(100),
-        }))
+        })
     }
 
-    pub async fn get_paypal_balance() -> eyre::Result<Option<AccountBalance>> {
+    pub async fn get_paypal_balance() -> eyre::Result<AccountBalance> {
         let api_username = &ENV.PAYPAL_NVP_USERNAME;
         let api_password = &ENV.PAYPAL_NVP_PASSWORD;
         let api_signature = &ENV.PAYPAL_NVP_SIGNATURE;
@@ -560,28 +560,23 @@ impl PayoutsQueue {
         let mut key_value_map = HashMap::new();
 
         for pair in body.split('&') {
-            let mut iter = pair.splitn(2, '=');
-            if let (Some(key), Some(value)) = (iter.next(), iter.next()) {
+            if let Some((key, value)) = pair.split_once('=') {
                 key_value_map.insert(key.to_string(), value.to_string());
             }
         }
 
-        if let Some(amount) = key_value_map
-            .get("L_AMT0")
-            .and_then(|x| Decimal::from_str_exact(x).ok())
-        {
-            Ok(Some(AccountBalance {
-                available: amount,
-                pending: Decimal::ZERO,
-            }))
-        } else {
-            Ok(None)
-        }
+        let amount =
+            key_value_map.get("L_AMT0").wrap_err("missing `L_AMT0`")?;
+        let amount = Decimal::from_str_exact(amount)
+            .wrap_err("cannot parse `L_AMT0` as decimal")?;
+
+        Ok(AccountBalance {
+            available: amount,
+            pending: Decimal::ZERO,
+        })
     }
 
-    pub async fn get_tremendous_balance(
-        &self,
-    ) -> eyre::Result<Option<AccountBalance>> {
+    pub async fn get_tremendous_balance(&self) -> eyre::Result<AccountBalance> {
         #[derive(Deserialize)]
         struct FundingSourceMeta {
             available_cents: Option<u64>,
@@ -606,18 +601,22 @@ impl PayoutsQueue {
                 None,
             )
             .await
-            .wrap_request_err("fetching funding sources")?;
+            .wrap_err("fetching funding sources")?;
 
-        Ok(val
+        let funding_source = val
             .funding_sources
             .into_iter()
             .find(|x| x.method == "balance")
-            .map(|x| AccountBalance {
-                available: Decimal::from(x.meta.available_cents.unwrap_or(0))
-                    / Decimal::from(100),
-                pending: Decimal::from(x.meta.pending_cents.unwrap_or(0))
-                    / Decimal::from(100),
-            }))
+            .wrap_err("no balance funding source")?;
+
+        Ok(AccountBalance {
+            available: Decimal::from(
+                funding_source.meta.available_cents.unwrap_or(0),
+            ) / Decimal::from(100),
+            pending: Decimal::from(
+                funding_source.meta.pending_cents.unwrap_or(0),
+            ) / Decimal::from(100),
+        })
     }
 }
 
@@ -1282,30 +1281,30 @@ pub async fn insert_bank_balances_and_webhook(
     let now = Utc::now();
     let today = now.date_naive().and_time(NaiveTime::MIN).and_utc();
 
-    let mut add_balance = |account_type: &str, balance: &AccountBalance| {
-        insert_account_types.push(account_type.to_string());
-        insert_amounts.push(balance.available);
-        insert_pending.push(false);
-        insert_recorded.push(today);
+    let mut add_balance =
+        |account_type: &str,
+         balance: Result<&AccountBalance, &eyre::Report>| match balance
+        {
+            Ok(balance) => {
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.available);
+                insert_pending.push(false);
+                insert_recorded.push(today);
 
-        insert_account_types.push(account_type.to_string());
-        insert_amounts.push(balance.pending);
-        insert_pending.push(true);
-        insert_recorded.push(today);
-    };
+                insert_account_types.push(account_type.to_string());
+                insert_amounts.push(balance.pending);
+                insert_pending.push(true);
+                insert_recorded.push(today);
+            }
+            Err(err) => {
+                warn!("Failed to check balance for '{account_type}': {err:?}");
+            }
+        };
 
-    if let Ok(Some(ref paypal)) = paypal_result {
-        add_balance("paypal", paypal);
-    }
-    if let Ok(Some(ref brex)) = brex_result {
-        add_balance("brex", brex);
-    }
-    if let Ok(Some(ref tremendous)) = tremendous_result {
-        add_balance("tremendous", tremendous);
-    }
-    if let Ok(Some(ref mural)) = mural_result {
-        add_balance("mural", mural);
-    }
+    add_balance("paypal", paypal_result.as_ref());
+    add_balance("brex", brex_result.as_ref());
+    add_balance("tremendous", tremendous_result.as_ref());
+    add_balance("mural", mural_result.as_ref());
 
     let inserted = sqlx::query_scalar!(
         r#"
@@ -1362,13 +1361,13 @@ pub async fn insert_bank_balances_and_webhook(
 async fn check_balance_with_webhook(
     source: &str,
     threshold: u64,
-    result: eyre::Result<Option<AccountBalance>>,
-) -> eyre::Result<Option<AccountBalance>> {
+    result: eyre::Result<AccountBalance>,
+) -> eyre::Result<()> {
     let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
     let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
     match &result {
-        Ok(Some(account_balance)) => {
+        Ok(account_balance) => {
             if let Some(threshold) = maybe_threshold
                 && let Some(available) =
                     account_balance.available.trunc().to_u64()
@@ -1385,7 +1384,6 @@ async fn check_balance_with_webhook(
                 .await?;
             }
         }
-
         Err(error) => {
             // use compact single-line error repr here
             error!(
@@ -1405,11 +1403,9 @@ async fn check_balance_with_webhook(
                 .await?;
             }
         }
-
-        _ => {}
     }
 
-    Ok(result.ok().flatten())
+    Ok(())
 }
 
 #[cfg(test)]

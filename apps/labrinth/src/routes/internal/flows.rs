@@ -24,6 +24,7 @@ use crate::util::captcha::check_hcaptcha;
 use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
+use crate::util::neverbounce::{check_email, email_check_error_generic};
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
 use actix_web::http::StatusCode;
@@ -60,9 +61,13 @@ use webauthn_rs::prelude::{
 };
 use zxcvbn::Score;
 
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+/// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
+const DISPOSABLE_EMAIL_BLOCKLIST: &str =
+    include_str!("../../../assets/disposable_email_blocklist.txt");
+
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        utoipa_actix_web::scope("/auth")
+        web::scope("/auth")
             .service(init)
             .service(auth_callback)
             .service(delete_auth_provider)
@@ -1068,12 +1073,15 @@ pub struct Authorization {
 // Init link takes us to GitHub API and calls back to callback endpoint with a code and state
 // http://localhost:8000/auth/init?url=https://modrinth.com
 #[utoipa::path(
-    get,
-    operation_id = "authInit",
-    responses(
-        (status = 307, description = "Redirect to OAuth provider"),
-        (status = 400, description = "Invalid input")
-    )
+	context_path = "/auth",
+	tag = "auth",
+	params(
+		("url" = Url, Query),
+		("provider" = Option<AuthProvider>, Query),
+		("token" = Option<String>, Query),
+		("auth_token" = Option<String>, Query)
+	),
+	responses((status = TEMPORARY_REDIRECT), (status = OK))
 )]
 #[get("/init")]
 pub async fn init(
@@ -1166,12 +1174,8 @@ pub async fn init(
 }
 
 #[utoipa::path(
-    get,
-    operation_id = "authCallback",
-    responses(
-        (status = 307, description = "Redirect with auth code"),
-        (status = 401, description = "Authentication failed")
-    )
+	context_path = "/auth",
+	tag = "auth", responses((status = OK))
 )]
 #[get("/callback")]
 pub async fn auth_callback(
@@ -1439,18 +1443,34 @@ struct NewOAuthAccount {
     pub state: String,
     pub challenge: String,
     pub sign_up_newsletter: bool,
+    #[serde(default)]
+    pub account_consent: bool,
 }
 
+fn validate_account_consent(account_consent: bool) -> Result<(), ApiError> {
+    if account_consent {
+        info!("account consent trigger, denying");
+        return Err(ApiError::Request(eyre!(
+            "Sorry, something went wrong. Please try again"
+        )));
+    }
+
+    Ok(())
+}
+
+/// Create account with OAuth.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "createOAuthAccount",
-    responses(
-        (status = 200, description = "OAuth account created"),
-        (status = 400, description = "Invalid input")
-    )
+	operation_id = "createOAuthAccount",
+	responses(
+		(status = 200, description = "OAuth account created", body = serde_json::Value),
+		(status = 400, description = "Invalid input")
+	)
 )]
 #[post("/create/oauth")]
-async fn create_oauth_account(
+pub async fn create_oauth_account(
     req: HttpRequest,
     db: Data<PgPool>,
     file_host: Data<dyn FileHost>,
@@ -1460,6 +1480,8 @@ async fn create_oauth_account(
     new_account.validate().map_err(|err| {
         ApiError::InvalidInput(validation_errors_to_string(err, None))
     })?;
+
+    validate_account_consent(new_account.account_consent)?;
 
     if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
@@ -1478,6 +1500,10 @@ async fn create_oauth_account(
     else {
         return Err(ApiError::Internal(eyre!("invalid flow kind")));
     };
+
+    if let Some(email) = &user.email {
+        ensure_email_is_usable(email).await?;
+    }
 
     let mut txn = db
         .begin()
@@ -1525,7 +1551,10 @@ struct DiscordCommunityHandoffPayload {
     nonce: String,
 }
 
+/// Link Discord community.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     operation_id = "discordCommunityLink",
     responses(
         (status = 200, description = "Discord community bot handoff URL", body = DiscordCommunityLinkResponse),
@@ -1599,7 +1628,10 @@ pub async fn discord_community_link(
     Ok(web::Json(DiscordCommunityLinkResponse { url }))
 }
 
+/// Remove an auth provider.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     delete,
     operation_id = "deleteAuthProvider",
     responses(
@@ -1701,6 +1733,8 @@ pub struct NewAccount {
     pub email: String,
     pub challenge: Option<String>,
     pub sign_up_newsletter: Option<bool>,
+    #[serde(default)]
+    pub account_consent: bool,
 }
 
 #[derive(Debug, Validate)]
@@ -1784,6 +1818,63 @@ impl From<NewAccount> for AccountRegisterFlow {
             sign_up_newsletter: account.sign_up_newsletter.unwrap_or(false),
         }
     }
+}
+
+/// The bundled disposable domain list is checked first. Environment blacklist
+/// entries are matched literally, unless they begin with `*.`, in which case
+/// they match any subdomain of the remaining suffix.
+fn is_blacklisted_domain(domain: &str) -> bool {
+    let domain = domain.to_ascii_lowercase();
+
+    if DISPOSABLE_EMAIL_BLOCKLIST.lines().any(|entry| {
+        // The upstream list expects listed domains to match subdomains too.
+        domain == entry
+            || domain
+                .strip_suffix(entry)
+                .is_some_and(|subdomain| subdomain.ends_with('.'))
+    }) {
+        return true;
+    }
+
+    ENV.EMAIL_DOMAIN_BLACKLIST.iter().any(|entry| {
+        let entry = entry.trim().to_ascii_lowercase();
+
+        match entry.strip_prefix("*.") {
+            Some(suffix) => domain
+                .strip_suffix(suffix)
+                .is_some_and(|subdomain| subdomain.ends_with('.')),
+            None => entry == domain,
+        }
+    })
+}
+
+fn ensure_email_domain_is_allowed(email: &str) -> Result<(), ApiError> {
+    let Some((_, domain)) = email.rsplit_once('@') else {
+        return Err(ApiError::Request(email_check_error_generic()));
+    };
+
+    if is_blacklisted_domain(domain) {
+        info!(email.domain = domain, "blacklisted email domain, denying");
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
+}
+
+async fn ensure_email_is_usable(email: &str) -> Result<(), ApiError> {
+    ensure_email_domain_is_allowed(email)?;
+
+    let result = check_email(email).await.map_err(ApiError::Request)?;
+
+    if matches!(
+        result,
+        neverbounce::VerificationResult::Invalid
+            | neverbounce::VerificationResult::Disposable
+    ) {
+        return Err(ApiError::Request(email_check_error_generic()));
+    }
+
+    Ok(())
 }
 
 impl AccountRegisterFlow {
@@ -1939,11 +2030,14 @@ impl ReadyAccountRegisterFlow {
     }
 }
 
+/// Validate password account creation.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "validateCreateAccountWithPassword",
     responses(
-        (status = 200, description = "Account input is valid"),
+        (status = NO_CONTENT, description = "Account input is valid"),
         (status = 400, description = "Invalid input")
     )
 )]
@@ -1964,13 +2058,16 @@ pub async fn validate_create_account_with_password(
     Ok(())
 }
 
+/// Create account with a password.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "createAccountPassword",
-    responses(
-        (status = 200, description = "Account created"),
-        (status = 400, description = "Invalid input")
-    )
+	operation_id = "createAccountPassword",
+	responses(
+		(status = 200, description = "Account created", body = serde_json::Value),
+		(status = 400, description = "Invalid input")
+	)
 )]
 #[post("/create")]
 pub async fn create_account_with_password(
@@ -1982,11 +2079,15 @@ pub async fn create_account_with_password(
 ) -> Result<HttpResponse, ApiError> {
     let new_account = new_account.into_inner();
 
+    validate_account_consent(new_account.account_consent)?;
+
     if !check_hcaptcha(&req, new_account.challenge.as_deref().unwrap_or(""))
         .await?
     {
         return Err(ApiError::Turnstile);
     }
+
+    ensure_email_is_usable(&new_account.email).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -2010,13 +2111,16 @@ pub struct Login {
     pub challenge: String,
 }
 
+/// Log in with a password.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "loginPassword",
-    responses(
-        (status = 200, description = "Login successful"),
-        (status = 401, description = "Invalid credentials")
-    )
+	operation_id = "loginPassword",
+	responses(
+		(status = 200, description = "Login successful", body = serde_json::Value),
+		(status = 401, description = "Invalid credentials")
+	)
 )]
 #[post("/login")]
 pub async fn login_password(
@@ -2109,7 +2213,7 @@ async fn validate_2fa_code(
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    const TOTP_NAMESPACE: &str = "used_totp";
+    const TOTP_NAMESPACE: &str = "used_totp:v1";
     let mut conn = redis.connect().await?;
 
     // Check if TOTP has already been used
@@ -2168,13 +2272,16 @@ async fn validate_2fa_code(
     }
 }
 
+/// Complete login with 2FA.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "login2fa",
-    responses(
-        (status = 200, description = "2FA login successful"),
-        (status = 401, description = "Invalid credentials")
-    )
+	operation_id = "login2fa",
+	responses(
+		(status = 200, description = "2FA login successful", body = serde_json::Value),
+		(status = 401, description = "Invalid credentials")
+	)
 )]
 #[post("/login/2fa")]
 pub async fn login_2fa(
@@ -2225,13 +2332,16 @@ pub async fn login_2fa(
     }
 }
 
+/// Start 2FA setup.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "begin2faFlow",
-    responses(
-        (status = 200, description = "2FA secret generated"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "begin2faFlow",
+	responses(
+		(status = 200, description = "2FA secret generated", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = []))
 )]
 #[post("/2fa/get_secret")]
@@ -2273,13 +2383,16 @@ pub async fn begin_2fa_flow(
     }
 }
 
+/// Finish 2FA setup.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "finish2faFlow",
-    responses(
-        (status = 200, description = "2FA enabled"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "finish2faFlow",
+	responses(
+		(status = 200, description = "2FA enabled", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = []))
 )]
 #[post("/2fa")]
@@ -2405,7 +2518,10 @@ pub struct Remove2FA {
     pub code: String,
 }
 
+/// Remove 2FA.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     delete,
     operation_id = "remove2fa",
     responses(
@@ -2502,7 +2618,10 @@ pub struct ResetPassword {
     pub challenge: String,
 }
 
+/// Start password reset.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "resetPasswordBegin",
     responses(
@@ -2605,7 +2724,10 @@ pub struct ChangePassword {
     pub new_password: Option<String>,
 }
 
+/// Change password.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     patch,
     operation_id = "changePassword",
     responses(
@@ -2768,7 +2890,10 @@ pub struct SetEmail {
     pub email: String,
 }
 
+/// Set email address.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     patch,
     operation_id = "setEmail",
     responses(
@@ -2817,6 +2942,8 @@ pub async fn set_email(
             "Email is already registered on Modrinth! Try 'Forgot password' in incognito to access and delete your other account.".to_string(),
         ));
     }
+
+    ensure_email_is_usable(&email_address.email).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -2887,7 +3014,10 @@ pub async fn set_email(
     Ok(HttpResponse::Ok().finish())
 }
 
+/// Resend verification email.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "resendVerifyEmail",
     responses(
@@ -2959,7 +3089,10 @@ pub struct VerifyEmail {
     pub flow: String,
 }
 
+/// Verify email address.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "verifyEmail",
     responses(
@@ -3022,7 +3155,10 @@ pub async fn verify_email(
     }
 }
 
+/// Subscribe to the newsletter.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "subscribeNewsletter",
     responses(
@@ -3068,13 +3204,16 @@ pub async fn subscribe_newsletter(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Get newsletter subscription status.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     get,
-    operation_id = "getNewsletterSubscriptionStatus",
-    responses(
-        (status = 200, description = "Subscription status"),
-        (status = 401, description = "Unauthorized")
-    ),
+	operation_id = "getNewsletterSubscriptionStatus",
+	responses(
+		(status = 200, description = "Subscription status", body = serde_json::Value),
+		(status = 401, description = "Unauthorized")
+	),
     security(("bearer_auth" = []))
 )]
 #[get("/email/subscribe")]
@@ -3115,7 +3254,10 @@ pub struct RegisterPasskeyResponse {
     pub flow: String,
 }
 
+/// Start passkey registration.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "registerPasskeyStart",
     responses(
@@ -3212,7 +3354,10 @@ pub struct PasskeyResponse {
     pub last_used: Option<chrono::DateTime<Utc>>,
 }
 
+/// Finish passkey registration.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "registerPasskeyFinish",
     responses(
@@ -3318,7 +3463,10 @@ pub struct AuthenticatePasskeyResponse {
     pub flow: String,
 }
 
+/// Start passkey authentication.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
     operation_id = "authenticatePasskeyStart",
     responses(
@@ -3358,13 +3506,16 @@ pub struct AuthenticatePasskeyFinish {
     pub credential: PublicKeyCredential,
 }
 
+/// Finish passkey authentication.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     post,
-    operation_id = "authenticatePasskeyFinish",
-    responses(
-        (status = 200, description = "Passkey authentication successful"),
-        (status = 400, description = "Invalid input")
-    )
+	operation_id = "authenticatePasskeyFinish",
+	responses(
+		(status = 200, description = "Passkey authentication successful", body = serde_json::Value),
+		(status = 400, description = "Invalid input")
+	)
 )]
 #[post("/passkey/finish")]
 pub async fn authenticate_passkey_finish(
@@ -3472,7 +3623,10 @@ pub async fn authenticate_passkey_finish(
     }
 }
 
+/// List passkeys.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     get,
     operation_id = "listPasskeys",
     responses(
@@ -3519,7 +3673,10 @@ pub struct RenamePasskey {
     pub name: String,
 }
 
+/// Rename a passkey.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     patch,
     operation_id = "renamePasskey",
     responses(
@@ -3571,7 +3728,10 @@ pub async fn rename_passkey(
     Ok(HttpResponse::NoContent().finish())
 }
 
+/// Delete a passkey.
 #[utoipa::path(
+	context_path = "/auth",
+	tag = "auth",
     delete,
     operation_id = "deletePasskey",
     responses(

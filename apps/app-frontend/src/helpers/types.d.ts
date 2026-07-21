@@ -133,11 +133,18 @@ type Hooks = {
 
 type Manifest = {
 	gameVersions: ManifestGameVersion[]
+	versionGroups?: ManifestVersionGroup[]
 }
 
 type ManifestGameVersion = {
 	id: string
 	stable: boolean
+	versionGroup?: string
+	loaders: ManifestLoaderVersion[]
+}
+
+type ManifestVersionGroup = {
+	id: string
 	loaders: ManifestLoaderVersion[]
 }
 

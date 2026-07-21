@@ -9,8 +9,8 @@ use std::hash::Hash;
 use super::{DBTeamMember, ids::*};
 use serde::{Deserialize, Serialize};
 
-const ORGANIZATIONS_NAMESPACE: &str = "organizations";
-const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles";
+const ORGANIZATIONS_NAMESPACE: &str = "organizations:v1";
+const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v1";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 /// An organization of users who together control one or more projects and organizations.

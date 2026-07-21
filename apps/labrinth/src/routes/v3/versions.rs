@@ -31,33 +31,34 @@ use crate::search::{SearchBackend, SearchState};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{HttpRequest, HttpResponse, get, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route(
-        "version",
-        web::post().to(super::version_creation::version_create),
-    );
-    cfg.route("versions", web::get().to(versions_get));
-
-    cfg.service(
-        web::scope("version")
-            .route("{id}", web::get().to(version_get))
-            .route("{id}", web::patch().to(version_edit))
-            .route("{id}", web::delete().to(version_delete))
-            .route(
-                "{version_id}/file",
-                web::post().to(super::version_creation::upload_file_to_version),
-            ),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(super::version_creation::version_create_route)
+        .service(versions_get_route)
+        .service(version_get_route)
+        .service(version_edit_route)
+        .service(version_delete_route)
+        .service(super::version_creation::upload_file_to_version_route);
 }
 
 // Given a project ID/slug and a version slug
-#[utoipa::path]
+/// Get a project version.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "versions",
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	)
+)]
 #[get("/{project_id}/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
@@ -162,6 +163,28 @@ fn default_true() -> bool {
     true
 }
 
+/// Get multiple versions by ID.
+#[utoipa::path(
+	tag = "versions",
+	get,
+	params(
+		("ids" = String, Query, description = "The JSON array of version IDs"),
+		("include_changelog" = Option<bool>, Query, description = "Whether to include changelog fields")
+	),
+	responses((status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>))
+)]
+#[get("/versions")]
+pub async fn versions_get_route(
+    req: HttpRequest,
+    ids: web::Query<VersionIds>,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    versions_get(req, ids, pool, ro_pool, redis, session_queue).await
+}
+
 pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
@@ -209,6 +232,33 @@ pub async fn versions_get(
     }
 
     Ok(HttpResponse::Ok().json(versions))
+}
+
+/// Get a version by ID.
+#[utoipa::path(
+	tag = "versions",
+	get,
+	params(
+		("id" = VersionId, Path, description = "The ID of the version")
+	),
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = models::projects::Version),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	)
+)]
+#[get("/version/{id}")]
+pub async fn version_get_route(
+    req: HttpRequest,
+    info: web::Path<(models::ids::VersionId,)>,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<models::projects::Version>, ApiError> {
+    version_get(req, info, pool, ro_pool, redis, session_queue).await
 }
 
 pub async fn version_get(
@@ -328,6 +378,48 @@ pub struct EditVersionFileType {
     pub algorithm: String,
     pub hash: String,
     pub file_type: Option<FileType>,
+}
+
+/// Update an existing version.
+#[utoipa::path(
+	tag = "versions",
+	patch,
+	params(
+		("id" = VersionId, Path, description = "The ID of the version")
+	),
+	responses(
+		(status = NO_CONTENT, description = "Expected response to a valid request"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["VERSION_WRITE"]))
+)]
+#[patch("/version/{id}")]
+pub async fn version_edit_route(
+    req: HttpRequest,
+    info: web::Path<(VersionId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    new_version: web::Json<serde_json::Value>,
+    session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
+    version_edit(
+        req,
+        info,
+        pool,
+        redis,
+        new_version,
+        session_queue,
+        search_state,
+    )
+    .await
 }
 
 pub async fn version_edit(
@@ -798,9 +890,29 @@ pub struct VersionListFilters {
     pub include_changelog: bool,
 }
 
-#[utoipa::path]
+/// List project versions.  
+#[utoipa::path(
+	context_path = "/project",
+	tag = "versions",
+	params(
+		("loaders" = Option<String>, Query),
+		("featured" = Option<bool>, Query),
+		("version_type" = Option<VersionType>, Query),
+		("limit" = Option<usize>, Query),
+		("offset" = Option<usize>, Query),
+		("loader_fields" = Option<String>, Query),
+		("include_changelog" = Option<bool>, Query)
+	),
+	responses(
+		(status = 200, description = "Expected response to a valid request", body = Vec<models::projects::Version>),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	)
+)]
 #[get("/{project_id}/version")]
-async fn version_list(
+pub async fn version_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
@@ -990,6 +1102,48 @@ pub async fn version_list_internal(
     }
 }
 
+/// Delete a version by ID.
+#[utoipa::path(
+	tag = "versions",
+	delete,
+	params(
+		("id" = VersionId, Path, description = "The ID of the version")
+	),
+	responses(
+		(status = NO_CONTENT, description = "Expected response to a valid request"),
+		(
+			status = 401,
+			description = "Incorrect token scopes or no authorization to access the requested item(s)"
+		),
+		(
+			status = 404,
+			description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+		)
+	),
+	security(("bearer_auth" = ["VERSION_DELETE"]))
+)]
+#[delete("/version/{id}")]
+pub async fn version_delete_route(
+    req: HttpRequest,
+    info: web::Path<(VersionId,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    search_backend: web::Data<dyn SearchBackend>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
+    version_delete(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        search_backend,
+        search_state,
+    )
+    .await
+}
+
 pub async fn version_delete(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
@@ -1063,11 +1217,6 @@ pub async fn version_delete(
     }
 
     let mut transaction = pool.begin().await?;
-    let was_in_tech_review = delphi::is_project_in_tech_review(
-        version.inner.project_id,
-        &mut transaction,
-    )
-    .await?;
 
     let context = ImageContext::Version {
         version_id: Some(version.inner.id.into()),
@@ -1088,9 +1237,9 @@ pub async fn version_delete(
     )
     .await?;
 
-    delphi::send_tech_review_exit_file_deleted_message_if_exited(
-        version.inner.project_id,
-        was_in_tech_review,
+    delphi::tech_review_sync::sync_project_tech_review_state(
+        &[version.inner.project_id],
+        delphi::tech_review_sync::TechReviewExitReason::FileDeleted,
         &mut transaction,
     )
     .await?;

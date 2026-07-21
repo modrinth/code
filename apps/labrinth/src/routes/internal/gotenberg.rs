@@ -28,6 +28,12 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(success_callback).service(error_callback);
 }
 
+/// Receive a Gotenberg success callback.  
+#[utoipa::path(
+	tag = "gotenberg",
+	request_body = Vec<u8>,
+	responses((status = NO_CONTENT))
+)]
 #[post("/gotenberg/success", guard = "internal_network_guard")]
 pub async fn success_callback(
     web::Header(header::ContentDisposition {
@@ -64,11 +70,11 @@ pub async fn success_callback(
 
     let body = base64::engine::general_purpose::STANDARD.encode(&body);
 
-    let redis_msg = serde_json::to_string(&Ok::<
+    let redis_msg = postcard::to_allocvec(&Ok::<
         GotenbergDocument,
         GotenbergError,
     >(GotenbergDocument { body }))
-    .wrap_internal_err("failed to serialize document to JSON")?;
+    .wrap_internal_err("failed to serialize Redis document response")?;
 
     redis
         .lpush(
@@ -82,7 +88,7 @@ pub async fn success_callback(
     Ok(())
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Error)]
+#[derive(Debug, Clone, Serialize, Deserialize, Error, utoipa::ToSchema)]
 pub struct GotenbergError {
     pub status: Option<String>,
     pub message: Option<String>,
@@ -101,6 +107,11 @@ impl fmt::Display for GotenbergError {
     }
 }
 
+/// Receive a Gotenberg error callback.  
+#[utoipa::path(
+	tag = "gotenberg",
+	responses((status = NO_CONTENT))
+)]
 #[post("/gotenberg/error", guard = "internal_network_guard")]
 pub async fn error_callback(
     web::Header(GotenbergTrace(trace)): web::Header<GotenbergTrace>,
@@ -128,11 +139,11 @@ pub async fn error_callback(
         .await
         .wrap_internal_err("failed to get Redis connection")?;
 
-    let redis_msg = serde_json::to_string(&Err::<
+    let redis_msg = postcard::to_allocvec(&Err::<
         GotenbergDocument,
         GotenbergError,
     >(error_body))
-    .wrap_internal_err("failed to serialize error to JSON")?;
+    .wrap_internal_err("failed to serialize Redis error response")?;
 
     redis
         .lpush(

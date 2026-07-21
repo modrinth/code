@@ -11,6 +11,87 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Приховати більше запущених профілів"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Скопійовано"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Скопіювати деталі"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Відхилити"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Відкрити екземпляр"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Спробувати знову"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Скасовано через закриття додатку"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Не вдалось прочитати збірку модифікацій"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Скасовано"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Очищення не завершено"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Не вдалося завантажити файли"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Завантажений файл пошкоджений"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Не вдалося зберегти файли"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Завантаження не вдалося завершити"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Екземпляр не знайдено"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Шлях до файлу недійсний"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Дані збірки модів недійсні"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Файли збірки модифікацій містять не дійсні метадані"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Не вдалося завершити встановлення Java"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Помилка встановлення завантажувача"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Не вдалося оновити локальні дані"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Не вдалося встановити Minecraft"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Не вдалося зʼєднатися з Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Немає прав для запису"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Не вдалося встановити збірку"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Щось пішло не так"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Невідомий екземпляр"
+  },
+  "app.action-bar.installs": {
+    "message": "Установки"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Зробити основним профілем"
   },
@@ -101,6 +182,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Час гри"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Автоматично пропускає підтвердження з низьким рівнем ризику, такі як встановлення дублікатів інсталяцій, звичайне видалення вмісту, масові оновлення, від’єднання інсталяцій та запити на відновлення. Попередження про небезпеку й надалі будуть показуватися."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Пропустити несуттєві попередження"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Умикає можливість перемикання бокової панелі."
   },
@@ -147,7 +234,7 @@
     "message": "Дослідити сервера"
   },
   "app.browse.hide-added-servers": {
-    "message": "Сховати наявні сервери"
+    "message": "Приховати вже додані сервери"
   },
   "app.browse.project-type.modpacks": {
     "message": "Збірки"
@@ -182,6 +269,60 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "Завантаження вмісту"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Завантаження Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Завантаження файлу пакета"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Розпакування файлів заміщення"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Завершення"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "У черзі на встановлення"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Підготовка Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Завантаження Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Розпакування Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Отримання Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Підготовка Java {version}"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Перевірка Java {version}"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Читання маніфесту пакета"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Визначення завантажувача"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Узгодження версії Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Узгодження вмісту"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Повернення"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Запуск процесорів завантажувача"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Усі дані вашого профілю будуть видалені назавжди, включно з вашими світами, налаштуваннями та всім установленим умістом."
   },
@@ -205,6 +346,15 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Профіль"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "Завантаження проєктів: {current, number}/{total, number}..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Завершуємо оновлення…"
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Знаходимо версії…"
   },
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
@@ -230,6 +380,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Переглянути сервери"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Видалити світ"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Видалити світ"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Цей світ буде видалено назавжди з цього екземпляра. Це не можна скасувати."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Видалення {name}"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Модифіковано"
   },
@@ -248,32 +410,53 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
   },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Видалити сервер"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Видалити сервер"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Цей сервер буде видалено з вашого списку серверів. Ви зможете повернути його, якщо знаєте адресу."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Видалення {name}"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Потрібний уміст"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Не встановлювати"
   },
   "app.modal.install-to-play.header": {
     "message": "Установлення для гри"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Усе одно встановити"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Установити"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Це запрошення створив інший користувач Modrinth, не сам Modrinth. Приймайте запрошення лише від тих людей, яким довіряєте."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Потрібна збірка"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб налаштувати необхідні файли з Modrinth, а потім запустіть безпосередньо на сервері."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Файл перевірятиметься, лише якщо його завантажено на Modrinth, незалежно від його формату (включно з .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Профіль"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Серверний профіль"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ця збірка сервера містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Попередження про невідомі файли"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Нерозпізнані файли"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Дивитися вміст"
@@ -281,8 +464,8 @@
   "app.modal.update-to-play.header": {
     "message": "Оновлення для гри"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Необхідне оновлення"
+  "app.modal.update-to-play.removed": {
+    "message": "Видалено"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть до останньої версії, щоб запустити гру."
@@ -290,11 +473,11 @@
   "app.project.install-button.already-installed": {
     "message": "Проєкт уже встановлено"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Змінити версію"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Повернутися до дослідження"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Установити вміст до профілю"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
@@ -415,6 +598,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -618,7 +804,7 @@
     "message": "Додавання файлів ({completed}/{total})"
   },
   "instance.files.save-as": {
-    "message": "Зберегти як…"
+    "message": "Зберегти як..."
   },
   "instance.server-modal.address": {
     "message": "Адреса"
@@ -833,6 +1019,9 @@
   "instance.worlds.copy_address": {
     "message": "Скопіювати адресу"
   },
+  "instance.worlds.create_shortcut": {
+    "message": "Створити ярлик"
+  },
   "instance.worlds.dont_show_on_home": {
     "message": "Не показувати на головній"
   },
@@ -907,26 +1096,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Завантажувач наданий сервером"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Файл перевірятиметься лише, якщо його завантажено на Modrinth, незалежно від його формату (включно з .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Не показувати більше це попередження"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Підтвердити встановлення"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Усе одно встановити"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Шкідливе програмне забезпечення часто поширюють через файли збірок, які публікуються на таких платформах, як Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Ми не змогли знайти цей файл на Modrinth. Ми рекомендуємо встановлювати файли лише з тих джерел яким ви довіряєте."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Попередження про невідомий файл"
   }
 }

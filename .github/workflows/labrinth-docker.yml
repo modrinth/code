@@ -79,6 +79,7 @@ jobs:
       SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      RUST_MIN_STACK: '16777216'
     steps:
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -93,10 +94,11 @@ jobs:
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
       - name: Install build dependencies
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
-        with:
-          packages: cmake libcurl4-openssl-dev
-          version: v2 # cache key
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake libcurl4-openssl-dev
+        #uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
+        #with:
+        #  packages: cmake libcurl4-openssl-dev
+        #  version: v2 # cache key
 
       - name: Cache Cargo registry and index
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -106,6 +108,10 @@ jobs:
             ~/.cargo/git
             ~/.cargo/bin
           key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Ensure sccache directory exists
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        run: sudo mkdir -p /mnt/sccache && sudo chown $(id -u):$(id -g) /mnt/sccache
 
       - name: Mount sccache disk cache
         if: needs.skip-if-clean.outputs.internal == 'true'

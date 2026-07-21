@@ -10,32 +10,56 @@ use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
+use crate::routes::{FileHash, HashAlgorithm};
 use crate::{database, models};
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("version_file")
-            .route("{version_id}", web::get().to(get_version_from_hash))
-            .route("{version_id}/update", web::post().to(get_update_from_hash))
-            .route("project", web::post().to(get_projects_from_hashes))
-            .route("{version_id}", web::delete().to(delete_file))
-            .route("{version_id}/download", web::get().to(download_version)),
-    );
-    cfg.service(
-        web::scope("version_files")
-            // DEPRECATED - use `update_many` instead
-            // see `fn update_files` comment
-            .route("update", web::post().to(update_files))
-            .route("update_many", web::post().to(update_files_many))
-            .route("update_individual", web::post().to(update_individual_files))
-            .route("", web::post().to(get_versions_from_hashes)),
-    );
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(get_version_from_hash_route)
+        .service(get_update_from_hash_route)
+        .service(get_projects_from_hashes_route)
+        .service(delete_file_route)
+        .service(download_version_route)
+        .service(update_files_route)
+        .service(update_files_many_route)
+        .service(update_individual_files_route)
+        .service(get_versions_from_hashes_route);
+}
+
+/// Get version metadata by file hash.
+#[utoipa::path(
+	tag = "version files",
+    get,
+    operation_id = "v3VersionFromHash",
+    params(
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = models::projects::Version),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[get("/version_file/{version_id}")]
+pub async fn get_version_from_hash_route(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    hash_query: web::Query<HashQuery>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    get_version_from_hash(req, info, pool, redis, hash_query, session_queue)
+        .await
 }
 
 pub async fn get_version_from_hash(
@@ -89,7 +113,7 @@ pub async fn get_version_from_hash(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct HashQuery {
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub version_id: Option<VersionId>,
@@ -110,7 +134,7 @@ pub fn default_algorithm_from_hashes(hashes: &[String]) -> String {
     "sha1".into()
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UpdateData {
     pub loaders: Option<Vec<String>>,
     pub version_types: Option<Vec<VersionType>>,
@@ -121,6 +145,47 @@ pub struct UpdateData {
        Returns if it matches any of the values
     */
     pub loader_fields: Option<HashMap<String, Vec<serde_json::Value>>>,
+}
+
+/// Get the latest matching version by file hash.
+#[utoipa::path(
+	tag = "version files",
+    post,
+    operation_id = "v3UpdateFromHash",
+    params(
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
+    ),
+    request_body = UpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = models::projects::Version),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[post("/version_file/{version_id}/update")]
+pub async fn get_update_from_hash_route(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    hash_query: web::Query<HashQuery>,
+    update_data: web::Json<UpdateData>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    get_update_from_hash(
+        req,
+        info,
+        pool,
+        redis,
+        hash_query,
+        update_data,
+        session_queue,
+    )
+    .await
 }
 
 pub async fn get_update_from_hash(
@@ -208,10 +273,38 @@ pub async fn get_update_from_hash(
 }
 
 // Requests above with multiple versions below
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileHashes {
+    /// Hash algorithm to use (sha1 or sha512)
+    #[schema(value_type = Option<HashAlgorithm>)]
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
+    #[schema(value_type = Vec<FileHash>)]
     pub hashes: Vec<String>,
+}
+
+/// Get versions by file hashes.
+#[utoipa::path(
+	tag = "version files",
+    post,
+    operation_id = "v3VersionsFromHashes",
+    request_body = FileHashes,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, models::projects::Version>),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[post("/version_files")]
+pub async fn get_versions_from_hashes_route(
+    req: HttpRequest,
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    file_data: web::Json<FileHashes>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    get_versions_from_hashes(req, pool, redis, file_data, session_queue).await
 }
 
 pub async fn get_versions_from_hashes(
@@ -267,6 +360,31 @@ pub async fn get_versions_from_hashes(
     }
 
     Ok(HttpResponse::Ok().json(response))
+}
+
+/// Get projects by file hashes.
+#[utoipa::path(
+	tag = "version files",
+    post,
+    operation_id = "v3ProjectsFromHashes",
+    request_body = FileHashes,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, models::projects::Project>),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[post("/version_file/project")]
+pub async fn get_projects_from_hashes_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_data: web::Json<FileHashes>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    get_projects_from_hashes(req, pool, redis, file_data, session_queue).await
 }
 
 pub async fn get_projects_from_hashes(
@@ -327,13 +445,33 @@ pub async fn get_projects_from_hashes(
     Ok(HttpResponse::Ok().json(response))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyUpdateData {
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<String>,
     pub loaders: Option<Vec<String>>,
     pub game_versions: Option<Vec<String>>,
     pub version_types: Option<Vec<VersionType>>,
+}
+
+/// Get latest matching versions by file hashes.
+#[utoipa::path(
+	tag = "version files",
+    post,
+    operation_id = "v3UpdateFilesMany",
+    request_body = ManyUpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, Vec<models::projects::Version>>)
+    )
+)]
+#[post("/version_files/update_many")]
+pub async fn update_files_many_route(
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    update_data: web::Json<ManyUpdateData>,
+) -> Result<web::Json<HashMap<String, Vec<models::projects::Version>>>, ApiError>
+{
+    update_files_many(pool, redis, update_data).await
 }
 
 pub async fn update_files_many(
@@ -368,6 +506,25 @@ pub async fn update_files_many(
 // This endpoint is kept for backwards compat, since it still works in 99% of
 // cases where H only maps to a single version, and for older clients. This
 // endpoint will only take the first version for each file hash.
+/// Get the latest matching version by file hash.
+#[utoipa::path(
+	tag = "version files",
+    post,
+    operation_id = "v3UpdateFiles",
+    request_body = ManyUpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, models::projects::Version>)
+    )
+)]
+#[post("/version_files/update")]
+pub async fn update_files_route(
+    pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    update_data: web::Json<ManyUpdateData>,
+) -> Result<web::Json<HashMap<String, models::projects::Version>>, ApiError> {
+    update_files(pool, redis, update_data).await
+}
+
 pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -468,7 +625,7 @@ async fn update_files_internal(
     Ok(response)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct FileUpdateData {
     pub hash: String,
     pub loaders: Option<Vec<String>>,
@@ -476,10 +633,31 @@ pub struct FileUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ManyFileUpdateData {
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<FileUpdateData>,
+}
+
+/// Get latest matching versions by individual file filters.
+#[utoipa::path(
+	tag = "version files",
+    post,
+    operation_id = "v3UpdateIndividualFiles",
+    request_body = ManyFileUpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, models::projects::Version>)
+    )
+)]
+#[post("/version_files/update_individual")]
+pub async fn update_individual_files_route(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    update_data: web::Json<ManyFileUpdateData>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    update_individual_files(req, pool, redis, update_data, session_queue).await
 }
 
 pub async fn update_individual_files(
@@ -603,6 +781,40 @@ pub async fn update_individual_files(
 }
 
 // under /api/v1/version_file/{hash}
+/// Delete a file by hash.
+#[utoipa::path(
+	tag = "version files",
+    delete,
+    operation_id = "v3DeleteFileFromHash",
+    params(
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID to delete from")
+    ),
+    responses(
+        (status = NO_CONTENT, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[delete("/version_file/{version_id}")]
+pub async fn delete_file_route(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    hash_query: web::Query<HashQuery>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    delete_file(req, info, pool, redis, hash_query, session_queue).await
+}
+
 pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -698,9 +910,6 @@ pub async fn delete_file(
         }
 
         let mut transaction = pool.begin().await?;
-        let was_in_tech_review =
-            delphi::is_project_in_tech_review(row.project_id, &mut transaction)
-                .await?;
 
         sqlx::query!(
             "
@@ -725,9 +934,9 @@ pub async fn delete_file(
         database::models::version_item::cleanup_unused_attribution_files_and_groups(&mut transaction)
             .await?;
 
-        delphi::send_tech_review_exit_file_deleted_message_if_exited(
-            row.project_id,
-            was_in_tech_review,
+        delphi::tech_review_sync::sync_project_tech_review_state(
+            &[row.project_id],
+            delphi::tech_review_sync::TechReviewExitReason::FileDeleted,
             &mut transaction,
         )
         .await?;
@@ -740,12 +949,42 @@ pub async fn delete_file(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DownloadRedirect {
     pub url: String,
 }
 
 // under /api/v1/version_file/{hash}/download
+/// Download a file by hash.
+#[utoipa::path(
+	tag = "version files",
+    get,
+    operation_id = "v3DownloadVersionFromHash",
+    params(
+        ("version_id" = String, Path, description = "The hexadecimal file hash"),
+        ("algorithm" = Option<String>, Query, description = "Hash algorithm to use (sha1 or sha512)"),
+        ("version_id" = Option<VersionId>, Query, description = "Optional version ID when hash maps to multiple files")
+    ),
+    responses(
+        (status = 302, description = "Temporary redirect to file URL", body = DownloadRedirect),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[get("/version_file/{version_id}/download")]
+pub async fn download_version_route(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    hash_query: web::Query<HashQuery>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    download_version(req, info, pool, redis, hash_query, session_queue).await
+}
+
 pub async fn download_version(
     req: HttpRequest,
     info: web::Path<(String,)>,
