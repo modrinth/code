@@ -1,3 +1,4 @@
+use crate::InvocationContext;
 use crate::state::instances::{
     ContentEntry, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -27,6 +28,7 @@ struct UpdateCandidate {
 }
 
 pub(crate) async fn check_content_updates(
+    context: &InvocationContext,
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
@@ -53,12 +55,13 @@ pub(crate) async fn check_content_updates(
             entry.file_id.as_deref().map(|file_id| (file_id, entry))
         })
         .collect::<HashMap<_, _>>();
-    let files = sync_instance_content_files(&instance, state).await?;
+    let files = sync_instance_content_files(context, &instance, state).await?;
     let hashes = files
         .iter()
         .map(|file| file.sha1.as_str())
         .collect::<Vec<_>>();
     let file_info = CachedEntry::get_file_many(
+        context,
         &hashes,
         cache_behaviour,
         &state.pool,
@@ -91,7 +94,8 @@ pub(crate) async fn check_content_updates(
     }
 
     let installed_channels =
-        installed_update_channels(&candidates, cache_behaviour, state).await?;
+        installed_update_channels(context, &candidates, cache_behaviour, state)
+            .await?;
     let update_keys = candidates
         .iter()
         .map(|candidate| {
@@ -112,6 +116,7 @@ pub(crate) async fn check_content_updates(
         .map(|key| key.as_str())
         .collect::<Vec<_>>();
     let updates = CachedEntry::get_file_update_many(
+        context,
         &update_key_refs,
         cache_behaviour,
         &state.pool,
@@ -159,6 +164,7 @@ pub(crate) async fn check_content_updates(
 }
 
 async fn installed_update_channels(
+    context: &InvocationContext,
     candidates: &[UpdateCandidate],
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
@@ -168,6 +174,7 @@ async fn installed_update_channels(
         .map(|candidate| candidate.current_version_id.as_str())
         .collect::<Vec<_>>();
     let versions = CachedEntry::get_version_many(
+        context,
         &version_ids,
         cache_behaviour,
         &state.pool,

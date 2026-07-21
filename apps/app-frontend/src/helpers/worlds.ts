@@ -1,6 +1,6 @@
 import type { GameVersion } from '@modrinth/ui'
 import { autoToHTML } from '@sfirew/minecraft-motd-parser'
-import { invoke } from '@tauri-apps/api/core'
+import { invoke } from '@/helpers/invoke'
 import dayjs from 'dayjs'
 
 import { get_full_path } from '@/helpers/instance'

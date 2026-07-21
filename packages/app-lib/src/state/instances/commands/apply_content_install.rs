@@ -1,3 +1,4 @@
+use crate::InvocationContext;
 use crate::state::instances::{
     ContentRequirement, ContentSourceKind, Instance, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -45,6 +46,7 @@ pub(crate) struct InstanceInstallProjectRequest {
 }
 
 struct CachedEntryContentProvider<'a> {
+    context: &'a InvocationContext,
     state: &'a State,
     cache_behaviour: Option<CacheBehaviour>,
 }
@@ -57,6 +59,7 @@ impl ContentMetadataProvider for CachedEntryContentProvider<'_> {
     ) -> Result<Option<modrinth_content_management::Version>, ResolveError>
     {
         let version = CachedEntry::get_version(
+            self.context,
             version_id,
             self.cache_behaviour,
             &self.state.pool,
@@ -73,6 +76,7 @@ impl ContentMetadataProvider for CachedEntryContentProvider<'_> {
         project_id: &str,
     ) -> Result<Vec<modrinth_content_management::Version>, ResolveError> {
         let versions = CachedEntry::get_project_versions(
+            self.context,
             project_id,
             self.cache_behaviour,
             &self.state.pool,
@@ -157,6 +161,7 @@ fn target_preferences(
 }
 
 pub(crate) async fn resolve_install_plan(
+    context: &InvocationContext,
     instance_id: &str,
     request: InstanceInstallProjectRequest,
     state: &State,
@@ -171,12 +176,14 @@ pub(crate) async fn resolve_install_plan(
             })?;
     let existing_project_ids =
         crate::state::get_installed_project_ids_for_instance(
+            context,
             instance_id,
             None,
             state,
         )
         .await?;
     let provider = CachedEntryContentProvider {
+        context,
         state,
         cache_behaviour: Some(CacheBehaviour::MustRevalidate),
     };
@@ -200,11 +207,13 @@ pub(crate) async fn resolve_install_plan(
 }
 
 pub(crate) async fn install_resolved_content_plan(
+    context: &InvocationContext,
     instance_id: &str,
     plan: &ResolveContentPlan,
     state: &State,
 ) -> crate::Result<()> {
     add_resolved_content(
+        context,
         instance_id,
         &plan.primary,
         DownloadReason::Standalone,
@@ -213,6 +222,7 @@ pub(crate) async fn install_resolved_content_plan(
     .await?;
     for dependency in &plan.dependencies {
         add_resolved_content(
+            context,
             instance_id,
             dependency,
             DownloadReason::Dependency,
@@ -225,12 +235,14 @@ pub(crate) async fn install_resolved_content_plan(
 }
 
 pub(crate) async fn switch_project_version_with_dependencies(
+    context: &InvocationContext,
     instance_id: &str,
     project_path: &str,
     version_id: &str,
     state: &State,
 ) -> crate::Result<String> {
     let version = CachedEntry::get_version(
+        context,
         version_id,
         Some(CacheBehaviour::MustRevalidate),
         &state.pool,
@@ -246,6 +258,7 @@ pub(crate) async fn switch_project_version_with_dependencies(
         .map(ContentType::from)
         .unwrap_or(ContentType::Mod);
     let plan = resolve_install_plan(
+        context,
         instance_id,
         InstanceInstallProjectRequest {
             project_id: version.project_id,
@@ -259,6 +272,7 @@ pub(crate) async fn switch_project_version_with_dependencies(
 
     let was_disabled = project_path.ends_with(".disabled");
     let mut new_path = add_project_from_version(
+        context,
         instance_id,
         &plan.primary.version_id,
         DownloadReason::Update,
@@ -276,6 +290,7 @@ pub(crate) async fn switch_project_version_with_dependencies(
 
     for dependency in &plan.dependencies {
         add_resolved_content(
+            context,
             instance_id,
             dependency,
             DownloadReason::Dependency,
@@ -299,12 +314,14 @@ pub(crate) async fn switch_project_version_with_dependencies(
 }
 
 async fn add_resolved_content(
+    context: &InvocationContext,
     instance_id: &str,
     content: &ResolvedContent,
     reason: DownloadReason,
     state: &State,
 ) -> crate::Result<String> {
     add_project_from_version(
+        context,
         instance_id,
         &content.version_id,
         reason,
@@ -342,6 +359,7 @@ pub(crate) async fn resolve_content_scope(
 }
 
 pub(crate) async fn add_project_from_version(
+    context: &InvocationContext,
     instance_id: &str,
     version_id: &str,
     reason: DownloadReason,
@@ -350,6 +368,7 @@ pub(crate) async fn add_project_from_version(
     state: &State,
 ) -> crate::Result<String> {
     let downloaded = download_project_version(
+        context,
         instance_id,
         version_id,
         reason,
@@ -363,6 +382,7 @@ pub(crate) async fn add_project_from_version(
 }
 
 pub(crate) async fn download_project_version(
+    context: &InvocationContext,
     instance_id: &str,
     version_id: &str,
     reason: DownloadReason,
@@ -380,6 +400,7 @@ pub(crate) async fn download_project_version(
                 ))
             })?;
     let version = CachedEntry::get_version(
+        context,
         version_id,
         None,
         &state.pool,
@@ -408,6 +429,7 @@ pub(crate) async fn download_project_version(
         dependent_on: dependent_on_version_id,
     };
     let bytes = fetch::fetch(
+        context,
         &file.url,
         file.hashes.get("sha1").map(|hash| hash.as_str()),
         Some(&download_meta),

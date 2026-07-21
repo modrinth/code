@@ -2,6 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
+use crate::operation::{InvocationContext, REQUEST_CONTEXT_HEADER};
 use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -333,6 +334,7 @@ fn duration_seconds_ceil(duration: Duration) -> u64 {
 
 fn reqwest_client_builder() -> reqwest::ClientBuilder {
     reqwest::Client::builder()
+        .referer(false)
         .connect_timeout(time::Duration::from_secs(15))
         .read_timeout(time::Duration::from_secs(30))
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
@@ -353,6 +355,41 @@ pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
         .expect("client configuration should be valid")
 });
 
+fn is_approved_modrinth_service_url(url: &str) -> bool {
+    let Ok(url) = url::Url::parse(url) else {
+        return false;
+    };
+
+    [
+        env!("MODRINTH_API_BASE_URL"),
+        env!("MODRINTH_API_URL"),
+        env!("MODRINTH_API_URL_V3"),
+    ]
+    .into_iter()
+    .filter_map(|approved| url::Url::parse(approved).ok())
+    .any(|approved| url.origin() == approved.origin())
+}
+
+fn attach_invocation_headers(
+    request: reqwest::RequestBuilder,
+    url: &str,
+    context: &InvocationContext,
+) -> reqwest::RequestBuilder {
+    if !is_approved_modrinth_service_url(url) {
+        return request;
+    }
+
+    if cfg!(debug_assertions) && context.cause() == "unattributed" {
+        tracing::warn!(
+            "Unattributed invocation context reached the Modrinth HTTP boundary"
+        );
+    }
+
+    request
+        .header(reqwest::header::REFERER, context.referer())
+        .header(REQUEST_CONTEXT_HEADER, context.request_context_header())
+}
+
 const FETCH_ATTEMPTS: usize = 2;
 
 pub type FetchProgressFn<'a> = dyn FnMut(
@@ -364,6 +401,7 @@ pub type FetchProgressFn<'a> = dyn FnMut(
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
+    context: &InvocationContext,
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -372,6 +410,7 @@ pub async fn fetch(
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
     fetch_advanced(
+        context,
         Method::GET,
         url,
         sha1,
@@ -388,6 +427,7 @@ pub async fn fetch(
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch_with_client(
+    context: &InvocationContext,
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -397,6 +437,7 @@ pub async fn fetch_with_client(
     client: &reqwest::Client,
 ) -> crate::Result<Bytes> {
     fetch_advanced_with_client(
+        context,
         Method::GET,
         url,
         sha1,
@@ -414,6 +455,7 @@ pub async fn fetch_with_client(
 
 #[tracing::instrument(skip(semaphore, progress))]
 pub async fn fetch_with_client_progress(
+    context: &InvocationContext,
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -424,6 +466,7 @@ pub async fn fetch_with_client_progress(
     progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<Bytes> {
     fetch_advanced_with_client_and_progress(
+        context,
         Method::GET,
         url,
         sha1,
@@ -442,6 +485,7 @@ pub async fn fetch_with_client_progress(
 
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn fetch_json<T>(
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -454,8 +498,8 @@ where
     T: DeserializeOwned,
 {
     let result = fetch_advanced(
-        method, url, sha1, json_body, None, None, None, uri_path, semaphore,
-        exec,
+        context, method, url, sha1, json_body, None, None, None, uri_path,
+        semaphore, exec,
     )
     .await?;
     let value = serde_json::from_slice(&result)?;
@@ -467,6 +511,7 @@ where
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -479,6 +524,7 @@ pub async fn fetch_advanced(
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
     fetch_advanced_with_client(
+        context,
         method,
         url,
         sha1,
@@ -497,6 +543,7 @@ pub async fn fetch_advanced(
 #[tracing::instrument(skip(json_body, semaphore, progress))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_progress(
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -510,6 +557,7 @@ pub async fn fetch_advanced_with_progress(
     progress: Option<&mut FetchProgressFn<'_>>,
 ) -> crate::Result<Bytes> {
     fetch_advanced_with_client_and_progress(
+        context,
         method,
         url,
         sha1,
@@ -530,6 +578,7 @@ pub async fn fetch_advanced_with_progress(
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_client(
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -543,6 +592,7 @@ pub async fn fetch_advanced_with_client(
     client: &reqwest::Client,
 ) -> crate::Result<Bytes> {
     fetch_advanced_with_client_and_progress(
+        context,
         method,
         url,
         sha1,
@@ -562,6 +612,7 @@ pub async fn fetch_advanced_with_client(
 #[tracing::instrument(skip(json_body, semaphore, client, progress))]
 #[allow(clippy::too_many_arguments)]
 async fn fetch_advanced_with_client_and_progress(
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -608,7 +659,11 @@ async fn fetch_advanced_with_client_and_progress(
             .into());
         }
 
-        let mut req = client.request(method.clone(), url);
+        let mut req = attach_invocation_headers(
+            client.request(method.clone(), url),
+            url,
+            context,
+        );
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
@@ -755,6 +810,7 @@ async fn fetch_advanced_with_client_and_progress(
 /// Downloads a file from specified mirrors
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch_mirrors(
+    context: &InvocationContext,
     mirrors: &[&str],
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -770,6 +826,7 @@ pub async fn fetch_mirrors(
 
     for (index, mirror) in mirrors.iter().enumerate() {
         let result = fetch_with_client(
+            context,
             mirror,
             sha1,
             download_meta,
@@ -790,6 +847,7 @@ pub async fn fetch_mirrors(
 
 #[tracing::instrument(skip(semaphore, progress))]
 pub async fn fetch_mirrors_with_progress(
+    context: &InvocationContext,
     mirrors: &[&str],
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -806,6 +864,7 @@ pub async fn fetch_mirrors_with_progress(
 
     for (index, mirror) in mirrors.iter().enumerate() {
         let result = fetch_with_client_progress(
+            context,
             mirror,
             sha1,
             download_meta,
@@ -828,6 +887,7 @@ pub async fn fetch_mirrors_with_progress(
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn post_json(
+    context: &InvocationContext,
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
@@ -835,7 +895,12 @@ pub async fn post_json(
 ) -> crate::Result<()> {
     let _permit = semaphore.0.acquire().await?;
 
-    let mut req = INSECURE_REQWEST_CLIENT.post(url).json(&json_body);
+    let mut req = attach_invocation_headers(
+        INSECURE_REQWEST_CLIENT.post(url),
+        url,
+        context,
+    )
+    .json(&json_body);
 
     if let Some(creds) =
         crate::state::ModrinthCredentials::get_active(exec).await?
@@ -936,6 +1001,116 @@ pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     .await?;
 
     Ok(hash)
+}
+
+#[cfg(test)]
+mod invocation_context_tests {
+    use super::*;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    use tokio::net::TcpListener;
+
+    fn built_request(
+        url: &str,
+        context: &InvocationContext,
+    ) -> reqwest::Request {
+        attach_invocation_headers(
+            INSECURE_REQWEST_CLIENT.get(url),
+            url,
+            context,
+        )
+        .build()
+        .unwrap()
+    }
+
+    #[test]
+    fn approved_origins_receive_invocation_headers() {
+        let context = InvocationContext::new("navigation/instance/content");
+        let request = built_request(
+            concat!(env!("MODRINTH_API_URL"), "project/example"),
+            &context,
+        );
+
+        assert_eq!(
+            request.headers().get(reqwest::header::REFERER).unwrap(),
+            "https://tauri.modrinth.app/_rc/navigation/instance/content"
+        );
+        assert_eq!(
+            request.headers().get(REQUEST_CONTEXT_HEADER).unwrap(),
+            "navigation/instance/content"
+        );
+    }
+
+    #[test]
+    fn third_party_origins_do_not_receive_invocation_headers() {
+        let context = InvocationContext::new("instance/install");
+        let request = built_request("https://example.com/file.jar", &context);
+
+        assert!(!request.headers().contains_key(reqwest::header::REFERER));
+        assert!(!request.headers().contains_key(REQUEST_CONTEXT_HEADER));
+    }
+
+    #[test]
+    fn similarly_prefixed_hosts_are_not_approved() {
+        let context = InvocationContext::new("navigation/browse");
+        let approved = url::Url::parse(env!("MODRINTH_API_URL")).unwrap();
+        let url = format!(
+            "{}://{}.example.com/project",
+            approved.scheme(),
+            approved.host_str().unwrap()
+        );
+        let request = built_request(&url, &context);
+
+        assert!(!request.headers().contains_key(reqwest::header::REFERER));
+        assert!(!request.headers().contains_key(REQUEST_CONTEXT_HEADER));
+    }
+
+    #[test]
+    fn every_retry_attempt_retains_the_same_context() {
+        let context = InvocationContext::new("new/frontend/cause");
+        let url = concat!(env!("MODRINTH_API_URL_V3"), "projects");
+
+        for _ in 0..=FETCH_ATTEMPTS {
+            let request = built_request(url, &context);
+            assert_eq!(
+                request.headers().get(REQUEST_CONTEXT_HEADER).unwrap(),
+                context.request_context_header()
+            );
+            assert_eq!(
+                request.headers().get(reqwest::header::REFERER).unwrap(),
+                context.referer().as_str()
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn disabling_automatic_referer_keeps_redirects_enabled() {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+
+        let server = tokio::spawn(async move {
+            for response in [
+                "HTTP/1.1 302 Found\r\nLocation: /final\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                "HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok",
+            ] {
+                let (mut stream, _) = listener.accept().await.unwrap();
+                let mut request = vec![0; 1024];
+                stream.read(&mut request).await.unwrap();
+                stream.write_all(response.as_bytes()).await.unwrap();
+            }
+        });
+
+        let response = reqwest_client_builder()
+            .build()
+            .unwrap()
+            .get(format!("http://{address}/redirect"))
+            .send()
+            .await
+            .unwrap();
+
+        assert_eq!(response.url().path(), "/final");
+        assert_eq!(response.bytes().await.unwrap(), "ok");
+        server.await.unwrap();
+    }
 }
 
 pub async fn sha1_file_async(

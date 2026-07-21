@@ -19,7 +19,7 @@ use sysinfo::{MemoryRefreshKind, RefreshKind};
 use crate::util::io;
 use crate::util::jre::extract_java_version;
 use crate::{
-    LoadingBarType, State,
+    InvocationContext, LoadingBarType, State,
     util::jre::{self},
 };
 
@@ -59,22 +59,27 @@ pub async fn find_filtered_jres(
     })
 }
 
-pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
-    auto_install_java_with_loading(java_version, true).await
+pub async fn auto_install_java(
+    context: &InvocationContext,
+    java_version: u32,
+) -> crate::Result<PathBuf> {
+    auto_install_java_with_loading(context, java_version, true).await
 }
 
 pub async fn auto_install_java_with_loading(
+    context: &InvocationContext,
     java_version: u32,
     show_loading: bool,
 ) -> crate::Result<PathBuf> {
-    auto_install_java_inner(java_version, show_loading, None).await
+    auto_install_java_inner(context, java_version, show_loading, None).await
 }
 
 pub async fn auto_install_java_with_reporter(
+    context: &InvocationContext,
     java_version: u32,
     reporter: InstallProgressReporter,
 ) -> crate::Result<PathBuf> {
-    auto_install_java_inner(java_version, false, Some(reporter)).await
+    auto_install_java_inner(context, java_version, false, Some(reporter)).await
 }
 
 const JAVA_INSTALL_STEPS: u64 = 4;
@@ -111,6 +116,7 @@ fn java_step_progress(current: u64) -> InstallProgress {
 }
 
 async fn auto_install_java_inner(
+    context: &InvocationContext,
     java_version: u32,
     show_loading: bool,
     reporter: Option<InstallProgressReporter>,
@@ -167,6 +173,7 @@ async fn auto_install_java_inner(
             .await?;
     }
     let packages = fetch_json::<Vec<Package>>(
+        context,
         Method::GET,
         &metadata_url,
         None,
@@ -235,6 +242,7 @@ async fn auto_install_java_inner(
             };
 
             fetch_advanced_with_progress(
+                context,
                 Method::GET,
                 &download.download_url,
                 None,
@@ -250,6 +258,7 @@ async fn auto_install_java_inner(
             .await?
         } else {
             fetch_advanced(
+                context,
                 Method::GET,
                 &download.download_url,
                 None,

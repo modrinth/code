@@ -196,8 +196,10 @@ pub async fn remove_server_from_instance(
 #[tauri::command]
 pub async fn get_instance_protocol_version(
     instance_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Option<ProtocolVersion>> {
-    Ok(worlds::get_instance_protocol_version(instance_id).await?)
+    let context = invocation_context;
+    Ok(worlds::get_instance_protocol_version(&context, instance_id).await?)
 }
 
 #[tauri::command]
@@ -212,9 +214,15 @@ pub async fn get_server_status(
 pub async fn start_join_singleplayer_world(
     instance_id: &str,
     world: String,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<ProcessMetadata> {
-    let process =
-        instance::run(instance_id, QuickPlayType::Singleplayer(world)).await?;
+    let context = invocation_context;
+    let process = instance::run(
+        &context,
+        instance_id,
+        QuickPlayType::Singleplayer(world),
+    )
+    .await?;
 
     Ok(process)
 }
@@ -223,8 +231,11 @@ pub async fn start_join_singleplayer_world(
 pub async fn start_join_server(
     instance_id: &str,
     address: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<ProcessMetadata> {
+    let context = invocation_context;
     let process = instance::run(
+        &context,
         instance_id,
         QuickPlayType::Server(ServerAddress::Unresolved(address.to_owned())),
     )

@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core'
+import { invoke } from '@/helpers/invoke'
 
 import { install_job_listener } from './events'
 import type { InstanceLink, InstanceLoader } from './types'

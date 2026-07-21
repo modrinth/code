@@ -1,6 +1,7 @@
 use super::content::get_projects;
 use super::get::get;
 use super::paths::get_full_path;
+use crate::InvocationContext;
 use crate::event::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::pack::install_from::{
@@ -20,6 +21,7 @@ use tokio::io::AsyncReadExt;
 
 #[tracing::instrument(skip_all)]
 pub async fn export_mrpack(
+    context: &InvocationContext,
     instance_id: &str,
     export_path: PathBuf,
     included_export_candidates: Vec<String>,
@@ -54,7 +56,7 @@ pub async fn export_mrpack(
     let mut writer = ZipFileWriter::with_tokio(&mut file);
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
-        create_mrpack_json(&metadata, version_id, description).await?;
+        create_mrpack_json(context, &metadata, version_id, description).await?;
     packfile.files.retain(|f| {
         is_export_candidate_included(
             f.path.as_str(),
@@ -176,6 +178,7 @@ fn pack_get_relative_path(
 
 #[tracing::instrument(skip_all)]
 pub async fn create_mrpack_json(
+    context: &InvocationContext,
     metadata: &InstanceMetadata,
     version_id: String,
     description: Option<String>,
@@ -212,6 +215,7 @@ pub async fn create_mrpack_json(
 
     let state = State::get().await?;
     let projects = get_projects(
+        context,
         &metadata.instance.id,
         Some(CacheBehaviour::MustRevalidate),
     )
@@ -223,6 +227,7 @@ pub async fn create_mrpack_json(
     })
     .collect::<Vec<_>>();
     let versions = CachedEntry::get_version_many(
+        context,
         &projects.iter().map(|x| &*x.1).collect::<Vec<_>>(),
         None,
         &state.pool,

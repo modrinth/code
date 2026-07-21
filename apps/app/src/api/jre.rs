@@ -53,8 +53,12 @@ pub async fn jre_test_jre(path: PathBuf, major_version: u32) -> Result<bool> {
 
 // Auto installs java for the given java version
 #[tauri::command]
-pub async fn jre_auto_install_java(java_version: u32) -> Result<PathBuf> {
-    Ok(jre::auto_install_java(java_version).await?)
+pub async fn jre_auto_install_java(
+    java_version: u32,
+    invocation_context: theseus::InvocationContext,
+) -> Result<PathBuf> {
+    let context = invocation_context;
+    Ok(jre::auto_install_java(&context, java_version).await?)
 }
 
 // Gets the maximum memory a system has available.

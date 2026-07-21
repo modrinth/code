@@ -177,6 +177,7 @@ async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
 
 // #[tracing::instrument]
 pub async fn import_mmc(
+    context: &crate::InvocationContext,
     mmc_base_path: PathBuf,  // path to base mmc folder
     instance_folder: String, // instance folder in mmc_base_path
     instance_id: &str,
@@ -235,23 +236,24 @@ pub async fn import_mmc(
 
                 // Modrinth Managed Pack
                 // Kept separate as we may in the future want to add special handling for modrinth managed packs
-                import_mmc_unmanaged(instance_id, minecraft_folder, "Imported Modrinth Modpack".to_string(), description, mmc_pack, reporter, details).await?;
+                import_mmc_unmanaged(context, instance_id, minecraft_folder, "Imported Modrinth Modpack".to_string(), description, mmc_pack, reporter, details).await?;
             }
             Some(MMCManagedPackType::Flame | MMCManagedPackType::ATLauncher) => {
                 // For flame/atlauncher managed packs
                 // Treat as unmanaged, but with 'minecraft' folder instead of '.minecraft'
-                import_mmc_unmanaged(instance_id, minecraft_folder, "Imported Modpack".to_string(), description, mmc_pack, reporter, details).await?;
+                import_mmc_unmanaged(context, instance_id, minecraft_folder, "Imported Modpack".to_string(), description, mmc_pack, reporter, details).await?;
             },
             Some(_) => {
                 // For managed packs that aren't modrinth, flame, atlauncher
                 // Treat as unmanaged
-                import_mmc_unmanaged(instance_id, minecraft_folder, "ImportedModpack".to_string(), description, mmc_pack, reporter, details).await?;
+                import_mmc_unmanaged(context, instance_id, minecraft_folder, "ImportedModpack".to_string(), description, mmc_pack, reporter, details).await?;
             },
             _ => return Err(crate::ErrorKind::InputError("Instance is managed, but managed pack type not specified in instance.cfg".to_string()).into())
         }
     } else {
         // Directly import unmanaged pack
         import_mmc_unmanaged(
+            context,
             instance_id,
             minecraft_folder,
             "Imported Modpack".to_string(),
@@ -266,6 +268,7 @@ pub async fn import_mmc(
 }
 
 async fn import_mmc_unmanaged(
+    context: &crate::InvocationContext,
     instance_id: &str,
     minecraft_folder: PathBuf,
     backup_name: String,
@@ -315,6 +318,7 @@ async fn import_mmc_unmanaged(
         .collect();
 
     install_from::set_instance_information(
+        context,
         instance_id.to_string(),
         &description,
         &backup_name,
@@ -327,6 +331,7 @@ async fn import_mmc_unmanaged(
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
     finish_import(
+        context,
         instance_id,
         minecraft_folder,
         &state.io_semaphore,

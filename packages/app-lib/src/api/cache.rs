@@ -1,3 +1,4 @@
+use crate::InvocationContext;
 use crate::state::{
     CacheBehaviour, CacheValueType, CachedEntry, Organization, Project,
     ProjectV3, SearchResults, SearchResultsV3, TeamMember, User, Version,
@@ -9,23 +10,25 @@ macro_rules! impl_cache_methods {
             paste::paste! {
                 #[tracing::instrument]
                 pub async fn [<get_ $variant:snake>](
+                    context: &InvocationContext,
                     id: &str,
                     cache_behaviour: Option<CacheBehaviour>,
                 ) -> crate::Result<Option<$type>>
                 {
                     let state = crate::State::get().await?;
-                    Ok(CachedEntry::[<get_ $variant:snake _many>](&[id], cache_behaviour, &state.pool, &state.api_semaphore).await?.into_iter().next())
+                    Ok(CachedEntry::[<get_ $variant:snake _many>](context, &[id], cache_behaviour, &state.pool, &state.api_semaphore).await?.into_iter().next())
                 }
 
                 #[tracing::instrument]
                 pub async fn [<get_ $variant:snake _many>](
+                    context: &InvocationContext,
                     ids: &[&str],
                     cache_behaviour: Option<CacheBehaviour>,
                 ) -> crate::Result<Vec<$type>>
                 {
                     let state = crate::State::get().await?;
                     let entries =
-                        CachedEntry::[<get_ $variant:snake _many>](ids, None, &state.pool, &state.api_semaphore).await?;
+                        CachedEntry::[<get_ $variant:snake _many>](context, ids, None, &state.pool, &state.api_semaphore).await?;
 
                     Ok(entries)
                 }
@@ -58,11 +61,13 @@ pub async fn purge_cache_types(
 /// Uses the cache system with the ProjectVersions cache type.
 #[tracing::instrument]
 pub async fn get_project_versions(
+    context: &InvocationContext,
     project_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Option<Vec<Version>>> {
     let state = crate::State::get().await?;
     CachedEntry::get_project_versions(
+        context,
         project_id,
         cache_behaviour,
         &state.pool,

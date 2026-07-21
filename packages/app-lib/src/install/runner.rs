@@ -6,7 +6,6 @@ use super::model::{
     InstallRequest, InstallRollbackState, InstallTarget,
 };
 use super::{diagnostics, recovery, store};
-use crate::ErrorKind;
 use crate::api::pack::install_from::{
     CreatePackLocation, generate_pack_from_file,
     generate_pack_from_version_id_with_reporter, get_instance_from_pack,
@@ -19,11 +18,13 @@ use crate::state::{
     ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
+use crate::{ErrorKind, InvocationContext};
 use std::collections::HashSet;
 use std::path::PathBuf;
 use uuid::Uuid;
 
 pub async fn create_instance(
+    context: &InvocationContext,
     name: String,
     game_version: String,
     loader: ModLoader,
@@ -31,64 +32,89 @@ pub async fn create_instance(
     icon_path: Option<String>,
     link: InstanceLink,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::CreateInstance {
-        name,
-        game_version,
-        loader,
-        loader_version,
-        icon_path,
-        link,
-    })
+    start(
+        context,
+        InstallRequest::CreateInstance {
+            name,
+            game_version,
+            loader,
+            loader_version,
+            icon_path,
+            link,
+        },
+    )
     .await
 }
 
 pub async fn create_modpack_instance(
+    context: &InvocationContext,
     location: CreatePackLocation,
     post_install_edit: Option<InstallPostInstallEdit>,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::CreateModpackInstance {
-        location,
-        post_install_edit,
-    })
+    start(
+        context,
+        InstallRequest::CreateModpackInstance {
+            location,
+            post_install_edit,
+        },
+    )
     .await
 }
 
 pub async fn import_instance(
+    context: &InvocationContext,
     launcher_type: crate::api::pack::import::ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::ImportInstance {
-        launcher_type,
-        base_path,
-        instance_folder,
-    })
+    start(
+        context,
+        InstallRequest::ImportInstance {
+            launcher_type,
+            base_path,
+            instance_folder,
+        },
+    )
     .await
 }
 
 pub async fn duplicate_instance(
+    context: &InvocationContext,
     source_instance_id: String,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::DuplicateInstance { source_instance_id }).await
+    start(
+        context,
+        InstallRequest::DuplicateInstance { source_instance_id },
+    )
+    .await
 }
 
 pub async fn install_existing_instance(
+    context: &InvocationContext,
     instance_id: String,
     force: bool,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::InstallExistingInstance { instance_id, force }).await
+    start(
+        context,
+        InstallRequest::InstallExistingInstance { instance_id, force },
+    )
+    .await
 }
 
 pub async fn install_pack_to_existing_instance(
+    context: &InvocationContext,
     instance_id: String,
     location: CreatePackLocation,
     post_install_edit: Option<InstallPostInstallEdit>,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::InstallPackToExistingInstance {
-        instance_id,
-        location,
-        post_install_edit,
-    })
+    start(
+        context,
+        InstallRequest::InstallPackToExistingInstance {
+            instance_id,
+            location,
+            post_install_edit,
+        },
+    )
     .await
 }
 
@@ -114,7 +140,10 @@ pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
     diagnostics::build_job_support_details(&job, &state).await
 }
 
-pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
+pub async fn retry_job(
+    context: &InvocationContext,
+    job_id: Uuid,
+) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
 
@@ -138,7 +167,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.progress.phase = InstallPhaseId::PreparingInstance;
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
-    prepare_initial_instance(&mut job.state, &state).await?;
+    prepare_initial_instance(context, &mut job.state, &state).await?;
     job.state.record_event(InstallJobEventKind::JobQueued {
         kind: job.state.request.kind(),
     });
@@ -151,7 +180,7 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     )
     .await?;
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(job_id);
+    spawn_job(job_id, context.clone());
 
     Ok(record.snapshot())
 }
@@ -214,19 +243,23 @@ pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
     store::dismiss(job_id, &state).await
 }
 
-async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
+async fn start(
+    context: &InvocationContext,
+    request: InstallRequest,
+) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
-    prepare_initial_instance(&mut job_state, &state).await?;
+    prepare_initial_instance(context, &mut job_state, &state).await?;
     let record =
         store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
     emit_install_job(&record.snapshot()).await?;
-    spawn_job(id);
+    spawn_job(id, context.clone());
     Ok(record.snapshot())
 }
 
 async fn prepare_initial_instance(
+    context: &InvocationContext,
     job_state: &mut InstallJobState,
     state: &State,
 ) -> crate::Result<()> {
@@ -240,6 +273,7 @@ async fn prepare_initial_instance(
             link,
         } => {
             let metadata = crate::api::instance::create(
+                context,
                 name,
                 game_version,
                 loader,
@@ -259,7 +293,7 @@ async fn prepare_initial_instance(
             location,
             post_install_edit,
         } => {
-            let preview = get_instance_from_pack(location).await?;
+            let preview = get_instance_from_pack(context, location).await?;
             let name = post_install_edit
                 .as_ref()
                 .and_then(|edit| edit.name.clone())
@@ -281,6 +315,7 @@ async fn prepare_initial_instance(
                 .or_else(|| preview.link.clone())
                 .unwrap_or(InstanceLink::Unmanaged);
             let metadata = crate::api::instance::create(
+                context,
                 name,
                 preview.game_version,
                 preview.modloader,
@@ -300,6 +335,7 @@ async fn prepare_initial_instance(
             instance_folder, ..
         } => {
             let metadata = crate::api::instance::create(
+                context,
                 instance_folder,
                 "1.19.4".to_string(),
                 ModLoader::Vanilla,
@@ -325,6 +361,7 @@ async fn prepare_initial_instance(
                         )
                     })?;
             let created = crate::api::instance::create(
+                context,
                 metadata.instance.name,
                 metadata.applied_content_set.game_version,
                 metadata.applied_content_set.loader,
@@ -351,9 +388,9 @@ async fn prepare_initial_instance(
     Ok(())
 }
 
-fn spawn_job(job_id: Uuid) {
+fn spawn_job(job_id: Uuid, context: InvocationContext) {
     tokio::spawn(async move {
-        if let Err(error) = run_job(job_id).await {
+        if let Err(error) = run_job(&context, job_id).await {
             tracing::error!(
                 "Install job {job_id} failed to update state: {error}"
             );
@@ -361,7 +398,10 @@ fn spawn_job(job_id: Uuid) {
     });
 }
 
-async fn run_job(job_id: Uuid) -> crate::Result<()> {
+async fn run_job(
+    context: &InvocationContext,
+    job_id: Uuid,
+) -> crate::Result<()> {
     let state = State::get().await?;
     let mut job = store::get_required(job_id, &state).await?;
 
@@ -387,7 +427,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
     .await?;
     emit_install_job(&record.snapshot()).await?;
 
-    let result = run_request(job_id, &mut job_state, &state).await;
+    let result = run_request(context, job_id, &mut job_state, &state).await;
     if let Ok(record) = store::get_required(job_id, &state).await {
         job_state = record.state;
     }
@@ -468,6 +508,7 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
 }
 
 async fn run_request(
+    context: &InvocationContext,
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -506,7 +547,7 @@ async fn run_request(
                 },
             )
             .await?;
-            let context =
+            let launch_context =
                 crate::state::instances::commands::get_instance_launch_context(
                     &instance_id,
                     &state.pool,
@@ -516,7 +557,8 @@ async fn run_request(
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
             crate::launcher::install_minecraft_with_reporter(
-                &context,
+                context,
+                &launch_context,
                 false,
                 Some(InstallProgressReporter::new(job_id, job_state.clone())),
             )
@@ -542,6 +584,7 @@ async fn run_request(
             )
             .await?;
             install_pack(
+                context,
                 job_id,
                 job_state,
                 location,
@@ -575,6 +618,7 @@ async fn run_request(
             )
             .await?;
             crate::api::pack::import::import_instance_with_reporter(
+                context,
                 &instance_id,
                 launcher_type,
                 base_path,
@@ -609,7 +653,7 @@ async fn run_request(
                 InstallPhaseDetails::Empty,
             )
             .await?;
-            let context =
+            let launch_context =
                 crate::state::instances::commands::get_instance_launch_context(
                     &instance_id,
                     &state.pool,
@@ -619,7 +663,8 @@ async fn run_request(
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
             crate::launcher::install_minecraft_with_reporter(
-                &context,
+                context,
+                &launch_context,
                 false,
                 Some(InstallProgressReporter::new(job_id, job_state.clone())),
             )
@@ -637,7 +682,7 @@ async fn run_request(
                 InstallPhaseDetails::Empty,
             )
             .await?;
-            let context =
+            let launch_context =
                 crate::state::instances::commands::get_instance_launch_context(
                     &instance_id,
                     &state.pool,
@@ -647,7 +692,8 @@ async fn run_request(
                     crate::ErrorKind::InputError("Unknown instance".to_string())
                 })?;
             crate::launcher::install_minecraft_with_reporter(
-                &context,
+                context,
+                &launch_context,
                 force,
                 Some(InstallProgressReporter::new(job_id, job_state.clone())),
             )
@@ -661,6 +707,7 @@ async fn run_request(
         } => {
             prepare_existing_rollback(job_state, state, &instance_id).await?;
             let disabled_project_ids = remove_existing_pack_content(
+                context,
                 job_id,
                 job_state,
                 state,
@@ -668,6 +715,7 @@ async fn run_request(
             )
             .await?;
             install_pack(
+                context,
                 job_id,
                 job_state,
                 location,
@@ -715,6 +763,7 @@ async fn apply_post_install_edit(
 }
 
 async fn remove_existing_pack_content(
+    context: &InvocationContext,
     job_id: Uuid,
     job_state: &InstallJobState,
     state: &State,
@@ -761,6 +810,7 @@ async fn remove_existing_pack_content(
         .collect::<HashSet<_>>();
     let reporter = InstallProgressReporter::new(job_id, job_state.clone());
     let old_pack = generate_pack_from_version_id_with_reporter(
+        context,
         project_id.clone(),
         version_id.clone(),
         metadata.instance.name.clone(),
@@ -772,6 +822,7 @@ async fn remove_existing_pack_content(
     .await?;
 
     crate::api::pack::install_mrpack::remove_all_related_files(
+        context,
         instance_id.to_string(),
         old_pack.file,
     )
@@ -871,6 +922,7 @@ async fn restore_disabled_projects(
 }
 
 async fn install_pack(
+    context: &InvocationContext,
     job_id: Uuid,
     job_state: &mut InstallJobState,
     location: CreatePackLocation,
@@ -902,6 +954,7 @@ async fn install_pack(
                 )
                 .await?;
             generate_pack_from_version_id_with_reporter(
+                context,
                 project_id,
                 version_id,
                 title,
@@ -925,6 +978,7 @@ async fn install_pack(
     };
 
     install_zipped_mrpack_files_with_reporter(
+        context,
         create_pack,
         false,
         reason,

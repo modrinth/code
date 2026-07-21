@@ -1,4 +1,5 @@
 //! Theseus state management system
+use crate::InvocationContext;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
@@ -114,20 +115,23 @@ impl State {
             )
             .await;
 
+            let auth_context = InvocationContext::new("auth/session_refresh");
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 instances::refresh_all_instances(),
                 Settings::migrate(&state.pool),
-                ModrinthCredentials::refresh_all(),
+                ModrinthCredentials::refresh_all(&auth_context),
             );
 
             if let Err(e) = res {
                 tracing::error!("Error running discord RPC: {e}");
             }
 
+            let friends_context = InvocationContext::new("background/friends");
             let _ = state
                 .friends_socket
                 .connect(
+                    &friends_context,
                     &state.pool,
                     &state.api_semaphore,
                     &state.process_manager,

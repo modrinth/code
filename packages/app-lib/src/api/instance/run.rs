@@ -1,4 +1,5 @@
 use super::content::get_projects;
+use crate::InvocationContext;
 use crate::server_address::ServerAddress;
 use crate::state::{
     Credentials, InstanceLink, ProcessMetadata, Settings, State,
@@ -20,6 +21,7 @@ pub enum QuickPlayType {
 
 #[tracing::instrument]
 pub async fn run(
+    invocation_context: &InvocationContext,
     instance_id: &str,
     quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
@@ -28,18 +30,25 @@ pub async fn run(
         .await?
         .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
-    run_credentials(instance_id, &default_account, quick_play_type).await
+    run_credentials(
+        invocation_context,
+        instance_id,
+        &default_account,
+        quick_play_type,
+    )
+    .await
 }
 
 #[tracing::instrument(skip(credentials))]
 async fn run_credentials(
+    invocation_context: &InvocationContext,
     instance_id: &str,
     credentials: &Credentials,
     quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
-    let context =
+    let launch_context =
         crate::state::instances::commands::get_instance_launch_context(
             instance_id,
             &state.pool,
@@ -51,7 +60,7 @@ async fn run_credentials(
             ))
         })?;
 
-    let pre_launch_hooks = context
+    let pre_launch_hooks = launch_context
         .launch_overrides
         .hooks
         .pre_launch
@@ -72,7 +81,7 @@ async fn run_credentials(
                 state
                     .directories
                     .instances_dir()
-                    .join(&context.instance.path),
+                    .join(&launch_context.instance.path),
             )?;
             let result = Command::new(command)
                 .args(cmd)
@@ -93,29 +102,32 @@ async fn run_credentials(
         }
     }
 
-    let java_args = context
+    let java_args = launch_context
         .launch_overrides
         .extra_launch_args
         .clone()
         .unwrap_or(settings.extra_launch_args);
-    let wrapper = context
+    let wrapper = launch_context
         .launch_overrides
         .hooks
         .wrapper
         .clone()
         .or(settings.hooks.wrapper)
         .filter(|hook_command| !hook_command.is_empty());
-    let memory = context.launch_overrides.memory.unwrap_or(settings.memory);
-    let resolution = context
+    let memory = launch_context
+        .launch_overrides
+        .memory
+        .unwrap_or(settings.memory);
+    let resolution = launch_context
         .launch_overrides
         .game_resolution
         .unwrap_or(settings.game_resolution);
-    let env_args = context
+    let env_args = launch_context
         .launch_overrides
         .custom_env_vars
         .clone()
         .unwrap_or(settings.custom_env_vars);
-    let post_exit_hook = context
+    let post_exit_hook = launch_context
         .launch_overrides
         .hooks
         .post_exit
@@ -124,13 +136,13 @@ async fn run_credentials(
         .filter(|hook_command| !hook_command.is_empty());
 
     let mut mc_set_options: Vec<(String, String)> = vec![];
-    if let Some(fullscreen) = context.launch_overrides.force_fullscreen {
+    if let Some(fullscreen) = launch_context.launch_overrides.force_fullscreen {
         mc_set_options.push(("fullscreen".to_string(), fullscreen.to_string()));
     } else if settings.force_fullscreen {
         mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
     }
 
-    if let Some(project_id) = server_play_project_id(&context.link)
+    if let Some(project_id) = server_play_project_id(&launch_context.link)
         && !project_id.trim().is_empty()
     {
         let server_id = uuid::Uuid::new_v4().to_string();
@@ -148,6 +160,7 @@ async fn run_credentials(
         match join_result {
             Ok(resp) if resp.status().is_success() => {
                 let result = fetch::post_json(
+                    invocation_context,
                     concat!(
                         env!("MODRINTH_API_BASE_URL"),
                         "analytics/minecraft-server-play"
@@ -181,6 +194,7 @@ async fn run_credentials(
 
     crate::minecraft_skins::flush_pending_skin_change().await?;
     crate::launcher::launch_minecraft(
+        invocation_context,
         &java_args,
         &env_args,
         &mc_set_options,
@@ -189,7 +203,7 @@ async fn run_credentials(
         &resolution,
         credentials,
         post_exit_hook,
-        &context,
+        &launch_context,
         quick_play_type,
     )
     .await
@@ -224,10 +238,11 @@ pub async fn kill(instance_id: &str) -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn try_update_playtime_by_instance_id(
+    invocation_context: &InvocationContext,
     instance_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let context =
+    let launch_context =
         crate::state::instances::commands::get_instance_launch_context(
             instance_id,
             &state.pool,
@@ -238,9 +253,9 @@ pub async fn try_update_playtime_by_instance_id(
                 "Tried to update playtime for nonexistent instance {instance_id}!"
             ))
         })?;
-    let updated_recent_playtime = context.instance.recent_time_played;
+    let updated_recent_playtime = launch_context.instance.recent_time_played;
     let res = if updated_recent_playtime > 0 {
-        let modrinth_pack_version_id = match &context.link {
+        let modrinth_pack_version_id = match &launch_context.link {
             InstanceLink::ModrinthModpack { version_id, .. }
             | InstanceLink::ServerProjectModpack {
                 content_version_id: version_id,
@@ -258,13 +273,15 @@ pub async fn try_update_playtime_by_instance_id(
         };
         let playtime_update_json = json!({
             "seconds": updated_recent_playtime,
-            "loader": context.applied_content_set.loader.as_str(),
-            "game_version": &context.applied_content_set.game_version,
+            "loader": launch_context.applied_content_set.loader.as_str(),
+            "game_version": &launch_context.applied_content_set.game_version,
             "parent": modrinth_pack_version_id,
         });
         let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
 
-        for (_, project) in get_projects(instance_id, None).await? {
+        for (_, project) in
+            get_projects(invocation_context, instance_id, None).await?
+        {
             if let Some(metadata) = project.metadata {
                 hashmap
                     .insert(metadata.version_id, playtime_update_json.clone());
@@ -272,6 +289,7 @@ pub async fn try_update_playtime_by_instance_id(
         }
 
         fetch::post_json(
+            invocation_context,
             concat!(env!("MODRINTH_API_BASE_URL"), "analytics/playtime"),
             serde_json::to_value(hashmap)?,
             &state.api_semaphore,
@@ -284,7 +302,7 @@ pub async fn try_update_playtime_by_instance_id(
 
     if res.is_ok() {
         crate::state::instances::commands::mark_instance_playtime_submitted(
-            &context.instance.id,
+            &launch_context.instance.id,
             updated_recent_playtime,
             &state.pool,
         )

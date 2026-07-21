@@ -1,12 +1,15 @@
-use crate::State;
 use crate::state::CachedEntry;
+use crate::{InvocationContext, State};
 pub use daedalus::minecraft::VersionManifest;
 pub use daedalus::modded::Manifest;
 
 #[tracing::instrument]
-pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
+pub async fn get_minecraft_versions(
+    context: &InvocationContext,
+) -> crate::Result<VersionManifest> {
     let state = State::get().await?;
     let minecraft_versions = CachedEntry::get_minecraft_manifest(
+        context,
         None,
         &state.pool,
         &state.api_semaphore,
@@ -20,11 +23,15 @@ pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
 }
 
 // #[tracing::instrument]
-pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
+pub async fn get_loader_versions(
+    context: &InvocationContext,
+    loader: &str,
+) -> crate::Result<Manifest> {
     let state = State::get().await?;
     let cache_key =
         daedalus::modded::loader_manifest_metadata(loader).cache_key;
     let loaders = CachedEntry::get_loader_manifest(
+        context,
         &cache_key,
         None,
         &state.pool,

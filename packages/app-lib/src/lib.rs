@@ -16,6 +16,7 @@ mod event;
 pub mod install;
 mod launcher;
 mod logger;
+mod operation;
 mod state;
 
 pub use api::*;
@@ -25,6 +26,7 @@ pub use event::{
     emit::init_loading,
 };
 pub use logger::start_logger;
+pub use operation::{InvocationContext, REQUEST_CONTEXT_HEADER};
 pub use state::State;
 pub use util::fetch::DownloadReason;
 

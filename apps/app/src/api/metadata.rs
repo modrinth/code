@@ -13,12 +13,19 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 
 /// Gets the game versions from daedalus
 #[tauri::command]
-pub async fn metadata_get_game_versions() -> Result<VersionManifest> {
-    Ok(theseus::metadata::get_minecraft_versions().await?)
+pub async fn metadata_get_game_versions(
+    invocation_context: theseus::InvocationContext,
+) -> Result<VersionManifest> {
+    let context = invocation_context;
+    Ok(theseus::metadata::get_minecraft_versions(&context).await?)
 }
 
 /// Gets the fabric versions from daedalus
 #[tauri::command]
-pub async fn metadata_get_loader_versions(loader: &str) -> Result<Manifest> {
-    Ok(theseus::metadata::get_loader_versions(loader).await?)
+pub async fn metadata_get_loader_versions(
+    loader: &str,
+    invocation_context: theseus::InvocationContext,
+) -> Result<Manifest> {
+    let context = invocation_context;
+    Ok(theseus::metadata::get_loader_versions(&context, loader).await?)
 }

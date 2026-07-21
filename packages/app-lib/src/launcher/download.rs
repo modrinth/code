@@ -7,6 +7,7 @@ use crate::install::{
 use crate::instance::QuickPlayType;
 use crate::launcher::parse_rules;
 use crate::{
+    InvocationContext,
     event::{
         LoadingBarId,
         emit::{emit_loading, loading_try_for_each_concurrent},
@@ -142,24 +143,33 @@ impl MinecraftDownloadProgress {
 }
 
 async fn fetch_minecraft_file(
+    invocation_context: &InvocationContext,
     st: &State,
     url: &str,
     sha1: Option<&str>,
     expected_size: Option<u64>,
     progress: Option<MinecraftDownloadProgress>,
-    context: InstallErrorContext,
+    error_context: InstallErrorContext,
 ) -> crate::Result<bytes::Bytes> {
-    let mut context = context;
-    context.urls.push(url.to_string());
-    context.expected_hash = sha1.map(str::to_string);
-    context.expected_size = expected_size;
+    let mut error_context = error_context;
+    error_context.urls.push(url.to_string());
+    error_context.expected_hash = sha1.map(str::to_string);
+    error_context.expected_size = expected_size;
     if let Some(progress) = &progress {
-        progress.set_context(context.clone()).await?;
+        progress.set_context(error_context.clone()).await?;
     }
 
     let Some(progress) = progress else {
-        return fetch(url, sha1, None, None, &st.fetch_semaphore, &st.pool)
-            .await;
+        return fetch(
+            invocation_context,
+            url,
+            sha1,
+            None,
+            None,
+            &st.fetch_semaphore,
+            &st.pool,
+        )
+        .await;
     };
 
     let last_downloaded = Arc::new(AtomicU64::new(0));
@@ -178,6 +188,7 @@ async fn fetch_minecraft_file(
     };
 
     let bytes = match fetch_advanced_with_progress(
+        invocation_context,
         Method::GET,
         url,
         sha1,
@@ -194,7 +205,7 @@ async fn fetch_minecraft_file(
     {
         Ok(bytes) => bytes,
         Err(error) => {
-            progress.persist_failure_context(context).await;
+            progress.persist_failure_context(error_context).await;
             return Err(error);
         }
     };
@@ -384,6 +395,7 @@ fn missing_initial_minecraft_bytes(
 
 #[tracing::instrument(skip(st, version))]
 pub async fn download_minecraft(
+    context: &InvocationContext,
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -415,6 +427,7 @@ pub async fn download_minecraft(
 
     // 5
     let assets_index = download_assets_index(
+        context,
         st,
         version,
         loading_bar,
@@ -441,10 +454,10 @@ pub async fn download_minecraft(
 
     tokio::try_join! {
         // Total loading sums to 90/60
-        download_client(st, version, loading_bar, force, progress.clone()), // 9
-        download_log_config(st, version, loading_bar, force, progress.clone()),
-        download_assets(st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone()), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone()) // 40
+        download_client(context, st, version, loading_bar, force, progress.clone()), // 9
+        download_log_config(context, st, version, loading_bar, force, progress.clone()),
+        download_assets(context, st, version.assets == "legacy", &assets_index, loading_bar, amount, force, progress.clone()), // 40
+        download_libraries(context, st, version.libraries.as_slice(), &version.id, loading_bar, amount, java_arch, force, minecraft_updated, progress.clone()) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -454,6 +467,7 @@ pub async fn download_minecraft(
 #[tracing::instrument(skip_all, fields(version = version.id.as_str(), loader = ?loader))]
 
 pub async fn download_version_info(
+    context: &InvocationContext,
     st: &State,
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
@@ -494,6 +508,7 @@ pub async fn download_version_info(
                 .await?;
         }
         let mut info = fetch_json(
+            context,
             Method::GET,
             &version.url,
             None,
@@ -519,6 +534,7 @@ pub async fn download_version_info(
                     .await?;
             }
             let partial: d::modded::PartialVersionInfo = fetch_json(
+                context,
                 Method::GET,
                 &loader.url,
                 None,
@@ -548,6 +564,7 @@ pub async fn download_version_info(
 #[tracing::instrument(skip_all)]
 
 pub async fn download_client(
+    context: &InvocationContext,
     st: &State,
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -572,6 +589,7 @@ pub async fn download_client(
 
     if !path.exists() || force {
         let bytes = fetch_minecraft_file(
+            context,
             st,
             &client_download.url,
             Some(&client_download.sha1),
@@ -598,6 +616,7 @@ pub async fn download_client(
 #[tracing::instrument(skip_all)]
 
 pub async fn download_assets_index(
+    context: &InvocationContext,
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -617,6 +636,7 @@ pub async fn download_assets_index(
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
         let index = fetch_minecraft_file(
+            context,
             st,
             &version.asset_index.url,
             None,
@@ -645,6 +665,7 @@ pub async fn download_assets_index(
 #[tracing::instrument(skip(st, index))]
 
 pub async fn download_assets(
+    context: &InvocationContext,
     st: &State,
     with_legacy: bool,
     index: &AssetsIndex,
@@ -691,6 +712,7 @@ pub async fn download_assets(
                         if should_fetch_object {
                             let resource = fetch_cell
                                 .get_or_try_init(|| fetch_minecraft_file(
+                                    context,
                                     st,
                                     &url,
                                     Some(hash),
@@ -711,6 +733,7 @@ pub async fn download_assets(
                         if should_fetch_legacy {
                             let resource = fetch_cell
                                 .get_or_try_init(|| fetch_minecraft_file(
+                                    context,
                                     st,
                                     &url,
                                     Some(hash),
@@ -740,6 +763,7 @@ pub async fn download_assets(
 #[tracing::instrument(skip(st, libraries))]
 #[allow(clippy::too_many_arguments)]
 pub async fn download_libraries(
+    context: &InvocationContext,
     st: &State,
     libraries: &[Library],
     version: &str,
@@ -796,6 +820,7 @@ pub async fn download_libraries(
 
                 if let Some(native) = classifiers.get(&parsed_key) {
                     let data = fetch_minecraft_file(
+                        context,
                         st,
                         &native.url,
                         Some(&native.sha1),
@@ -851,6 +876,7 @@ pub async fn download_libraries(
                     && !artifact.url.is_empty()
                 {
                     let bytes = fetch_minecraft_file(
+                        context,
                         st,
                         &artifact.url,
                         Some(&artifact.sha1),
@@ -896,6 +922,7 @@ pub async fn download_libraries(
                     //
                     // See DEV-479.
                     match fetch(
+                        context,
                         &url,
                         None,
                         None,
@@ -938,6 +965,7 @@ pub async fn download_libraries(
 
 #[tracing::instrument(skip_all)]
 pub async fn download_log_config(
+    context: &InvocationContext,
     st: &State,
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -962,6 +990,7 @@ pub async fn download_log_config(
 
     if !path.exists() || force {
         let bytes = fetch_minecraft_file(
+            context,
             st,
             &log_download.url,
             Some(&log_download.sha1),

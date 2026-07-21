@@ -5,7 +5,7 @@
  */
 import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
-import { invoke } from '@tauri-apps/api/core'
+import { invoke } from '@/helpers/invoke'
 
 import type { InstallJobSnapshot } from './install'
 import type {

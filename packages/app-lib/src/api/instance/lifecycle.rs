@@ -1,3 +1,4 @@
+use crate::InvocationContext;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -11,6 +12,7 @@ use std::path::Path;
 #[tracing::instrument]
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn create(
+    context: &InvocationContext,
     name: String,
     game_version: String,
     modloader: ModLoader,
@@ -20,6 +22,7 @@ pub(crate) async fn create(
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
     let instance = crate::state::create_instance(
+        context,
         CreateInstance {
             name,
             path: None,

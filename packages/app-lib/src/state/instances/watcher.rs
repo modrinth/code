@@ -1,10 +1,10 @@
-use crate::State;
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
 use crate::state::{
     DirectoryInfo, InstanceInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
+use crate::{InvocationContext, State};
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::{DebounceEventResult, Debouncer, new_debouncer};
 use std::{collections::HashMap, sync::Arc, time::Duration};
@@ -34,6 +34,12 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
         tracing::info!(parent: &span, "Initing watcher");
         while let Some(res) = rx.recv().await {
             let _span = span.enter();
+            let context =
+                InvocationContext::new("instance/refresh/filesystem_watch");
+            tracing::debug!(
+                invocation_cause = %context.cause(),
+                "Processing filesystem watcher refresh"
+            );
 
             match res {
                 Ok(events) => {

@@ -125,6 +125,7 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
 #[tracing::instrument]
 
 pub async fn import_atlauncher(
+    context: &crate::InvocationContext,
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
     instance_id: &str,
@@ -178,6 +179,7 @@ pub async fn import_atlauncher(
     let minecraft_folder = atlauncher_instance_path;
 
     import_atlauncher_unmanaged(
+        context,
         instance_id,
         minecraft_folder,
         backup_name,
@@ -191,6 +193,7 @@ pub async fn import_atlauncher(
 }
 
 async fn import_atlauncher_unmanaged(
+    context: &crate::InvocationContext,
     instance_id: &str,
     minecraft_folder: PathBuf,
     backup_name: String,
@@ -214,6 +217,7 @@ async fn import_atlauncher_unmanaged(
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
+            context,
             &game_version,
             mod_loader,
             Some(&atinstance.launcher.loader_version.version),
@@ -264,6 +268,7 @@ async fn import_atlauncher_unmanaged(
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
     finish_import(
+        context,
         instance_id,
         minecraft_folder,
         &state.io_semaphore,
