@@ -11,7 +11,7 @@
 			</div>
 			<div class="relative h-full w-[96px] overflow-hidden mx-3">
 				<div class="absolute top-0 left-0 z-0 w-full flex grow-0 flex-col items-end p-0">
-					<img src="./steve.png" alt="" class="self-stretch" />
+					<img :src="steveImage" alt="" class="self-stretch" />
 				</div>
 				<div
 					class="absolute left-0 bottom-0 z-10 order-1 h-6 w-[120px] shrink-0 grow-0 bg-[linear-gradient(180deg,rgba(39,41,46,0)_0%,#27292E_80%,#27292E_100%)]"
@@ -72,6 +72,7 @@ import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
 import { inject, type Ref, ref } from 'vue'
 
+import steveImage from '@/assets/steve.webp'
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { login as loginFlow, set_default_user } from '@/helpers/auth.js'
