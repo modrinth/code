@@ -25,7 +25,6 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
-use reqwest::StatusCode;
 use serde::Deserialize;
 use validator::Validate;
 use xredis::RedisPool;
