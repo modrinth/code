@@ -296,9 +296,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Volver a descubrir"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Instalar contenido"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },

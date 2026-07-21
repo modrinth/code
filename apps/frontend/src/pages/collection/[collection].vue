@@ -72,7 +72,7 @@
 							:show-icon="false"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							class="hidden"
-							aria-label="Upload icon"
+							:aria-label="formatMessage(messages.uploadIconAriaLabel)"
 							@change="showPreviewImage"
 						/>
 					</div>
@@ -371,7 +371,7 @@
 					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
 						<nuxt-link class="mx-auto w-min" to="/discover/mods">
 							<CompassIcon class="size-5" />
-							Discover mods
+							{{ formatMessage(messages.discoverModsButton) }}
 						</nuxt-link>
 					</ButtonStyled>
 				</template>
@@ -533,6 +533,14 @@ const messages = defineMessages({
 	noProjectsLabel: {
 		id: 'collection.label.no-projects',
 		defaultMessage: 'No projects in collection yet',
+	},
+	discoverModsButton: {
+		id: 'collection.button.discover-mods',
+		defaultMessage: 'Discover mods',
+	},
+	uploadIconAriaLabel: {
+		id: 'collection.aria-label.upload-icon',
+		defaultMessage: 'Upload icon',
 	},
 	projectsCountLabel: {
 		id: 'collection.label.projects-count',

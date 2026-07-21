@@ -4067,9 +4067,6 @@
   "servers.plan.small.description": {
     "message": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {월간 결제} quarterly {분기별 결제} yearly {연간 결제} other {{interval} 결제}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "설정 완료"
   },

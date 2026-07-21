@@ -494,9 +494,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Install content to instance"
-  },
   "app.project.version.all-versions": {
     "message": "All versions"
   },
