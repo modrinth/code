@@ -25,7 +25,7 @@ const VERSIONS: VersionEntry[] = [
 	{
 		date: `2026-07-21T18:43:00+00:00`,
 		product: 'app',
-		version: '0.15.13',
+		version: '0.15.14',
 		body: `## Added
 - Added browse page header onto project pages when going into a project page from search.
 - Added support for the [Ears](https://modrinth.com/mod/ears) mod in the Skin selector.
