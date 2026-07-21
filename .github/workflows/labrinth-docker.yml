@@ -109,6 +109,10 @@ jobs:
             ~/.cargo/bin
           key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Ensure sccache directory exists
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        run: mkdir -p /mnt/sccache && chown $(id -u):$(id -g) /mnt/sccache
+
       - name: Mount sccache disk cache
         if: needs.skip-if-clean.outputs.internal == 'true'
         uses: useblacksmith/stickydisk@13af8883542ca949a717e70fef89d15edbb29d88 # v1.2.0
