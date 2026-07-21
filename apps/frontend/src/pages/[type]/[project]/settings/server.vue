@@ -120,14 +120,13 @@
 					</div>
 					<div v-else class="mt-2 text-sm">
 						<IntlFormatted :message-id="messages.srvRecordsHint">
-							<template #srv-tooltip>
-								<InfoIcon
+							<template #srv-tooltip="{ children }"
+								><component :is="() => normalizeChildren(children)" /><InfoIcon
 									v-tooltip="{
 										content: formatMessage(messages.srvRecordsTooltip),
 										popperClass: 'max-w-xs',
 									}"
-								/>
-							</template>
+							/></template>
 						</IntlFormatted>
 					</div>
 				</div>
@@ -253,7 +252,7 @@ const messages = defineMessages({
 	srvRecordsTooltip: {
 		id: 'project.settings.server.srv-records-tooltip',
 		defaultMessage:
-			"The address you enter here may have DNS SRV records _minecraft._tcp.'{'your domain'}' which point to your Minecraft server address and port.",
+			'The address you enter here may have DNS SRV records _minecraft._tcp.(your domain) which point to your Minecraft server address and port.',
 	},
 	bedrockAddressLabel: {
 		id: 'project.settings.server.bedrock-address-label',
