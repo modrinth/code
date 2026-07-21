@@ -265,6 +265,9 @@ vars! {
 
     DELPHI_URL: String = "";
 
+    SHARED_INSTANCES_URL: String = "";
+    SHARED_INSTANCES_KEY: String = "";
+
     AVALARA_1099_API_URL: String = "https://www.track1099.com/api";
     AVALARA_1099_API_KEY: String = "none";
     AVALARA_1099_API_TEAM_ID: String = "none";

@@ -8,6 +8,7 @@ use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -17,12 +18,15 @@ use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::error::Context;
+use crate::util::http::HTTP_CLIENT;
 use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
+use reqwest::StatusCode;
 use serde::Deserialize;
 use validator::Validate;
 
@@ -176,7 +180,25 @@ pub async fn report_create(
                 new_report.item_id.as_str(),
             )? as i64);
 
-            // TODO: validate that the shared instance exists
+            let url = format!(
+                "{}/v1/instances/{}",
+                ENV.SHARED_INSTANCES_URL, shared_instance_id.0
+            );
+            let instance_response = HTTP_CLIENT
+                .get(&url)
+                .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
+                .send()
+                .await
+                .wrap_internal_err(
+                    "failed to reach the shared instance service",
+                )?;
+
+            if !instance_response.status().is_success() {
+                return Err(ApiError::InvalidInput(format!(
+                    "Shared instance could not be found: {}",
+                    new_report.item_id
+                )));
+            }
 
             report.shared_instance_id = Some(shared_instance_id)
         }
