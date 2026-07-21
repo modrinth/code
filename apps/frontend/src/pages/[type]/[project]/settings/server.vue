@@ -265,7 +265,8 @@ const messages = defineMessages({
 	},
 	cannotSaveText: {
 		id: 'project.settings.server.cannot-save-text',
-		defaultMessage: 'The Java server must be reachable before saving. Please ensure the ping succeeds.',
+		defaultMessage:
+			'The Java server must be reachable before saving. Please ensure the ping succeeds.',
 	},
 })
 

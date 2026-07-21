@@ -4067,9 +4067,6 @@
   "servers.plan.small.description": {
     "message": "Perfekt für 1 - 5 Freunde mit ein par leichten Mods."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "abgerechnet {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Einrichtung abschliessen"
   },

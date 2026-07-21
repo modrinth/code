@@ -58,7 +58,11 @@
 				<Combobox
 					v-model="selectedGiftCardId"
 					:options="rewardOptions"
-					:placeholder="formatMessage(messages.selectCategoryPlaceholder, { category: categoryLabel.toLowerCase() })"
+					:placeholder="
+						formatMessage(messages.selectCategoryPlaceholder, {
+							category: categoryLabel.toLowerCase(),
+						})
+					"
 					searchable
 					:search-placeholder="
 						formatMessage(messages.searchCategoryPlaceholder, {

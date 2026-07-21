@@ -4058,9 +4058,6 @@
   "servers.plan.small.description": {
     "message": "Idealny dla 1–5 przyjaciół z kilkoma lekkimi modami."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "naliczane {interval, select, monthly {miesięcznie} quarterly {co kwartał} yearly {rocznie} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Zakończ ustawianie"
   },

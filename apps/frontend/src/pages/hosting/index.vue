@@ -702,7 +702,8 @@ const messages = defineMessages({
 	},
 	invalidProductText: {
 		id: 'hosting-marketing.notification.invalid-product-text',
-		defaultMessage: 'The selected product was found but lacks necessary data. Please contact support.',
+		defaultMessage:
+			'The selected product was found but lacks necessary data. Please contact support.',
 	},
 	hostWithModrinth: {
 		id: 'hosting-marketing.hero.host-with-modrinth',

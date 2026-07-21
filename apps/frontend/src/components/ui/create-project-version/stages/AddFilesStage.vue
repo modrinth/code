@@ -196,7 +196,8 @@ const messages = defineMessages({
 	},
 	primaryFileDescription: {
 		id: 'create-project-version.create-modal.stage.add-files.primary-file-description',
-		defaultMessage: 'The primary file is the default file a user downloads when installing the project.',
+		defaultMessage:
+			'The primary file is the default file a user downloads when installing the project.',
 	},
 	supplementaryFilesLabel: {
 		id: 'create-project-version.create-modal.stage.add-files.supplementary-files-label',

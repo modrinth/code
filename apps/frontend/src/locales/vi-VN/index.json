@@ -3695,9 +3695,6 @@
   "servers.plan.small.description": {
     "message": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "trả tiền hàng {interval, select, monthly {tháng} quarterly {quý (3 tháng)} yearly {năm} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Hoàn tất thiết lập"
   },

@@ -102,7 +102,9 @@
 				</template>
 				<div class="label">
 					<h4>
-						<span class="label__title"><StarIcon /> {{ formatMessage(messages.featuredTags) }}</span>
+						<span class="label__title"
+							><StarIcon /> {{ formatMessage(messages.featuredTags) }}</span
+						>
 					</h4>
 					<span class="label__description">{{
 						formatMessage(messages.featuredTagsDescription)

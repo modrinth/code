@@ -46,7 +46,9 @@
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.versionChangelog) }}</span>
+			<span class="font-semibold text-contrast">{{
+				formatMessage(messages.versionChangelog)
+			}}</span>
 
 			<div class="w-full">
 				<MarkdownEditor
