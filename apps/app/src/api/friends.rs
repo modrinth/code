@@ -16,7 +16,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 pub async fn friends(
     invocation_context: theseus::InvocationContext,
 ) -> crate::api::Result<Vec<UserFriend>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::friends::friends(&context).await?)
 }
 
@@ -30,7 +30,7 @@ pub async fn add_friend(
     user_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> crate::api::Result<()> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::friends::add_friend(&context, user_id).await?)
 }
 
@@ -39,6 +39,6 @@ pub async fn remove_friend(
     user_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> crate::api::Result<()> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::friends::remove_friend(&context, user_id).await?)
 }

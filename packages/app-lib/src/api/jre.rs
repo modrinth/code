@@ -19,7 +19,7 @@ use sysinfo::{MemoryRefreshKind, RefreshKind};
 use crate::util::io;
 use crate::util::jre::extract_java_version;
 use crate::{
-    LoadingBarType, OperationContext, State,
+    InvocationContext, LoadingBarType, State,
     util::jre::{self},
 };
 
@@ -60,14 +60,14 @@ pub async fn find_filtered_jres(
 }
 
 pub async fn auto_install_java(
-    context: &OperationContext,
+    context: &InvocationContext,
     java_version: u32,
 ) -> crate::Result<PathBuf> {
     auto_install_java_with_loading(context, java_version, true).await
 }
 
 pub async fn auto_install_java_with_loading(
-    context: &OperationContext,
+    context: &InvocationContext,
     java_version: u32,
     show_loading: bool,
 ) -> crate::Result<PathBuf> {
@@ -75,7 +75,7 @@ pub async fn auto_install_java_with_loading(
 }
 
 pub async fn auto_install_java_with_reporter(
-    context: &OperationContext,
+    context: &InvocationContext,
     java_version: u32,
     reporter: InstallProgressReporter,
 ) -> crate::Result<PathBuf> {
@@ -116,7 +116,7 @@ fn java_step_progress(current: u64) -> InstallProgress {
 }
 
 async fn auto_install_java_inner(
-    context: &OperationContext,
+    context: &InvocationContext,
     java_version: u32,
     show_loading: bool,
     reporter: Option<InstallProgressReporter>,

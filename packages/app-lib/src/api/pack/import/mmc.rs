@@ -177,7 +177,7 @@ async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
 
 // #[tracing::instrument]
 pub async fn import_mmc(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     mmc_base_path: PathBuf,  // path to base mmc folder
     instance_folder: String, // instance folder in mmc_base_path
     instance_id: &str,
@@ -268,7 +268,7 @@ pub async fn import_mmc(
 }
 
 async fn import_mmc_unmanaged(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     instance_id: &str,
     minecraft_folder: PathBuf,
     backup_name: String,

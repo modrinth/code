@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::instances::{
     ContentRequirement, ContentSourceKind, Instance, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -46,7 +46,7 @@ pub(crate) struct InstanceInstallProjectRequest {
 }
 
 struct CachedEntryContentProvider<'a> {
-    context: &'a OperationContext,
+    context: &'a InvocationContext,
     state: &'a State,
     cache_behaviour: Option<CacheBehaviour>,
 }
@@ -161,7 +161,7 @@ fn target_preferences(
 }
 
 pub(crate) async fn resolve_install_plan(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     request: InstanceInstallProjectRequest,
     state: &State,
@@ -207,7 +207,7 @@ pub(crate) async fn resolve_install_plan(
 }
 
 pub(crate) async fn install_resolved_content_plan(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     plan: &ResolveContentPlan,
     state: &State,
@@ -235,7 +235,7 @@ pub(crate) async fn install_resolved_content_plan(
 }
 
 pub(crate) async fn switch_project_version_with_dependencies(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     project_path: &str,
     version_id: &str,
@@ -314,7 +314,7 @@ pub(crate) async fn switch_project_version_with_dependencies(
 }
 
 async fn add_resolved_content(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     content: &ResolvedContent,
     reason: DownloadReason,
@@ -359,7 +359,7 @@ pub(crate) async fn resolve_content_scope(
 }
 
 pub(crate) async fn add_project_from_version(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     version_id: &str,
     reason: DownloadReason,
@@ -382,7 +382,7 @@ pub(crate) async fn add_project_from_version(
 }
 
 pub(crate) async fn download_project_version(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     version_id: &str,
     reason: DownloadReason,

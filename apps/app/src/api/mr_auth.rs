@@ -24,7 +24,7 @@ pub async fn modrinth_login<R: Runtime>(
     app: tauri::AppHandle<R>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<ModrinthCredentials> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     let (auth_code_recv_socket_tx, auth_code_recv_socket) = oneshot::channel();
     let auth_code = tokio::spawn(oauth_utils::auth_code_reply::listen(
         auth_code_recv_socket_tx,
@@ -79,7 +79,7 @@ pub async fn logout() -> Result<()> {
 pub async fn get(
     invocation_context: theseus::InvocationContext,
 ) -> Result<Option<ModrinthCredentials>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::mr_auth::get_credentials(&context).await?)
 }
 

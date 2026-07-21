@@ -1,13 +1,13 @@
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
 use crate::state::{CachedEntry, ProjectType};
-use crate::{OperationContext, State};
+use crate::{InvocationContext, State};
 use chrono::Utc;
 use std::collections::HashMap;
 use uuid::Uuid;
 
 pub(crate) async fn sync_content_files(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
@@ -22,7 +22,7 @@ pub(crate) async fn sync_content_files(
 }
 
 pub(crate) async fn sync_instance_content_files(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance: &Instance,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {

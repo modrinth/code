@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::{
     CacheBehaviour, CacheValueType, CachedEntry, Organization, Project,
     ProjectV3, SearchResults, SearchResultsV3, TeamMember, User, Version,
@@ -10,7 +10,7 @@ macro_rules! impl_cache_methods {
             paste::paste! {
                 #[tracing::instrument]
                 pub async fn [<get_ $variant:snake>](
-                    context: &OperationContext,
+                    context: &InvocationContext,
                     id: &str,
                     cache_behaviour: Option<CacheBehaviour>,
                 ) -> crate::Result<Option<$type>>
@@ -21,7 +21,7 @@ macro_rules! impl_cache_methods {
 
                 #[tracing::instrument]
                 pub async fn [<get_ $variant:snake _many>](
-                    context: &OperationContext,
+                    context: &InvocationContext,
                     ids: &[&str],
                     cache_behaviour: Option<CacheBehaviour>,
                 ) -> crate::Result<Vec<$type>>
@@ -61,7 +61,7 @@ pub async fn purge_cache_types(
 /// Uses the cache system with the ProjectVersions cache type.
 #[tracing::instrument]
 pub async fn get_project_versions(
-    context: &OperationContext,
+    context: &InvocationContext,
     project_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Option<Vec<Version>>> {

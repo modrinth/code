@@ -156,7 +156,7 @@ pub async fn get_java_version_from_launch_context(
 }
 
 pub async fn get_loader_version_from_profile(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     game_version: &str,
     loader: ModLoader,
     loader_version: Option<&str>,
@@ -174,7 +174,7 @@ pub async fn get_loader_version_from_profile(
     };
 
     let versions = crate::api::metadata::get_loader_versions(
-        operation_context,
+        invocation_context,
         loader.as_meta_str(),
     )
     .await?;
@@ -222,12 +222,13 @@ fn loader_versions_for_game_version<'a>(
 /// game version. If the version isn't found in the cache, forces a manifest
 /// refresh to pick up newly-released versions.
 pub async fn resolve_minecraft_manifest(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     game_version: &str,
     state: &State,
 ) -> crate::Result<(d::minecraft::VersionManifest, usize)> {
     let minecraft =
-        crate::api::metadata::get_minecraft_versions(operation_context).await?;
+        crate::api::metadata::get_minecraft_versions(invocation_context)
+            .await?;
 
     if let Some(idx) = minecraft
         .versions
@@ -240,7 +241,7 @@ pub async fn resolve_minecraft_manifest(
     // Version not found in cache — force a manifest refresh in case it was
     // released after the cache was populated.
     let refreshed = crate::state::CachedEntry::get_minecraft_manifest(
-        operation_context,
+        invocation_context,
         Some(crate::state::CacheBehaviour::MustRevalidate),
         &state.pool,
         &state.api_semaphore,
@@ -269,7 +270,7 @@ async fn get_instance_full_path(instance_path: &str) -> crate::Result<PathBuf> {
 }
 
 pub async fn install_minecraft_with_reporter(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     launch_context: &InstanceLaunchContext,
     repairing: bool,
     reporter: Option<InstallProgressReporter>,
@@ -318,7 +319,7 @@ pub async fn install_minecraft_with_reporter(
             .await?;
     }
     let (minecraft, version_index) = resolve_minecraft_manifest(
-        operation_context,
+        invocation_context,
         &content_set.game_version,
         &state,
     )
@@ -344,7 +345,7 @@ pub async fn install_minecraft_with_reporter(
     }
 
     let mut loader_version = get_loader_version_from_profile(
-        operation_context,
+        invocation_context,
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
@@ -354,7 +355,7 @@ pub async fn install_minecraft_with_reporter(
     // If no loader version is selected, try to select the stable version!
     if content_set.loader != ModLoader::Vanilla && loader_version.is_none() {
         loader_version = get_loader_version_from_profile(
-            operation_context,
+            invocation_context,
             &content_set.game_version,
             content_set.loader,
             Some("stable"),
@@ -376,7 +377,7 @@ pub async fn install_minecraft_with_reporter(
 
     // Download version info (5)
     let mut version_info = download::download_version_info(
-        operation_context,
+        invocation_context,
         &state,
         version,
         loader_version.as_ref(),
@@ -414,14 +415,14 @@ pub async fn install_minecraft_with_reporter(
     } else {
         let path = if let Some(reporter) = &reporter {
             crate::api::jre::auto_install_java_with_reporter(
-                operation_context,
+                invocation_context,
                 key,
                 reporter.clone(),
             )
             .await?
         } else {
             crate::api::jre::auto_install_java_with_loading(
-                operation_context,
+                invocation_context,
                 key,
                 true,
             )
@@ -465,7 +466,7 @@ pub async fn install_minecraft_with_reporter(
             .await?;
     }
     download::download_minecraft(
-        operation_context,
+        invocation_context,
         &state,
         &version_info,
         loading_bar.as_ref(),
@@ -645,7 +646,7 @@ pub async fn install_minecraft_with_reporter(
 }
 
 pub async fn install_minecraft_for_instance_id_with_reporter(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     instance_id: &str,
     repairing: bool,
     reporter: Option<InstallProgressReporter>,
@@ -664,7 +665,7 @@ pub async fn install_minecraft_for_instance_id_with_reporter(
         })?;
 
     install_minecraft_with_reporter(
-        operation_context,
+        invocation_context,
         &launch_context,
         repairing,
         reporter,
@@ -728,7 +729,7 @@ fn link_project_and_version(
 #[tracing::instrument(skip_all)]
 #[allow(clippy::too_many_arguments)]
 pub async fn launch_minecraft(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     java_args: &[String],
     env_args: &[(String, String)],
     mc_set_options: &[(String, String)],
@@ -764,7 +765,7 @@ pub async fn launch_minecraft(
     let instance_path = get_instance_full_path(&instance.path).await?;
 
     let (minecraft, version_index) = resolve_minecraft_manifest(
-        operation_context,
+        invocation_context,
         &content_set.game_version,
         &state,
     )
@@ -778,7 +779,7 @@ pub async fn launch_minecraft(
             .unwrap_or(0);
 
     let loader_version = get_loader_version_from_profile(
-        operation_context,
+        invocation_context,
         &content_set.game_version,
         content_set.loader,
         content_set.loader_version.as_deref(),
@@ -799,7 +800,7 @@ pub async fn launch_minecraft(
         });
 
     let mut version_info = download::download_version_info(
-        operation_context,
+        invocation_context,
         &state,
         version,
         loader_version.as_ref(),
@@ -817,7 +818,7 @@ pub async fn launch_minecraft(
                 .unwrap_or(0);
         if requires_logging_info {
             version_info = download::download_version_info(
-                operation_context,
+                invocation_context,
                 &state,
                 version,
                 loader_version.as_ref(),
@@ -830,7 +831,7 @@ pub async fn launch_minecraft(
     }
 
     let _ = download_log_config(
-        operation_context,
+        invocation_context,
         &state,
         &version_info,
         None,
@@ -1093,7 +1094,7 @@ pub async fn launch_minecraft(
     state
         .process_manager
         .insert_new_process(
-            operation_context,
+            invocation_context,
             &instance.id,
             &instance.path,
             &instance.name,

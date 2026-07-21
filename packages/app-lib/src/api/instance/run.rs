@@ -1,5 +1,5 @@
 use super::content::get_projects;
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::server_address::ServerAddress;
 use crate::state::{
     Credentials, InstanceLink, ProcessMetadata, Settings, State,
@@ -21,7 +21,7 @@ pub enum QuickPlayType {
 
 #[tracing::instrument]
 pub async fn run(
-    operation_context: &OperationContext,
+    invocation_context: &InvocationContext,
     instance_id: &str,
     quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
@@ -31,7 +31,7 @@ pub async fn run(
         .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
     run_credentials(
-        operation_context,
+        invocation_context,
         instance_id,
         &default_account,
         quick_play_type,
@@ -41,7 +41,7 @@ pub async fn run(
 
 #[tracing::instrument(skip(credentials))]
 async fn run_credentials(
-    operation_context: &OperationContext,
+    invocation_context: &InvocationContext,
     instance_id: &str,
     credentials: &Credentials,
     quick_play_type: QuickPlayType,
@@ -160,7 +160,7 @@ async fn run_credentials(
         match join_result {
             Ok(resp) if resp.status().is_success() => {
                 let result = fetch::post_json(
-                    operation_context,
+                    invocation_context,
                     concat!(
                         env!("MODRINTH_API_BASE_URL"),
                         "analytics/minecraft-server-play"
@@ -194,7 +194,7 @@ async fn run_credentials(
 
     crate::minecraft_skins::flush_pending_skin_change().await?;
     crate::launcher::launch_minecraft(
-        operation_context,
+        invocation_context,
         &java_args,
         &env_args,
         &mc_set_options,
@@ -238,7 +238,7 @@ pub async fn kill(instance_id: &str) -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn try_update_playtime_by_instance_id(
-    operation_context: &OperationContext,
+    invocation_context: &InvocationContext,
     instance_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
@@ -280,7 +280,7 @@ pub async fn try_update_playtime_by_instance_id(
         let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
 
         for (_, project) in
-            get_projects(operation_context, instance_id, None).await?
+            get_projects(invocation_context, instance_id, None).await?
         {
             if let Some(metadata) = project.metadata {
                 hashmap
@@ -289,7 +289,7 @@ pub async fn try_update_playtime_by_instance_id(
         }
 
         fetch::post_json(
-            operation_context,
+            invocation_context,
             concat!(env!("MODRINTH_API_BASE_URL"), "analytics/playtime"),
             serde_json::to_value(hashmap)?,
             &state.api_semaphore,

@@ -238,7 +238,7 @@ where
 }
 
 pub(crate) async fn get_external_files_from_mrpack(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     file: &CreatePackFile,
 ) -> crate::Result<Vec<String>> {
     let mut zip_reader = MrpackZipReader::new(file).await?;
@@ -300,7 +300,7 @@ pub(crate) async fn get_external_files_from_mrpack(
         .map(|(_, hash)| hash.as_str())
         .collect::<Vec<_>>();
     let recognized_hashes = match CachedEntry::get_file_many(
-        operation_context,
+        invocation_context,
         &hashes,
         None,
         &state.pool,
@@ -398,7 +398,7 @@ where
 }
 
 pub(crate) async fn install_zipped_mrpack_files_with_reporter(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     create_pack: CreatePack,
     ignore_lock: bool,
     reason: DownloadReason,
@@ -568,7 +568,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     }
 
     set_instance_information(
-        operation_context,
+        invocation_context,
         instance_id.clone(),
         &description,
         &pack.name,
@@ -633,7 +633,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
         .collect::<Vec<_>>();
     let file_infos_by_hash = Arc::new(
         CachedEntry::get_file_many(
-            operation_context,
+            invocation_context,
             &file_info_hashes,
             None,
             &state.pool,
@@ -769,7 +769,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
                 let progress =
                     &mut report_download_progress as &mut FetchProgressFn<'_>;
                 let file = match fetch_mirrors_with_progress(
-                    operation_context,
+                    invocation_context,
                     &project
                         .downloads
                         .iter()
@@ -1066,7 +1066,7 @@ pub(crate) async fn install_zipped_mrpack_files_with_reporter(
     }
 
     crate::launcher::install_minecraft_for_instance_id_with_reporter(
-        operation_context,
+        invocation_context,
         &instance_id,
         false,
         Some(reporter.clone()),
@@ -1095,7 +1095,7 @@ fn modpack_source_kind(version_id: Option<&str>) -> ContentSourceKind {
 #[tracing::instrument(skip(mrpack_file))]
 
 pub async fn remove_all_related_files(
-    operation_context: &crate::OperationContext,
+    invocation_context: &crate::InvocationContext,
     instance_id: String,
     mrpack_file: CreatePackFile,
 ) -> crate::Result<()> {
@@ -1153,7 +1153,7 @@ pub async fn remove_all_related_files(
 
     // First, get project info by hash
     let file_infos = CachedEntry::get_file_many(
-        operation_context,
+        invocation_context,
         &all_hashes.iter().map(|x| &**x).collect::<Vec<_>>(),
         None,
         &state.pool,

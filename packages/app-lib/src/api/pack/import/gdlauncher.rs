@@ -41,7 +41,7 @@ pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
 }
 
 pub async fn import_gdlauncher(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     gdlauncher_instance_folder: PathBuf, // instance's folder
     instance_id: &str,
     reporter: InstallProgressReporter,

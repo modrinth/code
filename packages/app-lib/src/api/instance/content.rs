@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::{
     CacheBehaviour, ContentFile, ContentItem, ContentSet, Dependency,
     InstanceInstallCandidate, InstanceInstallTarget, LinkedModpackInfo,
@@ -8,7 +8,7 @@ use dashmap::DashMap;
 
 #[tracing::instrument]
 pub async fn sync_content_files(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
 ) -> crate::Result<Vec<crate::state::instances::InstanceFile>> {
     let state = State::get().await?;
@@ -25,7 +25,7 @@ pub async fn list_content_sets(
 
 #[tracing::instrument]
 pub async fn get_projects(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<DashMap<String, ContentFile>> {
@@ -42,7 +42,7 @@ pub async fn get_projects(
 
 #[tracing::instrument]
 pub async fn get_installed_project_ids(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
 ) -> crate::Result<Vec<String>> {
     let state = State::get().await?;
@@ -73,7 +73,7 @@ pub async fn get_install_candidates(
 
 #[tracing::instrument]
 pub async fn get_content_items(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Vec<ContentItem>> {
@@ -90,7 +90,7 @@ pub async fn get_content_items(
 
 #[tracing::instrument]
 pub async fn get_linked_modpack_content(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Vec<ContentItem>> {
@@ -107,7 +107,7 @@ pub async fn get_linked_modpack_content(
 
 #[tracing::instrument]
 pub async fn get_dependencies_as_content_items(
-    context: &OperationContext,
+    context: &InvocationContext,
     dependencies: Vec<Dependency>,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Vec<ContentItem>> {
@@ -124,7 +124,7 @@ pub async fn get_dependencies_as_content_items(
 
 #[tracing::instrument]
 pub async fn get_linked_modpack_info(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<Option<LinkedModpackInfo>> {

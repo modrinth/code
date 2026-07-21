@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::instances::{
     ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -64,7 +64,7 @@ struct ResolvedDependency {
 }
 
 pub(crate) async fn update_project(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     project_path: &str,
     state: &State,
@@ -90,7 +90,7 @@ pub(crate) async fn update_project(
 }
 
 async fn apply_content_update(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     project_path: &str,
     update: &ContentUpdate,
@@ -128,7 +128,7 @@ async fn apply_content_update(
 }
 
 pub(crate) async fn update_all_projects(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<HashMap<String, String>> {
@@ -210,7 +210,7 @@ pub(crate) async fn update_all_projects(
 }
 
 async fn download_planned_projects(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     plan: &BulkUpdatePlan,
     total: usize,
@@ -307,7 +307,7 @@ async fn emit_bulk_update_progress(
 }
 
 async fn plan_bulk_update(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<BulkUpdatePlan> {
@@ -434,7 +434,7 @@ async fn plan_bulk_update(
 }
 
 async fn bulk_updateable_project_paths(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<HashSet<String>> {
@@ -497,7 +497,7 @@ fn installed_project_from_row(
 }
 
 async fn dependency_closure(
-    context: &OperationContext,
+    context: &InvocationContext,
     root_versions: Vec<Version>,
     content_set: &ContentSet,
     state: &State,
@@ -559,7 +559,7 @@ fn is_required_dependency(
 }
 
 async fn resolve_dependency_version(
-    context: &OperationContext,
+    context: &InvocationContext,
     dependency: &Dependency,
     content_set: &ContentSet,
     state: &State,
@@ -590,7 +590,7 @@ async fn resolve_dependency_version(
 }
 
 async fn cached_version(
-    context: &OperationContext,
+    context: &InvocationContext,
     version_id: &str,
     version_cache: &mut HashMap<String, Option<Version>>,
     state: &State,
@@ -611,7 +611,7 @@ async fn cached_version(
 }
 
 async fn cached_project_versions(
-    context: &OperationContext,
+    context: &InvocationContext,
     project_id: &str,
     project_versions_cache: &mut HashMap<String, Option<Vec<Version>>>,
     state: &State,

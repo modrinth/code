@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::instances::{
     ContentEntry, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -28,7 +28,7 @@ struct UpdateCandidate {
 }
 
 pub(crate) async fn check_content_updates(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
@@ -164,7 +164,7 @@ pub(crate) async fn check_content_updates(
 }
 
 async fn installed_update_channels(
-    context: &OperationContext,
+    context: &InvocationContext,
     candidates: &[UpdateCandidate],
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,

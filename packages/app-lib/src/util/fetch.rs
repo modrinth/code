@@ -2,9 +2,7 @@
 use super::io::{self, IOError};
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
-use crate::operation::{
-    OperationCause, OperationContext, REQUEST_CONTEXT_HEADER,
-};
+use crate::operation::{InvocationContext, REQUEST_CONTEXT_HEADER};
 use crate::{ErrorKind, LabrinthError};
 use bytes::Bytes;
 use chrono::{DateTime, TimeDelta, Utc};
@@ -372,20 +370,18 @@ fn is_approved_modrinth_service_url(url: &str) -> bool {
     .any(|approved| url.origin() == approved.origin())
 }
 
-fn attach_operation_headers(
+fn attach_invocation_headers(
     request: reqwest::RequestBuilder,
     url: &str,
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> reqwest::RequestBuilder {
     if !is_approved_modrinth_service_url(url) {
         return request;
     }
 
-    if cfg!(debug_assertions) && context.cause() == OperationCause::Unattributed
-    {
+    if cfg!(debug_assertions) && context.cause() == "unattributed" {
         tracing::warn!(
-            operation_id = %context.id,
-            "Unattributed operation context reached the Modrinth HTTP boundary"
+            "Unattributed invocation context reached the Modrinth HTTP boundary"
         );
     }
 
@@ -405,7 +401,7 @@ pub type FetchProgressFn<'a> = dyn FnMut(
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
-    context: &OperationContext,
+    context: &InvocationContext,
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -431,7 +427,7 @@ pub async fn fetch(
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch_with_client(
-    context: &OperationContext,
+    context: &InvocationContext,
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -459,7 +455,7 @@ pub async fn fetch_with_client(
 
 #[tracing::instrument(skip(semaphore, progress))]
 pub async fn fetch_with_client_progress(
-    context: &OperationContext,
+    context: &InvocationContext,
     url: &str,
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -489,7 +485,7 @@ pub async fn fetch_with_client_progress(
 
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn fetch_json<T>(
-    context: &OperationContext,
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -515,7 +511,7 @@ where
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
-    context: &OperationContext,
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -547,7 +543,7 @@ pub async fn fetch_advanced(
 #[tracing::instrument(skip(json_body, semaphore, progress))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_progress(
-    context: &OperationContext,
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -582,7 +578,7 @@ pub async fn fetch_advanced_with_progress(
 #[tracing::instrument(skip(json_body, semaphore))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_client(
-    context: &OperationContext,
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -616,7 +612,7 @@ pub async fn fetch_advanced_with_client(
 #[tracing::instrument(skip(json_body, semaphore, client, progress))]
 #[allow(clippy::too_many_arguments)]
 async fn fetch_advanced_with_client_and_progress(
-    context: &OperationContext,
+    context: &InvocationContext,
     method: Method,
     url: &str,
     sha1: Option<&str>,
@@ -663,7 +659,7 @@ async fn fetch_advanced_with_client_and_progress(
             .into());
         }
 
-        let mut req = attach_operation_headers(
+        let mut req = attach_invocation_headers(
             client.request(method.clone(), url),
             url,
             context,
@@ -814,7 +810,7 @@ async fn fetch_advanced_with_client_and_progress(
 /// Downloads a file from specified mirrors
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch_mirrors(
-    context: &OperationContext,
+    context: &InvocationContext,
     mirrors: &[&str],
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -851,7 +847,7 @@ pub async fn fetch_mirrors(
 
 #[tracing::instrument(skip(semaphore, progress))]
 pub async fn fetch_mirrors_with_progress(
-    context: &OperationContext,
+    context: &InvocationContext,
     mirrors: &[&str],
     sha1: Option<&str>,
     download_meta: Option<&DownloadMeta>,
@@ -891,7 +887,7 @@ pub async fn fetch_mirrors_with_progress(
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn post_json(
-    context: &OperationContext,
+    context: &InvocationContext,
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
@@ -899,7 +895,7 @@ pub async fn post_json(
 ) -> crate::Result<()> {
     let _permit = semaphore.0.acquire().await?;
 
-    let mut req = attach_operation_headers(
+    let mut req = attach_invocation_headers(
         INSECURE_REQWEST_CLIENT.post(url),
         url,
         context,
@@ -1008,24 +1004,27 @@ pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
 }
 
 #[cfg(test)]
-mod operation_context_tests {
+mod invocation_context_tests {
     use super::*;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::TcpListener;
 
     fn built_request(
         url: &str,
-        context: &OperationContext,
+        context: &InvocationContext,
     ) -> reqwest::Request {
-        attach_operation_headers(INSECURE_REQWEST_CLIENT.get(url), url, context)
-            .build()
-            .unwrap()
+        attach_invocation_headers(
+            INSECURE_REQWEST_CLIENT.get(url),
+            url,
+            context,
+        )
+        .build()
+        .unwrap()
     }
 
     #[test]
-    fn approved_origins_receive_operation_headers() {
-        let context =
-            OperationContext::new(OperationCause::NavigationInstanceContent);
+    fn approved_origins_receive_invocation_headers() {
+        let context = InvocationContext::new("navigation/instance/content");
         let request = built_request(
             concat!(env!("MODRINTH_API_URL"), "project/example"),
             &context,
@@ -1042,8 +1041,8 @@ mod operation_context_tests {
     }
 
     #[test]
-    fn third_party_origins_do_not_receive_operation_headers() {
-        let context = OperationContext::new(OperationCause::InstanceInstall);
+    fn third_party_origins_do_not_receive_invocation_headers() {
+        let context = InvocationContext::new("instance/install");
         let request = built_request("https://example.com/file.jar", &context);
 
         assert!(!request.headers().contains_key(reqwest::header::REFERER));
@@ -1052,7 +1051,7 @@ mod operation_context_tests {
 
     #[test]
     fn similarly_prefixed_hosts_are_not_approved() {
-        let context = OperationContext::new(OperationCause::NavigationBrowse);
+        let context = InvocationContext::new("navigation/browse");
         let approved = url::Url::parse(env!("MODRINTH_API_URL")).unwrap();
         let url = format!(
             "{}://{}.example.com/project",
@@ -1067,7 +1066,7 @@ mod operation_context_tests {
 
     #[test]
     fn every_retry_attempt_retains_the_same_context() {
-        let context = OperationContext::new(OperationCause::CacheRevalidate);
+        let context = InvocationContext::new("new/frontend/cause");
         let url = concat!(env!("MODRINTH_API_URL_V3"), "projects");
 
         for _ in 0..=FETCH_ATTEMPTS {

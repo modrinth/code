@@ -57,7 +57,7 @@ pub async fn jre_auto_install_java(
     java_version: u32,
     invocation_context: theseus::InvocationContext,
 ) -> Result<PathBuf> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(jre::auto_install_java(&context, java_version).await?)
 }
 

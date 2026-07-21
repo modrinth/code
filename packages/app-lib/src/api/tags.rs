@@ -1,14 +1,14 @@
 //! Theseus tag management interface
 use crate::state::CachedEntry;
 pub use crate::{
-    OperationContext, State,
+    InvocationContext, State,
     state::{Category, DonationPlatform, GameVersion, Loader},
 };
 
 /// Get category tags
 #[tracing::instrument]
 pub async fn get_category_tags(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Vec<Category>> {
     let state = State::get().await?;
     let categories = CachedEntry::get_categories(
@@ -26,7 +26,7 @@ pub async fn get_category_tags(
 /// Get report type tags
 #[tracing::instrument]
 pub async fn get_report_type_tags(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Vec<String>> {
     let state = State::get().await?;
     let report_types = CachedEntry::get_report_types(
@@ -46,7 +46,7 @@ pub async fn get_report_type_tags(
 /// Get loader tags
 #[tracing::instrument]
 pub async fn get_loader_tags(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Vec<Loader>> {
     let state = State::get().await?;
     let loaders = CachedEntry::get_loaders(
@@ -64,7 +64,7 @@ pub async fn get_loader_tags(
 /// Get game version tags
 #[tracing::instrument]
 pub async fn get_game_version_tags(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Vec<GameVersion>> {
     let state = State::get().await?;
     let game_versions = CachedEntry::get_game_versions(
@@ -84,7 +84,7 @@ pub async fn get_game_version_tags(
 /// Get donation platform tags
 #[tracing::instrument]
 pub async fn get_donation_platform_tags(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Vec<DonationPlatform>> {
     let state = State::get().await?;
     let donation_platforms = CachedEntry::get_donation_platforms(

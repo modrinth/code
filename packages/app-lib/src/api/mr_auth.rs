@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::ModrinthCredentials;
 
 #[tracing::instrument]
@@ -8,7 +8,7 @@ pub fn authenticate_begin_flow() -> &'static str {
 
 #[tracing::instrument]
 pub async fn authenticate_finish_flow(
-    context: &OperationContext,
+    context: &InvocationContext,
     code: &str,
 ) -> crate::Result<ModrinthCredentials> {
     let state = crate::State::get().await?;
@@ -50,7 +50,7 @@ pub async fn logout() -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn get_credentials(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Option<ModrinthCredentials>> {
     let state = crate::State::get().await?;
     let current = ModrinthCredentials::get_and_refresh(

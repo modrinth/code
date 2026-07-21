@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -21,7 +21,7 @@ pub struct InstallProjectWithDependenciesRequest {
 
 #[tracing::instrument]
 pub async fn update_all_projects(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
 ) -> crate::Result<HashMap<String, String>> {
     let state = State::get().await?;
@@ -49,7 +49,7 @@ pub async fn update_all_projects(
 
 #[tracing::instrument]
 pub async fn update_project(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     project_path: &str,
     skip_send_event: Option<bool>,
@@ -72,7 +72,7 @@ pub async fn update_project(
 
 #[tracing::instrument]
 pub async fn add_project_from_version(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     version_id: &str,
     reason: fetch::DownloadReason,
@@ -97,7 +97,7 @@ pub async fn add_project_from_version(
 
 #[tracing::instrument]
 pub async fn install_project_with_dependencies(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     request: InstallProjectWithDependenciesRequest,
 ) -> crate::Result<ResolveContentPlan> {
@@ -187,7 +187,7 @@ fn plan_project_ids(plan: &ResolveContentPlan) -> Vec<String> {
 
 #[tracing::instrument]
 pub async fn switch_project_version_with_dependencies(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     project_path: &str,
     version_id: &str,
@@ -228,7 +228,7 @@ pub async fn add_project_from_path(
 
 #[tracing::instrument]
 pub async fn is_file_on_modrinth(
-    context: &OperationContext,
+    context: &InvocationContext,
     path: &Path,
 ) -> crate::Result<bool> {
     let state = State::get().await?;
@@ -283,7 +283,7 @@ pub async fn remove_project(
 
 #[tracing::instrument]
 pub async fn update_managed_modrinth_version(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     version_id: &str,
 ) -> crate::Result<crate::install::InstallJobSnapshot> {
@@ -343,7 +343,7 @@ pub async fn update_managed_modrinth_version(
 
 #[tracing::instrument]
 pub async fn repair_managed_modrinth(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
 ) -> crate::Result<crate::install::InstallJobSnapshot> {
     let state = State::get().await?;

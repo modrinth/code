@@ -49,7 +49,7 @@ pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
 }
 
 pub async fn import_curseforge(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     curseforge_instance_folder: PathBuf, // instance's folder
     instance_id: &str,
     reporter: InstallProgressReporter,

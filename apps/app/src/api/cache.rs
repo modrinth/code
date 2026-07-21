@@ -12,7 +12,7 @@ macro_rules! impl_cache_methods {
                     invocation_context: theseus::InvocationContext,
                 ) -> Result<Option<$type>>
                 {
-                    let context = crate::api::operation_context(invocation_context);
+                    let context = invocation_context;
                     Ok(theseus::cache::[<get_ $variant:snake>](&context, id, cache_behaviour).await?)
                 }
 
@@ -23,7 +23,7 @@ macro_rules! impl_cache_methods {
                     invocation_context: theseus::InvocationContext,
                 ) -> Result<Vec<$type>>
                 {
-                    let context = crate::api::operation_context(invocation_context);
+                    let context = invocation_context;
                     let ids = ids.iter().map(|x| &**x).collect::<Vec<&str>>();
                     let entries =
                         theseus::cache::[<get_ $variant:snake _many>](&context, &*ids, cache_behaviour).await?;
@@ -82,7 +82,7 @@ pub async fn get_project_versions(
     cache_behaviour: Option<CacheBehaviour>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Option<Vec<Version>>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::cache::get_project_versions(
         &context,
         project_id,

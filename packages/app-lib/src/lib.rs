@@ -26,9 +26,7 @@ pub use event::{
     emit::init_loading,
 };
 pub use logger::start_logger;
-pub use operation::{
-    InvocationContext, OperationCause, OperationContext, REQUEST_CONTEXT_HEADER,
-};
+pub use operation::{InvocationContext, REQUEST_CONTEXT_HEADER};
 pub use state::State;
 pub use util::fetch::DownloadReason;
 

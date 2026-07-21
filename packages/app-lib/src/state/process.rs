@@ -102,7 +102,7 @@ impl ProcessManager {
     #[allow(clippy::too_many_arguments)]
     pub async fn insert_new_process(
         &self,
-        operation_context: &crate::OperationContext,
+        invocation_context: &crate::InvocationContext,
         instance_id: &str,
         instance_path: &str,
         instance_name: &str,
@@ -215,7 +215,7 @@ impl ProcessManager {
         }
 
         tokio::spawn(Process::sequential_process_manager(
-            operation_context.clone(),
+            invocation_context.clone(),
             instance_id.to_string(),
             instance_path.to_string(),
             post_exit_command,
@@ -749,7 +749,7 @@ impl Process {
     // Also, as the process ends, it spawns the follow-up process if it exists
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
     async fn sequential_process_manager(
-        operation_context: crate::OperationContext,
+        invocation_context: crate::InvocationContext,
         instance_id: String,
         instance_path: String,
         post_exit_command: Option<String>,
@@ -836,7 +836,7 @@ impl Process {
         tokio::spawn(async move {
             if let Err(e) =
                 crate::api::instance::try_update_playtime_by_instance_id(
-                    &operation_context,
+                    &invocation_context,
                     &playtime_instance_id,
                 )
                 .await

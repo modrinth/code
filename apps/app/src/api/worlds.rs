@@ -198,7 +198,7 @@ pub async fn get_instance_protocol_version(
     instance_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Option<ProtocolVersion>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(worlds::get_instance_protocol_version(&context, instance_id).await?)
 }
 
@@ -216,7 +216,7 @@ pub async fn start_join_singleplayer_world(
     world: String,
     invocation_context: theseus::InvocationContext,
 ) -> Result<ProcessMetadata> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     let process = instance::run(
         &context,
         instance_id,
@@ -233,7 +233,7 @@ pub async fn start_join_server(
     address: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<ProcessMetadata> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     let process = instance::run(
         &context,
         instance_id,

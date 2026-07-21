@@ -16,7 +16,7 @@ use crate::state::{
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
 };
-use crate::{OperationContext, State};
+use crate::{InvocationContext, State};
 use async_zip::base::read::seek::ZipFileReader;
 use dashmap::DashMap;
 use sqlx::SqlitePool;
@@ -59,7 +59,7 @@ pub(crate) async fn list_content_sets(
 }
 
 pub(crate) async fn get_content_projects(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -83,7 +83,7 @@ pub(crate) async fn get_content_projects(
 }
 
 pub(crate) async fn get_installed_project_ids_for_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     state: &State,
@@ -195,7 +195,7 @@ fn instance_matches_targets(
 }
 
 pub(crate) async fn list_content(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -267,7 +267,7 @@ pub(crate) async fn list_content(
 }
 
 pub(crate) async fn list_linked_modpack_content(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -348,7 +348,7 @@ pub(crate) async fn list_linked_modpack_content(
 }
 
 pub(crate) async fn get_linked_modpack_info(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -473,7 +473,7 @@ pub(crate) async fn get_linked_modpack_info(
 }
 
 pub(crate) async fn dependencies_to_content_items(
-    context: &OperationContext,
+    context: &InvocationContext,
     dependencies: &[Dependency],
     cache_behaviour: Option<CacheBehaviour>,
     pool: &SqlitePool,
@@ -614,7 +614,7 @@ async fn resolve_content_scope_with_instance(
 }
 
 async fn content_projects_for_scope(
-    context: &OperationContext,
+    context: &InvocationContext,
     resolved: &ResolvedContentScope,
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
@@ -779,7 +779,7 @@ async fn content_projects_for_scope(
 }
 
 async fn get_installed_update_channels(
-    context: &OperationContext,
+    context: &InvocationContext,
     file_info_by_hash: &HashMap<String, CachedFile>,
     cache_behaviour: Option<CacheBehaviour>,
     pool: &SqlitePool,
@@ -844,7 +844,7 @@ fn file_update_cache_key(
 }
 
 async fn content_files_to_content_items(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance: &Instance,
     files: &[(String, ContentFile)],
     cache_behaviour: Option<CacheBehaviour>,
@@ -953,7 +953,7 @@ struct ResolvedMetadata {
 }
 
 async fn resolve_metadata(
-    context: &OperationContext,
+    context: &InvocationContext,
     project_ids: &HashSet<String>,
     version_ids: &HashSet<String>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -1213,7 +1213,7 @@ impl ModpackIdentifiers {
 }
 
 async fn get_cached_modpack_identifiers(
-    context: &OperationContext,
+    context: &InvocationContext,
     version_id: &str,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
@@ -1240,7 +1240,7 @@ async fn get_cached_modpack_identifiers(
 }
 
 async fn get_modpack_identifiers(
-    context: &OperationContext,
+    context: &InvocationContext,
     version_id: &str,
     content_set: &ContentSet,
     pool: &SqlitePool,

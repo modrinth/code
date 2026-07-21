@@ -1,10 +1,10 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::{FriendsSocket, UserFriend};
 use ariadne::users::UserStatus;
 
 #[tracing::instrument]
 pub async fn friends(
-    context: &OperationContext,
+    context: &InvocationContext,
 ) -> crate::Result<Vec<UserFriend>> {
     let state = crate::State::get().await?;
     let friends =
@@ -23,7 +23,7 @@ pub async fn friend_statuses() -> crate::Result<Vec<UserStatus>> {
 
 #[tracing::instrument]
 pub async fn add_friend(
-    context: &OperationContext,
+    context: &InvocationContext,
     user_id: &str,
 ) -> crate::Result<()> {
     let state = crate::State::get().await?;
@@ -40,7 +40,7 @@ pub async fn add_friend(
 
 #[tracing::instrument]
 pub async fn remove_friend(
-    context: &OperationContext,
+    context: &InvocationContext,
     user_id: &str,
 ) -> crate::Result<()> {
     let state = crate::State::get().await?;

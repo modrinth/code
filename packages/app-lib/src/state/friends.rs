@@ -1,11 +1,11 @@
 use crate::ErrorKind;
+use crate::InvocationContext;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
-use crate::{OperationCause, OperationContext};
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
@@ -69,7 +69,7 @@ impl FriendsSocket {
     #[tracing::instrument(skip_all)]
     pub async fn connect(
         &self,
-        context: &OperationContext,
+        context: &InvocationContext,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
         process_manager: &ProcessManager,
@@ -258,7 +258,7 @@ impl FriendsSocket {
     #[tracing::instrument(skip_all)]
     pub async fn socket_loop() -> crate::Result<()> {
         let state = crate::State::get().await?;
-        let context = OperationContext::new(OperationCause::BackgroundFriends);
+        let context = InvocationContext::new("background/friends");
 
         tokio::task::spawn(async move {
             let mut last_connection = Utc::now();
@@ -326,7 +326,7 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip_all)]
     pub async fn friends(
-        context: &OperationContext,
+        context: &InvocationContext,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<UserFriend>> {
@@ -353,7 +353,7 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip(exec, semaphore))]
     pub async fn add_friend(
-        context: &OperationContext,
+        context: &InvocationContext,
         user_id: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
@@ -389,7 +389,7 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip(exec, semaphore))]
     pub async fn remove_friend(
-        context: &OperationContext,
+        context: &InvocationContext,
         user_id: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,

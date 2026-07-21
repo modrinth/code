@@ -69,7 +69,7 @@ pub async fn install_get_modpack_preview(
     location: CreatePackLocation,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallModpackPreview> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(
         theseus::pack::install_from::get_instance_from_pack(&context, location)
             .await?,
@@ -81,7 +81,7 @@ pub async fn install_create_instance(
     request: InstallCreateInstanceRequest,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::install::create_instance(
         &context,
         request.name.trim().to_string(),
@@ -103,7 +103,7 @@ pub async fn install_create_modpack_instance(
     post_install_edit: Option<InstallPostInstallEditRequest>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::install::create_modpack_instance(
         &context,
         location,
@@ -119,7 +119,7 @@ pub async fn install_import_instance(
     instance_folder: String,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::install::import_instance(
         &context,
         launcher_type,
@@ -134,7 +134,7 @@ pub async fn install_duplicate_instance(
     source_instance_id: String,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(
         theseus::install::duplicate_instance(&context, source_instance_id)
             .await?,
@@ -147,7 +147,7 @@ pub async fn install_existing_instance(
     force: bool,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::install::install_existing_instance(
         &context,
         instance_id,
@@ -163,7 +163,7 @@ pub async fn install_pack_to_existing_instance(
     post_install_edit: Option<InstallPostInstallEditRequest>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::install::install_pack_to_existing_instance(
         &context,
         instance_id,
@@ -190,7 +190,7 @@ pub async fn install_job_retry(
     job_id: Uuid,
     invocation_context: theseus::InvocationContext,
 ) -> Result<InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::install::retry_job(&context, job_id).await?)
 }
 

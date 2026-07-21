@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -17,7 +17,7 @@ pub struct ModrinthCredentials {
 
 impl ModrinthCredentials {
     pub async fn get_and_refresh(
-        context: &OperationContext,
+        context: &InvocationContext,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<Option<Self>> {
@@ -177,7 +177,7 @@ impl ModrinthCredentials {
     }
 
     pub(crate) async fn refresh_all(
-        context: &OperationContext,
+        context: &InvocationContext,
     ) -> crate::Result<()> {
         let state = crate::State::get().await?;
         let all = Self::get_all(&state.pool).await?;
@@ -202,7 +202,7 @@ pub const fn get_login_url() -> &'static str {
 }
 
 pub async fn finish_login_flow(
-    context: &OperationContext,
+    context: &InvocationContext,
     code: &str,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
@@ -224,7 +224,7 @@ pub async fn finish_login_flow(
 }
 
 async fn fetch_info(
-    context: &OperationContext,
+    context: &InvocationContext,
     token: &str,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,

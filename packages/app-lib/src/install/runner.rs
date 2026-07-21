@@ -18,13 +18,13 @@ use crate::state::{
     ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
-use crate::{ErrorKind, OperationContext};
+use crate::{ErrorKind, InvocationContext};
 use std::collections::HashSet;
 use std::path::PathBuf;
 use uuid::Uuid;
 
 pub async fn create_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     name: String,
     game_version: String,
     loader: ModLoader,
@@ -47,7 +47,7 @@ pub async fn create_instance(
 }
 
 pub async fn create_modpack_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     location: CreatePackLocation,
     post_install_edit: Option<InstallPostInstallEdit>,
 ) -> crate::Result<InstallJobSnapshot> {
@@ -62,7 +62,7 @@ pub async fn create_modpack_instance(
 }
 
 pub async fn import_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     launcher_type: crate::api::pack::import::ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
@@ -79,7 +79,7 @@ pub async fn import_instance(
 }
 
 pub async fn duplicate_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     source_instance_id: String,
 ) -> crate::Result<InstallJobSnapshot> {
     start(
@@ -90,7 +90,7 @@ pub async fn duplicate_instance(
 }
 
 pub async fn install_existing_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: String,
     force: bool,
 ) -> crate::Result<InstallJobSnapshot> {
@@ -102,7 +102,7 @@ pub async fn install_existing_instance(
 }
 
 pub async fn install_pack_to_existing_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: String,
     location: CreatePackLocation,
     post_install_edit: Option<InstallPostInstallEdit>,
@@ -141,7 +141,7 @@ pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
 }
 
 pub async fn retry_job(
-    context: &OperationContext,
+    context: &InvocationContext,
     job_id: Uuid,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
@@ -244,7 +244,7 @@ pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
 }
 
 async fn start(
-    context: &OperationContext,
+    context: &InvocationContext,
     request: InstallRequest,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
@@ -259,7 +259,7 @@ async fn start(
 }
 
 async fn prepare_initial_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     job_state: &mut InstallJobState,
     state: &State,
 ) -> crate::Result<()> {
@@ -388,7 +388,7 @@ async fn prepare_initial_instance(
     Ok(())
 }
 
-fn spawn_job(job_id: Uuid, context: OperationContext) {
+fn spawn_job(job_id: Uuid, context: InvocationContext) {
     tokio::spawn(async move {
         if let Err(error) = run_job(&context, job_id).await {
             tracing::error!(
@@ -399,7 +399,7 @@ fn spawn_job(job_id: Uuid, context: OperationContext) {
 }
 
 async fn run_job(
-    context: &OperationContext,
+    context: &InvocationContext,
     job_id: Uuid,
 ) -> crate::Result<()> {
     let state = State::get().await?;
@@ -508,7 +508,7 @@ async fn run_job(
 }
 
 async fn run_request(
-    context: &OperationContext,
+    context: &InvocationContext,
     job_id: Uuid,
     job_state: &mut InstallJobState,
     state: &State,
@@ -763,7 +763,7 @@ async fn apply_post_install_edit(
 }
 
 async fn remove_existing_pack_content(
-    context: &OperationContext,
+    context: &InvocationContext,
     job_id: Uuid,
     job_state: &InstallJobState,
     state: &State,
@@ -922,7 +922,7 @@ async fn restore_disabled_projects(
 }
 
 async fn install_pack(
-    context: &OperationContext,
+    context: &InvocationContext,
     job_id: Uuid,
     job_state: &mut InstallJobState,
     location: CreatePackLocation,

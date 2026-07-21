@@ -125,7 +125,7 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
 #[tracing::instrument]
 
 pub async fn import_atlauncher(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
     instance_id: &str,
@@ -193,7 +193,7 @@ pub async fn import_atlauncher(
 }
 
 async fn import_atlauncher_unmanaged(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     instance_id: &str,
     minecraft_folder: PathBuf,
     backup_name: String,

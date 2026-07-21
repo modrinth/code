@@ -7,7 +7,7 @@ use crate::install::{
 use crate::instance::QuickPlayType;
 use crate::launcher::parse_rules;
 use crate::{
-    OperationContext,
+    InvocationContext,
     event::{
         LoadingBarId,
         emit::{emit_loading, loading_try_for_each_concurrent},
@@ -143,7 +143,7 @@ impl MinecraftDownloadProgress {
 }
 
 async fn fetch_minecraft_file(
-    operation_context: &OperationContext,
+    invocation_context: &InvocationContext,
     st: &State,
     url: &str,
     sha1: Option<&str>,
@@ -161,7 +161,7 @@ async fn fetch_minecraft_file(
 
     let Some(progress) = progress else {
         return fetch(
-            operation_context,
+            invocation_context,
             url,
             sha1,
             None,
@@ -188,7 +188,7 @@ async fn fetch_minecraft_file(
     };
 
     let bytes = match fetch_advanced_with_progress(
-        operation_context,
+        invocation_context,
         Method::GET,
         url,
         sha1,
@@ -395,7 +395,7 @@ fn missing_initial_minecraft_bytes(
 
 #[tracing::instrument(skip(st, version))]
 pub async fn download_minecraft(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -467,7 +467,7 @@ pub async fn download_minecraft(
 #[tracing::instrument(skip_all, fields(version = version.id.as_str(), loader = ?loader))]
 
 pub async fn download_version_info(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
@@ -564,7 +564,7 @@ pub async fn download_version_info(
 #[tracing::instrument(skip_all)]
 
 pub async fn download_client(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -616,7 +616,7 @@ pub async fn download_client(
 #[tracing::instrument(skip_all)]
 
 pub async fn download_assets_index(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
@@ -665,7 +665,7 @@ pub async fn download_assets_index(
 #[tracing::instrument(skip(st, index))]
 
 pub async fn download_assets(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     with_legacy: bool,
     index: &AssetsIndex,
@@ -763,7 +763,7 @@ pub async fn download_assets(
 #[tracing::instrument(skip(st, libraries))]
 #[allow(clippy::too_many_arguments)]
 pub async fn download_libraries(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     libraries: &[Library],
     version: &str,
@@ -965,7 +965,7 @@ pub async fn download_libraries(
 
 #[tracing::instrument(skip_all)]
 pub async fn download_log_config(
-    context: &OperationContext,
+    context: &InvocationContext,
     st: &State,
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,

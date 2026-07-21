@@ -115,7 +115,7 @@ pub async fn get_importable_instances(
 }
 
 pub(crate) async fn import_instance_with_reporter(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     instance_id: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
@@ -134,7 +134,7 @@ pub(crate) async fn import_instance_with_reporter(
 }
 
 async fn import_instance_inner(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     instance_id: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
@@ -416,7 +416,7 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
 }
 
 pub(crate) async fn finish_import(
-    context: &crate::OperationContext,
+    context: &crate::InvocationContext,
     instance_id: &str,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,

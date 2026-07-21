@@ -31,12 +31,6 @@ mod oauth_utils;
 
 pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
 
-pub(crate) fn operation_context(
-    invocation_context: theseus::InvocationContext,
-) -> theseus::OperationContext {
-    invocation_context.into_operation_context()
-}
-
 // // Main returnable Theseus GUI error
 // // Needs to be Serializable to be returned to the JavaScript side
 // #[derive(Error, Debug, Serialize)]

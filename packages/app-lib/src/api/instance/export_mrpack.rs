@@ -1,7 +1,7 @@
 use super::content::get_projects;
 use super::get::get;
 use super::paths::get_full_path;
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::event::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::pack::install_from::{
@@ -21,7 +21,7 @@ use tokio::io::AsyncReadExt;
 
 #[tracing::instrument(skip_all)]
 pub async fn export_mrpack(
-    context: &OperationContext,
+    context: &InvocationContext,
     instance_id: &str,
     export_path: PathBuf,
     included_export_candidates: Vec<String>,
@@ -178,7 +178,7 @@ fn pack_get_relative_path(
 
 #[tracing::instrument(skip_all)]
 pub async fn create_mrpack_json(
-    context: &OperationContext,
+    context: &InvocationContext,
     metadata: &InstanceMetadata,
     version_id: String,
     description: Option<String>,

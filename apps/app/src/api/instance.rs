@@ -439,7 +439,7 @@ pub async fn instance_get_projects(
     cache_behaviour: Option<CacheBehaviour>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<DashMap<String, ContentFile>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(
         theseus::instance::get_projects(&context, instance_id, cache_behaviour)
             .await?,
@@ -451,7 +451,7 @@ pub async fn instance_get_installed_project_ids(
     instance_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<String>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(
         theseus::instance::get_installed_project_ids(&context, instance_id)
             .await?,
@@ -488,7 +488,7 @@ pub async fn instance_get_content_items(
     cache_behaviour: Option<CacheBehaviour>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::get_content_items(
         &context,
         instance_id,
@@ -503,7 +503,7 @@ pub async fn instance_get_dependencies_as_content_items(
     cache_behaviour: Option<CacheBehaviour>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::get_dependencies_as_content_items(
         &context,
         dependencies,
@@ -518,7 +518,7 @@ pub async fn instance_get_linked_modpack_info(
     cache_behaviour: Option<CacheBehaviour>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Option<LinkedModpackInfo>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::get_linked_modpack_info(
         &context,
         instance_id,
@@ -533,7 +533,7 @@ pub async fn instance_get_linked_modpack_content(
     cache_behaviour: Option<CacheBehaviour>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::get_linked_modpack_content(
         &context,
         instance_id,
@@ -560,7 +560,7 @@ pub async fn instance_get_optimal_jre_key(
     instance_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<Option<JavaVersion>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::get_optimal_jre_key(&context, instance_id).await?)
 }
 
@@ -570,7 +570,7 @@ pub async fn instance_check_installed(
     project_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<bool> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     let check_project_id = project_id;
 
     if let Ok(projects) =
@@ -592,7 +592,7 @@ pub async fn instance_update_all(
     instance_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<HashMap<String, String>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::update_all_projects(&context, instance_id).await?)
 }
 
@@ -602,7 +602,7 @@ pub async fn instance_update_project(
     project_path: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<String> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::update_project(
         &context,
         instance_id,
@@ -620,7 +620,7 @@ pub async fn instance_add_project_from_version(
     dependent_on_version_id: Option<String>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<String> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::add_project_from_version(
         &context,
         instance_id,
@@ -637,7 +637,7 @@ pub async fn instance_install_project_with_dependencies(
     request: InstallProjectWithDependenciesRequest,
     invocation_context: theseus::InvocationContext,
 ) -> Result<ResolveContentPlan> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::install_project_with_dependencies(
         &context,
         instance_id,
@@ -653,7 +653,7 @@ pub async fn instance_switch_project_version_with_dependencies(
     version_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<String> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::switch_project_version_with_dependencies(
         &context,
         instance_id,
@@ -682,7 +682,7 @@ pub async fn instance_is_file_on_modrinth(
     project_path: &Path,
     invocation_context: theseus::InvocationContext,
 ) -> Result<bool> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::is_file_on_modrinth(&context, project_path).await?)
 }
 
@@ -715,7 +715,7 @@ pub async fn instance_update_managed_modrinth_version(
     version_id: String,
     invocation_context: theseus::InvocationContext,
 ) -> Result<theseus::install::InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::instance::update_managed_modrinth_version(
         &context,
         &instance_id,
@@ -729,7 +729,7 @@ pub async fn instance_repair_managed_modrinth(
     instance_id: &str,
     invocation_context: theseus::InvocationContext,
 ) -> Result<theseus::install::InstallJobSnapshot> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(
         theseus::instance::repair_managed_modrinth(&context, instance_id)
             .await?,
@@ -746,7 +746,7 @@ pub async fn instance_export_mrpack(
     name: Option<String>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<()> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     theseus::instance::export_mrpack(
         &context,
         instance_id,
@@ -773,7 +773,7 @@ pub async fn instance_run(
     server_address: Option<String>,
     invocation_context: theseus::InvocationContext,
 ) -> Result<ProcessMetadata> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     let quick_play = match server_address {
         Some(addr) => QuickPlayType::Server(ServerAddress::Unresolved(addr)),
         None => QuickPlayType::None,

@@ -1,4 +1,4 @@
-use crate::OperationContext;
+use crate::InvocationContext;
 use crate::launcher::get_loader_version_from_profile;
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSourceKind, Instance,
@@ -28,7 +28,7 @@ pub struct CreateInstance {
 }
 
 pub(crate) async fn create_instance(
-    context: &OperationContext,
+    context: &InvocationContext,
     input: CreateInstance,
     state: &State,
 ) -> crate::Result<Instance> {
@@ -171,7 +171,7 @@ async fn path_available(
 }
 
 async fn resolve_icon_path(
-    context: &OperationContext,
+    context: &InvocationContext,
     icon_path: Option<&str>,
     state: &State,
 ) -> crate::Result<Option<String>> {

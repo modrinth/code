@@ -18,7 +18,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 pub async fn tags_get_categories(
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<Category>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::tags::get_category_tags(&context).await?)
 }
 
@@ -27,7 +27,7 @@ pub async fn tags_get_categories(
 pub async fn tags_get_report_types(
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<String>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::tags::get_report_type_tags(&context).await?)
 }
 
@@ -36,7 +36,7 @@ pub async fn tags_get_report_types(
 pub async fn tags_get_loaders(
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<Loader>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::tags::get_loader_tags(&context).await?)
 }
 
@@ -45,7 +45,7 @@ pub async fn tags_get_loaders(
 pub async fn tags_get_game_versions(
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<GameVersion>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::tags::get_game_version_tags(&context).await?)
 }
 
@@ -54,6 +54,6 @@ pub async fn tags_get_game_versions(
 pub async fn tags_get_donation_platforms(
     invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<DonationPlatform>> {
-    let context = crate::api::operation_context(invocation_context);
+    let context = invocation_context;
     Ok(theseus::tags::get_donation_platform_tags(&context).await?)
 }

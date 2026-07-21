@@ -1,6 +1,6 @@
+use crate::InvocationContext;
 use crate::state::ProjectType;
 use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
-use crate::{OperationCause, OperationContext};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -805,7 +805,7 @@ macro_rules! impl_cache_methods {
                 paste::paste! {
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
                     pub async fn [<get_ $variant:snake>](
-                        context: &OperationContext,
+                        context: &InvocationContext,
                         id: &str,
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
@@ -817,7 +817,7 @@ macro_rules! impl_cache_methods {
 
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
                     pub async fn [<get_ $variant:snake _many>](
-                        context: &OperationContext,
+                        context: &InvocationContext,
                         ids: &[&str],
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
@@ -846,7 +846,7 @@ macro_rules! impl_cache_method_singular {
                 paste::paste! {
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
                     pub async fn [<get_ $variant:snake>] (
-                        context: &OperationContext,
+                        context: &InvocationContext,
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
                         fetch_semaphore: &FetchSemaphore,
@@ -894,7 +894,7 @@ impl_cache_method_singular!(
 impl CachedEntry {
     #[tracing::instrument(skip(pool, fetch_semaphore))]
     pub async fn get(
-        context: &OperationContext,
+        context: &InvocationContext,
         type_: CacheValueType,
         key: &str,
         cache_behaviour: Option<CacheBehaviour>,
@@ -916,7 +916,7 @@ impl CachedEntry {
 
     #[tracing::instrument(skip(pool, fetch_semaphore))]
     pub async fn get_many(
-        context: &OperationContext,
+        context: &InvocationContext,
         type_: CacheValueType,
         keys: &[&str],
         cache_behaviour: Option<CacheBehaviour>,
@@ -1065,7 +1065,7 @@ impl CachedEntry {
                 || cache_behaviour
                     == CacheBehaviour::StaleWhileRevalidateSkipOffline)
         {
-            let context = context.child(OperationCause::CacheRevalidate);
+            let context = context.clone();
             tokio::task::spawn(async move {
                 // TODO: if possible- find a way to do this without invoking state get
                 let state = crate::state::State::get().await?;
@@ -1094,14 +1094,14 @@ impl CachedEntry {
     }
 
     async fn fetch_many(
-        context: &OperationContext,
+        context: &InvocationContext,
         type_: CacheValueType,
         keys: DashSet<impl Display + Eq + Hash + Serialize>,
         fetch_semaphore: &FetchSemaphore,
         pool: &SqlitePool,
     ) -> crate::Result<Vec<(Self, bool)>> {
         async fn fetch_many_batched<T: DeserializeOwned>(
-            context: &OperationContext,
+            context: &InvocationContext,
             method: Method,
             api_url: &str,
             url: &str,
@@ -2098,7 +2098,7 @@ impl CachedEntry {
 
     /// Get modpack file hashes from cache
     pub async fn get_modpack_files(
-        context: &OperationContext,
+        context: &InvocationContext,
         version_id: &str,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
@@ -2127,7 +2127,7 @@ impl CachedEntry {
     /// Get versions for a project (without changelogs for fast loading)
     #[tracing::instrument(skip(pool, fetch_semaphore))]
     pub async fn get_project_versions(
-        context: &OperationContext,
+        context: &InvocationContext,
         project_id: &str,
         cache_behaviour: Option<CacheBehaviour>,
         pool: &SqlitePool,
