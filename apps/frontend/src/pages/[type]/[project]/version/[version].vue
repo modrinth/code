@@ -832,8 +832,8 @@ const deleteVersionMutation = useMutation({
 	mutationFn: () => client.labrinth.versions_v3.deleteVersion(version.value!.id),
 	onSuccess: async () => {
 		addNotification({
-			title: 'Version deleted',
-			text: 'The version has been successfully deleted.',
+			title: formatMessage(messages.versionDeletedTitle),
+			text: formatMessage(messages.versionDeletedText),
 			type: 'success',
 		})
 		await invalidate()
@@ -841,7 +841,7 @@ const deleteVersionMutation = useMutation({
 	},
 	onError: (err: { data?: { description?: string } }) => {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data?.description ?? String(err),
 			type: 'error',
 		})
@@ -894,8 +894,8 @@ const createDataPackVersionMutation = useMutation({
 		packageModal.value?.hide()
 
 		addNotification({
-			title: 'Packaging Success',
-			text: 'Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.',
+			title: formatMessage(messages.packagingSuccessTitle),
+			text: formatMessage(messages.packagingSuccessText),
 			type: 'success',
 		})
 
@@ -906,7 +906,7 @@ const createDataPackVersionMutation = useMutation({
 	},
 	onError: (err: { data?: { description?: string } }) => {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data?.description ?? String(err),
 			type: 'error',
 		})
@@ -938,6 +938,23 @@ const messages = defineMessages({
 	noPrimaryFile: {
 		id: 'version.download.no-primary-file',
 		defaultMessage: 'Error: No primary file found',
+	},
+	versionDeletedTitle: {
+		id: 'version.notification.deleted-title',
+		defaultMessage: 'Version deleted',
+	},
+	versionDeletedText: {
+		id: 'version.notification.deleted-text',
+		defaultMessage: 'The version has been successfully deleted.',
+	},
+	packagingSuccessTitle: {
+		id: 'version.notification.packaging-success-title',
+		defaultMessage: 'Packaging Success',
+	},
+	packagingSuccessText: {
+		id: 'version.notification.packaging-success-text',
+		defaultMessage:
+			'Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors.',
 	},
 	downloadVersion: {
 		id: 'version.download.version',

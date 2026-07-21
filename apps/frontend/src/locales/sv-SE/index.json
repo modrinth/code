@@ -3425,9 +3425,6 @@
   "servers.plan.small.description": {
     "message": "Perfekt för 1–5 vänner med några få lätta moddar."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "fakturerad {interval, select, monthly {månadsvis} quarterly {kvartalvis} yearly {årligen} other {{interval}}}"
-  },
   "settings.account.delete.confirm.proceed": {
     "message": "Radera kontot"
   },

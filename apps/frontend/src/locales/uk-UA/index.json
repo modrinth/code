@@ -4064,9 +4064,6 @@
   "servers.plan.small.description": {
     "message": "Прекрасно підходить для 1–5 друзів із кількома легкими модами."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "оплата {interval, select, monthly {щомісяця} quarterly {щокварталу} yearly {щороку} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Завершити налаштування"
   },
