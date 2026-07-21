@@ -326,6 +326,8 @@ export const linksNags: Nag[] = [
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) => {
+			if (context.projectV3.project_types.includes('datapack')) return false
+
 			const hasSourceUrl = !!context.project.source_url
 			const hasAdditionalFiles = (context: NagContext) => {
 				let hasAdditional = true
