@@ -111,7 +111,7 @@ jobs:
 
       - name: Ensure sccache directory exists
         if: needs.skip-if-clean.outputs.internal == 'true'
-        run: mkdir -p /mnt/sccache && chown $(id -u):$(id -g) /mnt/sccache
+        run: sudo mkdir -p /mnt/sccache && sudo chown $(id -u):$(id -g) /mnt/sccache
 
       - name: Mount sccache disk cache
         if: needs.skip-if-clean.outputs.internal == 'true'
