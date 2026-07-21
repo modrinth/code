@@ -48,8 +48,7 @@ function installAdsRailStyle() {
 	style.id = 'modrinth-ads-rail-style'
 	style.textContent = `
 		html.modrinth-ads-consent-preferences #modrinth-rail-1 {
-			visibility: hidden !important;
-			pointer-events: none !important;
+			display: none !important;
 		}
 	`
 	document.documentElement.appendChild(style)
@@ -62,18 +61,9 @@ function installAdsConsentOverlayStyle() {
 	const style = document.createElement('style')
 	style.id = 'modrinth-ads-consent-overlay-style'
 	style.textContent = `
-		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #modrinth-rail-1 {
-			visibility: hidden !important;
-		}
-
 		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #qc-cmp2-container,
-		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #qc-cmp2-main {
-			visibility: hidden !important;
-			pointer-events: none !important;
-		}
-
-		.qc-cmp2-close-icon {
-			background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M.5.5l23 23m0-23l-23 23' fill='none' stroke='%23b0bac5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10'/%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3C/svg%3E") 0% 0% / 66% auto no-repeat !important;
+		html.modrinth-ads-consent-preferences:not(.modrinth-ads-consent-preferences-visible) #qc-cmp2-container {
+			display: none !important;
 		}
 	`
 	document.documentElement.appendChild(style)
@@ -96,13 +86,20 @@ function invokeAdsConsentOverlayCommand(shown) {
 	invoke(`plugin:ads|${command}`, args).catch(() => {})
 }
 
-function revealAdsConsentPreferences() {
+function prepareAdsConsentPreferences() {
+	installAdsRailStyle()
+	installAdsConsentOverlayStyle()
 	document.documentElement.classList.add('modrinth-ads-consent-preferences')
-	document.getElementById('modrinth-ads-consent-overlay-style')?.remove()
+	document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
+}
+
+function revealAdsConsentPreferences() {
+	document.documentElement.classList.add('modrinth-ads-consent-preferences-visible')
 }
 
 function concealAdsConsentPreferences() {
 	document.documentElement.classList.remove('modrinth-ads-consent-preferences')
+	document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
 	installAdsConsentOverlayStyle()
 }
 
@@ -128,38 +125,19 @@ function isDirectChildFrame(source) {
 }
 
 function findAdsConsentButton(action) {
-	const container = document.querySelector('#qc-cmp2-container, #qc-cmp2-main')
+	const container = document.getElementById('qc-cmp2-container')
 	if (!container) return null
-	const summaryButtons = Array.from(container.querySelectorAll('.qc-cmp2-summary-buttons button'))
 
-	if (action === 'accept') {
-		const explicitAcceptButton = container.querySelector('#accept-btn')
-		if (explicitAcceptButton) return explicitAcceptButton
-		if (summaryButtons.length >= 3) return summaryButtons[2]
-
-		return container.querySelector('.qc-cmp2-summary-buttons button[mode="primary"]')
+	const buttonIds = {
+		accept: 'accept-btn',
+		reject: 'disagree-btn',
+		manage: 'more-options-btn',
 	}
+	const buttonId = buttonIds[action]
+	if (!buttonId) return null
 
-	if (action === 'reject') {
-		const explicitRejectButton = container.querySelector('#disagree-btn')
-		if (explicitRejectButton) return explicitRejectButton
-		if (summaryButtons.length >= 3) return summaryButtons[1]
-
-		const secondaryButtons = container.querySelectorAll(
-			'.qc-cmp2-summary-buttons button[mode="secondary"]',
-		)
-		if (secondaryButtons.length > 1) return secondaryButtons[1]
-
-		return summaryButtons.find(
-			(button) => button.textContent?.trim().toLowerCase() === 'reject all',
-		)
-	}
-
-	return (
-		container.querySelector(
-			'#more-options-btn, .qc-cmp2-summary-buttons > button[mode="secondary"]:first-of-type',
-		) ?? summaryButtons[0]
-	)
+	const button = container.querySelector(`#${buttonId}`)
+	return button && !button.disabled ? button : null
 }
 
 function clickAdsConsentButtonWhenReady(action, timeoutMs, onButtonFound) {
@@ -231,10 +209,12 @@ function finishAdsConsentReprompt() {
 }
 
 async function openAdsConsentPreferences() {
-	revealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
+	prepareAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
 	await expandAdsConsentWebview()
 	await waitForAdsConsentLayout()
+	revealAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
 
 	window.dispatchEvent(new Event('resize'))
 	sendAdsConsentCommandToChildFrames({ type: 'resize' })
@@ -267,12 +247,14 @@ window.modrinthAdsConsentAction = (action) => {
 window.modrinthAdsReopenConsentPreferences = async () => {
 	modrinthAdsConsentReprompt = true
 	modrinthAdsConsentRepromptManaging = false
-	revealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
+	prepareAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
 
 	try {
 		await expandAdsConsentWebview()
 		await waitForAdsConsentLayout()
+		revealAdsConsentPreferences()
+		sendAdsConsentCommandToChildFrames({ type: 'reveal' })
 		window.dispatchEvent(new Event('resize'))
 		sendAdsConsentCommandToChildFrames({ type: 'resize' })
 
@@ -302,7 +284,10 @@ window.addEventListener('message', (event) => {
 	const command = event.data?.modrinthAdsConsentCommand
 	if (!command || typeof command !== 'object') return
 
-	if (command.type === 'reveal') {
+	if (command.type === 'prepare') {
+		prepareAdsConsentPreferences()
+		sendAdsConsentCommandToChildFrames(command)
+	} else if (command.type === 'reveal') {
 		revealAdsConsentPreferences()
 		sendAdsConsentCommandToChildFrames(command)
 	} else if (command.type === 'conceal') {
@@ -332,6 +317,7 @@ function setAdsConsentOverlay(shown) {
 	document.documentElement.classList.toggle('modrinth-ads-consent-overlay', shown)
 	if (!shown) {
 		document.documentElement.classList.remove('modrinth-ads-consent-preferences')
+		document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
 	}
 
 	if (window.top === window) {
