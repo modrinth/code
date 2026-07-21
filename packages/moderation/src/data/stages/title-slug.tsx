@@ -326,11 +326,10 @@ export default function () {
 									}))(state)
 								})
 								.fix(
-                  //TODO chyz think of some way to have initial values actually be reflected in state without having to store them
+									//TODO chyz think of some way to have initial values actually be reflected in state without having to store them
 									fix().project((patch, state) => {
 										const slug =
-											(state['correct-slug'] as string | undefined) ??
-											resolvedAutoSlug.value
+											(state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value
 										if (!slug || slug === project.value.slug) return
 										patch.slug = slug
 									}),
