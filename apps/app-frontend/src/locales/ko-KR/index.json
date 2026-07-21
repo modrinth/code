@@ -479,21 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "탐색으로 돌아가기"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "인스턴스에 콘텐츠 설치"
-  },
-  "app.project.version.all-versions": {
-    "message": "모든 버전"
-  },
-  "app.project.version.download-in-browser": {
-    "message": "브라우저에서 다운로드"
-  },
-  "app.project.version.installing": {
-    "message": "설치 중"
-  },
-  "app.project.versions.already-installed": {
-    "message": "이미 설치됨"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되었습니다."
   },

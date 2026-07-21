@@ -205,11 +205,16 @@
 					<UpToDate class="icon" />
 					<br />
 					<span class="preserve-lines text">
-						This organization doesn't have any projects yet.
 						<template v-if="isPermission(currentMember?.permissions, 1 << 4)">
-							Would you like to
-							<a class="link" @click="modal_creation?.show()">create one</a>?
+							<IntlFormatted :message-id="messages.noProjectsWithCreatePrompt">
+								<template #create-link="{ children }">
+									<a class="link" @click="modal_creation?.show()"
+										><component :is="() => normalizeChildren(children)"
+									/></a>
+								</template>
+							</IntlFormatted>
 						</template>
+						<template v-else>{{ formatMessage(messages.noProjects) }}</template>
 					</span>
 				</div>
 			</div>
@@ -233,8 +238,11 @@ import {
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	defineMessages,
 	injectModrinthClient,
+	IntlFormatted,
 	NavTabs,
+	normalizeChildren,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectCard,
 	ProjectCardList,
@@ -265,6 +273,18 @@ type ProjectV3 = Labrinth.Projects.v3.Project & {
 
 const vintl = useVIntl()
 const { formatMessage } = vintl
+
+const messages = defineMessages({
+	noProjects: {
+		id: 'organization.projects.none',
+		defaultMessage: "This organization doesn't have any projects yet.",
+	},
+	noProjectsWithCreatePrompt: {
+		id: 'organization.projects.none-with-create-prompt',
+		defaultMessage:
+			"This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?",
+	},
+})
 
 const { formatCompactNumber } = useCompactNumber()
 

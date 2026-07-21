@@ -479,21 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Terug naar Ontdekken"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Inhoud op instantie installeren"
-  },
-  "app.project.version.all-versions": {
-    "message": "Alle versies"
-  },
-  "app.project.version.download-in-browser": {
-    "message": "Downloaden in de browser"
-  },
-  "app.project.version.installing": {
-    "message": "Wordt geïnstalleerd"
-  },
-  "app.project.versions.already-installed": {
-    "message": "Al geïnstalleerd"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },

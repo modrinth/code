@@ -775,19 +775,22 @@ function suppressUpcomingChartClick() {
 	}, 350)
 }
 
-function clearUnpinnedTouchInteraction(ignoreClick: boolean) {
+function clearUnpinnedTouchInteraction(ignoreClick: boolean, pinHover = false) {
 	if (props.pinnedSliceIndex !== null) return
+
+	if (ignoreClick) {
+		suppressUpcomingChartClick()
+	}
+	if (pinHover) {
+		emit('touch-drag')
+	}
 
 	clearChartActiveState()
 	updateChartWithoutGeometry()
 
-	if (ignoreClick) {
-		suppressUpcomingChartClick()
-		emit('touch-drag')
-		return
+	if (!pinHover) {
+		emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
 	}
-
-	emit('hover', { visible: false, x: 0, y: 0, sliceIndex: null })
 }
 
 function handleCanvasClickCapture(event: MouseEvent) {
@@ -918,7 +921,7 @@ function handleRangePointerEnd(event: PointerEvent) {
 
 	if (isRangeSelecting && rangeSelectPointerType === 'touch') {
 		event.preventDefault()
-		clearUnpinnedTouchInteraction(true)
+		clearUnpinnedTouchInteraction(true, true)
 	} else if (isRangeSelecting && startSliceIndex !== null && endSliceIndex !== null) {
 		event.preventDefault()
 		emit('range-select', { startSliceIndex, endSliceIndex })

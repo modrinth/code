@@ -479,9 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Zurück zu Entdecken"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Inhalt in Instanz installieren"
-  },
   "app.project.version.all-versions": {
     "message": "Alle Versionen"
   },

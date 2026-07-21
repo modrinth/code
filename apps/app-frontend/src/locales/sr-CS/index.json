@@ -479,9 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Nazad da otkrivanje"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Instaliraj sadržaj na instancu"
-  },
   "app.project.version.all-versions": {
     "message": "Sve verzije"
   },

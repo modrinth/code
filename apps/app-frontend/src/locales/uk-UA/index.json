@@ -479,21 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Повернутися до дослідження"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Установити вміст до профілю"
-  },
-  "app.project.version.all-versions": {
-    "message": "Усі версії"
-  },
-  "app.project.version.download-in-browser": {
-    "message": "Завантажити в браузері"
-  },
-  "app.project.version.installing": {
-    "message": "Установлення"
-  },
-  "app.project.versions.already-installed": {
-    "message": "Уже встановлено"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },

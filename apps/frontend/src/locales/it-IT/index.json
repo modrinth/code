@@ -4040,9 +4040,6 @@
   "servers.plan.small.description": {
     "message": "Perfetto per 1–5 giocatori e qualche mod leggera."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "addebitato {interval, select, monthly {mensilmente} quarterly {trimerstralmente} yearly {annualmente} other {{interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Completa la configurazione"
   },

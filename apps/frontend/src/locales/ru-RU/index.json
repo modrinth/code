@@ -4046,9 +4046,6 @@
   "servers.plan.small.description": {
     "message": "Для 1–5 друзей и пары лёгких модов."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {на месяц} quarterly {на 3 месяца} yearly {на год} other {оплата {interval}}}"
-  },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
   },
