@@ -680,6 +680,30 @@ const formatPrice = useFormatPrice()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({
+	errorFetchingPaymentDataTitle: {
+		id: 'hosting-marketing.notification.error-fetching-payment-data-title',
+		defaultMessage: 'Error fetching payment data',
+	},
+	unexpectedErrorText: {
+		id: 'hosting-marketing.notification.unexpected-error-text',
+		defaultMessage: 'An unexpected error occurred',
+	},
+	serverCapacityFullTitle: {
+		id: 'hosting-marketing.notification.server-capacity-full-title',
+		defaultMessage: 'Server Capacity Full',
+	},
+	serverCapacityFullText: {
+		id: 'hosting-marketing.notification.server-capacity-full-text',
+		defaultMessage: 'We are currently at capacity. Please try again later.',
+	},
+	invalidProductTitle: {
+		id: 'hosting-marketing.notification.invalid-product-title',
+		defaultMessage: 'Invalid product',
+	},
+	invalidProductText: {
+		id: 'hosting-marketing.notification.invalid-product-text',
+		defaultMessage: 'The selected product was found but lacks necessary data. Please contact support.',
+	},
 	hostWithModrinth: {
 		id: 'hosting-marketing.hero.host-with-modrinth',
 		defaultMessage: 'Host your next server with Modrinth Hosting',
@@ -1106,7 +1130,7 @@ const startTyping = () => {
 
 const handleError = (err) => {
 	addNotification({
-		title: 'An error occurred',
+		title: formatMessage(commonMessages.errorNotificationTitle),
 		type: 'error',
 		text: err.message ?? (err.data ? err.data.description : err),
 	})
@@ -1124,9 +1148,9 @@ async function fetchPaymentData() {
 	} catch (error) {
 		console.error('Error fetching payment data:', error)
 		addNotification({
-			title: 'Error fetching payment data',
+			title: formatMessage(messages.errorFetchingPaymentDataTitle),
 			type: 'error',
-			text: error.message || 'An unexpected error occurred',
+			text: error.message || formatMessage(messages.unexpectedErrorText),
 		})
 	}
 }
@@ -1177,9 +1201,9 @@ const selectProduct = async (product) => {
 
 	if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
 		addNotification({
-			title: 'Server Capacity Full',
+			title: formatMessage(messages.serverCapacityFullTitle),
 			type: 'error',
-			text: 'We are currently at capacity. Please try again later.',
+			text: formatMessage(messages.serverCapacityFullText),
 		})
 		return
 	}
@@ -1192,9 +1216,9 @@ const selectProduct = async (product) => {
 		(product !== 'custom' && !selectedPlan.metadata)
 	) {
 		addNotification({
-			title: 'Invalid product',
+			title: formatMessage(messages.invalidProductTitle),
 			type: 'error',
-			text: 'The selected product was found but lacks necessary data. Please contact support.',
+			text: formatMessage(messages.invalidProductText),
 		})
 		return
 	}

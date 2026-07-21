@@ -58,7 +58,7 @@
 						class="!w-full flex-grow sm:!w-[160px] sm:flex-grow-0 lg:!w-[140px]"
 						trigger-class="!h-10"
 						:options="itemsPerPageOptions"
-						placeholder="Items per page"
+						:placeholder="formatMessage(messages.itemsPerPagePlaceholder)"
 						@select="goToPage(1)"
 					>
 						<template #selected>
@@ -77,7 +77,7 @@
 					>
 						<ScaleIcon class="flex-shrink-0" />
 						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
-						<span class="sm:hidden">Moderate</span>
+						<span class="sm:hidden">{{ formatMessage(messages.moderate) }}</span>
 					</button>
 				</ButtonStyled>
 			</div>
@@ -86,9 +86,16 @@
 		<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 			<div class="flex flex-wrap items-center gap-3">
 				<div v-if="totalProjects > 0">
-					Showing {{ pageStart }}–{{ pageEnd }} of {{ totalProjects }}
 					{{
-						currentFilterType === DEFAULT_FILTER_TYPE ? 'projects' : currentFilterType.toLowerCase()
+						formatMessage(messages.showingProjectsRange, {
+							start: pageStart,
+							end: pageEnd,
+							total: totalProjects,
+							type:
+								currentFilterType === DEFAULT_FILTER_TYPE
+									? formatMessage(messages.genericProjectsLabel)
+									: currentFilterType.toLowerCase(),
+						})
 					}}
 				</div>
 				<div class="flex items-center gap-2 text-sm font-semibold text-secondary">
@@ -189,6 +196,35 @@ const messages = defineMessages({
 	excludeTechnicalReview: {
 		id: 'moderation.exclude-technical-review',
 		defaultMessage: 'Exclude TR',
+	},
+	itemsPerPagePlaceholder: {
+		id: 'moderation.items-per-page-placeholder',
+		defaultMessage: 'Items per page',
+	},
+	skippedProjectsTitle: {
+		id: 'moderation.notification.skipped-projects-title',
+		defaultMessage: 'Skipped projects',
+	},
+	skippedProjectsText: {
+		id: 'moderation.notification.skipped-projects-text',
+		defaultMessage:
+			'{count, plural, one {Skipped # project} other {Skipped # projects}} already moderated or locked by others.',
+	},
+	noProjectsAvailableTitle: {
+		id: 'moderation.notification.no-projects-available-title',
+		defaultMessage: 'No projects available',
+	},
+	noProjectsAvailableText: {
+		id: 'moderation.notification.no-projects-available-text',
+		defaultMessage: 'All projects in queue are already moderated or locked by others.',
+	},
+	genericProjectsLabel: {
+		id: 'moderation.generic-projects-label',
+		defaultMessage: 'projects',
+	},
+	showingProjectsRange: {
+		id: 'moderation.showing-projects-range',
+		defaultMessage: 'Showing {start}–{end} of {total} {type}',
 	},
 })
 
@@ -498,8 +534,8 @@ function goToPage(page: number) {
 function notifySkippedProjects(skippedCount: number) {
 	if (skippedCount <= 0) return
 	addNotification({
-		title: 'Skipped projects',
-		text: `Skipped ${skippedCount} project(s) already moderated or locked by others.`,
+		title: formatMessage(messages.skippedProjectsTitle),
+		text: formatMessage(messages.skippedProjectsText, { count: skippedCount }),
 		type: 'info',
 		autoCloseMs: 2000,
 	})
@@ -577,8 +613,8 @@ async function moderateAllInFilter() {
 
 	if (!targetProjectId) {
 		addNotification({
-			title: 'No projects available',
-			text: 'All projects in queue are already moderated or locked by others.',
+			title: formatMessage(messages.noProjectsAvailableTitle),
+			text: formatMessage(messages.noProjectsAvailableText),
 			type: 'warning',
 		})
 		return
@@ -601,8 +637,8 @@ async function startFromProject(projectId: string) {
 
 	if (!targetProjectId) {
 		addNotification({
-			title: 'No projects available',
-			text: 'All projects in queue are already moderated or locked by others.',
+			title: formatMessage(messages.noProjectsAvailableTitle),
+			text: formatMessage(messages.noProjectsAvailableText),
 			type: 'warning',
 		})
 		return

@@ -11,19 +11,21 @@
 			v-if="handlingNewFiles || !(filesToAdd.length || draftVersion.existing_files?.length)"
 		>
 			<DropzoneFileInput
-				aria-label="Upload file"
+				:aria-label="formatMessage(messages.uploadFileAriaLabel)"
 				multiple
 				:accept="acceptFileFromProjectType(projectV2.project_type)"
 				:max-size="524288000"
-				primary-prompt="Upload primary and supporting files"
-				secondary-prompt="Drag and drop files or click to browse"
+				:primary-prompt="formatMessage(messages.uploadPrimaryPrompt)"
+				:secondary-prompt="formatMessage(messages.uploadSecondaryPrompt)"
 				@change="handleNewFiles"
 			/>
 		</template>
 
 		<template v-else>
 			<div class="flex flex-col gap-2">
-				<span class="text-base font-semibold text-contrast">Primary file</span>
+				<span class="text-base font-semibold text-contrast">{{
+					formatMessage(messages.primaryFileLabel)
+				}}</span>
 				<div class="flex flex-col gap-2.5">
 					<VersionFileRow
 						v-if="primaryFile"
@@ -36,7 +38,7 @@
 					/>
 				</div>
 				<span>
-					The primary file is the default file a user downloads when installing the project.
+					{{ formatMessage(messages.primaryFileDescription) }}
 				</span>
 			</div>
 
@@ -46,16 +48,18 @@
 						{{ formatMessage(messages.addFilesAdmonition) }}
 					</Admonition>
 
-					<span class="text-base font-semibold text-contrast">Supplementary files</span>
+					<span class="text-base font-semibold text-contrast">{{
+						formatMessage(messages.supplementaryFilesLabel)
+					}}</span>
 
 					<DropzoneFileInput
-						aria-label="Upload additional file"
+						:aria-label="formatMessage(messages.uploadAdditionalFileAriaLabel)"
 						multiple
 						:accept="acceptFileFromProjectType(projectV2.project_type)"
 						:max-size="524288000"
 						size="small"
 						:primary-prompt="null"
-						secondary-prompt="Drag and drop files or click to browse"
+						:secondary-prompt="formatMessage(messages.uploadSecondaryPrompt)"
 						@change="handleNewFiles"
 					/>
 
@@ -84,8 +88,7 @@
 					</div>
 				</div>
 				<span>
-					You can optionally add supplementary files such as source code, documentation, or required
-					resource packs.
+					{{ formatMessage(messages.supplementaryFilesDescription) }}
 				</span>
 			</div>
 		</template>
@@ -124,11 +127,11 @@ const {
 	handleNewFiles,
 } = injectManageVersionContext()
 
-const editTabs: TabsTab[] = [
-	{ label: 'Metadata', value: 'metadata' },
-	{ label: 'Details', value: 'add-details' },
-	{ label: 'Files', value: 'add-files' },
-]
+const editTabs = computed<TabsTab[]>(() => [
+	{ label: formatMessage(messages.metadataTab), value: 'metadata' },
+	{ label: formatMessage(messages.detailsTab), value: 'add-details' },
+	{ label: formatMessage(messages.filesTab), value: 'add-files' },
+])
 
 function setEditTab(tab: TabsTab) {
 	modal.value?.setStage(tab.value)
@@ -170,6 +173,51 @@ const messages = defineMessages({
 		id: 'create-project-version.create-modal.stage.add-files.admonition',
 		defaultMessage:
 			'Supplementary files are for supporting resources like source code, not for alternative versions or variants.',
+	},
+	uploadFileAriaLabel: {
+		id: 'create-project-version.create-modal.stage.add-files.upload-file-aria-label',
+		defaultMessage: 'Upload file',
+	},
+	uploadAdditionalFileAriaLabel: {
+		id: 'create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label',
+		defaultMessage: 'Upload additional file',
+	},
+	uploadPrimaryPrompt: {
+		id: 'create-project-version.create-modal.stage.add-files.upload-primary-prompt',
+		defaultMessage: 'Upload primary and supporting files',
+	},
+	uploadSecondaryPrompt: {
+		id: 'create-project-version.create-modal.stage.add-files.upload-secondary-prompt',
+		defaultMessage: 'Drag and drop files or click to browse',
+	},
+	primaryFileLabel: {
+		id: 'create-project-version.create-modal.stage.add-files.primary-file-label',
+		defaultMessage: 'Primary file',
+	},
+	primaryFileDescription: {
+		id: 'create-project-version.create-modal.stage.add-files.primary-file-description',
+		defaultMessage: 'The primary file is the default file a user downloads when installing the project.',
+	},
+	supplementaryFilesLabel: {
+		id: 'create-project-version.create-modal.stage.add-files.supplementary-files-label',
+		defaultMessage: 'Supplementary files',
+	},
+	supplementaryFilesDescription: {
+		id: 'create-project-version.create-modal.stage.add-files.supplementary-files-description',
+		defaultMessage:
+			'You can optionally add supplementary files such as source code, documentation, or required resource packs.',
+	},
+	metadataTab: {
+		id: 'create-project-version.create-modal.stage.add-files.metadata-tab',
+		defaultMessage: 'Metadata',
+	},
+	detailsTab: {
+		id: 'create-project-version.create-modal.stage.add-files.details-tab',
+		defaultMessage: 'Details',
+	},
+	filesTab: {
+		id: 'create-project-version.create-modal.stage.add-files.files-tab',
+		defaultMessage: 'Files',
 	},
 })
 </script>

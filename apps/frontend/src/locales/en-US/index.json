@@ -251,6 +251,9 @@
   "analytics.empty.select-project": {
     "message": "Select at least one project to view data"
   },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Dependent projects failed to load"
+  },
   "analytics.filter.game-version-type": {
     "message": "Game version type"
   },
@@ -947,6 +950,12 @@
   "auth.verify-email.title": {
     "message": "Verify Email"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "Upload icon"
+  },
+  "collection.button.discover-mods": {
+    "message": "Discover mods"
+  },
   "collection.button.edit-icon": {
     "message": "Edit icon"
   },
@@ -1121,6 +1130,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Details"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Files"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "The primary file is the default file a user downloads when installing the project."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Primary file"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "You can optionally add supplementary files such as source code, documentation, or required resource packs."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Supplementary files"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Upload additional file"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Upload file"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Upload primary and supporting files"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Drag and drop files or click to browse"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Details"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Files"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Version changelog"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Version number"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "The version number differentiates this specific version from others."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Enter version number, e.g. 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Version subtitle"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Enter subtitle..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Version type"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Add dependency"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Dependencies"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Details"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Detected loaders"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Detected versions"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Edit"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Environment"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Files"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Loaders"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Modpack loaders cannot be edited"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "Modpack versions cannot be edited"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "No dependencies added."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "No environment has been set."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "No loaders selected."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "No mod loader"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "No versions selected."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Pre-filled from a previous similar version"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Resource pack loaders cannot be edited"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Suggested"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Uploaded files"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versions"
+  },
   "create.collection.collection-info": {
     "message": "Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}."
   },
@@ -1217,6 +1355,9 @@
   "create.project.name-placeholder": {
     "message": "Enter project name..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} Icon"
+  },
   "create.project.owner-description": {
     "message": "Set the project owner as yourself or an organization you're a member of."
   },
@@ -1247,8 +1388,14 @@
   "create.project.type-server": {
     "message": "Server"
   },
+  "create.project.unknown-user": {
+    "message": "Unknown user"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "User Avatar"
   },
   "create.project.visibility-description": {
     "message": "The visibility of your project after it has been approved."
@@ -1331,6 +1478,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Recently Updated"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Close"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
   },
@@ -1357,6 +1507,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Tax form"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "You have not completed the tax form. Please try again."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Tax form incomplete"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>"
@@ -1397,6 +1553,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Business entity"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Select date of birth"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "A business entity refers to a registered organization such as a corporation, partnership, or LLC."
   },
@@ -1405,6 +1564,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Private individual"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Search countries..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Search subdivisions..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Select your country"
@@ -1541,6 +1706,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Enter amount"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "The minimum denomination is {min}, which exceeds your balance of {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "You need at least {min} to use this gift card."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "No denominations available for your current balance"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "No denominations near this amount"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "No denominations near this amount. The highest available is {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Payment method"
   },
@@ -1555,6 +1735,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Search amount"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Search {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Select {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Select a denomination:"
@@ -1573,6 +1759,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "You selected USD for PayPal International. <direct-paypal-link>Switch to direct PayPal</direct-paypal-link> for better fees (≈2% instead of ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "{min} min, {max} max withdrawal amount."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "{min} min withdrawal amount."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Withdraw"
@@ -2237,6 +2429,24 @@
   "hosting-marketing.medal.text-secondary": {
     "message": "Limited-time offer. No credit card required. Available for US servers."
   },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Error fetching payment data"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "The selected product was found but lacks necessary data. Please contact support."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Invalid product"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "We are currently at capacity. Please try again later."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Server Capacity Full"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "An unexpected error occurred"
+  },
   "hosting-marketing.pick-customized-plan": {
     "message": "Pick a customized plan with just the specs you need."
   },
@@ -2555,6 +2765,21 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
+  "layout.footer.based-on-label": {
+    "message": "Based on"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Developer mode has been enabled"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Developer mode activated"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Developer mode has been disabled"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Developer mode deactivated"
+  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -2623,6 +2848,9 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.unknown-commit": {
+    "message": "unknown"
   },
   "layout.menu-toggle.action": {
     "message": "Toggle menu"
@@ -2696,8 +2924,26 @@
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
+  "moderation.generic-projects-label": {
+    "message": "projects"
+  },
+  "moderation.items-per-page-placeholder": {
+    "message": "Items per page"
+  },
   "moderation.moderate": {
     "message": "Moderate"
+  },
+  "moderation.notification.no-projects-available-text": {
+    "message": "All projects in queue are already moderated or locked by others."
+  },
+  "moderation.notification.no-projects-available-title": {
+    "message": "No projects available"
+  },
+  "moderation.notification.skipped-projects-text": {
+    "message": "{count, plural, one {Skipped # project} other {Skipped # projects}} already moderated or locked by others."
+  },
+  "moderation.notification.skipped-projects-title": {
+    "message": "Skipped projects"
   },
   "moderation.page.external-projects": {
     "message": "External projects"
@@ -2713,6 +2959,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Tech review"
+  },
+  "moderation.showing-projects-range": {
+    "message": "Showing {start}–{end} of {total} {type}"
   },
   "modpack-scan-modal.clear-all-groups": {
     "message": "Clear All Groups"
@@ -3040,6 +3289,45 @@
   },
   "organization.label.projects": {
     "message": "projects"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Name"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "No projects available to transfer."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Icon for {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Transfer projects"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "Transfer {count, plural, one {# project} other {# projects}}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Type"
+  },
+  "organization.projects.none": {
+    "message": "This organization doesn't have any projects yet."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
+  },
+  "profile.admin.edit-role-header": {
+    "message": "Edit role"
+  },
+  "profile.admin.select-role-placeholder": {
+    "message": "Select a role"
+  },
+  "profile.admin.update-role-failed-message": {
+    "message": "An error occurred while updating the user role. Please try again."
+  },
+  "profile.admin.update-role-failed-title": {
+    "message": "Failed to update role"
   },
   "profile.bio.fallback.creator": {
     "message": "A Modrinth creator."
@@ -3695,6 +3983,102 @@
   "project.settings.permissions.sort.status": {
     "message": "Status"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Bedrock address"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "The Java server must be reachable before saving. Please ensure the ping succeeds."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Cannot save"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Server details"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Enter address"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java address"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Languages"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Latency: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "optional"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "We couldn't ping this server. It may be blocked by your host so try refreshing a few times. If it still doesn't respond please <support-link>contact support</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Refresh ping"
+  },
+  "project.settings.server.region-label": {
+    "message": "Region"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Select languages"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Select region"
+  },
+  "project.settings.server.server-online": {
+    "message": "Server is online!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "If you have <srv-tooltip>[SRV records]</srv-tooltip>, you do not need to add a port. Otherwise if you have a port which isn't 25565, you can include it as :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "The address you enter here may have DNS SRV records _minecraft._tcp.'{'your domain'}' which point to your Minecraft server address and port."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "You've selected all {count} available tags. Please select only the tags that truly apply to your project."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Select all categories that reflect the themes or function of your {type}."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Featured tags"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "You can feature up to 3 of your most relevant tags. Other tags may be promoted to featured if you do not select all 3."
+  },
+  "project.settings.tags.features-description": {
+    "message": "Select all of the features that your {type} makes use of."
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Select the realistic performance impact of your {type}. Select multiple if the {type} is configurable to different levels of performance impact."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Select the resolution(s) of textures in your {type}."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Select at least one category in order to feature a category."
+  },
+  "project.settings.tags.tagging-importance-description": {
+    "message": "Accurate tagging is important to help people find your {type}. Make sure to select all tags that apply."
+  },
+  "project.settings.tags.title": {
+    "message": "Tags"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "You've selected {count} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "You've selected {count} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "You've selected {count} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Please upload a version first in order to select tags!"
+  },
   "project.settings.title": {
     "message": "Settings"
   },
@@ -3704,8 +4088,50 @@
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
   },
+  "project.versions.copy-id-option": {
+    "message": "Copy ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Copy link"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Copy Maven coordinates"
+  },
+  "project.versions.delete-button": {
+    "message": "Delete"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "This will remove this version forever (like really forever)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Are you sure you want to delete this version?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Edit details"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Edit files"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Edit metadata"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Edit version"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Open in new tab"
+  },
+  "project.versions.share-option": {
+    "message": "Share"
+  },
   "project.versions.title": {
     "message": "Versions"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "The version has been successfully deleted."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Version deleted"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {This version is} other {These versions are}} currently withheld and not publicly listed. Please provide proof that you have permission to redistribute certain files included in the modpack {count, plural, one {version} other {versions}}."
@@ -4121,8 +4547,11 @@
   "servers.plan.small.description": {
     "message": "Perfect for 1–5 friends with a few light mods."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "billed {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Most popular"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ month{interval, select, monthly {} other {, billed {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Complete setup"
@@ -4966,6 +5395,18 @@
   },
   "version.environment.unknown.title": {
     "message": "Unknown environment"
+  },
+  "version.notification.deleted-text": {
+    "message": "The version has been successfully deleted."
+  },
+  "version.notification.deleted-title": {
+    "message": "Version deleted"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "Your data pack was successfully packaged as a mod! Make sure to playtest to check for errors."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Packaging Success"
   },
   "version.package-as-mod.button": {
     "message": "Package as mod"

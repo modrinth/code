@@ -99,7 +99,7 @@
 						v-model="formData.dateOfBirth"
 						:max-date="maxDate"
 						autocomplete="bday"
-						placeholder="Select date of birth"
+						:placeholder="formatMessage(messages.dateOfBirthPlaceholder)"
 						wrapper-class="w-full"
 					/>
 				</div>
@@ -162,7 +162,7 @@
 						:options="subdivisionOptions"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
 						searchable
-						search-placeholder="Search subdivisions..."
+						:search-placeholder="formatMessage(messages.searchSubdivisionsPlaceholder)"
 					/>
 					<StyledInput
 						v-else
@@ -201,7 +201,7 @@
 						:options="countryOptions"
 						:placeholder="formatMessage(formFieldPlaceholders.countryPlaceholder)"
 						searchable
-						search-placeholder="Search countries..."
+						:search-placeholder="formatMessage(messages.searchCountriesPlaceholder)"
 					/>
 				</div>
 			</div>
@@ -360,6 +360,18 @@ const messages = defineMessages({
 	businessEntity: {
 		id: 'dashboard.creator-withdraw-modal.kyc.business-entity',
 		defaultMessage: 'Business entity',
+	},
+	dateOfBirthPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder',
+		defaultMessage: 'Select date of birth',
+	},
+	searchSubdivisionsPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder',
+		defaultMessage: 'Search subdivisions...',
+	},
+	searchCountriesPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.kyc.search-countries-placeholder',
+		defaultMessage: 'Search countries...',
 	},
 })
 </script>
