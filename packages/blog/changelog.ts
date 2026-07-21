@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-21T20:10:55+00:00`,
+		product: 'app',
+		version: '0.15.16',
+		body: `## Fixed
+- Fixed skins having a massive UV offset.
+- Fixed deeplink issues for slugs containing + characters.`,
+	},
+	{
 		date: `2026-07-21T19:36:51+00:00`,
 		product: 'app',
 		version: '0.15.15',
