@@ -7,6 +7,7 @@
 		max-width="544px"
 		width="544px"
 		no-padding
+		scrollable
 	>
 		<div v-if="preview" class="flex w-full flex-col gap-6 p-6 pb-2">
 			<Admonition
