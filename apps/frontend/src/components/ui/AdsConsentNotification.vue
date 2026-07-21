@@ -8,6 +8,7 @@ import {
 import { onBeforeUnmount, onMounted } from 'vue'
 
 type ConsentAction = 'accept' | 'reject' | 'manage'
+type ConsentVariant = 'tcf' | 'usp'
 
 interface TcfData {
 	eventStatus?: string
@@ -16,6 +17,19 @@ interface TcfData {
 
 type TcfCallback = (data: TcfData, success: boolean) => void
 type TcfApi = (command: string, version: number, callback: TcfCallback, parameter?: unknown) => void
+
+interface UspControls {
+	toggles: HTMLButtonElement[]
+	confirmButton: HTMLButtonElement
+}
+
+interface GppData {
+	eventName?: string
+	listenerId?: number
+}
+
+type GppCallback = (data: GppData, success: boolean) => void
+type GppApi = (command: string, callback: GppCallback, parameter?: unknown) => void
 
 const CMP_HIDDEN_CLASS = 'modrinth-cmp-summary-hidden'
 const notificationManager = injectNotificationManager()
@@ -47,13 +61,26 @@ const messages = defineMessages({
 
 let notificationId: WebNotification['id'] | null = null
 let tcfListenerId: number | undefined
+let gppListenerId: number | undefined
 let listenerInstalled = false
+let gppListenerInstalled = false
+let gppListenerAttempts = 0
+let gppInstallTimeout: ReturnType<typeof setTimeout> | undefined
 let managingPreferences = false
+let consentComplete = false
+let consentVariant: ConsentVariant | null = null
+let uspConsentCommitPending = false
+let uspSuccessModalDismissed = false
+let uspCommitTimeout: ReturnType<typeof setTimeout> | undefined
 let consentContainerObserver: MutationObserver | undefined
 const consentContainerContains = new Map<HTMLElement, HTMLElement['contains']>()
 
 function getTcfApi(): TcfApi | undefined {
 	return (window as typeof window & { __tcfapi?: TcfApi }).__tcfapi
+}
+
+function getGppApi(): GppApi | undefined {
+	return (window as typeof window & { __gpp?: GppApi }).__gpp
 }
 
 function setConsentUiHidden(hidden: boolean) {
@@ -62,23 +89,120 @@ function setConsentUiHidden(hidden: boolean) {
 }
 
 function patchConsentFocusTrapContainer() {
-	const container = document.querySelector<HTMLElement>('#qc-cmp2-ui')
-	if (!container || consentContainerContains.has(container)) return
+	const containers = document.querySelectorAll<HTMLElement>('#qc-cmp2-ui, #qc-cmp2-usp')
 
-	const originalContains = container.contains
-	// InMobi's focus trap otherwise cancels clicks outside its hidden container.
-	container.contains = (node: Node | null) =>
-		document.documentElement.classList.contains(CMP_HIDDEN_CLASS) ||
-		originalContains.call(container, node)
-	consentContainerContains.set(container, originalContains)
+	for (const container of containers) {
+		if (consentContainerContains.has(container)) continue
+
+		const originalContains = container.contains
+		// InMobi's focus trap otherwise cancels clicks outside its hidden container.
+		container.contains = (node: Node | null) =>
+			document.documentElement.classList.contains(CMP_HIDDEN_CLASS) ||
+			originalContains.call(container, node)
+		consentContainerContains.set(container, originalContains)
+	}
+}
+
+function detectConsentVariant(): ConsentVariant | null {
+	let variant: ConsentVariant | null = null
+
+	if (document.getElementById('qc-cmp2-usp')) {
+		variant = 'usp'
+	} else if (document.getElementById('qc-cmp2-ui')) {
+		variant = 'tcf'
+	}
+
+	if (variant) consentVariant = variant
+	return variant
 }
 
 function getConsentContainers(): ParentNode[] {
 	const containers = Array.from(
-		document.querySelectorAll<HTMLElement>('#qc-cmp2-container, #qc-cmp2-main, #qc-cmp2-ui'),
+		document.querySelectorAll<HTMLElement>(
+			'#qc-cmp2-container, #qc-cmp2-main, #qc-cmp2-ui, #qc-cmp2-usp',
+		),
 	)
 
 	return containers.length > 0 ? containers : [document]
+}
+
+function getUspConsentControls(): UspControls | null {
+	const dialog = document.getElementById('qc-cmp2-usp')
+	if (!dialog) return null
+
+	const toggles = Array.from(
+		dialog.querySelectorAll<HTMLButtonElement>(
+			'.qc-usp-container button.qc-cmp2-toggle[role="switch"]',
+		),
+	)
+	const confirmButton = dialog.querySelector<HTMLButtonElement>(
+		'.qc-usp-ui-form-content button[mode="primary"]',
+	)
+
+	if (
+		toggles.length === 0 ||
+		!confirmButton ||
+		confirmButton.disabled ||
+		toggles.some(
+			(toggle) =>
+				toggle.disabled || !['true', 'false'].includes(toggle.getAttribute('aria-checked') ?? ''),
+		)
+	) {
+		return null
+	}
+
+	return { toggles, confirmButton }
+}
+
+function waitForUspToggleState(
+	index: number,
+	checked: boolean,
+	expectedCount: number,
+	deadline: number,
+): Promise<UspControls | null> {
+	return new Promise((resolve) => {
+		function checkState() {
+			const controls = getUspConsentControls()
+			if (
+				controls &&
+				controls.toggles.length === expectedCount &&
+				controls.toggles[index]?.getAttribute('aria-checked') === String(checked)
+			) {
+				resolve(controls)
+			} else if (Date.now() >= deadline) {
+				resolve(null)
+			} else {
+				setTimeout(checkState, 50)
+			}
+		}
+
+		checkState()
+	})
+}
+
+async function setUspToggleStates(
+	checked: boolean,
+	controls: UspControls,
+	timeoutMs: number,
+): Promise<UspControls | null> {
+	const expectedCount = controls.toggles.length
+	const deadline = Date.now() + timeoutMs
+
+	for (let index = 0; index < expectedCount; index += 1) {
+		const currentControls = getUspConsentControls()
+		if (!currentControls || currentControls.toggles.length !== expectedCount) return null
+		controls = currentControls
+
+		const toggle = controls.toggles[index]
+		if (toggle.getAttribute('aria-checked') !== String(checked)) {
+			toggle.click()
+			const settledControls = await waitForUspToggleState(index, checked, expectedCount, deadline)
+			if (!settledControls) return null
+			controls = settledControls
+		}
+	}
+
+	return controls
 }
 
 function matchesButtonText(button: HTMLButtonElement, terms: string[]): boolean {
@@ -173,9 +297,29 @@ function clickConsentButtonWhenReady(action: ConsentAction, timeoutMs: number): 
 }
 
 async function performConsentAction(action: ConsentAction) {
+	const variant = detectConsentVariant()
+
 	if (action === 'manage') {
 		managingPreferences = true
 		setConsentUiHidden(false)
+		if (variant === 'usp') return
+	}
+
+	if (variant === 'usp' && action !== 'manage') {
+		const controls = getUspConsentControls()
+		const settledControls = controls
+			? await setUspToggleStates(action === 'reject', controls, 2000)
+			: null
+
+		if (settledControls) {
+			beginUspConsentCommit()
+			settledControls.confirmButton.click()
+			return
+		}
+
+		managingPreferences = false
+		setConsentUiHidden(false)
+		return
 	}
 
 	const clicked = await clickConsentButtonWhenReady(action, action === 'manage' ? 2500 : 1000)
@@ -194,6 +338,8 @@ async function performConsentAction(action: ConsentAction) {
 }
 
 function showConsentNotification() {
+	if (consentComplete) return
+
 	setConsentUiHidden(true)
 
 	if (
@@ -239,6 +385,10 @@ function showConsentNotification() {
 
 function finishConsent() {
 	managingPreferences = false
+	consentComplete = true
+	uspConsentCommitPending = false
+	clearTimeout(uspCommitTimeout)
+	uspCommitTimeout = undefined
 	setConsentUiHidden(false)
 
 	if (notificationId !== null) {
@@ -247,8 +397,67 @@ function finishConsent() {
 	}
 }
 
+function beginUspConsentCommit() {
+	if (!document.getElementById('qc-cmp2-usp')) return
+
+	consentVariant = 'usp'
+	uspConsentCommitPending = true
+	uspSuccessModalDismissed = false
+	clearTimeout(uspCommitTimeout)
+
+	const deadline = Date.now() + 2500
+	function checkForDialogClosure() {
+		if (!uspConsentCommitPending) return
+
+		if (!document.getElementById('qc-cmp2-usp')) {
+			finishConsent()
+		} else if (Date.now() >= deadline) {
+			uspConsentCommitPending = false
+			uspCommitTimeout = undefined
+		} else {
+			uspCommitTimeout = setTimeout(checkForDialogClosure, 50)
+		}
+	}
+
+	uspCommitTimeout = setTimeout(checkForDialogClosure, 50)
+}
+
+function dismissUspSuccessModal() {
+	if ((!uspConsentCommitPending && !consentComplete) || uspSuccessModalDismissed) return
+
+	const closeButton = document.querySelector<HTMLElement>(
+		'#qc-cmp2-usp [aria-label="Close success modal"]',
+	)
+	if (!closeButton || (closeButton instanceof HTMLButtonElement && closeButton.disabled)) return
+
+	uspSuccessModalDismissed = true
+	closeButton.click()
+}
+
+function syncConsentUi() {
+	patchConsentFocusTrapContainer()
+	installGppConsentListener()
+	const variant = detectConsentVariant()
+	dismissUspSuccessModal()
+
+	if (
+		variant === 'usp' &&
+		!consentComplete &&
+		!uspConsentCommitPending &&
+		!managingPreferences &&
+		getUspConsentControls()
+	) {
+		showConsentNotification()
+	}
+
+	if (uspConsentCommitPending && !document.getElementById('qc-cmp2-usp')) {
+		finishConsent()
+	}
+}
+
 function handleTcfConsentEvent(data: TcfData, success: boolean) {
 	if (!success) return
+	detectConsentVariant()
 
 	if (data.listenerId !== undefined) {
 		tcfListenerId = data.listenerId
@@ -258,9 +467,45 @@ function handleTcfConsentEvent(data: TcfData, success: boolean) {
 		if (!managingPreferences) {
 			showConsentNotification()
 		}
-	} else if (data.eventStatus === 'useractioncomplete') {
+	} else if (data.eventStatus === 'useractioncomplete' && consentVariant === 'tcf') {
 		finishConsent()
 	}
+}
+
+function handleGppConsentEvent(data: GppData, success: boolean) {
+	if (data.listenerId !== undefined) {
+		gppListenerId = data.listenerId
+	}
+
+	if (
+		success &&
+		data.eventName === 'sectionChange' &&
+		consentVariant === 'usp' &&
+		uspConsentCommitPending
+	) {
+		finishConsent()
+	}
+}
+
+function installGppConsentListener() {
+	if (gppListenerInstalled) return
+
+	const gppApi = getGppApi()
+	if (!gppApi) {
+		if (gppListenerAttempts < 60 && gppInstallTimeout === undefined) {
+			gppListenerAttempts += 1
+			gppInstallTimeout = setTimeout(() => {
+				gppInstallTimeout = undefined
+				installGppConsentListener()
+			}, 500)
+		}
+		return
+	}
+
+	gppListenerInstalled = true
+	clearTimeout(gppInstallTimeout)
+	gppInstallTimeout = undefined
+	gppApi('addEventListener', handleGppConsentEvent)
 }
 
 function installTcfConsentListener() {
@@ -273,31 +518,56 @@ function installTcfConsentListener() {
 	tcfApi('addEventListener', 2, handleTcfConsentEvent)
 }
 
-function handleDocumentClick(event: MouseEvent) {
-	if (!managingPreferences || !(event.target instanceof Element)) return
-	if (!event.target.closest('.qc-cmp2-close-icon')) return
-
+function restoreConsentNotification() {
 	setTimeout(() => {
-		if (notificationId === null) return
-
 		managingPreferences = false
-		setConsentUiHidden(true)
+		showConsentNotification()
 	})
 }
 
+function handleDocumentClick(event: MouseEvent) {
+	if (!(event.target instanceof Element)) return
+
+	if (event.target.closest('#qc-cmp2-usp .qc-usp-ui-form-content button[mode="primary"]')) {
+		beginUspConsentCommit()
+		return
+	}
+
+	if (!managingPreferences) return
+	if (!event.target.closest('.qc-cmp2-close-icon, .qc-usp-close-icon')) return
+
+	restoreConsentNotification()
+}
+
+function handleDocumentKeydown(event: KeyboardEvent) {
+	if (event.key === 'Escape' && managingPreferences) {
+		restoreConsentNotification()
+	}
+}
+
 onMounted(() => {
-	consentContainerObserver = new MutationObserver(patchConsentFocusTrapContainer)
-	consentContainerObserver.observe(document.body, { childList: true, subtree: true })
-	patchConsentFocusTrapContainer()
+	consentContainerObserver = new MutationObserver(syncConsentUi)
+	consentContainerObserver.observe(document.body, {
+		childList: true,
+		subtree: true,
+		attributes: true,
+		attributeFilter: ['aria-label', 'disabled'],
+	})
+	syncConsentUi()
 	installTcfConsentListener()
+	installGppConsentListener()
 	window.addEventListener('modrinth-cmp-ready', installTcfConsentListener)
 	document.addEventListener('click', handleDocumentClick, true)
+	document.addEventListener('keydown', handleDocumentKeydown, true)
 })
 
 onBeforeUnmount(() => {
 	consentContainerObserver?.disconnect()
+	clearTimeout(uspCommitTimeout)
+	clearTimeout(gppInstallTimeout)
 	window.removeEventListener('modrinth-cmp-ready', installTcfConsentListener)
 	document.removeEventListener('click', handleDocumentClick, true)
+	document.removeEventListener('keydown', handleDocumentKeydown, true)
 	setConsentUiHidden(false)
 	for (const [container, originalContains] of consentContainerContains) {
 		container.contains = originalContains
@@ -307,6 +577,11 @@ onBeforeUnmount(() => {
 	const tcfApi = getTcfApi()
 	if (tcfApi && tcfListenerId !== undefined) {
 		tcfApi('removeEventListener', 2, () => {}, tcfListenerId)
+	}
+
+	const gppApi = getGppApi()
+	if (gppApi && gppListenerId !== undefined) {
+		gppApi('removeEventListener', () => {}, gppListenerId)
 	}
 
 	if (notificationId !== null) {
@@ -319,7 +594,8 @@ onBeforeUnmount(() => {
 html.modrinth-cmp-summary-hidden .qc-cmp2-container,
 html.modrinth-cmp-summary-hidden #qc-cmp2-container,
 html.modrinth-cmp-summary-hidden #qc-cmp2-main,
-html.modrinth-cmp-summary-hidden #qc-cmp2-ui {
+html.modrinth-cmp-summary-hidden #qc-cmp2-ui,
+html.modrinth-cmp-summary-hidden #qc-cmp2-usp {
 	display: none !important;
 	z-index: -1 !important;
 	pointer-events: none !important;
