@@ -17,7 +17,7 @@
 				@mouseleave="setNotificationTimer(item)"
 			>
 				<div
-					class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl border border-solid border-surface-5"
+					class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised border border-solid border-surface-5"
 					:class="item.containerClass"
 				>
 					<div

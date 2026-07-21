@@ -1,17 +1,156 @@
 const MODRINTH_ORIGIN = 'https://modrinth.com'
 
+function installAdsConsentThemeStyle() {
+	if (document.getElementById('modrinth-ads-consent-theme-style')) return
+
+	const style = document.createElement('style')
+	style.id = 'modrinth-ads-consent-theme-style'
+	style.textContent = `
+		:root {
+			--modrinth-usp-bg: #27292e;
+			--modrinth-usp-surface: #34363c;
+			--modrinth-usp-divider: #34363c;
+			--modrinth-usp-text: #b0bac5;
+			--modrinth-usp-contrast: #ffffff;
+			--modrinth-usp-brand: #1bd96a;
+			--modrinth-usp-link: #4f9cff;
+			--modrinth-usp-accent-contrast: #000000;
+			--modrinth-usp-shadow: rgba(0, 0, 0, 0.1) 0 4px 6px -1px,
+				rgba(0, 0, 0, 0.06) 0 2px 4px -1px;
+			color-scheme: dark;
+		}
+
+		#qc-cmp2-usp {
+			background: var(--modrinth-usp-bg) !important;
+			border: 1px solid var(--modrinth-usp-divider) !important;
+			border-radius: 1rem !important;
+			box-shadow: var(--modrinth-usp-shadow) !important;
+			color: var(--modrinth-usp-text) !important;
+			font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Roboto,
+				Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+			max-width: 660px;
+		}
+
+		#qc-cmp2-usp .qc-usp-ui-content,
+		#qc-cmp2-usp .qc-usp-ui-form-content,
+		#qc-cmp2-usp .qc-usp-container {
+			background: transparent !important;
+		}
+		#qc-cmp2-usp .qc-usp-container{
+			margin-bottom: 12px;
+		}
+
+		#qc-cmp2-usp p,
+		#qc-cmp2-usp label,
+		#qc-cmp2-usp .qc-usp-action-description {
+			color: var(--modrinth-usp-text) !important;
+			font-family: inherit !important;
+		}
+
+		#qc-cmp2-usp .qc-usp-title,
+		#qc-cmp2-usp .qc-cmp2-list-item-title {
+			color: var(--modrinth-usp-contrast) !important;
+			font-family: inherit !important;
+			font-weight: 700 !important;
+		}
+
+		#qc-cmp2-usp .qc-usp-title {
+			font-size: 1.25rem !important;
+		}
+
+		#qc-cmp2-usp a,
+		#qc-cmp2-usp .qc-usp-alt-action {
+			color: var(--modrinth-usp-link) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-list-item {
+			background: var(--modrinth-usp-surface) !important;
+			border: 1px solid var(--modrinth-usp-divider) !important;
+			border-radius: 0.75rem !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-list-item-header {
+			background: transparent !important;
+			border: 0 !important;
+			color: var(--modrinth-usp-contrast) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-list-item-header svg {
+			color: var(--modrinth-usp-text) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-toggle {
+			background: var(--modrinth-usp-bg) !important;
+			border-color: var(--modrinth-usp-divider) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-toggle .toggle {
+			background: var(--modrinth-usp-contrast) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-toggle .text {
+			color: var(--modrinth-usp-contrast) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-toggle[aria-checked='true'] {
+			background: var(--modrinth-usp-brand) !important;
+			border-color: var(--modrinth-usp-brand) !important;
+		}
+
+		#qc-cmp2-usp .qc-cmp2-toggle[aria-checked='true'] .text {
+			color: var(--modrinth-usp-accent-contrast) !important;
+		}
+
+		#qc-cmp2-usp button[mode='primary'] {
+			background: var(--modrinth-usp-brand) !important;
+			border: 0 !important;
+			border-radius: 0.75rem !important;
+			color: var(--modrinth-usp-accent-contrast) !important;
+			font-family: inherit !important;
+			font-weight: 700 !important;
+		}
+
+		#qc-cmp2-usp .qc-usp-close-icon {
+			border: 0 !important;
+			background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E")
+				center / 1.5rem 1.5rem no-repeat;
+		}
+
+		#qc-cmp2-usp a:focus-visible,
+		#qc-cmp2-usp button:focus-visible {
+			outline: 2px solid var(--modrinth-usp-brand) !important;
+			outline-offset: 2px !important;
+		}
+
+		#qc-cmp2-usp .qc-usp-ui-content {
+			max-width: 100% !important;
+		}
+
+		#qc-cmp2-usp .qc-usp-ui-content .qc-usp-ui-form-content {
+			border: 1px solid transparent !important;
+			padding: 0 !important;
+		}
+	`
+	document.documentElement.appendChild(style)
+}
+
 document.addEventListener(
 	'click',
 	function (e) {
 		window.top.postMessage({ modrinthAdClick: true }, MODRINTH_ORIGIN)
 
 		let target = e.target
-		if (target?.closest?.('.qc-cmp2-close-icon')) {
-			if (modrinthAdsConsentReprompt) {
+		const uspCloseIcon = target?.closest?.('.qc-usp-close-icon')
+		if (target?.closest?.('.qc-cmp2-close-icon') || uspCloseIcon) {
+			if (isAdsConsentReprompt()) {
 				setTimeout(finishAdsConsentReprompt)
 			} else if (document.documentElement.classList.contains('modrinth-ads-consent-preferences')) {
 				setTimeout(() => void restoreAdsConsentNotification())
 			}
+		}
+
+		if (target?.closest?.('#qc-cmp2-usp .qc-usp-ui-form-content button[mode="primary"]')) {
+			beginUspConsentCommit()
 		}
 
 		while (target != null) {
@@ -32,13 +171,53 @@ window.open = (url, target, features) => {
 	window.top.postMessage({ modrinthOpenUrl: url }, MODRINTH_ORIGIN)
 }
 
-let modrinthAdsConsentOverlayShown = false
+const modrinthAdsConsentState = {
+	phase: 'idle',
+	variant: null,
+	commitTimeout: null,
+}
 let modrinthTcfListenerInstalled = false
 let modrinthTcfListenerAttempts = 0
-let modrinthAdsConsentReprompt = false
-let modrinthAdsConsentRepromptManaging = false
+let modrinthGppListenerInstalled = false
+let modrinthGppListenerAttempts = 0
 let modrinthAdsConsentActionRequestId = 0
 const modrinthAdsConsentActionResolvers = new Map()
+
+function transitionAdsConsent(event) {
+	const phase = modrinthAdsConsentState.phase
+
+	if (event === 'prompt-detected') {
+		if (phase === 'idle') modrinthAdsConsentState.phase = 'initial'
+	} else if (event === 'reprompt-started') {
+		modrinthAdsConsentState.phase = 'reprompt'
+	} else if (event === 'commit-started') {
+		modrinthAdsConsentState.phase = isAdsConsentReprompt()
+			? 'reprompt-committing'
+			: 'initial-committing'
+	} else if (event === 'commit-timed-out') {
+		if (phase === 'reprompt-committing') {
+			modrinthAdsConsentState.phase = 'reprompt'
+		} else if (phase === 'initial-committing') {
+			modrinthAdsConsentState.phase = 'initial'
+		}
+	} else if (event === 'completed') {
+		modrinthAdsConsentState.phase = 'complete'
+	}
+}
+
+function isAdsConsentReprompt() {
+	return (
+		modrinthAdsConsentState.phase === 'reprompt' ||
+		modrinthAdsConsentState.phase === 'reprompt-committing'
+	)
+}
+
+function isUspConsentCommitPending() {
+	return (
+		modrinthAdsConsentState.phase === 'initial-committing' ||
+		modrinthAdsConsentState.phase === 'reprompt-committing'
+	)
+}
 
 function installAdsRailStyle() {
 	if (document.getElementById('modrinth-ads-rail-style')) {
@@ -48,8 +227,7 @@ function installAdsRailStyle() {
 	style.id = 'modrinth-ads-rail-style'
 	style.textContent = `
 		html.modrinth-ads-consent-preferences #modrinth-rail-1 {
-			visibility: hidden !important;
-			pointer-events: none !important;
+			display: none !important;
 		}
 	`
 	document.documentElement.appendChild(style)
@@ -62,18 +240,13 @@ function installAdsConsentOverlayStyle() {
 	const style = document.createElement('style')
 	style.id = 'modrinth-ads-consent-overlay-style'
 	style.textContent = `
-		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #modrinth-rail-1 {
-			visibility: hidden !important;
-		}
-
 		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #qc-cmp2-container,
-		html.modrinth-ads-consent-overlay:not(.modrinth-ads-consent-preferences) #qc-cmp2-main {
-			visibility: hidden !important;
-			pointer-events: none !important;
+		html.modrinth-ads-consent-preferences:not(.modrinth-ads-consent-preferences-visible) #qc-cmp2-container {
+			display: none !important;
 		}
 
-		.qc-cmp2-close-icon {
-			background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M.5.5l23 23m0-23l-23 23' fill='none' stroke='%23b0bac5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10'/%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3C/svg%3E") 0% 0% / 66% auto no-repeat !important;
+		#qc-cmp2-usp .qc-usp-close-icon {
+			display: none !important;
 		}
 	`
 	document.documentElement.appendChild(style)
@@ -96,13 +269,20 @@ function invokeAdsConsentOverlayCommand(shown) {
 	invoke(`plugin:ads|${command}`, args).catch(() => {})
 }
 
-function revealAdsConsentPreferences() {
+function prepareAdsConsentPreferences() {
+	installAdsRailStyle()
+	installAdsConsentOverlayStyle()
 	document.documentElement.classList.add('modrinth-ads-consent-preferences')
-	document.getElementById('modrinth-ads-consent-overlay-style')?.remove()
+	document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
+}
+
+function revealAdsConsentPreferences() {
+	document.documentElement.classList.add('modrinth-ads-consent-preferences-visible')
 }
 
 function concealAdsConsentPreferences() {
 	document.documentElement.classList.remove('modrinth-ads-consent-preferences')
+	document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
 	installAdsConsentOverlayStyle()
 }
 
@@ -127,60 +307,181 @@ function isDirectChildFrame(source) {
 	)
 }
 
-function findAdsConsentButton(action) {
-	const container = document.querySelector('#qc-cmp2-container, #qc-cmp2-main')
-	if (!container) return null
-	const summaryButtons = Array.from(container.querySelectorAll('.qc-cmp2-summary-buttons button'))
+function displayUspConsentUi() {
+	if (typeof window.__uspapi !== 'function') return false
 
-	if (action === 'accept') {
-		const explicitAcceptButton = container.querySelector('#accept-btn')
-		if (explicitAcceptButton) return explicitAcceptButton
-		if (summaryButtons.length >= 3) return summaryButtons[2]
-
-		return container.querySelector('.qc-cmp2-summary-buttons button[mode="primary"]')
+	try {
+		window.__uspapi('displayUspUi', 1, () => {})
+		return true
+	} catch {
+		return false
 	}
-
-	if (action === 'reject') {
-		const explicitRejectButton = container.querySelector('#disagree-btn')
-		if (explicitRejectButton) return explicitRejectButton
-		if (summaryButtons.length >= 3) return summaryButtons[1]
-
-		const secondaryButtons = container.querySelectorAll(
-			'.qc-cmp2-summary-buttons button[mode="secondary"]',
-		)
-		if (secondaryButtons.length > 1) return secondaryButtons[1]
-
-		return summaryButtons.find(
-			(button) => button.textContent?.trim().toLowerCase() === 'reject all',
-		)
-	}
-
-	return (
-		container.querySelector(
-			'#more-options-btn, .qc-cmp2-summary-buttons > button[mode="secondary"]:first-of-type',
-		) ?? summaryButtons[0]
-	)
 }
 
-function clickAdsConsentButtonWhenReady(action, timeoutMs, onButtonFound) {
-	const deadline = Date.now() + timeoutMs
+function detectAdsConsentVariant() {
+	let variant = null
 
+	if (document.getElementById('qc-cmp2-usp')) {
+		variant = 'usp'
+	} else if (document.getElementById('qc-cmp2-ui')) {
+		variant = 'tcf'
+	}
+
+	if (variant) {
+		modrinthAdsConsentState.variant = variant
+	}
+
+	return variant
+}
+
+function findTcfConsentButton(action) {
+	const dialog = document.getElementById('qc-cmp2-ui')
+	if (!dialog) return null
+
+	const buttonIds = {
+		accept: 'accept-btn',
+		reject: 'disagree-btn',
+		manage: 'more-options-btn',
+	}
+	const buttonId = buttonIds[action]
+	if (!buttonId) return null
+
+	const button = dialog.querySelector(`#${buttonId}`)
+	return button && !button.disabled ? button : null
+}
+
+function getUspConsentControls() {
+	const dialog = document.getElementById('qc-cmp2-usp')
+	if (!dialog) return null
+
+	const toggles = Array.from(
+		dialog.querySelectorAll('.qc-usp-container button.qc-cmp2-toggle[role="switch"]'),
+	)
+	const confirmButton = dialog.querySelector('.qc-usp-ui-form-content button[mode="primary"]')
+
+	if (
+		toggles.length === 0 ||
+		!confirmButton ||
+		confirmButton.disabled ||
+		toggles.some(
+			(toggle) =>
+				toggle.disabled || !['true', 'false'].includes(toggle.getAttribute('aria-checked')),
+		)
+	) {
+		return null
+	}
+
+	return { toggles, confirmButton }
+}
+
+function waitForUspToggleState(index, checked, expectedCount, deadline) {
 	return new Promise((resolve) => {
-		function tryClick() {
-			const button = findAdsConsentButton(action)
-			if (button) {
-				// CMP navigation can replace this document during the click, so acknowledge it first.
-				onButtonFound?.()
-				resolve(true)
-				button.click()
+		function checkState() {
+			const controls = getUspConsentControls()
+			if (
+				controls &&
+				controls.toggles.length === expectedCount &&
+				controls.toggles[index]?.getAttribute('aria-checked') === String(checked)
+			) {
+				resolve(controls)
 			} else if (Date.now() >= deadline) {
-				resolve(false)
+				resolve(null)
 			} else {
-				setTimeout(tryClick, 50)
+				setTimeout(checkState, 50)
 			}
 		}
 
-		tryClick()
+		checkState()
+	})
+}
+
+async function setUspToggleStates(checked, controls, timeoutMs) {
+	const expectedCount = controls.toggles.length
+	const deadline = Date.now() + timeoutMs
+
+	for (let index = 0; index < expectedCount; index += 1) {
+		controls = getUspConsentControls()
+		if (!controls || controls.toggles.length !== expectedCount) return null
+
+		const toggle = controls.toggles[index]
+		if (toggle.getAttribute('aria-checked') !== String(checked)) {
+			toggle.click()
+			controls = await waitForUspToggleState(index, checked, expectedCount, deadline)
+			if (!controls) return null
+		}
+	}
+
+	return controls
+}
+
+async function performAdsConsentActionInDocument(action, onHandled) {
+	const variant = detectAdsConsentVariant()
+	const unknownDialog = document.querySelector('#qc-cmp2-container [role="dialog"]')
+
+	if (action === 'show') {
+		if (variant || unknownDialog) {
+			onHandled?.()
+			return 'handled'
+		}
+		return 'not-ready'
+	}
+
+	if (variant === 'usp') {
+		if (action === 'manage') {
+			onHandled?.()
+			return 'handled'
+		}
+
+		if (!['accept', 'reject'].includes(action)) return 'failed'
+
+		const controls = getUspConsentControls()
+		if (!controls) return 'not-ready'
+
+		const shouldOptOut = action === 'reject'
+		const settledControls = await setUspToggleStates(shouldOptOut, controls, 2000)
+		if (!settledControls) return 'failed'
+
+		// CMP navigation can replace this document during the click, so acknowledge it first.
+		onHandled?.()
+		beginUspConsentCommit()
+		settledControls.confirmButton.click()
+		return 'handled'
+	}
+
+	if (variant === 'tcf') {
+		const button = findTcfConsentButton(action)
+		if (!button) return 'not-ready'
+
+		// CMP navigation can replace this document during the click, so acknowledge it first.
+		onHandled?.()
+		button.click()
+		return 'handled'
+	}
+
+	if (action === 'manage' && unknownDialog) {
+		onHandled?.()
+		return 'handled'
+	}
+
+	return 'not-ready'
+}
+
+function performAdsConsentActionWhenReady(action, timeoutMs, onHandled) {
+	const deadline = Date.now() + timeoutMs
+
+	return new Promise((resolve) => {
+		async function tryAction() {
+			const result = await performAdsConsentActionInDocument(action, onHandled)
+			if (result === 'handled') {
+				resolve(true)
+			} else if (result === 'failed' || Date.now() >= deadline) {
+				resolve(false)
+			} else {
+				setTimeout(tryAction, 50)
+			}
+		}
+
+		void tryAction()
 	})
 }
 
@@ -200,9 +501,7 @@ function performAdsConsentActionAcrossFrames(action, timeoutMs) {
 		const timeout = setTimeout(() => settle(false), timeoutMs)
 		modrinthAdsConsentActionResolvers.set(requestId, () => settle(true))
 		sendAdsConsentCommandToChildFrames({ type: 'perform', action, requestId, timeoutMs })
-		clickAdsConsentButtonWhenReady(action, timeoutMs, () => settle(true)).then((clicked) => {
-			if (!clicked) settle(false)
-		})
+		void performAdsConsentActionWhenReady(action, timeoutMs, () => settle(true))
 	})
 }
 
@@ -220,10 +519,30 @@ async function restoreAdsConsentNotification() {
 	}
 }
 
+async function showNativeAdsConsentUi() {
+	prepareAdsConsentPreferences()
+	await waitForAdsConsentLayout()
+	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
+	await expandAdsConsentWebview()
+	await waitForAdsConsentLayout()
+	revealAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
+
+	window.dispatchEvent(new Event('resize'))
+	sendAdsConsentCommandToChildFrames({ type: 'resize' })
+
+	const shown = await performAdsConsentActionAcrossFrames('show', 2500)
+	if (!shown) {
+		await restoreAdsConsentNotification()
+	}
+
+	return shown
+}
+
 function finishAdsConsentReprompt() {
-	modrinthAdsConsentReprompt = false
-	modrinthAdsConsentRepromptManaging = false
-	modrinthAdsConsentOverlayShown = false
+	transitionAdsConsent('completed')
+	clearTimeout(modrinthAdsConsentState.commitTimeout)
+	modrinthAdsConsentState.commitTimeout = null
 	document.documentElement.classList.remove('modrinth-ads-consent-overlay')
 	concealAdsConsentPreferences()
 	sendAdsConsentCommandToChildFrames({ type: 'conceal' })
@@ -231,18 +550,9 @@ function finishAdsConsentReprompt() {
 }
 
 async function openAdsConsentPreferences() {
-	revealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
-	await expandAdsConsentWebview()
-	await waitForAdsConsentLayout()
+	if (!(await showNativeAdsConsentUi())) return
 
-	window.dispatchEvent(new Event('resize'))
-	sendAdsConsentCommandToChildFrames({ type: 'resize' })
-
-	const clicked = await performAdsConsentActionAcrossFrames('manage', 2500)
-	if (!clicked) {
-		await restoreAdsConsentNotification()
-	}
+	await performAdsConsentActionAcrossFrames('manage', 2500)
 }
 
 async function performAdsConsentAction(action) {
@@ -257,30 +567,119 @@ async function performAdsConsentAction(action) {
 		return
 	}
 
-	await performAdsConsentActionAcrossFrames(action, 1000)
+	const handled = await performAdsConsentActionAcrossFrames(action, 2500)
+	if (!handled) {
+		try {
+			await showNativeAdsConsentUi()
+		} catch {
+			await restoreAdsConsentNotification()
+		}
+	}
 }
 
 window.modrinthAdsConsentAction = (action) => {
 	void performAdsConsentAction(action)
 }
 
+function isUspConsentApplicable() {
+	if (detectAdsConsentVariant() === 'usp') return Promise.resolve(true)
+	if (typeof window.__uspapi !== 'function') return Promise.resolve(false)
+
+	return new Promise((resolve) => {
+		let settled = false
+		const settle = (applicable) => {
+			if (settled) return
+			settled = true
+			clearTimeout(timeout)
+			resolve(applicable)
+		}
+		const timeout = setTimeout(() => settle(false), 500)
+
+		try {
+			window.__uspapi('uspPing', 1, (data, success) => {
+				if (!success || !data) {
+					settle(false)
+					return
+				}
+
+				const modes = Array.isArray(data.mode) ? data.mode : [data.mode]
+				const jurisdictions = Array.isArray(data.jurisdiction)
+					? data.jurisdiction
+					: [data.jurisdiction]
+				const location = String(data.location ?? '').toUpperCase()
+				const hasUspMode = modes.some((mode) =>
+					String(mode ?? '')
+						.toUpperCase()
+						.includes('USP'),
+				)
+				const locationApplies =
+					!location ||
+					jurisdictions.some((jurisdiction) =>
+						String(jurisdiction ?? '')
+							.toUpperCase()
+							.includes(location),
+					)
+
+				settle(hasUspMode && locationApplies)
+			})
+		} catch {
+			settle(false)
+		}
+	})
+}
+
+async function displayAdsConsentReprompt() {
+	if (
+		(modrinthAdsConsentState.variant === 'usp' || (await isUspConsentApplicable())) &&
+		typeof window.__uspapi === 'function'
+	) {
+		modrinthAdsConsentState.variant = 'usp'
+		return displayUspConsentUi()
+	}
+
+	if (typeof window.__tcfapi === 'function') {
+		modrinthAdsConsentState.variant = 'tcf'
+		window.__tcfapi('displayConsentUi', 2, () => {})
+		return true
+	}
+
+	return false
+}
+
 window.modrinthAdsReopenConsentPreferences = async () => {
-	modrinthAdsConsentReprompt = true
-	modrinthAdsConsentRepromptManaging = false
-	revealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
+	if (document.documentElement.classList.contains('modrinth-ads-consent-overlay')) {
+		try {
+			await openAdsConsentPreferences()
+		} catch {
+			await restoreAdsConsentNotification()
+		}
+		return
+	}
+
+	transitionAdsConsent('reprompt-started')
+	prepareAdsConsentPreferences()
+	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
 
 	try {
+		await waitForAdsConsentLayout()
 		await expandAdsConsentWebview()
 		await waitForAdsConsentLayout()
+		revealAdsConsentPreferences()
+		sendAdsConsentCommandToChildFrames({ type: 'reveal' })
 		window.dispatchEvent(new Event('resize'))
 		sendAdsConsentCommandToChildFrames({ type: 'resize' })
 
-		if (typeof window.__tcfapi === 'function') {
-			window.__tcfapi('displayConsentUi', 2, () => {})
-		} else {
+		if (!(await displayAdsConsentReprompt())) {
 			finishAdsConsentReprompt()
+			return
 		}
+
+		if (!(await performAdsConsentActionAcrossFrames('show', 2500))) {
+			finishAdsConsentReprompt()
+			return
+		}
+
+		await performAdsConsentActionAcrossFrames('manage', 2500)
 	} catch {
 		finishAdsConsentReprompt()
 	}
@@ -302,7 +701,10 @@ window.addEventListener('message', (event) => {
 	const command = event.data?.modrinthAdsConsentCommand
 	if (!command || typeof command !== 'object') return
 
-	if (command.type === 'reveal') {
+	if (command.type === 'prepare') {
+		prepareAdsConsentPreferences()
+		sendAdsConsentCommandToChildFrames(command)
+	} else if (command.type === 'reveal') {
 		revealAdsConsentPreferences()
 		sendAdsConsentCommandToChildFrames(command)
 	} else if (command.type === 'conceal') {
@@ -318,20 +720,20 @@ window.addEventListener('message', (event) => {
 		typeof command.timeoutMs === 'number'
 	) {
 		sendAdsConsentCommandToChildFrames(command)
-		clickAdsConsentButtonWhenReady(command.action, command.timeoutMs, () => {
+		performAdsConsentActionWhenReady(command.action, command.timeoutMs, () => {
 			window.parent.postMessage({ modrinthAdsConsentResult: command.requestId }, '*')
 		})
 	}
 })
 
 function setAdsConsentOverlay(shown) {
-	if (modrinthAdsConsentOverlayShown === shown) return
+	if (document.documentElement.classList.contains('modrinth-ads-consent-overlay') === shown) return
 
-	modrinthAdsConsentOverlayShown = shown
 	installAdsConsentOverlayStyle()
 	document.documentElement.classList.toggle('modrinth-ads-consent-overlay', shown)
 	if (!shown) {
 		document.documentElement.classList.remove('modrinth-ads-consent-preferences')
+		document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
 	}
 
 	if (window.top === window) {
@@ -343,36 +745,111 @@ function setAdsConsentOverlay(shown) {
 
 if (window.top === window) {
 	window.addEventListener('message', (event) => {
-		if (
-			event.origin === MODRINTH_ORIGIN &&
-			typeof event.data?.modrinthAdsConsentOverlay === 'boolean'
-		) {
+		if (event.origin !== MODRINTH_ORIGIN) return
+
+		if (typeof event.data?.modrinthAdsConsentOverlay === 'boolean') {
 			setAdsConsentOverlay(event.data.modrinthAdsConsentOverlay)
 		}
 	})
 }
 
+function finishUspConsentCommit() {
+	if (!isUspConsentCommitPending()) return
+
+	const wasReprompt = isAdsConsentReprompt()
+	transitionAdsConsent('completed')
+	clearTimeout(modrinthAdsConsentState.commitTimeout)
+	modrinthAdsConsentState.commitTimeout = null
+
+	if (wasReprompt) {
+		finishAdsConsentReprompt()
+	} else {
+		setAdsConsentOverlay(false)
+	}
+}
+
+function beginUspConsentCommit() {
+	if (!document.getElementById('qc-cmp2-usp')) return
+
+	modrinthAdsConsentState.variant = 'usp'
+	transitionAdsConsent('commit-started')
+	clearTimeout(modrinthAdsConsentState.commitTimeout)
+
+	const deadline = Date.now() + 2500
+	function checkForDialogClosure() {
+		if (!isUspConsentCommitPending()) return
+
+		if (!document.getElementById('qc-cmp2-usp')) {
+			finishUspConsentCommit()
+		} else if (Date.now() >= deadline) {
+			transitionAdsConsent('commit-timed-out')
+			modrinthAdsConsentState.commitTimeout = null
+		} else {
+			modrinthAdsConsentState.commitTimeout = setTimeout(checkForDialogClosure, 50)
+		}
+	}
+
+	modrinthAdsConsentState.commitTimeout = setTimeout(checkForDialogClosure, 50)
+}
+
+function syncAdsConsentUi() {
+	const variant = detectAdsConsentVariant()
+
+	if (variant && !isAdsConsentReprompt() && modrinthAdsConsentState.phase !== 'complete') {
+		transitionAdsConsent('prompt-detected')
+		setAdsConsentOverlay(true)
+	}
+
+	if (isUspConsentCommitPending() && !document.getElementById('qc-cmp2-usp')) {
+		finishUspConsentCommit()
+	}
+}
+
+function handleGppConsentEvent(gppData, success) {
+	if (
+		success &&
+		gppData?.eventName === 'sectionChange' &&
+		modrinthAdsConsentState.variant === 'usp' &&
+		isUspConsentCommitPending()
+	) {
+		finishUspConsentCommit()
+	}
+}
+
+function installGppConsentListener() {
+	if (modrinthGppListenerInstalled) return
+
+	if (typeof window.__gpp === 'function') {
+		modrinthGppListenerInstalled = true
+		window.__gpp('addEventListener', handleGppConsentEvent)
+		return
+	}
+
+	if (modrinthGppListenerAttempts < 60) {
+		modrinthGppListenerAttempts += 1
+		setTimeout(installGppConsentListener, 500)
+	}
+}
+
 function handleTcfConsentEvent(tcData, success) {
 	if (!success || !tcData) return
+	detectAdsConsentVariant()
 
 	if (tcData.eventStatus === 'cmpuishown') {
-		if (modrinthAdsConsentReprompt) {
-			if (!modrinthAdsConsentRepromptManaging) {
-				modrinthAdsConsentRepromptManaging = true
-				window.dispatchEvent(new Event('resize'))
-				sendAdsConsentCommandToChildFrames({ type: 'resize' })
-				void performAdsConsentActionAcrossFrames('manage', 2500)
-			}
-			return
-		}
+		if (isAdsConsentReprompt()) return
 
+		transitionAdsConsent('prompt-detected')
 		setAdsConsentOverlay(true)
-	} else if (tcData.eventStatus === 'useractioncomplete') {
-		if (modrinthAdsConsentReprompt) {
+	} else if (
+		tcData.eventStatus === 'useractioncomplete' &&
+		modrinthAdsConsentState.variant === 'tcf'
+	) {
+		if (isAdsConsentReprompt()) {
 			finishAdsConsentReprompt()
 			return
 		}
 
+		transitionAdsConsent('completed')
 		setAdsConsentOverlay(false)
 	}
 }
@@ -469,14 +946,22 @@ function muteVideos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+	installAdsConsentThemeStyle()
 	installAdsRailStyle()
 	installAdsConsentOverlayStyle()
 	muteVideos()
 	muteAudioContext()
+	syncAdsConsentUi()
 	installTcfConsentListener()
+	installGppConsentListener()
 
-	const observer = new MutationObserver(muteVideos)
+	const observer = new MutationObserver(() => {
+		muteVideos()
+		syncAdsConsentUi()
+	})
 	observer.observe(document.body, { childList: true, subtree: true })
 })
 
+syncAdsConsentUi()
 installTcfConsentListener()
+installGppConsentListener()
