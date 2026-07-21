@@ -388,7 +388,7 @@
 						projectV3.project_types.includes('mod') ||
 						projectV3.project_types.includes('plugin')
 					"
-					class="flex flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-2 p-0"
+					class="mb-4 flex flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-2 p-0"
 				>
 					<button
 						class="group m-0 flex w-full min-w-0 appearance-none items-center gap-3 rounded-2xl rounded-b-none bg-surface-3 p-4 text-left outline-offset-[-3px]"
