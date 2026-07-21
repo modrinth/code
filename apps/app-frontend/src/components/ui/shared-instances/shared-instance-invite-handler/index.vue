@@ -26,7 +26,7 @@ const { handleNotification, installFromInviteId } = useSharedInstanceInviteHandl
 )
 
 async function requestAuth(flow: ModrinthAuthFlow) {
-	await auth.requestSignIn('', flow)
+	await auth.requestSignIn('', flow, { showModal: false })
 	await nextTick()
 	return !!auth.session_token.value
 }

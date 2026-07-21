@@ -78,8 +78,8 @@ import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToIn
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
-import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
@@ -98,7 +98,7 @@ import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
 import { list, run } from '@/helpers/instance'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
+import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -644,7 +644,7 @@ const installToPlayModal = ref()
 const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
-const modrinthLoginFlowWaitModal = ref()
+const modrinthLoginModal = ref()
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {
@@ -652,8 +652,12 @@ watch(incompatibilityWarningModal, (modal) => {
 	}
 })
 
-setupAuthProvider(credentials, async (_redirectPath, flow) => {
-	await signIn(flow)
+setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
+	if (options?.showModal === false) {
+		await signIn(flow)
+	} else {
+		await requestSignIn(flow)
+	}
 })
 
 async function validateSession(sessionToken) {
@@ -693,8 +697,6 @@ async function fetchCredentials() {
 }
 
 async function signIn(flow = 'sign-in') {
-	modrinthLoginFlowWaitModal.value.show()
-
 	try {
 		await login(flow)
 		await fetchCredentials()
@@ -708,9 +710,16 @@ async function signIn(flow = 'sign-in') {
 		} else {
 			handleError(error)
 		}
-	} finally {
-		modrinthLoginFlowWaitModal.value.hide()
 	}
+}
+
+async function requestSignIn(flow = 'sign-in') {
+	await modrinthLoginModal.value?.showSigningIn(flow)
+}
+
+async function requestModrinthAuth(flow = 'sign-in') {
+	await signIn(flow)
+	return !!credentials.value?.session
 }
 
 async function logOut() {
@@ -1430,7 +1439,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
 		<Suspense>
-			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
+			<ModrinthAccountRequiredModal
+				ref="modrinthLoginModal"
+				:request-auth="requestModrinthAuth"
+			/>
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
@@ -1540,7 +1552,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</template>
 				<template #sign-out> <LogOutIcon /> Sign out </template>
 			</OverflowMenu>
-			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+			<NavButton
+				v-else
+				v-tooltip.right="'Sign in to a Modrinth account'"
+				:to="() => requestSignIn()"
+			>
 				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
@@ -1687,7 +1703,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
-							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
+							<FriendsList :credentials="credentials" :sign-in="() => requestSignIn()" />
 						</suspense>
 					</div>
 					<PrideFundraiserBanner

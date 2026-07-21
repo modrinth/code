@@ -349,7 +349,9 @@ function userProfileLink(username: string) {
 		: () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
 }
 async function requestAuth(flow: ModrinthAuthFlow) {
-	await auth.requestSignIn(`/instance/${encodeURIComponent(props.instance.id)}/share`, flow)
+	await auth.requestSignIn(`/instance/${encodeURIComponent(props.instance.id)}/share`, flow, {
+		showModal: false,
+	})
 	return !!auth.session_token.value
 }
 function signInToShare(event?: MouseEvent) {
