@@ -312,60 +312,142 @@
 				class="mb-4"
 			/>
 
-			<ProjectCardList
-				v-if="projects && projects?.length > 0"
-				:layout="cosmetics.searchDisplayMode.collection"
-			>
-				<ProjectCard
-					v-for="project in (route.params.projectType !== undefined
-						? projects.filter(
-								(x) =>
-									x.project_type ===
-									route.params.projectType.substr(0, route.params.projectType.length - 1),
-							)
-						: projects
-					)
-						.slice()
-						.sort((a, b) => b.downloads - a.downloads)"
-					:key="project.id"
-					:link="`/${project.project_type}/${project.slug ?? project.id}`"
-					:title="project.title"
-					:icon-url="project.icon_url"
-					:banner="project.gallery.find((element) => element.featured)?.url"
-					:summary="project.description"
-					:date-updated="project.updated"
-					:downloads="project.downloads ?? 0"
-					:followers="project.followers ?? 0"
-					:tags="project.categories"
-					:environment="{
-						clientSide: project.client_side,
-						serverSide: project.server_side,
-					}"
-					:color="project.color"
-					:layout="
-						cosmetics.searchDisplayMode.collection === 'grid' ||
-						cosmetics.searchDisplayMode.collection === 'gallery'
-							? 'grid'
-							: 'list'
-					"
-				>
-					<template v-if="canEdit || collection.id === 'following'" #actions>
-						<ButtonStyled v-if="canEdit">
-							<button class="remove-btn" :disabled="removing" @click="() => removeProject(project)">
-								<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
-								<XIcon v-else aria-hidden="true" />
-								{{ formatMessage(messages.removeProjectButton) }}
+			<template v-if="projects && projects.length > 0">
+				<div class="mb-4 flex flex-col gap-3">
+					<div class="flex flex-wrap items-center gap-2">
+						<StyledInput
+							v-model="searchQuery"
+							:icon="SearchIcon"
+							type="text"
+							autocomplete="off"
+							:placeholder="formatMessage(messages.searchPlaceholder)"
+							clearable
+							wrapper-class="w-full flex-grow sm:w-auto"
+						/>
+						<Combobox
+							v-model="currentSort"
+							:options="sortOptions"
+							class="!w-[14rem] min-w-max max-w-full flex-grow sm:flex-grow-0"
+						>
+							<template #prefix>
+								<span class="font-semibold text-primary">
+									{{ formatMessage(commonMessages.sortByLabel) }}
+								</span>
+							</template>
+						</Combobox>
+						<ButtonStyled v-if="collectionFilterTypes.length > 0">
+							<button @click="filtersOpen = !filtersOpen">
+								<FilterIcon aria-hidden="true" />
+								{{ formatMessage(commonMessages.filtersLabel) }}
+								<span
+									v-if="selectedFilters.length > 0"
+									class="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-xs font-bold text-brand-inverted"
+								>
+									{{ selectedFilters.length }}
+								</span>
+								<DropdownIcon
+									aria-hidden="true"
+									class="h-4 w-4 transition-transform"
+									:class="{ 'rotate-180': filtersOpen }"
+								/>
 							</button>
 						</ButtonStyled>
-						<ButtonStyled v-if="collection.id === 'following'">
-							<button @click="unfollowProject(project)">
-								<HeartMinusIcon aria-hidden="true" />
-								{{ formatMessage(messages.unfollowProjectButton) }}
+					</div>
+					<div
+						v-if="filtersOpen && collectionFilterTypes.length > 0"
+						class="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-3"
+					>
+						<SearchSidebarFilter
+							v-for="filterType in collectionFilterTypes"
+							:key="filterType.id"
+							v-model:selected-filters="selectedFilters"
+							v-model:toggled-groups="toggledGroups"
+							:filter-type="filterType"
+							:provided-filters="[]"
+							:open-by-default="false"
+							class="card-shadow rounded-2xl border border-solid border-surface-4 bg-surface-3"
+							button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none"
+							content-class="mb-4 mx-3"
+							inner-panel-class="p-1"
+						>
+							<template #header>
+								<h3 class="m-0 text-base font-semibold text-contrast">
+									{{ filterType.formatted_name }}
+								</h3>
+							</template>
+						</SearchSidebarFilter>
+					</div>
+					<SearchFilterControl
+						v-model:selected-filters="selectedFilters"
+						:filters="collectionFilterTypes"
+						:provided-filters="[]"
+						:overridden-provided-filter-types="[]"
+					/>
+				</div>
+				<ProjectCardList
+					v-if="displayProjects.length > 0"
+					:layout="cosmetics.searchDisplayMode.collection"
+				>
+					<ProjectCard
+						v-for="project in displayProjects"
+						:key="project.id"
+						:link="`/${project.project_type}/${project.slug ?? project.id}`"
+						:title="project.title"
+						:icon-url="project.icon_url"
+						:banner="project.gallery.find((element) => element.featured)?.url"
+						:summary="project.description"
+						:date-updated="project.updated"
+						:downloads="project.downloads ?? 0"
+						:followers="project.followers ?? 0"
+						:tags="project.categories"
+						:environment="{
+							clientSide: project.client_side,
+							serverSide: project.server_side,
+						}"
+						:color="project.color"
+						:layout="
+							cosmetics.searchDisplayMode.collection === 'grid' ||
+							cosmetics.searchDisplayMode.collection === 'gallery'
+								? 'grid'
+								: 'list'
+						"
+					>
+						<template v-if="canEdit || collection.id === 'following'" #actions>
+							<ButtonStyled v-if="canEdit">
+								<button
+									class="remove-btn"
+									:disabled="removing"
+									@click="() => removeProject(project)"
+								>
+									<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+									<XIcon v-else aria-hidden="true" />
+									{{ formatMessage(messages.removeProjectButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-if="collection.id === 'following'">
+								<button @click="unfollowProject(project)">
+									<HeartMinusIcon aria-hidden="true" />
+									{{ formatMessage(messages.unfollowProjectButton) }}
+								</button>
+							</ButtonStyled>
+						</template>
+					</ProjectCard>
+				</ProjectCardList>
+				<EmptyState
+					v-else
+					type="no-search-result"
+					:heading="formatMessage(messages.noResultsLabel)"
+				>
+					<template #actions>
+						<ButtonStyled v-if="searchQuery || selectedFilters.length > 0">
+							<button @click="clearSearchAndFilters">
+								<XIcon aria-hidden="true" />
+								{{ formatMessage(messages.clearFiltersButton) }}
 							</button>
 						</ButtonStyled>
 					</template>
-				</ProjectCard>
-			</ProjectCardList>
+				</EmptyState>
+			</template>
 			<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
 				<template #actions>
 					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
@@ -385,13 +467,18 @@ import {
 	CalendarIcon,
 	ChevronLeftIcon,
 	CompassIcon,
+	DropdownIcon,
 	EditIcon,
+	FilterIcon,
+	getCategoryIcon,
+	getLoaderIcon,
 	GlobeIcon,
 	HeartMinusIcon,
 	LinkIcon,
 	LockIcon,
 	MoreVerticalIcon,
 	SaveIcon,
+	SearchIcon,
 	SpinnerIcon,
 	TrashIcon,
 	UpdatedIcon,
@@ -401,6 +488,7 @@ import {
 import {
 	Avatar,
 	ButtonStyled,
+	Combobox,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
@@ -409,6 +497,9 @@ import {
 	defineMessages,
 	EmptyState,
 	FileInput,
+	formatCategory,
+	formatCategoryHeader,
+	formatLoader,
 	HorizontalRule,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -421,6 +512,8 @@ import {
 	ProjectCard,
 	ProjectCardList,
 	RadioButtons,
+	SearchFilterControl,
+	SearchSidebarFilter,
 	SidebarCard,
 	StyledInput,
 	useCompactNumber,
@@ -450,6 +543,7 @@ const route = useNativeRoute()
 const router = useRouter()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
+const tags = useGeneratedState()
 const queryClient = useQueryClient()
 const baseId = useId()
 
@@ -533,6 +627,30 @@ const messages = defineMessages({
 	noProjectsLabel: {
 		id: 'collection.label.no-projects',
 		defaultMessage: 'No projects in collection yet',
+	},
+	noResultsLabel: {
+		id: 'collection.label.no-results',
+		defaultMessage: 'No projects match your search',
+	},
+	clearFiltersButton: {
+		id: 'collection.button.clear-filters',
+		defaultMessage: 'Clear filters',
+	},
+	searchPlaceholder: {
+		id: 'collection.search.placeholder',
+		defaultMessage: 'Search collection...',
+	},
+	gameVersionFilterLabel: {
+		id: 'search.filter_type.game_version',
+		defaultMessage: 'Game version',
+	},
+	loaderFilterLabel: {
+		id: 'search.filter_type.mod_loader',
+		defaultMessage: 'Loader',
+	},
+	showAllVersionsLabel: {
+		id: 'search.filter_type.game_version.all_versions',
+		defaultMessage: 'Show all versions',
 	},
 	projectsCountLabel: {
 		id: 'collection.label.projects-count',
@@ -770,6 +888,183 @@ function getProjectTypeCategoryMessage(type) {
 	return commonProjectTypeCategoryMessages[type] ?? commonProjectTypeCategoryMessages.project
 }
 
+const searchQuery = ref('')
+const filtersOpen = ref(false)
+const selectedFilters = ref([])
+const toggledGroups = ref([])
+
+const sortOptions = [
+	{ value: 'downloads', label: 'Downloads' },
+	{ value: 'follows', label: 'Followers' },
+	{ value: 'updated', label: 'Date updated' },
+	{ value: 'newest', label: 'Date published' },
+	{ value: 'name', label: 'Name' },
+]
+const currentSort = ref('downloads')
+
+const typeFilteredProjects = computed(() => {
+	if (!projects.value) return []
+	const typeParam = route.params.projectType
+	if (typeParam === undefined) return projects.value
+	const type = typeParam.substring(0, typeParam.length - 1)
+	return projects.value.filter((x) => x.project_type === type)
+})
+
+const collectionFilterTypes = computed(() => {
+	const gameVersions = new Set()
+	const loaders = new Set()
+	const categories = new Set()
+	for (const project of typeFilteredProjects.value) {
+		project.game_versions?.forEach((version) => gameVersions.add(version))
+		project.loaders?.forEach((loader) => loaders.add(loader))
+		project.categories?.forEach((category) => categories.add(category))
+	}
+	for (const loader of loaders) {
+		categories.delete(loader)
+	}
+
+	const filterTypes = []
+
+	const gameVersionOptions = tags.value.gameVersions
+		.filter((gameVersion) => gameVersions.has(gameVersion.version))
+		.map((gameVersion) => ({
+			id: gameVersion.version,
+			toggle_group: gameVersion.version_type !== 'release' ? 'all_versions' : undefined,
+			method: 'or',
+			value: gameVersion.version,
+		}))
+	if (gameVersionOptions.length > 0) {
+		filterTypes.push({
+			id: 'game_version',
+			formatted_name: formatMessage(messages.gameVersionFilterLabel),
+			supported_project_types: [],
+			display: 'scrollable',
+			query_param: 'v',
+			supports_negative_filter: false,
+			searchable: true,
+			toggle_groups: gameVersionOptions.some((option) => option.toggle_group)
+				? [{ id: 'all_versions', formatted_name: formatMessage(messages.showAllVersionsLabel) }]
+				: [],
+			options: gameVersionOptions,
+		})
+	}
+
+	const loaderOptions = tags.value.loaders
+		.filter((loader) => loaders.has(loader.name))
+		.map((loader) => ({
+			id: loader.name,
+			formatted_name: formatLoader(formatMessage, loader.name),
+			icon: getLoaderIcon(loader.name),
+			method: 'or',
+			value: loader.name,
+		}))
+	if (loaderOptions.length > 0) {
+		filterTypes.push({
+			id: 'mod_loader',
+			formatted_name: formatMessage(messages.loaderFilterLabel),
+			supported_project_types: [],
+			display: 'scrollable',
+			query_param: 'g',
+			supports_negative_filter: true,
+			searchable: false,
+			options: loaderOptions,
+		})
+	}
+
+	const seenCategories = new Set()
+	const categoryOptions = []
+	for (const category of tags.value.categories) {
+		if (!categories.has(category.name) || seenCategories.has(category.name)) continue
+		seenCategories.add(category.name)
+		categoryOptions.push({
+			id: category.name,
+			formatted_name: formatCategory(formatMessage, category.name),
+			icon: getCategoryIcon(category.name),
+			method: 'or',
+			value: category.name,
+		})
+	}
+	if (categoryOptions.length > 0) {
+		filterTypes.push({
+			id: 'category',
+			formatted_name: formatCategoryHeader(formatMessage, 'categories'),
+			supported_project_types: [],
+			display: 'scrollable',
+			query_param: 'f',
+			supports_negative_filter: true,
+			searchable: false,
+			options: categoryOptions,
+		})
+	}
+
+	return filterTypes
+})
+
+watch(
+	() => route.params.projectType,
+	() => {
+		const validOptions = new Set(
+			collectionFilterTypes.value.flatMap((filterType) =>
+				filterType.options.map((option) => `${filterType.id}:${option.id}`),
+			),
+		)
+		selectedFilters.value = selectedFilters.value.filter((filter) =>
+			validOptions.has(`${filter.type}:${filter.option}`),
+		)
+	},
+)
+
+function projectMatchesFilters(project) {
+	for (const filterType of collectionFilterTypes.value) {
+		const selected = selectedFilters.value.filter((filter) => filter.type === filterType.id)
+		if (selected.length === 0) continue
+		const values =
+			filterType.id === 'game_version'
+				? (project.game_versions ?? [])
+				: filterType.id === 'mod_loader'
+					? (project.loaders ?? [])
+					: (project.categories ?? [])
+		if (selected.some((filter) => filter.negative && values.includes(filter.option))) {
+			return false
+		}
+		const included = selected.filter((filter) => !filter.negative)
+		if (included.length > 0 && !included.some((filter) => values.includes(filter.option))) {
+			return false
+		}
+	}
+	return true
+}
+
+const displayProjects = computed(() => {
+	const query = searchQuery.value.trim().toLowerCase()
+	const filtered = typeFilteredProjects.value.filter(
+		(project) =>
+			(!query ||
+				project.title?.toLowerCase().includes(query) ||
+				project.description?.toLowerCase().includes(query)) &&
+			projectMatchesFilters(project),
+	)
+	return filtered.sort((a, b) => {
+		switch (currentSort.value) {
+			case 'follows':
+				return (b.followers ?? 0) - (a.followers ?? 0)
+			case 'updated':
+				return dayjs(b.updated).diff(dayjs(a.updated))
+			case 'newest':
+				return dayjs(b.published).diff(dayjs(a.published))
+			case 'name':
+				return a.title.localeCompare(b.title)
+			default:
+				return (b.downloads ?? 0) - (a.downloads ?? 0)
+		}
+	})
+})
+
+function clearSearchAndFilters() {
+	searchQuery.value = ''
+	selectedFilters.value = []
+}
+
 const showUpdatedDate = computed(() => {
 	if (!collection.value?.updated || !collection.value?.created) {
 		return false
@@ -940,11 +1235,6 @@ function openEditModal(event) {
 </script>
 
 <style scoped lang="scss">
-.animated-dropdown {
-	// Omorphia's dropdowns are harcoded in width, so we need to override that
-	width: 100% !important;
-}
-
 :deep(.description-body) {
 	p {
 		margin: 0;
