@@ -329,21 +329,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Quay lại trang Khám Phá"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Cài đặt nội dung vào phiên bản"
-  },
-  "app.project.version.all-versions": {
-    "message": "Tất cả phiên bản"
-  },
-  "app.project.version.download-in-browser": {
-    "message": "Tải trong trình duyệt"
-  },
-  "app.project.version.installing": {
-    "message": "Đang tải"
-  },
-  "app.project.versions.already-installed": {
-    "message": "Đã có sẵn"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Chế độ nhà phát triển đã được bật."
   },

@@ -446,9 +446,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Tillbaka till upptäck"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installera innehåll till instans"
-  },
   "app.project.version.all-versions": {
     "message": "Alla versioner"
   },

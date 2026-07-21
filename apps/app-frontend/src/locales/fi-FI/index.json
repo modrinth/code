@@ -377,9 +377,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Takaisin sisällön löytöön"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Asenna sisältöä instanssiin"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
   },

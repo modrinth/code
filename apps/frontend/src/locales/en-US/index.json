@@ -3476,6 +3476,9 @@
   "project.gallery.title": {
     "message": "Gallery"
   },
+  "project.install-context.back-to-discover": {
+    "message": "Back to discover"
+  },
   "project.license.error": {
     "message": "License text could not be retrieved."
   },
