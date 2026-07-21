@@ -252,7 +252,7 @@ const messages = defineMessages({
 	srvRecordsTooltip: {
 		id: 'project.settings.server.srv-records-tooltip',
 		defaultMessage:
-			'The address you enter here may have DNS SRV records _minecraft._tcp.(your domain) which point to your Minecraft server address and port.',
+			'The address you enter here may have DNS SRV records _minecraft._tcp.{your domain} which point to your Minecraft server address and port.',
 	},
 	bedrockAddressLabel: {
 		id: 'project.settings.server.bedrock-address-label',
