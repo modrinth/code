@@ -483,7 +483,6 @@ pub async fn init_ads_window<R: Runtime>(
 
             let webview = window.add_child(
                 tauri::webview::WebviewBuilder::new("ads-window", webview_url)
-                    .incognito(true) // REMOVE WHEN DONE!!
                     .initialization_script_for_all_frames(include_str!(
                         "ads-init.js"
                     ))
