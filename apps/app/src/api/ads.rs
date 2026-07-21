@@ -699,15 +699,16 @@ pub async fn hide_ads_window<R: Runtime>(
     reset: Option<bool>,
 ) -> crate::api::Result<()> {
     let reset = reset.unwrap_or(false);
+    let state = app.state::<RwLock<AdsState>>();
+    let mut state = state.write().await;
+
+    if reset {
+        state.shown = false;
+        state.consent_overlay_shown = false;
+    }
 
     if let Some(webview) = app.webviews().get("ads-window") {
-        let state = app.state::<RwLock<AdsState>>();
-        let mut state = state.write().await;
-
-        if reset {
-            state.shown = false;
-            state.consent_overlay_shown = false;
-        } else {
+        if !reset {
             state.modal_shown = true;
 
             if state.consent_overlay_shown {
