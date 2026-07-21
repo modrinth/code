@@ -16,10 +16,10 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
-      environment:
-        required: true
-        type: string
-        description: 'The environment to deploy to (staging-preview or production-preview)'
+      preview:
+        required: false
+        type: boolean
+        description: 'Whether this is a preview deployment'
       head_sha:
         required: false
         type: string
@@ -34,7 +34,7 @@ on:
         description: 'The persistent preview alias for the branch'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.environment || 'push' }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.preview && 'preview' || 'push' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
 jobs:
@@ -53,7 +53,7 @@ jobs:
       - name: Configure environment
         id: meta
         env:
-          ENV_INPUT: ${{ inputs.environment }}
+          PREVIEW_INPUT: ${{ inputs.preview }}
           REF: ${{ github.ref }}
           DEPLOY_SHA: ${{ inputs.head_sha || github.sha }}
           BRANCH_ALIAS: ${{ inputs.branch_alias }}
@@ -62,22 +62,21 @@ jobs:
 
           SHA_SHORT="${DEPLOY_SHA::8}"
 
-          if [ "$ENV_INPUT" = "staging-preview" ]; then
-            URL="https://git-$SHA_SHORT-frontend-staging.modrinth.workers.dev"
-            echo "env=staging" >> $GITHUB_OUTPUT
-            echo "url=$URL" >> $GITHUB_OUTPUT
-            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true --var CF_PAGES_URL:$URL" >> $GITHUB_OUTPUT
-            if [ -n "$BRANCH_ALIAS" ]; then
-              echo "branch_alias_url=https://$BRANCH_ALIAS-frontend-staging.modrinth.workers.dev" >> $GITHUB_OUTPUT
-            fi
-
-          elif [ "$ENV_INPUT" = "production-preview" ]; then
+          if [ "$PREVIEW_INPUT" = "true" ]; then
             URL="https://git-$SHA_SHORT-frontend.modrinth.workers.dev"
+            STAGING_URL="https://git-$SHA_SHORT-staging-frontend.modrinth.workers.dev"
             echo "env=production" >> $GITHUB_OUTPUT
             echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "staging_url=$STAGING_URL" >> $GITHUB_OUTPUT
             echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true --var CF_PAGES_URL:$URL" >> $GITHUB_OUTPUT
+
+            STAGING_VARS=$(jq -r '.env.staging.vars | to_entries[] | "--var \(.key):\(.value)"' ./apps/frontend/wrangler.jsonc | tr '\n' ' ')
+            echo "staging_cmd=versions upload --preview-alias git-$SHA_SHORT-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:$STAGING_URL" >> $GITHUB_OUTPUT
+
             if [ -n "$BRANCH_ALIAS" ]; then
               echo "branch_alias_url=https://$BRANCH_ALIAS-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
+              echo "staging_branch_alias_url=https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
+              echo "staging_branch_alias_cmd=versions upload --preview-alias $BRANCH_ALIAS-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
             fi
 
           elif [ "$REF" = "refs/heads/main" ]; then
@@ -133,7 +132,7 @@ jobs:
           CF_PAGES_COMMIT_SHA: ${{ inputs.head_sha || github.sha }}
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
           BUILD_ENV: ${{ steps.meta.outputs.env }}
-          PREVIEW: ${{ inputs.environment != '' && 'true' || 'false' }}
+          PREVIEW: ${{ inputs.preview && 'true' || 'false' }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Create Sentry release and upload sourcemaps
@@ -159,17 +158,38 @@ jobs:
           wranglerVersion: '4.54.0'
           command: ${{ steps.meta.outputs.cmd }}
 
-      - name: Deploy persistent Cloudflare Worker preview
-        if: ${{ inputs.environment != '' && inputs.branch_alias != '' }}
+      - name: Deploy staging Cloudflare Worker preview
+        if: ${{ inputs.preview }}
         uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          environment: ${{ steps.meta.outputs.env != 'production' && steps.meta.outputs.env || '' }}
+          workingDirectory: ./apps/frontend
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: ${{ steps.meta.outputs.staging_cmd }}
+
+      - name: Deploy persistent Cloudflare Worker preview
+        if: ${{ inputs.preview && inputs.branch_alias != '' }}
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
           wranglerVersion: '4.54.0'
           command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true --var CF_PAGES_URL:${{ steps.meta.outputs.branch_alias_url }}
+
+      - name: Deploy persistent staging Cloudflare Worker preview
+        if: ${{ inputs.preview && inputs.branch_alias != '' }}
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          workingDirectory: ./apps/frontend
+          packageManager: pnpm
+          wranglerVersion: '4.54.0'
+          command: ${{ steps.meta.outputs.staging_branch_alias_cmd }}
 
       - name: Purge cache
         if: github.ref == 'refs/heads/prod'
@@ -180,14 +200,22 @@ jobs:
             --data '{"hosts": ["modrinth.com", "www.modrinth.com", "staging.modrinth.com"]}' \
             https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache
 
-      - name: Write deployment URL to file
-        if: ${{ inputs.environment != '' }}
+      - name: Write deployment URLs to files
+        if: ${{ inputs.preview }}
         run: |
-          echo "${{ steps.meta.outputs.url }}" > deployment-url-${{ inputs.environment }}.txt
+          echo "${{ steps.meta.outputs.url }}" > deployment-url-production.txt
+          echo "${{ steps.meta.outputs.staging_url }}" > deployment-url-staging.txt
 
-      - name: Upload deployment URL
-        if: ${{ inputs.environment != '' }}
+      - name: Upload production deployment URL
+        if: ${{ inputs.preview }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: deployment-url-${{ inputs.environment }}
-          path: deployment-url-${{ inputs.environment }}.txt
+          name: deployment-url-production
+          path: deployment-url-production.txt
+
+      - name: Upload staging deployment URL
+        if: ${{ inputs.preview }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: deployment-url-staging
+          path: deployment-url-staging.txt

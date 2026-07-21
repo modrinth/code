@@ -39,13 +39,10 @@ jobs:
     uses: ./.github/workflows/frontend-deploy.yml
     secrets: inherit
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.environment }}
+      group: ${{ github.workflow }}-${{ github.ref }}-deploy
       cancel-in-progress: true
-    strategy:
-      matrix:
-        environment: [staging-preview, production-preview]
     with:
-      environment: ${{ matrix.environment }}
+      preview: true
       head_sha: ${{ github.event.pull_request.head.sha }}
       head_ref: ${{ github.event.pull_request.head.ref }}
       branch_alias: ${{ needs.metadata.outputs.branch-alias }}
@@ -145,9 +142,9 @@ jobs:
           STORYBOOK_RESULT: ${{ needs.deploy-storybook.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          STAGING_SHA_URL=$(cat deployment-url-staging-preview.txt)
-          PRODUCTION_SHA_URL=$(cat deployment-url-production-preview.txt)
-          STAGING_BRANCH_URL="https://$BRANCH_ALIAS-frontend-staging.modrinth.workers.dev"
+          STAGING_SHA_URL=$(cat deployment-url-staging.txt)
+          PRODUCTION_SHA_URL=$(cat deployment-url-production.txt)
+          STAGING_BRANCH_URL="https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev"
           PRODUCTION_BRANCH_URL="https://$BRANCH_ALIAS-frontend.modrinth.workers.dev"
 
           if [ "$STORYBOOK_RESULT" = "success" ]; then
