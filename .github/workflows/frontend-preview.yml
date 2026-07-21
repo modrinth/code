@@ -145,29 +145,25 @@ jobs:
           STORYBOOK_RESULT: ${{ needs.deploy-storybook.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          STAGING_PREVIEW_URL=$(cat deployment-url-staging-preview.txt)
-          PRODUCTION_PREVIEW_URL=$(cat deployment-url-production-preview.txt)
+          STAGING_SHA_URL=$(cat deployment-url-staging-preview.txt)
+          PRODUCTION_SHA_URL=$(cat deployment-url-production-preview.txt)
           STAGING_BRANCH_URL="https://$BRANCH_ALIAS-frontend-staging.modrinth.workers.dev"
           PRODUCTION_BRANCH_URL="https://$BRANCH_ALIAS-frontend.modrinth.workers.dev"
 
-          STAGING_CELL="$STAGING_PREVIEW_URL<br><sub><a href=\"$STAGING_BRANCH_URL\">$STAGING_BRANCH_URL</a></sub>"
-          PRODUCTION_CELL="$PRODUCTION_PREVIEW_URL<br><sub><a href=\"$PRODUCTION_BRANCH_URL\">$PRODUCTION_BRANCH_URL</a></sub>"
-
           if [ "$STORYBOOK_RESULT" = "success" ]; then
-            STORYBOOK_PREVIEW_URL="https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev"
+            STORYBOOK_SHA_URL="https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev"
             STORYBOOK_BRANCH_URL="https://$BRANCH_ALIAS-storybook.modrinth.workers.dev"
-            STORYBOOK_CELL="$STORYBOOK_PREVIEW_URL<br><sub><a href=\"$STORYBOOK_BRANCH_URL\">$STORYBOOK_BRANCH_URL</a></sub>"
           else
-            STORYBOOK_CELL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
+            STORYBOOK_SHA_URL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
+            STORYBOOK_BRANCH_URL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
           fi
 
-          echo "Production preview URLs: $PRODUCTION_CELL"
-          echo "Staging preview URLs: $STAGING_CELL"
-          echo "Storybook preview URLs: $STORYBOOK_CELL"
-
-          echo "staging-preview-cell=$STAGING_CELL" >> $GITHUB_OUTPUT
-          echo "production-preview-cell=$PRODUCTION_CELL" >> $GITHUB_OUTPUT
-          echo "storybook-preview-cell=$STORYBOOK_CELL" >> $GITHUB_OUTPUT
+          echo "staging-sha-url=$STAGING_SHA_URL" >> $GITHUB_OUTPUT
+          echo "production-sha-url=$PRODUCTION_SHA_URL" >> $GITHUB_OUTPUT
+          echo "storybook-sha-url=$STORYBOOK_SHA_URL" >> $GITHUB_OUTPUT
+          echo "staging-branch-url=$STAGING_BRANCH_URL" >> $GITHUB_OUTPUT
+          echo "production-branch-url=$PRODUCTION_BRANCH_URL" >> $GITHUB_OUTPUT
+          echo "storybook-branch-url=$STORYBOOK_BRANCH_URL" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
@@ -190,9 +186,19 @@ jobs:
 
             Last deployed commit is [${{ github.event.pull_request.head.sha }}](${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.event.pull_request.head.sha }})
 
+            ### Persistent
+
             | Environment | URL |
             |-------------|-----|
-            | staging     | ${{ steps.urls.outputs.staging-preview-cell }} |
-            | production  | ${{ steps.urls.outputs.production-preview-cell }} |
-            | storybook   | ${{ steps.urls.outputs.storybook-preview-cell }} |
+            | staging     | ${{ steps.urls.outputs.staging-branch-url }} |
+            | production  | ${{ steps.urls.outputs.production-branch-url }} |
+            | storybook   | ${{ steps.urls.outputs.storybook-branch-url }} |
+
+            ### Latest commit
+
+            | Environment | URL |
+            |-------------|-----|
+            | staging     | ${{ steps.urls.outputs.staging-sha-url }} |
+            | production  | ${{ steps.urls.outputs.production-sha-url }} |
+            | storybook   | ${{ steps.urls.outputs.storybook-sha-url }} |
           edit-mode: replace
