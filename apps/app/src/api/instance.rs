@@ -437,15 +437,25 @@ pub async fn instance_list() -> Result<Vec<Instance>> {
 pub async fn instance_get_projects(
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<DashMap<String, ContentFile>> {
-    Ok(theseus::instance::get_projects(instance_id, cache_behaviour).await?)
+    let context = crate::api::operation_context(invocation_context);
+    Ok(
+        theseus::instance::get_projects(&context, instance_id, cache_behaviour)
+            .await?,
+    )
 }
 
 #[tauri::command]
 pub async fn instance_get_installed_project_ids(
     instance_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<String>> {
-    Ok(theseus::instance::get_installed_project_ids(instance_id).await?)
+    let context = crate::api::operation_context(invocation_context);
+    Ok(
+        theseus::instance::get_installed_project_ids(&context, instance_id)
+            .await?,
+    )
 }
 
 #[tauri::command]
@@ -466,27 +476,36 @@ pub async fn instance_get_install_candidates(
 pub async fn instance_content(
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
-    instance_get_content_items(instance_id, cache_behaviour).await
+    instance_get_content_items(instance_id, cache_behaviour, invocation_context)
+        .await
 }
 
 #[tauri::command]
 pub async fn instance_get_content_items(
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
-    Ok(
-        theseus::instance::get_content_items(instance_id, cache_behaviour)
-            .await?,
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::instance::get_content_items(
+        &context,
+        instance_id,
+        cache_behaviour,
     )
+    .await?)
 }
 
 #[tauri::command]
 pub async fn instance_get_dependencies_as_content_items(
     dependencies: Vec<Dependency>,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
+    let context = crate::api::operation_context(invocation_context);
     Ok(theseus::instance::get_dependencies_as_content_items(
+        &context,
         dependencies,
         cache_behaviour,
     )
@@ -497,22 +516,26 @@ pub async fn instance_get_dependencies_as_content_items(
 pub async fn instance_get_linked_modpack_info(
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Option<LinkedModpackInfo>> {
-    Ok(
-        theseus::instance::get_linked_modpack_info(
-            instance_id,
-            cache_behaviour,
-        )
-        .await?,
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::instance::get_linked_modpack_info(
+        &context,
+        instance_id,
+        cache_behaviour,
     )
+    .await?)
 }
 
 #[tauri::command]
 pub async fn instance_get_linked_modpack_content(
     instance_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Vec<ContentItem>> {
+    let context = crate::api::operation_context(invocation_context);
     Ok(theseus::instance::get_linked_modpack_content(
+        &context,
         instance_id,
         cache_behaviour,
     )
@@ -535,19 +558,23 @@ pub async fn instance_get_mod_full_path(
 #[tauri::command]
 pub async fn instance_get_optimal_jre_key(
     instance_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Option<JavaVersion>> {
-    Ok(theseus::instance::get_optimal_jre_key(instance_id).await?)
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::instance::get_optimal_jre_key(&context, instance_id).await?)
 }
 
 #[tauri::command]
 pub async fn instance_check_installed(
     instance_id: &str,
     project_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<bool> {
+    let context = crate::api::operation_context(invocation_context);
     let check_project_id = project_id;
 
     if let Ok(projects) =
-        theseus::instance::get_projects(instance_id, None).await
+        theseus::instance::get_projects(&context, instance_id, None).await
     {
         Ok(projects.into_iter().any(|(_, project)| {
             project
@@ -563,19 +590,26 @@ pub async fn instance_check_installed(
 #[tauri::command]
 pub async fn instance_update_all(
     instance_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<HashMap<String, String>> {
-    Ok(theseus::instance::update_all_projects(instance_id).await?)
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::instance::update_all_projects(&context, instance_id).await?)
 }
 
 #[tauri::command]
 pub async fn instance_update_project(
     instance_id: &str,
     project_path: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<String> {
-    Ok(
-        theseus::instance::update_project(instance_id, project_path, None)
-            .await?,
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::instance::update_project(
+        &context,
+        instance_id,
+        project_path,
+        None,
     )
+    .await?)
 }
 
 #[tauri::command]
@@ -584,8 +618,11 @@ pub async fn instance_add_project_from_version(
     version_id: &str,
     reason: DownloadReason,
     dependent_on_version_id: Option<String>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<String> {
+    let context = crate::api::operation_context(invocation_context);
     Ok(theseus::instance::add_project_from_version(
+        &context,
         instance_id,
         version_id,
         reason,
@@ -598,8 +635,11 @@ pub async fn instance_add_project_from_version(
 pub async fn instance_install_project_with_dependencies(
     instance_id: &str,
     request: InstallProjectWithDependenciesRequest,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<ResolveContentPlan> {
+    let context = crate::api::operation_context(invocation_context);
     Ok(theseus::instance::install_project_with_dependencies(
+        &context,
         instance_id,
         request,
     )
@@ -611,8 +651,11 @@ pub async fn instance_switch_project_version_with_dependencies(
     instance_id: &str,
     project_path: &str,
     version_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<String> {
+    let context = crate::api::operation_context(invocation_context);
     Ok(theseus::instance::switch_project_version_with_dependencies(
+        &context,
         instance_id,
         project_path,
         version_id,
@@ -635,8 +678,12 @@ pub async fn instance_add_project_from_path(
 }
 
 #[tauri::command]
-pub async fn instance_is_file_on_modrinth(project_path: &Path) -> Result<bool> {
-    Ok(theseus::instance::is_file_on_modrinth(project_path).await?)
+pub async fn instance_is_file_on_modrinth(
+    project_path: &Path,
+    invocation_context: theseus::InvocationContext,
+) -> Result<bool> {
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::instance::is_file_on_modrinth(&context, project_path).await?)
 }
 
 #[tauri::command]
@@ -666,8 +713,11 @@ pub async fn instance_remove_project(
 pub async fn instance_update_managed_modrinth_version(
     instance_id: String,
     version_id: String,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<theseus::install::InstallJobSnapshot> {
+    let context = crate::api::operation_context(invocation_context);
     Ok(theseus::instance::update_managed_modrinth_version(
+        &context,
         &instance_id,
         &version_id,
     )
@@ -677,8 +727,13 @@ pub async fn instance_update_managed_modrinth_version(
 #[tauri::command]
 pub async fn instance_repair_managed_modrinth(
     instance_id: &str,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<theseus::install::InstallJobSnapshot> {
-    Ok(theseus::instance::repair_managed_modrinth(instance_id).await?)
+    let context = crate::api::operation_context(invocation_context);
+    Ok(
+        theseus::instance::repair_managed_modrinth(&context, instance_id)
+            .await?,
+    )
 }
 
 #[tauri::command]
@@ -689,8 +744,11 @@ pub async fn instance_export_mrpack(
     version_id: Option<String>,
     description: Option<String>,
     name: Option<String>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<()> {
+    let context = crate::api::operation_context(invocation_context);
     theseus::instance::export_mrpack(
+        &context,
         instance_id,
         export_location,
         included_overrides,
@@ -713,12 +771,14 @@ pub async fn instance_get_pack_export_candidates(
 pub async fn instance_run(
     instance_id: &str,
     server_address: Option<String>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<ProcessMetadata> {
+    let context = crate::api::operation_context(invocation_context);
     let quick_play = match server_address {
         Some(addr) => QuickPlayType::Server(ServerAddress::Unresolved(addr)),
         None => QuickPlayType::None,
     };
-    Ok(theseus::instance::run(instance_id, quick_play).await?)
+    Ok(theseus::instance::run(&context, instance_id, quick_play).await?)
 }
 
 #[tauri::command]

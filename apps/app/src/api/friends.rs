@@ -13,8 +13,11 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 }
 
 #[tauri::command]
-pub async fn friends() -> crate::api::Result<Vec<UserFriend>> {
-    Ok(theseus::friends::friends().await?)
+pub async fn friends(
+    invocation_context: theseus::InvocationContext,
+) -> crate::api::Result<Vec<UserFriend>> {
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::friends::friends(&context).await?)
 }
 
 #[tauri::command]
@@ -23,11 +26,19 @@ pub async fn friend_statuses() -> crate::api::Result<Vec<UserStatus>> {
 }
 
 #[tauri::command]
-pub async fn add_friend(user_id: &str) -> crate::api::Result<()> {
-    Ok(theseus::friends::add_friend(user_id).await?)
+pub async fn add_friend(
+    user_id: &str,
+    invocation_context: theseus::InvocationContext,
+) -> crate::api::Result<()> {
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::friends::add_friend(&context, user_id).await?)
 }
 
 #[tauri::command]
-pub async fn remove_friend(user_id: &str) -> crate::api::Result<()> {
-    Ok(theseus::friends::remove_friend(user_id).await?)
+pub async fn remove_friend(
+    user_id: &str,
+    invocation_context: theseus::InvocationContext,
+) -> crate::api::Result<()> {
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::friends::remove_friend(&context, user_id).await?)
 }

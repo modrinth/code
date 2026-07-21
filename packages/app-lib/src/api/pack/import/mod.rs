@@ -115,6 +115,7 @@ pub async fn get_importable_instances(
 }
 
 pub(crate) async fn import_instance_with_reporter(
+    context: &crate::OperationContext,
     instance_id: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
@@ -122,6 +123,7 @@ pub(crate) async fn import_instance_with_reporter(
     reporter: InstallProgressReporter,
 ) -> crate::Result<()> {
     import_instance_inner(
+        context,
         instance_id,
         launcher_type,
         base_path,
@@ -132,6 +134,7 @@ pub(crate) async fn import_instance_with_reporter(
 }
 
 async fn import_instance_inner(
+    context: &crate::OperationContext,
     instance_id: &str,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
@@ -146,6 +149,7 @@ async fn import_instance_inner(
     let res = match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
+                context,
                 base_path,       // path to base mmc folder
                 instance_folder, // instance folder in mmc_base_path
                 instance_id,
@@ -156,6 +160,7 @@ async fn import_instance_inner(
         }
         ImportLauncherType::ATLauncher => {
             atlauncher::import_atlauncher(
+                context,
                 base_path,       // path to atlauncher folder
                 instance_folder, // instance folder in atlauncher
                 instance_id,
@@ -166,6 +171,7 @@ async fn import_instance_inner(
         }
         ImportLauncherType::GDLauncher => {
             gdlauncher::import_gdlauncher(
+                context,
                 base_path.join("instances").join(instance_folder), // path to gdlauncher folder
                 instance_id,
                 reporter.clone(),
@@ -175,6 +181,7 @@ async fn import_instance_inner(
         }
         ImportLauncherType::Curseforge => {
             curseforge::import_curseforge(
+                context,
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
                 instance_id,
                 reporter.clone(),
@@ -199,6 +206,7 @@ async fn import_instance_inner(
                 {
                     matched = true;
                     Box::pin(import_instance_inner(
+                        context,
                         instance_id,
                         lt,
                         base_path,
@@ -408,6 +416,7 @@ pub(crate) async fn copy_dotminecraft_with_reporter(
 }
 
 pub(crate) async fn finish_import(
+    context: &crate::OperationContext,
     instance_id: &str,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,
@@ -424,6 +433,7 @@ pub(crate) async fn finish_import(
     .await?;
 
     crate::launcher::install_minecraft_for_instance_id_with_reporter(
+        context,
         instance_id,
         false,
         Some(reporter),

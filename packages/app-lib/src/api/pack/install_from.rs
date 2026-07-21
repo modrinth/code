@@ -164,6 +164,7 @@ pub struct CreatePackDescription {
 }
 
 pub async fn get_instance_from_pack(
+    context: &crate::OperationContext,
     location: CreatePackLocation,
 ) -> crate::Result<CreatePackInstance> {
     match location {
@@ -194,6 +195,7 @@ pub async fn get_instance_from_pack(
                 let state = State::get().await?;
                 let (_, hash) = sha1_file_async(&path).await?;
                 match CachedEntry::get_file_many(
+                    context,
                     &[&hash],
                     Some(CacheBehaviour::StaleWhileRevalidateSkipOffline),
                     &state.pool,
@@ -217,6 +219,7 @@ pub async fn get_instance_from_pack(
 
             let external_files_in_modpack =
                 super::install_mrpack::get_external_files_from_mrpack(
+                    context,
                     &CreatePackFile::Path(path),
                 )
                 .await?;
@@ -234,6 +237,7 @@ pub async fn get_instance_from_pack(
 #[tracing::instrument(skip(reporter))]
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn generate_pack_from_version_id_with_reporter(
+    context: &crate::OperationContext,
     project_id: String,
     version_id: String,
     title: String,
@@ -246,6 +250,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
     let has_icon_url = icon_url.is_some();
 
     let version = CachedEntry::get_version(
+        context,
         &version_id,
         Some(CacheBehaviour::Bypass),
         &state.pool,
@@ -351,14 +356,15 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         };
     let progress = Some(&mut progress as &mut FetchProgressFn<'_>);
 
-    let context = InstallErrorContext::new("download modpack file")
+    let error_context = InstallErrorContext::new("download modpack file")
         .urls(vec![url.clone()])
         .maybe_expected_hash(hash.cloned())
         .project_id(project_id.clone())
         .version_id(version_id.clone())
         .build();
-    reporter.set_context(context).await?;
+    reporter.set_context(error_context).await?;
     let file = fetch_advanced_with_progress(
+        context,
         Method::GET,
         &url,
         hash.map(|x| &**x),
@@ -378,6 +384,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         .await?;
 
     let project = CachedEntry::get_project(
+        context,
         &version.project_id,
         None,
         &state.pool,
@@ -406,6 +413,7 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
                 )
                 .await?;
             let icon_bytes = fetch(
+                context,
                 &icon_url,
                 None,
                 None,
@@ -484,6 +492,7 @@ pub async fn generate_pack_from_file(
 /// Sets generated instance attributes to the pack ones.
 /// This includes the pack name, icon, game version, loader version, and loader
 pub async fn set_instance_information(
+    context: &crate::OperationContext,
     instance_id: String,
     description: &CreatePackDescription,
     backup_name: &str,
@@ -527,6 +536,7 @@ pub async fn set_instance_information(
     let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
+            context,
             game_version,
             mod_loader,
             loader_version.cloned().as_deref(),

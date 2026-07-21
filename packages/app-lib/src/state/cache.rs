@@ -1,5 +1,6 @@
 use crate::state::ProjectType;
 use crate::util::fetch::{FetchSemaphore, fetch_json, sha1_async};
+use crate::{OperationCause, OperationContext};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
@@ -804,17 +805,19 @@ macro_rules! impl_cache_methods {
                 paste::paste! {
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
                     pub async fn [<get_ $variant:snake>](
+                        context: &OperationContext,
                         id: &str,
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
                         fetch_semaphore: &FetchSemaphore,
                     ) -> crate::Result<Option<$type>>
                     {
-                        Ok(Self::[<get_ $variant:snake _many>](&[id], cache_behaviour, pool, fetch_semaphore).await?.into_iter().next())
+                        Ok(Self::[<get_ $variant:snake _many>](context, &[id], cache_behaviour, pool, fetch_semaphore).await?.into_iter().next())
                     }
 
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
                     pub async fn [<get_ $variant:snake _many>](
+                        context: &OperationContext,
                         ids: &[&str],
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
@@ -822,7 +825,7 @@ macro_rules! impl_cache_methods {
                     ) -> crate::Result<Vec<$type>>
                     {
                         let entry =
-                            CachedEntry::get_many(CacheValueType::$variant, ids, cache_behaviour, pool, fetch_semaphore).await?;
+                            CachedEntry::get_many(context, CacheValueType::$variant, ids, cache_behaviour, pool, fetch_semaphore).await?;
 
                         Ok(entry.into_iter().filter_map(|x| if let Some(CacheValue::$variant(value)) = x.data {
                             Some(value)
@@ -843,13 +846,14 @@ macro_rules! impl_cache_method_singular {
                 paste::paste! {
                     #[tracing::instrument(skip(pool, fetch_semaphore))]
                     pub async fn [<get_ $variant:snake>] (
+                        context: &OperationContext,
                         cache_behaviour: Option<CacheBehaviour>,
                         pool: &SqlitePool,
                         fetch_semaphore: &FetchSemaphore,
                     ) -> crate::Result<Option<$type>>
                     {
                         let entry =
-                            CachedEntry::get(CacheValueType::$variant, DEFAULT_ID, cache_behaviour, pool, fetch_semaphore).await?;
+                            CachedEntry::get(context, CacheValueType::$variant, DEFAULT_ID, cache_behaviour, pool, fetch_semaphore).await?;
 
                         if let Some(CacheValue::$variant(value)) = entry.map(|x| x.data).flatten() {
                             Ok(Some(value))
@@ -890,6 +894,7 @@ impl_cache_method_singular!(
 impl CachedEntry {
     #[tracing::instrument(skip(pool, fetch_semaphore))]
     pub async fn get(
+        context: &OperationContext,
         type_: CacheValueType,
         key: &str,
         cache_behaviour: Option<CacheBehaviour>,
@@ -897,6 +902,7 @@ impl CachedEntry {
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Option<Self>> {
         Ok(Self::get_many(
+            context,
             type_,
             &[key],
             cache_behaviour,
@@ -910,6 +916,7 @@ impl CachedEntry {
 
     #[tracing::instrument(skip(pool, fetch_semaphore))]
     pub async fn get_many(
+        context: &OperationContext,
         type_: CacheValueType,
         keys: &[&str],
         cache_behaviour: Option<CacheBehaviour>,
@@ -1017,6 +1024,7 @@ impl CachedEntry {
 
         if !remaining_keys.is_empty() {
             let res = Self::fetch_many(
+                context,
                 type_,
                 remaining_keys.clone(),
                 fetch_semaphore,
@@ -1057,11 +1065,13 @@ impl CachedEntry {
                 || cache_behaviour
                     == CacheBehaviour::StaleWhileRevalidateSkipOffline)
         {
+            let context = context.child(OperationCause::CacheRevalidate);
             tokio::task::spawn(async move {
                 // TODO: if possible- find a way to do this without invoking state get
                 let state = crate::state::State::get().await?;
 
                 let values = Self::fetch_many(
+                    &context,
                     type_,
                     expired_keys,
                     &state.api_semaphore,
@@ -1084,12 +1094,14 @@ impl CachedEntry {
     }
 
     async fn fetch_many(
+        context: &OperationContext,
         type_: CacheValueType,
         keys: DashSet<impl Display + Eq + Hash + Serialize>,
         fetch_semaphore: &FetchSemaphore,
         pool: &SqlitePool,
     ) -> crate::Result<Vec<(Self, bool)>> {
         async fn fetch_many_batched<T: DeserializeOwned>(
+            context: &OperationContext,
             method: Method,
             api_url: &str,
             url: &str,
@@ -1112,6 +1124,7 @@ impl CachedEntry {
 
             let res = futures::future::try_join_all(urls.iter().map(|url| {
                 fetch_json::<Vec<_>>(
+                    context,
                     method.clone(),
                     url,
                     None,
@@ -1129,6 +1142,7 @@ impl CachedEntry {
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $uri_path:expr, $cache_variant:path) => {{
                 let mut results = fetch_many_batched(
+                    context,
                     Method::GET,
                     $api_url,
                     &format!("{}?ids=", $url_suffix),
@@ -1192,6 +1206,7 @@ impl CachedEntry {
                 vec![(
                     $cache_variant(
                         fetch_json(
+                            context,
                             Method::GET,
                             &*format!("{}{}", $api_url, $url_suffix),
                             None,
@@ -1247,6 +1262,7 @@ impl CachedEntry {
             }
             CacheValueType::Team => {
                 let mut teams = fetch_many_batched::<Vec<TeamMember>>(
+                    context,
                     Method::GET,
                     env!("MODRINTH_API_URL_V3"),
                     "teams?ids=",
@@ -1287,6 +1303,7 @@ impl CachedEntry {
             }
             CacheValueType::Organization => {
                 let mut orgs = fetch_many_batched::<Organization>(
+                    context,
                     Method::GET,
                     env!("MODRINTH_API_URL_V3"),
                     "organizations?ids=",
@@ -1343,6 +1360,7 @@ impl CachedEntry {
             }
             CacheValueType::File => {
                 let mut versions = fetch_json::<HashMap<String, Version>>(
+                    context,
                     Method::POST,
                     concat!(env!("MODRINTH_API_URL"), "version_files"),
                     None,
@@ -1419,6 +1437,7 @@ impl CachedEntry {
                 futures::future::try_join_all(fetch_urls.iter().map(
                     |(_, _, url)| {
                         fetch_json(
+                            context,
                             Method::GET,
                             url,
                             None,
@@ -1644,6 +1663,7 @@ impl CachedEntry {
                                 let variation = fetch_json::<
                                     HashMap<String, Vec<Version>>,
                                 >(
+                                    context,
                                     Method::POST,
                                     concat!(
                                         env!("MODRINTH_API_URL"),
@@ -1779,6 +1799,7 @@ impl CachedEntry {
                 futures::future::try_join_all(fetch_urls.iter().map(
                     |(_, url)| {
                         fetch_json(
+                            context,
                             Method::GET,
                             url,
                             None,
@@ -1821,6 +1842,7 @@ impl CachedEntry {
                     );
 
                     match fetch_json::<Vec<Version>>(
+                        context,
                         Method::GET,
                         &url,
                         None,
@@ -1873,6 +1895,7 @@ impl CachedEntry {
                 futures::future::try_join_all(fetch_urls.iter().map(
                     |(_, url)| {
                         fetch_json(
+                            context,
                             Method::GET,
                             url,
                             None,
@@ -2075,11 +2098,13 @@ impl CachedEntry {
 
     /// Get modpack file hashes from cache
     pub async fn get_modpack_files(
+        context: &OperationContext,
         version_id: &str,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Option<CachedModpackFiles>> {
         let entry = Self::get(
+            context,
             CacheValueType::ModpackFiles,
             version_id,
             None,
@@ -2102,12 +2127,14 @@ impl CachedEntry {
     /// Get versions for a project (without changelogs for fast loading)
     #[tracing::instrument(skip(pool, fetch_semaphore))]
     pub async fn get_project_versions(
+        context: &OperationContext,
         project_id: &str,
         cache_behaviour: Option<CacheBehaviour>,
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Option<Vec<Version>>> {
         let entry = Self::get(
+            context,
             CacheValueType::ProjectVersions,
             project_id,
             cache_behaviour,

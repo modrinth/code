@@ -1,5 +1,6 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use crate::{OperationCause, OperationContext};
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use tokio::sync::{OnceCell, Semaphore};
@@ -96,6 +97,7 @@ pub struct State {
 
 impl State {
     pub async fn init(app_identifier: String) -> crate::Result<()> {
+        let context = OperationContext::new(OperationCause::AppStartup);
         let state = LAUNCHER_STATE
             .get_or_try_init(move || Self::initialize_state(app_identifier))
             .await?;
@@ -114,11 +116,13 @@ impl State {
             )
             .await;
 
+            let auth_context =
+                context.child(OperationCause::AuthSessionRefresh);
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 instances::refresh_all_instances(),
                 Settings::migrate(&state.pool),
-                ModrinthCredentials::refresh_all(),
+                ModrinthCredentials::refresh_all(&auth_context),
             );
 
             if let Err(e) = res {
@@ -128,6 +132,7 @@ impl State {
             let _ = state
                 .friends_socket
                 .connect(
+                    &context.child(OperationCause::BackgroundFriends),
                     &state.pool,
                     &state.api_semaphore,
                     &state.process_manager,

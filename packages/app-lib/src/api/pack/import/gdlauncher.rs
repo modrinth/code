@@ -41,6 +41,7 @@ pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
 }
 
 pub async fn import_gdlauncher(
+    context: &crate::OperationContext,
     gdlauncher_instance_folder: PathBuf, // instance's folder
     instance_id: &str,
     reporter: InstallProgressReporter,
@@ -80,6 +81,7 @@ pub async fn import_gdlauncher(
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
+            context,
             &game_version,
             mod_loader,
             loader_version.as_deref(),
@@ -116,6 +118,7 @@ pub async fn import_gdlauncher(
     // Copy in contained folders as overrides
     let state = State::get().await?;
     finish_import(
+        context,
         instance_id,
         gdlauncher_instance_folder,
         &state.io_semaphore,

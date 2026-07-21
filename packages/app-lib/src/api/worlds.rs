@@ -923,6 +923,7 @@ mod servers_data {
 }
 
 pub async fn get_instance_protocol_version(
+    operation_context: &crate::OperationContext,
     instance_id: &str,
 ) -> Result<Option<ProtocolVersion>> {
     let metadata =
@@ -951,6 +952,7 @@ pub async fn get_instance_protocol_version(
     let state = State::get().await?;
     let (minecraft, version_index) =
         crate::launcher::resolve_minecraft_manifest(
+            operation_context,
             &metadata.applied_content_set.game_version,
             &state,
         )
@@ -958,6 +960,7 @@ pub async fn get_instance_protocol_version(
     let version = &minecraft.versions[version_index];
 
     let loader_version = get_loader_version_from_profile(
+        operation_context,
         &metadata.applied_content_set.game_version,
         metadata.applied_content_set.loader,
         metadata.applied_content_set.loader_version.as_deref(),

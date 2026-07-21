@@ -1,7 +1,6 @@
 use super::sync_content_files::{
     project_type_for_file, sync_instance_content_files,
 };
-use crate::State;
 use crate::pack::install_from::{PackFileHash, PackFormat};
 use crate::state::instances::adapters::sqlite;
 use crate::state::instances::{
@@ -17,6 +16,7 @@ use crate::state::{
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchSemaphore, fetch_mirrors, sha1_async,
 };
+use crate::{OperationContext, State};
 use async_zip::base::read::seek::ZipFileReader;
 use dashmap::DashMap;
 use sqlx::SqlitePool;
@@ -59,6 +59,7 @@ pub(crate) async fn list_content_sets(
 }
 
 pub(crate) async fn get_content_projects(
+    context: &OperationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -72,6 +73,7 @@ pub(crate) async fn get_content_projects(
     .await?;
 
     content_projects_for_scope(
+        context,
         &resolved,
         cache_behaviour,
         state,
@@ -81,12 +83,14 @@ pub(crate) async fn get_content_projects(
 }
 
 pub(crate) async fn get_installed_project_ids_for_instance(
+    context: &OperationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     state: &State,
 ) -> crate::Result<Vec<String>> {
     let projects =
-        get_content_projects(instance_id, content_set_id, None, state).await?;
+        get_content_projects(context, instance_id, content_set_id, None, state)
+            .await?;
 
     Ok(projects
         .into_iter()
@@ -191,6 +195,7 @@ fn instance_matches_targets(
 }
 
 pub(crate) async fn list_content(
+    context: &OperationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -215,6 +220,7 @@ pub(crate) async fn list_content(
         match linked_modpack_ids(&link) {
             Some((_, version_id)) => {
                 get_cached_modpack_identifiers(
+                    context,
                     &version_id,
                     &state.pool,
                     &state.api_semaphore,
@@ -240,12 +246,18 @@ pub(crate) async fn list_content(
     } else {
         ContentFilter::All
     };
-    let files =
-        content_projects_for_scope(&resolved, cache_behaviour, state, filter)
-            .await?;
+    let files = content_projects_for_scope(
+        context,
+        &resolved,
+        cache_behaviour,
+        state,
+        filter,
+    )
+    .await?;
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
+        context,
         &resolved.instance,
         &files,
         cache_behaviour,
@@ -255,6 +267,7 @@ pub(crate) async fn list_content(
 }
 
 pub(crate) async fn list_linked_modpack_content(
+    context: &OperationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -273,6 +286,7 @@ pub(crate) async fn list_linked_modpack_content(
     .await?;
     if is_imported_modpack_scope(&link) {
         let files = content_projects_for_scope(
+            context,
             &resolved,
             cache_behaviour,
             state,
@@ -286,6 +300,7 @@ pub(crate) async fn list_linked_modpack_content(
         let files = files.into_iter().collect::<Vec<_>>();
 
         return content_files_to_content_items(
+            context,
             &resolved.instance,
             &files,
             cache_behaviour,
@@ -298,6 +313,7 @@ pub(crate) async fn list_linked_modpack_content(
         return Ok(Vec::new());
     };
     let ids = match get_modpack_identifiers(
+        context,
         &version_id,
         &resolved.content_set,
         &state.pool,
@@ -312,6 +328,7 @@ pub(crate) async fn list_linked_modpack_content(
         }
     };
     let files = content_projects_for_scope(
+        context,
         &resolved,
         cache_behaviour,
         state,
@@ -321,6 +338,7 @@ pub(crate) async fn list_linked_modpack_content(
     let files = files.into_iter().collect::<Vec<_>>();
 
     content_files_to_content_items(
+        context,
         &resolved.instance,
         &files,
         cache_behaviour,
@@ -330,6 +348,7 @@ pub(crate) async fn list_linked_modpack_content(
 }
 
 pub(crate) async fn get_linked_modpack_info(
+    context: &OperationContext,
     instance_id: &str,
     content_set_id: Option<&str>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -349,18 +368,21 @@ pub(crate) async fn get_linked_modpack_info(
     };
     let (project, version, all_versions) = tokio::try_join!(
         CachedEntry::get_project(
+            context,
             &project_id,
             cache_behaviour,
             &state.pool,
             &state.api_semaphore,
         ),
         CachedEntry::get_version(
+            context,
             &version_id,
             cache_behaviour,
             &state.pool,
             &state.api_semaphore,
         ),
         CachedEntry::get_project_versions(
+            context,
             &project_id,
             cache_behaviour,
             &state.pool,
@@ -375,12 +397,14 @@ pub(crate) async fn get_linked_modpack_info(
     let (project, all_versions) = if version.project_id != project_id {
         let (modpack_project, modpack_versions) = tokio::try_join!(
             CachedEntry::get_project(
+                context,
                 &version.project_id,
                 cache_behaviour,
                 &state.pool,
                 &state.api_semaphore,
             ),
             CachedEntry::get_project_versions(
+                context,
                 &version.project_id,
                 cache_behaviour,
                 &state.pool,
@@ -398,6 +422,7 @@ pub(crate) async fn get_linked_modpack_info(
     })?;
     let owner = if let Some(org_id) = &project.organization {
         let org = CachedEntry::get_organization(
+            context,
             org_id,
             cache_behaviour,
             &state.pool,
@@ -412,6 +437,7 @@ pub(crate) async fn get_linked_modpack_info(
         })
     } else {
         let team = CachedEntry::get_team(
+            context,
             &project.team,
             cache_behaviour,
             &state.pool,
@@ -447,6 +473,7 @@ pub(crate) async fn get_linked_modpack_info(
 }
 
 pub(crate) async fn dependencies_to_content_items(
+    context: &OperationContext,
     dependencies: &[Dependency],
     cache_behaviour: Option<CacheBehaviour>,
     pool: &SqlitePool,
@@ -464,6 +491,7 @@ pub(crate) async fn dependencies_to_content_items(
         .filter_map(|dependency| dependency.version_id.clone())
         .collect::<HashSet<_>>();
     let meta = resolve_metadata(
+        context,
         &project_ids,
         &version_ids,
         cache_behaviour,
@@ -586,12 +614,14 @@ async fn resolve_content_scope_with_instance(
 }
 
 async fn content_projects_for_scope(
+    context: &OperationContext,
     resolved: &ResolvedContentScope,
     cache_behaviour: Option<CacheBehaviour>,
     state: &State,
     filter: ContentFilter<'_>,
 ) -> crate::Result<DashMap<String, ContentFile>> {
-    let files = sync_instance_content_files(&resolved.instance, state).await?;
+    let files =
+        sync_instance_content_files(context, &resolved.instance, state).await?;
     let entries = sqlite::content_rows::get_content_entries(
         &resolved.content_set.id,
         &state.pool,
@@ -608,6 +638,7 @@ async fn content_projects_for_scope(
         .map(|file| file.sha1.as_str())
         .collect::<Vec<_>>();
     let file_info = CachedEntry::get_file_many(
+        context,
         &hashes,
         cache_behaviour,
         &state.pool,
@@ -619,6 +650,7 @@ async fn content_projects_for_scope(
         .map(|file| (file.hash.clone(), file))
         .collect::<HashMap<_, _>>();
     let installed_channels = get_installed_update_channels(
+        context,
         &file_info_by_hash,
         cache_behaviour,
         &state.pool,
@@ -647,6 +679,7 @@ async fn content_projects_for_scope(
     let update_key_refs =
         update_keys.iter().map(String::as_str).collect::<Vec<_>>();
     let file_updates = CachedEntry::get_file_update_many(
+        context,
         &update_key_refs,
         cache_behaviour,
         &state.pool,
@@ -746,6 +779,7 @@ async fn content_projects_for_scope(
 }
 
 async fn get_installed_update_channels(
+    context: &OperationContext,
     file_info_by_hash: &HashMap<String, CachedFile>,
     cache_behaviour: Option<CacheBehaviour>,
     pool: &SqlitePool,
@@ -760,6 +794,7 @@ async fn get_installed_update_channels(
     }
     let version_id_refs = version_ids.iter().copied().collect::<Vec<_>>();
     let versions = CachedEntry::get_version_many(
+        context,
         &version_id_refs,
         cache_behaviour,
         pool,
@@ -809,6 +844,7 @@ fn file_update_cache_key(
 }
 
 async fn content_files_to_content_items(
+    context: &OperationContext,
     instance: &Instance,
     files: &[(String, ContentFile)],
     cache_behaviour: Option<CacheBehaviour>,
@@ -831,6 +867,7 @@ async fn content_files_to_content_items(
         })
         .collect::<HashSet<_>>();
     let meta = resolve_metadata(
+        context,
         &project_ids,
         &version_ids,
         cache_behaviour,
@@ -916,6 +953,7 @@ struct ResolvedMetadata {
 }
 
 async fn resolve_metadata(
+    context: &OperationContext,
     project_ids: &HashSet<String>,
     version_ids: &HashSet<String>,
     cache_behaviour: Option<CacheBehaviour>,
@@ -934,6 +972,7 @@ async fn resolve_metadata(
                         Ok(Vec::new())
                     } else {
                         CachedEntry::get_project_many(
+                            context,
                             &project_id_refs,
                             cache_behaviour,
                             pool,
@@ -947,6 +986,7 @@ async fn resolve_metadata(
                         Ok(Vec::new())
                     } else {
                         CachedEntry::get_version_many(
+                            context,
                             &version_id_refs,
                             cache_behaviour,
                             pool,
@@ -977,6 +1017,7 @@ async fn resolve_metadata(
                     Ok(Vec::new())
                 } else {
                     CachedEntry::get_team_many(
+                        context,
                         &team_id_refs,
                         cache_behaviour,
                         pool,
@@ -990,6 +1031,7 @@ async fn resolve_metadata(
                     Ok(Vec::new())
                 } else {
                     CachedEntry::get_organization_many(
+                        context,
                         &org_id_refs,
                         cache_behaviour,
                         pool,
@@ -1171,13 +1213,18 @@ impl ModpackIdentifiers {
 }
 
 async fn get_cached_modpack_identifiers(
+    context: &OperationContext,
     version_id: &str,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<Option<ModpackIdentifiers>> {
-    let Some(cached) =
-        CachedEntry::get_modpack_files(version_id, pool, fetch_semaphore)
-            .await?
+    let Some(cached) = CachedEntry::get_modpack_files(
+        context,
+        version_id,
+        pool,
+        fetch_semaphore,
+    )
+    .await?
     else {
         return Ok(None);
     };
@@ -1193,14 +1240,19 @@ async fn get_cached_modpack_identifiers(
 }
 
 async fn get_modpack_identifiers(
+    context: &OperationContext,
     version_id: &str,
     content_set: &ContentSet,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<ModpackIdentifiers> {
-    if let Some(cached) =
-        CachedEntry::get_modpack_files(version_id, pool, fetch_semaphore)
-            .await?
+    if let Some(cached) = CachedEntry::get_modpack_files(
+        context,
+        version_id,
+        pool,
+        fetch_semaphore,
+    )
+    .await?
     {
         if !cached.project_ids.is_empty() {
             return Ok(ModpackIdentifiers {
@@ -1214,9 +1266,14 @@ async fn get_modpack_identifiers(
             .iter()
             .map(String::as_str)
             .collect::<Vec<_>>();
-        let files =
-            CachedEntry::get_file_many(&hash_refs, None, pool, fetch_semaphore)
-                .await?;
+        let files = CachedEntry::get_file_many(
+            context,
+            &hash_refs,
+            None,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
         let project_ids = files
             .iter()
             .map(|file| file.project_id.clone())
@@ -1237,14 +1294,19 @@ async fn get_modpack_identifiers(
         });
     }
 
-    let version =
-        CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Modpack version {version_id} not found"
-                ))
-            })?;
+    let version = CachedEntry::get_version(
+        context,
+        version_id,
+        None,
+        pool,
+        fetch_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Modpack version {version_id} not found"
+        ))
+    })?;
     let primary_file = version
         .files
         .iter()
@@ -1262,6 +1324,7 @@ async fn get_modpack_identifiers(
         dependent_on: Some(version_id.to_string()),
     };
     let mrpack_bytes = fetch_mirrors(
+        context,
         &[&primary_file.url],
         primary_file.hashes.get("sha1").map(String::as_str),
         Some(&download_meta),

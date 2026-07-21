@@ -37,7 +37,7 @@ pub mod data {
 
 pub mod prelude {
     pub use crate::{
-        State,
+        InvocationContext, OperationCause, OperationContext, State,
         data::*,
         event::CommandPayload,
         install, instance, jre, metadata, minecraft_auth, mr_auth, pack,

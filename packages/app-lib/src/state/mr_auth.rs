@@ -1,3 +1,4 @@
+use crate::OperationContext;
 use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -16,6 +17,7 @@ pub struct ModrinthCredentials {
 
 impl ModrinthCredentials {
     pub async fn get_and_refresh(
+        context: &OperationContext,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<Option<Self>> {
@@ -29,6 +31,7 @@ impl ModrinthCredentials {
                 }
 
                 let resp = fetch_advanced(
+                    context,
                     Method::POST,
                     concat!(env!("MODRINTH_API_URL"), "session/refresh"),
                     None,
@@ -173,13 +176,16 @@ impl ModrinthCredentials {
         Ok(())
     }
 
-    pub(crate) async fn refresh_all() -> crate::Result<()> {
+    pub(crate) async fn refresh_all(
+        context: &OperationContext,
+    ) -> crate::Result<()> {
         let state = crate::State::get().await?;
         let all = Self::get_all(&state.pool).await?;
 
         let user_ids = all.into_iter().map(|x| x.0).collect::<Vec<_>>();
 
         CachedEntry::get_user_many(
+            context,
             &user_ids.iter().map(|x| &**x).collect::<Vec<_>>(),
             Some(CacheBehaviour::Bypass),
             &state.pool,
@@ -196,6 +202,7 @@ pub const fn get_login_url() -> &'static str {
 }
 
 pub async fn finish_login_flow(
+    context: &OperationContext,
     code: &str,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
@@ -206,7 +213,7 @@ pub async fn finish_login_flow(
     // needed. TODO not do this for the reasons outlined at
     // https://oauth.net/2/grant-types/implicit/
 
-    let info = fetch_info(code, semaphore, exec).await?;
+    let info = fetch_info(context, code, semaphore, exec).await?;
 
     Ok(ModrinthCredentials {
         session: code.to_string(),
@@ -217,11 +224,13 @@ pub async fn finish_login_flow(
 }
 
 async fn fetch_info(
+    context: &OperationContext,
     token: &str,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<crate::state::cache::User> {
     let result = fetch_advanced(
+        context,
         Method::GET,
         concat!(env!("MODRINTH_API_URL"), "user"),
         None,

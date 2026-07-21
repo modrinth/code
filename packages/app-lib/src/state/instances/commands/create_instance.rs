@@ -1,3 +1,4 @@
+use crate::OperationContext;
 use crate::launcher::get_loader_version_from_profile;
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSourceKind, Instance,
@@ -27,6 +28,7 @@ pub struct CreateInstance {
 }
 
 pub(crate) async fn create_instance(
+    context: &OperationContext,
     input: CreateInstance,
     state: &State,
 ) -> crate::Result<Instance> {
@@ -45,6 +47,7 @@ pub(crate) async fn create_instance(
 
         let loader_version = if input.loader != ModLoader::Vanilla {
             get_loader_version_from_profile(
+                context,
                 &input.game_version,
                 input.loader,
                 input.loader_version.as_deref(),
@@ -56,7 +59,8 @@ pub(crate) async fn create_instance(
         };
 
         let icon_path =
-            resolve_icon_path(input.icon_path.as_deref(), state).await?;
+            resolve_icon_path(context, input.icon_path.as_deref(), state)
+                .await?;
         let now = Utc::now();
         let instance_id = format!("local:{}", Uuid::new_v4());
         let content_set_id = format!("content-set:{}", Uuid::new_v4());
@@ -167,6 +171,7 @@ async fn path_available(
 }
 
 async fn resolve_icon_path(
+    context: &OperationContext,
     icon_path: Option<&str>,
     state: &State,
 ) -> crate::Result<Option<String>> {
@@ -178,6 +183,7 @@ async fn resolve_icon_path(
         || icon.starts_with("http://")
     {
         let fetched = fetch::fetch(
+            context,
             icon,
             None,
             None,

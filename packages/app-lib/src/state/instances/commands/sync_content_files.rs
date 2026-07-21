@@ -1,12 +1,13 @@
-use crate::State;
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
 use crate::state::{CachedEntry, ProjectType};
+use crate::{OperationContext, State};
 use chrono::Utc;
 use std::collections::HashMap;
 use uuid::Uuid;
 
 pub(crate) async fn sync_content_files(
+    context: &OperationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
@@ -17,10 +18,11 @@ pub(crate) async fn sync_content_files(
                 crate::ErrorKind::InputError("Unknown instance".to_string())
             })?;
 
-    sync_instance_content_files(&instance, state).await
+    sync_instance_content_files(context, &instance, state).await
 }
 
 pub(crate) async fn sync_instance_content_files(
+    context: &OperationContext,
     instance: &Instance,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
@@ -33,6 +35,7 @@ pub(crate) async fn sync_instance_content_files(
         .map(|file| file.hash_cache_key.as_str())
         .collect::<Vec<_>>();
     let hashes = CachedEntry::get_file_hash_many(
+        context,
         &cache_keys,
         None,
         &state.pool,

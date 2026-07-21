@@ -1,3 +1,4 @@
+use crate::OperationContext;
 use crate::event::emit::{emit_instance, emit_loading, init_loading};
 use crate::event::{InstancePayloadType, LoadingBarType};
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -20,6 +21,7 @@ pub struct InstallProjectWithDependenciesRequest {
 
 #[tracing::instrument]
 pub async fn update_all_projects(
+    context: &OperationContext,
     instance_id: &str,
 ) -> crate::Result<HashMap<String, String>> {
     let state = State::get().await?;
@@ -34,6 +36,7 @@ pub async fn update_all_projects(
     )
     .await?;
     let map = crate::state::instances::commands::update_all_projects(
+        context,
         instance_id,
         &state,
     )
@@ -46,12 +49,14 @@ pub async fn update_all_projects(
 
 #[tracing::instrument]
 pub async fn update_project(
+    context: &OperationContext,
     instance_id: &str,
     project_path: &str,
     skip_send_event: Option<bool>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
     let path = crate::state::instances::commands::update_project(
+        context,
         instance_id,
         project_path,
         &state,
@@ -67,6 +72,7 @@ pub async fn update_project(
 
 #[tracing::instrument]
 pub async fn add_project_from_version(
+    context: &OperationContext,
     instance_id: &str,
     version_id: &str,
     reason: fetch::DownloadReason,
@@ -75,6 +81,7 @@ pub async fn add_project_from_version(
     let state = State::get().await?;
     let project_path =
         crate::state::instances::commands::add_project_from_version(
+            context,
             instance_id,
             version_id,
             reason,
@@ -90,6 +97,7 @@ pub async fn add_project_from_version(
 
 #[tracing::instrument]
 pub async fn install_project_with_dependencies(
+    context: &OperationContext,
     instance_id: &str,
     request: InstallProjectWithDependenciesRequest,
 ) -> crate::Result<ResolveContentPlan> {
@@ -98,6 +106,7 @@ pub async fn install_project_with_dependencies(
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
     let plan = crate::state::instances::commands::resolve_install_plan(
+        context,
         instance_id,
         crate::state::instances::commands::InstanceInstallProjectRequest {
             project_id: request.project_id,
@@ -112,8 +121,10 @@ pub async fn install_project_with_dependencies(
     let instance_id = metadata.instance.id;
     let project_ids = plan_project_ids(&plan);
     let install_plan = plan.clone();
+    let context = context.clone();
     tokio::spawn(async move {
         match crate::state::instances::commands::install_resolved_content_plan(
+            &context,
             &instance_id,
             &install_plan,
             &state,
@@ -176,6 +187,7 @@ fn plan_project_ids(plan: &ResolveContentPlan) -> Vec<String> {
 
 #[tracing::instrument]
 pub async fn switch_project_version_with_dependencies(
+    context: &OperationContext,
     instance_id: &str,
     project_path: &str,
     version_id: &str,
@@ -186,6 +198,7 @@ pub async fn switch_project_version_with_dependencies(
     })?;
     let path =
         crate::state::instances::commands::switch_project_version_with_dependencies(
+            context,
             instance_id,
             project_path,
             version_id,
@@ -214,10 +227,14 @@ pub async fn add_project_from_path(
 }
 
 #[tracing::instrument]
-pub async fn is_file_on_modrinth(path: &Path) -> crate::Result<bool> {
+pub async fn is_file_on_modrinth(
+    context: &OperationContext,
+    path: &Path,
+) -> crate::Result<bool> {
     let state = State::get().await?;
     let (_, hash) = fetch::sha1_file_async(path).await?;
     let files = CachedEntry::get_file_many(
+        context,
         &[&hash],
         Some(CacheBehaviour::Bypass),
         &state.pool,
@@ -266,6 +283,7 @@ pub async fn remove_project(
 
 #[tracing::instrument]
 pub async fn update_managed_modrinth_version(
+    context: &OperationContext,
     instance_id: &str,
     version_id: &str,
 ) -> crate::Result<crate::install::InstallJobSnapshot> {
@@ -310,6 +328,7 @@ pub async fn update_managed_modrinth_version(
     };
 
     crate::install::install_pack_to_existing_instance(
+        context,
         metadata.instance.id,
         crate::api::pack::install_from::CreatePackLocation::FromVersionId {
             project_id,
@@ -324,6 +343,7 @@ pub async fn update_managed_modrinth_version(
 
 #[tracing::instrument]
 pub async fn repair_managed_modrinth(
+    context: &OperationContext,
     instance_id: &str,
 ) -> crate::Result<crate::install::InstallJobSnapshot> {
     let state = State::get().await?;
@@ -363,6 +383,7 @@ pub async fn repair_managed_modrinth(
     };
 
     crate::install::install_pack_to_existing_instance(
+        context,
         metadata.instance.id,
         crate::api::pack::install_from::CreatePackLocation::FromVersionId {
             project_id,

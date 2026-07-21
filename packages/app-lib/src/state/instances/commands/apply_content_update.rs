@@ -1,3 +1,4 @@
+use crate::OperationContext;
 use crate::state::instances::{
     ContentEntry, ContentSet, ContentSourceKind, InstanceFile,
     adapters::sqlite::{content_rows, instance_rows},
@@ -63,11 +64,13 @@ struct ResolvedDependency {
 }
 
 pub(crate) async fn update_project(
+    context: &OperationContext,
     instance_id: &str,
     project_path: &str,
     state: &State,
 ) -> crate::Result<String> {
     let updates = check_content_updates(
+        context,
         instance_id,
         Some(CacheBehaviour::MustRevalidate),
         state,
@@ -82,16 +85,19 @@ pub(crate) async fn update_project(
             )
         })?;
 
-    apply_content_update(instance_id, project_path, &update, state).await
+    apply_content_update(context, instance_id, project_path, &update, state)
+        .await
 }
 
 async fn apply_content_update(
+    context: &OperationContext,
     instance_id: &str,
     project_path: &str,
     update: &ContentUpdate,
     state: &State,
 ) -> crate::Result<String> {
     let mut new_path = add_project_from_version(
+        context,
         instance_id,
         &update.update_version_id,
         DownloadReason::Update,
@@ -122,6 +128,7 @@ async fn apply_content_update(
 }
 
 pub(crate) async fn update_all_projects(
+    context: &OperationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<HashMap<String, String>> {
@@ -132,12 +139,17 @@ pub(crate) async fn update_all_projects(
         0,
     )
     .await?;
-    let plan = plan_bulk_update(instance_id, state).await?;
+    let plan = plan_bulk_update(context, instance_id, state).await?;
     let download_total =
         plan.project_updates.len() + plan.dependency_additions.len();
-    let downloads =
-        download_planned_projects(instance_id, &plan, download_total, state)
-            .await?;
+    let downloads = download_planned_projects(
+        context,
+        instance_id,
+        &plan,
+        download_total,
+        state,
+    )
+    .await?;
 
     let mut changed = HashMap::new();
     emit_bulk_update_progress(
@@ -198,6 +210,7 @@ pub(crate) async fn update_all_projects(
 }
 
 async fn download_planned_projects(
+    context: &OperationContext,
     instance_id: &str,
     plan: &BulkUpdatePlan,
     total: usize,
@@ -226,6 +239,7 @@ async fn download_planned_projects(
             match download {
                 PlannedDownload::ProjectUpdate(update) => {
                     let downloaded = download_project_version(
+                        context,
                         instance_id,
                         &update.update_version_id,
                         DownloadReason::Update,
@@ -240,6 +254,7 @@ async fn download_planned_projects(
                 }
                 PlannedDownload::DependencyAddition(dependency) => {
                     let downloaded = download_project_version(
+                        context,
                         instance_id,
                         &dependency.version_id,
                         DownloadReason::Dependency,
@@ -292,11 +307,12 @@ async fn emit_bulk_update_progress(
 }
 
 async fn plan_bulk_update(
+    context: &OperationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<BulkUpdatePlan> {
     let updateable_paths =
-        bulk_updateable_project_paths(instance_id, state).await?;
+        bulk_updateable_project_paths(context, instance_id, state).await?;
     if updateable_paths.is_empty() {
         return Ok(BulkUpdatePlan {
             project_updates: Vec::new(),
@@ -305,6 +321,7 @@ async fn plan_bulk_update(
     }
 
     let updates = check_content_updates(
+        context,
         instance_id,
         Some(CacheBehaviour::MustRevalidate),
         state,
@@ -364,6 +381,7 @@ async fn plan_bulk_update(
     let version_id_refs =
         version_ids.iter().map(|id| id.as_str()).collect::<Vec<_>>();
     let versions = CachedEntry::get_version_many(
+        context,
         &version_id_refs,
         Some(CacheBehaviour::MustRevalidate),
         &state.pool,
@@ -388,7 +406,8 @@ async fn plan_bulk_update(
         })
         .collect::<Vec<_>>();
     let planned_dependencies =
-        dependency_closure(planned_versions, &content_set, state).await?;
+        dependency_closure(context, planned_versions, &content_set, state)
+            .await?;
     let dependency_additions = planned_dependencies
         .values()
         .filter(|dependency| {
@@ -415,10 +434,12 @@ async fn plan_bulk_update(
 }
 
 async fn bulk_updateable_project_paths(
+    context: &OperationContext,
     instance_id: &str,
     state: &State,
 ) -> crate::Result<HashSet<String>> {
     let items = super::list_content::list_content(
+        context,
         instance_id,
         None,
         Some(CacheBehaviour::MustRevalidate),
@@ -476,6 +497,7 @@ fn installed_project_from_row(
 }
 
 async fn dependency_closure(
+    context: &OperationContext,
     root_versions: Vec<Version>,
     content_set: &ContentSet,
     state: &State,
@@ -497,6 +519,7 @@ async fn dependency_closure(
             }
 
             let Some(dependency_version) = resolve_dependency_version(
+                context,
                 dependency,
                 content_set,
                 state,
@@ -536,6 +559,7 @@ fn is_required_dependency(
 }
 
 async fn resolve_dependency_version(
+    context: &OperationContext,
     dependency: &Dependency,
     content_set: &ContentSet,
     state: &State,
@@ -543,15 +567,19 @@ async fn resolve_dependency_version(
     project_versions_cache: &mut HashMap<String, Option<Vec<Version>>>,
 ) -> crate::Result<Option<Version>> {
     if let Some(version_id) = &dependency.version_id {
-        return cached_version(version_id, version_cache, state).await;
+        return cached_version(context, version_id, version_cache, state).await;
     }
 
     let Some(project_id) = &dependency.project_id else {
         return Ok(None);
     };
-    let Some(mut versions) =
-        cached_project_versions(project_id, project_versions_cache, state)
-            .await?
+    let Some(mut versions) = cached_project_versions(
+        context,
+        project_id,
+        project_versions_cache,
+        state,
+    )
+    .await?
     else {
         return Ok(None);
     };
@@ -562,12 +590,14 @@ async fn resolve_dependency_version(
 }
 
 async fn cached_version(
+    context: &OperationContext,
     version_id: &str,
     version_cache: &mut HashMap<String, Option<Version>>,
     state: &State,
 ) -> crate::Result<Option<Version>> {
     if !version_cache.contains_key(version_id) {
         let version = CachedEntry::get_version(
+            context,
             version_id,
             Some(CacheBehaviour::MustRevalidate),
             &state.pool,
@@ -581,12 +611,14 @@ async fn cached_version(
 }
 
 async fn cached_project_versions(
+    context: &OperationContext,
     project_id: &str,
     project_versions_cache: &mut HashMap<String, Option<Vec<Version>>>,
     state: &State,
 ) -> crate::Result<Option<Vec<Version>>> {
     if !project_versions_cache.contains_key(project_id) {
         let versions = CachedEntry::get_project_versions(
+            context,
             project_id,
             Some(CacheBehaviour::MustRevalidate),
             &state.pool,

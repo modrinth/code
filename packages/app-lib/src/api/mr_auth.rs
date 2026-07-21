@@ -1,3 +1,4 @@
+use crate::OperationContext;
 use crate::state::ModrinthCredentials;
 
 #[tracing::instrument]
@@ -7,11 +8,13 @@ pub fn authenticate_begin_flow() -> &'static str {
 
 #[tracing::instrument]
 pub async fn authenticate_finish_flow(
+    context: &OperationContext,
     code: &str,
 ) -> crate::Result<ModrinthCredentials> {
     let state = crate::State::get().await?;
 
     let creds = crate::state::finish_login_flow(
+        context,
         code,
         &state.api_semaphore,
         &state.pool,
@@ -21,7 +24,12 @@ pub async fn authenticate_finish_flow(
     creds.upsert(&state.pool).await?;
     state
         .friends_socket
-        .connect(&state.pool, &state.api_semaphore, &state.process_manager)
+        .connect(
+            context,
+            &state.pool,
+            &state.api_semaphore,
+            &state.process_manager,
+        )
         .await?;
 
     Ok(creds)
@@ -41,11 +49,16 @@ pub async fn logout() -> crate::Result<()> {
 }
 
 #[tracing::instrument]
-pub async fn get_credentials() -> crate::Result<Option<ModrinthCredentials>> {
+pub async fn get_credentials(
+    context: &OperationContext,
+) -> crate::Result<Option<ModrinthCredentials>> {
     let state = crate::State::get().await?;
-    let current =
-        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
-            .await?;
+    let current = ModrinthCredentials::get_and_refresh(
+        context,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
 
     Ok(current)
 }

@@ -22,7 +22,9 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 #[tauri::command]
 pub async fn modrinth_login<R: Runtime>(
     app: tauri::AppHandle<R>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<ModrinthCredentials> {
+    let context = crate::api::operation_context(invocation_context);
     let (auth_code_recv_socket_tx, auth_code_recv_socket) = oneshot::channel();
     let auth_code = tokio::spawn(oauth_utils::auth_code_reply::listen(
         auth_code_recv_socket_tx,
@@ -58,7 +60,8 @@ pub async fn modrinth_login<R: Runtime>(
         ));
     };
 
-    let credentials = mr_auth::authenticate_finish_flow(&auth_code).await?;
+    let credentials =
+        mr_auth::authenticate_finish_flow(&context, &auth_code).await?;
 
     if let Some(main_window) = app.get_window("main") {
         main_window.set_focus().ok();
@@ -73,8 +76,11 @@ pub async fn logout() -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn get() -> Result<Option<ModrinthCredentials>> {
-    Ok(theseus::mr_auth::get_credentials().await?)
+pub async fn get(
+    invocation_context: theseus::InvocationContext,
+) -> Result<Option<ModrinthCredentials>> {
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::mr_auth::get_credentials(&context).await?)
 }
 
 #[tauri::command]

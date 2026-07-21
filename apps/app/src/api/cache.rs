@@ -6,20 +6,27 @@ macro_rules! impl_cache_methods {
         $(
             paste::paste! {
                 #[tauri::command]
-                pub async fn [<get_ $variant:snake>](id: &str, cache_behaviour: Option<CacheBehaviour>) -> Result<Option<$type>>
+                pub async fn [<get_ $variant:snake>](
+                    id: &str,
+                    cache_behaviour: Option<CacheBehaviour>,
+                    invocation_context: theseus::InvocationContext,
+                ) -> Result<Option<$type>>
                 {
-                    Ok(theseus::cache::[<get_ $variant:snake>](id, cache_behaviour).await?)
+                    let context = crate::api::operation_context(invocation_context);
+                    Ok(theseus::cache::[<get_ $variant:snake>](&context, id, cache_behaviour).await?)
                 }
 
                 #[tauri::command]
                 pub async fn [<get_ $variant:snake _many>](
                     ids: Vec<String>,
                     cache_behaviour: Option<CacheBehaviour>,
+                    invocation_context: theseus::InvocationContext,
                 ) -> Result<Vec<$type>>
                 {
+                    let context = crate::api::operation_context(invocation_context);
                     let ids = ids.iter().map(|x| &**x).collect::<Vec<&str>>();
                     let entries =
-                        theseus::cache::[<get_ $variant:snake _many>](&*ids, cache_behaviour).await?;
+                        theseus::cache::[<get_ $variant:snake _many>](&context, &*ids, cache_behaviour).await?;
 
                     Ok(entries)
                 }
@@ -73,9 +80,13 @@ pub async fn purge_cache_types(cache_types: Vec<CacheValueType>) -> Result<()> {
 pub async fn get_project_versions(
     project_id: &str,
     cache_behaviour: Option<CacheBehaviour>,
+    invocation_context: theseus::InvocationContext,
 ) -> Result<Option<Vec<Version>>> {
-    Ok(
-        theseus::cache::get_project_versions(project_id, cache_behaviour)
-            .await?,
+    let context = crate::api::operation_context(invocation_context);
+    Ok(theseus::cache::get_project_versions(
+        &context,
+        project_id,
+        cache_behaviour,
     )
+    .await?)
 }

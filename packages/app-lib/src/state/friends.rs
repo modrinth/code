@@ -5,6 +5,7 @@ use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
+use crate::{OperationCause, OperationContext};
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
@@ -68,12 +69,14 @@ impl FriendsSocket {
     #[tracing::instrument(skip_all)]
     pub async fn connect(
         &self,
+        context: &OperationContext,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
         process_manager: &ProcessManager,
     ) -> crate::Result<()> {
         let credentials =
-            ModrinthCredentials::get_and_refresh(exec, semaphore).await?;
+            ModrinthCredentials::get_and_refresh(context, exec, semaphore)
+                .await?;
 
         if let Some(credentials) = credentials {
             let mut request = format!(
@@ -255,6 +258,7 @@ impl FriendsSocket {
     #[tracing::instrument(skip_all)]
     pub async fn socket_loop() -> crate::Result<()> {
         let state = crate::State::get().await?;
+        let context = OperationContext::new(OperationCause::BackgroundFriends);
 
         tokio::task::spawn(async move {
             let mut last_connection = Utc::now();
@@ -272,6 +276,7 @@ impl FriendsSocket {
                     let _ = state
                         .friends_socket
                         .connect(
+                            &context,
                             &state.pool,
                             &state.api_semaphore,
                             &state.process_manager,
@@ -321,10 +326,12 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip_all)]
     pub async fn friends(
+        context: &OperationContext,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<UserFriend>> {
         fetch_json(
+            context,
             Method::GET,
             concat!(env!("MODRINTH_API_URL_V3"), "friends"),
             None,
@@ -346,11 +353,13 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip(exec, semaphore))]
     pub async fn add_friend(
+        context: &OperationContext,
         user_id: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<()> {
         let result = fetch_advanced(
+            context,
             Method::POST,
             &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
             None,
@@ -380,11 +389,13 @@ impl FriendsSocket {
 
     #[tracing::instrument(skip(exec, semaphore))]
     pub async fn remove_friend(
+        context: &OperationContext,
         user_id: &str,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<()> {
         fetch_advanced(
+            context,
             Method::DELETE,
             &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
             None,
