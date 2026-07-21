@@ -73,6 +73,18 @@ export class LabrinthVersionsV2Module extends AbstractModule {
 		})
 	}
 
+	public async getVersionFromFileHash(
+		hash: string,
+		algorithm: keyof Labrinth.Versions.v2.VersionFileHash,
+	): Promise<Labrinth.Versions.v2.Version> {
+		return this.client.request<Labrinth.Versions.v2.Version>(`/version_file/${hash}`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+			params: { algorithm },
+		})
+	}
+
 	/**
 	 * Get multiple versions by IDs (v2)
 	 *

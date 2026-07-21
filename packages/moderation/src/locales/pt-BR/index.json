@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Adicione um endereço Java"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Adicione um URL válido e nome ou um identificador SPDX para uma licença personalizada."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Adicionar detalhes da licença"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Adicione qualquer link relevante direcionado fora do Modrinth, como um site, loja ou convite do Discord."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Adicione links externos"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Você selecionou todas as opções de idiomas disponíveis. Por favor, liste apenas os idiomas que seu servidor usa ativamente."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecione idiomas precisos"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Você selecionou {totalAvailableTags, plural,one {# etiqueta disponível} other {todas as # etiquetas disponíveis}}. Isso vai contra o propósito das etiquetas, que são feitas para ajudar usuários a encontrarem projetos relevantes. Selecione apenas as etiquetas relevantes para seu projeto."
@@ -220,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpe o nome"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Você selecionou {languageCount, plural, one {# idioma} other {# idiomas}}. Por favor, liste apenas os idiomas que seu servidor usa ativamente."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecione idiomas precisos"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Você selecionou {tagCount, plural,=0 {nenhuma tag} one {# tag} other {# tags}}. Por favor reduza para {maxTagCount} ou menos para garantir que seu servidor apareça nos resultados de pesquisa relevantes."

@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "View logs"
   },
+  "app.ads-consent.accept": {
+    "message": "Accept all"
+  },
+  "app.ads-consent.body": {
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
+  },
+  "app.ads-consent.manage": {
+    "message": "Manage preferences"
+  },
+  "app.ads-consent.reject": {
+    "message": "Reject all"
+  },
+  "app.ads-consent.title": {
+    "message": "Your privacy and how ads support Modrinth"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
   },
@@ -425,29 +440,38 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Content required"
+  "app.modal.install-to-play.dont-install": {
+    "message": "Dont install"
   },
   "app.modal.install-to-play.header": {
     "message": "Install to play"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Install anyway"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Install"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Required modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Shared server instance"
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Unknown files warning"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Unrecognized files"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
@@ -455,8 +479,8 @@
   "app.modal.update-to-play.header": {
     "message": "Update to play"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Update required"
+  "app.modal.update-to-play.removed": {
+    "message": "Removed"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
@@ -490,6 +514,9 @@
   },
   "app.settings.downloading": {
     "message": "Downloading v{version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
@@ -532,6 +559,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Error processing file"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "This skin uses features from the {ears} mod"
   },
   "app.skins.edit-button": {
     "message": "Edit skin"
@@ -659,6 +689,12 @@
   "app.skins.title": {
     "message": "Skin selector"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Toggle off"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Toggle on"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
@@ -770,6 +806,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Create shortcut"
+  },
+  "instance.action.export-modpack": {
+    "message": "Export modpack"
+  },
+  "instance.action.launch-instance": {
+    "message": "Launch instance"
+  },
+  "instance.action.more-actions": {
+    "message": "More actions"
+  },
+  "instance.action.open-folder": {
+    "message": "Open folder"
+  },
+  "instance.action.repair": {
+    "message": "Repair"
+  },
+  "instance.action.settings": {
+    "message": "Instance settings"
+  },
+  "instance.action.starting": {
+    "message": "Starting..."
+  },
+  "instance.action.stopping": {
+    "message": "Stopping..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
   },
@@ -811,6 +874,9 @@
   },
   "instance.files.save-as": {
     "message": "Save as..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Never played"
   },
   "instance.server-modal.address": {
     "message": "Address"
@@ -1102,26 +1168,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "A file is only reviewed if it’s uploaded to Modrinth, regardless of its file format (including .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Don't show this warning again"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Confirm installation"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Install anyway"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware is often distributed through modpack files by sharing them on platforms like Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "We couldn't find this file on Modrinth. We strongly recommend only installing files from sources you trust."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Unknown file warning"
   }
 }

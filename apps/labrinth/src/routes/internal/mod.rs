@@ -142,6 +142,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		attribution::scan,
 		attribution::list,
 		attribution::update_group,
+		attribution::delete_group,
 		attribution::assign,
 		attribution::split,
 		billing::products,

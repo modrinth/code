@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Javaadresse hinzufügen"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Gib eine gültige URL mit Namen oder eine SPDX-Kennung für deine benutzerdefinierte Lizenz ein."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Details zur Lizenz hinzufügen"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Füge alle relevanten Links hinzu, die außerhalb von Modrinth liegen, wie z. B. eine Website, einen Shop oder eine Discord-Einladung."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Externe Links hinzufügen"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Du hast alle verfügbaren Sprachoptionen ausgewählt. Bitte gib nur die Sprachen an, die dein Server aktiv unterstützt."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Wähle passende Sprachen aus"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Du hast alle {totalAvailableTags, plural, one {# verfügbaren Tag} other {# verfügbaren Tags}} ausgewählt. Das widerspricht dem Zweck von Tags, die dazu dienen, Nutzern zu helfen, relevante Projekte zu finden. Bitte wähle nur die Tags aus, die wirklich zu deinem Projekt passen."
@@ -220,6 +232,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Namen bereinigen"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Du hast {languageCount, plural, one {# Sprache} other {# Sprachen}} ausgewählt. Bitte gib nur die Sprachen an, die dein Server aktiv unterstützt."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Wähle passende Sprachen aus"
   },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchen erscheint."

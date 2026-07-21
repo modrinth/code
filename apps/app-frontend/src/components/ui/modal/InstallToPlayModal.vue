@@ -1,15 +1,22 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.installToPlay)" :closable="true">
-		<div v-if="requiredContentProject" class="flex flex-col gap-6 max-w-[500px]">
-			<Admonition type="info" :header="formatMessage(messages.contentRequired)">
-				{{ formatMessage(messages.serverRequiresMods) }}
-			</Admonition>
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.installToPlay)"
+		:closable="true"
+		:on-hide="show_ads_window"
+		max-width="640px"
+		width="640px"
+	>
+		<div v-if="requiredContentProject" class="flex w-full flex-col gap-6">
+			<p class="m-0 text-primary">
+				{{ formatMessage(messages.inviteWarning) }}
+			</p>
 
-			<div class="flex flex-col gap-1">
-				<div class="flex justify-between items-center">
-					<span class="font-semibold text-contrast">{{
-						formatMessage(messages.requiredModpack)
-					}}</span>
+			<div class="flex flex-col gap-2.5">
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast">
+						{{ formatMessage(messages.sharedInstance) }}
+					</span>
 
 					<ButtonStyled type="transparent">
 						<button @click="openViewContents">
@@ -19,14 +26,16 @@
 					</ButtonStyled>
 				</div>
 
-				<div class="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
+				<div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
 					<Avatar
 						:src="requiredContentProject.icon_url"
 						:alt="requiredContentProject.title"
-						size="48px"
+						size="56px"
+						no-shadow
+						class="!rounded-2xl"
 					/>
-					<div class="flex flex-col gap-0.5">
-						<span class="font-semibold text-contrast">
+					<div class="flex min-w-0 flex-col gap-0.5">
+						<span class="truncate font-semibold text-contrast">
 							<template v-if="usingCustomModpack && modpackVersion">
 								{{ modpackVersion.name }}
 							</template>
@@ -34,7 +43,7 @@
 								{{ requiredContentProject.title }}
 							</template>
 						</span>
-						<span class="text-sm text-secondary">
+						<span class="truncate text-sm font-medium text-secondary">
 							{{ loaderDisplay }} {{ requiredContentProject.game_versions?.[0] }}
 							<template v-if="modCount">
 								· {{ formatMessage(messages.modCount, { count: modCount }) }}
@@ -43,24 +52,105 @@
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<template #actions>
-			<div class="flex justify-end gap-2">
-				<ButtonStyled>
-					<button @click="handleDecline">
-						<XIcon />
-						{{ formatMessage(commonMessages.cancelButton) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<button @click="handleAccept">
-						<DownloadIcon />
-						{{ formatMessage(messages.installButton) }}
-					</button>
-				</ButtonStyled>
+			<Admonition
+				v-if="hasExternalFiles"
+				type="warning"
+				:header="formatMessage(messages.unknownFilesWarning)"
+			>
+				{{ formatMessage(messages.unknownFilesDescription) }}
+			</Admonition>
+
+			<div v-if="hasExternalFiles" class="relative w-full">
+				<div
+					ref="externalFileTable"
+					class="max-h-[242px] overflow-y-auto rounded-2xl"
+					@scroll="checkTableScrollState"
+				>
+					<Table
+						:columns="externalFileColumns"
+						:data="externalFileRows"
+						row-key="id"
+						virtualized
+						:virtual-row-height="48"
+						class="shadow-sm"
+					>
+						<template #cell-name="{ value }">
+							<span class="block truncate" :title="String(value)">{{ value }}</span>
+						</template>
+					</Table>
+				</div>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-2"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-2"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showTableTopFade"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-b from-bg-raised to-transparent"
+					/>
+				</Transition>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-2"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-2"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showTableBottomFade"
+						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-2 bg-gradient-to-t from-bg-raised to-transparent"
+					/>
+				</Transition>
 			</div>
-		</template>
+
+			<p v-if="hasExternalFiles" class="m-0 text-primary">
+				{{ formatMessage(messages.reviewedFiles) }}
+			</p>
+
+			<div class="flex w-full items-center justify-between gap-2">
+				<ButtonStyled type="transparent" color="red">
+					<button @click="handleReport">
+						<ReportIcon />
+						{{ formatMessage(commonMessages.reportButton) }}
+					</button>
+				</ButtonStyled>
+
+				<div class="flex items-center gap-2">
+					<template v-if="hasExternalFiles">
+						<ButtonStyled type="transparent" color="orange">
+							<button @click="handleAccept">
+								{{ formatMessage(messages.installAnyway) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleDecline">
+								<BanIcon />
+								{{ formatMessage(messages.dontInstall) }}
+							</button>
+						</ButtonStyled>
+					</template>
+					<template v-else>
+						<ButtonStyled>
+							<button @click="handleDecline">
+								<XIcon />
+								{{ formatMessage(commonMessages.cancelButton) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleAccept">
+								<DownloadIcon />
+								{{ formatMessage(messages.installButton) }}
+							</button>
+						</ButtonStyled>
+					</template>
+				</div>
+			</div>
+		</div>
 	</NewModal>
 
 	<ModpackContentModal
@@ -72,33 +162,56 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, EyeIcon, XIcon } from '@modrinth/assets'
-import type { ContentItem } from '@modrinth/ui'
+import { BanIcon, DownloadIcon, EyeIcon, ReportIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
 	ButtonStyled,
 	commonMessages,
+	type ContentItem,
 	defineMessages,
 	formatLoader,
 	ModpackContentModal,
 	NewModal,
+	Table,
+	type TableColumn,
+	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { computed, nextTick, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { injectServerInstall } from '@/providers/server-install'
+
+type ExternalFileColumn = 'name'
+type ExternalFileRow = {
+	id: string
+	name: string
+}
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const project = ref<Labrinth.Projects.v3.Project | null>(null)
 const requiredContentProject = ref<Labrinth.Projects.v2.Project | null>(null)
+const externalFiles = ref<string[]>([])
+const externalFileTable = ref<HTMLElement | null>(null)
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
+
+const props = defineProps<{
+	showExternalWarnings?: boolean
+}>()
+
 const { installServerProject, startInstallingServer, stopInstallingServer } = injectServerInstall()
+const {
+	showTopFade: showTableTopFade,
+	showBottomFade: showTableBottomFade,
+	checkScrollState: checkTableScrollState,
+	forceCheck: forceCheckTableScroll,
+} = useScrollIndicator(externalFileTable)
 
 const usingCustomModpack = computed(() => {
 	return requiredContentProject.value?.id === project.value?.id
@@ -111,13 +224,36 @@ const loaderDisplay = computed(() => {
 })
 
 const modCount = computed(() => modpackVersion.value?.dependencies?.length)
+const hasExternalFiles = computed(
+	() => Boolean(props.showExternalWarnings) && externalFiles.value.length > 0,
+)
+const externalFileRows = computed<ExternalFileRow[]>(() =>
+	externalFiles.value.map((name, index) => ({
+		id: `${index}-${name}`,
+		name,
+	})),
+)
 
 async function fetchData(versionId: string) {
 	// cache is making version null for some reason so bypassing for now
-	modpackVersion.value = await get_version(versionId, 'bypass')
+	const version = await get_version(versionId, 'bypass')
+	modpackVersion.value = version
 
-	if (modpackVersion.value?.project_id) {
-		requiredContentProject.value = await get_project(modpackVersion.value.project_id, 'bypass')
+	if (version?.project_id) {
+		requiredContentProject.value = await get_project(version.project_id, 'bypass')
+		externalFiles.value = [
+			...new Set(
+				(version.dependencies ?? [])
+					.filter(
+						(dependency) =>
+							dependency.dependency_type === 'embedded' &&
+							!dependency.project_id &&
+							!dependency.version_id &&
+							dependency.file_name,
+					)
+					.flatMap((dependency) => (dependency.file_name ? [dependency.file_name] : [])),
+			),
+		].sort((left, right) => left.localeCompare(right))
 	}
 }
 
@@ -137,6 +273,12 @@ async function handleAccept() {
 
 function handleDecline() {
 	hide()
+}
+
+function handleReport() {
+	if (project.value?.id) {
+		openUrl(`https://modrinth.com/report?item=project&itemID=${project.value.id}`)
+	}
 }
 
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
@@ -217,17 +359,19 @@ async function show(
 	modpackVersionId.value = modpackVersionIdVal
 	modpackVersion.value = null
 	requiredContentProject.value = null
+	externalFiles.value = []
 	onInstallComplete.value = callback
 
 	if (modpackVersionIdVal) await fetchData(modpackVersionIdVal)
 
 	hide_ads_window()
 	modal.value?.show(e)
+	await nextTick()
+	forceCheckTableScroll()
 }
 
 function hide() {
 	modal.value?.hide()
-	show_ads_window()
 }
 
 const messages = defineMessages({
@@ -235,22 +379,10 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.header',
 		defaultMessage: 'Install to play',
 	},
-	sharedServerInstance: {
-		id: 'app.modal.install-to-play.shared-server-instance',
-		defaultMessage: 'Shared server instance',
-	},
-	contentRequired: {
-		id: 'app.modal.install-to-play.content-required',
-		defaultMessage: 'Content required',
-	},
-	serverRequiresMods: {
-		id: 'app.modal.install-to-play.server-requires-mods',
+	inviteWarning: {
+		id: 'app.modal.install-to-play.invite-warning',
 		defaultMessage:
-			'This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server.',
-	},
-	requiredModpack: {
-		id: 'app.modal.install-to-play.required-modpack',
-		defaultMessage: 'Required modpack',
+			'This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust.',
 	},
 	sharedInstance: {
 		id: 'app.modal.install-to-play.shared-instance',
@@ -268,7 +400,41 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.view-contents',
 		defaultMessage: 'View contents',
 	},
+	unknownFilesWarning: {
+		id: 'app.modal.install-to-play.unknown-files-warning',
+		defaultMessage: 'Unknown files warning',
+	},
+	unknownFilesDescription: {
+		id: 'app.modal.install-to-play.unknown-files-description',
+		defaultMessage:
+			'This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust.',
+	},
+	unrecognizedFiles: {
+		id: 'app.modal.install-to-play.unrecognized-files',
+		defaultMessage: 'Unrecognized files',
+	},
+	reviewedFiles: {
+		id: 'app.modal.install-to-play.reviewed-files',
+		defaultMessage:
+			'A file is only reviewed if it’s published to Modrinth, regardless of its file format (including .mrpack).',
+	},
+	installAnyway: {
+		id: 'app.modal.install-to-play.install-anyway',
+		defaultMessage: 'Install anyway',
+	},
+	dontInstall: {
+		id: 'app.modal.install-to-play.dont-install',
+		defaultMessage: 'Dont install',
+	},
 })
+
+const externalFileColumns = computed<TableColumn<ExternalFileColumn>[]>(() => [
+	{
+		key: 'name',
+		label: formatMessage(messages.unrecognizedFiles),
+		cellClass: '!h-12',
+	},
+])
 
 defineExpose({ show, hide })
 </script>

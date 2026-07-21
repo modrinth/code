@@ -50,6 +50,9 @@
   "badge.new": {
     "defaultMessage": "New"
   },
+  "badge.release": {
+    "defaultMessage": "リリース"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "キャンセル"
   },
@@ -218,6 +221,9 @@
   "button.open-folder": {
     "defaultMessage": "フォルダーを開く"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "ブラウザで開く"
+  },
   "button.open-in-folder": {
     "defaultMessage": "フォルダを開く"
   },
@@ -232,6 +238,9 @@
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Modパックを再インストール"
+  },
+  "button.remove": {
+    "defaultMessage": "削除する"
   },
   "button.remove-image": {
     "defaultMessage": "画像を削除"
@@ -284,6 +293,9 @@
   "button.stop": {
     "defaultMessage": "停止"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "バージョンを切り替える"
+  },
   "button.switch-version": {
     "defaultMessage": "バージョンを切り替え"
   },
@@ -310,6 +322,18 @@
   },
   "changelog.product.web": {
     "defaultMessage": "プラットフォーム"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "このコレクションにはまだ何もありません。"
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "プロジェクトをロード中…"
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "該当するプロジェクトがありません。"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "プロジェクトを検索"
   },
   "collections.label.private": {
     "defaultMessage": "非公開"
@@ -370,6 +394,21 @@
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "リンクを解除"
+  },
+  "content.dependency-warning.context.instance": {
+    "defaultMessage": "インスタンス"
+  },
+  "content.dependency-warning.context.server": {
+    "defaultMessage": "サーバー"
+  },
+  "content.dependency-warning.delete-anyway-button": {
+    "defaultMessage": "とにかく削除する"
+  },
+  "content.dependency-warning.deleting-label": {
+    "defaultMessage": "削除中"
+  },
+  "content.dependency-warning.header": {
+    "defaultMessage": "依存関係の警告"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} 件追加されました"
@@ -817,6 +856,60 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "サーバーの設定"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, other {ファイルを追加}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": ""
+  },
+  "external-files.permissions-card.add-files-to-group": {
+    "defaultMessage": "ファイルを追加…"
+  },
+  "external-files.permissions-card.custom-license-option": {
+    "defaultMessage": "その他"
+  },
+  "external-files.permissions-card.editor.input-optional": {
+    "defaultMessage": "(任意)"
+  },
+  "external-files.permissions-card.editor.license-label": {
+    "defaultMessage": "ライセンス"
+  },
+  "external-files.permissions-card.editor.notes-label": {
+    "defaultMessage": "ノート"
+  },
+  "external-files.permissions-card.editor.notes-placeholder": {
+    "defaultMessage": "何かここに書いてください..."
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "ライセンスを選んでください…"
+  },
+  "external-files.permissions-card.explanation-label": {
+    "defaultMessage": "説明"
+  },
+  "external-files.permissions-card.license.unknown": {
+    "defaultMessage": "不明"
+  },
+  "external-files.permissions-card.moderation-reason": {
+    "defaultMessage": "理由"
+  },
+  "external-files.permissions-card.notes-label": {
+    "defaultMessage": "ノート："
+  },
+  "external-files.permissions-card.notes-none": {
+    "defaultMessage": "無し"
+  },
+  "external-files.permissions-card.reason.license": {
+    "defaultMessage": "ライセンス"
+  },
+  "external-files.permissions-card.reason.my-project": {
+    "defaultMessage": "私のプロジェクト"
+  },
+  "external-files.permissions-card.updated-by-moderator": {
+    "defaultMessage": "モデレーター"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "いいえ"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "概要を書き出す"
@@ -1805,6 +1898,9 @@
   "label.installing": {
     "defaultMessage": "インストール中…"
   },
+  "label.installing-content": {
+    "defaultMessage": "コンテンツのインストール"
+  },
   "label.loading": {
     "defaultMessage": "読み込み中…"
   },
@@ -1889,6 +1985,9 @@
   "label.server": {
     "defaultMessage": "サーバー"
   },
+  "label.server-only": {
+    "defaultMessage": "サーバーのみ"
+  },
   "label.servers": {
     "defaultMessage": "サーバー"
   },
@@ -1925,8 +2024,14 @@
   "label.username": {
     "defaultMessage": "ユーザー名"
   },
+  "label.validating": {
+    "defaultMessage": "検証しています"
+  },
   "label.version": {
     "defaultMessage": "バージョン"
+  },
+  "label.view": {
+    "defaultMessage": "表示"
   },
   "label.visibility": {
     "defaultMessage": "公開範囲"
@@ -2010,7 +2115,7 @@
     "defaultMessage": "ロシア語"
   },
   "locale.sr-CS": {
-    "defaultMessage": "セルビア語 (ラテン)"
+    "defaultMessage": "セルビア語 (ラテン文字)"
   },
   "locale.sv-SE": {
     "defaultMessage": "スウェーデン語"
@@ -2032,6 +2137,12 @@
   },
   "locale.zh-TW": {
     "defaultMessage": "中国語 (繁体字)"
+  },
+  "markdown-editor.default-image-alt-text": {
+    "defaultMessage": "これを説明文に置き換えてください"
+  },
+  "markdown-editor.error-label": {
+    "defaultMessage": "エラー"
   },
   "markdown-editor.image-modal.description-field.description": {
     "defaultMessage": "画像を見ることができない人にも理解できるよう説明してください。"
@@ -2075,6 +2186,21 @@
   "markdown-editor.link-modal.url-field.placeholder": {
     "defaultMessage": "リンクのURLを入力..."
   },
+  "markdown-editor.markdown-formatting-support": {
+    "defaultMessage": "これは<markdown-link>マークダウン</markdown-link>をサポートしています。"
+  },
+  "markdown-editor.max-length.label": {
+    "defaultMessage": "最大の長さ："
+  },
+  "markdown-editor.max-length.unlimited": {
+    "defaultMessage": "無限"
+  },
+  "markdown-editor.max-length.value": {
+    "defaultMessage": "{currentLength}/{maxLength}"
+  },
+  "markdown-editor.placeholder": {
+    "defaultMessage": "何か書いてください…"
+  },
   "markdown-editor.preview-label": {
     "defaultMessage": "出力"
   },
@@ -2117,11 +2243,17 @@
   "markdown-editor.toolbar.spoiler": {
     "defaultMessage": "ネタバレ"
   },
+  "markdown-editor.toolbar.strikethrough": {
+    "defaultMessage": "取り消し線"
+  },
   "markdown-editor.toolbar.video": {
     "defaultMessage": "動画"
   },
   "markdown-editor.url-label": {
     "defaultMessage": "URL"
+  },
+  "markdown-editor.video-embed.title": {
+    "defaultMessage": "YouTubeプレイヤー"
   },
   "markdown-editor.video-modal.header": {
     "defaultMessage": "Youtube動画の追加"
@@ -2185,6 +2317,9 @@
   },
   "omorphia.component.badge.label.failed": {
     "defaultMessage": "失敗"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "公開"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "モデレーター"
@@ -3032,6 +3167,15 @@
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "スタッフにより限定公開"
   },
+  "report.item-type.project": {
+    "defaultMessage": "プロジェクト"
+  },
+  "report.item-type.user": {
+    "defaultMessage": "ユーザー"
+  },
+  "report.item-type.version": {
+    "defaultMessage": "バージョン"
+  },
   "s.bg": {
     "defaultMessage": "バックグラウンドタスクが実行中です"
   },
@@ -3121,6 +3265,15 @@
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "バニラ(Mod非導入)"
+  },
+  "servers.access-page.activity-log-filter.action-group.server": {
+    "defaultMessage": "サーバー"
+  },
+  "servers.access-page.activity-log-filter.action-types": {
+    "defaultMessage": "アクション"
+  },
+  "servers.access-page.activity-log-filter.action.backup-deleted": {
+    "defaultMessage": "削除されたバックアップ"
   },
   "servers.admonitions.background-task-running": {
     "defaultMessage": "バックグラウンドタスクが実行中です"
@@ -3287,6 +3440,15 @@
   "servers.listing.new-label": {
     "defaultMessage": "新規"
   },
+  "servers.manage.your-servers-title": {
+    "defaultMessage": "あなたのサーバー"
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "新しいサーバー"
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "サーバーアイコン"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "閉じる"
   },
@@ -3371,6 +3533,18 @@
   "servers.region.custom.prompt": {
     "defaultMessage": "サーバーに必要なRAMはどのくらいですか？"
   },
+  "servers.region.custom.prompt-ram-only": {
+    "defaultMessage": "メモリ"
+  },
+  "servers.region.north-america-central": {
+    "defaultMessage": "北米中部"
+  },
+  "servers.region.north-america-east": {
+    "defaultMessage": "北米東部"
+  },
+  "servers.region.north-america-west": {
+    "defaultMessage": "北米西部"
+  },
   "servers.region.prompt": {
     "defaultMessage": "サーバーをどこに設置しますか？"
   },
@@ -3382,6 +3556,12 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "西ヨーロッパ"
+  },
+  "servers.setup.onboarding.setup-server.button": {
+    "defaultMessage": "サーバーをセットアップ"
+  },
+  "servers.setup.onboarding.step.invite-friends.title": {
+    "defaultMessage": "フレンドを招待"
   },
   "servers.setup.rate-limit.text": {
     "defaultMessage": "レート制限に達しました。時間をおいて再試行してください。"
@@ -3905,13 +4085,76 @@
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
   },
+  "time-frame-picker.apply": {
+    "defaultMessage": "適用"
+  },
+  "time-frame-picker.cancel": {
+    "defaultMessage": "キャンセル"
+  },
   "time-frame-picker.option.today": {
     "defaultMessage": "今日"
   },
   "time-frame-picker.option.yesterday": {
     "defaultMessage": "昨日"
   },
+  "time-frame-picker.selected-range": {
+    "defaultMessage": "選択"
+  },
+  "time-frame-picker.selecting-range": {
+    "defaultMessage": "選択"
+  },
+  "time-frame-picker.unit.days": {
+    "defaultMessage": "日"
+  },
+  "time-frame-picker.unit.hours": {
+    "defaultMessage": "時間"
+  },
+  "time-frame-picker.unit.months": {
+    "defaultMessage": "ヶ月"
+  },
+  "time-frame-picker.unit.weeks": {
+    "defaultMessage": "週間"
+  },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "保存されていない変更があります。"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "ページを離れる"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "ページに残る"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "ページを離れますか？"
+  },
+  "user.profile.badge.moderator.name": {
+    "defaultMessage": "コンテンツモデレーター"
+  },
+  "version.content.name": {
+    "defaultMessage": "名前"
+  },
+  "version.content.version": {
+    "defaultMessage": "バージョン"
+  },
+  "version.file-type.unknown": {
+    "defaultMessage": "その他"
+  },
+  "version.section.content": {
+    "defaultMessage": "コンテンツ"
+  },
+  "version.section.content.search-placeholder": {
+    "defaultMessage": "コンテンツを検索…"
+  },
+  "version.section.files": {
+    "defaultMessage": "ファイル"
+  },
+  "version.supplementary-resources.file": {
+    "defaultMessage": "ファイル"
+  },
+  "version.supplementary-resources.size": {
+    "defaultMessage": "サイズ"
+  },
+  "version.supplementary-resources.type": {
+    "defaultMessage": "タイプ"
   }
 }

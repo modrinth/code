@@ -258,7 +258,7 @@ pub async fn fetch_query_context(
         HashMap::new()
     } else {
         redis
-            .get_many_deserialized_from_json::<minecraft::JavaServerPing>(
+            .get_many_deserialized::<minecraft::JavaServerPing>(
                 server_ping::REDIS_NAMESPACE,
                 &minecraft_java_server_pings
                     .iter()
@@ -281,7 +281,7 @@ pub async fn fetch_query_context(
         HashMap::new()
     } else {
         redis
-            .get_many_deserialized_from_json::<MinecraftServerAnalytics>(
+            .get_many_deserialized::<MinecraftServerAnalytics>(
                 MINECRAFT_SERVER_ANALYTICS,
                 &minecraft_server_analytics
                     .iter()

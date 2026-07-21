@@ -11,6 +11,24 @@
   "nags.add-icon.title": {
     "defaultMessage": "Adiciona um ícone"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Adiciona o endereço IP e a porta que os jogadores de Java Edition podem usar para entrar no teu servidor."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Adicionar um endereço Java"
+  },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Adiciona um URL válido e um nome ou identificador SPDX para a tua licença personalizada."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Adicionar detalhes da licença"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Adiciona quaisquer links relevantes externos ao Modrinth, tais como um site, loja ou convite do Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Adicionar links externos"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Adiciona quaisquer links relevantes que direcionem para fora do Modrinth, como o código-fonte, um rastreador de problemas ou um convite para um servidor do Discord."
   },
@@ -53,8 +71,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Vê a página da galeria"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "O teu {type} usa uma licença que exige a disponibilização do código-fonte. Fornece um link para o código-fonte ou um ficheiro de código-fonte para cada versão adicional, ou considera usar uma licença diferente."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornece o código-fonte"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Alguns dos teus links externos parecem ser idênticos. Cada link deve ser inserido apenas uma vez e com o tipo de link adequado."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Limpar links idênticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "A tua Descrição deve conter texto simples ou texto alternativo para imagens suficiente, mantendo-a acessível aos que utilizam leitores de ecrã ou que têm ligações lentas à internet."
@@ -119,6 +146,30 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleciona a resolução correta"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Certifica-te de que fornecestes uma prova da tua permissão para distribuir qualquer conteúdo externo no teu Modpack."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Rever permissões externas"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Seleciona as versões que o teu servidor suporta, escolhe um Modpack ou carrega o teu próprio."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Selecionar compatibilidade"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Informa os jogadores sobre a região em que o teu servidor está localizado."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Selecionar uma região"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Lista o idioma ou os idiomas suportados pelo teu servidor."
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Seleciona a licença sob a qual o teu {type} é distribuído."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Seleciona uma licença"
   },
@@ -128,6 +179,9 @@
   "nags.select-tags.title": {
     "defaultMessage": "Seleciona etiquetas"
   },
+  "nags.server.title": {
+    "defaultMessage": "Visitar as definições do servidor"
+  },
   "nags.settings.description.title": {
     "defaultMessage": "Vê as definições da descrição"
   },
@@ -136,6 +190,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Vê as definições de links"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Visitar o painel de permissões"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Vê as definições de etiquetas"
@@ -167,6 +224,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpa o nome"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Selecionaste {tagCount, plural, one {# tag} other {# tags}}. Reduz para {maxTagCount} ou menos para garantir que o teu servidor aparece nos resultados de pesquisa relevantes."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Seleciona etiquetas precisas"
   },
@@ -175,6 +235,9 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleciona etiquetas precisas"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "É necessária pelo menos uma imagem na galeria para mostrar o conteúdo do teu {type}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Adiciona uma imagem à galeria"

@@ -22,6 +22,9 @@ export interface ModerationActions {
 	tryFocusNextAction: () => void
 	tryFocusPreviousAction: () => void
 	tryActivateFocusedAction: () => void
+
+	tryCopyLink: (permalink: boolean, relative: boolean, page: boolean) => void
+	tryCopyId: () => void
 }
 
 export interface ModerationState {

@@ -1,6 +1,8 @@
 import { defineMessage, formatProjectTypeSentence, useVIntl } from '@modrinth/ui'
 
 import type { Nag, NagContext } from '../../types/nags'
+import { licenseRequiresSource, licensesRequiringSource, notSourceAsDistributed } from '../../utils'
+import license from '../stages/license'
 
 export const commonLinkDomains = {
 	source: [
@@ -324,31 +326,6 @@ export const linksNags: Nag[] = [
 		},
 		status: 'required',
 		shouldShow: (context: NagContext) => {
-			const gplLicenses = [
-				'GPL-2.0',
-				'GPL-2.0+',
-				'GPL-2.0-only',
-				'GPL-2.0-or-later',
-				'GPL-3.0',
-				'GPL-3.0+',
-				'GPL-3.0-only',
-				'GPL-3.0-or-later',
-				'LGPL-2.1',
-				'LGPL-2.1+',
-				'LGPL-2.1-only',
-				'LGPL-2.1-or-later',
-				'LGPL-3.0',
-				'LGPL-3.0+',
-				'LGPL-3.0-only',
-				'LGPL-3.0-or-later',
-				'AGPL-3.0',
-				'AGPL-3.0+',
-				'AGPL-3.0-only',
-				'AGPL-3.0-or-later',
-				'MPL-2.0',
-			]
-
-			const isGplLicense = gplLicenses.includes(context.project.license.id)
 			const hasSourceUrl = !!context.project.source_url
 			const hasAdditionalFiles = (context: NagContext) => {
 				let hasAdditional = true
@@ -357,12 +334,10 @@ export const linksNags: Nag[] = [
 				})
 				return hasAdditional
 			}
-			const notSourceAsDistributed = (context: NagContext) =>
-				context.project.project_type === 'mod' || context.project.project_type === 'plugin'
 
 			return (
-				isGplLicense &&
-				notSourceAsDistributed(context) &&
+				licenseRequiresSource(context.projectV3.license.id) &&
+				notSourceAsDistributed(context.projectV3.project_types) &&
 				!hasSourceUrl &&
 				!hasAdditionalFiles(context)
 			)

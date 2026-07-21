@@ -23,6 +23,15 @@
   "analytics.breakdown.country": {
     "message": "Країна"
   },
+  "analytics.breakdown.dependent-on": {
+    "message": "Залежить від"
+  },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Залежний проєкт"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Залежний тип проєкту"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Причина завантаження"
   },
@@ -37,6 +46,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Завантажувач"
+  },
+  "analytics.breakdown.members": {
+    "message": "Член"
   },
   "analytics.breakdown.monetization": {
     "message": "Монетизація"
@@ -131,8 +143,71 @@
   "analytics.chart.render-limit.description": {
     "message": "Показування всіх вибраних ліній з таблиці може знизити продуктивність."
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Показано всі {itemType, select, project {{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєкту}}} country {{count, plural, one {країна} few {країни} many {країн} other {країни}}} monetization {{count, plural, one {значення монетизації} few {значення монетизації} many {значень монетизації} other {значення монетизації}}} downloadSource {{count, plural, one {джерело завантаження} few {джерела завантаження} many {джерел завантаження} other {джерела завантаження}}} downloadReason {{count, plural, one {причина завантаження} few {причини завантаження} many {причин завантаження} other {причини завантаження}}} member {{count, plural, one {член} few {члени} many {членів} other {члена}}} projectVersion {{count, plural, one {версія проєкту} few {версії проєкту} many {версій проєкту} other {версій проєкту}}} loader {{count, plural, one {завантажувач} few {завантажувачі} many {завантажувачів} other {завантажувача}}} gameVersion {{count, plural, one {версія гри} few {версії гри} many {версій гри} other {версії гри}}} other {{count, plural, one {предмет} few {предмети} many {предметів} other {предмета}}}} з таблиці"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Показано топ {count} {itemType, select, project {{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєкту}}} country {{count, plural, one {країна} few {країни} many {країн} other {країни}}} monetization {{count, plural, one {значення монетизації} few {значення монетизації} many {значень монетизації} other {значення монетизації}}} downloadSource {{count, plural, one {джерело завантаження} few {джерела завантаження} many {джерел завантаження} other {джерела завантаження}}} downloadReason {{count, plural, one {причина завантаження} few {причини завантаження} many {причин завантаження} other {причини завантаження}}} member {{count, plural, one {член} few {члени} many {членів} other {члена}}} projectVersion {{count, plural, one {версія проєкту} few {версії проєкту} many {версій проєкту} other {версій проєкту}}} loader {{count, plural, one {завантажувач} few {завантажувачі} many {завантажувачів} other {завантажувача}}} gameVersion {{count, plural, one {версія гри} few {версії гри} many {версій гри} other {версії гри}}} other {{count, plural, one {предмет} few {предмети} many {предметів} other {предмета}}}} з таблиці"
+  },
+  "analytics.chart.table-selection.limited": {
+    "message": "Показано {limit} {itemType, select, project {{limit, plural, one {проєкт} few {проєкти} many {проєктів} other {проєкту}}} country {{limit, plural, one {країна} few {країни} many {країн} other {країни}}} monetization {{limit, plural, one {значення монетизації} few {значення монетизації} many {значень монетизації} other {значення монетизації}}} downloadSource {{limit, plural, one {джерело завантаження} few {джерела завантаження} many {джерел завантаження} other {джерела завантаження}}} downloadReason {{limit, plural, one {причина завантаження} few {причини завантаження} many {причин завантаження} other {причини завантаження}}} member {{limit, plural, one {член} few {члени} many {членів} other {члена}}} projectVersion {{limit, plural, one {версія проєкту} few {версії проєкту} many {версій проєкту} other {версій проєкту}}} loader {{limit, plural, one {завантажувач} few {завантажувачі} many {завантажувачів} other {завантажувача}}} gameVersion {{limit, plural, one {версія гри} few {версії гри} many {версій гри} other {версії гри}}} other {{limit, plural, one {предмет} few {предмети} many {предметів} other {предмета}}}} з таблиці"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Показано топ {count} {itemType, select, project {{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєкту}}} country {{count, plural, one {країна} few {країни} many {країн} other {країни}}} monetization {{count, plural, one {значення монетизації} few {значення монетизації} many {значень монетизації} other {значення монетизації}}} downloadSource {{count, plural, one {джерело завантаження} few {джерела завантаження} many {джерел завантаження} other {джерела завантаження}}} downloadReason {{count, plural, one {причина завантаження} few {причини завантаження} many {причин завантаження} other {причини завантаження}}} member {{count, plural, one {член} few {члени} many {членів} other {члена}}} projectVersion {{count, plural, one {версія проєкту} few {версії проєкту} many {версій проєкту} other {версій проєкту}}} loader {{count, plural, one {завантажувач} few {завантажувачі} many {завантажувачів} other {завантажувача}}} gameVersion {{count, plural, one {версія гри} few {версії гри} many {версій гри} other {версії гри}}} other {{count, plural, one {предмет} few {предмети} many {предметів} other {предмета}}}} з таблиці"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Залежить від {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} залежить від {dependencyProject}, {version}"
+  },
+  "analytics.chart.tooltip.duration.days": {
+    "message": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}"
+  },
+  "analytics.chart.tooltip.duration.hours": {
+    "message": "{count, plural, one {# година} few {# години} many {# годин} other {# години}}"
+  },
+  "analytics.chart.tooltip.duration.minutes": {
+    "message": "{count, plural, one {# хвилина} few {# хвилини} many {# хвилин} other {# хвилини}}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Приховати {name} на графіку"
+  },
+  "analytics.chart.tooltip.pinned": {
+    "message": "Підказку графіка закріплено"
+  },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Закріплено"
+  },
+  "analytics.chart.tooltip.previous-period-short": {
+    "message": "(попер.)"
+  },
+  "analytics.chart.tooltip.show-entry": {
+    "message": "Показати {name} на графіку"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Усього"
+  },
+  "analytics.chart.view.area": {
+    "message": "Області"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Стовпці"
+  },
+  "analytics.chart.view.line": {
+    "message": "Лінії"
+  },
+  "analytics.download-reason.dependency": {
+    "message": "Залежність"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Збірка"
+  },
+  "analytics.download-reason.standalone": {
+    "message": "Безпосередньо"
+  },
+  "analytics.download-reason.update": {
+    "message": "Оновлення"
   },
   "analytics.download-source.app": {
     "message": "Modrinth App"
@@ -155,11 +230,29 @@
   "analytics.empty.no-projects-for-analytics": {
     "message": "Немає доступних проєктів для аналітики"
   },
+  "analytics.empty.select-project": {
+    "message": "Оберіть принаймні один проєкт, аби переглянути дані"
+  },
+  "analytics.filter.game-version-type": {
+    "message": "Тип версії"
+  },
   "analytics.filter.game-version-type.all": {
     "message": "Усі"
   },
   "analytics.filter.game-version-type.release": {
     "message": "Випуск"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Пошук країн…"
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Пошук проєктів…"
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Пошук джерел завантаження…"
+  },
+  "analytics.filter.search.members": {
+    "message": "Пошук членів…"
   },
   "analytics.filter.search.project-versions": {
     "message": "Пошук версій проєкту…"
@@ -228,7 +321,19 @@
     "message": "Проєкт затверджено"
   },
   "analytics.project-event.project-private": {
-    "message": "Проєкт приватний"
+    "message": "Проєкт установлено як приватний"
+  },
+  "analytics.project-event.project-status-changed": {
+    "message": "Статус проєкту змінено"
+  },
+  "analytics.project-event.project-unlisted": {
+    "message": "Проєкт приховано"
+  },
+  "analytics.project-event.version-released": {
+    "message": "{version} випущено"
+  },
+  "analytics.project-event.version-uploaded": {
+    "message": "Версію завантажено"
   },
   "analytics.project-status.approved": {
     "message": "Затверджений"
@@ -266,14 +371,32 @@
   "analytics.project.select": {
     "message": "Обрати проєкти"
   },
+  "analytics.project.user": {
+    "message": "Проєкти {username}"
+  },
+  "analytics.project.your": {
+    "message": "Ваші проєкти"
+  },
   "analytics.query.filter.add": {
     "message": "Додати фільтр"
+  },
+  "analytics.query.label.breakdown": {
+    "message": "Розклад:"
+  },
+  "analytics.query.label.grouped-by": {
+    "message": "Групування:"
   },
   "analytics.query.label.project": {
     "message": "Проєкт:"
   },
+  "analytics.query.label.timeframe": {
+    "message": "Часовий проміжок:"
+  },
   "analytics.stat.downloads": {
     "message": "Завантаження"
+  },
+  "analytics.stat.monetization-banner.body": {
+    "message": "Для монетизації зараховуються лише перегляди та завантаження, здійснені через Modrinth, щоб уникнути фальшувань. Завантаження через Modrinth App зараховуються, лише якщо користувач зареєстрований. Оскільки всі проєкти мають схоже відношення монетизованих завантажень, ваш прибуток не зміниться суттєво, якщо враховувати всі завантаження."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Дізнатися більше"
@@ -287,17 +410,101 @@
   "analytics.stat.playtime-hours": {
     "message": "{hours} год"
   },
+  "analytics.stat.previous-period-comparison": {
+    "message": "проти попер. періоду"
+  },
+  "analytics.stat.previous-period-comparison-short": {
+    "message": "проти попер."
+  },
+  "analytics.stat.revenue": {
+    "message": "Дохід"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "невідомо"
+  },
+  "analytics.stat.unavailable-tooltip": {
+    "message": "Статистика недоступна для поточного запиту"
+  },
+  "analytics.stat.views": {
+    "message": "Перегляди"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "від {start} до {end}"
+  },
+  "analytics.table.csv.filename": {
+    "message": "Аналітика Modrinth з розкладом за: {breakdown} — {dateRange}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Ігровий час (сек.)"
+  },
+  "analytics.table.csv.selected-range": {
+    "message": "Обраний проміжок"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# година} few {# години} many {# годин} other {# години}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# хвилина} few {# хвилини} many {# хвилин} other {# хвилини}}"
+  },
+  "analytics.table.empty.no-matching-rows": {
+    "message": "Немає відповідних рядків аналітики"
+  },
+  "analytics.table.export-csv": {
+    "message": "Експортувати в CSV"
+  },
+  "analytics.table.export.cumulative": {
+    "message": "Кумулятивний"
+  },
+  "analytics.table.export.grouped": {
+    "message": "Групований за {groupBy}"
+  },
   "analytics.table.pagination.summary": {
     "message": "Показано {start} до {end} з {total}"
   },
   "analytics.table.search.placeholder": {
     "message": "Пошук…"
   },
+  "analytics.threshold.countries-above": {
+    "message": "Країни від"
+  },
+  "analytics.threshold.country-downloads-aria": {
+    "message": "Поріг завантажень для країни"
+  },
+  "analytics.threshold.game-version-downloads-aria": {
+    "message": "Поріг завантажень для версії гри"
+  },
+  "analytics.threshold.game-versions-above": {
+    "message": "Версії гри від"
+  },
+  "analytics.threshold.project-downloads-aria": {
+    "message": "Поріг завантажень для проєкту"
+  },
+  "analytics.threshold.project-version-downloads-aria": {
+    "message": "Поріг завантажень для версії проєкту"
+  },
+  "analytics.threshold.project-versions-above": {
+    "message": "Версії проєкту від"
+  },
+  "analytics.threshold.projects-above": {
+    "message": "Проєкти від"
+  },
   "analytics.title": {
     "message": "Аналітика"
   },
   "analytics.value.monetized": {
     "message": "Монетизація"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Немає"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Завантажено не як залежність"
   },
   "analytics.value.none": {
     "message": "Немає"
@@ -307,6 +514,9 @@
   },
   "analytics.value.unknown": {
     "message": "Невідомо"
+  },
+  "analytics.value.unknown-dependent-tooltip": {
+    "message": "Відсутні метадані, які вказують, який залежний проєкт використовує цей завантажений файл."
   },
   "analytics.value.unmonetized": {
     "message": "Прибрати монетизацію"
@@ -521,11 +731,71 @@
   "auth.authorize.authorize-app-name": {
     "message": "Авторизувати «{appName}»"
   },
+  "auth.authorize.error.missing-parameters": {
+    "message": "Відсутні обов'язкові параметри запиту OAuth."
+  },
   "auth.authorize.error.no-redirect-url": {
     "message": "У відповіді не знайдено посилання для перенаправлення"
   },
+  "auth.authorize.errro-title": {
+    "message": "Виникла помилка"
+  },
   "auth.authorize.redirect-url": {
     "message": "Ви будете перенаправлені на <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Продовжити з {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Вікове обмеження"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "Завершити реєстрацію"
+  },
+  "auth.create-account.date-of-birth.invalid.text": {
+    "message": "Будь ласка, уведіть дійсну дату народження. Рік не може бути 0000."
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Недійсна дата народження"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Дата народження"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Оберіть дату народження"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "Уведіть свою дату народження, перш ніж продовжити."
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Потрібна дата народження"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Ви не відповідаєте віковим вимогам, аби створити обліковий запис в Modrinth."
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Вихідний код"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "Ми не зберігаємо вашу дату народження. Ми використовуємо її лише під час реєстрації, аби виконати вимоги COPPA."
+  },
+  "auth.create-account.page-title": {
+    "message": "Створити обліковий запис"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Перевірка безпеки"
+  },
+  "auth.create-account.subscribe.label": {
+    "message": "Сповіщати мене електронною поштою про круті речі, над якими працює Modrinth"
+  },
+  "auth.create-account.title": {
+    "message": "Створення облікового запису"
+  },
+  "auth.create-account.username.label": {
+    "message": "Ім’я користувача"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Уведіть ім’я користувача"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Надіслати лист для відновлення"
@@ -560,14 +830,53 @@
   "auth.reset-password.title.long": {
     "message": "Скидання пароля"
   },
+  "auth.sign-in.2fa.description": {
+    "message": "Уведіть 6-цифровий код з вашого автентифікатора або використайте один із резервних кодів."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Двофакторна автентифікація"
+  },
   "auth.sign-in.2fa.placeholder": {
     "message": "Уведіть код…"
+  },
+  "auth.sign-in.continue-with-email": {
+    "message": "Продовжити з електронною поштою"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Продовжити з ключем доступу"
+  },
+  "auth.sign-in.create-account": {
+    "message": "Зареєструватися"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Не пам'ятаю пароль"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Востаннє використано"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Не маєте облікового запису?"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Увійти в Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Вхід"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Вікове обмеження"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Продовжити з електронною поштою"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Створивши обліковий запис, ви погоджуєтеся з <terms-link>Умовами використання</terms-link> та <privacy-policy-link>Політикою конфіденційности</privacy-policy-link> Modrinth."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Показати менше опцій"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Показати інші опції"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Уже маєте обліковий запис?"
@@ -575,8 +884,14 @@
   "auth.sign-up.title": {
     "message": "Реєстрація"
   },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Створити обліковий запис"
+  },
   "auth.verify-email.action.account-settings": {
     "message": "Налаштування облікового запису"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Знайти моди"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Ваша електронна пошта вже підтверджена!"
@@ -595,6 +910,15 @@
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Не вдалося перевірити електронну пошту"
+  },
+  "auth.verify-email.notification.email-sent.description": {
+    "message": "Ми відправили лист з посиланням для підтвердження вашого облікового запису на {email}."
+  },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "Лист відправлено"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Виникла помилка"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Вашу електронну пошту успішно підтверджено!"
@@ -951,7 +1275,7 @@
     "message": "Всього завантажень"
   },
   "dashboard.analytics.total-followers": {
-    "message": "Всього підписались"
+    "message": "Усього стежить"
   },
   "dashboard.collections.button.create-new": {
     "message": "Створити нову"
@@ -1241,6 +1565,9 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "Ви використали свій ліміт зняття коштів <b>{withdrawLimit}</b>. Щоб зняти більше, вам потрібно заповнити податкову форму."
   },
+  "dashboard.discord-roles.banner.body": {
+    "message": "Ви можете отримати ролі: {roles}. Прив'яжіть свій обліковий запис Discord, а ми синхронізуємо дані автоматично."
+  },
   "dashboard.discord-roles.banner.cta": {
     "message": "Посилання Discord"
   },
@@ -1249,6 +1576,12 @@
   },
   "dashboard.discord-roles.role.big-creator": {
     "message": "понад 1млн завантажень"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Творець"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
   },
   "dashboard.head-title": {
     "message": "Панель керування"
@@ -1358,6 +1691,9 @@
   "dashboard.projects.links.source-code.label": {
     "message": "Вихідний код"
   },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "Сторінка з інформацією, документацією та допомогою для проєкту"
+  },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Сторінка вікі"
   },
@@ -1373,11 +1709,20 @@
   "dashboard.projects.project.review-environment-metadata": {
     "message": "Перегляньте метадані середовища"
   },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Обрані дії проєкту"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "Обрано {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
+  },
   "dashboard.projects.table.id": {
     "message": "ID"
   },
   "dashboard.projects.table.name": {
     "message": "Назва"
+  },
+  "dashboard.projects.table.select-all-bulk-editable": {
+    "message": "Обрати всі проєкти, які підтримують масове редагування"
   },
   "dashboard.projects.table.status": {
     "message": "Статус"
@@ -1601,8 +1946,20 @@
   "discover.install.error.no-server-world": {
     "message": "Жоден світ сервера недоступний для встановлення."
   },
+  "discover.install.error.unsupported-content-type": {
+    "message": "Цей тип умісту не можна встановити на сервер через «Дослідити»."
+  },
   "discover.install.heading.reset-modpack": {
     "message": "Вибір збірки для встановлення після скидання"
+  },
+  "discover.seo.description": {
+    "message": "Шукайте та досліджуйте {projectType} для Minecraft, отримуючи миттєві й точні результати пошуку. Наші фільтри допоможуть вам знайти найкращі {projectType} для Minecraft."
+  },
+  "discover.seo.title": {
+    "message": "Шукати {projectType}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Шукати {projectType} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Можливо, ви помилилися в посиланні на добірку."
@@ -1706,6 +2063,9 @@
   "frog.title": {
     "message": "Жаба"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Широке охоплення завдяки серверам у Північній Америці, Європі, Південно-Східній Азії та Австралії."
+  },
   "hosting-marketing.billing.monthly": {
     "message": "Щомісячна плата"
   },
@@ -1765,6 +2125,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Де розташовані сервери Modrinth Hosting? Чи зможу я вибрати регіон?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Ми маємо сервери в Північній Америці, Європі, Південно-Східній Азії та Австралії — ви зможете обрати під час покупки. У майбутньому з’являться й інші регіони! Якщо ви захочете змінити регіон, зверніться до підтримки."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Які версії Minecraft і завантажувачі модів можна використовувати?"
@@ -2039,6 +2402,9 @@
   "landing.subheading": {
     "message": "Досліджуйте, грайте, та діліться вмістом Minecraft через нашу платформу з відкритим кодом, розроблену для спільноти."
   },
+  "layout.action.analytics-events": {
+    "message": "Події аналітики"
+  },
   "layout.action.change-theme": {
     "message": "Змінити тему"
   },
@@ -2303,11 +2669,23 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Оновитись до Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Підтвердьте свою електронну пошту, перш ніж публікувати на Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Необхідно підтвердити електронну пошту"
+  },
+  "moderation.exclude-technical-review": {
+    "message": "Виключити технічні розгляди"
+  },
   "moderation.moderate": {
     "message": "Проглядати"
   },
   "moderation.page.external-projects": {
     "message": "Зовнішні проєкти"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "Глобальні збіги"
   },
   "moderation.page.projects": {
     "message": "Проєкти"
@@ -2317,6 +2695,45 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
+  },
+  "modpack-scan-modal.failed": {
+    "message": "Помилка"
+  },
+  "modpack-scan-modal.load-versions-error": {
+    "message": "Не вдалося завантажити версії: {error}"
+  },
+  "modpack-scan-modal.loading-versions": {
+    "message": "Завантажуємо версії…"
+  },
+  "modpack-scan-modal.new-files": {
+    "message": "Нові файли"
+  },
+  "modpack-scan-modal.new-groups": {
+    "message": "Нові групи"
+  },
+  "modpack-scan-modal.no-files": {
+    "message": "Не знайдено файлів."
+  },
+  "modpack-scan-modal.not-scanned": {
+    "message": "Не сканований"
+  },
+  "modpack-scan-modal.override-files": {
+    "message": "Перезаписати файли ({count})"
+  },
+  "modpack-scan-modal.pack-file-name": {
+    "message": "Назва файлу збірки"
+  },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Сканувати всі файли"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Деякі файли не вдалося просканувати: {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Скануємо…"
+  },
+  "modpack-scan-modal.title": {
+    "message": "Сканування збірки ({scanned}/{total} файлів)"
   },
   "muralpay.account-type.checking": {
     "message": "Перевірка"
@@ -2591,6 +3008,9 @@
   "profile.bio.fallback.user": {
     "message": "Користувач Modrinth."
   },
+  "profile.button.analytics": {
+    "message": "Переглянути аналітику користувача"
+  },
   "profile.button.billing": {
     "message": "Керувати розрахунками користувача"
   },
@@ -2608,6 +3028,9 @@
   },
   "profile.button.set-affiliate": {
     "message": "Установити як партнера"
+  },
+  "profile.collection.projects-count": {
+    "message": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
   },
   "profile.details.label.auth-providers": {
     "message": "Провайдери автентифікації"
@@ -2645,9 +3068,6 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
-  },
   "profile.label.joined": {
     "message": "Приєднався"
   },
@@ -2666,9 +3086,6 @@
   "profile.label.organizations": {
     "message": "Організації"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
-  },
   "profile.label.saving": {
     "message": "Збереження…"
   },
@@ -2677,6 +3094,12 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
+  },
+  "profile.official-account": {
+    "message": "Офіційний обліковий запис Modrinth"
+  },
+  "profile.official-account.bio": {
+    "message": "Офіційний обліковий запис Modrinth. Зв'язатися з підтримкою можна за <support-link></support-link> або через електронну пошту за <email></email>"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> відстежує} few {<stat>{count}</stat> відстежує} other {<stat>{count}</stat> відстежують}}"
@@ -2849,17 +3272,107 @@
   "project.details.licensed": {
     "message": "Ліцензія:"
   },
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "Ця версія гри несумісна з базовим проєктом."
+  },
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "Цей завантажувач несумісний з базовим проєктом."
+  },
+  "project.download.compatible-version-title": {
+    "message": "Сумісні версії"
+  },
+  "project.download.dependencies-title": {
+    "message": "Залежності"
+  },
+  "project.download.dependency-already-installed": {
+    "message": "Ця залежність уже встановлена"
+  },
+  "project.download.dependency-any-compatible": {
+    "message": "Будь-яка сумісна"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "Ця залежність конфліктує з іншою залежністю"
+  },
+  "project.download.dependency-download-file": {
+    "message": "Завантажити {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Завантажити {filename} ({size})"
+  },
+  "project.download.dependency-duplicate": {
+    "message": "Цю залежність уже включено"
+  },
+  "project.download.dependency-missing-version": {
+    "message": "Ця версія залежності недоступна"
+  },
+  "project.download.dependency-no-compatible-version": {
+    "message": "Немає сумісної версії для цієї залежності"
+  },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Fabric API пропускається для Quilt"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "Цей проєкт має залежність з необхідним пакетом ресурсів. Завантажте його та розмістіть у теку {folder}."
+  },
+  "project.download.dependency-unavailable": {
+    "message": "Цю залежність неможливо завантажити"
+  },
+  "project.download.download": {
+    "message": "Завантажити"
+  },
+  "project.download.download-as-zip": {
+    "message": "Завантажити як .zip"
+  },
+  "project.download.download-version": {
+    "message": "Завантажити {version}"
+  },
+  "project.download.download-with-dependencies": {
+    "message": "Завантажити із залежностями"
+  },
+  "project.download.download-with-recommended": {
+    "message": "Завантажити з рекомендованими"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": "Завантажити з рекомендованими як .zip"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "Дубльовані залежності приховано"
+  },
+  "project.download.file-unavailable": {
+    "message": "Цей файл не можна завантажити"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "«{title}» не підтримує {gameVersion} для {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Установити через Modrinth App"
+  },
+  "project.download.manually": {
+    "message": "Завантажити вручну"
   },
   "project.download.no-app": {
     "message": "Не маєте Modrinth App?"
   },
+  "project.download.no-game-versions-found": {
+    "message": "Не знайдено версій гри"
+  },
+  "project.download.no-versions-available": {
+    "message": "Немає версій для {gameVersion} та {platform}."
+  },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} не підтримує {platform} для {gameVersion}"
   },
+  "project.download.recommended-title": {
+    "message": "Рекомендоване"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "Цей пакет даних вимагає пакет ресурсів. Завантажте його та розмістіть у теку {folder}."
+  },
+  "project.download.required-resource-pack-short": {
+    "message": "Пакет ресурсів"
+  },
   "project.download.search-game-versions": {
-    "message": "Пошук версій гри…"
+    "message": "Оберіть версію гри"
   },
   "project.download.select-game-version": {
     "message": "Виберіть версію гри"
@@ -2872,6 +3385,15 @@
   },
   "project.download.title": {
     "message": "Завантажити {title}"
+  },
+  "project.download.unknown-loader": {
+    "message": "Невідомий завантажувач"
+  },
+  "project.download.zip-failed-text": {
+    "message": "Один чи кілька файлів не вдалося завантажити. Спробуйте знову."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Не вдалося завантажити файли"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Нещодавно ми оновили систему середовищ у Modrinth і вам тепер доступні нові налаштування. У вас немає дозволу на зміну цих налаштувань, але, будь ласка, повідомте іншим учасникам проєкту, що метадані середовища потребують підтвердження."
@@ -3050,14 +3572,77 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.attention-needed.description.proj-approved": {
+    "message": "Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження всіх наведених нижче файлів. Після завершення приховані версії буде автоматично опубліковано."
+  },
+  "project.settings.permissions.attention-needed.description.proj-draft": {
+    "message": "Будь ласка, надайте підтвердження того, що ви маєте дозвіл на розповсюдження всіх наведених нижче файлів, перш ніж ви зможете подати свій проєкт на розгляд."
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Невідомий зовнішній уміст"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Команда модерації Modrinth відхилила вашу інформацію про дозволи для певного зовнішнього вмісту. Будь ласка, перегляньте відхилені матеріали нижче, надайте переконливі докази або видаліть уміст."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Деякі докази відхилено"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Згорнути все"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Увесь зовнішній уміст має інформацію про дозволи та атрибуції."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Дозволи отримано!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Жодна з ваших версій проєкту не містить зовнішнього вмісту, тому вам не потрібно турбуватися про отримання дозволів."
+  },
   "project.settings.permissions.empty-state.heading": {
     "message": "Усе готово!"
+  },
+  "project.settings.permissions.expand-all": {
+    "message": "Розгорнути все"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Ви можете не мати дозволу на розповсюдження деякого зовнішнього вмісту у своєму проєкті. Щоб опублікувати його на Modrinth, видаліть цей уміст або наведіть докази того, що ви маєте дозволи на його поширення."
   },
   "project.settings.permissions.fail.title": {
     "message": "Деякий уміст не можна включити"
   },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Якщо ви додаєте вміст, який не розміщено на Modrinth, ви повинні повідомити нас, звідки він, і підтвердити, що ви маєте дозвіл на розповсюдження файлів. Перегляньте <link>наше оголошення цієї нової системи</link>, щоб дізнатися більше!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Дізнайтеся про дозволи на розповсюдження"
+  },
   "project.settings.permissions.learn-more": {
     "message": "Дізнатися більше"
+  },
+  "project.settings.permissions.no-results": {
+    "message": "За вашим запитом не знайдено жодного зовнішнього файлу."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Деякий зовнішній уміст не можна поширювати на Modrinth, оскільки він порушує наші правила. Ви повинні видалити його."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Жодні атрибуції не потребують затвердження} one {# атрибуція потребує затвердження} few {# атрибуції потребують затвердження} many {# атрибуцій потребують затвердження} other {# атрибуції потребують затвердження}}"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Пошук {count} {count, plural, one {проєкту} few {проєктів} many {проєктів} other {проєктів}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Найбільше файлів"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Недавно змінено"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Відхилено"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Статус"
   },
   "project.settings.title": {
     "message": "Налаштування"
@@ -3072,13 +3657,16 @@
     "message": "Версії"
   },
   "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на повторне розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
+    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Версія{version_name}} other {Версії}} утримано через невідомий убудований уміст"
   },
   "report.already-reported": {
     "message": "Ви вже повідомляли про «{title}»"
+  },
+  "report.already-reported-description": {
+    "message": "Ви вже відкрили скаргу на {item}. Ви можете додати більше деталей до вашої скарги, якщо маєте більше інформації щодо неї."
   },
   "report.back-to-item": {
     "message": "Повернутися до {item}"
@@ -3128,8 +3716,14 @@
   "report.please-report": {
     "message": "Можна скаржитись на:"
   },
+  "report.question.content-id": {
+    "message": "Який ідентифікатор має {item}?"
+  },
   "report.question.content-type": {
     "message": "Який тип умісту ви оскаржуєте?"
+  },
+  "report.question.report-reason": {
+    "message": "Яке правило Modrinth порушує {item}?"
   },
   "report.report-content": {
     "message": "Повідомити модераторів про вміст"
@@ -3242,14 +3836,26 @@
   "scopes.organizationWrite.label": {
     "message": "Редагувати організації"
   },
+  "scopes.patCreate.description": {
+    "message": "Створювати особисті токени доступу"
+  },
   "scopes.patCreate.label": {
     "message": "Створювати токени доступу"
+  },
+  "scopes.patDelete.description": {
+    "message": "Видаляти особисті токени доступу"
   },
   "scopes.patDelete.label": {
     "message": "Видаляти токени доступу"
   },
+  "scopes.patRead.description": {
+    "message": "Переглядати особисті токени доступу"
+  },
   "scopes.patRead.label": {
     "message": "Дивитися токени доступу"
+  },
+  "scopes.patWrite.description": {
+    "message": "Змінювати особисті токени доступу"
   },
   "scopes.patWrite.label": {
     "message": "Редагувати токени доступу"
@@ -3458,6 +4064,9 @@
   "servers.plan.small.description": {
     "message": "Прекрасно підходить для 1–5 друзів із кількома легкими модами."
   },
+  "servers.purchase.step.plan.billed": {
+    "message": "оплата {interval, select, monthly {щомісяця} quarterly {щокварталу} yearly {щороку} other {{interval}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Завершити налаштування"
   },
@@ -3580,6 +4189,57 @@
   },
   "settings.account.security.email.title": {
     "message": "Електронна пошта"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Використайте щось пам'ятне, аби ви змогли згадати цей ключ доступу пізніше."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Назва"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Мій ключ доступу"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Додати ключ доступу"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Додати ключ доступу"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Керуати ключами доступу"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Керувати зареєстрованими ключами доступу або створити новий."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Додано {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Востаннє використано {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Завантаження ключів доступу…"
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Ніколи не використовувався"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Ви не маєте зареєстрованих ключів доступу."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Видалити ключ доступу"
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Це назавжди видалить ключ доступу «{name}». Ви більше не зможете його використовувати."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Видалити цей ключ доступу?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Перейменувати ключ доступу"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Керуати ключами доступу"
   },
   "settings.account.security.password.action.add": {
     "message": "Додати пароль"
@@ -3897,7 +4557,7 @@
     "message": "{shared} спільних ЦП (з можливістю посилення до {bursts} ЦП)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Не вдалося знайти підключений до цієї підписки сервер. Це може бути пов’язано з кількома причинами. Якщо ви щойно придбали сервер — це нормально, налаштування сервера може зайняти до години. Якщо ж ви придбали цей сервер деякий час тому, ймовірно, його було призупинено. Якщо це не те, чого ви очікували, зверніться до служби підтримки Modrinth, надавши таку інформацію:"
+    "message": "Не вдалося знайти сервер, прив'язаний до цієї підписки. Це може бути пов’язано з кількома причинами. Якщо ви щойно придбали сервер, це нормально: налаштування сервера може зайняти до години. Якщо ж ви придбали цей сервер раніше, ймовірно, його було призупинено. Якщо це не те, чого ви очікували, зверніться до служби підтримки Modrinth, надавши наступну інформацію:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "ID сервера: {id}"
@@ -3958,6 +4618,12 @@
   },
   "settings.billing.subscription.title": {
     "message": "Підписки"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Переходимо на {interval, select, monthly {щомісячну} yearly {щорічну} other {{interval}}}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Перейти на {interval, select, monthly {щомісячну} yearly {щорічну} other {{interval}}}"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Щомісячна оплата обійдеться вам у додаткові {amount} на рік"
@@ -4187,6 +4853,51 @@
   "ui.newsletter-button.tooltip": {
     "message": "Підписатися на розсилку новин Modrinth"
   },
+  "version.all-versions": {
+    "message": "Усі версії"
+  },
+  "version.confirm-delete.description": {
+    "message": "Цю версію буде видалено назавжди. Цю дію не можна скасувати."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Видалити версію"
+  },
+  "version.confirm-delete.title": {
+    "message": "Видалити цю версію?"
+  },
+  "version.dependency.view-project": {
+    "message": "Переглянути проєкт"
+  },
+  "version.dependency.view-version": {
+    "message": "Переглянути версію"
+  },
+  "version.download.download-dependency": {
+    "message": "Обрати версію для завантаження"
+  },
+  "version.download.no-primary-file": {
+    "message": "Помилка: Не знайдено основного файлу"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Необов'язковий пакет ресурсів"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Обов'язковий пакет ресурсів"
+  },
+  "version.download.version": {
+    "message": "Завантажити {version} ({size})"
+  },
+  "version.edit.button": {
+    "message": "Змінити"
+  },
+  "version.edit.details": {
+    "message": "Змінити деталі"
+  },
+  "version.edit.files": {
+    "message": "Змінити файли"
+  },
+  "version.edit.metadata": {
+    "message": "Змінити метадані"
+  },
   "version.environment.none.description": {
     "message": "Середовище для цієї версії не було вказано."
   },
@@ -4198,5 +4909,56 @@
   },
   "version.environment.unknown.title": {
     "message": "Невідоме середовище"
+  },
+  "version.package-as-mod.button": {
+    "message": "Зібрати в мод"
+  },
+  "version.package-as-mod.description": {
+    "message": "Це створить нову версію з підтримкою обраних завантажувачів. Вас буде перенаправлено на нову версію, яку зможете змінювати на свій смак."
+  },
+  "version.package-as-mod.header": {
+    "message": "Спакувати пакет даних як мод"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Завантажувачі модів"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "Завантажувачі модів, для яких ви б хотіли спакувати свій пакет даних."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Оберіть завантажувачі модів…"
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Спакувати пакет даних"
+  },
+  "version.section.content.dev-info": {
+    "message": "Інформація для розробників"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Координати Maven:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Проєкти на Modrinth автоматично публікуються в Maven для використання з інструментами збірки JVM, як-от <gradle-link>Gradle</gradle-link>. Щоб дізнатися більше про Modrinth Maven API, <article-link>натисніть тут</article-link>."
+  },
+  "version.section.content.dev-info.maven-note": {
+    "message": "Примітка: За можливості використовуйте Maven-репозиторій автора, оскільки він матиме інформацію про транзитивні залежності, які Modrinth Maven API може не мати. Крім того, ви можете отримати дубльовані залежності, якщо разом використовуватимете Maven-репозиторії, пов'язані з Modrinth, та сторонні. Це тому, що груповий ідентифікатор відрізнятиметься при отриманні через Modrinth Maven API."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Ідентифікатор версії:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Скопіювати SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Скопіювати SHA-512"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Ця версія наразі є прихована. Надайте докази, що ви маєте дозволи на розповсюдження певних файлів."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Приховано через невідомий укладений уміст"
   }
 }

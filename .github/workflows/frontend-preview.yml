@@ -76,6 +76,8 @@ jobs:
 
       - name: Deploy Storybook preview
         uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
@@ -85,7 +87,11 @@ jobs:
           command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
 
   comment:
-    if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
+    if: |
+      !cancelled()
+      && github.repository_owner == 'modrinth'
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && needs.deploy.result == 'success'
     runs-on: ubuntu-latest
     needs: [deploy, deploy-storybook]
     steps:
@@ -99,16 +105,25 @@ jobs:
         id: urls
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          STORYBOOK_RESULT: ${{ needs.deploy-storybook.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           STAGING_PREVIEW_URL=$(cat deployment-url-staging-preview.txt)
           PRODUCTION_PREVIEW_URL=$(cat deployment-url-production-preview.txt)
 
+          if [ "$STORYBOOK_RESULT" = "success" ]; then
+            STORYBOOK_PREVIEW_URL="https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev"
+          else
+            STORYBOOK_PREVIEW_URL="⚠️ Deployment $STORYBOOK_RESULT ([logs]($RUN_URL))"
+          fi
+
           echo "Production preview URL: $PRODUCTION_PREVIEW_URL"
           echo "Staging preview URL: $STAGING_PREVIEW_URL"
+          echo "Storybook preview URL: $STORYBOOK_PREVIEW_URL"
 
           echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
           echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
-          echo "storybook-preview-url=https://git-${HEAD_SHA::8}-storybook.modrinth.workers.dev" >> $GITHUB_OUTPUT
+          echo "storybook-preview-url=$STORYBOOK_PREVIEW_URL" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'

@@ -120,35 +120,34 @@
 		</NewModal>
 		<div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
 			<div class="normal-page__header py-4">
-				<ContentPageHeader>
-					<template #icon>
-						<Avatar
-							:src="user.avatar_url"
-							:alt="user.username"
-							:size="isModrinthUser ? '64px' : '96px'"
-							circle
-						/>
-					</template>
-					<template #title>
-						<span class="flex items-center gap-2">
-							{{ user.username }}
-							<BadgeCheckIcon
-								v-if="isOfficialAccount"
-								v-tooltip="formatMessage(messages.officialAccount)"
-								class="size-5 text-brand"
-								fill="var(--color-brand-highlight)"
-							/>
-							<TagItem
-								v-if="isAdminViewing && isAffiliate"
-								:style="{
-									'--_color': 'var(--color-brand)',
-									'--_bg-color': 'var(--color-brand-highlight)',
-								}"
-							>
-								<AffiliateIcon /> Affiliate
-							</TagItem>
-						</span>
-					</template>
+				<UserPageHeader
+					:user="user"
+					:summary="isModrinthUser ? null : profileHeaderSummary"
+					:auth-user="auth.user"
+					:is-modrinth-user="isModrinthUser"
+					:is-official-account="isOfficialAccount"
+					:show-affiliate-badge="isAdminViewing && !!isAffiliate"
+					:is-affiliate="!!isAffiliate"
+					:is-self="auth.user?.id === user.id"
+					:is-admin="isAdminViewing"
+					:is-staff="!!(auth.user && isStaff(auth.user))"
+					:projects-count="projects?.length || 0"
+					:downloads="sumDownloads"
+					@manage-projects="navigateTo('/dashboard/projects')"
+					@report="reportProfileFromHeader"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
+					@open-billing="navigateTo(`/admin/billing/${user.id}`)"
+					@toggle-affiliate="toggleAffiliate(user.id)"
+					@open-info="userDetailsModal?.show()"
+					@open-analytics="
+						navigateTo({
+							path: '/dashboard/analytics',
+							query: { user: user.username || user.id },
+						})
+					"
+					@edit-role="openRoleEditModal"
+				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
 							<template #support-link>
@@ -173,159 +172,7 @@
 							</template>
 						</IntlFormatted>
 					</template>
-					<template v-else #summary>
-						{{
-							user.bio
-								? user.bio
-								: projects?.length > 0
-									? formatMessage(messages.bioFallbackCreator)
-									: formatMessage(messages.bioFallbackUser)
-						}}
-					</template>
-					<template v-if="!isModrinthUser" #stats>
-						<div
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-						>
-							<BoxIcon class="h-6 w-6 text-secondary" />
-							{{
-								formatMessage(messages.profileProjectsLabel, {
-									count: formatCompactNumber(projects?.length || 0),
-									countPlural: formatCompactNumberPlural(projects?.length || 0),
-								})
-							}}
-						</div>
-						<div
-							v-tooltip="formatNumber(sumDownloads)"
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
-						>
-							<DownloadIcon class="h-6 w-6 text-secondary" />
-							{{
-								formatMessage(messages.profileDownloadsLabel, {
-									count: formatCompactNumber(sumDownloads),
-									countPlural: formatCompactNumberPlural(sumDownloads),
-								})
-							}}
-						</div>
-						<div
-							v-tooltip="formatDateTime(user.created)"
-							class="flex items-center gap-2 font-semibold"
-						>
-							<CalendarIcon class="h-6 w-6 text-secondary" />
-							{{ formatMessage(messages.profileJoinedLabel) }}
-							{{ formatRelativeTime(user.created) }}
-						</div>
-					</template>
-					<template #actions>
-						<ButtonStyled size="large">
-							<NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
-								<EditIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.editButton) }}
-							</NuxtLink>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'manage-projects',
-										action: () => navigateTo('/dashboard/projects'),
-										hoverOnly: true,
-										shown: auth.user && auth.user.id === user.id,
-									},
-									{ divider: true, shown: auth.user && auth.user.id === user.id },
-									{
-										id: 'report',
-										action: () =>
-											auth.user ? reportUser(user.id) : navigateTo(getSignInRouteObj(route)),
-										color: 'red',
-										hoverOnly: true,
-										shown: auth.user?.id !== user.id,
-									},
-									{ id: 'copy-id', action: () => copyId() },
-									{ id: 'copy-permalink', action: () => copyPermalink() },
-									{
-										divider: true,
-										shown: auth.user && isAdmin(auth.user),
-									},
-									{
-										id: 'open-billing',
-										action: () => navigateTo(`/admin/billing/${user.id}`),
-										shown: auth.user && isStaff(auth.user),
-									},
-									{
-										id: 'toggle-affiliate',
-										action: () => toggleAffiliate(user.id),
-										shown: isAdminViewing,
-										remainOnClick: true,
-										color: isAffiliate ? 'red' : 'orange',
-									},
-									{
-										id: 'open-info',
-										action: () => $refs.userDetailsModal.show(),
-										shown: auth.user && isStaff(auth.user),
-									},
-									{
-										id: 'open-analytics',
-										action: () =>
-											navigateTo({
-												path: '/dashboard/analytics',
-												query: { user: user.username || user.id },
-											}),
-										shown: auth.user && isAdmin(auth.user),
-									},
-									{
-										id: 'edit-role',
-										action: () => openRoleEditModal(),
-										shown: auth.user && isAdmin(auth.user),
-									},
-								]"
-								aria-label="More options"
-								:dropdown-id="`${baseId}-more-options`"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #manage-projects>
-									<BoxIcon aria-hidden="true" />
-									{{ formatMessage(messages.profileManageProjectsButton) }}
-								</template>
-								<template #report>
-									<ReportIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.reportButton) }}
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-								<template #open-billing>
-									<CurrencyIcon aria-hidden="true" />
-									{{ formatMessage(messages.billingButton) }}
-								</template>
-								<template #open-info>
-									<InfoIcon aria-hidden="true" />
-									{{ formatMessage(messages.infoButton) }}
-								</template>
-								<template #open-analytics>
-									<ChartIcon aria-hidden="true" />
-									{{ formatMessage(messages.analyticsButton) }}
-								</template>
-								<template #toggle-affiliate>
-									<AffiliateIcon aria-hidden="true" />
-									{{
-										formatMessage(
-											isAffiliate ? messages.removeAffiliateButton : messages.setAffiliateButton,
-										)
-									}}
-								</template>
-								<template #edit-role>
-									<EditIcon aria-hidden="true" />
-									{{ formatMessage(messages.editRoleButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ContentPageHeader>
+				</UserPageHeader>
 			</div>
 			<div class="normal-page__content">
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
@@ -509,23 +356,12 @@
 </template>
 <script setup>
 import {
-	AffiliateIcon,
-	BadgeCheckIcon,
 	BoxIcon,
-	CalendarIcon,
-	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
-	CurrencyIcon,
-	DownloadIcon,
-	EditIcon,
 	GlobeIcon,
-	InfoIcon,
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
-	MoreVerticalIcon,
-	ReportIcon,
 	SaveIcon,
 	SpinnerIcon,
 	XIcon,
@@ -535,22 +371,15 @@ import {
 	ButtonStyled,
 	Combobox,
 	commonMessages,
-	ContentPageHeader,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
 	NewModal,
-	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
-	TagItem,
-	useCompactNumber,
-	useFormatDateTime,
-	useFormatNumber,
 	UserBadges,
-	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -561,6 +390,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
+import UserPageHeader from '~/components/ui/UserPageHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectUserSorting } from '~/utils/projects.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
@@ -575,34 +405,13 @@ const config = useRuntimeConfig()
 const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
-const formatNumber = useFormatNumber()
-const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
-const formatRelativeTime = useRelativeTime()
-const formatDateTime = useFormatDateTime({
-	timeStyle: 'short',
-	dateStyle: 'long',
-})
 
 const { addNotification } = injectNotificationManager()
 
-const baseId = useId()
-
 const messages = defineMessages({
-	profileProjectsLabel: {
-		id: 'profile.label.projects',
-		defaultMessage: '{count} {countPlural, plural, one {project} other {projects}}',
-	},
-	profileDownloadsLabel: {
-		id: 'profile.label.downloads',
-		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
-	},
 	collectionProjectsCount: {
 		id: 'profile.collection.projects-count',
 		defaultMessage: '{count, plural, one {# project} other {# projects}}',
-	},
-	profileJoinedLabel: {
-		id: 'profile.label.joined',
-		defaultMessage: 'Joined',
 	},
 	savingLabel: {
 		id: 'profile.label.saving',
@@ -669,10 +478,6 @@ const messages = defineMessages({
 		id: 'profile.label.badges',
 		defaultMessage: 'Badges',
 	},
-	profileManageProjectsButton: {
-		id: 'profile.button.manage-projects',
-		defaultMessage: 'Manage projects',
-	},
 	profileMetaDescription: {
 		id: 'profile.meta.description',
 		defaultMessage: "Download {username}'s projects on Modrinth",
@@ -699,41 +504,9 @@ const messages = defineMessages({
 		defaultMessage:
 			"You don't have any collections.\nWould you like to <create-link>create one</create-link>?",
 	},
-	billingButton: {
-		id: 'profile.button.billing',
-		defaultMessage: 'Manage user billing',
-	},
-	infoButton: {
-		id: 'profile.button.info',
-		defaultMessage: 'View user details',
-	},
-	analyticsButton: {
-		id: 'profile.button.analytics',
-		defaultMessage: 'View user analytics',
-	},
-	setAffiliateButton: {
-		id: 'profile.button.set-affiliate',
-		defaultMessage: 'Set as affiliate',
-	},
-	removeAffiliateButton: {
-		id: 'profile.button.remove-affiliate',
-		defaultMessage: 'Remove as affiliate',
-	},
-	affiliateLabel: {
-		id: 'profile.label.affiliate',
-		defaultMessage: 'Affiliate',
-	},
-	editRoleButton: {
-		id: 'profile.button.edit-role',
-		defaultMessage: 'Edit role',
-	},
 	userNotFoundError: {
 		id: 'profile.error.not-found',
 		defaultMessage: 'User not found',
-	},
-	officialAccount: {
-		id: 'profile.official-account',
-		defaultMessage: 'Official Modrinth account',
 	},
 	officialAccountBio: {
 		id: 'profile.official-account.bio',
@@ -891,13 +664,31 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
+function reportProfileFromHeader() {
+	if (!user.value) return
+	if (auth.value.user) {
+		reportUser(user.value.id)
+	} else {
+		navigateTo(getSignInRouteObj(route))
+	}
+}
+
 const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
+const userDetailsModal = useTemplateRef('userDetailsModal')
 
 async function toggleAffiliate(id) {
 	await client.labrinth.users_v2.patch(id, { badges: user.value.badges ^ (1 << 7) })
 	queryClient.invalidateQueries({ queryKey: ['user', userId] })
 }
+
+const profileHeaderSummary = computed(() =>
+	user.value?.bio
+		? user.value.bio
+		: (projects.value?.length ?? 0) === 0
+			? formatMessage(messages.bioFallbackUser)
+			: formatMessage(messages.bioFallbackCreator),
+)
 
 const navLinks = computed(() => [
 	{
@@ -950,7 +741,7 @@ function saveRoleEdit() {
 
 			editRoleModal.value?.hide()
 		})
-		.catch(() => {
+		.catch((error) => {
 			console.error('Failed to update user role:', error)
 
 			addNotification({

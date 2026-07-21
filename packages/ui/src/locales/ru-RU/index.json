@@ -98,6 +98,9 @@
   "browse.offline": {
     "defaultMessage": "Вы не в сети. Подключитесь к интернету, чтобы искать на Modrinth."
   },
+  "browse.search.placeholder": {
+    "defaultMessage": "Искать {projectType}..."
+  },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "Выбранные проекты"
   },
@@ -215,6 +218,9 @@
   "button.open-folder": {
     "defaultMessage": "Открыть папку"
   },
+  "button.open-in-browser": {
+    "defaultMessage": "Открыть в браузере"
+  },
   "button.open-in-folder": {
     "defaultMessage": "Открыть в папке"
   },
@@ -231,7 +237,7 @@
     "defaultMessage": "Переустановить сборку"
   },
   "button.remove": {
-    "defaultMessage": "Удалить ключ доступа"
+    "defaultMessage": "Удалить"
   },
   "button.remove-image": {
     "defaultMessage": "Удалить изображение"
@@ -284,6 +290,9 @@
   "button.stop": {
     "defaultMessage": "Остановить"
   },
+  "button.switch-to-version": {
+    "defaultMessage": "Сменить на версию"
+  },
   "button.switch-version": {
     "defaultMessage": "Сменить версию"
   },
@@ -310,6 +319,21 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Платформа"
+  },
+  "collection-widget.empty-collection": {
+    "defaultMessage": "Коллекция пуста."
+  },
+  "collection-widget.loading-projects": {
+    "defaultMessage": "Загрузка проектов..."
+  },
+  "collection-widget.no-search-results": {
+    "defaultMessage": "Не найдены проекты, соответствующие запросу."
+  },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "collection-widget.search-placeholder": {
+    "defaultMessage": "Поиск проектов"
   },
   "collections.label.private": {
     "defaultMessage": "Приватная"
@@ -413,8 +437,35 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Обновлён"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Не устанавливать"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Добавленный"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Удалённый"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Обновлённый"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Всё равно установить"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Некоторые файлы на вашем сервере распознать не удалось. Это может повлиять на их работу."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Это обновление содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Предупреждение о неизвестных файлах"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Неизвестно"
   },
   "content.filter.disabled": {
     "defaultMessage": "Отключённые"
@@ -792,7 +843,7 @@
     "defaultMessage": "Классический Minecraft без модов или плагинов."
   },
   "creation-flow.modal.setup-type.option.vanilla-minecraft.title": {
-    "defaultMessage": "Чистый Minecraft"
+    "defaultMessage": "Ванильный Minecraft"
   },
   "creation-flow.modal.setup-type.title.installation": {
     "defaultMessage": "Выберите тип установки"
@@ -804,7 +855,7 @@
     "defaultMessage": "Выберите тип мира"
   },
   "creation-flow.title.choose-modpack": {
-    "defaultMessage": "Выбрать сборку модов"
+    "defaultMessage": "Выберите сборку"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Создание сборки"
@@ -923,8 +974,14 @@
   "external-files.permissions-card.editor.notes-placeholder": {
     "defaultMessage": "Напишите что‑нибудь..."
   },
+  "external-files.permissions-card.editor.proof-image-alt": {
+    "defaultMessage": "Скриншот доказательства {n}"
+  },
   "external-files.permissions-card.editor.proof-image-remove": {
     "defaultMessage": "Удалить изображение"
+  },
+  "external-files.permissions-card.editor.proof-images-label": {
+    "defaultMessage": "Доказательства"
   },
   "external-files.permissions-card.editor.proof-images-upload-prompt": {
     "defaultMessage": "Перетащите изображение или нажмите, чтобы выбрать"
@@ -947,11 +1004,20 @@
   "external-files.permissions-card.error.custom-license-required": {
     "defaultMessage": "Укажите ссылку на лицензию. Если у вас её нет, лучше указать «Все права защищены/Без лицензии»"
   },
+  "external-files.permissions-card.error.explanation-or-images-required": {
+    "defaultMessage": "Предоставьте объяснение или загрузите хотя бы одно доказательство."
+  },
   "external-files.permissions-card.error.link-required": {
     "defaultMessage": "Введите ссылку."
   },
+  "external-files.permissions-card.error.notes-or-images-required": {
+    "defaultMessage": "Предоставьте примечание или хотя бы одно доказательство."
+  },
   "external-files.permissions-card.error.proof-image-invalid-type": {
     "defaultMessage": "Загрузите изображение в формате PNG, JPEG, GIF, WebP, или BMP."
+  },
+  "external-files.permissions-card.error.proof-images-required": {
+    "defaultMessage": "Загрузите хотя бы одно доказательство."
   },
   "external-files.permissions-card.explanation-description": {
     "defaultMessage": "Предоставьте краткое объяснение или изображение."
@@ -969,10 +1035,10 @@
     "defaultMessage": "Включённые файлы:"
   },
   "external-files.permissions-card.included-in-versions": {
-    "defaultMessage": "Включён в {count, plural, one {# версию} few {# версии} other {# версий}}:"
+    "defaultMessage": "Есть в {count, plural, one {# версии} other {# версиях}}:"
   },
   "external-files.permissions-card.last-updated": {
-    "defaultMessage": "Последнее обновление: {date} пользователем {user}"
+    "defaultMessage": "Последнее изменение {date} от {user}"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Неизвестно"
@@ -1000,6 +1066,12 @@
   },
   "external-files.permissions-card.original-project-page": {
     "defaultMessage": "Оригинальный проект"
+  },
+  "external-files.permissions-card.proof-image-alt": {
+    "defaultMessage": "Скриншот доказательства {n}"
+  },
+  "external-files.permissions-card.proof-images-label": {
+    "defaultMessage": "Доказательства:"
   },
   "external-files.permissions-card.reason.globally-allowed": {
     "defaultMessage": "Атрибутировано автоматически"
@@ -1039,6 +1111,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Вы получили особое разрешение на распространение этой работы в вашей сборке."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Удалить группу"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Не удалось удалить группу"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Удалить из группы"
@@ -1306,6 +1384,9 @@
   },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# элемент} few {# элемента} other {# элементов}}"
+  },
+  "files.row.parent-folder": {
+    "defaultMessage": "Родительская папка"
   },
   "files.table-header.created": {
     "defaultMessage": "Создан"
@@ -2170,6 +2251,9 @@
   },
   "label.server": {
     "defaultMessage": "Сервер"
+  },
+  "label.server-only": {
+    "defaultMessage": "Только для сервера"
   },
   "label.servers": {
     "defaultMessage": "Серверы"
@@ -3243,19 +3327,19 @@
     "defaultMessage": "Только для клиента"
   },
   "project.settings.environment.notice.missing-env.description": {
-    "defaultMessage": "В проекте отсутствуют метаданные среды. Выберите подходящий вариант ниже."
+    "defaultMessage": "В проекте отсутствуют метаданные среды. Выберите один из вариантов ниже."
   },
   "project.settings.environment.notice.missing-env.title": {
     "defaultMessage": "Укажите среду проекта"
   },
   "project.settings.environment.notice.multiple-environments.description": {
-    "defaultMessage": "В разных версиях проекта указаны разные среды — глобальное изменение сред невозможно."
+    "defaultMessage": "В разных версиях проекта указаны разные среды, поэтому глобальное изменение сред невозможно."
   },
   "project.settings.environment.notice.multiple-environments.title": {
     "defaultMessage": "У проекта несколько сред"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Мы переработали систему сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что выбран подходящий вариант, и подтвердите его!"
+    "defaultMessage": "На Modrinth изменилась система сред и появились новые варианты. Убедитесь в верности выбранного варианта и подтвердите его."
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Подтвердите выбранный вариант"
@@ -3347,6 +3431,12 @@
   "project.versions.channel.release.symbol": {
     "defaultMessage": "Р"
   },
+  "project.versions.filter.toggle-tooltip": {
+    "defaultMessage": "Переключить фильтр: {filter}"
+  },
+  "project.versions.platform.modloader.short": {
+    "defaultMessage": "ModLoader"
+  },
   "project.versions.version.withheld": {
     "defaultMessage": "На удержании"
   },
@@ -3430,6 +3520,18 @@
   },
   "search.filter.option.show_more": {
     "defaultMessage": "Показать больше"
+  },
+  "search.filter_type.advanced": {
+    "defaultMessage": "Расширенные"
+  },
+  "search.filter_type.advanced.exclude_datapack": {
+    "defaultMessage": "Исключать наборы данных"
+  },
+  "search.filter_type.advanced.exclude_mod": {
+    "defaultMessage": "Исключать моды"
+  },
+  "search.filter_type.advanced.exclude_plugin": {
+    "defaultMessage": "Исключать плагины"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"
@@ -3672,7 +3774,7 @@
     "defaultMessage": "Добавить пользователя"
   },
   "servers.access-page.notification.friend-request-failed.title": {
-    "defaultMessage": "Запрос в друзья не может быть отправлен"
+    "defaultMessage": "Не удалось отправить запрос в друзья"
   },
   "servers.access-page.notification.invite-cancelled.text": {
     "defaultMessage": "Отозвано приглашение {target}."
@@ -3777,7 +3879,7 @@
     "defaultMessage": "По заданным фильтрам пользователи не найдены."
   },
   "servers.access-table.member-actions-label": {
-    "defaultMessage": "Действия для {username}"
+    "defaultMessage": "Действия с {username}"
   },
   "servers.access-table.pending": {
     "defaultMessage": "В ожидании"
@@ -4116,7 +4218,7 @@
     "defaultMessage": "Восстановление из резервной копии"
   },
   "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Выбрана 1 резервная копия} other {Выбрано # резервныx копий}}"
+    "defaultMessage": "Действия с выбранными резервными копиями"
   },
   "servers.backups.bulk-bar.deleting": {
     "defaultMessage": "Удаление {total, plural, one {# резервной копии} other {# резервных копий}}..."
@@ -4575,7 +4677,7 @@
     "defaultMessage": "Успешная покупка"
   },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "Средства пока не будут списаны."
+    "defaultMessage": "Средства пока не будут списаны."
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "Выберите способ оплаты"
@@ -4659,7 +4761,7 @@
     "defaultMessage": "Где вы хотите разместить свой сервер?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Нет нужного региона? <link>Сообщите, где бы вы хотели видеть Modrinth Hosting!</link>"
+    "defaultMessage": "Нет нужного региона? <link>Сообщите, где запустить Modrinth Hosting дальше!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Юго-Восточная Азия"
@@ -5395,6 +5497,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Закрыть всё"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Не устанавливать"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Больше не предупреждать"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Подтверждение установки"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Всё равно установить"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Вредоносное ПО часто распространяется через моды на таких платформах, как Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " не опубликован на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Предупреждение о неизвестном файле"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Предупреждение о неизвестных файлах"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Нераспознанные файлы"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Этот пользователь присоединился к Modrinth до завершения альфа‑тестирования в ноябре 2020 года."

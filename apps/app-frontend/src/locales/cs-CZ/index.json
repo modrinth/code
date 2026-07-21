@@ -11,6 +11,9 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Skrýt více spuštěných instancí"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Zkopírováno"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Zavřít"
   },
@@ -19,6 +22,9 @@
   },
   "app.action-bar.install.retry": {
     "message": "Zkusit znovu"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Zrušeno"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Neznámá instance"
@@ -167,9 +173,6 @@
   "app.browse.discover-servers": {
     "message": "Objevit servery"
   },
-  "app.browse.hide-added-servers": {
-    "message": "Skrýt již přidané servery"
-  },
   "app.browse.project-type.modpacks": {
     "message": "Modpacky"
   },
@@ -219,7 +222,7 @@
     "message": "Dokončení instalace"
   },
   "app.install.phase.preparing_instance": {
-    "message": "Příprava instance"
+    "message": "Ve frontě na instalaci"
   },
   "app.install.phase.preparing_java": {
     "message": "Příprava Javy"
@@ -359,9 +362,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hledat v {count} světech..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Požadovaný obsah"
-  },
   "app.modal.install-to-play.header": {
     "message": "Nainstaluj pro hraní"
   },
@@ -371,17 +371,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mód} few {# módy} other {# módů}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Požadovaný modpack"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth a poté se rovnou připoj na server."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Sdílená instance"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Sdílená serverová instance"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Zobrazit obsah"
@@ -389,20 +380,29 @@
   "app.modal.update-to-play.header": {
     "message": "Aktualizuj pro hraní"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Je vyžadována aktualizace"
-  },
   "app.modal.update-to-play.update-required-description": {
     "message": "Pro hraní {name} je vyžadována aktualizace. Prosím aktualizuj na nejnovější verzi, abys mohl hru spustit."
   },
   "app.project.install-button.already-installed": {
     "message": "Tento projekt je již nainstalován"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Změnit verzi"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Zpět k Objevování"
   },
   "app.project.install-context.install-content-to-instance": {
     "message": "Nainstalovat obsah do instance"
+  },
+  "app.project.version.all-versions": {
+    "message": "Všechny verze"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Stáhnout v prohlížeči"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Již staženo"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
@@ -523,6 +523,9 @@
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -1018,26 +1021,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader zprostředkovává server"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Soubor je zkontrolován pouze v případě, že je nahrán na Modrinth, bez ohledu na jeho formát (včetně formátu .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Toto varování znovu nezobrazovat"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Potvrdit instalaci"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Přesto nainstalovat"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Malware se často šíří prostřednictvím souborů s modpacky, které se sdílejí na platformách jako Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Tento soubor jsme na Modrinthu nenašli. Důrazně doporučujeme instalovat pouze soubory z důvěryhodných zdrojů."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Upozornění na neznámý soubor"
   }
 }

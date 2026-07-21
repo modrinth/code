@@ -2822,9 +2822,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifique la dirección de su billetera. Los fondos enviados a una dirección incorrecta no se pueden recuperar."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Estos cambios serán aplicados {count, plural, one {al proyecto} other {a los # proyectos}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Creador en Modrinth."
   },
@@ -2891,9 +2888,6 @@
   "profile.label.collection": {
     "message": "Colección"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {descarga} other {descargas}}"
-  },
   "profile.label.joined": {
     "message": "Se unió hace"
   },
@@ -2911,9 +2905,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."
@@ -3109,9 +3100,6 @@
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} no está soportado para {platform} en la {gameVersion}"
-  },
-  "project.download.search-game-versions": {
-    "message": "Buscar versiones del juego..."
   },
   "project.download.select-game-version": {
     "message": "Selecciona la versión del juego"
@@ -3379,12 +3367,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Visita el panel de proyectos"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {descarga} other {descargas}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {seguidor} other {seguidores}}"
   },
   "project.status.archived.message": {
     "message": "{title} ha sido archivado. {title} no recibirá ninguna futura actualización excepto que el autor decida desarchivar el proyecto."
@@ -4561,9 +4543,6 @@
   },
   "version.dependency.view-version": {
     "message": "Ver versión"
-  },
-  "version.download.download-dependency": {
-    "message": "Descargar dependencia"
   },
   "version.download.no-primary-file": {
     "message": "Error: No se encontró el archivo principal"
