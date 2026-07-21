@@ -483,6 +483,7 @@ pub async fn init_ads_window<R: Runtime>(
 
             let webview = window.add_child(
                 tauri::webview::WebviewBuilder::new("ads-window", webview_url)
+                    .incognito(true) // REMOVE WHEN DONE!!
                     .initialization_script_for_all_frames(include_str!(
                         "ads-init.js"
                     ))
@@ -581,6 +582,8 @@ pub async fn init_ads_window<R: Runtime>(
                     unsafe { webview2_8.SetIsMuted(true) }.ok();
                 }
             })?;
+
+            webview.open_devtools();
 
             Some(webview)
         } else {
