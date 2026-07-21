@@ -20,18 +20,7 @@ jobs:
     steps:
       - name: Configure branch alias
         id: meta
-        env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        run: |
-          BRANCH_SLUG=$(sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' <<< "${HEAD_REF,,}")
-          BRANCH_SLUG="${BRANCH_SLUG:0:42}"
-          BRANCH_SLUG=$(sed -E 's/-+$//' <<< "$BRANCH_SLUG")
-
-          if [ -z "$BRANCH_SLUG" ]; then
-            BRANCH_SLUG="preview"
-          fi
-
-          echo "branch_alias=git-$BRANCH_SLUG" >> $GITHUB_OUTPUT
+        run: echo "branch_alias=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
 
   deploy:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
