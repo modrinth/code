@@ -13,8 +13,6 @@ const modelCache: Map<string, GLTF> = new Map()
 const modelPromiseCache: Map<string, Promise<GLTF>> = new Map()
 const textureCache: Map<string, THREE.Texture> = new Map()
 const texturePromiseCache: Map<string, Promise<THREE.Texture>> = new Map()
-const SKIN_TEXTURE_SIZE = 64
-const SKIN_UV_INSET_VERSION = 1
 
 export async function loadModel(modelUrl: string): Promise<GLTF> {
 	if (modelCache.has(modelUrl)) {
@@ -155,58 +153,12 @@ function setCommonMaterialProperties(mat: THREE.MeshStandardMaterial): void {
 	}
 }
 
-function insetSkinGeometryUvs(geometry: THREE.BufferGeometry): void {
-	if (geometry.userData.skinUvInsetVersion === SKIN_UV_INSET_VERSION) return
-
-	const uv = geometry.getAttribute('uv')
-	if (!uv || uv.itemSize < 2 || uv.count % 4 !== 0) return
-
-	for (let faceStart = 0; faceStart < uv.count; faceStart += 4) {
-		let minU = Infinity
-		let maxU = -Infinity
-		let minV = Infinity
-		let maxV = -Infinity
-
-		for (let vertex = faceStart; vertex < faceStart + 4; vertex++) {
-			const u = uv.getX(vertex)
-			const v = uv.getY(vertex)
-			minU = Math.min(minU, u)
-			maxU = Math.max(maxU, u)
-			minV = Math.min(minV, v)
-			maxV = Math.max(maxV, v)
-		}
-
-		const insetMinU = (Math.round(minU * SKIN_TEXTURE_SIZE) + 0.5) / SKIN_TEXTURE_SIZE
-		const insetMaxU = (Math.round(maxU * SKIN_TEXTURE_SIZE) - 0.5) / SKIN_TEXTURE_SIZE
-		const insetMinV = (Math.round(minV * SKIN_TEXTURE_SIZE) + 0.5) / SKIN_TEXTURE_SIZE
-		const insetMaxV = (Math.round(maxV * SKIN_TEXTURE_SIZE) - 0.5) / SKIN_TEXTURE_SIZE
-
-		for (let vertex = faceStart; vertex < faceStart + 4; vertex++) {
-			const u = uv.getX(vertex)
-			const v = uv.getY(vertex)
-			const insetU = u === minU ? insetMinU : u === maxU ? insetMaxU : u
-			const insetV = v === minV ? insetMinV : v === maxV ? insetMaxV : v
-			uv.setXY(vertex, insetU, insetV)
-		}
-	}
-
-	uv.needsUpdate = true
-	geometry.userData.skinUvInsetVersion = SKIN_UV_INSET_VERSION
-}
-
 export function applyTexture(model: THREE.Object3D, texture: THREE.Texture): void {
 	model.traverse((child) => {
 		if ((child as THREE.Mesh).isMesh) {
 			const mesh = child as THREE.Mesh
 			const isSkinLayer = mesh.name.endsWith('_Layer')
 			const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-			const usesSkinTexture = materials.some(
-				(mat) => mat instanceof THREE.MeshStandardMaterial && mat.name !== 'cape',
-			)
-
-			if (usesSkinTexture) {
-				insetSkinGeometryUvs(mesh.geometry)
-			}
 
 			materials.forEach((mat: THREE.Material) => {
 				if (mat instanceof THREE.MeshStandardMaterial) {

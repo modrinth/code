@@ -131,7 +131,7 @@ const SKIN_SIZE = 64
 const EARS_V0_MAGIC = 0x3f23d8
 const EARS_V1_MAGIC = 0xea2501
 const ALFALFA_MAGIC = 0xea1fa1fa
-const UV_TEXEL_INSET = 0.5
+const UV_TEXEL_INSET = 1 / 32
 
 const EAR_MODES: EarMode[] = [
 	'NONE',
