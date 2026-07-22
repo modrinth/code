@@ -7,6 +7,7 @@ import svgLoader from 'vite-svg-loader'
 import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const STAGING_SHARED_INSTANCES_API_URL = 'https://staging-shared-instances.modrinth.com'
 const API_CLIENT_SOURCE = fileURLToPath(
 	new URL('../../packages/api-client/src/index.ts', import.meta.url),
 )
@@ -357,14 +358,12 @@ function getApiUrl() {
 }
 
 function getSharedInstancesApiUrl() {
-	const url =
+	return (
 		process.env.SHARED_INSTANCES_API_BASE_URL ??
 		// @ts-ignore
-		globalThis.SHARED_INSTANCES_API_BASE_URL
-	if (!url) {
-		throw new Error('SHARED_INSTANCES_API_BASE_URL is not configured')
-	}
-	return url
+		globalThis.SHARED_INSTANCES_API_BASE_URL ??
+		STAGING_SHARED_INSTANCES_API_URL
+	)
 }
 
 function isProduction() {
