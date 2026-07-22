@@ -455,7 +455,6 @@
 					/>
 					<ProjectSidebarDetails
 						:project="project"
-						:has-versions="versions.length > 0"
 						:link-target="$external()"
 						:show-followers="isServerProject"
 						class="card flex-card"

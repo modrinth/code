@@ -78,7 +78,10 @@
 					}}
 				</div>
 			</div>
-			<div v-if="hasVersions && project.updated" v-tooltip="formatDateTime(project.updated)">
+			<div
+				v-if="project.versions.length > 0 && project.updated"
+				v-tooltip="formatDateTime(project.updated)"
+			>
 				<VersionIcon aria-hidden="true" />
 				<div>
 					{{
@@ -116,7 +119,6 @@ const formatDateTime = useFormatDateTime({
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project
 	linkTarget: string
-	hasVersions: boolean
 	hideLicense?: boolean
 	showFollowers?: boolean
 }>()
