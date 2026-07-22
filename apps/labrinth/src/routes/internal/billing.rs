@@ -2011,7 +2011,7 @@ pub async fn stripe_webhook(
                         };
 
                         if charge_status != ChargeStatus::Failed {
-                            charge.upsert(transaction).await?;
+                            charge.upsert(&mut *transaction).await?;
                         }
 
                         (charge, price, product, subscription, new_region)

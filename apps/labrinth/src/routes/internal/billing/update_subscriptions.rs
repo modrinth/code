@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use crate::database::PgPool;
 use crate::database::models::user_subscription_item::DBUserSubscription;
-use crate::database::{Acquire, PgPool};
 use crate::models::billing::SubscriptionMetadata;
 use crate::routes::ApiError;
 use crate::util::error::Context;
@@ -101,8 +101,8 @@ pub async fn update_many(
         };
 
         // Update the subscription region
-        subscription.metadata.as_mut().inspect(|m| match m {
-            SubscriptionMetadata::Pyro { ref mut region, .. } => {
+        subscription.metadata.as_mut().map(|m| match m {
+            SubscriptionMetadata::Pyro { region, .. } => {
                 if let Some(new_region) = update.update_region.clone() {
                     *region = Some(new_region);
                 }

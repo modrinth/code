@@ -1,4 +1,3 @@
-use crate::database::PgTransaction;
 use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
