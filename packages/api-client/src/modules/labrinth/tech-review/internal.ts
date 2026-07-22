@@ -68,6 +68,15 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		})
 	}
 
+	public async scanRules(signal?: AbortSignal): Promise<ReadableStream<Uint8Array>> {
+		return this.client.stream('/moderation/tech-review/rules/scan', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			signal,
+		})
+	}
+
 	/**
 	 * Search for projects awaiting technical review.
 	 *

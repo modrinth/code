@@ -2265,6 +2265,20 @@ export namespace Labrinth {
 				effects: Array<DelphiRuleEffect | null>
 			}
 
+			export type DelphiRuleScanPhase = 'scanning' | 'publishing' | 'complete'
+
+			export type DelphiRuleScanEvent = {
+				phase: DelphiRuleScanPhase
+				revision: number
+				scanned: number
+				total: number
+				effects: number
+			}
+
+			export type DelphiRuleScanErrorEvent = {
+				message: string
+			}
+
 			export type SearchProjectsRequest = {
 				limit?: number
 				page?: number

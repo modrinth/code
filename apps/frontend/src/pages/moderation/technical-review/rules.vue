@@ -133,6 +133,14 @@
 		proceed-label="Delete rule"
 		@proceed="deleteRule"
 	/>
+	<ConfirmModal
+		ref="scanModal"
+		title="Run a full Delphi rule scan?"
+		description="Every stored issue detail will be evaluated against the current rules. Existing effects remain active unless the entire scan succeeds."
+		:markdown="false"
+		proceed-label="Run full scan"
+		@proceed="runFullScan"
+	/>
 
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-wrap items-center justify-between gap-3">
@@ -148,13 +156,44 @@
 				</div>
 			</div>
 
-			<ButtonStyled color="brand">
-				<button type="button" @click="openCreateModal">
-					<PlusIcon />
-					Create rule
-				</button>
-			</ButtonStyled>
+			<div class="flex flex-wrap gap-2">
+				<ButtonStyled>
+					<button type="button" :disabled="isScanning" @click="scanModal?.show()">
+						<PlayIcon />
+						{{ isScanning ? 'Scanning...' : 'Run full scan' }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button type="button" :disabled="isScanning" @click="openCreateModal">
+						<PlusIcon />
+						Create rule
+					</button>
+				</ButtonStyled>
+			</div>
 		</div>
+
+		<section v-if="isScanning && scanProgress" class="universal-card flex flex-col gap-3">
+			<div class="flex flex-wrap items-center justify-between gap-2">
+				<div>
+					<h2 class="m-0 text-base font-bold text-contrast">Scanning Delphi rule effects</h2>
+					<p class="m-0 text-sm text-secondary">
+						{{ scanProgress.scanned.toLocaleString() }} of
+						{{ scanProgress.total.toLocaleString() }} details scanned ·
+						{{ scanProgress.effects.toLocaleString() }} effects
+					</p>
+				</div>
+				<span class="text-sm font-semibold capitalize text-secondary">
+					{{ scanProgress.phase }} revision {{ scanProgress.revision }}
+				</span>
+			</div>
+			<ProgressBar
+				:progress="scanProgress.scanned"
+				:max="Math.max(scanProgress.total, 1)"
+				:waiting="scanProgress.total === 0 && scanProgress.phase !== 'complete'"
+				full-width
+				show-progress
+			/>
+		</section>
 
 		<details class="universal-card text-sm">
 			<summary class="cursor-pointer font-semibold text-contrast">CEL contract and input</summary>
@@ -163,6 +202,9 @@
 					Effects are maps such as
 					<code>{ "severity": "low", "hidden": false }</code>. Severity can be <code>low</code>,
 					<code>medium</code>, <code>high</code>, or <code>severe</code>.
+				</p>
+				<p class="m-0">
+					Rules run in the order shown below. The first rule that returns a non-null effect wins.
 				</p>
 				<p class="m-0">
 					The <code>input</code> object contains <code>schema_version</code>,
@@ -195,17 +237,17 @@
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div>
 						<h2 class="m-0 text-lg font-bold text-contrast">{{ rule.name }}</h2>
-						<p class="m-0 text-sm text-secondary">Last applied in revision {{ rule.revision }}</p>
+						<p class="m-0 text-sm text-secondary">Revision {{ rule.revision }}</p>
 					</div>
 					<div class="flex gap-2">
 						<ButtonStyled>
-							<button type="button" @click="openEditModal(rule)">
+							<button type="button" :disabled="isScanning" @click="openEditModal(rule)">
 								<EditIcon />
 								Edit
 							</button>
 						</ButtonStyled>
 						<ButtonStyled color="red">
-							<button type="button" @click="openDeleteModal(rule)">
+							<button type="button" :disabled="isScanning" @click="openDeleteModal(rule)">
 								<TrashIcon />
 								Delete
 							</button>
@@ -221,12 +263,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { type Labrinth, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
 	EditIcon,
 	EyeOffIcon,
 	LoaderCircleIcon,
+	PlayIcon,
 	PlusIcon,
 	TrashIcon,
 } from '@modrinth/assets'
@@ -237,6 +280,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
+	ProgressBar,
 	StyledInput,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
@@ -282,12 +326,14 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const ruleModal = useTemplateRef<InstanceType<typeof NewModal>>('ruleModal')
 const deleteModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('deleteModal')
+const scanModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('scanModal')
 const editorComponent = shallowRef<Component | null>(null)
 const ruleEditorInstance = shallowRef<Ace.Editor | null>(null)
 
 const rules = ref<Labrinth.TechReview.Internal.DelphiRule[]>([])
 const isLoading = ref(true)
 const isSaving = ref(false)
+const isScanning = ref(false)
 const isTestingRule = ref(false)
 const isRuleModalOpen = ref(false)
 const loadFailed = ref(false)
@@ -295,11 +341,13 @@ const editingRuleId = ref<number | null>(null)
 const ruleToDelete = ref<Labrinth.TechReview.Internal.DelphiRule | null>(null)
 const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect | null>>([])
 const ruleTestError = ref<string | null>(null)
+const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
 const form = reactive({
 	name: '',
 	rule: DEFAULT_RULE,
 })
 let ruleTestRequestId = 0
+let scanAbortController: AbortController | null = null
 
 onMounted(async () => {
 	const [{ VAceEditor }] = await Promise.all([
@@ -421,6 +469,7 @@ async function loadRules() {
 }
 
 function openCreateModal() {
+	if (isScanning.value) return
 	editingRuleId.value = null
 	form.name = ''
 	form.rule = DEFAULT_RULE
@@ -431,6 +480,7 @@ function openCreateModal() {
 }
 
 function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
+	if (isScanning.value) return
 	editingRuleId.value = rule.id
 	form.name = rule.name
 	form.rule = rule.rule
@@ -452,7 +502,7 @@ function handleRuleModalHide() {
 }
 
 async function saveRule() {
-	if (isSaving.value) return
+	if (isSaving.value || isScanning.value) return
 
 	if (!form.name.trim() || !form.rule.trim()) {
 		addNotification({
@@ -495,11 +545,13 @@ async function saveRule() {
 }
 
 function openDeleteModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
+	if (isScanning.value) return
 	ruleToDelete.value = rule
 	deleteModal.value?.show()
 }
 
 async function deleteRule() {
+	if (isScanning.value) return
 	const rule = ruleToDelete.value
 	if (!rule) return
 
@@ -523,5 +575,73 @@ async function deleteRule() {
 	}
 }
 
+async function runFullScan() {
+	if (isScanning.value) return
+
+	isScanning.value = true
+	scanProgress.value = null
+	scanAbortController = new AbortController()
+	let completed = false
+
+	try {
+		const stream = await client.labrinth.tech_review_internal.scanRules(scanAbortController.signal)
+		const reader = stream.getReader()
+		const decoder = new TextDecoder()
+		const parser = new SseParser()
+
+		const processItems = (items: ReturnType<SseParser['feed']>) => {
+			for (const item of items) {
+				if (item.kind !== 'event') continue
+
+				if (item.event === 'failed') {
+					const error = JSON.parse(
+						item.data,
+					) as Labrinth.TechReview.Internal.DelphiRuleScanErrorEvent
+					throw new Error(error.message)
+				}
+
+				if (item.event === 'progress' || item.event === 'complete') {
+					scanProgress.value = JSON.parse(
+						item.data,
+					) as Labrinth.TechReview.Internal.DelphiRuleScanEvent
+					completed ||= item.event === 'complete'
+				}
+			}
+		}
+
+		while (true) {
+			const { done, value } = await reader.read()
+			if (done) break
+			processItems(parser.feed(decoder.decode(value, { stream: true })))
+		}
+
+		const finalChunk = decoder.decode()
+		if (finalChunk) processItems(parser.feed(finalChunk))
+		processItems(parser.end())
+
+		if (!completed || !scanProgress.value) {
+			throw new Error('The scan stream ended before the new revision was published.')
+		}
+
+		addNotification({
+			type: 'success',
+			title: 'Rule scan complete',
+			text: `${scanProgress.value.scanned.toLocaleString()} details were scanned for revision ${scanProgress.value.revision}.`,
+		})
+		await loadRules()
+	} catch (error) {
+		console.error('Failed to scan Delphi rules', error)
+		addNotification({
+			type: 'error',
+			title: 'Rule scan failed',
+			text: error instanceof Error ? error.message : 'The previous rule revision remains active.',
+		})
+	} finally {
+		isScanning.value = false
+		scanAbortController = null
+	}
+}
+
 onMounted(loadRules)
+onUnmounted(() => scanAbortController?.abort())
 </script>

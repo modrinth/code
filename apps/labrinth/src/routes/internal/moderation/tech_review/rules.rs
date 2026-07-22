@@ -191,32 +191,12 @@ pub async fn test_rule(
 
     for (index, trace) in request.traces.iter().enumerate() {
         let input = test_rule_input(trace);
-        let mut context = cel::Context::default();
-        context.add_variable("input", input).map_err(|error| {
-            ApiError::Request(eyre!(
-                "failed to build input for test trace {index}: {error}"
-            ))
-        })?;
-
-        let value = program.execute(&context).map_err(|error| {
-            ApiError::Request(eyre!(
-                "failed to evaluate test trace {index}: {error}"
-            ))
-        })?;
-        let value = value.json().map_err(|error| {
-            ApiError::Request(eyre!(
-                "failed to decode result for test trace {index}: {error}"
-            ))
-        })?;
-
-        let effect = match value {
-            serde_json::Value::Null => None,
-            value => Some(serde_json::from_value(value).map_err(|error| {
+        let effect = super::rules_scan::evaluate_rule(&program, input)
+            .map_err(|error| {
                 ApiError::Request(eyre!(
-                    "invalid effect for test trace {index}: {error}"
+                    "failed to evaluate test trace {index}: {error}"
                 ))
-            })?),
-        };
+            })?;
         effects.push(effect);
     }
 
@@ -280,7 +260,7 @@ pub async fn get_rules(
 			updated_by
 		FROM delphi_rules
 		WHERE NOT delete_on_next_revision
-		ORDER BY name, id
+		ORDER BY id
 		"#,
     )
     .fetch_all(&***ro_pool)
@@ -336,10 +316,17 @@ pub async fn create_rule(
 		INSERT INTO delphi_rules (
 			name,
 			rule,
+			revision,
 			created_by,
 			updated_by
 		)
-		VALUES ($1, $2, $3, $3)
+		VALUES (
+			$1,
+			$2,
+			(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),
+			$3,
+			$3
+		)
 		RETURNING
 			id,
 			name,
@@ -405,6 +392,9 @@ pub async fn update_rule(
 		SET
 			name = $2,
 			rule = $3,
+			revision = (
+				SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1
+			),
 			updated_at = CURRENT_TIMESTAMP,
 			updated_by = $4
 		WHERE id = $1 AND NOT delete_on_next_revision
@@ -470,6 +460,9 @@ pub async fn delete_rule(
 		UPDATE delphi_rules
 		SET
 			delete_on_next_revision = TRUE,
+			revision = (
+				SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1
+			),
 			updated_at = CURRENT_TIMESTAMP,
 			updated_by = $2
 		WHERE id = $1 AND NOT delete_on_next_revision

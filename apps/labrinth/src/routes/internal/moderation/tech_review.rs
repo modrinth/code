@@ -45,11 +45,13 @@ use eyre::eyre;
 
 pub mod global;
 pub mod rules;
+pub mod rules_scan;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search_projects)
         .configure(global::config)
         .configure(rules::config)
+        .configure(rules_scan::config)
         .service(get_project_report)
         .service(get_report)
         .service(get_issue)

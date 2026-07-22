@@ -120,6 +120,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::tech_review::rules::create_rule,
 		moderation::tech_review::rules::update_rule,
 		moderation::tech_review::rules::delete_rule,
+		moderation::tech_review::rules_scan::scan_rules,
 		moderation::tech_review::get_project_report,
 		moderation::tech_review::submit_report,
 		moderation::tech_review::update_issue_details,
