@@ -128,6 +128,33 @@ pub(super) struct RedisConfig {
     wait_timeout_ms: u64,
     blocking_pool_size: RedisPoolSize,
     cache_locking_strategy: CacheLockingStrategy,
+    read_replica_strategy: ReadReplicaStrategy,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReadReplicaStrategy {
+    Primary,
+    RoundRobinReplica,
+    RandomReplica,
+}
+
+#[derive(Debug, Error)]
+#[error(
+    "invalid Redis read replica strategy; expected `primary`, `round_robin`, or `random`"
+)]
+pub struct InvalidRedisReadReplicaStrategy;
+
+impl FromStr for ReadReplicaStrategy {
+    type Err = InvalidRedisReadReplicaStrategy;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "primary" => Ok(Self::Primary),
+            "round_robin" => Ok(Self::RoundRobinReplica),
+            "random" => Ok(Self::RandomReplica),
+            _ => Err(InvalidRedisReadReplicaStrategy),
+        }
+    }
 }
 
 #[derive(Debug, Error)]
@@ -176,6 +203,7 @@ impl RedisConfig {
                 0,
             )?,
             ENV.REDIS_CACHE_LOCKING_STRATEGY,
+            ENV.REDIS_READ_REPLICA_STRATEGY,
         )
     }
 
@@ -188,6 +216,7 @@ impl RedisConfig {
         cluster_pool_size: (usize, usize),
         blocking_pool_size: RedisPoolSize,
         cache_locking_strategy: CacheLockingStrategy,
+        read_replica_strategy: ReadReplicaStrategy,
     ) -> Result<Self, RedisConfigError> {
         if cache_locking_strategy == CacheLockingStrategy::Distributed {
             return Err(RedisConfigError::UnsupportedCacheLockingStrategy {
@@ -242,6 +271,7 @@ impl RedisConfig {
             wait_timeout_ms,
             blocking_pool_size,
             cache_locking_strategy,
+            read_replica_strategy,
         })
     }
 
@@ -263,6 +293,10 @@ impl RedisConfig {
 
     pub(super) fn blocking_pool_size(&self) -> RedisPoolSize {
         self.blocking_pool_size
+    }
+
+    pub(super) fn read_replica_strategy(&self) -> ReadReplicaStrategy {
+        self.read_replica_strategy
     }
 
     pub(super) fn cache_locking_strategy(&self) -> CacheLockingStrategy {

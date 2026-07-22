@@ -3,7 +3,13 @@ use std::time::Duration;
 use futures::future::try_join_all;
 use prometheus::Registry;
 use redis::aio::ConnectionLike;
+use redis::cluster_read_routing::{
+    RandomReplicaStrategy, RoundRobinReplicaStrategy,
+};
 use thiserror::Error;
+use tracing::warn;
+
+use crate::database::redis::ReadReplicaStrategy;
 
 use super::config::{RedisBackendConfig, RedisConfig, RedisPoolSize};
 use super::metrics::{
@@ -96,6 +102,12 @@ impl RedisBackend {
             .runtime(deadpool_redis::Runtime::Tokio1)
             .build()?;
 
+        if config.read_replica_strategy() != ReadReplicaStrategy::Primary {
+            warn!(
+                "Cannot respect read replica strategy when using cluster pooled backend"
+            );
+        }
+
         warm_cluster_pool(&pool, pool_size.min()).await?;
         retain_cluster_pool(pool.clone());
 
@@ -105,10 +117,22 @@ impl RedisBackend {
     async fn cluster_multiplexed(
         config: &RedisConfig,
     ) -> Result<Self, RedisBackendBuildError> {
-        let client = redis::cluster::ClusterClientBuilder::new(
+        let mut builder = redis::cluster::ClusterClientBuilder::new(
             config.seed_urls().iter().map(String::as_str),
-        )
-        .build()?;
+        );
+
+        match config.read_replica_strategy() {
+            ReadReplicaStrategy::Primary => {}
+            ReadReplicaStrategy::RoundRobinReplica => {
+                builder = builder
+                    .read_routing_strategy(RoundRobinReplicaStrategy::new());
+            }
+            ReadReplicaStrategy::RandomReplica => {
+                builder = builder.read_routing_strategy(RandomReplicaStrategy);
+            }
+        }
+
+        let client = builder.build()?;
         let connection = client.get_async_connection().await?;
 
         Ok(Self::ClusterMultiplexed(connection))

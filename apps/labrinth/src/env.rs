@@ -5,6 +5,8 @@ use eyre::{Context, eyre};
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 
+use crate::database::redis::ReadReplicaStrategy;
+
 use crate::database::redis::{
     CacheLockingStrategy, RedisConnectionType, RedisTopology,
 };
@@ -173,6 +175,8 @@ vars! {
     // The minimum savings ratio required to trigger compression for Redis cache values. If the savings ratio is lower than this,
     // the compressed payload is discarded and the original payload is stored as-is.
     REDIS_COMPRESSION_MIN_SAVINGS_RATIO: f64 = 12.5f64;
+
+    REDIS_READ_REPLICA_STRATEGY: ReadReplicaStrategy = ReadReplicaStrategy::Primary;
 
     KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
     KAFKA_CLIENT_ID: String = "labrinth";
