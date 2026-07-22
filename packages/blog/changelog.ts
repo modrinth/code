@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-22T10:46:03+00:00`,
+		product: 'app',
+		version: '0.15.18',
+		body: `## Fixed
+- Fixed the browse content page when coming from an instance.`,
+	},
+	{
+		date: `2026-07-21T23:25:29+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed license source nag showing on Data Pack projects.`,
+	},
+	{
+		date: `2026-07-21T23:25:29+00:00`,
+		product: 'app',
+		version: '0.15.17',
+		body: `## Fixed
+- Fixed skin selector serving old cached skin previews with bad UVs.
+- Fixed ads showing when sidebar is disabled.`,
+	},
+	{
 		date: `2026-07-21T20:10:55+00:00`,
 		product: 'app',
 		version: '0.15.16',

@@ -210,7 +210,7 @@ function getModelUrlForVariant(variant: string): string {
 export const skinBlobUrlMap = reactive(new Map<string, RenderResult>())
 export const headBlobUrlMap = reactive(new Map<string, string>())
 const DEBUG_MODE = false
-const SKIN_PREVIEW_RENDER_VERSION = 'ears-2'
+const SKIN_PREVIEW_RENDER_VERSION = 'ears-2-fixed-uvs'
 
 let sharedRenderer: BatchSkinRenderer | null = null
 let latestPreviewGeneration = 0

@@ -26,11 +26,6 @@ use util::{cmd, redis_pipe};
 
 pub mod util;
 
-const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
-const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
-const VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 48; // 48 hours
-const VERSION_ACTUAL_EXPIRY: i64 = 60 * 60 * 24; // 24 hours
-
 // Bound how many commands we send in a single Redis pipeline. The multiplexed
 // connection's BytesMut write buffer keeps its peak capacity for the life of
 // the connection, so larger pipelines cause higher steady-state RSS.
@@ -150,10 +145,11 @@ where
 fn cache_expiries(namespace: &str) -> (i64, i64) {
     // Namespaces may embed a version suffix like `:v1`, so split it out.
     match namespace.split_once(':').map(|t| t.0).unwrap_or(namespace) {
-        "versions" | "versions_files" => {
-            (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
-        }
-        _ => (DEFAULT_EXPIRY, ACTUAL_EXPIRY),
+        "versions" | "versions_files" => (
+            ENV.REDIS_VERSION_DEFAULT_EXPIRY,
+            ENV.REDIS_VERSION_ACTUAL_EXPIRY,
+        ),
+        _ => (ENV.REDIS_DEFAULT_EXPIRY, ENV.REDIS_ACTUAL_EXPIRY),
     }
 }
 
@@ -744,7 +740,7 @@ impl RedisConnection {
         cmd.arg(format!("{}_{}:{}", self.meta_namespace, namespace, id))
             .arg(data)
             .arg("EX")
-            .arg(expiry.unwrap_or(DEFAULT_EXPIRY));
+            .arg(expiry.unwrap_or(ENV.REDIS_DEFAULT_EXPIRY));
         redis_execute::<()>(&mut cmd, &mut self.connection).await?;
         Ok(())
     }
