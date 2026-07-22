@@ -601,7 +601,7 @@ pub(crate) async fn get_instance_file_by_relative_path(
 
 pub(crate) async fn upsert_instance_file_from_parts(
     input: UpsertInstanceFile<'_>,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<InstanceFile> {
     let now = Utc::now();
     let file = InstanceFile {
@@ -617,11 +617,7 @@ pub(crate) async fn upsert_instance_file_from_parts(
         modified_at: now,
     };
 
-    let mut tx = pool.begin().await?;
-    let stored = upsert_instance_file(&file, &mut tx).await?;
-    tx.commit().await?;
-
-    Ok(stored)
+    upsert_instance_file(&file, tx).await
 }
 
 pub(crate) async fn rename_instance_file(
@@ -630,11 +626,10 @@ pub(crate) async fn rename_instance_file(
     new_relative_path: &str,
     new_file_name: &str,
     enabled: bool,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<Option<InstanceFile>> {
     let enabled = i64::from(enabled);
     let modified_at = Utc::now().timestamp();
-    let mut tx = pool.begin().await?;
 
     let source_id = sqlx::query_scalar!(
         "
@@ -645,7 +640,7 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         old_relative_path,
     )
-    .fetch_optional(&mut *tx)
+    .fetch_optional(&mut **tx)
     .await?;
     let target_id = sqlx::query_scalar!(
         "
@@ -656,7 +651,7 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         new_relative_path,
     )
-    .fetch_optional(&mut *tx)
+    .fetch_optional(&mut **tx)
     .await?;
 
     if let (Some(source_id), Some(target_id)) =
@@ -684,7 +679,7 @@ pub(crate) async fn rename_instance_file(
             target_id,
             source_id,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
 
         sqlx::query!(
@@ -698,7 +693,7 @@ pub(crate) async fn rename_instance_file(
             instance_id,
             target_id,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
 
         sqlx::query!(
@@ -708,7 +703,7 @@ pub(crate) async fn rename_instance_file(
 				",
             target_id,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
     }
 
@@ -730,19 +725,29 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         old_relative_path,
     )
-    .execute(&mut *tx)
+    .execute(&mut **tx)
     .await?;
 
-    tx.commit().await?;
+    let row = sqlx::query_as!(
+        InstanceFileRow,
+        "
+		SELECT *
+		FROM instance_files
+		WHERE instance_id = ? AND relative_path = ?
+		",
+        instance_id,
+        new_relative_path,
+    )
+    .fetch_optional(&mut **tx)
+    .await?;
 
-    get_instance_file_by_relative_path(instance_id, new_relative_path, pool)
-        .await
+    row.map(TryInto::try_into).transpose()
 }
 
 pub(crate) async fn remove_instance_file_by_relative_path(
     instance_id: &str,
     relative_path: &str,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
@@ -752,7 +757,7 @@ pub(crate) async fn remove_instance_file_by_relative_path(
         instance_id,
         relative_path,
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(())
@@ -815,7 +820,7 @@ pub(crate) async fn get_content_entry_by_file(
 
 pub(crate) async fn upsert_content_entry_from_parts(
     input: UpsertContentEntry<'_>,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<ContentEntry> {
     let id = format!("content-entry:{}", Uuid::new_v4());
     let project_type = input.project_type.get_name();
@@ -885,7 +890,7 @@ pub(crate) async fn upsert_content_entry_from_parts(
             now,
             now,
         )
-        .fetch_one(pool)
+        .fetch_one(&mut **tx)
         .await?
     } else if let (Some(project_id), Some(version_id)) =
         (input.project_id, input.version_id)
@@ -949,7 +954,7 @@ pub(crate) async fn upsert_content_entry_from_parts(
             now,
             now,
         )
-        .fetch_one(pool)
+        .fetch_one(&mut **tx)
         .await?
     } else {
         sqlx::query_as!(
@@ -999,7 +1004,7 @@ pub(crate) async fn upsert_content_entry_from_parts(
             now,
             now,
         )
-        .fetch_one(pool)
+        .fetch_one(&mut **tx)
         .await?
     };
 
@@ -1010,7 +1015,7 @@ pub(crate) async fn set_content_entry_enabled_for_file(
     content_set_id: &str,
     file_id: &str,
     enabled: bool,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<bool> {
     let enabled = i64::from(enabled);
     let modified_at = Utc::now().timestamp();
@@ -1026,7 +1031,7 @@ pub(crate) async fn set_content_entry_enabled_for_file(
         content_set_id,
         file_id,
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(result.rows_affected() > 0)
@@ -1035,7 +1040,7 @@ pub(crate) async fn set_content_entry_enabled_for_file(
 pub(crate) async fn remove_content_entries_for_file(
     content_set_id: &str,
     file_id: &str,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
@@ -1045,7 +1050,7 @@ pub(crate) async fn remove_content_entries_for_file(
         content_set_id,
         file_id,
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(())
