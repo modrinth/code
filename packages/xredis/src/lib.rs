@@ -270,7 +270,6 @@ impl RedisConnection {
             expiry.unwrap_or(self.settings.default_expiry),
         )
         .await
-        .map_err(Error::from)
     }
 
     pub async fn set_serialized<D>(
@@ -290,22 +289,17 @@ impl RedisConnection {
             &self.settings,
         )
         .await
-        .map_err(Error::from)
     }
 
     pub async fn get(&mut self, key: &str) -> Result<Option<String>, Error> {
-        commands::get(&mut self.inner, key)
-            .await
-            .map_err(Error::from)
+        commands::get(&mut self.inner, key).await
     }
 
     pub async fn get_many(
         &mut self,
         keys: &[String],
     ) -> Result<Vec<Option<Vec<u8>>>, Error> {
-        commands::get_many(&mut self.inner, keys)
-            .await
-            .map_err(Error::from)
+        commands::get_many(&mut self.inner, keys).await
     }
 
     pub async fn get_many_typed<R>(
@@ -315,9 +309,7 @@ impl RedisConnection {
     where
         R: FromRedisValue,
     {
-        commands::get_many_as(&mut self.inner, keys)
-            .await
-            .map_err(Error::from)
+        commands::get_many_as(&mut self.inner, keys).await
     }
 
     pub async fn get_deserialized<R>(
@@ -327,9 +319,7 @@ impl RedisConnection {
     where
         R: for<'a> serde::Deserialize<'a>,
     {
-        commands::get_deserialized(&mut self.inner, key, &self.settings)
-            .await
-            .map_err(Error::from)
+        commands::get_deserialized(&mut self.inner, key, &self.settings).await
     }
 
     pub async fn get_many_deserialized<R>(
@@ -341,34 +331,25 @@ impl RedisConnection {
     {
         commands::get_many_deserialized(&mut self.inner, keys, &self.settings)
             .await
-            .map_err(Error::from)
     }
 
     pub async fn delete(&mut self, key: &str) -> Result<(), Error> {
-        commands::delete(&mut self.inner, key)
-            .await
-            .map_err(Error::from)
+        commands::delete(&mut self.inner, key).await
     }
 
     pub async fn delete_many(&mut self, keys: &[String]) -> Result<(), Error> {
-        commands::delete_many(&mut self.inner, keys)
-            .await
-            .map_err(Error::from)
+        commands::delete_many(&mut self.inner, keys).await
     }
 
     pub async fn lpush<D>(&mut self, key: &str, value: D) -> Result<(), Error>
     where
         D: ToRedisArgs + Send + Sync + Debug,
     {
-        commands::lpush(&mut self.inner, key, value)
-            .await
-            .map_err(Error::from)
+        commands::lpush(&mut self.inner, key, value).await
     }
 
     pub async fn incr(&mut self, key: &str) -> Result<Option<u64>, Error> {
-        commands::incr(&mut self.inner, key)
-            .await
-            .map_err(Error::from)
+        commands::incr(&mut self.inner, key).await
     }
 }
 
