@@ -6,7 +6,6 @@ use super::*;
 use async_walkdir::{Filtering, WalkDir};
 use async_zip::{Compression, ZipEntryBuilder};
 use futures::StreamExt;
-use sha1_smol::Sha1;
 use std::collections::BTreeMap;
 
 #[tracing::instrument]
@@ -86,8 +85,6 @@ pub(super) async fn detach_local_shared_instance(
         .await?;
     }
 
-    crate::install::clear_installed_shared_config_hashes(instance_id, state)
-        .await?;
     crate::state::clear_shared_instance(instance_id, &state.pool).await?;
 
     Ok(())
@@ -757,9 +754,7 @@ pub(super) async fn collect_config_files(
             continue;
         }
         let path = relative_path.to_string_lossy().replace('\\', "/");
-        let bytes = crate::util::io::read(entry_path).await?;
-        let hash = Sha1::from(&bytes).hexdigest();
-        files.push(ConfigFile { path, hash });
+        files.push(ConfigFile { path });
     }
 
     files.sort_by(|left, right| left.path.cmp(&right.path));
@@ -811,7 +806,7 @@ async fn build_config_bundle_candidate(
     }
 
     let mut entries = BTreeMap::new();
-    if let (Some(previous_version), Some(previous_bundle)) =
+    if let (Some(_), Some(previous_bundle)) =
         (previous_version, previous_bundle)
     {
         let response = REQWEST_CLIENT.get(&previous_bundle.url).send().await?;
@@ -823,20 +818,11 @@ async fn build_config_bundle_candidate(
             .into());
         }
         let bytes = response.bytes().await?;
-        let mut archived_entries = tokio::task::spawn_blocking(move || {
+        let archived_entries = tokio::task::spawn_blocking(move || {
             read_config_bundle(bytes.as_ref())
         })
         .await??;
-        for file in remote_config_files(previous_version).await? {
-            let bytes =
-                archived_entries.remove(&file.path).ok_or_else(|| {
-                    crate::ErrorKind::InputError(format!(
-                        "Previous config bundle is missing {}",
-                        file.path
-                    ))
-                })?;
-            entries.insert(file.path, bytes);
-        }
+        entries.extend(archived_entries);
     }
 
     let config_path = state

@@ -3,82 +3,6 @@ use super::publish::*;
 use super::types::*;
 use super::*;
 
-fn shared_config_diffs(
-    local: &[ConfigFile],
-    remote: &[ConfigFile],
-) -> Vec<SharedInstanceUpdateDiff> {
-    let current = local
-        .iter()
-        .map(|file| (file.path.clone(), file.hash.clone()))
-        .collect::<HashMap<_, _>>();
-    let latest = remote
-        .iter()
-        .map(|file| (file.path.clone(), file.hash.clone()))
-        .collect::<HashMap<_, _>>();
-    let mut changed_files = latest
-        .iter()
-        .filter_map(|(path, hash)| match current.get(path) {
-            None => Some((path.clone(), "added")),
-            Some(current_hash) if current_hash != hash => {
-                Some((path.clone(), "updated"))
-            }
-            Some(_) => None,
-        })
-        .chain(
-            current
-                .keys()
-                .filter(|path| !latest.contains_key(*path))
-                .map(|path| (path.clone(), "removed")),
-        )
-        .collect::<Vec<_>>();
-    changed_files.sort_by(|left, right| left.0.cmp(&right.0));
-    let changed_file_count = changed_files.len();
-    if changed_file_count == 0 {
-        return Vec::new();
-    }
-
-    tracing::info!(
-        direction = "update",
-        changed_file_count,
-        ?changed_files,
-        "Reviewed shared instance config changes"
-    );
-
-    vec![SharedInstanceUpdateDiff {
-        type_: SharedInstanceUpdateDiffType::ConfigFilesUpdated,
-        project_id: None,
-        project_name: None,
-        file_name: None,
-        current_version_name: None,
-        new_version_name: None,
-        config_file_count: Some(changed_file_count),
-        disabled: false,
-    }]
-}
-
-pub(super) async fn remote_config_files(
-    version: &InstanceVersionResponse,
-) -> crate::Result<Vec<ConfigFile>> {
-    let Some(bundle) = version
-        .external_files
-        .iter()
-        .find(|file| file.file_type == CONFIG_BUNDLE_FILE_TYPE)
-    else {
-        return Ok(Vec::new());
-    };
-    let metadata = bundle.metadata.clone().ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Shared instance config bundle is missing file metadata"
-                .to_string(),
-        )
-    })?;
-    let mut files = serde_json::from_value::<Vec<ConfigFile>>(metadata)?;
-    files.retain(|file| {
-        !is_excluded_config_path(std::path::Path::new(&file.path))
-    });
-    Ok(files)
-}
-
 pub(super) async fn shared_instance_update_diffs(
     metadata: &crate::state::InstanceMetadata,
     version: &InstanceVersionResponse,
@@ -106,24 +30,6 @@ pub(super) async fn shared_instance_update_diffs(
         state,
     )
     .await?;
-    if CONFIG_SYNC_ENABLED {
-        let (installed_config_hashes, remote_config_files) = tokio::try_join!(
-            crate::install::installed_shared_config_hashes(
-                &metadata.instance.id,
-                state,
-            ),
-            remote_config_files(version),
-        )?;
-        let local_config_files = installed_config_hashes
-            .into_iter()
-            .map(|(path, hash)| ConfigFile { path, hash })
-            .collect::<Vec<_>>();
-        diffs.extend(shared_config_diffs(
-            &local_config_files,
-            &remote_config_files,
-        ));
-    }
-
     let mut configuration_diffs = shared_instance_configuration_diffs(
         current_modpack_id.as_deref(),
         remote_modpack_id,

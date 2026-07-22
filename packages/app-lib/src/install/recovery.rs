@@ -27,7 +27,6 @@ const SHARED_INSTANCE_ROLLBACK_INSTANCE_DIR: &str = "instance";
 struct SharedInstanceUpdateRollback {
     files: Vec<InstanceFile>,
     entries: Vec<ContentEntry>,
-    config_manifest: Option<Vec<u8>>,
 }
 
 pub(super) async fn prepare_shared_instance_update_backup(
@@ -56,22 +55,9 @@ pub(super) async fn prepare_shared_instance_update_backup(
             &state.pool,
         )
         .await?;
-        let config_manifest_path =
-            super::shared_instance::installed_shared_config_paths_path(
-                &metadata.instance.id,
-                state,
-            );
-        let config_manifest = match crate::util::io::read(config_manifest_path)
-            .await
-        {
-            Ok(bytes) => Some(bytes),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
-            Err(error) => return Err(error.into()),
-        };
         let snapshot = SharedInstanceUpdateRollback {
             files,
             entries,
-            config_manifest,
         };
         let instance_path = state
             .directories
@@ -144,24 +130,6 @@ async fn restore_shared_instance_update(
     )
     .await?;
     restore_instance_metadata(&rollback.instance, state).await?;
-
-    let config_manifest_path =
-        super::shared_instance::installed_shared_config_paths_path(
-            &rollback.instance.instance.id,
-            state,
-        );
-    if let Some(bytes) = snapshot.config_manifest {
-        if let Some(parent) = config_manifest_path.parent() {
-            crate::util::io::create_dir_all(parent).await?;
-        }
-        crate::util::io::write(config_manifest_path, bytes).await?;
-    } else {
-        match crate::util::io::remove_file(config_manifest_path).await {
-            Ok(()) => {}
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-            Err(error) => return Err(error.into()),
-        }
-    }
 
     Ok(())
 }

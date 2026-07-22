@@ -48,7 +48,6 @@ pub(super) enum ExternalFileSource {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub(super) struct ConfigFile {
     pub(super) path: String,
-    pub(super) hash: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -107,8 +106,6 @@ pub(super) struct ExternalFileResponse {
     pub(super) url: String,
     #[serde(default)]
     pub(super) file_size: Option<i64>,
-    #[serde(default)]
-    pub(super) metadata: Option<serde_json::Value>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
