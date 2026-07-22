@@ -180,8 +180,6 @@ let modrinthTcfListenerInstalled = false
 let modrinthTcfListenerAttempts = 0
 let modrinthGppListenerInstalled = false
 let modrinthGppListenerAttempts = 0
-let modrinthAdsConsentActionRequestId = 0
-const modrinthAdsConsentActionResolvers = new Map()
 
 function transitionAdsConsent(event) {
 	const phase = modrinthAdsConsentState.phase
@@ -293,18 +291,6 @@ async function expandAdsConsentWebview() {
 	}
 
 	await invoke('plugin:ads|show_ads_consent_preferences')
-}
-
-function sendAdsConsentCommandToChildFrames(command) {
-	document.querySelectorAll('iframe').forEach((frame) => {
-		frame.contentWindow?.postMessage({ modrinthAdsConsentCommand: command }, '*')
-	})
-}
-
-function isDirectChildFrame(source) {
-	return Array.from(document.querySelectorAll('iframe')).some(
-		(frame) => frame.contentWindow === source,
-	)
 }
 
 function displayUspConsentUi() {
@@ -466,16 +452,23 @@ async function performAdsConsentActionInDocument(action, onHandled) {
 	return 'not-ready'
 }
 
-function performAdsConsentActionWhenReady(action, timeoutMs, onHandled) {
+function performAdsConsentActionWhenReady(action, timeoutMs) {
 	const deadline = Date.now() + timeoutMs
 
 	return new Promise((resolve) => {
+		let settled = false
+		const settle = (handled) => {
+			if (settled) return
+			settled = true
+			resolve(handled)
+		}
+
 		async function tryAction() {
-			const result = await performAdsConsentActionInDocument(action, onHandled)
+			const result = await performAdsConsentActionInDocument(action, () => settle(true))
 			if (result === 'handled') {
-				resolve(true)
+				settle(true)
 			} else if (result === 'failed' || Date.now() >= deadline) {
-				resolve(false)
+				settle(false)
 			} else {
 				setTimeout(tryAction, 50)
 			}
@@ -485,33 +478,12 @@ function performAdsConsentActionWhenReady(action, timeoutMs, onHandled) {
 	})
 }
 
-function performAdsConsentActionAcrossFrames(action, timeoutMs) {
-	const requestId = `${Date.now()}-${++modrinthAdsConsentActionRequestId}`
-
-	return new Promise((resolve) => {
-		let settled = false
-		const settle = (clicked) => {
-			if (settled) return
-			settled = true
-			clearTimeout(timeout)
-			modrinthAdsConsentActionResolvers.delete(requestId)
-			resolve(clicked)
-		}
-
-		const timeout = setTimeout(() => settle(false), timeoutMs)
-		modrinthAdsConsentActionResolvers.set(requestId, () => settle(true))
-		sendAdsConsentCommandToChildFrames({ type: 'perform', action, requestId, timeoutMs })
-		void performAdsConsentActionWhenReady(action, timeoutMs, () => settle(true))
-	})
-}
-
 function waitForAdsConsentLayout() {
 	return new Promise((resolve) => setTimeout(resolve, 100))
 }
 
 async function restoreAdsConsentNotification() {
 	concealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'conceal' })
 
 	const invoke = getTauriInvoke()
 	if (typeof invoke === 'function') {
@@ -522,16 +494,13 @@ async function restoreAdsConsentNotification() {
 async function showNativeAdsConsentUi() {
 	prepareAdsConsentPreferences()
 	await waitForAdsConsentLayout()
-	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
 	await expandAdsConsentWebview()
 	await waitForAdsConsentLayout()
 	revealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'reveal' })
 
 	window.dispatchEvent(new Event('resize'))
-	sendAdsConsentCommandToChildFrames({ type: 'resize' })
 
-	const shown = await performAdsConsentActionAcrossFrames('show', 2500)
+	const shown = await performAdsConsentActionWhenReady('show', 2500)
 	if (!shown) {
 		await restoreAdsConsentNotification()
 	}
@@ -545,14 +514,13 @@ function finishAdsConsentReprompt() {
 	modrinthAdsConsentState.commitTimeout = null
 	document.documentElement.classList.remove('modrinth-ads-consent-overlay')
 	concealAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'conceal' })
 	invokeAdsConsentOverlayCommand(false)
 }
 
 async function openAdsConsentPreferences() {
 	if (!(await showNativeAdsConsentUi())) return
 
-	await performAdsConsentActionAcrossFrames('manage', 2500)
+	await performAdsConsentActionWhenReady('manage', 2500)
 }
 
 async function performAdsConsentAction(action) {
@@ -567,7 +535,7 @@ async function performAdsConsentAction(action) {
 		return
 	}
 
-	const handled = await performAdsConsentActionAcrossFrames(action, 2500)
+	const handled = await performAdsConsentActionWhenReady(action, 2500)
 	if (!handled) {
 		try {
 			await showNativeAdsConsentUi()
@@ -658,73 +626,29 @@ window.modrinthAdsReopenConsentPreferences = async () => {
 
 	transitionAdsConsent('reprompt-started')
 	prepareAdsConsentPreferences()
-	sendAdsConsentCommandToChildFrames({ type: 'prepare' })
 
 	try {
 		await waitForAdsConsentLayout()
 		await expandAdsConsentWebview()
 		await waitForAdsConsentLayout()
 		revealAdsConsentPreferences()
-		sendAdsConsentCommandToChildFrames({ type: 'reveal' })
 		window.dispatchEvent(new Event('resize'))
-		sendAdsConsentCommandToChildFrames({ type: 'resize' })
 
 		if (!(await displayAdsConsentReprompt())) {
 			finishAdsConsentReprompt()
 			return
 		}
 
-		if (!(await performAdsConsentActionAcrossFrames('show', 2500))) {
+		if (!(await performAdsConsentActionWhenReady('show', 2500))) {
 			finishAdsConsentReprompt()
 			return
 		}
 
-		await performAdsConsentActionAcrossFrames('manage', 2500)
+		await performAdsConsentActionWhenReady('manage', 2500)
 	} catch {
 		finishAdsConsentReprompt()
 	}
 }
-
-window.addEventListener('message', (event) => {
-	const resultRequestId = event.data?.modrinthAdsConsentResult
-	if (typeof resultRequestId === 'string' && isDirectChildFrame(event.source)) {
-		if (window.top === window) {
-			modrinthAdsConsentActionResolvers.get(resultRequestId)?.()
-		} else {
-			window.parent.postMessage({ modrinthAdsConsentResult: resultRequestId }, '*')
-		}
-		return
-	}
-
-	if (window.top === window || event.source !== window.parent) return
-
-	const command = event.data?.modrinthAdsConsentCommand
-	if (!command || typeof command !== 'object') return
-
-	if (command.type === 'prepare') {
-		prepareAdsConsentPreferences()
-		sendAdsConsentCommandToChildFrames(command)
-	} else if (command.type === 'reveal') {
-		revealAdsConsentPreferences()
-		sendAdsConsentCommandToChildFrames(command)
-	} else if (command.type === 'conceal') {
-		concealAdsConsentPreferences()
-		sendAdsConsentCommandToChildFrames(command)
-	} else if (command.type === 'resize') {
-		window.dispatchEvent(new Event('resize'))
-		sendAdsConsentCommandToChildFrames(command)
-	} else if (
-		command.type === 'perform' &&
-		typeof command.action === 'string' &&
-		typeof command.requestId === 'string' &&
-		typeof command.timeoutMs === 'number'
-	) {
-		sendAdsConsentCommandToChildFrames(command)
-		performAdsConsentActionWhenReady(command.action, command.timeoutMs, () => {
-			window.parent.postMessage({ modrinthAdsConsentResult: command.requestId }, '*')
-		})
-	}
-})
 
 function setAdsConsentOverlay(shown) {
 	if (document.documentElement.classList.contains('modrinth-ads-consent-overlay') === shown) return
@@ -736,21 +660,7 @@ function setAdsConsentOverlay(shown) {
 		document.documentElement.classList.remove('modrinth-ads-consent-preferences-visible')
 	}
 
-	if (window.top === window) {
-		invokeAdsConsentOverlayCommand(shown)
-	} else {
-		window.top.postMessage({ modrinthAdsConsentOverlay: shown }, MODRINTH_ORIGIN)
-	}
-}
-
-if (window.top === window) {
-	window.addEventListener('message', (event) => {
-		if (event.origin !== MODRINTH_ORIGIN) return
-
-		if (typeof event.data?.modrinthAdsConsentOverlay === 'boolean') {
-			setAdsConsentOverlay(event.data.modrinthAdsConsentOverlay)
-		}
-	})
+	invokeAdsConsentOverlayCommand(shown)
 }
 
 function finishUspConsentCommit() {
@@ -793,12 +703,7 @@ function beginUspConsentCommit() {
 }
 
 function syncAdsConsentUi() {
-	const variant = detectAdsConsentVariant()
-
-	if (variant && !isAdsConsentReprompt() && modrinthAdsConsentState.phase !== 'complete') {
-		transitionAdsConsent('prompt-detected')
-		setAdsConsentOverlay(true)
-	}
+	detectAdsConsentVariant()
 
 	if (isUspConsentCommitPending() && !document.getElementById('qc-cmp2-usp')) {
 		finishUspConsentCommit()
@@ -946,22 +851,29 @@ function muteVideos() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-	installAdsConsentThemeStyle()
-	installAdsRailStyle()
-	installAdsConsentOverlayStyle()
 	muteVideos()
 	muteAudioContext()
-	syncAdsConsentUi()
-	installTcfConsentListener()
-	installGppConsentListener()
+
+	if (window.top === window) {
+		installAdsConsentThemeStyle()
+		installAdsRailStyle()
+		installAdsConsentOverlayStyle()
+		syncAdsConsentUi()
+		installTcfConsentListener()
+		installGppConsentListener()
+	}
 
 	const observer = new MutationObserver(() => {
 		muteVideos()
-		syncAdsConsentUi()
+		if (window.top === window) {
+			syncAdsConsentUi()
+		}
 	})
 	observer.observe(document.body, { childList: true, subtree: true })
 })
 
-syncAdsConsentUi()
-installTcfConsentListener()
-installGppConsentListener()
+if (window.top === window) {
+	syncAdsConsentUi()
+	installTcfConsentListener()
+	installGppConsentListener()
+}
