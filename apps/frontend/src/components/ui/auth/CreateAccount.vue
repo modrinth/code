@@ -72,6 +72,18 @@
 			/>
 		</div>
 
+		<div class="hidden" aria-hidden="true">
+			<input
+				id="create-account-consent"
+				v-model="accountConsent"
+				name="account_consent"
+				type="checkbox"
+				tabindex="-1"
+				autocomplete="off"
+			/>
+			<label for="create-account-consent">I agree to receive account updates by email</label>
+		</div>
+
 		<ButtonStyled color="brand">
 			<button
 				class="!w-full font-bold"
@@ -97,7 +109,7 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 
@@ -109,7 +121,7 @@ interface AuthGlobals {
 interface Props {
 	globals?: AuthGlobals | null
 	requiresDob?: boolean
-	onCompleteSignUp?: () => void
+	onCompleteSignUp?: (accountConsent: boolean) => void
 	onSetCaptchaRef?: ((captchaRef: unknown) => void) | undefined
 }
 
@@ -127,6 +139,7 @@ const dateOfBirthModel = defineModel<string | null>('dateOfBirth', { default: ''
 const usernameModel = defineModel<string>('username', { default: '' })
 const tokenModel = defineModel<string>('token', { default: '' })
 const subscribeModel = defineModel<boolean>('subscribe', { default: false })
+const accountConsent = ref(false)
 
 const maxInputDate = computed(() => `${new Date().getFullYear()}-12-31`)
 
@@ -198,7 +211,7 @@ function onCompleteSignUpClick() {
 		return
 	}
 
-	onCompleteSignUp()
+	onCompleteSignUp(accountConsent.value)
 }
 
 const messages = defineMessages({

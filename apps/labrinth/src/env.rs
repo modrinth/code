@@ -240,6 +240,11 @@ vars! {
     SENDY_LIST_ID: String = "none";
     SENDY_API_KEY: String = "none";
 
+    NEVERBOUNCE_API_KEY: String = "";
+    NEVERBOUNCE_BASE_URL: String = neverbounce::DEFAULT_API_URL;
+
+    EMAIL_DOMAIN_BLACKLIST: StringCsv = StringCsv(vec![]);
+
     CLICKHOUSE_REPLICATED: bool = false;
     CLICKHOUSE_URL: String = "http://localhost:8123";
     CLICKHOUSE_USER: String = "default";
@@ -294,6 +299,11 @@ vars! {
     REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
     REDIS_MAX_CONNECTIONS: u32 = 10000u32;
     REDIS_MIN_CONNECTIONS: usize = 0usize;
+    REDIS_ENCODING_FORMAT: crate::database::redis::EncodingFormat = crate::database::redis::EncodingFormat::Json;
+    REDIS_COMPRESSION_LEVEL: i32 = 0i32;
+    REDIS_COMPRESSION_ALGORITHM: crate::database::redis::Codec = crate::database::redis::Codec::Lz4;
+    REDIS_COMPRESSION_THRESHOLD_BYTES: usize = 1024usize;
+    REDIS_COMPRESSION_MIN_SAVINGS_RATIO: f64 = 12.5f64;
 
     SEARCH_OPERATION_TIMEOUT: u64 = 300000u64;
 

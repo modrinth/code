@@ -21,7 +21,7 @@ use super::{
 
 use super::{database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 7;
+pub const DUMMY_DATA_UPDATE: i64 = 8;
 
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",

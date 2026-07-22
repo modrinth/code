@@ -134,6 +134,12 @@
   "analytics.chart.render-limit.header": {
     "message": "Hiện thị tất cả {count} đường trong biểu đồ?"
   },
+  "analytics.chart.table-selection.all": {
+    "message": "Đang hiện mọi {itemType, select, project {{count, plural, other {dự án}}} country {{count, plural, other {quốc gia}}} monetization {{count, plural, other {giá trị doanh thu}}} downloadSource {{count, plural, other {nguồn tải}}} downloadReason {{count, plural, other {lý do tải}}} member {{count, plural, other {thành viên}}} projectVersion {{count, plural, other {phiên bản dự án}}} loader {{count, plural, other {mod loader}}} gameVersion {{count, plural, other {phiên bản trò chơi}}} other {{count, plural, other {vật phẩm}}}} từ bảng"
+  },
+  "analytics.chart.table-selection.count": {
+    "message": "Đang hiện {count} {itemType, select, project {{count, plural, other {dự án}}} country {{count, plural, other {quốc gia}}} monetization {{count, plural, other {giá trị doanh thu}}} downloadSource {{count, plural, other {nguồn tải}}} downloadReason {{count, plural, other {lý do tải}}} member {{count, plural, other {thành viên}}} projectVersion {{count, plural, other {phiên bản dự án}}} loader {{count, plural, other {mod loader}}} gameVersion {{count, plural, other {phiên bản trò chơi}}} other {{count, plural, other {vật phẩm}}}} từ bảng"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, other {# ngày}}"
   },
@@ -2786,9 +2792,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "{count, plural, other {# dự án}} sẽ được thay đổi."
-  },
   "profile.bio.fallback.creator": {
     "message": "Một nhà sáng tạo trên Modrinth."
   },
@@ -2855,9 +2858,6 @@
   "profile.label.collection": {
     "message": "Bộ sưu tập"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {lượt tải xuống} other {lượt tải xuống}}"
-  },
   "profile.label.joined": {
     "message": "Đã tham gia"
   },
@@ -2875,9 +2875,6 @@
   },
   "profile.label.organizations": {
     "message": "Tổ chức"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {dự án} other {dự án}}"
   },
   "profile.label.saving": {
     "message": "Đang lưu..."
@@ -3277,12 +3274,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Truy cập bảng điều khiển dự án"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {lượt tải}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, other {lượt theo dõi}}"
   },
   "project.status.archived.message": {
     "message": "{title} đã được lưu trữ. {title} sẽ không nhận được bất kỳ bản cập nhật nào trong tương lai trừ khi tác giả quyết định hủy lưu trữ dự án."
@@ -3703,9 +3694,6 @@
   },
   "servers.plan.small.description": {
     "message": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "trả tiền hàng {interval, select, monthly {tháng} quarterly {quý (3 tháng)} yearly {năm} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Hoàn tất thiết lập"

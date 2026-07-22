@@ -2213,9 +2213,6 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {na download}}"
-  },
   "profile.label.joined": {
     "message": "Sumali"
   },
@@ -2233,9 +2230,6 @@
   },
   "profile.label.organizations": {
     "message": "Mga organisasyon"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "profile.label.saving": {
     "message": "Sine-save..."

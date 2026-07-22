@@ -407,6 +407,9 @@
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "削除中"
   },
+  "content.dependency-warning.header": {
+    "defaultMessage": "依存関係の警告"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} 件追加されました"
   },
@@ -853,6 +856,12 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "サーバーの設定"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, other {ファイルを追加}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": ""
   },
   "external-files.permissions-card.add-files-to-group": {
     "defaultMessage": "ファイルを追加…"

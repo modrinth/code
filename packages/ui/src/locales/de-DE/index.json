@@ -455,11 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aktualisiert"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Nicht Installieren"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Hinzugefügt"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Entfernt"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Aktualisiert"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Trotzdem Installieren"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} entfernt"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Eine Datei wird nur geprüft, wenn sie auf Modrinth veröffentlicht wird, unabhängig von ihrem Dateiformat (auch .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Einige Inhalte auf deinem Server konnten nicht analysiert werden und sind möglicherweise von dieser Änderung betroffen."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Dieses Update enthält Dateien, die nicht auf Modrinth veröffentlicht sind. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Warnung vor unbekannten Dateien"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Unbekannt"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} aktualisiert"
@@ -5554,6 +5581,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Alle ausblenden"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Nicht Installieren"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Diese Warnung nicht erneut anzeigen"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Installation bestätigen"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Trotzdem Installieren"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Schadsoftware wird häufig über Mod-Dateien verbreitet, indem diese auf Plattformen wie Discord geteilt werden."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " ist nicht auf Modrinth veröffentlicht. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Warnung vor unbekannter Datei"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " enthält Dateien, die nicht auf Modrinth veröffentlicht sind. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Warnung vor unbekannten Dateien"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Eine Datei wird nur geprüft, wenn sie auf Modrinth veröffentlicht wird, unabhängig von ihrem Dateiformat (auch .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Nicht erkannte Dateien"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Dieser Benutzer ist seit der Alpha von Modrinth dabei, die im November 2020 endete."

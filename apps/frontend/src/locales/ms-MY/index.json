@@ -2684,9 +2684,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Pemasangan akan diterapkan kepada {count, plural, other {# projek}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Seorang pencipta Modrinth."
   },
@@ -2750,9 +2747,6 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {muat turun}}"
-  },
   "profile.label.joined": {
     "message": "Telah menyertai"
   },
@@ -2770,9 +2764,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasi"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
@@ -3188,9 +3179,6 @@
   "project.settings.visit-dashboard": {
     "message": "Kunjungi papan pemuka projek"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {muat turun}}"
-  },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
   },
@@ -3583,9 +3571,6 @@
   },
   "servers.plan.small.description": {
     "message": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "dibilkan {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Lengkapkan persediaan"

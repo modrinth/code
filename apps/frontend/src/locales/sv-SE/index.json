@@ -401,6 +401,9 @@
   "analytics.threshold.game-versions-above": {
     "message": "Spelversioner ovan"
   },
+  "analytics.threshold.project-versions-above": {
+    "message": "Projektversioner ovan"
+  },
   "analytics.threshold.projects-above": {
     "message": "Projekt ovan"
   },
@@ -641,11 +644,14 @@
   "auth.continue-with-provider": {
     "message": "Fortsätt med {provider}"
   },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Ålderskrav"
+  },
   "auth.create-account.complete-sign-up": {
     "message": "Avsluta registrering"
   },
   "auth.create-account.date-of-birth.invalid.text": {
-    "message": "Vänligen skriv in ett giltligt födelsedatum. Året kan inte vara 0000."
+    "message": "Vänligen ange ett giltigt födelsedatum. Året kan inte vara 0000."
   },
   "auth.create-account.date-of-birth.invalid.title": {
     "message": "Ogiltligt födelsedatum"
@@ -657,10 +663,13 @@
     "message": "Välj ditt födelsedatum"
   },
   "auth.create-account.date-of-birth.required.text": {
-    "message": "Vänligen skriv in ditt födelsedatum innan du fortsätter."
+    "message": "Vänligen ange ditt födelsedatum innan du fortsätter."
   },
   "auth.create-account.date-of-birth.required.title": {
     "message": "Födelsedatum behövs"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Du uppfyller inte ålderskravet för att skapa ett konto hos Modrinth."
   },
   "auth.create-account.info-panel.source-code-link": {
     "message": "Relevand källkod"
@@ -670,6 +679,9 @@
   },
   "auth.create-account.page-title": {
     "message": "Skapa konto"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Säkerhetskontroll"
   },
   "auth.create-account.subscribe.label": {
     "message": "Håll mig uppdaterad om de coola sakerna Modrinth arbetar på via e-post"
@@ -687,7 +699,7 @@
     "message": "Skicka återställningsmejl"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Skriv in din e-post nedan så skickar vi en återställningslänk som låter dig återställa ditt konto."
+    "message": "Ange din e-post nedan så skickar vi en återställningslänk som låter dig återställa ditt konto."
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Ett e-postmeddelande med instruktioner har skickats till dig om din e-post tidigare har sparats på ditt konto."
@@ -717,7 +729,7 @@
     "message": "Återställ ditt lösenord"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Ange 6-siffriga koden från din autentiseringsapp, eller en av dina reservkoder."
+    "message": "Ange den 6-siffriga koden från din autentiseringsapp eller en av dina reservkoder."
   },
   "auth.sign-in.2fa.label": {
     "message": "Tvåfaktorsautentisering"
@@ -1535,8 +1547,17 @@
   "dashboard.projects.links.header.edit": {
     "message": "Redigera länkar"
   },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Ange en giltig URL för Discordinbjudan"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Ange en giltig URL"
+  },
   "dashboard.projects.links.show-all-projects": {
     "message": "Visa alla projekt"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "En sida/kodförråd som innehåller källkoden till ditt projekt"
   },
   "dashboard.projects.links.source-code.label": {
     "message": "Källkod"
@@ -1549,6 +1570,18 @@
   },
   "dashboard.projects.project.icon-alt": {
     "message": "Ikon för {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Projektet har ett meddelande från moderatorerna. Se projektet för att se mer."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Vänligen verifiera miljömetadata"
+  },
+  "dashboard.projects.selection-bar.aria-label": {
+    "message": "Valda projektåtgärder"
+  },
+  "dashboard.projects.selection-bar.selected-count": {
+    "message": "{count,plural,one{# projekt valt}other{# projekt valda}}"
   },
   "dashboard.projects.table.id": {
     "message": "ID"
@@ -1604,11 +1637,17 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Ladda ner som CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Transaktionshistorik"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transaktioner"
   },
   "dashboard.revenue.transactions.none": {
     "message": "Inga transaktioner"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Dina utbetalningar och utdrag kommer synas här."
   },
   "dashboard.revenue.transactions.period.last-month": {
     "message": "Senaste månaden"
@@ -1633,6 +1672,9 @@
   },
   "dashboard.sidebar.label.analytics": {
     "message": "Statistik"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Skapare"
   },
   "dashboard.sidebar.label.dashboard": {
     "message": "Kontrollpanel"
@@ -1741,6 +1783,9 @@
   },
   "discover.install.back-to-server": {
     "message": "Tillbaka till server"
+  },
+  "discover.seo.description": {
+    "message": "Sök och bläddra bland tusen av Minecraft {projectType} på Modrinth med snabba, träffsäkra resultat. Våra filter hjälper dig att snabbt hitta de bästa Minecraft {projectType}."
   },
   "discover.seo.title": {
     "message": "Sök {projectType}"
@@ -1909,6 +1954,9 @@
   },
   "hosting-marketing.faq.location": {
     "message": "Var finns Modrinth Hostings servrar? Kan jag välja region?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Vi har servrar tillgängliga runtom i Nordamerika, Europa, Sydostasien och Australien för tillfället som du kan välja vid köp. Fler regioner kommer i framtiden! Om du skulle vilja byta din region, vänligen kontakta support."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Vilka Minecraft versioner och loaders kan användas?"
@@ -2459,6 +2507,15 @@
   "modpack-scan-modal.not-scanned": {
     "message": "Inte skannad"
   },
+  "modpack-scan-modal.scan-all-files": {
+    "message": "Skanna alla filer"
+  },
+  "modpack-scan-modal.scan-error": {
+    "message": "Några filer kunde inte skannas: {error}"
+  },
+  "modpack-scan-modal.scanning": {
+    "message": "Skannar..."
+  },
   "muralpay.account-type.checking": {
     "message": "Checkkonto"
   },
@@ -2534,6 +2591,12 @@
   "muralpay.field.account-number": {
     "message": "Kontonummer"
   },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Kontonummer (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Kontonummer (CCI)"
+  },
   "muralpay.field.account-number-type": {
     "message": "Kontonummerstyp"
   },
@@ -2570,8 +2633,11 @@
   "muralpay.pix-type.phone": {
     "message": "Telefonnummer"
   },
+  "muralpay.placeholder.account-number": {
+    "message": "Ange kontonummer"
+  },
   "muralpay.placeholder.enter-account-number": {
-    "message": "Skriv in kontonummer"
+    "message": "Ange kontonummer"
   },
   "muralpay.placeholder.pix-phone": {
     "message": "+55..."
@@ -2608,9 +2674,6 @@
   },
   "muralpay.rail.fiat-zar.name": {
     "message": "Banköverföring (ZAR)"
-  },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Ändringar kommer tillämpas på {count} projekt."
   },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth kreatör."
@@ -2671,9 +2734,6 @@
   },
   "profile.label.collection": {
     "message": "Samling"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedladdning} other {nedladdningar}}"
   },
   "profile.label.joined": {
     "message": "Gick med"
@@ -2912,6 +2972,9 @@
   "project.download.title": {
     "message": "Ladda ner {title}"
   },
+  "project.download.zip-failed-title": {
+    "message": "Kunde inte ladda ner filer"
+  },
   "project.environment.migration-no-permission.message": {
     "message": "Vi har förbättrat miljösystemet på Modrinth och nya inställningar är tillgängliga. Du har inte behörighet att ändra dessa inställningar, men meddela en annan medlem i projektet att miljömetadatan måste verifieras."
   },
@@ -3013,6 +3076,9 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.permissions.attention-needed.title": {
+    "message": "Okänt externt innehåll"
   },
   "project.settings.permissions.learn-more": {
     "message": "Läs mer"
@@ -3359,9 +3425,6 @@
   "servers.plan.small.description": {
     "message": "Perfekt för 1–5 vänner med några få lätta moddar."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "fakturerad {interval, select, monthly {månadsvis} quarterly {kvartalvis} yearly {årligen} other {{interval}}}"
-  },
   "settings.account.delete.confirm.proceed": {
     "message": "Radera kontot"
   },
@@ -3516,10 +3579,10 @@
     "message": "Koden du angav är inkorrekt!"
   },
   "settings.account.two-factor.field.code.description": {
-    "message": "Ange din tvåfaktorskod för att fortsätta."
+    "message": "Vänligen ange din tvåfaktorskod för att fortsätta."
   },
   "settings.account.two-factor.field.code.label": {
-    "message": "Ange en tvåfaktorskod"
+    "message": "Ange tvåfaktorskod"
   },
   "settings.account.two-factor.field.code.placeholder": {
     "message": "Ange kod..."

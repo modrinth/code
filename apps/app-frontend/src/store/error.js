@@ -6,6 +6,7 @@ export const useError = defineStore('errorsStore', {
 	state: () => ({
 		errorModal: null,
 		minecraftAuthErrorModal: null,
+		minecraftRequiredModal: null,
 	}),
 	actions: {
 		setErrorModal(ref) {
@@ -14,7 +15,19 @@ export const useError = defineStore('errorsStore', {
 		setMinecraftAuthErrorModal(ref) {
 			this.minecraftAuthErrorModal = ref
 		},
+		setMinecraftRequiredModal(ref) {
+			this.minecraftRequiredModal = ref
+		},
 		showError(error, context, closable = true, source = null) {
+			const errorMessage = error.message?.toLowerCase()
+			if (
+				(errorMessage?.includes('user is not logged in') ||
+					errorMessage?.includes('cannot play instance since minecraft is required')) &&
+				this.minecraftRequiredModal
+			) {
+				this.minecraftRequiredModal.show()
+				return
+			}
 			if (
 				error.message &&
 				(error.message.includes('Minecraft authentication error:') ||

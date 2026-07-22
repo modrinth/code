@@ -69,7 +69,7 @@
     "message": "Разбивка: {breakdown}"
   },
   "analytics.chart.action.show-all": {
-    "message": "Показать все"
+    "message": "Показать всё"
   },
   "analytics.chart.action.show-limited": {
     "message": "Показать меньше"
@@ -114,7 +114,7 @@
     "message": "Доли"
   },
   "analytics.chart.empty.select-table-items": {
-    "message": "Выберите элементы из таблицы ниже, чтобы отобразить данные."
+    "message": "Выберите элементы из таблицы ниже, чтобы отобразить данные."
   },
   "analytics.chart.events.count-aria": {
     "message": "{count, plural, one {# событие аналитики} few {# события аналитики} other {# событий аналитики}}"
@@ -123,7 +123,7 @@
     "message": "<project>{projectName}</project>: {title}"
   },
   "analytics.chart.events.see-announcement": {
-    "message": "Перейти к объявлению"
+    "message": "Перейти к объявлению"
   },
   "analytics.chart.legend.monetization-details.aria": {
     "message": "Посмотреть сведения о монетизации"
@@ -138,7 +138,7 @@
     "message": "{name} (пред.)"
   },
   "analytics.chart.render-limit.description": {
-    "message": "Если показать все выбранные строки, страница может работать медленнее."
+    "message": "Отображение всех выбранных строк из таблицы может замедлить страницу."
   },
   "analytics.chart.table-selection.all": {
     "message": "Показаны все {itemType, select,\n  project {проекты}\n  country {страны}\n  monetization {типы монетизации}\n  downloadSource {источники скачивания}\n  downloadReason {причины скачивания}\n  member {участники}\n  projectVersion {версии проекта}\n  loader {загрузчики}\n  gameVersion {версии игры}\n  other {элементы}\n} из таблицы"
@@ -171,7 +171,7 @@
     "message": "Скрыть {name} на диаграмме"
   },
   "analytics.chart.tooltip.pinned": {
-    "message": "Подсказка диаграммы закреплена"
+    "message": "Подсказка графика закреплена"
   },
   "analytics.chart.tooltip.pinned-aria": {
     "message": "Закреплено"
@@ -210,7 +210,7 @@
     "message": "Modrinth App"
   },
   "analytics.download-source.website": {
-    "message": "Сайт Modrinth"
+    "message": "Веб-сайт Modrinth"
   },
   "analytics.downloads.suffix": {
     "message": "скачиваний"
@@ -798,7 +798,7 @@
     "message": "Отправить письмо"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Введите свою почту, чтобы получить ссылку для восстановления доступа к аккаунту."
+    "message": "Введите почту, чтобы получить ссылку для восстановления доступа к аккаунту."
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Если почта привязана к аккаунту, на неё придёт письмо с инструкциями."
@@ -2666,6 +2666,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Перейти на Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Перед публикацией на Modrinth необходимо подтвердить адрес электронной почты."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Необходимо подтвердить почту"
+  },
   "moderation.exclude-technical-review": {
     "message": "Исключать ТП"
   },
@@ -2990,9 +2996,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Перепроверьте адрес кошелька. Отправку средств на неверный адрес невозможно отменить."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Изменения будут применены к {count, plural, one {# проекту} other {# проектам}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Автор на Modrinth."
   },
@@ -3059,9 +3062,6 @@
   "profile.label.collection": {
     "message": "Коллекция"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
-  },
   "profile.label.joined": {
     "message": "Регистрация:"
   },
@@ -3079,9 +3079,6 @@
   },
   "profile.label.organizations": {
     "message": "Организации"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "profile.label.saving": {
     "message": "Сохранение..."
@@ -3647,12 +3644,6 @@
   "project.settings.visit-dashboard": {
     "message": "Управление проектами"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {загрузка} few {загрузки} other {загрузок}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
-  },
   "project.status.archived.message": {
     "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
@@ -4054,9 +4045,6 @@
   },
   "servers.plan.small.description": {
     "message": "Для 1–5 друзей и пары лёгких модов."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {на месяц} quarterly {на 3 месяца} yearly {на год} other {оплата {interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"

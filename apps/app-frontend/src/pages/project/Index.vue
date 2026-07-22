@@ -59,142 +59,100 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<ProjectHeader
+				<ProjectPageHeader
 					v-else
 					:project="data"
 					:project-v3="projectV3"
-					:ping="serverPing"
+					:show-status-badge="data.status !== 'approved'"
 					@contextmenu.prevent.stop="handleRightClick"
+					@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 				>
-					<template v-if="isServerProject" #actions>
-						<ButtonStyled v-if="serverPlaying" size="large" color="red">
-							<button @click="handleStopServer">
-								<StopCircleIcon />
-								{{ formatMessage(commonMessages.stopButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else size="large" color="brand">
-							<button
-								:disabled="data && installingServerProjects.includes(data.id)"
-								@click="handleClickPlay"
-							>
-								<PlayIcon />
-								{{
-									data && installingServerProjects.includes(data.id)
-										? formatMessage(commonMessages.installingLabel)
-										: formatMessage(commonMessages.playButton)
-								}}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular>
-							<button
-								v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
-								@click="handleAddServerToInstance"
-							>
-								<PlusIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/project/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser>
-									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
-								</template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
+					<template #actions>
+						<template v-if="isServerProject">
+							<ButtonStyled v-if="serverPlaying" color="red" size="large">
+								<button type="button" @click="handleStopServer">
+									<StopCircleIcon />
+									{{ formatMessage(commonMessages.stopButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" size="large">
+								<button type="button" :disabled="serverInstallLoading" @click="handleClickPlay">
+									<PlayIcon />
+									{{
+										serverInstallLoading
+											? formatMessage(commonMessages.installingLabel)
+											: formatMessage(commonMessages.playButton)
+									}}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular size="large">
+								<button
+									v-tooltip="formatMessage(commonMessages.addServerToInstanceButton)"
+									type="button"
+									:aria-label="formatMessage(commonMessages.addServerToInstanceButton)"
+									@click="handleAddServerToInstance"
+								>
+									<PlusIcon />
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular size="large" type="transparent">
+								<TeleportOverflowMenu
+									:options="serverProjectHeaderMoreActions"
+									tooltip="More options"
+									aria-label="More options"
+								>
+									<MoreVerticalIcon />
+								</TeleportOverflowMenu>
+							</ButtonStyled>
+						</template>
+						<template v-else>
+							<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
+								<button v-tooltip="formatMessage(messages.alreadyInstalled)" type="button" disabled>
+									<CheckIcon />
+									{{ formatMessage(commonMessages.installedLabel) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else-if="showSwitchVersion" size="large">
+								<button type="button" @click="goToVersions">
+									<SwapIcon />
+									{{ formatMessage(messages.switchVersion) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" size="large">
+								<button
+									v-tooltip="
+										installButtonInstalled ? formatMessage(messages.alreadyInstalled) : undefined
+									"
+									type="button"
+									:disabled="installButtonDisabled"
+									@click="install(null)"
+								>
+									<component :is="installButtonIcon" :class="installButtonIconClass" />
+									{{
+										installButtonInstalled
+											? formatMessage(commonMessages.installedLabel)
+											: installButtonValidating
+												? formatMessage(commonMessages.validatingLabel)
+												: installButtonLoading
+													? formatMessage(commonMessages.installingLabel)
+													: serverProjectSelected
+														? formatMessage(commonMessages.selectedLabel)
+														: formatMessage(commonMessages.installButton)
+									}}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled circular size="large" type="transparent">
+								<TeleportOverflowMenu
+									:options="projectHeaderMoreActions"
+									tooltip="More options"
+									aria-label="More options"
+								>
+									<MoreVerticalIcon />
+								</TeleportOverflowMenu>
+							</ButtonStyled>
+						</template>
 					</template>
-					<template v-else #actions>
-						<ButtonStyled v-if="showSwitchVersion && onVersionsPage" size="large">
-							<button v-tooltip="installButtonTooltip" disabled>
-								<CheckIcon />
-								{{ formatMessage(commonMessages.installedLabel) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else-if="showSwitchVersion" size="large">
-							<button @click="goToVersions">
-								<SwapIcon />
-								{{ formatMessage(messages.switchVersion) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else size="large" color="brand">
-							<button
-								v-tooltip="installButtonTooltip"
-								:disabled="installButtonDisabled"
-								@click="install(null)"
-							>
-								<SpinnerIcon
-									v-if="installButtonLoading && !installButtonInstalled"
-									class="animate-spin"
-								/>
-								<DownloadIcon v-else-if="!installButtonInstalled && !serverProjectSelected" />
-								<CheckIcon v-else />
-								{{ installButtonLabel }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'follow',
-										disabled: true,
-										tooltip: 'Coming soon',
-										action: () => {},
-									},
-									{
-										id: 'save',
-										disabled: true,
-										tooltip: 'Coming soon',
-										action: () => {},
-									},
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/${data.project_type}/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser>
-									<ExternalIcon /> {{ formatMessage(commonMessages.openInBrowserButton) }}
-								</template>
-								<template #follow> <HeartIcon /> Follow </template>
-								<template #save> <BookmarkIcon /> Save </template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ProjectHeader>
+				</ProjectPageHeader>
 				<NavTabs
 					:links="[
 						{
@@ -289,9 +247,8 @@ import {
 	getTargetInstallPreferences,
 	injectNotificationManager,
 	NavTabs,
-	OverflowMenu,
 	ProjectBackgroundGradient,
-	ProjectHeader,
+	ProjectPageHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
@@ -300,6 +257,7 @@ import {
 	ProjectSidebarTags,
 	requestInstall,
 	SelectedProjectsFloatingBar,
+	TeleportOverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -357,10 +315,6 @@ const messages = defineMessages({
 	backToBrowse: {
 		id: 'app.project.install-context.back-to-browse',
 		defaultMessage: 'Back to discover',
-	},
-	installContentToInstance: {
-		id: 'app.project.install-context.install-content-to-instance',
-		defaultMessage: 'Install content to instance',
 	},
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
@@ -492,7 +446,7 @@ const projectInstallContext = computed(() => {
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: projectBrowseBackUrl.value,
 			backLabel: formatMessage(messages.backToBrowse),
-			heading: formatMessage(messages.installContentToInstance),
+			heading: formatMessage(commonMessages.installingContentLabel),
 		}
 	}
 
@@ -529,17 +483,72 @@ const installButtonInstalled = computed(() =>
 const installButtonDisabled = computed(
 	() => installButtonInstalled.value || installButtonLoading.value,
 )
-const installButtonLabel = computed(() => {
-	if (installButtonInstalled.value) return formatMessage(commonMessages.installedLabel)
-	if (installButtonValidating.value) return formatMessage(commonMessages.validatingLabel)
-	if (installButtonLoading.value) return formatMessage(commonMessages.installingLabel)
-	if (serverProjectSelected.value) return formatMessage(commonMessages.selectedLabel)
-	return formatMessage(commonMessages.installButton)
+const serverInstallLoading = computed(
+	() => !!data.value && installingServerProjects.value.includes(data.value.id),
+)
+const installButtonIcon = computed(() => {
+	if (installButtonLoading.value && !installButtonInstalled.value) return SpinnerIcon
+	if (!installButtonInstalled.value && !serverProjectSelected.value) return DownloadIcon
+	return CheckIcon
 })
-const installButtonTooltip = computed(() => {
-	if (installButtonInstalled.value) return formatMessage(messages.alreadyInstalled)
-	return null
-})
+const installButtonIconClass = computed(() =>
+	installButtonLoading.value && !installButtonInstalled.value ? 'animate-spin' : undefined,
+)
+const serverProjectHeaderMoreActions = computed(() => [
+	{
+		id: 'open-in-browser',
+		label: formatMessage(commonMessages.openInModrinthButton),
+		icon: ExternalIcon,
+		action: openProjectInBrowser,
+	},
+	{
+		divider: true,
+	},
+	{
+		id: 'report',
+		label: formatMessage(commonMessages.reportButton),
+		icon: ReportIcon,
+		color: 'red',
+		action: reportProject,
+	},
+])
+const projectHeaderMoreActions = computed(() => [
+	{
+		id: 'follow',
+		label: formatMessage(commonMessages.followButton),
+		icon: HeartIcon,
+		disabled: true,
+		tooltip: 'Coming soon',
+		action: () => {},
+	},
+	{
+		id: 'save',
+		label: formatMessage(commonMessages.saveButton),
+		icon: BookmarkIcon,
+		disabled: true,
+		tooltip: 'Coming soon',
+		action: () => {},
+	},
+	{
+		id: 'open-in-browser',
+		label: formatMessage(commonMessages.openInModrinthButton),
+		icon: ExternalIcon,
+		action: openProjectInBrowser,
+	},
+	{
+		divider: true,
+	},
+	{
+		id: 'report',
+		label: formatMessage(commonMessages.reportButton),
+		icon: ReportIcon,
+		color: 'red',
+		action: reportProject,
+	},
+])
+const projectSearchUrl = computed(
+	() => `/browse/${isServerProject.value ? 'server' : data.value?.project_type}`,
+)
 
 const showSwitchVersion = computed(() => !!instance.value && installed.value)
 const onVersionsPage = computed(() => route.name === 'Versions')
@@ -583,6 +592,17 @@ function handleAddServerToInstance() {
 	const address = getServerAddress(projectV3.value?.minecraft_java_server)
 	if (!address || !data.value) return
 	showAddServerToInstanceModal(data.value.title, address)
+}
+
+function openProjectInBrowser() {
+	if (!data.value) return
+	const type = isServerProject.value ? 'project' : data.value.project_type
+	void openUrl(`https://modrinth.com/${type}/${data.value.slug}`)
+}
+
+function reportProject() {
+	if (!data.value) return
+	void openUrl(`https://modrinth.com/report?item=project&itemID=${data.value.id}`)
 }
 
 async function fetchProjectData() {

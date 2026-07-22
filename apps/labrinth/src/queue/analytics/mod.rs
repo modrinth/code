@@ -13,9 +13,9 @@ use tracing::trace;
 
 pub mod cache;
 
-const DOWNLOADS_NAMESPACE: &str = "downloads";
-const VIEWS_NAMESPACE: &str = "views";
-const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays";
+const DOWNLOADS_NAMESPACE: &str = "downloads:v1";
+const VIEWS_NAMESPACE: &str = "views:v1";
+const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays:v1";
 const MINECRAFT_SERVER_PLAYS_EXPIRY: u64 = 86_400; // 24 hours
 const MINECRAFT_SERVER_PLAYS_LIMIT: u32 = 5;
 

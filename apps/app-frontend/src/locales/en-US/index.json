@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "View logs"
   },
+  "app.ads-consent.accept": {
+    "message": "Accept all"
+  },
+  "app.ads-consent.body": {
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance."
+  },
+  "app.ads-consent.manage": {
+    "message": "Manage preferences"
+  },
+  "app.ads-consent.reject": {
+    "message": "Reject all"
+  },
+  "app.ads-consent.title": {
+    "message": "Your privacy and how ads support Modrinth"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
   },
@@ -479,9 +494,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Install content to instance"
-  },
   "app.project.version.all-versions": {
     "message": "All versions"
   },
@@ -499,6 +511,9 @@
   },
   "app.settings.downloading": {
     "message": "Downloading v{version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
@@ -541,6 +556,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Error processing file"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "This skin uses features from the {ears} mod"
   },
   "app.skins.edit-button": {
     "message": "Edit skin"
@@ -668,6 +686,12 @@
   "app.skins.title": {
     "message": "Skin selector"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Toggle off"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Toggle on"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
   },
@@ -779,6 +803,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Create shortcut"
+  },
+  "instance.action.export-modpack": {
+    "message": "Export modpack"
+  },
+  "instance.action.launch-instance": {
+    "message": "Launch instance"
+  },
+  "instance.action.more-actions": {
+    "message": "More actions"
+  },
+  "instance.action.open-folder": {
+    "message": "Open folder"
+  },
+  "instance.action.repair": {
+    "message": "Repair"
+  },
+  "instance.action.settings": {
+    "message": "Instance settings"
+  },
+  "instance.action.starting": {
+    "message": "Starting..."
+  },
+  "instance.action.stopping": {
+    "message": "Stopping..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
   },
@@ -820,6 +871,9 @@
   },
   "instance.files.save-as": {
     "message": "Save as..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Never played"
   },
   "instance.server-modal.address": {
     "message": "Address"
@@ -1087,6 +1141,27 @@
   },
   "minecraft-account.sign-in": {
     "message": "Sign in to Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "You need a Microsoft account that owns Minecraft before you can launch and play."
+  },
+  "minecraft-required.description-header": {
+    "message": "Sign in to a Microsoft account"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Don’t have an account?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Get Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Get support"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft required"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Sign in to Microsoft"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"

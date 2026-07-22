@@ -13,7 +13,7 @@ use crate::{
     util::error::Context,
 };
 
-pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics";
+pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v1";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MinecraftServerAnalytics {
@@ -117,7 +117,7 @@ pub async fn cache_analytics(
 
         debug!("Caching analytics for {project_id}: {analytics:?}");
         redis
-            .set_serialized_to_json(
+            .set_serialized(
                 MINECRAFT_SERVER_ANALYTICS,
                 project_id.to_string(),
                 analytics,

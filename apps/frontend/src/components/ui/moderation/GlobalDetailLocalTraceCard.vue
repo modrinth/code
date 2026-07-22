@@ -5,16 +5,21 @@
 				<p class="m-0 break-words font-semibold text-contrast">
 					{{ trace.project_name }}
 				</p>
-				<p class="m-0 mt-1 break-all text-sm text-secondary">
-					Project {{ trace.project_slug ?? trace.project_id }} / Version
-					{{ trace.version_number }} / File {{ trace.file_name }}
+				<p class="m-0 mt-1 flex flex-wrap items-center gap-1 text-sm text-secondary">
+					<span class="break-all">{{ trace.version_number }}</span>
+					<ChevronRightIcon class="size-4 shrink-0" aria-hidden="true" />
+					<span class="break-all">{{ decodeTracePath(trace.file_name) }}</span>
+					<template v-if="trace.jar">
+						<ChevronRightIcon class="size-4 shrink-0" aria-hidden="true" />
+						<span class="break-all">{{ decodeTracePath(trace.jar) }}</span>
+					</template>
 				</p>
 			</div>
 			<div class="flex flex-wrap items-center gap-2">
-				<span class="text-sm text-secondary">Local</span>
-				<Badge :type="trace.local_status" />
-				<span class="text-sm text-secondary">Effective</span>
-				<Badge :type="trace.effective_status" />
+				<template v-if="trace.local_status !== 'pending'">
+					<span class="text-sm text-secondary">Local</span>
+					<Badge :type="trace.local_status" />
+				</template>
 				<ButtonStyled>
 					<NuxtLink :to="localTraceLink">
 						<ExternalIcon aria-hidden="true" />
@@ -23,31 +28,12 @@
 				</ButtonStyled>
 			</div>
 		</div>
-
-		<div class="mt-3 grid gap-2 text-sm text-secondary md:grid-cols-2">
-			<p class="m-0 break-all">
-				<span class="font-semibold text-contrast">Issue</span>
-				{{ trace.issue_type }}
-			</p>
-			<p class="m-0 break-all">
-				<span class="font-semibold text-contrast">Severity</span>
-				{{ trace.severity }}
-			</p>
-			<p class="m-0 break-all">
-				<span class="font-semibold text-contrast">Path</span>
-				{{ trace.file_path }}
-			</p>
-			<p v-if="trace.jar" class="m-0 break-all">
-				<span class="font-semibold text-contrast">JAR</span>
-				{{ trace.jar }}
-			</p>
-		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ExternalIcon } from '@modrinth/assets'
+import { ChevronRightIcon, ExternalIcon } from '@modrinth/assets'
 import { Badge, ButtonStyled } from '@modrinth/ui'
 
 const props = defineProps<{
@@ -60,4 +46,12 @@ const localTraceLink = computed(
 			props.trace.detail_id,
 		)}`,
 )
+
+function decodeTracePath(path: string): string {
+	try {
+		return decodeURIComponent(path)
+	} catch {
+		return path
+	}
+}
 </script>

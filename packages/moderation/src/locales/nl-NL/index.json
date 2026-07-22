@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Voeg een Java adres toe"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "Voer een geldige URL en een naam of SPDX-identificatie in voor je aangepaste licentie."
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "Licentiegegevens toevoegen"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals een website, winkel of Discord invite."
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Voeg externe links toe"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "Je hebt alle beschikbare taalopties geselecteerd. Geef alleen de talen op die je server daadwerkelijk ondersteunt."
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "Selecteer relevante talen"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": " Je hebt alle {totalAvailableTags, plural,one { # beschikbare tag} other {# beschikbare tags}}. Tags zijn bedoelt om gebruikers relevante projecten te helpen vinden. Selecteer graag alleen tags die relevant zijn aan jouw project."
@@ -65,11 +77,17 @@
   "nags.gallery.title": {
     "defaultMessage": "Bezoek de galerij pagina"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Je {type} maakt gebruik van een licentie die vereist dat de broncode beschikbaar is. Geef voor elke extra versie een link naar de broncode of het bronbestand op, of overweeg om een andere licentie te gebruiken."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
   "nags.identical-links.description": {
     "defaultMessage": "Sommige van je externe links lijken identiek te zijn, elke link moet maar een keer worden ingevuld met de juiste link type."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Identieke links opschonen"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Uw beschrijving moet voldoende platte tekst of alternatieve afbeeldingstekst bevatten, zodat deze ook toegankelijk is voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
@@ -134,6 +152,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Zorg ervoor dat je bewijs hebt geleverd van je toestemming om eventuele externe inhoud in je modpack te verspreiden."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Externe toestemmingen controleren"
+  },
   "nags.select-compatibility.description": {
     "defaultMessage": "Selecteer welke versies je server ondersteunt, kies een Modpack, of upload je eigen."
   },
@@ -151,6 +175,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "Selecteer een taal"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Selecteer de licentie waaronder je {type} wordt gedistribueerd."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecteer een licentie"
@@ -172,6 +199,9 @@
   },
   "nags.settings.links.title": {
     "defaultMessage": "Bekijk linkjes instellingen"
+  },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Ga naar dashboard voor toestemmingen"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "Bekijk tag instellingen"
@@ -203,6 +233,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Maak de naam duidelijk"
   },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "Je hebt {languageCount, plural, one {# taal} other {# talen}} geselecteerd. Geef alleen de talen op die je server daadwerkelijk ondersteunt."
+  },
+  "nags.too-many-languages.title": {
+    "defaultMessage": "Selecteer relevante talen"
+  },
   "nags.too-many-tags-server.description": {
     "defaultMessage": "Je hebt {tagCount, plural, one {# tag} other {# tags}} geselecteerd. Verminder het naar {maxTagCount} of minder om zeker te weten dat je server verschijnt in relevante zoekresultaten."
   },
@@ -214,6 +250,12 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Er is minstens één afbeelding in de galerij vereist om de inhoud van je {type} te tonen."
+  },
+  "nags.upload-gallery-image.resourcepack-type": {
+    "defaultMessage": "resource packs, met uitzondering van audio- of lokalisatiepakketten. Als dit op jouw pakket van toepassing is, selecteer dan de juiste tag"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"

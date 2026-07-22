@@ -2672,6 +2672,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "升級至 Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "在 Modrinth 上發行內容之前，你必須先驗證你的電子郵件地址。"
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "需要驗證電子郵件地址"
+  },
   "moderation.exclude-technical-review": {
     "message": "排除技術審查"
   },
@@ -2999,9 +3005,6 @@
   "muralpay.warning.wallet-address": {
     "message": "請仔細檢查你的錢包帳戶。發送到錯誤帳戶的款項將無法追回。"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "變更將套用於 {count, plural, other {# 個專案}}。"
-  },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 創作者。"
   },
@@ -3068,9 +3071,6 @@
   "profile.label.collection": {
     "message": "收藏"
   },
-  "profile.label.downloads": {
-    "message": "下載次數：{count}"
-  },
   "profile.label.joined": {
     "message": "加入時間："
   },
@@ -3088,9 +3088,6 @@
   },
   "profile.label.organizations": {
     "message": "組織"
-  },
-  "profile.label.projects": {
-    "message": "{count} 個{countPlural, plural, other {專案}}"
   },
   "profile.label.saving": {
     "message": "儲存中..."
@@ -3656,12 +3653,6 @@
   "project.settings.visit-dashboard": {
     "message": "前往專案資訊主頁"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {下載}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, other {追蹤者}}"
-  },
   "project.status.archived.message": {
     "message": "{title} 已封存。{title} 將不會再收到任何後續更新，除非作者決定解除封存該專案。"
   },
@@ -4081,9 +4072,6 @@
   },
   "servers.plan.small.description": {
     "message": "適合 1 到 5 位好友及少量輕量模組。"
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "按{interval, select, monthly {月} quarterly {季} yearly {年} other {{interval}}}計費"
   },
   "settings.account.button.complete-setup": {
     "message": "完成設定"

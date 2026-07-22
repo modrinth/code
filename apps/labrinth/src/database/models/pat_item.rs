@@ -11,9 +11,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
-const PATS_NAMESPACE: &str = "pats";
-const PATS_TOKENS_NAMESPACE: &str = "pats_tokens";
-const PATS_USERS_NAMESPACE: &str = "pats_users";
+const PATS_NAMESPACE: &str = "pats:v1";
+const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v1";
+const PATS_USERS_NAMESPACE: &str = "pats_users:v1";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBPersonalAccessToken {
@@ -161,7 +161,7 @@ impl DBPersonalAccessToken {
             let mut redis = redis.connect().await?;
 
             let res = redis
-                .get_deserialized_from_json::<Vec<i64>>(
+                .get_deserialized::<Vec<i64>>(
                     PATS_USERS_NAMESPACE,
                     &user_id.0.to_string(),
                 )
@@ -189,12 +189,7 @@ impl DBPersonalAccessToken {
         let mut redis = redis.connect().await?;
 
         redis
-            .set(
-                PATS_USERS_NAMESPACE,
-                &user_id.0.to_string(),
-                &serde_json::to_string(&db_pats)?,
-                None,
-            )
+            .set_serialized(PATS_USERS_NAMESPACE, user_id.0, &db_pats, None)
             .await?;
         Ok(db_pats)
     }

@@ -422,23 +422,47 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Szukaj wśród {count} światów..."
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Nie instaluj"
+  },
   "app.modal.install-to-play.header": {
     "message": "Zainstaluj, aby grać"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Instaluj mimo to"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Zainstaluj"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "To zaproszenie zostało utworzone przez innego użytkownika Modrinth, nie przez firmę Modrinth. Tylko akceptuj zaproszenia od osób, którym ufasz."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} few {# mody} other {# modów}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Plik jest sprawdzony tylko, jeżeli został opublikowany na Modrinth, niezależnie od jego formatu (w tym pliki .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Wspólna instancja"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Ostrzeżenie o nieznanych plikach"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Nieznane plki"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Pokaż zawartość"
   },
   "app.modal.update-to-play.header": {
     "message": "Zaktualizuj, by grać"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Usunięto"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
@@ -451,9 +475,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Powróć do odkrywania"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Zainstaluj zasoby do instancji"
   },
   "app.project.version.all-versions": {
     "message": "Wszystkie wersje"

@@ -11,12 +11,83 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-07-16T19:36:45+00:00`,
+		date: `2026-07-22T10:46:03+00:00`,
 		product: 'app',
-		version: '0.15.12',
+		version: '0.15.18',
 		body: `## Fixed
+- Fixed the browse content page when coming from an instance.`,
+	},
+	{
+		date: `2026-07-21T23:25:29+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed license source nag showing on Data Pack projects.`,
+	},
+	{
+		date: `2026-07-21T23:25:29+00:00`,
+		product: 'app',
+		version: '0.15.17',
+		body: `## Fixed
+- Fixed skin selector serving old cached skin previews with bad UVs.
+- Fixed ads showing when sidebar is disabled.`,
+	},
+	{
+		date: `2026-07-21T20:10:55+00:00`,
+		product: 'app',
+		version: '0.15.16',
+		body: `## Fixed
+- Fixed skins having a massive UV offset.
+- Fixed deeplink issues for slugs containing + characters.`,
+	},
+	{
+		date: `2026-07-21T19:36:51+00:00`,
+		product: 'app',
+		version: '0.15.15',
+		body: `## Changed
+- Updated the "Minecraft required" popup to a new style.
+
+## Fixed
+- Fixed devtools opening when ads are initialized.`,
+	},
+	{
+		date: `2026-07-21T18:43:00+00:00`,
+		product: 'web',
+		body: `## Changed
+- Replaced default Aditude consent pop-up with a custom one with more accurate phrasing.
+- Updated page headers to use a consistent design style.
+- Updated translations
+
+## Fixed
+- Fixed analytics tooltip not pinned after mobile chart drag
+- Fixed extra spacing sometimes on the download modal.`,
+	},
+	{
+		date: `2026-07-21T18:43:00+00:00`,
+		product: 'app',
+		version: '0.15.14',
+		body: `## Added
+- Added browse page header onto project pages when going into a project page from search.
+- Added support for the [Ears](https://modrinth.com/mod/ears) mod in the Skin selector.
+
+## Changed
+- Replaced default Aditude consent pop-up with a custom one with more accurate phrasing.
+- Updated page headers to use a consistent design style.
+- Updated translations
+
+## Fixed
+- Fixed ratelimits not being handled properly.
+- Fixed UV spill issues causing some tiny parts of the skin texture to appear as floating lines.
 - Fixed issue with some modpacks failing to install due to file mismatches.
 - Fixed hardcore worlds generated in 26.1+ not being recognised as hardcore in the Jump back in and Worlds tab.`,
+	},
+	{
+		date: `2026-07-21T18:43:00+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added browse page header onto project pages when going into a project page from search.
+
+## Changed
+- Updated translations`,
 	},
 	{
 		date: `2026-07-14T22:14:08+00:00`,
