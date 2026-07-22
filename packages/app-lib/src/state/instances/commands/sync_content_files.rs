@@ -90,13 +90,16 @@ pub(crate) async fn sync_instance_content_files(
     sqlite::content_rows::mark_instance_files_missing(&instance.id, &mut tx)
         .await?;
 
+    let mut stored_files = Vec::with_capacity(files.len());
     for file in &files {
-        sqlite::content_rows::upsert_instance_file(file, &mut tx).await?;
+        stored_files.push(
+            sqlite::content_rows::upsert_instance_file(file, &mut tx).await?,
+        );
     }
 
     tx.commit().await?;
 
-    Ok(files)
+    Ok(stored_files)
 }
 
 pub(crate) fn project_type_for_file(

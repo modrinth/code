@@ -445,7 +445,7 @@ pub(crate) async fn mark_instance_files_missing(
 pub(crate) async fn upsert_instance_file(
     file: &InstanceFile,
     tx: &mut Transaction<'_, Sqlite>,
-) -> crate::Result<()> {
+) -> crate::Result<InstanceFile> {
     let id = file.id.as_str();
     let instance_id = file.instance_id.as_str();
     let relative_path = file.relative_path.as_str();
@@ -457,7 +457,8 @@ pub(crate) async fn upsert_instance_file(
     let added_at = file.added_at.timestamp();
     let modified_at = file.modified_at.timestamp();
 
-    sqlx::query!(
+    let row = sqlx::query_as!(
+        InstanceFileRow,
         "
 		INSERT INTO instance_files (
 			id,
@@ -479,6 +480,17 @@ pub(crate) async fn upsert_instance_file(
 			size = excluded.size,
 			missing = excluded.missing,
 			modified_at = excluded.modified_at
+		RETURNING
+			id,
+			instance_id,
+			relative_path,
+			file_name,
+			enabled,
+			sha1,
+			size,
+			missing,
+			added_at,
+			modified_at
 		",
         id,
         instance_id,
@@ -491,10 +503,10 @@ pub(crate) async fn upsert_instance_file(
         added_at,
         modified_at,
     )
-    .execute(&mut **tx)
+    .fetch_one(&mut **tx)
     .await?;
 
-    Ok(())
+    row.try_into()
 }
 
 pub(crate) async fn get_content_entries<'e, E>(
@@ -577,17 +589,9 @@ pub(crate) async fn upsert_instance_file_from_parts(
     input: UpsertInstanceFile<'_>,
     pool: &SqlitePool,
 ) -> crate::Result<InstanceFile> {
-    let existing = get_instance_file_by_relative_path(
-        input.instance_id,
-        input.relative_path,
-        pool,
-    )
-    .await?;
+    let now = Utc::now();
     let file = InstanceFile {
-        id: existing
-            .as_ref()
-            .map(|file| file.id.clone())
-            .unwrap_or_else(|| format!("instance-file:{}", Uuid::new_v4())),
+        id: format!("instance-file:{}", Uuid::new_v4()),
         instance_id: input.instance_id.to_string(),
         relative_path: input.relative_path.to_string(),
         file_name: input.file_name.to_string(),
@@ -595,18 +599,15 @@ pub(crate) async fn upsert_instance_file_from_parts(
         sha1: input.sha1.to_string(),
         size: input.size,
         missing: input.missing,
-        added_at: existing
-            .as_ref()
-            .map(|file| file.added_at)
-            .unwrap_or_else(Utc::now),
-        modified_at: Utc::now(),
+        added_at: now,
+        modified_at: now,
     };
 
     let mut tx = pool.begin().await?;
-    upsert_instance_file(&file, &mut tx).await?;
+    let stored = upsert_instance_file(&file, &mut tx).await?;
     tx.commit().await?;
 
-    Ok(file)
+    Ok(stored)
 }
 
 pub(crate) async fn rename_instance_file(
