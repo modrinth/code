@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { FolderSearchIcon, StarIcon, TrashIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -94,6 +95,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const clearModalRef = useTemplateRef<InstanceType<typeof ConfirmModal>>('clearModalRef')
 const { formatMessage } = useVIntl()
 
 const rows = ref<ScanRow[]>([])
@@ -217,6 +219,10 @@ async function fetchAllScans() {
 	}
 }
 
+function showConfirmClearGroups() {
+	clearModalRef.value?.show()
+}
+
 async function clearAllGroups() {
 	if (isBusy.value) {
 		return
@@ -270,6 +276,14 @@ defineExpose({ show, hide })
 </script>
 
 <template>
+	<ConfirmModal
+		ref="clearModalRef"
+		title="Clear all permission groups?"
+		description="This will clear **all** groups for this project. This action cannot be undone."
+		proceed-label="Clear"
+		@proceed="clearAllGroups"
+	/>
+
 	<NewModal
 		ref="modalRef"
 		width="60vw"
@@ -288,11 +302,11 @@ defineExpose({ show, hide })
 					}}
 				</span>
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular>
+					<ButtonStyled circular color="red" color-fill="none">
 						<button
 							v-tooltip="formatMessage(messages.clearAllGroups)"
 							:disabled="isBusy || rows.length === 0"
-							@click="clearAllGroups"
+							@click="showConfirmClearGroups"
 						>
 							<TrashIcon aria-hidden="true" />
 						</button>
