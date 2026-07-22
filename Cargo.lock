@@ -5414,6 +5414,7 @@ dependencies = [
  "bytes",
  "censor",
  "chrono",
+ "chumsky",
  "clap 4.5.48",
  "clickhouse",
  "color-eyre",

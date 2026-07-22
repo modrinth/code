@@ -103,11 +103,18 @@
 //! is faster than two. It's even faster if you search for more facets like
 //! category, game version, loader, and environment.
 //!
-//! Filters are parsed into a backend-independent AST before they reach this
-//! module. Its normalization pass compacts Cartesian products such as many
-//! game versions combined with many loaders into `IN` predicates. The
-//! Typesense filter planner then puts maximal version-only expressions into a
-//! single join, avoiding repeated joins and deeply expanded boolean trees.
+//! ### Filter AST
+//!
+//! When a caller provides a search filter, we first parse it into a
+//! search-backend-independent AST; then normalize the AST to compact it down
+//! to make it easier for Typesense to manage; check that it's not too big;
+//! and finally submit it to Typesense. Parsing into our own AST first has
+//! the following benefits:
+//! - we can make our search filter syntax search-backend-independent
+//! - we can normalize the AST to compact down e.g. Cartesian products into `IN`
+//!   predicates, to avoid repeated joins and deep boolean trees
+//! - we can check that the filter isn't too complex before submitting to
+//!   Typesense
 //!
 //! ### Whole-field tokenization
 //!
