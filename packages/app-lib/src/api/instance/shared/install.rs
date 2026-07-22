@@ -131,6 +131,7 @@ pub(super) async fn shared_instance_install_preview_from_version(
     let external_files = version
         .external_files
         .iter()
+        .filter(|file| file.file_type != CONFIG_BUNDLE_FILE_TYPE)
         .map(|file| SharedInstanceExternalFilePreview {
             file_name: file.file_name.clone(),
             file_type: file.file_type.clone(),
