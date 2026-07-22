@@ -157,6 +157,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		billing::remove_payment_method,
 		billing::payment_methods,
 		billing::active_servers,
+		billing::update_subscriptions::update_many,
 		billing::initiate_payment,
 		billing::stripe_webhook,
 		billing::credit,

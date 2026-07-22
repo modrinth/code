@@ -1,4 +1,5 @@
 use self::payments::*;
+use self::update_subscriptions::*;
 use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
@@ -56,6 +57,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .service(charges)
             .service(credit)
             .service(active_servers)
+            .service(update_many)
             .service(initiate_payment)
             .service(stripe_webhook)
             .service(refund_charge)
@@ -63,7 +65,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     );
 }
 
-/// List products.  
+/// List products.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -113,7 +115,7 @@ struct UserSubscriptionWithNextChargeTaxAmount {
     pub next_charge_tax_amount: Option<i64>,
 }
 
-/// List subscriptions.  
+/// List subscriptions.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -187,7 +189,7 @@ pub struct ChargeRefund {
     pub unprovision: Option<bool>,
 }
 
-/// Refund a charge.  
+/// Refund a charge.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -457,7 +459,7 @@ pub async fn refund_charge(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Reprocess tax for a charge.  
+/// Reprocess tax for a charge.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -646,7 +648,7 @@ pub struct SubscriptionEditQuery {
     pub dry: Option<bool>,
 }
 
-/// Update a subscription.  
+/// Update a subscription.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1146,7 +1148,7 @@ pub async fn edit_subscription(
     }
 }
 
-/// Get the current customer.  
+/// Get the current customer.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1190,7 +1192,7 @@ pub struct ChargesQuery {
     pub user_id: Option<ariadne::ids::UserId>,
 }
 
-/// List payments.  
+/// List payments.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1256,7 +1258,7 @@ pub async fn charges(
     ))
 }
 
-/// Start a payment method flow.  
+/// Start a payment method flow.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1315,7 +1317,7 @@ pub struct EditPaymentMethod {
     pub primary: bool,
 }
 
-/// Update a payment method.  
+/// Update a payment method.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1385,7 +1387,7 @@ pub async fn edit_payment_method(
     }
 }
 
-/// Remove a payment method.  
+/// Remove a payment method.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1474,7 +1476,7 @@ pub async fn remove_payment_method(
     }
 }
 
-/// List payment methods.  
+/// List payment methods.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1537,7 +1539,7 @@ struct ActiveServerResponse {
     pub region: Option<String>,
 }
 
-/// List active servers.  
+/// List active servers.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1651,7 +1653,7 @@ pub struct PaymentRequest {
     pub metadata: Option<PaymentRequestMetadata>,
 }
 
-/// Initiate a payment.  
+/// Initiate a payment.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1721,7 +1723,7 @@ pub async fn initiate_payment(
     }
 }
 
-/// Receive a Stripe webhook.  
+/// Receive a Stripe webhook.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -1967,7 +1969,7 @@ pub async fn stripe_webhook(
 
                                     if charge_status != ChargeStatus::Failed {
                                         subscription
-                                            .upsert(transaction)
+                                            .upsert(&mut *transaction)
                                             .await?;
                                     }
 
@@ -2009,7 +2011,7 @@ pub async fn stripe_webhook(
                         };
 
                         if charge_status != ChargeStatus::Failed {
-                            charge.upsert(transaction).await?;
+                            charge.upsert(&mut *transaction).await?;
                         }
 
                         (charge, price, product, subscription, new_region)
@@ -2644,7 +2646,7 @@ pub enum CreditTarget {
     },
 }
 
-/// Credit subscriptions.  
+/// Credit subscriptions.
 #[utoipa::path(
 	context_path = "/billing",
 	tag = "billing",
@@ -2773,3 +2775,4 @@ pub async fn credit(
 }
 
 pub mod payments;
+pub mod update_subscriptions;
