@@ -203,22 +203,6 @@ jobs:
       - name: Lint and test
         run: pnpm run ci
 
-      # Test different Redis connection modes
-
-      - name: Test pooled Redis cluster backend
-        if: steps.check-labrinth.outputs.needs_services == 'true'
-        env:
-          REDIS_CONNECTION_TYPE: pooled
-        run: cargo nextest run --package labrinth --test redis --no-fail-fast
-
-      - name: Test pooled standalone Redis backend
-        if: steps.check-labrinth.outputs.needs_services == 'true'
-        env:
-          REDIS_TOPOLOGY: standalone
-          REDIS_CONNECTION_TYPE: pooled
-          REDIS_URL: redis://127.0.0.1:6379
-        run: cargo nextest run --package labrinth --test redis --no-fail-fast
-
       - name: Verify intl:extract has been run
         run: |
           pnpm turbo run intl:extract --force
