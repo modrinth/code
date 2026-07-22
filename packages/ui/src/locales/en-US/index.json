@@ -497,6 +497,9 @@
   "content.diff-modal.modpack-updated": {
     "defaultMessage": "Updated modpack"
   },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "No content changes"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} removed"
   },

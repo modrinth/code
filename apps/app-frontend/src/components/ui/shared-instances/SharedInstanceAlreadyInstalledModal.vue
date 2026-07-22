@@ -68,9 +68,7 @@ const messages = defineMessages({
 })
 
 const emit = defineEmits<{
-	(e: 'cancel'): void
-	(e: 'go-to-instance'): void
-	(e: 'install-anyway'): void
+	(e: 'cancel' | 'go-to-instance' | 'install-anyway'): void
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()

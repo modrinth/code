@@ -117,10 +117,7 @@
 			</div>
 		</div>
 
-		<div
-			v-if="$slots['additional-content']"
-			class="px-4 pt-4"
-		>
+		<div v-if="$slots['additional-content']" class="px-4 pt-4">
 			<slot name="additional-content" />
 		</div>
 

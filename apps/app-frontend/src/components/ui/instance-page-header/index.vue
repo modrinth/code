@@ -27,10 +27,7 @@
 					:linked-project-v3="linkedProjectV3"
 					:instance-id="instance.id"
 				/>
-				<PageHeaderMetadataItem
-					v-if="sharedInstanceManager"
-					:action="sharedInstanceManagerAction"
-				>
+				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
 					{{ sharedInstanceManagerLabel }}
 					<Avatar
 						:src="sharedInstanceManager.avatarUrl"
@@ -61,10 +58,7 @@
 				>
 					{{ playtimeLabel }}
 				</PageHeaderMetadataItem>
-				<PageHeaderMetadataItem
-					v-if="sharedInstanceManager"
-					:action="sharedInstanceManagerAction"
-				>
+				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
 					{{ sharedInstanceManagerLabel }}
 					<Avatar
 						:src="sharedInstanceManager.avatarUrl"

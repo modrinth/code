@@ -15,8 +15,8 @@ import { injectAuth } from '@modrinth/ui'
 import { nextTick, ref } from 'vue'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
-import SharedInstanceAlreadyInstalledModal from '@/components/ui/shared-instances/SharedInstanceAlreadyInstalledModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import SharedInstanceAlreadyInstalledModal from '@/components/ui/shared-instances/SharedInstanceAlreadyInstalledModal.vue'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth'
 
 import SharedInstanceInviteLinkModal from './shared-instance-invite-link-modal.vue'

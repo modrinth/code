@@ -55,10 +55,7 @@ pub(super) async fn prepare_shared_instance_update_backup(
             &state.pool,
         )
         .await?;
-        let snapshot = SharedInstanceUpdateRollback {
-            files,
-            entries,
-        };
+        let snapshot = SharedInstanceUpdateRollback { files, entries };
         let instance_path = state
             .directories
             .instances_dir()

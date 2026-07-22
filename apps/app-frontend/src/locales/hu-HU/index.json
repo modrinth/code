@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Keresés {count} világ között..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Ne töltse le"
-  },
   "app.modal.install-to-play.header": {
     "message": "Telepítés a játékhoz"
   },

@@ -143,7 +143,9 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         .is_some_and(|name| {
                                             ProjectType::iterator().any(
                                                 |project_type| {
-                                                    *name == project_type.get_folder()
+                                                    *name
+                                                        == project_type
+                                                            .get_folder()
                                                 },
                                             )
                                         });

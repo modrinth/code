@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜索 {count} 个世界……"
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "不要安装"
-  },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
   },

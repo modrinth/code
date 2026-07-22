@@ -422,9 +422,6 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
-  "app.instance.share.config-sharing-settings": {
-    "message": "Sharing settings"
-  },
   "app.instance.share.empty.description": {
     "message": "You can share this instance with your friends!"
   },
@@ -490,6 +487,18 @@
   },
   "app.instance.share.unlink.header": {
     "message": "Sharing requires unlinking"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "This shared instance is already installed as <bold>{instanceName}</bold>. Are you sure you want to install another copy?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "Shared instance already installed"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Install anyway"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instance"
   },
   "app.instance.shared-instance-wrong-account.fallback-username": {
     "message": "the linked account"
@@ -572,6 +581,9 @@
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "Content you’re reporting"
   },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Delete instance"
+  },
   "app.modal.install-to-play.external-files-dont-install": {
     "message": "Don't install"
   },
@@ -607,6 +619,12 @@
   },
   "app.modal.install-to-play.report-reason.other": {
     "message": "Other"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Report shared instance"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Report submitted"
   },
   "app.modal.install-to-play.report-support-and-bugs": {
     "message": "For support requests, contact our <support-link>support team</support-link>. For bug reports, open a <github-link>GitHub issue</github-link>."
@@ -1307,21 +1325,6 @@
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
   },
-  "instance.settings.tabs.sharing.manual-push.button": {
-    "message": "Manually push update"
-  },
-  "instance.settings.tabs.sharing.manual-push.description": {
-    "message": "Review the current instance changes and choose any config files you want to send to everyone using it."
-  },
-  "instance.settings.tabs.sharing.manual-push.pushing-button": {
-    "message": "Pushing"
-  },
-  "instance.settings.tabs.sharing.manual-push.reviewing-button": {
-    "message": "Reviewing"
-  },
-  "instance.settings.tabs.sharing.manual-push.title": {
-    "message": "Manual push update"
-  },
   "instance.settings.tabs.window": {
     "message": "Window"
   },
@@ -1352,15 +1355,6 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
   },
-  "instance.shared-instance.config-sharing-hint.description": {
-    "message": "You can manually push updates and choose config files in the instance settings"
-  },
-  "instance.shared-instance.config-sharing-hint.dismiss": {
-    "message": "Don't show again"
-  },
-  "instance.shared-instance.config-sharing-hint.title": {
-    "message": "Share config files"
-  },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
   },
@@ -1373,11 +1367,8 @@
   "instance.shared-instance.publish-review.admonition-header": {
     "message": "Push update to players"
   },
-  "instance.shared-instance.publish-review.config-description": {
-    "message": "Choose which config files to send with this update. Only selected files will be updated; everything else stays as it is."
-  },
-  "instance.shared-instance.publish-review.config-title": {
-    "message": "Config files"
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Select config files"
   },
   "instance.shared-instance.publish-review.description": {
     "message": "Review the content changes and choose any config files to include in this update."
@@ -1493,6 +1484,15 @@
   "minecraft-required.sign-in": {
     "message": "Sign in to Microsoft"
   },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "A new tab opened to sign in. Complete the sign in there, then return to the app."
+  },
+  "modal.modrinth-account-required.cancel-button": {
+    "message": "Cancel"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Continue in your browser"
+  },
   "modal.modrinth-account-required.create-account-button": {
     "message": "Create an account"
   },
@@ -1502,14 +1502,23 @@
   "modal.modrinth-account-required.header": {
     "message": "Account required"
   },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Open browser again"
+  },
   "modal.modrinth-account-required.sign-in-button": {
     "message": "Sign in to Modrinth"
   },
   "modal.modrinth-account-required.sign-in-heading": {
     "message": "Sign in to a Modrinth account"
   },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Signing in"
+  },
   "modal.modrinth-account-required.support-prompt": {
     "message": "Having trouble signing in? <support>Get support</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "Waiting for browser confirmation..."
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"

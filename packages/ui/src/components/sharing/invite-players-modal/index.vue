@@ -103,7 +103,7 @@
 					<ButtonStyled>
 						<button
 							type="button"
-							class="!h-10 w-full !justify-between !px-4 text-left"
+							class="!h-10 w-full !justify-between !px-4 text-left !shadow-none"
 							@click="copyInviteLink"
 						>
 							<span class="min-w-0 truncate text-base font-semibold text-primary">

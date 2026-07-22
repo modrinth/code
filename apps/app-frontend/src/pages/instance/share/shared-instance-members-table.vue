@@ -28,11 +28,7 @@
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
 						>
-							<SpinnerIcon
-								v-if="pushUpdatePending"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
+							<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
 							<UploadIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.pushUpdate) }}
 						</button>

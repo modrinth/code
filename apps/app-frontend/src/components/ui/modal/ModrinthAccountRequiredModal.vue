@@ -20,21 +20,13 @@
 			<div class="flex flex-col gap-6">
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
 					<ButtonStyled>
-						<button
-							class="w-full !shadow-none"
-							type="button"
-							@click="authenticate('sign-up')"
-						>
+						<button class="w-full !shadow-none" type="button" @click="authenticate('sign-up')">
 							<UserPlusIcon aria-hidden="true" />
 							{{ formatMessage(messages.createAccountButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button
-							class="w-full"
-							type="button"
-							@click="authenticate('sign-in')"
-						>
+						<button class="w-full" type="button" @click="authenticate('sign-in')">
 							<LogInIcon aria-hidden="true" />
 							{{ formatMessage(messages.signInButton) }}
 						</button>
@@ -115,13 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	LogInIcon,
-	RefreshCwIcon,
-	SpinnerIcon,
-	UserPlusIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { LogInIcon, RefreshCwIcon, SpinnerIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'

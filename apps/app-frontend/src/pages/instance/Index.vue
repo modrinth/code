@@ -5,10 +5,7 @@
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
-			<ConfirmDeleteInstanceModal
-				ref="reportDeleteConfirmModal"
-				@delete="deleteReportedInstance"
-			/>
+			<ConfirmDeleteInstanceModal ref="reportDeleteConfirmModal" @delete="deleteReportedInstance" />
 			<InstanceSettingsModal
 				:key="instance.id"
 				ref="settingsModal"
@@ -151,8 +148,8 @@ import InstancePageHeader from '@/components/ui/instance-page-header/index.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
-import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
+import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,

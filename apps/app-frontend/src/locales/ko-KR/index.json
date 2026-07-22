@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count}개의 세계 검색..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "설치하지 않음"
-  },
   "app.modal.install-to-play.header": {
     "message": "설치하고 플레이"
   },

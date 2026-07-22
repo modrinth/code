@@ -419,9 +419,6 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Не устанавливать"
-  },
   "app.modal.install-to-play.header": {
     "message": "Установка перед запуском"
   },

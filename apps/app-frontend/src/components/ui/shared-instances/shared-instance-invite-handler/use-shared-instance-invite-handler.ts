@@ -217,21 +217,17 @@ export function useSharedInstanceInviteHandler(
 		try {
 			if (!(await requireAccount())) return
 			const invite = await install_accept_shared_instance_invite(inviteId)
-			await showInstallOrAlreadyInstalled(
-				invite.sharedInstanceId,
-				invite.preview,
-				async () => {
-					await install_shared_instance(
-						invite.sharedInstanceId,
-						invite.preview.name,
-						invite.managerId,
-						invite.serverManagerName,
-						invite.serverManagerIconUrl,
-						invite.instanceIconUrl,
-					)
-					await queryClient.invalidateQueries({ queryKey: ['instances'] })
-				},
-			)
+			await showInstallOrAlreadyInstalled(invite.sharedInstanceId, invite.preview, async () => {
+				await install_shared_instance(
+					invite.sharedInstanceId,
+					invite.preview.name,
+					invite.managerId,
+					invite.serverManagerName,
+					invite.serverManagerIconUrl,
+					invite.instanceIconUrl,
+				)
+				await queryClient.invalidateQueries({ queryKey: ['instances'] })
+			})
 		} catch (error) {
 			handleError(toError(error))
 		}
