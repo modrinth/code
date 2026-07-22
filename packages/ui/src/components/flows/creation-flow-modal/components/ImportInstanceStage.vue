@@ -77,7 +77,7 @@
 			<!-- Add launcher path -->
 			<div v-if="!showAddPath">
 				<ButtonStyled>
-					<button class="w-full !shadow-none" @click="showAddPath = true">
+					<button class="!px-4 !shadow-none" @click="showAddPath = true">
 						{{ formatMessage(messages.addLauncherPath) }}
 					</button>
 				</ButtonStyled>
