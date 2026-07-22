@@ -6,6 +6,8 @@ use redis::{FromRedisValue, ToRedisArgs};
 use crate::Error;
 
 use super::cache::CacheSettings;
+use super::connection::RoutableConnection;
+use super::routing::primary_mget_routing;
 use super::util::cmd;
 
 pub const MGET_CHUNK_SIZE: usize = 32;
@@ -88,6 +90,26 @@ where
     get_many_as(connection, keys).await
 }
 
+pub(super) async fn get_many_primary<C>(
+    connection: &mut C,
+    keys: &[String],
+) -> Result<Vec<Option<Vec<u8>>>, Error>
+where
+    C: RoutableConnection,
+{
+    get_many_primary_as(connection, keys).await
+}
+
+pub(super) async fn get_many_strings_primary<C>(
+    connection: &mut C,
+    keys: &[String],
+) -> Result<Vec<Option<String>>, Error>
+where
+    C: RoutableConnection,
+{
+    get_many_primary_as(connection, keys).await
+}
+
 pub(super) async fn get_many_as<C, T>(
     connection: &mut C,
     keys: &[String],
@@ -102,6 +124,29 @@ where
             .arg(chunk)
             .query_async::<Vec<Option<T>>>(connection)
             .await?;
+        values.extend(part);
+    }
+    Ok(values)
+}
+
+async fn get_many_primary_as<C, T>(
+    connection: &mut C,
+    keys: &[String],
+) -> Result<Vec<Option<T>>, Error>
+where
+    C: RoutableConnection,
+    T: FromRedisValue,
+{
+    let mut values = Vec::with_capacity(keys.len());
+    for chunk in keys.chunks(MGET_CHUNK_SIZE) {
+        let mut command = redis::cmd("MGET");
+        command.arg(chunk);
+        let value = connection
+            .route_command(command, primary_mget_routing(chunk))
+            .await?;
+        let part =
+            redis::from_redis_value::<Vec<Option<T>>>(value.extract_error()?)
+                .map_err(redis::RedisError::from)?;
         values.extend(part);
     }
     Ok(values)

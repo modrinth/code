@@ -19,6 +19,7 @@ use tracing::{Instrument, info_span};
 use crate::Error;
 
 use super::commands;
+use super::connection::RoutableConnection;
 use super::key::KeyBuilder;
 
 mod locking;
@@ -30,11 +31,17 @@ use locking::{
 const FILL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
 
 pub(super) trait ConnectionProvider {
-    type Connection: ConnectionLike;
+    type Connection: ConnectionLike + RoutableConnection;
 
     fn connect(
         &self,
     ) -> impl Future<Output = Result<Self::Connection, Error>> + Send;
+}
+
+#[derive(Clone, Copy)]
+enum CacheReadRouting {
+    ReplicaOptional,
+    Primary,
 }
 
 #[repr(u8)]
@@ -335,69 +342,93 @@ impl CacheManager {
             return Ok(HashMap::new());
         }
 
-        let get_cached_values = |ids: DashMap<String, I>| {
-            async move {
-                let slug_ids = if let Some(slug_namespace) = slug_namespace {
-                    async {
-                        let keys = ids
-                            .iter()
-                            .map(|entry| {
-                                let logical_key = normalize_key(
-                                    &entry.value().to_string(),
-                                    case_sensitive,
-                                );
-                                self.key_builder
-                                    .entity(slug_namespace, logical_key)
-                            })
-                            .collect::<Vec<_>>();
-                        let mut connection =
-                            provider.connect().await.map_err(E::from)?;
-                        Ok::<_, E>(
-                            commands::get_many_strings(&mut connection, &keys)
+        let get_cached_values =
+            |ids: DashMap<String, I>, routing: CacheReadRouting| {
+                async move {
+                    let slug_ids = if let Some(slug_namespace) = slug_namespace
+                    {
+                        async {
+                            let keys = ids
+                                .iter()
+                                .map(|entry| {
+                                    let logical_key = normalize_key(
+                                        &entry.value().to_string(),
+                                        case_sensitive,
+                                    );
+                                    self.key_builder
+                                        .entity(slug_namespace, logical_key)
+                                })
+                                .collect::<Vec<_>>();
+                            let mut connection =
+                                provider.connect().await.map_err(E::from)?;
+                            let values = match routing {
+                                CacheReadRouting::ReplicaOptional => {
+                                    commands::get_many_strings(
+                                        &mut connection,
+                                        &keys,
+                                    )
+                                    .await
+                                }
+                                CacheReadRouting::Primary => {
+                                    commands::get_many_strings_primary(
+                                        &mut connection,
+                                        &keys,
+                                    )
+                                    .await
+                                }
+                            }
+                            .map_err(E::from)?;
+                            Ok::<_, E>(
+                                values
+                                    .into_iter()
+                                    .flatten()
+                                    .collect::<Vec<_>>(),
+                            )
+                        }
+                        .instrument(info_span!("get slug ids"))
+                        .await?
+                    } else {
+                        Vec::new()
+                    };
+
+                    let keys = ids
+                        .iter()
+                        .map(|entry| entry.value().to_string())
+                        .chain(ids.iter().filter_map(|entry| {
+                            parse_base62(&entry.value().to_string())
+                                .ok()
+                                .map(|value| value.to_string())
+                        }))
+                        .chain(slug_ids)
+                        .map(|key| self.key_builder.entity(namespace, key))
+                        .collect::<Vec<_>>();
+
+                    let mut connection =
+                        provider.connect().await.map_err(E::from)?;
+                    let mut cached_values = HashMap::new();
+                    let values = match routing {
+                        CacheReadRouting::ReplicaOptional => {
+                            commands::get_many(&mut connection, &keys).await
+                        }
+                        CacheReadRouting::Primary => {
+                            commands::get_many_primary(&mut connection, &keys)
                                 .await
-                                .map_err(E::from)?
-                                .into_iter()
-                                .flatten()
-                                .collect::<Vec<_>>(),
-                        )
+                        }
                     }
-                    .instrument(info_span!("get slug ids"))
-                    .await?
-                } else {
-                    Vec::new()
-                };
-
-                let keys = ids
-                    .iter()
-                    .map(|entry| entry.value().to_string())
-                    .chain(ids.iter().filter_map(|entry| {
-                        parse_base62(&entry.value().to_string())
-                            .ok()
-                            .map(|value| value.to_string())
-                    }))
-                    .chain(slug_ids)
-                    .map(|key| self.key_builder.entity(namespace, key))
-                    .collect::<Vec<_>>();
-
-                let mut connection =
-                    provider.connect().await.map_err(E::from)?;
-                let mut cached_values = HashMap::new();
-                for value in commands::get_many(&mut connection, &keys)
-                    .await
-                    .map_err(E::from)?
-                {
-                    if let Some(value) = value.and_then(|value| {
-                        self.settings
-                            .decode_value::<RedisValue<T, K, S>>(&value)
-                    }) {
-                        cached_values.insert(value.key.clone(), value);
+                    .map_err(E::from)?;
+                    for value in values {
+                        if let Some(value) = value.and_then(|value| {
+                            self.settings
+                                .decode_value::<RedisValue<T, K, S>>(&value)
+                        }) {
+                            cached_values.insert(value.key.clone(), value);
+                        }
                     }
+
+                    Ok::<_, E>((cached_values, ids))
                 }
-
-                Ok::<_, E>((cached_values, ids))
-            }
-            .instrument(info_span!("get cached values"))
-        };
+                .instrument(info_span!("get_cached_values_closure"))
+            };
 
         let (default_expiry, actual_expiry) = self.settings.expiries(namespace);
         let current_time = Utc::now();
@@ -405,7 +436,8 @@ impl CacheManager {
         let mut expired_identities = HashMap::new();
         let deadline = Instant::now() + WAIT_TIMEOUT;
 
-        let (cached_values_raw, ids) = get_cached_values(ids).await?;
+        let (cached_values_raw, ids) =
+            get_cached_values(ids, CacheReadRouting::ReplicaOptional).await?;
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, value)| {
@@ -559,7 +591,12 @@ impl CacheManager {
                                     )
                                 })
                                 .collect::<DashMap<_, _>>();
-                            match get_cached_values(fetch_ids).await {
+                            match get_cached_values(
+                                fetch_ids,
+                                CacheReadRouting::Primary,
+                            )
+                            .await
+                            {
                                 Ok((released_values, _)) => {
                                     values.extend(released_values);
                                     Ok(values)

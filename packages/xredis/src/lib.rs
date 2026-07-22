@@ -20,6 +20,7 @@ mod connection;
 mod key;
 mod metrics;
 mod pubsub;
+mod routing;
 mod util;
 
 use cache::{CacheManager, ConnectionProvider};
@@ -390,5 +391,15 @@ impl ConnectionLike for RedisConnection {
 
     fn get_db(&self) -> i64 {
         self.inner.get_db()
+    }
+}
+
+impl connection::RoutableConnection for RedisConnection {
+    fn route_command<'a>(
+        &'a mut self,
+        command: redis::Cmd,
+        routing: redis::cluster_routing::RoutingInfo,
+    ) -> redis::RedisFuture<'a, redis::Value> {
+        self.inner.route_command(command, routing)
     }
 }

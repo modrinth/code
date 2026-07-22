@@ -6,6 +6,7 @@ use redis::aio::ConnectionLike;
 use redis::cluster_read_routing::{
     RandomReplicaStrategy, RoundRobinReplicaStrategy,
 };
+use redis::cluster_routing::RoutingInfo;
 use thiserror::Error;
 use tracing::warn;
 
@@ -46,6 +47,14 @@ enum RedisConnectionInner {
     StandalonePooled(deadpool_redis::Connection),
     ClusterPooled(deadpool_redis::cluster::Connection),
     ClusterMultiplexed(redis::cluster_async::ClusterConnection),
+}
+
+pub(crate) trait RoutableConnection: ConnectionLike {
+    fn route_command<'a>(
+        &'a mut self,
+        command: redis::Cmd,
+        routing: RoutingInfo,
+    ) -> redis::RedisFuture<'a, redis::Value>;
 }
 
 impl RedisBackend {
@@ -245,6 +254,28 @@ impl ConnectionLike for RedisConnection {
 
     fn get_db(&self) -> i64 {
         self.inner.get_db()
+    }
+}
+
+impl RoutableConnection for RedisConnection {
+    fn route_command<'a>(
+        &'a mut self,
+        command: redis::Cmd,
+        routing: RoutingInfo,
+    ) -> redis::RedisFuture<'a, redis::Value> {
+        Box::pin(async move {
+            match &mut self.inner {
+                RedisConnectionInner::StandalonePooled(connection) => {
+                    command.query_async(connection).await
+                }
+                RedisConnectionInner::ClusterPooled(connection) => {
+                    command.query_async(connection).await
+                }
+                RedisConnectionInner::ClusterMultiplexed(connection) => {
+                    connection.route_command(command, routing).await
+                }
+            }
+        })
     }
 }
 
