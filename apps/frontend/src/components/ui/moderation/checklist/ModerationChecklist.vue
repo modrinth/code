@@ -1542,6 +1542,16 @@ function previousStage() {
 }
 
 function nextStage() {
+	if (done.value) {
+		endChecklist(undefined)
+		return
+	}
+
+	if (alreadyReviewed.value || isLockedByOther.value) {
+		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) skipToNextProject()
+		return
+	}
+
 	if (generatedMessage.value) return
 
 	let targetStage = currentStage.value + 1

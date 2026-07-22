@@ -4,7 +4,6 @@ const keybinds: { [id: string]: KeybindListener } = {
 	'next-stage': {
 		keybind: 'ArrowRight',
 		description: 'Go to next stage',
-		enabled: (ctx) => !ctx.state.isDone,
 		action: (ctx) => ctx.actions.tryGoNext(),
 	},
 	'previous-stage': {
