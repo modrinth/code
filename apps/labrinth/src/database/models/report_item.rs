@@ -10,6 +10,7 @@ pub struct DBReport {
     pub version_id: Option<DBVersionId>,
     pub user_id: Option<DBUserId>,
     pub shared_instance_id: Option<SharedInstanceId>,
+    pub shared_instance_version_id: Option<i32>,
     pub body: String,
     pub reporter: DBUserId,
     pub created: DateTime<Utc>,
@@ -23,6 +24,7 @@ pub struct ReportQueryResult {
     pub version_id: Option<DBVersionId>,
     pub user_id: Option<DBUserId>,
     pub shared_instance_id: Option<SharedInstanceId>,
+    pub shared_instance_version_id: Option<i32>,
     pub body: String,
     pub reporter: DBUserId,
     pub created: DateTime<Utc>,
@@ -39,11 +41,11 @@ impl DBReport {
             "
             INSERT INTO reports (
                 id, report_type_id, mod_id, version_id, user_id,
-                shared_instance_id, body, reporter
+                shared_instance_id, shared_instance_version_id, body, reporter
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7, $8
+                $6, $7, $8, $9
             )
             ",
             self.id as DBReportId,
@@ -52,6 +54,7 @@ impl DBReport {
             self.version_id.map(|x| x.0 as i64),
             self.user_id.map(|x| x.0 as i64),
             self.shared_instance_id.map(|x| x.0 as i64),
+            self.shared_instance_version_id,
             self.body,
             self.reporter as DBUserId
         )
@@ -86,7 +89,7 @@ impl DBReport {
             report_ids.iter().map(|x| x.0).collect();
         let reports = sqlx::query!(
             "
-            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.shared_instance_id, r.body, r.reporter, r.created, t.id thread_id, r.closed
+            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.shared_instance_id, r.shared_instance_version_id, r.body, r.reporter, r.created, t.id thread_id, r.closed
             FROM reports r
             INNER JOIN report_types rt ON rt.id = r.report_type_id
             INNER JOIN threads t ON t.report_id = r.id
@@ -103,6 +106,7 @@ impl DBReport {
             version_id: x.version_id.map(DBVersionId),
             user_id: x.user_id.map(DBUserId),
             shared_instance_id: x.shared_instance_id.map(SharedInstanceId),
+            shared_instance_version_id: x.shared_instance_version_id,
             body: x.body,
             reporter: DBUserId(x.reporter),
             created: x.created,
