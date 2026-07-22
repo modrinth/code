@@ -56,11 +56,57 @@ fn normalize_or(expressions: Vec<FilterExpr>) -> FilterExpr {
     normalized.sort();
     normalized.dedup();
 
+    if let Some(expression) = factor_common_predicates(&normalized) {
+        return normalize(expression);
+    }
+
     if let Some(expression) = compact_cartesian_product(&normalized) {
         return expression;
     }
 
     FilterExpr::or(normalized).expect("an OR expression is non-empty")
+}
+
+fn factor_common_predicates(expressions: &[FilterExpr]) -> Option<FilterExpr> {
+    let clauses = expressions
+        .iter()
+        .map(predicate_clause)
+        .collect::<Option<Vec<_>>>()?;
+    if clauses.len() < 2 {
+        return None;
+    }
+
+    let common = clauses
+        .iter()
+        .skip(1)
+        .fold(clauses[0].clone(), |common, clause| {
+            common.intersection(clause).cloned().collect()
+        });
+    if common.is_empty() {
+        return None;
+    }
+
+    let remaining = clauses
+        .iter()
+        .map(|clause| clause.difference(&common).cloned().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+    if remaining.iter().any(Vec::is_empty) {
+        return FilterExpr::and(common.into_iter().map(FilterExpr::Predicate));
+    }
+
+    let alternatives = remaining.into_iter().map(|clause| {
+        FilterExpr::and(clause.into_iter().map(FilterExpr::Predicate))
+            .expect("a factored OR clause is non-empty")
+    });
+    let alternatives =
+        FilterExpr::or(alternatives).expect("a factored OR has alternatives");
+
+    FilterExpr::and(
+        common
+            .into_iter()
+            .map(FilterExpr::Predicate)
+            .chain([alternatives]),
+    )
 }
 
 fn compact_cartesian_product(expressions: &[FilterExpr]) -> Option<FilterExpr> {
@@ -222,5 +268,59 @@ mod tests {
                 negated: false,
             },
         })));
+    }
+
+    #[test]
+    fn factors_common_predicates_before_compacting() {
+        let expression = parse_expression(
+            "(license = MIT AND game_versions = 1.20.1 AND categories = fabric) OR \
+             (license = MIT AND game_versions = 1.21.1 AND categories = forge)",
+        )
+        .unwrap();
+        let FilterExpr::And(expressions) = normalize(expression) else {
+            panic!("expected a factored conjunction");
+        };
+
+        assert!(expressions.iter().any(|expression| matches!(
+            expression,
+            FilterExpr::Predicate(predicate)
+                if predicate.field.as_str() == "license"
+        )));
+        assert!(
+            expressions
+                .iter()
+                .any(|expression| matches!(expression, FilterExpr::Or(_)))
+        );
+    }
+
+    #[test]
+    fn compacts_production_sized_cartesian_product() {
+        let versions = [
+            "26.2", "26.1.2", "26.1.1", "26.1", "1.21.11", "1.21.10", "1.21.8",
+            "1.21.7", "1.21.5", "1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6",
+            "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2",
+            "1.18.2", "1.17.1", "1.12.2", "1.8.9",
+        ];
+        let input = versions
+            .iter()
+            .flat_map(|version| {
+                ["fabric", "forge"].map(|loader| {
+                    format!(
+                        "(project_types = modpack AND game_versions = {version} AND categories = {loader} AND categories = technology)"
+                    )
+                })
+            })
+            .collect::<Vec<_>>()
+            .join(" OR ");
+        let normalized = normalize(parse_expression(&input).unwrap());
+        let expected = normalize(
+            parse_expression(&format!(
+                "project_types = modpack AND game_versions IN [{}] AND categories IN [fabric, forge] AND categories = technology",
+                versions.join(", ")
+            ))
+            .unwrap(),
+        );
+
+        assert_eq!(normalized, expected);
     }
 }

@@ -451,4 +451,47 @@ mod tests {
         assert!(filter.contains("game_versions:[`1.20.1`,`1.21.1`]"));
         assert!(filter.contains("categories:`technology`"));
     }
+
+    #[test]
+    fn factored_mixed_filter_uses_one_version_join() {
+        let filter = serialize(
+            "(license = MIT AND game_versions = 1.20.1 AND categories = fabric) OR \
+             (license = MIT AND game_versions = 1.21.1 AND categories = forge)",
+        );
+
+        assert_eq!(filter.matches("$versions(").count(), 1);
+        assert!(filter.contains("license:=`MIT`"));
+        assert!(filter.contains(
+            "categories:`fabric` && game_versions:1.20.1 || categories:`forge` && game_versions:1.21.1"
+        ));
+    }
+
+    #[test]
+    fn production_cartesian_filter_uses_one_join() {
+        let versions = [
+            "26.2", "26.1.2", "26.1.1", "26.1", "1.21.11", "1.21.10", "1.21.8",
+            "1.21.7", "1.21.5", "1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6",
+            "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2",
+            "1.18.2", "1.17.1", "1.12.2", "1.8.9",
+        ];
+        let input = versions
+            .iter()
+            .flat_map(|version| {
+                ["fabric", "forge"].map(|loader| {
+                    format!(
+                        "(project_types = modpack AND game_versions = {version} AND categories = {loader} AND categories = technology)"
+                    )
+                })
+            })
+            .collect::<Vec<_>>()
+            .join(" OR ");
+        let filter = serialize(&input);
+
+        assert_eq!(filter.matches("$versions(").count(), 1);
+        assert!(filter.contains("categories:[`fabric`,`forge`]"));
+        assert!(filter.contains("game_versions:["));
+        assert!(filter.contains("`1.8.9`"));
+        assert!(filter.contains("26.2"));
+        assert!(filter.contains("categories:`technology`"));
+    }
 }
