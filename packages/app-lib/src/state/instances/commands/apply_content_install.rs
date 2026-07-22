@@ -516,10 +516,14 @@ pub(crate) async fn add_project_bytes(
         None => fetch::sha1_async(bytes.clone()).await?,
     };
 
+    fetch::write(&full_path, &bytes, &state.io_semaphore).await?;
+    let modified_at_ns =
+        crate::state::file_modified_at_ns(&io::metadata(&full_path).await?)?;
     cache_file_hash(
         bytes.clone(),
         &scope.instance.id,
         &relative_path,
+        modified_at_ns,
         Some(&sha1),
         Some(project_type),
         project_id.zip(version_id).map(|(project_id, version_id)| {
@@ -531,7 +535,6 @@ pub(crate) async fn add_project_bytes(
         &state.pool,
     )
     .await?;
-    fetch::write(&full_path, &bytes, &state.io_semaphore).await?;
 
     let mut tx = state.pool.begin().await?;
     let file = content_rows::upsert_instance_file_from_parts(

@@ -1,7 +1,7 @@
 use crate::State;
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
-use crate::state::{CachedEntry, ProjectType};
+use crate::state::{CachedEntry, ProjectType, file_hash_cache_key};
 use chrono::Utc;
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
@@ -44,10 +44,10 @@ pub(crate) async fn sync_instance_content_files(
         .into_iter()
         .map(|hash| {
             (
-                format!(
-                    "{}-{}",
+                file_hash_cache_key(
                     hash.size,
-                    hash.path.trim_end_matches(".disabled")
+                    hash.modified_at_ns,
+                    hash.path.trim_end_matches(".disabled"),
                 ),
                 hash,
             )
