@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="ruleModal" :header="modalTitle" @hide="handleRuleModalHide">
+	<NewModal ref="ruleModal" :header="modalTitle" :on-hide="handleRuleModalHide">
 		<form class="flex w-[48rem] max-w-full flex-col gap-3" @submit.prevent="saveRule">
 			<label class="font-semibold text-contrast" for="rule-name">Name</label>
 			<StyledInput
@@ -11,16 +11,27 @@
 			/>
 
 			<label class="font-semibold text-contrast" for="rule-expression">CEL expression</label>
-			<StyledInput
-				id="rule-expression"
-				v-model="form.rule"
-				type="text"
-				multiline
-				resize="vertical"
-				class="font-mono"
-				input-class="min-h-64 font-mono"
-				@input="queueRuleTest"
-			/>
+			<div
+				class="relative overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+			>
+				<component
+					:is="editorComponent"
+					v-if="editorComponent"
+					id="rule-expression"
+					:value="form.rule"
+					lang="javascript"
+					theme="modrinth"
+					:print-margin="false"
+					:options="RULE_EDITOR_OPTIONS"
+					:style="{ height: '16rem', fontSize: '0.875rem' }"
+					class="ace-modrinth rounded-[20px]"
+					@init="onRuleEditorInit"
+					@update:value="handleRuleInput"
+				/>
+				<div v-else class="flex h-64 items-center justify-center bg-bg-raised">
+					<LoaderCircleIcon class="size-8 animate-spin text-secondary" />
+				</div>
+			</div>
 			<p class="m-0 text-sm text-secondary">
 				Return <code>null</code> when the rule does not match, or a map containing
 				<code>severity</code> and/or <code>hidden</code> when it does.
@@ -229,10 +240,17 @@ import {
 	StyledInput,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
+import type { Ace } from 'ace-builds'
+import type { Component } from 'vue'
 
 const DEFAULT_RULE = `input.trace.issue_type == "OBFUSCATED_NAMES"
 	? {"severity": "low", "hidden": false}
 	: null`
+const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
+	useWorker: false,
+	tabSize: 2,
+	useSoftTabs: true,
+}
 
 const TEST_TRACES: Labrinth.TechReview.Internal.TestDelphiRuleTrace[] = [
 	{
@@ -264,6 +282,8 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const ruleModal = useTemplateRef<InstanceType<typeof NewModal>>('ruleModal')
 const deleteModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('deleteModal')
+const editorComponent = shallowRef<Component | null>(null)
+const ruleEditorInstance = shallowRef<Ace.Editor | null>(null)
 
 const rules = ref<Labrinth.TechReview.Internal.DelphiRule[]>([])
 const isLoading = ref(true)
@@ -280,6 +300,14 @@ const form = reactive({
 	rule: DEFAULT_RULE,
 })
 let ruleTestRequestId = 0
+
+onMounted(async () => {
+	const [{ VAceEditor }] = await Promise.all([
+		import('vue3-ace-editor'),
+		import('@modrinth/ui/src/utils/ace-theme'),
+	])
+	editorComponent.value = VAceEditor
+})
 
 const modalTitle = computed(() => (editingRuleId.value === null ? 'Create rule' : 'Edit rule'))
 const previewExamples = computed(() =>
@@ -321,6 +349,16 @@ function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeve
 		default:
 			return 'border-blue/60 bg-highlight-blue text-blue'
 	}
+}
+
+function onRuleEditorInit(editor: Ace.Editor) {
+	ruleEditorInstance.value = editor
+	editor.session.setUseWrapMode(true)
+}
+
+function handleRuleInput(rule: string) {
+	form.rule = rule
+	queueRuleTest()
 }
 
 async function testRule() {
@@ -388,6 +426,7 @@ function openCreateModal() {
 	form.rule = DEFAULT_RULE
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
+	nextTick(() => ruleEditorInstance.value?.resize(true))
 	void testRule()
 }
 
@@ -397,6 +436,7 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	form.rule = rule.rule
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
+	nextTick(() => ruleEditorInstance.value?.resize(true))
 	void testRule()
 }
 
@@ -406,6 +446,7 @@ function closeRuleModal() {
 
 function handleRuleModalHide() {
 	isRuleModalOpen.value = false
+	ruleEditorInstance.value = null
 	ruleTestRequestId += 1
 	isTestingRule.value = false
 }
