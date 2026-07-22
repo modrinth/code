@@ -1367,24 +1367,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Creat pe {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licențiat cu {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publicat pe {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Trimis pe {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalii"
-  },
-  "project.about.details.updated": {
-    "message": "Actualizat pe {date}"
-  },
   "project.actions.create-server": {
     "message": "Creează un server"
   },
@@ -1411,9 +1393,6 @@
   },
   "project.description.title": {
     "message": "Descriere"
-  },
-  "project.details.licensed": {
-    "message": "Licență"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nu este compatibil cu {gameVersion} pentru {platform}"
@@ -1462,15 +1441,6 @@
   },
   "project.gallery.title": {
     "message": "Galerie"
-  },
-  "project.license.error": {
-    "message": "Textul licenței nu a putut fi preluat."
-  },
-  "project.license.loading": {
-    "message": "Se încarcă textul licenței..."
-  },
-  "project.license.title": {
-    "message": "Licență"
   },
   "project.moderation.title": {
     "message": "Moderare"

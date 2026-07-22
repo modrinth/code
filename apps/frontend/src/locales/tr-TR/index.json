@@ -3218,24 +3218,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "{date} oluşturuldu"
-  },
-  "project.about.details.licensed": {
-    "message": "{license} lisanslı"
-  },
-  "project.about.details.published": {
-    "message": "{date} yayınlandı"
-  },
-  "project.about.details.submitted": {
-    "message": "{date} sunuldu"
-  },
-  "project.about.details.title": {
-    "message": "Detaylar"
-  },
-  "project.about.details.updated": {
-    "message": "{date} güncellendi"
-  },
   "project.actions.create-server": {
     "message": "Sunucu oluştur"
   },
@@ -3265,9 +3247,6 @@
   },
   "project.description.title": {
     "message": "Açıklama"
-  },
-  "project.details.licensed": {
-    "message": "Lisans:"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Bu oyun sürümü projenin bu sürümü ile uygun değil."
@@ -3421,15 +3400,6 @@
   },
   "project.gallery.title": {
     "message": "Galeri"
-  },
-  "project.license.error": {
-    "message": "Lisans yazısı getirilemedi."
-  },
-  "project.license.loading": {
-    "message": "Lisans yazısı yükleniyor..."
-  },
-  "project.license.title": {
-    "message": "Lisans"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Projeniz özeldir, yani yalnızca siz ve davet ettiğiniz kişiler tarafından erişilebilir."
