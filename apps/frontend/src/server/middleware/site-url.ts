@@ -12,6 +12,9 @@ export default defineEventHandler(async (event) => {
 			config.public.pyroBaseUrl = cfEnv.PYRO_BASE_URL
 			config.pyroBaseUrl = cfEnv.PYRO_BASE_URL
 		}
-		if (cfEnv.STRIPE_PUBLISHABLE_KEY) config.public.stripePublishableKey = cfEnv.STRIPE_PUBLISHABLE_KEY
-	} catch { /* empty */ }
+		if (cfEnv.STRIPE_PUBLISHABLE_KEY)
+			config.public.stripePublishableKey = cfEnv.STRIPE_PUBLISHABLE_KEY
+	} catch {
+		/* empty */
+	}
 })
