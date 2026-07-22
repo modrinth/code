@@ -1,8 +1,9 @@
 //! Theseus state management system
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use dashmap::DashMap;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
-use tokio::sync::{OnceCell, Semaphore};
+use tokio::sync::{Mutex, OnceCell, OwnedMutexGuard, Semaphore};
 
 use crate::state::instances::watcher::FileWatcher;
 use sqlx::SqlitePool;
@@ -71,6 +72,8 @@ pub struct State {
     pub api_semaphore: FetchSemaphore,
     pub(crate) install_job_semaphore: Semaphore,
     pub(crate) install_db_semaphore: Semaphore,
+    /// Serializes filesystem reconciliation and content mutations per instance.
+    instance_content_locks: DashMap<String, Arc<Mutex<()>>>,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -95,6 +98,19 @@ pub struct State {
 }
 
 impl State {
+    pub(crate) async fn lock_instance_content(
+        &self,
+        instance_id: &str,
+    ) -> OwnedMutexGuard<()> {
+        let lock = self
+            .instance_content_locks
+            .entry(instance_id.to_string())
+            .or_insert_with(|| Arc::new(Mutex::new(())))
+            .clone();
+
+        lock.lock_owned().await
+    }
+
     pub async fn init(app_identifier: String) -> crate::Result<()> {
         let state = LAUNCHER_STATE
             .get_or_try_init(move || Self::initialize_state(app_identifier))
@@ -210,6 +226,7 @@ impl State {
             api_semaphore,
             install_job_semaphore: Semaphore::new(MAX_CONCURRENT_INSTALL_JOBS),
             install_db_semaphore: Semaphore::new(1),
+            instance_content_locks: DashMap::new(),
             discord_rpc,
             process_manager,
             friends_socket,

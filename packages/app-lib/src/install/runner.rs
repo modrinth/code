@@ -785,6 +785,7 @@ async fn remove_existing_imported_pack_content(
     metadata: &crate::state::InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
+    let _content_lock = state.lock_instance_content(instance_id).await;
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,

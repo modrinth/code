@@ -24,6 +24,7 @@ pub(crate) async fn sync_instance_content_files(
     instance: &Instance,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
+    let _content_lock = state.lock_instance_content(&instance.id).await;
     let scanned = filesystem::scan_content_files(
         &state.directories.instances_dir(),
         &instance.path,
