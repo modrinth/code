@@ -302,7 +302,7 @@ defineExpose({ show, hide })
 					}}
 				</span>
 				<div class="flex items-center gap-2">
-					<ButtonStyled circular>
+					<ButtonStyled circular color="red" color-fill="none">
 						<button
 							v-tooltip="formatMessage(messages.clearAllGroups)"
 							:disabled="isBusy || rows.length === 0"
