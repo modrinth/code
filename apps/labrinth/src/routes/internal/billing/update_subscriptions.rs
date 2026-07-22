@@ -101,14 +101,13 @@ pub async fn update_many(
         };
 
         // Update the subscription region
-        subscription.metadata.as_mut().map(|m| match m {
-            SubscriptionMetadata::Pyro { region, .. } => {
+        if let Some(m) = subscription.metadata.as_mut() {
+            if let SubscriptionMetadata::Pyro { region, .. } = m {
                 if let Some(new_region) = update.update_region.clone() {
                     *region = Some(new_region);
                 }
             }
-            _ => {}
-        });
+        }
 
         subscription.upsert(&mut txn).await?;
     }
