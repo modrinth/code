@@ -149,6 +149,7 @@ import {
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
+	ReportIcon,
 	SettingsIcon,
 	StopCircleIcon,
 	TagCategoryGamepad2Icon as Gamepad2Icon,
@@ -284,6 +285,7 @@ const emit = defineEmits<{
 	openFolder: []
 	export: []
 	createShortcut: []
+	report: [event?: MouseEvent]
 }>()
 
 const installingStages = [
@@ -346,24 +348,41 @@ const serverPlayActions = computed<JoinedButtonAction[]>(() => [
 		action: () => emit('play'),
 	},
 ])
-const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
-	{
-		id: 'open-folder',
-		label: formatMessage(messages.openFolder),
-		icon: FolderOpenIcon,
-		action: () => emit('openFolder'),
-	},
-	{
-		id: 'export-mrpack',
-		label: formatMessage(messages.exportModpack),
-		icon: PackageIcon,
-		action: () => emit('export'),
-	},
-	{
-		id: 'create-shortcut',
-		label: formatMessage(messages.createShortcut),
-		icon: ExternalIcon,
-		action: () => emit('createShortcut'),
-	},
-])
+const moreActions = computed<TeleportOverflowMenuItem[]>(() => {
+	const actions: TeleportOverflowMenuItem[] = [
+		{
+			id: 'open-folder',
+			label: formatMessage(messages.openFolder),
+			icon: FolderOpenIcon,
+			action: () => emit('openFolder'),
+		},
+		{
+			id: 'export-mrpack',
+			label: formatMessage(messages.exportModpack),
+			icon: PackageIcon,
+			action: () => emit('export'),
+		},
+		{
+			id: 'create-shortcut',
+			label: formatMessage(messages.createShortcut),
+			icon: ExternalIcon,
+			action: () => emit('createShortcut'),
+		},
+	]
+
+	if (props.instance.shared_instance?.role === 'member') {
+		actions.push(
+			{ divider: true },
+			{
+				id: 'report-shared-instance',
+				label: formatMessage(commonMessages.reportButton),
+				icon: ReportIcon,
+				color: 'red',
+				action: (event) => emit('report', event),
+			},
+		)
+	}
+
+	return actions
+})
 </script>

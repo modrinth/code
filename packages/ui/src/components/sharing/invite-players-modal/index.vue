@@ -100,16 +100,18 @@
 					<div class="text-base font-semibold text-contrast">
 						{{ inviteLinkHeading }}
 					</div>
-					<button
-						type="button"
-						class="flex h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-[14px] border-none bg-surface-2 px-4 text-left transition-all hover:brightness-110 active:scale-[0.98]"
-						@click="copyInviteLink"
-					>
-						<span class="min-w-0 truncate text-base font-semibold text-primary">
-							{{ link }}
-						</span>
-						<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
-					</button>
+					<ButtonStyled>
+						<button
+							type="button"
+							class="!h-10 w-full !justify-between !px-4 text-left"
+							@click="copyInviteLink"
+						>
+							<span class="min-w-0 truncate text-base font-semibold text-primary">
+								{{ link }}
+							</span>
+							<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+						</button>
+					</ButtonStyled>
 					<p v-if="link && linkExpiryDescription" class="m-0 text-base text-primary">
 						{{ linkExpiryDescription }}
 						<button

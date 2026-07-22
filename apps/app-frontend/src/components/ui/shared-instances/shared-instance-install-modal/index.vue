@@ -1,7 +1,11 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.installToPlay)"
+		:header="
+			reportMode
+				? formatMessage(messages.reportSharedInstance)
+				: formatMessage(messages.installToPlay)
+		"
 		:closable="true"
 		:on-hide="handleHide"
 		max-width="544px"
@@ -100,7 +104,14 @@
 							wrapper-class="w-full"
 						/>
 					</div>
-					<Checkbox v-model="blockUser" :label="formatMessage(messages.blockUser)" />
+					<div class="flex flex-col gap-2">
+						<Checkbox v-model="blockUser" :label="formatMessage(messages.blockUser)" />
+						<Checkbox
+							v-if="reportOnly"
+							v-model="deleteInstance"
+							:label="formatMessage(messages.deleteInstance)"
+						/>
+					</div>
 				</div>
 			</Transition>
 			<Admonition
@@ -178,7 +189,9 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-if="reportMode" color="brand">
-						<button><SendIcon />{{ formatMessage(commonMessages.reportButton) }}</button>
+						<button @click="submitReport">
+							<SendIcon />{{ formatMessage(commonMessages.reportButton) }}
+						</button>
 					</ButtonStyled>
 					<template v-else-if="hasExternalFiles">
 						<ButtonStyled type="transparent" color="orange">
@@ -227,6 +240,7 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	injectNotificationManager,
 	IntlFormatted,
 	ModpackContentModal,
 	NewModal,
@@ -256,11 +270,17 @@ const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
+const reportOnly = ref(false)
 type ReportReason = 'malicious' | 'illegal' | 'other'
 const reportReason = ref<ReportReason>('malicious')
 const additionalContext = ref('')
 const blockUser = ref(false)
+const deleteInstance = ref(true)
+const emit = defineEmits<{
+	reported: [deleteInstance: boolean]
+}>()
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const { load } = useSharedInstancePreviewContent()
 const {
 	showTopFade: showTableTopFade,
@@ -301,8 +321,17 @@ async function openViewContents() {
 		contentModal.value?.show([])
 	}
 }
+function submitReport() {
+	const shouldDeleteInstance = reportOnly.value && deleteInstance.value
+	hide()
+	addNotification({
+		type: 'success',
+		title: formatMessage(messages.reportSubmitted),
+	})
+	emit('reported', shouldDeleteInstance)
+}
 function handleCancel() {
-	if (reportMode.value) {
+	if (reportMode.value && !reportOnly.value) {
 		reportMode.value = false
 		void nextTick(() => forceCheckTableScroll())
 		return
@@ -315,9 +344,11 @@ function handleHide() {
 }
 function resetReportState() {
 	reportMode.value = false
+	reportOnly.value = false
 	reportReason.value = 'malicious'
 	additionalContext.value = ''
 	blockUser.value = false
+	deleteInstance.value = true
 }
 function show(
 	previewValue: SharedInstanceInstallPreview,
@@ -325,8 +356,18 @@ function show(
 	event?: MouseEvent,
 ) {
 	resetReportState()
-	preview.value = previewValue
 	install.value = installValue
+	showPreview(previewValue, event)
+}
+function showReport(previewValue: SharedInstanceInstallPreview, event?: MouseEvent) {
+	resetReportState()
+	reportMode.value = true
+	reportOnly.value = true
+	install.value = () => {}
+	showPreview(previewValue, event)
+}
+function showPreview(previewValue: SharedInstanceInstallPreview, event?: MouseEvent) {
+	preview.value = previewValue
 	hide_ads_window()
 	modal.value?.show(event)
 	void nextTick(() => forceCheckTableScroll())
@@ -337,6 +378,14 @@ function hide() {
 
 const messages = defineMessages({
 	installToPlay: { id: 'app.modal.install-to-play.header', defaultMessage: 'Install to play' },
+	reportSharedInstance: {
+		id: 'app.modal.install-to-play.report-shared-instance-header',
+		defaultMessage: 'Report shared instance',
+	},
+	reportSubmitted: {
+		id: 'app.modal.install-to-play.report-submitted',
+		defaultMessage: 'Report submitted',
+	},
 	sharedInstanceContent: {
 		id: 'app.modal.install-to-play.shared-instance-content',
 		defaultMessage: 'Shared instance content',
@@ -397,6 +446,10 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.block-user',
 		defaultMessage: 'Block this user',
 	},
+	deleteInstance: {
+		id: 'app.modal.install-to-play.delete-instance',
+		defaultMessage: 'Delete instance',
+	},
 	unknownFilesWarning: {
 		id: 'app.modal.install-to-play.unknown-files-warning',
 		defaultMessage: 'Unknown files warning',
@@ -434,5 +487,5 @@ const externalFileColumns = computed<TableColumn<ExternalFileColumn>[]>(() => [
 	},
 ])
 
-defineExpose({ show, hide })
+defineExpose({ show, showReport, hide })
 </script>

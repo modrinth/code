@@ -9,11 +9,12 @@
 		:confirm-icon="DownloadIcon"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
-		:show-report-button="false"
+		show-report-button
 		show-external-warnings
 		:external-warning-description="formatMessage(messages.externalWarningDescription)"
 		@confirm="update"
 		@cancel="emit('cancel')"
+		@report="emit('report', $event)"
 	/>
 </template>
 
@@ -44,6 +45,7 @@ type UpdateCompleteCallback = () => void | Promise<void>
 const emit = defineEmits<{
 	cancel: []
 	complete: []
+	report: [event?: MouseEvent]
 	sharedInstanceUnavailable: [reason: SharedInstanceUnavailableReason | null]
 }>()
 const modal = ref<InstanceType<typeof ContentDiffModal>>()

@@ -5,6 +5,10 @@
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal ref="exportModal" :instance="instance" />
+			<ConfirmDeleteInstanceModal
+				ref="reportDeleteConfirmModal"
+				@delete="deleteReportedInstance"
+			/>
 			<InstanceSettingsModal
 				:key="instance.id"
 				ref="settingsModal"
@@ -16,6 +20,11 @@
 			<SharedInstanceUpdateModal
 				ref="sharedInstanceUpdateModal"
 				@shared-instance-unavailable="handleSharedInstanceUnavailable"
+				@report="(event) => reportSharedInstance(event, true)"
+			/>
+			<SharedInstanceInstallModal
+				ref="sharedInstanceReportModal"
+				@reported="handleSharedInstanceReported"
 			/>
 			<InstancePageHeader
 				:instance="instance"
@@ -42,6 +51,7 @@
 				@open-folder="() => instance && showInstanceInFolder(instance.id)"
 				@export="() => exportModal?.show()"
 				@create-shortcut="() => createShortcut()"
+				@report="reportSharedInstance"
 			/>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
@@ -138,9 +148,11 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceAdmonitions from '@/components/ui/instance/instance-admonitions/index.vue'
 import InstancePageHeader from '@/components/ui/instance-page-header/index.vue'
+import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import SharedInstanceUpdateModal from '@/components/ui/shared-instances/SharedInstanceUpdateModal.vue'
+import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
@@ -152,11 +164,12 @@ import { instance_listener, process_listener } from '@/helpers/events'
 import {
 	getSharedInstanceUnavailableReason,
 	install_existing_instance,
+	install_get_shared_instance_preview,
 	install_pack_to_existing_instance,
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
-import { get, get_full_path, kill, run } from '@/helpers/instance'
+import { get, get_full_path, kill, remove, run } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
@@ -201,6 +214,9 @@ const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
+const sharedInstanceReportModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
+const reportDeleteConfirmModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
+const reportedInstanceToDelete = ref<GameInstance | null>(null)
 
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 
@@ -589,6 +605,43 @@ const createShortcut = async () => {
 			text: `${error}`,
 		})
 	}
+}
+
+async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false) {
+	const reportInstance = instance.value
+	const sharedInstance = reportInstance?.shared_instance
+	if (!reportInstance || sharedInstance?.role !== 'member') return
+
+	try {
+		const preview = await install_get_shared_instance_preview(
+			sharedInstance.id,
+			reportInstance.name,
+		)
+		if (instance.value?.id !== reportInstance.id) return
+		if (closeUpdateModal) sharedInstanceUpdateModal.value?.hide()
+		sharedInstanceReportModal.value?.showReport(preview, event)
+	} catch (error) {
+		handleError(error as Error)
+	}
+}
+
+function handleSharedInstanceReported(deleteInstance: boolean) {
+	if (!deleteInstance || !instance.value) return
+	reportedInstanceToDelete.value = instance.value
+	reportDeleteConfirmModal.value?.show()
+}
+
+async function deleteReportedInstance() {
+	const reportedInstance = reportedInstanceToDelete.value
+	reportedInstanceToDelete.value = null
+	if (!reportedInstance) return
+
+	trackEvent('InstanceRemove', {
+		loader: reportedInstance.loader,
+		game_version: reportedInstance.game_version,
+	})
+	await router.push({ path: '/' })
+	await remove(reportedInstance.id).catch(handleError)
 }
 
 const handleRightClick = (event: MouseEvent) => {

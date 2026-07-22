@@ -22,11 +22,9 @@
 							Invite friends
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="orange" circular>
+					<ButtonStyled>
 						<button
-							v-tooltip="formatMessage(messages.pushUpdate)"
-							class="!h-10 !min-h-10 !w-10 !min-w-10 shrink-0 !p-0"
-							:aria-label="formatMessage(messages.pushUpdate)"
+							class="flex !h-10 shrink-0 items-center gap-2"
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
 						>
@@ -36,6 +34,7 @@
 								aria-hidden="true"
 							/>
 							<UploadIcon v-else aria-hidden="true" />
+							{{ formatMessage(messages.pushUpdate) }}
 						</button>
 					</ButtonStyled>
 				</template>

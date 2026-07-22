@@ -139,18 +139,28 @@
 		<template #actions>
 			<div v-if="hasExternalDiffs" class="flex flex-col gap-6 p-2">
 				<p class="m-0 text-primary">{{ formatMessage(messages.reviewedFiles) }}</p>
-				<div class="flex justify-end gap-2">
-					<ButtonStyled type="transparent" color="orange">
-						<button :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
-							{{ formatMessage(messages.installAnyway) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button @click="handleCancel">
-							<BanIcon />
-							{{ formatMessage(messages.dontInstall) }}
-						</button>
-					</ButtonStyled>
+				<div class="flex justify-between gap-2">
+					<div>
+						<ButtonStyled v-if="showReportButton" color="red" type="transparent">
+							<button @click="emit('report', $event)">
+								<ReportIcon />
+								{{ formatMessage(commonMessages.reportButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
+					<div class="flex gap-2">
+						<ButtonStyled type="transparent" color="orange">
+							<button :disabled="buttonsDisabled || confirmDisabled" @click="handleConfirm">
+								{{ formatMessage(messages.installAnyway) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="brand">
+							<button @click="handleCancel">
+								<BanIcon />
+								{{ formatMessage(messages.dontInstall) }}
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
 			</div>
 			<div
@@ -160,7 +170,7 @@
 			>
 				<div>
 					<ButtonStyled v-if="showReportButton" color="red" type="transparent">
-						<button @click="emit('report')">
+						<button @click="emit('report', $event)">
 							<ReportIcon />
 							{{ formatMessage(commonMessages.reportButton) }}
 						</button>
@@ -228,7 +238,7 @@ const props = defineProps<{
 const emit = defineEmits<{
 	confirm: []
 	cancel: []
-	report: []
+	report: [event?: MouseEvent]
 }>()
 
 const { formatMessage } = useVIntl()

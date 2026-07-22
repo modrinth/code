@@ -7,6 +7,7 @@ import {
 import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type Ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
@@ -16,6 +17,8 @@ import {
 	install_get_shared_instance_preview,
 	install_shared_instance,
 } from '@/helpers/install'
+import { list } from '@/helpers/instance'
+import { useTheming } from '@/store/state'
 
 import { parseSharedInstanceInviteNotification } from './shared-instance-invite-parser'
 import type { AppNotification, SharedInstanceInvite } from './shared-instance-invite-types'
@@ -31,8 +34,13 @@ type AccountRequiredModal = {
 	show(event?: MouseEvent): Promise<boolean>
 }
 
+type AlreadyInstalledModal = {
+	show(instanceName: string): void
+}
+
 export function useSharedInstanceInviteHandler(
 	installModal: Ref<InstallModal | undefined>,
+	alreadyInstalledModal: Ref<AlreadyInstalledModal | undefined>,
 	accountRequiredModal: Ref<AccountRequiredModal | undefined>,
 ) {
 	const auth = injectAuth()
@@ -40,7 +48,17 @@ export function useSharedInstanceInviteHandler(
 	const { handleError } = injectNotificationManager()
 	const { addPopupNotification } = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
+	const router = useRouter()
+	const themeStore = useTheming()
 	const displayedNotifications = new Set<string | number>()
+	let pendingAlreadyInstalled:
+		| {
+				instanceId: string
+				preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>
+				install: () => Promise<void>
+				onGoToInstance?: () => void | Promise<void>
+		  }
+		| undefined
 
 	async function markNotificationRead(notification: AppNotification) {
 		await client.labrinth.notifications_v2.markAsRead(String(notification.id))
@@ -67,6 +85,60 @@ export function useSharedInstanceInviteHandler(
 		installModal.value.show(preview, install)
 	}
 
+	async function showInstallOrAlreadyInstalled(
+		sharedInstanceId: string,
+		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
+		install: () => Promise<void>,
+		onGoToInstance?: () => void | Promise<void>,
+	) {
+		const existingInstance = (await list()).find(
+			(instance) => instance.shared_instance?.id === sharedInstanceId,
+		)
+
+		if (!existingInstance || themeStore.getFeatureFlag('skip_non_essential_warnings')) {
+			showInstall(preview, install)
+			return
+		}
+
+		if (!alreadyInstalledModal.value) {
+			throw new Error('Shared instance already installed modal is not available.')
+		}
+
+		pendingAlreadyInstalled = {
+			instanceId: existingInstance.id,
+			preview,
+			install,
+			onGoToInstance,
+		}
+		alreadyInstalledModal.value.show(existingInstance.name)
+	}
+
+	function handleAlreadyInstalledCancel() {
+		pendingAlreadyInstalled = undefined
+	}
+
+	async function handleAlreadyInstalledGoToInstance() {
+		const pending = pendingAlreadyInstalled
+		pendingAlreadyInstalled = undefined
+		if (!pending) return
+
+		if (pending.onGoToInstance) {
+			try {
+				await pending.onGoToInstance()
+			} catch (error) {
+				handleError(toError(error))
+			}
+		}
+		await router.push(`/instance/${encodeURIComponent(pending.instanceId)}/`)
+	}
+
+	function handleAlreadyInstalledInstallAnyway() {
+		const pending = pendingAlreadyInstalled
+		pendingAlreadyInstalled = undefined
+		if (!pending) return
+		showInstall(pending.preview, pending.install)
+	}
+
 	async function acceptNotification(notification: AppNotification, invite: SharedInstanceInvite) {
 		try {
 			const preview = await install_get_shared_instance_preview(
@@ -75,18 +147,23 @@ export function useSharedInstanceInviteHandler(
 			)
 			if (invite.instanceIconUrl) preview.iconUrl = invite.instanceIconUrl
 
-			showInstall(preview, async () => {
-				await install_shared_instance(
-					invite.sharedInstanceId,
-					invite.sharedInstanceName,
-					invite.invitedById,
-					null,
-					null,
-					invite.instanceIconUrl,
-				)
-				await markNotificationRead(notification)
-				await queryClient.invalidateQueries({ queryKey: ['instances'] })
-			})
+			await showInstallOrAlreadyInstalled(
+				invite.sharedInstanceId,
+				preview,
+				async () => {
+					await install_shared_instance(
+						invite.sharedInstanceId,
+						invite.sharedInstanceName,
+						invite.invitedById,
+						null,
+						null,
+						invite.instanceIconUrl,
+					)
+					await markNotificationRead(notification)
+					await queryClient.invalidateQueries({ queryKey: ['instances'] })
+				},
+				() => markNotificationRead(notification),
+			)
 		} catch (error) {
 			handleError(toError(error))
 		}
@@ -140,21 +217,31 @@ export function useSharedInstanceInviteHandler(
 		try {
 			if (!(await requireAccount())) return
 			const invite = await install_accept_shared_instance_invite(inviteId)
-			showInstall(invite.preview, async () => {
-				await install_shared_instance(
-					invite.sharedInstanceId,
-					invite.preview.name,
-					invite.managerId,
-					invite.serverManagerName,
-					invite.serverManagerIconUrl,
-					invite.instanceIconUrl,
-				)
-				await queryClient.invalidateQueries({ queryKey: ['instances'] })
-			})
+			await showInstallOrAlreadyInstalled(
+				invite.sharedInstanceId,
+				invite.preview,
+				async () => {
+					await install_shared_instance(
+						invite.sharedInstanceId,
+						invite.preview.name,
+						invite.managerId,
+						invite.serverManagerName,
+						invite.serverManagerIconUrl,
+						invite.instanceIconUrl,
+					)
+					await queryClient.invalidateQueries({ queryKey: ['instances'] })
+				},
+			)
 		} catch (error) {
 			handleError(toError(error))
 		}
 	}
 
-	return { handleNotification, installFromInviteId }
+	return {
+		handleNotification,
+		installFromInviteId,
+		handleAlreadyInstalledCancel,
+		handleAlreadyInstalledGoToInstance,
+		handleAlreadyInstalledInstallAnyway,
+	}
 }
