@@ -130,6 +130,7 @@ provideModrinthClient(client)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(false),
 	showAds: ref(false),
+	adConsentAvailable: ref(false),
 	openExternalUrl: (url) => window.open(url, '_blank'),
 })
 

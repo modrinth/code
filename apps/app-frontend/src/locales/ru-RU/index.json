@@ -419,23 +419,47 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Не устанавливать"
+  },
   "app.modal.install-to-play.header": {
     "message": "Установка перед запуском"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Всё равно установить"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Это приглашение создано другим пользователем Modrinth. Принимайте приглашения только от тех, кому доверяете."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Сборка"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Сборка этого сервера содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Предупреждение о неизвестных файлах"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Нераспознанные файлы"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Посмотреть содержимое"
   },
   "app.modal.update-to-play.header": {
     "message": "Обновление перед запуском"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Удалён"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Обновите {name} до последней версии, чтобы запустить игру."
@@ -448,9 +472,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Вернуться к поиску"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Установка контента в сборку"
   },
   "app.project.version.all-versions": {
     "message": "Все версии"

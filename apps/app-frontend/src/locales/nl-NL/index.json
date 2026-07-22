@@ -11,6 +11,87 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Verberg meer actieve instanties"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Gekopieerd"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Details kopiëren"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Sluiten"
+  },
+  "app.action-bar.install.open-instance": {
+    "message": "Instantie openen"
+  },
+  "app.action-bar.install.retry": {
+    "message": "Opnieuw proberen"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Geannuleerd vanwege het sluiten van de app"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Modpack kon niet gelezen worden"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Geannuleerd"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Opschonen is niet voltooid"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Bestanden konden niet gedownload worden"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Gedownloade bestand is beschadigd"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Bestanden konden niet opgeslagen worden"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Downloaden kon niet worden voltooid"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instantie kon niet gevonden worden"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Bestandspad is ongeldig"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Modpack-gegevens ongeldig"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpack-bestanden bevatten ongeldige metagegevens"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Installatie van Java kon niet worden voltooid"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Instellen van loader is mislukt"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Lokale gegevens konden niet bijgewerkt worden"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Instellen van Minecraft is mislukt"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Modrinth kon niet bereikt worden"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Geen schrijfrechten"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Pack kon niet gedownload worden"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Er is iets misgegaan"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Onbekende instantie"
+  },
+  "app.action-bar.installs": {
+    "message": "Installaties"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "Maak primaire instantie"
   },
@@ -101,6 +182,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Speeltijd laten zien"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Bevestigingen met een laag risico, zoals het installeren van dubbele modpacks, het verwijderen van normale inhoud, bulkupdates, het ontkoppelen van modpacks en reparatieverzoeken, worden automatisch overgeslagen. Waarschuwingen voor gevaarlijke dingen worden nog steeds weergegeven."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Niet-essentiële waarschuwingen overslaan"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Schakelt de mogelijkheid om de zijbalk in- of uit te schakelen in."
   },
@@ -141,16 +228,19 @@
     "message": "Terug naar instantie"
   },
   "app.browse.discover-content": {
-    "message": "Ontdek content"
+    "message": "Inhoud ontdekken"
   },
   "app.browse.discover-servers": {
     "message": "Ontdek servers"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Al toegevoegde servers verbergen"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Het toevoegen van content kan de compatibiliteit verbreken bij het verbinden met de server. Alle toegevoegde inhoud gaat ook verloren wanneer u de content van de serverinstantie bijwerkt."
+    "message": "Het toevoegen van inhoud kan de compatibiliteit verstoren bij het verbinden met de server. Eventuele toegevoegde inhoud gaat bovendien verloren wanneer je de inhoud van de serverinstantie bijwerkt."
   },
   "app.browse.server.installing": {
     "message": "Installeren"
@@ -167,6 +257,9 @@
   "app.export-modal.header": {
     "message": "Exporteer modpack"
   },
+  "app.export-modal.modpack-name-label": {
+    "message": "Naam van modpack"
+  },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpack naam"
   },
@@ -176,8 +269,62 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.install.phase.downloading_content": {
+    "message": "Inhoud aan het downloaden"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Minecraft aan het downloaden"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Pakketbestand aan het downloaden"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Overschrijvingen eruit halen"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Aan het afronden"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "In de wachtrij voor installatie"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Java aan het voorbereiden"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Java {version} aan het downloaden"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Java {version} aan het uitpakken"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Java {version} aan het ophalen"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Java {version} aan het voorbereiden"
+  },
+  "app.install.phase.preparing_java.validating": {
+    "message": "Java {version} aan het valideren"
+  },
+  "app.install.phase.reading_pack_manifest": {
+    "message": "Paketmanifest aan het lezen"
+  },
+  "app.install.phase.resolving_loader": {
+    "message": "Loader wordt bepaald"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Minecraft wordt bepaald"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Inhoud aan het bepalen"
+  },
+  "app.install.phase.rolling_back": {
+    "message": "Aan het terugdraaien"
+  },
+  "app.install.phase.running_loader_processors": {
+    "message": "Loader-processors aan het uitvoeren"
+  },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Alle data van je instantie zal permanent verwijderd worden, inclusief al je werelden, voorkeuren, en alle geïnstalleerde content."
+    "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Deze actie kan niet ongedaan gemaakt worden"
@@ -199,6 +346,15 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instantie"
+  },
+  "app.instance.mods.bulk-update.downloading-projects": {
+    "message": "{current, number}/{total, number} projecten aan het downloaden..."
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Update aan het afronden..."
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Versies worden bepaald..."
   },
   "app.instance.mods.content-type-project": {
     "message": "project"
@@ -224,6 +380,18 @@
   "app.instance.worlds.browse-servers": {
     "message": "Zoek servers"
   },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Wereld verwijderen"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Wereld verwijderen"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Deze wereld wordt definitief uit deze instantie verwijderd. Deze actie kan niet ongedaan worden gemaakt."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "{name} verwijderen"
+  },
   "app.instance.worlds.filter-modded": {
     "message": "Gemod"
   },
@@ -242,26 +410,62 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Noch servers noch werelden toegevoegd"
   },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Server verwijderen"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Server verwijderen"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Deze server wordt verwijderd uit je serverlijst en uit de serverlijst in het spel. Je kunt hem later weer toevoegen als je het adres weet."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "{name} verwijderen"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
+  },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Niet installeren"
   },
   "app.modal.install-to-play.header": {
     "message": "Installeer om te spelen"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Toch installeren"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installeer"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Deze uitnodiging is aangemaakt door een andere Modrinth-gebruiker, niet door Modrinth zelf. Accepteer alleen uitnodigingen van mensen die je vertrouwt."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Gedeelde instantie"
   },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Dit server-modpack bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Waarschuwing voor onbekende bestanden"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Onbekende bestanden"
+  },
   "app.modal.install-to-play.view-contents": {
-    "message": "Toon content"
+    "message": "Inhoud bekijken"
   },
   "app.modal.update-to-play.header": {
     "message": "Update om te spelen"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Verwijderde"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
@@ -269,11 +473,11 @@
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Versie wijzigen"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Terug naar Ontdekken"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installeer content naar instantie"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
@@ -390,10 +594,13 @@
     "message": "Je skinvolgorde kon niet worden opgeslagen."
   },
   "app.skins.reorder-error.title": {
-    "message": "Het herschikken van skins is mislukt."
+    "message": "Herschikken van skins is mislukt"
   },
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
+  },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
   },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
@@ -621,7 +828,7 @@
     "message": "Verwijder instantie"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Verwijdert permanent een instantie van je apparaat, inclusief je werelden, instellingen en alle geïnstalleerde inhoud. Wees voorzichtig, zodra je een instantie verwijdert, is het niet meer mogelijk om deze te herstellen."
+    "message": "Hiermee wordt een instantie definitief van je apparaat verwijderd, inclusief je werelden, instellingen en alle geïnstalleerde inhoud. Wees voorzichtig, want zodra je een instantie hebt verwijderd, kun je deze niet meer herstellen."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Verwijderen..."
@@ -811,6 +1018,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Kopieer adres"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Snelkoppeling maken"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Niet tonen op de startpagina"

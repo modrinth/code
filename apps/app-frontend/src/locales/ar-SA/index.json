@@ -455,9 +455,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "العودة إلى الاستكشاف"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "تثبيت المحتويات الى النموذج"
-  },
   "app.project.version.all-versions": {
     "message": "جميع الإصدارات"
   },

@@ -126,7 +126,7 @@
     "defaultMessage": "选定的项目尚未安装"
   },
   "browse.view-prefix": {
-    "defaultMessage": "查看："
+    "defaultMessage": "显示数量："
   },
   "button.accept": {
     "defaultMessage": "接受"
@@ -455,11 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "不要安装"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "已添加"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "已移除"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "已更新"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "仍然安装"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "移除了 {count} 项"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "你服务器上的部分内容未能完成分析，可能受此变更影响。"
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "这个更新包含一些未在 Modrinth 发布的文件。我们强烈建议只从你信任的来源安装文件。"
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "未知文件警告"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "未知"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "更新了 {count} 项"
@@ -1758,10 +1785,10 @@
     "defaultMessage": "支持选项"
   },
   "hosting.specs.burst": {
-    "defaultMessage": "Burst 时最高 {cpus} CPU"
+    "defaultMessage": "爆发时最多 {cpus} CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "CPU burst 可让你的服务器暂时使用其他线程，从而减轻 TPS 骤降问题。单击以获取更多信息。"
+    "defaultMessage": "CPU 爆发可让你的服务器暂时使用其他线程，从而减轻 TPS 骤降问题。单击以获取更多信息。"
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB 内存"
@@ -5545,6 +5572,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "全部忽略"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "不要安装"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "不再显示此警告"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "确认安装"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "仍然安装"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "恶意软件经常通过在像 Discord 这样的平台上分享的 mod 文件传播。"
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": "没有在 Modrinth 上发布。我们强烈建议只安装你信任来源的文件。"
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "未知文件警告"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": "包含一些未在 Modrinth 发布的文件。我们强烈建议只从你信任的来源安装文件。"
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "未知文件警告"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "未识别文件"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "该用户自 Modrinth 内测时期便已加入平台，该测试版于 2020 年 11 月收官。"

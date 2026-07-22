@@ -422,23 +422,47 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cerca tra {count} mondi..."
   },
+  "app.modal.install-to-play.dont-install": {
+    "message": "Non installare"
+  },
   "app.modal.install-to-play.header": {
     "message": "Installa per continuare"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installa comunque"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Installa"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Questo invito è stato creato da un utente e non da Modrinth. Accetta solo gli inviti da persone fidate."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Solo i file pubblicati su Modrinth vengono esaminati, qualunque sia il loro formato (.mrpack inclusi)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Istanza condivisa"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Questo pacchetto contiene dei file che non sono su Modrinth. Consigliamo di installare file solo da fonti attendibili."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "File sconosciuti"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "File non riconosciuti"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Mostra contenuti"
   },
   "app.modal.update-to-play.header": {
     "message": "Aggiorna per continuare"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Rimosso"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} richiede degli aggiornamenti. Installa l'ultima versione per poter giocare."
@@ -451,9 +475,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Torna a Esplora"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installa il contenuto nell'istanza"
   },
   "app.project.version.all-versions": {
     "message": "Tutte le versioni"

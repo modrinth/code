@@ -2609,9 +2609,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Dobbeltsjekk lommeboksadressa di. Penger sendt til feil adresse kan ikke bli gjenoppretta."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Endringer blir utført på {count, plural, one {prosjekt} other {prosjekter}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth-skaper."
   },
@@ -2678,9 +2675,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedlasting} other {nedlastinger}}"
-  },
   "profile.label.joined": {
     "message": "Blei med"
   },
@@ -2698,9 +2692,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasjoner"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
   },
   "profile.label.saving": {
     "message": "Lagrer..."
@@ -3037,12 +3028,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Besøk prosjekt-dashbordet"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {nedlasting} other {nedlastinger}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {følger} other {følgere}}"
   },
   "project.status.archived.message": {
     "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."

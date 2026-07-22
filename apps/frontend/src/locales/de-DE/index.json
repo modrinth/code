@@ -2999,9 +2999,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Überprüfe deine Wallet-Adresse. An eine falsche Adresse gesendete Gelder können nicht wiederhergestellt werden."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Änderungen werden auf {count, plural, one {# Projekt} other {# Projekte}} angewendet."
-  },
   "profile.bio.fallback.creator": {
     "message": "Ein Modrinth-Ersteller."
   },
@@ -3068,9 +3065,6 @@
   "profile.label.collection": {
     "message": "Kollektion"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {Download} other {Downloads}}"
-  },
   "profile.label.joined": {
     "message": "Beigetreten"
   },
@@ -3088,9 +3082,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisationen"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {Projekt} other {Projekte}}"
   },
   "profile.label.saving": {
     "message": "Speichert..."
@@ -3656,12 +3647,6 @@
   "project.settings.visit-dashboard": {
     "message": "Projekt-Dashboard besuchen"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {Download} other {Downloads}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {Follower} other {Follower}}"
-  },
   "project.status.archived.message": {
     "message": "{title} wurde archiviert. {title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheidet sich das Projekt zu dearchivieren."
   },
@@ -4081,9 +4066,6 @@
   },
   "servers.plan.small.description": {
     "message": "Perfekt für 1–5 Freunde mit ein paar kleinen Mods."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {monatlich} quarterly {vierteljährlich} yearly {jährlich} other {{interval}}} abgerechnet"
   },
   "settings.account.button.complete-setup": {
     "message": "Einrichtung abschließen"

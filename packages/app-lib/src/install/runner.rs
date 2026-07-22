@@ -1313,7 +1313,8 @@ fn install_error_code(
         ErrorKind::FetchError(_)
         | ErrorKind::ApiIsDownError(_)
         | ErrorKind::WSError(_)
-        | ErrorKind::WSClosedError(_) => "network_error",
+        | ErrorKind::WSClosedError(_)
+        | ErrorKind::Ratelimited { .. } => "network_error",
         ErrorKind::Any(_)
             if matches!(
                 phase,

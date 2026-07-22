@@ -77,6 +77,7 @@ import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
+import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
@@ -91,7 +92,14 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
-import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
+import {
+	ads_consent_listener,
+	get_ads_consent_required,
+	hide_ads_window,
+	init_ads_window,
+	perform_ads_consent_action,
+	show_ads_window,
+} from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
@@ -187,6 +195,8 @@ const { handleError, addNotification } = notificationManager
 const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
+let adsConsentPopupId = null
+let unlistenAdsConsent
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
@@ -217,9 +227,20 @@ const { data: authenticatedModrinthUser } = useQuery({
 	enabled: () => !!credentials.value?.session,
 	retry: false,
 })
+const hasPlus = computed(
+	() =>
+		!!credentials.value?.user &&
+		(hasMidasBadge(credentials.value.user) ||
+			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
+)
+const showAd = computed(
+	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
+)
+const adConsentAvailable = computed(() => credentials.value !== undefined && !hasPlus.value)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
-	showAds: ref(false),
+	showAds: showAd,
+	adConsentAvailable,
 	floatingActionBarOffsets: {
 		left: ref(APP_LEFT_NAV_WIDTH),
 		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
@@ -299,6 +320,12 @@ const authUnreachable = computed(() => {
 
 onMounted(async () => {
 	await useCheckDisableMouseover()
+	try {
+		unlistenAdsConsent = await ads_consent_listener(handleAdsConsentRequired)
+		handleAdsConsentRequired(await get_ads_consent_required())
+	} catch (error) {
+		handleError(error)
+	}
 
 	document.querySelector('body').addEventListener('click', handleClick)
 	document.querySelector('body').addEventListener('auxclick', handleAuxClick)
@@ -312,6 +339,7 @@ onUnmounted(async () => {
 	unsubscribeSidebarToggle()
 	clearDelayedUpdatePopup()
 
+	await unlistenAdsConsent?.()
 	await unlistenUpdateDownload?.()
 })
 
@@ -336,7 +364,76 @@ const messages = defineMessages({
 		defaultMessage:
 			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
 	},
+	adsConsentTitle: {
+		id: 'app.ads-consent.title',
+		defaultMessage: 'Your privacy and how ads support Modrinth',
+	},
+	adsConsentBody: {
+		id: 'app.ads-consent.body',
+		defaultMessage:
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance.',
+	},
+	adsConsentManage: {
+		id: 'app.ads-consent.manage',
+		defaultMessage: 'Manage preferences',
+	},
+	adsConsentReject: {
+		id: 'app.ads-consent.reject',
+		defaultMessage: 'Reject all',
+	},
+	adsConsentAccept: {
+		id: 'app.ads-consent.accept',
+		defaultMessage: 'Accept all',
+	},
 })
+
+function handleAdsConsentRequired(required) {
+	if (!required) {
+		if (adsConsentPopupId !== null) {
+			popupNotificationManager.removeNotification(adsConsentPopupId)
+			adsConsentPopupId = null
+		}
+		return
+	}
+
+	if (
+		adsConsentPopupId !== null &&
+		popupNotificationManager.getNotifications().some((item) => item.id === adsConsentPopupId)
+	) {
+		return
+	}
+
+	const notification = addPopupNotification({
+		title: formatMessage(messages.adsConsentTitle),
+		text: formatMessage(messages.adsConsentBody),
+		type: 'info',
+		hideIcon: true,
+		autoCloseMs: null,
+		dismissible: false,
+		buttons: [
+			{
+				label: formatMessage(messages.adsConsentManage),
+				action: () => perform_ads_consent_action('manage').catch(handleError),
+				color: 'standard',
+				keepOpen: true,
+			},
+			{
+				label: formatMessage(messages.adsConsentReject),
+				action: () => perform_ads_consent_action('reject').catch(handleError),
+				color: 'brand',
+				keepOpen: true,
+			},
+			{
+				label: formatMessage(messages.adsConsentAccept),
+				action: () => perform_ads_consent_action('accept').catch(handleError),
+				color: 'brand',
+				keepOpen: true,
+			},
+		],
+	})
+
+	adsConsentPopupId = notification.id
+}
 
 async function setupApp() {
 	const {
@@ -407,7 +504,7 @@ async function setupApp() {
 		addNotification({
 			title: 'Warning',
 			text: e.message,
-			type: 'warn',
+			type: 'warning',
 		}),
 	)
 
@@ -592,6 +689,7 @@ watch(stateInitialized, (ready) => {
 const error = useError()
 const errorModal = ref()
 const minecraftAuthErrorModal = ref()
+const minecraftRequiredModal = ref()
 
 const contentInstall = createContentInstall({ router, handleError })
 provideContentInstall(contentInstall)
@@ -734,17 +832,6 @@ async function performLogOut() {
 	await fetchCredentials()
 }
 
-const hasPlus = computed(
-	() =>
-		!!credentials.value?.user &&
-		(hasMidasBadge(credentials.value.user) ||
-			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
-)
-
-const showAd = computed(
-	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
-)
-
 async function fetchIntercomToken() {
 	const creds = await getCreds()
 	if (!creds?.session) {
@@ -771,19 +858,28 @@ async function fetchIntercomToken() {
 	return await response.json()
 }
 
-watch(showAd, () => {
-	if (!showAd.value) {
-		hide_ads_window(true)
-	} else {
-		init_ads_window(true)
-	}
-})
+watch(
+	[showAd, adConsentAvailable],
+	async ([showAds, canManageConsent]) => {
+		if (showAds) {
+			await init_ads_window(true)
+			return
+		}
+
+		await hide_ads_window(true)
+		if (canManageConsent) {
+			await init_ads_window()
+		}
+	},
+	{ immediate: true },
+)
 
 onMounted(() => {
 	invoke('show_window')
 
 	error.setErrorModal(errorModal.value)
 	error.setMinecraftAuthErrorModal(minecraftAuthErrorModal.value)
+	error.setMinecraftRequiredModal(minecraftRequiredModal.value)
 
 	setContentIncompatibilityWarningModal(incompatibilityWarningModal.value)
 	setContentInstallModal(modInstallModal.value)
@@ -1744,6 +1840,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
+	<MinecraftRequiredModal ref="minecraftRequiredModal" />
 	<ContentInstallModal
 		ref="modInstallModal"
 		:instances="contentInstallInstances"
