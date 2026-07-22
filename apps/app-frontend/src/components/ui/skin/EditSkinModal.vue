@@ -11,6 +11,7 @@
 				<SkinPreviewRenderer
 					:variant="variant"
 					:texture-src="previewSkin || ''"
+					:ears-texture-src="uploadedTextureUrl?.original ?? currentSkin?.texture"
 					:cape-src="selectedCapeTexture"
 					framing="modal"
 					:initial-rotation="Math.PI / 8"

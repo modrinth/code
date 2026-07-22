@@ -272,9 +272,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Kembali ke halaman pencarian"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Pasang konten ke instans"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
   },

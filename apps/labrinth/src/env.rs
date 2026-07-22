@@ -149,6 +149,11 @@ vars! {
     REDIS_MAX_CONNECTIONS: u32 = 2048u32;
     REDIS_MIN_CONNECTIONS: usize = 0usize;
 
+    REDIS_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
+    REDIS_ACTUAL_EXPIRY: i64 = 60 * 30;
+    REDIS_VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
+    REDIS_VERSION_ACTUAL_EXPIRY: i64 = 60 * 30;
+
     // Minimum and maximum number of connections when Redis is in Cluster topology, Pooled connection type.
     REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;
     REDIS_CLUSTER_MIN_CONNECTIONS: usize = 0usize;

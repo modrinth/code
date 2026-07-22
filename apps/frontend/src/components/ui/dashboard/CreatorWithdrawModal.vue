@@ -54,7 +54,7 @@
 			<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
 			<LegacyPaypalDetailsStage v-else-if="currentStage === 'paypal-details'" />
 			<CompletionStage v-else-if="currentStage === 'completion'" />
-			<div v-else>Something went wrong</div>
+			<div v-else>{{ formatMessage(commonMessages.errorNotificationTitle) }}</div>
 		</div>
 		<template #actions>
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
@@ -96,7 +96,7 @@
 	</NewModal>
 	<CreatorTaxFormModal
 		ref="taxFormModal"
-		close-button-text="Continue"
+		:close-button-text="formatMessage(commonMessages.continueButton)"
 		@success="onTaxFormSuccess"
 		@cancelled="onTaxFormCancelled"
 	/>

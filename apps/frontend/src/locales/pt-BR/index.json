@@ -3005,9 +3005,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifique novamente seu endereço da carteira. Fundos enviados para um endereço incorreto não podem ser recuperados."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "As alterações serão aplicadas a {count, plural, one {# projeto} other {# projetos}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Um criador Modrinth."
   },
@@ -3656,12 +3653,6 @@
   "project.settings.visit-dashboard": {
     "message": "Visitar painel de projetos"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, =0 {Nenhum download} one {# download} other {# downloads}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, =0 {Nenhum seguidor} one {# seguidor} other {# seguidores}}"
-  },
   "project.status.archived.message": {
     "message": "{title} foi arquivado. {title} não receberá atualizações a menos que o autor decida desarquivar o projeto."
   },
@@ -4081,9 +4072,6 @@
   },
   "servers.plan.small.description": {
     "message": "Perfeito para 1–5 amigos e alguns mods leves."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "cobrado {interval, select, monthly {mensalmente} quarterly {trimestralmente} yearly {anualmente} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Terminar configuração"

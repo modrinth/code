@@ -2996,9 +2996,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Перепроверьте адрес кошелька. Отправку средств на неверный адрес невозможно отменить."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Изменения будут применены к {count, plural, one {# проекту} other {# проектам}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Автор на Modrinth."
   },
@@ -3065,9 +3062,6 @@
   "profile.label.collection": {
     "message": "Коллекция"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
-  },
   "profile.label.joined": {
     "message": "Регистрация:"
   },
@@ -3085,9 +3079,6 @@
   },
   "profile.label.organizations": {
     "message": "Организации"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "profile.label.saving": {
     "message": "Сохранение..."
@@ -3653,12 +3644,6 @@
   "project.settings.visit-dashboard": {
     "message": "Управление проектами"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {загрузка} few {загрузки} other {загрузок}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
-  },
   "project.status.archived.message": {
     "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
@@ -4060,9 +4045,6 @@
   },
   "servers.plan.small.description": {
     "message": "Для 1–5 друзей и пары лёгких модов."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {на месяц} quarterly {на 3 месяца} yearly {на год} other {оплата {interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"

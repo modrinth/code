@@ -4,11 +4,11 @@ use redis::aio::ConnectionLike;
 use redis::{FromRedisValue, ToRedisArgs};
 
 use crate::database::models::DatabaseError;
+use crate::env::ENV;
 
 use super::cache::CacheSettings;
 use super::util::cmd;
 
-pub const DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
 pub const MGET_CHUNK_SIZE: usize = 32;
 
 #[tracing::instrument(skip_all)]
@@ -26,7 +26,7 @@ where
         .arg(key)
         .arg(data)
         .arg("EX")
-        .arg(expiry.unwrap_or(DEFAULT_EXPIRY))
+        .arg(expiry.unwrap_or(ENV.REDIS_DEFAULT_EXPIRY))
         .query_async::<()>(connection)
         .await?;
     Ok(())

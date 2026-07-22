@@ -1730,9 +1730,6 @@
   "servers.plan.small.description": {
     "message": "Savršeno za 1–5 prijatelja sa nekoliko lakih modova."
   },
-  "servers.purchase.step.plan.billed": {
-    "message": "naplaćuje se {interval, select, monthly {mesečno} quarterly {kvartalno} yearly {godišnje} other {{interval}}}"
-  },
   "settings.account.delete.section.description": {
     "message": "Kad obrišeš svoj račun, povratka nema. Brisanjem računa sa naših servera biće uklonjeni svi povezani podaci, izuzev projekata."
   },

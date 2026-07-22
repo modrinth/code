@@ -476,9 +476,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Torna a Esplora"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installa il contenuto nell'istanza"
-  },
   "app.project.version.all-versions": {
     "message": "Tutte le versioni"
   },

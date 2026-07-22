@@ -2999,9 +2999,6 @@
   "muralpay.warning.wallet-address": {
     "message": "지갑 주소를 다시 확인하세요. 잘못된 주소로 송금된 자금은 복구할 수 없습니다."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "변경 사항이 {count, plural, one {# 개 프로젝트} other {# 개 프로젝트}}에 적용됩니다."
-  },
   "profile.bio.fallback.creator": {
     "message": "Modrinth 창작자입니다."
   },
@@ -3068,9 +3065,6 @@
   "profile.label.collection": {
     "message": "컬렉션"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {다운로드} other {다운로드}}"
-  },
   "profile.label.joined": {
     "message": "가입"
   },
@@ -3088,9 +3082,6 @@
   },
   "profile.label.organizations": {
     "message": "조직"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "profile.label.saving": {
     "message": "저장..."
@@ -3656,12 +3647,6 @@
   "project.settings.visit-dashboard": {
     "message": "프로젝트 대시보드 방문"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {{count}회 다운로드} other {{count}회 다운로드}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {팔로워} other {팔로워}}"
-  },
   "project.status.archived.message": {
     "message": "{title} 은(는) 보관되었습니다. 작성자가 프로젝트 보관 해제를 결정하지 않는 한 더 이상 업데이트가 제공되지 않습니다."
   },
@@ -4081,9 +4066,6 @@
   },
   "servers.plan.small.description": {
     "message": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "{interval, select, monthly {월간 결제} quarterly {분기별 결제} yearly {연간 결제} other {{interval} 결제}}"
   },
   "settings.account.button.complete-setup": {
     "message": "설정 완료"

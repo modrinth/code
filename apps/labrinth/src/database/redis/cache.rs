@@ -17,6 +17,7 @@ use tokio::time::{Instant, timeout_at};
 use tracing::{Instrument, info_span};
 
 use crate::database::models::DatabaseError;
+use crate::env::ENV;
 
 use super::commands;
 use super::key::KeyBuilder;
@@ -27,10 +28,7 @@ use locking::{
     LockAcquisition, LockCoordinator, LockWaiter, WAIT_TIMEOUT, normalize_key,
 };
 
-const ACTUAL_EXPIRY: i64 = 60 * 30;
 const FILL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(60);
-const VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 48;
-const VERSION_ACTUAL_EXPIRY: i64 = 60 * 60 * 24;
 
 pub(super) trait ConnectionProvider {
     type Connection: ConnectionLike;
@@ -560,10 +558,11 @@ fn cache_expiries(namespace: &str) -> (i64, i64) {
         .map(|value| value.0)
         .unwrap_or(namespace)
     {
-        "versions" | "versions_files" => {
-            (VERSION_DEFAULT_EXPIRY, VERSION_ACTUAL_EXPIRY)
-        }
-        _ => (commands::DEFAULT_EXPIRY, ACTUAL_EXPIRY),
+        "versions" | "versions_files" => (
+            ENV.REDIS_VERSION_DEFAULT_EXPIRY,
+            ENV.REDIS_VERSION_ACTUAL_EXPIRY,
+        ),
+        _ => (ENV.REDIS_DEFAULT_EXPIRY, ENV.REDIS_ACTUAL_EXPIRY),
     }
 }
 

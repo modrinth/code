@@ -13,207 +13,31 @@
 				@unlinked="fetchInstance"
 			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
-			<ContentPageHeader>
-				<template #icon>
-					<Avatar
-						:src="icon ? icon : undefined"
-						:alt="instance.name"
-						size="64px"
-						:tint-by="instance.id"
-					/>
-				</template>
-				<template #title>
-					{{ instance.name }}
-				</template>
-				<template #stats>
-					<div class="flex items-center flex-wrap gap-2">
-						<template v-if="!isServerInstance">
-							<div class="flex items-center gap-2 capitalize font-medium">
-								{{ instance.loader }} {{ instance.game_version }}
-							</div>
-
-							<template v-if="showInstancePlayTime">
-								<div class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-								<div class="flex items-center gap-2 font-medium">
-									<template v-if="timePlayed > 0">
-										{{ timePlayedHumanized }}
-									</template>
-									<template v-else> Never played </template>
-								</div>
-							</template>
-						</template>
-
-						<template v-else>
-							<template v-if="loadingServerPing">
-								<ServerOnlinePlayers
-									v-if="playersOnline !== undefined"
-									:online="playersOnline"
-									:status-online="statusOnline"
-									hide-label
-								/>
-								<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
-								<div
-									v-if="
-										(playersOnline !== undefined || recentPlays !== undefined) &&
-										(minecraftServer?.region || ping)
-									"
-									class="w-1.5 h-1.5 rounded-full bg-surface-5"
-								></div>
-								<ServerPing v-if="ping" :ping="ping" />
-							</template>
-
-							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
-
-							<div
-								v-if="minecraftServer?.region || ping"
-								class="w-1.5 h-1.5 rounded-full bg-surface-5"
-							></div>
-
-							<div
-								v-if="linkedProjectV3"
-								class="flex gap-1.5 items-center font-medium text-primary"
-							>
-								Linked to
-								<Avatar
-									:src="linkedProjectV3.icon_url"
-									:alt="linkedProjectV3.name"
-									:tint-by="instance.id"
-									size="24px"
-								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
-									{{ linkedProjectV3.name }}
-								</router-link>
-							</div>
-						</template>
-					</div>
-				</template>
-				<template #actions>
-					<div class="flex gap-2">
-						<ButtonStyled
-							v-if="
-								[
-									'installing',
-									'pack_installing',
-									'pack_installed',
-									'not_installed',
-									'minecraft_installing',
-								].includes(instance.install_stage)
-							"
-							color="brand"
-							size="large"
-						>
-							<button disabled>Installing...</button>
-						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="instance.install_stage !== 'installed'"
-							color="brand"
-							size="large"
-						>
-							<button @click="repairInstance()">
-								<DownloadIcon />
-								Repair
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button :disabled="stopping" @click="stopInstance('InstancePage')">
-								<StopCircleIcon />
-								{{ stopping ? 'Stopping...' : 'Stop' }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled
-							v-else-if="playing === false && loading === false && !isServerInstance"
-							color="brand"
-							size="large"
-						>
-							<button @click="startInstance('InstancePage')">
-								<PlayIcon />
-								Play
-							</button>
-						</ButtonStyled>
-						<div
-							v-else-if="playing === false && loading === false && isServerInstance"
-							class="joined-buttons"
-						>
-							<ButtonStyled color="brand" size="large">
-								<button @click="handlePlayServer()">
-									<PlayIcon />
-									Play
-								</button>
-							</ButtonStyled>
-							<ButtonStyled color="brand" size="large">
-								<OverflowMenu
-									:options="[
-										{
-											id: 'join_server',
-											action: () => handlePlayServer(),
-										},
-										{
-											id: 'launch_instance',
-											action: () => startInstance('InstancePage'),
-										},
-									]"
-								>
-									<div class="w-0 text-xl relative top-0.5 right-2.5">
-										<DropdownIcon />
-									</div>
-
-									<template #join_server>
-										<PlayIcon />
-										Join server
-									</template>
-									<template #launch_instance>
-										<PlayIcon />
-										Launch instance
-									</template>
-								</OverflowMenu>
-							</ButtonStyled>
-						</div>
-						<ButtonStyled
-							v-else-if="loading === true && playing === false"
-							color="brand"
-							size="large"
-						>
-							<button disabled>Starting...</button>
-						</ButtonStyled>
-						<ButtonStyled circular size="large">
-							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="transparent" circular size="large">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'open-folder',
-										action: () => {
-											if (instance) showInstanceInFolder(instance.id)
-										},
-									},
-									{
-										id: 'export-mrpack',
-										action: () => exportModal?.show(),
-									},
-									{
-										id: 'create-shortcut',
-										action: () => createShortcut(),
-									},
-								]"
-							>
-								<MoreVerticalIcon />
-								<template #share-instance> <UserPlusIcon /> Share instance </template>
-								<template #host-a-server> <ServerIcon /> Create a server </template>
-								<template #open-folder> <FolderOpenIcon /> Open folder </template>
-								<template #export-mrpack> <PackageIcon /> Export modpack </template>
-								<template #create-shortcut> <ExternalIcon /> Create shortcut </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</div>
-				</template>
-			</ContentPageHeader>
+			<InstancePageHeader
+				:instance="instance"
+				:icon-src="icon"
+				:is-server-instance="isServerInstance"
+				:show-instance-play-time="showInstancePlayTime"
+				:time-played="timePlayed"
+				:playing="playing"
+				:loading="loading"
+				:stopping="stopping"
+				:loading-server-ping="loadingServerPing"
+				:players-online="playersOnline"
+				:status-online="statusOnline"
+				:recent-plays="recentPlays"
+				:ping="ping"
+				:minecraft-server="minecraftServer"
+				:linked-project-v3="linkedProjectV3"
+				@repair="() => repairInstance()"
+				@stop="() => stopInstance('InstancePage')"
+				@play="() => startInstance('InstancePage')"
+				@play-server="() => handlePlayServer()"
+				@settings="() => settingsModal?.show()"
+				@open-folder="() => instance && showInstanceInFolder(instance.id)"
+				@export="() => exportModal?.show()"
+				@create-shortcut="() => createShortcut()"
+			/>
 		</div>
 		<div :class="['px-6', { 'shrink-0': isFixedRender }]">
 			<NavTabs :links="tabs" />
@@ -272,49 +96,30 @@ import {
 	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
-	DownloadIcon,
-	DropdownIcon,
 	EditIcon,
 	ExternalIcon,
 	EyeIcon,
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
-	MoreVerticalIcon,
-	PackageIcon,
 	PlayIcon,
 	PlusIcon,
-	ServerIcon,
-	SettingsIcon,
 	StopCircleIcon,
 	TerminalSquareIcon,
 	UpdatedIcon,
-	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	ContentPageHeader,
-	injectNotificationManager,
-	NavTabs,
-	OverflowMenu,
-	ServerOnlinePlayers,
-	ServerPing,
-	ServerRecentPlays,
-	ServerRegion,
-	useLoadingBarToken,
-} from '@modrinth/ui'
+import { injectNotificationManager, NavTabs, useLoadingBarToken } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import InstancePageHeader from '@/components/ui/instance-page-header/index.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import {
@@ -336,7 +141,6 @@ import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useTheming } from '@/store/state'
 
-dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
@@ -756,22 +560,6 @@ const timePlayed = computed(() => {
 	return instance.value
 		? instance.value.recent_time_played + instance.value.submitted_time_played
 		: 0
-})
-
-const timePlayedHumanized = computed(() => {
-	const duration = dayjs.duration(timePlayed.value, 'seconds')
-	const hours = Math.floor(duration.asHours())
-	if (hours >= 1) {
-		return hours + ' hour' + (hours > 1 ? 's' : '')
-	}
-
-	const minutes = Math.floor(duration.asMinutes())
-	if (minutes >= 1) {
-		return minutes + ' minute' + (minutes > 1 ? 's' : '')
-	}
-
-	const seconds = Math.floor(duration.asSeconds())
-	return seconds + ' second' + (seconds > 1 ? 's' : '')
 })
 
 onUnmounted(() => {

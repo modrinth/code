@@ -2996,9 +2996,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Controleer uw portemonnee adres nogmaals. Geld dat naar een onjuist adres is overgemaakt, kan niet worden teruggevonden."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "De wijzigingen worden toegepast op {count, plural, one {# project} other {# projects}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Een Modrinth creator."
   },
@@ -3065,9 +3062,6 @@
   "profile.label.collection": {
     "message": "Collectie"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
-  },
   "profile.label.joined": {
     "message": "Lid geworden"
   },
@@ -3085,9 +3079,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisaties"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {project} other {projecten}}"
   },
   "profile.label.saving": {
     "message": "Opslaan..."

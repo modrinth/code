@@ -479,9 +479,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "返回发现页"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "将内容安装到实例中"
-  },
   "app.project.version.all-versions": {
     "message": "所有版本"
   },

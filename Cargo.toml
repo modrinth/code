@@ -89,10 +89,12 @@ fs4 = { version = "0.13.1", default-features = false }
 futures = "0.3.31"
 futures-lite = "2.6.1"
 futures-util = "0.3.31"
+governor = "0.10.4"
 heck = "0.5.0"
 hex = "0.4.3"
 hickory-resolver = "0.25.2"
 hmac = "0.12.1"
+httpdate = "1.0.3"
 hyper = "1.7.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
   "aws-lc-rs",

@@ -3002,9 +3002,6 @@
   "muralpay.warning.wallet-address": {
     "message": "请再次确认你的钱包地址。发送到错误地址的资金将无法追回。"
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "将对{count, plural,one {# 项目}other {# 项目}}应用更改。"
-  },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 创作者。"
   },
@@ -3068,9 +3065,6 @@
   "profile.label.collection": {
     "message": "收藏夹"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {次下载}}"
-  },
   "profile.label.joined": {
     "message": "加入于"
   },
@@ -3088,9 +3082,6 @@
   },
   "profile.label.organizations": {
     "message": "组织"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "profile.label.saving": {
     "message": "正在保存…"
@@ -3656,12 +3647,6 @@
   "project.settings.visit-dashboard": {
     "message": "访问项目的控制面板"
   },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {下载}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, other {关注者}}"
-  },
   "project.status.archived.message": {
     "message": "{title} 已归档。除非作者决定取消归档，否则 {title} 将不再更新。"
   },
@@ -4081,9 +4066,6 @@
   },
   "servers.plan.small.description": {
     "message": "适合 1–5 位朋友使用，加少量轻量模组。"
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "计费{interval, select, monthly {按月} quarterly {按季度} yearly {按年} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "完成设置"
