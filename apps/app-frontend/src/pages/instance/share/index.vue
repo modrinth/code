@@ -200,7 +200,7 @@ function notifyOperationError(error: unknown) {
 			sharedInstanceState.unavailableManager.value,
 		)
 	} else {
-		notifySharedInstanceError(error instanceof Error ? error : new Error(String(error)))
+		notifySharedInstanceError(error)
 	}
 }
 
