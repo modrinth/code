@@ -68,10 +68,8 @@ pub async fn update_many(
             .await
             .wrap_internal_err("failed to fetch subscriptions to update")?;
 
-    let mut subscriptions_by_target = subscriptions
-        .iter()
-        .map(|update| (update.target, None))
-        .collect::<HashMap<SubscriptionTarget, Option<DBUserSubscription>>>();
+    let mut subscriptions_by_target =
+        HashMap::<SubscriptionTarget, DBUserSubscription>::new();
 
     // Creates a map of subscription "key" -> it's DB representation.
     for subscription in found_subscriptions {
@@ -88,25 +86,22 @@ pub async fn update_many(
             server_id,
         };
 
-        if let Some(entry) = subscriptions_by_target.get_mut(&target) {
-            *entry = Some(subscription);
-        }
+        subscriptions_by_target.insert(target, subscription);
     }
 
     for update in subscriptions {
-        let Some(Some(subscription)) =
+        let Some(subscription) =
             subscriptions_by_target.get_mut(&update.target)
         else {
             continue;
         };
 
         // Update the subscription region
-        if let Some(m) = subscription.metadata.as_mut() {
-            if let SubscriptionMetadata::Pyro { region, .. } = m {
-                if let Some(new_region) = update.update_region.clone() {
-                    *region = Some(new_region);
-                }
-            }
+        if let Some(SubscriptionMetadata::Pyro { region, .. }) =
+            subscription.metadata.as_mut()
+            && let Some(new_region) = update.update_region.clone()
+        {
+            *region = Some(new_region);
         }
 
         subscription.upsert(&mut txn).await?;
