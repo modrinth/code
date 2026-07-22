@@ -217,7 +217,7 @@ pub async fn report_create(
             }
 
             let version_response = HTTP_CLIENT
-                .get(&format!("{}/versions/{}", url, version_part))
+                .get(format!("{url}/versions/{version_part}"))
                 .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
                 .send()
                 .await
