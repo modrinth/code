@@ -47,9 +47,7 @@ export default function () {
 	let slugDebounceTimer: ReturnType<typeof setTimeout> | undefined
 
 	function currentSlug(state: Record<string, NodeState>) {
-		return (
-			(state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value ?? project.value.slug
-		)
+		return state['correct-slug'] as string
 	}
 
 	async function checkSlugTaken(slug: string): Promise<Labrinth.Projects.v3.Project | null> {
@@ -326,10 +324,8 @@ export default function () {
 									}))(state)
 								})
 								.fix(
-									//TODO chyz think of some way to have initial values actually be reflected in state without having to store them
 									fix().project((patch, state) => {
-										const slug =
-											(state['correct-slug'] as string | undefined) ?? resolvedAutoSlug.value
+										const slug = state['correct-slug']
 										if (!slug || slug === project.value.slug) return
 										patch.slug = slug
 									}),

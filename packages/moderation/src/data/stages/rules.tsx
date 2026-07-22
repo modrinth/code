@@ -92,7 +92,6 @@ export default function () {
 					.message(),
 
 				toggle('rule-breaking-other', 'Other')
-					// TODO: chyz, the required asterisk is on a separate line
 					.suggestedStatus('rejected')
 					.severity('critical')
 					.message(undefined, (state) => ({ MESSAGE: state.message }))

@@ -635,6 +635,11 @@ function stampChildPaths(entries: ChildEntry[], scopePath: string[]): void {
 	}
 }
 
+/**
+ * Whether a node counts as "active" given its resolved state. `state` is expected to already
+ * reflect the node's default (see `withDefaults`) when nothing's been explicitly written —
+ * this only interprets the value, it doesn't apply any defaulting of its own.
+ */
 export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 	switch (node.type) {
 		case 'toggle':
@@ -645,7 +650,7 @@ export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 				const v = (state as NodeStateWithChildren).value
 				if (typeof v === 'boolean') return v
 			}
-			return (node as BooleanNodeBuilder)._defaultValue === true
+			return false
 		}
 		case 'group': {
 			const g = node as GroupNodeBuilder
@@ -746,6 +751,11 @@ export function walkNodes(
 		localState: Record<string, NodeState>,
 	) => void,
 ): void {
+	// Consumer-facing state (fix/message segments) gets defaulting-aware reads; the
+	// traversal below stays on raw `stageState` for structural decisions (isNodeActive,
+	// resolveChildren) so defaults never change what gets walked, only what's read.
+	const scopedState = withDefaults(stageState, nodes)
+
 	for (const node of nodes) {
 		if (!(node instanceof NodeBuilder)) continue
 		if (node._shown !== undefined && !resolve(node._shown)) continue
@@ -791,8 +801,12 @@ export function walkNodes(
 			node.type === 'group'
 				? ((node as GroupNodeBuilder)._selectId ?? identified.id!)
 				: identified.id!
-		const nodeState = stageState[stateKey]
-		visitor(identified, nodeState, stageState)
+		// Defaulting-aware: isNodeActive and the visitor callback (fix/message evaluation) should
+		// see a field's default when nothing's been written yet. Structural recursion below stays
+		// on the raw value so descending into children never depends on what a default resolves to.
+		const rawNodeState = stageState[stateKey]
+		const nodeState = scopedState[stateKey]
+		visitor(identified, nodeState, scopedState)
 
 		const active = isNodeActive(node, nodeState)
 		const children = resolveChildren(identified, stageState)
@@ -816,11 +830,11 @@ export function walkNodes(
 					(rawChildState as NodeStateWithChildren).value === undefined
 						? { ...(rawChildState as NodeStateWithChildren), value: true }
 						: (rawChildState ?? true)
-				visitor(childId, childState, stageState)
+				visitor(childId, childState, scopedState)
 				walkNodes(resolveChildren(childId, stageState), stageState, visitor)
 			}
 		} else if (node.type === 'toggle' || node.type === 'check') {
-			const childState = getBooleanChildState(nodeState)
+			const childState = getBooleanChildState(rawNodeState)
 			walkNodes(children, childState, visitor)
 		} else if (
 			(node.type === 'group' && (node as GroupNodeBuilder)._selectMode === 'single') ||
@@ -841,7 +855,7 @@ export function walkNodes(
 						(rawChildState as NodeStateWithChildren).value === undefined
 							? { ...(rawChildState as NodeStateWithChildren), value: true }
 							: (rawChildState ?? true)
-					visitor(childId, childState, stageState)
+					visitor(childId, childState, scopedState)
 					walkNodes(resolveChildren(childId, stageState), stageState, visitor)
 					break
 				}
@@ -850,6 +864,159 @@ export function walkNodes(
 			walkNodes(children, stageState, visitor)
 		}
 	}
+}
+
+// ─── Self-defaulting state ────────────────────────────────────────────────────
+
+export function resolveDefault(
+	node: { _defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState) },
+	state: Record<string, NodeState>,
+): NodeState {
+	const d = node._defaultValue
+	return typeof d === 'function' ? d(state) : d
+}
+
+const defaultingProxyCache = new WeakMap<object, object>()
+
+/**
+ * A stand-in for a container that hasn't been written to yet (e.g. a group or toggle
+ * nobody has touched), so reads can chain arbitrarily deep without checking existence
+ * first. Reads resolve defaults the same way `withDefaults` does. A write cascades back
+ * up through `writeSelf`, materializing every not-yet-real ancestor along the way as a
+ * single patch on the nearest real object — nothing is written until something actually is.
+ */
+function emptyScope(
+	children: ChildNode[],
+	writeSelf: (patch: Record<string, NodeState>) => void,
+): Record<string, NodeState> {
+	const childMap = new Map<string, IdentifiedNodeBuilder>()
+	for (const child of children) {
+		if (child instanceof IdentifiedNodeBuilder && child.id) childMap.set(child.id, child)
+	}
+
+	const resolving = new Set<string>()
+	const emptyCache = new Map<string, Record<string, NodeState>>()
+
+	const proxy: Record<string, NodeState> = new Proxy(
+		{},
+		{
+			get(_target, key) {
+				if (typeof key !== 'string') return undefined
+				const child = childMap.get(key)
+				if (!child) return undefined
+
+				if (!resolving.has(key)) {
+					resolving.add(key)
+					try {
+						const def = resolveDefault(child, proxy)
+						if (def !== undefined) return def
+					} finally {
+						resolving.delete(key)
+					}
+				}
+
+				const cached = emptyCache.get(key)
+				if (cached) return cached
+
+				const grandchildren = resolveChildren(child, {})
+				if (grandchildren.length === 0) return undefined
+
+				const nested = emptyScope(grandchildren, (patch) => writeSelf({ [key]: patch }))
+				emptyCache.set(key, nested)
+				return nested
+			},
+			set(_target, key, value) {
+				if (typeof key === 'string') writeSelf({ [key]: value as NodeState })
+				return true
+			},
+			deleteProperty() {
+				return true
+			},
+		},
+	) as Record<string, NodeState>
+
+	return proxy
+}
+
+/**
+ * Wraps a state object so reading an unset key transparently returns that field's
+ * `.initial()` default instead of `undefined`, without needing to store it, and so
+ * reading into a container nobody has touched yet (a group/toggle with no state at all)
+ * returns a safely-chainable empty scope instead of `undefined`. Writes pass through to
+ * the real underlying object, materializing not-yet-real containers the first time
+ * something is actually written into them. Nested objects are wrapped lazily on read,
+ * scoped to whichever child's own children apply at that depth, so the wrap only needs
+ * to happen once at the top of a scope for defaulting to work at any depth beneath it.
+ */
+export function withDefaults<T extends Record<string, NodeState>>(
+	rawState: T,
+	children: ChildNode[],
+): T {
+	if (rawState == null || typeof rawState !== 'object' || rawState instanceof Set) return rawState
+
+	const cached = defaultingProxyCache.get(rawState)
+	if (cached) return cached as T
+
+	const childMap = new Map<string, IdentifiedNodeBuilder>()
+	for (const child of children) {
+		if (child instanceof IdentifiedNodeBuilder && child.id) childMap.set(child.id, child)
+	}
+
+	// Guards a default function that reads its own key from recursing into itself forever.
+	const resolving = new Set<string>()
+	const emptyCache = new Map<string, Record<string, NodeState>>()
+
+	const proxy = new Proxy(rawState, {
+		get(target, key, receiver) {
+			if (typeof key !== 'string') return Reflect.get(target, key, receiver)
+			const child = childMap.get(key)
+			let value = Reflect.get(target, key, receiver)
+
+			if (value === undefined && child !== undefined && !resolving.has(key)) {
+				resolving.add(key)
+				try {
+					value = resolveDefault(child, proxy)
+				} finally {
+					resolving.delete(key)
+				}
+			}
+
+			if (
+				child !== undefined &&
+				value !== null &&
+				typeof value === 'object' &&
+				!(value instanceof Set)
+			) {
+				const nested = value as Record<string, NodeState>
+				return withDefaults(nested, resolveChildren(child, nested))
+			}
+
+			if (value === undefined && child !== undefined) {
+				const cachedEmpty = emptyCache.get(key)
+				if (cachedEmpty) return cachedEmpty
+
+				const grandchildren = resolveChildren(child, {})
+				if (grandchildren.length > 0) {
+					const nested = emptyScope(grandchildren, (patch) => {
+						Reflect.set(target, key, patch, receiver)
+					})
+					emptyCache.set(key, nested)
+					return nested
+				}
+			}
+
+			return value
+		},
+		set(target, key, value, receiver) {
+			return Reflect.set(target, key, value, receiver)
+		},
+		deleteProperty(target, key) {
+			return Reflect.deleteProperty(target, key)
+		},
+	}) as T
+
+	defaultingProxyCache.set(rawState, proxy)
+	return proxy
 }
 
 // ─── Factory functions ────────────────────────────────────────────────────────

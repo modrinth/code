@@ -24,6 +24,7 @@ import {
 	resolve,
 	resolveChildren,
 	setMessageProject,
+	withDefaults,
 } from '@modrinth/moderation'
 import {
 	ButtonStyled,
@@ -339,18 +340,20 @@ function childScopedContext(child: IdentifiedNodeBuilder): Record<string, NodeSt
 	const basePath = child._statePath
 	const state = getAtPath(basePath)
 	if (state && typeof state === 'object' && !(state instanceof Set)) {
-		return state as Record<string, NodeState>
+		const raw = state as Record<string, NodeState>
+		return withDefaults(raw, resolveChildren(child, raw))
 	}
 	const existing = scopedContextFallbacks.get(child)
-	if (existing) return existing
-	const fallback = new Proxy({} as Record<string, NodeState>, {
-		set(_target, key, value) {
-			setAtPath([...basePath, key as string], value as NodeState)
-			return true
-		},
-	})
-	scopedContextFallbacks.set(child, fallback)
-	return fallback
+	const fallback =
+		existing ??
+		new Proxy({} as Record<string, NodeState>, {
+			set(_target, key, value) {
+				setAtPath([...basePath, key as string], value as NodeState)
+				return true
+			},
+		})
+	if (!existing) scopedContextFallbacks.set(child, fallback)
+	return withDefaults(fallback, resolveChildren(child, {}))
 }
 
 function getChildrenContext(node: IdentifiedNodeBuilder): Record<string, NodeState> {
