@@ -116,6 +116,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::tech_review::global::search_global_issue_details,
 		moderation::tech_review::global::get_global_issue_detail,
 		moderation::tech_review::rules::get_rules,
+		moderation::tech_review::rules::test_rule,
 		moderation::tech_review::rules::create_rule,
 		moderation::tech_review::rules::update_rule,
 		moderation::tech_review::rules::delete_rule,

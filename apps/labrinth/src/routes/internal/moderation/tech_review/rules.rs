@@ -1,3 +1,5 @@
+use std::collections::{BTreeMap, HashMap};
+
 use actix_web::{HttpRequest, delete, get, post, put, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
@@ -5,18 +7,23 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::check_is_moderator_from_headers,
-    database::{PgPool, ReadOnlyPgPool, redis::RedisPool},
+    database::{
+        PgPool, ReadOnlyPgPool, models::delphi_report_item::DelphiSeverity,
+        redis::RedisPool,
+    },
     models::pats::Scopes,
     queue::session::AuthQueue,
     routes::ApiError,
     util::error::Context,
 };
 
-const MAX_RULE_NAME_LENGTH: usize = 128;
+const MAX_RULE_NAME_LENGTH: usize = 256;
 const MAX_RULE_EXPRESSION_LENGTH: usize = 65_536;
+const MAX_RULE_TEST_TRACES: usize = 10;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_rules)
+        .service(test_rule)
         .service(create_rule)
         .service(update_rule)
         .service(delete_rule);
@@ -26,28 +33,80 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub struct DelphiRule {
     pub id: i64,
     pub name: String,
-    pub priority: i32,
-    pub expression: String,
-    pub revision_id: i64,
-    pub created: DateTime<Utc>,
-    pub updated: DateTime<Utc>,
-    pub revision_created: DateTime<Utc>,
+    pub rule: String,
+    pub revision: i64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub created_by: Option<i64>,
     pub updated_by: Option<i64>,
-    pub revision_created_by: Option<i64>,
 }
 
 #[derive(Debug, Deserialize, utoipa::ToSchema)]
 pub struct WriteDelphiRule {
     pub name: String,
-    pub priority: i32,
-    pub expression: String,
+    pub rule: String,
+}
+
+#[derive(Debug, Deserialize, utoipa::ToSchema)]
+pub struct TestDelphiRule {
+    pub rule: String,
+    pub traces: Vec<TestDelphiRuleTrace>,
+}
+
+#[derive(Debug, Deserialize, Serialize, utoipa::ToSchema)]
+pub struct TestDelphiRuleTrace {
+    pub key: String,
+    pub issue_type: String,
+    pub severity: DelphiSeverity,
+    pub jar: Option<String>,
+    pub file_path: String,
+    pub data: HashMap<String, serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct TestDelphiRuleResponse {
+    pub effects: Vec<Option<DelphiRuleEffect>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, utoipa::ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct DelphiRuleEffect {
+    #[serde(default)]
+    pub severity: Option<DelphiSeverity>,
+    #[serde(default)]
+    pub hidden: bool,
+}
+
+#[derive(Serialize)]
+struct TestRuleInput<'a> {
+    schema_version: u32,
+    trace: &'a TestDelphiRuleTrace,
+    scan: TestRuleScan,
+    artifact: TestRuleArtifact,
+    scope: TestRuleScope,
+}
+
+#[derive(Serialize)]
+struct TestRuleScan {
+    delphi_version: i32,
+}
+
+#[derive(Serialize)]
+struct TestRuleArtifact {
+    size: u32,
+    hashes: BTreeMap<String, String>,
+}
+
+#[derive(Serialize)]
+struct TestRuleScope {
+    project_id: String,
+    version_id: String,
+    file_id: String,
 }
 
 struct ValidatedRule {
     name: String,
-    priority: i32,
-    expression: String,
+    rule: String,
 }
 
 impl WriteDelphiRule {
@@ -62,31 +121,129 @@ impl WriteDelphiRule {
             )));
         }
 
-        let expression = self.expression.trim().to_string();
-        if expression.is_empty() {
+        let rule = self.rule.trim().to_string();
+        if rule.is_empty() {
             return Err(ApiError::Request(eyre!(
                 "rule expression cannot be empty"
             )));
         }
-        if expression.len() > MAX_RULE_EXPRESSION_LENGTH {
+        if rule.len() > MAX_RULE_EXPRESSION_LENGTH {
             return Err(ApiError::Request(eyre!(
                 "rule expression cannot exceed {MAX_RULE_EXPRESSION_LENGTH} bytes"
             )));
         }
 
-        cel::Program::compile(&expression).map_err(|error| {
+        cel::Program::compile(&rule).map_err(|error| {
             ApiError::Request(eyre!("invalid cel expression: {error}"))
         })?;
 
-        Ok(ValidatedRule {
-            name,
-            priority: self.priority,
-            expression,
-        })
+        Ok(ValidatedRule { name, rule })
     }
 }
 
-/// List the current revision of every Delphi rule.
+/// Evaluate a CEL rule against caller-provided issue traces without saving it.
+#[utoipa::path(
+	context_path = "/moderation/tech-review",
+	tag = "moderation",
+	security(("bearer_auth" = [])),
+	request_body = TestDelphiRule,
+	responses((status = OK, body = TestDelphiRuleResponse))
+)]
+#[post("/rules/test")]
+pub async fn test_rule(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<TestDelphiRule>,
+) -> Result<web::Json<TestDelphiRuleResponse>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let request = body.into_inner();
+    let rule = request.rule.trim();
+    if rule.is_empty() {
+        return Err(ApiError::Request(eyre!(
+            "rule expression cannot be empty"
+        )));
+    }
+    if rule.len() > MAX_RULE_EXPRESSION_LENGTH {
+        return Err(ApiError::Request(eyre!(
+            "rule expression cannot exceed {MAX_RULE_EXPRESSION_LENGTH} bytes"
+        )));
+    }
+    if request.traces.len() > MAX_RULE_TEST_TRACES {
+        return Err(ApiError::Request(eyre!(
+            "cannot test more than {MAX_RULE_TEST_TRACES} traces at once"
+        )));
+    }
+
+    let program = cel::Program::compile(rule).map_err(|error| {
+        ApiError::Request(eyre!("invalid cel expression: {error}"))
+    })?;
+    let mut effects = Vec::with_capacity(request.traces.len());
+
+    for (index, trace) in request.traces.iter().enumerate() {
+        let input = test_rule_input(trace);
+        let mut context = cel::Context::default();
+        context.add_variable("input", input).map_err(|error| {
+            ApiError::Request(eyre!(
+                "failed to build input for test trace {index}: {error}"
+            ))
+        })?;
+
+        let value = program.execute(&context).map_err(|error| {
+            ApiError::Request(eyre!(
+                "failed to evaluate test trace {index}: {error}"
+            ))
+        })?;
+        let value = value.json().map_err(|error| {
+            ApiError::Request(eyre!(
+                "failed to decode result for test trace {index}: {error}"
+            ))
+        })?;
+
+        let effect = match value {
+            serde_json::Value::Null => None,
+            value => Some(serde_json::from_value(value).map_err(|error| {
+                ApiError::Request(eyre!(
+                    "invalid effect for test trace {index}: {error}"
+                ))
+            })?),
+        };
+        effects.push(effect);
+    }
+
+    Ok(web::Json(TestDelphiRuleResponse { effects }))
+}
+
+fn test_rule_input(trace: &TestDelphiRuleTrace) -> TestRuleInput<'_> {
+    TestRuleInput {
+        schema_version: 1,
+        trace,
+        scan: TestRuleScan { delphi_version: 17 },
+        artifact: TestRuleArtifact {
+            size: 412_892,
+            hashes: BTreeMap::from([
+                ("sha1".to_string(), "0123456789abcdef".to_string()),
+                ("sha512".to_string(), "fedcba9876543210".to_string()),
+            ]),
+        },
+        scope: TestRuleScope {
+            project_id: "example-project".to_string(),
+            version_id: "example-version".to_string(),
+            file_id: "example-file".to_string(),
+        },
+    }
+}
+
+/// List all Delphi rules that are not pending deletion.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -110,25 +267,20 @@ pub async fn get_rules(
     )
     .await?;
 
-    let rows = sqlx::query!(
+    let rules = sqlx::query!(
         r#"
 		SELECT
-			r.id,
-			r.name,
-			r.priority,
-			r.created,
-			r.updated,
-			r.created_by,
-			r.updated_by,
-			rr.id AS revision_id,
-			rr.expression,
-			rr.created AS revision_created,
-			rr.created_by AS revision_created_by
-		FROM delphi_rules r
-		INNER JOIN delphi_rule_revisions rr
-			ON rr.rule_id = r.id
-			AND rr.active
-		ORDER BY r.priority DESC, r.id
+			id,
+			name,
+			rule,
+			revision,
+			created_at,
+			updated_at,
+			created_by,
+			updated_by
+		FROM delphi_rules
+		WHERE NOT delete_on_next_revision
+		ORDER BY name, id
 		"#,
     )
     .fetch_all(&***ro_pool)
@@ -136,25 +288,23 @@ pub async fn get_rules(
     .wrap_internal_err("failed to fetch delphi rules")?;
 
     Ok(web::Json(
-        rows.into_iter()
-            .map(|row| DelphiRule {
-                id: row.id,
-                name: row.name,
-                priority: row.priority,
-                expression: row.expression,
-                revision_id: row.revision_id,
-                created: row.created,
-                updated: row.updated,
-                revision_created: row.revision_created,
-                created_by: row.created_by,
-                updated_by: row.updated_by,
-                revision_created_by: row.revision_created_by,
+        rules
+            .into_iter()
+            .map(|rule| DelphiRule {
+                id: rule.id,
+                name: rule.name,
+                rule: rule.rule,
+                revision: rule.revision,
+                created_at: rule.created_at,
+                updated_at: rule.updated_at,
+                created_by: rule.created_by,
+                updated_by: rule.updated_by,
             })
             .collect(),
     ))
 }
 
-/// Create a Delphi rule and its first revision.
+/// Create a Delphi rule. It will be applied by the next manual rule scan.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -180,65 +330,47 @@ pub async fn create_rule(
     .await?;
     let rule = body.into_inner().validate()?;
     let user_id = user.id.0 as i64;
-    let mut transaction = pool
-        .begin()
-        .await
-        .wrap_internal_err("failed to begin delphi rule transaction")?;
 
-    let row = sqlx::query!(
+    let rule = sqlx::query!(
         r#"
 		INSERT INTO delphi_rules (
 			name,
-			priority,
+			rule,
 			created_by,
 			updated_by
 		)
 		VALUES ($1, $2, $3, $3)
-		RETURNING id, name, priority, created, updated, created_by, updated_by
+		RETURNING
+			id,
+			name,
+			rule,
+			revision,
+			created_at,
+			updated_at,
+			created_by,
+			updated_by
 		"#,
         rule.name,
-        rule.priority,
+        rule.rule,
         user_id,
     )
-    .fetch_one(&mut transaction)
+    .fetch_one(&**pool)
     .await
     .wrap_internal_err("failed to create delphi rule")?;
 
-    let revision = sqlx::query!(
-        r#"
-		INSERT INTO delphi_rule_revisions (rule_id, expression, created_by)
-		VALUES ($1, $2, $3)
-		RETURNING id, expression, created, created_by
-		"#,
-        row.id,
-        rule.expression,
-        user_id,
-    )
-    .fetch_one(&mut transaction)
-    .await
-    .wrap_internal_err("failed to create delphi rule revision")?;
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("failed to commit delphi rule transaction")?;
-
     Ok(web::Json(DelphiRule {
-        id: row.id,
-        name: row.name,
-        priority: row.priority,
-        expression: revision.expression,
-        revision_id: revision.id,
-        created: row.created,
-        updated: row.updated,
-        revision_created: revision.created,
-        created_by: row.created_by,
-        updated_by: row.updated_by,
-        revision_created_by: revision.created_by,
+        id: rule.id,
+        name: rule.name,
+        rule: rule.rule,
+        revision: rule.revision,
+        created_at: rule.created_at,
+        updated_at: rule.updated_at,
+        created_by: rule.created_by,
+        updated_by: rule.updated_by,
     }))
 }
 
-/// Replace a Delphi rule and create a new current revision.
+/// Update a Delphi rule. Its materialized effects remain unchanged until the next scan.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -266,79 +398,49 @@ pub async fn update_rule(
     let (id,) = path.into_inner();
     let rule = body.into_inner().validate()?;
     let user_id = user.id.0 as i64;
-    let mut transaction = pool
-        .begin()
-        .await
-        .wrap_internal_err("failed to begin delphi rule transaction")?;
 
-    let row = sqlx::query!(
+    let rule = sqlx::query!(
         r#"
 		UPDATE delphi_rules
 		SET
 			name = $2,
-			priority = $3,
-			updated = CURRENT_TIMESTAMP,
+			rule = $3,
+			updated_at = CURRENT_TIMESTAMP,
 			updated_by = $4
-		WHERE id = $1
-		RETURNING id, name, priority, created, updated, created_by, updated_by
+		WHERE id = $1 AND NOT delete_on_next_revision
+		RETURNING
+			id,
+			name,
+			rule,
+			revision,
+			created_at,
+			updated_at,
+			created_by,
+			updated_by
 		"#,
         id,
         rule.name,
-        rule.priority,
+        rule.rule,
         user_id,
     )
-    .fetch_optional(&mut transaction)
+    .fetch_optional(&**pool)
     .await
     .wrap_internal_err("failed to update delphi rule")?
     .ok_or(ApiError::NotFound)?;
 
-    sqlx::query!(
-        r#"
-		UPDATE delphi_rule_revisions
-		SET active = FALSE
-		WHERE rule_id = $1 AND active
-		"#,
-        id,
-    )
-    .execute(&mut transaction)
-    .await
-    .wrap_internal_err("failed to deactivate delphi rule revision")?;
-
-    let revision = sqlx::query!(
-        r#"
-		INSERT INTO delphi_rule_revisions (rule_id, expression, created_by)
-		VALUES ($1, $2, $3)
-		RETURNING id, expression, created, created_by
-		"#,
-        id,
-        rule.expression,
-        user_id,
-    )
-    .fetch_one(&mut transaction)
-    .await
-    .wrap_internal_err("failed to create delphi rule revision")?;
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("failed to commit delphi rule transaction")?;
-
     Ok(web::Json(DelphiRule {
-        id: row.id,
-        name: row.name,
-        priority: row.priority,
-        expression: revision.expression,
-        revision_id: revision.id,
-        created: row.created,
-        updated: row.updated,
-        revision_created: revision.created,
-        created_by: row.created_by,
-        updated_by: row.updated_by,
-        revision_created_by: revision.created_by,
+        id: rule.id,
+        name: rule.name,
+        rule: rule.rule,
+        revision: rule.revision,
+        created_at: rule.created_at,
+        updated_at: rule.updated_at,
+        created_by: rule.created_by,
+        updated_by: rule.updated_by,
     }))
 }
 
-/// Delete a Delphi rule and all its revisions and materialized effects.
+/// Mark a Delphi rule for deletion when the next rule scan is published.
 #[utoipa::path(
 	context_path = "/moderation/tech-review",
 	tag = "moderation",
@@ -353,7 +455,7 @@ pub async fn delete_rule(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(i64,)>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -364,12 +466,21 @@ pub async fn delete_rule(
     let (id,) = path.into_inner();
 
     let deleted = sqlx::query!(
-        "DELETE FROM delphi_rules WHERE id = $1 RETURNING id",
+        r#"
+		UPDATE delphi_rules
+		SET
+			delete_on_next_revision = TRUE,
+			updated_at = CURRENT_TIMESTAMP,
+			updated_by = $2
+		WHERE id = $1 AND NOT delete_on_next_revision
+		RETURNING id
+		"#,
         id,
+        user.id.0 as i64,
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to delete delphi rule")?;
+    .wrap_internal_err("failed to mark delphi rule for deletion")?;
 
     if deleted.is_none() {
         return Err(ApiError::NotFound);

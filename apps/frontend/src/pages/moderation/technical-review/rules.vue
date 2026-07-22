@@ -1,33 +1,105 @@
 <template>
-	<NewModal ref="ruleModal" :header="modalTitle">
-		<form class="flex w-[36rem] max-w-full flex-col gap-3" @submit.prevent="saveRule">
+	<NewModal ref="ruleModal" :header="modalTitle" @hide="handleRuleModalHide">
+		<form class="flex w-[48rem] max-w-full flex-col gap-3" @submit.prevent="saveRule">
 			<label class="font-semibold text-contrast" for="rule-name">Name</label>
 			<StyledInput
 				id="rule-name"
 				v-model="form.name"
 				type="text"
-				maxlength="128"
+				maxlength="256"
 				placeholder="Known-safe obfuscated bootstrap"
 			/>
-
-			<label class="font-semibold text-contrast" for="rule-priority">Priority</label>
-			<StyledInput id="rule-priority" v-model="form.priority" type="number" placeholder="0" />
-			<p class="m-0 text-sm text-secondary">Higher-priority rules are evaluated first.</p>
 
 			<label class="font-semibold text-contrast" for="rule-expression">CEL expression</label>
 			<StyledInput
 				id="rule-expression"
-				v-model="form.expression"
+				v-model="form.rule"
 				type="text"
 				multiline
 				resize="vertical"
 				class="font-mono"
 				input-class="min-h-64 font-mono"
+				@input="queueRuleTest"
 			/>
 			<p class="m-0 text-sm text-secondary">
 				Return <code>null</code> when the rule does not match, or a map containing
 				<code>severity</code> and/or <code>hidden</code> when it does.
 			</p>
+
+			<section class="mt-2 flex flex-col gap-3">
+				<div class="flex items-center justify-between gap-3">
+					<div>
+						<h3 class="m-0 text-base font-bold text-contrast">Test traces</h3>
+						<p class="m-0 text-sm text-secondary">
+							These results are evaluated from the current expression.
+						</p>
+					</div>
+					<LoaderCircleIcon v-if="isTestingRule" class="size-5 animate-spin text-secondary" />
+				</div>
+
+				<div
+					v-if="ruleTestError"
+					class="border-red/40 rounded-lg border bg-highlight-red p-3 text-sm text-red"
+				>
+					{{ ruleTestError }}
+				</div>
+
+				<div
+					v-for="example in previewExamples"
+					:key="example.original.key"
+					class="grid items-stretch gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
+				>
+					<article class="universal-card flex min-w-0 flex-col gap-3">
+						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">Original</p>
+						<div class="flex flex-wrap items-center gap-2">
+							<span
+								class="rounded-full border px-2 py-0.5 text-xs font-semibold capitalize"
+								:class="getSeverityBadgeColor(example.original.severity)"
+							>
+								{{ example.original.severity }}
+							</span>
+							<strong class="break-all text-contrast">{{ example.original.issue_type }}</strong>
+						</div>
+						<dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-sm">
+							<dt class="text-secondary">Key</dt>
+							<dd class="m-0 break-all font-mono text-contrast">{{ example.original.key }}</dd>
+							<dt class="text-secondary">File</dt>
+							<dd class="m-0 break-all font-mono text-contrast">
+								{{ example.original.file_path }}
+							</dd>
+						</dl>
+					</article>
+
+					<div
+						class="flex items-center justify-center text-2xl font-bold text-secondary max-md:rotate-90"
+						aria-hidden="true"
+					>
+						→
+					</div>
+
+					<article class="universal-card flex min-w-0 flex-col gap-3">
+						<p class="m-0 text-xs font-semibold uppercase tracking-wide text-secondary">
+							New state
+						</p>
+						<div v-if="example.effect?.hidden" class="flex items-center gap-2 text-secondary">
+							<EyeOffIcon class="size-5" />
+							<strong class="text-contrast">Hidden from reports</strong>
+						</div>
+						<template v-else>
+							<div class="flex flex-wrap items-center gap-2">
+								<span
+									class="rounded-full border px-2 py-0.5 text-xs font-semibold capitalize"
+									:class="getSeverityBadgeColor(example.effectiveSeverity)"
+								>
+									{{ example.effectiveSeverity }}
+								</span>
+								<strong class="break-all text-contrast">{{ example.original.issue_type }}</strong>
+							</div>
+							<p class="m-0 text-sm text-secondary">{{ example.summary }}</p>
+						</template>
+					</article>
+				</div>
+			</section>
 
 			<div class="flex justify-end gap-2">
 				<ButtonStyled>
@@ -45,13 +117,13 @@
 	<ConfirmModal
 		ref="deleteModal"
 		:title="`Delete ${ruleToDelete?.name ?? 'rule'}?`"
-		description="This permanently deletes the rule, its revisions, and its materialized effects."
+		description="The rule will stop being included the next time the rules are scanned. Existing effects remain active until then."
 		:markdown="false"
 		proceed-label="Delete rule"
 		@proceed="deleteRule"
 	/>
 
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-6">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<ButtonStyled circular type="transparent">
@@ -112,9 +184,7 @@
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div>
 						<h2 class="m-0 text-lg font-bold text-contrast">{{ rule.name }}</h2>
-						<p class="m-0 text-sm text-secondary">
-							Priority {{ rule.priority }} · revision {{ rule.revision_id }}
-						</p>
+						<p class="m-0 text-sm text-secondary">Last applied in revision {{ rule.revision }}</p>
 					</div>
 					<div class="flex gap-2">
 						<ButtonStyled>
@@ -133,7 +203,7 @@
 				</div>
 				<pre
 					class="m-0 overflow-x-auto rounded-lg bg-bg-raised p-3 text-sm"
-				><code>{{ rule.expression }}</code></pre>
+				><code>{{ rule.rule }}</code></pre>
 			</article>
 		</div>
 	</div>
@@ -141,7 +211,14 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftIcon, EditIcon, LoaderCircleIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import {
+	ArrowLeftIcon,
+	EditIcon,
+	EyeOffIcon,
+	LoaderCircleIcon,
+	PlusIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	ConfirmModal,
@@ -151,10 +228,35 @@ import {
 	NewModal,
 	StyledInput,
 } from '@modrinth/ui'
+import { useDebounceFn } from '@vueuse/core'
 
-const DEFAULT_EXPRESSION = `input.trace.issue_type == "OBFUSCATED_NAMES"
+const DEFAULT_RULE = `input.trace.issue_type == "OBFUSCATED_NAMES"
 	? {"severity": "low", "hidden": false}
 	: null`
+
+const TEST_TRACES: Labrinth.TechReview.Internal.TestDelphiRuleTrace[] = [
+	{
+		key: 'known-safe:obfuscated-bootstrap',
+		issue_type: 'OBFUSCATED_NAMES',
+		severity: 'high',
+		jar: 'META-INF/jars/embedded.jar',
+		file_path: 'com/example/Bootstrap.class',
+		data: {
+			confidence: 0.97,
+			symbol_count: 42,
+		},
+	},
+	{
+		key: 'network/known-telemetry-host',
+		issue_type: 'SUSPICIOUS_NETWORK_ACCESS',
+		severity: 'medium',
+		jar: null,
+		file_path: 'com/example/Telemetry.class',
+		data: {
+			host: 'telemetry.example.com',
+		},
+	},
+]
 
 useHead({ title: 'Delphi rules - Modrinth' })
 
@@ -166,16 +268,106 @@ const deleteModal = useTemplateRef<InstanceType<typeof ConfirmModal>>('deleteMod
 const rules = ref<Labrinth.TechReview.Internal.DelphiRule[]>([])
 const isLoading = ref(true)
 const isSaving = ref(false)
+const isTestingRule = ref(false)
+const isRuleModalOpen = ref(false)
 const loadFailed = ref(false)
 const editingRuleId = ref<number | null>(null)
 const ruleToDelete = ref<Labrinth.TechReview.Internal.DelphiRule | null>(null)
+const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect | null>>([])
+const ruleTestError = ref<string | null>(null)
 const form = reactive({
 	name: '',
-	priority: '0',
-	expression: DEFAULT_EXPRESSION,
+	rule: DEFAULT_RULE,
 })
+let ruleTestRequestId = 0
 
 const modalTitle = computed(() => (editingRuleId.value === null ? 'Create rule' : 'Edit rule'))
+const previewExamples = computed(() =>
+	TEST_TRACES.map((original, index) => {
+		const effect = ruleTestEffects.value[index] ?? null
+		const effectiveSeverity = effect?.severity ?? original.severity
+		let summary: string
+
+		if (isTestingRule.value) {
+			summary = 'Evaluating the current expression...'
+		} else if (ruleTestError.value) {
+			summary = 'Preview unavailable.'
+		} else if (!effect) {
+			summary = 'Rule does not match; no change.'
+		} else if (effect.severity && effect.severity !== original.severity) {
+			summary = `Severity changed from ${original.severity} to ${effect.severity}.`
+		} else {
+			summary = 'Rule matched; no visible change.'
+		}
+
+		return {
+			original,
+			effect,
+			effectiveSeverity,
+			summary,
+		}
+	}),
+)
+
+function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
+	switch (severity) {
+		case 'severe':
+			return 'border-red/60 bg-highlight-red text-red'
+		case 'high':
+			return 'border-orange/60 bg-highlight-orange text-orange'
+		case 'medium':
+			return 'border-green/60 bg-highlight-green text-green'
+		case 'low':
+		default:
+			return 'border-blue/60 bg-highlight-blue text-blue'
+	}
+}
+
+async function testRule() {
+	if (!isRuleModalOpen.value) return
+
+	const requestId = ++ruleTestRequestId
+	const rule = form.rule.trim()
+	ruleTestEffects.value = []
+	ruleTestError.value = null
+
+	if (!rule) {
+		isTestingRule.value = false
+		ruleTestError.value = 'Enter a CEL expression to test it.'
+		return
+	}
+
+	isTestingRule.value = true
+	try {
+		const response = await client.labrinth.tech_review_internal.testRule({
+			rule,
+			traces: TEST_TRACES,
+		})
+		if (requestId !== ruleTestRequestId) return
+
+		ruleTestEffects.value = response.effects
+	} catch (error) {
+		if (requestId !== ruleTestRequestId) return
+
+		ruleTestError.value = error instanceof Error ? error.message : 'The rule could not be tested.'
+	} finally {
+		if (requestId === ruleTestRequestId) {
+			isTestingRule.value = false
+		}
+	}
+}
+
+const testRuleDebounced = useDebounceFn(testRule, 350)
+
+function queueRuleTest() {
+	if (!isRuleModalOpen.value) return
+
+	ruleTestRequestId += 1
+	ruleTestEffects.value = []
+	ruleTestError.value = null
+	isTestingRule.value = true
+	void testRuleDebounced()
+}
 
 async function loadRules() {
 	isLoading.value = true
@@ -193,32 +385,39 @@ async function loadRules() {
 function openCreateModal() {
 	editingRuleId.value = null
 	form.name = ''
-	form.priority = '0'
-	form.expression = DEFAULT_EXPRESSION
+	form.rule = DEFAULT_RULE
+	isRuleModalOpen.value = true
 	ruleModal.value?.show()
+	void testRule()
 }
 
 function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	editingRuleId.value = rule.id
 	form.name = rule.name
-	form.priority = String(rule.priority)
-	form.expression = rule.expression
+	form.rule = rule.rule
+	isRuleModalOpen.value = true
 	ruleModal.value?.show()
+	void testRule()
 }
 
 function closeRuleModal() {
 	ruleModal.value?.hide()
 }
 
+function handleRuleModalHide() {
+	isRuleModalOpen.value = false
+	ruleTestRequestId += 1
+	isTestingRule.value = false
+}
+
 async function saveRule() {
 	if (isSaving.value) return
 
-	const priority = Number(form.priority)
-	if (!form.name.trim() || !form.expression.trim() || !Number.isInteger(priority)) {
+	if (!form.name.trim() || !form.rule.trim()) {
 		addNotification({
 			type: 'error',
 			title: 'Invalid rule',
-			text: 'Enter a name, a CEL expression, and an integer priority.',
+			text: 'Enter a name and a CEL expression.',
 		})
 		return
 	}
@@ -226,8 +425,7 @@ async function saveRule() {
 	isSaving.value = true
 	const payload = {
 		name: form.name,
-		priority,
-		expression: form.expression,
+		rule: form.rule,
 	}
 
 	try {
@@ -240,7 +438,7 @@ async function saveRule() {
 		addNotification({
 			type: 'success',
 			title: 'Rule saved',
-			text: 'The Delphi rule revision was saved.',
+			text: 'The rule will take effect after the next manual scan.',
 		})
 		await loadRules()
 	} catch (error) {
@@ -269,7 +467,7 @@ async function deleteRule() {
 		addNotification({
 			type: 'success',
 			title: 'Rule deleted',
-			text: `${rule.name} was deleted.`,
+			text: `${rule.name} will be removed by the next manual scan.`,
 		})
 		await loadRules()
 	} catch (error) {

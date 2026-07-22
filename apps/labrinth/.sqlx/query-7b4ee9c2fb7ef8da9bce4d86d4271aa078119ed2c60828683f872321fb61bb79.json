@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tUPDATE delphi_rules\n\t\tSET\n\t\t\tdelete_on_next_revision = TRUE,\n\t\t\tupdated_at = CURRENT_TIMESTAMP,\n\t\t\tupdated_by = $2\n\t\tWHERE id = $1 AND NOT delete_on_next_revision\n\t\tRETURNING id\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7b4ee9c2fb7ef8da9bce4d86d4271aa078119ed2c60828683f872321fb61bb79"
+}

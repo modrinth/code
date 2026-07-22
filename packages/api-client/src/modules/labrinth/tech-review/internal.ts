@@ -17,6 +17,20 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		)
 	}
 
+	public async testRule(
+		request: Labrinth.TechReview.Internal.TestDelphiRuleRequest,
+	): Promise<Labrinth.TechReview.Internal.TestDelphiRuleResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.TestDelphiRuleResponse>(
+			'/moderation/tech-review/rules/test',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
 	public async createRule(
 		rule: Labrinth.TechReview.Internal.WriteDelphiRule,
 	): Promise<Labrinth.TechReview.Internal.DelphiRule> {

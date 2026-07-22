@@ -2229,21 +2229,40 @@ export namespace Labrinth {
 			export type DelphiRule = {
 				id: number
 				name: string
-				priority: number
-				expression: string
-				revision_id: number
-				created: string
-				updated: string
-				revision_created: string
+				rule: string
+				revision: number
+				created_at: string
+				updated_at: string
 				created_by: number | null
 				updated_by: number | null
-				revision_created_by: number | null
 			}
 
 			export type WriteDelphiRule = {
 				name: string
-				priority: number
-				expression: string
+				rule: string
+			}
+
+			export type TestDelphiRuleTrace = {
+				key: string
+				issue_type: string
+				severity: DelphiSeverity
+				jar: string | null
+				file_path: string
+				data: Record<string, unknown>
+			}
+
+			export type TestDelphiRuleRequest = {
+				rule: string
+				traces: TestDelphiRuleTrace[]
+			}
+
+			export type DelphiRuleEffect = {
+				severity: DelphiSeverity | null
+				hidden: boolean
+			}
+
+			export type TestDelphiRuleResponse = {
+				effects: Array<DelphiRuleEffect | null>
 			}
 
 			export type SearchProjectsRequest = {
