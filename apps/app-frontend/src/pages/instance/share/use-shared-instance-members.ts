@@ -75,7 +75,9 @@ export function useSharedInstanceMembers(options: {
 		queryFn: loadRows,
 		enabled: () =>
 			options.isSignedIn.value && !!options.instance.value.id && !options.actionsLocked.value,
-		staleTime: Infinity,
+		staleTime: 10_000,
+		refetchInterval: 10_000,
+		refetchOnMount: 'always',
 	})
 	const remoteRows = computed(
 		() => query.data.value ?? queryClient.getQueryData<ShareRow[]>(queryKey.value) ?? [],
