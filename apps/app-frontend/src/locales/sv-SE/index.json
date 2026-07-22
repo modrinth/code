@@ -119,18 +119,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Färgtema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ändrar sidan som launchern öppnas på."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Hem"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliotek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standardlandingssida"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Inaktiverar namnskylten ovanför din spelare på utseende-sidan."
   },
@@ -154,9 +142,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Inbyggda fönsterdekorationer"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Välj ett alternativ"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Visar hur mycket tid du spelat på en instans."

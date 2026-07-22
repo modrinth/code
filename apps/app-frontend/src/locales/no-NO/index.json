@@ -68,18 +68,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Fargetema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Endre sida som vises når launcheren åpnes."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Hjem"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliotek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Åpningsside"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Skjuler navnelappen over din spiller på utseende siden."
   },
@@ -88,9 +76,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer launcheren"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Velg et alternativ"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Viser hvor lenge du har spilt et tilfelle."

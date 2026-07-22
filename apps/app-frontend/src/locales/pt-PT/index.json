@@ -56,23 +56,8 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Cor de tema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Mudar a página em que o launcher abre."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Casa"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Livraria"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página de carregamento principal"
-  },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimizar launcher"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Seleciona uma opção"
   },
   "app.auth-servers.unreachable.body": {
     "message": "Os servidores de autenticação do Minecraft poderão estar em baixo de momento. Verifica a tua ligação à internet e tenta novamente mais tarde."

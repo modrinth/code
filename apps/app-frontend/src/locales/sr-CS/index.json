@@ -86,18 +86,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema boje"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Promeni stranicu na kojoj se otvara pokretač."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Početna stranica"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Podrazumevana odredišna stranica"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Onemogućava oznaku sa imenom iznad tvog igrača na stranici sa skinovima."
   },
@@ -121,9 +109,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Zavičajni ukrasi"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Izaberi opciju"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Pokazuje koliko vremena si proveo igrajući instancu."

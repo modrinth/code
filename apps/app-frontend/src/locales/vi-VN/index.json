@@ -56,18 +56,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Màu chủ đề"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Thay đổi trang hiển thị khi khởi chạy launcher."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Trang chủ"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Thư viện"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Trang mặc định"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Tắt hiển thị thẻ tên phía trên người chơi ở trang skin."
   },
@@ -91,9 +79,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Giao diện cửa sổ hệ thống"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Chọn một tuỳ chọn"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Hiển thị thời gian bạn đã dành để chơi bằng một cấu hình."

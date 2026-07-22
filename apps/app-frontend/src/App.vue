@@ -15,7 +15,6 @@ import {
 	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
-	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -249,11 +248,8 @@ const {
 	handleModpackDuplicateGoToInstance,
 	onboardingChecklist,
 } = setupProviders(notificationManager, popupNotificationManager)
-const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } =
-	onboardingChecklist
-const showFriendsList = computed(
-	() => !showChecklist.value || hasLoggedIntoModrinth.value,
-)
+const { hasLoggedIntoMinecraft, hasLoggedIntoModrinth, showChecklist } = onboardingChecklist
+const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModrinth.value)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -351,7 +347,6 @@ async function setupApp() {
 		collapsed_navigation,
 		hide_nametag_skins_page,
 		advanced_rendering,
-		default_page,
 		toggle_sidebar,
 		developer_mode,
 		feature_flags,
@@ -361,10 +356,6 @@ async function setupApp() {
 	// Initialize locale from saved settings
 	if (locale) {
 		i18n.global.locale.value = locale
-	}
-
-	if (default_page === 'Library') {
-		await router.push('/library')
 	}
 
 	os.value = await getOS()
@@ -1424,7 +1415,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
-			<NavButton v-tooltip.right="'Home'" to="/">
+			<NavButton
+				v-tooltip.right="'Home'"
+				to="/"
+				:is-subpage="
+					() =>
+						route.path.startsWith('/instance') ||
+						((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
+							route.query.i)
+				"
+			>
 				<HomeIcon />
 			</NavButton>
 			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
@@ -1440,19 +1440,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton v-tooltip.right="'Skin selector'" to="/skins">
 				<ChangeSkinIcon />
-			</NavButton>
-			<NavButton
-				v-tooltip.right="'Library'"
-				to="/library"
-				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
-				:is-subpage="
-					() =>
-						route.path.startsWith('/instance') ||
-						((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
-							route.query.i)
-				"
-			>
-				<LibraryIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="'Modrinth Hosting'"

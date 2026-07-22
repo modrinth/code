@@ -56,18 +56,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Kleurenthema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Wijzig de pagina waarop de launcher opent."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Start"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliotheek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standaard openingspagina"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Schakelt het nametag boven jouw speler op de skins pagina uit."
   },
@@ -91,9 +79,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Oorspronkelijke versieringen"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Selecteer een optie"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Toont hoeveel tijd je aan een instantie hebt besteed."

@@ -71,18 +71,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "색상 테마"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "런처의 기본 시작 화면을 변경합니다."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "홈"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "라이브러리"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "기본 시작 화면"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "스킨 화면에서 플레이어 위에 있는 이름표를 비활성화합니다."
   },
@@ -106,9 +94,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "네이티브 제목 표시줄"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "옵션 선택"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "인스턴스의 플레이 시간을 표시합니다."

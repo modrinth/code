@@ -56,18 +56,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema warna"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ubah halaman utama yang dibuka oleh peluncur."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Beranda"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Pustaka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Halaman arahan bawaan"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Mematikan label nama di atas wujud pemain Anda pada halaman rupa."
   },
@@ -91,9 +79,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Hiasan asli"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Pilih opsi"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Menampilkan seberapa lama Anda memainkan sebuah instans."

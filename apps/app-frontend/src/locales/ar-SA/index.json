@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "لون السمة"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "غير الصفحة التي يفتح عليها المشغل."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "صفحة الرئيسية"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "مكتبة"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "الصفحة الرئيسة الافتراضية"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "ألغ تفعيل عرض الاسم فوق لاعبك في صفحة المظاهر."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "الزخارف التقليدية"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "حدد خياراً"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "يعرض مقدار الوقت الذي قضيته في لعب إحدى المهام."

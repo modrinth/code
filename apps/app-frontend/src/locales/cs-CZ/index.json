@@ -77,18 +77,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Barevný motiv"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Změňte stránku, která se otevře po spuštění launcheru."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Domů"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Knihovna"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Výchozí stránka po spuštění"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Zakáže zobrazení jmenovky nad vaší postavou na stránce skinů."
   },
@@ -112,9 +100,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Systémové dekorace"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Vyberte možnost"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zobrazuje, kolik času jsi strávil hraním instance."

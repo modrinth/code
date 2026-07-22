@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
 import * as Hosting from '@/pages/hosting/manage'
 import * as Instance from '@/pages/instance'
-import * as Library from '@/pages/library'
 import * as Project from '@/pages/project'
 
 /**
@@ -99,41 +98,6 @@ export default new createRouter({
 			meta: {
 				breadcrumb: [{ name: 'Skin selector' }],
 			},
-		},
-		{
-			path: '/library',
-			name: 'Library',
-			component: Library.Index,
-			meta: {
-				breadcrumb: [{ name: 'Library' }],
-			},
-			children: [
-				{
-					path: '',
-					name: 'Overview',
-					component: Library.Overview,
-				},
-				{
-					path: 'downloaded',
-					name: 'Downloaded',
-					component: Library.Downloaded,
-				},
-				{
-					path: 'modpacks',
-					name: 'Modpacks',
-					component: Library.Modpacks,
-				},
-				{
-					path: 'servers',
-					name: 'LibraryServers',
-					component: Library.Servers,
-				},
-				{
-					path: 'custom',
-					name: 'Custom',
-					component: Library.Custom,
-				},
-			],
 		},
 		{
 			path: '/:projectType(mod|plugin|datapack|resourcepack|shader|modpack)/:id/:rest(.*)*',

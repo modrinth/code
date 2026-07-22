@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Change the page to which the launcher opens on."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Home"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Library"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Default landing page"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Disables the nametag above your player on the skins page."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Native decorations"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Select an option"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Displays how much time you've spent playing an instance."

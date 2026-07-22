@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主题"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "更改启动器打开的页面。"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "首页"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "库"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "默认起始页"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "在皮肤页面中禁用你玩家头顶上的名牌。"
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "原生窗口"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "选择一个选项"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "显示你在每个实例中游玩的时间。"

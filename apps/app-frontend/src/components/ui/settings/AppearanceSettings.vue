@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Combobox, defineMessages, ThemeSelector, Toggle, useVIntl } from '@modrinth/ui'
+import { defineMessages, ThemeSelector, Toggle, useVIntl } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
@@ -56,26 +56,6 @@ const messages = defineMessages({
 	minimizeLauncherDescription: {
 		id: 'app.appearance-settings.minimize-launcher.description',
 		defaultMessage: 'Minimize the launcher when a Minecraft process starts.',
-	},
-	defaultLandingPageTitle: {
-		id: 'app.appearance-settings.default-landing-page.title',
-		defaultMessage: 'Default landing page',
-	},
-	defaultLandingPageDescription: {
-		id: 'app.appearance-settings.default-landing-page.description',
-		defaultMessage: 'Change the page to which the launcher opens on.',
-	},
-	defaultLandingPageHome: {
-		id: 'app.appearance-settings.default-landing-page.home',
-		defaultMessage: 'Home',
-	},
-	defaultLandingPageLibrary: {
-		id: 'app.appearance-settings.default-landing-page.library',
-		defaultMessage: 'Library',
-	},
-	selectOption: {
-		id: 'app.appearance-settings.select-option',
-		defaultMessage: 'Select an option',
 	},
 	jumpBackIntoWorldsTitle: {
 		id: 'app.appearance-settings.jump-back-into-worlds.title',
@@ -227,32 +207,6 @@ watch(
 					settings.hide_nametag_skins_page = themeStore.hideNametagSkinsPage
 				}
 			"
-		/>
-	</div>
-
-	<div class="mt-6 flex items-center justify-between">
-		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.defaultLandingPageTitle) }}
-			</h2>
-			<p class="m-0 mt-1">{{ formatMessage(messages.defaultLandingPageDescription) }}</p>
-		</div>
-		<Combobox
-			id="opening-page"
-			v-model="settings.default_page"
-			name="Opening page dropdown"
-			class="max-w-40"
-			:options="[
-				{
-					value: 'Home',
-					label: formatMessage(messages.defaultLandingPageHome),
-				},
-				{
-					value: 'Library',
-					label: formatMessage(messages.defaultLandingPageLibrary),
-				},
-			]"
-			:display-value="settings.default_page ?? 'Select an option'"
 		/>
 	</div>
 

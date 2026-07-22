@@ -56,18 +56,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "ธีมสี"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "เปลี่ยนหน้าไปหน้าต่างที่ลันเชอร์เปิดขึ้นมา"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "หน้าหลัก"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "ไลบรารี"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "หน้าเริ่มต้น"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "ซ่อนป้ายชื่อบนศีรษะของผู้เล่นในหน้าแสดงสกิน"
   },
@@ -91,9 +79,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "ของตกแต่งดั้งเดิม"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "เลือกตัวเลือก"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "แสดงเวลาที่คุณใช้เล่นในแต่ละอินสแตนซ์"

@@ -68,18 +68,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Farvetema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Skift hvilken side launcheren åbner i."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Hjem"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliotek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standard startside"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Slår nametagget over din spiller på skins siden fra."
   },
@@ -97,9 +85,6 @@
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer launcher"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Vælg en mulighed"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Vis hvor meget tid du har brugt på at spille en instance."

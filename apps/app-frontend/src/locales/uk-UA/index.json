@@ -131,18 +131,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Колірна тема"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Змініть сторінку, на якій відкривається запускач."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Головна"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Бібліотека"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Усталена цільова сторінка"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Вимикає ім'я над вашим гравцем на сторінці скінів."
   },
@@ -166,9 +154,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Системне оформлення"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Виберіть опцію"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показує, скільки часу ви провели в цьому профілі."

@@ -71,18 +71,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Väriteema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Muuta sivua mille laukaisin avautuu."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Koti"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Kirjasto"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Oletus laskeutumissivu"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Kytkee pois päältä nimikyltin pelaajasi päällä skinit sivulla."
   },
@@ -106,9 +94,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Natiivit koristukset"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Valitse vaihtoehto"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Näyttää, kuinka paljon aikaa olet käyttänyt instanssin pelaamiseen."

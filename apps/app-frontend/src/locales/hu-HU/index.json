@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Téma"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Állítsd be, hogy az indító melyik oldalon nyíljon meg."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Kezdőlap"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Könyvtár"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Alapértelmezett nyitóoldal"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Letiltja a játékosod felett megjelenő névcímkét a Kinézetek oldalon."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Rendszer ablakkeret használata"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Válassz egy lehetőséget"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Megmutatja, mennyi időt töltöttél egy példányban."

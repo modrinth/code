@@ -71,18 +71,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema de color"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Cambia la página en la que el launcher inicia."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Inicio"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Biblioteca"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página de inicio predeterminada"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Desactiva la etiqueta arriba de tu personaje en la página de skins."
   },
@@ -106,9 +94,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Decoraciones nativas"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Selecciona una opción"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Muestra cuánto tiempo has estado jugando en una instancia."

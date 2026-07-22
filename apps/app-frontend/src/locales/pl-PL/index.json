@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Motyw"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ustaw stronę, która pojawia się po włączeniu launchera."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Strona główna"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Biblioteka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Domyślna strona główna"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Wyłącza nazwę użytkownika nad modelem gracza na stronie skórek."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Systemowe dekoracje"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Wybierz opcję"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Pokazuje czas gry spędzony w danej instancji."

@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema Rengi"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Launcher açıldığında varsayılan olarak açılacak sayfayı seçin."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Ana Sayfa"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Kütüphane"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Varsayılan karşılama sayfası"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Kostümler sayfasındaki karakterinizin üzerindeki isim etiketini devre dışı bırakır."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Yerel pencere öğeleri"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Bir seçenek seçin"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Bir oyun oturumunda ne kadar zaman geçirdiğinizi gösterir."

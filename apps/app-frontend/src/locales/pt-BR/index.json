@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema de cores"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Altera a página que o launcher é aberto."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Início"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Biblioteca"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Página inicial padrão"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Desativa o nametag acima do seu jogador na página de Skins."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Decorações nativas"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Selecione uma opção"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Exibe a quantidade de tempo jogado de uma instância."

@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "色彩主題"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "變更啟動器開啟時的頁面。"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "首頁"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "遊戲庫"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "預設起始頁面"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "在外觀頁面中隱藏玩家上方的名牌。"
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "原生視窗"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "選擇選項"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "顯示你在該實例的遊玩時數。"

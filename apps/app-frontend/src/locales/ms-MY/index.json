@@ -56,18 +56,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Tema warna"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Tukar laman utama yang dibuka oleh pelancar."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Laman utama"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Pustaka"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Laman pendaratan lalai"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Menyahdayakan tanda nama di atas pemain anda pada halaman kekulit."
   },
@@ -91,9 +79,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Hiasan asli"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Pilih satu pilihan"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
     "message": "Melangkau pengesahan berisiko rendah secara automatik seperti pemasangan pek mod pendua, pemadaman kandungan biasa, kemas kini pukal, menyahpautkan pek mod dan gesaan pembaikan. Amaran berbahaya masih akan ditunjukkan."

@@ -116,18 +116,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Couleur du thème"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Modifier la page sur laquelle le lanceur s'ouvre."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Accueil"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliothèque"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Page d'ouverture"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Désactive le nom au-dessus du joueur sur la page skins."
   },
@@ -151,9 +139,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Décorations natives"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Sélectionnez une option"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Affiche combien de temps vous avez passé sur une instance."

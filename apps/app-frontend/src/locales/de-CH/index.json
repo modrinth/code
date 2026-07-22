@@ -137,18 +137,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "Farbschema"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "Ändere die Seite, die beim Öffnen des Launchers angezeigt wird."
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "Start"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "Bibliothek"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "Standard-Startseite"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "Deaktiviert das Namensschild über deinem Spieler auf der Skin-Seite."
   },
@@ -172,9 +160,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Native Dekorationen"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Option wählen"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zeigt an, wie viel Zeit du mit dem Spielen einer Instanz verbracht hast."

@@ -98,18 +98,6 @@
   "app.appearance-settings.color-theme.title": {
     "message": "テーマ"
   },
-  "app.appearance-settings.default-landing-page.description": {
-    "message": "ランチャー起動時に表示するページを変更します"
-  },
-  "app.appearance-settings.default-landing-page.home": {
-    "message": "ホーム"
-  },
-  "app.appearance-settings.default-landing-page.library": {
-    "message": "ライブラリ"
-  },
-  "app.appearance-settings.default-landing-page.title": {
-    "message": "デフォルトの起動ページ"
-  },
   "app.appearance-settings.hide-nametag.description": {
     "message": "スキンページでプレイヤー上部のネームタグを非表示にします。"
   },
@@ -133,9 +121,6 @@
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "OSのウィンドウUIを使用"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "オプションを選択してください"
   },
   "app.appearance-settings.show-play-time.description": {
     "message": "インスタンスのプレイ時間を表示します。"
