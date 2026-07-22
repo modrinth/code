@@ -103,6 +103,12 @@
 //! is faster than two. It's even faster if you search for more facets like
 //! category, game version, loader, and environment.
 //!
+//! Filters are parsed into a backend-independent AST before they reach this
+//! module. Its normalization pass compacts Cartesian products such as many
+//! game versions combined with many loaders into `IN` predicates. The
+//! Typesense filter planner then puts maximal version-only expressions into a
+//! single join, avoiding repeated joins and deeply expanded boolean trees.
+//!
 //! ### Whole-field tokenization
 //!
 //! For fields like a version's `categories`, `environment`, `game_versions`
@@ -117,6 +123,12 @@
 //!
 //! For this, we use the `:` operator instead of `:=` to tell
 //! Typesense to treat this as an exact token match.
+//!
+//! ### Query caching
+//!
+//! Typesense caches identical search responses when `TYPESENSE_USE_CACHE` is
+//! enabled. This avoids repeating joins for popular queries at the cost of
+//! results remaining stale for Typesense's default 60-second cache lifetime.
 
 use std::sync::LazyLock;
 
@@ -136,6 +148,9 @@ use crate::search::backend::{
     SearchIndex, combined_search_filters, parse_search_index,
     parse_search_request,
 };
+use crate::search::filter::{
+    FilterExpr, from_legacy_v2_facets_json, normalize, parse_expression,
+};
 use crate::search::indexing::index_local;
 use crate::search::{
     ResultSearchProject, SearchBackend, SearchField, SearchIndexUpdate,
@@ -144,11 +159,9 @@ use crate::search::{
 };
 use crate::util::error::Context;
 
-use self::filter_rewrite::{
-    facets_to_typesense, meili_to_typesense, rewrite_filter_for_join,
-};
+use self::filter::serialize_filter;
 
-mod filter_rewrite;
+mod filter;
 
 const DELETE_FILTER_ID_BATCH_SIZE: usize = 256;
 
@@ -161,6 +174,7 @@ pub struct TypesenseConfig {
     pub index_chunk_size: i64,
     pub import_batch_size: usize,
     pub delete_batch_size: usize,
+    pub use_cache: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -291,6 +305,7 @@ impl TypesenseConfig {
             index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
             import_batch_size: ENV.TYPESENSE_IMPORT_BATCH_SIZE,
             delete_batch_size: ENV.TYPESENSE_DELETE_BATCH_SIZE,
+            use_cache: ENV.TYPESENSE_USE_CACHE,
         }
     }
 
@@ -905,38 +920,23 @@ impl Typesense {
         versions_collection: &str,
     ) -> Result<Option<String>, ApiError> {
         let facet_part = if let Some(facets_json) = info.facets.as_deref() {
-            Some(
-                facets_to_typesense(facets_json)
-                    .wrap_request_err("failed to parse facets")?,
-            )
+            from_legacy_v2_facets_json(facets_json)
+                .wrap_request_err("failed to parse facets")?
         } else {
             None
         };
 
-        let new_filters_part =
-            info.new_filters.as_deref().map(meili_to_typesense);
+        let filter_part = combined_search_filters(info)
+            .filter(|filter| !filter.trim().is_empty())
+            .map(|filter| parse_expression(&filter))
+            .transpose()
+            .wrap_request_err("failed to parse filters")?;
 
-        let legacy_part = if info.new_filters.is_none() {
-            combined_search_filters(info).map(|f| meili_to_typesense(&f))
-        } else {
-            None
-        };
-
-        let filter_part = new_filters_part.or(legacy_part);
-
-        let filter = match (facet_part, filter_part) {
-            (Some(f), Some(l)) if !f.is_empty() && !l.is_empty() => {
-                Some(format!("({f}) && ({l})"))
-            }
-            (Some(f), _) if !f.is_empty() => Some(f),
-            (_, Some(l)) if !l.is_empty() => Some(l),
-            _ => None,
-        };
-
-        filter
+        FilterExpr::and([facet_part, filter_part].into_iter().flatten())
+            .map(normalize)
             .map(|filter| {
-                rewrite_filter_for_join(&filter, versions_collection)
-                    .wrap_request_err("failed to rewrite search filter")
+                serialize_filter(&filter, versions_collection)
+                    .wrap_request_err("failed to build search filter")
             })
             .transpose()
     }
@@ -1114,6 +1114,7 @@ impl SearchBackend for Typesense {
         let resp = self
             .client
             .request(Method::POST, "/multi_search")
+            .query(&[("use_cache", self.config.use_cache)])
             .json(&json!({
                 "searches": [
                     serde_json::Map::from_iter(

@@ -16,6 +16,7 @@ use thiserror::Error;
 use utoipa::ToSchema;
 
 pub mod backend;
+pub mod filter;
 pub mod incremental;
 pub mod indexing;
 

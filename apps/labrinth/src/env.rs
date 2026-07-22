@@ -167,6 +167,7 @@ vars! {
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
     TYPESENSE_IMPORT_BATCH_SIZE: usize = 5000usize;
     TYPESENSE_DELETE_BATCH_SIZE: usize = 10_000usize;
+    TYPESENSE_USE_CACHE: bool = true;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;
