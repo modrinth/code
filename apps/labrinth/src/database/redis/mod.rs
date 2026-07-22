@@ -53,9 +53,14 @@ impl RedisPool {
             strategy = %config.cache_locking_strategy(),
             "configured Redis cache locking"
         );
-        let backend = RedisBackend::new(&config)
-            .await
-            .expect("failed to initialize Redis connections");
+
+        let backend = match RedisBackend::new(&config).await {
+            Ok(b) => b,
+            Err(error) => {
+                panic!("failed to initialize Redis connection(s): {error}");
+            }
+        };
+
         let blocking = blocking::RedisBlockingPool::new(&config)
             .await
             .expect("failed to initialize blocking Redis connections");
