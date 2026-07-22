@@ -2235,6 +2235,26 @@ export namespace Labrinth {
 				updated_at: string
 				created_by: number | null
 				updated_by: number | null
+				affected_details_count: number
+				affected_details: DelphiRuleAffectedDetail[]
+			}
+
+			export type DelphiRuleAffectedDetail = {
+				detail_id: string
+				issue_id: string
+				project_id: string | null
+				project_name: string | null
+				project_icon_url: string | null
+				version_id: string | null
+				version_name: string | null
+				version_number: string | null
+				issue_type: string
+				key: string
+				jar: string | null
+				file_path: string
+				original_severity: DelphiSeverity
+				severity: DelphiSeverity | null
+				hidden: boolean
 			}
 
 			export type WriteDelphiRule = {
@@ -2259,6 +2279,14 @@ export namespace Labrinth {
 			export type DelphiRuleEffect = {
 				severity: DelphiSeverity | null
 				hidden: boolean
+			}
+
+			export type DelphiRuleSchema = Record<string, unknown>
+
+			export type DelphiRuleSchemaResponse = {
+				input: DelphiRuleSchema
+				output: DelphiRuleSchema
+				components: Record<string, DelphiRuleSchema>
 			}
 
 			export type TestDelphiRuleResponse = {

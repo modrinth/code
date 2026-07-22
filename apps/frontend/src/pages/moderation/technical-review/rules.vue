@@ -37,6 +37,37 @@
 				<code>severity</code> and/or <code>hidden</code> when it does.
 			</p>
 
+			<details class="rounded-xl border border-divider bg-bg-raised p-3">
+				<summary class="cursor-pointer font-semibold text-contrast">
+					Input and output schema
+				</summary>
+				<div v-if="isLoadingRuleSchema" class="mt-3 flex items-center gap-2 text-secondary">
+					<LoaderCircleIcon class="size-4 animate-spin" />
+					Loading schema…
+				</div>
+				<p v-else-if="ruleSchemaError" class="m-0 mt-3 text-sm text-red">
+					{{ ruleSchemaError }}
+				</p>
+				<div v-else class="mt-3 grid gap-3 md:grid-cols-2">
+					<div class="min-w-0">
+						<p class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
+							Input (<code>input</code>)
+						</p>
+						<pre
+							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
+						><code>{{ ruleInputSchemaText }}</code></pre>
+					</div>
+					<div class="min-w-0">
+						<p class="m-0 mb-2 text-xs font-semibold uppercase tracking-wide text-secondary">
+							Output
+						</p>
+						<pre
+							class="m-0 overflow-x-auto rounded-lg bg-surface-1 p-3 text-xs leading-relaxed text-contrast"
+						><code>{{ ruleOutputSchemaText }}</code></pre>
+					</div>
+				</div>
+			</details>
+
 			<section class="mt-2 flex flex-col gap-3">
 				<div class="flex items-center justify-between gap-3">
 					<div>
@@ -233,7 +264,11 @@
 			description="Create a rule to transform matching issue traces."
 		/>
 		<div v-else class="flex flex-col gap-3">
-			<article v-for="rule in rules" :key="rule.id" class="universal-card flex flex-col gap-3">
+			<article
+				v-for="rule in rules"
+				:key="rule.id"
+				class="universal-card relative flex flex-col gap-3 overflow-hidden"
+			>
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div>
 						<h2 class="m-0 text-lg font-bold text-contrast">{{ rule.name }}</h2>
@@ -257,6 +292,112 @@
 				<pre
 					class="m-0 overflow-x-auto rounded-lg bg-bg-raised p-3 text-sm"
 				><code>{{ rule.rule }}</code></pre>
+
+				<section class="flex flex-col gap-2">
+					<h3 class="m-0 text-sm font-semibold text-contrast">
+						Affected details ({{ rule.affected_details_count.toLocaleString() }})
+					</h3>
+					<p v-if="rule.affected_details_count === 0" class="m-0 text-sm text-secondary">
+						No details are affected in the current revision.
+					</p>
+					<div v-else class="flex flex-col gap-2">
+						<div
+							v-for="detail in getVisibleRuleDetails(rule)"
+							:key="detail.detail_id"
+							class="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-divider bg-bg-raised px-3 py-2"
+						>
+							<div class="min-w-0">
+								<div class="mb-1 flex min-w-0 items-center gap-1.5 text-sm">
+									<NuxtLink
+										v-if="detail.project_id"
+										:to="getProjectLink(detail)"
+										class="flex min-w-0 items-center gap-1.5 font-semibold text-contrast hover:underline"
+									>
+										<Avatar
+											:src="detail.project_icon_url"
+											:alt="detail.project_name ?? ''"
+											size="xs"
+											no-shadow
+										/>
+										<span class="truncate">{{ detail.project_name ?? detail.project_id }}</span>
+									</NuxtLink>
+									<span v-else class="text-secondary">Unattached trace</span>
+									<template v-if="detail.project_id && detail.version_id">
+										<span class="shrink-0 text-secondary" aria-hidden="true">·</span>
+										<NuxtLink
+											:to="getVersionLink(detail)"
+											class="truncate text-secondary hover:underline"
+										>
+											{{ detail.version_name ?? detail.version_number ?? detail.version_id }}
+										</NuxtLink>
+									</template>
+								</div>
+								<div class="flex min-w-0 flex-wrap items-center gap-2">
+									<span
+										v-if="!detail.hidden"
+										class="rounded-full border px-2 py-0.5 text-xs font-semibold capitalize"
+										:class="getSeverityBadgeColor(detail.severity ?? detail.original_severity)"
+									>
+										{{ detail.severity ?? detail.original_severity }}
+									</span>
+									<span v-else class="flex items-center gap-1 text-xs font-semibold text-secondary">
+										<EyeOffIcon class="size-4" />
+										Hidden
+									</span>
+									<strong class="truncate text-sm text-contrast">{{ detail.issue_type }}</strong>
+								</div>
+								<p
+									class="m-0 mt-0.5 flex min-w-0 items-center gap-1 font-mono text-xs text-secondary"
+								>
+									<template v-if="detail.jar">
+										<span class="truncate">{{ detail.jar }}</span>
+										<ChevronRightIcon class="size-3.5 shrink-0" aria-hidden="true" />
+									</template>
+									<span class="truncate">{{ detail.file_path }}</span>
+								</p>
+							</div>
+							<ButtonStyled>
+								<NuxtLink v-if="detail.project_id" :to="getAffectedDetailLink(detail)">
+									<ExternalIcon />
+									View
+								</NuxtLink>
+								<button
+									v-else
+									type="button"
+									disabled
+									title="This trace is not attached to a project"
+								>
+									<ExternalIcon />
+									View
+								</button>
+							</ButtonStyled>
+						</div>
+
+						<div
+							v-if="rule.affected_details_count > 3"
+							class="relative z-20 mt-1 flex justify-center"
+						>
+							<ButtonStyled circular type="transparent">
+								<button
+									type="button"
+									:disabled="loadingAffectedRuleIds.has(rule.id)"
+									@click="toggleAffectedDetails(rule)"
+								>
+									<LoaderCircleIcon
+										v-if="loadingAffectedRuleIds.has(rule.id)"
+										class="animate-spin"
+									/>
+									{{ expandedAffectedDetails.has(rule.id) ? 'Show less' : 'Show more' }}
+								</button>
+							</ButtonStyled>
+						</div>
+					</div>
+				</section>
+				<div
+					v-if="rule.affected_details_count > 3 && !expandedAffectedDetails.has(rule.id)"
+					class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent to-surface-3"
+					aria-hidden="true"
+				/>
 			</article>
 		</div>
 	</div>
@@ -266,8 +407,10 @@
 import { type Labrinth, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
+	ChevronRightIcon,
 	EditIcon,
 	EyeOffIcon,
+	ExternalIcon,
 	LoaderCircleIcon,
 	PlayIcon,
 	PlusIcon,
@@ -275,6 +418,7 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Avatar,
 	ConfirmModal,
 	EmptyState,
 	injectModrinthClient,
@@ -335,13 +479,20 @@ const isLoading = ref(true)
 const isSaving = ref(false)
 const isScanning = ref(false)
 const isTestingRule = ref(false)
+const isLoadingRuleSchema = ref(false)
 const isRuleModalOpen = ref(false)
 const loadFailed = ref(false)
+const ruleSchemaError = ref<string | null>(null)
+const ruleSchema = ref<Labrinth.TechReview.Internal.DelphiRuleSchemaResponse | null>(null)
 const editingRuleId = ref<number | null>(null)
 const ruleToDelete = ref<Labrinth.TechReview.Internal.DelphiRule | null>(null)
 const ruleTestEffects = ref<Array<Labrinth.TechReview.Internal.DelphiRuleEffect | null>>([])
 const ruleTestError = ref<string | null>(null)
 const scanProgress = ref<Labrinth.TechReview.Internal.DelphiRuleScanEvent | null>(null)
+const expandedAffectedDetails = reactive(
+	new Map<number, Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(),
+)
+const loadingAffectedRuleIds = reactive(new Set<number>())
 const form = reactive({
 	name: '',
 	rule: DEFAULT_RULE,
@@ -358,6 +509,12 @@ onMounted(async () => {
 })
 
 const modalTitle = computed(() => (editingRuleId.value === null ? 'Create rule' : 'Edit rule'))
+const ruleInputSchemaText = computed(() =>
+	ruleSchema.value ? formatRuleSchema(ruleSchema.value.input, ruleSchema.value.components) : '',
+)
+const ruleOutputSchemaText = computed(() =>
+	ruleSchema.value ? formatRuleSchema(ruleSchema.value.output, ruleSchema.value.components) : '',
+)
 const previewExamples = computed(() =>
 	TEST_TRACES.map((original, index) => {
 		const effect = ruleTestEffects.value[index] ?? null
@@ -397,6 +554,92 @@ function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeve
 		default:
 			return 'border-blue/60 bg-highlight-blue text-blue'
 	}
+}
+
+function isSchema(value: unknown): value is Labrinth.TechReview.Internal.DelphiRuleSchema {
+	return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function formatRuleSchema(
+	schema: Labrinth.TechReview.Internal.DelphiRuleSchema,
+	components: Record<string, Labrinth.TechReview.Internal.DelphiRuleSchema>,
+	depth = 0,
+	visitedReferences = new Set<string>(),
+): string {
+	if (typeof schema.$ref === 'string') {
+		const name = decodeURIComponent(schema.$ref.split('/').at(-1) ?? '')
+		if (visitedReferences.has(name)) return name || 'unknown'
+
+		const referencedSchema = components[name]
+		if (!referencedSchema) return name || 'unknown'
+
+		const visited = new Set(visitedReferences)
+		visited.add(name)
+		return formatRuleSchema(referencedSchema, components, depth, visited)
+	}
+
+	const resolved = schema
+	const alternatives = [resolved.oneOf, resolved.anyOf].find(Array.isArray)
+	if (alternatives) {
+		return alternatives
+			.filter(isSchema)
+			.map((alternative) => formatRuleSchema(alternative, components, depth, visitedReferences))
+			.join(' | ')
+	}
+
+	if (Array.isArray(resolved.enum)) {
+		return resolved.enum.map((value) => JSON.stringify(value)).join(' | ')
+	}
+
+	const declaredTypes = Array.isArray(resolved.type)
+		? resolved.type.filter((type): type is string => typeof type === 'string')
+		: typeof resolved.type === 'string'
+			? [resolved.type]
+			: []
+	const nullable = resolved.nullable === true || declaredTypes.includes('null')
+	const type = declaredTypes.find((value) => value !== 'null')
+	let formatted: string
+
+	if (type === 'object' || isSchema(resolved.properties) || resolved.additionalProperties) {
+		const properties = isSchema(resolved.properties) ? resolved.properties : {}
+		const required = new Set(
+			Array.isArray(resolved.required)
+				? resolved.required.filter((name): name is string => typeof name === 'string')
+				: [],
+		)
+		const indentation = '  '.repeat(depth)
+		const childIndentation = '  '.repeat(depth + 1)
+		const lines = Object.entries(properties)
+			.filter((entry): entry is [string, Labrinth.TechReview.Internal.DelphiRuleSchema] =>
+				isSchema(entry[1]),
+			)
+			.map(
+				([name, property]) =>
+					`${childIndentation}${JSON.stringify(name)}${required.has(name) ? '' : '?'}: ${formatRuleSchema(property, components, depth + 1, visitedReferences)}`,
+			)
+
+		if (isSchema(resolved.additionalProperties)) {
+			lines.push(
+				`${childIndentation}[key: string]: ${formatRuleSchema(resolved.additionalProperties, components, depth + 1, visitedReferences)}`,
+			)
+		} else if (resolved.additionalProperties === true) {
+			lines.push(`${childIndentation}[key: string]: unknown`)
+		}
+
+		formatted = lines.length === 0 ? '{}' : `{\n${lines.join(',\n')}\n${indentation}}`
+	} else if (type === 'array') {
+		formatted = isSchema(resolved.items)
+			? `Array<${formatRuleSchema(resolved.items, components, depth, visitedReferences)}>`
+			: 'unknown[]'
+	} else if (type === 'integer' || type === 'number') {
+		formatted = 'number'
+	} else if (type === 'boolean' || type === 'string' || type === 'null') {
+		formatted = type
+	} else {
+		formatted = 'unknown'
+	}
+
+	return nullable && formatted !== 'null' ? `${formatted} | null` : formatted
 }
 
 function onRuleEditorInit(editor: Ace.Editor) {
@@ -460,11 +703,70 @@ async function loadRules() {
 	loadFailed.value = false
 	try {
 		rules.value = await client.labrinth.tech_review_internal.getRules()
+		expandedAffectedDetails.clear()
 	} catch (error) {
 		console.error('Failed to load Delphi rules', error)
 		loadFailed.value = true
 	} finally {
 		isLoading.value = false
+	}
+}
+
+async function loadRuleSchema() {
+	if (ruleSchema.value || isLoadingRuleSchema.value) return
+
+	isLoadingRuleSchema.value = true
+	ruleSchemaError.value = null
+	try {
+		ruleSchema.value = await client.labrinth.tech_review_internal.getRuleSchema()
+	} catch (error) {
+		console.error('Failed to load Delphi rule schema', error)
+		ruleSchemaError.value = 'The rule input and output schema could not be loaded.'
+	} finally {
+		isLoadingRuleSchema.value = false
+	}
+}
+
+function getVisibleRuleDetails(
+	rule: Labrinth.TechReview.Internal.DelphiRule,
+): Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[] {
+	return expandedAffectedDetails.get(rule.id) ?? rule.affected_details
+}
+
+function getAffectedDetailLink(
+	detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail,
+): string {
+	return `/moderation/technical-review/${detail.project_id}?detail=${encodeURIComponent(detail.detail_id)}`
+}
+
+function getProjectLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail): string {
+	return `/project/${detail.project_id}`
+}
+
+function getVersionLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail): string {
+	return `/project/${detail.project_id}/version/${detail.version_id}`
+}
+
+async function toggleAffectedDetails(rule: Labrinth.TechReview.Internal.DelphiRule) {
+	if (expandedAffectedDetails.has(rule.id)) {
+		expandedAffectedDetails.delete(rule.id)
+		return
+	}
+	if (loadingAffectedRuleIds.has(rule.id)) return
+
+	loadingAffectedRuleIds.add(rule.id)
+	try {
+		const details = await client.labrinth.tech_review_internal.getRuleAffectedDetails(rule.id)
+		expandedAffectedDetails.set(rule.id, details)
+	} catch (error) {
+		console.error('Failed to load details affected by Delphi rule', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to load affected details',
+			text: 'The complete list of affected details could not be loaded.',
+		})
+	} finally {
+		loadingAffectedRuleIds.delete(rule.id)
 	}
 }
 
@@ -476,6 +778,7 @@ function openCreateModal() {
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
 	nextTick(() => ruleEditorInstance.value?.resize(true))
+	void loadRuleSchema()
 	void testRule()
 }
 
@@ -487,6 +790,7 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
 	nextTick(() => ruleEditorInstance.value?.resize(true))
+	void loadRuleSchema()
 	void testRule()
 }
 

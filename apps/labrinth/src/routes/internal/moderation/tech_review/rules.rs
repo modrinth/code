@@ -5,13 +5,23 @@ use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
+use super::rules_scan::{
+    RuleArtifact, RuleInput, RuleScan, RuleScope, RuleTrace,
+};
 use crate::{
     auth::check_is_moderator_from_headers,
     database::{
-        PgPool, ReadOnlyPgPool, models::delphi_report_item::DelphiSeverity,
+        PgPool, ReadOnlyPgPool,
+        models::{
+            DBProjectId, DBVersionId, DelphiReportIssueDetailsId,
+            DelphiReportIssueId, delphi_report_item::DelphiSeverity,
+        },
         redis::RedisPool,
     },
-    models::pats::Scopes,
+    models::{
+        ids::{ProjectId, VersionId},
+        pats::Scopes,
+    },
     queue::session::AuthQueue,
     routes::ApiError,
     util::error::Context,
@@ -24,6 +34,7 @@ const MAX_RULE_TEST_TRACES: usize = 10;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_rules)
         .service(test_rule)
+        .service(get_rule_affected_details)
         .service(create_rule)
         .service(update_rule)
         .service(delete_rule);
@@ -39,6 +50,27 @@ pub struct DelphiRule {
     pub updated_at: DateTime<Utc>,
     pub created_by: Option<i64>,
     pub updated_by: Option<i64>,
+    pub affected_details_count: i64,
+    pub affected_details: Vec<DelphiRuleAffectedDetail>,
+}
+
+#[derive(Debug, Serialize, utoipa::ToSchema)]
+pub struct DelphiRuleAffectedDetail {
+    pub detail_id: DelphiReportIssueDetailsId,
+    pub issue_id: DelphiReportIssueId,
+    pub project_id: Option<ProjectId>,
+    pub project_name: Option<String>,
+    pub project_icon_url: Option<String>,
+    pub version_id: Option<VersionId>,
+    pub version_name: Option<String>,
+    pub version_number: Option<String>,
+    pub issue_type: String,
+    pub key: String,
+    pub jar: Option<String>,
+    pub file_path: String,
+    pub original_severity: DelphiSeverity,
+    pub severity: Option<DelphiSeverity>,
+    pub hidden: bool,
 }
 
 #[derive(Debug, Deserialize, utoipa::ToSchema)]
@@ -75,33 +107,6 @@ pub struct DelphiRuleEffect {
     pub severity: Option<DelphiSeverity>,
     #[serde(default)]
     pub hidden: bool,
-}
-
-#[derive(Serialize)]
-struct TestRuleInput<'a> {
-    schema_version: u32,
-    trace: &'a TestDelphiRuleTrace,
-    scan: TestRuleScan,
-    artifact: TestRuleArtifact,
-    scope: TestRuleScope,
-}
-
-#[derive(Serialize)]
-struct TestRuleScan {
-    delphi_version: i32,
-}
-
-#[derive(Serialize)]
-struct TestRuleArtifact {
-    size: u32,
-    hashes: BTreeMap<String, String>,
-}
-
-#[derive(Serialize)]
-struct TestRuleScope {
-    project_id: String,
-    version_id: String,
-    file_id: String,
 }
 
 struct ValidatedRule {
@@ -203,22 +208,29 @@ pub async fn test_rule(
     Ok(web::Json(TestDelphiRuleResponse { effects }))
 }
 
-fn test_rule_input(trace: &TestDelphiRuleTrace) -> TestRuleInput<'_> {
-    TestRuleInput {
+fn test_rule_input(trace: &TestDelphiRuleTrace) -> RuleInput {
+    RuleInput {
         schema_version: 1,
-        trace,
-        scan: TestRuleScan { delphi_version: 17 },
-        artifact: TestRuleArtifact {
-            size: 412_892,
+        trace: RuleTrace {
+            key: trace.key.clone(),
+            issue_type: trace.issue_type.clone(),
+            severity: trace.severity,
+            jar: trace.jar.clone(),
+            file_path: trace.file_path.clone(),
+            data: trace.data.clone(),
+        },
+        scan: RuleScan { delphi_version: 17 },
+        artifact: RuleArtifact {
+            size: Some(412_892),
             hashes: BTreeMap::from([
                 ("sha1".to_string(), "0123456789abcdef".to_string()),
                 ("sha512".to_string(), "fedcba9876543210".to_string()),
             ]),
         },
-        scope: TestRuleScope {
-            project_id: "example-project".to_string(),
-            version_id: "example-version".to_string(),
-            file_id: "example-file".to_string(),
+        scope: RuleScope {
+            project_id: Some("example-project".to_string()),
+            version_id: Some("example-version".to_string()),
+            file_id: Some("example-file".to_string()),
         },
     }
 }
@@ -250,27 +262,81 @@ pub async fn get_rules(
     let rules = sqlx::query!(
         r#"
 		SELECT
-			id,
-			name,
-			rule,
-			revision,
-			created_at,
-			updated_at,
-			created_by,
-			updated_by
-		FROM delphi_rules
-		WHERE NOT delete_on_next_revision
-		ORDER BY id
+			delphi_rule.id,
+			delphi_rule.name,
+			delphi_rule.rule,
+			delphi_rule.revision,
+			delphi_rule.created_at,
+			delphi_rule.updated_at,
+			delphi_rule.created_by,
+			delphi_rule.updated_by,
+			COALESCE(preview.affected_details_count, 0)
+				AS "affected_details_count!",
+			preview.detail_id AS "detail_id?: DelphiReportIssueDetailsId",
+			preview.issue_id AS "issue_id?: DelphiReportIssueId",
+			preview.project_id AS "project_id?: DBProjectId",
+			preview.project_name AS "project_name?",
+			preview.project_icon_url AS "project_icon_url?",
+			preview.version_id AS "version_id?: DBVersionId",
+			preview.version_name AS "version_name?",
+			preview.version_number AS "version_number?",
+			preview.issue_type AS "issue_type?",
+			preview.key AS "key?",
+			preview.jar AS "jar?",
+			preview.file_path AS "file_path?",
+			preview.original_severity AS "original_severity?: DelphiSeverity",
+			preview.severity AS "effect_severity?: DelphiSeverity",
+			preview.hidden AS "hidden?"
+		FROM delphi_rules delphi_rule
+		LEFT JOIN LATERAL (
+			SELECT
+				effect.detail_id,
+				detail.issue_id,
+				version.mod_id AS project_id,
+				project.name AS project_name,
+				project.icon_url AS project_icon_url,
+				version.id AS version_id,
+				version.name AS version_name,
+				version.version_number,
+				issue.issue_type,
+				detail.key,
+				detail.jar,
+				detail.file_path,
+				detail.severity AS original_severity,
+				effect.severity,
+				effect.hidden,
+				COUNT(*) OVER () AS affected_details_count
+			FROM delphi_rule_effects effect
+			INNER JOIN delphi_rule_revisions published
+				ON published.revision = effect.revision
+			INNER JOIN delphi_report_issue_details detail
+				ON detail.id = effect.detail_id
+			INNER JOIN delphi_report_issues issue
+				ON issue.id = detail.issue_id
+			INNER JOIN delphi_reports report
+				ON report.id = issue.report_id
+			LEFT JOIN files file ON file.id = report.file_id
+			LEFT JOIN versions version ON version.id = file.version_id
+			LEFT JOIN mods project ON project.id = version.mod_id
+			WHERE effect.rule_id = delphi_rule.id
+			ORDER BY effect.detail_id DESC
+			LIMIT 3
+		) preview ON TRUE
+		WHERE NOT delphi_rule.delete_on_next_revision
+		ORDER BY delphi_rule.id, preview.detail_id DESC
 		"#,
     )
     .fetch_all(&***ro_pool)
     .await
     .wrap_internal_err("failed to fetch delphi rules")?;
 
-    Ok(web::Json(
-        rules
-            .into_iter()
-            .map(|rule| DelphiRule {
+    let mut response = Vec::<DelphiRule>::new();
+    for rule in rules {
+        if response
+            .last()
+            .is_none_or(|existing| existing.id != rule.id)
+        {
+            response.push(DelphiRule {
                 id: rule.id,
                 name: rule.name,
                 rule: rule.rule,
@@ -279,6 +345,137 @@ pub async fn get_rules(
                 updated_at: rule.updated_at,
                 created_by: rule.created_by,
                 updated_by: rule.updated_by,
+                affected_details_count: rule.affected_details_count,
+                affected_details: Vec::new(),
+            });
+        }
+
+        if let (
+            Some(detail_id),
+            Some(issue_id),
+            Some(issue_type),
+            Some(key),
+            Some(file_path),
+            Some(original_severity),
+            Some(hidden),
+        ) = (
+            rule.detail_id,
+            rule.issue_id,
+            rule.issue_type,
+            rule.key,
+            rule.file_path,
+            rule.original_severity,
+            rule.hidden,
+        ) {
+            response
+                .last_mut()
+                .expect("a delphi rule was inserted above")
+                .affected_details
+                .push(DelphiRuleAffectedDetail {
+                    detail_id,
+                    issue_id,
+                    project_id: rule.project_id.map(ProjectId::from),
+                    project_name: rule.project_name,
+                    project_icon_url: rule.project_icon_url,
+                    version_id: rule.version_id.map(VersionId::from),
+                    version_name: rule.version_name,
+                    version_number: rule.version_number,
+                    issue_type,
+                    key,
+                    jar: rule.jar,
+                    file_path,
+                    original_severity,
+                    severity: rule.effect_severity,
+                    hidden,
+                });
+        }
+    }
+
+    Ok(web::Json(response))
+}
+
+/// List all details affected by a Delphi rule in the published revision.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = Vec<DelphiRuleAffectedDetail>))
+)]
+#[get("/rules/{id}/effects")]
+pub async fn get_rule_affected_details(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(i64,)>,
+) -> Result<web::Json<Vec<DelphiRuleAffectedDetail>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+    let (rule_id,) = path.into_inner();
+
+    let details = sqlx::query!(
+        r#"
+		SELECT
+			effect.detail_id AS "detail_id!: DelphiReportIssueDetailsId",
+			detail.issue_id AS "issue_id!: DelphiReportIssueId",
+			version.mod_id AS "project_id?: DBProjectId",
+			project.name AS "project_name?",
+			project.icon_url AS "project_icon_url?",
+			version.id AS "version_id?: DBVersionId",
+			version.name AS "version_name?",
+			version.version_number AS "version_number?",
+			issue.issue_type,
+			detail.key,
+			detail.jar,
+			detail.file_path,
+			detail.severity AS "original_severity!: DelphiSeverity",
+			effect.severity AS "effect_severity: DelphiSeverity",
+			effect.hidden
+		FROM delphi_rule_effects effect
+		INNER JOIN delphi_rule_revisions published
+			ON published.revision = effect.revision
+		INNER JOIN delphi_report_issue_details detail
+			ON detail.id = effect.detail_id
+		INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+		INNER JOIN delphi_reports report ON report.id = issue.report_id
+		LEFT JOIN files file ON file.id = report.file_id
+		LEFT JOIN versions version ON version.id = file.version_id
+		LEFT JOIN mods project ON project.id = version.mod_id
+		WHERE effect.rule_id = $1
+		ORDER BY effect.detail_id DESC
+		"#,
+        rule_id,
+    )
+    .fetch_all(&***ro_pool)
+    .await
+    .wrap_internal_err("failed to fetch details affected by delphi rule")?;
+
+    Ok(web::Json(
+        details
+            .into_iter()
+            .map(|detail| DelphiRuleAffectedDetail {
+                detail_id: detail.detail_id,
+                issue_id: detail.issue_id,
+                project_id: detail.project_id.map(ProjectId::from),
+                project_name: detail.project_name,
+                project_icon_url: detail.project_icon_url,
+                version_id: detail.version_id.map(VersionId::from),
+                version_name: detail.version_name,
+                version_number: detail.version_number,
+                issue_type: detail.issue_type,
+                key: detail.key,
+                jar: detail.jar,
+                file_path: detail.file_path,
+                original_severity: detail.original_severity,
+                severity: detail.effect_severity,
+                hidden: detail.hidden,
             })
             .collect(),
     ))
@@ -354,6 +551,8 @@ pub async fn create_rule(
         updated_at: rule.updated_at,
         created_by: rule.created_by,
         updated_by: rule.updated_by,
+        affected_details_count: 0,
+        affected_details: Vec::new(),
     }))
 }
 
@@ -427,6 +626,8 @@ pub async fn update_rule(
         updated_at: rule.updated_at,
         created_by: rule.created_by,
         updated_by: rule.updated_by,
+        affected_details_count: 0,
+        affected_details: Vec::new(),
     }))
 }
 

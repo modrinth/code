@@ -17,6 +17,30 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		)
 	}
 
+	public async getRuleSchema(): Promise<Labrinth.TechReview.Internal.DelphiRuleSchemaResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRuleSchemaResponse>(
+			'/moderation/tech-review/rules/schema',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async getRuleAffectedDetails(
+		id: number,
+	): Promise<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]> {
+		return this.client.request<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]>(
+			`/moderation/tech-review/rules/${id}/effects`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
 	public async testRule(
 		request: Labrinth.TechReview.Internal.TestDelphiRuleRequest,
 	): Promise<Labrinth.TechReview.Internal.TestDelphiRuleResponse> {

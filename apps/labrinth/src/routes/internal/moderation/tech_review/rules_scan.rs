@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
 
-use actix_web::{HttpRequest, HttpResponse, post, web};
+use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use ariadne::ids::base62_impl::to_base62;
 use bytes::Bytes;
 use eyre::{Context as _, Result, eyre};
@@ -9,6 +9,7 @@ use serde::Serialize;
 use sqlx::types::Json;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
+use utoipa::{PartialSchema, ToSchema};
 
 use super::rules::DelphiRuleEffect;
 use crate::{
@@ -26,7 +27,7 @@ const RULE_SCAN_LOCK_ID: i64 = 0x6465_6c70_6869_7275;
 const PROGRESS_INTERVAL: usize = 50;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.service(scan_rules);
+    cfg.service(get_rule_schema).service(scan_rules);
 }
 
 #[derive(Serialize)]
@@ -43,41 +44,41 @@ struct RuleScanErrorEvent<'a> {
     message: &'a str,
 }
 
-#[derive(Serialize)]
-struct RuleInput {
-    schema_version: u32,
-    trace: RuleTrace,
-    scan: RuleScan,
-    artifact: RuleArtifact,
-    scope: RuleScope,
+#[derive(Serialize, utoipa::ToSchema)]
+pub(super) struct RuleInput {
+    pub(super) schema_version: u32,
+    pub(super) trace: RuleTrace,
+    pub(super) scan: RuleScan,
+    pub(super) artifact: RuleArtifact,
+    pub(super) scope: RuleScope,
 }
 
-#[derive(Serialize)]
-struct RuleTrace {
-    key: String,
-    issue_type: String,
-    severity: DelphiSeverity,
-    jar: Option<String>,
-    file_path: String,
-    data: HashMap<String, serde_json::Value>,
+#[derive(Serialize, utoipa::ToSchema)]
+pub(super) struct RuleTrace {
+    pub(super) key: String,
+    pub(super) issue_type: String,
+    pub(super) severity: DelphiSeverity,
+    pub(super) jar: Option<String>,
+    pub(super) file_path: String,
+    pub(super) data: HashMap<String, serde_json::Value>,
 }
 
-#[derive(Serialize)]
-struct RuleScan {
-    delphi_version: i32,
+#[derive(Serialize, utoipa::ToSchema)]
+pub(super) struct RuleScan {
+    pub(super) delphi_version: i32,
 }
 
-#[derive(Serialize)]
-struct RuleArtifact {
-    size: Option<i32>,
-    hashes: BTreeMap<String, String>,
+#[derive(Serialize, utoipa::ToSchema)]
+pub(super) struct RuleArtifact {
+    pub(super) size: Option<i32>,
+    pub(super) hashes: BTreeMap<String, String>,
 }
 
-#[derive(Serialize)]
-struct RuleScope {
-    project_id: Option<String>,
-    version_id: Option<String>,
-    file_id: Option<String>,
+#[derive(Serialize, utoipa::ToSchema)]
+pub(super) struct RuleScope {
+    pub(super) project_id: Option<String>,
+    pub(super) version_id: Option<String>,
+    pub(super) file_id: Option<String>,
 }
 
 struct CompiledRule {
@@ -96,6 +97,62 @@ struct ScanSummary {
     scanned: usize,
     total: usize,
     effects: usize,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct DelphiRuleSchemaResponse {
+    pub input: serde_json::Value,
+    pub output: serde_json::Value,
+    pub components: BTreeMap<String, serde_json::Value>,
+}
+
+/// Get the schemas for the CEL input and output values.
+#[utoipa::path(
+    context_path = "/moderation/tech-review",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = DelphiRuleSchemaResponse))
+)]
+#[get("/rules/schema")]
+pub async fn get_rule_schema(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<DelphiRuleSchemaResponse>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let mut schemas = Vec::new();
+    <RuleInput as ToSchema>::schemas(&mut schemas);
+    <Option<DelphiRuleEffect> as ToSchema>::schemas(&mut schemas);
+
+    Ok(web::Json(DelphiRuleSchemaResponse {
+        input: schema_to_value(<RuleInput as PartialSchema>::schema())?,
+        output: schema_to_value(
+            <Option<DelphiRuleEffect> as PartialSchema>::schema(),
+        )?,
+        components: schemas
+            .into_iter()
+            .map(|(name, schema)| Ok((name, schema_to_value(schema)?)))
+            .collect::<Result<_, ApiError>>()?,
+    }))
+}
+
+fn schema_to_value<T: Serialize>(
+    schema: T,
+) -> Result<serde_json::Value, ApiError> {
+    serde_json::to_value(schema).map_err(|error| {
+        ApiError::Internal(
+            eyre!(error).wrap_err("failed to serialize Delphi rule schema"),
+        )
+    })
 }
 
 /// Re-evaluate every Delphi issue detail and atomically publish a new rule revision.
@@ -316,12 +373,13 @@ async fn run_scan(
         };
 
         for rule in &rules {
-            let effect = evaluate_rule(&rule.program, &input).wrap_err_with(|| {
-                format!(
-                    "failed to evaluate delphi rule {} for detail {detail_id}",
-                    rule.id
-                )
-            })?;
+            let effect = evaluate_rule(&rule.program, &input)
+                .wrap_err_with(|| {
+                    format!(
+                        "failed to evaluate delphi rule {} for detail {detail_id}",
+                        rule.id
+                    )
+                })?;
             if let Some(effect) = effect {
                 effects.push(MaterializedEffect {
                     detail_id,
