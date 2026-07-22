@@ -2360,24 +2360,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Linikha {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Linisensiya {license}"
-  },
-  "project.about.details.published": {
-    "message": "Inilathala {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Isinumite {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalye"
-  },
-  "project.about.details.updated": {
-    "message": "In-update {date}"
-  },
   "project.actions.create-server": {
     "message": "Lumikha ng server"
   },
@@ -2407,9 +2389,6 @@
   },
   "project.description.title": {
     "message": "Paglalarawan"
-  },
-  "project.details.licensed": {
-    "message": "Lisensiyang"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "Hindi masuporta ng {title} ang {gameVersion} para sa {platform}"
@@ -2461,15 +2440,6 @@
   },
   "project.gallery.title": {
     "message": "Galeriya"
-  },
-  "project.license.error": {
-    "message": "Hindi makuha ang teksto ng lisensiya."
-  },
-  "project.license.loading": {
-    "message": "Nag-load sa teksto ng lisensiya..."
-  },
-  "project.license.title": {
-    "message": "Lisensiya"
   },
   "project.moderation.title": {
     "message": "Moderation"

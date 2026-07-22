@@ -3224,24 +3224,6 @@
   "project-type.shader.singular": {
     "message": "光影包"
   },
-  "project.about.details.created": {
-    "message": "建立時間：{date}"
-  },
-  "project.about.details.licensed": {
-    "message": "授權條款：{license}"
-  },
-  "project.about.details.published": {
-    "message": "發布時間：{date}"
-  },
-  "project.about.details.submitted": {
-    "message": "提交時間：{date}"
-  },
-  "project.about.details.title": {
-    "message": "詳細資訊"
-  },
-  "project.about.details.updated": {
-    "message": "更新時間：{date}"
-  },
   "project.actions.create-server": {
     "message": "建立伺服器"
   },
@@ -3271,9 +3253,6 @@
   },
   "project.description.title": {
     "message": "描述"
-  },
-  "project.details.licensed": {
-    "message": "授權條款"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "這個遊戲版本與基底專案不相容。"
@@ -3427,15 +3406,6 @@
   },
   "project.gallery.title": {
     "message": "圖庫"
-  },
-  "project.license.error": {
-    "message": "取得授權條款文字內容時發生錯誤。"
-  },
-  "project.license.loading": {
-    "message": "正在載入授權條款文字..."
-  },
-  "project.license.title": {
-    "message": "授權條款"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "你的專案目前設為私人，這代表只有你和你邀請的人才能存取。"
@@ -4072,9 +4042,6 @@
   },
   "servers.plan.small.description": {
     "message": "適合 1 到 5 位好友及少量輕量模組。"
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "按{interval, select, monthly {月} quarterly {季} yearly {年} other {{interval}}}計費"
   },
   "settings.account.button.complete-setup": {
     "message": "完成設定"

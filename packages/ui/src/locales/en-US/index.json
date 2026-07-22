@@ -3101,6 +3101,15 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
   },
+  "project.license.error": {
+    "defaultMessage": "License text could not be retrieved."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Loading license text..."
+  },
+  "project.license.title": {
+    "defaultMessage": "License"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
   },

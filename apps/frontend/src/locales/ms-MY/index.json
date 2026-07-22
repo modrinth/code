@@ -2897,24 +2897,6 @@
   "project-type.shader.singular": {
     "message": "Pembayang"
   },
-  "project.about.details.created": {
-    "message": "Dicipta {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Berlesen {license}"
-  },
-  "project.about.details.published": {
-    "message": "Diterbitkan {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Diserahkan {date}"
-  },
-  "project.about.details.title": {
-    "message": "Butiran"
-  },
-  "project.about.details.updated": {
-    "message": "Dikemas kini {date}"
-  },
   "project.actions.create-server": {
     "message": "Cipta pelayan"
   },
@@ -2944,9 +2926,6 @@
   },
   "project.description.title": {
     "message": "Keterangan"
-  },
-  "project.details.licensed": {
-    "message": "Berlesen"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
@@ -2998,15 +2977,6 @@
   },
   "project.gallery.title": {
     "message": "Galeri"
-  },
-  "project.license.error": {
-    "message": "Teks lesen tidak dapat diambil."
-  },
-  "project.license.loading": {
-    "message": "Sedang memuat teks lesen..."
-  },
-  "project.license.title": {
-    "message": "Lesen"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Projek anda adalah peribadi, yang bermakna ia hanya boleh diakses oleh anda dan orang yang anda jemput."
@@ -3571,9 +3541,6 @@
   },
   "servers.plan.small.description": {
     "message": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "dibilkan {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Lengkapkan persediaan"

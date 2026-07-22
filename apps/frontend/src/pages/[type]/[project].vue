@@ -48,25 +48,6 @@
 		</template>
 
 		<div v-else>
-			<NewModal
-				ref="modalLicense"
-				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
-			>
-				<template #title>
-					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
-					<span class="text-lg font-extrabold text-contrast">
-						{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
-					</span>
-				</template>
-				<div
-					class="markdown-body"
-					v-html="
-						renderString(licenseText).isEmpty
-							? formatMessage(messages.loadingLicenseText)
-							: renderString(licenseText)
-					"
-				/>
-			</NewModal>
 			<OpenInAppModal ref="openInAppModal" />
 			<div
 				class="over-the-top-download-animation"
@@ -98,6 +79,22 @@
 			<ModpackScanModal ref="scanModal" :project_id="project.id" />
 
 			<div
+				v-if="projectInstallContext && !isSettings"
+				ref="stickyInstallHeaderRef"
+				class="sticky top-0 z-20 mx-auto max-w-[80rem] border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
+				:class="[isInstallHeaderStuck ? 'border-t' : '']"
+			>
+				<BrowseInstallHeader
+					:install-context="projectHeaderInstallContext"
+					divider
+					bottom-padding
+				/>
+			</div>
+			<SelectedProjectsFloatingBar
+				v-if="projectInstallContext && !isSettings"
+				:install-context="projectInstallContext"
+			/>
+			<div
 				class="new-page sidebar"
 				:class="{
 					'alt-layout': cosmetics.leftContentLayout,
@@ -111,7 +108,10 @@
 						!flags.alwaysShowChecklistAsPopup,
 				}"
 			>
-				<div class="normal-page__header relative my-4">
+				<div
+					class="normal-page__header relative mb-4"
+					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
+				>
 					<div class="mb-6">
 						<ModerationProjectNags
 							v-if="
@@ -453,116 +453,12 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
 					/>
-					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
-						v-if="false"
 						:project="project"
-						:has-versions="versions.length > 0"
 						:link-target="$external()"
 						:show-followers="isServerProject"
 						class="card flex-card"
 					/>
-					<div class="card flex-card">
-						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
-
-						<div class="details-list">
-							<div v-if="projectV3Loaded && !isServerProject" class="details-list__item">
-								<BookTextIcon aria-hidden="true" />
-								<div>
-									{{ formatMessage(messages.licensedLabel) }}
-									<a
-										v-if="project.license.url"
-										class="text-link hover:underline"
-										:href="project.license.url"
-										:target="$external()"
-										rel="noopener nofollow ugc"
-									>
-										{{ licenseIdDisplay }}
-										<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
-									</a>
-									<span
-										v-else-if="
-											project.license.id === 'LicenseRef-All-Rights-Reserved' ||
-											!project.license.id.includes('LicenseRef')
-										"
-										class="text-link hover:underline"
-										@click="(event) => getLicenseData(event)"
-									>
-										{{ licenseIdDisplay }}
-									</span>
-									<span v-else>{{ licenseIdDisplay }}</span>
-								</div>
-							</div>
-
-							<div v-if="isServerProject" class="details-list__item">
-								<HeartIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(
-											formatMessage(commonMessages.projectFollowers, {
-												count: project.followers,
-											}),
-										)
-									}}
-								</div>
-							</div>
-							<div
-								v-if="project.approved"
-								v-tooltip="formatDateTime(project.approved)"
-								class="details-list__item"
-							>
-								<CalendarIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(
-											formatMessage(detailsMessages.published, {
-												date: publishedDate,
-											}),
-										)
-									}}
-								</div>
-							</div>
-
-							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
-								<CalendarIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
-									}}
-								</div>
-							</div>
-
-							<div
-								v-if="project.status === 'processing' && project.queued"
-								v-tooltip="formatDateTime(project.queued)"
-								class="details-list__item"
-							>
-								<ScaleIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(
-											formatMessage(detailsMessages.submitted, {
-												date: submittedDate,
-											}),
-										)
-									}}
-								</div>
-							</div>
-
-							<div
-								v-if="versions.length > 0 && project.updated"
-								v-tooltip="formatDateTime(project.updated)"
-								class="details-list__item"
-							>
-								<VersionIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
-									}}
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 
 				<div class="normal-page__content">
@@ -593,13 +489,10 @@
 
 <script setup>
 import {
-	BookTextIcon,
-	CalendarIcon,
 	ChartIcon,
 	ChevronRightIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
-	ExternalIcon,
 	FolderSearchIcon,
 	HeartIcon,
 	ListIcon,
@@ -610,12 +503,12 @@ import {
 	ScanEyeIcon,
 	ServerPlusIcon,
 	SettingsIcon,
-	VersionIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
+	BrowseInstallHeader,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
@@ -623,7 +516,6 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
-	NewModal,
 	OpenInAppModal,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
@@ -636,14 +528,14 @@ import {
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
 	provideProjectPageContext,
+	SelectedProjectsFloatingBar,
 	TeleportOverflowMenu,
 	useDebugLogger,
-	useFormatDateTime,
 	useFormatPrice,
-	useRelativeTime,
+	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
+import { formatProjectType } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
@@ -663,6 +555,7 @@ import { getSignInRouteObj } from '~/composables/auth.ts'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import { loadChecklistState } from '~/services/moderation-checklist-storage.ts'
@@ -710,10 +603,6 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { formatMessage } = useVIntl()
-const formatDateTime = useFormatDateTime({
-	timeStyle: 'short',
-	dateStyle: 'long',
-})
 const formatPrice = useFormatPrice()
 
 const debug = useDebugLogger('DownloadModal')
@@ -725,6 +614,11 @@ const scanModal = ref()
 
 const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+const stickyInstallHeaderRef = ref(null)
+const { isStuck: isInstallHeaderStuck } = useStickyObserver(
+	stickyInstallHeaderRef,
+	'ProjectInstallHeader',
+)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
@@ -745,40 +639,15 @@ function handlePlayServerProject() {
 	})
 }
 
-const formatRelativeTime = useRelativeTime()
-
-const detailsMessages = defineMessages({
-	title: {
-		id: 'project.about.details.title',
-		defaultMessage: 'Details',
-	},
-	licensed: {
-		id: 'project.about.details.licensed',
-		defaultMessage: 'Licensed {license}',
-	},
-	created: {
-		id: 'project.about.details.created',
-		defaultMessage: 'Created {date}',
-	},
-	submitted: {
-		id: 'project.about.details.submitted',
-		defaultMessage: 'Submitted {date}',
-	},
-	published: {
-		id: 'project.about.details.published',
-		defaultMessage: 'Published {date}',
-	},
-	updated: {
-		id: 'project.about.details.updated',
-		defaultMessage: 'Updated {date}',
-	},
-})
-
 const messages = defineMessages({
 	archivedMessage: {
 		id: 'project.status.archived.message',
 		defaultMessage:
 			'{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project.',
+	},
+	backToDiscover: {
+		id: 'project.install-context.back-to-discover',
+		defaultMessage: 'Back to discover',
 	},
 	changelogTab: {
 		id: 'project.navigation.changelog',
@@ -837,22 +706,6 @@ const messages = defineMessages({
 	galleryTab: {
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
-	},
-	licenseErrorMessage: {
-		id: 'project.license.error',
-		defaultMessage: 'License text could not be retrieved.',
-	},
-	licenseTitle: {
-		id: 'project.license.title',
-		defaultMessage: 'License',
-	},
-	licensedLabel: {
-		id: 'project.details.licensed',
-		defaultMessage: 'Licensed',
-	},
-	loadingLicenseText: {
-		id: 'project.license.loading',
-		defaultMessage: 'Loading license text...',
 	},
 	moderationTab: {
 		id: 'project.moderation.title',
@@ -924,45 +777,7 @@ const messages = defineMessages({
 	},
 })
 
-const modalLicense = ref(null)
 const modalCollection = useTemplateRef('modal_collection')
-const licenseText = ref('')
-
-const createdDate = computed(() =>
-	project.value.published ? formatRelativeTime(project.value.published) : 'unknown',
-)
-const submittedDate = computed(() =>
-	project.value.queued ? formatRelativeTime(project.value.queued) : 'unknown',
-)
-const publishedDate = computed(() =>
-	project.value.approved ? formatRelativeTime(project.value.approved) : 'unknown',
-)
-const updatedDate = computed(() =>
-	project.value.updated ? formatRelativeTime(project.value.updated) : 'unknown',
-)
-
-const licenseIdDisplay = computed(() => {
-	const id = project.value.license.id
-
-	if (id === 'LicenseRef-All-Rights-Reserved') {
-		return 'ARR'
-	} else if (id.includes('LicenseRef')) {
-		return id.replaceAll('LicenseRef-', '').replaceAll('-', ' ')
-	} else {
-		return id
-	}
-})
-
-async function getLicenseData(event) {
-	modalLicense.value.show(event)
-
-	try {
-		const text = await client.labrinth.tags_v2.getLicenseText(project.value.license.id)
-		licenseText.value = text.body || formatMessage(messages.licenseErrorMessage)
-	} catch {
-		licenseText.value = formatMessage(messages.licenseErrorMessage)
-	}
-}
 
 const collections = computed(() =>
 	user.value && user.value.collections ? user.value.collections : [],
@@ -1026,6 +841,51 @@ const project = computed(() => {
 			projectRaw.value.loaders,
 			tags.value,
 		),
+	}
+})
+
+const routeProjectType = computed(() =>
+	Array.isArray(route.params.type) ? route.params.type[0] : route.params.type,
+)
+const projectInstallType = computed(() => ({
+	id: project.value?.actualProjectType ?? routeProjectType.value,
+}))
+const serverInstallModalRef = ref(null)
+const serverInstallDebug = useDebugLogger('ProjectServerInstall')
+const { installContext: serverBrowseInstallContext } = useServerInstallContent({
+	projectType: projectInstallType,
+	onboardingModalRef: serverInstallModalRef,
+	debug: serverInstallDebug,
+})
+const projectDiscoverBackUrl = computed(() => {
+	const discoverType =
+		routeProjectType.value === 'project'
+			? (project.value?.actualProjectType ?? project.value?.project_type ?? 'mod')
+			: (routeProjectType.value ?? project.value?.actualProjectType ?? 'mod')
+
+	return `/discover/${discoverType}s${getInstallContextQueryString(['sid', 'wid', 'from', 'shi'])}`
+})
+const projectInstallContext = computed(() => {
+	const context = serverBrowseInstallContext.value
+	if (!context) return null
+	return {
+		...context,
+		backUrl: projectDiscoverBackUrl.value,
+		backLabel: formatMessage(messages.backToDiscover),
+		discardSelectedAndBack: async () => {
+			await (context.clearSelected ?? context.clearQueued)?.()
+			await navigateTo(projectDiscoverBackUrl.value)
+		},
+	}
+})
+const projectHeaderInstallContext = computed(() => {
+	const context = projectInstallContext.value
+	if (!context) return null
+	return {
+		...context,
+		onBack: undefined,
+		selectedProjects: [],
+		isInstallingSelected: false,
 	}
 })
 
@@ -2067,6 +1927,32 @@ function triggerDownloadAnimation() {
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
+const INSTALL_CONTEXT_QUERY_KEYS = ['sid', 'wid', 'from', 'shi']
+
+function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
+	const params = new URLSearchParams()
+
+	for (const key of keys) {
+		const value = route.query[key]
+		if (Array.isArray(value)) {
+			for (const item of value) {
+				if (item != null) {
+					params.append(key, item)
+				}
+			}
+		} else if (value != null) {
+			params.append(key, value)
+		}
+	}
+
+	const queryString = params.toString()
+	return queryString ? `?${queryString}` : ''
+}
+
+function withInstallContextQuery(path) {
+	return `${path}${getInstallContextQueryString()}`
+}
+
 async function deleteVersion(id) {
 	if (!id) return
 
@@ -2091,16 +1977,16 @@ const navLinks = computed(() => {
 	return [
 		{
 			label: formatMessage(messages.descriptionTab),
-			href: projectUrl,
+			href: withInstallContextQuery(projectUrl),
 		},
 		{
 			label: formatMessage(messages.galleryTab),
-			href: `${projectUrl}/gallery`,
+			href: withInstallContextQuery(`${projectUrl}/gallery`),
 			shown: galleryCount > 0 || !!currentMember.value,
 		},
 		{
 			label: formatMessage(messages.changelogTab),
-			href: `${projectUrl}/changelog`,
+			href: withInstallContextQuery(`${projectUrl}/changelog`),
 			shown:
 				hasVersions.value &&
 				projectV3Loaded.value &&
@@ -2109,7 +1995,7 @@ const navLinks = computed(() => {
 		},
 		{
 			label: formatMessage(messages.versionsTab),
-			href: `${projectUrl}/versions`,
+			href: withInstallContextQuery(`${projectUrl}/versions`),
 			shown:
 				(hasVersions.value || !!currentMember.value) &&
 				projectV3Loaded.value &&
@@ -2119,7 +2005,7 @@ const navLinks = computed(() => {
 		},
 		{
 			label: formatMessage(messages.moderationTab),
-			href: `${projectUrl}/moderation`,
+			href: withInstallContextQuery(`${projectUrl}/moderation`),
 			shown: !!currentMember.value,
 		},
 	]

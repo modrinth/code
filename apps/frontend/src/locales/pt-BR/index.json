@@ -3224,24 +3224,6 @@
   "project-type.shader.singular": {
     "message": "Sombreador"
   },
-  "project.about.details.created": {
-    "message": "Criado {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licenciado como {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publicado {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Enviado {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalhes"
-  },
-  "project.about.details.updated": {
-    "message": "Atualizado {date}"
-  },
   "project.actions.create-server": {
     "message": "Criar um servidor"
   },
@@ -3271,9 +3253,6 @@
   },
   "project.description.title": {
     "message": "Descrição"
-  },
-  "project.details.licensed": {
-    "message": "Licença"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Esta versão do jogo é incompatível com o projeto base."
@@ -3427,15 +3406,6 @@
   },
   "project.gallery.title": {
     "message": "Galeria"
-  },
-  "project.license.error": {
-    "message": "Não foi possível obter o texto da licença."
-  },
-  "project.license.loading": {
-    "message": "Carregando texto da licença..."
-  },
-  "project.license.title": {
-    "message": "Licença"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Seu projeto é privado, o que significa que só você e as pessoas que você convidar podem acessá-lo."
@@ -4072,9 +4042,6 @@
   },
   "servers.plan.small.description": {
     "message": "Perfeito para 1–5 amigos e alguns mods leves."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "cobrado {interval, select, monthly {mensalmente} quarterly {trimestralmente} yearly {anualmente} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Terminar configuração"

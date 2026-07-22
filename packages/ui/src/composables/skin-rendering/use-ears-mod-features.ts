@@ -1,7 +1,10 @@
 /*
- * Portions of this file are adapted from Ears and the Ears Skin Manipulator:
- * https://github.com/exaskye/Ears
- * Source revision: 5d050d461d207c1a7cda0de11e2562f6581f7a16
+ * Portions of this file are adapted from Ears, Ears2, and the Ears Skin Manipulator:
+ * https://git.sleeping.town/exa.mods/Ears
+ * https://git.sleeping.town/exa.mods/Ears2
+ * Source revisions:
+ * - Ears: 5d050d461d207c1a7cda0de11e2562f6581f7a16
+ * - Ears2: 8ad9adc213e3b16b1a3306fb4141cfb618c25a6f
  *
  * MIT License
  *
@@ -59,16 +62,26 @@ type WingMode =
 	| 'ASYMMETRIC_R'
 	| 'ASYMMETRIC_DUAL'
 	| 'FLAT'
+type WingAnimationMode = 'NORMAL' | 'NONE' | 'NO_FLIGHT'
+type LegMode = 'PLANTIGRADE' | 'DIGITIGRADE_PARTIAL' | 'DIGITIGRADE_FULL'
+type Protrusions =
+	| 'NONE'
+	| 'HORN'
+	| 'CLAWS'
+	| 'CLAWS_AND_HORN'
+	| 'HALO'
+	| 'DOUBLE_HALO'
+	| 'CLAWS_AND_HALO'
+	| 'CLAWS_AND_DOUBLE_HALO'
 type BodyPart = 'HEAD' | 'TORSO' | 'LEFT_ARM' | 'RIGHT_ARM' | 'LEFT_LEG' | 'RIGHT_LEG'
-type TextureSource = 'skin' | 'wing' | 'cape'
+type TextureSource = 'skin' | 'displaced-skin' | 'wing' | 'cape'
 type TextureRotation = 'NONE' | 'CW' | 'CCW' | 'UPSIDE_DOWN'
 type TextureFlip = 'NONE' | 'HORIZONTAL' | 'VERTICAL' | 'BOTH'
 
 interface EarsFeatures {
 	earMode: EarMode
 	earAnchor: EarAnchor
-	claws: boolean
-	horn: boolean
+	protrusions: Protrusions
 	tailMode: TailMode
 	tailSegments: number
 	tailBends: [number, number, number, number]
@@ -78,9 +91,12 @@ interface EarsFeatures {
 	snoutDepth: number
 	chestSize: number
 	wingMode: WingMode
-	animateWings: boolean
+	wingAnimationMode: WingAnimationMode
 	capeEnabled: boolean
 	emissive: boolean
+	legMode: LegMode
+	animateTail: boolean
+	swapJacketBackAndTail: boolean
 }
 
 interface TexturePair {
@@ -115,7 +131,7 @@ const SKIN_SIZE = 64
 const EARS_V0_MAGIC = 0x3f23d8
 const EARS_V1_MAGIC = 0xea2501
 const ALFALFA_MAGIC = 0xea1fa1fa
-const UV_TEXEL_INSET = 0.5
+const UV_TEXEL_INSET = 1 / 32
 
 const EAR_MODES: EarMode[] = [
 	'NONE',
@@ -150,6 +166,24 @@ const WING_MODES: WingMode[] = [
 	'ASYMMETRIC_DUAL',
 	'FLAT',
 ]
+const WING_ANIMATION_MODES: WingAnimationMode[] = ['NORMAL', 'NONE', 'NO_FLIGHT']
+const LEG_MODES: LegMode[] = ['PLANTIGRADE', 'DIGITIGRADE_PARTIAL', 'DIGITIGRADE_FULL']
+const PROTRUSIONS: Protrusions[] = [
+	'NONE',
+	'HORN',
+	'CLAWS',
+	'CLAWS_AND_HORN',
+	'HALO',
+	'DOUBLE_HALO',
+	'CLAWS_AND_HALO',
+	'CLAWS_AND_DOUBLE_HALO',
+]
+const CLAW_PROTRUSIONS = new Set<Protrusions>([
+	'CLAWS',
+	'CLAWS_AND_HORN',
+	'CLAWS_AND_HALO',
+	'CLAWS_AND_DOUBLE_HALO',
+])
 
 const MAGIC_PIXELS = {
 	BLUE: 0x3f23d8,
@@ -187,6 +221,54 @@ const FORCED_OPAQUE_REGIONS = [
 	[20, 48, 28, 52],
 	[36, 48, 44, 52],
 	[16, 52, 48, 64],
+] as const
+
+const FORCED_OPAQUE_REGIONS_WITHOUT_LEG_BOTTOM = [
+	[8, 0, 24, 8],
+	[0, 8, 32, 16],
+	[4, 16, 8, 20],
+	[20, 16, 36, 20],
+	[44, 16, 52, 20],
+	[0, 20, 16, 38],
+	[16, 20, 56, 32],
+	[20, 48, 24, 52],
+	[36, 48, 44, 52],
+	[16, 52, 32, 58],
+	[32, 52, 48, 64],
+] as const
+
+const FORCED_OPAQUE_REGIONS_WITHOUT_LEGS = [
+	[8, 0, 24, 8],
+	[0, 8, 32, 16],
+	[4, 16, 8, 20],
+	[20, 16, 36, 20],
+	[44, 16, 52, 20],
+	[16, 20, 56, 32],
+	[20, 48, 24, 52],
+	[36, 48, 44, 52],
+	[32, 52, 48, 64],
+] as const
+
+const LEG_BOTTOM_HALF_REGIONS = [
+	[24, 48, 28, 52, true],
+	[16, 58, 32, 64, true],
+	[8, 16, 12, 20, true],
+	[0, 26, 16, 32, true],
+	[8, 32, 12, 36, false],
+	[0, 42, 16, 48, false],
+	[8, 48, 12, 52, false],
+	[0, 58, 16, 64, false],
+] as const
+
+const LEG_REGIONS = [
+	[20, 48, 28, 52, true],
+	[16, 52, 32, 64, true],
+	[4, 16, 12, 20, true],
+	[0, 20, 16, 32, true],
+	[4, 32, 12, 36, false],
+	[0, 36, 16, 48, false],
+	[4, 48, 12, 52, false],
+	[0, 52, 16, 64, false],
 ] as const
 
 const BODY_PART_NODES: Record<BodyPart, string> = {
@@ -303,18 +385,18 @@ function parseV1Features(data: Uint8ClampedArray): EarsFeatures | null {
 
 	try {
 		const reader = new BitReader(new Uint8Array(bytes))
-		reader.read(8)
+		const version = reader.read(8)
 
 		const ears = reader.read(6)
 		const earMode = ears === 0 ? 'NONE' : (EAR_MODES[Math.floor((ears - 1) / 3) + 1] ?? 'NONE')
 		const earAnchor = ears === 0 ? 'CENTER' : (EAR_ANCHORS[(ears - 1) % 3] ?? 'CENTER')
-		const claws = reader.readBoolean()
-		const horn = reader.readBoolean()
-		const tailMode = TAIL_MODES[reader.read(3)] ?? 'NONE'
+		let protrusionsIndex = reader.read(2)
+		const tailIndex = reader.read(3)
+		let tailMode = TAIL_MODES[tailIndex] ?? 'NONE'
 		let tailSegments = 0
 		const tailBends: [number, number, number, number] = [0, 0, 0, 0]
 
-		if (tailMode !== 'NONE') {
+		if (tailIndex !== 0) {
 			tailSegments = reader.read(2) + 1
 			for (let index = 0; index < tailSegments; index++) {
 				tailBends[index] = reader.readSignedUnit(6) * 90
@@ -336,12 +418,30 @@ function parseV1Features(data: Uint8ClampedArray): EarsFeatures | null {
 		const animateWings = wingMode === 'NONE' ? false : reader.readBoolean()
 		const capeEnabled = reader.readBoolean()
 		const emissive = reader.readBoolean()
+		let wingAnimationMode: WingAnimationMode = animateWings ? 'NORMAL' : 'NONE'
+		let legMode: LegMode = 'PLANTIGRADE'
+		let animateTail = true
+		let swapJacketBackAndTail = false
+
+		if (version >= 1 && tailIndex === 7) {
+			tailMode = TAIL_MODES[tailIndex + reader.read(3)] ?? 'NONE'
+		}
+		if (version >= 2) {
+			legMode = LEG_MODES[reader.read(3)] ?? 'PLANTIGRADE'
+			if (wingMode !== 'NONE') {
+				wingAnimationMode = WING_ANIMATION_MODES[reader.read(3)] ?? wingAnimationMode
+			}
+			animateTail = reader.readBoolean()
+			swapJacketBackAndTail = reader.readBoolean()
+		}
+		if (version >= 3) {
+			protrusionsIndex |= reader.read(2) << 2
+		}
 
 		return {
 			earMode,
 			earAnchor,
-			claws,
-			horn,
+			protrusions: PROTRUSIONS[protrusionsIndex] ?? 'NONE',
 			tailMode,
 			tailSegments,
 			tailBends,
@@ -351,9 +451,12 @@ function parseV1Features(data: Uint8ClampedArray): EarsFeatures | null {
 			snoutDepth,
 			chestSize,
 			wingMode,
-			animateWings,
+			wingAnimationMode,
 			capeEnabled,
 			emissive,
+			legMode,
+			animateTail,
+			swapJacketBackAndTail,
 		}
 	} catch {
 		return null
@@ -406,12 +509,31 @@ function parseV0Features(data: Uint8ClampedArray): EarsFeatures {
 		[MAGIC_PIXELS.PURPLE, 'ASYMMETRIC_DUAL'],
 		[MAGIC_PIXELS.PURPLE2, 'FLAT'],
 	])
+	const protrusionsByPixel = new Map<number, Protrusions>([
+		[MAGIC_PIXELS.BLUE, 'NONE'],
+		[MAGIC_PIXELS.RED, 'NONE'],
+		[MAGIC_PIXELS.GREEN, 'CLAWS'],
+		[MAGIC_PIXELS.PURPLE, 'HORN'],
+		[MAGIC_PIXELS.CYAN, 'CLAWS_AND_HORN'],
+		[MAGIC_PIXELS.WHITE, 'HALO'],
+		[MAGIC_PIXELS.GRAY, 'DOUBLE_HALO'],
+		[MAGIC_PIXELS.PURPLE2, 'CLAWS_AND_HALO'],
+		[MAGIC_PIXELS.PINK, 'CLAWS_AND_DOUBLE_HALO'],
+	])
+	const wingAnimationModeByPixel = new Map<number, WingAnimationMode>([
+		[MAGIC_PIXELS.BLUE, 'NORMAL'],
+		[MAGIC_PIXELS.RED, 'NONE'],
+		[MAGIC_PIXELS.GREEN, 'NO_FLIGHT'],
+	])
+	const legModeByPixel = new Map<number, LegMode>([
+		[MAGIC_PIXELS.BLUE, 'PLANTIGRADE'],
+		[MAGIC_PIXELS.GREEN, 'DIGITIGRADE_PARTIAL'],
+		[MAGIC_PIXELS.PINK, 'DIGITIGRADE_FULL'],
+	])
 
 	const earMode = earModeByPixel.get(getConfigPixel(data, 1).rgb) ?? 'NONE'
 	const earAnchor = earAnchorByPixel.get(getConfigPixel(data, 2).rgb) ?? 'CENTER'
-	const protrusions = getConfigPixel(data, 3).rgb
-	const claws = protrusions === MAGIC_PIXELS.GREEN || protrusions === MAGIC_PIXELS.CYAN
-	const horn = protrusions === MAGIC_PIXELS.PURPLE || protrusions === MAGIC_PIXELS.CYAN
+	const protrusions = protrusionsByPixel.get(getConfigPixel(data, 3).rgb) ?? 'NONE'
 	const tailMode = tailModeByPixel.get(getConfigPixel(data, 4).rgb) ?? 'NONE'
 	const tailPixel = getConfigPixel(data, 5)
 	const tailBends: [number, number, number, number] = [0, 0, 0, 0]
@@ -444,12 +566,13 @@ function parseV0Features(data: Uint8ClampedArray): EarsFeatures {
 	const etcIsDefault = etcPixel.rgb === MAGIC_PIXELS.BLUE
 	const chestSize = etcIsDefault ? 0 : Math.min(etcPixel.r / 128, 1)
 	const capeEnabled = !etcIsDefault && (etcPixel.b & 16) !== 0
+	const bitflags = getConfigPixel(data, 12).rgb
+	const bitflagsAreDefault = bitflags === MAGIC_PIXELS.BLUE
 
 	return {
 		earMode,
 		earAnchor,
-		claws,
-		horn,
+		protrusions,
 		tailMode,
 		tailSegments,
 		tailBends,
@@ -459,9 +582,12 @@ function parseV0Features(data: Uint8ClampedArray): EarsFeatures {
 		snoutDepth,
 		chestSize,
 		wingMode: wingModeByPixel.get(getConfigPixel(data, 8).rgb) ?? 'NONE',
-		animateWings: getConfigPixel(data, 9).rgb !== MAGIC_PIXELS.RED,
+		wingAnimationMode: wingAnimationModeByPixel.get(getConfigPixel(data, 9).rgb) ?? 'NORMAL',
 		capeEnabled,
 		emissive: getConfigPixel(data, 10).rgb === MAGIC_PIXELS.ORANGE,
+		legMode: legModeByPixel.get(getConfigPixel(data, 11).rgb) ?? 'PLANTIGRADE',
+		animateTail: bitflagsAreDefault || (bitflags & 1) !== 0,
+		swapJacketBackAndTail: !bitflagsAreDefault && (bitflags & 2) !== 0,
 	}
 }
 
@@ -567,12 +693,56 @@ function applyEraseData(data: Uint8ClampedArray, eraseData: Uint8Array | undefin
 	}
 }
 
-function forceOpaqueSkinRegions(data: Uint8ClampedArray) {
-	for (const [x1, y1, x2, y2] of FORCED_OPAQUE_REGIONS) {
+function forceOpaqueSkinRegions(data: Uint8ClampedArray, legMode: LegMode) {
+	const regions =
+		legMode === 'DIGITIGRADE_FULL'
+			? FORCED_OPAQUE_REGIONS_WITHOUT_LEGS
+			: legMode === 'DIGITIGRADE_PARTIAL'
+				? FORCED_OPAQUE_REGIONS_WITHOUT_LEG_BOTTOM
+				: FORCED_OPAQUE_REGIONS
+	for (const [x1, y1, x2, y2] of regions) {
 		for (let x = x1; x < x2; x++) {
 			for (let y = y1; y < y2; y++) {
 				data[pixelOffset(x, y) + 3] = 255
 			}
+		}
+	}
+}
+
+function displaceDigitigradeLegPixels(data: Uint8ClampedArray, legMode: LegMode) {
+	if (legMode === 'PLANTIGRADE') return null
+
+	const displaced = new Uint8ClampedArray(data.length)
+	const regions = legMode === 'DIGITIGRADE_FULL' ? LEG_REGIONS : LEG_BOTTOM_HALF_REGIONS
+	for (const [x1, y1, x2, y2, forceOpaque] of regions) {
+		for (let x = x1; x < x2; x++) {
+			for (let y = y1; y < y2; y++) {
+				const offset = pixelOffset(x, y)
+				displaced.set(data.subarray(offset, offset + 4), offset)
+				if (forceOpaque) displaced[offset + 3] = 255
+				data.fill(0, offset, offset + 4)
+			}
+		}
+	}
+	return displaced
+}
+
+function swapJacketBackAndTailPixels(data: Uint8ClampedArray) {
+	const tail = new Uint8ClampedArray(8 * 12 * 4)
+	for (let x = 0; x < 8; x++) {
+		for (let y = 0; y < 12; y++) {
+			const tailOffset = pixelOffset(56 + x, 16 + y)
+			const savedOffset = (y * 8 + x) * 4
+			tail.set(data.subarray(tailOffset, tailOffset + 4), savedOffset)
+
+			const jacketOffset = pixelOffset(32 + x, 36 + (11 - y))
+			data.set(data.subarray(jacketOffset, jacketOffset + 4), tailOffset)
+		}
+	}
+	for (let x = 0; x < 8; x++) {
+		for (let y = 0; y < 12; y++) {
+			const savedOffset = (y * 8 + x) * 4
+			data.set(tail.subarray(savedOffset, savedOffset + 4), pixelOffset(32 + x, 36 + y))
 		}
 	}
 }
@@ -857,7 +1027,22 @@ class EarsGeometryBuilder {
 		flip: TextureFlip = 'NONE',
 		grow = 0,
 	) {
-		this.quad(u, v, width, height, rotation, flip, grow, false)
+		this.quad(u, v, width, height, rotation, flip, grow, false, 0, 0, 0)
+	}
+
+	frontSkew(
+		u: number,
+		v: number,
+		width: number,
+		height: number,
+		xSkew: number,
+		ySkew: number,
+		zSkew: number,
+		rotation: TextureRotation = 'NONE',
+		flip: TextureFlip = 'NONE',
+		grow = 0,
+	) {
+		this.quad(u, v, width, height, rotation, flip, grow, false, xSkew, ySkew, zSkew)
 	}
 
 	back(
@@ -869,7 +1054,7 @@ class EarsGeometryBuilder {
 		flip: TextureFlip = 'NONE',
 		grow = 0,
 	) {
-		this.quad(u, v, width, height, rotation, flipHorizontally(flip), grow, true)
+		this.quad(u, v, width, height, rotation, flipHorizontally(flip), grow, true, 0, 0, 0)
 	}
 
 	doubleSided(
@@ -905,42 +1090,46 @@ class EarsGeometryBuilder {
 		flip: TextureFlip,
 		grow: number,
 		back: boolean,
+		xSkew: number,
+		ySkew: number,
+		zSkew: number,
 	) {
 		const anchor = this.state.anchor
 		const textures = this.textures.get(this.textureSource)
 		if (!anchor || !textures) return
 
-		const textureWidth = this.textureSource === 'skin' ? 64 : 20
-		const textureHeight = this.textureSource === 'skin' ? 64 : 16
+		const skinTexture = this.textureSource === 'skin' || this.textureSource === 'displaced-skin'
+		const textureWidth = skinTexture ? 64 : 20
+		const textureHeight = skinTexture ? 64 : 16
 		const uvs = calculateUvs(u, v, width, height, rotation, flip, textureWidth, textureHeight)
 		const positions = back
 			? [
+					grow + xSkew,
+					grow + ySkew,
+					-zSkew,
+					-width - grow + xSkew,
 					grow,
-					grow,
-					0,
-					-width - grow,
-					grow,
-					0,
-					-width - grow,
+					-zSkew,
+					-width - grow - xSkew,
 					-height - grow,
-					0,
-					grow,
-					-height - grow,
-					0,
+					zSkew,
+					grow - xSkew,
+					-height - grow + ySkew,
+					zSkew,
 				]
 			: [
-					grow,
-					-height - grow,
-					0,
-					-width - grow,
-					-height - grow,
-					0,
-					-width - grow,
-					grow,
-					0,
-					grow,
-					grow,
-					0,
+					grow - xSkew,
+					-height - grow + ySkew,
+					zSkew,
+					-width - grow - xSkew,
+					-height - grow - ySkew,
+					zSkew,
+					-width - grow + xSkew,
+					grow - ySkew,
+					-zSkew,
+					grow + xSkew,
+					grow + ySkew,
+					-zSkew,
 				]
 		const orderedUvs = back ? [uvs[3], uvs[2], uvs[1], uvs[0]] : [uvs[0], uvs[1], uvs[2], uvs[3]]
 		const geometry = new THREE.BufferGeometry()
@@ -1213,18 +1402,24 @@ function renderTail(builder: EarsGeometryBuilder, features: EarsFeatures) {
 	builder.pop()
 }
 
-function renderClawsAndHorn(builder: EarsGeometryBuilder, features: EarsFeatures, slim: boolean) {
-	if (features.claws) {
+function renderProtrusions(builder: EarsGeometryBuilder, features: EarsFeatures, slim: boolean) {
+	if (CLAW_PROTRUSIONS.has(features.protrusions)) {
+		const legOffset =
+			features.legMode === 'DIGITIGRADE_FULL'
+				? -1.5
+				: features.legMode === 'DIGITIGRADE_PARTIAL'
+					? -1
+					: 0
 		builder.push()
 		builder.anchorTo('LEFT_LEG')
-		builder.translate(0, 0, -4)
+		builder.translate(0, 0, -4 + legOffset)
 		builder.rotate(90, 1, 0, 0)
 		builder.doubleSided(16, 48, 4, 4, 'NONE', 'HORIZONTAL')
 		builder.pop()
 
 		builder.push()
 		builder.anchorTo('RIGHT_LEG')
-		builder.translate(0, 0, -4)
+		builder.translate(0, 0, -4 + legOffset)
 		builder.rotate(90, 1, 0, 0)
 		builder.doubleSided(0, 16, 4, 4, 'NONE', 'HORIZONTAL')
 		builder.pop()
@@ -1244,7 +1439,7 @@ function renderClawsAndHorn(builder: EarsGeometryBuilder, features: EarsFeatures
 		builder.pop()
 	}
 
-	if (features.horn) {
+	if (features.protrusions === 'HORN' || features.protrusions === 'CLAWS_AND_HORN') {
 		builder.push()
 		builder.anchorTo('HEAD')
 		builder.translate(0, -8, 0)
@@ -1253,6 +1448,172 @@ function renderClawsAndHorn(builder: EarsGeometryBuilder, features: EarsFeatures
 		builder.doubleSided(56, 0, 8, 8)
 		builder.pop()
 	}
+
+	if (features.protrusions === 'HALO' || features.protrusions === 'CLAWS_AND_HALO') {
+		builder.push()
+		builder.anchorTo('HEAD')
+		builder.translate(0, -12, 0)
+		builder.rotate(90, 1, 0, 0)
+		builder.doubleSided(56, 0, 8, 8)
+		builder.pop()
+	}
+
+	if (features.protrusions === 'DOUBLE_HALO' || features.protrusions === 'CLAWS_AND_DOUBLE_HALO') {
+		builder.push()
+		builder.anchorTo('HEAD')
+		builder.translate(0, -10, 0)
+		builder.rotate(90, 1, 0, 0)
+		for (let index = 0; index < 2; index++) {
+			builder.translate(4, 4, 0)
+			builder.rotate(45, 0, 0, 1)
+			builder.translate(-4, -4, 2)
+			builder.doubleSided(56, 0, 8, 8)
+		}
+		builder.pop()
+	}
+}
+
+function drawDigitigradeLeg(
+	builder: EarsGeometryBuilder,
+	u: number,
+	v: number,
+	grow: number,
+	bottom: boolean,
+	mend: boolean,
+) {
+	const width = 4
+	const height = 12
+	const depth = 4
+	const doubleGrow = grow * 2
+	const skew = 1
+	const vOffset = bottom ? 10 : 4
+
+	builder.push()
+	builder.translate(width / 2, height / 2, depth / 2)
+	builder.scale(
+		(width + doubleGrow) / width,
+		(height + doubleGrow) / height,
+		(depth + doubleGrow) / depth,
+	)
+	builder.translate(-width / 2, -height / 2, -depth / 2)
+
+	builder.push()
+	builder.translate(0, bottom ? -6 : -12, 0)
+	if (!mend && bottom) {
+		builder.push()
+		builder.translate(0, 2, 0)
+		builder.frontSkew(u + 4, v + vOffset + 2, 4, 4, 0, 0, -skew)
+		builder.pop()
+	} else {
+		builder.frontSkew(u + 4, v + vOffset, 4, 6, 0, 0, -skew)
+	}
+	if (mend && !bottom) {
+		builder.push()
+		builder.translate(0, 6, 0)
+		builder.frontSkew(u + 4, v + vOffset + 6, 4, 2, 0, 0, skew)
+		builder.pop()
+	}
+
+	builder.rotate(-90, 0, 1, 0)
+	builder.translate(0, 0, -4)
+	if (!mend && bottom) {
+		builder.push()
+		builder.translate(0, 2, 0)
+		builder.frontSkew(u + 8, v + vOffset + 2, 4, 4, -skew, 0, 0)
+		builder.pop()
+	} else {
+		builder.frontSkew(u + 8, v + vOffset, 4, 6, -skew, 0, 0)
+	}
+	if (mend && !bottom) {
+		builder.push()
+		builder.translate(0, 6, 0)
+		builder.frontSkew(u + 8, v + vOffset + 6, 4, 2, skew, 0, 0)
+		builder.pop()
+	}
+
+	builder.rotate(-90, 0, 1, 0)
+	builder.translate(0, 0, -4)
+	if (!mend && bottom) {
+		builder.push()
+		builder.translate(0, 2, 0)
+		builder.frontSkew(u + 12, v + vOffset + 2, 4, 4, 0, 0, skew)
+		builder.pop()
+	} else {
+		builder.frontSkew(u + 12, v + vOffset, 4, 6, 0, 0, skew)
+	}
+	if (mend && !bottom) {
+		builder.push()
+		builder.translate(0, 6, 0)
+		builder.frontSkew(u + 12, v + vOffset + 5, 4, 2, 0, 0, -skew)
+		builder.pop()
+	}
+
+	builder.rotate(-90, 0, 1, 0)
+	builder.translate(0, 0, -4)
+	if (!mend && bottom) {
+		builder.push()
+		builder.translate(0, 2, 0)
+		builder.frontSkew(u, v + vOffset + 2, 4, 4, skew, 0, 0)
+		builder.pop()
+	} else {
+		builder.frontSkew(u, v + vOffset, 4, 6, skew, 0, 0)
+	}
+	if (mend && !bottom) {
+		builder.push()
+		builder.translate(0, 6, 0)
+		builder.frontSkew(u, v + vOffset + 6, 4, 2, -skew, 0, 0)
+		builder.pop()
+	}
+	builder.pop()
+
+	builder.push()
+	builder.rotate(90, 1, 0, 0)
+	if (bottom) {
+		builder.push()
+		builder.translate(0, -skew, 0)
+		builder.front(u + 8, v, 4, 4, 'NONE', 'VERTICAL')
+		builder.pop()
+	} else {
+		builder.push()
+		builder.translate(0, skew, 12)
+		builder.back(u + 8, v, 4, 4, 'NONE', 'VERTICAL')
+		builder.pop()
+	}
+	if (mend && bottom) {
+		builder.translate(0, 0, 6)
+		builder.front(u + 4, v + vOffset, 4, 1)
+		builder.translate(0, 4, 0)
+		builder.back(u + 12, v + vOffset, 4, 1)
+	}
+	builder.pop()
+	builder.pop()
+}
+
+function renderDigitigradeLegs(builder: EarsGeometryBuilder, features: EarsFeatures) {
+	if (features.legMode === 'PLANTIGRADE') return
+
+	const full = features.legMode === 'DIGITIGRADE_FULL'
+	builder.bind('displaced-skin')
+	for (let layer = 0; layer < 2; layer++) {
+		const grow = layer === 0 ? 0 : 0.25
+
+		builder.push()
+		builder.anchorTo('LEFT_LEG')
+		if (full) builder.translate(0, 0, -0.5)
+		if (layer === 1) builder.translate(0, 0.5, 0)
+		if (full) drawDigitigradeLeg(builder, layer === 0 ? 16 : 0, 48, grow, false, true)
+		drawDigitigradeLeg(builder, layer === 0 ? 16 : 0, 48, grow, true, !full)
+		builder.pop()
+
+		builder.push()
+		builder.anchorTo('RIGHT_LEG')
+		if (full) builder.translate(0, 0, -0.5)
+		if (layer === 1) builder.translate(0, 0.5, 0)
+		if (full) drawDigitigradeLeg(builder, 0, layer === 0 ? 16 : 32, grow, false, true)
+		drawDigitigradeLeg(builder, 0, layer === 0 ? 16 : 32, grow, true, !full)
+		builder.pop()
+	}
+	builder.bind('skin')
 }
 
 function renderSnout(builder: EarsGeometryBuilder, features: EarsFeatures) {
@@ -1366,7 +1727,7 @@ function renderWings(builder: EarsGeometryBuilder, features: EarsFeatures) {
 	const mode = features.wingMode
 	if (mode === 'NONE') return
 
-	const wiggle = features.animateWings ? Math.sin(8 / 12) * 2 : 0
+	const wiggle = features.wingAnimationMode !== 'NONE' ? Math.sin(8 / 12) * 2 : 0
 	builder.push()
 	builder.anchorTo('TORSO')
 	builder.bind('wing')
@@ -1604,7 +1965,9 @@ export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture
 	const alfalfa = parseAlfalfa(sourceImage.data)
 	const processedData = new Uint8ClampedArray(sourceImage.data)
 	applyEraseData(processedData, alfalfa.get('erase'))
-	forceOpaqueSkinRegions(processedData)
+	const displacedData = displaceDigitigradeLegPixels(processedData, features.legMode)
+	if (features.swapJacketBackAndTail) swapJacketBackAndTailPixels(processedData)
+	forceOpaqueSkinRegions(processedData, features.legMode)
 
 	const palette = features.emissive ? getEmissivePalette(processedData) : new Set<number>()
 	if (palette.size === 0) features.emissive = false
@@ -1623,6 +1986,20 @@ export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture
 	if (skinTextures.emissive) addEmissiveBodyOverlays(model, skinTextures.emissive, resources)
 
 	const textures = new Map<TextureSource, TexturePair>([['skin', skinTextures]])
+	if (displacedData) {
+		const displacedPixels = features.emissive
+			? splitEmissivePixels(displacedData, palette)
+			: { base: displacedData, emissive: undefined }
+		const displacedTextures: TexturePair = {
+			base: createCanvasTexture(displacedPixels.base, SKIN_SIZE, SKIN_SIZE),
+			emissive: displacedPixels.emissive
+				? createCanvasTexture(displacedPixels.emissive, SKIN_SIZE, SKIN_SIZE)
+				: undefined,
+		}
+		resources.featureTextures.add(displacedTextures.base)
+		if (displacedTextures.emissive) resources.featureTextures.add(displacedTextures.emissive)
+		textures.set('displaced-skin', displacedTextures)
+	}
 	const wingData = alfalfa.get('wing')
 	const wingDimensions = wingData ? readPngDimensions(wingData) : null
 	if (
@@ -1659,10 +2036,11 @@ export function applyEarsMod(model: THREE.Object3D, sourceTexture: THREE.Texture
 	const builder = new EarsGeometryBuilder(anchors, textures, resources)
 	renderEars(builder, features)
 	renderTail(builder, features)
-	renderClawsAndHorn(builder, features, isSlimModel(model))
+	renderProtrusions(builder, features, isSlimModel(model))
 	renderSnout(builder, features)
 	renderChest(builder, features)
 	renderWings(builder, features)
 	renderCape(builder, features)
+	renderDigitigradeLegs(builder, features)
 	return true
 }

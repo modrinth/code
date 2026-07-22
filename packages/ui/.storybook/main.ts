@@ -17,6 +17,9 @@ const config: StorybookConfig = {
 	addons: ['@storybook/addon-themes', '@storybook/addon-a11y'],
 	viteFinal: async (config) =>
 		mergeConfig(config, {
+			build: {
+				reportCompressedSize: false,
+			},
 			resolve: {
 				alias: {
 					'@modrinth/api-client': path.resolve(storybookDirectory, '../../api-client/src/index.ts'),

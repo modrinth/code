@@ -494,9 +494,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Install content to instance"
-  },
   "app.project.version.all-versions": {
     "message": "All versions"
   },
@@ -1144,6 +1141,27 @@
   },
   "minecraft-account.sign-in": {
     "message": "Sign in to Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "You need a Microsoft account that owns Minecraft before you can launch and play."
+  },
+  "minecraft-required.description-header": {
+    "message": "Sign in to a Microsoft account"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Don’t have an account?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Get Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Get support"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft required"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Sign in to Microsoft"
   },
   "search.filter.locked.instance": {
     "message": "Provided by the instance"

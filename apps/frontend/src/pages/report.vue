@@ -288,6 +288,7 @@ import {
 	AutoLink,
 	Avatar,
 	ButtonStyled,
+	commonMessages,
 	defineMessage,
 	defineMessages,
 	formatReportItemType,
@@ -480,7 +481,7 @@ const submitReport = async () => {
 
 		if (error instanceof Error) {
 			addNotification({
-				title: 'An error occurred',
+				title: formatMessage(commonMessages.errorNotificationTitle),
 				text: error.message,
 				type: 'error',
 			})
@@ -505,7 +506,7 @@ const submitReport = async () => {
 
 		if (error instanceof Error) {
 			addNotification({
-				title: 'An error occurred',
+				title: formatMessage(commonMessages.errorNotificationTitle),
 				text: error.message,
 				type: 'error',
 			})

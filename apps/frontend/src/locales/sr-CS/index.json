@@ -1343,24 +1343,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Kreirano {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licencirano {license}"
-  },
-  "project.about.details.published": {
-    "message": "Objavljeno {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Poslato {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalji"
-  },
-  "project.about.details.updated": {
-    "message": "Ažurirano {date}"
-  },
   "project.actions.create-server": {
     "message": "Kreiraj server"
   },
@@ -1729,9 +1711,6 @@
   },
   "servers.plan.small.description": {
     "message": "Savršeno za 1–5 prijatelja sa nekoliko lakih modova."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "naplaćuje se {interval, select, monthly {mesečno} quarterly {kvartalno} yearly {godišnje} other {{interval}}}"
   },
   "settings.account.delete.section.description": {
     "message": "Kad obrišeš svoj račun, povratka nema. Brisanjem računa sa naših servera biće uklonjeni svi povezani podaci, izuzev projekata."

@@ -3218,24 +3218,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Creado {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Con licencia {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publicado {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Enviado {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalles"
-  },
-  "project.about.details.updated": {
-    "message": "Actualizado {date}"
-  },
   "project.actions.create-server": {
     "message": "Crear un servidor"
   },
@@ -3265,9 +3247,6 @@
   },
   "project.description.title": {
     "message": "Descripción"
-  },
-  "project.details.licensed": {
-    "message": "Con licencia"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Esta versión del juego no es compatible con el proyecto base."
@@ -3421,15 +3400,6 @@
   },
   "project.gallery.title": {
     "message": "Galería"
-  },
-  "project.license.error": {
-    "message": "No se pudo recuperar el texto de la licencia."
-  },
-  "project.license.loading": {
-    "message": "Cargando el texto de la licencia..."
-  },
-  "project.license.title": {
-    "message": "Licencia"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Tu proyecto es privado, lo que significa que solo pueden acceder tú y las personas a las que invites."
@@ -4066,9 +4036,6 @@
   },
   "servers.plan.small.description": {
     "message": "Perfecto para 1–5 amigos con algunos mods ligeros."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "facturado {interval, select, monthly {mensual} quarterly {trimestral} yearly {anual} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Finalizar configuración"

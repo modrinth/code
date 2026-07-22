@@ -3011,24 +3011,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Tạo vào {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Giấy phép: {license}"
-  },
-  "project.about.details.published": {
-    "message": "Xuất bản vào {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Gửi vào {date}"
-  },
-  "project.about.details.title": {
-    "message": "Chi tiết"
-  },
-  "project.about.details.updated": {
-    "message": "Cập nhật vào {date}"
-  },
   "project.actions.create-server": {
     "message": "Tạo máy chủ"
   },
@@ -3058,9 +3040,6 @@
   },
   "project.description.title": {
     "message": "Mô tả"
-  },
-  "project.details.licensed": {
-    "message": "Giấy phép"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} không hỗ trợ {gameVersion} cho {platform}"
@@ -3112,15 +3091,6 @@
   },
   "project.gallery.title": {
     "message": "Thư viện"
-  },
-  "project.license.error": {
-    "message": "Không thể tải nội dung giấy phép."
-  },
-  "project.license.loading": {
-    "message": "Đang tải nội dung giấy phép..."
-  },
-  "project.license.title": {
-    "message": "Giấy phép"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Dự án của bạn đang để chế độ riêng tư, nghĩa là chỉ có bạn và những người khác được mời có thể truy cập nó."
@@ -3694,9 +3664,6 @@
   },
   "servers.plan.small.description": {
     "message": "Hoàn hảo cho 1–5 người bạn với một vài mod nhẹ."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "trả tiền hàng {interval, select, monthly {tháng} quarterly {quý (3 tháng)} yearly {năm} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Hoàn tất thiết lập"

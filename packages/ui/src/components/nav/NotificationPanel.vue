@@ -17,7 +17,7 @@
 				@mouseleave="setNotificationTimer(item)"
 			>
 				<div
-					class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl border border-solid border-surface-5"
+					class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised border border-solid border-surface-5"
 					:class="item.containerClass"
 				>
 					<div
@@ -77,7 +77,11 @@
 							</ButtonStyled>
 						</div>
 						<div v-if="item.type !== 'neutral'"></div>
-						<div class="col-span-2 whitespace-pre-wrap text-sm text-primary">{{ item.text }}</div>
+						<div
+							class="col-span-2 whitespace-pre-wrap text-sm text-primary max-h-[80vh] overflow-y-auto"
+						>
+							{{ item.text }}
+						</div>
 						<template v-if="item.errorCode">
 							<div></div>
 							<div class="m-0 text-wrap text-xs font-medium text-secondary">
