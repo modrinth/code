@@ -419,27 +419,41 @@ where
     rows.into_iter().map(TryInto::try_into).collect()
 }
 
-pub(crate) async fn mark_instance_files_missing(
-    instance_id: &str,
+pub(crate) async fn set_instance_file_missing(
+    file_id: &str,
+    missing: bool,
     tx: &mut Transaction<'_, Sqlite>,
-) -> crate::Result<()> {
+) -> crate::Result<Option<InstanceFile>> {
+    let missing = i64::from(missing);
     let modified_at = Utc::now().timestamp();
-
-    sqlx::query!(
+    let row = sqlx::query_as!(
+        InstanceFileRow,
         "
 		UPDATE instance_files
 		SET
-			missing = 1,
+			missing = ?,
 			modified_at = ?
-		WHERE instance_id = ?
+		WHERE id = ?
+		RETURNING
+			id,
+			instance_id,
+			relative_path,
+			file_name,
+			enabled,
+			sha1,
+			size,
+			missing,
+			added_at,
+			modified_at
 		",
+        missing,
         modified_at,
-        instance_id,
+        file_id,
     )
-    .execute(&mut **tx)
+    .fetch_optional(&mut **tx)
     .await?;
 
-    Ok(())
+    row.map(TryInto::try_into).transpose()
 }
 
 pub(crate) async fn upsert_instance_file(
