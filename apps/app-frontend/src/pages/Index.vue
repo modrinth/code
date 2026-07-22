@@ -51,9 +51,7 @@ onUnmounted(() => {
 <template>
 	<WelcomeScreen v-if="isReady && !hasCreatedInstance" />
 	<div v-else-if="isReady" class="flex flex-col gap-6 p-6">
-		<h1 v-if="recentInstances?.length > 0" class="m-0 text-2xl font-extrabold">Welcome back!</h1>
-		<h1 v-else class="m-0 text-2xl font-extrabold">Welcome to Modrinth App!</h1>
-		<RecentWorldsList :recent-instances="recentInstances" />
+		<RecentWorldsList v-if="recentInstances?.length > 0" :recent-instances="recentInstances" />
 		<LibrarySection :instances="instances" />
 	</div>
 </template>

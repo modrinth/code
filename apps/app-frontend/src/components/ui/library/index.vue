@@ -3,7 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { NavTabs } from '@modrinth/ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import GridDisplay from '@/components/GridDisplay.vue'
+import GridDisplay from '@/components/ui/library/GridDisplay.vue'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import type { GameInstance } from '@/helpers/types'
 
@@ -70,12 +70,6 @@ const filteredInstances = computed(() => {
 <template>
 	<section class="flex flex-col gap-3">
 		<h2 class="m-0 text-lg font-bold text-primary">Library</h2>
-		<NavTabs
-			mode="local"
-			:links="tabs"
-			:active-index="activeTab"
-			@tab-click="(index) => (activeTab = index)"
-		/>
 		<GridDisplay label="Instances" :instances="filteredInstances" />
 	</section>
 </template>
