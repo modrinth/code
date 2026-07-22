@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::search::{self, SearchBackend};
@@ -7,6 +6,7 @@ use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use url::Url;
+use xredis::RedisPool;
 
 use crate::test::{dummy_data, environment::TestEnvironment};
 
@@ -90,7 +90,8 @@ impl TemporaryDatabase {
         println!("Migrations complete");
 
         // Gets new Redis pool
-        let redis_pool = RedisPool::new(temp_database_name.clone()).await;
+        let redis_pool =
+            crate::database::redis::from_env(temp_database_name.clone()).await;
 
         // Create search backend
         let search_backend = search::backend(Some(temp_database_name.clone()));
@@ -192,7 +193,10 @@ impl TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                        redis_pool: RedisPool::new(name.clone()).await,
+                        redis_pool: crate::database::redis::from_env(
+                            name.clone(),
+                        )
+                        .await,
                         search_backend: Arc::from(search::backend(Some(
                             name.clone(),
                         ))),

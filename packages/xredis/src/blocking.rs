@@ -2,15 +2,13 @@ use std::time::Duration;
 
 use prometheus::Registry;
 
-use crate::database::models::DatabaseError;
-
-use super::RedisPool;
 use super::config::{RedisConfig, RedisTopology};
 use super::connection::RedisBackendBuildError;
 use super::metrics::{
     LogicalPoolStatus, LogicalPoolStatusProvider,
     register_blocking_pool_metrics,
 };
+use super::{Error, RedisPool};
 
 const POOL_RETAIN_INTERVAL: Duration = Duration::from_secs(30);
 const MAX_IDLE_CONNECTION_AGE: Duration = Duration::from_secs(5 * 60);
@@ -33,7 +31,7 @@ impl RedisBlockingPool {
         config: &RedisConfig,
     ) -> Result<Self, RedisBackendBuildError> {
         let pool_size = config.blocking_pool_size();
-        let inner = match config.mode() {
+        let inner = match config.topology() {
             RedisTopology::Standalone => {
                 let connection_config = redis::AsyncConnectionConfig::new()
                     .set_connection_timeout(None)
@@ -83,11 +81,9 @@ impl RedisBlockingPool {
         &self,
         key: &str,
         timeout: Duration,
-    ) -> Result<Option<[Vec<u8>; 2]>, DatabaseError> {
+    ) -> Result<Option<[Vec<u8>; 2]>, Error> {
         if timeout.is_zero() {
-            return Err(DatabaseError::Internal(eyre::eyre!(
-                "redis blocking timeout must be greater than zero"
-            )));
+            return Err(Error::InvalidBlockingTimeout);
         }
 
         let mut command = redis::cmd("BRPOP");
@@ -124,7 +120,7 @@ impl RedisPool {
         &self,
         key: &str,
         timeout: Duration,
-    ) -> Result<Option<[Vec<u8>; 2]>, DatabaseError> {
+    ) -> Result<Option<[Vec<u8>; 2]>, Error> {
         self.blocking.brpop(key, timeout).await
     }
 }

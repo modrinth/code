@@ -6,7 +6,7 @@ use crate::auth::get_user_from_headers;
 use crate::database::models::ids::DBVersionId;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBProject, DBVersion};
-use crate::database::{PgPool, ReadOnlyPgPool, redis::RedisPool};
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
 use crate::models::projects::{DependencyType, Version};
 use crate::models::users::User;
@@ -21,6 +21,7 @@ use modrinth_content_management::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
+use xredis::RedisPool;
 
 const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v3";
 const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v3";

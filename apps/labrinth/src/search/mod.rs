@@ -1,4 +1,3 @@
-use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
@@ -14,6 +13,7 @@ use serde_json::Value;
 use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
+use xredis::RedisPool;
 
 pub mod backend;
 pub mod incremental;

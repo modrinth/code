@@ -41,7 +41,6 @@ color-eyre = { workspace = true }
 color-thief = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
-deadpool-redis = { workspace = true, features = ["cluster-async"] }
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
@@ -73,7 +72,6 @@ image = { workspace = true, features = [
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
-lz4_flex = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
@@ -147,6 +145,7 @@ webauthn-rs = { workspace = true, features = [
 webauthn-rs-proto = { workspace = true }
 webp = { workspace = true }
 woothee = { workspace = true }
+xredis = { workspace = true }
 yaserde = { workspace = true, features = ["derive"] }
 zip = { workspace = true }
 zxcvbn = { workspace = true }
@@ -169,7 +168,7 @@ tikv-jemallocator = { workspace = true, features = [
 ] }
 
 [features]
-test = []
+test = ["xredis/test"]
 
 [lints]
 workspace = true

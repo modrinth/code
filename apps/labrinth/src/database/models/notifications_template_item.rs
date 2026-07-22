@@ -1,8 +1,8 @@
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
 use crate::routes::ApiError;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const TEMPLATES_NAMESPACE: &str = "notifications_templates:v3";
 const TEMPLATES_HTML_DATA_NAMESPACE: &str =
@@ -93,7 +93,7 @@ impl NotificationTemplate {
     ) -> Result<Option<String>, DatabaseError> {
         let mut redis = redis.connect().await?;
         let key = redis.key().metadata(TEMPLATES_HTML_DATA_NAMESPACE, self.id);
-        redis.get_deserialized(&key).await
+        redis.get_deserialized(&key).await.map_err(Into::into)
     }
 
     pub async fn set_cached_html_data(
@@ -106,6 +106,7 @@ impl NotificationTemplate {
         redis
             .set_serialized(&key, &data, Some(HTML_DATA_CACHE_EXPIRY))
             .await
+            .map_err(Into::into)
     }
 }
 

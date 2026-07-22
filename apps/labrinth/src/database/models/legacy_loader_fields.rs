@@ -9,7 +9,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::database::redis::RedisPool;
+use xredis::RedisPool;
 
 use super::{
     DatabaseError, LoaderFieldEnumValueId,

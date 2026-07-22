@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use xredis::RedisPool;
 
 use const_format::formatcp;
 use eyre::{Result, eyre};
@@ -7,10 +8,8 @@ use sqlx::PgPool;
 use tracing::{debug, info};
 
 use crate::{
-    database::{DBProject, redis::RedisPool},
-    models::ids::ProjectId,
-    routes::analytics::MINECRAFT_SERVER_PLAYS,
-    util::error::Context,
+    database::DBProject, models::ids::ProjectId,
+    routes::analytics::MINECRAFT_SERVER_PLAYS, util::error::Context,
 };
 
 pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v3";

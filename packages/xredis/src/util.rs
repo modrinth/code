@@ -1,14 +1,14 @@
 use redis::{FromRedisValue, RedisResult, ToRedisArgs};
 use tracing::{Instrument, info_span};
 
-pub fn cmd(name: &str) -> InstrumentedCmd {
+pub(crate) fn cmd(name: &str) -> InstrumentedCmd {
     InstrumentedCmd {
         inner: redis::cmd(name),
         name: name.to_string(),
     }
 }
 
-pub struct InstrumentedCmd {
+pub(crate) struct InstrumentedCmd {
     inner: redis::Cmd,
     name: String,
 }

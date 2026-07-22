@@ -5,10 +5,9 @@ use eyre::{Context, eyre};
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 
-use crate::database::redis::ReadReplicaStrategy;
-
-use crate::database::redis::{
-    CacheLockingStrategy, RedisConnectionType, RedisTopology,
+use xredis::{
+    CacheLockingStrategy, ReadReplicaStrategy, RedisConnectionType,
+    RedisTopology,
 };
 
 macro_rules! vars {
@@ -165,11 +164,11 @@ vars! {
     REDIS_BLOCKING_MAX_CONNECTIONS: u32 = 256u32;
 
     // The encoding format used for Redis cache values.
-    REDIS_ENCODING_FORMAT: crate::database::redis::EncodingFormat = crate::database::redis::EncodingFormat::Json;
+    REDIS_ENCODING_FORMAT: xredis::EncodingFormat = xredis::EncodingFormat::Json;
     // The level of LZ4 compression used for Redis cache values. A value of 0 disables compression (supports 1-12)
     REDIS_COMPRESSION_LEVEL: i32 = 0i32;
     // The compression algorithm used for Redis cache values. Currently only LZ4 is supported.
-    REDIS_COMPRESSION_ALGORITHM: crate::database::redis::Codec = crate::database::redis::Codec::Lz4;
+    REDIS_COMPRESSION_ALGORITHM: xredis::Codec = xredis::Codec::Lz4;
     // The minimum number of bytes required to trigger compression for Redis cache values.
     REDIS_COMPRESSION_THRESHOLD_BYTES: usize = 1024usize;
     // The minimum savings ratio required to trigger compression for Redis cache values. If the savings ratio is lower than this,

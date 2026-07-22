@@ -22,12 +22,12 @@ use labrinth::database::models::DBProjectId;
 use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE, ProjectQueryResult,
 };
-use labrinth::database::redis::RedisValue;
 use labrinth::models::ids::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 use sha1::Digest;
+use xredis::RedisValue;
 
 pub mod common;
 

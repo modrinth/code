@@ -16,8 +16,7 @@ use thiserror::Error;
 use tokio::time::{Instant, timeout_at};
 use tracing::{Instrument, info_span};
 
-use crate::database::models::DatabaseError;
-use crate::env::ENV;
+use crate::Error;
 
 use super::commands;
 use super::key::KeyBuilder;
@@ -35,7 +34,7 @@ pub(super) trait ConnectionProvider {
 
     fn connect(
         &self,
-    ) -> impl Future<Output = Result<Self::Connection, DatabaseError>> + Send;
+    ) -> impl Future<Output = Result<Self::Connection, Error>> + Send;
 }
 
 #[repr(u8)]
@@ -94,6 +93,10 @@ impl FromStr for EncodingFormat {
 
 #[derive(Debug, Clone)]
 pub struct CacheSettings {
+    pub default_expiry: i64,
+    pub actual_expiry: i64,
+    pub version_default_expiry: i64,
+    pub version_actual_expiry: i64,
     pub encoding_format: EncodingFormat,
     pub compression_algorithm: Codec,
     pub compression_level: i32,
@@ -105,7 +108,7 @@ impl CacheSettings {
     pub fn encode_value<T: Serialize>(
         &self,
         value: &T,
-    ) -> Result<Vec<u8>, DatabaseError> {
+    ) -> Result<Vec<u8>, Error> {
         let mut value = match self.encoding_format {
             EncodingFormat::Json => serde_json::to_vec(value)?,
         };
@@ -150,6 +153,19 @@ impl CacheSettings {
             EncodingFormat::Json => serde_json::from_slice(&value).ok(),
         }
     }
+
+    fn expiries(&self, namespace: &str) -> (i64, i64) {
+        match namespace
+            .split_once(':')
+            .map(|value| value.0)
+            .unwrap_or(namespace)
+        {
+            "versions" | "versions_files" => {
+                (self.version_default_expiry, self.version_actual_expiry)
+            }
+            _ => (self.default_expiry, self.actual_expiry),
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -173,17 +189,18 @@ impl CacheManager {
     }
 
     #[tracing::instrument(skip(self, provider, keys, closure))]
-    pub async fn get_cached_keys<P, F, Fut, T, K>(
+    pub async fn get_cached_keys<P, F, Fut, T, K, E>(
         &self,
         provider: &P,
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<Vec<T>, DatabaseError>
+    ) -> Result<Vec<T>, E>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -202,17 +219,18 @@ impl CacheManager {
     }
 
     #[tracing::instrument(skip(self, provider, keys, closure))]
-    pub async fn get_cached_keys_raw<P, F, Fut, T, K>(
+    pub async fn get_cached_keys_raw<P, F, Fut, T, K, E>(
         &self,
         provider: &P,
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<HashMap<K, T>, DatabaseError>
+    ) -> Result<HashMap<K, T>, E>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<K>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -241,7 +259,7 @@ impl CacheManager {
     }
 
     #[tracing::instrument(skip(self, provider, keys, closure))]
-    pub async fn get_cached_keys_with_slug<P, F, Fut, T, I, K, S>(
+    pub async fn get_cached_keys_with_slug<P, F, Fut, T, I, K, S, E>(
         &self,
         provider: &P,
         namespace: &str,
@@ -249,11 +267,12 @@ impl CacheManager {
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<Vec<T>, DatabaseError>
+    ) -> Result<Vec<T>, E>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<I>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -280,7 +299,7 @@ impl CacheManager {
     }
 
     #[tracing::instrument(skip(self, provider, keys, closure))]
-    pub async fn get_cached_keys_raw_with_slug<P, F, Fut, T, I, K, S>(
+    pub async fn get_cached_keys_raw_with_slug<P, F, Fut, T, I, K, S, E>(
         &self,
         provider: &P,
         namespace: &str,
@@ -288,11 +307,12 @@ impl CacheManager {
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<HashMap<K, T>, DatabaseError>
+    ) -> Result<HashMap<K, T>, E>
     where
         P: ConnectionProvider,
         F: FnOnce(Vec<I>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -330,10 +350,12 @@ impl CacheManager {
                                     .entity(slug_namespace, logical_key)
                             })
                             .collect::<Vec<_>>();
-                        let mut connection = provider.connect().await?;
-                        Ok::<_, DatabaseError>(
+                        let mut connection =
+                            provider.connect().await.map_err(E::from)?;
+                        Ok::<_, E>(
                             commands::get_many_strings(&mut connection, &keys)
-                                .await?
+                                .await
+                                .map_err(E::from)?
                                 .into_iter()
                                 .flatten()
                                 .collect::<Vec<_>>(),
@@ -357,9 +379,13 @@ impl CacheManager {
                     .map(|key| self.key_builder.entity(namespace, key))
                     .collect::<Vec<_>>();
 
-                let mut connection = provider.connect().await?;
+                let mut connection =
+                    provider.connect().await.map_err(E::from)?;
                 let mut cached_values = HashMap::new();
-                for value in commands::get_many(&mut connection, &keys).await? {
+                for value in commands::get_many(&mut connection, &keys)
+                    .await
+                    .map_err(E::from)?
+                {
                     if let Some(value) = value.and_then(|value| {
                         self.settings
                             .decode_value::<RedisValue<T, K, S>>(&value)
@@ -368,12 +394,12 @@ impl CacheManager {
                     }
                 }
 
-                Ok::<_, DatabaseError>((cached_values, ids))
+                Ok::<_, E>((cached_values, ids))
             }
             .instrument(info_span!("get cached values"))
         };
 
-        let (default_expiry, actual_expiry) = cache_expiries(namespace);
+        let (default_expiry, actual_expiry) = self.settings.expiries(namespace);
         let current_time = Utc::now();
         let mut expired_values = HashMap::new();
         let mut expired_identities = HashMap::new();
@@ -462,11 +488,13 @@ impl CacheManager {
                         val: value,
                         alias: slug.clone(),
                     };
-                    let encoded = self.settings.encode_value(&value)?;
+                    let encoded =
+                        self.settings.encode_value(&value).map_err(E::from)?;
                     encoded_values.push((key, slug, value, encoded));
                 }
 
-                let mut connection = provider.connect().await?;
+                let mut connection =
+                    provider.connect().await.map_err(E::from)?;
                 for (key, slug, _, encoded) in &encoded_values {
                     let redis_key =
                         self.key_builder.entity(namespace, key.to_string());
@@ -474,9 +502,10 @@ impl CacheManager {
                         &mut connection,
                         &redis_key,
                         encoded,
-                        Some(default_expiry),
+                        default_expiry,
                     )
-                    .await?;
+                    .await
+                    .map_err(E::from)?;
                     if let Some(slug) = slug
                         && let Some(slug_namespace) = slug_namespace
                     {
@@ -490,9 +519,10 @@ impl CacheManager {
                             &mut connection,
                             &slug_key,
                             canonical_key.as_bytes(),
-                            Some(default_expiry),
+                            default_expiry,
                         )
-                        .await?;
+                        .await
+                        .map_err(E::from)?;
                     }
                 }
 
@@ -501,7 +531,7 @@ impl CacheManager {
                     return_values.insert(key, value);
                 }
 
-                Result::<_, DatabaseError>::Ok(return_values)
+                Result::<_, E>::Ok(return_values)
             }
             .await
         } else {
@@ -537,7 +567,7 @@ impl CacheManager {
                                 Err(error) => Err(error),
                             }
                         }
-                        Err(error) => Err(error),
+                        Err(error) => Err(E::from(error)),
                     }
                 }
             }
@@ -549,20 +579,6 @@ impl CacheManager {
             .into_iter()
             .map(|(key, value)| (key, value.val))
             .collect())
-    }
-}
-
-fn cache_expiries(namespace: &str) -> (i64, i64) {
-    match namespace
-        .split_once(':')
-        .map(|value| value.0)
-        .unwrap_or(namespace)
-    {
-        "versions" | "versions_files" => (
-            ENV.REDIS_VERSION_DEFAULT_EXPIRY,
-            ENV.REDIS_VERSION_ACTUAL_EXPIRY,
-        ),
-        _ => (ENV.REDIS_DEFAULT_EXPIRY, ENV.REDIS_ACTUAL_EXPIRY),
     }
 }
 
@@ -626,7 +642,7 @@ fn push_identity(identities: &mut Vec<String>, identity: String) {
 async fn wait_for_locks<I>(
     waiters: Vec<(I, LockWaiter)>,
     deadline: Instant,
-) -> Result<Vec<I>, DatabaseError> {
+) -> Result<Vec<I>, Error> {
     let total = waiters.len();
     let mut released = Vec::with_capacity(total);
     let mut futures = FuturesUnordered::new();
@@ -653,15 +669,12 @@ async fn wait_for_locks<I>(
     Ok(released)
 }
 
-fn is_lock_timeout(error: &DatabaseError) -> bool {
-    matches!(error, DatabaseError::LocalCacheTimeout { .. })
+fn is_lock_timeout(error: &Error) -> bool {
+    matches!(error, Error::LocalCacheTimeout { .. })
 }
 
-fn lock_timeout_error(
-    locks_released: usize,
-    locks_waiting: usize,
-) -> DatabaseError {
-    DatabaseError::LocalCacheTimeout {
+fn lock_timeout_error(locks_released: usize, locks_waiting: usize) -> Error {
+    Error::LocalCacheTimeout {
         released: locks_released,
         total: locks_waiting,
     }

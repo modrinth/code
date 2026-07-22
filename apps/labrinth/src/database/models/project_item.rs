@@ -4,7 +4,6 @@ use super::loader_fields::{
 };
 use super::{DBUser, ids::*};
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
@@ -22,6 +21,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
 pub const PROJECTS_NAMESPACE: &str = "projects:v3";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v3";
@@ -942,7 +942,7 @@ impl DBProject {
                     })
                     ?;
 
-                Ok(projects)
+                Ok::<_, DatabaseError>(projects)
             },
         )
         .await

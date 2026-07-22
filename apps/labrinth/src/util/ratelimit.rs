@@ -1,5 +1,5 @@
+use crate::env::ENV;
 use crate::routes::ApiError;
-use crate::{database::redis::RedisPool, env::ENV};
 use actix_web::{
     Error, ResponseError,
     body::{EitherBody, MessageBody},
@@ -10,6 +10,7 @@ use actix_web::{
 use chrono::Utc;
 use std::str::FromStr;
 use std::sync::Arc;
+use xredis::RedisPool;
 
 const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v3";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes

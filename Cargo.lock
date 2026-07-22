@@ -5471,7 +5471,6 @@ dependencies = [
  "color-thief",
  "const_format",
  "dashmap",
- "deadpool-redis",
  "derive_more 2.1.1",
  "dotenv-build",
  "dotenvy",
@@ -5491,7 +5490,6 @@ dependencies = [
  "json-patch 4.1.0",
  "labrinth",
  "lettre",
- "lz4_flex",
  "meilisearch-sdk",
  "modrinth-content-management",
  "modrinth-util",
@@ -5541,6 +5539,7 @@ dependencies = [
  "webauthn-rs-proto",
  "webp",
  "woothee",
+ "xredis",
  "yaserde",
  "zip 6.0.0",
  "zxcvbn",
@@ -13432,6 +13431,25 @@ name = "xmlparser"
 version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "66fee0b777b0f5ac1c69bb06d361268faafa61cd4682ae064a171c16c433e9e4"
+
+[[package]]
+name = "xredis"
+version = "0.1.0"
+dependencies = [
+ "ariadne",
+ "chrono",
+ "dashmap",
+ "deadpool-redis",
+ "futures",
+ "lz4_flex",
+ "prometheus",
+ "redis",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+]
 
 [[package]]
 name = "xxhash-rust"

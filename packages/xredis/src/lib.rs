@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 use std::fmt::{Debug, Display};
 use std::future::Future;
 use std::hash::Hash;
@@ -10,9 +12,6 @@ use redis::{FromRedisValue, ToRedisArgs};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
-use crate::database::models::DatabaseError;
-use crate::env::ENV;
-
 mod blocking;
 mod cache;
 mod commands;
@@ -23,15 +22,37 @@ mod metrics;
 mod pubsub;
 mod util;
 
-use cache::{CacheManager, CacheSettings, ConnectionProvider};
-pub use cache::{Codec, EncodingFormat, RedisValue};
-use config::RedisConfig;
+use cache::{CacheManager, ConnectionProvider};
+pub use cache::{
+    CacheSettings, Codec, EncodingFormat, InvalidCodec, InvalidEncodingFormat,
+    RedisValue,
+};
 pub use config::{
-    CacheLockingStrategy, ReadReplicaStrategy, RedisConnectionType,
-    RedisTopology,
+    CacheLockingStrategy, InvalidCacheLockingStrategy,
+    InvalidRedisConnectionType, InvalidRedisMode,
+    InvalidRedisReadReplicaStrategy, ReadReplicaStrategy, RedisConfig,
+    RedisConfigError, RedisConnectionType, RedisTopology,
 };
 use connection::RedisBackend;
+pub use connection::RedisBackendBuildError;
 pub use key::KeyBuilder;
+use thiserror::Error as ThisError;
+
+#[derive(Debug, ThisError)]
+pub enum Error {
+    #[error("error while interacting with Redis: {0}")]
+    Redis(#[from] redis::RedisError),
+    #[error("Redis pool error: {0}")]
+    Pool(#[from] deadpool_redis::PoolError),
+    #[error("error while serializing a Redis cache value: {0}")]
+    Serialization(#[from] serde_json::Error),
+    #[error("Redis blocking timeout must be greater than zero")]
+    InvalidBlockingTimeout,
+    #[error(
+        "timeout waiting on local cache lock ({released}/{total} released)"
+    )]
+    LocalCacheTimeout { released: usize, total: usize },
+}
 
 #[derive(Clone)]
 pub struct RedisPool {
@@ -49,52 +70,38 @@ pub struct RedisConnection {
 }
 
 impl RedisPool {
-    pub async fn new(meta_namespace: impl Into<Arc<str>>) -> Self {
-        let config =
-            RedisConfig::from_env().expect("invalid Redis configuration");
+    pub async fn new(
+        meta_namespace: impl Into<Arc<str>>,
+        config: RedisConfig,
+        cache_settings: CacheSettings,
+    ) -> Result<Self, RedisBackendBuildError> {
         tracing::info!(
             strategy = %config.cache_locking_strategy(),
             "configured Redis cache locking"
         );
 
-        let backend = match RedisBackend::new(&config).await {
-            Ok(b) => b,
-            Err(error) => {
-                panic!("failed to initialize Redis connection(s): {error}");
-            }
-        };
+        let backend = RedisBackend::new(&config).await?;
 
-        let blocking = blocking::RedisBlockingPool::new(&config)
-            .await
-            .expect("failed to initialize blocking Redis connections");
-        let key_builder = KeyBuilder::new(meta_namespace, config.mode());
-        let cache = CacheManager::new(
-            key_builder.clone(),
-            CacheSettings {
-                encoding_format: ENV.REDIS_ENCODING_FORMAT,
-                compression_algorithm: ENV.REDIS_COMPRESSION_ALGORITHM,
-                compression_level: ENV.REDIS_COMPRESSION_LEVEL,
-                compression_threshold_bytes: ENV
-                    .REDIS_COMPRESSION_THRESHOLD_BYTES,
-                compression_min_savings_ratio: ENV
-                    .REDIS_COMPRESSION_MIN_SAVINGS_RATIO,
-            },
-        );
+        let blocking = blocking::RedisBlockingPool::new(&config).await?;
+        let key_builder = KeyBuilder::new(meta_namespace, config.topology());
+        let cache = CacheManager::new(key_builder.clone(), cache_settings);
 
-        Self {
+        Ok(Self {
             backend,
             blocking,
             cache,
             config,
             key_builder,
-        }
+        })
     }
 
     pub fn key(&self) -> &KeyBuilder {
         &self.key_builder
     }
+}
 
-    pub async fn connect(&self) -> Result<RedisConnection, DatabaseError> {
+impl RedisPool {
+    pub async fn connect(&self) -> Result<RedisConnection, Error> {
         Ok(RedisConnection {
             inner: self.backend.connect().await?,
             key_builder: self.key_builder.clone(),
@@ -110,15 +117,16 @@ impl RedisPool {
         self.blocking.register_metrics(registry)
     }
 
-    pub async fn get_cached_keys<F, Fut, T, K>(
+    pub async fn get_cached_keys<F, Fut, T, K, E>(
         &self,
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<Vec<T>, DatabaseError>
+    ) -> Result<Vec<T>, E>
     where
         F: FnOnce(Vec<K>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -134,15 +142,16 @@ impl RedisPool {
             .await
     }
 
-    pub async fn get_cached_keys_raw<F, Fut, T, K>(
+    pub async fn get_cached_keys_raw<F, Fut, T, K, E>(
         &self,
         namespace: &str,
         keys: &[K],
         closure: F,
-    ) -> Result<std::collections::HashMap<K, T>, DatabaseError>
+    ) -> Result<std::collections::HashMap<K, T>, E>
     where
         F: FnOnce(Vec<K>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, T>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, T>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -158,17 +167,18 @@ impl RedisPool {
             .await
     }
 
-    pub async fn get_cached_keys_with_slug<F, Fut, T, I, K, S>(
+    pub async fn get_cached_keys_with_slug<F, Fut, T, I, K, S, E>(
         &self,
         namespace: &str,
         slug_namespace: &str,
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<Vec<T>, DatabaseError>
+    ) -> Result<Vec<T>, E>
     where
         F: FnOnce(Vec<I>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -192,17 +202,18 @@ impl RedisPool {
             .await
     }
 
-    pub async fn get_cached_keys_raw_with_slug<F, Fut, T, I, K, S>(
+    pub async fn get_cached_keys_raw_with_slug<F, Fut, T, I, K, S, E>(
         &self,
         namespace: &str,
         slug_namespace: Option<&str>,
         case_sensitive: bool,
         keys: &[I],
         closure: F,
-    ) -> Result<std::collections::HashMap<K, T>, DatabaseError>
+    ) -> Result<std::collections::HashMap<K, T>, E>
     where
         F: FnOnce(Vec<I>) -> Fut,
-        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, DatabaseError>>,
+        Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
+        E: From<Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -232,8 +243,7 @@ impl ConnectionProvider for RedisPool {
 
     fn connect(
         &self,
-    ) -> impl Future<Output = Result<Self::Connection, DatabaseError>> + Send
-    {
+    ) -> impl Future<Output = Result<Self::Connection, Error>> + Send {
         RedisPool::connect(self)
     }
 }
@@ -248,11 +258,18 @@ impl RedisConnection {
         key: &str,
         data: D,
         expiry: Option<i64>,
-    ) -> Result<(), DatabaseError>
+    ) -> Result<(), Error>
     where
         D: ToRedisArgs + Send + Sync + Debug,
     {
-        commands::set(&mut self.inner, key, data, expiry).await
+        commands::set(
+            &mut self.inner,
+            key,
+            data,
+            expiry.unwrap_or(self.settings.default_expiry),
+        )
+        .await
+        .map_err(Error::from)
     }
 
     pub async fn set_serialized<D>(
@@ -260,7 +277,7 @@ impl RedisConnection {
         key: &str,
         data: D,
         expiry: Option<i64>,
-    ) -> Result<(), DatabaseError>
+    ) -> Result<(), Error>
     where
         D: Serialize,
     {
@@ -272,80 +289,85 @@ impl RedisConnection {
             &self.settings,
         )
         .await
+        .map_err(Error::from)
     }
 
-    pub async fn get(
-        &mut self,
-        key: &str,
-    ) -> Result<Option<String>, DatabaseError> {
-        commands::get(&mut self.inner, key).await
+    pub async fn get(&mut self, key: &str) -> Result<Option<String>, Error> {
+        commands::get(&mut self.inner, key)
+            .await
+            .map_err(Error::from)
     }
 
     pub async fn get_many(
         &mut self,
         keys: &[String],
-    ) -> Result<Vec<Option<Vec<u8>>>, DatabaseError> {
-        commands::get_many(&mut self.inner, keys).await
+    ) -> Result<Vec<Option<Vec<u8>>>, Error> {
+        commands::get_many(&mut self.inner, keys)
+            .await
+            .map_err(Error::from)
     }
 
     pub async fn get_many_typed<R>(
         &mut self,
         keys: &[String],
-    ) -> Result<Vec<Option<R>>, DatabaseError>
+    ) -> Result<Vec<Option<R>>, Error>
     where
         R: FromRedisValue,
     {
-        commands::get_many_as(&mut self.inner, keys).await
+        commands::get_many_as(&mut self.inner, keys)
+            .await
+            .map_err(Error::from)
     }
 
     pub async fn get_deserialized<R>(
         &mut self,
         key: &str,
-    ) -> Result<Option<R>, DatabaseError>
+    ) -> Result<Option<R>, Error>
     where
         R: for<'a> serde::Deserialize<'a>,
     {
-        commands::get_deserialized(&mut self.inner, key, &self.settings).await
+        commands::get_deserialized(&mut self.inner, key, &self.settings)
+            .await
+            .map_err(Error::from)
     }
 
     pub async fn get_many_deserialized<R>(
         &mut self,
         keys: &[String],
-    ) -> Result<Vec<Option<R>>, DatabaseError>
+    ) -> Result<Vec<Option<R>>, Error>
     where
         R: for<'a> serde::Deserialize<'a>,
     {
         commands::get_many_deserialized(&mut self.inner, keys, &self.settings)
             .await
+            .map_err(Error::from)
     }
 
-    pub async fn delete(&mut self, key: &str) -> Result<(), DatabaseError> {
-        commands::delete(&mut self.inner, key).await
+    pub async fn delete(&mut self, key: &str) -> Result<(), Error> {
+        commands::delete(&mut self.inner, key)
+            .await
+            .map_err(Error::from)
     }
 
-    pub async fn delete_many(
-        &mut self,
-        keys: &[String],
-    ) -> Result<(), DatabaseError> {
-        commands::delete_many(&mut self.inner, keys).await
+    pub async fn delete_many(&mut self, keys: &[String]) -> Result<(), Error> {
+        commands::delete_many(&mut self.inner, keys)
+            .await
+            .map_err(Error::from)
     }
 
-    pub async fn lpush<D>(
-        &mut self,
-        key: &str,
-        value: D,
-    ) -> Result<(), DatabaseError>
+    pub async fn lpush<D>(&mut self, key: &str, value: D) -> Result<(), Error>
     where
         D: ToRedisArgs + Send + Sync + Debug,
     {
-        commands::lpush(&mut self.inner, key, value).await
+        commands::lpush(&mut self.inner, key, value)
+            .await
+            .map_err(Error::from)
     }
 
-    pub async fn incr(
-        &mut self,
-        key: &str,
-    ) -> Result<Option<u64>, DatabaseError> {
-        commands::incr(&mut self.inner, key).await
+    pub async fn incr(&mut self, key: &str) -> Result<Option<u64>, Error> {
+        commands::incr(&mut self.inner, key)
+            .await
+            .map_err(Error::from)
     }
 }
 

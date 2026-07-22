@@ -1,7 +1,6 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
@@ -10,6 +9,7 @@ use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
 const PATS_NAMESPACE: &str = "pats:v3";
 const PATS_TOKENS_NAMESPACE: &str = "pats_tokens:v3";
@@ -141,7 +141,7 @@ impl DBPersonalAccessToken {
                         async move { Ok(acc) }
                     })
                     .await?;
-                    Ok(pats)
+                    Ok::<_, DatabaseError>(pats)
                 },
             )
             .await?;

@@ -1,10 +1,10 @@
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
 use super::{DBTeamMember, ids::*};
 use serde::{Deserialize, Serialize};
@@ -159,7 +159,9 @@ impl DBOrganization {
                     })
                     .await?;
 
-                    Ok(organizations)
+                    Ok::<_, crate::database::models::DatabaseError>(
+                        organizations,
+                    )
                 },
             )
             .await?;

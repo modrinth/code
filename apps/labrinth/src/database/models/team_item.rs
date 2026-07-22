@@ -1,6 +1,6 @@
 use super::{DBOrganization, DBProject, ids::*};
 use crate::{
-    database::{PgTransaction, redis::RedisPool},
+    database::PgTransaction,
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
 use dashmap::DashMap;
@@ -8,6 +8,7 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const TEAMS_NAMESPACE: &str = "teams:v3";
 
@@ -253,7 +254,7 @@ impl DBTeamMember {
                     })
                     .await?;
 
-                Ok(teams)
+                Ok::<_, crate::database::models::DatabaseError>(teams)
             },
         ).await?;
 

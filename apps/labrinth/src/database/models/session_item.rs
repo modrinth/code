@@ -1,7 +1,6 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
@@ -9,6 +8,7 @@ use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
 const SESSIONS_NAMESPACE: &str = "sessions:v3";
 const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids:v3";
@@ -208,7 +208,7 @@ impl DBSession {
                     })
                     .await?;
 
-                Ok(db_sessions)
+                Ok::<_, DatabaseError>(db_sessions)
             }).await?;
 
         Ok(val)

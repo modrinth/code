@@ -15,6 +15,7 @@ members = [
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
+  "packages/xredis",
 ]
 
 [workspace.package]
@@ -237,6 +238,7 @@ webauthn-rs-proto = "0.5.5"
 webp = { version = "0.3.1", default-features = false }
 webview2-com = "0.38.0"  # Should be updated in lockstep with wry
 whoami = "1.6.1"
+xredis = { path = "packages/xredis" }
 windows = "=0.61.3"  # Locked on 0.61 until we can update windows-core to 0.62
 windows-core = "=0.61.2"  # Locked on 0.61 until webview2-com updates to 0.62
 winreg = "0.55.0"

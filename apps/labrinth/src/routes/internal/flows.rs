@@ -8,7 +8,6 @@ use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::error::ApiError as ApiErrorResponse;
@@ -59,6 +58,7 @@ use webauthn_rs::prelude::{
     PublicKeyCredential, RegisterPublicKeyCredential, RequestChallengeResponse,
     Webauthn, WebauthnError,
 };
+use xredis::RedisPool;
 use zxcvbn::Score;
 
 /// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.

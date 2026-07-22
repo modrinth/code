@@ -3,7 +3,6 @@ use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
@@ -15,6 +14,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
 const USERS_NAMESPACE: &str = "users:v3";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v3";
@@ -273,7 +273,7 @@ impl DBUser {
                     })
                     .await?;
 
-                Ok(users)
+                Ok::<_, DatabaseError>(users)
             }).await?;
         Ok(val)
     }

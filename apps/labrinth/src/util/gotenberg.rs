@@ -1,4 +1,3 @@
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::routes::ApiError;
@@ -9,6 +8,7 @@ use chrono::{DateTime, Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use std::time::Duration;
+use xredis::RedisPool;
 
 pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");

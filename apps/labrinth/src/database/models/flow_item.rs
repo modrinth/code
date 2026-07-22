@@ -1,7 +1,6 @@
 use super::ids::*;
 use crate::auth::oauth::uris::OAuthRedirectUris;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
 use chrono::Duration;
@@ -12,6 +11,7 @@ use rand_chacha::rand_core::SeedableRng;
 use serde::{Deserialize, Serialize};
 use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
+use xredis::RedisPool;
 
 const FLOWS_NAMESPACE: &str = "flows:v3";
 
@@ -105,7 +105,7 @@ impl DBFlow {
         let mut redis = redis.connect().await?;
         let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.get_deserialized(&key).await
+        redis.get_deserialized(&key).await.map_err(Into::into)
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true

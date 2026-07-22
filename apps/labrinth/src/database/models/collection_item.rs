@@ -1,12 +1,12 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const COLLECTIONS_NAMESPACE: &str = "collections:v3";
 
@@ -204,7 +204,7 @@ impl DBCollection {
                     })
                     .await?;
 
-                    Ok(collections)
+                    Ok::<_, DatabaseError>(collections)
                 },
             )
             .await?;

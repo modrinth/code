@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::database::redis::RedisPool;
+use xredis::RedisPool;
 
 use super::DatabaseError;
 use super::ids::*;

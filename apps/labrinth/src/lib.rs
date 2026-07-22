@@ -4,12 +4,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use actix_web::web;
-use database::redis::RedisPool;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
 };
 use tracing::{debug, info, warn};
+use xredis::RedisPool;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;

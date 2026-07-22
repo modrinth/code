@@ -5,9 +5,7 @@ use redis::ToRedisArgs;
 use tokio::sync::mpsc;
 use tracing::{info, warn};
 
-use crate::database::models::DatabaseError;
-
-use super::RedisPool;
+use super::{Error, RedisPool};
 
 const PUBSUB_BUFFER_SIZE: usize = 1024;
 const INITIAL_RECONNECT_BACKOFF: Duration = Duration::from_millis(250);
@@ -19,10 +17,7 @@ enum SubscriptionOutcome {
 }
 
 impl RedisPool {
-    pub(crate) fn subscribe(
-        &self,
-        channel: &'static str,
-    ) -> mpsc::Receiver<Vec<u8>> {
+    pub fn subscribe(&self, channel: &'static str) -> mpsc::Receiver<Vec<u8>> {
         let seed_urls = self.config.seed_urls().to_vec();
         let (sender, receiver) = mpsc::channel(PUBSUB_BUFFER_SIZE);
         tokio::spawn(run_subscription(seed_urls, channel, sender));
@@ -44,7 +39,7 @@ impl RedisPool {
         &self,
         channel: &str,
         message: M,
-    ) -> Result<(), DatabaseError>
+    ) -> Result<(), Error>
     where
         M: ToRedisArgs + Send + Sync,
     {
@@ -53,7 +48,8 @@ impl RedisPool {
             .arg(channel)
             .arg(message)
             .query_async(&mut connection)
-            .await?;
+            .await
+            .map_err(Error::from)?;
         Ok(())
     }
 }

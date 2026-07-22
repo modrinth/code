@@ -18,13 +18,13 @@ use labrinth::database::models::DBVersionId;
 use labrinth::database::models::version_item::{
     VERSIONS_NAMESPACE, VersionQueryResult,
 };
-use labrinth::database::redis::RedisValue;
 use labrinth::models::ids::VersionId;
 use labrinth::models::projects::{
     Dependency, DependencyType, VersionStatus, VersionType,
 };
 use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;
+use xredis::RedisValue;
 
 pub mod common;
 

@@ -9,7 +9,7 @@ use redis::cluster_read_routing::{
 use thiserror::Error;
 use tracing::warn;
 
-use crate::database::redis::ReadReplicaStrategy;
+use crate::ReadReplicaStrategy;
 
 use super::config::{RedisBackendConfig, RedisConfig, RedisPoolSize};
 use super::metrics::{
@@ -22,14 +22,14 @@ const MAX_STANDALONE_CONNECTION_AGE: Duration = Duration::from_secs(120);
 
 /// The primary backing "connection provider" for a Redis backend implementation.
 #[derive(Clone)]
-pub(super) enum RedisBackend {
+pub(crate) enum RedisBackend {
     StandalonePooled(deadpool_redis::Pool),
     ClusterPooled(deadpool_redis::cluster::Pool),
     ClusterMultiplexed(redis::cluster_async::ClusterConnection),
 }
 
 #[derive(Debug, Error)]
-pub(super) enum RedisBackendBuildError {
+pub enum RedisBackendBuildError {
     #[error("failed to configure Redis client: {0}")]
     Redis(#[from] redis::RedisError),
     #[error("failed to build Redis pool: {0}")]
@@ -38,7 +38,7 @@ pub(super) enum RedisBackendBuildError {
     Pool(#[from] deadpool_redis::PoolError),
 }
 
-pub(super) struct RedisConnection {
+pub(crate) struct RedisConnection {
     inner: RedisConnectionInner,
 }
 
@@ -49,7 +49,7 @@ enum RedisConnectionInner {
 }
 
 impl RedisBackend {
-    pub(super) async fn new(
+    pub(crate) async fn new(
         config: &RedisConfig,
     ) -> Result<Self, RedisBackendBuildError> {
         match config.backend() {
@@ -138,7 +138,7 @@ impl RedisBackend {
         Ok(Self::ClusterMultiplexed(connection))
     }
 
-    pub(super) async fn connect(
+    pub(crate) async fn connect(
         &self,
     ) -> Result<RedisConnection, deadpool_redis::PoolError> {
         let inner = match self {
@@ -156,7 +156,7 @@ impl RedisBackend {
         Ok(RedisConnection { inner })
     }
 
-    pub(super) fn register_metrics(
+    pub(crate) fn register_metrics(
         &self,
         registry: &Registry,
     ) -> Result<(), prometheus::Error> {

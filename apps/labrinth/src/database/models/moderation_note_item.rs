@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::database::redis::RedisPool;
+use xredis::RedisPool;
 
 use super::{DBOrganizationId, DBUserId, DatabaseError};
 
@@ -279,7 +279,7 @@ impl DBModerationNote {
         let key = redis
             .key()
             .entity(MODERATION_NOTES_USERS_NAMESPACE, user_id.0);
-        redis.delete(&key).await
+        redis.delete(&key).await.map_err(Into::into)
     }
 
     pub async fn clear_organization_cache(
@@ -291,6 +291,6 @@ impl DBModerationNote {
             MODERATION_NOTES_ORGANIZATIONS_NAMESPACE,
             organization_id.0,
         );
-        redis.delete(&key).await
+        redis.delete(&key).await.map_err(Into::into)
     }
 }

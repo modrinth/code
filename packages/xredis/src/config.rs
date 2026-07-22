@@ -1,6 +1,5 @@
 use std::{fmt, str::FromStr};
 
-use crate::env::ENV;
 use thiserror::Error;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -86,7 +85,7 @@ impl FromStr for RedisConnectionType {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(super) struct RedisPoolSize {
+pub(crate) struct RedisPoolSize {
     max: usize,
     min: usize,
 }
@@ -104,24 +103,24 @@ impl RedisPoolSize {
         Ok(Self { max, min })
     }
 
-    pub(super) fn max(self) -> usize {
+    pub(crate) fn max(self) -> usize {
         self.max
     }
 
-    pub(super) fn min(self) -> usize {
+    pub(crate) fn min(self) -> usize {
         self.min
     }
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(super) enum RedisBackendConfig {
+pub(crate) enum RedisBackendConfig {
     StandalonePooled(RedisPoolSize),
     ClusterPooled(RedisPoolSize),
     ClusterMultiplexed,
 }
 
 #[derive(Debug, Clone)]
-pub(super) struct RedisConfig {
+pub struct RedisConfig {
     mode: RedisTopology,
     backend: RedisBackendConfig,
     seed_urls: Vec<String>,
@@ -158,8 +157,8 @@ impl FromStr for ReadReplicaStrategy {
 }
 
 #[derive(Debug, Error)]
-pub(super) enum RedisConfigError {
-    #[error("`REDIS_URL` must contain at least one Redis URL")]
+pub enum RedisConfigError {
+    #[error("Redis configuration must contain at least one URL")]
     MissingUrl,
     #[error("standalone Redis mode requires exactly one URL")]
     MultipleStandaloneUrls,
@@ -183,38 +182,15 @@ pub(super) enum RedisConfigError {
 }
 
 impl RedisConfig {
-    pub(super) fn from_env() -> Result<Self, RedisConfigError> {
-        Self::new(
-            ENV.REDIS_TOPOLOGY,
-            ENV.REDIS_CONNECTION_TYPE,
-            &ENV.REDIS_URL,
-            ENV.REDIS_WAIT_TIMEOUT_MS,
-            (
-                ENV.REDIS_MAX_CONNECTIONS as usize,
-                ENV.REDIS_MIN_CONNECTIONS,
-            ),
-            (
-                ENV.REDIS_CLUSTER_MAX_CONNECTIONS as usize,
-                ENV.REDIS_CLUSTER_MIN_CONNECTIONS,
-            ),
-            RedisPoolSize::new(
-                "blocking",
-                ENV.REDIS_BLOCKING_MAX_CONNECTIONS as usize,
-                0,
-            )?,
-            ENV.REDIS_CACHE_LOCKING_STRATEGY,
-            ENV.REDIS_READ_REPLICA_STRATEGY,
-        )
-    }
-
-    fn new(
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
         mode: RedisTopology,
         connection_type: RedisConnectionType,
         raw_urls: &str,
         wait_timeout_ms: u64,
         standalone_pool_size: (usize, usize),
         cluster_pool_size: (usize, usize),
-        blocking_pool_size: RedisPoolSize,
+        blocking_pool_size: (usize, usize),
         cache_locking_strategy: CacheLockingStrategy,
         read_replica_strategy: ReadReplicaStrategy,
     ) -> Result<Self, RedisConfigError> {
@@ -269,37 +245,41 @@ impl RedisConfig {
             backend,
             seed_urls,
             wait_timeout_ms,
-            blocking_pool_size,
+            blocking_pool_size: RedisPoolSize::new(
+                "blocking",
+                blocking_pool_size.0,
+                blocking_pool_size.1,
+            )?,
             cache_locking_strategy,
             read_replica_strategy,
         })
     }
 
-    pub(super) fn mode(&self) -> RedisTopology {
+    pub fn topology(&self) -> RedisTopology {
         self.mode
     }
 
-    pub(super) fn backend(&self) -> RedisBackendConfig {
+    pub(crate) fn backend(&self) -> RedisBackendConfig {
         self.backend
     }
 
-    pub(super) fn seed_urls(&self) -> &[String] {
+    pub fn seed_urls(&self) -> &[String] {
         &self.seed_urls
     }
 
-    pub(super) fn wait_timeout_ms(&self) -> u64 {
+    pub fn wait_timeout_ms(&self) -> u64 {
         self.wait_timeout_ms
     }
 
-    pub(super) fn blocking_pool_size(&self) -> RedisPoolSize {
+    pub(crate) fn blocking_pool_size(&self) -> RedisPoolSize {
         self.blocking_pool_size
     }
 
-    pub(super) fn read_replica_strategy(&self) -> ReadReplicaStrategy {
+    pub fn read_replica_strategy(&self) -> ReadReplicaStrategy {
         self.read_replica_strategy
     }
 
-    pub(super) fn cache_locking_strategy(&self) -> CacheLockingStrategy {
+    pub fn cache_locking_strategy(&self) -> CacheLockingStrategy {
         self.cache_locking_strategy
     }
 }

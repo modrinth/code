@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::sync::Arc;
 
-use super::RedisTopology;
+use crate::RedisTopology;
 
 #[derive(Debug, Clone)]
 pub struct KeyBuilder {

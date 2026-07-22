@@ -1,8 +1,8 @@
-use crate::database::redis::RedisPool;
 use crate::queue::socket::ActiveSockets;
 use ariadne::ids::UserId;
 use ariadne::users::UserStatus;
 use redis::AsyncCommands;
+use xredis::RedisPool;
 
 const EXPIRY_TIME_SECONDS: i64 = 60;
 const USER_STATUS_NAMESPACE: &str = "user_status:v3";

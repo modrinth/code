@@ -3,8 +3,7 @@ use std::fmt::Debug;
 use redis::aio::ConnectionLike;
 use redis::{FromRedisValue, ToRedisArgs};
 
-use crate::database::models::DatabaseError;
-use crate::env::ENV;
+use crate::Error;
 
 use super::cache::CacheSettings;
 use super::util::cmd;
@@ -16,8 +15,8 @@ pub async fn set<C, D>(
     connection: &mut C,
     key: &str,
     data: D,
-    expiry: Option<i64>,
-) -> Result<(), DatabaseError>
+    expiry: i64,
+) -> Result<(), Error>
 where
     C: ConnectionLike,
     D: ToRedisArgs + Send + Sync + Debug,
@@ -26,7 +25,7 @@ where
         .arg(key)
         .arg(data)
         .arg("EX")
-        .arg(expiry.unwrap_or(ENV.REDIS_DEFAULT_EXPIRY))
+        .arg(expiry)
         .query_async::<()>(connection)
         .await?;
     Ok(())
@@ -39,19 +38,25 @@ pub async fn set_serialized<C, D>(
     data: D,
     expiry: Option<i64>,
     settings: &CacheSettings,
-) -> Result<(), DatabaseError>
+) -> Result<(), Error>
 where
     C: ConnectionLike,
     D: serde::Serialize,
 {
-    set(connection, key, settings.encode_value(&data)?, expiry).await
+    set(
+        connection,
+        key,
+        settings.encode_value(&data)?,
+        expiry.unwrap_or(settings.default_expiry),
+    )
+    .await
 }
 
 #[tracing::instrument(skip_all)]
 pub async fn get<C>(
     connection: &mut C,
     key: &str,
-) -> Result<Option<String>, DatabaseError>
+) -> Result<Option<String>, Error>
 where
     C: ConnectionLike,
 {
@@ -65,7 +70,7 @@ where
 pub async fn get_many<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<Vec<u8>>>, DatabaseError>
+) -> Result<Vec<Option<Vec<u8>>>, Error>
 where
     C: ConnectionLike,
 {
@@ -76,7 +81,7 @@ where
 pub async fn get_many_strings<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<String>>, DatabaseError>
+) -> Result<Vec<Option<String>>, Error>
 where
     C: ConnectionLike,
 {
@@ -86,7 +91,7 @@ where
 pub(super) async fn get_many_as<C, T>(
     connection: &mut C,
     keys: &[String],
-) -> Result<Vec<Option<T>>, DatabaseError>
+) -> Result<Vec<Option<T>>, Error>
 where
     C: ConnectionLike,
     T: FromRedisValue,
@@ -107,7 +112,7 @@ pub async fn get_deserialized<C, R>(
     connection: &mut C,
     key: &str,
     settings: &CacheSettings,
-) -> Result<Option<R>, DatabaseError>
+) -> Result<Option<R>, Error>
 where
     C: ConnectionLike,
     R: for<'a> serde::Deserialize<'a>,
@@ -122,7 +127,7 @@ pub async fn get_many_deserialized<C, R>(
     connection: &mut C,
     keys: &[String],
     settings: &CacheSettings,
-) -> Result<Vec<Option<R>>, DatabaseError>
+) -> Result<Vec<Option<R>>, Error>
 where
     C: ConnectionLike,
     R: for<'a> serde::Deserialize<'a>,
@@ -135,10 +140,7 @@ where
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn delete<C>(
-    connection: &mut C,
-    key: &str,
-) -> Result<(), DatabaseError>
+pub async fn delete<C>(connection: &mut C, key: &str) -> Result<(), Error>
 where
     C: ConnectionLike,
 {
@@ -150,7 +152,7 @@ where
 pub async fn delete_many<C>(
     connection: &mut C,
     keys: &[String],
-) -> Result<(), DatabaseError>
+) -> Result<(), Error>
 where
     C: ConnectionLike,
 {
@@ -165,7 +167,7 @@ pub async fn lpush<C, D>(
     connection: &mut C,
     key: &str,
     value: D,
-) -> Result<(), DatabaseError>
+) -> Result<(), Error>
 where
     C: ConnectionLike,
     D: ToRedisArgs + Send + Sync + Debug,
@@ -182,7 +184,7 @@ where
 pub async fn incr<C>(
     connection: &mut C,
     key: &str,
-) -> Result<Option<u64>, DatabaseError>
+) -> Result<Option<u64>, Error>
 where
     C: ConnectionLike,
 {

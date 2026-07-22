@@ -6,24 +6,21 @@ use dashmap::mapref::entry::Entry;
 use tokio::sync::Notify;
 use tokio::time::{Instant, timeout_at};
 
-use crate::database::models::DatabaseError;
+use crate::Error;
 
 #[derive(Clone)]
-pub(in crate::database::redis::cache) struct LockCoordinator {
+pub(in crate::cache) struct LockCoordinator {
     locks: Arc<DashMap<String, Arc<LockState>>>,
 }
 
 impl LockCoordinator {
-    pub(in crate::database::redis::cache) fn new() -> Self {
+    pub(in crate::cache) fn new() -> Self {
         Self {
             locks: Arc::new(DashMap::with_capacity(2048)),
         }
     }
 
-    pub(in crate::database::redis::cache) fn acquire(
-        &self,
-        key: String,
-    ) -> LockAcquisition {
+    pub(in crate::cache) fn acquire(&self, key: String) -> LockAcquisition {
         match self.locks.entry(key.clone()) {
             Entry::Occupied(entry) => LockAcquisition::Waiting(LockWaiter {
                 state: entry.get().clone(),
@@ -42,12 +39,12 @@ impl LockCoordinator {
     }
 }
 
-pub(in crate::database::redis::cache) enum LockAcquisition {
+pub(in crate::cache) enum LockAcquisition {
     Owned(OwnedLockGuard),
     Waiting(LockWaiter),
 }
 
-pub(in crate::database::redis::cache) struct OwnedLockGuard {
+pub(in crate::cache) struct OwnedLockGuard {
     locks: Arc<DashMap<String, Arc<LockState>>>,
     key: String,
     state: Arc<LockState>,
@@ -74,15 +71,15 @@ impl Drop for OwnedLockGuard {
     }
 }
 
-pub(in crate::database::redis::cache) struct LockWaiter {
+pub(in crate::cache) struct LockWaiter {
     state: Arc<LockState>,
 }
 
 impl LockWaiter {
-    pub(in crate::database::redis::cache) async fn wait(
+    pub(in crate::cache) async fn wait(
         self,
         deadline: Instant,
-    ) -> Result<(), DatabaseError> {
+    ) -> Result<(), Error> {
         loop {
             if self.state.released.load(Ordering::Acquire) {
                 return Ok(());
@@ -116,8 +113,8 @@ impl LockState {
     }
 }
 
-fn lock_timeout() -> DatabaseError {
-    DatabaseError::LocalCacheTimeout {
+fn lock_timeout() -> Error {
+    Error::LocalCacheTimeout {
         released: 0,
         total: 1,
     }

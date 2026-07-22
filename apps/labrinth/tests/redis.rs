@@ -16,19 +16,23 @@ use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE,
 };
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
-use labrinth::database::redis::{KeyBuilder, RedisPool, RedisTopology};
 use redis::cluster_routing::Slot;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::sync::{Barrier, Notify};
 use tokio::time::timeout;
 use uuid::Uuid;
+use xredis::{KeyBuilder, RedisPool, RedisTopology};
 
 pub mod common;
 
 async fn isolated_redis_pool(label: &str) -> RedisPool {
     labrinth::env::init().expect("failed to initialize test environment");
-    RedisPool::new(format!("redis_test_{label}_{}", Uuid::new_v4())).await
+    labrinth::database::redis::from_env(format!(
+        "redis_test_{label}_{}",
+        Uuid::new_v4()
+    ))
+    .await
 }
 
 fn clustered_key_builder(label: &str) -> KeyBuilder {

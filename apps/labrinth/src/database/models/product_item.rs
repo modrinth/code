@@ -1,13 +1,13 @@
 use crate::database::models::{
     DBProductId, DBProductPriceId, DatabaseError, product_item,
 };
-use crate::database::redis::RedisPool;
 use crate::models::billing::{Price, ProductMetadata};
 use dashmap::DashMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::convert::TryInto;
+use xredis::RedisPool;
 
 const PRODUCTS_NAMESPACE: &str = "products:v3";
 

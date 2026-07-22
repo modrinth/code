@@ -4,13 +4,13 @@ use std::hash::Hasher;
 use super::DatabaseError;
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const GAMES_LIST_NAMESPACE: &str = "games:v3";
 const LOADER_ID: &str = "loader_id:v3";
@@ -438,7 +438,7 @@ impl LoaderField {
                     })
                     .await?;
 
-                Ok(result)
+                Ok::<_, DatabaseError>(result)
             },
         ).await?;
 
@@ -645,7 +645,7 @@ impl LoaderFieldEnumValue {
                     })
                     .await?;
 
-                Ok(values)
+                Ok::<_, DatabaseError>(values)
             },
         ).await?;
 

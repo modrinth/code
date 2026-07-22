@@ -1,6 +1,6 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::{models::DatabaseError, redis::RedisPool};
+use crate::database::models::DatabaseError;
 use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
     NotificationType,
@@ -8,6 +8,7 @@ use crate::models::notifications::{
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications:v3";
 

@@ -10,6 +10,7 @@ use sha2::Sha256;
 use std::collections::HashSet;
 use tracing::{debug, info, warn};
 use uuid::Uuid;
+use xredis::RedisPool;
 
 use crate::{
     database::{
@@ -18,7 +19,6 @@ use crate::{
             DBCampaignDonationId, DBUser, DBUserId,
             generate_campaign_donation_id,
         },
-        redis::RedisPool,
     },
     env::ENV,
     models::payouts::TremendousForexResponse,

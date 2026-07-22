@@ -1,12 +1,10 @@
 use chrono::{DateTime, Utc};
 use futures::{StreamExt, TryStreamExt};
 use sqlx::types::Json;
+use xredis::RedisPool;
 
 use crate::{
-    database::{
-        models::{DBAnalyticsEventId, DatabaseError},
-        redis::RedisPool,
-    },
+    database::models::{DBAnalyticsEventId, DatabaseError},
     models::v3::analytics_event::AnalyticsEventMeta,
 };
 use serde::{Deserialize, Serialize};

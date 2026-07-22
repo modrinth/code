@@ -1,7 +1,7 @@
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationType;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const NOTIFICATION_TYPES_NAMESPACE: &str = "notification_types:v3";
 

@@ -1,10 +1,10 @@
 use super::ids::*;
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 const IMAGES_NAMESPACE: &str = "images:v3";
 
@@ -217,7 +217,7 @@ impl DBImage {
                     })
                     .await?;
 
-                Ok(images)
+                Ok::<_, DatabaseError>(images)
             },
         ).await?;
 

@@ -2,12 +2,10 @@ use eyre::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use validator::Validate;
+use xredis::RedisPool;
 
 use crate::{
-    database::{
-        models::{DBProjectId, DBVersionId},
-        redis::RedisPool,
-    },
+    database::models::{DBProjectId, DBVersionId},
     models::{
         exp::{
             component::{

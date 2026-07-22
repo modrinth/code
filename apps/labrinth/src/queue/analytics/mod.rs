@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::analytics::{
     AffiliateCodeClick, Download, MinecraftServerPlay, PageView, Playtime,
 };
@@ -8,6 +7,7 @@ use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 use dashmap::{DashMap, DashSet};
 use std::collections::HashMap;
 use tracing::trace;
+use xredis::RedisPool;
 
 pub mod cache;
 

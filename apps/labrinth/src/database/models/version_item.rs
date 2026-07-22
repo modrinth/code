@@ -5,9 +5,9 @@ use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::exp;
+use xredis::RedisPool;
 
 use crate::models::projects::{FileType, VersionStatus};
 use crate::queue::file_scan::scan_file;
@@ -947,7 +947,7 @@ impl DBVersion {
                     })
                     .await?;
 
-                Ok(res)
+                Ok::<_, DatabaseError>(res)
             },
         ).await?;
 
@@ -1038,7 +1038,7 @@ impl DBVersion {
                     })
                     .await?;
 
-                Ok(files)
+                Ok::<_, DatabaseError>(files)
             }
         ).await?;
 

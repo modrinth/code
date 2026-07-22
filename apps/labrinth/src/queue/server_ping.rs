@@ -1,6 +1,5 @@
 use crate::database::DBProject;
 use crate::database::models::DBProjectId;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
@@ -18,6 +17,7 @@ use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
 use tracing::{Instrument, info, info_span, trace, warn};
+use xredis::RedisPool;
 
 pub struct ServerPingQueue {
     pub db: PgPool,
