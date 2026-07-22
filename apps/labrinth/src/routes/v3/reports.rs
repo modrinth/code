@@ -24,7 +24,7 @@ use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::UserId;
-use ariadne::ids::base62_impl::parse_base62;
+use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::Utc;
 use serde::Deserialize;
 use validator::Validate;
@@ -108,6 +108,7 @@ pub async fn report_create(
         version_id: None,
         user_id: None,
         shared_instance_id: None,
+        shared_instance_version_id: None,
         body: new_report.body.clone(),
         reporter: current_user.id.into(),
         created: Utc::now(),
@@ -175,10 +176,27 @@ pub async fn report_create(
             report.user_id = Some(user_id.into())
         }
         ItemType::SharedInstance => {
-            let shared_instance_id = SharedInstanceId(parse_base62(
-                new_report.item_id.as_str(),
-            )? as i64);
+            // parsing
+            let (instance_part, version_part) = new_report
+                .item_id
+                .split_once('/')
+                .ok_or_else(|| {
+                    ApiError::InvalidInput(
+                        "Shared instance reports must format the item ID as `instance_id/version_id`"
+                            .to_string(),
+                    )
+                })?;
 
+            let shared_instance_id =
+                SharedInstanceId(parse_base62(instance_part)? as i64);
+            let shared_instance_version_id: i32 =
+                version_part.parse().map_err(|_| {
+                    ApiError::InvalidInput(format!(
+                        "Shared instance version is not a number: {version_part}"
+                    ))
+                })?;
+
+            // validation
             let url = format!(
                 "{}/v1/instances/{}",
                 ENV.SHARED_INSTANCES_URL, shared_instance_id.0
@@ -189,17 +207,30 @@ pub async fn report_create(
                 .send()
                 .await
                 .wrap_internal_err(
-                    "failed to reach the shared instance service",
+                    "failed to reach the shared instance service (instance lookup)",
                 )?;
 
             if !instance_response.status().is_success() {
                 return Err(ApiError::InvalidInput(format!(
-                    "Shared instance could not be found: {}",
-                    new_report.item_id
+                    "Shared instance could not be found: {instance_part}"
                 )));
             }
 
-            report.shared_instance_id = Some(shared_instance_id)
+            let version_response = HTTP_CLIENT
+                .get(&format!("{}/versions/{}", url, version_part))
+                .bearer_auth(&ENV.SHARED_INSTANCES_KEY)
+                .send()
+                .await
+                .wrap_internal_err("failed to reach the shared instance service (version lookup)")?;
+
+            if !version_response.status().is_success() {
+                return Err(ApiError::InvalidInput(format!(
+                    "Shared instance version could not be found: {instance_part}/{version_part}"
+                )));
+            }
+
+            report.shared_instance_id = Some(shared_instance_id);
+            report.shared_instance_version_id = Some(shared_instance_version_id)
         }
         ItemType::Unknown => {
             return Err(ApiError::InvalidInput(format!(
@@ -268,8 +299,12 @@ pub async fn report_create(
     Ok(HttpResponse::Ok().json(Report {
         id: id.into(),
         report_type: new_report.report_type.clone(),
-        item_id: new_report.item_id.clone(),
+        item_id: match report.shared_instance_id {
+            Some(shared_instance_id) => to_base62(shared_instance_id.0 as u64),
+            None => new_report.item_id.clone(),
+        },
         item_type: new_report.item_type.clone(),
+        shared_instance_version_id: report.shared_instance_version_id,
         reporter: current_user.id,
         body: new_report.body.clone(),
         created: Utc::now(),
