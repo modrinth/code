@@ -1,6 +1,11 @@
 mod content;
 pub use self::content::*;
 
+mod content_lock;
+pub(crate) use self::content_lock::{
+    InstanceContentGuard, InstanceContentLocks,
+};
+
 mod model;
 pub use self::model::*;
 
