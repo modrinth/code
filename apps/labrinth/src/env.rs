@@ -294,6 +294,10 @@ vars! {
     REDIS_WAIT_TIMEOUT_MS: u64 = 15000u64;
     REDIS_MAX_CONNECTIONS: u32 = 10000u32;
     REDIS_MIN_CONNECTIONS: usize = 0usize;
+    REDIS_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
+    REDIS_ACTUAL_EXPIRY: i64 = 60 * 30;
+    REDIS_VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
+    REDIS_VERSION_ACTUAL_EXPIRY: i64 = 60 * 30;
     REDIS_ENCODING_FORMAT: crate::database::redis::EncodingFormat = crate::database::redis::EncodingFormat::Json;
     REDIS_COMPRESSION_LEVEL: i32 = 0i32;
     REDIS_COMPRESSION_ALGORITHM: crate::database::redis::Codec = crate::database::redis::Codec::Lz4;
