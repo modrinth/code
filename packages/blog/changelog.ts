@@ -11,6 +11,27 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-22T21:33:46+00:00`,
+		product: 'app',
+		version: '0.15.19',
+		body: `## Added
+- Added project licensing info to project sidebar
+
+## Fixed
+- Fixed project updated date needing to wait for versions to load.
+- Fixed large error notifications going off-screen and being impossible to copy or close.`,
+	},
+	{
+		date: `2026-07-22T21:33:46+00:00`,
+		product: 'web',
+		body: `## Changed
+- Project license info is now prefetched on hover so it loads quicker.
+
+## Fixed
+- Fixed project updated date needing to wait for versions to load.
+- Fixed large error notifications going off-screen and being impossible to copy or close.`,
+	},
+	{
 		date: `2026-07-22T10:46:03+00:00`,
 		product: 'app',
 		version: '0.15.18',
