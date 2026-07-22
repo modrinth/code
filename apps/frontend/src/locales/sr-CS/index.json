@@ -1343,24 +1343,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Kreirano {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licencirano {license}"
-  },
-  "project.about.details.published": {
-    "message": "Objavljeno {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Poslato {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalji"
-  },
-  "project.about.details.updated": {
-    "message": "Ažurirano {date}"
-  },
   "project.actions.create-server": {
     "message": "Kreiraj server"
   },

@@ -3215,24 +3215,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Gemaakt op {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Gelicentieerd met {license}"
-  },
-  "project.about.details.published": {
-    "message": "Gepubliceerd op {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Ingediend op {date}"
-  },
-  "project.about.details.title": {
-    "message": "Details"
-  },
-  "project.about.details.updated": {
-    "message": "Bijgewerkt op {date}"
-  },
   "project.actions.create-server": {
     "message": "Creëer een server"
   },
@@ -3262,9 +3244,6 @@
   },
   "project.description.title": {
     "message": "Beschrijving"
-  },
-  "project.details.licensed": {
-    "message": "Gelicentieerd"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Deze spelversie is niet compatibel met het basisproject."
@@ -3409,15 +3388,6 @@
   },
   "project.gallery.title": {
     "message": "Gallerij"
-  },
-  "project.license.error": {
-    "message": "Licentie inhoud kon niet worden verkregen."
-  },
-  "project.license.loading": {
-    "message": "Licentietekst aan het laden..."
-  },
-  "project.license.title": {
-    "message": "Licentie"
   },
   "project.moderation.admonition.approved.body.unlisted": {
     "message": "Jouw project is verborgen. Dit betekend dat het alleen beschikbaar is via een directe link en niet vindbaar is op Modrinth."

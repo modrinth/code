@@ -2882,24 +2882,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Skapad {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licensierat {license}"
-  },
-  "project.about.details.published": {
-    "message": "Skapades {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Inskickad {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaljer"
-  },
-  "project.about.details.updated": {
-    "message": "Uppdaterad {date}"
-  },
   "project.actions.create-server": {
     "message": "Skapa en server"
   },
@@ -2929,9 +2911,6 @@
   },
   "project.description.title": {
     "message": "Beskrivning"
-  },
-  "project.details.licensed": {
-    "message": "Licensierad"
   },
   "project.download.dependency-download-file": {
     "message": "Ladda ner {filename}"
@@ -3004,15 +2983,6 @@
   },
   "project.gallery.title": {
     "message": "Galleri"
-  },
-  "project.license.error": {
-    "message": "Licenstext kunde inte hämtas."
-  },
-  "project.license.loading": {
-    "message": "Laddar licenstext..."
-  },
-  "project.license.title": {
-    "message": "Licens"
   },
   "project.moderation.admonition.under-review.header": {
     "message": "Projekt under granskning"
