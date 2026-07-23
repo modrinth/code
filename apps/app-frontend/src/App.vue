@@ -104,7 +104,12 @@ import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
-import { get as getInstance, list, run } from '@/helpers/instance'
+import {
+	can_current_user_use_shared_instances,
+	get as getInstance,
+	list,
+	run,
+} from '@/helpers/instance'
 import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -225,6 +230,16 @@ const { data: authenticatedModrinthUser } = useQuery({
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
 	enabled: () => !!credentials.value?.session,
 	retry: false,
+})
+useQuery({
+	queryKey: computed(() => ['shared-instance-eligibility', credentials.value?.user?.id]),
+	queryFn: can_current_user_use_shared_instances,
+	enabled: () => !!credentials.value?.session && !!credentials.value?.user?.id,
+	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: false,
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
 })
 const hasPlus = computed(
 	() =>

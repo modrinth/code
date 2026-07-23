@@ -414,22 +414,18 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
-const {
-	data: canCurrentUserUseSharedInstances,
-	isError: sharedInstanceEligibilityError,
-	isFetching: sharedInstanceEligibilityFetching,
-} = useQuery({
+const { data: canCurrentUserUseSharedInstances } = useQuery({
 	queryKey: computed(() => ['shared-instance-eligibility', auth.user.value?.id]),
 	queryFn: can_current_user_use_shared_instances,
 	enabled: () => !!auth.session_token.value && !!auth.user.value?.id,
 	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: 'always',
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
 })
 const currentUserCanUseSharedInstances = computed(
-	() =>
-		!auth.session_token.value ||
-		(!sharedInstanceEligibilityError.value &&
-			!sharedInstanceEligibilityFetching.value &&
-			canCurrentUserUseSharedInstances.value === true),
+	() => !auth.session_token.value || canCurrentUserUseSharedInstances.value !== false,
 )
 const showShareTab = computed(() => {
 	const linkType = instance.value?.link?.type
