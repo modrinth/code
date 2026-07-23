@@ -216,7 +216,6 @@ async function fetchScan(id: string) {
 
 	rows.value[id].isScanning = true
 	try {
-		if (Math.random() < 0.25) throw new Error('test error')
 		const scan = await client.labrinth.attribution_internal.scanFile(id)
 
 		rows.value[id].scan = scan
