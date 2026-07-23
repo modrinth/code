@@ -3905,6 +3905,21 @@
   "project.settings.permissions.completed.title": {
     "message": "Permissions completed!"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Delete all groups"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "This will permanently delete all {count, plural, one {# attribution group} other {# attribution groups}} for this project and all files inside them. This action cannot be undone."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Delete all attribution groups?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Could not delete all attribution groups"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "All attribution groups were deleted."
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "None of your project's versions contain external content, so you don't need to worry about obtaining permissions."
   },
