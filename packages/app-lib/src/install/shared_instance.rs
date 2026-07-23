@@ -9,7 +9,7 @@ use super::runner::{
 };
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES, is_excluded_config_path,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
     read_bounded_config_bundle_entry,
 };
 use crate::api::pack::install_from::CreatePackLocation;
@@ -983,9 +983,6 @@ fn read_config_bundle(bytes: &[u8]) -> crate::Result<Vec<(PathBuf, Vec<u8>)>> {
                     .to_string(),
             )
         })?;
-        if is_excluded_config_path(&path) {
-            continue;
-        }
         if !is_supported_config_file(&path) {
             return Err(crate::ErrorKind::InputError(format!(
                 "Shared instance config bundle contains unsupported file {}",

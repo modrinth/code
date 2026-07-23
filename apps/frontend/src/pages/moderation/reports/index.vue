@@ -204,6 +204,7 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	FloatingPanel,
+	injectModrinthClient,
 	MultiSelect,
 	type MultiSelectItem,
 	Pagination,
@@ -221,6 +222,7 @@ const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
 const auth = await useAuth()
+const client = injectModrinthClient()
 
 const { data: allReports } = await useLazyAsyncData('new-moderation-reports', async () => {
 	const startTime = performance.now()
@@ -242,7 +244,7 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 			break
 		}
 
-		const enrichmentPromise = enrichReportBatch(reports)
+		const enrichmentPromise = enrichReportBatch(reports, client)
 		enrichmentPromises.push(enrichmentPromise)
 
 		// this is explicitly not the length of the reports array, because the API may return fewer reports due to a report in the middle not being

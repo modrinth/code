@@ -74,6 +74,11 @@ pub(super) struct CreateInstanceInviteResponse {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+pub(super) struct BlacklistStatusResponse {
+    pub(super) blacklisted: bool,
+}
+
+#[derive(Clone, Debug, Deserialize)]
 pub(super) struct InstanceInviteInfoResponse {
     pub(super) instance_id: String,
     pub(super) instance_name: String,
@@ -151,6 +156,20 @@ pub(super) async fn create_remote_instance(
         Method::POST,
         "/instances",
         Some(json!({ "name": name })),
+        state,
+    )
+    .await
+}
+
+pub(super) async fn get_user_blacklist_status(
+    user_id: &str,
+    state: &State,
+) -> crate::Result<BlacklistStatusResponse> {
+    request_json(
+        "get_user_blacklist_status",
+        Method::GET,
+        &format!("/blacklist/{user_id}"),
+        None,
         state,
     )
     .await

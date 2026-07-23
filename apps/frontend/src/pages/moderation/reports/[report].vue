@@ -13,7 +13,7 @@ const { data: report } = useQuery({
 	queryFn: async () => {
 		try {
 			const report = await client.labrinth.reports_v3.get(reportId)
-			const enrichedReport = (await enrichReportBatch([report]))[0]
+			const enrichedReport = (await enrichReportBatch([report], client))[0]
 			return enrichedReport
 		} catch (error) {
 			console.error('Error fetching report:', error)

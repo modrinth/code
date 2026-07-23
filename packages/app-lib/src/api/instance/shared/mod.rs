@@ -47,12 +47,6 @@ pub(crate) const CONFIG_FILE_EXTENSIONS: [&str; 13] = [
     "xml",
 ];
 
-pub(crate) fn is_excluded_config_path(path: &std::path::Path) -> bool {
-    EXCLUDED_CONFIG_FOLDERS
-        .iter()
-        .any(|folder| path.starts_with(folder))
-}
-
 pub(crate) fn read_bounded_config_bundle_entry(
     reader: impl Read,
     declared_size: u64,
@@ -101,13 +95,11 @@ pub(crate) fn read_bounded_config_bundle_entry(
 
 mod client;
 mod diff;
-mod excluded_configs;
 mod install;
 mod invites;
 mod publish;
 mod types;
 
-pub(crate) use self::excluded_configs::EXCLUDED_CONFIG_FOLDERS;
 pub(crate) use self::install::check_shared_instance_availability_before_launch;
 pub(crate) use self::publish::sync_shared_instance_icon;
 
@@ -132,3 +124,17 @@ pub use self::types::{
     SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
     SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };
+
+pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {
+    let state = State::get().await?;
+    let Some(credentials) =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+    else {
+        return Ok(true);
+    };
+
+    let status =
+        client::get_user_blacklist_status(&credentials.user_id, &state).await?;
+    Ok(!status.blacklisted)
+}

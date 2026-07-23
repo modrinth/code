@@ -130,7 +130,7 @@
 							</span>
 							<CopyCode v-if="report.item_type === 'shared-instance'" :text="report.item_id" />
 							<span
-								v-if="report.item_type === 'shared-instance' && sharedInstanceDetails?.quarantine"
+								v-if="report.item_type === 'shared-instance' && sharedInstanceQuarantined"
 								class="bg-orange-highlight inline-flex items-center gap-1 rounded-full border border-solid border-orange px-2.5 py-1 text-sm font-semibold text-orange"
 							>
 								<LockIcon class="size-4" />
@@ -281,6 +281,7 @@ import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
 import SharedInstanceReportContext, {
+	type SharedInstanceOwnerInstance,
 	type SharedInstanceReportDetails,
 	type SharedInstanceReportUser,
 } from './SharedInstanceReportContext.vue'
@@ -289,17 +290,13 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = await useAuth()
 
-type ExtendedReportWithSharedInstance = ExtendedReport & {
-	shared_instance?: SharedInstanceReportDetails
-}
-
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
 	version_id?: string
 }
 
 const props = defineProps<{
-	report: ExtendedReportWithSharedInstance
+	report: ExtendedReport
 	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
 	sharedInstanceVersionContentLoader?: (
 		instanceId: string,
@@ -312,9 +309,7 @@ const reportThread = ref<{
 	sendReply: (privateMessage?: boolean) => Promise<void>
 } | null>(null)
 const isThreadCollapsed = ref(true)
-const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(
-	props.report.shared_instance ?? null,
-)
+const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(null)
 const sharedInstanceLoading = ref(false)
 const sharedInstanceError = ref<string | null>(null)
 const sharedInstanceBanPending = ref(false)
@@ -329,6 +324,10 @@ const didCloseReport = ref(false)
 const reportClosed = computed(() => {
 	return didCloseReport.value || props.report.closed
 })
+const sharedInstanceQuarantined = computed(
+	() =>
+		sharedInstanceDetails.value?.quarantine ?? props.report.shared_instance?.quarantine ?? false,
+)
 
 const threadWithReportBody = computed(() => {
 	if (!props.report.thread) return null
@@ -435,28 +434,47 @@ function updateThread(newThread: any) {
 async function getSharedInstanceVersion(
 	instanceId: string,
 	versionNumber: number,
-	useLatestFallback = false,
-): Promise<SharedInstances.Instances.v1.InstanceVersion | undefined> {
+): Promise<SharedInstances.Instances.v1.InstanceVersion> {
 	const cacheKey = `${instanceId}:${versionNumber}`
 	const cachedVersion = sharedInstanceVersions.get(cacheKey)
 	if (cachedVersion) return cachedVersion
 
-	let instanceVersion
-	try {
-		instanceVersion = await client.sharedinstances.instances_v1.getVersion(
-			instanceId,
-			versionNumber,
-		)
-	} catch (error) {
-		if (!useLatestFallback) throw error
-
-		const latestVersion = await client.sharedinstances.instances_v1.getLatestVersion(instanceId)
-		if (!latestVersion || latestVersion.version !== versionNumber) throw error
-		instanceVersion = latestVersion
-	}
-
-	if (instanceVersion) sharedInstanceVersions.set(cacheKey, instanceVersion)
+	const instanceVersion = await client.sharedinstances.instances_v1.getVersion(
+		instanceId,
+		versionNumber,
+	)
+	sharedInstanceVersions.set(cacheKey, instanceVersion)
 	return instanceVersion
+}
+
+async function getOtherSharedInstances(ownerId: string): Promise<SharedInstanceOwnerInstance[]> {
+	const instanceIds = await client.sharedinstances.instances_v1.getForUser(ownerId)
+	const otherInstanceIds = [...new Set(instanceIds)].filter(
+		(instanceId) => instanceId !== props.report.item_id,
+	)
+	const results = await Promise.allSettled(
+		otherInstanceIds.map(async (instanceId) => {
+			const [instance, instanceUsers, latestVersion] = await Promise.all([
+				client.sharedinstances.instances_v1.get(instanceId),
+				client.sharedinstances.instances_v1.getUsers(instanceId),
+				client.sharedinstances.instances_v1.getLatestVersion(instanceId),
+			])
+			sharedInstanceVersions.set(`${instanceId}:${latestVersion.version}`, latestVersion)
+
+			return {
+				id: instanceId,
+				name: instance.name,
+				icon_url: instance.icon,
+				latest_version: latestVersion.version,
+				member_count: instanceUsers.users.length,
+				quarantine: instance.quarantine,
+			}
+		}),
+	)
+
+	return results
+		.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
+		.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 async function loadSharedInstanceDetails() {
@@ -474,7 +492,8 @@ async function loadSharedInstanceDetails() {
 			}
 
 			const [instance, instanceUsers] = await Promise.all([
-				client.sharedinstances.instances_v1.get(props.report.item_id),
+				props.report.shared_instance ??
+					client.sharedinstances.instances_v1.get(props.report.item_id),
 				client.sharedinstances.instances_v1.getUsers(props.report.item_id),
 			])
 			const userIds = [...new Set(instanceUsers.users.map((user) => user.id))]
@@ -504,26 +523,31 @@ async function loadSharedInstanceDetails() {
 			const versionNumbers = reportedVersion
 				? Array.from({ length: reportedVersion }, (_, index) => reportedVersion - index)
 				: []
-			const versionDetails = await Promise.all(
-				versionNumbers.map(async (versionNumber) => {
-					try {
-						const version = await getSharedInstanceVersion(props.report.item_id, versionNumber)
-						return {
-							version: version?.version ?? versionNumber,
-							game_version: version?.game_version,
-							loader: version?.loader,
-							loader_version: version?.loader_version,
+			const [versionDetails, otherInstancesResult] = await Promise.all([
+				Promise.all(
+					versionNumbers.map(async (versionNumber) => {
+						try {
+							const version = await getSharedInstanceVersion(props.report.item_id, versionNumber)
+							return {
+								version: version.version,
+								game_version: version.game_version,
+								loader: version.loader,
+								loader_version: version.loader_version,
+							}
+						} catch {
+							return { version: versionNumber }
 						}
-					} catch {
-						return { version: versionNumber }
-					}
-				}),
-			)
+					}),
+				),
+				getOtherSharedInstances(ownerMembership.id)
+					.then((instances) => ({ instances, loaded: true }))
+					.catch(() => ({ instances: [], loaded: false })),
+			])
 
 			sharedInstanceDetails.value = {
 				id: props.report.item_id,
-				name: 'Shared instance',
-				icon_url: null,
+				name: instance.name,
+				icon_url: instance.icon,
 				quarantine: instance.quarantine,
 				owner: toReportUser(ownerMembership),
 				members: instanceUsers.users
@@ -531,8 +555,8 @@ async function loadSharedInstanceDetails() {
 					.map(toReportUser),
 				reported_version: versionDetails[0],
 				previous_versions: versionDetails.slice(1),
-				other_instances: [],
-				other_instances_loaded: false,
+				other_instances: otherInstancesResult.instances,
+				other_instances_loaded: otherInstancesResult.loaded,
 			}
 		} catch (error) {
 			sharedInstanceError.value = getErrorMessage(error, 'Failed to load shared instance details.')
@@ -554,8 +578,7 @@ async function loadSharedInstanceVersionContent(
 		return props.sharedInstanceVersionContentLoader(instanceId, versionNumber)
 	}
 
-	const instanceVersion = await getSharedInstanceVersion(instanceId, versionNumber, true)
-	if (!instanceVersion) return []
+	const instanceVersion = await getSharedInstanceVersion(instanceId, versionNumber)
 
 	const modpackVersionId = instanceVersion.modpack_id
 	const directVersionIds = (instanceVersion.modrinth_ids ?? []).filter(
@@ -709,7 +732,7 @@ const reportItemAvatarUrl = computed(() => {
 		case 'user':
 			return props.report.user?.avatar_url || ''
 		case 'shared-instance':
-			return sharedInstanceDetails.value?.icon_url || ''
+			return sharedInstanceDetails.value?.icon_url || props.report.shared_instance?.icon || ''
 		default:
 			return undefined
 	}
@@ -718,7 +741,9 @@ const reportItemAvatarUrl = computed(() => {
 const reportItemTitle = computed(() => {
 	if (props.report.item_type === 'user') return props.report.user?.username || 'Unknown User'
 	if (props.report.item_type === 'shared-instance') {
-		return sharedInstanceDetails.value?.name || 'Shared instance'
+		return (
+			sharedInstanceDetails.value?.name || props.report.shared_instance?.name || 'Shared instance'
+		)
 	}
 
 	return props.report.project?.title || 'Unknown Project'

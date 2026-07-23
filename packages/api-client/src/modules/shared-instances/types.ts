@@ -37,6 +37,8 @@ export namespace SharedInstances {
 	export namespace Instances {
 		export namespace v1 {
 			export type Instance = {
+				name: string
+				icon: string | null
 				quarantine: boolean
 			}
 
@@ -84,6 +86,14 @@ export namespace SharedInstances {
 		export namespace v1 {
 			export type BlacklistUserRequest = {
 				user_ids: string[]
+			}
+		}
+	}
+
+	export namespace Users {
+		export namespace v1 {
+			export type BlacklistStatus = {
+				blacklisted: boolean
 			}
 		}
 	}

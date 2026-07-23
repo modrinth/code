@@ -3,7 +3,7 @@ use super::diff::*;
 use super::install::*;
 use super::types::*;
 use super::*;
-use async_walkdir::{Filtering, WalkDir};
+use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use futures::StreamExt;
 use std::collections::BTreeMap;
@@ -722,21 +722,7 @@ pub(super) async fn collect_config_files(
     let config_path = instance_path.join(CONFIG_DIRECTORY);
     crate::util::io::create_dir_all(&config_path).await?;
     let mut files = Vec::new();
-    let filter_root = config_path.clone();
-    let mut walker = WalkDir::new(&config_path).filter(move |entry| {
-        let filter_root = filter_root.clone();
-        async move {
-            let excluded = entry
-                .path()
-                .strip_prefix(&filter_root)
-                .is_ok_and(is_excluded_config_path);
-            if excluded {
-                Filtering::IgnoreDir
-            } else {
-                Filtering::Continue
-            }
-        }
-    });
+    let mut walker = WalkDir::new(&config_path);
 
     while let Some(entry) = walker.next().await {
         let entry = entry.map_err(|error| {
@@ -752,9 +738,6 @@ pub(super) async fn collect_config_files(
 
         let entry_path = entry.path();
         let relative_path = entry_path.strip_prefix(&config_path)?;
-        if is_excluded_config_path(relative_path) {
-            continue;
-        }
         let path = relative_path.to_string_lossy().replace('\\', "/");
         files.push(ConfigFile { path });
     }
@@ -930,9 +913,6 @@ fn read_config_bundle(
                     .to_string(),
             )
         })?;
-        if is_excluded_config_path(&path) {
-            continue;
-        }
         if !is_supported_config_file(&path) {
             return Err(crate::ErrorKind::InputError(format!(
                 "Shared instance config bundle contains unsupported file {}",

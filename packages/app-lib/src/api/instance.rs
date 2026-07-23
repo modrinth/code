@@ -37,7 +37,7 @@ pub use self::run::{
 };
 pub(crate) use self::shared::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_EXTENSIONS,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES, is_excluded_config_path,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
     read_bounded_config_bundle_entry,
 };
 pub use self::shared::{
@@ -48,7 +48,8 @@ pub use self::shared::{
     SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
     accept_pending_shared_instance_invite,
     accept_shared_instance_invite_for_install,
-    create_shared_instance_invite_link, decline_pending_shared_instance_invite,
+    can_active_user_use_shared_instances, create_shared_instance_invite_link,
+    decline_pending_shared_instance_invite,
     get_shared_instance_install_preview, get_shared_instance_publish_preview,
     get_shared_instance_update_preview, get_shared_instance_users,
     install_shared_instance, invite_shared_instance_users,

@@ -26,5 +26,4 @@ export type SharedInstanceInvite = {
 export type SharedInstanceInviteHandler = {
 	handleNotification(notification: AppNotification): Promise<boolean>
 	installFromInviteId(inviteId: string): Promise<void>
-	showManualInviteLinkModal(event?: MouseEvent): void
 }

@@ -16,7 +16,6 @@ import {
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
-	LinkIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
@@ -1603,12 +1602,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:disabled="offline"
 			>
 				<PlusIcon />
-			</NavButton>
-			<NavButton
-				v-tooltip.right="'Install from invite link'"
-				:to="(event) => sharedInstanceInviteHandler?.showManualInviteLinkModal(event)"
-			>
-				<LinkIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
 			<NavButton

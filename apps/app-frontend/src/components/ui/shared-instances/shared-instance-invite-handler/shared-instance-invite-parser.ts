@@ -27,16 +27,3 @@ export function parseSharedInstanceInviteNotification(
 		instanceIconUrl: optionalString(body.instance_icon_url),
 	}
 }
-
-export function parseSharedInstanceInviteLink(value: string) {
-	const trimmedValue = value.trim()
-	if (!trimmedValue) return null
-
-	try {
-		const url = new URL(trimmedValue)
-		const match = /^\/share\/([^/]+)\/?$/.exec(url.pathname)
-		return match ? decodeURIComponent(match[1]) : null
-	} catch {
-		return null
-	}
-}

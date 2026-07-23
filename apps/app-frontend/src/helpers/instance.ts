@@ -365,6 +365,10 @@ export interface SharedInstanceInviteLink {
 	maxUses: number
 }
 
+export async function can_current_user_use_shared_instances(): Promise<boolean> {
+	return await invoke('plugin:instance|instance_share_can_current_user_use')
+}
+
 export async function get_shared_instance_users(instanceId: string): Promise<SharedInstanceUsers> {
 	return await invoke('plugin:instance|instance_share_get_users', { instanceId })
 }

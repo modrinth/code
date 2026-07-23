@@ -16,12 +16,14 @@ import {
 	ButtonStyled,
 	ConfirmLeaveModal,
 	type ContentItem,
+	injectModrinthClient,
 	ModpackContentModal,
 	Table,
 	type TableColumn,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 export interface SharedInstanceReportUser {
@@ -76,6 +78,7 @@ const emit = defineEmits<{
 
 const contentModal = ref<InstanceType<typeof ModpackContentModal> | null>(null)
 const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
+const client = injectModrinthClient()
 const contentByVersion = new Map<string, ContentItem[]>()
 const contentInstance = ref<Pick<SharedInstanceOwnerInstance, 'id' | 'name' | 'icon_url'>>({
 	id: props.details.id,
@@ -127,6 +130,24 @@ const allVersions = computed(() => [
 	...(props.details.reported_version ? [props.details.reported_version] : []),
 	...props.details.previous_versions,
 ])
+const { data: ownerBlacklistStatus, isFetching: ownerBlacklistStatusFetching } = useQuery({
+	queryKey: computed(() => ['shared-instance-blacklist', 'v1', props.details.owner.id]),
+	queryFn: () => client.sharedinstances.users_v1.getBlacklistStatus(props.details.owner.id),
+	retry: false,
+})
+const banDisabled = computed(
+	() =>
+		!!props.banPending ||
+		props.details.quarantine ||
+		ownerBlacklistStatusFetching.value ||
+		ownerBlacklistStatus.value?.blacklisted === true,
+)
+const banButtonLabel = computed(() => {
+	if (props.banPending) return 'Banning owner…'
+	if (ownerBlacklistStatus.value?.blacklisted) return 'Owner already banned'
+	if (props.details.quarantine) return 'Instance already quarantined'
+	return 'Ban from shared instances'
+})
 const memberRows = computed<MemberTableRow[]>(() =>
 	[props.details.owner, ...props.details.members].map((user) => ({
 		id: user.id,
@@ -139,7 +160,7 @@ const memberRows = computed<MemberTableRow[]>(() =>
 )
 
 async function promptBanOwner() {
-	if (props.banPending || !(await banModal.value?.prompt())) return
+	if (banDisabled.value || !(await banModal.value?.prompt())) return
 	emit('banOwner', props.details.owner)
 }
 
@@ -370,9 +391,9 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 					</span>
 				</div>
 				<ButtonStyled color="red">
-					<button :disabled="banPending" class="w-full gap-2 sm:w-auto" @click="promptBanOwner">
+					<button :disabled="banDisabled" class="w-full gap-2 sm:w-auto" @click="promptBanOwner">
 						<BanIcon class="size-4" />
-						{{ banPending ? 'Banning owner…' : 'Ban from shared instances' }}
+						{{ banButtonLabel }}
 					</button>
 				</ButtonStyled>
 			</footer>

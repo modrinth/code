@@ -134,8 +134,8 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectNotificationManager, NavTabs, useLoadingBarToken } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { injectAuth, injectNotificationManager, NavTabs, useLoadingBarToken } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -167,7 +167,14 @@ import {
 	isSharedInstanceUnavailableError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
-import { get, get_full_path, kill, remove, run } from '@/helpers/instance'
+import {
+	can_current_user_use_shared_instances,
+	get,
+	get_full_path,
+	kill,
+	remove,
+	run,
+} from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
@@ -184,6 +191,7 @@ dayjs.extend(relativeTime)
 
 const { addNotification, handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
+const auth = injectAuth()
 const queryClient = useQueryClient()
 const route = useRoute()
 
@@ -406,10 +414,28 @@ const isFixedRender = computed(() => renderMode.value === 'fixed')
 const contentSubpageProps = computed(() =>
 	isContentSubpageRoute() ? { preloadedContent: preloadedContent.value } : {},
 )
+const {
+	data: canCurrentUserUseSharedInstances,
+	isError: sharedInstanceEligibilityError,
+	isFetching: sharedInstanceEligibilityFetching,
+} = useQuery({
+	queryKey: computed(() => ['shared-instance-eligibility', auth.user.value?.id]),
+	queryFn: can_current_user_use_shared_instances,
+	enabled: () => !!auth.session_token.value && !!auth.user.value?.id,
+	retry: false,
+})
+const currentUserCanUseSharedInstances = computed(
+	() =>
+		!auth.session_token.value ||
+		(!sharedInstanceEligibilityError.value &&
+			!sharedInstanceEligibilityFetching.value &&
+			canCurrentUserUseSharedInstances.value === true),
+)
 const showShareTab = computed(() => {
 	const linkType = instance.value?.link?.type
 
 	return (
+		currentUserCanUseSharedInstances.value &&
 		!instance.value?.quarantined &&
 		instance.value?.shared_instance?.role !== 'member' &&
 		linkType !== 'server_project' &&

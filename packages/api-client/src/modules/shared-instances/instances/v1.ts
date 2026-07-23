@@ -17,6 +17,15 @@ export class SharedInstancesInstancesV1Module extends AbstractModule {
 		)
 	}
 
+	public async getForUser(userId: string): Promise<string[]> {
+		return this.client.request<string[]>('/instances', {
+			api: 'sharedinstances',
+			version: 1,
+			method: 'GET',
+			params: { user: userId },
+		})
+	}
+
 	public async getUsers(instanceId: string): Promise<SharedInstances.Instances.v1.InstanceUsers> {
 		return this.client.request<SharedInstances.Instances.v1.InstanceUsers>(
 			`/instances/${encodeURIComponent(instanceId)}/users`,

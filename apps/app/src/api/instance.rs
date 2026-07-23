@@ -52,6 +52,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_kill,
             instance_edit,
             instance_edit_icon,
+            instance_share_can_current_user_use,
             instance_share_get_users,
             instance_share_invite_users,
             instance_share_create_invite_link,
@@ -783,6 +784,11 @@ pub async fn instance_edit_icon(
 ) -> Result<()> {
     theseus::instance::edit_icon(instance_id, icon_path).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_can_current_user_use() -> Result<bool> {
+    Ok(theseus::instance::can_active_user_use_shared_instances().await?)
 }
 
 #[tauri::command]
