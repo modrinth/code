@@ -113,7 +113,7 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
 pub async fn parse_command(
     command_string: &str,
 ) -> crate::Result<CommandPayload> {
-    tracing::debug!("Parsing command: {}", &command_string);
+    tracing::debug!("Parsing external command");
 
     // modrinth://some-command
     // This occurs when following a web redirect link

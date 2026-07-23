@@ -58,7 +58,7 @@ pub async fn get_shared_instance_install_preview(
     .await
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(invite_id))]
 pub async fn accept_shared_instance_invite_for_install(
     invite_id: &str,
 ) -> crate::Result<SharedInstanceInviteInstallPreview> {

@@ -154,14 +154,19 @@ pub(super) async fn delete_remote_instance(
     shared_instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    request_empty(
-        "delete_instance",
-        Method::DELETE,
-        &format!("/instances/{shared_instance_id}"),
-        None,
-        state,
-    )
-    .await
+    let operation = "delete_instance";
+    let method = Method::DELETE;
+    let path = format!("/instances/{shared_instance_id}");
+    let response =
+        send_request(operation, method.clone(), &path, None, state).await?;
+
+    if response.status().is_success()
+        || matches!(response.status(), StatusCode::NOT_FOUND | StatusCode::GONE)
+    {
+        return Ok(());
+    }
+
+    shared_instances_request_error(operation, method, &path, response).await
 }
 
 pub(super) async fn update_remote_instance(
@@ -401,13 +406,15 @@ pub(super) async fn accept_shared_instance_invite(
     state: &State,
 ) -> crate::Result<()> {
     let path = format!("/instances/{shared_instance_id}/invites/{invite_id}");
+    let log_path = "/instances/:instance_id/invites/:invite_id";
     let operation = "accept_instance_invite";
     let method = Method::POST;
 
-    let response = send_request_with_auth(
+    let response = send_request_with_auth_and_log_path(
         operation,
         method.clone(),
         &path,
+        log_path,
         None,
         state,
         SharedInstancesRequestAuth::ModrinthSession,
@@ -419,7 +426,11 @@ pub(super) async fn accept_shared_instance_invite(
 
     let status = response.status();
     let request_id = response_request_id(&response);
-    let body = response.text().await.unwrap_or_default();
+    let body = response
+        .text()
+        .await
+        .map_err(reqwest::Error::without_url)
+        .unwrap_or_default();
     if status == StatusCode::BAD_REQUEST && body.contains("already has access")
     {
         return Ok(());
@@ -428,15 +439,32 @@ pub(super) async fn accept_shared_instance_invite(
     tracing::warn!(
         operation,
         method = method.as_str(),
-        path,
+        path = log_path,
         status = status.as_u16(),
         request_id = request_id.as_deref().unwrap_or("none"),
         "Shared instances API request failed"
     );
     Err(crate::ErrorKind::OtherError(format!(
-        "Shared instances API request {operation} {method} {path} failed with status {status}"
-    ))
-    .into())
+		"Shared instances API request {operation} {method} {log_path} failed with status {status}"
+	))
+	.into())
+}
+
+pub(super) async fn delete_remote_invite(
+    shared_instance_id: &str,
+    invite_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let path = format!("/instances/{shared_instance_id}/invites/{invite_id}");
+    request_empty_with_log_path(
+        "delete_instance_invite",
+        Method::DELETE,
+        &path,
+        "/instances/:instance_id/invites/:invite_id",
+        None,
+        state,
+    )
+    .await
 }
 
 pub(super) async fn get_shared_instance_invite_info(
@@ -446,10 +474,12 @@ pub(super) async fn get_shared_instance_invite_info(
     let operation = "get_instance_invite";
     let method = Method::GET;
     let path = format!("/invites/{invite_id}");
-    let response = send_request_with_auth(
+    let log_path = "/invites/:invite_id";
+    let response = send_request_with_auth_and_log_path(
         operation,
         method.clone(),
         &path,
+        log_path,
         None,
         state,
         SharedInstancesRequestAuth::None,
@@ -457,12 +487,15 @@ pub(super) async fn get_shared_instance_invite_info(
     .await?;
     if !response.status().is_success() {
         return shared_instances_request_error(
-            operation, method, &path, response,
+            operation, method, log_path, response,
         )
         .await;
     }
 
-    decode_json_response(operation, method, &path, response).await
+    decode_json_response_with_log_path(
+        operation, method, log_path, response, true,
+    )
+    .await
 }
 
 pub(super) async fn decline_pending_remote_invite(
@@ -604,26 +637,46 @@ pub(super) async fn decode_json_response<T>(
 where
     T: DeserializeOwned,
 {
+    decode_json_response_with_log_path(operation, method, path, response, false)
+        .await
+}
+
+async fn decode_json_response_with_log_path<T>(
+    operation: &'static str,
+    method: Method,
+    log_path: &str,
+    response: reqwest::Response,
+    strip_response_url: bool,
+) -> crate::Result<T>
+where
+    T: DeserializeOwned,
+{
     let status = response.status();
     let request_id = response_request_id(&response);
-    let body = response.text().await?;
+    let body = match response.text().await {
+        Ok(body) => body,
+        Err(error) if strip_response_url => {
+            return Err(error.without_url().into());
+        }
+        Err(error) => return Err(error.into()),
+    };
     serde_json::from_str::<T>(&body).map_err(|error| {
-        tracing::warn!(
-            operation,
-            method = method.as_str(),
-            path,
-            status = status.as_u16(),
-            request_id = request_id.as_deref().unwrap_or("none"),
-            error_category = ?error.classify(),
+		tracing::warn!(
+			operation,
+			method = method.as_str(),
+			path = log_path,
+			status = status.as_u16(),
+			request_id = request_id.as_deref().unwrap_or("none"),
+			error_category = ?error.classify(),
             error_line = error.line(),
             error_column = error.column(),
             "Shared instances API returned an invalid JSON response"
-        );
-        crate::ErrorKind::OtherError(format!(
-            "Shared instances API request {operation} {method} {path} returned invalid JSON with status {status}"
-        ))
-        .into()
-    })
+		);
+		crate::ErrorKind::OtherError(format!(
+			"Shared instances API request {operation} {method} {log_path} returned invalid JSON with status {status}"
+		))
+		.into()
+	})
 }
 
 pub(super) async fn request_empty(
@@ -635,6 +688,31 @@ pub(super) async fn request_empty(
 ) -> crate::Result<()> {
     request(operation, method, path, body, state).await?;
     Ok(())
+}
+
+async fn request_empty_with_log_path(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    log_path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+) -> crate::Result<()> {
+    let response = send_request_with_auth_and_log_path(
+        operation,
+        method.clone(),
+        path,
+        log_path,
+        body,
+        state,
+        SharedInstancesRequestAuth::ModrinthSession,
+    )
+    .await?;
+    if response.status().is_success() {
+        return Ok(());
+    }
+
+    shared_instances_request_error(operation, method, log_path, response).await
 }
 
 pub(super) async fn request(
@@ -761,6 +839,21 @@ pub(super) async fn send_request_with_auth(
     state: &State,
     auth: SharedInstancesRequestAuth,
 ) -> crate::Result<reqwest::Response> {
+    send_request_with_auth_and_log_path(
+        operation, method, path, path, body, state, auth,
+    )
+    .await
+}
+
+async fn send_request_with_auth_and_log_path(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    log_path: &str,
+    body: Option<serde_json::Value>,
+    state: &State,
+    auth: SharedInstancesRequestAuth,
+) -> crate::Result<reqwest::Response> {
     let modrinth_credentials =
         if matches!(auth, SharedInstancesRequestAuth::ModrinthSession) {
             Some(
@@ -777,6 +870,7 @@ pub(super) async fn send_request_with_auth(
     let _permit = state.api_semaphore.0.acquire().await?;
     let base_url = service_base_url();
     let url = service_url(base_url, path);
+    let log_url = service_url(base_url, log_path);
     let mut request =
         shared_instances_client(base_url).request(method.clone(), &url);
     let mut user_id = None;
@@ -794,8 +888,8 @@ pub(super) async fn send_request_with_auth(
     tracing::debug!(
         operation,
         method = method.as_str(),
-        path,
-        url = %url,
+        path = log_path,
+        url = %log_url,
         user_id = user_id.as_deref(),
         auth = auth.label(),
         has_body = body.is_some(),
@@ -806,14 +900,20 @@ pub(super) async fn send_request_with_auth(
         request = request.json(&body);
     }
 
-    let response = request.send().await?;
+    let response = match request.send().await {
+        Ok(response) => response,
+        Err(error) if path != log_path => {
+            return Err(error.without_url().into());
+        }
+        Err(error) => return Err(error.into()),
+    };
     if response.status().is_success() {
         let request_id = response_request_id(&response);
         tracing::debug!(
             operation,
             method = method.as_str(),
-            path,
-            url = %url,
+            path = log_path,
+            url = %log_url,
             status = response.status().as_u16(),
             request_id = request_id.as_deref().unwrap_or("none"),
             "Shared instances API request succeeded"

@@ -19,9 +19,14 @@ use crate::state::{
     ProjectType, SharedInstanceAttachmentInput, SharedInstanceRole, State,
 };
 use crate::util::fetch::{DownloadReason, REQWEST_CLIENT};
+use futures::StreamExt;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use uuid::Uuid;
+
+const MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE: u64 = 500 * 1024 * 1024;
+const MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE: u64 = 8 * 1024 * 1024;
 
 pub(super) async fn attach_pending_shared_instance(
     instance_id: &str,
@@ -78,15 +83,18 @@ struct CurrentSharedInstanceProject {
 
 #[derive(Clone, Debug)]
 struct CurrentSharedInstanceExternalFile {
-    file_name: String,
-    file_type: ProjectType,
     relative_path: String,
 }
+
+type SharedInstanceExternalFileKey = (ProjectType, String);
 
 #[derive(Default)]
 struct CurrentSharedInstanceContent {
     projects: HashMap<String, CurrentSharedInstanceProject>,
-    external_files: HashMap<String, CurrentSharedInstanceExternalFile>,
+    external_files: HashMap<
+        SharedInstanceExternalFileKey,
+        CurrentSharedInstanceExternalFile,
+    >,
 }
 
 #[derive(Clone, Debug)]
@@ -104,7 +112,10 @@ struct DesiredSharedInstanceExternalFile {
 #[derive(Default)]
 struct DesiredSharedInstanceContent {
     projects: HashMap<String, DesiredSharedInstanceProject>,
-    external_files: HashMap<String, DesiredSharedInstanceExternalFile>,
+    external_files: HashMap<
+        SharedInstanceExternalFileKey,
+        DesiredSharedInstanceExternalFile,
+    >,
     config_bundle: Option<SharedInstanceExternalFileData>,
 }
 
@@ -150,13 +161,9 @@ impl SharedInstanceApplyPlan {
             .collect();
         let external_removals = current
             .external_files
-            .values()
-            .filter(|current| {
-                desired.external_files.get(&current.file_name).is_none_or(
-                    |desired| desired.file_type != current.file_type,
-                )
-            })
-            .cloned()
+            .iter()
+            .filter(|(key, _)| !desired.external_files.contains_key(*key))
+            .map(|(_, current)| current.clone())
             .collect();
         let mut plan = Self {
             project_removals,
@@ -179,8 +186,9 @@ impl SharedInstanceApplyPlan {
         }
 
         for desired in desired.external_files.into_values() {
-            match current.external_files.get(&desired.file.file_name) {
-                Some(current) if current.file_type == desired.file_type => {
+            let key = (desired.file_type, desired.file.file_name.clone());
+            match current.external_files.get(&key) {
+                Some(_) => {
                     plan.external_updates.push(desired);
                 }
                 _ => plan.external_additions.push(desired),
@@ -457,10 +465,8 @@ async fn current_shared_instance_content(
             );
         } else {
             content.external_files.insert(
-                file.file_name.clone(),
+                (entry.project_type, file.file_name.clone()),
                 CurrentSharedInstanceExternalFile {
-                    file_name: file.file_name.clone(),
-                    file_type: entry.project_type,
                     relative_path: file.relative_path.clone(),
                 },
             );
@@ -508,7 +514,7 @@ async fn desired_shared_instance_content(
                 ))
             })?;
         content.external_files.insert(
-            file.file_name.clone(),
+            (file_type, file.file_name.clone()),
             DesiredSharedInstanceExternalFile {
                 file: file.clone(),
                 file_type,
@@ -784,6 +790,16 @@ async fn install_shared_instance_external_file(
         return Ok(());
     }
 
+    validate_shared_instance_external_file_name(&file.file_name)?;
+
+    if file.file_size > MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Shared instance external file {} exceeds the maximum size",
+            file.file_name
+        ))
+        .into());
+    }
+
     let response = REQWEST_CLIENT.get(&file.url).send().await?;
 
     if !response.status().is_success() {
@@ -794,7 +810,48 @@ async fn install_shared_instance_external_file(
         .into());
     }
 
-    let bytes = response.bytes().await?;
+    if response
+        .content_length()
+        .is_some_and(|content_length| content_length != file.file_size)
+    {
+        return Err(crate::ErrorKind::OtherError(format!(
+            "Shared instance external file {} has an unexpected size",
+            file.file_name
+        ))
+        .into());
+    }
+
+    let mut stream = response.bytes_stream();
+    let initial_capacity = usize::try_from(
+        file.file_size.min(MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE),
+    )
+    .map_err(|_| {
+        crate::ErrorKind::InputError(format!(
+            "Shared instance external file {} is too large",
+            file.file_name
+        ))
+    })?;
+    let mut bytes = Vec::with_capacity(initial_capacity);
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk?;
+        let downloaded_size = (bytes.len() as u64)
+            .checked_add(chunk.len() as u64)
+            .ok_or_else(|| {
+                crate::ErrorKind::InputError(format!(
+                    "Shared instance external file {} is too large",
+                    file.file_name
+                ))
+            })?;
+        if downloaded_size > file.file_size {
+            return Err(crate::ErrorKind::OtherError(format!(
+                "Shared instance external file {} has an unexpected size",
+                file.file_name
+            ))
+            .into());
+        }
+        bytes.extend_from_slice(&chunk);
+    }
+
     if bytes.len() as u64 != file.file_size {
         return Err(crate::ErrorKind::OtherError(format!(
             "Shared instance external file {} has an unexpected size",
@@ -802,6 +859,7 @@ async fn install_shared_instance_external_file(
         ))
         .into());
     }
+    let bytes = bytes::Bytes::from(bytes);
 
     if file.file_type == CONFIG_BUNDLE_FILE_TYPE {
         return install_shared_instance_config_bundle(
@@ -832,6 +890,29 @@ async fn install_shared_instance_external_file(
         state,
     )
     .await?;
+
+    Ok(())
+}
+
+fn validate_shared_instance_external_file_name(
+    file_name: &str,
+) -> crate::Result<()> {
+    let path = SafeRelativeUtf8UnixPathBuf::try_from(file_name.to_string())
+        .map_err(|_| {
+            crate::ErrorKind::InputError(format!(
+                "Shared instance external file {file_name} has an invalid file name"
+            ))
+        })?;
+    if file_name == "."
+        || file_name.contains('/')
+        || file_name.contains('\\')
+        || path.components().count() != 1
+    {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Shared instance external file {file_name} has an invalid file name"
+        ))
+        .into());
+    }
 
     Ok(())
 }

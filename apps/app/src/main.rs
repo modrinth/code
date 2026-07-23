@@ -152,7 +152,7 @@ fn main() {
     builder = builder
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             if let Some(payload) = args.get(1) {
-                tracing::info!("Handling deep link from arg {payload}");
+                tracing::info!("Handling command-line deep link");
                 let payload = payload.clone();
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
@@ -197,7 +197,7 @@ fn main() {
                             .unwrap_or(request);
 
                     tauri::async_runtime::spawn(async move {
-                        tracing::info!("Handling deep link {actual_request}");
+                        tracing::info!("Handling macOS deep link");
 
                         let mut payload = mtx_copy_copy.lock().await;
                         if payload.is_none() {
@@ -213,7 +213,7 @@ fn main() {
             #[cfg(not(target_os = "macos"))]
             app.listen("deep-link://new-url", |url| {
                 let payload = url.payload().to_owned();
-                tracing::info!("Handling deep link {payload}");
+                tracing::info!("Handling deep link");
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
                 ));

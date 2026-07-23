@@ -133,7 +133,7 @@ pub struct FileMetadata {
     pub version_id: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq, Hash)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectType {
     Mod,

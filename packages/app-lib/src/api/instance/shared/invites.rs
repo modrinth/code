@@ -58,7 +58,7 @@ pub async fn invite_shared_instance_users(
     Ok(users)
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(replace_invite_id))]
 pub async fn create_shared_instance_invite_link(
     instance_id: &str,
     max_age_seconds: Option<i32>,
@@ -97,14 +97,7 @@ pub async fn create_shared_instance_invite_link(
     }
 
     if let Some(invite_id) = replace_invite_id {
-        request_empty(
-            "delete_instance_invite",
-            Method::DELETE,
-            &format!("/instances/{}/invites/{invite_id}", attachment.id),
-            None,
-            &state,
-        )
-        .await?;
+        delete_remote_invite(&attachment.id, &invite_id, &state).await?;
     }
 
     let created_at = Utc::now();
