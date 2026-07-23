@@ -14,7 +14,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models::ids::{FileId, ProjectId, VersionId};
+use crate::models::ids::{AttributionGroupId, FileId, ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     AttributionModerationStatusKind, AttributionResolution,
@@ -31,7 +31,8 @@ use crate::util::error::Context;
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(list)
         .service(update_group)
-        .service(delete_group)
+        .service(delete_groups)
+        .service(delete_all_groups)
         .service(scan)
         .service(force_scan_file)
         .service(assign)
@@ -706,19 +707,25 @@ pub async fn update_group(
     Ok(())
 }
 
-/// Delete an attribution group and all files inside it.
+#[derive(Deserialize, utoipa::ToSchema)]
+struct DeleteGroupsBody {
+    groups: Vec<AttributionGroupId>,
+}
+
+/// Delete attribution groups and all files inside them.
 #[utoipa::path(
 	context_path = "/attribution",
 	tag = "attribution",
+	request_body = DeleteGroupsBody,
 	responses((status = NO_CONTENT))
 )]
-#[delete("/group/{group_id}")]
-pub async fn delete_group(
+#[delete("/group")]
+pub async fn delete_groups(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<i64>,
+    web::Json(body): web::Json<DeleteGroupsBody>,
 ) -> Result<(), ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -729,11 +736,79 @@ pub async fn delete_group(
     )
     .await?;
 
+    let group_ids = body
+        .groups
+        .into_iter()
+        .map(|id| DBAttributionGroupId::from(id).0)
+        .collect::<Vec<_>>();
+
+    delete_attribution_groups(pool.as_ref(), redis.as_ref(), group_ids).await
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+struct DeleteAllGroupsBody {
+    project_id: ProjectId,
+}
+
+/// Delete all attribution groups and files for a project.
+#[utoipa::path(
+	context_path = "/attribution",
+	tag = "attribution",
+	request_body = DeleteAllGroupsBody,
+	responses((status = NO_CONTENT))
+)]
+#[delete("/all-groups")]
+pub async fn delete_all_groups(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    web::Json(body): web::Json<DeleteAllGroupsBody>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let project_id = DBProjectId::from(body.project_id).0;
+    let group_ids = sqlx::query_scalar!(
+        r#"
+		SELECT id AS "id: DBAttributionGroupId"
+		FROM project_attribution_groups
+		WHERE project_id = $1
+		"#,
+        project_id,
+    )
+    .fetch_all(pool.as_ref())
+    .await
+    .wrap_internal_err("failed to fetch project attribution groups")?
+    .into_iter()
+    .map(|id| id.0)
+    .collect::<Vec<_>>();
+
+    delete_attribution_groups(pool.as_ref(), redis.as_ref(), group_ids).await
+}
+
+async fn delete_attribution_groups(
+    pool: &PgPool,
+    redis: &RedisPool,
+    mut group_ids: Vec<i64>,
+) -> Result<(), ApiError> {
+    group_ids.sort_unstable();
+    group_ids.dedup();
+
+    if group_ids.is_empty() {
+        return Ok(());
+    }
+
     let mut txn = pool.begin().await.wrap_internal_err(
         "failed to begin attribution group deletion transaction",
     )?;
 
-    let group_id = path.into_inner();
     let version_ids = sqlx::query_scalar!(
         r#"
 		SELECT DISTINCT f.version_id AS "version_id: DBVersionId"
@@ -742,10 +817,10 @@ pub async fn delete_group(
 		INNER JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1
 		INNER JOIN files f ON f.id = ofs.file_id
 		INNER JOIN versions v ON v.id = f.version_id
-		WHERE paf.group_id = $1
+		WHERE paf.group_id = ANY($1)
 			AND pag.project_id = v.mod_id
 		"#,
-        group_id,
+        &group_ids,
     )
     .fetch_all(&mut txn)
     .await
@@ -754,9 +829,9 @@ pub async fn delete_group(
     sqlx::query!(
         "
 		DELETE FROM project_attribution_files
-		WHERE group_id = $1
+		WHERE group_id = ANY($1)
 		",
-        group_id,
+        &group_ids,
     )
     .execute(&mut txn)
     .await
@@ -765,15 +840,15 @@ pub async fn delete_group(
     let result = sqlx::query!(
         "
 		DELETE FROM project_attribution_groups
-		WHERE id = $1
+		WHERE id = ANY($1)
 		",
-        group_id,
+        &group_ids,
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to delete attribution group")?;
+    .wrap_internal_err("failed to delete attribution groups")?;
 
-    if result.rows_affected() == 0 {
+    if result.rows_affected() != group_ids.len() as u64 {
         return Err(ApiError::NotFound);
     }
 
@@ -781,7 +856,7 @@ pub async fn delete_group(
         "failed to commit attribution group deletion transaction",
     )?;
 
-    DBVersion::clear_cache_ids(&version_ids, redis.as_ref())
+    DBVersion::clear_cache_ids(&version_ids, redis)
         .await
         .wrap_internal_err("failed to clear version attribution cache")?;
 

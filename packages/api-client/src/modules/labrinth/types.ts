@@ -397,6 +397,14 @@ export namespace Labrinth {
 				attribution: AttributionResolution
 			}
 
+			export type DeleteGroupsRequest = {
+				groups: string[]
+			}
+
+			export type DeleteAllGroupsRequest = {
+				project_id: string
+			}
+
 			export type AssignRequest = {
 				sha1: string
 				target_group_id: number
