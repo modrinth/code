@@ -12,7 +12,6 @@ use crate::database::models::{
         generate_attribution_group_id,
     },
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{FileId, ProjectId, VersionId};
 use crate::models::pats::Scopes;
@@ -27,6 +26,7 @@ use crate::queue::moderation::ApprovalType;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(list)

@@ -1,7 +1,6 @@
 use super::ids::*;
 use crate::auth::oauth::uris::OAuthRedirectUris;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
 use chrono::Duration;
@@ -12,8 +11,9 @@ use rand_chacha::rand_core::SeedableRng;
 use serde::{Deserialize, Serialize};
 use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
+use xredis::RedisPool;
 
-const FLOWS_NAMESPACE: &str = "flows:v1";
+const FLOWS_NAMESPACE: &str = "flows:v3";
 
 #[derive(Deserialize, Serialize)]
 pub enum DBFlow {
@@ -75,14 +75,10 @@ impl DBFlow {
         state: &str,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(FLOWS_NAMESPACE, state);
 
         redis
-            .set_serialized(
-                FLOWS_NAMESPACE,
-                &state,
-                &self,
-                Some(expires.num_seconds()),
-            )
+            .set_serialized(&key, &self, Some(expires.num_seconds()))
             .await?;
         Ok(())
     }
@@ -107,8 +103,9 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<DBFlow>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.get_deserialized(FLOWS_NAMESPACE, id).await
+        redis.get_deserialized(&key).await.map_err(Into::into)
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
@@ -132,8 +129,9 @@ impl DBFlow {
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
-        redis.delete(FLOWS_NAMESPACE, id).await?;
+        redis.delete(&key).await?;
         Ok(Some(()))
     }
 }

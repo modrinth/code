@@ -1,6 +1,5 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, DownloadReason};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
@@ -22,6 +21,7 @@ use std::net::Ipv4Addr;
 use std::str::FromStr;
 use std::sync::Arc;
 use tracing::trace;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(

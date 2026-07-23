@@ -2,6 +2,7 @@ use std::{
     cmp::Reverse,
     collections::{HashMap, HashSet},
 };
+use xredis::RedisPool;
 
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::database::PgPool;
@@ -12,10 +13,7 @@ use crate::{
         filter_visible_collections, filter_visible_projects,
         get_user_from_headers,
     },
-    database::{
-        models::{DBModerationNote, DBOrganization, DBProjectId, DBUser},
-        redis::RedisPool,
-    },
+    database::models::{DBModerationNote, DBOrganization, DBProjectId, DBUser},
     file_hosting::{FileHost, FileHostPublicity},
     models::{
         ids::OrganizationId,

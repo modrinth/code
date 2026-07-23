@@ -2,7 +2,6 @@ use crate::database;
 use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::NotificationBody;
 use crate::queue::analytics::cache::cache_analytics;
@@ -20,6 +19,7 @@ use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
 use tracing::info;
+use xredis::RedisPool;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -386,11 +386,11 @@ mod version_updater {
 
     use crate::database::PgPool;
     use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-    use crate::database::redis::RedisPool;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
     use thiserror::Error;
     use tracing::warn;
+    use xredis::RedisPool;
 
     #[derive(Deserialize)]
     struct InputFormat<'a> {
