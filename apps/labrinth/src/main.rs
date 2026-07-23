@@ -7,7 +7,7 @@ use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
 use labrinth::background_task::BackgroundTask;
-use labrinth::database::redis::RedisPool;
+use labrinth::database::redis;
 use labrinth::env::ENV;
 use labrinth::file_hosting::{FileHost, FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
@@ -110,7 +110,7 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new("");
+    let redis_pool = redis::from_env("").await;
 
     let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn FileHost> = match storage_backend {

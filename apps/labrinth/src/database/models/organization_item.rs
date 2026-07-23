@@ -1,16 +1,16 @@
 use crate::database::PgTransaction;
-use crate::database::redis::RedisPool;
 use ariadne::ids::base62_impl::parse_base62;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
 use super::{DBTeamMember, ids::*};
 use serde::{Deserialize, Serialize};
 
-const ORGANIZATIONS_NAMESPACE: &str = "organizations:v1";
-const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v1";
+const ORGANIZATIONS_NAMESPACE: &str = "organizations:v3";
+const ORGANIZATIONS_TITLES_NAMESPACE: &str = "organizations_titles:v3";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 /// An organization of users who together control one or more projects and organizations.
@@ -159,7 +159,9 @@ impl DBOrganization {
                     })
                     .await?;
 
-                    Ok(organizations)
+                    Ok::<_, crate::database::models::DatabaseError>(
+                        organizations,
+                    )
                 },
             )
             .await?;
@@ -256,16 +258,17 @@ impl DBOrganization {
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
-
-        redis
-            .delete_many([
-                (ORGANIZATIONS_NAMESPACE, Some(id.0.to_string())),
-                (
+        let mut keys = vec![redis.key().entity(ORGANIZATIONS_NAMESPACE, id.0)];
+        if let Some(slug) = slug {
+            keys.push(
+                redis.key().entity(
                     ORGANIZATIONS_TITLES_NAMESPACE,
-                    slug.map(|x| x.to_lowercase()),
+                    slug.to_lowercase(),
                 ),
-            ])
-            .await?;
+            );
+        }
+
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 }

@@ -6,7 +6,6 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
-use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -24,6 +23,7 @@ use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use serde::Deserialize;
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(report_create_route)

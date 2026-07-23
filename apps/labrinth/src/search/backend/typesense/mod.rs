@@ -10,7 +10,6 @@ use serde_json::{Value, json};
 use tracing::{info, warn};
 
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::routes::ApiError;
@@ -24,6 +23,7 @@ use crate::search::{
     SearchResults, TasksCancelFilter, UploadSearchProject,
 };
 use crate::util::error::Context;
+use xredis::RedisPool;
 
 #[derive(Debug, Clone)]
 pub struct TypesenseConfig {

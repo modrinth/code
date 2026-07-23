@@ -10,7 +10,6 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
     DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
 };
-use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
 use crate::env::ENV;
@@ -43,6 +42,7 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_search)

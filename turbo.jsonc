@@ -84,6 +84,7 @@
 			"env": [
 				"SQLX_OFFLINE",
 				"DATABASE_URL",
+				"REDIS_*",
 				"CARGO_*",
 				"RUST_*",
 				"RUSTFLAGS",

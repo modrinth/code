@@ -8,9 +8,10 @@ use rdkafka::{
 };
 use serde::Deserialize;
 use std::collections::HashSet;
+use xredis::RedisPool;
 
 use crate::{
-    database::{PgPool, redis::RedisPool},
+    database::PgPool,
     models::ids::ProjectId,
     search::{
         SearchBackend, incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,

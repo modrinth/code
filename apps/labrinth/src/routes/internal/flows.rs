@@ -8,7 +8,6 @@ use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::session_item::DBSession;
 use crate::database::models::{DBPasskey, DBPasskeyId, DBUser, DBUserId};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::error::ApiError as ApiErrorResponse;
@@ -59,6 +58,7 @@ use webauthn_rs::prelude::{
     PublicKeyCredential, RegisterPublicKeyCredential, RequestChallengeResponse,
     Webauthn, WebauthnError,
 };
+use xredis::RedisPool;
 use zxcvbn::Score;
 
 /// Sourced from <https://github.com/disposable-email-domains/disposable-email-domains>.
@@ -2213,15 +2213,15 @@ async fn validate_2fa_code(
     )
     .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    const TOTP_NAMESPACE: &str = "used_totp:v1";
+    const TOTP_NAMESPACE: &str = "used_totp:v3";
     let mut conn = redis.connect().await?;
+    let logical_key = format!("{}-{}", input, user_id.0);
+    let key = redis
+        .key()
+        .with_slot(TOTP_NAMESPACE, &logical_key, &logical_key);
 
     // Check if TOTP has already been used
-    if conn
-        .get(TOTP_NAMESPACE, &format!("{}-{}", input, user_id.0))
-        .await?
-        .is_some()
-    {
+    if conn.get(&key).await?.is_some() {
         return Err(AuthenticationError::InvalidCredentials);
     }
 
@@ -2229,13 +2229,7 @@ async fn validate_2fa_code(
         .check_current(input.as_str())
         .map_err(|_| AuthenticationError::InvalidCredentials)?
     {
-        conn.set(
-            TOTP_NAMESPACE,
-            &format!("{}-{}", input, user_id.0),
-            "",
-            Some(60),
-        )
-        .await?;
+        conn.set(&key, "", Some(60)).await?;
 
         Ok(true)
     } else if allow_backup {
