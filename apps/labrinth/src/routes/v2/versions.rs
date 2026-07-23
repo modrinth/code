@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
@@ -15,6 +14,7 @@ use crate::search::{SearchBackend, SearchState};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(versions_get);

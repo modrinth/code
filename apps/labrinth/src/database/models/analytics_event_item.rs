@@ -1,17 +1,15 @@
 use chrono::{DateTime, Utc};
 use futures::{StreamExt, TryStreamExt};
 use sqlx::types::Json;
+use xredis::RedisPool;
 
 use crate::{
-    database::{
-        models::{DBAnalyticsEventId, DatabaseError},
-        redis::RedisPool,
-    },
+    database::models::{DBAnalyticsEventId, DatabaseError},
     models::v3::analytics_event::AnalyticsEventMeta,
 };
 use serde::{Deserialize, Serialize};
 
-const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v1";
+const ANALYTICS_EVENTS_NAMESPACE: &str = "analytics_events:v3";
 const ANALYTICS_EVENTS_ALL_KEY: &str = "all";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,14 +84,11 @@ impl DBAnalyticsEvent {
         redis: &RedisPool,
     ) -> Result<Vec<DBAnalyticsEvent>, DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis
+            .key()
+            .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
 
-        if let Some(events) = redis
-            .get_deserialized(
-                ANALYTICS_EVENTS_NAMESPACE,
-                ANALYTICS_EVENTS_ALL_KEY,
-            )
-            .await?
-        {
+        if let Some(events) = redis.get_deserialized(&key).await? {
             return Ok(events);
         }
 
@@ -118,23 +113,17 @@ impl DBAnalyticsEvent {
         .try_collect::<Vec<_>>()
         .await?;
 
-        redis
-            .set_serialized(
-                ANALYTICS_EVENTS_NAMESPACE,
-                ANALYTICS_EVENTS_ALL_KEY,
-                &events,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &events, None).await?;
 
         Ok(events)
     }
 
     pub async fn clear_cache(redis: &RedisPool) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-        redis
-            .delete(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY)
-            .await?;
+        let key = redis
+            .key()
+            .metadata(ANALYTICS_EVENTS_NAMESPACE, ANALYTICS_EVENTS_ALL_KEY);
+        redis.delete(&key).await?;
         Ok(())
     }
 }

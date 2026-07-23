@@ -10,7 +10,6 @@ use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
 use crate::database::models::{self, DBOrganization, image_item};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::exp;
@@ -42,6 +41,7 @@ use serde::{Deserialize, Serialize};
 use sha1::Digest;
 use std::collections::{HashMap, HashSet};
 use validator::Validate;
+use xredis::RedisPool;
 
 fn default_requested_status() -> VersionStatus {
     VersionStatus::Listed

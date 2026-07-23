@@ -1,6 +1,7 @@
 use actix_web::{HttpRequest, post, web};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 use crate::{
     auth::check_is_moderator_from_headers,
@@ -11,7 +12,6 @@ use crate::{
             DelphiReportIssueId,
             delphi_report_item::{DelphiSeverity, DelphiStatus},
         },
-        redis::RedisPool,
     },
     models::{
         ids::{FileId, ProjectId, VersionId},
