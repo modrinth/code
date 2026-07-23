@@ -1,6 +1,6 @@
 ---
 title: Share content with friends
-summary: Shared instances let you send and update content without sharing `.mrpack` files.
+summary: Shared instances let you send and update content without sharing modpack files
 date: 2026-07-24T12:00:00+01:00
 ---
 
