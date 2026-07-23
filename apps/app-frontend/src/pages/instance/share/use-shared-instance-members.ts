@@ -21,6 +21,11 @@ type MutationContext = {
 	previousPendingRows: Record<string, ShareRow>
 }
 
+type RemoveMemberVariables = {
+	id: string
+	hasPendingRecipients: boolean
+}
+
 export function useSharedInstanceMembers(options: {
 	instance: Ref<GameInstance>
 	currentUserId: Ref<string | null>
@@ -130,13 +135,17 @@ export function useSharedInstanceMembers(options: {
 	})
 
 	const removeMutation = useMutation({
-		mutationFn: async (id: string) => {
+		mutationFn: async ({ id, hasPendingRecipients }: RemoveMemberVariables) => {
 			if (options.actionsLocked.value) {
 				return { user_ids: [], users: [], tokens: 0 } satisfies SharedInstanceUsers
 			}
-			return await remove_shared_instance_users(options.instance.value.id, [id])
+			return await remove_shared_instance_users(
+				options.instance.value.id,
+				[id],
+				hasPendingRecipients,
+			)
 		},
-		onMutate: async (id): Promise<MutationContext> => {
+		onMutate: async ({ id }): Promise<MutationContext> => {
 			const currentKey = queryKey.value
 			await queryClient.cancelQueries({ queryKey: currentKey })
 			const context = {
@@ -150,7 +159,7 @@ export function useSharedInstanceMembers(options: {
 			removePendingRow(id)
 			return context
 		},
-		onError: (error, _id, context) => {
+		onError: (error, _variables, context) => {
 			restore(context)
 			options.onError(error)
 		},
@@ -179,7 +188,14 @@ export function useSharedInstanceMembers(options: {
 	}
 
 	function remove(id: string) {
-		if (!options.actionsLocked.value) removeMutation.mutate(id)
+		if (options.actionsLocked.value) return
+		const normalizedId = normalizeInviteKey(id)
+		removeMutation.mutate({
+			id,
+			hasPendingRecipients: rows.value.some(
+				(row) => row.pending && normalizeInviteKey(row.id) !== normalizedId,
+			),
+		})
 	}
 
 	function setPendingRow(user: InvitePlayersUser) {

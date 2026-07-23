@@ -128,6 +128,7 @@ pub async fn create_shared_instance_invite_link(
 pub async fn remove_shared_instance_users(
     instance_id: &str,
     user_ids: Vec<String>,
+    has_pending_recipients: bool,
 ) -> crate::Result<SharedInstanceUsers> {
     let state = State::get().await?;
     let Some(attachment) = shared_attachment(instance_id, &state).await? else {
@@ -139,9 +140,25 @@ pub async fn remove_shared_instance_users(
         remove_remote_users(&attachment.id, user_ids, &state).await?;
     }
 
+    let remaining_users = get_remote_users(&attachment.id, &state).await?;
+    if !has_shared_instance_recipients(
+        &remaining_users,
+        &attachment,
+        has_pending_recipients,
+        &state,
+    )
+    .await?
+    {
+        delete_remote_instance(&attachment.id, &state).await?;
+        crate::state::clear_shared_instance(instance_id, &state.pool).await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+
+        return Ok(SharedInstanceUsers::empty());
+    }
+
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-    get_remote_users(&attachment.id, &state).await
+    Ok(remaining_users)
 }
 
 #[tracing::instrument]

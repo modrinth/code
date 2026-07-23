@@ -26,6 +26,7 @@
 		<SharedInstanceRemoveMemberModal
 			ref="removeMemberModal"
 			:row="pendingRemovalRow"
+			:member-count="members.rows.value.length"
 			@confirm="removeMember"
 			@clear="pendingRemovalRow = null"
 		/>

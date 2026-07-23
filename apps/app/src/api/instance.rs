@@ -829,10 +829,15 @@ pub async fn instance_share_create_invite_link(
 pub async fn instance_share_remove_users(
     instance_id: &str,
     user_ids: Vec<String>,
+    has_pending_recipients: bool,
 ) -> Result<theseus::instance::SharedInstanceUsers> {
     Ok(
-        theseus::instance::remove_shared_instance_users(instance_id, user_ids)
-            .await?,
+        theseus::instance::remove_shared_instance_users(
+            instance_id,
+            user_ids,
+            has_pending_recipients,
+        )
+        .await?,
     )
 }
 

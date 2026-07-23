@@ -397,8 +397,13 @@ export async function create_shared_instance_invite_link(
 export async function remove_shared_instance_users(
 	instanceId: string,
 	userIds: string[],
+	hasPendingRecipients: boolean,
 ): Promise<SharedInstanceUsers> {
-	return await invoke('plugin:instance|instance_share_remove_users', { instanceId, userIds })
+	return await invoke('plugin:instance|instance_share_remove_users', {
+		instanceId,
+		userIds,
+		hasPendingRecipients,
+	})
 }
 
 export async function get_shared_instance_publish_preview(

@@ -465,7 +465,7 @@
     "message": "You can invite them again later"
   },
   "app.instance.share.remove-user-modal.effect-last-user": {
-    "message": "If this is the last user, sharing will be turned off for this instance"
+    "message": "This is the last user, sharing will be turned off for this instance"
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "What happens?"
