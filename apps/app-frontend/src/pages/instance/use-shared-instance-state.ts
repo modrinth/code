@@ -180,7 +180,7 @@ export function useSharedInstanceState(
 		async ({ instanceId, role, locked, offline, signedIn, userId, authReady }) => {
 			if (
 				!instanceId ||
-				role !== 'member' ||
+				!role ||
 				locked ||
 				offline ||
 				!authReady ||

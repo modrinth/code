@@ -18,6 +18,7 @@ export type GameInstance = {
 
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null
+	quarantined: boolean
 	update_channel: ReleaseChannel
 
 	created: Date

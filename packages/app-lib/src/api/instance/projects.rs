@@ -25,6 +25,7 @@ pub async fn update_all_projects(
     instance_id: &str,
 ) -> crate::Result<HashMap<String, String>> {
     let state = State::get().await?;
+    ensure_instance_content_unlocked(instance_id, &state).await?;
     let instance = get_instance_display_info(instance_id, &state).await?;
     let loading_bar = init_loading(
         LoadingBarType::InstanceUpdate {
@@ -80,6 +81,7 @@ pub async fn add_project_from_version(
     dependent_on_version_id: Option<String>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
+    ensure_instance_content_unlocked(instance_id, &state).await?;
     let project_path =
         crate::state::instances::commands::add_project_from_version(
             instance_id,
@@ -104,6 +106,7 @@ pub async fn install_project_with_dependencies(
     let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
+    ensure_metadata_content_unlocked(&metadata)?;
     let plan = crate::state::instances::commands::resolve_install_plan(
         instance_id,
         crate::state::instances::commands::InstanceInstallProjectRequest {
@@ -217,6 +220,7 @@ pub async fn add_project_from_path(
     project_type: Option<ProjectType>,
 ) -> crate::Result<String> {
     let state = State::get().await?;
+    ensure_instance_content_unlocked(instance_id, &state).await?;
     let project_path =
         crate::state::instances::commands::add_project_from_path(
             instance_id,
@@ -298,6 +302,7 @@ async fn ensure_shared_instance_can_modify_project(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
+    ensure_metadata_content_unlocked(&metadata)?;
     if !metadata
         .shared_instance
         .is_some_and(|attachment| attachment.role.is_member())
@@ -337,6 +342,7 @@ pub async fn update_managed_modrinth_version(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
+    ensure_metadata_content_unlocked(&metadata)?;
 
     let post_install_edit = match &metadata.link {
         crate::state::InstanceLink::ServerProjectModpack {
@@ -394,6 +400,7 @@ pub async fn repair_managed_modrinth(
     .ok_or_else(|| {
         crate::ErrorKind::InputError("Unknown instance".to_string())
     })?;
+    ensure_metadata_content_unlocked(&metadata)?;
 
     let post_install_edit = match &metadata.link {
         crate::state::InstanceLink::ServerProjectModpack { .. } => {
@@ -438,6 +445,34 @@ fn unmanaged_pack_error(instance_id: &str) -> crate::ErrorKind {
     crate::ErrorKind::InputError(format!(
         "Instance {instance_id} is not a managed Modrinth pack, or has been disconnected."
     ))
+}
+
+async fn ensure_instance_content_unlocked(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    if instance_rows::is_instance_quarantined(instance_id, &state.pool).await?
+    {
+        return Err(quarantined_content_error().into());
+    }
+
+    Ok(())
+}
+
+fn ensure_metadata_content_unlocked(
+    metadata: &crate::state::InstanceMetadata,
+) -> crate::Result<()> {
+    if metadata.quarantined {
+        return Err(quarantined_content_error().into());
+    }
+
+    Ok(())
+}
+
+fn quarantined_content_error() -> crate::ErrorKind {
+    crate::ErrorKind::InputError(
+        "Content in quarantined instances cannot be changed.".to_string(),
+    )
 }
 
 async fn get_instance_display_info(

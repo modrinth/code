@@ -108,6 +108,7 @@ mod publish;
 mod types;
 
 pub(crate) use self::excluded_configs::EXCLUDED_CONFIG_FOLDERS;
+pub(crate) use self::install::check_shared_instance_availability_before_launch;
 pub(crate) use self::publish::sync_shared_instance_icon;
 
 pub use self::install::{

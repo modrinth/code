@@ -446,6 +446,78 @@ where
     Ok(row)
 }
 
+pub(crate) async fn is_instance_quarantined<'e, E>(
+    instance_id: &str,
+    exec: E,
+) -> crate::Result<bool>
+where
+    E: Executor<'e, Database = Sqlite>,
+{
+    let quarantined = sqlx::query_scalar::<_, bool>(
+        "
+		SELECT EXISTS (
+			SELECT 1
+			FROM instance_quarantines
+			WHERE instance_id = ?
+		)
+		",
+    )
+    .bind(instance_id)
+    .fetch_one(exec)
+    .await?;
+
+    Ok(quarantined)
+}
+
+pub(crate) async fn get_quarantined_instance_ids<'e, E>(
+    exec: E,
+) -> crate::Result<std::collections::HashSet<String>>
+where
+    E: Executor<'e, Database = Sqlite>,
+{
+    let instance_ids = sqlx::query_scalar::<_, String>(
+        "
+		SELECT instance_id
+		FROM instance_quarantines
+		",
+    )
+    .fetch_all(exec)
+    .await?;
+
+    Ok(instance_ids.into_iter().collect())
+}
+
+pub(crate) async fn set_instance_quarantined(
+    instance_id: &str,
+    quarantined: bool,
+    tx: &mut Transaction<'_, Sqlite>,
+) -> crate::Result<()> {
+    if quarantined {
+        sqlx::query(
+            "
+			INSERT INTO instance_quarantines (instance_id)
+			VALUES (?)
+			ON CONFLICT (instance_id) DO NOTHING
+			",
+        )
+        .bind(instance_id)
+        .execute(&mut **tx)
+        .await?;
+    } else {
+        sqlx::query(
+            "
+			DELETE FROM instance_quarantines
+			WHERE instance_id = ?
+			",
+        )
+        .bind(instance_id)
+        .execute(&mut **tx)
+        .await?;
+    }
+
+    Ok(())
+}
+
 macro_rules! query_instance_metadata {
     (
         $prefix:literal,

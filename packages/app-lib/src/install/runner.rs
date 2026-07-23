@@ -1122,6 +1122,12 @@ async fn prepare_existing_rollback(
                 "Unknown instance {instance_id}"
             ))
         })?;
+    if instance.quarantined {
+        return Err(crate::ErrorKind::InputError(
+            "Content in quarantined instances cannot be changed.".to_string(),
+        )
+        .into());
+    }
     let install_stage = instance.instance.install_stage;
     set_display(
         job_state,

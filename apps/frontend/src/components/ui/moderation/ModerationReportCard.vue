@@ -216,6 +216,7 @@
 							<SharedInstanceReportContext
 								v-else-if="sharedInstanceDetails"
 								:details="sharedInstanceDetails"
+								:ban-pending="sharedInstanceBanPending"
 								:load-version-content="loadSharedInstanceVersionContent"
 								@ban-owner="banSharedInstanceOwner"
 								@content-error="showSharedInstanceContentError"
@@ -252,6 +253,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
@@ -291,6 +293,11 @@ type ExtendedReportWithSharedInstance = ExtendedReport & {
 	shared_instance?: SharedInstanceReportDetails
 }
 
+type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
+	project_id?: string
+	version_id?: string
+}
+
 const props = defineProps<{
 	report: ExtendedReportWithSharedInstance
 	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
@@ -310,6 +317,7 @@ const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(
 )
 const sharedInstanceLoading = ref(false)
 const sharedInstanceError = ref<string | null>(null)
+const sharedInstanceBanPending = ref(false)
 let sharedInstanceDetailsRequest: Promise<void> | null = null
 
 watch(isThreadCollapsed, (collapsed) => {
@@ -512,57 +520,74 @@ async function loadSharedInstanceVersionContent(
 		)
 	} catch (error) {
 		const latestVersion = await client.sharedinstances.instances_v1.getLatestVersion(instanceId)
-		if (latestVersion.version !== versionNumber) throw error
+		if (!latestVersion || latestVersion.version !== versionNumber) throw error
 		instanceVersion = latestVersion
 	}
 
-	const versionIds = [
-		...(instanceVersion.modrinth_ids ?? []),
-		...(instanceVersion.modpack_id ? [instanceVersion.modpack_id] : []),
-	]
-	const uniqueVersionIds = [...new Set(versionIds)]
+	if (!instanceVersion) return []
+
+	const modpackVersionId = instanceVersion.modpack_id
+	const directVersionIds = (instanceVersion.modrinth_ids ?? []).filter(
+		(versionId) => versionId !== modpackVersionId,
+	)
+	const modpackVersion = modpackVersionId
+		? await client.labrinth.versions_v2.getVersion(modpackVersionId)
+		: null
+	const modpackDependencies = (modpackVersion?.dependencies ??
+		[]) as SharedInstanceVersionDependency[]
+	const dependencyVersionIds = modpackDependencies.flatMap((dependency) =>
+		dependency.version_id ? [dependency.version_id] : [],
+	)
+	const uniqueVersionIds = [...new Set([...directVersionIds, ...dependencyVersionIds])]
 	const versions = uniqueVersionIds.length
 		? await client.labrinth.versions_v2.getVersions(uniqueVersionIds)
 		: []
-	const projectIds = [...new Set(versions.map((version) => version.project_id))]
+	const dependencyProjectIds = modpackDependencies.flatMap((dependency) =>
+		dependency.project_id ? [dependency.project_id] : [],
+	)
+	const projectIds = [
+		...new Set([...versions.map((version) => version.project_id), ...dependencyProjectIds]),
+	]
 	const projects = projectIds.length
 		? await client.labrinth.projects_v2.getMultiple(projectIds)
 		: []
+	const versionsById = new Map(versions.map((version) => [version.id, version]))
 	const projectsById = new Map(projects.map((project) => [project.id, project]))
 
-	const modrinthContent: ContentItem[] = versions.map((version) => {
-		const project = projectsById.get(version.project_id)
-		const primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
-		const fileName = primaryFile?.filename ?? version.name
+	const directContent: ContentItem[] = [...new Set(directVersionIds)].flatMap((versionId) => {
+		const version = versionsById.get(versionId)
+		if (!version) return []
 
-		return {
-			id: version.id,
-			file_name: fileName,
-			size: primaryFile?.size,
-			project_type: project?.project_type ?? 'mod',
-			has_update: false,
-			update_version_id: null,
-			source_kind: 'shared_instance',
-			project: project
-				? {
-						id: project.id,
-						slug: project.slug,
-						title: project.title,
-						icon_url: project.icon_url,
-					}
-				: {
-						id: version.project_id,
-						slug: version.project_id,
-						title: version.name,
-						icon_url: undefined,
-					},
-			version: {
-				id: version.id,
-				version_number: version.version_number,
-				file_name: fileName,
-				date_published: version.date_published,
-			},
-		}
+		const project = projectsById.get(version.project_id)
+		return [sharedInstanceContentItem(version, project)]
+	})
+
+	const modpackContent: ContentItem[] = modpackDependencies.map((dependency) => {
+		const version = dependency.version_id
+			? versionsById.get(dependency.version_id)
+			: undefined
+		const project = dependency.project_id
+			? projectsById.get(dependency.project_id)
+			: version
+				? projectsById.get(version.project_id)
+				: undefined
+		const primaryFile = version
+			? (version.files.find((file) => file.primary) ?? version.files[0])
+			: undefined
+		const fileName =
+			primaryFile?.filename ??
+			dependency.file_name ??
+			project?.title ??
+			version?.name ??
+			'Unknown'
+
+		return sharedInstanceContentItem(
+			version,
+			project,
+			fileName,
+			dependency.project_id ?? fileName,
+			!project && !version,
+		)
 	})
 
 	const externalContent: ContentItem[] = instanceVersion.external_files.map((file, index) => ({
@@ -583,7 +608,48 @@ async function loadSharedInstanceVersionContent(
 		},
 	}))
 
-	return [...modrinthContent, ...externalContent]
+	return [...externalContent, ...modpackContent, ...directContent]
+}
+
+function sharedInstanceContentItem(
+	version: Labrinth.Versions.v2.Version | undefined,
+	project: Labrinth.Projects.v2.Project | undefined,
+	fallbackFileName?: string,
+	fallbackProjectId = version?.project_id ?? fallbackFileName ?? 'unknown',
+	external = false,
+): ContentItem {
+	const primaryFile = version
+		? (version.files.find((file) => file.primary) ?? version.files[0])
+		: undefined
+	const fileName =
+		primaryFile?.filename ?? fallbackFileName ?? project?.title ?? version?.name ?? 'Unknown'
+
+	return {
+		id: version?.id ?? project?.id ?? fileName,
+		file_name: fileName,
+		size: primaryFile?.size,
+		project_type: project?.project_type ?? 'mod',
+		has_update: false,
+		update_version_id: null,
+		source_kind: 'shared_instance',
+		external,
+		project: {
+			id: project?.id ?? fallbackProjectId,
+			slug: project?.slug ?? fallbackProjectId,
+			title: project?.title ?? version?.name ?? fileName,
+			icon_url: project?.icon_url ?? undefined,
+		},
+		...(version
+			? {
+					version: {
+						id: version.id,
+						version_number: version.version_number,
+						file_name: fileName,
+						date_published: version.date_published,
+					},
+				}
+			: {}),
+	}
 }
 
 function showSharedInstanceContentError(error: unknown) {
@@ -666,11 +732,39 @@ function copyId() {
 	})
 }
 
-function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
-	addNotification({
-		type: 'info',
-		title: 'Shared instances ban preview',
-		text: `${owner.username} would be banned from the shared instances service and all of their instances would be quarantined.`,
-	})
+async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
+	if (sharedInstanceBanPending.value) return
+	sharedInstanceBanPending.value = true
+
+	try {
+		await client.sharedinstances.moderation_v1.blacklistUsers({
+			user_ids: [owner.id],
+		})
+
+		if (sharedInstanceDetails.value) {
+			sharedInstanceDetails.value = {
+				...sharedInstanceDetails.value,
+				quarantine: true,
+				other_instances: sharedInstanceDetails.value.other_instances.map((instance) => ({
+					...instance,
+					quarantine: true,
+				})),
+			}
+		}
+
+		addNotification({
+			type: 'success',
+			title: 'Owner banned from shared instances',
+			text: `${owner.username} has been banned and all of their shared instances have been quarantined.`,
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Failed to ban shared instance owner',
+			text: getErrorMessage(error, `Could not ban ${owner.username} from shared instances.`),
+		})
+	} finally {
+		sharedInstanceBanPending.value = false
+	}
 }
 </script>

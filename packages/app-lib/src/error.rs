@@ -27,6 +27,7 @@ pub struct LabrinthError {
 pub enum SharedInstanceUnavailableReason {
     Deleted,
     AccessRevoked,
+    Quarantined,
 }
 
 impl std::fmt::Display for SharedInstanceUnavailableReason {
@@ -34,6 +35,7 @@ impl std::fmt::Display for SharedInstanceUnavailableReason {
         match self {
             Self::Deleted => write!(fmt, "deleted"),
             Self::AccessRevoked => write!(fmt, "access_revoked"),
+            Self::Quarantined => write!(fmt, "quarantined"),
         }
     }
 }

@@ -19,11 +19,13 @@
 					ref="modpackContentModal"
 					:modpack-name="displayedModpackProject?.title"
 					:modpack-icon-url="displayedModpackProject?.icon_url ?? undefined"
-					:enable-toggle="!props.isServerInstance && !isSharedMember"
+					:enable-toggle="!props.isServerInstance && !isSharedMember && !isQuarantined"
 					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
 					:switch-version="
-						props.isServerInstance || isSharedMember ? undefined : handleSwitchVersion
+						props.isServerInstance || isSharedMember || isQuarantined
+							? undefined
+							: handleSwitchVersion
 					"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
@@ -48,7 +50,11 @@
 					@confirm="handleModpackUpdateConfirm"
 					@cancel="handleModpackUpdateCancel"
 				/>
-				<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+				<ExportModal
+					v-if="projects.length > 0 && !instance.quarantined"
+					ref="exportModal"
+					:instance="instance"
+				/>
 				<ContentUpdaterModal
 					v-if="updatingProject || updatingModpack"
 					ref="contentUpdaterModal"
@@ -168,6 +174,10 @@ const messages = defineMessages({
 		id: 'app.instance.mods.projects-were-added',
 		defaultMessage: '{count} projects were added',
 	},
+	quarantinedContent: {
+		id: 'app.instance.mods.quarantined-content',
+		defaultMessage: 'Content in quarantined instances cannot be changed.',
+	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
@@ -210,6 +220,7 @@ const props = defineProps<{
 const managedContentPolicy = useManagedContentPolicy(computed(() => props.instance))
 const {
 	isManagedModpack: isSharedMember,
+	isQuarantined,
 	canMutateContent,
 	canUpdateContent: canUpdateProject,
 } = managedContentPolicy
@@ -303,6 +314,7 @@ const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
 const isPackLocked = computed(
 	() =>
+		props.instance.quarantined ||
 		props.instance?.link?.type === 'modrinth_modpack' ||
 		props.instance?.link?.type === 'server_project_modpack',
 )
@@ -504,7 +516,7 @@ async function getUpdaterProjectVersions(projectId: string, pinnedVersionId?: st
 }
 
 async function handleBrowseContent() {
-	if (!props.instance) return
+	if (!props.instance || props.instance.quarantined) return
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'resourcepack' : 'mod'}`,
 		query: { i: props.instance.id },
@@ -512,7 +524,7 @@ async function handleBrowseContent() {
 }
 
 async function handleUploadFiles() {
-	if (!props.instance) return
+	if (!props.instance || props.instance.quarantined) return
 	const files = await open({ multiple: true })
 	if (!files) return
 	const selectedFiles: Array<{ path: string; filename: string }> = []
@@ -1398,6 +1410,8 @@ provideContentManager({
 	}),
 	isPackLocked,
 	isBusy: isInstanceBusy,
+	disableAddContent: isQuarantined,
+	disableAddContentTooltip: formatMessage(messages.quarantinedContent),
 	isBulkOperating,
 	skipNonEssentialWarnings,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
@@ -1429,7 +1443,10 @@ provideContentManager({
 	updateItem: handleUpdate,
 	bulkUpdateAll: bulkUpdateAllProjects,
 	bulkUpdateItem: updateProject,
-	updateModpack: props.isServerInstance || isSharedMember.value ? undefined : handleModpackUpdate,
+	updateModpack:
+		props.isServerInstance || isSharedMember.value || isQuarantined.value
+			? undefined
+			: handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairInstance,
 	openSettings: props.openSettings,

@@ -102,6 +102,8 @@ pub(crate) async fn edit_instance(
     patch: EditInstance,
     pool: &SqlitePool,
 ) -> crate::Result<Instance> {
+    let modifies_content =
+        patch.link.is_some() || patch.content_set_patch.is_some();
     let should_mark_shared_instance_stale = patch.link.is_some()
         || patch.content_set_patch.as_ref().is_some_and(|patch| {
             patch.source_kind.is_some()
@@ -114,6 +116,14 @@ pub(crate) async fn edit_instance(
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
+    if modifies_content
+        && instance_rows::is_instance_quarantined(instance_id, pool).await?
+    {
+        return Err(crate::ErrorKind::InputError(
+            "Content in quarantined instances cannot be changed.".to_string(),
+        )
+        .into());
+    }
     let now = Utc::now();
 
     apply_instance_patch(&mut instance, &patch, now);

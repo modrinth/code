@@ -383,6 +383,7 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 
 		<ModpackContentModal
 			ref="contentModal"
+			header="Shared instance content"
 			:modpack-name="contentInstance.name"
 			:modpack-icon-url="contentInstance.icon_url ?? undefined"
 		/>

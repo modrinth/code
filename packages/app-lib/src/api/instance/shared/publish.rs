@@ -131,9 +131,10 @@ pub async fn get_shared_instance_publish_preview(
     let version = match version {
         SharedInstanceRemoteResponse::Available(version) => version,
         SharedInstanceRemoteResponse::Unavailable(reason) => {
-            clear_shared_instance_if_current_user(
+            handle_unavailable_shared_instance_if_current_user(
                 instance_id,
                 &attachment,
+                reason,
                 &state,
             )
             .await?;
@@ -684,9 +685,10 @@ pub(super) async fn publish_current_content(
         SharedInstanceRemoteResponse::Available(response) => response,
         SharedInstanceRemoteResponse::Unavailable(reason) => {
             if let Some(attachment) = metadata.shared_instance.as_ref() {
-                clear_shared_instance_if_current_user(
+                handle_unavailable_shared_instance_if_current_user(
                     instance_id,
                     attachment,
+                    reason,
                     state,
                 )
                 .await?;

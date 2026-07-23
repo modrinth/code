@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div v-if="!instance.quarantined" class="flex flex-col gap-4">
 		<ModrinthAccountRequiredModal ref="accountRequiredModal" :request-auth="requestAuth" />
 		<InvitePlayersModal
 			ref="invitePlayersModal"

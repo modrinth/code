@@ -103,7 +103,7 @@ export interface SharedInstanceUpdateDiff {
 
 export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
 
-export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked'
+export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'quarantined'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null
@@ -117,7 +117,11 @@ export function getSharedInstanceUnavailableReason(
 	error: unknown,
 ): SharedInstanceUnavailableReason | null {
 	if (!isRecord(error) || error.code !== SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE) return null
-	return error.reason === 'deleted' || error.reason === 'access_revoked' ? error.reason : null
+	return error.reason === 'deleted' ||
+		error.reason === 'access_revoked' ||
+		error.reason === 'quarantined'
+		? error.reason
+		: null
 }
 
 export function getErrorMessage(error: unknown): string {

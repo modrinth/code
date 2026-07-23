@@ -32,6 +32,12 @@ pub(super) enum SharedInstanceRemoteResponse<T> {
     Unavailable(SharedInstanceUnavailableReason),
 }
 
+#[derive(Clone, Debug, Deserialize)]
+pub(super) struct RemoteInstanceResponse {
+    #[serde(default)]
+    pub(super) quarantine: bool,
+}
+
 #[derive(Clone, Debug)]
 pub(super) struct ExternalFileCandidate {
     pub(super) file_name: String,
@@ -233,6 +239,16 @@ pub(super) async fn get_remote_instance_access(
             operation, method, &path, response,
         )
         .await;
+    }
+
+    let instance = decode_json_response::<RemoteInstanceResponse>(
+        operation, method, &path, response,
+    )
+    .await?;
+    if instance.quarantine {
+        return Ok(SharedInstanceRemoteResponse::Unavailable(
+            SharedInstanceUnavailableReason::Quarantined,
+        ));
     }
 
     Ok(SharedInstanceRemoteResponse::Available(()))

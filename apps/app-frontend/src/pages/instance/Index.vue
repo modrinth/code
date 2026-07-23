@@ -4,7 +4,7 @@
 			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
-			<ExportModal ref="exportModal" :instance="instance" />
+			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />
 			<ConfirmDeleteInstanceModal ref="reportDeleteConfirmModal" @delete="deleteReportedInstance" />
 			<InstanceSettingsModal
 				:key="instance.id"
@@ -46,7 +46,7 @@
 				@play-server="() => handlePlayServer()"
 				@settings="() => settingsModal?.show()"
 				@open-folder="() => instance && showInstanceInFolder(instance.id)"
-				@export="() => exportModal?.show()"
+				@export="() => !instance.quarantined && exportModal?.show()"
 				@create-shortcut="() => createShortcut()"
 				@report="reportSharedInstance"
 			/>
@@ -409,6 +409,7 @@ const showShareTab = computed(() => {
 	const linkType = instance.value?.link?.type
 
 	return (
+		!instance.value?.quarantined &&
 		instance.value?.shared_instance?.role !== 'member' &&
 		linkType !== 'server_project' &&
 		linkType !== 'server_project_modpack'
@@ -450,6 +451,19 @@ const tabs = computed(() => {
 	return instanceTabs
 })
 
+watch(
+	() => ({
+		quarantined: instance.value?.quarantined ?? false,
+		routeName: router.currentRoute.value.name,
+	}),
+	({ quarantined, routeName }) => {
+		if (quarantined && routeName === 'InstanceShare') {
+			void router.replace(basePath.value)
+		}
+	},
+	{ immediate: true },
+)
+
 if (instance.value) {
 	breadcrumbs.setName(
 		'Instance',
@@ -467,6 +481,7 @@ if (instance.value) {
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
 const launchInstance = async (context: string) => {
+	if (!instance.value || instance.value.quarantined) return
 	loading.value = true
 	try {
 		await run(route.params.id as string)
@@ -493,13 +508,13 @@ async function handleSharedInstanceUnavailable(
 }
 
 const startInstance = async (context: string) => {
-	if (!instance.value) return
+	if (!instance.value || instance.value.quarantined) return
 	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
 
 	const instanceId = instance.value.id
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
 	const canCheckSharedInstanceUpdate =
-		isSharedInstanceMember && !sharedInstanceActionsLocked.value && !offline.value
+		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
 
 	if (canCheckSharedInstanceUpdate) {
 		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>>
@@ -558,7 +573,7 @@ const stopInstance = async (context: string) => {
 }
 
 const handlePlayServer = async () => {
-	if (!instance.value?.link?.project_id) return
+	if (!instance.value?.link?.project_id || instance.value.quarantined) return
 	loading.value = true
 	try {
 		await playServerProject(instance.value.link.project_id)
@@ -569,6 +584,7 @@ const handlePlayServer = async () => {
 }
 
 const repairInstance = async () => {
+	if (instance.value.quarantined) return
 	if (
 		instance.value.install_stage !== 'pack_installed' &&
 		(instance.value.link?.type === 'modrinth_modpack' ||
@@ -586,7 +602,7 @@ const repairInstance = async () => {
 }
 
 const createShortcut = async () => {
-	if (!instance.value) return
+	if (!instance.value || instance.value.quarantined) return
 	try {
 		const shortcutPath = await createInstanceShortcut(instance.value.name, instance.value.id)
 		if (!shortcutPath) return
@@ -643,8 +659,7 @@ async function deleteReportedInstance() {
 
 const handleRightClick = (event: MouseEvent) => {
 	const baseOptions = [
-		{ name: 'add_content' },
-		{ type: 'divider' },
+		...(instance.value?.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
 		{ name: 'edit' },
 		{ name: 'open_folder' },
 		{ name: 'copy_path' },
@@ -662,10 +677,14 @@ const handleRightClick = (event: MouseEvent) => {
 					...baseOptions,
 				]
 			: [
-					{
-						name: 'play',
-						color: 'primary',
-					},
+					...(instance.value?.quarantined
+						? []
+						: [
+								{
+									name: 'play',
+									color: 'primary',
+								},
+							]),
 					...baseOptions,
 				],
 	)

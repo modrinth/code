@@ -4,8 +4,17 @@
 			<Avatar :src="iconSrc" :alt="instance.name" size="64px" :tint-by="instance.id" />
 		</template>
 
-		<template v-if="instance.shared_instance" #badges>
+		<template v-if="instance.shared_instance || instance.quarantined" #badges>
 			<PageHeaderBadgeItem
+				v-if="instance.quarantined"
+				:icon="LockIcon"
+				aria-label="Quarantined instance information"
+				class="!border-orange !bg-highlight-orange !text-orange"
+			>
+				Quarantined
+			</PageHeaderBadgeItem>
+			<PageHeaderBadgeItem
+				v-else
 				:icon="UnknownIcon"
 				:tooltip="sharedInstanceTooltip"
 				aria-label="Shared instance information"
@@ -80,18 +89,28 @@
 						{{ formatMessage(commonMessages.installingLabel) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
-					<button type="button" @click="emit('repair')">
-						<DownloadIcon />
-						{{ formatMessage(messages.repair) }}
-					</button>
-				</ButtonStyled>
 				<ButtonStyled v-else-if="playing" color="red" size="large">
 					<button type="button" :disabled="stopping" @click="emit('stop')">
 						<StopCircleIcon />
 						{{
 							stopping ? formatMessage(messages.stopping) : formatMessage(commonMessages.stopButton)
 						}}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="instance.quarantined" color="brand" size="large">
+					<button
+						v-tooltip="formatMessage(messages.quarantinedPlayTooltip)"
+						type="button"
+						disabled
+					>
+						<PlayIcon />
+						{{ formatMessage(commonMessages.playButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
+					<button type="button" @click="emit('repair')">
+						<DownloadIcon />
+						{{ formatMessage(messages.repair) }}
 					</button>
 				</ButtonStyled>
 				<JoinedButtons
@@ -140,6 +159,7 @@ import {
 	DownloadIcon,
 	ExternalIcon,
 	FolderOpenIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
@@ -208,6 +228,10 @@ const messages = defineMessages({
 	repair: {
 		id: 'instance.action.repair',
 		defaultMessage: 'Repair',
+	},
+	quarantinedPlayTooltip: {
+		id: 'instance.quarantined.play-tooltip',
+		defaultMessage: 'This instance has been quarantined',
 	},
 	starting: {
 		id: 'instance.action.starting',
@@ -350,19 +374,24 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => {
 			icon: FolderOpenIcon,
 			action: () => emit('openFolder'),
 		},
-		{
-			id: 'export-mrpack',
-			label: formatMessage(messages.exportModpack),
-			icon: PackageIcon,
-			action: () => emit('export'),
-		},
-		{
-			id: 'create-shortcut',
-			label: formatMessage(messages.createShortcut),
-			icon: ExternalIcon,
-			action: () => emit('createShortcut'),
-		},
 	]
+
+	if (!props.instance.quarantined) {
+		actions.push(
+			{
+				id: 'export-mrpack',
+				label: formatMessage(messages.exportModpack),
+				icon: PackageIcon,
+				action: () => emit('export'),
+			},
+			{
+				id: 'create-shortcut',
+				label: formatMessage(messages.createShortcut),
+				icon: ExternalIcon,
+				action: () => emit('createShortcut'),
+			},
+		)
+	}
 
 	if (props.instance.shared_instance?.role === 'member') {
 		actions.push(

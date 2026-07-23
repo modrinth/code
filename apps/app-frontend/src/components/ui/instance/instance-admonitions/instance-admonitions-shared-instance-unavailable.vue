@@ -1,7 +1,7 @@
 <template>
 	<Admonition
 		type="warning"
-		:header="formatMessage(sharedInstanceErrorMessages.unavailableTitle)"
+		:header="formatMessage(sharedInstanceUnavailableTitleMessage(reason ?? null))"
 		:dismissible="dismissible"
 		@dismiss="emit('dismiss')"
 	>
@@ -14,7 +14,7 @@ import { Admonition, useVIntl } from '@modrinth/ui'
 
 import type { SharedInstanceUnavailableReason } from '@/helpers/install'
 import {
-	sharedInstanceErrorMessages,
+	sharedInstanceUnavailableTitleMessage,
 	useSharedInstanceErrors,
 } from '@/helpers/shared-instance-errors'
 

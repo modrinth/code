@@ -181,6 +181,19 @@ pub async fn get_shared_instance_update_preview(
         return Ok(None);
     };
     if !attachment.role.is_member() {
+        if let SharedInstanceRemoteResponse::Unavailable(reason) =
+            get_remote_instance_access(&attachment.id, &state).await?
+        {
+            handle_unavailable_shared_instance_if_current_user(
+                instance_id,
+                &attachment,
+                reason,
+                &state,
+            )
+            .await?;
+            return Err(shared_instance_unavailable_error(reason));
+        }
+
         return Ok(None);
     }
 
@@ -213,6 +226,54 @@ pub async fn get_shared_instance_update_preview(
         update_available,
         diffs,
     }))
+}
+
+pub(crate) async fn check_shared_instance_availability_before_launch(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError("Unknown instance".to_string())
+        })?;
+    let Some(attachment) = metadata.shared_instance else {
+        return Ok(());
+    };
+
+    let availability =
+        match get_remote_instance_access(&attachment.id, state).await {
+            Ok(availability) => availability,
+            Err(error)
+                if matches!(
+                    error.raw.as_ref(),
+                    crate::ErrorKind::NoCredentialsError
+                        | crate::ErrorKind::FetchError(_)
+                ) =>
+            {
+                tracing::warn!(
+                    instance_id,
+                    shared_instance_id = %attachment.id,
+                    error = %error,
+                    "Could not check shared instance availability before launch"
+                );
+                return Ok(());
+            }
+            Err(error) => return Err(error),
+        };
+
+    if let SharedInstanceRemoteResponse::Unavailable(reason) = availability {
+        handle_unavailable_shared_instance_if_current_user(
+            instance_id,
+            &attachment,
+            reason,
+            state,
+        )
+        .await?;
+        return Err(shared_instance_unavailable_error(reason));
+    }
+
+    Ok(())
 }
 
 #[tracing::instrument]
@@ -275,9 +336,10 @@ pub(super) async fn ensure_ready_remote_version_for_invite(
             publish_shared_instance_inner(instance_id, &[], state).await
         }
         SharedInstanceRemoteResponse::Unavailable(reason) => {
-            clear_shared_instance_if_current_user(
+            handle_unavailable_shared_instance_if_current_user(
                 instance_id,
                 attachment,
+                reason,
                 state,
             )
             .await?;
@@ -295,9 +357,10 @@ pub(super) async fn get_latest_remote_member_version(
         get_remote_instance_access(&attachment.id, state).await?
     {
         if shared_attachment_matches_current_user(attachment, state).await? {
-            clear_shared_instance_if_current_user(
+            handle_unavailable_shared_instance_if_current_user(
                 instance_id,
                 attachment,
+                reason,
                 state,
             )
             .await?;
@@ -322,9 +385,10 @@ pub(super) async fn get_latest_remote_member_version(
         SharedInstanceRemoteResponse::Unavailable(reason) => {
             if shared_attachment_matches_current_user(attachment, state).await?
             {
-                clear_shared_instance_if_current_user(
+                handle_unavailable_shared_instance_if_current_user(
                     instance_id,
                     attachment,
+                    reason,
                     state,
                 )
                 .await?;
@@ -375,15 +439,32 @@ pub(super) async fn has_shared_instance_recipients(
     }))
 }
 
-pub(super) async fn clear_shared_instance_if_current_user(
+pub(super) async fn handle_unavailable_shared_instance_if_current_user(
     instance_id: &str,
     attachment: &SharedInstanceAttachment,
+    reason: SharedInstanceUnavailableReason,
     state: &State,
 ) -> crate::Result<()> {
-    if shared_attachment_matches_current_user(attachment, state).await? {
-        crate::state::clear_shared_instance(instance_id, &state.pool).await?;
-        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    if reason != SharedInstanceUnavailableReason::Quarantined
+        && !shared_attachment_matches_current_user(attachment, state).await?
+    {
+        return Ok(());
     }
+
+    match reason {
+        SharedInstanceUnavailableReason::Quarantined => {
+            crate::state::quarantine_shared_instance(
+                instance_id,
+                &state.pool,
+            )
+            .await?;
+        }
+        _ => {
+            crate::state::clear_shared_instance(instance_id, &state.pool)
+                .await?;
+        }
+    }
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
     Ok(())
 }
@@ -403,6 +484,9 @@ pub(super) fn shared_instance_unavailable_message(
         }
         SharedInstanceUnavailableReason::AccessRevoked => {
             "Shared instance access was revoked"
+        }
+        SharedInstanceUnavailableReason::Quarantined => {
+            "Shared instance was quarantined"
         }
     }
 }

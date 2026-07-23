@@ -105,7 +105,7 @@ import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
-import { list, run } from '@/helpers/instance'
+import { get as getInstance, list, run } from '@/helpers/instance'
 import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -1002,6 +1002,9 @@ async function handleCommand(e) {
 			})
 		}
 	} else if (e.event === 'LaunchInstance') {
+		const instance = await getInstance(e.id).catch(handleError)
+		if (!instance || instance.quarantined) return
+
 		if (e.server) {
 			await start_join_server(e.id, e.server).catch(handleError)
 		} else if (e.singleplayer_world) {

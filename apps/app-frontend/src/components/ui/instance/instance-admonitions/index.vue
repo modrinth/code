@@ -14,7 +14,7 @@
 			/>
 			<InstanceAdmonitionsSharedInstanceUnavailable
 				v-else-if="item.kind === 'shared-instance-unavailable'"
-				:reason="sharedInstanceUnavailableReason"
+				:reason="displayedSharedInstanceUnavailableReason"
 				:manager="sharedInstanceUnavailableManager"
 				:dismissible="dismissible"
 				@dismiss="sharedInstanceUnavailableDismissed = true"
@@ -54,6 +54,12 @@ const emit = defineEmits<{
 }>()
 
 const sharedInstanceWrongAccount = computed(() => props.sharedInstanceWrongAccount ?? false)
+const displayedSharedInstanceUnavailableReason = computed<SharedInstanceUnavailableReason | null>(
+	() =>
+		props.instance.quarantined
+			? 'quarantined'
+			: (props.sharedInstanceUnavailableReason ?? null),
+)
 const sharedInstanceUnavailableDismissed = ref(false)
 const showSharedInstancePublishAdmonition = computed(
 	() =>
@@ -75,11 +81,16 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 		})
 	}
 
-	if (props.sharedInstanceUnavailableReason && !sharedInstanceUnavailableDismissed.value) {
+	const unavailableReason = displayedSharedInstanceUnavailableReason.value
+	const sharedInstanceQuarantined = unavailableReason === 'quarantined'
+	if (
+		unavailableReason &&
+		(sharedInstanceQuarantined || !sharedInstanceUnavailableDismissed.value)
+	) {
 		items.push({
 			id: 'shared-instance-unavailable',
 			type: 'warning',
-			dismissible: true,
+			dismissible: !sharedInstanceQuarantined,
 			kind: 'shared-instance-unavailable',
 		})
 	}
@@ -97,7 +108,7 @@ const stackItems = computed<InstanceAdmonitionItem[]>(() => {
 })
 
 watch(
-	() => [props.instance.id, props.sharedInstanceUnavailableReason],
+	() => [props.instance.id, displayedSharedInstanceUnavailableReason.value],
 	() => {
 		sharedInstanceUnavailableDismissed.value = false
 	},

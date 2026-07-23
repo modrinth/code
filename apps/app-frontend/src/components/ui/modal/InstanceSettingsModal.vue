@@ -106,7 +106,7 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		}),
 		icon: UsersIcon,
 		content: SharingSettings,
-		shown: props.instance.shared_instance?.role === 'owner',
+		shown: props.instance.shared_instance?.role === 'owner' && !props.instance.quarantined,
 	},
 	{
 		name: defineMessage({

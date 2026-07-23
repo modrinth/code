@@ -45,5 +45,5 @@ pub(crate) use self::apply_content_update::*;
 mod shared_instance;
 pub(crate) use self::shared_instance::{
     attach_shared_instance, clear_shared_instance, mark_shared_instance_stale,
-    set_shared_instance_sync_status,
+    quarantine_shared_instance, set_shared_instance_sync_status,
 };

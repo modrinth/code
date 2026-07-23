@@ -131,6 +131,18 @@ const modpackInfo = modpackInfoQuery.data
 const repairing = ref(false)
 const reinstalling = ref(false)
 const unlinkingSharedInstance = ref(false)
+const installationSettingsBusy = computed(
+	() =>
+		instance.value.quarantined ||
+		instance.value.install_stage !== 'installed' ||
+		repairing.value ||
+		reinstalling.value ||
+		unlinkingSharedInstance.value ||
+		!!offline,
+)
+const installationSettingsBusyMessage = computed(() =>
+	instance.value.quarantined ? formatMessage(messages.quarantined) : null,
+)
 
 async function unlinkSharedInstance() {
 	unlinkingSharedInstance.value = true
@@ -150,6 +162,10 @@ const messages = defineMessages({
 	loaderVersion: {
 		id: 'instance.settings.tabs.installation.loader-version',
 		defaultMessage: '{loader} version',
+	},
+	quarantined: {
+		id: 'instance.settings.tabs.installation.quarantined',
+		defaultMessage: 'Installation settings are unavailable while this instance is quarantined.',
 	},
 })
 
@@ -215,14 +231,8 @@ provideInstallationSettings({
 			isImportedModpack.value ||
 			isSharedInstanceManagedModpack.value,
 	),
-	isBusy: computed(
-		() =>
-			instance.value.install_stage !== 'installed' ||
-			repairing.value ||
-			reinstalling.value ||
-			unlinkingSharedInstance.value ||
-			!!offline,
-	),
+	isBusy: installationSettingsBusy,
+	busyMessage: installationSettingsBusyMessage,
 	skipNonEssentialWarnings,
 	modpack: computed(() => {
 		if (isImportedModpack.value && instance.value.link?.type === 'imported_modpack') {
@@ -477,13 +487,7 @@ provideInstallationSettings({
 		<template #extra>
 			<SharedInstanceInstallationSettingsControls
 				:can-unlink="canUnlinkSharedInstance"
-				:busy="
-					instance.install_stage !== 'installed' ||
-					repairing ||
-					reinstalling ||
-					unlinkingSharedInstance ||
-					!!offline
-				"
+				:busy="installationSettingsBusy"
 				:unlinking="unlinkingSharedInstance"
 				:unlink="unlinkSharedInstance"
 			/>
