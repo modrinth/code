@@ -55,7 +55,6 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_importable_instances",
-                        "import_instance",
                         "is_valid_importable_instance",
                         "get_default_launcher_path",
                     ])
@@ -224,6 +223,7 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
+                        "instance_share_can_current_user_use",
                         "instance_share_get_users",
                         "instance_share_invite_users",
                         "instance_share_create_invite_link",
@@ -305,7 +305,6 @@ fn main() {
                     .commands(&[
                         "init_ads_window",
                         "hide_ads_window",
-                        "scroll_ads_window",
                         "show_ads_window",
                         "show_ads_consent_overlay",
                         "show_ads_consent_preferences",
