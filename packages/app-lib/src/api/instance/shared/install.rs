@@ -49,7 +49,13 @@ pub async fn get_shared_instance_install_preview(
 ) -> crate::Result<SharedInstanceInstallPreview> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
-    shared_instance_install_preview_from_version(name, version, &state).await
+    shared_instance_install_preview_from_version(
+        shared_instance_id.to_string(),
+        name,
+        version,
+        &state,
+    )
+    .await
 }
 
 #[tracing::instrument]
@@ -70,9 +76,13 @@ pub async fn accept_shared_instance_invite_for_install(
         .await?;
     let version =
         get_latest_remote_version(&shared_instance_id, &state).await?;
-    let mut preview =
-        shared_instance_install_preview_from_version(name, version, &state)
-            .await?;
+    let mut preview = shared_instance_install_preview_from_version(
+        shared_instance_id.clone(),
+        name,
+        version,
+        &state,
+    )
+    .await?;
     if instance_icon_url.is_some() {
         preview.icon_url.clone_from(&instance_icon_url);
     }
@@ -102,6 +112,7 @@ pub(super) fn shared_instance_invite_manager(
 }
 
 pub(super) async fn shared_instance_install_preview_from_version(
+    shared_instance_id: String,
     name: String,
     version: InstanceVersionResponse,
     state: &State,
@@ -140,6 +151,8 @@ pub(super) async fn shared_instance_install_preview_from_version(
     let external_file_count = external_files.len();
 
     Ok(SharedInstanceInstallPreview {
+        shared_instance_id,
+        version: version.version,
         name,
         icon_url,
         game_version: version.game_version,

@@ -177,7 +177,7 @@
 
 		<div class="flex flex-col gap-4">
 			<div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
-			<ReportCard v-for="report in paginatedReports" v-else :key="report.id" :report="report" />
+			<ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" />
 		</div>
 
 		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
@@ -210,7 +210,6 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import type { Report, User } from '@modrinth/utils'
 import Fuse from 'fuse.js'
 
 import ReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
@@ -231,12 +230,12 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 
 	const enrichmentPromises: Promise<ExtendedReport[]>[] = []
 
-	let reports: Report[]
+	let reports: Labrinth.Reports.v3.Report[]
 	let hasMoreReports = true
 	while (hasMoreReports) {
 		reports = (await useBaseFetch(`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}`, {
 			apiVersion: 3,
-		})) as Report[]
+		})) as Labrinth.Reports.v3.Report[]
 
 		hasMoreReports = reports.length > 0
 		if (!hasMoreReports) {
@@ -323,6 +322,7 @@ const projectTypeFilterTypes: ComboboxOption<string>[] = [
 	{ value: 'plugin', label: 'Plugins' },
 	{ value: 'shader', label: 'Shaders' },
 	{ value: 'minecraft_java_server', label: 'Servers' },
+	{ value: 'shared-instance', label: 'Shared instance' },
 ]
 
 const currentReportTargetFilter = ref('all')
@@ -331,6 +331,7 @@ const reportTargetFilterTypes: ComboboxOption<string>[] = [
 	{ value: 'project', label: 'Projects' },
 	{ value: 'user', label: 'Users' },
 	{ value: 'version', label: 'Versions' },
+	{ value: 'shared-instance', label: 'Shared instances' },
 ]
 
 const currentReportIssueFilter = ref('all')
@@ -505,7 +506,9 @@ const filteredReports = computed(() => {
 	}
 
 	const projectTypeFilterPredicate = (report: ExtendedReport) => {
-		return projectTypeFilter === 'all' || report.project?.project_type === projectTypeFilter
+		if (projectTypeFilter === 'all') return true
+		if (projectTypeFilter === 'shared-instance') return report.item_type === 'shared-instance'
+		return report.project?.project_type === projectTypeFilter
 	}
 
 	const reportTargetFilterPredicate = (report: ExtendedReport) => {

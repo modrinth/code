@@ -102,6 +102,7 @@
 		"instance:default",
 		"install:default",
 		"process:default",
+		"reports:default",
 		"cache:default",
 		"files:default",
 		"settings:default",

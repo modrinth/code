@@ -2,6 +2,7 @@
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
+	ExternalIcon,
 	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
@@ -13,6 +14,7 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -85,6 +87,18 @@ const messages = defineMessages({
 	noResults: {
 		id: 'instances.modpack-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
+	},
+	externalContent: {
+		id: 'instances.modpack-content-modal.external-content',
+		defaultMessage: 'External',
+	},
+	externalContentDescription: {
+		id: 'instances.modpack-content-modal.external-content-description',
+		defaultMessage: 'This file is not published on Modrinth.',
+	},
+	openInSlicer: {
+		id: 'instances.modpack-content-modal.open-in-slicer',
+		defaultMessage: 'Open in Slicer',
 	},
 })
 
@@ -275,6 +289,20 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		],
 	})),
 )
+const externalItemIds = computed(
+	() => new Set(items.value.filter((item) => item.external).map((item) => item.id)),
+)
+const externalSlicerUrls = computed(() => {
+	const urls: Record<string, string> = {}
+	for (const item of items.value) {
+		if (item.external && item.external_url) {
+			urls[item.id] = `https://slicer.run/?url=${encodeURIComponent(item.external_url)}`
+		}
+	}
+	return urls
+})
+const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
+const showTableActions = computed(() => props.enableToggle || hasExternalSlicerUrls.value)
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -510,7 +538,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						<div
 							class="flex min-w-0 items-center gap-4"
 							:class="
-								props.enableToggle
+								showTableActions
 									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
@@ -529,13 +557,13 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						</div>
 						<div
 							class="hidden @[800px]:flex"
-							:class="props.enableToggle ? 'flex-1 min-w-0' : 'flex-1'"
+							:class="showTableActions ? 'flex-1 min-w-0' : 'flex-1'"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.versionLabel)
 							}}</span>
 						</div>
-						<div v-if="props.enableToggle" class="min-w-[160px] shrink-0 text-right">
+						<div v-if="showTableActions" class="min-w-[160px] shrink-0 text-right">
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.actionsLabel)
 							}}</span>
@@ -546,6 +574,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="props.enableToggle"
+							:show-item-actions="hasExternalSlicerUrls"
 							hide-delete
 							hide-header
 							flat
@@ -554,7 +583,30 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
 									: {}
 							"
-						/>
+						>
+							<template #itemTitleBadges="{ item }">
+								<span
+									v-if="externalItemIds.has(item.id)"
+									v-tooltip="formatMessage(messages.externalContentDescription)"
+									class="inline-flex shrink-0 items-center rounded-full border border-solid border-orange bg-orange-highlight px-2 py-0.5 text-xs font-semibold leading-4 text-orange"
+								>
+									{{ formatMessage(messages.externalContent) }}
+								</span>
+							</template>
+							<template #itemButtonsRight="{ item }">
+								<ButtonStyled v-if="externalSlicerUrls[item.id]" circular type="transparent">
+									<a
+										v-tooltip="formatMessage(messages.openInSlicer)"
+										:aria-label="formatMessage(messages.openInSlicer)"
+										:href="externalSlicerUrls[item.id]"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<ExternalIcon class="size-4" />
+									</a>
+								</ButtonStyled>
+							</template>
+						</ContentCardTable>
 					</div>
 				</div>
 			</div>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { injectModrinthClient } from '@modrinth/ui'
-import type { Report } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import ModerationReportCard from '~/components/ui/moderation/ModerationReportCard.vue'
@@ -13,7 +12,7 @@ const { data: report } = useQuery({
 	queryKey: computed(() => ['report', reportId]),
 	queryFn: async () => {
 		try {
-			const report = (await client.labrinth.reports_v3.get(reportId)) as Report
+			const report = await client.labrinth.reports_v3.get(reportId)
 			const enrichedReport = (await enrichReportBatch([report]))[0]
 			return enrichedReport
 		} catch (error) {

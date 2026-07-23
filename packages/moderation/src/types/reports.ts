@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { Report, Thread, User, Version } from '@modrinth/utils'
+import type { Thread, User, Version } from '@modrinth/utils'
 
 export interface OwnershipTarget {
 	name: string
@@ -8,7 +8,7 @@ export interface OwnershipTarget {
 	type: 'user' | 'organization'
 }
 
-export interface ExtendedReport extends Report {
+export interface ExtendedReport extends Labrinth.Reports.v3.Report {
 	thread: Thread
 	reporter_user: User
 	project?: Labrinth.Projects.v2.Project

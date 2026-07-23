@@ -33,4 +33,58 @@ export namespace SharedInstances {
 			}
 		}
 	}
+
+	export namespace Instances {
+		export namespace v1 {
+			export type Instance = {
+				quarantine: boolean
+			}
+
+			export type JoinType = 'owner' | 'invite' | 'link'
+
+			export type InstanceUser = {
+				id: string
+				joined_at: string | null
+				join_type: JoinType
+				last_played: string | null
+			}
+
+			export type InstanceUsers = {
+				users: InstanceUser[]
+				tokens: number
+			}
+
+			export type FileMetadata = {
+				path: string
+				hash: string
+			}
+
+			export type ExternalFile = {
+				file_name: string
+				file_type: string
+				url: string
+				file_size?: number
+				metadata?: FileMetadata[]
+			}
+
+			export type InstanceVersion = {
+				version: number
+				modrinth_ids: string[]
+				ready: boolean
+				external_files: ExternalFile[]
+				modpack_id: string | null
+				game_version: string
+				loader: string
+				loader_version: string
+			}
+		}
+	}
+
+	export namespace Moderation {
+		export namespace v1 {
+			export type BlacklistUserRequest = {
+				user_ids: string[]
+			}
+		}
+	}
 }

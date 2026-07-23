@@ -182,6 +182,14 @@ fn main() {
                     ),
             )
             .plugin(
+                "reports",
+                InlinedPlugin::new()
+                    .commands(&["reports_create"])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "instance",
                 InlinedPlugin::new()
                     .commands(&[

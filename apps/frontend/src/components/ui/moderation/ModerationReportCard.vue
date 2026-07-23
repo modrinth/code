@@ -89,14 +89,18 @@
 					</div>
 
 					<div v-else class="flex flex-col gap-1.5">
-						<div class="flex items-center gap-2">
+						<div class="flex flex-wrap items-center gap-2">
 							<NuxtLink
+								v-if="report.item_type !== 'shared-instance'"
 								:to="reportItemUrl"
 								target="_blank"
 								class="text-base font-semibold text-contrast hover:underline"
 							>
 								{{ reportItemTitle }}
 							</NuxtLink>
+							<span v-else class="text-base font-semibold text-contrast">
+								{{ reportItemTitle }}
+							</span>
 
 							<div
 								v-if="report.project?.project_type"
@@ -118,6 +122,20 @@
 							>
 								{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
 							</span>
+							<span
+								v-if="report.item_type === 'shared-instance' && report.shared_instance_version_id"
+								class="text-sm text-secondary"
+							>
+								Version {{ report.shared_instance_version_id }}
+							</span>
+							<CopyCode v-if="report.item_type === 'shared-instance'" :text="report.item_id" />
+							<span
+								v-if="report.item_type === 'shared-instance' && sharedInstanceDetails?.quarantine"
+								class="bg-orange-highlight inline-flex items-center gap-1 rounded-full border border-solid border-orange px-2.5 py-1 text-sm font-semibold text-orange"
+							>
+								<LockIcon class="size-4" />
+								Quarantined
+							</span>
 						</div>
 
 						<div v-if="report.target" class="flex items-center gap-1">
@@ -133,6 +151,24 @@
 								class="text-sm font-medium text-secondary hover:underline"
 							>
 								{{ report.target.name }}
+							</NuxtLink>
+						</div>
+						<div
+							v-else-if="report.item_type === 'shared-instance' && sharedInstanceDetails"
+							class="flex items-center gap-1"
+						>
+							<Avatar
+								:src="sharedInstanceDetails.owner.avatar_url"
+								size="1.5rem"
+								circle
+								class="border border-surface-5 bg-surface-4 !shadow-none"
+							/>
+							<NuxtLink
+								:to="`/user/${sharedInstanceDetails.owner.username}`"
+								target="_blank"
+								class="text-sm font-medium text-secondary hover:underline"
+							>
+								{{ sharedInstanceDetails.owner.username }}
 							</NuxtLink>
 						</div>
 					</div>
@@ -154,6 +190,38 @@
 					:closed="reportClosed"
 					@update-thread="updateThread"
 				>
+					<template #afterMessages>
+						<template v-if="report.item_type === 'shared-instance'">
+							<div
+								v-if="sharedInstanceLoading"
+								class="flex items-center gap-2 border-0 border-t border-solid border-surface-4 px-4 py-6 text-secondary"
+							>
+								<LoaderCircleIcon class="size-5 animate-spin" />
+								Loading shared instance details…
+							</div>
+							<div
+								v-else-if="sharedInstanceError"
+								class="flex flex-col items-start gap-3 border-0 border-t border-solid border-surface-4 px-4 py-6"
+							>
+								<div class="flex flex-col gap-1">
+									<span class="font-semibold text-contrast">
+										Shared instance details could not be loaded
+									</span>
+									<span class="text-sm text-secondary">{{ sharedInstanceError }}</span>
+								</div>
+								<ButtonStyled type="outlined">
+									<button @click="loadSharedInstanceDetails">Try again</button>
+								</ButtonStyled>
+							</div>
+							<SharedInstanceReportContext
+								v-else-if="sharedInstanceDetails"
+								:details="sharedInstanceDetails"
+								:load-version-content="loadSharedInstanceVersionContent"
+								@ban-owner="banSharedInstanceOwner"
+								@content-error="showSharedInstanceContentError"
+							/>
+						</template>
+					</template>
 					<template #closedActions>
 						<ButtonStyled v-if="isStaff(auth.user)" color="green">
 							<button class="mt-2 w-full gap-2 sm:w-auto" @click="reopenReport()">
@@ -184,29 +252,52 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { CheckCircleIcon, ClipboardCopyIcon, ExternalIcon } from '@modrinth/assets'
+import {
+	CheckCircleIcon,
+	ClipboardCopyIcon,
+	ExternalIcon,
+	LoaderCircleIcon,
+	LockIcon,
+} from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
 	ButtonStyled,
 	CollapsibleRegion,
+	type ContentItem,
+	CopyCode,
 	getProjectTypeIcon,
+	injectModrinthClient,
 	injectNotificationManager,
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
+import SharedInstanceReportContext, {
+	type SharedInstanceReportDetails,
+	type SharedInstanceReportUser,
+} from './SharedInstanceReportContext.vue'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 const auth = await useAuth()
 
+type ExtendedReportWithSharedInstance = ExtendedReport & {
+	shared_instance?: SharedInstanceReportDetails
+}
+
 const props = defineProps<{
-	report: ExtendedReport
+	report: ExtendedReportWithSharedInstance
+	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
+	sharedInstanceVersionContentLoader?: (
+		instanceId: string,
+		version: number,
+	) => Promise<ContentItem[]>
 }>()
 
 const reportThread = ref<{
@@ -214,6 +305,16 @@ const reportThread = ref<{
 	sendReply: (privateMessage?: boolean) => Promise<void>
 } | null>(null)
 const isThreadCollapsed = ref(true)
+const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(
+	props.report.shared_instance ?? null,
+)
+const sharedInstanceLoading = ref(false)
+const sharedInstanceError = ref<string | null>(null)
+let sharedInstanceDetailsRequest: Promise<void> | null = null
+
+watch(isThreadCollapsed, (collapsed) => {
+	if (!collapsed) void loadSharedInstanceDetails()
+})
 
 const didCloseReport = ref(false)
 const reportClosed = computed(() => {
@@ -322,6 +423,193 @@ function updateThread(newThread: any) {
 	}
 }
 
+async function loadSharedInstanceDetails() {
+	if (props.report.item_type !== 'shared-instance' || sharedInstanceDetails.value) return
+	if (sharedInstanceDetailsRequest) return sharedInstanceDetailsRequest
+
+	sharedInstanceDetailsRequest = (async () => {
+		sharedInstanceLoading.value = true
+		sharedInstanceError.value = null
+
+		try {
+			if (props.sharedInstanceDetailsLoader) {
+				sharedInstanceDetails.value = await props.sharedInstanceDetailsLoader()
+				return
+			}
+
+			const [instance, instanceUsers] = await Promise.all([
+				client.sharedinstances.instances_v1.get(props.report.item_id),
+				client.sharedinstances.instances_v1.getUsers(props.report.item_id),
+			])
+			const userIds = [...new Set(instanceUsers.users.map((user) => user.id))]
+			const users = userIds.length ? await client.labrinth.users_v2.getMultiple(userIds) : []
+			const usersById = new Map(users.map((user) => [user.id, user]))
+			const ownerMembership = instanceUsers.users.find((user) => user.join_type === 'owner')
+
+			if (!ownerMembership) {
+				throw new Error('The shared instance has no owner.')
+			}
+
+			const toReportUser = (
+				membership: (typeof instanceUsers.users)[number],
+			): SharedInstanceReportUser => {
+				const user = usersById.get(membership.id)
+				return {
+					id: membership.id,
+					username: user?.username ?? membership.id,
+					avatar_url: user?.avatar_url,
+					joined_at: membership.joined_at,
+					last_played: membership.last_played,
+					join_type: membership.join_type,
+				}
+			}
+
+			const reportedVersion = props.report.shared_instance_version_id
+
+			sharedInstanceDetails.value = {
+				id: props.report.item_id,
+				name: 'Shared instance',
+				icon_url: null,
+				quarantine: instance.quarantine,
+				owner: toReportUser(ownerMembership),
+				members: instanceUsers.users
+					.filter((user) => user.id !== ownerMembership.id)
+					.map(toReportUser),
+				reported_version: reportedVersion ? { version: reportedVersion } : undefined,
+				previous_versions: reportedVersion
+					? Array.from({ length: Math.max(0, reportedVersion - 1) }, (_, index) => ({
+							version: reportedVersion - index - 1,
+						}))
+					: [],
+				other_instances: [],
+				other_instances_loaded: false,
+			}
+		} catch (error) {
+			sharedInstanceError.value = getErrorMessage(error, 'Failed to load shared instance details.')
+		} finally {
+			sharedInstanceLoading.value = false
+			sharedInstanceDetailsRequest = null
+		}
+	})()
+
+	return sharedInstanceDetailsRequest
+}
+
+async function loadSharedInstanceVersionContent(
+	instanceId: string,
+	versionNumber: number,
+): Promise<ContentItem[]> {
+	if (props.report.item_type !== 'shared-instance') return []
+	if (props.sharedInstanceVersionContentLoader) {
+		return props.sharedInstanceVersionContentLoader(instanceId, versionNumber)
+	}
+
+	let instanceVersion
+	try {
+		instanceVersion = await client.sharedinstances.instances_v1.getVersion(
+			instanceId,
+			versionNumber,
+		)
+	} catch (error) {
+		const latestVersion = await client.sharedinstances.instances_v1.getLatestVersion(instanceId)
+		if (latestVersion.version !== versionNumber) throw error
+		instanceVersion = latestVersion
+	}
+
+	const versionIds = [
+		...instanceVersion.modrinth_ids,
+		...(instanceVersion.modpack_id ? [instanceVersion.modpack_id] : []),
+	]
+	const uniqueVersionIds = [...new Set(versionIds)]
+	const versions = uniqueVersionIds.length
+		? await client.labrinth.versions_v2.getVersions(uniqueVersionIds)
+		: []
+	const projectIds = [...new Set(versions.map((version) => version.project_id))]
+	const projects = projectIds.length
+		? await client.labrinth.projects_v2.getMultiple(projectIds)
+		: []
+	const projectsById = new Map(projects.map((project) => [project.id, project]))
+
+	const modrinthContent: ContentItem[] = versions.map((version) => {
+		const project = projectsById.get(version.project_id)
+		const primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
+		const fileName = primaryFile?.filename ?? version.name
+
+		return {
+			id: version.id,
+			file_name: fileName,
+			size: primaryFile?.size,
+			project_type: project?.project_type ?? 'mod',
+			has_update: false,
+			update_version_id: null,
+			source_kind: 'shared_instance',
+			project: project
+				? {
+						id: project.id,
+						slug: project.slug,
+						title: project.title,
+						icon_url: project.icon_url,
+					}
+				: {
+						id: version.project_id,
+						slug: version.project_id,
+						title: version.name,
+						icon_url: undefined,
+					},
+			version: {
+				id: version.id,
+				version_number: version.version_number,
+				file_name: fileName,
+				date_published: version.date_published,
+			},
+		}
+	})
+
+	const externalContent: ContentItem[] = instanceVersion.external_files.map((file, index) => ({
+		id: `external:${file.file_type}:${file.file_name}:${index}`,
+		file_name: file.file_name,
+		size: file.file_size,
+		project_type: file.file_type,
+		has_update: false,
+		update_version_id: null,
+		source_kind: 'shared_instance',
+		external: true,
+		external_url: file.url,
+		project: {
+			id: file.file_name,
+			slug: file.file_name,
+			title: file.file_name,
+			icon_url: undefined,
+		},
+	}))
+
+	return [...modrinthContent, ...externalContent]
+}
+
+function showSharedInstanceContentError(error: unknown) {
+	addNotification({
+		type: 'error',
+		title: 'Failed to load version content',
+		text: getErrorMessage(
+			error,
+			'The content for this shared instance version could not be loaded.',
+		),
+	})
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+	if (typeof error === 'string') return error
+	if (!error || typeof error !== 'object') return fallback
+
+	const requestError = error as {
+		message?: string
+		data?: {
+			description?: string
+		}
+	}
+	return requestError.data?.description ?? requestError.message ?? fallback
+}
+
 const reportItemAvatarUrl = computed(() => {
 	switch (props.report.item_type) {
 		case 'project':
@@ -329,6 +617,8 @@ const reportItemAvatarUrl = computed(() => {
 			return props.report.project?.icon_url || ''
 		case 'user':
 			return props.report.user?.avatar_url || ''
+		case 'shared-instance':
+			return sharedInstanceDetails.value?.icon_url || ''
 		default:
 			return undefined
 	}
@@ -336,6 +626,9 @@ const reportItemAvatarUrl = computed(() => {
 
 const reportItemTitle = computed(() => {
 	if (props.report.item_type === 'user') return props.report.user?.username || 'Unknown User'
+	if (props.report.item_type === 'shared-instance') {
+		return sharedInstanceDetails.value?.name || 'Shared instance'
+	}
 
 	return props.report.project?.title || 'Unknown Project'
 })
@@ -348,6 +641,8 @@ const reportItemUrl = computed(() => {
 			return `/${props.report.project?.project_type}/${props.report.project?.slug}`
 		case 'version':
 			return `/${props.report.project?.project_type}/${props.report.project?.slug}/version/${props.report.version?.id}`
+		case 'shared-instance':
+			return ''
 		default:
 			return `/${props.report.item_type}/${props.report.id}`
 	}
@@ -368,6 +663,14 @@ function copyId() {
 			title: 'Report ID copied',
 			text: 'The ID of this report has been copied to your clipboard.',
 		})
+	})
+}
+
+function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
+	addNotification({
+		type: 'info',
+		title: 'Shared instances ban preview',
+		text: `${owner.username} would be banned from the shared instances service and all of their instances would be quarantined.`,
 	})
 }
 </script>

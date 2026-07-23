@@ -575,9 +575,6 @@
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "Include links and images if possible and relevant"
   },
-  "app.modal.install-to-play.block-user": {
-    "message": "Block this user"
-  },
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "Content you’re reporting"
   },
@@ -605,20 +602,26 @@
   "app.modal.install-to-play.report-description": {
     "message": "Use this form to report content that may violate our <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>."
   },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "File is not an accepted image type"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "File exceeds the 1 MiB size limit"
+  },
   "app.modal.install-to-play.report-legal-claims": {
     "message": "For DMCA notices or other legal claims, see our <copyright-link>Copyright Policy</copyright-link>."
   },
   "app.modal.install-to-play.report-reason": {
     "message": "Which rule does this content violate?"
   },
-  "app.modal.install-to-play.report-reason.illegal": {
-    "message": "Illegal"
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "Inappropriate"
   },
   "app.modal.install-to-play.report-reason.malicious": {
     "message": "Malicious"
   },
-  "app.modal.install-to-play.report-reason.other": {
-    "message": "Other"
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Spam"
   },
   "app.modal.install-to-play.report-shared-instance-header": {
     "message": "Report shared instance"

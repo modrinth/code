@@ -27,6 +27,7 @@ interface Props {
 	hideDelete?: boolean
 	hideHeader?: boolean
 	flat?: boolean
+	showItemActions?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 	hideDelete: false,
 	hideHeader: false,
 	flat: false,
+	showItemActions: false,
 })
 
 const stickyHeaderRef = ref<HTMLElement | null>(null)
@@ -81,7 +83,7 @@ const hasAnyActions = computed(() => {
 			item.enabled !== undefined,
 	)
 
-	return hasListeners || hasItemActions
+	return hasListeners || hasItemActions || props.showItemActions
 })
 
 // Virtualization
@@ -297,6 +299,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 						hasSwitchVersionListener ? { switchVersion: () => emit('switchVersion', item.id) } : {}
 					"
 				>
+					<template #title-badges>
+						<slot name="itemTitleBadges" :item="item" :index="visibleRange.start + idx" />
+					</template>
 					<template #additionalButtonsLeft>
 						<slot name="itemButtonsLeft" :item="item" :index="visibleRange.start + idx" />
 					</template>
@@ -352,6 +357,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 				@update="emit('update', item.id)"
 				@switch-version="emit('switchVersion', item.id)"
 			>
+				<template #title-badges>
+					<slot name="itemTitleBadges" :item="item" :index="index" />
+				</template>
 				<template #additionalButtonsLeft>
 					<slot name="itemButtonsLeft" :item="item" :index="index" />
 				</template>

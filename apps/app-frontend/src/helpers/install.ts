@@ -46,6 +46,8 @@ export interface InstallPostInstallEdit {
 }
 
 export interface SharedInstanceInstallPreview {
+	sharedInstanceId: string
+	version: number
 	name: string
 	iconUrl?: string | null
 	gameVersion: string

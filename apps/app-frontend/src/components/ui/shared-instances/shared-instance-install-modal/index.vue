@@ -6,7 +6,7 @@
 				? formatMessage(messages.reportSharedInstance)
 				: formatMessage(messages.installToPlay)
 		"
-		:closable="true"
+		:closable="!submitLoading"
 		:on-hide="handleHide"
 		max-width="544px"
 		width="544px"
@@ -92,25 +92,19 @@
 						<Combobox v-model="reportReason" :options="reportReasonOptions" />
 					</div>
 					<div class="flex flex-col gap-2.5">
-						<label for="shared-instance-report-context" class="font-semibold text-contrast">
+						<span class="font-semibold text-contrast">
 							{{ formatMessage(messages.additionalContext) }}
-						</label>
-						<StyledInput
-							id="shared-instance-report-context"
+						</span>
+						<MarkdownEditor
 							v-model="additionalContext"
-							multiline
-							:rows="5"
 							:placeholder="formatMessage(messages.additionalContextPlaceholder)"
-							wrapper-class="w-full"
+							:on-image-upload="onImageUpload"
+							:min-height="120"
+							:max-height="240"
 						/>
 					</div>
-					<div class="flex flex-col gap-2">
-						<Checkbox v-model="blockUser" :label="formatMessage(messages.blockUser)" />
-						<Checkbox
-							v-if="reportOnly"
-							v-model="deleteInstance"
-							:label="formatMessage(messages.deleteInstance)"
-						/>
+					<div v-if="reportOnly" class="flex flex-col gap-2">
+						<Checkbox v-model="deleteInstance" :label="formatMessage(messages.deleteInstance)" />
 					</div>
 				</div>
 			</Transition>
@@ -184,13 +178,15 @@
 				</div>
 				<div class="flex gap-2">
 					<ButtonStyled v-if="reportMode" type="outlined">
-						<button class="!border" @click="handleCancel">
+						<button class="!border" :disabled="submitLoading" @click="handleCancel">
 							<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-if="reportMode" color="brand">
-						<button @click="submitReport">
-							<SendIcon />{{ formatMessage(commonMessages.reportButton) }}
+						<button :disabled="!canSubmitReport" @click="submitReport">
+							<SpinnerIcon v-if="submitLoading" class="animate-spin" />
+							<SendIcon v-else />
+							{{ formatMessage(commonMessages.reportButton) }}
 						</button>
 					</ButtonStyled>
 					<template v-else-if="hasExternalFiles">
@@ -230,7 +226,8 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon, DownloadIcon, ReportIcon, SendIcon, XIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import { BanIcon, DownloadIcon, ReportIcon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	AutoLink,
@@ -240,11 +237,12 @@ import {
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	MarkdownEditor,
 	ModpackContentModal,
 	NewModal,
-	StyledInput,
 	Table,
 	type TableColumn,
 	useScrollIndicator,
@@ -253,7 +251,9 @@ import {
 import { computed, nextTick, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
+import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
+import { create_report } from '@/helpers/reports'
 
 import SharedInstanceInstallSummary from './shared-instance-install-summary.vue'
 import { useSharedInstancePreviewContent } from './use-shared-instance-preview-content'
@@ -271,16 +271,18 @@ const preview = ref<SharedInstanceInstallPreview | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
 const reportOnly = ref(false)
-type ReportReason = 'malicious' | 'illegal' | 'other'
+type ReportReason = 'malicious' | 'inappropriate' | 'spam'
 const reportReason = ref<ReportReason>('malicious')
 const additionalContext = ref('')
-const blockUser = ref(false)
 const deleteInstance = ref(true)
+const submitLoading = ref(false)
+const uploadedImageIDs = ref<string[]>([])
 const emit = defineEmits<{
 	reported: [deleteInstance: boolean]
 }>()
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+const { addNotification, handleError } = injectNotificationManager()
 const { load } = useSharedInstancePreviewContent()
 const {
 	showTopFade: showTableTopFade,
@@ -299,9 +301,12 @@ const externalFileRows = computed<ExternalFileRow[]>(() =>
 )
 const reportReasonOptions = computed<ComboboxOption<ReportReason>[]>(() => [
 	{ value: 'malicious', label: formatMessage(messages.maliciousReason) },
-	{ value: 'illegal', label: formatMessage(messages.illegalReason) },
-	{ value: 'other', label: formatMessage(messages.otherReason) },
+	{ value: 'inappropriate', label: formatMessage(messages.inappropriateReason) },
+	{ value: 'spam', label: formatMessage(messages.spamReason) },
 ])
+const canSubmitReport = computed(
+	() => Boolean(preview.value && additionalContext.value.trim()) && !submitLoading.value,
+)
 
 async function accept() {
 	hide()
@@ -321,14 +326,55 @@ async function openViewContents() {
 		contentModal.value?.show([])
 	}
 }
-function submitReport() {
-	const shouldDeleteInstance = reportOnly.value && deleteInstance.value
-	hide()
-	addNotification({
-		type: 'success',
-		title: formatMessage(messages.reportSubmitted),
-	})
-	emit('reported', shouldDeleteInstance)
+async function submitReport() {
+	const reportPreview = preview.value
+	const body = additionalContext.value.trim()
+	if (!reportPreview || !body || submitLoading.value) return
+
+	submitLoading.value = true
+	try {
+		const uploadedImages = uploadedImageIDs.value.slice(-10)
+		await create_report({
+			report_type: reportReason.value,
+			item_type: 'shared-instance',
+			item_id: `${reportPreview.sharedInstanceId}/${reportPreview.version}`,
+			body,
+			uploaded_images: uploadedImages,
+		})
+
+		const shouldDeleteInstance = reportOnly.value && deleteInstance.value
+		hide()
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.reportSubmitted),
+		})
+		emit('reported', shouldDeleteInstance)
+	} catch (error) {
+		handleError(toError(error))
+	} finally {
+		submitLoading.value = false
+	}
+}
+async function onImageUpload(file: File) {
+	const imageExtensionByType: Partial<Record<string, Labrinth.Images.v3.ImageExtension>> = {
+		'image/gif': 'gif',
+		'image/jpeg': 'jpeg',
+		'image/png': 'png',
+		'image/webp': 'webp',
+	}
+	const extension = imageExtensionByType[file.type]
+	if (!extension) {
+		throw new Error(formatMessage(messages.invalidImageType))
+	}
+	if (file.size > 1024 * 1024) {
+		throw new Error(formatMessage(messages.imageTooLarge))
+	}
+
+	const image = await client.labrinth.images_v3.uploadImage(file, extension, {
+		context: 'report',
+	}).promise
+	uploadedImageIDs.value.push(image.id)
+	return image.url
 }
 function handleCancel() {
 	if (reportMode.value && !reportOnly.value) {
@@ -347,8 +393,9 @@ function resetReportState() {
 	reportOnly.value = false
 	reportReason.value = 'malicious'
 	additionalContext.value = ''
-	blockUser.value = false
 	deleteInstance.value = true
+	submitLoading.value = false
+	uploadedImageIDs.value = []
 }
 function show(
 	previewValue: SharedInstanceInstallPreview,
@@ -426,13 +473,13 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.report-reason.malicious',
 		defaultMessage: 'Malicious',
 	},
-	illegalReason: {
-		id: 'app.modal.install-to-play.report-reason.illegal',
-		defaultMessage: 'Illegal',
+	inappropriateReason: {
+		id: 'app.modal.install-to-play.report-reason.inappropriate',
+		defaultMessage: 'Inappropriate',
 	},
-	otherReason: {
-		id: 'app.modal.install-to-play.report-reason.other',
-		defaultMessage: 'Other',
+	spamReason: {
+		id: 'app.modal.install-to-play.report-reason.spam',
+		defaultMessage: 'Spam',
 	},
 	additionalContext: {
 		id: 'app.modal.install-to-play.additional-context',
@@ -442,9 +489,13 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.additional-context-placeholder',
 		defaultMessage: 'Include links and images if possible and relevant',
 	},
-	blockUser: {
-		id: 'app.modal.install-to-play.block-user',
-		defaultMessage: 'Block this user',
+	invalidImageType: {
+		id: 'app.modal.install-to-play.report-image-invalid-type',
+		defaultMessage: 'File is not an accepted image type',
+	},
+	imageTooLarge: {
+		id: 'app.modal.install-to-play.report-image-too-large',
+		defaultMessage: 'File exceeds the 1 MiB size limit',
 	},
 	deleteInstance: {
 		id: 'app.modal.install-to-play.delete-instance',

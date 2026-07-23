@@ -87,6 +87,7 @@ export interface ContentItem extends Omit<
 	installing?: boolean
 	source_kind?: ContentSourceKind | null
 	external?: boolean
+	external_url?: string
 }
 
 export type ContentModpackCardProject = Pick<

@@ -85,6 +85,8 @@ pub enum SharedInstanceJoinType {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInstallPreview {
+    pub shared_instance_id: String,
+    pub version: i32,
     pub name: String,
     pub icon_url: Option<String>,
     pub game_version: String,

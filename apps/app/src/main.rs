@@ -240,6 +240,7 @@ fn main() {
         .plugin(api::metadata::init())
         .plugin(api::minecraft_skins::init())
         .plugin(api::process::init())
+        .plugin(api::reports::init())
         .plugin(api::settings::init())
         .plugin(api::shortcuts::init())
         .plugin(api::tags::init())

@@ -1,14 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { ExtendedReport, OwnershipTarget } from '@modrinth/moderation'
-import type {
-	Organization,
-	Project,
-	Report,
-	TeamMember,
-	Thread,
-	User,
-	Version,
-} from '@modrinth/utils'
+import type { Organization, Project, TeamMember, Thread, User, Version } from '@modrinth/utils'
 
 export const useModerationCache = () => ({
 	threads: useState<Map<string, Thread>>('moderation-report-cache-threads', () => new Map()),
@@ -20,7 +12,9 @@ export const useModerationCache = () => ({
 })
 
 // TODO: @AlexTMjugador - backend should do all of these functions.
-export async function enrichReportBatch(reports: Report[]): Promise<ExtendedReport[]> {
+export async function enrichReportBatch(
+	reports: Labrinth.Reports.v3.Report[],
+): Promise<ExtendedReport[]> {
 	if (reports.length === 0) return []
 
 	const cache = useModerationCache()

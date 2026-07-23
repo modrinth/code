@@ -2078,6 +2078,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "No content found"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "External"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "This file is not published on Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpack content"
   },
@@ -2086,6 +2092,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "No projects match your search."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Open in Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
