@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { FolderSearchIcon, StarIcon, TrashIcon } from '@modrinth/assets'
+import {
+	FolderSearchIcon,
+	RotateCounterClockwiseIcon,
+	SpinnerIcon,
+	StarIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	ButtonStyled,
 	ConfirmModal,
@@ -12,6 +18,7 @@ import {
 	type TableColumn,
 	useVIntl,
 } from '@modrinth/ui'
+import { renderString } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef } from 'vue'
 
@@ -66,7 +73,7 @@ const messages = defineMessages({
 	},
 	scanError: {
 		id: 'modpack-scan-modal.scan-error',
-		defaultMessage: 'Some files failed to scan: {error}',
+		defaultMessage: 'Some files failed to scan: \n\n{error}',
 	},
 	clearAllGroups: {
 		id: 'modpack-scan-modal.clear-all-groups',
@@ -98,7 +105,7 @@ const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const clearModalRef = useTemplateRef<InstanceType<typeof ConfirmModal>>('clearModalRef')
 const { formatMessage } = useVIntl()
 
-const rows = ref<ScanRow[]>([])
+const rows = ref<Record<string, ScanRow>>({})
 const isLoadingVersions = ref(false)
 const isScanning = ref(false)
 const isClearing = ref(false)
@@ -113,8 +120,25 @@ const columns = computed<TableColumn<ScanTableColumn>[]>(() => [
 	{ key: 'newGroups', label: formatMessage(messages.newGroups), align: 'center', width: '20%' },
 ])
 
-const scannedCount = computed(() => rows.value.filter((row) => row.scan || row.error).length)
+const scannedCount = computed(
+	() => Object.entries(rows.value).filter(([_, row]) => row.scan || row.error).length,
+)
 const isBusy = computed(() => isLoadingVersions.value || isScanning.value || isClearing.value)
+const titleButtonsDisabled = computed(() => isBusy || Object.keys(rows.value).length === 0)
+const rescanButtonsDisabled = computed(() => isLoadingVersions.value || isClearing.value)
+
+const rowErrors = computed(() =>
+	Object.entries(rows.value)
+		.filter(([_, row]) => row.error)
+		.map(([_, row]) => row),
+)
+
+const rowScanError = computed(() => {
+	if (rowErrors.value.length === 0) return undefined
+	return formatMessage(messages.scanError, {
+		error: rowErrors.value.map((r) => `\n - ${r.filename}`).join(''),
+	})
+})
 
 function getErrorMessage(error: unknown) {
 	if (error instanceof Error) {
@@ -131,12 +155,28 @@ function getErrorMessage(error: unknown) {
 	return String(error)
 }
 
+async function runWithConcurrency<T>(
+	items: T[],
+	limit: number,
+	task: (item: T) => Promise<void>,
+): Promise<void> {
+	const queue = [...items]
+	const workers = Array.from({ length: limit }, async () => {
+		while (queue.length) {
+			const item = queue.shift()
+			if (item === undefined) return
+			await task(item)
+		}
+	})
+	await Promise.all(workers)
+}
+
 async function fetchAllVersions() {
 	const currentRequestId = ++requestId.value
 	isLoadingVersions.value = true
 	versionLoadError.value = null
 	scanError.value = null
-	rows.value = []
+	rows.value = {}
 
 	try {
 		const versions = await client.labrinth.versions_v2.getProjectVersions(props.project_id)
@@ -144,17 +184,20 @@ async function fetchAllVersions() {
 			return
 		}
 
-		rows.value = versions
+		const filteredVersions = versions
 			.flatMap((version) => version.files)
 			.filter((file): file is Labrinth.Versions.v2.VersionFile & { id: string } => Boolean(file.id))
-			.map((file) => ({
-				id: file.id,
-				filename: file.filename,
-				primary: file.primary,
+
+		for (const version of filteredVersions) {
+			rows.value[version.id] = {
+				id: version.id,
+				filename: version.filename,
+				primary: version.primary,
 				isScanning: false,
 				newFiles: undefined,
 				newGroups: undefined,
-			}))
+			}
+		}
 	} catch (error) {
 		if (currentRequestId === requestId.value) {
 			versionLoadError.value = formatMessage(messages.loadVersionsError, {
@@ -168,54 +211,50 @@ async function fetchAllVersions() {
 	}
 }
 
-async function fetchAllScans() {
-	if (isBusy.value) {
-		return
-	}
+async function fetchScan(id: string) {
+	console.log(`scanning for row with id ${id}`)
 
-	const currentScanRequestId = ++scanRequestId.value
+	rows.value[id].isScanning = true
+	try {
+		if (Math.random() < 0.25) throw new Error('test error')
+		const scan = await client.labrinth.attribution_internal.scanFile(id)
+
+		rows.value[id].scan = scan
+		rows.value[id].newFiles = scan.new_attribution_files
+		rows.value[id].newGroups = scan.new_attribution_groups
+
+		rows.value[id].error = undefined
+	} catch (error) {
+		rows.value[id].error = getErrorMessage(error)
+		scanError.value = formatMessage(messages.scanError, { error: rows.value[id].error })
+	} finally {
+		rows.value[id].isScanning = false
+	}
+}
+
+async function fetchAllScans() {
+	if (isBusy.value) return
+
 	isScanning.value = true
 	scanError.value = null
-	rows.value = rows.value.map((row) => ({
-		...row,
-		scan: undefined,
-		isScanning: false,
-		error: undefined,
-		newFiles: undefined,
-		newGroups: undefined,
-	}))
+
+	Object.entries(rows.value).map(([id, row]) => {
+		rows.value[id] = {
+			...row,
+			scan: undefined,
+			isScanning: false,
+			error: undefined,
+			newFiles: undefined,
+			newGroups: undefined,
+		}
+	})
 
 	try {
-		for (const row of rows.value) {
-			if (currentScanRequestId !== scanRequestId.value) {
-				return
-			}
-
-			row.isScanning = true
-			try {
-				const scan = await client.labrinth.attribution_internal.scanFile(row.id)
-				if (currentScanRequestId !== scanRequestId.value) {
-					return
-				}
-
-				row.scan = scan
-				row.newFiles = scan.new_attribution_files
-				row.newGroups = scan.new_attribution_groups
-			} catch (error) {
-				if (currentScanRequestId !== scanRequestId.value) {
-					return
-				}
-
-				row.error = getErrorMessage(error)
-				scanError.value = formatMessage(messages.scanError, { error: row.error })
-			} finally {
-				row.isScanning = false
-			}
-		}
+		await runWithConcurrency(Object.keys(rows.value), 10, async (id: string) => {
+			await fetchScan(id)
+		})
 	} finally {
-		if (currentScanRequestId === scanRequestId.value) {
-			isScanning.value = false
-		}
+		isScanning.value = false
 	}
 }
 
@@ -264,7 +303,7 @@ async function clearAllGroups() {
 function show() {
 	scanRequestId.value++
 	isScanning.value = false
-	rows.value = []
+	rows.value = {}
 	void fetchAllVersions()
 	modalRef.value?.show()
 }
@@ -297,7 +336,7 @@ defineExpose({ show, hide })
 					{{
 						formatMessage(messages.title, {
 							scanned: scannedCount,
-							total: rows.length,
+							total: Object.keys(rows).length,
 						})
 					}}
 				</span>
@@ -305,19 +344,21 @@ defineExpose({ show, hide })
 					<ButtonStyled circular color="red" color-fill="none">
 						<button
 							v-tooltip="formatMessage(messages.clearAllGroups)"
-							:disabled="isBusy || rows.length === 0"
+							:disabled="titleButtonsDisabled.value"
 							@click="showConfirmClearGroups"
 						>
-							<TrashIcon aria-hidden="true" />
+							<TrashIcon v-if="!isClearing" aria-hidden="true" />
+							<SpinnerIcon class="animate-spin" v-else />
 						</button>
 					</ButtonStyled>
 					<ButtonStyled circular>
 						<button
 							v-tooltip="formatMessage(messages.scanAllFiles)"
-							:disabled="isBusy || rows.length === 0"
+							:disabled="titleButtonsDisabled.value"
 							@click="fetchAllScans"
 						>
-							<FolderSearchIcon aria-hidden="true" />
+							<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
+							<SpinnerIcon class="animate-spin" v-else />
 						</button>
 					</ButtonStyled>
 				</div>
@@ -326,14 +367,14 @@ defineExpose({ show, hide })
 
 		<div class="w-full">
 			<div
-				v-if="versionLoadError || scanError"
-				class="mb-3 rounded-xl bg-highlight-red p-3 text-red"
+				v-if="versionLoadError || rowScanError"
+				class="mb-3 rounded-xl bg-highlight-red px-4 py-1 text-red"
 			>
-				{{ versionLoadError || scanError }}
+				<div v-html="renderString((versionLoadError || rowScanError) ?? '')"></div>
 			</div>
 			<Table
 				:columns="columns"
-				:data="rows"
+				:data="Object.entries(rows).map(([_, row]) => row)"
 				row-key="id"
 				:row-below-visible="
 					(row) => Boolean(row.scan?.scanned_file_names && row.scan.scanned_file_names.length > 0)
@@ -348,16 +389,36 @@ defineExpose({ show, hide })
 				</template>
 				<template #cell-newFiles="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
-					<span v-else-if="row.error" v-tooltip="row.error" class="text-red">
-						{{ formatMessage(messages.failed) }}
+					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
+						<ButtonStyled
+							class="justify-self-center"
+							color="red"
+							type="outlined"
+							hover-color-fill="background"
+						>
+							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
+								<RotateCounterClockwiseIcon />
+								{{ formatMessage(messages.failed) }}
+							</button>
+						</ButtonStyled>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_files }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>
 				</template>
 				<template #cell-newGroups="{ row }">
 					<span v-if="row.isScanning">{{ formatMessage(messages.scanning) }}</span>
-					<span v-else-if="row.error" v-tooltip="row.error" class="text-red">
-						{{ formatMessage(messages.failed) }}
+					<span v-else-if="row.error" v-tooltip="row.error" class="flex justify-center">
+						<ButtonStyled
+							class="justify-self-center"
+							color="red"
+							type="outlined"
+							hover-color-fill="background"
+						>
+							<button :disabled="rescanButtonsDisabled" @click="() => fetchScan(row.id)">
+								<RotateCounterClockwiseIcon />
+								{{ formatMessage(messages.failed) }}
+							</button>
+						</ButtonStyled>
 					</span>
 					<span v-else-if="row.scan">{{ row.scan.new_attribution_groups }}</span>
 					<span v-else>{{ formatMessage(messages.notScanned) }}</span>
