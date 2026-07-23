@@ -956,6 +956,7 @@ async fn remove_existing_imported_pack_content(
     metadata: &crate::state::InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
+    let _content_lock = state.lock_instance_content(instance_id).await;
     let entries = content_rows::get_content_entries(
         &metadata.applied_content_set.id,
         &state.pool,
@@ -992,18 +993,20 @@ async fn remove_existing_imported_pack_content(
             continue;
         };
         crate::util::io::remove_file(base.join(&file.relative_path)).await?;
+        let mut tx = state.pool.begin().await?;
         content_rows::remove_content_entries_for_file(
             &metadata.applied_content_set.id,
             &file.id,
-            &state.pool,
+            &mut tx,
         )
         .await?;
         content_rows::remove_instance_file_by_relative_path(
             instance_id,
             &file.relative_path,
-            &state.pool,
+            &mut tx,
         )
         .await?;
+        tx.commit().await?;
     }
 
     Ok(())

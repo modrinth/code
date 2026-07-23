@@ -82,6 +82,7 @@ jobs:
       SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
       SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
+      CARGO_INCREMENTAL: 0
       # Redis config for tests
       REDIS_TOPOLOGY: cluster
       REDIS_CONNECTION_TYPE: multiplexed
