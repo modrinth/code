@@ -226,28 +226,6 @@
 			/>
 		</section>
 
-		<details class="universal-card text-sm">
-			<summary class="cursor-pointer font-semibold text-contrast">CEL contract and input</summary>
-			<div class="mt-3 flex flex-col gap-2 text-secondary">
-				<p class="m-0">
-					Effects are maps such as
-					<code>{ "severity": "low", "hidden": false }</code>. Severity can be <code>low</code>,
-					<code>medium</code>, <code>high</code>, or <code>severe</code>.
-				</p>
-				<p class="m-0">
-					Rules run in the order shown below. The first rule that returns a non-null effect wins.
-				</p>
-				<p class="m-0">
-					The <code>input</code> object contains <code>schema_version</code>,
-					<code>trace</code> (<code>key</code>, <code>issue_type</code>, <code>severity</code>,
-					<code>jar</code>, <code>file_path</code>, <code>data</code>),
-					<code>scan.delphi_version</code>, <code>artifact</code> (<code>size</code>,
-					<code>hashes</code>), and stable IDs under <code>scope</code> (<code>project_id</code>,
-					<code>version_id</code>, <code>file_id</code>).
-				</p>
-			</div>
-		</details>
-
 		<div v-if="isLoading" class="universal-card flex h-32 items-center justify-center">
 			<LoaderCircleIcon class="size-8 animate-spin text-secondary" />
 		</div>
