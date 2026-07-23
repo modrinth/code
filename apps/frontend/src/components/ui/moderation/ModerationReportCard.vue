@@ -517,7 +517,7 @@ async function loadSharedInstanceVersionContent(
 	}
 
 	const versionIds = [
-		...instanceVersion.modrinth_ids,
+		...(instanceVersion.modrinth_ids ?? []),
 		...(instanceVersion.modpack_id ? [instanceVersion.modpack_id] : []),
 	]
 	const uniqueVersionIds = [...new Set(versionIds)]
