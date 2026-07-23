@@ -502,6 +502,13 @@ pub(crate) async fn add_project_bytes(
     version_id: Option<&str>,
     state: &State,
 ) -> crate::Result<String> {
+    if !path_util::is_safe_file_name(file_name) {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Project file {file_name} has an invalid file name"
+        ))
+        .into());
+    }
+
     let _content_lock = state.lock_instance_content(instance_id).await;
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let project_type = match project_type {
