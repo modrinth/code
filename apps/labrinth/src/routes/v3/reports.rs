@@ -199,7 +199,8 @@ pub async fn report_create(
             // validation
             let url = format!(
                 "{}/v1/instances/{}",
-                ENV.SHARED_INSTANCES_URL, shared_instance_id.0
+                ENV.SHARED_INSTANCES_URL,
+                to_base62(shared_instance_id.0 as u64)
             );
             let instance_response = HTTP_CLIENT
                 .get(&url)
