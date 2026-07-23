@@ -5,7 +5,7 @@ export const article = {
   summary: "Shared instances let you send and update content without sharing modpack files",
   date: "2026-07-24T11:00:00.000Z",
   slug: "shared-instances",
-  authors: [],
+  authors: ["bOHH0P9Z","o2Dd4mrX","AJfd8YH6"],
   unlisted: false,
   thumbnail: true,
   
