@@ -46,7 +46,7 @@ export interface BrowseManagerContext {
 	clearSearch: () => void
 	onFilterChange: () => void
 
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => string | RouteLocationRaw
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => string | RouteLocationRaw
 	getServerProjectLink: (
 		result: Labrinth.Search.v3.ResultSearchProject,
 	) => string | RouteLocationRaw
@@ -57,7 +57,7 @@ export interface BrowseManagerContext {
 	variant: 'app' | 'web'
 
 	getCardActions?: (
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+		result: Labrinth.Search.v3.ResultSearchProject,
 		projectType: string,
 	) => CardAction[]
 
@@ -85,13 +85,10 @@ export interface BrowseManagerContext {
 		result: Labrinth.Search.v3.ResultSearchProject,
 	) => ServerModpackContent | undefined
 
-	onProjectHover?: (result: Labrinth.Search.v2.ResultSearchProject) => void
+	onProjectHover?: (result: Labrinth.Search.v3.ResultSearchProject) => void
 	onServerProjectHover?: (result: Labrinth.Search.v3.ResultSearchProject) => void
 	onProjectHoverEnd?: () => void
-	onContextMenu?: (
-		event: MouseEvent,
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-	) => void
+	onContextMenu?: (event: MouseEvent, result: Labrinth.Search.v3.ResultSearchProject) => void
 	offline?: Ref<boolean>
 
 	filtersMenuOpen?: Ref<boolean>

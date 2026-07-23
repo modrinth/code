@@ -250,9 +250,9 @@ pub struct SearchResultsV3 {
 pub struct SearchResultV3 {
     pub hits: Vec<serde_json::Value>,
     #[serde(default)]
-    pub offset: u32,
-    #[serde(default)]
-    pub limit: u32,
+    pub page: u32,
+    #[serde(default, alias = "limit")]
+    pub hits_per_page: u32,
     #[serde(default)]
     pub total_hits: u32,
 }
