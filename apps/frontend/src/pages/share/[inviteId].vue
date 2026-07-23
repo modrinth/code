@@ -207,7 +207,13 @@ const {
 })
 
 const instanceIcon = computed(() => invite.value?.instance_icon ?? null)
-const instanceUsers = computed(() => invite.value?.instance_users ?? [])
+const instanceUsers = computed(() => {
+	if (!invite.value) return []
+	const managerIds = new Set(
+		invite.value.managers.flatMap((manager) => (manager.type === 'user' ? [manager.id] : [])),
+	)
+	return invite.value.instance_users?.filter((user) => !managerIds.has(user.id)) ?? []
+})
 const visibleInstanceUsers = computed(() => instanceUsers.value.slice(0, 4))
 const hiddenUserCount = computed(() =>
 	Math.max(0, instanceUsers.value.length - visibleInstanceUsers.value.length),
