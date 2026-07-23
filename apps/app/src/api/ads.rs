@@ -23,6 +23,9 @@ const ADS_CONSENT_REQUIRED_EVENT: &str = "ads-consent-required";
 const APP_TITLE_BAR_HEIGHT: f32 = 48.0;
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
+/// occlusion visibility is debounced to not run unless the window is hidden for a couple seconds to avoid repeated changes.
+#[cfg(any(windows, target_os = "macos"))]
+const OCCLUSION_VISIBILITY_DEBOUNCE: Duration = Duration::from_secs(2);
 #[cfg(not(target_os = "linux"))]
 const ADS_USER_AGENT: &str = concat!(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
@@ -189,14 +192,40 @@ fn compute_ads_webview_occlusion<R: Runtime>(
 }
 
 #[cfg(any(windows, target_os = "macos"))]
-async fn sync_ads_occlusion<R: Runtime>(app: &tauri::AppHandle<R>) {
+async fn sync_ads_occlusion<R: Runtime>(
+    app: &tauri::AppHandle<R>,
+    pending: &mut Option<(bool, Instant)>,
+) {
     let Some(occluded) = compute_ads_webview_occlusion(app) else {
         return;
     };
 
     let state = app.state::<RwLock<AdsState>>();
-    let mut state = state.write().await;
+    let current_occluded = state
+        .try_read()
+        .map(|state| state.occluded)
+        .unwrap_or(false);
 
+    if occluded == current_occluded {
+        *pending = None;
+        return;
+    }
+
+    match pending {
+        Some((pending_occluded, since)) if *pending_occluded == occluded => {
+            if since.elapsed() < OCCLUSION_VISIBILITY_DEBOUNCE {
+                return;
+            }
+        }
+        _ => {
+            *pending = Some((occluded, Instant::now()));
+            return;
+        }
+    }
+
+    *pending = None;
+
+    let mut state = state.write().await;
     if state.occluded == occluded {
         return;
     }
@@ -347,8 +376,11 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 let app_handle = app.clone();
 
                 tauri::async_runtime::spawn(async move {
+                    let mut pending_occlusion = None;
+
                     loop {
-                        sync_ads_occlusion(&app_handle).await;
+                        sync_ads_occlusion(&app_handle, &mut pending_occlusion)
+                            .await;
 
                         tokio::time::sleep(Duration::from_millis(200)).await;
                     }
