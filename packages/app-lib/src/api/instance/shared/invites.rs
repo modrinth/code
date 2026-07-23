@@ -139,20 +139,9 @@ pub async fn remove_shared_instance_users(
         remove_remote_users(&attachment.id, user_ids, &state).await?;
     }
 
-    let remaining_users = get_remote_users(&attachment.id, &state).await?;
-    if !has_shared_instance_recipients(&remaining_users, &attachment, &state)
-        .await?
-    {
-        delete_remote_instance(&attachment.id, &state).await?;
-        crate::state::clear_shared_instance(instance_id, &state.pool).await?;
-        emit_instance(instance_id, InstancePayloadType::Edited).await?;
-
-        return Ok(SharedInstanceUsers::empty());
-    }
-
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-    Ok(remaining_users)
+    get_remote_users(&attachment.id, &state).await
 }
 
 #[tracing::instrument]

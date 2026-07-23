@@ -421,24 +421,6 @@ pub(super) async fn shared_attachment_matches_current_user(
         .is_some_and(|current_user_id| current_user_id == linked_user_id))
 }
 
-pub(super) async fn has_shared_instance_recipients(
-    users: &SharedInstanceUsers,
-    attachment: &SharedInstanceAttachment,
-    state: &State,
-) -> crate::Result<bool> {
-    if users.tokens > 0 {
-        return Ok(true);
-    }
-
-    let current_user_id = linked_modrinth_user_id(state).await?;
-
-    Ok(users.user_ids.iter().any(|user_id| {
-        Some(user_id.as_str()) != attachment.linked_user_id.as_deref()
-            && Some(user_id.as_str()) != attachment.manager_id.as_deref()
-            && Some(user_id.as_str()) != current_user_id.as_deref()
-    }))
-}
-
 pub(super) async fn handle_unavailable_shared_instance_if_current_user(
     instance_id: &str,
     attachment: &SharedInstanceAttachment,
