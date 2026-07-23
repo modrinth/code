@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created, t.id thread_id, r.closed\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            INNER JOIN threads t ON t.report_id = r.id\n            WHERE r.id = ANY($1)\n            ORDER BY r.created DESC\n            ",
+  "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.shared_instance_id, r.shared_instance_version_id, r.body, r.reporter, r.created, t.id thread_id, r.closed\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            INNER JOIN threads t ON t.report_id = r.id\n            WHERE r.id = ANY($1)\n            ORDER BY r.created DESC\n            ",
   "describe": {
     "columns": [
       {
@@ -30,26 +30,36 @@
       },
       {
         "ordinal": 5,
+        "name": "shared_instance_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "shared_instance_version_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
         "name": "body",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "reporter",
         "type_info": "Int8"
       },
       {
-        "ordinal": 7,
+        "ordinal": 9,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 8,
+        "ordinal": 10,
         "name": "thread_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 9,
+        "ordinal": 11,
         "name": "closed",
         "type_info": "Bool"
       }
@@ -65,6 +75,8 @@
       true,
       true,
       true,
+      true,
+      true,
       false,
       false,
       false,
@@ -72,5 +84,5 @@
       false
     ]
   },
-  "hash": "6b7958eac5f273af8f37c0c888594e106fe323cbb3b0c32868b02f869d30f33f"
+  "hash": "de085413113d832b534db925b8bf1e50b852afea1c6e751664cae4fd9e789aab"
 }
