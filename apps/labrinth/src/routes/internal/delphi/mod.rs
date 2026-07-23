@@ -1,4 +1,5 @@
 use std::{collections::HashMap, fmt::Write, time::Instant};
+use xredis::RedisPool;
 
 use crate::env::ENV;
 use crate::{database::PgPool, util::http::HttpClient};
@@ -11,16 +12,13 @@ use tracing::info;
 
 use crate::{
     auth::check_is_moderator_from_headers,
-    database::{
-        models::{
-            DBFileId, DBProjectId, DelphiReportId, DelphiReportIssueDetailsId,
-            DelphiReportIssueId,
-            delphi_report_item::{
-                DBDelphiReport, DBDelphiReportIssue, DelphiSeverity,
-                DelphiStatus, ReportIssueDetail,
-            },
+    database::models::{
+        DBFileId, DBProjectId, DelphiReportId, DelphiReportIssueDetailsId,
+        DelphiReportIssueId,
+        delphi_report_item::{
+            DBDelphiReport, DBDelphiReportIssue, DelphiSeverity, DelphiStatus,
+            ReportIssueDetail,
         },
-        redis::RedisPool,
     },
     models::{
         ids::{ProjectId, VersionId},

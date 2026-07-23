@@ -5,9 +5,9 @@ use crate::database::PgTransaction;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::exp;
+use xredis::RedisPool;
 
 use crate::models::projects::{FileType, VersionStatus};
 use crate::queue::file_scan::scan_file;
@@ -19,11 +19,10 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::iter;
 use tracing::error;
 
-pub const VERSIONS_NAMESPACE: &str = "versions:v1";
-const VERSION_FILES_NAMESPACE: &str = "versions_files:v1";
+pub const VERSIONS_NAMESPACE: &str = "versions:v3";
+const VERSION_FILES_NAMESPACE: &str = "versions_files:v3";
 
 pub async fn cleanup_unused_attribution_files_and_groups(
     transaction: &mut PgTransaction<'_>,
@@ -948,7 +947,7 @@ impl DBVersion {
                     })
                     .await?;
 
-                Ok(res)
+                Ok::<_, DatabaseError>(res)
             },
         ).await?;
 
@@ -1039,7 +1038,7 @@ impl DBVersion {
                     })
                     .await?;
 
-                Ok(files)
+                Ok::<_, DatabaseError>(files)
             }
         ).await?;
 
@@ -1051,25 +1050,18 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let mut keys =
+            vec![redis.key().entity(VERSIONS_NAMESPACE, version.inner.id.0)];
+        keys.extend(version.files.iter().flat_map(|file| {
+            file.hashes.iter().map(|(algorithm, hash)| {
+                redis.key().entity(
+                    VERSION_FILES_NAMESPACE,
+                    format!("{algorithm}_{hash}"),
+                )
+            })
+        }));
 
-        redis
-            .delete_many(
-                iter::once((
-                    VERSIONS_NAMESPACE,
-                    Some(version.inner.id.0.to_string()),
-                ))
-                .chain(version.files.iter().flat_map(
-                    |file| {
-                        file.hashes.iter().map(|(algo, hash)| {
-                            (
-                                VERSION_FILES_NAMESPACE,
-                                Some(format!("{algo}_{hash}")),
-                            )
-                        })
-                    },
-                )),
-            )
-            .await?;
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 
@@ -1078,14 +1070,12 @@ impl DBVersion {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let keys = version_ids
+            .iter()
+            .map(|id| redis.key().entity(VERSIONS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
 
-        redis
-            .delete_many(
-                version_ids
-                    .iter()
-                    .map(|id| (VERSIONS_NAMESPACE, Some(id.0.to_string()))),
-            )
-            .await?;
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 }

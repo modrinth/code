@@ -1,11 +1,12 @@
 use std::time::Duration;
+use xredis::RedisPool;
 
 use actix_web::{HttpRequest, post, web};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::get_user_from_headers,
-    database::{PgPool, redis::RedisPool},
+    database::PgPool,
     models::pats::Scopes,
     queue::{server_ping, session::AuthQueue},
     routes::ApiError,

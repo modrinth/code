@@ -3521,24 +3521,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Created {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licensed {license}"
-  },
-  "project.about.details.published": {
-    "message": "Published {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Submitted {date}"
-  },
-  "project.about.details.title": {
-    "message": "Details"
-  },
-  "project.about.details.updated": {
-    "message": "Updated {date}"
-  },
   "project.actions.create-server": {
     "message": "Create a server"
   },
@@ -3574,9 +3556,6 @@
   },
   "project.description.title": {
     "message": "Description"
-  },
-  "project.details.licensed": {
-    "message": "Licensed"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "This game version is incompatible with the base project."
@@ -3733,15 +3712,6 @@
   },
   "project.install-context.back-to-discover": {
     "message": "Back to discover"
-  },
-  "project.license.error": {
-    "message": "License text could not be retrieved."
-  },
-  "project.license.loading": {
-    "message": "Loading license text..."
-  },
-  "project.license.title": {
-    "message": "License"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Your project is private, meaning it can only be accessed by you and people you invite."

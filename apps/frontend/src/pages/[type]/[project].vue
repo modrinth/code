@@ -48,25 +48,6 @@
 		</template>
 
 		<div v-else>
-			<NewModal
-				ref="modalLicense"
-				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
-			>
-				<template #title>
-					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
-					<span class="text-lg font-extrabold text-contrast">
-						{{ project.license.name ? project.license.name : formatMessage(messages.licenseTitle) }}
-					</span>
-				</template>
-				<div
-					class="markdown-body"
-					v-html="
-						renderString(licenseText).isEmpty
-							? formatMessage(messages.loadingLicenseText)
-							: renderString(licenseText)
-					"
-				/>
-			</NewModal>
 			<OpenInAppModal ref="openInAppModal" />
 			<div
 				class="over-the-top-download-animation"
@@ -472,116 +453,12 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
 					/>
-					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
-						v-if="false"
 						:project="project"
-						:has-versions="versions.length > 0"
 						:link-target="$external()"
 						:show-followers="isServerProject"
 						class="card flex-card"
 					/>
-					<div class="card flex-card">
-						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
-
-						<div class="details-list">
-							<div v-if="projectV3Loaded && !isServerProject" class="details-list__item">
-								<BookTextIcon aria-hidden="true" />
-								<div>
-									{{ formatMessage(messages.licensedLabel) }}
-									<a
-										v-if="project.license.url"
-										class="text-link hover:underline"
-										:href="project.license.url"
-										:target="$external()"
-										rel="noopener nofollow ugc"
-									>
-										{{ licenseIdDisplay }}
-										<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
-									</a>
-									<span
-										v-else-if="
-											project.license.id === 'LicenseRef-All-Rights-Reserved' ||
-											!project.license.id.includes('LicenseRef')
-										"
-										class="text-link hover:underline"
-										@click="(event) => getLicenseData(event)"
-									>
-										{{ licenseIdDisplay }}
-									</span>
-									<span v-else>{{ licenseIdDisplay }}</span>
-								</div>
-							</div>
-
-							<div v-if="isServerProject" class="details-list__item">
-								<HeartIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(
-											formatMessage(commonMessages.projectFollowers, {
-												count: project.followers,
-											}),
-										)
-									}}
-								</div>
-							</div>
-							<div
-								v-if="project.approved"
-								v-tooltip="formatDateTime(project.approved)"
-								class="details-list__item"
-							>
-								<CalendarIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(
-											formatMessage(detailsMessages.published, {
-												date: publishedDate,
-											}),
-										)
-									}}
-								</div>
-							</div>
-
-							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
-								<CalendarIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
-									}}
-								</div>
-							</div>
-
-							<div
-								v-if="project.status === 'processing' && project.queued"
-								v-tooltip="formatDateTime(project.queued)"
-								class="details-list__item"
-							>
-								<ScaleIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(
-											formatMessage(detailsMessages.submitted, {
-												date: submittedDate,
-											}),
-										)
-									}}
-								</div>
-							</div>
-
-							<div
-								v-if="versions.length > 0 && project.updated"
-								v-tooltip="formatDateTime(project.updated)"
-								class="details-list__item"
-							>
-								<VersionIcon aria-hidden="true" />
-								<div>
-									{{
-										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
-									}}
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 
 				<div class="normal-page__content">
@@ -612,13 +489,10 @@
 
 <script setup>
 import {
-	BookTextIcon,
-	CalendarIcon,
 	ChartIcon,
 	ChevronRightIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
-	ExternalIcon,
 	FolderSearchIcon,
 	HeartIcon,
 	ListIcon,
@@ -629,7 +503,6 @@ import {
 	ScanEyeIcon,
 	ServerPlusIcon,
 	SettingsIcon,
-	VersionIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -643,7 +516,6 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
-	NewModal,
 	OpenInAppModal,
 	PROJECT_DEP_MARKER_QUERY,
 	ProjectBackgroundGradient,
@@ -659,13 +531,11 @@ import {
 	SelectedProjectsFloatingBar,
 	TeleportOverflowMenu,
 	useDebugLogger,
-	useFormatDateTime,
 	useFormatPrice,
-	useRelativeTime,
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
+import { formatProjectType } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
@@ -733,10 +603,6 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { formatMessage } = useVIntl()
-const formatDateTime = useFormatDateTime({
-	timeStyle: 'short',
-	dateStyle: 'long',
-})
 const formatPrice = useFormatPrice()
 
 const debug = useDebugLogger('DownloadModal')
@@ -772,35 +638,6 @@ function handlePlayServerProject() {
 		serverProject: serverProject.value,
 	})
 }
-
-const formatRelativeTime = useRelativeTime()
-
-const detailsMessages = defineMessages({
-	title: {
-		id: 'project.about.details.title',
-		defaultMessage: 'Details',
-	},
-	licensed: {
-		id: 'project.about.details.licensed',
-		defaultMessage: 'Licensed {license}',
-	},
-	created: {
-		id: 'project.about.details.created',
-		defaultMessage: 'Created {date}',
-	},
-	submitted: {
-		id: 'project.about.details.submitted',
-		defaultMessage: 'Submitted {date}',
-	},
-	published: {
-		id: 'project.about.details.published',
-		defaultMessage: 'Published {date}',
-	},
-	updated: {
-		id: 'project.about.details.updated',
-		defaultMessage: 'Updated {date}',
-	},
-})
 
 const messages = defineMessages({
 	archivedMessage: {
@@ -869,22 +706,6 @@ const messages = defineMessages({
 	galleryTab: {
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
-	},
-	licenseErrorMessage: {
-		id: 'project.license.error',
-		defaultMessage: 'License text could not be retrieved.',
-	},
-	licenseTitle: {
-		id: 'project.license.title',
-		defaultMessage: 'License',
-	},
-	licensedLabel: {
-		id: 'project.details.licensed',
-		defaultMessage: 'Licensed',
-	},
-	loadingLicenseText: {
-		id: 'project.license.loading',
-		defaultMessage: 'Loading license text...',
 	},
 	moderationTab: {
 		id: 'project.moderation.title',
@@ -956,45 +777,7 @@ const messages = defineMessages({
 	},
 })
 
-const modalLicense = ref(null)
 const modalCollection = useTemplateRef('modal_collection')
-const licenseText = ref('')
-
-const createdDate = computed(() =>
-	project.value.published ? formatRelativeTime(project.value.published) : 'unknown',
-)
-const submittedDate = computed(() =>
-	project.value.queued ? formatRelativeTime(project.value.queued) : 'unknown',
-)
-const publishedDate = computed(() =>
-	project.value.approved ? formatRelativeTime(project.value.approved) : 'unknown',
-)
-const updatedDate = computed(() =>
-	project.value.updated ? formatRelativeTime(project.value.updated) : 'unknown',
-)
-
-const licenseIdDisplay = computed(() => {
-	const id = project.value.license.id
-
-	if (id === 'LicenseRef-All-Rights-Reserved') {
-		return 'ARR'
-	} else if (id.includes('LicenseRef')) {
-		return id.replaceAll('LicenseRef-', '').replaceAll('-', ' ')
-	} else {
-		return id
-	}
-})
-
-async function getLicenseData(event) {
-	modalLicense.value.show(event)
-
-	try {
-		const text = await client.labrinth.tags_v2.getLicenseText(project.value.license.id)
-		licenseText.value = text.body || formatMessage(messages.licenseErrorMessage)
-	} catch {
-		licenseText.value = formatMessage(messages.licenseErrorMessage)
-	}
-}
 
 const collections = computed(() =>
 	user.value && user.value.collections ? user.value.collections : [],
