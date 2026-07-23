@@ -2825,8 +2825,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Client or server"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Dedicated server"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Server"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Singleplayer"
   },
   "project-type.all": {
     "defaultMessage": "All"

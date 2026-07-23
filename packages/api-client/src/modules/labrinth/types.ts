@@ -1750,6 +1750,17 @@ export namespace Labrinth {
 	}
 
 	export namespace Search {
+		export type SearchParams = {
+			query?: string
+			offset?: string | number
+			index?: string
+			limit?: string | number
+			new_filters?: string
+			facets?: string[][]
+			filters?: string
+			version?: string
+		}
+
 		export namespace v2 {
 			export interface ResultSearchProject {
 				project_id: string
@@ -1812,7 +1823,9 @@ export namespace Labrinth {
 				featured_gallery: string | null
 				color: number | null
 				loaders: string[]
-				project_loader_fields?: Record<string, unknown[]>
+				project_loader_fields?: Record<string, unknown[]> & {
+					environment?: Projects.v3.Environment[]
+				}
 				minecraft_server?: Projects.v3.MinecraftServer | null
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
