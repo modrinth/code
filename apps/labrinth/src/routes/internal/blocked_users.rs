@@ -102,16 +102,14 @@ pub async fn block_status(
 ) -> Result<web::Json<BlockStatus>, ApiError> {
     let (user_id, target_id) = info.into_inner();
 
-    let user_id = DBUserId(
-        parse_base62(&user_id)
-            .map_err(|_| ApiError::InvalidInput("invalid user_id".to_string()))?
-            as i64,
-    );
-    let target_id = DBUserId(
-        parse_base62(&target_id)
-            .map_err(|_| ApiError::InvalidInput("invalid target_id".to_string()))?
-            as i64,
-    );
+    let user_id =
+        DBUserId(parse_base62(&user_id).map_err(|_| {
+            ApiError::InvalidInput("invalid user_id".to_string())
+        })? as i64);
+    let target_id =
+        DBUserId(parse_base62(&target_id).map_err(|_| {
+            ApiError::InvalidInput("invalid target_id".to_string())
+        })? as i64);
 
     let blocked =
         DBBlockedUser::is_blocked(user_id, target_id, &**pool).await?;
