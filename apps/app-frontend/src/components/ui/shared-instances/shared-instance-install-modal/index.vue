@@ -8,8 +8,8 @@
 		"
 		:closable="!submitLoading"
 		:on-hide="handleHide"
-		max-width="544px"
-		width="544px"
+		:max-width="reportMode ? '816px' : '544px'"
+		:width="reportMode ? '816px' : '544px'"
 		no-padding
 		scrollable
 	>
@@ -449,7 +449,7 @@ const messages = defineMessages({
 	reportDescription: {
 		id: 'app.modal.install-to-play.report-description',
 		defaultMessage:
-			'Use this form to report content that may violate our <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>.',
+			'Use this form to report instances that may violate our <rules-link>Rules</rules-link> or <terms-link>Terms of Use</terms-link>.',
 	},
 	supportAndBugReports: {
 		id: 'app.modal.install-to-play.report-support-and-bugs',
@@ -463,11 +463,11 @@ const messages = defineMessages({
 	},
 	contentYouAreReporting: {
 		id: 'app.modal.install-to-play.content-you-are-reporting',
-		defaultMessage: 'Content you’re reporting',
+		defaultMessage: 'Instance you’re reporting',
 	},
 	reportReason: {
 		id: 'app.modal.install-to-play.report-reason',
-		defaultMessage: 'Which rule does this content violate?',
+		defaultMessage: 'Which rule does this instance violate?',
 	},
 	maliciousReason: {
 		id: 'app.modal.install-to-play.report-reason.malicious',
