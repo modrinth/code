@@ -1,4 +1,4 @@
-use crate::state::ProjectType;
+use crate::state::{ProjectType, file_hash_cache_key, file_modified_at_ns};
 use crate::util::io::{self, IOError};
 use std::path::{Path, PathBuf};
 
@@ -44,17 +44,23 @@ pub(crate) fn scan_content_files(
                 continue;
             }
 
-            let size = path.metadata().map_err(IOError::from)?.len();
+            let metadata = path.metadata().map_err(IOError::from)?;
+            let size = metadata.len();
+            let modified_at_ns =
+                file_modified_at_ns(&metadata).map_err(IOError::from)?;
             let relative_path = format!("{folder}/{file_name}");
+            let hash_cache_key = file_hash_cache_key(
+                size,
+                modified_at_ns,
+                &format!("{instance_path}/{relative_path}"),
+            );
 
             files.push(ScannedContentFile {
                 relative_path,
                 file_name: file_name.to_string(),
                 enabled: !file_name.ends_with(".disabled"),
                 size,
-                hash_cache_key: format!(
-                    "{size}-{instance_path}/{folder}/{file_name}"
-                ),
+                hash_cache_key,
             });
         }
     }
