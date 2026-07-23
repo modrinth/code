@@ -174,9 +174,9 @@ const messages = defineMessages({
 		id: 'app.instance.mods.projects-were-added',
 		defaultMessage: '{count} projects were added',
 	},
-	quarantinedContent: {
-		id: 'app.instance.mods.quarantined-content',
-		defaultMessage: 'Content in quarantined instances cannot be changed.',
+	lockedContent: {
+		id: 'app.instance.mods.locked-content',
+		defaultMessage: 'Content in locked instances cannot be changed.',
 	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
@@ -1411,7 +1411,7 @@ provideContentManager({
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	disableAddContent: isQuarantined,
-	disableAddContentTooltip: formatMessage(messages.quarantinedContent),
+	disableAddContentTooltip: formatMessage(messages.lockedContent),
 	isBulkOperating,
 	skipNonEssentialWarnings,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),

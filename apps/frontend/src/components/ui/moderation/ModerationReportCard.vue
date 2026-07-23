@@ -253,7 +253,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
@@ -318,6 +318,7 @@ const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(
 const sharedInstanceLoading = ref(false)
 const sharedInstanceError = ref<string | null>(null)
 const sharedInstanceBanPending = ref(false)
+const sharedInstanceVersions = new Map<string, SharedInstances.Instances.v1.InstanceVersion>()
 let sharedInstanceDetailsRequest: Promise<void> | null = null
 
 watch(isThreadCollapsed, (collapsed) => {
@@ -431,6 +432,33 @@ function updateThread(newThread: any) {
 	}
 }
 
+async function getSharedInstanceVersion(
+	instanceId: string,
+	versionNumber: number,
+	useLatestFallback = false,
+): Promise<SharedInstances.Instances.v1.InstanceVersion | undefined> {
+	const cacheKey = `${instanceId}:${versionNumber}`
+	const cachedVersion = sharedInstanceVersions.get(cacheKey)
+	if (cachedVersion) return cachedVersion
+
+	let instanceVersion
+	try {
+		instanceVersion = await client.sharedinstances.instances_v1.getVersion(
+			instanceId,
+			versionNumber,
+		)
+	} catch (error) {
+		if (!useLatestFallback) throw error
+
+		const latestVersion = await client.sharedinstances.instances_v1.getLatestVersion(instanceId)
+		if (!latestVersion || latestVersion.version !== versionNumber) throw error
+		instanceVersion = latestVersion
+	}
+
+	if (instanceVersion) sharedInstanceVersions.set(cacheKey, instanceVersion)
+	return instanceVersion
+}
+
 async function loadSharedInstanceDetails() {
 	if (props.report.item_type !== 'shared-instance' || sharedInstanceDetails.value) return
 	if (sharedInstanceDetailsRequest) return sharedInstanceDetailsRequest
@@ -473,6 +501,24 @@ async function loadSharedInstanceDetails() {
 			}
 
 			const reportedVersion = props.report.shared_instance_version_id
+			const versionNumbers = reportedVersion
+				? Array.from({ length: reportedVersion }, (_, index) => reportedVersion - index)
+				: []
+			const versionDetails = await Promise.all(
+				versionNumbers.map(async (versionNumber) => {
+					try {
+						const version = await getSharedInstanceVersion(props.report.item_id, versionNumber)
+						return {
+							version: version?.version ?? versionNumber,
+							game_version: version?.game_version,
+							loader: version?.loader,
+							loader_version: version?.loader_version,
+						}
+					} catch {
+						return { version: versionNumber }
+					}
+				}),
+			)
 
 			sharedInstanceDetails.value = {
 				id: props.report.item_id,
@@ -483,12 +529,8 @@ async function loadSharedInstanceDetails() {
 				members: instanceUsers.users
 					.filter((user) => user.id !== ownerMembership.id)
 					.map(toReportUser),
-				reported_version: reportedVersion ? { version: reportedVersion } : undefined,
-				previous_versions: reportedVersion
-					? Array.from({ length: Math.max(0, reportedVersion - 1) }, (_, index) => ({
-							version: reportedVersion - index - 1,
-						}))
-					: [],
+				reported_version: versionDetails[0],
+				previous_versions: versionDetails.slice(1),
 				other_instances: [],
 				other_instances_loaded: false,
 			}
@@ -512,18 +554,7 @@ async function loadSharedInstanceVersionContent(
 		return props.sharedInstanceVersionContentLoader(instanceId, versionNumber)
 	}
 
-	let instanceVersion
-	try {
-		instanceVersion = await client.sharedinstances.instances_v1.getVersion(
-			instanceId,
-			versionNumber,
-		)
-	} catch (error) {
-		const latestVersion = await client.sharedinstances.instances_v1.getLatestVersion(instanceId)
-		if (!latestVersion || latestVersion.version !== versionNumber) throw error
-		instanceVersion = latestVersion
-	}
-
+	const instanceVersion = await getSharedInstanceVersion(instanceId, versionNumber, true)
 	if (!instanceVersion) return []
 
 	const modpackVersionId = instanceVersion.modpack_id

@@ -7,29 +7,29 @@ export const sharedInstanceErrorMessages = defineMessages({
 		id: 'instance.shared-instance.unavailable.title',
 		defaultMessage: 'Shared instance no longer available',
 	},
-	quarantinedTitle: {
-		id: 'instance.shared-instance.unavailable.quarantined-title',
-		defaultMessage: 'This instance has been quarantined',
+	lockedTitle: {
+		id: 'instance.shared-instance.unavailable.locked-title',
+		defaultMessage: 'Instance locked',
 	},
 	unavailableText: {
-		id: 'instance.shared-instance.unavailable.text-v2',
+		id: 'instance.shared-instance.unavailable.text',
 		defaultMessage:
 			"Your local instance is still available, but it is no longer linked and won't receive updates.",
 	},
 	deletedText: {
-		id: 'instance.shared-instance.unavailable.deleted-text-v2',
+		id: 'instance.shared-instance.unavailable.deleted-text',
 		defaultMessage:
-			"The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates.",
+			'The primary instance was deleted. This instance is still available, but it is no longer linked and will no longer receive updates.',
 	},
 	accessRevokedText: {
-		id: 'instance.shared-instance.unavailable.access-revoked-text-v2',
+		id: 'instance.shared-instance.unavailable.access-revoked-text',
 		defaultMessage:
-			"Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates.",
+			'Your access to the shared instance was revoked. This instance is still available, but it is no longer linked and will no longer receive updates.',
 	},
-	quarantinedText: {
-		id: 'instance.shared-instance.unavailable.quarantined-text',
+	lockedText: {
+		id: 'instance.shared-instance.unavailable.locked-text',
 		defaultMessage:
-			'The user who managed this shared instance has been restricted from sharing by the moderation team. This instance has been locked and cannot be played due to safety issues.',
+			'This shared instance was locked by the Content Moderation team. It will no longer receive updates from the primary instance and cannot be played.',
 	},
 	unavailableFallbackManager: {
 		id: 'instance.shared-instance.unavailable.manager-fallback',
@@ -46,7 +46,7 @@ export function sharedInstanceUnavailableTextMessage(
 ) {
 	if (reason === 'deleted') return sharedInstanceErrorMessages.deletedText
 	if (reason === 'access_revoked') return sharedInstanceErrorMessages.accessRevokedText
-	if (reason === 'quarantined') return sharedInstanceErrorMessages.quarantinedText
+	if (reason === 'quarantined') return sharedInstanceErrorMessages.lockedText
 	return sharedInstanceErrorMessages.unavailableText
 }
 
@@ -54,7 +54,7 @@ export function sharedInstanceUnavailableTitleMessage(
 	reason: SharedInstanceUnavailableReason | null,
 ) {
 	return reason === 'quarantined'
-		? sharedInstanceErrorMessages.quarantinedTitle
+		? sharedInstanceErrorMessages.lockedTitle
 		: sharedInstanceErrorMessages.unavailableTitle
 }
 

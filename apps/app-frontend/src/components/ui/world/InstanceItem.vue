@@ -195,7 +195,7 @@ onUnmounted(() => {
 					<button
 						v-tooltip="
 							instance.quarantined
-								? 'This instance has been quarantined'
+								? 'This instance has been locked'
 								: playing
 									? 'Instance is already open'
 									: null

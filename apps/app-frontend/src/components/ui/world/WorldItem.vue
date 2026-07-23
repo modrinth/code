@@ -425,7 +425,7 @@ const messages = defineMessages({
 					<button
 						v-tooltip="
 							quarantined
-								? 'This instance has been quarantined'
+								? 'This instance has been locked'
 								: world.type === 'server'
 									? !supportsServerQuickPlay
 										? formatMessage(messages.noServerQuickPlay)

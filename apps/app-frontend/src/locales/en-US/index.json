@@ -407,14 +407,14 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.locked-content": {
+    "message": "Content in locked instances cannot be changed."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was added"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} projects were added"
-  },
-  "app.instance.mods.quarantined-content": {
-    "message": "Content in quarantined instances cannot be changed."
   },
   "app.instance.mods.share-text": {
     "message": "Check out the projects I'm using in my modpack!"
@@ -1151,11 +1151,14 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
+  "instance.locked.delete-button": {
+    "message": "Delete instance"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "This instance has been locked"
+  },
   "instance.playtime.never-played": {
     "message": "Never played"
-  },
-  "instance.quarantined.play-tooltip": {
-    "message": "This instance has been quarantined"
   },
   "instance.server-modal.address": {
     "message": "Address"
@@ -1292,8 +1295,8 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
   },
-  "instance.settings.tabs.installation.quarantined": {
-    "message": "Installation settings are unavailable while this instance is quarantined."
+  "instance.settings.tabs.installation.locked": {
+    "message": "Installation settings are unavailable while this instance is locked."
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"
@@ -1397,22 +1400,22 @@
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."
   },
-  "instance.shared-instance.unavailable.access-revoked-text-v2": {
-    "message": "Your access to the shared instance was revoked. Your local instance is still available, but it is no longer linked and won't receive updates."
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Your access to the shared instance was revoked. This instance is still available, but it is no longer linked and will no longer receive updates."
   },
-  "instance.shared-instance.unavailable.deleted-text-v2": {
-    "message": "The shared instance was deleted. Your local instance is still available, but it is no longer linked and won't receive updates."
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "The primary instance was deleted. This instance is still available, but it is no longer linked and will no longer receive updates."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "This shared instance was locked by the Content Moderation team. It will no longer receive updates from the primary instance and cannot be played."
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "Instance locked"
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "the instance manager"
   },
-  "instance.shared-instance.unavailable.quarantined-text": {
-    "message": "The user who managed this shared instance has been restricted from sharing by the moderation team. This instance has been locked and cannot be played due to safety issues."
-  },
-  "instance.shared-instance.unavailable.quarantined-title": {
-    "message": "This instance has been quarantined"
-  },
-  "instance.shared-instance.unavailable.text-v2": {
+  "instance.shared-instance.unavailable.text": {
     "message": "Your local instance is still available, but it is no longer linked and won't receive updates."
   },
   "instance.shared-instance.unavailable.title": {

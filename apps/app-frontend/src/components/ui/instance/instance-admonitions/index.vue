@@ -18,6 +18,7 @@
 				:manager="sharedInstanceUnavailableManager"
 				:dismissible="dismissible"
 				@dismiss="sharedInstanceUnavailableDismissed = true"
+				@delete="emit('delete')"
 			/>
 		</template>
 	</StackedAdmonitions>
@@ -51,6 +52,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	published: []
+	delete: []
 }>()
 
 const sharedInstanceWrongAccount = computed(() => props.sharedInstanceWrongAccount ?? false)

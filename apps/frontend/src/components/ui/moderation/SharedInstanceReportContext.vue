@@ -296,9 +296,6 @@ function formattedLoader(version: SharedInstanceReportVersion) {
 									<span v-if="version.game_version" class="truncate text-sm text-secondary">
 										Minecraft {{ version.game_version }} · {{ formattedLoader(version) }}
 									</span>
-									<span v-else class="text-sm text-secondary">
-										Content and metadata load on demand
-									</span>
 								</div>
 							</div>
 

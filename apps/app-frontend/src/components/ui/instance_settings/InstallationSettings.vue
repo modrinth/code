@@ -141,7 +141,7 @@ const installationSettingsBusy = computed(
 		!!offline,
 )
 const installationSettingsBusyMessage = computed(() =>
-	instance.value.quarantined ? formatMessage(messages.quarantined) : null,
+	instance.value.quarantined ? formatMessage(messages.locked) : null,
 )
 
 async function unlinkSharedInstance() {
@@ -163,9 +163,9 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.loader-version',
 		defaultMessage: '{loader} version',
 	},
-	quarantined: {
-		id: 'instance.settings.tabs.installation.quarantined',
-		defaultMessage: 'Installation settings are unavailable while this instance is quarantined.',
+	locked: {
+		id: 'instance.settings.tabs.installation.locked',
+		defaultMessage: 'Installation settings are unavailable while this instance is locked.',
 	},
 })
 

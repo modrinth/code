@@ -5,7 +5,7 @@
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />
-			<ConfirmDeleteInstanceModal ref="reportDeleteConfirmModal" @delete="deleteReportedInstance" />
+			<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="deleteSelectedInstance" />
 			<InstanceSettingsModal
 				:key="instance.id"
 				ref="settingsModal"
@@ -63,6 +63,7 @@
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
 				@published="fetchInstance"
+				@delete="requestInstanceDeletion"
 			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
@@ -212,8 +213,8 @@ const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateModal>>()
 const sharedInstanceReportModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
-const reportDeleteConfirmModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
-const reportedInstanceToDelete = ref<GameInstance | null>(null)
+const deleteConfirmModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
+const selectedInstanceToDelete = ref<GameInstance | null>(null)
 
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 
@@ -640,21 +641,26 @@ async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false
 
 function handleSharedInstanceReported(deleteInstance: boolean) {
 	if (!deleteInstance || !instance.value) return
-	reportedInstanceToDelete.value = instance.value
-	reportDeleteConfirmModal.value?.show()
+	requestInstanceDeletion()
 }
 
-async function deleteReportedInstance() {
-	const reportedInstance = reportedInstanceToDelete.value
-	reportedInstanceToDelete.value = null
-	if (!reportedInstance) return
+function requestInstanceDeletion() {
+	if (!instance.value) return
+	selectedInstanceToDelete.value = instance.value
+	deleteConfirmModal.value?.show()
+}
+
+async function deleteSelectedInstance() {
+	const selectedInstance = selectedInstanceToDelete.value
+	selectedInstanceToDelete.value = null
+	if (!selectedInstance) return
 
 	trackEvent('InstanceRemove', {
-		loader: reportedInstance.loader,
-		game_version: reportedInstance.game_version,
+		loader: selectedInstance.loader,
+		game_version: selectedInstance.game_version,
 	})
 	await router.push({ path: '/' })
-	await remove(reportedInstance.id).catch(handleError)
+	await remove(selectedInstance.id).catch(handleError)
 }
 
 const handleRightClick = (event: MouseEvent) => {

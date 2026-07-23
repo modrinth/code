@@ -8,10 +8,10 @@
 			<PageHeaderBadgeItem
 				v-if="instance.quarantined"
 				:icon="LockIcon"
-				aria-label="Quarantined instance information"
+				aria-label="Locked instance information"
 				class="!border-orange !bg-highlight-orange !text-orange"
 			>
-				Quarantined
+				Locked
 			</PageHeaderBadgeItem>
 			<PageHeaderBadgeItem
 				v-else
@@ -98,7 +98,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else-if="instance.quarantined" color="brand" size="large">
-					<button v-tooltip="formatMessage(messages.quarantinedPlayTooltip)" type="button" disabled>
+					<button v-tooltip="formatMessage(messages.lockedPlayTooltip)" type="button" disabled>
 						<PlayIcon />
 						{{ formatMessage(commonMessages.playButton) }}
 					</button>
@@ -225,9 +225,9 @@ const messages = defineMessages({
 		id: 'instance.action.repair',
 		defaultMessage: 'Repair',
 	},
-	quarantinedPlayTooltip: {
-		id: 'instance.quarantined.play-tooltip',
-		defaultMessage: 'This instance has been quarantined',
+	lockedPlayTooltip: {
+		id: 'instance.locked.play-tooltip',
+		defaultMessage: 'This instance has been locked',
 	},
 	starting: {
 		id: 'instance.action.starting',
