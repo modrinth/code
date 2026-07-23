@@ -427,20 +427,20 @@ const messages = defineMessages({
 							quarantined
 								? 'This instance has been quarantined'
 								: world.type === 'server'
-								? !supportsServerQuickPlay
-									? formatMessage(messages.noServerQuickPlay)
-									: playingOtherWorld
-										? formatMessage(messages.gameAlreadyOpen)
-										: !serverStatus
-											? formatMessage(messages.noContact)
-											: serverIncompatible
-												? formatMessage(messages.incompatibleServer)
-												: null
-								: !supportsWorldQuickPlay
-									? formatMessage(messages.noSingleplayerQuickPlay)
-									: playingOtherWorld || locked
-										? formatMessage(messages.gameAlreadyOpen)
-										: null
+									? !supportsServerQuickPlay
+										? formatMessage(messages.noServerQuickPlay)
+										: playingOtherWorld
+											? formatMessage(messages.gameAlreadyOpen)
+											: !serverStatus
+												? formatMessage(messages.noContact)
+												: serverIncompatible
+													? formatMessage(messages.incompatibleServer)
+													: null
+									: !supportsWorldQuickPlay
+										? formatMessage(messages.noSingleplayerQuickPlay)
+										: playingOtherWorld || locked
+											? formatMessage(messages.gameAlreadyOpen)
+											: null
 						"
 						:disabled="
 							quarantined ||

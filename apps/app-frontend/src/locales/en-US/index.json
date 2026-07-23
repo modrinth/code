@@ -413,6 +413,9 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projects were added"
   },
+  "app.instance.mods.quarantined-content": {
+    "message": "Content in quarantined instances cannot be changed."
+  },
   "app.instance.mods.share-text": {
     "message": "Check out the projects I'm using in my modpack!"
   },
@@ -1151,6 +1154,9 @@
   "instance.playtime.never-played": {
     "message": "Never played"
   },
+  "instance.quarantined.play-tooltip": {
+    "message": "This instance has been quarantined"
+  },
   "instance.server-modal.address": {
     "message": "Address"
   },
@@ -1286,6 +1292,9 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
   },
+  "instance.settings.tabs.installation.quarantined": {
+    "message": "Installation settings are unavailable while this instance is quarantined."
+  },
   "instance.settings.tabs.java": {
     "message": "Java and memory"
   },
@@ -1396,6 +1405,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "the instance manager"
+  },
+  "instance.shared-instance.unavailable.quarantined-text": {
+    "message": "The user who managed this shared instance has been restricted from sharing by the moderation team. This instance has been locked and cannot be played due to safety issues."
+  },
+  "instance.shared-instance.unavailable.quarantined-title": {
+    "message": "This instance has been quarantined"
   },
   "instance.shared-instance.unavailable.text-v2": {
     "message": "Your local instance is still available, but it is no longer linked and won't receive updates."

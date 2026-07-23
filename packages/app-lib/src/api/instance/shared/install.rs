@@ -453,11 +453,8 @@ pub(super) async fn handle_unavailable_shared_instance_if_current_user(
 
     match reason {
         SharedInstanceUnavailableReason::Quarantined => {
-            crate::state::quarantine_shared_instance(
-                instance_id,
-                &state.pool,
-            )
-            .await?;
+            crate::state::quarantine_shared_instance(instance_id, &state.pool)
+                .await?;
         }
         _ => {
             crate::state::clear_shared_instance(instance_id, &state.pool)

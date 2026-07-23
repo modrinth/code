@@ -56,9 +56,7 @@ const emit = defineEmits<{
 const sharedInstanceWrongAccount = computed(() => props.sharedInstanceWrongAccount ?? false)
 const displayedSharedInstanceUnavailableReason = computed<SharedInstanceUnavailableReason | null>(
 	() =>
-		props.instance.quarantined
-			? 'quarantined'
-			: (props.sharedInstanceUnavailableReason ?? null),
+		props.instance.quarantined ? 'quarantined' : (props.sharedInstanceUnavailableReason ?? null),
 )
 const sharedInstanceUnavailableDismissed = ref(false)
 const showSharedInstancePublishAdmonition = computed(

@@ -98,11 +98,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else-if="instance.quarantined" color="brand" size="large">
-					<button
-						v-tooltip="formatMessage(messages.quarantinedPlayTooltip)"
-						type="button"
-						disabled
-					>
+					<button v-tooltip="formatMessage(messages.quarantinedPlayTooltip)" type="button" disabled>
 						<PlayIcon />
 						{{ formatMessage(commonMessages.playButton) }}
 					</button>

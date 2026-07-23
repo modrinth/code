@@ -563,9 +563,7 @@ async function loadSharedInstanceVersionContent(
 	})
 
 	const modpackContent: ContentItem[] = modpackDependencies.map((dependency) => {
-		const version = dependency.version_id
-			? versionsById.get(dependency.version_id)
-			: undefined
+		const version = dependency.version_id ? versionsById.get(dependency.version_id) : undefined
 		const project = dependency.project_id
 			? projectsById.get(dependency.project_id)
 			: version
@@ -575,11 +573,7 @@ async function loadSharedInstanceVersionContent(
 			? (version.files.find((file) => file.primary) ?? version.files[0])
 			: undefined
 		const fileName =
-			primaryFile?.filename ??
-			dependency.file_name ??
-			project?.title ??
-			version?.name ??
-			'Unknown'
+			primaryFile?.filename ?? dependency.file_name ?? project?.title ?? version?.name ?? 'Unknown'
 
 		return sharedInstanceContentItem(
 			version,

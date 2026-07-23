@@ -178,15 +178,7 @@ export function useSharedInstanceState(
 			authReady: auth.isReady?.value ?? true,
 		}),
 		async ({ instanceId, role, locked, offline, signedIn, userId, authReady }) => {
-			if (
-				!instanceId ||
-				!role ||
-				locked ||
-				offline ||
-				!authReady ||
-				!signedIn ||
-				!userId
-			) {
+			if (!instanceId || !role || locked || offline || !authReady || !signedIn || !userId) {
 				availabilityRequestId++
 				availabilityRequest = null
 				availabilityCheckKey.value = null

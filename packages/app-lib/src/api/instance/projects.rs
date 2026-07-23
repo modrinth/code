@@ -451,8 +451,7 @@ async fn ensure_instance_content_unlocked(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    if instance_rows::is_instance_quarantined(instance_id, &state.pool).await?
-    {
+    if instance_rows::is_instance_quarantined(instance_id, &state.pool).await? {
         return Err(quarantined_content_error().into());
     }
 
