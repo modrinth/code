@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Share content with friends",
+			"summary": "Shared instances let you send and update content without sharing `.mrpack` files.",
+			"thumbnail": "https://modrinth.com/news/article/shared-instances/thumbnail.webp",
+			"date": "2026-07-24T11:00:00.000Z",
+			"link": "https://modrinth.com/news/article/shared-instances"
+		},
+		{
 			"title": "Proud of you all",
 			"summary": "Over 2,400 of you came together to raise more than $40,000 for charity this Pride month!",
 			"thumbnail": "https://modrinth.com/news/article/proud-of-you-2026/thumbnail.webp",
