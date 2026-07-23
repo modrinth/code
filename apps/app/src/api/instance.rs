@@ -831,14 +831,12 @@ pub async fn instance_share_remove_users(
     user_ids: Vec<String>,
     has_pending_recipients: bool,
 ) -> Result<theseus::instance::SharedInstanceUsers> {
-    Ok(
-        theseus::instance::remove_shared_instance_users(
-            instance_id,
-            user_ids,
-            has_pending_recipients,
-        )
-        .await?,
+    Ok(theseus::instance::remove_shared_instance_users(
+        instance_id,
+        user_ids,
+        has_pending_recipients,
     )
+    .await?)
 }
 
 #[tauri::command]

@@ -24,6 +24,6 @@ export function parseSharedInstanceInviteNotification(
 		invitedById: optionalString(body.invited_by),
 		invitedByUsername: optionalString(body.invited_by_username),
 		invitedByAvatarUrl: optionalString(body.invited_by_avatar_url),
-		instanceIconUrl: optionalString(body.instance_icon_url),
+		instanceIconUrl: optionalString(body.shared_instance_icon),
 	}
 }

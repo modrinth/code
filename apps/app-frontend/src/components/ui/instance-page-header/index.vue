@@ -54,6 +54,7 @@
 					Minecraft {{ instance.game_version }}
 				</PageHeaderMetadataItem>
 				<PageHeaderMetadataItem
+					v-if="sharedInstanceManager?.type !== 'user'"
 					:icon="ServerLoaderIcon"
 					:icon-props="{ loader: loaderDisplayName }"
 					tooltip="Mod loader"

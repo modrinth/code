@@ -65,15 +65,18 @@ export function useSharedInstanceInviteHandler(
 	}
 
 	async function resolveInvite(invite: SharedInstanceInvite) {
-		const invitedBy =
+		const [invitedBy, sharedInstance] = await Promise.all([
 			!invite.invitedByUsername && invite.invitedById
-				? await get_user(invite.invitedById, 'bypass').catch(() => null)
-				: null
+				? get_user(invite.invitedById, 'bypass').catch(() => null)
+				: null,
+			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => null),
+		])
 
 		return {
 			...invite,
 			invitedByUsername: invite.invitedByUsername ?? invitedBy?.username ?? null,
 			invitedByAvatarUrl: invite.invitedByAvatarUrl ?? invitedBy?.avatar_url ?? null,
+			instanceIconUrl: sharedInstance ? sharedInstance.icon : invite.instanceIconUrl,
 		}
 	}
 

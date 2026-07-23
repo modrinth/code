@@ -42,7 +42,7 @@
 									size="28px"
 									no-shadow
 									raised
-									class="mx-1 inline-block !rounded-lg align-middle"
+									class="inline-block !rounded-lg align-middle"
 								/>
 								<span class="font-semibold text-contrast">{{ entityLabel }}</span>
 								<span> instance.</span>
