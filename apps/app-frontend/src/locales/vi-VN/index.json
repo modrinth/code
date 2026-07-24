@@ -11,6 +11,15 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Đóng các phiên bản đang chạy"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Đã sao chép"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Sao chép chi tiết"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "Bỏ qua"
+  },
   "app.action-bar.install.retry": {
     "message": "Thử lại"
   },
@@ -37,6 +46,45 @@
   },
   "app.action-bar.install.summary.download-failed": {
     "message": "Không hoàn tất tải xuống"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Đường dẫn tệp tin không hợp lệ"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Dữ liệu modpack không hợp lệ"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Tệp modpack có metadata không hợp lệ"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Quá trình cài đặt Java không thể hoàn thành"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Cài đặt Loader thất bại"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Không thể cập nhật dữ liệu cục bộ"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Cài đặt Minecraft thất bại"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Không thể kết nối được với Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Không có quyền để viết"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Không thể tải xuống gói"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Đã xảy ra lỗi"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instance không rõ"
+  },
+  "app.action-bar.installs": {
+    "message": "Cài đặt"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Đặt làm bản instance chính"
@@ -70,6 +118,21 @@
   },
   "app.action-bar.view-logs": {
     "message": "Xem logs"
+  },
+  "app.ads-consent.accept": {
+    "message": "Chấp nhận tất cả"
+  },
+  "app.ads-consent.body": {
+    "message": "Quảng cáo giúp Modrinth hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
+  },
+  "app.ads-consent.manage": {
+    "message": "Quản lý tùy chọn"
+  },
+  "app.ads-consent.reject": {
+    "message": "Từ chối tất cả"
+  },
+  "app.ads-consent.title": {
+    "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Kích hoạt các tính năng dựng hình nâng cao như hiệu ứng làm mờ, có thể gây giảm hiệu năng nếu không có chế độ tăng tốc phần cứng."
@@ -128,6 +191,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "Hiện thời gian chơi"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Tự động bỏ qua các bước xác nhận rủi ro thấp như cài đặt gói mod trùng lặp, xóa nội dung thông thường, cập nhật hàng loạt, hủy liên kết gói mod và lời nhắc sửa chữa. Các cảnh báo nguy hiểm vẫn sẽ được hiển thị."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "Bỏ qua các cảnh báo không quan trọng"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "Bật tính năng ẩn hiển thị thanh menu bên."
   },
@@ -173,6 +242,9 @@
   "app.browse.discover-servers": {
     "message": "Khám phá máy chủ"
   },
+  "app.browse.hide-added-servers": {
+    "message": "Ẩn máy chủ đã thêm vào"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpack"
   },
@@ -194,6 +266,9 @@
   "app.export-modal.header": {
     "message": "Xuất modpack"
   },
+  "app.export-modal.modpack-name-label": {
+    "message": "Tên modpack"
+  },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Tên modpack"
   },
@@ -202,6 +277,39 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Đang tải nội dung"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Đang tải Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Đang tải tệp gói"
+  },
+  "app.install.phase.extracting_overrides": {
+    "message": "Trích xuất ghi đè"
+  },
+  "app.install.phase.finalizing": {
+    "message": "Hoàn tất"
+  },
+  "app.install.phase.preparing_instance": {
+    "message": "Đã thêm vào hàng chờ tải"
+  },
+  "app.install.phase.preparing_java": {
+    "message": "Đang chuẩn bị Java"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Đang tải Java {version}"
+  },
+  "app.install.phase.preparing_java.extracting": {
+    "message": "Trích xuất Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Đang tìm Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Đang chuẩn bị Java {version}"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Tất cả dữ liệu trong gói hồ sơ này sẽ bị xoá, bao gồm thế giới của bạn, cấu hình, và tất cả nội dung đã được tải xuống."
@@ -314,9 +422,6 @@
   "app.modal.update-to-play.removed": {
     "message": "Đã bỏ"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Bạn cần cập nhật {name} để có thể chơi. Vui lòng cập nhật lên bản mới nhất để khởi chạy trò chơi."
-  },
   "app.project.install-button.already-installed": {
     "message": "Dự án này đã được cài đặt"
   },
@@ -325,6 +430,18 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Quay lại trang Khám Phá"
+  },
+  "app.project.version.all-versions": {
+    "message": "Tất cả phiên bản"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Tải trong trình duyệt"
+  },
+  "app.project.version.installing": {
+    "message": "Đang tải"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Đã có sẵn"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Chế độ nhà phát triển đã được bật."

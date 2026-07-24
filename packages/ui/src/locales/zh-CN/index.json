@@ -42,10 +42,10 @@
     "defaultMessage": "Alpha 早期预览版"
   },
   "badge.beta": {
-    "defaultMessage": "Beta 测试版"
+    "defaultMessage": "Beta 版"
   },
   "badge.beta-release": {
-    "defaultMessage": "Beta 测试发行版"
+    "defaultMessage": "Beta 发行版"
   },
   "badge.new": {
     "defaultMessage": "新"
@@ -96,7 +96,7 @@
     "defaultMessage": "筛选结果……"
   },
   "browse.no-results": {
-    "defaultMessage": "没有找到您的查询结果！"
+    "defaultMessage": "找不到你查询的结果！"
   },
   "browse.offline": {
     "defaultMessage": "你目前处于离线状态。连接互联网来浏览Modrinth！"
@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "删除 {itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "禁用 {itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {降级} other {更新}}可能会导致兼容性问题。你在整合包基础上额外添加的模组或内容将被保留，但可能与新版本不兼容。"
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "添加了 {count} 项"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "已修改的配置文件"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "添加（依赖）"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "已禁用"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "已移除（已禁用）"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "已更新"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, other {# 个文件}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "游戏版本"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "仍然安装"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "模组加载器"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "已关联整合包"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "已取消关联整合包"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "已更新整合包"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "内容无变更"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "移除了 {count} 项"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "已移除（已禁用） {count} 项"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
@@ -1161,10 +1194,19 @@
     "defaultMessage": "您已获得特殊许可，可将本作品再分发至您的整合包中。"
   },
   "external-files.permissions-card.remove-group": {
-    "defaultMessage": "移除组"
+    "defaultMessage": "删除分组"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "此操作将永久删除该贡献者分组及其包含的所有文件，且无法撤销。"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "删除 {title} ？"
   },
   "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "未能移除组"
+    "defaultMessage": "无法删除分组"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "按住 Shift 键点击可跳过二次确认。"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "从组中移除"
@@ -2045,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "未找到内容"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "外部来源"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "此文件未发布于 Modrinth 平台。"
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "整合包内容"
   },
@@ -2053,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "没有符合搜索条件的项目。"
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "在 Slicer 中打开"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "搜索 {count, number} {count, plural, other {个项目}}"
@@ -2816,8 +2867,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "客户端或服务端"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "专用服务器"
+  },
   "project-card.environment.server": {
     "defaultMessage": "服务端"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "单人游戏"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -3091,6 +3148,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, other {人关注}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "获取许可证文本内容时出错。"
+  },
+  "project.license.loading": {
+    "defaultMessage": "正在加载许可证文本……"
+  },
+  "project.license.title": {
+    "defaultMessage": "许可证"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 在线"
@@ -3496,6 +3562,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "视图"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, other {下载量}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, other {关注者}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -5039,6 +5111,81 @@
   "settings.sessions.title": {
     "defaultMessage": "会话"
   },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "添加"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "已添加"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "此用户已被邀请。"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} 的头像"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "编辑邀请链接。"
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "编辑邀请链接"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "过期日期"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "好友列表 - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "邀请"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "你的邀请链接将在 {duration} 后失效。"
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "或者使用邀请链接"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "邀请链接已复制至剪贴板。"
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "已复制链接"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "无法复制链接"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "最大使用次数"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "没有找到朋友。"
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "没有找到匹配的用户。"
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "邀请已发送"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "需要 {username} 先接受你的好友请求"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "保存"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "输入 Modrinth 用户名"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "搜索中……"
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "无法更新邀请链接"
+  },
   "tag.category.128x": {
     "defaultMessage": "128x"
   },
@@ -5616,7 +5763,7 @@
     "defaultMessage": "该用户自 Modrinth 公测时期便已加入平台，该测试版于 2022 年 2 月收官。"
   },
   "user.profile.badge.beta.link": {
-    "defaultMessage": "点击阅读关于 Modrinth 测试版的发布信息。"
+    "defaultMessage": "点击阅读关于 Modrinth 公测版本发布的信息。"
   },
   "user.profile.badge.beta.name": {
     "defaultMessage": "公测用户"
@@ -5664,7 +5811,7 @@
     "defaultMessage": "光影包功能首发体验者"
   },
   "user.profile.badge.hosting-alpha.about.1": {
-    "defaultMessage": "该用户在 Modrinth 托管服务 2024 年 11 月开启 Beta 公测前，参与了此项功能的封闭内测。"
+    "defaultMessage": "该用户在 Modrinth Hosting 服务 2024 年 11 月开启公测前，参与了此项功能的封闭内测。"
   },
   "user.profile.badge.hosting-alpha.name": {
     "defaultMessage": "托管服务内测用户"
@@ -5793,3 +5940,4 @@
     "defaultMessage": "类型"
   }
 }
+

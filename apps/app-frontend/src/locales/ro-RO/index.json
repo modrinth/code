@@ -23,9 +23,6 @@
   "app.modal.update-to-play.header": {
     "message": "Actualizați pentru a juca"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Este necesară o actualizare pentru a juca {name}. Vă rugăm să actualizați la cea mai recentă versiune pentru a lansa jocul."
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Modul dezvoltator activat."
   },

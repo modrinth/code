@@ -89,6 +89,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Nieznana instancja"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Aktualizowanie udostępnionych zasobów"
+  },
   "app.action-bar.installs": {
     "message": "Instalacje"
   },
@@ -124,6 +127,21 @@
   },
   "app.action-bar.view-logs": {
     "message": "Pokaż logi"
+  },
+  "app.ads-consent.accept": {
+    "message": "Zaakceptuj wszystko"
+  },
+  "app.ads-consent.body": {
+    "message": "Reklamy pozwalają Modrinth oraz fundują wypłaty twórców. Nasi partnerzy mogą zachować lub uzyskać dostęp ciasteczek w aplikacji, żeby spersonalizować reklamy i zmierzyć wydajność."
+  },
+  "app.ads-consent.manage": {
+    "message": "Zarządzaj preferencjami"
+  },
+  "app.ads-consent.reject": {
+    "message": "Odrzuć wszystkie"
+  },
+  "app.ads-consent.title": {
+    "message": "Twoja prywatność i jak reklamy wspierają Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Włącza zaawansowane renderowanie, takie jak efekty rozmycia, które może powodować problemy z wydajnością bez sprzętowej akceleracji renderowania."
@@ -323,6 +341,24 @@
   "app.install.phase.running_loader_processors": {
     "message": "Uruchamianie procesorów loadera"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Dodano"
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Twoje zmiany nie zostały jeszcze udostępnione"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Opublikuj aktualizację"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Publikowanie..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Usunięto"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Opublikuj aktualizację"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i jakakolwiek dodana zawartość."
   },
@@ -461,9 +497,6 @@
   "app.modal.update-to-play.removed": {
     "message": "Usunięto"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Aktualizacja jest wymagana, aby grać w {name}. Proszę zaktualizować do najnowszej wersji, aby uruchomić grę."
-  },
   "app.project.install-button.already-installed": {
     "message": "Ten projekt jest już zainstalowany"
   },
@@ -490,6 +523,9 @@
   },
   "app.settings.downloading": {
     "message": "Pobieranie v{version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Reklamy pozwalają Modrinth oraz fundują wypłaty twórców. Nasi partnerzy mogą zachować lub uzyskać dostęp ciasteczek w aplikacji, żeby spersonalizować reklamy i zmierzyć wydajność. Możesz optować lub zarządzać preferencjami poniżej."
   },
   "app.settings.tabs.appearance": {
     "message": "Wygląd"
@@ -532,6 +568,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Błąd podczas przetwarzania pliku"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Ta skórka używa funkcjonalności modyfikacji {ears}"
   },
   "app.skins.edit-button": {
     "message": "Edytuj skórkę"
@@ -659,6 +698,12 @@
   "app.skins.title": {
     "message": "Wybór skórki"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Wyłącz"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Włącz"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Wersja Modrinth App v{version} została pobrana. Załaduj ponownie, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
   },
@@ -770,6 +815,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Zaloguj się na konto Modrinth</link> by dodać znajomych i widzieć, w co grają!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Utwórz skrót"
+  },
+  "instance.action.export-modpack": {
+    "message": "Eksportuj paczkę modów"
+  },
+  "instance.action.launch-instance": {
+    "message": "Uruchom instancję"
+  },
+  "instance.action.more-actions": {
+    "message": "Więcej akcji"
+  },
+  "instance.action.open-folder": {
+    "message": "Otwórz folder"
+  },
+  "instance.action.repair": {
+    "message": "Napraw"
+  },
+  "instance.action.settings": {
+    "message": "Ustawienia instancji"
+  },
+  "instance.action.starting": {
+    "message": "Uruchamianie..."
+  },
+  "instance.action.stopping": {
+    "message": "Zatrzymywanie..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Dodaj i graj"
   },
@@ -811,6 +883,9 @@
   },
   "instance.files.save-as": {
     "message": "Zapisz jako..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Nigdy nie grano"
   },
   "instance.server-modal.address": {
     "message": "Adres"
@@ -1016,6 +1091,12 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Wprowadź szerokość..."
   },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Opublikuj aktualizację graczom"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Opublikuj aktualizację"
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "Serwer Minecraft"
   },
@@ -1078,6 +1159,27 @@
   },
   "minecraft-account.sign-in": {
     "message": "Zaloguj się do Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Potrzebujesz konto Microsoft, które posiada Minecraft, zanim będziesz mógł włączyć i zacząć grać."
+  },
+  "minecraft-required.description-header": {
+    "message": "Zaloguj się do konta Microsoft"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Nie masz konta?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Zdobądź Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Zdobądź pomoc techniczną"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft wymagany"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Zaloguj się do Microsoft"
   },
   "search.filter.locked.instance": {
     "message": "Podane przez instancję"

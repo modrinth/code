@@ -89,6 +89,9 @@
   "app.action-bar.install.unknown-instance": {
     "message": "未知的实例"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "更新共享内容"
+  },
   "app.action-bar.installs": {
     "message": "安装"
   },
@@ -124,6 +127,21 @@
   },
   "app.action-bar.view-logs": {
     "message": "查看日志"
+  },
+  "app.ads-consent.accept": {
+    "message": "全部接受"
+  },
+  "app.ads-consent.body": {
+    "message": "广告使 Modrinth 得以运营，并为创作者报酬提供资金支持。我们的合作伙伴可能会在应用中存储或访问 Cookie，以便实现广告个性化和效果衡量。"
+  },
+  "app.ads-consent.manage": {
+    "message": "管理偏好设置"
+  },
+  "app.ads-consent.reject": {
+    "message": "全部拒绝"
+  },
+  "app.ads-consent.title": {
+    "message": "您的隐私以及广告如何支持 Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "启用模糊效果等高级渲染。可能会在没有硬件加速渲染的情况下造成性能问题。"
@@ -323,6 +341,36 @@
   "app.install.phase.running_loader_processors": {
     "message": "正在运行加载处理器"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "新增内容"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "本地实例有尚未同步给其他用户的更改。"
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "本地更改尚未发布分享"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "推送更新"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "推送中……"
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "移除内容"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "推送更新"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "预览即将同步给所有使用该实例用户的变更内容。"
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "审核变更"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "正在审核……"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "你实例的所有数据将被永久删除，包括你的世界、配置和所有已安装的内容。"
   },
@@ -359,6 +407,9 @@
   "app.instance.mods.content-type-project": {
     "message": "项目"
   },
+  "app.instance.mods.locked-content": {
+    "message": "已锁定实例中的内容无法修改。"
+  },
   "app.instance.mods.project-was-added": {
     "message": "已添加 “{name}”"
   },
@@ -373,6 +424,102 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "上传成功"
+  },
+  "app.instance.share.empty.description": {
+    "message": "你可以将此实例分享给你的好友！"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "没有邀请好友"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "邀请好友"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "分享 {name}"
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "你需要登录账号"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "才能访问此页面。"
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "已关联的账号"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "未登录"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "切换账号"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "账号不正确"
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "对方将不再收到该共享实例的后续更新"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "对方已安装的副本仍将保留在其设备上"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "你可以稍后仍可以再邀请对方"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "这是最后一位共享成员，移除后将关闭此实例的共享"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "这会产生什么影响？"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "撤销访问权限"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "撤销访问权限"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username} 的头像"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "若撤销 {username} 对该共享实例的访问权限，你需要重新向其发送邀请才能使其接收后续更新。"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "登录"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "你必须先取消关联此整合包才能分享你的实例"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "分享前需要取消关联"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "本地已安装该共享实例，名称为 <bold>{instanceName}</bold>。确定要再安装一份吗？"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "共享实例已安装"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "仍要安装"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "实例"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "已关联的账号"
+  },
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "才能管理此共享实例。否则你将无法向其他用户推送更新。"
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "登录账号"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "你需要登录 Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "才能接收此共享实例的更新。"
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "你当前使用的 Modrinth 账号不正确"
   },
   "app.instance.worlds.add-server": {
     "message": "添加服务器"
@@ -425,6 +572,21 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜索 {count} 个世界……"
   },
+  "app.modal.install-to-play.additional-context": {
+    "message": "补充说明"
+  },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "如有必要，请尽量附上相关链接与图片"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "所举报的实例"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "删除实例"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "请勿安装"
+  },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
   },
@@ -440,11 +602,50 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "请使用此表单举报违反我们<rules-link>规则</rules-link>和<terms-link>使用条款</terms-link>的实例。"
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "不支持的图片格式"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "文件大小超出 1 MiB 限制"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "如需提交 DMCA 通知或其他法律诉求，请参阅我们的<copyright-link>版权政策</copyright-link>。"
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "该实例违反了哪项规则？"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "不当内容"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "恶意内容"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "垃圾内容"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "举报共享实例"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "举报已提交"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "为了寻求支持，请咨询我们的<support-link>支持团队</support-link>为了发漏洞请进开启我们的一个<github-link>github-漏洞报告</github-link>。"
+  },
   "app.modal.install-to-play.reviewed-files": {
     "message": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共享实例"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "共享的实例"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "这实例里面有东西没有在modrinth。我们真的建议只安装你信任的文件源。"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "这个整合包包含一些未在 Modrinth 发布的文件。我们强烈建议只从你信任的来源安装文件。"
@@ -464,8 +665,23 @@
   "app.modal.update-to-play.removed": {
     "message": "已移除"
   },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "这服务器里面的模组有些不在modrinth。我们真的建议只安装你信任的文件源。"
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "被加入的"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "被删除的"
+  },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "这分享实例里面有东西没有在modrinth。我们真的建议只安装你信任的文件源。"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "需要更新"
+  },
   "app.modal.update-to-play.update-required-description": {
-    "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
+    "message": "为了玩{name}你需要更新。"
   },
   "app.project.install-button.already-installed": {
     "message": "此项目已安装"
@@ -493,6 +709,9 @@
   },
   "app.settings.downloading": {
     "message": "正在下载 v{version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "广告使 Modrinth 得以运营，并为创作者报酬提供资金支持。我们的合作伙伴可能会在应用中存储或访问 Cookie，以便实现广告个性化和效果衡量。您可以在下方选择退出或管理您的偏好设置。"
   },
   "app.settings.tabs.appearance": {
     "message": "外观"
@@ -535,6 +754,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "处理文件时出错"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "此皮肤使用了 {ears} 模组的功能特性"
   },
   "app.skins.edit-button": {
     "message": "编辑皮肤"
@@ -662,6 +884,12 @@
   "app.skins.title": {
     "message": "皮肤选择器"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "切换至关"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "切换至开"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
   },
@@ -709,6 +937,39 @@
   },
   "app.world.world-item.players-online": {
     "message": "{count} 人在线"
+  },
+  "content.shared-instance.change-version-body": {
+    "message": "更改版本只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "部分选中的项目属于共享实例的一部分。删除它们只会修改你的本地副本，未来的共享实例更新可能会再次将其恢复或更改。"
+  },
+  "content.shared-instance.delete-button": {
+    "message": "就要删除"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "就要删除{count, number}"
+  },
+  "content.shared-instance.delete-single-body": {
+    "message": "删除它只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "部分选中的项目属于共享实例的一部分。禁用它们只会修改你的本地副本，未来的共享实例更新可能会再次重新启用、恢复或更改它们。"
+  },
+  "content.shared-instance.disable-button": {
+    "message": "坚持禁用"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "坚持禁用这 {count, number} 个项目"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "禁用它只会修改你的本地副本。未来的共享实例更新可能会再次将其启用、恢复或更改。"
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "解除关联只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
+  },
+  "content.shared-instance.warning-header": {
+    "message": "这是共享实例的一部分"
   },
   "friends.action.add-friend": {
     "message": "添加好友"
@@ -773,6 +1034,75 @@
   "friends.sign-in-to-add-friends": {
     "message": "登录你的 <link>Modrinth 账号</link>，添加好友，看看他们在玩什么！"
   },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "已关联的共享实例"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "取消发布实例"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "解除共享实例关联"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "断开此本地实例与未来共享更新的连接。"
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "正在解除关联……"
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "取消发布共享实例"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "从Modrinth移除这个分享实例，同时停止发送新的更新到正在使用它的人，你的本地实例不会被影响。"
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "取消发布中……"
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "这只会影响到你的本地实例，你安装过的内容依然会在你的设备上保留，被其他人使用的分享实例也不会被影响。"
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "解除共享实例关联"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "解除共享实例关联"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "这将从 Modrinth 服务器上删除该共享实例。在 Modrinth App 中使用它的用户将停止接收更新，但你的本地实例及其内容仍会保留在此设备上。"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "取消发布共享实例"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "取消发布共享实例"
+  },
+  "instance.action.create-shortcut": {
+    "message": "创建快捷方式"
+  },
+  "instance.action.export-modpack": {
+    "message": "导出整合包"
+  },
+  "instance.action.launch-instance": {
+    "message": "启动实例"
+  },
+  "instance.action.more-actions": {
+    "message": "更多操作"
+  },
+  "instance.action.open-folder": {
+    "message": "打开文件夹"
+  },
+  "instance.action.repair": {
+    "message": "修复"
+  },
+  "instance.action.settings": {
+    "message": "实例设置"
+  },
+  "instance.action.starting": {
+    "message": "正在启动……"
+  },
+  "instance.action.stopping": {
+    "message": "正在停止……"
+  },
   "instance.add-server.add-and-play": {
     "message": "添加并游玩"
   },
@@ -814,6 +1144,15 @@
   },
   "instance.files.save-as": {
     "message": "保存为……"
+  },
+  "instance.locked.delete-button": {
+    "message": "删除实例"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "此实例已被锁定"
+  },
+  "instance.playtime.never-played": {
+    "message": "从未玩过"
   },
   "instance.server-modal.address": {
     "message": "地址"
@@ -888,13 +1227,13 @@
     "message": "Alpha 测试版"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "正式版，beta 和 alpha 测试版会被显示为可用更新。"
+    "message": "正式版、beta 和 alpha 版本会显示为可用更新。"
   },
   "instance.settings.tabs.general.update-channel.beta": {
-    "message": "Beta 测试版"
+    "message": "Beta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "正式版和 beta 测试版会被显示为可用更新。"
+    "message": "正式版和 beta 版本会被显示为可用更新。"
   },
   "instance.settings.tabs.general.update-channel.release": {
     "message": "正式版"
@@ -950,6 +1289,9 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} 版本"
   },
+  "instance.settings.tabs.installation.locked": {
+    "message": "当实例被锁定时，安装设置不可用。"
+  },
   "instance.settings.tabs.java": {
     "message": "Java 及内存"
   },
@@ -989,6 +1331,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
+  "instance.settings.tabs.sharing": {
+    "message": "共享"
+  },
   "instance.settings.tabs.window": {
     "message": "游戏窗口"
   },
@@ -1018,6 +1363,57 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "输入宽度……"
+  },
+  "instance.shared-instance.error.title": {
+    "message": "出错了"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "此实例的内容正在共享给其他用户。"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "新增"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "向玩家推送更新"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "预览内容变更，并选择要在本次更新中包含的配置文件"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "审核哪些内容做了更改，并选择你想要包含在这次更新的的配置文件。"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "审核更改内容"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "推送更新"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "已移除"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "此实例的内容正由他人管理。"
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "你对此共享实例的访问权限已被撤销。该实例仍可正常使用，但已解除关联且不再接收后续更新。"
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "源实例已被删除。该实例仍可正常使用，但已解除关联且不再接收后续更新。"
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "此共享实例已被内容审核团队锁定。它将不再接收主实例的更新，且无法继续游玩。"
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "实例已锁定"
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "该实例的管理者"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "你的本地实例仍可正常使用，但已解除关联且不再接收后续更新。"
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "共享实例不再可用"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 服务器"
@@ -1081,6 +1477,63 @@
   },
   "minecraft-account.sign-in": {
     "message": "登录 Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "你需要先登录拥有 Minecraft 的 Microsoft 账户，然后才能启动游戏。"
+  },
+  "minecraft-required.description-header": {
+    "message": "请登录 Microsoft 账户"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "没有账户？"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "获取 Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "获取支持"
+  },
+  "minecraft-required.header": {
+    "message": "需要 Minecraft"
+  },
+  "minecraft-required.sign-in": {
+    "message": "登录 Microsoft 账户"
+  },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "一个新的标签页已打开，你需要在那里完成登录，然后回到Modrinth app。"
+  },
+  "modal.modrinth-account-required.cancel-button": {
+    "message": "取消"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "请在你的浏览器中继续"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "创建账户"
+  },
+  "modal.modrinth-account-required.description": {
+    "message": "在使用这个功能之前，你需要登入你的Modrinth账户。"
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "需要账户"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "再次开启浏览器"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "登录 Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "登录 Modrinth 账号"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "正在登录"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "在登录时遇到困难？<support>获取帮助</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "等待浏览器确认……"
   },
   "search.filter.locked.instance": {
     "message": "由该实例提供"

@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "사용자를 찾을 수 없습니다"
   },
+  "ads-consent.accept": {
+    "message": "모두 수용"
+  },
+  "ads-consent.body": {
+    "message": "Modrinth는 광고를 통해 운영되며, 크리에이터에게 지급하여 보상합니다. 파트너들은 맞춤형 광고 제공과 성과 측정을 위해 웹사이트에서 쿠키를 저장 또는 접근할 수 있습니다."
+  },
+  "ads-consent.manage": {
+    "message": "참조 관리"
+  },
+  "ads-consent.reject": {
+    "message": "모두 거절"
+  },
+  "ads-consent.title": {
+    "message": "프라이버시와 광고가 Modrinth를 지원하는 방식"
+  },
   "analytics.action.add": {
     "message": "추가"
   },
@@ -235,6 +250,9 @@
   },
   "analytics.empty.select-project": {
     "message": "적어도 하나의 프로젝트를 선택해 데이터를 보세요"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "종속 프로젝트를 불러오지 못했습니다"
   },
   "analytics.filter.game-version-type": {
     "message": "게임 버전 유형"
@@ -932,6 +950,12 @@
   "auth.verify-email.title": {
     "message": "이메일 인증"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "아이콘 업로드"
+  },
+  "collection.button.discover-mods": {
+    "message": "모드 탐색"
+  },
   "collection.button.edit-icon": {
     "message": "아이콘 수정"
   },
@@ -1106,6 +1130,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "상세 정보"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "파일"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "메타데이터"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "기본 파일은 사용자가 프로젝트를 설치할 때 다운로드하는 기본 제공 파일입니다."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "기본 파일"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "사용자는 프로젝트를 설치할 때 소스 코드, 문서, 또는 필요한 리소스 팩과 같은 보조 파일을 선택적으로 추가할 수 있습니다."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "보조 파일"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "보조 파일 업로드"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "파일 업로드"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "기본 파일과 보조 파일 업로드"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "파일 드래그 앤 드랍 또는 브라우저 클릭"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "상세 정보"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "파일"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "메타데이터"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "버전 변경 로그"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "버전 넘버"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "버전 넘버는 특정 버전과 다른 버전을 구분 짓습니다."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "버전 넘버를 입력하세요, ex. 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "버전 부제목"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "부제목을 입력하세요..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "버전 타입"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "의존성 추가"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "의존성"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "상세 내용"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "감지된 로더"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "감지된 버전"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "수정"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "환경"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "파일"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "로더"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "메타데이터"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "모드팩 로더는 수정할 수 없습니다"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "모드팩 버전은 수정할 수 없습니다"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "의존성 추가가 없습니다."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "설정된 환경이 없습니다."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "로더가 선택되지 않았습니다."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "모드 로더가 없음"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "선택된 버전이 없습니다."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "이전 유사한 버전의 값으로 미리 입력되었습니다"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "리소스 팩 로더는 수정할 수 없습니다"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "제안"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "파일 업로드가 완료되엇습니다"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "버전"
+  },
   "create.collection.collection-info": {
     "message": "새 컬렉션은 {count, plural, =0 {프로젝트 없음} other {#개의 프로젝트}}를 포함한 공개 컬렉션으로 생성됩니다."
   },
@@ -1202,6 +1355,9 @@
   "create.project.name-placeholder": {
     "message": "프로젝트 이름 입력..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} 아이콘"
+  },
   "create.project.owner-description": {
     "message": "프로젝트 소유자를 자신 또는 소속된 조직으로 설정하세요."
   },
@@ -1232,8 +1388,14 @@
   "create.project.type-server": {
     "message": "서버"
   },
+  "create.project.unknown-user": {
+    "message": "알려지지 않은 사용자"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "사용자 아바타"
   },
   "create.project.visibility-description": {
     "message": "승인 후 프로젝트의 공개 범위."
@@ -1316,6 +1478,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "최근 업데이트"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "닫기"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} 다운로드"
   },
@@ -1342,6 +1507,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "세금 신고서"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "세금 양식 작성이 완료되지 않았습니다. 다시 시도하여 주십시오."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "완료되지 않은 세금 양식"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth는 제3자 제공업체 Track1099를 통해 세금 신고서를 안전하게 수집하고 보관합니다. <security-link>자세히 알아보기</security-link>"
@@ -1382,6 +1553,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "사업체"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "생일 선택"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "사업체란 법인, 파트너십 또는 유한책임회사(LLC)와 같이 등록된 조직을 의미합니다."
   },
@@ -1390,6 +1564,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "개인"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "국가 검색..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "하위 분류 검색..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "국가 선택"
@@ -1526,6 +1706,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "금액 입력"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "최소 단위는 {min}이며, 이는 {balance}의 잔액을 초과합니다."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "이 선불 카드를 사용하려면 최소 {min}이 필요합니다."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "현재 잔액에 사용할 수 있는 금액 단위가 없습니다"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "해당 금액에 가까운 금액 단위가 없습니다"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "해당 금액에 가까운 금액 단위가 없습니다. 사용 가능한 최고 금액 단위는 {max}입니다."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "결제 수단"
   },
@@ -1540,6 +1735,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "금액 검색"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "{category} 검색..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "{category} 선택"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "지정 금액을 선택해 주세요:"
@@ -1558,6 +1759,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "PayPal 국제 결제를 위해 USD를 선택하셨습니다. <direct-paypal-link>직접 PayPal 결제</direct-paypal-link>로 전환하시면 수수료가 더 저렴합니다(약 6% 대신 약 2%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "최소 인출 금액은 {min}, 최대 인출 금액은 {max}입니다."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "최소 인출 금액은 {min}입니다."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "출금"
@@ -2222,6 +2429,24 @@
   "hosting-marketing.medal.text-secondary": {
     "message": "기간 한정 특가. 신용카드 필요 없음. 미국 서버에서 사용 가능."
   },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "결제 정보를 불러오는 데 실패했습니다"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "선택한 제품은 확인되었으나 필수 데이터가 없습니다. 고객 지원팀에 연락해 주세요."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "유효하지 않은 제품"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "현재 수용 한도에 도달했습니다. 나중에 다시 시도해 주세요."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "서버 용량이 가득 찼습니다"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "예기치 않은 에러가 발생하였습니다"
+  },
   "hosting-marketing.pick-customized-plan": {
     "message": "당신이 필요한 사양만 포함된 맞춤형 플랜을 선택하세요."
   },
@@ -2540,6 +2765,21 @@
   "layout.footer.about.status": {
     "message": "상태"
   },
+  "layout.footer.based-on-label": {
+    "message": "에 따라"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "개발자 모드로 사용 가능합니다"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "개발자 모드가 활성화되었습니다"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "개발자 모드가 비활성되었습니다"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "개발자모드가 종료되었습니다"
+  },
   "layout.footer.legal": {
     "message": "법률 정보"
   },
@@ -2609,6 +2849,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "확인되지 않음"
+  },
   "layout.menu-toggle.action": {
     "message": "메뉴 전환"
   },
@@ -2672,6 +2915,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+ 로 업그레이드"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Modrinth에 개시하기 전 이메일에서 승인해야 합니다."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "이메일 승인이 필요합니다"
+  },
   "moderation.exclude-technical-review": {
     "message": "기술 검토 제외"
   },
@@ -2692,6 +2941,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "기술 리뷰"
+  },
+  "modpack-scan-modal.clear-all-groups": {
+    "message": "모든 그룹 삭제"
   },
   "modpack-scan-modal.failed": {
     "message": "실패"
@@ -2999,6 +3251,51 @@
   "muralpay.warning.wallet-address": {
     "message": "지갑 주소를 다시 확인하세요. 잘못된 주소로 송금된 자금은 복구할 수 없습니다."
   },
+  "organization.button.manage": {
+    "message": "관리"
+  },
+  "organization.button.manage-projects": {
+    "message": "프로젝트 관리"
+  },
+  "organization.label.downloads": {
+    "message": "다운로드"
+  },
+  "organization.label.members": {
+    "message": "멤버"
+  },
+  "organization.label.organization": {
+    "message": "조직"
+  },
+  "organization.label.projects": {
+    "message": "프로젝트"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "아이디"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "이름"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "전송할 수 있는 프로젝트가 없습니다."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "{name}용 아이콘"
+  },
+  "organization.project-transfer.title": {
+    "message": "프로젝트 전송"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "{count, plural, one {# project} other {# projects}} 전송"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "타입"
+  },
+  "organization.projects.none": {
+    "message": "이 조직에는 아직 프로젝트가 없습니다."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "이 조직에는 아직 프로젝트가 없습니다. <create-link>하나 생성하시겠습니까?</create-link>?"
+  },
   "profile.bio.fallback.creator": {
     "message": "Modrinth 창작자입니다."
   },
@@ -3065,6 +3362,9 @@
   "profile.label.collection": {
     "message": "컬렉션"
   },
+  "profile.label.download-count": {
+    "message": ""
+  },
   "profile.label.joined": {
     "message": "가입"
   },
@@ -3082,6 +3382,9 @@
   },
   "profile.label.organizations": {
     "message": "조직"
+  },
+  "profile.label.project-count": {
+    "message": ""
   },
   "profile.label.saving": {
     "message": "저장..."
@@ -3226,6 +3529,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "다시 보지 않기"
+  },
+  "project.actions.edit-project": {
+    "message": "프로젝트 수정"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "모드팩 재검사"
   },
   "project.actions.review-project": {
     "message": "프로젝트 검토"
@@ -3400,6 +3709,9 @@
   },
   "project.gallery.title": {
     "message": "갤러리"
+  },
+  "project.install-context.back-to-discover": {
+    "message": "탐색으로 돌아가기"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "이 프로젝트는 비공개로 설정되어 있어, 본인과 본인이 초대한 사람만 접근할 수 있습니다."
@@ -3611,6 +3923,102 @@
   "project.settings.permissions.sort.status": {
     "message": "상태별"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Bedrock 주소"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "저장하기 전에 Java 서버에 연결할 수 있어야 합니다. ping이 성공하는지 확인해 주세요."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "저장할 수 없습니다"
+  },
+  "project.settings.server.details-heading": {
+    "message": "서버 상세 내용"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "주소 입력"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "자바 주소"
+  },
+  "project.settings.server.languages-label": {
+    "message": "언어"
+  },
+  "project.settings.server.latency-label": {
+    "message": "응답 지연: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "옵션"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "이 서버에 ping을 보낼 수 없습니다. 호스트에서 차단되었을 수 있으니 몇 번 새로고침해 보세요. 그래도 응답하지 않으면 <support-link>지원팀에 문의해 주세요.</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Ping 새로고침"
+  },
+  "project.settings.server.region-label": {
+    "message": "지역"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "언어 선택"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "지역 선택"
+  },
+  "project.settings.server.server-online": {
+    "message": "서버 접속!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": " <srv-tooltip>[SRV 레코드]</srv-tooltip>가 있는 경우 포트를 추가할 필요가 없습니다. 그렇지 않고 포트가 25565가 아니라면 :12345처럼 포함할 수 있습니다."
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "여기 입력한 주소에는 DNS SRV 레코드 _minecraft._tcp.(도메인)이 있을 수 있으며, 이는 Minecraft 서버 주소와 포트를 가리킵니다."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "사용 가능한 {count}개의 태그를 모두 선택하셨습니다. 프로젝트에 실제로 적용되는 태그만 선택해 주세요."
+  },
+  "project.settings.tags.categories-description": {
+    "message": " {type}의 주제나 기능을 반영하는 모든 카테고리를 선택하세요."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "추천 태그"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "가장 적합한 태그를 최대 3개까지 지정할 수 있습니다. 3개를 모두 선택하지 않으면 다른 태그가 추천 태그로 표시될 수 있습니다."
+  },
+  "project.settings.tags.features-description": {
+    "message": " {type}에서 사용하는 모든 기능을 선택하세요."
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "현재 {count}개의 해상도 태그({tags})를 선택했습니다. 리소스 팩에는 보통 하나의 해상도 태그만 지정하는 것이 권장됩니다."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": " {type}이 실제로 성능에 미치는 영향을 선택하세요. {type}이 여러 수준의 성능 영향을 설정할 수 있다면, 여러 항목을 선택할 수 있습니다."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "{type}에서 사용할 텍스처의 해상도를 선택해 주세요."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "추천 카테고리를 지정하려면 적어도 하나의 카테고리를 선택해야 합니다."
+  },
+  "project.settings.tags.tagging-importance-description": {
+    "message": "정확한 태그 선택은 {type}을 쉽게 찾을 수 있도록 돕습니다. 관련된 모든 태그를 선택해 주세요."
+  },
+  "project.settings.tags.title": {
+    "message": "태그"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "선택한 태그가 {count}개입니다. 프로젝트를 더 집중적이고 검색하기 쉽게 만들려면 태그를 8개 이하로 줄이는 것이 좋습니다."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 18개 이하로 줄여 주세요."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "선택한 태그가 {count}개입니다. 서버를 더 집중적이고 검색하기 쉽게 만들려면 태그를 12개 이하로 줄이는 것이 좋습니다."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "먼저 버전을 업로드해야 태그를 선택할 수 있습니다!"
+  },
   "project.settings.title": {
     "message": "설정"
   },
@@ -3620,8 +4028,50 @@
   "project.status.archived.message": {
     "message": "{title} 은(는) 보관되었습니다. 작성자가 프로젝트 보관 해제를 결정하지 않는 한 더 이상 업데이트가 제공되지 않습니다."
   },
+  "project.versions.copy-id-option": {
+    "message": "ID 복사"
+  },
+  "project.versions.copy-link-option": {
+    "message": "링크 복사"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Maven 좌표 복사"
+  },
+  "project.versions.delete-button": {
+    "message": "삭제"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "이 버전을 삭제하면 영구적으로 제거됩니다 (정말 영구히)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "이 버전으르 삭제하시겠습니까?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "상세 내용 수정"
+  },
+  "project.versions.edit-files-option": {
+    "message": "파일 수정"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "메타데이터 수정"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "버전 수정"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "새 탭에서 열기"
+  },
+  "project.versions.share-option": {
+    "message": "공유"
+  },
   "project.versions.title": {
     "message": "버전"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "이 버전은 성공적으로 삭제되었습니다."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "버전 삭제"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, other {해당 버전은}} 현재 보류 상태이며 공개되지 않았습니다. 이 모드팩 {count, plural, other {버전에}} 포함된 특정 파일들을 재배포할 수 있는 권한이 있음을 증명하는 자료를 제출해주세요."
@@ -4036,6 +4486,12 @@
   },
   "servers.plan.small.description": {
     "message": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "현재 인기"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ 월{interval, select, monthly {매월} other {, 청구 {interval, select, quarterly {분기별} yearly {매년} other {{interval}}}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "설정 완료"
@@ -4876,6 +5332,18 @@
   },
   "version.environment.unknown.title": {
     "message": "알 수 없는 환경"
+  },
+  "version.notification.deleted-text": {
+    "message": "이 버전은 성공적으로 삭제되었습니다."
+  },
+  "version.notification.deleted-title": {
+    "message": "버전 삭제"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "데이터 팩이 성공적으로 모드로 패키징되었습니다."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "패키징 성공"
   },
   "version.package-as-mod.button": {
     "message": "모드로 패키징하기"

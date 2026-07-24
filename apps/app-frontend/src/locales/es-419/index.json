@@ -464,9 +464,6 @@
   "app.modal.update-to-play.removed": {
     "message": "Eliminado"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Se requiere una actualización para jugar {name}. Por favor, actualiza a la versión más reciente para iniciar el juego."
-  },
   "app.project.install-button.already-installed": {
     "message": "Este proyecto ya está instalado"
   },

@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "Gebruiker niet gevonden"
   },
+  "ads-consent.accept": {
+    "message": "Alles accepteren"
+  },
+  "ads-consent.body": {
+    "message": "Advertenties maken Modrinth mogelijk en financieren de uitbetalingen aan makers. Onze partners kunnen cookies op de website opslaan of gebruiken om advertenties te personaliseren en de prestaties te meten."
+  },
+  "ads-consent.manage": {
+    "message": "Voorkeuren beheren"
+  },
+  "ads-consent.reject": {
+    "message": "Alles afwijzen"
+  },
+  "ads-consent.title": {
+    "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
+  },
   "analytics.action.add": {
     "message": "Toevoegen"
   },
@@ -213,7 +228,7 @@
     "message": "Update"
   },
   "analytics.download-source.app": {
-    "message": "Modrinth App"
+    "message": "Modrinth-app"
   },
   "analytics.download-source.website": {
     "message": "Modrinth Website"
@@ -235,6 +250,9 @@
   },
   "analytics.empty.select-project": {
     "message": "Selecteer ten minste één project om de gegevens te bekijken"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Afhankelijke projecten konden niet worden geladen"
   },
   "analytics.filter.game-version-type": {
     "message": "Game versie typen"
@@ -336,7 +354,7 @@
     "message": "{version} gelanceerd"
   },
   "analytics.project-event.version-uploaded": {
-    "message": "Versie geüpdate"
+    "message": "Versie geüpload"
   },
   "analytics.project-status.approved": {
     "message": "Goedgekeurd"
@@ -354,7 +372,7 @@
     "message": "Privé"
   },
   "analytics.project-status.rejected": {
-    "message": "Afgekeurd"
+    "message": "Afgewezen"
   },
   "analytics.project-status.unlisted": {
     "message": "Verborgen"
@@ -443,6 +461,9 @@
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Speeltijd (seconden)"
   },
+  "analytics.table.csv.selected-range": {
+    "message": "Geselecteerd bereik"
+  },
   "analytics.table.duration.days": {
     "message": "{count, plural, one {# dag} other {# dagen}}"
   },
@@ -516,7 +537,7 @@
     "message": "Onbekend"
   },
   "analytics.value.unknown-dependent-tooltip": {
-    "message": "Er zijn geen metagegevens beschikbaar om te bepalen bij welk afhankelijke project deze download hoort."
+    "message": "Er zijn geen metagegevens beschikbaar om vast te stellen bij welk afhankelijk project deze download hoort."
   },
   "analytics.value.unmonetized": {
     "message": "Niet-gemonetariseerd"
@@ -543,7 +564,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "De Linux-versies zijn <issues-link>berucht wegens instabiliteiten</issues-link> op bepaalde systemen en configuraties. Als de Modrinth-app onstabiel functioneert op jou systeem, moedigen wij je aan om alternatieven zoals <prism-link>Prism Launcher</prism-link> te gebruiken, die direct van Modrinth kan downloaden."
+    "message": "Van de Linux-versies van de Modrinth-app is <issues-link>bekend dat ze problemen vertonen</issues-link> op bepaalde systemen en in bepaalde configuraties. Als de Modrinth-app op jouw systeem onstabiel werkt, raden we je aan om andere apps te gebruiken, zoals <prism-link>Prism Launcher</prism-link>, waarmee je Modrinth-inhoud eenvoudig kunt installeren."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -552,7 +573,7 @@
     "message": "Download opties"
   },
   "app-marketing.download.terms": {
-    "message": "Bij het Downloaden van Modrinth App, ga je akkoord met de <terms-link>Terms</terms-link> en <privacy-link>Privacy Policy</privacy-link>."
+    "message": "Door de Modrinth-app te downloaden, ga je akkoord met onze <terms-link>Algemene voorwaarden</terms-link> en <privacy-link>Privacybeleid</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Download de Modrinth-app (Bètaversie)"
@@ -567,7 +588,7 @@
     "message": "Volg projecten"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importeer al je favoriete profielen vanuit het opstartprogramma dat je eerder gebruikte, en ga binnen enkele seconden aan de slag met de Modrinth app!"
+    "message": "Importeer al je favoriete profielen vanuit de launcher die je eerder gebruikte, en ga binnen enkele seconden aan de slag met de Modrinth-app!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -585,7 +606,7 @@
     "message": "door {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Met Modrinth kun je makkelijk al je mods op één plek beheren. Installeer, verwijder en update je mods in een handomdraai."
+    "message": "Met Modrinth kun je al je mods eenvoudig op één plek beheren. Je kunt mods met één klik installeren, verwijderen en bijwerken."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Geïnstalleerde mods"
@@ -609,7 +630,7 @@
     "message": "Offline-modus"
   },
   "app-marketing.features.open-source.description": {
-    "message": "De launcher van Modrinth is volledig Open Source. Je kan de broncode vinden op onze <github-link>GitHub</github-link>!"
+    "message": "De launcher van Modrinth is volledig open source. Je kunt de broncode bekijken op onze <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open Source"
@@ -621,7 +642,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App presenteert beter dan vele andere mod managers, het gebruikt maar 150 MB aan RAM!"
+    "message": "De Modrinth-app presteert beter dan veel van de toonaangevende mod-managers, en verbruikt daarbij slechts 150 MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -660,13 +681,13 @@
     "message": "Snelheid gericht"
   },
   "app-marketing.features.play.description": {
-    "message": "Download en speel met je favorieten mods en modpacks met de Modrinth-app."
+    "message": "Gebruik de Modrinth-app om je favoriete mods en modpacks te downloaden en ermee te spelen."
   },
   "app-marketing.features.play.title": {
     "message": "Speel met je favorieten mods"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Verzamel, speel en deel modpacks met de duizenden mods en modpacks verkrijgbaar hier op Modrinth."
+    "message": "Maak, deel en speel modpacks met een van de duizenden mods en modpacks die hier op Modrinth worden gehost."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpack"
@@ -681,7 +702,7 @@
     "message": "Onvergelijkbaar met de concurrentie"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App is volledig geïntegreerd met de website, zodat u vanuit de app toegang heeft tot al uw favoriete projecten!"
+    "message": "De Modrinth-app is volledig geïntegreerd met de website, zodat je vanuit de app toegang hebt tot al je favoriete projecten!"
   },
   "app-marketing.features.website.title": {
     "message": "Website integratie"
@@ -690,19 +711,19 @@
     "message": "je hebt het al gezien"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot van de Modrinth App met een Cobblemon installatie geopend op de 'Content' pagina."
+    "message": "Screenshot van de Modrinth-app met een Cobblemon-instantie geopend op de pagina 'Inhoud'."
   },
   "app-marketing.hero.description": {
-    "message": "De Modrinth App is een unieke, openbare launcher waarmee je je favoriete mods kunt spelen en up-to-date houden, allemaal in één handig app."
+    "message": "De Modrinth-app is een unieke, open-source launcher waarmee je je favoriete mods kunt spelen en ze up-to-date kunt houden, allemaal in één handig pakketje."
   },
   "app-marketing.hero.download-button": {
-    "message": "Download de Modrinth App"
+    "message": "Modrinth-app downloaden"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Download de Modrinth App"
+    "message": "Modrinth-app downloaden"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Download de Modrinth App voor {os}"
+    "message": "Modrinth-app voor {os} downloaden"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Schermafbeelding van de Cobblemon instantie's hoofd menu scherm."
@@ -926,6 +947,12 @@
   "auth.verify-email.title": {
     "message": "Verifieer e-mail"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "Pictogram uploaden"
+  },
+  "collection.button.discover-mods": {
+    "message": "Mods ontdekken"
+  },
   "collection.button.edit-icon": {
     "message": "Bewerk icoon"
   },
@@ -1100,6 +1127,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Details"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Bestanden"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "Het primaire bestand is het standaardbestand dat een gebruiker downloadt bij het installeren van het project."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Primair bestand"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Je kunt desgewenst aanvullende bestanden toevoegen, zoals broncode, documentatie of benodigde bronpakketten."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Aanvullende bestanden"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Extra bestand uploaden"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Bestand uploaden"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Primaire en aanvullende bestanden uploaden"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Sleep bestanden hierheen of klik om te bladeren"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Details"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Bestanden"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metagegevens"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Wijzigingslogboek van de versie"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Versienummer"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Het versienummer onderscheidt deze specifieke versie van andere versies."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Voer het versienummer in, bijvoorbeeld 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Ondertitel van de versie"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Voer een ondertitel in..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Versietype"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Afhankelijkheid toevoegen"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Afhankelijkheden"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Details"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Gedetecteerde loaders"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Gedetecteerde versies"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Bewerken"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Omgeving"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Bestanden"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Loaders"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metagegevens"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Modpack-loaders kunnen niet worden bewerkt"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "Modpack-versies kunnen niet worden bewerkt"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "Geen afhankelijkheden toegevoegd."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "Er is geen omgeving ingesteld."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Geen loaders geselecteerd."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Geen mod-loader"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "Geen versies geselecteerd."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Overgenomen uit een eerdere, vergelijkbare versie"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Bronpakket-loaders kunnen niet worden bewerkt"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Aanbevolen"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Geüploade bestanden"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versies"
+  },
   "create.collection.collection-info": {
     "message": "Je nieuwe collectie wordt gemaakt als een publieke collectie met {count, plural,=0 {geen projecten}one {# project}other {# projecten}}."
   },
@@ -1167,7 +1323,7 @@
     "message": "Vul organisatienaam in"
   },
   "create.organization.ownership-info": {
-    "message": "Jij wordt de eigenaar van deze organisatie, maar je kan andere leden uitnodigen en het beheer altijd overdragen."
+    "message": "Jij zal de eigenaar van deze organisatie zijn, maar je kunt op elk moment andere leden uitnodigen en het eigendom overdragen."
   },
   "create.organization.summary-description": {
     "message": "Eén of twee zinnen die je organisatie beschrijven."
@@ -1195,6 +1351,9 @@
   },
   "create.project.name-placeholder": {
     "message": "Voer projectnaam in..."
+  },
+  "create.project.organization-icon-alt": {
+    "message": "{name} pictogram"
   },
   "create.project.owner-description": {
     "message": "Stel de project eigenaar in als jezelf of een organisatie waar je lid van bent."
@@ -1226,8 +1385,14 @@
   "create.project.type-server": {
     "message": "Server"
   },
+  "create.project.unknown-user": {
+    "message": "Onbekende gebruiker"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Gebruikersavatar"
   },
   "create.project.visibility-description": {
     "message": "De zichtbaarheid van je project nadat het is goedgekeurd."
@@ -1310,6 +1475,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Recentelijk geüpdate"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Sluiten"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
   },
@@ -1336,6 +1504,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Belastingformulier"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Je hebt het belastingformulier niet ingevuld. Probeer het nog eens."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Belastingformulier onvolledig"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth maakt gebruik van de externe leverancier Track1099 om je belastingformulieren veilig te verzamelen en op te slaan. <security-link>Leer hier meer.</security-link>"
@@ -1376,6 +1550,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Zakelijke entiteit"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Kies je geboortedatum"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Een bedrijfsentiteit is een geregistreerde organisatie, zoals een vennootschap, maatschap of LLC."
   },
@@ -1384,6 +1561,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Particulier"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Zoek landen..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Zoek deelgebieden..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Selecteer uw land"
@@ -1520,6 +1703,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Voer aantal in"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "De minimale coupure is {min}, wat hoger is dan je saldo van {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Je hebt minimaal {min} nodig om deze cadeaubon te gebruiken."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "Er zijn geen coupures beschikbaar voor uw huidige saldo"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Geen coupures in de buurt van dit bedrag"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Er zijn geen coupures die in de buurt van dit bedrag liggen. Het hoogste beschikbare bedrag is {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Payment method"
   },
@@ -1534,6 +1732,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Zoek aantal"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Zoek in {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Selecteer {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Selecteer een denominatie:"
@@ -1552,6 +1756,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "Je hebt USD voor PayPal International geselecteerd. <direct-paypal-link>Switch naar direct PayPal</direct-paypal-link> voor betere tarieven (≈2% in plaats van ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "{min} min., {max} max. opnamebedrag."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "{min} minimaal opnamebedrag."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Opnemen"
@@ -1704,7 +1914,7 @@
     "message": "Dit project heeft een bericht van de moderators. Bekijk het project voor meer informatie."
   },
   "dashboard.projects.project.review-environment-metadata": {
-    "message": "Controller project metadata alstublieft"
+    "message": "Controleer metagegevens van de omgeving"
   },
   "dashboard.projects.selection-bar.aria-label": {
     "message": ""
@@ -1767,7 +1977,7 @@
     "message": "Opgenomen"
   },
   "dashboard.revenue.tos": {
-    "message": "Door projecten te uploaden naar Modrinth en geld op te nemen van je account, ga je akkoord met onze <terms-link>voorwaarden van het belonings-programma</terms-link>. Leer meer over het <info-link>Beloningsprogramma</info-link>."
+    "message": "Door projecten op Modrinth te uploaden en geld van je account op te nemen, ga je akkoord met onze <terms-link>voorwaarden voor het beloningsprogramma</terms-link>. Lees meer over het <info-link>beloningsprogramma</info-link>."
   },
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Download als CSV"
@@ -1797,7 +2007,7 @@
     "message": "Alle jaren"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
-    "message": "Uw opnames zijn tijdelijk geblokkeerd omdat uw TIN of SSN niet overeenkomt met de gegevens van de IRS. Neem contact op met de klantenservice om uw gegevens te resetten en uw belastingaangifte opnieuw in te dienen."
+    "message": "Je opnames zijn tijdelijk geblokkeerd omdat je TIN of SSN niet overeenkomt met de gegevens van de IRS. Neem contact op met de klantenservice om je belastingformulier opnieuw in te vullen en in te dienen."
   },
   "dashboard.revenue.withdraw.card.description": {
     "message": ""
@@ -1920,7 +2130,7 @@
     "message": "Te laag bedrag"
   },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
-    "message": "Gebruik de juiste PayPal overdrachtsoptie voor uw regio (VS of Internationaal)."
+    "message": "Gebruik alsjeblieft de juiste PayPal-overschrijvingsoptie voor je regio (VS of internationaal)."
   },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal regio mismatch"
@@ -1944,7 +2154,7 @@
     "message": "Er is geen serverwereld beschikbaar om te installeren."
   },
   "discover.install.error.unsupported-content-type": {
-    "message": "Dit inhoudstype kan niet vanuit Discover op een server worden geïnstalleerd."
+    "message": "Dit inhoudstype kan niet vanuit Ontdekken op een server worden geïnstalleerd."
   },
   "discover.install.heading.reset-modpack": {
     "message": "Een modpack selecteren om te installeren na het resetten"
@@ -1995,7 +2205,7 @@
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Als dit blijft gebeuren zou u waarschijnlijk de Modrinth team moeten inlichten via onze <discord-link>Discord Server</discord-link>."
+    "message": "Als dit blijft gebeuren, kun je dit het beste aan het Modrinth-team laten weten door lid te worden van onze <discord-link>Discord-server</discord-link>."
   },
   "error.generic.default.list_title": {
     "message": "Probeer alstublieft opnieuw in een paar minuten."
@@ -2178,7 +2388,7 @@
     "message": "Gebruiksvriendelijke bestandsbeheerder"
   },
   "hosting-marketing.included.file-manager.description": {
-    "message": "Zoek, beheer, bewerk en upload bestanden eenvoudig rechtstreeks naar uw server."
+    "message": "Zoek, beheer, bewerk en upload bestanden moeiteloos rechtstreeks naar je server."
   },
   "hosting-marketing.included.heading": {
     "message": "Komt met alle functies die u nodig heeft."
@@ -2215,6 +2425,24 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "Tijdelijke aanbieding. Geen credit-card nodig. Beschikbaar voor US-servers."
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Fout bij het ophalen van betalingsgegevens"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "Het geselecteerde product is gevonden, maar er ontbreken noodzakelijke gegevens. Neem contact op met de klantenservice."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Ongeldig product"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "We zitten momenteel vol. Probeer het later nog eens."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Servercapaciteit vol"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Er is een onverwachte fout opgetreden"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "Kies een aangepast plan voor wat je nodig hebt."
@@ -2286,13 +2514,13 @@
     "message": "Cijfers en Statistieken"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Word ontdekt door duizenden gebruikers door middel van zoekresultaten, onze startpagina, Discord server, en nog veel meer mogelijkheden in de toekomst!"
+    "message": "Zorg ervoor dat je project door duizenden gebruikers wordt ontdekt via de zoekfunctie, onze startpagina, onze Discord-server en nog veel meer manieren die in de toekomst zullen volgen!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Ontdekken"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integreer je build-tools met behulp van Minotaur voor automatische uploads meteen wanneer je een nieuwe versie releaset. "
+    "message": "Integreer via Minotaur met je buildtools om automatisch bestanden te uploaden zodra je een nieuwe versie uitbrengt"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Een Diverse Ecosysteem "
@@ -2319,7 +2547,7 @@
     "message": "Volg je favoriete projecten"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth's open-source API biedt launchers diepe integratie met Modrinth. Je kan Modrinth gebruikern via onze <link>eigen app</link> en populaire launchers als ATLauncher, MultiMC, en Prism Launcher."
+    "message": "Dankzij de open-source API van Modrinth kunnen launchers een diepgaande integratie met Modrinth realiseren. Je kunt Modrinth gebruiken via <link>onze eigen app</link> en via enkele van de populairste launchers, zoals ATLauncher, MultiMC en Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Speel via je favoriete launcher"
@@ -2361,7 +2589,7 @@
     "message": "Een vereenvoudigde weergave van een Minecraft venster, met het Mojang Studios logo in Modrinth groen."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth App"
+    "message": "Modrinth-app"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -2394,10 +2622,10 @@
     "message": "Voor Spelers"
   },
   "landing.section.for-players.tagline": {
-    "message": "Ontdek meer dan {count, number} projecten"
+    "message": "Ontdek meer dan {count, number} creaties"
   },
   "landing.subheading": {
-    "message": "Ontdek, speel en deel Minecraft content via ons open bron platform, speciaal ontwikkeld voor de community."
+    "message": "Ontdek, speel en deel Minecraft-content via ons open-sourceplatform dat speciaal voor de gemeenschap is ontwikkeld."
   },
   "layout.action.analytics-events": {
     "message": "Analytics-gebeurtenissen"
@@ -2534,6 +2762,21 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
+  "layout.footer.based-on-label": {
+    "message": "Gebaseerd op"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Ontwikkelaarsmodus is ingeschakeld"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Ontwikkelaarsmodus geactiveerd"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Ontwikkelaarsmodus is uitgeschakeld"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Ontwikkelaarsmodus gedeactiveerd"
+  },
   "layout.footer.legal": {
     "message": "Juridisch"
   },
@@ -2565,7 +2808,7 @@
     "message": "Producten"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth App"
+    "message": "Modrinth-app"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
@@ -2603,14 +2846,17 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "onbekend"
+  },
   "layout.menu-toggle.action": {
     "message": "Menu in-/uitschakelen"
   },
   "layout.meta.description": {
-    "message": "Download Minecraft-mods, plugins datapacks, shaders resourcepacks op Modrinth. Ontdek en publiceer projecten op Modrinth met een modern en makkelijk te gebruiken interface en API."
+    "message": "Download Minecraft-mods, plug-ins, gegevenspakketten, shaders, bronpakketten op Modrinth. Ontdek en publiceer projecten op Modrinth via een moderne, gebruiksvriendelijke interface en API."
   },
   "layout.meta.og-description": {
-    "message": "Ontdek en publiceer Minecraft content!"
+    "message": "Ontdek en publiceer Minecraft-inhoud!"
   },
   "layout.mobile.close-menu": {
     "message": "Sluit menu"
@@ -2625,10 +2871,10 @@
     "message": "Ontdek"
   },
   "layout.nav.discover-content": {
-    "message": "Ontdek content"
+    "message": "Ontdek inhoud"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Download Modrinth App"
+    "message": "Modrinth-app downloaden"
   },
   "layout.nav.home": {
     "message": "Thuispagina"
@@ -2637,7 +2883,7 @@
     "message": "Host een server"
   },
   "layout.nav.modrinth-app": {
-    "message": "Modrinth App"
+    "message": "Modrinth-app"
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth startpagina"
@@ -2681,6 +2927,9 @@
   "moderation.page.external-projects": {
     "message": "Externe projecten"
   },
+  "moderation.page.global-detail-traces": {
+    "message": "Wereldwijde sporen"
+  },
   "moderation.page.projects": {
     "message": "Projecten"
   },
@@ -2689,6 +2938,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Technische beoordeling"
+  },
+  "modpack-scan-modal.clear-all-groups": {
+    "message": "Alle groepen wissen"
   },
   "modpack-scan-modal.failed": {
     "message": "Mislukt"
@@ -2996,6 +3248,51 @@
   "muralpay.warning.wallet-address": {
     "message": "Controleer uw portemonnee adres nogmaals. Geld dat naar een onjuist adres is overgemaakt, kan niet worden teruggevonden."
   },
+  "organization.button.manage": {
+    "message": "Beheren"
+  },
+  "organization.button.manage-projects": {
+    "message": "Projecten beheren"
+  },
+  "organization.label.downloads": {
+    "message": "downloads"
+  },
+  "organization.label.members": {
+    "message": "leden"
+  },
+  "organization.label.organization": {
+    "message": "Organisatie"
+  },
+  "organization.label.projects": {
+    "message": "projecten"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Naam"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "Geen projecten beschikbaar om over te zetten."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Pictogram voor {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Projecten overzetten"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "{count, plural, one {# project} other {# projecten}} overzetten"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Type"
+  },
+  "organization.projects.none": {
+    "message": "Deze organisatie heeft nog geen projecten."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Deze organisatie heeft nog geen projecten. Wil je er <create-link>een aanmaken</create-link>?"
+  },
   "profile.bio.fallback.creator": {
     "message": "Een Modrinth creator."
   },
@@ -3062,6 +3359,9 @@
   "profile.label.collection": {
     "message": "Collectie"
   },
+  "profile.label.download-count": {
+    "message": "{count, plural, one {download} other {downloads}}"
+  },
   "profile.label.joined": {
     "message": "Lid geworden"
   },
@@ -3079,6 +3379,9 @@
   },
   "profile.label.organizations": {
     "message": "Organisaties"
+  },
+  "profile.label.project-count": {
+    "message": "{count, plural, one {project} other {projecten}}"
   },
   "profile.label.saving": {
     "message": "Opslaan..."
@@ -3132,7 +3435,7 @@
     "message": "Opnieuw voor beoordeling indienen"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Je project is door het personeel van Modrinth beoordeeld met de status {status, select, rejected {rejected} withheld {withheld} other {{status}}}. In de meeste gevallen kun je het project opnieuw ter beoordeling indienen nadat je op het bericht van het personeel hebt gereageerd."
+    "message": "Je project is door de medewerkers van Modrinth als {status, select, rejected {afgewezen} withheld {verborgen} other {{status}}} beoordeeld. In de meeste gevallen kun je het project opnieuw ter beoordeling indienen nadat je de opmerkingen van de medewerkers hebt verwerkt."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Je moet de vereiste stappen in de publicatie checklist voltooien!"
@@ -3223,6 +3526,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "Niet opnieuw tonen"
+  },
+  "project.actions.edit-project": {
+    "message": "Project bewerken"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Modpack opnieuw scannen"
   },
   "project.actions.review-project": {
     "message": "Beoordeel project"
@@ -3324,7 +3633,7 @@
     "message": "Handmatig downloaden"
   },
   "project.download.no-app": {
-    "message": "Heb je de Modrinth App niet?"
+    "message": "Heb je de Modrinth-app nog niet?"
   },
   "project.download.no-game-versions-found": {
     "message": "Geen spelversies gevonden"
@@ -3359,23 +3668,32 @@
   "project.download.title": {
     "message": "Download {title}"
   },
+  "project.download.unknown-loader": {
+    "message": "Onbekende loader"
+  },
+  "project.download.zip-failed-text": {
+    "message": "Een of meer bestanden konden niet worden gedownload. Probeer het nog eens."
+  },
+  "project.download.zip-failed-title": {
+    "message": "Bestanden konden niet worden gedownload"
+  },
   "project.environment.migration-no-permission.message": {
-    "message": "We hebben het omgeving systeem op Modrinth onlangs vernieuwd en er zijn nu nieuwe opties beschikbaar. Je hebt geen toestemming om deze instellingen te wijzigen, maar laat een ander projectlid weten dat de omgeving metadata geverifieerd moet worden."
+    "message": "We hebben het Omgevingssysteem op Modrinth zojuist grondig herzien en er zijn nu nieuwe opties beschikbaar. Jij hebt geen toestemming om deze instellingen te wijzigen, maar laat een ander lid van het project weten dat de metagegevens van de omgeving moeten worden gecontroleerd."
   },
   "project.environment.migration-no-permission.title": {
-    "message": "De omgeving metadata moeten worden gecontroleerd."
+    "message": "Metagegevens van de omgeving moeten gecontroleerd worden"
   },
   "project.environment.migration.learn-more": {
     "message": "Lees meer over deze wijziging."
   },
   "project.environment.migration.message": {
-    "message": "We hebben het omgeving systeem op Modrinth onlangs vernieuwd en er zijn nu nieuwe opties beschikbaar. Controleer of de metadata correct is."
+    "message": "We hebben het Omgevingssysteem op Modrinth zojuist grondig herzien en er zijn nu nieuwe opties beschikbaar. Controleer alsjeblieft of de metagegevens correct zijn."
   },
   "project.environment.migration.review-button": {
     "message": "Controleer de omgevingsinstellingen"
   },
   "project.environment.migration.title": {
-    "message": "Bekijk de omgeving metadata."
+    "message": "Controleer metagegevens van de omgeving"
   },
   "project.error.loading": {
     "message": "Error tijdens het laden van de projectdata{message}"
@@ -3389,14 +3707,77 @@
   "project.gallery.title": {
     "message": "Gallerij"
   },
+  "project.install-context.back-to-discover": {
+    "message": "Terug naar Ontdekken"
+  },
+  "project.moderation.admonition.approved.body.private": {
+    "message": "Je project is privé, wat betekent dat alleen jij en de mensen die je uitnodigt er toegang toe hebben."
+  },
+  "project.moderation.admonition.approved.body.public": {
+    "message": "Je project is gepubliceerd en kan worden gevonden op Modrinth."
+  },
   "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Jouw project is verborgen. Dit betekend dat het alleen beschikbaar is via een directe link en niet vindbaar is op Modrinth."
+    "message": "Je project is verborgen, wat betekent dat het alleen via een directe link toegankelijk is en niet vindbaar is op Modrinth."
+  },
+  "project.moderation.admonition.approved.body.visibility-message": {
+    "message": "Je kunt de zichtbaarheid van je project wijzigen in de <visibility-settings-link>zichtbaarheidsinstellingen</visibility-settings-link> van je project."
+  },
+  "project.moderation.admonition.approved.header": {
+    "message": "Project goedgekeurd"
+  },
+  "project.moderation.admonition.draft.body": {
+    "message": "Dit is een conceptproject dat pas door anderen kan worden bekeken nadat het ter beoordeling is ingediend en is goedgekeurd door het moderatorteam van Modrinth."
+  },
+  "project.moderation.admonition.draft.header": {
+    "message": "Conceptproject"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "Zodra je alle vereiste stappen hebt doorlopen en hebt gecontroleerd of je project voldoet aan de <rules-link>Inhoudsregels</rules-link> van Modrinth, kun je je project ter beoordeling indienen."
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "Los eerst alle kwesties met betrekking tot de moderatie, inclusief de problemen die in de onderstaande berichten worden genoemd, op voordat u dit project opnieuw indient."
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "Gevraagde wijzigingen"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "Als je je project herhaaldelijk indient zonder eerst alle opmerkingen van de moderators te hebben verwerkt, kan dit leiden tot opschorting van je account."
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Je project staat in de wachtrij om door het moderatieteam van Modrinth te worden beoordeeld."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Je project wordt gescand en vervolgens door menselijke moderators beoordeeld om te controleren of het voldoet aan de <rules-link>Inhoudsregels</rules-link> en <terms-link>Gebruiksvoorwaarden</terms-link> van Modrinth."
+  },
+  "project.moderation.admonition.under-review.body.3": {
+    "message": "Je kunt je project nog steeds aanpassen; dit heeft geen invloed op je plaats in de wachtrij."
+  },
+  "project.moderation.admonition.under-review.body.4": {
+    "message": "We streven ernaar om inzendingen binnen 24 tot 48 uur te beoordelen, maar bij sommige projecten kan er vertraging optreden. Dit betekent niet dat er iets mis is met je inzending."
+  },
+  "project.moderation.admonition.under-review.body.5": {
+    "message": "<emphasis>We stellen je geduld zeer op prijs terwijl onze moderators hard werken om Modrinth veilig te houden, en we kijken ernaar uit om je te helpen je content te delen! 💚</emphasis>"
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Project in behandeling"
   },
   "project.moderation.admonition.withheld.body": {
-    "message": "Jouw project wordt niet publiek weergegeven en kan alleen benaderd worden via een directe link. {requestedStatus, select, unlisted { Gebaseerd op jouw geselecteerde <visibility-settings-link>zichtbaarheidsinstelling</visibility-settings-link> hoeft u waarschijnlijk geen verdere actie te ondernemen.} other { Verbeter alstublieft alle gekregen punten en de hieronder genoteerde problemen voordat u dit project opnieuw inzend.}}"
+    "message": "Je project wordt niet openbaar weergegeven en is alleen bereikbaar via een directe link. {requestedStatus, select, unlisted { Op basis van de door jou geselecteerde <visibility-settings-link>zichtbaarheidsinstellingen</visibility-settings-link> hoef je waarschijnlijk geen actie te ondernemen.} other { Los alsjeblieft alle moderatiekwesties op, inclusief de problemen die in de onderstaande berichten worden genoemd, voordat je dit project opnieuw indient.}}"
   },
   "project.moderation.admonition.withheld.header": {
-    "message": "Verborgen door moderator"
+    "message": "Door medewerkers verborgen"
+  },
+  "project.moderation.error.unauthorized": {
+    "message": "Ongeautoriseerd"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "Deze thread wordt niet actief gemodereerd, maar kan indien nodig worden bekeken om informatie over je project te verkrijgen."
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "Inhoudsmoderators kunnen voor de meeste problemen geen ondersteuning bieden en berichten in deze thread worden niet doorgestuurd naar het personeel."
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "Als je hulp nodig hebt of nog vragen hebt, ga dan naar het <help-center-link>Modrinth Helpcentrum</help-center-link> en klik op het blauwe ballonnetje om contact op te nemen met de klantenservice."
   },
   "project.moderation.thread.private-description": {
     "message": "Dit is een besloten discussiethread met de moderators van Modrinth. Zij kunnen je berichten sturen over zaken die betrekking hebben op dit project."
@@ -3468,13 +3849,64 @@
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Gelieve aan te tonen dat u toestemming hebt om alle onderstaande bestanden te verspreiden. Zodra dit is voltooid, worden de achtergehouden versies automatisch gepubliceerd."
+    "message": "Toon alsjeblieft aan dat je toestemming hebt om alle onderstaande bestanden te verspreiden. Zodra dit is voltooid, worden de achtergehouden versies automatisch gepubliceerd."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
     "message": "Gelieve aan te tonen dat u toestemming hebt om alle onderstaande bestanden te verspreiden, voordat u uw project ter beoordeling indient."
   },
   "project.settings.permissions.attention-needed.title": {
     "message": "Onbekende externe inhoud"
+  },
+  "project.settings.permissions.bad-proof.description": {
+    "message": "Het moderatieteam van Modrinth heeft de door jou verstrekte toestemmingsgegevens voor bepaalde externe inhoud afgewezen. Bekijk hieronder de afgewezen items en lever aanvaardbaar bewijs aan of verwijder de inhoud."
+  },
+  "project.settings.permissions.bad-proof.title": {
+    "message": "Sommige bewijzen werden afgewezen"
+  },
+  "project.settings.permissions.collapse-all": {
+    "message": "Alles samenvouwen"
+  },
+  "project.settings.permissions.completed.description": {
+    "message": "Alle externe inhoud is voorzien van toestemmingsinformatie en er zijn bronvermeldingen opgenomen."
+  },
+  "project.settings.permissions.completed.title": {
+    "message": "Toestemmingen voltooid!"
+  },
+  "project.settings.permissions.empty-state.description": {
+    "message": "Geen van de versies van je project bevat externe inhoud, dus je hoeft je geen zorgen te maken over het verkrijgen van toestemming."
+  },
+  "project.settings.permissions.empty-state.heading": {
+    "message": "Alles is geregeld!"
+  },
+  "project.settings.permissions.expand-all": {
+    "message": "Alles uitvouwen"
+  },
+  "project.settings.permissions.fail.description": {
+    "message": "Het is mogelijk dat je geen toestemming hebt om bepaalde externe inhoud in je project te verspreiden. Om je project op Modrinth te kunnen publiceren, moet je deze inhoud verwijderen of bewijs leveren dat je wel toestemming hebt om deze te gebruiken."
+  },
+  "project.settings.permissions.fail.title": {
+    "message": "Sommige inhoud kan niet worden opgenomen"
+  },
+  "project.settings.permissions.info-banner.description": {
+    "message": "Als je inhoud toevoegt die niet op Modrinth wordt gehost, moet je ons laten weten waar deze vandaan komt en aantonen dat je toestemming hebt om de bestanden te verspreiden. Bekijk <link>onze aankondiging over dit nieuwe systeem</link> voor meer informatie!"
+  },
+  "project.settings.permissions.info-banner.title": {
+    "message": "Meer informatie over distributierechten"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Meer informatie"
+  },
+  "project.settings.permissions.no-results": {
+    "message": "Geen externe bestanden voldoen aan de zoekopdracht."
+  },
+  "project.settings.permissions.not-allowed.description": {
+    "message": "Een deel van de opgenomen externe inhoud mag niet op Modrinth worden verspreid omdat deze in strijd is met onze inhoudsregels en daarom moet worden verwijderd."
+  },
+  "project.settings.permissions.pending-approval-count": {
+    "message": "{count, plural, =0 {Geen bronvermeldingen hebben goedkeuring nodig} one {# bronvermelding heeft goedkeuring nodig} other {# bronvermeldingen hebben goedkeuring nodig}}"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Zoek naar {count} {count, plural, one {project} other {projecten}}..."
   },
   "project.settings.permissions.sort.most-files": {
     "message": "Meeste bestanden"
@@ -3485,6 +3917,105 @@
   "project.settings.permissions.sort.rejected": {
     "message": "Afgewezen"
   },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
+  },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Bedrock-adres"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "De Java-server moet bereikbaar zijn voordat je kunt opslaan. Controleer of de ping slaagt."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Kan niet opslaan"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Serverdetails"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Adres invoeren"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java-adres"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Talen"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Vertraging: {latency} ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "optioneel"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "We konden deze server niet pingen. Mogelijk wordt deze door je provider geblokkeerd, dus probeer het een paar keer opnieuw. Als de server nog steeds niet reageert, neem dan <support-link>contact op met de klantenservice</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Ping vernieuwen"
+  },
+  "project.settings.server.region-label": {
+    "message": "Regio"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Talen selecteren"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Regio selecteren"
+  },
+  "project.settings.server.server-online": {
+    "message": "Server is online!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "Als je <srv-tooltip>[SRV-records]</srv-tooltip> hebt, hoef je geen poort toe te voegen. Als je daarentegen een poort hebt die niet 25565 is, kun je deze als volgt toevoegen: :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "Het adres dat je hier invoert, kan DNS SRV-records bevatten, zoals _minecraft._tcp.(jouw domein), die verwijzen naar het adres en de poort van je Minecraft-server."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Je hebt alle {count} beschikbare tags geselecteerd. Selecteer alleen de tags die daadwerkelijk van toepassing zijn op je project."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Selecteer alle categorieën die aansluiten bij de thema's of de functie van je {type}."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Uitgelichte tags"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "Je kunt maximaal 3 van je meest relevante tags als uitgelichte tags selecteren. Als je niet alle 3 selecteert, kunnen andere tags als uitgelichte tags worden weergegeven."
+  },
+  "project.settings.tags.features-description": {
+    "message": "Selecteer alle functies waarvan je {type} gebruikmaakt."
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "Je hebt {count} resolutietags ({tags}) geselecteerd. Bronpakketten zouden normaal gesproken slechts één resolutietag moeten hebben."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Selecteer de realistische invloed op de prestaties van uw {type}. Selecteer meerdere opties als het {type} kan worden geconfigureerd voor verschillende niveaus van invloed op de prestaties."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Selecteer de resolutie(s) van de texturen in je {type}."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Selecteer minstens één categorie om een categorie uit te lichten."
+  },
+  "project.settings.tags.tagging-importance-description": {
+    "message": "Nauwkeurige tags zijn belangrijk om mensen te helpen je {type} te vinden. Zorg ervoor dat je alle relevante tags selecteert."
+  },
+  "project.settings.tags.title": {
+    "message": "Tags"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 8 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "Je hebt {count} tags geselecteerd. Beperk dit aantal tot maximaal 18, zodat je project gericht blijft en gemakkelijker te vinden is."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 12 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Upload eerst een versie om tags te kunnen selecteren!"
+  },
   "project.settings.title": {
     "message": "Instellingen"
   },
@@ -3494,17 +4025,77 @@
   "project.status.archived.message": {
     "message": "{title} is gearchiveerd. {title} zal geen verdere updates krijgen tenzij de auteur het project de-archiveerd."
   },
+  "project.versions.copy-id-option": {
+    "message": "ID kopiëren"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Link kopiëren"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Maven-coördinaten kopiëren"
+  },
+  "project.versions.delete-button": {
+    "message": "Verwijderen"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Hierdoor wordt deze versie voorgoed verwijderd (echt voorgoed)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Weet je zeker dat je deze versie wilt verwijderen?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Details bewerken"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Bestanden bewerken"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Metagegevens bewerken"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Versie bewerken"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "In een nieuw tabblad openen"
+  },
+  "project.versions.share-option": {
+    "message": "Delen"
+  },
   "project.versions.title": {
     "message": "Versies"
   },
+  "project.versions.version-deleted-text": {
+    "message": "De versie is succesvol verwijderd."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Versie verwijderd"
+  },
+  "project.versions.withheld-versions-warning.description": {
+    "message": "{count, plural, one {Deze versie is} other {Deze versies zijn}} momenteel niet beschikbaar en wordt niet openbaar aangeboden. Toon alsjeblieft aan dat je toestemming hebt om bepaalde bestanden uit de modpack{count, plural, one {-versie} other {-versies}} te verspreiden."
+  },
+  "project.versions.withheld-versions-warning.title": {
+    "message": "{count, plural, one {Versie {version_name}} other {Versies}} niet weergegeven vanwege onbekende ingesloten inhoud"
+  },
   "report.already-reported": {
     "message": "U heeft al {title} gerapporteerd"
+  },
+  "report.already-reported-description": {
+    "message": "Je hebt al een openstaand rapport voor dit/deze {item}. Je kunt meer details aan je rapport toevoegen als je nog meer informatie hebt."
+  },
+  "report.back-to-item": {
+    "message": "Terug naar {item}"
   },
   "report.body.description": {
     "message": "Voeg linken en afbeelding als het mogelijk en relevant is. Lege of onvoldoende rapportages zullen gesloten worden en geregeerd worden."
   },
   "report.body.title": {
     "message": "Geef alstublieft aanvoegende context over uw rapportage"
+  },
+  "report.checking": {
+    "message": "{item} wordt gecontroleerd..."
+  },
+  "report.could-not-find": {
+    "message": "{item} kon niet worden gevonden"
   },
   "report.for.violation": {
     "message": "Het schenden van Modrinth <rules-link> Regels</rules-link> of <terms-link>Termen</terms-link>"
@@ -3531,7 +4122,7 @@
     "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
   },
   "report.note.copyright.1": {
-    "message": "Wees er zeker van dat je *geen* DMCA-report indient maar een report van opnieuw geüpload werk."
+    "message": "Houd er rekening mee dat je *geen* DMCA-verzoek tot verwijdering indient, maar een melding van opnieuw geüploade inhoud."
   },
   "report.note.copyright.2": {
     "message": "Als het uw bedoeling was om een DMCA-report in te dienen(wat een wettelijke actie is), kijk dan alsublieft in onze <copyright-policy-link>Copyright Policy</copyright-policy-link>."
@@ -3545,8 +4136,14 @@
   "report.please-report": {
     "message": "Graag rapporteer:"
   },
+  "report.question.content-id": {
+    "message": "Wat is het ID van de/het {item}?"
+  },
   "report.question.content-type": {
     "message": "Welk type conteant wil je rapporteren?"
+  },
+  "report.question.report-reason": {
+    "message": "Welke regel van Modrinth overtreedt dit/deze {item}?"
   },
   "report.report-content": {
     "message": "Meld content aan moderators"
@@ -3659,14 +4256,26 @@
   "scopes.organizationWrite.label": {
     "message": "Schrijf organisaties"
   },
+  "scopes.patCreate.description": {
+    "message": "Persoonlijke toegangstokens aanmaken"
+  },
   "scopes.patCreate.label": {
     "message": "Creëer PAT's"
+  },
+  "scopes.patDelete.description": {
+    "message": "Persoonlijke toegangstokens verwijderen"
   },
   "scopes.patDelete.label": {
     "message": "Verwijder PAT's"
   },
+  "scopes.patRead.description": {
+    "message": "Gemaakte persoonlijke toegangstokens bekijken"
+  },
   "scopes.patRead.label": {
     "message": "Lees PAT's"
+  },
+  "scopes.patWrite.description": {
+    "message": "Persoonlijke toegangstokens bewerken"
   },
   "scopes.patWrite.label": {
     "message": "Schrijf PAT's"
@@ -3836,6 +4445,9 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniseer met de server"
   },
+  "servers.manage.content.title": {
+    "message": "Inhoud - {serverName} - Modrinth"
+  },
   "servers.notice.actions": {
     "message": "Acties"
   },
@@ -3872,6 +4484,12 @@
   "servers.plan.small.description": {
     "message": "Perfect voor 1-5 vrienden en een paar lichte mods"
   },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Meest populair"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ maand{interval, select, monthly {} other {, gefactureerd {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}}}}"
+  },
   "settings.account.button.complete-setup": {
     "message": "Vervolledig setup"
   },
@@ -3885,7 +4503,7 @@
     "message": "Export wordt gegenereerd..."
   },
   "settings.account.data-export.description": {
-    "message": "Vraag een kopie aan van al uw persoonsgegevens die u naar Modrinth hebt geüpload. Dit kan enkele minuten duren."
+    "message": "Vraag een kopie aan van al je persoonsgegevens die je naar Modrinth hebt geüpload. Dit kan enkele minuten duren."
   },
   "settings.account.data-export.title": {
     "message": "Gegevens exporteren"
@@ -3995,6 +4613,57 @@
   "settings.account.security.email.title": {
     "message": "E-mail"
   },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Zorg ervoor dat je iets kiest dat je goed onthoudt, zodat je deze toegangscode later nog kunt herkennen."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Naam"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Mijn toegangscode"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Toegangscode toevoegen"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Toegangscode toevoegen"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Toegangscodes beheren"
+  },
+  "settings.account.security.passkey.description": {
+    "message": "Beheer je geregistreerde toegangscodes of voeg een nieuwe toe."
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "{ago} toegevoegd"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "{ago} laatst gebruikt"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Toegangscodes aan het laden..."
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Nooit gebruikt"
+  },
+  "settings.account.security.passkey.modal.no-passkeys": {
+    "message": "Je hebt geen toegangscodes geregistreerd."
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Toegangscode verwijderen"
+  },
+  "settings.account.security.passkey.remove.description": {
+    "message": "Hiermee wordt de toegangscode \"{name}\" definitief verwijderd. Je kunt je hiermee niet meer aanmelden."
+  },
+  "settings.account.security.passkey.remove.title": {
+    "message": "Weet je zeker dat je deze toegangscode wilt verwijderen?"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Toegangscode hernoemen"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Toegangscodes beheren"
+  },
   "settings.account.security.password.action.add": {
     "message": "Wachtwoord toevoegen"
   },
@@ -4034,6 +4703,12 @@
   "settings.account.security.two-factor.description": {
     "message": "Voeg een extra beveiligingslaag toe aan uw account tijdens het inloggen."
   },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "2FA uitschakelen"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "2FA instellen"
+  },
   "settings.account.security.two-factor.title": {
     "message": "Tweefactorauthenticatie"
   },
@@ -4062,7 +4737,7 @@
     "message": "Als de QR-code niet kan worden gescand, kun je de code handmatig invoeren:"
   },
   "settings.account.two-factor.setup.scan": {
-    "message": "Scan de QR-code met <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> of een andere 2FA app om te beginnen."
+    "message": "Scan de QR-code met <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> of een andere 2FA-app om te beginnen."
   },
   "settings.account.two-factor.verify.description": {
     "message": "Voer de eenmalige code uit de authenticator in om de toegang te verifiëren."
@@ -4098,7 +4773,7 @@
     "message": "Wijzigingen opslaan"
   },
   "settings.applications.button.upload-icon": {
-    "message": "Pictogram Uploaden"
+    "message": "Pictogram uploaden"
   },
   "settings.applications.client-id": {
     "message": "Client ID"
@@ -4119,7 +4794,7 @@
     "message": "Weet je zeker dat je dit project wilt verwijderen"
   },
   "settings.applications.description.intro": {
-    "message": "Applicaties kunnen worden gebruikt om Modrinth-gebruikers te authenticeren bij uw producten. Zie voor meer informatie de <docs-link>.API-documentatie van Modrinth.</docs-link>."
+    "message": "Met applicaties kan je Modrinth-gebruikers bij je producten authenticeren. Zie voor meer informatie <docs-link>de API-documentatie van Modrinth</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Beschrijving"
@@ -4173,7 +4848,7 @@
     "message": "door"
   },
   "settings.authorizations.description": {
-    "message": "Wanneer u een app machtigt via uw Modrinth account, verleent u deze apptoegang tot uw account. U kunt de toegang tot uw account hier op elk moment beheren en bekijken."
+    "message": "Wanneer je een app via je Modrinth-account autoriseert, verleen je die app toegang tot je account. Je kunt de toegang tot je account hier op elk moment beheren en bekijken."
   },
   "settings.authorizations.empty-state": {
     "message": "We kunnen je geautoriseerde apps momenteel niet weergeven, maar we werken eraan om dit te verhelpen. Kom later nog eens terug op deze pagina!"
@@ -4215,7 +4890,7 @@
     "message": "jaar"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Reclamevrij surfen op modrinth.com en in de Modrinth app"
+    "message": "Reclamevrij surfen op modrinth.com en in de Modrinth-app"
   },
   "settings.billing.midas.benefits.badge": {
     "message": "Modrinth+ badge op je profiel"
@@ -4296,7 +4971,7 @@
     "message": "{shared} Gedeelde CPU's (pieken tot {bursts} CPU's)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Er kon geen gekoppelde server worden gevonden voor dit abonnement. Hiervoor zijn een aantal mogelijke verklaringen. Als u uw server net hebt aangeschaft, is dit normaal. Het kan tot een uur duren voordat uw server is ingesteld. Als u deze server daarentegen al enige tijd geleden hebt aangeschaft, is deze waarschijnlijk inmiddels opgeschort. Als dit niet is wat u had verwacht, neem dan contact op met de Modrinth-helpdesk met de volgende informatie:"
+    "message": "Er kon geen gekoppelde server worden gevonden voor dit abonnement. Hiervoor zijn een aantal mogelijke verklaringen. Als je je server net hebt aangeschaft, is dit normaal. Het kan tot een uur duren voordat je server is verstrekt. Als je deze server daarentegen al een tijdje geleden hebt aangeschaft, is deze waarschijnlijk inmiddels opgeschort. Als dit niet is wat je had verwacht, neem dan contact op met de Modrinth-klantenservice met de volgende informatie:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "Server ID: {id}"
@@ -4351,6 +5026,15 @@
   },
   "settings.billing.subscription.title": {
     "message": "Abonnementen"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Schakelt over naar {interval, select, monthly {maandelijks} yearly {jaarlijks} other {{interval}}}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Overschakelen naar {interval, select, monthly {maandelijks} yearly {jaarlijks} other {{interval}}}"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Schakelt over naar {interval, select, monthly {maandelijkse} yearly {jaarlijkse} other {{interval}}} facturering op {date}"
   },
   "settings.billing.update-method": {
     "message": "Update methode"
@@ -4431,10 +5115,10 @@
     "message": "Externe links openen in nieuw tabblad"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Verbergt de \"Download Modrinth App\" knoppen in de primaire navigatie. De Modrinth App pagina kan nog steeds worden gevonden op de landingspagina of in de voettekst."
+    "message": "Verbergt de \"Modrinth-app downloaden\" knoppen in de primaire navigatie. De Modrinth App-pagina is nog steeds te vinden op de startpagina of in de voettekst."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Verberg Modrinth App promoties"
+    "message": "Promoties voor de Modrinth-app verbergen"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Links uitgelijnde zijbalk voor inhoudspagina's"
@@ -4449,7 +5133,7 @@
     "message": "Rechts uitgelijnde zijbalk voor zoek pagina's"
   },
   "settings.display.theme.description": {
-    "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
+    "message": "Kies het kleurenthema dat je het mooist vindt voor Modrinth op dit apparaat."
   },
   "settings.display.theme.title": {
     "message": "Kleurschema"
@@ -4539,7 +5223,7 @@
     "message": "Huidige sessie"
   },
   "settings.sessions.description": {
-    "message": "Hier zijn alle apparaten die momenteel zijn ingelogd met je Modrinth account. Je kunt elk afzonderlijk uitloggen.\n\nAls je een item ziet dat je niet herkent, log dan uit op dat apparaat en verander het wachtwoord van je Modrinth account."
+    "message": "Hier vind je alle apparaten die momenteel zijn aangemeld bij je Modrinth-account. Je kunt je op elk apparaat afzonderlijk afmelden.\n\nAls je een vermelding ziet die je niet herkent, meld je dan af op dat apparaat en wijzig onmiddellijk het wachtwoord van je Modrinth-account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Laatst geopend {ago}"
@@ -4574,6 +5258,51 @@
   "ui.newsletter-button.tooltip": {
     "message": "Abonneer je op de nieuwsbrief van Modrinth"
   },
+  "version.all-versions": {
+    "message": "Alle versies"
+  },
+  "version.confirm-delete.description": {
+    "message": "Deze versie wordt definitief verwijderd. Deze handeling kan niet ongedaan worden gemaakt."
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Versie verwijderen"
+  },
+  "version.confirm-delete.title": {
+    "message": "Weet je zeker dat je deze versie wilt verwijderen?"
+  },
+  "version.dependency.view-project": {
+    "message": "Project bekijken"
+  },
+  "version.dependency.view-version": {
+    "message": "Versie bekijken"
+  },
+  "version.download.download-dependency": {
+    "message": "Kies een versie om te downloaden"
+  },
+  "version.download.no-primary-file": {
+    "message": "Fout: geen primair bestand gevonden"
+  },
+  "version.download.optional-resource-pack": {
+    "message": "Optioneel bronpakket"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Vereist bronpakket"
+  },
+  "version.download.version": {
+    "message": "{version} downloaden ({size})"
+  },
+  "version.edit.button": {
+    "message": "Bewerken"
+  },
+  "version.edit.details": {
+    "message": "Details bewerken"
+  },
+  "version.edit.files": {
+    "message": "Bestanden bewerken"
+  },
+  "version.edit.metadata": {
+    "message": "Metagegevens bewerken"
+  },
   "version.environment.none.description": {
     "message": "De omgeving voor deze versie is niet gespecificeerd."
   },
@@ -4586,7 +5315,67 @@
   "version.environment.unknown.title": {
     "message": "Onbekende omgeving"
   },
+  "version.notification.deleted-text": {
+    "message": "De versie is succesvol verwijderd."
+  },
+  "version.notification.deleted-title": {
+    "message": "Versie verwijderd"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "Je gegevenspakket is succesvol als mod verpakt! Zorg ervoor dat je het spel test om te controleren of er geen fouten in zitten."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Succesvolle verpakking"
+  },
+  "version.package-as-mod.button": {
+    "message": "Als mod verpakken"
+  },
+  "version.package-as-mod.description": {
+    "message": "Hiermee wordt een nieuwe versie aangemaakt die de geselecteerde mod-loaders ondersteunt. Je wordt doorgestuurd naar de nieuwe versie en kunt deze naar wens aanpassen."
+  },
+  "version.package-as-mod.header": {
+    "message": "Gegevenspakket als mod verpakken"
+  },
+  "version.package-as-mod.mod-loaders": {
+    "message": "Mod-loaders"
+  },
+  "version.package-as-mod.mod-loaders.description": {
+    "message": "De mod-loaders waarvoor je je gegevenspakket wilt samenstellen."
+  },
+  "version.package-as-mod.mod-loaders.placeholder": {
+    "message": "Mod-loaders kiezen..."
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Gegevenspakket verpakken"
+  },
+  "version.section.content.dev-info": {
+    "message": "Informatie voor ontwikkelaars"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven-coördinaten:"
+  },
+  "version.section.content.dev-info.maven-description": {
+    "message": "Projecten op Modrinth zijn automatisch beschikbaar via een Maven-repository voor gebruik met JVM-buildtools zoals <gradle-link>Gradle</gradle-link>. Klik <article-link>hier</article-link> voor meer informatie over de Modrinth Maven API."
+  },
   "version.section.content.dev-info.maven-note": {
     "message": "Opmerking: Indien beschikbaar, raden we je aan om de Maven-repository van de maker te gebruiken, aangezien deze informatie over transitieve afhankelijkheden bevat die de Modrinth Maven API niet biedt. Bovendien kun je te maken krijgen met dubbele afhankelijkheden als je voor je afhankelijkheden zowel Modrinth- als niet-Modrinth-Maven-repositories gebruikt, omdat de groeps-ID anders zal zijn wanneer deze via de Modrinth Maven API wordt aangeboden."
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Versie-ID:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "SHA-1 kopiëren"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "SHA-512 kopiëren"
+  },
+  "version.unknown-embedded-content.description": {
+    "message": "Deze versie is momenteel niet beschikbaar en wordt niet openbaar aangeboden. Toon alsjeblieft aan dat je toestemming hebt om bepaalde bijgevoegde bestanden te verspreiden."
+  },
+  "version.unknown-embedded-content.title": {
+    "message": "Niet weergegeven vanwege onbekende ingesloten inhoud"
   }
 }

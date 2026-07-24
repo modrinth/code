@@ -278,9 +278,6 @@
   "app.modal.update-to-play.header": {
     "message": "Kemas kini untuk mainkan"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Kemas kini diperlukan untuk memainkan {name}. Sila kemas kini kepada versi terkini untuk melancarkan permainan."
-  },
   "app.project.install-button.already-installed": {
     "message": "Projek ini sudah dipasang"
   },

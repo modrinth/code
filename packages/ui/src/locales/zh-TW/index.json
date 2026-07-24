@@ -467,8 +467,17 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "已更新"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, other {# 個檔案}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "遊戲版本"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "仍要安裝"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "載入器"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "已移除 {count} 個"
@@ -1161,10 +1170,19 @@
     "defaultMessage": "你取得了特別授權，允許你在模組包中重新發布這個作品。"
   },
   "external-files.permissions-card.remove-group": {
-    "defaultMessage": "移除群組"
+    "defaultMessage": "刪除群組"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "這會永久刪除這個引用標註群組及其中的所有檔案，這項動作無法復原。"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "刪除 {title}？"
   },
   "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "無法移除群組"
+    "defaultMessage": "無法刪除群組"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "從群組中移除"
@@ -2816,8 +2834,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "用戶端或伺服器端"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "專用伺服器"
+  },
   "project-card.environment.server": {
     "defaultMessage": "伺服器"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "單人遊戲"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -3091,6 +3115,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} 位{count, plural, other {追蹤者}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "取得授權條款文字內容時發生錯誤。"
+  },
+  "project.license.loading": {
+    "defaultMessage": "正在載入授權條款文字..."
+  },
+  "project.license.title": {
+    "defaultMessage": "授權條款"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 人在線上"
@@ -3496,6 +3529,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "檢視"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, other {次下載}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, other {位追蹤者}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -4428,7 +4467,7 @@
     "defaultMessage": "輸入 Modrinth 使用者名稱"
   },
   "servers.grant-access-modal.target.searching": {
-    "defaultMessage": "搜尋中..."
+    "defaultMessage": "正在搜尋..."
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "無法安裝"
@@ -5038,6 +5077,75 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "工作階段"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "這個使用者已經被邀請。"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "編輯邀請連結。"
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "編輯邀請連結"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "有效期限"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "你的好友 - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "邀請"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "你的邀請連結會在 {duration} 後過期。"
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "或者使用邀請連結"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "邀請連結已複製到剪貼簿。"
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "連結已複製"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "無法複製連結"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "最大使用次數"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "沒有找到好友。"
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "沒有找到使用者。"
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "已送出邀請"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} 需要先接受你的好友邀請"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "儲存"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "輸入 Modrinth 使用者名稱"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "正在搜尋..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "無法更新邀請連結"
   },
   "tag.category.128x": {
     "defaultMessage": "128×"
@@ -5793,3 +5901,4 @@
     "defaultMessage": "類型"
   }
 }
+
