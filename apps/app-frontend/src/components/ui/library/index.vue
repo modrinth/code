@@ -3,7 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { NavTabs } from '@modrinth/ui'
 import { computed, ref, watchEffect } from 'vue'
 
-import GridDisplay from '@/components/ui/library/GridDisplay.vue'
+import GridDisplay from '@/components/ui/library/grid-display.vue'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import type { GameInstance } from '@/helpers/types'
 

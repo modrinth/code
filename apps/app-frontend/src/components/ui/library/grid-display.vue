@@ -22,7 +22,7 @@ import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import Instance from '@/components/ui/Instance.vue'
+import Instance from '@/components/ui/library/instance.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { install_duplicate_instance } from '@/helpers/install'
 import { remove } from '@/helpers/instance'
