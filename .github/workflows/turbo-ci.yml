@@ -76,10 +76,6 @@ jobs:
       # since we don't want warnings to become errors
       # while developing)
       RUSTFLAGS: -Dwarnings
-      # sccache config
-      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '20G' || '' }}
-      RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
-      CARGO_INCREMENTAL: 0
       # Redis config for tests
       REDIS_TOPOLOGY: cluster
       REDIS_CONNECTION_TYPE: multiplexed
@@ -114,10 +110,6 @@ jobs:
         if: needs.skip-if-clean.outputs.internal == 'true'
         uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
 
-      - name: Configure sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
-        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
-
       - name: Install apt dependencies
         run: |
           sudo apt-get update
@@ -132,9 +124,6 @@ jobs:
 
       - name: Setup mold
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
-
-      - name: Setup sccache
-        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Setup binstall
         uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # v1.21.0
