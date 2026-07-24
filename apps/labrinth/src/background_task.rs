@@ -18,7 +18,7 @@ use crate::util::anrok;
 use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
-use tracing::info;
+use tracing::{info, instrument};
 use xredis::RedisPool;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
@@ -50,6 +50,7 @@ pub enum BackgroundTask {
 
 impl BackgroundTask {
     #[allow(clippy::too_many_arguments)]
+    #[instrument(skip_all, fields(background_task = ?self))]
     pub async fn run(
         self,
         pool: PgPool,
@@ -176,7 +177,7 @@ pub async fn index_search(
     search_backend: web::Data<dyn SearchBackend>,
 ) -> eyre::Result<()> {
     info!("Indexing local database");
-    search_backend.index_projects(ro_pool, redis_pool).await
+    search_backend.rebuild_index(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {

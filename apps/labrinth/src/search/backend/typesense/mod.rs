@@ -1,29 +1,176 @@
+//! Search implementation backed by a Typesense cluster.
+//!
+//! # Search behavior
+//!
+//! Users expect very specific behavior when searching for projects on the
+//! platform. When making changes to search, you must ensure that the query
+//! behavior is roughly the same as before your changes - that means test with
+//! strings like `sodi`, `sodiu`, `sodium`, `sodium `, etc. and make sure the
+//! same results still appear.
+//!
+//! Before submitting a document into Typesense, we normalize the project name
+//! and author using [`normalize_for_search`]. This turns a name like `My Cool
+//! Mod` into `my-cool-mod`, which lets us exactly define what we consider to
+//! be word separators, and fine-tune search behavior. The normalized/indexed
+//! name is never shown to users; it's just used for search ops.
+//!
+//! # Collections
+//!
+//! The approach we take is to have two collections in TS: a project and a
+//! version collection, which we index separately, and then join together when
+//! we query. Project documents contain project metadata like name, downloads,
+//! summary, etc.; version documents contain game versions, compatible loaders,
+//! etc. This lets us deduplicate large chunks of data (project descriptions),
+//! but keep each version doc separate for accurate filtering.
+//!
+//! If you're wondering why we can't just put all the info required for
+//! searching into the project document, it's because collating version info
+//! into the project doc will break filtering on multiple fields. Let's say for
+//! example we have a project with 2 versions:
+//! - NeoForge 1.21.1
+//! - Fabric 1.20.0
+//!
+//! If we put both of these versions into the project object, we'd end up with
+//! a document like:
+//! ```json
+//! {
+//!   "name": "My Project",
+//!   "game_versions": ["1.21.1", "1.20.0"],
+//!   "loaders": ["neoforge", "fabric"]
+//! }
+//! ```
+//!
+//! If a user now searches for a mod for NeoForge 1.20.0, this project will
+//! match - when in reality it shouldn't, because it has no versions compatible
+//! with NeoForge 1.20.0! Only either Neoforge 1.21.1, or Fabric 1.20.0.
+//! Keeping the projects/versions document split retains this behavior.
+//!
+//! What if we put a `versions` object into the project document? This is
+//! terrible because:
+//! - it makes project documents massive
+//! - it forces an entire project document to be rebuilt when one change to a
+//!   version is made
+//!
+//! # Performance
+//!
+//! Our collections are quite large for a platform of our size. To ensure
+//! indexing and query performance, we do a few things.
+//!
+//! ## Indexing
+//!
+//! We use incremental indexing to update projects and version documents when
+//! a user makes a change ASAP[^1]. When a project or version is updated, we
+//! push a message "update this project ID/this version ID" into a Kafka topic;
+//! the `incremental-index-search` task then consumes all the Kafka messages
+//! and applies the actual indexing updates to the Typesense cluster, and
+//! commits the Kafka messages.
+//!
+//! We do also have the `index-search` task which does a full reindex, but this
+//! shouldn't be required in normal operation.
+//!
+//! Project categories are deliberately denormalized into every version
+//! document to avoid a second join when categories are combined with other
+//! version filters. Changing a project's categories must therefore reindex all
+//! of that project's version documents.
+//!
+//! When batching Typesense update operations, we batch by both project count
+//! and document count. Since a project can have an unbounded number of
+//! versions, we can (and will) have projects with thousands of versions. If we
+//! were to send updates for just this project alone, we will be sending a lot
+//! more data in a single HTTP request, which could timeout the operation.
+//!
+//! [^1]: Okay, not exactly ASAP. Once the Kafka consumer receives the first
+//! message, it waits for a small configurable time to batch a bunch of changes
+//! together, and updates Typesense in bulk with those.
+//!
+//! ## Querying
+//!
+//! Having two collections is cool and all, but joins over such a large dataset
+//! causes queries to be a lot slower than if we're just querying one
+//! collection. To speed this up, we use some tricks.
+//!
+//! ### Filtering on multiple version fields
+//!
+//! If you search for `categories = fabric AND game_versions = 1.21`, then
+//! you're searching for *one* project with *both* these conditions set.
+//! Project categories are inherited by every version document, while loaders
+//! remain specific to each version. This preserves the legacy behavior where
+//! `categories` can match either a project category or a loader, and allows
+//! both conditions to use one version join.
+//!
+//! Therefore, this uses *one* join over versions, rather than two joins
+//! each matching different versions of the same project. Using one join here
+//! is faster than two. It's even faster if you search for more facets like
+//! category, game version, loader, and environment.
+//!
+//! ### Filter AST
+//!
+//! When a caller provides a search filter, we first parse it into a
+//! search-backend-independent AST; then normalize the AST to compact it down
+//! to make it easier for Typesense to manage; check that it's not too big;
+//! and finally submit it to Typesense. Parsing into our own AST first has
+//! the following benefits:
+//! - we can make our search filter syntax search-backend-independent
+//! - we can normalize the AST to compact down e.g. Cartesian products into `IN`
+//!   predicates, to avoid repeated joins and deep boolean trees
+//! - we can check that the filter isn't too complex before submitting to
+//!   Typesense
+//!
+//! ### Whole-field tokenization
+//!
+//! For fields like a version's `categories`, `environment`, `game_versions`
+//! etc. it makes no sense to do full-text search on this (unlike name and
+//! author), since the full set of categories, environments, etc. is known
+//! and finite. All of these values can be represented as whitespace-free,
+//! atomic, single tokens in Typesense, if we set
+//! `symbols_to_index = ["-", ".", "_"]`. This means that `fabric-api` is
+//! treated as one token `fabric-api`, not as `fabric` and `api`. So if we use
+//! the filter `categories:fabric-api`, it will match for that *one token*
+//! `fabric-api` instead of full text search.
+//!
+//! For this, we use the `:` operator instead of `:=` to tell
+//! Typesense to treat this as an exact token match.
+//!
+//! ### Query caching
+//!
+//! Typesense caches identical search responses when `TYPESENSE_USE_CACHE` is
+//! enabled. This avoids repeating joins for popular queries at the cost of
+//! results remaining stale for Typesense's default 60-second cache lifetime.
+
 use std::sync::LazyLock;
 
-use ariadne::ids::base62_impl::to_base62;
 use async_trait::async_trait;
 use eyre::{Result, eyre};
-use regex::Regex;
+use itertools::Itertools;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use tracing::{info, warn};
+use tracing::{debug, info};
 
 use crate::database::PgPool;
 use crate::env::ENV;
-use crate::models::ids::{ProjectId, VersionId};
 use crate::routes::ApiError;
 use crate::search::backend::{
-    SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
+    SearchIndex, combined_search_filters, parse_search_index,
     parse_search_request,
+};
+use crate::search::filter::{
+    FilterExpr, from_legacy_v2_facets_json, normalize, parse_expression,
 };
 use crate::search::indexing::index_local;
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchField, SearchRequest,
-    SearchResults, TasksCancelFilter, UploadSearchProject,
+    ResultSearchProject, SearchBackend, SearchField, SearchIndexUpdate,
+    SearchRequest, SearchResults, TasksCancelFilter, UploadSearchProject,
+    UploadSearchVersion,
 };
 use crate::util::error::Context;
 use xredis::RedisPool;
+
+use self::filter::serialize_filter;
+
+mod filter;
+
+const DELETE_FILTER_ID_BATCH_SIZE: usize = 256;
 
 #[derive(Debug, Clone)]
 pub struct TypesenseConfig {
@@ -32,6 +179,9 @@ pub struct TypesenseConfig {
     pub index_prefix: String,
     pub meta_namespace: String,
     pub index_chunk_size: i64,
+    pub import_batch_size: usize,
+    pub delete_batch_size: usize,
+    pub use_cache: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -160,6 +310,9 @@ impl TypesenseConfig {
             index_prefix: ENV.TYPESENSE_INDEX_PREFIX.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
             index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
+            import_batch_size: ENV.TYPESENSE_IMPORT_BATCH_SIZE,
+            delete_batch_size: ENV.TYPESENSE_DELETE_BATCH_SIZE,
+            use_cache: ENV.TYPESENSE_USE_CACHE,
         }
     }
 
@@ -235,6 +388,22 @@ impl TypesenseClient {
         Ok(())
     }
 
+    async fn delete_alias_if_exists(&self, alias: &str) -> Result<()> {
+        let resp = self
+            .request(Method::DELETE, &format!("/aliases/{alias}"))
+            .send()
+            .await
+            .wrap_err("failed to DELETE Typesense alias")?;
+        if resp.status() == reqwest::StatusCode::NOT_FOUND {
+            return Ok(());
+        }
+        if !resp.status().is_success() {
+            let body = resp.json::<Value>().await.unwrap_or_default();
+            return Err(eyre!("failed to delete alias `{alias}`: {body}"));
+        }
+        Ok(())
+    }
+
     async fn collection_exists(&self, name: &str) -> Result<bool> {
         let resp = self
             .request(Method::GET, &format!("/collections/{name}"))
@@ -300,21 +469,35 @@ impl TypesenseClient {
             ));
         }
         // Typesense always returns HTTP 200; individual lines signal per-doc success.
-        let error_count = body
+        let failures = body
             .lines()
-            .filter(|l| !l.trim().is_empty())
-            .filter(|l| {
-                serde_json::from_str::<Value>(l)
-                    .ok()
-                    .and_then(|v| v["success"].as_bool())
-                    .map(|ok| !ok)
-                    .unwrap_or(false)
+            .filter(|line| !line.trim().is_empty())
+            .filter_map(|line| match serde_json::from_str::<Value>(line) {
+                Ok(result) if result["success"].as_bool() == Some(true) => None,
+                Ok(result) => Some(
+                    result["error"]
+                        .as_str()
+                        .unwrap_or(
+                            "Typesense returned an unsuccessful import result",
+                        )
+                        .to_string(),
+                ),
+                Err(err) => Some(format!(
+                    "failed to parse Typesense import result: {err}"
+                )),
             })
-            .count();
-        if error_count > 0 {
-            warn!(
-                "{error_count} document(s) failed to import into `{collection}`"
-            );
+            .collect::<Vec<_>>();
+        if !failures.is_empty() {
+            let failure_count = failures.len();
+            let errors = failures
+                .into_iter()
+                .unique()
+                .take(10)
+                .collect::<Vec<_>>()
+                .join("; ");
+            return Err(eyre!(
+                "{failure_count} document(s) failed to import into `{collection}`: {errors}"
+            ));
         }
         Ok(())
     }
@@ -323,12 +506,13 @@ impl TypesenseClient {
         &self,
         collection: &str,
         filter_by: &str,
+        batch_size: usize,
     ) -> Result<()> {
         let resp = self
             .request(
                 Method::DELETE,
                 &format!(
-					"/collections/{collection}/documents?filter_by={}&batch_size=1000",
+					"/collections/{collection}/documents?filter_by={}&batch_size={batch_size}",
 					urlencoding::encode(filter_by)
 				),
             )
@@ -363,6 +547,18 @@ pub struct TypesenseFieldSpec {
 }
 
 impl SearchField {
+    const fn is_version_field(self) -> bool {
+        matches!(
+            self,
+            Self::Categories
+                | Self::ProjectTypes
+                | Self::Environment
+                | Self::GameVersions
+                | Self::ClientSide
+                | Self::ServerSide
+        )
+    }
+
     pub const fn typesense_spec(self) -> TypesenseFieldSpec {
         match self {
             SearchField::Categories => TypesenseFieldSpec {
@@ -523,6 +719,8 @@ impl SearchField {
     }
 }
 
+const VERSION_FILTER_SYMBOLS: &[&str] = &["-", ".", "_"];
+
 static TYPESENSE_SEARCH_FIELDS: LazyLock<Vec<Value>> = LazyLock::new(|| {
     use strum::IntoEnumIterator;
 
@@ -564,7 +762,7 @@ impl Typesense {
         Self { config, client }
     }
 
-    fn collection_schema(name: &str) -> Value {
+    fn project_collection_schema(name: &str) -> Value {
         let mut fields = vec![
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
@@ -580,6 +778,7 @@ impl Typesense {
             json!({"name": "minecraft_java_server.is_online", "type": "bool", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.ping.data.players_online", "type": "int32", "sort": true, "optional": true}),
             json!({"name": "dependencies", "type": "object[]", "optional": true}),
+            json!({"name": "project_categories", "type": "string[]", "facet": true, "optional": true}),
         ];
         fields.extend(TYPESENSE_SEARCH_FIELDS.iter().cloned());
 
@@ -588,6 +787,50 @@ impl Typesense {
             "enable_nested_fields": true,
             "fields": fields,
             "default_sorting_field": "log_downloads"
+        })
+    }
+
+    fn version_collection_schema(
+        name: &str,
+        projects_collection: &str,
+    ) -> Value {
+        use strum::IntoEnumIterator;
+
+        let mut fields = SearchField::iter()
+            .filter(|field| field.is_version_field())
+            .map(|field| {
+                let spec = field.typesense_spec();
+                json!({
+                    "name": spec.path,
+                    "type": spec.ty,
+                    "facet": spec.facet,
+                    "optional": spec.optional,
+                    "symbols_to_index": VERSION_FILTER_SYMBOLS,
+                })
+            })
+            .collect::<Vec<_>>();
+        fields.extend([
+            json!({
+                "name": "version_id",
+                "type": "string",
+            }),
+            json!({
+                "name": "project_id",
+                "type": "string",
+                "reference": format!("{projects_collection}.id"),
+                "async_reference": true,
+                "cascade_delete": false,
+            }),
+            json!({
+                "name": "version_published_timestamp",
+                "type": "int64",
+                "sort": true,
+            }),
+        ]);
+
+        json!({
+            "name": name,
+            "fields": fields,
         })
     }
 
@@ -670,12 +913,7 @@ impl Typesense {
         request_config: &RequestConfig,
     ) -> Result<(String, String), ApiError> {
         let sort = parse_search_index(index, new_filters)?;
-        let alias = match sort.index_name {
-            SearchIndexName::Projects => self.config.get_alias_name("projects"),
-            SearchIndexName::ProjectsFiltered => {
-                self.config.get_alias_name("projects_filtered")
-            }
-        };
+        let alias = self.config.get_alias_name("projects");
         Ok((alias, self.get_sort_fields(sort.index, request_config)))
     }
 
@@ -684,50 +922,122 @@ impl Typesense {
     /// Handles the new-style filter string, legacy facets JSON, and the legacy
     /// `filters`/`version` fields, translating each from Meilisearch filter
     /// syntax to Typesense filter syntax.
-    fn build_filter(info: &SearchRequest) -> Result<Option<String>, ApiError> {
+    fn build_filter(
+        info: &SearchRequest,
+        versions_collection: &str,
+    ) -> Result<Option<String>, ApiError> {
         let facet_part = if let Some(facets_json) = info.facets.as_deref() {
-            Some(
-                facets_to_typesense(facets_json)
-                    .wrap_request_err("failed to parse facets")?,
-            )
+            from_legacy_v2_facets_json(facets_json)
+                .wrap_request_err("failed to parse facets")?
         } else {
             None
         };
 
-        let new_filters_part =
-            info.new_filters.as_deref().map(meili_to_typesense);
+        let filter_part = combined_search_filters(info)
+            .filter(|filter| !filter.trim().is_empty())
+            .map(|filter| parse_expression(&filter))
+            .transpose()
+            .wrap_request_err("failed to parse filters")?;
 
-        let legacy_part = if info.new_filters.is_none() {
-            combined_search_filters(info).map(|f| meili_to_typesense(&f))
-        } else {
-            None
-        };
-
-        let filter_part = new_filters_part.or(legacy_part);
-
-        Ok(match (facet_part, filter_part) {
-            (Some(f), Some(l)) if !f.is_empty() && !l.is_empty() => {
-                Some(format!("({f}) && ({l})"))
-            }
-            (Some(f), _) if !f.is_empty() => Some(f),
-            (_, Some(l)) if !l.is_empty() => Some(l),
-            _ => None,
-        })
+        FilterExpr::and([facet_part, filter_part].into_iter().flatten())
+            .map(normalize)
+            .map(|filter| {
+                serialize_filter(&filter, versions_collection)
+                    .wrap_request_err("failed to build search filter")
+            })
+            .transpose()
     }
 
-    /// Ensures the alias and its backing collection both exist, creating them
-    /// when necessary so reads succeed before the first full index run.
-    async fn ensure_collection(&self, alias: &str) -> Result<()> {
-        if self.client.get_alias(alias).await?.is_some() {
-            return Ok(());
+    async fn import_document_batches<T>(
+        &self,
+        collections: &[String],
+        documents: &[T],
+        serialize: fn(&[T]) -> Result<String>,
+    ) -> Result<()> {
+        let batch_size = self.config.import_batch_size.max(1);
+
+        for batch in documents.chunks(batch_size) {
+            let jsonl = serialize(batch)?;
+
+            for collection in collections {
+                info!(
+                    collection,
+                    document_count = batch.len(),
+                    content_length_bytes = jsonl.len(),
+                    "sending Typesense document import"
+                );
+                self.client
+                    .import_documents(collection, jsonl.clone())
+                    .await?;
+            }
         }
-        let name = self.config.get_next_collection_name(alias, false);
-        if !self.client.collection_exists(&name).await? {
-            self.client
-                .create_collection(&Self::collection_schema(&name))
-                .await?;
+
+        Ok(())
+    }
+
+    async fn existing_write_collections(
+        &self,
+        alias: &str,
+    ) -> Result<Vec<String>> {
+        let mut collections = self
+            .client
+            .get_alias(alias)
+            .await?
+            .into_iter()
+            .collect_vec();
+
+        for collection in [
+            self.config.get_next_collection_name(alias, true),
+            self.config.get_next_collection_name(alias, false),
+        ] {
+            if !collections.contains(&collection)
+                && self.client.collection_exists(&collection).await?
+            {
+                collections.push(collection);
+            }
         }
-        self.client.upsert_alias(alias, &name).await?;
+
+        Ok(collections)
+    }
+
+    async fn delete_ids_from_write_collections(
+        &self,
+        alias: &str,
+        field: &str,
+        ids: &[String],
+    ) -> Result<()> {
+        let collections = self.existing_write_collections(alias).await?;
+        for ids in ids.chunks(DELETE_FILTER_ID_BATCH_SIZE) {
+            let filter = format!("{field}:[{}]", ids.iter().join(", "));
+            for collection in &collections {
+                self.client
+                    .delete_documents_by_filter(
+                        collection,
+                        &filter,
+                        self.config.delete_batch_size,
+                    )
+                    .await?;
+            }
+        }
+        Ok(())
+    }
+
+    async fn delete_legacy_filtered_collections(&self) -> Result<()> {
+        let alias = self.config.get_alias_name("projects_filtered");
+        let live = self.client.get_alias(&alias).await?;
+        let shadow_alt = self.config.get_next_collection_name(&alias, true);
+        let shadow_current =
+            self.config.get_next_collection_name(&alias, false);
+
+        self.client.delete_alias_if_exists(&alias).await?;
+        for collection in live
+            .into_iter()
+            .chain([shadow_alt, shadow_current])
+            .unique()
+        {
+            self.client.delete_collection_if_exists(&collection).await?;
+        }
+
         Ok(())
     }
 }
@@ -744,7 +1054,8 @@ impl SearchBackend for Typesense {
             info.new_filters.as_deref(),
             &info.typesense_config,
         )?;
-        let filter_by = Self::build_filter(info)?;
+        let versions_alias = self.config.get_alias_name("versions");
+        let filter_by = Self::build_filter(info, &versions_alias)?;
 
         let q = if parsed.query.is_empty() {
             "*"
@@ -782,10 +1093,6 @@ impl SearchBackend for Typesense {
             ("sort_by", sort_by.to_string()),
             ("page", parsed.page.to_string()),
             ("per_page", parsed.hits_per_page.to_string()),
-            ("group_by", "project_id".to_string()),
-            ("group_limit", "1".to_string()),
-            ("facet_by", "project_id".to_string()),
-            ("max_facet_values", "0".to_string()),
             (
                 "max_candidates",
                 info.typesense_config.max_candidates.to_string(),
@@ -801,11 +1108,20 @@ impl SearchBackend for Typesense {
         }
         if let Some(filter) = &filter_by {
             params.push(("filter_by", filter.clone()));
+            if filter.contains(&format!("${versions_alias}(")) {
+                params.push((
+                    "include_fields",
+                    format!(
+                        "${versions_alias}(version_id, sort_by: version_published_timestamp:desc, limit:1, strategy: nest_array) as matching_versions"
+                    ),
+                ));
+            }
         }
 
         let resp = self
             .client
             .request(Method::POST, "/multi_search")
+            .query(&[("use_cache", self.config.use_cache)])
             .json(&json!({
                 "searches": [
                     serde_json::Map::from_iter(
@@ -841,27 +1157,35 @@ impl SearchBackend for Typesense {
             .cloned()
             .unwrap_or(body);
 
-        let total_hits = body["facet_counts"]
-            .as_array()
-            .and_then(|facets| {
-                facets.iter().find(|facet| {
-                    facet["field_name"].as_str() == Some("project_id")
-                })
-            })
-            .and_then(|facet| facet["stats"]["total_values"].as_u64())
-            .unwrap_or_else(|| body["found"].as_u64().unwrap_or(0))
-            as usize;
+        let total_hits = body["found"].as_u64().unwrap_or(0) as usize;
 
-        let hits = body["grouped_hits"]
+        let hits = body["hits"]
             .as_array()
             .cloned()
             .unwrap_or_default()
             .into_iter()
-            .filter_map(|group| {
-                let hit = group["hits"].as_array()?.first()?.clone();
+            .filter_map(|hit| {
                 let mut doc = hit.get("document")?.clone();
                 if let Some(obj) = doc.as_object_mut() {
                     obj.remove("id");
+                    let matching_version_id =
+                        obj.remove("matching_versions").and_then(|versions| {
+                            versions
+                                .as_array()
+                                .and_then(|versions| versions.first())
+                                .or_else(|| {
+                                    versions.as_object().map(|_| &versions)
+                                })
+                                .and_then(|version| version.get("version_id"))
+                                .and_then(Value::as_str)
+                                .map(ToString::to_string)
+                        });
+                    if let Some(version_id) = matching_version_id {
+                        obj.insert(
+                            "version_id".to_string(),
+                            Value::String(version_id),
+                        );
+                    }
                 }
 
                 let metadata = info.show_metadata.then(|| {
@@ -895,7 +1219,7 @@ impl SearchBackend for Typesense {
         })
     }
 
-    async fn index_projects(
+    async fn rebuild_index(
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
@@ -903,54 +1227,53 @@ impl SearchBackend for Typesense {
         info!("starting project indexing");
 
         let projects_alias = self.config.get_alias_name("projects");
-        let filtered_alias = self.config.get_alias_name("projects_filtered");
+        let versions_alias = self.config.get_alias_name("versions");
 
-        // Guarantee current aliases exist so reads keep working during re-index.
-        self.ensure_collection(&projects_alias).await?;
-        self.ensure_collection(&filtered_alias).await?;
-
-        // Toggle the shadow collection name between __current and __alt.
         let projects_current = self.client.get_alias(&projects_alias).await?;
-        let filtered_current = self.client.get_alias(&filtered_alias).await?;
+        let versions_current = self.client.get_alias(&versions_alias).await?;
 
         let projects_use_alt = !projects_current
             .as_deref()
             .is_some_and(|n| n.ends_with("__alt"));
-        let filtered_use_alt = !filtered_current
+        let versions_use_alt = !versions_current
             .as_deref()
             .is_some_and(|n| n.ends_with("__alt"));
 
         let projects_next = self
             .config
             .get_next_collection_name(&projects_alias, projects_use_alt);
-        let filtered_next = self
+        let versions_next = self
             .config
-            .get_next_collection_name(&filtered_alias, filtered_use_alt);
+            .get_next_collection_name(&versions_alias, versions_use_alt);
 
-        info!("shadow collections `{projects_next}` and `{filtered_next}`");
+        info!("shadow collections `{projects_next}` and `{versions_next}`");
 
+        self.client
+            .delete_collection_if_exists(&versions_next)
+            .await?;
         self.client
             .delete_collection_if_exists(&projects_next)
             .await?;
         self.client
-            .delete_collection_if_exists(&filtered_next)
+            .create_collection(&Self::project_collection_schema(&projects_next))
             .await?;
         self.client
-            .create_collection(&Self::collection_schema(&projects_next))
-            .await?;
-        self.client
-            .create_collection(&Self::collection_schema(&filtered_next))
+            .create_collection(&Self::version_collection_schema(
+                &versions_next,
+                &projects_next,
+            ))
             .await?;
 
         let mut cursor = 0_i64;
         let mut chunk_idx = 0_usize;
-        let mut total = 0_usize;
+        let mut total_projects = 0_usize;
+        let mut total_versions = 0_usize;
 
         loop {
             info!("fetching index chunk {chunk_idx}");
             chunk_idx += 1;
 
-            let (uploads, next_cursor) = index_local(
+            let (documents, next_cursor) = index_local(
                 &ro_pool,
                 &redis,
                 cursor,
@@ -959,21 +1282,29 @@ impl SearchBackend for Typesense {
             .await
             .wrap_err("failed to fetch projects from local DB")?;
 
-            if uploads.is_empty() {
+            if documents.projects.is_empty() {
                 info!(
-                    "no more documents; indexed {total} in {chunk_idx} chunks"
+                    "no more documents; indexed {total_projects} projects and {total_versions} versions in {chunk_idx} chunks"
                 );
                 break;
             }
 
-            total += uploads.len();
+            total_projects += documents.projects.len();
+            total_versions += documents.versions.len();
             cursor = next_cursor;
 
-            let jsonl = documents_to_jsonl(&uploads)?;
-            self.client
-                .import_documents(&projects_next, jsonl.clone())
-                .await?;
-            self.client.import_documents(&filtered_next, jsonl).await?;
+            self.import_document_batches(
+                std::slice::from_ref(&projects_next),
+                &documents.projects,
+                documents_to_jsonl,
+            )
+            .await?;
+            self.import_document_batches(
+                std::slice::from_ref(&versions_next),
+                &documents.versions,
+                version_documents_to_jsonl,
+            )
+            .await?;
         }
 
         info!("swapping aliases");
@@ -981,122 +1312,119 @@ impl SearchBackend for Typesense {
             .upsert_alias(&projects_alias, &projects_next)
             .await?;
         self.client
-            .upsert_alias(&filtered_alias, &filtered_next)
+            .upsert_alias(&versions_alias, &versions_next)
             .await?;
 
         info!("cleaning up old collections");
+        if let Some(old) = versions_current {
+            self.client.delete_collection_if_exists(&old).await?;
+        }
         if let Some(old) = projects_current {
             self.client.delete_collection_if_exists(&old).await?;
         }
-        if let Some(old) = filtered_current {
-            self.client.delete_collection_if_exists(&old).await?;
-        }
+
+        self.delete_legacy_filtered_collections().await?;
 
         info!("indexing complete");
         Ok(())
     }
 
-    async fn index_documents(
+    async fn apply_update(
         &self,
-        documents: &[UploadSearchProject],
+        update: SearchIndexUpdate<'_>,
     ) -> eyre::Result<()> {
-        if documents.is_empty() {
-            return Ok(());
-        }
+        let projects_alias = self.config.get_alias_name("projects");
+        let versions_alias = self.config.get_alias_name("versions");
 
-        let jsonl = documents_to_jsonl(documents)?;
-        for alias in [
-            self.config.get_alias_name("projects"),
-            self.config.get_alias_name("projects_filtered"),
-        ] {
-            let live = self.client.get_alias(&alias).await?;
-            let shadow_alt = self.config.get_next_collection_name(&alias, true);
-            let shadow_current =
-                self.config.get_next_collection_name(&alias, false);
-
-            for collection in
-                live.into_iter().chain([shadow_alt, shadow_current])
-            {
-                if self.client.collection_exists(&collection).await? {
-                    self.client
-                        .import_documents(&collection, jsonl.clone())
-                        .await?;
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    async fn remove_project_documents(
-        &self,
-        ids: &[ProjectId],
-    ) -> eyre::Result<()> {
-        if ids.is_empty() {
-            return Ok(());
-        }
-
-        let id_list = ids
+        let removed_project_ids = update
+            .removed_projects
             .iter()
-            .map(|id| to_base62(id.0))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let filter = format!("project_id:[{id_list}]");
-
-        for alias in [
-            self.config.get_alias_name("projects"),
-            self.config.get_alias_name("projects_filtered"),
-        ] {
-            let live = self.client.get_alias(&alias).await?;
-            let shadow_alt = self.config.get_next_collection_name(&alias, true);
-            let shadow_current =
-                self.config.get_next_collection_name(&alias, false);
-
-            for collection in
-                live.into_iter().chain([shadow_alt, shadow_current])
-            {
-                if self.client.collection_exists(&collection).await? {
-                    self.client
-                        .delete_documents_by_filter(&collection, &filter)
-                        .await?;
-                }
-            }
-        }
-        Ok(())
-    }
-
-    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()> {
-        if ids.is_empty() {
-            return Ok(());
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        if !removed_project_ids.is_empty() {
+            self.delete_ids_from_write_collections(
+                &versions_alias,
+                "project_id",
+                &removed_project_ids,
+            )
+            .await?;
+            self.delete_ids_from_write_collections(
+                &projects_alias,
+                "project_id",
+                &removed_project_ids,
+            )
+            .await?;
         }
 
-        let id_list = ids
+        let version_ids = update
+            .removed_versions
             .iter()
-            .map(|id| to_base62(id.0))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let filter = format!("id:[{id_list}]");
-
-        for alias in [
-            self.config.get_alias_name("projects"),
-            self.config.get_alias_name("projects_filtered"),
-        ] {
-            // Delete from both the live collection and any shadow collections.
-            let live = self.client.get_alias(&alias).await?;
-            let shadow_alt = self.config.get_next_collection_name(&alias, true);
-            let shadow_current =
-                self.config.get_next_collection_name(&alias, false);
-
-            for collection in
-                live.into_iter().chain([shadow_alt, shadow_current])
-            {
-                if self.client.collection_exists(&collection).await? {
-                    self.client
-                        .delete_documents_by_filter(&collection, &filter)
-                        .await?;
-                }
-            }
+            .map(ToString::to_string)
+            .chain(
+                update
+                    .versions
+                    .iter()
+                    .map(|document| document.version_id.clone()),
+            )
+            .unique()
+            .collect::<Vec<_>>();
+        if !version_ids.is_empty() {
+            self.delete_ids_from_write_collections(
+                &versions_alias,
+                "id",
+                &version_ids,
+            )
+            .await?;
         }
+
+        let project_ids = update
+            .projects
+            .iter()
+            .map(|document| document.project_id.clone())
+            .unique()
+            .collect::<Vec<_>>();
+        if !project_ids.is_empty() {
+            self.delete_ids_from_write_collections(
+                &projects_alias,
+                "project_id",
+                &project_ids,
+            )
+            .await?;
+        }
+
+        if !update.projects.is_empty() {
+            let collections =
+                self.existing_write_collections(&projects_alias).await?;
+            debug!(
+                ?collections,
+                num_documents = update.projects.len(),
+                "Replacing project documents in collections",
+            );
+            self.import_document_batches(
+                &collections,
+                update.projects,
+                documents_to_jsonl,
+            )
+            .await?;
+        }
+
+        if !update.versions.is_empty() {
+            let collections =
+                self.existing_write_collections(&versions_alias).await?;
+            debug!(
+                ?collections,
+                num_documents = update.versions.len(),
+                "Replacing version documents in collections",
+            );
+            self.import_document_batches(
+                &collections,
+                update.versions,
+                version_documents_to_jsonl,
+            )
+            .await?;
+        }
+
+        debug!("Done applying search index update");
         Ok(())
     }
 
@@ -1115,7 +1443,7 @@ impl SearchBackend for Typesense {
 
 /// Serialises a batch of [`UploadSearchProject`]s to a JSONL string suitable
 /// for the Typesense bulk-import endpoint.  Each document gets an `id` field
-/// equal to `version_id` so Typesense can use it as the primary key.
+/// equal to `project_id` so Typesense can use it as the primary key.
 fn documents_to_jsonl(uploads: &[UploadSearchProject]) -> Result<String> {
     let mut out = String::new();
     for upload in uploads {
@@ -1123,7 +1451,7 @@ fn documents_to_jsonl(uploads: &[UploadSearchProject]) -> Result<String> {
             .wrap_err("failed to serialise UploadSearchProject")?;
         if let Some(obj) = doc.as_object_mut() {
             let id = obj
-                .get("version_id")
+                .get("project_id")
                 .and_then(Value::as_str)
                 .unwrap_or_default()
                 .to_string();
@@ -1147,135 +1475,21 @@ fn documents_to_jsonl(uploads: &[UploadSearchProject]) -> Result<String> {
     Ok(out)
 }
 
-/// Translates a Meilisearch filter expression into Typesense `filter_by`
-/// syntax.
-///
-/// Transformations (applied in order):
-/// 1. `field (NOT )IN [v1, v2]`  →  `field:[v1, v2]` / `field:!=[v1, v2]`
-/// 2. `field op value` for op ∈ {`!=`, `>=`, `<=`, `>`, `<`, `=`}
-///    →  `field:op value`
-/// 3. `AND` / `OR` (case-insensitive)  →  `&&` / `||`
-fn meili_to_typesense(filter: &str) -> String {
-    static IN_RE: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(
-            r"(?i)\b([a-zA-Z_.][a-zA-Z0-9_.]*)\s+(NOT\s+)?IN\s*\[([^\]]*)\]",
-        )
-        .expect("valid regex")
-    });
-    static EXISTS_RE: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"(?i)\b([a-zA-Z_.][a-zA-Z0-9_.]*)\s+(NOT\s+)?EXISTS\b")
-            .expect("valid regex")
-    });
-    static CMP_RE: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"([a-zA-Z_.][a-zA-Z0-9_.]*)\s*(!=|>=|<=|>|<|=)\s*")
-            .expect("valid regex")
-    });
-    static AND_RE: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"(?i)\bAND\b").expect("valid regex"));
-    static OR_RE: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"(?i)\bOR\b").expect("valid regex"));
-
-    // Step 1 – IN / NOT IN
-    let s = IN_RE.replace_all(filter, |caps: &regex::Captures<'_>| {
-        let field = caps.get(1).map(|m| m.as_str()).unwrap_or_default();
-        let is_not = caps.get(2).is_some();
-        let values = caps.get(3).map(|m| m.as_str()).unwrap_or_default();
-        if is_not {
-            format!("{field}:!=[{values}]")
-        } else {
-            format!("{field}:[{values}]")
+fn version_documents_to_jsonl(
+    uploads: &[UploadSearchVersion],
+) -> Result<String> {
+    let mut out = String::new();
+    for upload in uploads {
+        let mut document = serde_json::to_value(upload)
+            .wrap_err("failed to serialise UploadSearchVersion")?;
+        if let Some(object) = document.as_object_mut() {
+            object.insert(
+                "id".to_string(),
+                Value::String(upload.version_id.clone()),
+            );
         }
-    });
-
-    let s = EXISTS_RE.replace_all(&s, |caps: &regex::Captures<'_>| {
-        let field = caps.get(1).map(|m| m.as_str()).unwrap_or_default();
-        let is_not = caps.get(2).is_some();
-
-        match field {
-            "minecraft_java_server.ping.data" => format!(
-                "minecraft_java_server.is_online:= {}",
-                if is_not { "false" } else { "true" }
-            ),
-            _ => caps
-                .get(0)
-                .map(|m| m.as_str())
-                .unwrap_or_default()
-                .to_string(),
-        }
-    });
-
-    // Step 2 – comparison operators (field op value → field:op value).
-    let s = CMP_RE.replace_all(&s, |caps: &regex::Captures<'_>| {
-        let field = caps.get(1).map(|m| m.as_str()).unwrap_or_default();
-        let op = caps.get(2).map(|m| m.as_str()).unwrap_or_default();
-        format!("{field}:{op} ")
-    });
-
-    // Step 3 – logical operators
-    let s = AND_RE.replace_all(&s, " && ");
-    let s = OR_RE.replace_all(&s, " || ");
-    s.into_owned()
-}
-
-/// Converts the legacy Meilisearch `facets` JSON array into a Typesense
-/// `filter_by` string.  The outer array items are AND-ed together; the inner
-/// array items are OR-ed together.
-fn facets_to_typesense(facets_json: &str) -> Result<String> {
-    let facets = serde_json::from_str::<Vec<Vec<Value>>>(facets_json)
-        .wrap_err("failed to parse facets JSON")?;
-
-    let and_parts: Vec<String> = facets
-        .into_iter()
-        .map(|or_group| {
-            let or_parts: Vec<String> = or_group
-                .into_iter()
-                .map(|facet| {
-                    let conditions: Vec<String> = if facet.is_array() {
-                        serde_json::from_value::<Vec<String>>(facet)
-                            .unwrap_or_default()
-                    } else {
-                        vec![
-                            serde_json::from_value::<String>(facet)
-                                .unwrap_or_default(),
-                        ]
-                    };
-                    let and_conds: Vec<String> = conditions
-                        .into_iter()
-                        .map(|c| condition_to_typesense_filter(&c))
-                        .collect();
-                    if and_conds.len() == 1 {
-                        and_conds.into_iter().next().unwrap_or_default()
-                    } else {
-                        format!("({})", and_conds.join(" && "))
-                    }
-                })
-                .collect();
-            if or_parts.len() == 1 {
-                or_parts.into_iter().next().unwrap_or_default()
-            } else {
-                format!("({})", or_parts.join(" || "))
-            }
-        })
-        .collect();
-
-    Ok(and_parts.join(" && "))
-}
-
-/// Converts a single facet condition such as `"categories:mods"`,
-/// `"categories=mods"`, or `"downloads!=100"` into a Typesense filter clause.
-fn condition_to_typesense_filter(cond: &str) -> String {
-    // Match multi-character operators before their single-character prefixes,
-    // and range/inequality operators before the plain `=` equality arm.
-    for op in ["!=", ">=", "<=", ">", "<"] {
-        if let Some((field, value)) = cond.split_once(op) {
-            return format!("{}:{} {}", field.trim(), op, value.trim());
-        }
+        out.push_str(&serde_json::to_string(&document)?);
+        out.push('\n');
     }
-    if let Some((field, value)) = cond.split_once(':') {
-        return format!("{}:= {}", field.trim(), value.trim());
-    }
-    if let Some((field, value)) = cond.split_once('=') {
-        return format!("{}:= {}", field.trim(), value.trim());
-    }
-    cond.to_string()
+    Ok(out)
 }

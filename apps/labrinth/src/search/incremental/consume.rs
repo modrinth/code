@@ -1,29 +1,33 @@
 use actix_web::web;
 use eyre::WrapErr;
-use futures::FutureExt;
 use rdkafka::{
     Message,
     consumer::{CommitMode, Consumer, StreamConsumer},
     message::BorrowedMessage,
 };
 use serde::Deserialize;
-use std::collections::HashSet;
+use std::{
+    collections::HashSet,
+    time::{Duration, Instant},
+};
+use tracing::{Instrument, info, info_span};
 use xredis::RedisPool;
 
 use crate::{
     database::PgPool,
-    models::ids::ProjectId,
+    env::ENV,
+    models::ids::{ProjectId, VersionId},
     search::{
-        SearchBackend, incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
-        indexing::index_project_documents,
+        SearchBackend, SearchDocumentBatch, SearchIndexUpdate,
+        UploadSearchProject,
+        incremental::SEARCH_PROJECT_INDEX_QUEUE_TOPIC,
+        indexing::{build_project_documents, build_version_change_documents},
     },
     util::kafka::{
         INCREMENTAL_INDEX_SEARCH_TASK, KAFKA_OPERATION_INTERVAL,
         KafkaClientState,
     },
 };
-
-const BATCH_SIZE: usize = 100;
 
 pub async fn run(
     ro_pool: PgPool,
@@ -61,25 +65,60 @@ async fn consume(
     search_backend: &dyn SearchBackend,
     consumer: &StreamConsumer,
 ) -> eyre::Result<()> {
+    // keep buffer capacity (pre-)allocated
+    let mut messages = Vec::with_capacity(1024);
     loop {
-        let mut messages = Vec::with_capacity(BATCH_SIZE);
-        messages.push(
-            consumer
-                .recv()
-                .await
-                .wrap_err("failed to receive Kafka message")?,
+        messages.clear();
+
+        // wait for a first message to come in...
+        let first_message = consumer
+            .recv()
+            .await
+            .wrap_err("failed to receive Kafka message")?;
+        messages.push(first_message);
+
+        let delay = Duration::from_secs(
+            ENV.SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS,
+        );
+        info!(
+            "Received initial Kafka message; waiting {delay:.2?} for more to batch",
         );
 
-        while messages.len() < BATCH_SIZE {
-            let Some(message) = consumer.recv().now_or_never() else {
-                break;
-            };
-
-            messages.push(message.wrap_err("failed to receive Kafka message")?);
+        // ..then wait a while for more messages to batch up
+        // so that we can process a big batch to reindex.
+        // we stop until either we've reached the max batch size,
+        // or we've waited enough time - whichever is first.
+        //
+        // do a little trick with an `AsyncFnMut` closure
+        // so that we can explicitly specify the return type
+        let mut collect_more_messages = async || -> eyre::Result<()> {
+            while messages.len() < ENV.SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE {
+                let message = consumer
+                    .recv()
+                    .await
+                    .wrap_err("failed to receive Kafka message")?;
+                messages.push(message);
+            }
+            eyre::Ok(())
+        };
+        match tokio::time::timeout(delay, collect_more_messages()).await {
+            Ok(Ok(())) | Err(_) => {}
+            Ok(Err(err)) => {
+                return Err(
+                    err.wrap_err("failed to receive more Kafka messages")
+                );
+            }
         }
 
-        consume_batch(ro_pool, redis_pool, search_backend, consumer, messages)
-            .await?;
+        info!("Consuming batch of {} messages", messages.len());
+        consume_batch(
+            ro_pool,
+            redis_pool,
+            search_backend,
+            consumer,
+            messages.drain(..),
+        )
+        .await?;
     }
 }
 
@@ -88,10 +127,14 @@ async fn consume_batch(
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     consumer: &StreamConsumer,
-    messages: Vec<BorrowedMessage<'_>>,
+    messages: impl IntoIterator<Item = BorrowedMessage<'_>>,
 ) -> eyre::Result<()> {
-    let mut project_ids = Vec::new();
-    let mut seen_project_ids = HashSet::new();
+    let start = Instant::now();
+
+    let mut project_ids_to_change = HashSet::new();
+    let mut project_ids_with_version_changes = HashSet::new();
+    let mut project_ids_to_remove = HashSet::new();
+    let mut version_ids_to_change = HashSet::new();
     let mut messages_to_commit = Vec::new();
 
     for message in messages {
@@ -126,25 +169,149 @@ async fn consume_batch(
             }
         };
 
-        if seen_project_ids.insert(event.project_id) {
-            project_ids.push(event.project_id);
+        let event = match event {
+            SearchProjectIndexQueueEvent::Current(event) => event,
+            SearchProjectIndexQueueEvent::Legacy { project_id } => {
+                SearchProjectIndexQueueEventData::Change { project_id }
+            }
+        };
+
+        match event {
+            SearchProjectIndexQueueEventData::Change { project_id } => {
+                project_ids_to_change.insert(project_id);
+            }
+            SearchProjectIndexQueueEventData::VersionChange {
+                project_id,
+                version_ids,
+            } => {
+                if !version_ids.is_empty() {
+                    project_ids_with_version_changes.insert(project_id);
+                    version_ids_to_change.extend(version_ids);
+                }
+            }
+            SearchProjectIndexQueueEventData::Removal { project_id } => {
+                project_ids_to_remove.insert(project_id);
+            }
         }
         messages_to_commit.push(message);
     }
 
-    if project_ids.is_empty() {
-        return Ok(());
+    project_ids_to_change
+        .retain(|project_id| !project_ids_to_remove.contains(project_id));
+    project_ids_with_version_changes
+        .retain(|project_id| !project_ids_to_remove.contains(project_id));
+    project_ids_to_change.retain(|project_id| {
+        !project_ids_with_version_changes.contains(project_id)
+    });
+    let project_ids_to_change =
+        project_ids_to_change.into_iter().collect::<Vec<_>>();
+    let project_ids_with_version_changes = project_ids_with_version_changes
+        .into_iter()
+        .collect::<Vec<_>>();
+    let mut project_ids_to_remove =
+        project_ids_to_remove.into_iter().collect::<Vec<_>>();
+    let version_ids_to_change =
+        version_ids_to_change.into_iter().collect::<Vec<_>>();
+
+    info!(
+        kafka.message_count = messages_to_commit.len(),
+        "Read all Kafka messages in {:.2?}, found {} projects to change, {} projects with {} version changes, and {} projects to remove",
+        start.elapsed(),
+        project_ids_to_change.len(),
+        project_ids_with_version_changes.len(),
+        version_ids_to_change.len(),
+        project_ids_to_remove.len(),
+    );
+    let start = Instant::now();
+    let mut documents = SearchDocumentBatch::default();
+
+    if !project_ids_with_version_changes.is_empty() {
+        let operation_start = Instant::now();
+        let changed_documents = build_version_change_documents(
+            ro_pool,
+            redis_pool,
+            &project_ids_with_version_changes,
+            &version_ids_to_change,
+        )
+        .instrument(info_span!(
+            "index",
+            batch_size = project_ids_with_version_changes.len(),
+            version_count = version_ids_to_change.len()
+        ))
+        .await
+        .wrap_err_with(|| {
+            format!(
+                "failed to build search documents for {} projects and {} versions",
+                project_ids_with_version_changes.len(),
+                version_ids_to_change.len()
+            )
+        })?;
+        project_ids_to_remove.extend(missing_project_document_ids(
+            &project_ids_with_version_changes,
+            &changed_documents.projects,
+        ));
+        documents.projects.extend(changed_documents.projects);
+        documents.versions.extend(changed_documents.versions);
+        info!(
+            project_count = project_ids_with_version_changes.len(),
+            version_count = version_ids_to_change.len(),
+            "Built changed project versions in {:.2?}",
+            operation_start.elapsed()
+        );
     }
 
-    tracing::info!(
-        kafka.message_count = messages_to_commit.len(),
-        project_count = project_ids.len(),
-        "Consumed incremental search index event batch"
-    );
-
-    reindex_projects(ro_pool, redis_pool, search_backend, &project_ids)
+    if !project_ids_to_change.is_empty() {
+        let operation_start = Instant::now();
+        info!(
+            project_count = project_ids_to_change.len(),
+            "Building changed projects"
+        );
+        let changed_project_documents = build_project_documents(
+            ro_pool,
+            redis_pool,
+            &project_ids_to_change,
+        )
+        .instrument(info_span!(
+            "index",
+            batch_size = project_ids_to_change.len()
+        ))
         .await
-        .wrap_err("failed to reindex project batch")?;
+        .wrap_err_with(|| {
+            format!(
+                "failed to build search documents for {} projects",
+                project_ids_to_change.len()
+            )
+        })?;
+        project_ids_to_remove.extend(missing_project_document_ids(
+            &project_ids_to_change,
+            &changed_project_documents,
+        ));
+        documents.projects.extend(changed_project_documents);
+        info!(
+            project_count = project_ids_to_change.len(),
+            "Built changed projects in {:.2?}",
+            operation_start.elapsed()
+        );
+    }
+
+    let operation_start = Instant::now();
+    search_backend
+        .apply_update(SearchIndexUpdate {
+            projects: &documents.projects,
+            versions: &documents.versions,
+            removed_projects: &project_ids_to_remove,
+            removed_versions: &version_ids_to_change,
+        })
+        .await
+        .wrap_err("failed to apply search index update")?;
+    info!(
+        project_count = documents.projects.len(),
+        version_count = documents.versions.len(),
+        removed_project_count = project_ids_to_remove.len(),
+        removed_version_count = version_ids_to_change.len(),
+        "Applied search index update in {:.2?}",
+        operation_start.elapsed()
+    );
 
     for message in messages_to_commit {
         consumer
@@ -152,45 +319,94 @@ async fn consume_batch(
             .wrap_err("failed to commit Kafka message")?;
     }
 
+    info!(
+        "Changed {} projects and removed {} projects in {:.2?}",
+        project_ids_to_change.len(),
+        project_ids_to_remove.len(),
+        start.elapsed()
+    );
+
     Ok(())
 }
 
-pub async fn reindex_project(
+pub async fn reindex_project_document(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     project_id: ProjectId,
 ) -> eyre::Result<()> {
-    reindex_projects(ro_pool, redis_pool, search_backend, &[project_id]).await
+    reindex_project_documents(
+        ro_pool,
+        redis_pool,
+        search_backend,
+        &[project_id],
+    )
+    .await
 }
 
-pub async fn reindex_projects(
+pub async fn reindex_project_documents(
     ro_pool: &PgPool,
     redis_pool: &RedisPool,
     search_backend: &dyn SearchBackend,
     project_ids: &[ProjectId],
 ) -> eyre::Result<()> {
-    search_backend.remove_project_documents(project_ids).await?;
-
-    let mut documents = Vec::new();
-    for project_id in project_ids {
-        documents.extend(
-            index_project_documents(ro_pool, redis_pool, *project_id)
-                .await
-                .wrap_err_with(|| {
-                    format!(
-                        "failed to build project {project_id} search documents"
-                    )
-                })?,
-        );
-    }
-
-    search_backend.index_documents(&documents).await?;
+    info!("Creating project documents");
+    let projects = build_project_documents(ro_pool, redis_pool, project_ids)
+        .instrument(info_span!("index", batch_size = project_ids.len()))
+        .await
+        .wrap_err_with(|| {
+            format!(
+                "failed to build search documents for {} projects",
+                project_ids.len()
+            )
+        })?;
+    let removed_projects = missing_project_document_ids(project_ids, &projects);
+    search_backend
+        .apply_update(SearchIndexUpdate {
+            projects: &projects,
+            removed_projects: &removed_projects,
+            ..SearchIndexUpdate::default()
+        })
+        .await?;
 
     Ok(())
 }
 
+fn missing_project_document_ids(
+    project_ids: &[ProjectId],
+    documents: &[UploadSearchProject],
+) -> Vec<ProjectId> {
+    let built_project_ids = documents
+        .iter()
+        .map(|project| project.project_id.as_str())
+        .collect::<HashSet<_>>();
+
+    project_ids
+        .iter()
+        .copied()
+        .filter(|project_id| {
+            !built_project_ids.contains(project_id.to_string().as_str())
+        })
+        .collect()
+}
+
 #[derive(Debug, Deserialize)]
-struct SearchProjectIndexQueueEvent {
-    project_id: ProjectId,
+#[serde(untagged)]
+enum SearchProjectIndexQueueEvent {
+    Current(SearchProjectIndexQueueEventData),
+    Legacy { project_id: ProjectId },
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+enum SearchProjectIndexQueueEventData {
+    #[serde(rename = "project_change")]
+    Change { project_id: ProjectId },
+    #[serde(rename = "project_version_change")]
+    VersionChange {
+        project_id: ProjectId,
+        version_ids: Vec<VersionId>,
+    },
+    #[serde(rename = "project_removal")]
+    Removal { project_id: ProjectId },
 }

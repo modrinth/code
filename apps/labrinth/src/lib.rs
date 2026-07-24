@@ -131,30 +131,6 @@ pub fn app_setup(
     ));
 
     if enable_background_tasks {
-        // The interval in seconds at which the local database is indexed
-        // for searching.  Defaults to 1 hour if unset.
-        let local_index_interval =
-            Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
-        let pool_ref = pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        let search_backend_ref = search_backend.clone();
-        scheduler.run(local_index_interval, move || {
-            let pool_ref = pool_ref.clone();
-            let redis_pool_ref = redis_pool_ref.clone();
-            let search_backend = search_backend_ref.clone();
-            async move {
-                if let Err(err) = background_task::index_search(
-                    pool_ref,
-                    redis_pool_ref,
-                    search_backend,
-                )
-                .await
-                {
-                    warn!("Failed to index search: {err:?}");
-                }
-            }
-        });
-
         // Changes statuses of scheduled projects/versions
         let pool_ref = pool.clone();
         // TODO: Clear cache when these are run
