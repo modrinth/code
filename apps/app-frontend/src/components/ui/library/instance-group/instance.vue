@@ -1,11 +1,12 @@
 <script setup>
-import { DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceFileIcon from '@/assets/icons/instance-file.svg?component'
+import { useLibrary } from '@/components/ui/library/use-library'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
@@ -15,6 +16,7 @@ import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
+const { selectedInstanceIds, toggleInstanceSelection } = useLibrary()
 
 const props = defineProps({
 	instance: {
@@ -27,6 +29,7 @@ const props = defineProps({
 
 const playing = ref(false)
 const loading = ref(false)
+const selectionControlActive = ref(false)
 const modLoading = computed(
 	() =>
 		loading.value ||
@@ -35,6 +38,7 @@ const modLoading = computed(
 )
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
+const selected = computed(() => selectedInstanceIds.value.has(props.instance.id))
 const instanceType = computed(() => {
 	if (
 		props.instance.link?.type === 'server_project' ||
@@ -147,7 +151,11 @@ onUnmounted(() => unlisten())
 
 <template>
 	<div
-		class="group relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all hover:brightness-110 active:scale-[0.98]"
+		class="relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all"
+		:class="{
+			'group/card hover:brightness-110 active:scale-[0.98]': !selectionControlActive,
+			'border-primary': selected,
+		}"
 		@click="seeInstance"
 		@mouseenter="checkProcess"
 	>
@@ -159,13 +167,38 @@ onUnmounted(() => unlisten())
 			alt=""
 			no-shadow
 		/>
+		<button
+			type="button"
+			class="group/selection absolute right-0 top-0 z-[2] flex size-[50px] cursor-pointer items-center justify-center border-0 bg-transparent p-0"
+			:aria-label="selected ? 'Deselect instance' : 'Select instance'"
+			:aria-pressed="selected"
+			@mouseenter="selectionControlActive = true"
+			@mouseleave="selectionControlActive = false"
+			@focus="selectionControlActive = true"
+			@blur="selectionControlActive = false"
+			@click.stop="toggleInstanceSelection(instance.id)"
+		>
+			<span
+				v-tooltip="selected ? 'Deselect instance' : 'Select instance'"
+				class="flex size-[24px] items-center justify-center rounded-full transition-all group-hover/selection:brightness-125"
+				:class="{
+					'border-0 bg-primary': selected,
+					'border-2 border-solid border-primary bg-transparent': !selected,
+					'opacity-100': selected || selectionControlActive,
+					'opacity-0 group-hover/card:opacity-100 group-focus-within/card:opacity-100':
+						!selected && !selectionControlActive,
+				}"
+			>
+				<CheckIcon v-if="selected" class="size-4 invert [stroke-width:3] top-px" />
+			</span>
+		</button>
 		<div class="relative z-[1] flex min-w-0 flex-1 items-center gap-2 pr-20">
 			<div class="relative flex size-10 shrink-0 items-center justify-center">
 				<div
 					v-if="!playing && !modLoading && !installing"
-					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-all"
+					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-opacity"
 					:class="{
-						'group-hover:scale-75 group-hover:opacity-0 group-focus-within:scale-75 group-focus-within:opacity-0':
+						'group-hover/card:scale-75 group-hover/card:opacity-0 group-focus-within/card:scale-75 group-focus-within/card:opacity-0':
 							!instance.quarantined,
 					}"
 				>
@@ -192,7 +225,7 @@ onUnmounted(() => unlisten())
 					<ButtonStyled v-else-if="!installed && !instance.quarantined" color="brand" circular>
 						<button
 							v-tooltip="'Repair'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover:scale-100 group-hover:opacity-100 group-focus-within:scale-100 group-focus-within:opacity-100"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100"
 							@click="(e) => repair(e)"
 						>
 							<DownloadIcon />
@@ -201,7 +234,7 @@ onUnmounted(() => unlisten())
 					<ButtonStyled v-else-if="!instance.quarantined" color="brand" circular>
 						<button
 							v-tooltip="'Play'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover:scale-100 group-hover:opacity-100 group-focus-within:scale-100 group-focus-within:opacity-100"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100"
 							@click="(e) => play(e, 'InstanceCard')"
 							@mouseenter="checkProcess"
 						>

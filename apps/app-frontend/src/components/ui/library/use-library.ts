@@ -74,6 +74,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const newGroupName = ref('')
 	const newGroupSearch = ref('')
 	const selectedNewGroupInstanceIds = ref(new Set<string>())
+	const selectedInstanceIds = ref(new Set<string>())
 	const creatingGroup = ref(false)
 	const instanceOptions = ref<InstanceContextMenu | null>(null)
 	const currentDeleteInstanceId = ref<string | null>(null)
@@ -331,6 +332,18 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		selectedNewGroupInstanceIds.value = selectedIds
 	}
 
+	const toggleInstanceSelection = (instanceId: string) => {
+		const selectedIds = new Set(selectedInstanceIds.value)
+
+		if (selectedIds.has(instanceId)) {
+			selectedIds.delete(instanceId)
+		} else {
+			selectedIds.add(instanceId)
+		}
+
+		selectedInstanceIds.value = selectedIds
+	}
+
 	const createGroup = async () => {
 		if (!canCreateGroup.value) return false
 
@@ -532,6 +545,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		newGroupName,
 		newGroupSearch,
 		selectedNewGroupInstanceIds,
+		selectedInstanceIds,
 		creatingGroup,
 		newGroupNameExists,
 		newGroupInstances,
@@ -543,6 +557,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		openNewGroupModal,
 		closeNewGroupModal,
 		toggleNewGroupInstance,
+		toggleInstanceSelection,
 		createGroup,
 		deleteGroup,
 		isValidGroupName,
