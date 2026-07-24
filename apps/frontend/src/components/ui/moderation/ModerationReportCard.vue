@@ -523,9 +523,10 @@ async function loadSharedInstanceDetails() {
 			}
 
 			const reportedVersion = props.report.shared_instance_version_id
-			const versionNumbers = reportedVersion !== undefined
-				? Array.from({ length: reportedVersion + 1 }, (_, index) => reportedVersion - index)
-				: []
+			const versionNumbers =
+				reportedVersion !== undefined
+					? Array.from({ length: reportedVersion + 1 }, (_, index) => reportedVersion - index)
+					: []
 			const [versionDetails, otherInstancesResult] = await Promise.all([
 				Promise.all(
 					versionNumbers.map(async (versionNumber) => {
