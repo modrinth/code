@@ -215,6 +215,8 @@ fn main() {
                         "instance_get_full_path",
                         "instance_get_mod_full_path",
                         "instance_list",
+                        "instance_list_groups",
+                        "instance_create_group",
                         "instance_check_installed",
                         "instance_update_all",
                         "instance_update_project",

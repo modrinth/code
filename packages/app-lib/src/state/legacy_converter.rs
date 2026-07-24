@@ -587,14 +587,45 @@ where
     .await?;
 
     for group in input.groups {
-        sqlx::query!(
+        let group_id = match sqlx::query_scalar::<_, String>(
             "
-            INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
+            SELECT id
+            FROM instance_groups
+            WHERE name = ?
+            ",
+        )
+        .bind(&group)
+        .fetch_optional(exec)
+        .await?
+        {
+            Some(group_id) => group_id,
+            None => {
+                let group_id = Uuid::new_v4().to_string();
+                sqlx::query(
+                    "
+                    INSERT INTO instance_groups (id, name)
+                    VALUES (?, ?)
+                    ",
+                )
+                .bind(&group_id)
+                .bind(&group)
+                .execute(exec)
+                .await?;
+                group_id
+            }
+        };
+
+        sqlx::query(
+            "
+            INSERT OR IGNORE INTO instance_group_memberships (
+                instance_id,
+                group_id
+            )
             VALUES (?, ?)
             ",
-            instance_id_str,
-            group,
         )
+        .bind(instance_id_str)
+        .bind(group_id)
         .execute(exec)
         .await?;
     }

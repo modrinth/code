@@ -29,6 +29,14 @@ export async function get_many(instanceIds: string[]): Promise<GameInstance[]> {
 	return await invoke('plugin:instance|instance_get_many', { instanceIds })
 }
 
+export async function list_groups(): Promise<string[]> {
+	return await invoke('plugin:instance|instance_list_groups')
+}
+
+export async function create_group(name: string): Promise<string> {
+	return await invoke('plugin:instance|instance_create_group', { name })
+}
+
 export async function get_projects(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,

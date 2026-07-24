@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT groups.name\n\t\tFROM instance_group_memberships memberships\n\t\tINNER JOIN instance_groups groups\n\t\t\tON groups.id = memberships.group_id\n\t\tWHERE memberships.instance_id = ?\n\t\tORDER BY groups.name\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "name",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ff28a1341b04afc4af46cd7110cb1daa7a669b3e7363fc27bbf4e66e82c98413"
+}

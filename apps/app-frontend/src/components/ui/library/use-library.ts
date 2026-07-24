@@ -13,7 +13,12 @@ import {
 
 import { get_project_v3_many } from '@/helpers/cache.js'
 import { install_duplicate_instance } from '@/helpers/install'
-import { edit, remove } from '@/helpers/instance'
+import {
+	create_group as createInstanceGroup,
+	edit,
+	list_groups as listInstanceGroups,
+	remove,
+} from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
 export const libraryFilterOptions = [
@@ -72,6 +77,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const search = ref('')
 	const activeFilter = ref<LibraryFilter>('All instances')
 	const serverProjectIds = ref(new Set<string>())
+	const libraryGroups = ref<string[]>([])
 	const isNewGroupModalOpen = ref(false)
 	const newGroupName = ref('')
 	const newGroupSearch = ref('')
@@ -103,10 +109,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const groupNames = computed(
 		() =>
 			new Set(
-				instances.value
-					.flatMap((instance) => instance.groups)
+				[...libraryGroups.value, ...instances.value.flatMap((instance) => instance.groups)]
 					.map((group) => group.trim())
-					.filter(Boolean),
+					.filter((group) => group && group.toLowerCase() !== 'none'),
 			),
 	)
 	const existingGroupNames = computed(
@@ -136,10 +141,19 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const canCreateGroup = computed(
 		() =>
 			normalizedNewGroupName.value.length > 0 &&
-			selectedNewGroupInstanceIds.value.size > 0 &&
 			!newGroupNameExists.value &&
 			!creatingGroup.value,
 	)
+
+	const refreshGroups = async () => {
+		try {
+			libraryGroups.value = await listInstanceGroups()
+		} catch (error) {
+			handleError(error)
+		}
+	}
+
+	void refreshGroups()
 
 	watchEffect(async () => {
 		const projectIds = [
@@ -237,6 +251,18 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			}
 		}
 
+		if (displayState.value.group === 'Group') {
+			const populatedGroupNames = new Set(
+				instances.value.flatMap((instance) => instance.groups),
+			)
+
+			for (const groupName of groupNames.value) {
+				if (!populatedGroupNames.has(groupName) && !groupedInstances.has(groupName)) {
+					groupedInstances.set(groupName, [])
+				}
+			}
+		}
+
 		const groups = Array.from(groupedInstances, ([key, groupInstances]) => ({
 			key,
 			instances: groupInstances,
@@ -309,18 +335,22 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		creatingGroup.value = true
 
 		try {
+			const groupName = await createInstanceGroup(normalizedNewGroupName.value)
+
 			await Promise.all(
 				instances.value
 					.filter((instance) => selectedNewGroupInstanceIds.value.has(instance.id))
 					.map((instance) =>
 						edit(instance.id, {
-							groups: [normalizedNewGroupName.value],
+							groups: [groupName],
 						}),
 					),
 			)
+			libraryGroups.value = [...new Set([...libraryGroups.value, groupName])]
 			return true
 		} catch (error) {
 			handleError(error)
+			await refreshGroups()
 			return false
 		} finally {
 			creatingGroup.value = false

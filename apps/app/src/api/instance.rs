@@ -25,6 +25,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get,
             instance_get_many,
             instance_list,
+            instance_list_groups,
+            instance_create_group,
             instance_get_projects,
             instance_get_installed_project_ids,
             instance_get_install_candidates,
@@ -472,6 +474,16 @@ pub async fn instance_list() -> Result<Vec<Instance>> {
         .into_iter()
         .map(Instance::from)
         .collect())
+}
+
+#[tauri::command]
+pub async fn instance_list_groups() -> Result<Vec<String>> {
+    Ok(theseus::instance::list_groups().await?)
+}
+
+#[tauri::command]
+pub async fn instance_create_group(name: String) -> Result<String> {
+    Ok(theseus::instance::create_group(name).await?)
 }
 
 #[tauri::command]

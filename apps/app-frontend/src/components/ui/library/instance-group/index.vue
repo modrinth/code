@@ -42,7 +42,13 @@ const {
 		<template v-if="instanceGroup.key !== 'None'" #title>
 			<span class="text-base">{{ instanceGroup.key }}</span>
 		</template>
-		<section class="instances">
+		<p
+			v-if="instanceGroup.instances.length === 0"
+			class="m-0 py-3 text-sm font-medium text-secondary"
+		>
+			No instances in this group.
+		</p>
+		<section v-else class="instances">
 			<Instance
 				v-for="instance in instanceGroup.instances"
 				ref="instanceComponents"

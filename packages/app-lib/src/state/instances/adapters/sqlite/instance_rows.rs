@@ -576,12 +576,14 @@ macro_rules! query_instance_metadata {
                     link.imported_version_number AS "imported_version_number?: String",
                     link.imported_filename AS "imported_filename?: String",
                     COALESCE((
-                        SELECT json_group_array(group_name)
+                        SELECT json_group_array(name)
                         FROM (
-                            SELECT group_name
-                            FROM instance_groups
-                            WHERE instance_id = i.id
-                            ORDER BY group_name
+                            SELECT groups.name
+                            FROM instance_group_memberships memberships
+                            INNER JOIN instance_groups groups
+                                ON groups.id = memberships.group_id
+                            WHERE memberships.instance_id = i.id
+                            ORDER BY groups.name
                         )
                     ), '[]') AS "groups!: String",
                     json(overrides.overrides) AS "launch_overrides?: String"
@@ -746,10 +748,12 @@ where
 {
     let rows = sqlx::query_scalar!(
         "
-		SELECT group_name
-		FROM instance_groups
-		WHERE instance_id = ?
-		ORDER BY group_name
+		SELECT groups.name
+		FROM instance_group_memberships memberships
+		INNER JOIN instance_groups groups
+			ON groups.id = memberships.group_id
+		WHERE memberships.instance_id = ?
+		ORDER BY groups.name
 		",
         instance_id,
     )
@@ -757,6 +761,41 @@ where
     .await?;
 
     Ok(rows)
+}
+
+pub(crate) async fn list_instance_group_names(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<String>> {
+    let groups = sqlx::query_scalar::<_, String>(
+        "
+		SELECT name
+		FROM instance_groups
+		ORDER BY name
+		",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(groups)
+}
+
+pub(crate) async fn create_instance_group(
+    id: &str,
+    name: &str,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    sqlx::query(
+        "
+		INSERT INTO instance_groups (id, name)
+		VALUES (?, ?)
+		",
+    )
+    .bind(id)
+    .bind(name)
+    .execute(pool)
+    .await?;
+
+    Ok(())
 }
 
 pub(crate) async fn get_instance_launch_overrides<'e, E>(
@@ -1037,7 +1076,7 @@ pub(crate) async fn replace_instance_groups(
 ) -> crate::Result<()> {
     sqlx::query!(
         "
-		DELETE FROM instance_groups
+		DELETE FROM instance_group_memberships
 		WHERE instance_id = ?
 		",
         instance_id,
@@ -1046,14 +1085,45 @@ pub(crate) async fn replace_instance_groups(
     .await?;
 
     for group in groups {
-        sqlx::query!(
+        let group_id = match sqlx::query_scalar::<_, String>(
             "
-			INSERT OR IGNORE INTO instance_groups (instance_id, group_name)
+			SELECT id
+			FROM instance_groups
+			WHERE name = ?
+			",
+        )
+        .bind(group)
+        .fetch_optional(&mut **tx)
+        .await?
+        {
+            Some(group_id) => group_id,
+            None => {
+                let group_id = Uuid::new_v4().to_string();
+                sqlx::query(
+                    "
+					INSERT INTO instance_groups (id, name)
+					VALUES (?, ?)
+					",
+                )
+                .bind(&group_id)
+                .bind(group)
+                .execute(&mut **tx)
+                .await?;
+                group_id
+            }
+        };
+
+        sqlx::query(
+            "
+			INSERT OR IGNORE INTO instance_group_memberships (
+				instance_id,
+				group_id
+			)
 			VALUES (?, ?)
 			",
-            instance_id,
-            group,
         )
+        .bind(instance_id)
+        .bind(group_id)
         .execute(&mut **tx)
         .await?;
     }
