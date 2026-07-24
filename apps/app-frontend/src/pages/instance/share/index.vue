@@ -131,7 +131,6 @@ import {
 	ConfirmUnlinkModal,
 	defineMessages,
 	injectAuth,
-	injectNotificationManager,
 	type InvitePlayersInvitePayload,
 	InvitePlayersModal,
 	type InvitePlayersUser,
@@ -171,7 +170,6 @@ const props = defineProps<{
 }>()
 const auth = injectAuth()
 const queryClient = useQueryClient()
-const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const {
 	formatSharedInstanceUnavailable,
@@ -210,7 +208,6 @@ const members = useSharedInstanceMembers({
 	isSignedIn,
 	actionsLocked,
 	onError: notifyOperationError,
-	onHydrationError: handleError,
 })
 const {
 	inviteFriends,

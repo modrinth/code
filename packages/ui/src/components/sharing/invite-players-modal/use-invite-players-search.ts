@@ -145,29 +145,12 @@ export function useInvitePlayersSearch(options: {
 		return friend.status ?? 'available'
 	}
 
-	function friendStatusSort(friend: InvitePlayersUser) {
-		switch (friendStatus(friend)) {
-			case 'available':
-				return 0
-			case 'requested':
-				return 1
-			case 'pending':
-				return 2
-			case 'added':
-				return 3
-		}
-		return 4
-	}
-
 	function syncFriendOrder(friends: InvitePlayersUser[]) {
 		const nextOrder = new Map(friendOrder.value)
 		let nextIndex = nextOrder.size
 		const unorderedFriends = friends.filter((friend) => !nextOrder.has(friend.id))
-		const orderedFriends = unorderedFriends
-			.map((friend, index) => ({ friend, index }))
-			.sort((a, b) => friendStatusSort(a.friend) - friendStatusSort(b.friend) || a.index - b.index)
-		if (orderedFriends.length === 0) return
-		for (const { friend } of orderedFriends) {
+		if (unorderedFriends.length === 0) return
+		for (const friend of unorderedFriends) {
 			nextOrder.set(friend.id, nextIndex)
 			nextIndex += 1
 		}

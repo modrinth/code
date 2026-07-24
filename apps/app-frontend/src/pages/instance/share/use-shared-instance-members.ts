@@ -1,9 +1,8 @@
 import type { InvitePlayersUser } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, watch } from 'vue'
+import { computed, type Ref } from 'vue'
 
 import { get_user_many } from '@/helpers/cache.js'
-import { toError } from '@/helpers/errors'
 import {
 	get_shared_instance_users,
 	invite_shared_instance_users,
@@ -15,14 +14,24 @@ import type { GameInstance } from '@/helpers/types'
 
 import { normalizeInviteKey, type ShareRow } from './shared-instance-share-types'
 
-type MutationContext = {
-	queryKey: readonly ['sharedInstanceUsers', string]
-	previousRows?: ShareRow[]
+type MembersQueryKey = readonly ['sharedInstanceUsers', string]
+
+type OptimisticChange = {
+	queryKey: MembersQueryKey
+	userId: string
+	previousRow?: ShareRow
+	previousIndex: number
 }
 
-type RemoveMemberVariables = {
+type InviteVariables = {
+	user: InvitePlayersUser
+	change: OptimisticChange
+}
+
+type RemoveVariables = {
 	id: string
 	hasPendingRecipients: boolean
+	change: OptimisticChange
 }
 
 export function useSharedInstanceMembers(options: {
@@ -31,10 +40,54 @@ export function useSharedInstanceMembers(options: {
 	isSignedIn: Ref<boolean>
 	actionsLocked: Ref<boolean>
 	onError: (error: unknown) => void
-	onHydrationError: (error: Error) => void
 }) {
 	const queryClient = useQueryClient()
 	const queryKey = computed(() => ['sharedInstanceUsers', options.instance.value.id] as const)
+	const invitingUserIds = new Set<string>()
+	const removingUserIds = new Set<string>()
+
+	const query = useQuery({
+		queryKey,
+		queryFn: ({ queryKey }) => fetchRows(queryKey),
+		enabled: () =>
+			options.isSignedIn.value && !!options.instance.value.id && !options.actionsLocked.value,
+		staleTime: Infinity,
+		refetchOnMount: 'always',
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
+	})
+	const rows = computed(() => query.data.value ?? [])
+
+	const inviteMutation = useMutation({
+		mutationFn: ({ user, change }: InviteVariables) =>
+			invite_shared_instance_users(change.queryKey[1], [user.id]),
+		onError: (error, { change }) => {
+			rollback(change)
+			options.onError(error)
+		},
+		onSettled: (_data, _error, { user }) => {
+			invitingUserIds.delete(normalizeInviteKey(user.id))
+		},
+	})
+
+	const removeMutation = useMutation({
+		mutationFn: ({ id, hasPendingRecipients, change }: RemoveVariables) =>
+			remove_shared_instance_users(change.queryKey[1], [id], hasPendingRecipients),
+		onError: (error, { change }) => {
+			rollback(change)
+			options.onError(error)
+		},
+		onSettled: (_data, _error, { id }) => {
+			removingUserIds.delete(normalizeInviteKey(id))
+		},
+	})
+
+	async function fetchRows(activeQueryKey: MembersQueryKey) {
+		const users = await get_shared_instance_users(activeQueryKey[1])
+		const loadedRows = await usersToRows(users)
+		const currentRows = queryClient.getQueryData<ShareRow[]>(activeQueryKey) ?? []
+		return preserveRowOrder(loadedRows, currentRows)
+	}
 
 	async function usersToRows(users: SharedInstanceUsers): Promise<ShareRow[]> {
 		const excludedIds = new Set(
@@ -66,99 +119,6 @@ export function useSharedInstanceMembers(options: {
 		})
 	}
 
-	async function loadRows() {
-		if (options.actionsLocked.value) return []
-		return await usersToRows(await get_shared_instance_users(options.instance.value.id))
-	}
-
-	const query = useQuery({
-		queryKey,
-		queryFn: loadRows,
-		enabled: () =>
-			options.isSignedIn.value && !!options.instance.value.id && !options.actionsLocked.value,
-		staleTime: 10_000,
-		refetchInterval: 10_000,
-		refetchOnMount: 'always',
-	})
-	const remoteRows = computed(
-		() => query.data.value ?? queryClient.getQueryData<ShareRow[]>(queryKey.value) ?? [],
-	)
-	const rows = computed(() => {
-		if (!options.instance.value.shared_instance) return []
-		return remoteRows.value
-	})
-
-	const inviteMutation = useMutation({
-		mutationFn: async (user: InvitePlayersUser) => {
-			if (options.actionsLocked.value) return
-			return await invite_shared_instance_users(options.instance.value.id, [user.id])
-		},
-		onMutate: async (user): Promise<MutationContext> => {
-			const currentKey = queryKey.value
-			await queryClient.cancelQueries({ queryKey: currentKey })
-			const context = {
-				queryKey: currentKey,
-				previousRows: queryClient.getQueryData<ShareRow[]>(currentKey),
-			}
-			upsert(inviteUserToRow(user))
-			return context
-		},
-		onError: (error, _user, context) => {
-			restore(context)
-			options.onError(error)
-		},
-		onSuccess: async (users, user) => {
-			try {
-				if (users) {
-					queryClient.setQueryData<ShareRow[]>(queryKey.value, await usersToRows(users))
-				} else {
-					upsert(inviteUserToRow(user))
-				}
-			} catch (error) {
-				options.onHydrationError(toError(error))
-				upsert(inviteUserToRow(user))
-				await queryClient.invalidateQueries({ queryKey: queryKey.value })
-			}
-		},
-	})
-
-	const removeMutation = useMutation({
-		mutationFn: async ({ id, hasPendingRecipients }: RemoveMemberVariables) => {
-			if (options.actionsLocked.value) {
-				return { user_ids: [], users: [], tokens: 0 } satisfies SharedInstanceUsers
-			}
-			return await remove_shared_instance_users(
-				options.instance.value.id,
-				[id],
-				hasPendingRecipients,
-			)
-		},
-		onMutate: async ({ id }): Promise<MutationContext> => {
-			const currentKey = queryKey.value
-			await queryClient.cancelQueries({ queryKey: currentKey })
-			const context = {
-				queryKey: currentKey,
-				previousRows: queryClient.getQueryData<ShareRow[]>(currentKey),
-			}
-			queryClient.setQueryData<ShareRow[]>(currentKey, (currentRows = []) =>
-				currentRows.filter((row) => normalizeInviteKey(row.id) !== normalizeInviteKey(id)),
-			)
-			return context
-		},
-		onError: (error, _variables, context) => {
-			restore(context)
-			options.onError(error)
-		},
-		onSuccess: async (users) => {
-			try {
-				queryClient.setQueryData<ShareRow[]>(queryKey.value, await usersToRows(users))
-			} catch (error) {
-				options.onHydrationError(toError(error))
-				await queryClient.invalidateQueries({ queryKey: queryKey.value })
-			}
-		},
-	})
-
 	function find(id: string, username: string) {
 		const normalizedId = normalizeInviteKey(id)
 		const normalizedUsername = normalizeInviteKey(username)
@@ -170,50 +130,72 @@ export function useSharedInstanceMembers(options: {
 	}
 
 	function invite(user: InvitePlayersUser) {
-		if (!options.actionsLocked.value && !find(user.id, user.username)) inviteMutation.mutate(user)
+		const normalizedId = normalizeInviteKey(user.id)
+		if (
+			options.actionsLocked.value ||
+			invitingUserIds.has(normalizedId) ||
+			find(user.id, user.username)
+		) {
+			return
+		}
+
+		invitingUserIds.add(normalizedId)
+		const change = beginOptimisticChange(user.id)
+		updateRows(change.queryKey, (currentRows) => [...currentRows, inviteUserToRow(user)])
+		inviteMutation.mutate({ user, change })
 	}
 
 	function remove(id: string) {
-		if (options.actionsLocked.value) return
 		const normalizedId = normalizeInviteKey(id)
-		removeMutation.mutate({
-			id,
-			hasPendingRecipients: rows.value.some(
-				(row) => row.pending && normalizeInviteKey(row.id) !== normalizedId,
-			),
-		})
+		if (options.actionsLocked.value || removingUserIds.has(normalizedId)) return
+
+		removingUserIds.add(normalizedId)
+		const hasPendingRecipients = rows.value.some(
+			(row) => row.pending && normalizeInviteKey(row.id) !== normalizedId,
+		)
+		const change = beginOptimisticChange(id)
+		updateRows(change.queryKey, (currentRows) =>
+			currentRows.filter((row) => normalizeInviteKey(row.id) !== normalizedId),
+		)
+		removeMutation.mutate({ id, hasPendingRecipients, change })
 	}
 
-	function upsert(row: ShareRow) {
-		queryClient.setQueryData<ShareRow[]>(queryKey.value, (currentRows = []) => [
-			row,
-			...currentRows.filter(
-				(existing) => normalizeInviteKey(existing.id) !== normalizeInviteKey(row.id),
-			),
-		])
-	}
+	function beginOptimisticChange(userId: string): OptimisticChange {
+		const activeQueryKey = queryKey.value
+		void queryClient.cancelQueries({ queryKey: activeQueryKey, exact: true }, { revert: false })
 
-	function restore(context?: MutationContext) {
-		if (!context) return
-		if (context.previousRows === undefined) {
-			queryClient.removeQueries({ queryKey: context.queryKey, exact: true })
-		} else {
-			queryClient.setQueryData(context.queryKey, context.previousRows)
+		const currentRows = queryClient.getQueryData<ShareRow[]>(activeQueryKey) ?? []
+		const previousIndex = currentRows.findIndex(
+			(row) => normalizeInviteKey(row.id) === normalizeInviteKey(userId),
+		)
+		return {
+			queryKey: activeQueryKey,
+			userId,
+			previousRow: previousIndex === -1 ? undefined : currentRows[previousIndex],
+			previousIndex,
 		}
 	}
 
-	watch(
-		() => ({
-			instanceId: options.instance.value.id,
-			isShared: !!options.instance.value.shared_instance,
-		}),
-		({ instanceId, isShared }) => {
-			if (!isShared) {
-				queryClient.setQueryData<ShareRow[]>(['sharedInstanceUsers', instanceId], [])
-			}
-		},
-		{ immediate: true },
-	)
+	function rollback(change: OptimisticChange) {
+		const normalizedId = normalizeInviteKey(change.userId)
+		updateRows(change.queryKey, (currentRows) => {
+			const rowsWithoutUser = currentRows.filter(
+				(row) => normalizeInviteKey(row.id) !== normalizedId,
+			)
+			if (!change.previousRow) return rowsWithoutUser
+
+			const previousIndex = Math.min(change.previousIndex, rowsWithoutUser.length)
+			return [
+				...rowsWithoutUser.slice(0, previousIndex),
+				change.previousRow,
+				...rowsWithoutUser.slice(previousIndex),
+			]
+		})
+	}
+
+	function updateRows(activeQueryKey: MembersQueryKey, update: (rows: ShareRow[]) => ShareRow[]) {
+		queryClient.setQueryData<ShareRow[]>(activeQueryKey, (currentRows = []) => update(currentRows))
+	}
 
 	return { rows, query, find, invite, remove }
 }
@@ -244,4 +226,16 @@ function inviteUserToRow(user: InvitePlayersUser): ShareRow {
 		method: 'direct',
 		pending: true,
 	}
+}
+
+function preserveRowOrder(rows: ShareRow[], previousRows: ShareRow[]) {
+	const rowsById = new Map(rows.map((row) => [normalizeInviteKey(row.id), row]))
+	const orderedRows = previousRows.flatMap((previousRow) => {
+		const id = normalizeInviteKey(previousRow.id)
+		const row = rowsById.get(id)
+		if (!row) return []
+		rowsById.delete(id)
+		return [row]
+	})
+	return [...orderedRows, ...rowsById.values()]
 }

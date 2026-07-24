@@ -5,6 +5,7 @@
 		width="min(34rem, calc(100vw - 2rem))"
 		max-width="34rem"
 		no-padding
+		noblur
 	>
 		<div class="flex max-h-[calc(100vh-8rem)] min-h-0 flex-col">
 			<div class="border-0 border-b border-solid border-surface-5 p-6">
