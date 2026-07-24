@@ -44,7 +44,7 @@
 									raised
 									class="inline-block !rounded-lg align-middle"
 								/>
-								<span class="font-semibold text-contrast">{{ entityLabel }}</span>
+								<span class="ml-1 font-semibold text-contrast">{{ entityLabel }}</span>
 								<span> instance.</span>
 							</template>
 						</template>

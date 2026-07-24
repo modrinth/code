@@ -547,26 +547,39 @@ async function handleUploadFiles() {
 		}),
 	)
 
-	const addedFiles: string[] = []
+	const confirmedFiles: Array<{ path: string; filename: string }> = []
 	for (const [index, { path, filename }] of selectedFiles.entries()) {
 		if (!fileRecognition[index] && !(await confirmUnknownFileInstallation(filename))) {
 			continue
 		}
-		try {
-			await add_project_from_path(props.instance.id, path)
-			addedFiles.push(filename)
-		} catch (e) {
-			handleError(e as Error)
-		}
+		confirmedFiles.push({ path, filename })
 	}
-	await initProjects()
 
-	if (addedFiles.length > 0) {
-		const names = addedFiles.map((f) => {
-			const item = projects.value.find(
-				(p) => p.file_name === f || p.file_name === f.replace('.zip', '.jar'),
-			)
-			return item?.project?.title ?? f
+	const addedFiles = (
+		await Promise.all(
+			confirmedFiles.map(async ({ path, filename }) => {
+				try {
+					const installedPath = await add_project_from_path(props.instance.id, path)
+					return { filename, installedPath }
+				} catch (error) {
+					handleError(error as Error)
+					return null
+				}
+			}),
+		)
+	).filter(
+		(result): result is { filename: string; installedPath: string } => result !== null,
+	)
+	const uniqueAddedFiles = [
+		...new Map(addedFiles.map((file) => [file.installedPath, file])).values(),
+	]
+
+	await initProjects('must_revalidate')
+
+	if (uniqueAddedFiles.length > 0) {
+		const names = uniqueAddedFiles.map(({ filename, installedPath }) => {
+			const item = projects.value.find((project) => project.file_path === installedPath)
+			return item?.project?.title ?? filename
 		})
 		addNotification({
 			type: 'success',

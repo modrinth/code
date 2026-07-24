@@ -11,17 +11,6 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<ButtonStyled color="brand">
-						<button
-							class="flex !h-10 shrink-0 items-center gap-2"
-							:disabled="invitePending"
-							@click="emit('invite', $event)"
-						>
-							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
-							<UserPlusIcon v-else aria-hidden="true" />
-							Invite friends
-						</button>
-					</ButtonStyled>
 					<ButtonStyled>
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
@@ -31,6 +20,17 @@
 							<SpinnerIcon v-if="pushUpdatePending" class="animate-spin" aria-hidden="true" />
 							<UploadIcon v-else aria-hidden="true" />
 							{{ formatMessage(messages.pushUpdate) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							class="flex !h-10 shrink-0 items-center gap-2"
+							:disabled="invitePending"
+							@click="emit('invite', $event)"
+						>
+							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
+							<UserPlusIcon v-else aria-hidden="true" />
+							Invite friends
 						</button>
 					</ButtonStyled>
 				</template>

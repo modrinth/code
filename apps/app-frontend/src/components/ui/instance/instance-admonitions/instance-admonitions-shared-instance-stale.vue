@@ -1,12 +1,12 @@
 <template>
 	<Admonition
-		type="warning"
+		type="info"
 		inline-actions
 		:header="formatMessage(messages.sharedInstanceChangesHeader)"
 	>
 		{{ formatMessage(messages.sharedInstanceChangesBody) }}
 		<template #actions>
-			<ButtonStyled color="orange">
+			<ButtonStyled color="blue">
 				<button class="!h-10" :disabled="isPublishButtonDisabled" @click="reviewChanges">
 					<SpinnerIcon
 						v-if="isReviewingPublish || isPublishing"

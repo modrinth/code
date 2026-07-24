@@ -1,6 +1,6 @@
 <template>
-	<div class="flex flex-col gap-1">
-		<div class="flex justify-between items-center">
+	<div class="flex flex-col gap-2.5">
+		<div class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">{{
 				heading ?? formatMessage(messages.sharedInstance)
 			}}</span>
@@ -11,15 +11,20 @@
 				</button>
 			</ButtonStyled>
 		</div>
-		<div class="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
-			<Avatar :src="preview.iconUrl" :alt="preview.name" size="48px" />
-			<div class="flex flex-col gap-0.5">
-				<span class="font-semibold text-contrast">{{ preview.name }}</span>
-				<span class="text-sm text-secondary">
+		<div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
+			<Avatar
+				:src="preview.iconUrl"
+				:alt="preview.name"
+				size="56px"
+				no-shadow
+				class="!rounded-2xl"
+			/>
+			<div class="flex min-w-0 flex-col gap-0.5">
+				<span class="truncate font-semibold text-contrast">{{ preview.name }}</span>
+				<span class="truncate text-sm font-medium text-secondary">
 					{{ loaderDisplay }} {{ preview.gameVersion }}
 					<template v-if="preview.modCount">
-						<BulletDivider />
-						{{ formatMessage(messages.modCount, { count: preview.modCount }) }}
+						· {{ formatMessage(messages.modCount, { count: preview.modCount }) }}
 					</template>
 				</span>
 			</div>
@@ -29,14 +34,7 @@
 
 <script setup lang="ts">
 import { EyeIcon } from '@modrinth/assets'
-import {
-	Avatar,
-	BulletDivider,
-	ButtonStyled,
-	defineMessages,
-	formatLoader,
-	useVIntl,
-} from '@modrinth/ui'
+import { Avatar, ButtonStyled, defineMessages, formatLoader, useVIntl } from '@modrinth/ui'
 import { computed, toRefs } from 'vue'
 
 import type { SharedInstanceInstallPreview } from '@/helpers/install'

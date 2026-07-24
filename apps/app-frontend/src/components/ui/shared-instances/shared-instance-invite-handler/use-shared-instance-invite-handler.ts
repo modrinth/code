@@ -1,3 +1,4 @@
+import { ModrinthApiError } from '@modrinth/api-client'
 import {
 	injectAuth,
 	injectModrinthClient,
@@ -61,7 +62,12 @@ export function useSharedInstanceInviteHandler(
 		| undefined
 
 	async function markNotificationRead(notification: AppNotification) {
-		await client.labrinth.notifications_v2.markAsRead(String(notification.id))
+		try {
+			await client.labrinth.notifications_v2.markAsRead(String(notification.id))
+		} catch (error) {
+			if (error instanceof ModrinthApiError && error.statusCode === 404) return
+			throw error
+		}
 	}
 
 	async function resolveInvite(invite: SharedInstanceInvite) {

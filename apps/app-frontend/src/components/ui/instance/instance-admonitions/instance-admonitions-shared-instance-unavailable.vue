@@ -7,8 +7,8 @@
 		@dismiss="emit('dismiss')"
 	>
 		{{ formatSharedInstanceUnavailable(reason ?? null, manager) }}
-		<template #actions>
-			<ButtonStyled v-if="reason === 'quarantined'" color="orange">
+		<template v-if="reason === 'quarantined'" #actions>
+			<ButtonStyled color="orange">
 				<button class="!h-10" @click="emit('delete')">
 					<TrashIcon aria-hidden="true" />
 					{{ formatMessage(messages.deleteInstance) }}

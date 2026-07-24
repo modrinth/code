@@ -10,67 +10,66 @@
 		:on-hide="handleHide"
 		:max-width="reportMode ? '816px' : '544px'"
 		:width="reportMode ? '816px' : '544px'"
-		no-padding
-		scrollable
+		:no-padding="reportMode"
+		:scrollable="reportMode"
 	>
-		<div v-if="preview" class="flex w-full flex-col gap-6 p-6 pb-2">
-			<Admonition
-				:type="reportMode ? 'info' : 'warning'"
-				:header="reportMode ? undefined : formatMessage(messages.trustWarningHeader)"
-			>
-				<template v-if="reportMode">
-					<div class="flex flex-col gap-2">
-						<p class="m-0">
-							<IntlFormatted :message-id="messages.reportDescription">
-								<template #rules-link="{ children }">
-									<AutoLink class="text-link hover:underline" to="https://modrinth.com/legal/rules">
+		<div
+			v-if="preview"
+			class="flex w-full flex-col gap-6"
+			:class="{ 'p-6 pb-2': reportMode }"
+		>
+			<Admonition v-if="reportMode" type="info">
+				<div class="flex flex-col gap-2">
+					<p class="m-0">
+						<IntlFormatted :message-id="messages.reportDescription">
+							<template #rules-link="{ children }">
+								<AutoLink class="text-link hover:underline" to="https://modrinth.com/legal/rules">
+									<component :is="() => children" />
+								</AutoLink>
+							</template>
+							<template #terms-link="{ children }">
+								<AutoLink class="text-link hover:underline" to="https://modrinth.com/legal/terms">
+									<component :is="() => children" />
+								</AutoLink>
+							</template>
+						</IntlFormatted>
+					</p>
+					<ul class="m-0 list-disc pl-5">
+						<li>
+							<IntlFormatted :message-id="messages.supportAndBugReports">
+								<template #support-link="{ children }">
+									<AutoLink class="text-link hover:underline" to="https://support.modrinth.com">
 										<component :is="() => children" />
 									</AutoLink>
 								</template>
-								<template #terms-link="{ children }">
-									<AutoLink class="text-link hover:underline" to="https://modrinth.com/legal/terms">
+								<template #github-link="{ children }">
+									<AutoLink
+										class="text-link hover:underline"
+										to="https://github.com/modrinth/code/issues"
+									>
 										<component :is="() => children" />
 									</AutoLink>
 								</template>
 							</IntlFormatted>
-						</p>
-						<ul class="m-0 list-disc pl-5">
-							<li>
-								<IntlFormatted :message-id="messages.supportAndBugReports">
-									<template #support-link="{ children }">
-										<AutoLink class="text-link hover:underline" to="https://support.modrinth.com">
-											<component :is="() => children" />
-										</AutoLink>
-									</template>
-									<template #github-link="{ children }">
-										<AutoLink
-											class="text-link hover:underline"
-											to="https://github.com/modrinth/code/issues"
-										>
-											<component :is="() => children" />
-										</AutoLink>
-									</template>
-								</IntlFormatted>
-							</li>
-							<li>
-								<IntlFormatted :message-id="messages.legalClaims">
-									<template #copyright-link="{ children }">
-										<AutoLink
-											class="text-link hover:underline"
-											to="https://modrinth.com/legal/copyright"
-										>
-											<component :is="() => children" />
-										</AutoLink>
-									</template>
-								</IntlFormatted>
-							</li>
-						</ul>
-					</div>
-				</template>
-				<template v-else>
-					{{ formatMessage(messages.trustWarningDescription) }}
-				</template>
+						</li>
+						<li>
+							<IntlFormatted :message-id="messages.legalClaims">
+								<template #copyright-link="{ children }">
+									<AutoLink
+										class="text-link hover:underline"
+										to="https://modrinth.com/legal/copyright"
+									>
+										<component :is="() => children" />
+									</AutoLink>
+								</template>
+							</IntlFormatted>
+						</li>
+					</ul>
+				</div>
 			</Admonition>
+			<p v-else class="m-0 text-primary">
+				{{ formatMessage(messages.inviteWarning) }}
+			</p>
 			<SharedInstanceInstallSummary
 				:preview="preview"
 				:heading="reportMode ? formatMessage(messages.contentYouAreReporting) : undefined"
@@ -166,30 +165,14 @@
 			<p v-if="!reportMode && hasExternalFiles" class="m-0 text-primary">
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
-		</div>
-		<template #actions>
-			<div class="flex justify-between gap-2">
-				<div>
-					<ButtonStyled v-if="!reportMode" color="red" type="transparent">
-						<button @click="reportMode = true">
-							<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-				<div class="flex gap-2">
-					<ButtonStyled v-if="reportMode" type="outlined">
-						<button class="!border" :disabled="submitLoading" @click="handleCancel">
-							<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="reportMode" color="brand">
-						<button :disabled="!canSubmitReport" @click="submitReport">
-							<SpinnerIcon v-if="submitLoading" class="animate-spin" />
-							<SendIcon v-else />
-							{{ formatMessage(commonMessages.reportButton) }}
-						</button>
-					</ButtonStyled>
-					<template v-else-if="hasExternalFiles">
+			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
+				<ButtonStyled color="red" type="transparent">
+					<button @click="reportMode = true">
+						<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
+					</button>
+				</ButtonStyled>
+				<div class="flex items-center gap-2">
+					<template v-if="hasExternalFiles">
 						<ButtonStyled type="transparent" color="orange">
 							<button @click="accept">
 								{{ formatMessage(messages.installAnyway) }}
@@ -214,6 +197,22 @@
 						</ButtonStyled>
 					</template>
 				</div>
+			</div>
+		</div>
+		<template v-if="reportMode" #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled type="outlined">
+					<button class="!border" :disabled="submitLoading" @click="handleCancel">
+						<XIcon />{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!canSubmitReport" @click="submitReport">
+						<SpinnerIcon v-if="submitLoading" class="animate-spin" />
+						<SendIcon v-else />
+						{{ formatMessage(commonMessages.reportButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -437,14 +436,10 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.shared-instance-content',
 		defaultMessage: 'Shared instance content',
 	},
-	trustWarningHeader: {
-		id: 'app.modal.install-to-play.trust-warning-header',
-		defaultMessage: 'Do you trust this user?',
-	},
-	trustWarningDescription: {
-		id: 'app.modal.install-to-play.trust-warning-description',
+	inviteWarning: {
+		id: 'app.modal.install-to-play.invite-warning',
 		defaultMessage:
-			'A shared instance will install files on your computer and may include content not from Modrinth.',
+			'This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust.',
 	},
 	reportDescription: {
 		id: 'app.modal.install-to-play.report-description',
