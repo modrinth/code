@@ -1,6 +1,6 @@
 import type { InvitePlayersUser } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, ref, watch } from 'vue'
+import { computed, type Ref, watch } from 'vue'
 
 import { get_user_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
@@ -18,7 +18,6 @@ import { normalizeInviteKey, type ShareRow } from './shared-instance-share-types
 type MutationContext = {
 	queryKey: readonly ['sharedInstanceUsers', string]
 	previousRows?: ShareRow[]
-	previousPendingRows: Record<string, ShareRow>
 }
 
 type RemoveMemberVariables = {
@@ -36,7 +35,6 @@ export function useSharedInstanceMembers(options: {
 }) {
 	const queryClient = useQueryClient()
 	const queryKey = computed(() => ['sharedInstanceUsers', options.instance.value.id] as const)
-	const pendingRows = ref<Record<string, ShareRow>>(loadPendingRows(options.instance.value.id))
 
 	async function usersToRows(users: SharedInstanceUsers): Promise<ShareRow[]> {
 		const excludedIds = new Set(
@@ -70,9 +68,7 @@ export function useSharedInstanceMembers(options: {
 
 	async function loadRows() {
 		if (options.actionsLocked.value) return []
-		const loadedRows = await usersToRows(await get_shared_instance_users(options.instance.value.id))
-		removePendingRows(loadedRows.map((row) => row.id))
-		return loadedRows
+		return await usersToRows(await get_shared_instance_users(options.instance.value.id))
 	}
 
 	const query = useQuery({
@@ -88,14 +84,8 @@ export function useSharedInstanceMembers(options: {
 		() => query.data.value ?? queryClient.getQueryData<ShareRow[]>(queryKey.value) ?? [],
 	)
 	const rows = computed(() => {
-		if (options.actionsLocked.value) return remoteRows.value
-		const remoteIds = new Set(remoteRows.value.map((row) => normalizeInviteKey(row.id)))
-		return [
-			...Object.values(pendingRows.value).filter(
-				(row) => !remoteIds.has(normalizeInviteKey(row.id)),
-			),
-			...remoteRows.value,
-		]
+		if (!options.instance.value.shared_instance) return []
+		return remoteRows.value
 	})
 
 	const inviteMutation = useMutation({
@@ -109,13 +99,11 @@ export function useSharedInstanceMembers(options: {
 			const context = {
 				queryKey: currentKey,
 				previousRows: queryClient.getQueryData<ShareRow[]>(currentKey),
-				previousPendingRows: pendingRows.value,
 			}
-			setPendingRow(user)
+			upsert(inviteUserToRow(user))
 			return context
 		},
-		onError: (error, user, context) => {
-			removePendingRow(user.id)
+		onError: (error, _user, context) => {
 			restore(context)
 			options.onError(error)
 		},
@@ -151,12 +139,10 @@ export function useSharedInstanceMembers(options: {
 			const context = {
 				queryKey: currentKey,
 				previousRows: queryClient.getQueryData<ShareRow[]>(currentKey),
-				previousPendingRows: pendingRows.value,
 			}
 			queryClient.setQueryData<ShareRow[]>(currentKey, (currentRows = []) =>
 				currentRows.filter((row) => normalizeInviteKey(row.id) !== normalizeInviteKey(id)),
 			)
-			removePendingRow(id)
 			return context
 		},
 		onError: (error, _variables, context) => {
@@ -198,32 +184,6 @@ export function useSharedInstanceMembers(options: {
 		})
 	}
 
-	function setPendingRow(user: InvitePlayersUser) {
-		pendingRows.value = { ...pendingRows.value, [user.id]: inviteUserToRow(user) }
-		savePendingRows()
-	}
-
-	function removePendingRow(id: string) {
-		const normalizedId = normalizeInviteKey(id)
-		pendingRows.value = Object.fromEntries(
-			Object.entries(pendingRows.value).filter(
-				([pendingId]) => normalizeInviteKey(pendingId) !== normalizedId,
-			),
-		)
-		savePendingRows()
-	}
-
-	function removePendingRows(ids: string[]) {
-		if (ids.length === 0) return
-		const normalizedIds = new Set(ids.map(normalizeInviteKey))
-		pendingRows.value = Object.fromEntries(
-			Object.entries(pendingRows.value).filter(
-				([id]) => !normalizedIds.has(normalizeInviteKey(id)),
-			),
-		)
-		savePendingRows()
-	}
-
 	function upsert(row: ShareRow) {
 		queryClient.setQueryData<ShareRow[]>(queryKey.value, (currentRows = []) => [
 			row,
@@ -240,23 +200,19 @@ export function useSharedInstanceMembers(options: {
 		} else {
 			queryClient.setQueryData(context.queryKey, context.previousRows)
 		}
-		pendingRows.value = context.previousPendingRows
-		savePendingRows()
-	}
-
-	function savePendingRows() {
-		if (typeof localStorage === 'undefined') return
-		const key = pendingRowsStorageKey(options.instance.value.id)
-		const storedRows = Object.values(pendingRows.value)
-		if (storedRows.length === 0) localStorage.removeItem(key)
-		else localStorage.setItem(key, JSON.stringify(storedRows))
 	}
 
 	watch(
-		() => options.instance.value.id,
-		(instanceId) => {
-			pendingRows.value = loadPendingRows(instanceId)
+		() => ({
+			instanceId: options.instance.value.id,
+			isShared: !!options.instance.value.shared_instance,
+		}),
+		({ instanceId, isShared }) => {
+			if (!isShared) {
+				queryClient.setQueryData<ShareRow[]>(['sharedInstanceUsers', instanceId], [])
+			}
 		},
+		{ immediate: true },
 	)
 
 	return { rows, query, find, invite, remove }
@@ -288,25 +244,4 @@ function inviteUserToRow(user: InvitePlayersUser): ShareRow {
 		method: 'direct',
 		pending: true,
 	}
-}
-
-function loadPendingRows(instanceId: string): Record<string, ShareRow> {
-	if (typeof localStorage === 'undefined') return {}
-	try {
-		const stored = localStorage.getItem(pendingRowsStorageKey(instanceId))
-		if (!stored) return {}
-		const rows = JSON.parse(stored) as ShareRow[]
-		return Object.fromEntries(
-			rows.map((row) => [
-				row.id,
-				{ ...row, lastPlayedAt: null, joinedAt: null, pending: true } satisfies ShareRow,
-			]),
-		)
-	} catch {
-		return {}
-	}
-}
-
-function pendingRowsStorageKey(instanceId: string) {
-	return `modrinth:shared-instance-pending-users:${instanceId}`
 }

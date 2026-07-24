@@ -30,7 +30,7 @@ async function unpublishSharedInstance() {
 	unpublishing.value = true
 	try {
 		await unpublish_shared_instance(instance.value.id)
-		await queryClient.invalidateQueries({ queryKey: ['sharedInstanceUsers', instance.value.id] })
+		queryClient.setQueryData(['sharedInstanceUsers', instance.value.id], [])
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
 		onUnlinked()
 	} catch (error) {
