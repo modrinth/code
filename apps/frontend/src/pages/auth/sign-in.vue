@@ -4,7 +4,6 @@
 		v-model:password="password"
 		v-model:token="token"
 		v-model:two-factor-code="twoFactorCode"
-		:subtle-launcher-redirect-uri="subtleLauncherRedirectUri"
 		:flow="flow"
 		:redirect-target="redirectTarget"
 		:route-query="route.query"
@@ -114,7 +113,6 @@ if (route.query.state !== undefined) {
 }
 
 const redirectTarget = getQueryString(route.query.redirect)
-const subtleLauncherRedirectUri = ref<string>()
 
 if (route.query.code) {
 	await finishSignIn()
@@ -230,20 +228,10 @@ async function finishSignIn(sessionToken?: string | null) {
 
 		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
 
-		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
-			await navigateTo(redirectUrl, {
-				external: true,
-			})
-		} else {
-			// When redirecting to localhost, the auth token is very visible in the URL to the user.
-			// While we could make it harder to find with a POST request, such is security by obscurity:
-			// the user and other applications would still be able to sniff the token in the request body.
-			// So, to make the UX a little better by not changing the displayed URL, while keeping the
-			// token hidden from very casual observation and keeping the protocol as close to OAuth's
-			// standard flows as possible, let's execute the redirect within an iframe that visually
-			// covers the entire page.
-			subtleLauncherRedirectUri.value = redirectUrl
-		}
+		await navigateTo(redirectUrl, {
+			external: true,
+			replace: true,
+		})
 
 		return
 	}
