@@ -117,8 +117,8 @@ jobs:
 
       - name: Install apt dependencies
         run: |
-          apt-get update
-          apt-get install -y cmake libcurl4-openssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get update
+          sudo apt-get install -y cmake libcurl4-openssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0

@@ -122,8 +122,8 @@ jobs:
       - name: Install Linux build dependencies
         if: contains(matrix.platform, 'ubuntu')
         run: |
-          apt-get update
-          apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Setup Dasel
         uses: jaxxstorm/action-install-gh-release@25e24d2d23ae098373794ef1d6faecb48ee52da8 # v3.0.0
