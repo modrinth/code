@@ -3,6 +3,7 @@ import {
 	ClipboardCopyIcon,
 	EyeIcon,
 	FolderOpenIcon,
+	MinusIcon,
 	PlayIcon,
 	PlusIcon,
 	StopCircleIcon,
@@ -48,7 +49,8 @@ const {
 				:key="instance.id + instance.install_stage"
 				:instance="instance"
 				@contextmenu.prevent.stop="
-					(event: MouseEvent) => handleInstanceContextMenu(event, instance.id)
+					(event: MouseEvent) =>
+						handleInstanceContextMenu(event, instance.id, instanceGroup.key)
 				"
 			/>
 		</section>
@@ -63,6 +65,7 @@ const {
 		<template #delete> <TrashIcon /> Delete </template>
 		<template #open> <FolderOpenIcon /> Open folder </template>
 		<template #copy> <ClipboardCopyIcon /> Copy path </template>
+		<template #remove_from_group> <MinusIcon /> Remove from group </template>
 	</ContextMenu>
 </template>
 

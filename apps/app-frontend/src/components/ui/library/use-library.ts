@@ -13,7 +13,7 @@ import {
 
 import { get_project_v3_many } from '@/helpers/cache.js'
 import { install_duplicate_instance } from '@/helpers/install'
-import { remove } from '@/helpers/instance'
+import { edit, remove } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
 export const libraryFilterOptions = [
@@ -73,9 +73,14 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const activeFilter = ref<LibraryFilter>('All instances')
 	const serverProjectIds = ref(new Set<string>())
 	const isNewGroupModalOpen = ref(false)
+	const newGroupName = ref('')
+	const newGroupSearch = ref('')
+	const selectedNewGroupInstanceIds = ref(new Set<string>())
+	const creatingGroup = ref(false)
 	const instanceOptions = ref<InstanceContextMenu | null>(null)
 	const instanceComponents = ref<InstanceCard[]>([])
 	const currentDeleteInstanceId = ref<string | null>(null)
+	const currentContextGroupName = ref<string | null>(null)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
 
 	const displayState = useStorage<{
@@ -95,6 +100,46 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const linkedInstances = computed(() => instances.value.filter((instance) => instance.link))
 	const collapsedSectionKeys = computed(() => new Set(displayState.value.collapsedGroups))
+	const groupNames = computed(
+		() =>
+			new Set(
+				instances.value
+					.flatMap((instance) => instance.groups)
+					.map((group) => group.trim())
+					.filter(Boolean),
+			),
+	)
+	const existingGroupNames = computed(
+		() =>
+			new Set([
+				'none',
+				...Array.from(groupNames.value, (group) => group.toLowerCase()),
+			]),
+	)
+	const normalizedNewGroupName = computed(() => newGroupName.value.trim().substring(0, 32))
+	const newGroupNameExists = computed(() =>
+		existingGroupNames.value.has(normalizedNewGroupName.value.toLowerCase()),
+	)
+	const newGroupInstances = computed(() => {
+		const query = newGroupSearch.value.trim().toLowerCase()
+
+		return instances.value
+			.filter((instance) => !query || instance.name.toLowerCase().includes(query))
+			.slice()
+			.sort((a, b) => {
+				const groupedDifference = Number(a.groups.length > 0) - Number(b.groups.length > 0)
+				if (groupedDifference !== 0) return groupedDifference
+
+				return a.name.localeCompare(b.name)
+			})
+	})
+	const canCreateGroup = computed(
+		() =>
+			normalizedNewGroupName.value.length > 0 &&
+			selectedNewGroupInstanceIds.value.size > 0 &&
+			!newGroupNameExists.value &&
+			!creatingGroup.value,
+	)
 
 	watchEffect(async () => {
 		const projectIds = [
@@ -231,11 +276,55 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	const openNewGroupModal = () => {
+		let groupNumber = groupNames.value.size + 1
+		while (existingGroupNames.value.has(`group ${groupNumber}`.toLowerCase())) {
+			groupNumber++
+		}
+
+		newGroupName.value = `Group ${groupNumber}`
+		newGroupSearch.value = ''
+		selectedNewGroupInstanceIds.value = new Set()
 		isNewGroupModalOpen.value = true
 	}
 
 	const closeNewGroupModal = () => {
 		isNewGroupModalOpen.value = false
+	}
+
+	const toggleNewGroupInstance = (instanceId: string) => {
+		const selectedIds = new Set(selectedNewGroupInstanceIds.value)
+
+		if (selectedIds.has(instanceId)) {
+			selectedIds.delete(instanceId)
+		} else {
+			selectedIds.add(instanceId)
+		}
+
+		selectedNewGroupInstanceIds.value = selectedIds
+	}
+
+	const createGroup = async () => {
+		if (!canCreateGroup.value) return false
+
+		creatingGroup.value = true
+
+		try {
+			await Promise.all(
+				instances.value
+					.filter((instance) => selectedNewGroupInstanceIds.value.has(instance.id))
+					.map((instance) =>
+						edit(instance.id, {
+							groups: [normalizedNewGroupName.value],
+						}),
+					),
+			)
+			return true
+		} catch (error) {
+			handleError(error)
+			return false
+		} finally {
+			creatingGroup.value = false
+		}
 	}
 
 	const deleteInstance = async () => {
@@ -249,11 +338,20 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		await install_duplicate_instance(instanceId).catch(handleError)
 	}
 
-	const handleInstanceContextMenu = (event: MouseEvent, instanceId: string) => {
+	const handleInstanceContextMenu = (
+		event: MouseEvent,
+		instanceId: string,
+		instanceGroupName: string,
+	) => {
 		const item = instanceComponents.value.find(
 			(instanceComponent) => instanceComponent.instance.id === instanceId,
 		)
 		if (!item) return
+
+		currentContextGroupName.value =
+			displayState.value.group === 'Group' && instanceGroupName !== 'None'
+				? instanceGroupName
+				: null
 
 		const baseOptions = [
 			...(item.instance.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
@@ -261,7 +359,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			{ name: 'duplicate' },
 			{ name: 'open' },
 			{ name: 'copy' },
-			{ type: 'divider' },
+			...(currentContextGroupName.value
+				? [{ name: 'remove_from_group' }, { type: 'divider' }]
+				: [{ type: 'divider' }]),
 			{ name: 'delete', color: 'danger' },
 		]
 
@@ -302,6 +402,14 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			case 'copy':
 				await navigator.clipboard.writeText(item.instance.id)
 				break
+			case 'remove_from_group':
+				if (currentContextGroupName.value) {
+					const groupName = currentContextGroupName.value
+					await edit(item.instance.id, {
+						groups: item.instance.groups.filter((group) => group !== groupName),
+					}).catch(handleError)
+				}
+				break
 			case 'delete':
 				currentDeleteInstanceId.value = item.instance.id
 				confirmDeleteModal.value?.show()
@@ -315,6 +423,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		displayState,
 		instanceGroups,
 		isNewGroupModalOpen,
+		newGroupName,
+		newGroupSearch,
+		selectedNewGroupInstanceIds,
+		creatingGroup,
+		newGroupNameExists,
+		newGroupInstances,
+		canCreateGroup,
 		instanceOptions,
 		instanceComponents,
 		confirmDeleteModal,
@@ -322,6 +437,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		setSectionCollapsed,
 		openNewGroupModal,
 		closeNewGroupModal,
+		toggleNewGroupInstance,
+		createGroup,
 		deleteInstance,
 		handleInstanceContextMenu,
 		handleInstanceOption,
