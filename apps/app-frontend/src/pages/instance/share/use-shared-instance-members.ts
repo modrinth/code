@@ -1,6 +1,6 @@
 import type { InvitePlayersUser } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 
 import { get_user_many } from '@/helpers/cache.js'
 import {
@@ -26,12 +26,14 @@ type OptimisticChange = {
 type InviteVariables = {
 	user: InvitePlayersUser
 	change: OptimisticChange
+	exclusive: boolean
 }
 
 type RemoveVariables = {
 	id: string
 	hasPendingRecipients: boolean
 	change: OptimisticChange
+	exclusive: boolean
 }
 
 export function useSharedInstanceMembers(options: {
@@ -45,6 +47,7 @@ export function useSharedInstanceMembers(options: {
 	const queryKey = computed(() => ['sharedInstanceUsers', options.instance.value.id] as const)
 	const invitingUserIds = new Set<string>()
 	const removingUserIds = new Set<string>()
+	const exclusiveMutationPending = ref(false)
 
 	const query = useQuery({
 		queryKey,
@@ -65,8 +68,9 @@ export function useSharedInstanceMembers(options: {
 			rollback(change)
 			options.onError(error)
 		},
-		onSettled: (_data, _error, { user }) => {
+		onSettled: (_data, _error, { user, exclusive }) => {
 			invitingUserIds.delete(normalizeInviteKey(user.id))
+			if (exclusive) exclusiveMutationPending.value = false
 		},
 	})
 
@@ -77,8 +81,9 @@ export function useSharedInstanceMembers(options: {
 			rollback(change)
 			options.onError(error)
 		},
-		onSettled: (_data, _error, { id }) => {
+		onSettled: (_data, _error, { id, exclusive }) => {
 			removingUserIds.delete(normalizeInviteKey(id))
+			if (exclusive) exclusiveMutationPending.value = false
 		},
 	})
 
@@ -133,23 +138,34 @@ export function useSharedInstanceMembers(options: {
 		const normalizedId = normalizeInviteKey(user.id)
 		if (
 			options.actionsLocked.value ||
+			exclusiveMutationPending.value ||
 			invitingUserIds.has(normalizedId) ||
 			find(user.id, user.username)
 		) {
 			return
 		}
 
+		const exclusive = rows.value.length === 0
 		invitingUserIds.add(normalizedId)
+		if (exclusive) exclusiveMutationPending.value = true
 		const change = beginOptimisticChange(user.id)
 		updateRows(change.queryKey, (currentRows) => [...currentRows, inviteUserToRow(user)])
-		inviteMutation.mutate({ user, change })
+		inviteMutation.mutate({ user, change, exclusive })
 	}
 
 	function remove(id: string) {
 		const normalizedId = normalizeInviteKey(id)
-		if (options.actionsLocked.value || removingUserIds.has(normalizedId)) return
+		if (
+			options.actionsLocked.value ||
+			exclusiveMutationPending.value ||
+			removingUserIds.has(normalizedId)
+		) {
+			return
+		}
 
+		const exclusive = rows.value.length === 1
 		removingUserIds.add(normalizedId)
+		if (exclusive) exclusiveMutationPending.value = true
 		const hasPendingRecipients = rows.value.some(
 			(row) => row.pending && normalizeInviteKey(row.id) !== normalizedId,
 		)
@@ -157,7 +173,7 @@ export function useSharedInstanceMembers(options: {
 		updateRows(change.queryKey, (currentRows) =>
 			currentRows.filter((row) => normalizeInviteKey(row.id) !== normalizedId),
 		)
-		removeMutation.mutate({ id, hasPendingRecipients, change })
+		removeMutation.mutate({ id, hasPendingRecipients, change, exclusive })
 	}
 
 	function beginOptimisticChange(userId: string): OptimisticChange {
@@ -197,7 +213,7 @@ export function useSharedInstanceMembers(options: {
 		queryClient.setQueryData<ShareRow[]>(activeQueryKey, (currentRows = []) => update(currentRows))
 	}
 
-	return { rows, query, find, invite, remove }
+	return { rows, query, exclusiveMutationPending, find, invite, remove }
 }
 
 function userEntries(users: SharedInstanceUsers): SharedInstanceUser[] {
