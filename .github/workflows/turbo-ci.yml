@@ -22,7 +22,7 @@ jobs:
     if: ${{ always() }}
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check if workflow runs on an internal branch
         id: check-internal
@@ -62,7 +62,7 @@ jobs:
 
   build:
     name: Lint and Test
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'blacksmith-4vcpu-ubuntu-2404' || 'ubuntu-latest' }}
+    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-modrinth-turbo' || 'ubuntu-latest' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
 
@@ -76,11 +76,8 @@ jobs:
       # since we don't want warnings to become errors
       # while developing)
       RUSTFLAGS: -Dwarnings
-      # sccache config (only populated for internal branches; secrets aren't
-      # available to forked PRs, and blacksmith stickydisk requires a
-      # blacksmith runner)
-      SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
-      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
+      # sccache config
+      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '20G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
       CARGO_INCREMENTAL: 0
       # Redis config for tests
@@ -92,38 +89,42 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
 
-      - name: Install build dependencies
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
-        with:
-          packages: cmake libcurl4-openssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
-          version: v2 # cache key
-
       - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
 
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Restore pnpm cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Set up caches
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
-          path: ${{ steps.pnpm-store.outputs.store-path }}
-          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-cache-
+          cache: |
+            rust
+            pnpm
+            apt
+
+      - name: Set up Turborepo caching
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
+
+      - name: Configure sccache
+        if: needs.skip-if-clean.outputs.internal == 'true'
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
+
+      - name: Install apt dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake libcurl4-openssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           rustflags: ''
           components: clippy, rustfmt
@@ -132,28 +133,11 @@ jobs:
       - name: Setup mold
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
-      - name: Cache Cargo registry and index
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-          key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Mount sccache disk cache
-        if: needs.skip-if-clean.outputs.internal == 'true'
-        uses: useblacksmith/stickydisk@13af8883542ca949a717e70fef89d15edbb29d88 # v1.2.0
-        with:
-          key: ${{ github.repository }}-turbo-sccache
-          path: /mnt/sccache
-
       - name: Setup sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Setup binstall
-        uses: cargo-bins/cargo-binstall@dc19f1e48450eefe5a29b8da6c6b00a87d730b37 # v1.18.1
+        uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # v1.21.0
 
       - name: Setup nextest
         run: cargo binstall --no-confirm --secure --locked cargo-nextest@0.9.133
@@ -161,15 +145,12 @@ jobs:
       # cargo-binstall does not have pre-built binaries for sqlx-cli, so we fall
       # back to a cached cargo install
       - name: Setup cargo-sqlx
-        uses: taiki-e/cache-cargo-install-action@f9eed3e4680f27610dc6d8c67be1b88593f7dade # v3.0.6
+        uses: taiki-e/cache-cargo-install-action@417450f3c33ee20393705369577571770643d4c7 # v3.0.7
         with:
           tool: sqlx-cli@0.8.6
           locked: false
           no-default-features: true
           features: rustls,postgres
-
-      - name: Setup Turbo cache
-        uses: rharkor/caching-for-turbo@56219402aacc0d06b650d898c222996dbc1191ec # v2.3.14
 
       - name: Install dependencies
         run: pnpm install
