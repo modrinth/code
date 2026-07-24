@@ -56,7 +56,9 @@
 				<span class="text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_project="{ row, value }">
+				<span v-if="isGroupedBreakdown('project')" class="mr-2.5 text-primary">{{ value }}</span>
 				<ProjectCell
+					v-else
 					:label="getProjectCellLabel(value)"
 					:icon-url="getProjectIconUrl(row.breakdownValues.project)"
 					:icon-tooltip="getProjectCellLabel(value)"
@@ -78,8 +80,10 @@
 				<span class="mr-2.5 text-primary">{{ value }}</span>
 			</template>
 			<template #cell-breakdown_user_id="{ row, value }">
+				<span v-if="isGroupedBreakdown('user_id')" class="mr-2.5 text-primary">{{ value }}</span>
 				<component
 					:is="getUserPageHref(row.breakdownValues.user_id) ? 'a' : 'span'"
+					v-else
 					:href="getUserPageHref(row.breakdownValues.user_id)"
 					:target="getUserPageHref(row.breakdownValues.user_id) ? '_blank' : undefined"
 					:rel="getUserPageHref(row.breakdownValues.user_id) ? 'noopener noreferrer' : undefined"
@@ -104,7 +108,11 @@
 				</component>
 			</template>
 			<template #cell-breakdown_dependent_project_download="{ row, value }">
+				<span v-if="isGroupedBreakdown('dependent_project_download')" class="mr-2.5 text-primary">
+					{{ value }}
+				</span>
 				<ProjectCell
+					v-else
 					:label="getProjectCellLabel(value)"
 					:icon-url="
 						isMissingDependentProjectValue(row.breakdownValues.dependent_project_download)
@@ -124,8 +132,10 @@
 				/>
 			</template>
 			<template #cell-breakdown_version_id="{ row, value }">
+				<span v-if="isGroupedBreakdown('version_id')" class="mr-2.5 text-primary">{{ value }}</span>
 				<component
 					:is="getVersionPageHref(row.projectVersionId) ? 'a' : 'span'"
+					v-else
 					v-tooltip="getVersionProjectName(row.projectVersionId)"
 					:href="getVersionPageHref(row.projectVersionId)"
 					:target="getVersionPageHref(row.projectVersionId) ? '_blank' : undefined"
@@ -276,6 +286,7 @@ const {
 	displayedSelectedGroupBy: selectedGroupBy,
 	displayedSelectedBreakdowns: selectedBreakdowns,
 	displayedSelectedFilters: selectedFilters,
+	resolvedActiveBreakdownGroup,
 	displayedFetchRequest: fetchRequest,
 	displayedTimeSlices: timeSlices,
 	activeStat,
@@ -407,9 +418,11 @@ const emptyTableMessage = computed(() => {
 })
 
 const breakdownColumnLabel = computed(() =>
-	selectedBreakdowns.value.length === 1
-		? getAnalyticsTableBreakdownColumnLabel(selectedBreakdowns.value[0], formatMessage)
-		: formatMessage(analyticsBreakdownMessages.breakdown),
+	resolvedActiveBreakdownGroup.value
+		? resolvedActiveBreakdownGroup.value.name
+		: selectedBreakdowns.value.length === 1
+			? getAnalyticsTableBreakdownColumnLabel(selectedBreakdowns.value[0], formatMessage)
+			: formatMessage(analyticsBreakdownMessages.breakdown),
 )
 const relevantStats = computed(
 	() =>
@@ -430,6 +443,7 @@ function buildTableRows(mode: AnalyticsTableMode) {
 		fetchRequest: fetchRequest.value,
 		timeSlices: timeSlices.value,
 		selectedBreakdowns: selectedBreakdowns.value,
+		breakdownGroup: resolvedActiveBreakdownGroup.value,
 		selectedProjectIds: selectedProjectIdSet.value,
 		selectedFilters: selectedFilters.value,
 		dependentProjectTypesById: dependentProjectTypesById.value,
@@ -454,6 +468,7 @@ function buildColumns(includeDate: boolean) {
 		selectedBreakdowns: selectedBreakdowns.value,
 		selectedFilters: selectedFilters.value,
 		showBreakdownColumn: showBreakdownColumn.value,
+		breakdownGroup: resolvedActiveBreakdownGroup.value,
 		formatMessage,
 		getRelevantAnalyticsDashboardStats,
 	})
@@ -461,6 +476,10 @@ function buildColumns(includeDate: boolean) {
 
 function getProjectIconUrl(projectId: string | undefined) {
 	return projectId ? projectIconUrlsById.value.get(projectId) : undefined
+}
+
+function isGroupedBreakdown(breakdown: string) {
+	return resolvedActiveBreakdownGroup.value?.breakdown === breakdown
 }
 
 function getProjectOrganizationName(projectId: string | undefined) {
@@ -592,6 +611,7 @@ watch(
 		selectedProjectIds,
 		selectedGroupBy,
 		selectedBreakdowns,
+		resolvedActiveBreakdownGroup,
 		selectedFilters,
 		projects,
 		dependentProjectTypesById,

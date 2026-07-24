@@ -1205,6 +1205,7 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 	switch (event.key) {
 		case 'Escape':
 			event.preventDefault()
+			event.stopPropagation()
 			closeDropdown()
 			break
 		case 'ArrowDown':
@@ -1355,7 +1356,7 @@ onClickOutside(
 	() => {
 		closeDropdown()
 	},
-	{ ignore: [triggerRef, containerRef, '.v-popper__popper'] },
+	{ ignore: [triggerRef, containerRef, '.v-popper__popper', '[data-multi-select-submenu]'] },
 )
 
 onMounted(() => {

@@ -5,6 +5,7 @@ import { computed, type ComputedRef, ref, watch } from 'vue'
 import { useTheme } from '~/composables/nuxt-accessors'
 import { isDarkTheme } from '~/plugins/theme/index.ts'
 import type {
+	AnalyticsBreakdownGroup,
 	AnalyticsBreakdownPreset,
 	AnalyticsDashboardContextValue,
 	AnalyticsDashboardProject,
@@ -51,6 +52,7 @@ export function useAnalyticsChartDatasets(
 		| 'displayedSelectedGroupBy'
 		| 'displayedSelectedBreakdowns'
 		| 'displayedSelectedFilters'
+		| 'resolvedActiveBreakdownGroup'
 		| 'hiddenGraphDatasetIds'
 		| 'hasExplicitGraphDatasetSelection'
 		| 'isGraphDatasetSelectionActive'
@@ -175,6 +177,7 @@ export function useAnalyticsChartDatasets(
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
 			sliceCount.value,
+			context.resolvedActiveBreakdownGroup.value,
 		),
 	)
 	const previousChartDatasetsByStat = computed<Record<AnalyticsDashboardStat, ChartDataset[]>>(() =>
@@ -191,6 +194,7 @@ export function useAnalyticsChartDatasets(
 			showProjectVersionNames.value ? context.getVersionProjectName : undefined,
 			formatMessage,
 			sliceCount.value,
+			context.resolvedActiveBreakdownGroup.value,
 		),
 	)
 	const allChartDatasets = computed(() => chartDatasetsByStat.value[context.activeStat.value])
@@ -384,6 +388,7 @@ function buildDatasetsByStat(
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
 	sliceCount: number,
+	breakdownGroup: AnalyticsBreakdownGroup | null,
 ) {
 	const datasetsByStat = {} as Record<AnalyticsDashboardStat, ChartDataset[]>
 	for (const stat of ANALYTICS_DASHBOARD_STATS) {
@@ -401,6 +406,7 @@ function buildDatasetsByStat(
 			getVersionProjectName,
 			formatMessage,
 			sliceCount,
+			breakdownGroup,
 		)
 	}
 	return datasetsByStat

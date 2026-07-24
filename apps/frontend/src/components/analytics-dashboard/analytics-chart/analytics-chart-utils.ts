@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 
 import {
+	type AnalyticsBreakdownGroup,
 	type AnalyticsBreakdownPreset,
 	type AnalyticsDashboardProject,
 	type AnalyticsDashboardStat,
@@ -17,6 +18,7 @@ import {
 	analyticsStatCardMessages,
 	formatAnalyticsDependentProjectFallbackLabel,
 	formatAnalyticsDownloadReasonLabel,
+	formatAnalyticsDownloadSourceLabel,
 	formatAnalyticsLoaderLabel,
 	formatAnalyticsMonetizationLabel,
 } from '../analytics-messages'
@@ -30,6 +32,10 @@ import {
 	isUnknownAnalyticsBreakdownValue,
 	UNKNOWN_BREAKDOWN_VALUE,
 } from '../breakdown'
+import {
+	applyAnalyticsBreakdownGroup,
+	getAnalyticsBreakdownGroupSeriesName,
+} from '../breakdown-groups'
 import { PREVIOUS_PERIOD_DATASET_ID_PREFIX } from './analytics-chart-constants'
 
 export type ChartDataset = {
@@ -167,6 +173,9 @@ export function formatBreakdownLabel(
 	}
 	if (selectedBreakdown === 'download_reason') {
 		return formatAnalyticsDownloadReasonLabel(normalizedLowercaseValue, formatMessage)
+	}
+	if (selectedBreakdown === 'user_agent') {
+		return formatAnalyticsDownloadSourceLabel(normalizedValue, formatMessage)
 	}
 	if (selectedBreakdown === 'dependent_project_download') {
 		if (isNoDependentAnalyticsBreakdownValue(breakdownValue)) {
@@ -412,6 +421,7 @@ export function buildChartDatasets(
 	getVersionProjectName: ((versionId: string) => string | undefined) | undefined,
 	formatMessage: FormatMessage,
 	sliceCount: number = timeSlices.length,
+	breakdownGroup?: AnalyticsBreakdownGroup | null,
 ): ChartDataset[] {
 	const selectedProjectIds = new Set(selectedProjects.map((project) => project.id))
 	if (selectedProjectIds.size === 0) {
@@ -428,6 +438,14 @@ export function buildChartDatasets(
 		return collapseRepeatedUnknownBreakdownLabels(
 			normalizedBreakdowns.map((breakdown, index) => {
 				const breakdownValue = breakdownValues[index] ?? ''
+				if (breakdown === breakdownGroup?.breakdown) {
+					const seriesName = getAnalyticsBreakdownGroupSeriesName(
+						breakdownValue,
+						breakdownGroup,
+						formatMessage(analyticsMessages.other),
+					)
+					if (seriesName) return seriesName
+				}
 				if (breakdown === 'project' || breakdown === 'dependent_project_download') {
 					if (
 						breakdown === 'dependent_project_download' &&
@@ -464,7 +482,7 @@ export function buildChartDatasets(
 
 	if (
 		normalizedBreakdowns.length > 0 &&
-		!(normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'project')
+		!(normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'project' && !breakdownGroup)
 	) {
 		const hasVersionBreakdown = normalizedBreakdowns.includes('version_id')
 		const hasDependentProjectBreakdown = normalizedBreakdowns.includes('dependent_project_download')
@@ -488,10 +506,10 @@ export function buildChartDatasets(
 					continue
 				}
 
-				const breakdownValues = getAnalyticsBreakdownValues(
-					point,
+				const breakdownValues = applyAnalyticsBreakdownGroup(
+					getAnalyticsBreakdownValues(point, normalizedBreakdowns, formatMessage),
 					normalizedBreakdowns,
-					formatMessage,
+					breakdownGroup,
 				)
 				if (breakdownValues.some((breakdownValue) => breakdownValue === ALL_BREAKDOWN_VALUE)) {
 					continue
@@ -543,11 +561,14 @@ export function buildChartDatasets(
 				'dependent_project_download',
 			)
 			const versionName =
-				hasVersionBreakdown && versionBreakdownIndex !== -1
+				hasVersionBreakdown &&
+				versionBreakdownIndex !== -1 &&
+				breakdownGroup?.breakdown !== 'version_id'
 					? getVersionDisplayName?.(breakdownValues[versionBreakdownIndex] ?? '')
 					: undefined
 			const dependentProjectId =
-				dependentProjectBreakdownIndex !== -1
+				dependentProjectBreakdownIndex !== -1 &&
+				breakdownGroup?.breakdown !== 'dependent_project_download'
 					? breakdownValues[dependentProjectBreakdownIndex]
 					: undefined
 			const dependentProjectName = dependentProjectId
@@ -556,7 +577,9 @@ export function buildChartDatasets(
 					: (projectNamesById.get(dependentProjectId) ?? dependentProjectId)
 				: undefined
 			const versionProjectName =
-				normalizedBreakdowns.length === 1 && normalizedBreakdowns[0] === 'version_id'
+				normalizedBreakdowns.length === 1 &&
+				normalizedBreakdowns[0] === 'version_id' &&
+				breakdownGroup?.breakdown !== 'version_id'
 					? getVersionProjectName?.(breakdownValues[0] ?? '')
 					: undefined
 			const dependencyProjectNames = [...(dependentOnProjectIdsByBreakdown.get(breakdownKey) ?? [])]
@@ -575,7 +598,7 @@ export function buildChartDatasets(
 							)
 				: undefined
 			const color =
-				normalizedBreakdowns.length === 1
+				normalizedBreakdowns.length === 1 && !breakdownGroup
 					? getBreakdownColor(
 							breakdownValues[0] ?? '',
 							normalizedBreakdowns[0],
