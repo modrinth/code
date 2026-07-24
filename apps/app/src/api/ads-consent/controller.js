@@ -1,7 +1,5 @@
-const ACTION_TIMEOUT = 10_000
 const LAYOUT_DELAY = 100
-const POPUP_READINESS_TIMEOUT = 10_000
-const SUBMISSION_TIMEOUT = 10_000
+const CONSENT_TIMEOUT = 10_000
 
 class AdsConsentController {
 	constructor() {
@@ -66,7 +64,7 @@ class AdsConsentController {
 
 			this.state.setState('showing-popup')
 			this.showNativeCmpFallback()
-		}, POPUP_READINESS_TIMEOUT)
+		}, CONSENT_TIMEOUT)
 	}
 
 	/** @returns {void} */
@@ -137,7 +135,7 @@ class AdsConsentController {
 				this.preSubmissionPhase = null
 				this.showNativeCmpFallback()
 			}
-		}, SUBMISSION_TIMEOUT)
+		}, CONSENT_TIMEOUT)
 	}
 
 	/** @returns {void} */
@@ -223,7 +221,7 @@ class AdsConsentController {
 				return
 			}
 
-			if (!(await this.openConsentManagerWhenReady(ACTION_TIMEOUT))) {
+			if (!(await this.openConsentManagerWhenReady(CONSENT_TIMEOUT))) {
 				this.showNativeCmpFallback()
 			}
 		} catch {
@@ -254,7 +252,7 @@ class AdsConsentController {
 				return false
 			}
 
-			await new Promise((resolve) => setTimeout(resolve, 50))
+			await new Promise((resolve) => setTimeout(resolve, 200))
 		}
 	}
 
@@ -295,7 +293,7 @@ class AdsConsentController {
 		this.state.setState('showing-preferences')
 		await this.showExpandedUi()
 
-		if (!(await this.openConsentManagerWhenReady(ACTION_TIMEOUT))) {
+		if (!(await this.openConsentManagerWhenReady(CONSENT_TIMEOUT))) {
 			this.showNativeCmpFallback()
 			return false
 		}
