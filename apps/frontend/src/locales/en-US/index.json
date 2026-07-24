@@ -2928,13 +2928,13 @@
     "message": "Email verification required"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Automatically install the required game and loader"
+    "message": "Automatically install everything they’re playing"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Join the shared instance in one click"
+    "message": "Play the same content as your friends"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
-    "message": "Keep shared content updated when the instance changes"
+    "message": "Keep shared content up to date as it changes"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Get Modrinth App"
