@@ -765,21 +765,20 @@ pub async fn show_ads_consent_ui<R: Runtime>(
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
 
-        // dont show for hidden ads so consent events cannot re-enable the webview.
-        if state.shown {
-            state.consent_required = true;
-            state.consent_notification_enabled = notification_enabled;
-            state.consent_overlay_shown = false;
-            show_notification = notification_enabled;
+        // Preserve pending consent while the sidebar is hidden, but keep all visibility
+        // changes gated by `state.shown` so consent events cannot re-enable hidden ads.
+        state.consent_required = true;
+        state.consent_notification_enabled = notification_enabled;
+        state.consent_overlay_shown = false;
+        show_notification = state.shown && notification_enabled;
 
-            if !state.modal_shown {
-                let dpr = get_device_pixel_ratio(&app, None);
-                let (position, size) = get_webview_position(&app, dpr)?;
-                webview.set_size(size).ok();
-                webview.set_position(position).ok();
-                webview.show().ok();
-                set_webview_visible_for_window(&app, webview, true);
-            }
+        if state.shown && !state.modal_shown {
+            let dpr = get_device_pixel_ratio(&app, None);
+            let (position, size) = get_webview_position(&app, dpr)?;
+            webview.set_size(size).ok();
+            webview.set_position(position).ok();
+            webview.show().ok();
+            set_webview_visible_for_window(&app, webview, true);
         }
     }
 
