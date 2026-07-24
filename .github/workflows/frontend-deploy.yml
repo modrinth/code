@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: namespace-profile-small-amd64
+    runs-on: namespace-profile-medium-amd64
     permissions:
       contents: read
       deployments: write
