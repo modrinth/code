@@ -31,6 +31,7 @@ export interface BrowseManagerContext {
 	effectiveSortTypes: ComputedRef<readonly SortType[]>
 	effectiveCurrentSortType: Ref<SortType>
 	loading: Ref<boolean>
+	refreshing: Ref<boolean>
 	projectHits: ShallowRef<BrowseSearchResponse['projectHits']>
 	serverHits: ShallowRef<BrowseSearchResponse['serverHits']>
 	totalHits: Ref<number>

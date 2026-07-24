@@ -37,13 +37,16 @@
 
 <script setup lang="ts">
 import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, type ComputedRef } from 'vue'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
+import { injectModrinthClient } from '../../providers'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import TagItem from '../base/TagItem.vue'
 
 const { formatMessage } = useVIntl()
+const { labrinth } = injectModrinthClient()
 
 const selectedFilters = defineModel<FilterValue[]>('selectedFilters', { required: true })
 
@@ -58,6 +61,10 @@ const defaultProvidedMessage = defineMessage({
 	id: 'search.filter.locked.default',
 	defaultMessage: 'Filter locked',
 })
+const dependentProjectMessage = defineMessage({
+	id: 'search.filter.dependent_project',
+	defaultMessage: 'Depends on: {project}',
+})
 
 type Item = {
 	type: string
@@ -67,13 +74,39 @@ type Item = {
 	provided: boolean
 }
 
+const dependentProjectIds = computed(() =>
+	[
+		...new Set(
+			[...selectedFilters.value, ...props.providedFilters]
+				.filter((filter) => filter.type === 'compatible_dependency_project_ids')
+				.map((filter) => filter.option),
+		),
+	].sort(),
+)
+
+const { data: dependentProjects } = useQuery({
+	queryKey: computed(() => [
+		'search-filter-control',
+		'dependent-projects',
+		dependentProjectIds.value,
+	]),
+	queryFn: () => labrinth.projects_v2.getMultiple(dependentProjectIds.value),
+	enabled: computed(() => dependentProjectIds.value.length > 0),
+	placeholderData: [],
+	refetchOnWindowFocus: false,
+})
+
+const dependentProjectNames = computed(
+	() => new Map(dependentProjects.value?.map((project) => [project.id, project.title]) ?? []),
+)
+
 function filterMatches(type: FilterType, option: FilterOption, list: FilterValue[]) {
 	return list.some((provided) => provided.type === type.id && provided.option === option.id)
 }
 
 const items: ComputedRef<Item[]> = computed(() => {
-	return props.filters.flatMap((type) =>
-		type.options
+	return props.filters.flatMap((type) => {
+		const optionItems = type.options
 			.filter(
 				(option) =>
 					filterMatches(type, option, selectedFilters.value) ||
@@ -86,8 +119,30 @@ const items: ComputedRef<Item[]> = computed(() => {
 					?.negative,
 				provided: filterMatches(type, option, props.providedFilters),
 				formatted_name: option.formatted_name,
+			}))
+
+		if (type.id !== 'compatible_dependency_project_ids') {
+			return optionItems
+		}
+
+		const customValues = [...selectedFilters.value, ...props.providedFilters].filter(
+			(filter) => filter.type === type.id,
+		)
+		return [
+			...optionItems,
+			...customValues.map((filter) => ({
+				type: type.id,
+				option: filter.option,
+				negative: filter.negative,
+				provided: props.providedFilters.some(
+					(provided) => provided.type === type.id && provided.option === filter.option,
+				),
+				formatted_name: formatMessage(dependentProjectMessage, {
+					project: dependentProjectNames.value.get(filter.option) ?? filter.option,
+				}),
 			})),
-	)
+		]
+	})
 })
 
 const selectedItems = computed(() => items.value.filter((x) => !x.provided))

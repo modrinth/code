@@ -43,10 +43,11 @@ export type FilterType = {
 	}[]
 	searchable: boolean
 	allows_custom_options?: 'and' | 'or'
+	custom_option_field?: string
 	ordering?: number
 } & (
 	| {
-			display: 'all' | 'scrollable' | 'none' | 'toggle'
+			display: 'all' | 'scrollable' | 'none' | 'depends-on-project' | 'toggle'
 	  }
 	| {
 			display: 'expandable'
@@ -145,6 +146,14 @@ export function useSearch(
 	const overriddenProvidedFilterTypes = ref<string[]>([])
 
 	const { formatMessage, locale } = useVIntl()
+	const dependsOnFilterName = defineMessage({
+		id: 'search.filter_type.compatible_dependency_project_ids',
+		defaultMessage: 'Depends on',
+	})
+	const includedContentFilterName = defineMessage({
+		id: 'search.filter_type.included_content',
+		defaultMessage: 'Included content',
+	})
 	const formatCategoryName = (categoryName: string) => {
 		return formatCategory(formatMessage, categoryName)
 	}
@@ -433,6 +442,21 @@ export function useSearch(
 					}),
 			},
 			{
+				id: 'compatible_dependency_project_ids',
+				formatted_name: formatMessage(
+					projectTypes.value.includes('modpack') ? includedContentFilterName : dependsOnFilterName,
+				),
+				supported_project_types: ALL_PROJECT_TYPES,
+				query_param: 'dep',
+				supports_negative_filter: false,
+				display: 'depends-on-project',
+				searchable: false,
+				options: [],
+				allows_custom_options: 'and',
+				custom_option_field: 'compatible_dependency_project_ids',
+				ordering: projectTypes.value.includes('modpack') ? undefined : -999,
+			},
+			{
 				id: 'license',
 				formatted_name: formatMessage(
 					defineMessage({ id: 'search.filter_type.license', defaultMessage: 'License' }),
@@ -533,7 +557,9 @@ export function useSearch(
 					formatted_name: filterValue.option,
 					icon: undefined,
 					method: type.allows_custom_options,
-					value: filterValue.option,
+					value: type.custom_option_field
+						? `${type.custom_option_field}:${filterValue.option}`
+						: filterValue.option,
 				}
 			} else if (!option) {
 				console.error(`Filter option ${filterValue.option} not found`)
@@ -771,8 +797,8 @@ export function useSearch(
 		currentFilters.value.forEach((filterValue) => {
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			const option = type?.options.find((option) => option.id === filterValue.option)
-			if (type && option) {
-				const value = getOptionValue(option, filterValue.negative)
+			if (type && (option || type.allows_custom_options)) {
+				const value = option ? getOptionValue(option, filterValue.negative) : filterValue.option
 				if (items[type.query_param]) {
 					items[type.query_param].push(value)
 				} else {

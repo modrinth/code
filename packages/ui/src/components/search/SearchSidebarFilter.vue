@@ -71,6 +71,14 @@
 		</template>
 		<template v-else #default>
 			<slot name="prefix" />
+			<SearchDependsOnFilter
+				v-if="filterType.display === 'depends-on-project'"
+				v-model:selected-filters="selectedFilters"
+				:project-type="projectType"
+				:inner-panel-class="innerPanelClass"
+				:result-count="resultCount"
+				:refreshing="refreshing"
+			/>
 			<div
 				v-if="filterType.display === 'toggle'"
 				:class="innerPanelClass ? innerPanelClass : ''"
@@ -90,7 +98,9 @@
 					/>
 				</label>
 			</div>
-			<template v-if="filterType.display !== 'toggle'">
+			<template
+				v-if="filterType.display !== 'toggle' && filterType.display !== 'depends-on-project'"
+			>
 				<StyledInput
 					v-if="filterType.searchable"
 					:id="`search-${filterType.id}`"
@@ -215,6 +225,7 @@ import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Toggle from '../base/Toggle.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
+import SearchDependsOnFilter from './SearchDependsOnFilter.vue'
 import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'
 
@@ -229,11 +240,14 @@ const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedF
 
 const props = defineProps<{
 	filterType: FilterType
+	projectType: string
 	buttonClass?: string
 	contentClass?: string
 	innerPanelClass?: string
 	openByDefault?: boolean
 	providedFilters: FilterValue[]
+	resultCount?: number
+	refreshing?: boolean
 }>()
 
 defineOptions({
