@@ -2132,6 +2132,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Amount too low"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "This payout method has been disabled by the payment provider. Please use a different payout method or contact support."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Payout method unavailable"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Please use the correct PayPal transfer option for your region (US or International)."
   },
