@@ -17,7 +17,7 @@ use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
-use crate::database::{PgPool, ReadOnlyPgPool};
+use crate::database::{PgPool, ReadOnlyPgPool, redis};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
@@ -26,10 +26,9 @@ use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
-use sync::friends::{self, FRIENDS_CHANNEL_NAME, handle_pubsub};
+use sync::friends::{FRIENDS_CHANNEL_NAME, handle_pubsub};
 use url::Url;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
-//
 
 pub mod auth;
 pub mod background_task;
