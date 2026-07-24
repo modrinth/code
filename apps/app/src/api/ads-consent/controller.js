@@ -24,10 +24,7 @@ class AdsConsentController {
 		if (!cmpMain) {
 			if (this.state.phase === 'idle') {
 				document.documentElement.classList.remove('modrinth-ads-consent-overlay')
-			} else if (
-				this.state.phase !== 'submitting-consent' &&
-				this.state.phase !== 'finishing'
-			) {
+			} else if (this.state.phase !== 'submitting-consent' && this.state.phase !== 'finishing') {
 				this.finishConsentFlow()
 			}
 			return
@@ -98,10 +95,7 @@ class AdsConsentController {
 			this.submissionTimeout = null
 			const dialogId = this.state.variant === 'usp' ? 'qc-cmp2-usp' : 'qc-cmp2-ui'
 
-			if (
-				this.state.phase === 'submitting-consent' &&
-				!document.getElementById(dialogId)
-			) {
+			if (this.state.phase === 'submitting-consent' && !document.getElementById(dialogId)) {
 				this.finishConsentFlow()
 			} else if (this.state.phase === 'submitting-consent' && preSubmissionPhase) {
 				this.state.setState(preSubmissionPhase)
