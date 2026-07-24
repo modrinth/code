@@ -270,8 +270,6 @@ async function fetchAllVersions() {
 }
 
 async function fetchScan(id: string) {
-	console.log(`scanning for row with id ${id}`)
-
 	rows.value[id].isScanning = true
 	try {
 		const scan = await client.labrinth.attribution_internal.scanFile(id)
