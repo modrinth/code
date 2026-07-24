@@ -102,6 +102,7 @@ jobs:
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
+            rust
             pnpm
             apt
 
@@ -172,34 +173,6 @@ jobs:
 
       - name: Lint and test
         run: pnpm run ci
-
-      - name: Post-run checks
-        if: ${{ always() }}
-        run: |
-          df -h
-
-          dd if=/dev/urandom of=/cache/a.bin bs=1024 count=8
-
-          print_cgroup_file() {
-            local file="$1"
-
-            if [ -r "$file" ]; then
-              echo "$file"
-              cat "$file"
-            fi
-          }
-
-          print_cgroup_file /proc/self/cgroup
-          print_cgroup_file /sys/fs/cgroup/memory.peak
-          print_cgroup_file /sys/fs/cgroup/memory.high
-          print_cgroup_file /sys/fs/cgroup/memory.events
-          print_cgroup_file /sys/fs/cgroup/cgroup.events
-          print_cgroup_file /sys/fs/cgroup/memory/memory.failcnt
-          print_cgroup_file /sys/fs/cgroup/memory/memory.oom_control
-
-          echo "::group::dmesg"
-          sudo dmesg | grep -E -i 'sigbus|bus error|segfault'
-          echo "::endgroup::"
 
       - name: Verify intl:extract has been run
         run: |
