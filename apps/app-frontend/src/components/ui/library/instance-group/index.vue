@@ -1,92 +1,72 @@
 <script setup lang="ts">
-import {
-	ClipboardCopyIcon,
-	EyeIcon,
-	FolderOpenIcon,
-	MinusIcon,
-	PlayIcon,
-	PlusIcon,
-	StopCircleIcon,
-	TrashIcon,
-} from '@modrinth/assets'
-import { Accordion } from '@modrinth/ui'
+import { DropdownIcon } from '@modrinth/assets'
+import { Accordion, TagItem } from '@modrinth/ui'
+import { ref } from 'vue'
 
-import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/library/instance-group/instance.vue'
 import { useLibrary } from '@/components/ui/library/use-library'
-import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
+import type {
+	InstanceCard,
+	InstanceGroup as InstanceGroupType,
+} from '@/components/ui/library/use-library'
 
-const {
-	instanceGroups,
-	instanceOptions,
-	instanceComponents,
-	confirmDeleteModal,
-	isSectionCollapsed,
-	setSectionCollapsed,
-	deleteInstance,
-	handleInstanceContextMenu,
-	handleInstanceOption,
-} = useLibrary()
+defineProps<{
+	instanceGroup: InstanceGroupType
+}>()
+
+const { isSectionCollapsed, setSectionCollapsed, handleInstanceContextMenu } = useLibrary()
+
+const instanceComponents = ref<InstanceCard[]>([])
+
+function openInstanceContextMenu(event: MouseEvent, instanceId: string, instanceGroupName: string) {
+	const instanceComponent = instanceComponents.value.find(
+		(component) => component.instance.id === instanceId,
+	)
+	if (!instanceComponent) return
+
+	handleInstanceContextMenu(event, instanceComponent, instanceGroupName)
+}
 </script>
 
 <template>
 	<Accordion
-		v-for="instanceGroup in instanceGroups"
-		:key="instanceGroup.key"
-		:divider="instanceGroup.key !== 'None'"
 		:open-by-default="!isSectionCollapsed(instanceGroup.key)"
-		class="row"
+		button-class="group flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5 bg-transparent px-0 py-2.5 mb-3 text-left"
+		class="w-full"
 		@on-open="setSectionCollapsed(instanceGroup.key, false)"
 		@on-close="setSectionCollapsed(instanceGroup.key, true)"
 	>
-		<template v-if="instanceGroup.key !== 'None'" #title>
-			<span class="text-base">{{ instanceGroup.key }}</span>
+		<template v-if="instanceGroup.key !== 'None'" #button="{ open }">
+			<DropdownIcon
+				class="size-5 shrink-0 text-secondary duration-300 group-hover:text-primary transition-all"
+				:class="{ 'rotate-180': open }"
+			/>
+			<span class="text-base font-semibold text-primary group-hover:text-contrast transition-all">
+				{{ instanceGroup.key }}
+			</span>
+			<TagItem class="shrink-0 bg-surface-2 border-surface-3">
+				{{ instanceGroup.instances.length }}
+			</TagItem>
 		</template>
 		<p
 			v-if="instanceGroup.instances.length === 0"
-			class="m-0 py-3 text-sm font-medium text-secondary"
+			class="m-0 py-2.5 pl-0.5 text-base font-medium text-secondary"
 		>
 			No instances in this group.
 		</p>
-		<section v-else class="instances">
+		<section
+			v-else
+			class="grid w-full grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-3 overflow-y-auto scroll-smooth"
+		>
 			<Instance
 				v-for="instance in instanceGroup.instances"
 				ref="instanceComponents"
 				:key="instance.id + instance.install_stage"
 				:instance="instance"
 				@contextmenu.prevent.stop="
-					(event: MouseEvent) =>
-						handleInstanceContextMenu(event, instance.id, instanceGroup.key)
+					(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.key)
 				"
 			/>
 		</section>
 	</Accordion>
-	<ConfirmDeleteInstanceModal ref="confirmDeleteModal" @delete="deleteInstance" />
-	<ContextMenu ref="instanceOptions" @option-clicked="handleInstanceOption">
-		<template #play> <PlayIcon /> Play </template>
-		<template #stop> <StopCircleIcon /> Stop </template>
-		<template #add_content> <PlusIcon /> Add content </template>
-		<template #edit> <EyeIcon /> View instance </template>
-		<template #duplicate> <ClipboardCopyIcon /> Duplicate instance</template>
-		<template #delete> <TrashIcon /> Delete </template>
-		<template #open> <FolderOpenIcon /> Open folder </template>
-		<template #copy> <ClipboardCopyIcon /> Copy path </template>
-		<template #remove_from_group> <MinusIcon /> Remove from group </template>
-	</ContextMenu>
 </template>
-
-<style lang="scss" scoped>
-.row {
-	width: 100%;
-}
-
-.instances {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-	width: 100%;
-	gap: 0.75rem;
-	margin-right: auto;
-	scroll-behavior: smooth;
-	overflow-y: auto;
-}
-</style>

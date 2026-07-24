@@ -47,7 +47,7 @@ export type InstanceGroup = {
 	instances: GameInstance[]
 }
 
-type InstanceCard = {
+export type InstanceCard = {
 	instance: GameInstance
 	playing: boolean
 	play: (event: MouseEvent | null, context: string) => Promise<void>
@@ -84,7 +84,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const selectedNewGroupInstanceIds = ref(new Set<string>())
 	const creatingGroup = ref(false)
 	const instanceOptions = ref<InstanceContextMenu | null>(null)
-	const instanceComponents = ref<InstanceCard[]>([])
 	const currentDeleteInstanceId = ref<string | null>(null)
 	const currentContextGroupName = ref<string | null>(null)
 	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
@@ -370,14 +369,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const handleInstanceContextMenu = (
 		event: MouseEvent,
-		instanceId: string,
+		item: InstanceCard,
 		instanceGroupName: string,
 	) => {
-		const item = instanceComponents.value.find(
-			(instanceComponent) => instanceComponent.instance.id === instanceId,
-		)
-		if (!item) return
-
 		currentContextGroupName.value =
 			displayState.value.group === 'Group' && instanceGroupName !== 'None'
 				? instanceGroupName
@@ -461,7 +455,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		newGroupInstances,
 		canCreateGroup,
 		instanceOptions,
-		instanceComponents,
 		confirmDeleteModal,
 		isSectionCollapsed,
 		setSectionCollapsed,
