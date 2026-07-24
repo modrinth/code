@@ -2936,9 +2936,6 @@
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "Очистити всі групи"
-  },
   "modpack-scan-modal.failed": {
     "message": "Помилка"
   },
