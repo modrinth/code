@@ -83,25 +83,24 @@ jobs:
       - name: Setup sccache
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Set up caches
+        if: contains(matrix.platform, 'windows') || contains(matrix.platform, 'macos')
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
             rust
             pnpm
 
-      - name: Set up Turborepo caching
-        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
-
       - name: Configure sccache
+        if: contains(matrix.platform, 'windows') || contains(matrix.platform, 'macos')
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Generate tauri-dev.conf.json
