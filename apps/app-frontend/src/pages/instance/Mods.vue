@@ -567,9 +567,7 @@ async function handleUploadFiles() {
 				}
 			}),
 		)
-	).filter(
-		(result): result is { filename: string; installedPath: string } => result !== null,
-	)
+	).filter((result): result is { filename: string; installedPath: string } => result !== null)
 	const uniqueAddedFiles = [
 		...new Map(addedFiles.map((file) => [file.installedPath, file])).values(),
 	]

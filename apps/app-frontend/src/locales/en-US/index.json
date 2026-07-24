@@ -647,12 +647,6 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "This shared instance contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
   },
-  "app.modal.install-to-play.trust-warning-description": {
-    "message": "A shared instance will install files on your computer and may include content not from Modrinth."
-  },
-  "app.modal.install-to-play.trust-warning-header": {
-    "message": "Do you trust this user?"
-  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
   },

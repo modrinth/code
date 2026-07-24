@@ -13,11 +13,7 @@
 		:no-padding="reportMode"
 		:scrollable="reportMode"
 	>
-		<div
-			v-if="preview"
-			class="flex w-full flex-col gap-6"
-			:class="{ 'p-6 pb-2': reportMode }"
-		>
+		<div v-if="preview" class="flex w-full flex-col gap-6" :class="{ 'p-6 pb-2': reportMode }">
 			<Admonition v-if="reportMode" type="info">
 				<div class="flex flex-col gap-2">
 					<p class="m-0">
