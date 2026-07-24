@@ -238,7 +238,15 @@
 									(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
 								)
 							"
-							:show-context="(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>"
+							:show-context="
+								withDefaults(
+									(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
+									resolveChildren(
+										currentStageObj,
+										(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
+									),
+								)
+							"
 							:on-image-upload="onUploadHandler"
 							:parent-state-path="currentStageObj._statePath ?? []"
 						/>
@@ -406,6 +414,7 @@ import {
 	setMissingMdHandler,
 	useStages,
 	walkNodes,
+	withDefaults,
 } from '@modrinth/moderation'
 import {
 	Avatar,
@@ -1533,6 +1542,16 @@ function previousStage() {
 }
 
 function nextStage() {
+	if (done.value) {
+		endChecklist(undefined)
+		return
+	}
+
+	if (alreadyReviewed.value || isLockedByOther.value) {
+		if (moderationQueue.isQueueMode && moderationQueue.queueLength > 1) skipToNextProject()
+		return
+	}
+
 	if (generatedMessage.value) return
 
 	let targetStage = currentStage.value + 1
