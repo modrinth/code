@@ -29,7 +29,6 @@ use crate::util::tiltify::TiltifyClient;
 use sync::friends::{FRIENDS_CHANNEL_NAME, handle_pubsub};
 use url::Url;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
-//a
 
 pub mod auth;
 pub mod background_task;
