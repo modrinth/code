@@ -595,8 +595,6 @@ pub async fn init_ads_window<R: Runtime>(
                 }
             })?;
 
-            webview.open_devtools();
-
             Some(webview)
         } else {
             None

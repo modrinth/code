@@ -106,6 +106,7 @@ class AdsConsentController {
 			} else if (this.state.phase === 'submitting-consent' && preSubmissionPhase) {
 				this.state.setState(preSubmissionPhase)
 				this.preSubmissionPhase = null
+				this.showNativeCmpFallback()
 			}
 		}, SUBMISSION_TIMEOUT)
 	}
