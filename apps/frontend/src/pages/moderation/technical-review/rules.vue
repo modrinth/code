@@ -327,11 +327,11 @@
 								<p
 									class="m-0 mt-0.5 flex min-w-0 items-center gap-1 font-mono text-xs text-secondary"
 								>
-									<template v-if="detail.jar">
-										<span class="truncate">{{ detail.jar }}</span>
-										<ChevronRightIcon class="size-3.5 shrink-0" aria-hidden="true" />
-									</template>
-									<span class="truncate">{{ detail.file_path }}</span>
+									<IssueDetailPath
+										:segments="[detail.jar, detail.file_path]"
+										hide-base-mrpack
+										truncate
+									/>
 								</p>
 							</div>
 							<ButtonStyled>
@@ -385,7 +385,6 @@
 import { type Labrinth, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
-	ChevronRightIcon,
 	EditIcon,
 	EyeOffIcon,
 	ExternalIcon,
@@ -408,6 +407,8 @@ import {
 import { useDebounceFn } from '@vueuse/core'
 import type { Ace } from 'ace-builds'
 import type { Component } from 'vue'
+
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const DEFAULT_RULE = `input.trace.issue_type == "OBFUSCATED_NAMES"
 	? {"severity": "low", "hidden": false}

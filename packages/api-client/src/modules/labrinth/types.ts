@@ -2289,6 +2289,30 @@ export namespace Labrinth {
 				components: Record<string, DelphiRuleSchema>
 			}
 
+			export type RuleInput = {
+				schema_version: number
+				trace: {
+					key: string
+					issue_type: string
+					severity: DelphiSeverity
+					jar: string | null
+					file_path: string
+					data: Record<string, unknown>
+				}
+				scan: {
+					delphi_version: number
+				}
+				artifact: {
+					size: number | null
+					hashes: Record<string, string>
+				}
+				scope: {
+					project_id: string | null
+					version_id: string | null
+					file_id: string | null
+				}
+			}
+
 			export type TestDelphiRuleResponse = {
 				effects: Array<DelphiRuleEffect | null>
 			}

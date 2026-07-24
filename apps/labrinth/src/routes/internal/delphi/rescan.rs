@@ -105,6 +105,7 @@ async fn fetch_unreviewed_tech_review_project_ids(
                 WHERE
                     didws.project_id = m.id
                     AND didws.status = 'pending'
+                    AND NOT didws.hidden
                     -- see delphi.rs todo comment
                     AND dri.issue_type != '__dummy'
             )
@@ -115,6 +116,7 @@ async fn fetch_unreviewed_tech_review_project_ids(
                 WHERE
                     didws.project_id = m.id
                     AND didws.status IN ('safe', 'unsafe')
+                    AND NOT didws.hidden
                     -- see delphi.rs todo comment
                     AND dri.issue_type != '__dummy'
             )

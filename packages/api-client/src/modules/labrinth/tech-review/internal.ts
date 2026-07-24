@@ -28,6 +28,19 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		)
 	}
 
+	public async getDetailRuleInput(
+		detailId: string,
+	): Promise<Labrinth.TechReview.Internal.RuleInput> {
+		return this.client.request<Labrinth.TechReview.Internal.RuleInput>(
+			`/moderation/tech-review/rules/details/${detailId}/input`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
 	public async getRuleAffectedDetails(
 		id: number,
 	): Promise<Labrinth.TechReview.Internal.DelphiRuleAffectedDetail[]> {

@@ -6,7 +6,6 @@ import {
 	CheckCheckIcon,
 	CheckIcon,
 	ChevronDownIcon,
-	ChevronRightIcon,
 	ClipboardCopyIcon,
 	CodeIcon,
 	CopyIcon,
@@ -49,6 +48,7 @@ import {
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
@@ -601,6 +601,29 @@ async function copyToClipboard(code: string, detailId: string) {
 	}
 }
 
+async function copyDetailCelInput(detailId: string) {
+	if (copyingCelDetails.has(detailId)) return
+
+	copyingCelDetails.add(detailId)
+	try {
+		const input = await client.labrinth.tech_review_internal.getDetailRuleInput(detailId)
+		await navigator.clipboard.writeText(JSON.stringify(input, null, 2))
+		copiedCelDetails.add(detailId)
+		setTimeout(() => {
+			copiedCelDetails.delete(detailId)
+		}, 2000)
+	} catch (error) {
+		console.error('Failed to copy CEL input:', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to copy CEL input',
+			text: 'An error occurred while loading the trace rule input.',
+		})
+	} finally {
+		copyingCelDetails.delete(detailId)
+	}
+}
+
 function getDetailDecision(
 	detailId: string,
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
@@ -999,6 +1022,8 @@ async function updateGlobalDetailStatus(
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
 const showCopyFeedback = reactive<Map<string, boolean>>(new Map())
+const copyingCelDetails = reactive<Set<string>>(new Set())
+const copiedCelDetails = reactive<Set<string>>(new Set())
 const highlightedSourceCache = reactive<Map<string, { source: string; lines: string[] }>>(new Map())
 const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 2
 
@@ -1025,7 +1050,7 @@ interface JarGroup {
 function splitJarSegments(jar: string | null, currentFileName: string | null): string[] {
 	if (!jar) return []
 	const segments = jar
-		.split(/[/#]/)
+		.split('#')
 		.map((s) => decodeURIComponent(s.trim()))
 		.filter((s) => s.length > 0)
 	// Skip the first segment if it matches the current file tab (it's already shown in the file list)
@@ -1770,27 +1795,12 @@ function copyId() {
 						class="border-b border-solid border-surface-1 px-4 py-3"
 					>
 						<div class="flex flex-wrap items-center justify-between gap-3">
-							<div class="flex flex-wrap items-center gap-1">
-								<template
-									v-for="(segment, index) in jarGroup.segments"
-									:key="`${jarGroup.key}-${index}`"
-								>
-									<span
-										class="font-mono text-sm"
-										:class="
-											index === jarGroup.segments.length - 1
-												? 'font-semibold text-contrast'
-												: 'text-secondary'
-										"
-									>
-										{{ segment }}
-									</span>
-									<ChevronRightIcon
-										v-if="index < jarGroup.segments.length - 1"
-										class="size-4 text-secondary"
-									/>
-								</template>
-							</div>
+							<IssueDetailPath
+								:segments="jarGroup.segments"
+								:decode="false"
+								class="font-mono text-sm"
+								emphasize-last
+							/>
 
 							<div
 								v-if="getJarRemainingUnmarkedCount(jarGroup) > 0"
@@ -1864,9 +1874,12 @@ function copyId() {
 									</button>
 								</ButtonStyled>
 
-								<span v-tooltip="classItem.filePath" class="font-mono font-semibold">{{
-									truncateMiddle(classItem.filePath)
-								}}</span>
+								<IssueDetailPath
+									:segments="[classItem.jar, classItem.filePath]"
+									class="font-mono font-semibold"
+									hide-base-mrpack
+									truncate
+								/>
 
 								<div
 									class="rounded-full border-solid px-2.5 py-1"
@@ -1941,6 +1954,23 @@ function copyId() {
 										</div>
 
 										<div class="detail-verdict-action-groups">
+											<ButtonStyled>
+												<button
+													type="button"
+													:disabled="copyingCelDetails.has(flag.detail.id)"
+													@click="copyDetailCelInput(flag.detail.id)"
+												>
+													<LoaderCircleIcon
+														v-if="copyingCelDetails.has(flag.detail.id)"
+														class="animate-spin"
+														aria-hidden="true"
+													/>
+													<ClipboardCopyIcon v-else aria-hidden="true" />
+													<span aria-live="polite">
+														{{ copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL' }}
+													</span>
+												</button>
+											</ButtonStyled>
 											<div
 												class="detail-verdict-buttons"
 												role="group"

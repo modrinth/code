@@ -188,6 +188,7 @@ pub async fn search_global_issue_details(
         FROM delphi_global_detail_verdicts dgdv
         LEFT JOIN delphi_issue_details_with_statuses didws
             ON didws.key = dgdv.detail_key
+            AND NOT didws.hidden
         LEFT JOIN delphi_report_issues dri
             ON dri.id = didws.issue_id
             AND dri.issue_type != '__dummy'
@@ -248,6 +249,7 @@ pub async fn search_global_issue_details(
                 AND didv.detail_key = didws.key
             WHERE
                 didws.key = ANY($1::text[])
+                AND NOT didws.hidden
                 AND dri.issue_type != '__dummy'
         )
         SELECT
@@ -367,6 +369,7 @@ pub async fn get_global_issue_detail(
         FROM delphi_global_detail_verdicts dgdv
         LEFT JOIN delphi_issue_details_with_statuses didws
             ON didws.key = dgdv.detail_key
+            AND NOT didws.hidden
         LEFT JOIN delphi_report_issues dri
             ON dri.id = didws.issue_id
             AND dri.issue_type != '__dummy'
@@ -412,6 +415,7 @@ pub async fn get_global_issue_detail(
         WHERE
             didws.key = $1
             AND ($2::bigint IS NULL OR didws.id > $2)
+            AND NOT didws.hidden
             AND dri.issue_type != '__dummy'
         ORDER BY didws.id
         LIMIT $3

@@ -43,7 +43,7 @@
 						</p>
 						<p class="m-0 break-all text-secondary">
 							<span class="font-semibold text-contrast">Path</span>
-							{{ decodeTracePath(latestLocalTrace.file_path) }}
+							<IssueDetailPath :segments="[latestLocalTrace.file_path]" />
 						</p>
 					</div>
 				</div>
@@ -103,6 +103,7 @@ import {
 } from '@modrinth/ui'
 
 import GlobalDetailLocalTraceCard from '~/components/ui/moderation/GlobalDetailLocalTraceCard.vue'
+import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -136,14 +137,6 @@ const pageEnd = computed(() =>
 	Math.min(currentPage.value * localTracePageSize, trace.value?.local_trace_count ?? 0),
 )
 const latestLocalTrace = computed(() => trace.value?.local_traces.at(-1))
-
-function decodeTracePath(path: string): string {
-	try {
-		return decodeURIComponent(path)
-	} catch {
-		return path
-	}
-}
 
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
