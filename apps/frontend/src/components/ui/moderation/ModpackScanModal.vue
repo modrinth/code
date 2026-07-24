@@ -61,6 +61,10 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.scanning',
 		defaultMessage: 'Scanning...',
 	},
+	success: {
+		id: 'modpack-scan-modal.success',
+		defaultMessage: 'Success',
+	},
 	failed: {
 		id: 'modpack-scan-modal.failed',
 		defaultMessage: 'Failed',
@@ -77,9 +81,38 @@ const messages = defineMessages({
 		id: 'modpack-scan-modal.scan-error',
 		defaultMessage: 'Some files failed to scan: \n\n{error}',
 	},
-	clearAllGroups: {
-		id: 'modpack-scan-modal.clear-all-groups',
-		defaultMessage: 'Clear All Groups',
+	batchPlaceholder: {
+		id: 'modpack-scan-modal.batch.placeholder',
+		defaultMessage: 'Batch amount',
+	},
+	batchLabel: {
+		id: 'modpack-scan-modal.batch.label',
+		defaultMessage: '{amount} per batch',
+	},
+	deleteAllGroups: {
+		id: 'project.settings.permissions.delete-all-groups',
+		defaultMessage: 'Delete all groups',
+	},
+	deleteAllGroupsConfirmationTitle: {
+		id: 'project.settings.permissions.delete-all-groups-confirmation.title',
+		defaultMessage: 'Delete all attribution groups?',
+	},
+	deleteAllGroupsConfirmationDescription: {
+		id: 'modpack-scan-modal.delete-all-groups-confirmation.description',
+		defaultMessage:
+			'This will permanently delete all attribution groups for this project and all files inside them. This action cannot be undone.',
+	},
+	deleteAllGroupsConfirmationProceed: {
+		id: 'modpack-scan-modal.delete-all-groups.proceed',
+		defaultMessage: 'Clear',
+	},
+	deleteAllGroupsSuccess: {
+		id: 'modpack-scan-modal.delete-all-groups.success',
+		defaultMessage: 'All groups cleared successfully.',
+	},
+	deleteAllGroupsError: {
+		id: 'modpack-scan-modal.delete-all-groups.error',
+		defaultMessage: 'Failed to clear all groups: {error}',
 	},
 })
 
@@ -150,7 +183,7 @@ const scannedCount = computed(
 	() => Object.entries(rows.value).filter(([_, row]) => row.scan || row.error).length,
 )
 const isBusy = computed(() => isLoadingVersions.value || isScanning.value || isClearing.value)
-const titleButtonsDisabled = computed(() => isBusy || Object.keys(rows.value).length === 0)
+const titleButtonsDisabled = computed(() => isBusy.value || Object.keys(rows.value).length === 0)
 const rescanButtonsDisabled = computed(() => isLoadingVersions.value || isClearing.value)
 
 const rowErrors = computed(() =>
@@ -303,8 +336,8 @@ async function clearAllGroups() {
 		failed = true
 		addNotification({
 			type: 'error',
-			title: 'An error occurred',
-			text: `Failed to clear all groups: ${getErrorMessage(error)}`,
+			title: formatMessage(messages.failed),
+			text: formatMessage(messages.deleteAllGroupsError, { error: getErrorMessage(error) }),
 		})
 	} finally {
 		isClearing.value = false
@@ -313,8 +346,8 @@ async function clearAllGroups() {
 	if (!failed) {
 		addNotification({
 			type: 'success',
-			title: 'Success',
-			text: 'All groups cleared successfully.',
+			title: formatMessage(messages.success),
+			text: formatMessage(messages.deleteAllGroupsSuccess),
 		})
 	}
 }
@@ -336,9 +369,9 @@ defineExpose({ show, hide })
 <template>
 	<ConfirmModal
 		ref="clearModalRef"
-		title="Clear all permission groups?"
-		description="This will clear **all** groups for this project. This action cannot be undone."
-		proceed-label="Clear"
+		:title="formatMessage(messages.deleteAllGroupsConfirmationTitle)"
+		:description="formatMessage(messages.deleteAllGroupsConfirmationDescription)"
+		:proceed-label="formatMessage(messages.deleteAllGroupsConfirmationProceed)"
 		@proceed="clearAllGroups"
 	/>
 
@@ -360,31 +393,38 @@ defineExpose({ show, hide })
 					}}
 				</span>
 				<div class="flex items-center gap-2">
-					<Combobox v-model="batchAmount" :options="batchAmountOptions" placeholder="Batch amount">
+					<Combobox
+						v-model="batchAmount"
+						:options="batchAmountOptions"
+						:disabled="titleButtonsDisabled"
+						:placeholder="formatMessage(messages.batchPlaceholder)"
+					>
 						<template #selected>
 							<span class="flex flex-row gap-2 align-middle font-semibold">
-								<span class="truncate text-contrast">{{ batchAmount }} per batch</span>
+								<span class="truncate text-contrast">{{
+									formatMessage(messages.batchLabel, { amount: batchAmount })
+								}}</span>
 							</span>
 						</template>
 					</Combobox>
 					<ButtonStyled circular color="red" color-fill="none">
 						<button
-							v-tooltip="formatMessage(messages.clearAllGroups)"
-							:disabled="titleButtonsDisabled.value"
+							v-tooltip="formatMessage(messages.deleteAllGroups)"
+							:disabled="titleButtonsDisabled"
 							@click="showConfirmClearGroups"
 						>
 							<TrashIcon v-if="!isClearing" aria-hidden="true" />
-							<SpinnerIcon class="animate-spin" v-else />
+							<SpinnerIcon v-else class="animate-spin" />
 						</button>
 					</ButtonStyled>
 					<ButtonStyled circular>
 						<button
 							v-tooltip="formatMessage(messages.scanAllFiles)"
-							:disabled="titleButtonsDisabled.value"
+							:disabled="titleButtonsDisabled"
 							@click="fetchAllScans"
 						>
 							<FolderSearchIcon v-if="!isScanning" aria-hidden="true" />
-							<SpinnerIcon class="animate-spin" v-else />
+							<SpinnerIcon v-else class="animate-spin" />
 						</button>
 					</ButtonStyled>
 				</div>
