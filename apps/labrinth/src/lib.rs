@@ -17,7 +17,7 @@ use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
-use crate::database::{PgPool, ReadOnlyPgPool, redis};
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
