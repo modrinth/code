@@ -8,6 +8,15 @@
   "admin.billing.error.not-found": {
     "message": "المستخدم غير موجود"
   },
+  "ads-consent.accept": {
+    "message": "قبول الكل"
+  },
+  "ads-consent.manage": {
+    "message": "إدارة التفضيلات"
+  },
+  "ads-consent.reject": {
+    "message": "رفض الكل"
+  },
   "analytics.action.add": {
     "message": "إضافة"
   },
@@ -407,6 +416,9 @@
   "analytics.stat.playtime-hours": {
     "message": "{hours} ساعة"
   },
+  "analytics.stat.views": {
+    "message": "المشاهدات"
+  },
   "analytics.table.search.placeholder": {
     "message": "بحث..."
   },
@@ -619,6 +631,9 @@
   },
   "auth.authorize.error.no-redirect-url": {
     "message": "لم يتم العثور على وجهة إعادة التوجيه في الاستجابة"
+  },
+  "auth.authorize.errro-title": {
+    "message": "حدثَ خطأ ما"
   },
   "auth.authorize.redirect-url": {
     "message": "ستتم إعادة توجيهك إلى <redirect-url>{url}</redirect-url>"

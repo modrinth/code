@@ -20,6 +20,18 @@
   "app.action-bar.install.retry": {
     "message": "Yritä uudelleen"
   },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Peruutettu"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Ei voitu ladata tiedostoja"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Ladattu tiedosto on vioittunut"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Ei voitu tallentaa tiedostoja"
+  },
   "app.action-bar.install.unknown-instance": {
     "message": "Tuntematon instanssi"
   },
@@ -353,6 +365,9 @@
   "app.modal.install-to-play.header": {
     "message": "Asenna pelataksesi"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Asenna silti"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Asenna"
   },
@@ -368,14 +383,17 @@
   "app.modal.update-to-play.header": {
     "message": "Päivitä pelataksesi"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Pävitys vaaditaan pelataksesi {name}. Päivitä viimeisimpään versioon pelataksesi."
-  },
   "app.project.install-button.already-installed": {
     "message": "Tämä projekti on jo asennettu"
   },
   "app.project.install-context.back-to-browse": {
     "message": "Takaisin sisällön löytöön"
+  },
+  "app.project.version.installing": {
+    "message": "Asennetaan"
+  },
+  "app.project.versions.already-installed": {
+    "message": "On jo asennettu"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
@@ -548,6 +566,12 @@
   "app.skins.title": {
     "message": "Skinivalinta"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Poista käytöstä"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Ota käyttöön"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
   },
@@ -658,6 +682,9 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Kirjaudu Modrinth-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Luo pikakuvake"
   },
   "instance.add-server.add-and-play": {
     "message": "Lisää ja pelaa"

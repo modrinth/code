@@ -1160,12 +1160,6 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Masz specjalne zezwolenie na użycie tego dzieła w Twojej paczce modów."
   },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Usuń grupę"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Nie udało się usunąć grupy"
-  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Usuń z grupy"
   },
@@ -3487,6 +3481,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Widok"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {pobranie} few {pobrania} other {pobrań}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {obserwujący} other {obserwujących}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"

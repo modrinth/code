@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "Користувача не знайдено"
   },
+  "ads-consent.accept": {
+    "message": "Прийняти всі"
+  },
+  "ads-consent.body": {
+    "message": "Реклама підтримує існування Modrinth та фінансує виплати творцям. Наші партнери можуть зберігати та отримувати доступ до cookie на вебсайті, аби персоналізувати рекламу та збирати метрики."
+  },
+  "ads-consent.manage": {
+    "message": "Налаштувати"
+  },
+  "ads-consent.reject": {
+    "message": "Відхилити всі"
+  },
+  "ads-consent.title": {
+    "message": "Ваша приватність та як реклама підтримує Modrinth"
+  },
   "analytics.action.add": {
     "message": "Додати"
   },
@@ -232,6 +247,9 @@
   },
   "analytics.empty.select-project": {
     "message": "Оберіть принаймні один проєкт, аби переглянути дані"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Не вдалося завантажити залежності"
   },
   "analytics.filter.game-version-type": {
     "message": "Тип версії"
@@ -929,6 +947,12 @@
   "auth.verify-email.title": {
     "message": "Підтвердити електронну пошту"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "Завантажити значок"
+  },
+  "collection.button.discover-mods": {
+    "message": "Знайти моди"
+  },
   "collection.button.edit-icon": {
     "message": "Редагувати значок"
   },
@@ -1103,6 +1127,132 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Додаткові файли призначені для допоміжних ресурсів, таких як початковий код, а не для альтернативних версій чи варіантів."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Деталі"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Файли"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Метадані"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "Основний файл — це файл, який користувач завантажує, коли встановлює проєкт."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Основний файл"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Ви можете надати додаткові файли, як-от вихідний код, документацію чи пакети ресурсів."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Додаткові файли"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Завантажити додатковий файл"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Завантажити файл"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Завантажити основний та додаткові файли"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Перетягніть або натисніть, щоб обрати"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Деталі"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Файли"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Метадані"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Журнал змін версії"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Номер версії"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Номер версії дозволяє відрізнити цю версію від інших."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Уведіть номер версії. Наприклад, 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Підзаголовок версії"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Уведіть підзаголовок…"
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Тип версії"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Додати залежність"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Залежності"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Деталі"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Виявлені завантажувачі"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Виявлені версії"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Змінити"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Середовище"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Файли"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Завантажувачі"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Метадані"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Завантажувачі збірки не можна змінювати"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "Версії збірки не можна змінювати"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "Немає доданих залежностей."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "Немає встановленого середовища."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Немає обраного завантажувача."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Немає завантажувача"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "Немає обраної версії."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Заповнено від попередньої схожої версії"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Завантажувачі пакетів ресурсів не можна змінювати"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Завантажені файли"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Версії"
+  },
   "create.collection.collection-info": {
     "message": "Ваша нова добірка після створення буде публічною {count, plural,=0 {без проєктів} one {і міститиме # проєкт} few {і міститиме # проєкти} other {і міститиме # проєктів}}."
   },
@@ -1199,6 +1349,9 @@
   "create.project.name-placeholder": {
     "message": "Уведіть назву проєкту…"
   },
+  "create.project.organization-icon-alt": {
+    "message": "Значок {name}"
+  },
   "create.project.owner-description": {
     "message": "Установіть власника проєкту як себе чи організацію, членом якої ви є."
   },
@@ -1229,8 +1382,14 @@
   "create.project.type-server": {
     "message": "Сервер"
   },
+  "create.project.unknown-user": {
+    "message": "Невідомий користувач"
+  },
   "create.project.url-label": {
     "message": "Посилання"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Аватар користувача"
   },
   "create.project.visibility-description": {
     "message": "Видимість вашого проєкту після його затвердження."
@@ -1313,6 +1472,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Нещодавно оновлені"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Закрити"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Завантажити {formType}"
   },
@@ -1339,6 +1501,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Податкова форма"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Ви не заповнили податкову форму. Спробуйте знову."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Незавершена податкова форма"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth використовує стороннього постачальника Track1099 для безпечного збору та зберігання ваших податкових форм. <security-link>Дізнайтеся більше тут.</security-link>"
@@ -1379,6 +1547,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридична особа"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Оберіть дату народження"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Юридичною особою є зареєстрована організація, як-от корпорація, товариство або ТОВ."
   },
@@ -1387,6 +1558,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Фізична особа"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Оберіть країну…"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Оберіть регіон…"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Виберіть свою країну"
@@ -1523,6 +1700,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Уведіть суму"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "Мінімальний номінал — {min}, що перевищує {balance} на вашому балансі."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Ви повинні мати принаймні {min}, щоб використати цю подарункову карту."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "Для поточного балансу відсутні номінали"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Немає номіналів зі схожою кількістю"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Немає номіналів зі схожою кількістю. Найвищий — {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Спосіб оплати"
   },
@@ -1537,6 +1729,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Знайдіть суму"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Пошук {category}…"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Обрати {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Виберіть номінал:"
@@ -1555,6 +1753,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "Ви обрали долари США для PayPal International. <direct-paypal-link>Перейдіть на прямий PayPal</direct-paypal-link> для отримання кращих комісій (≈2% замість ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "Можна вивести від {min} до {max}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "Можна вивести від {min}."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Зняти"
@@ -2219,6 +2423,24 @@
   "hosting-marketing.medal.text-secondary": {
     "message": "Тимчасова пропозиція. Банківська картка не потрібна. Доступно для серверів у США."
   },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Виникла помилка під час отримання даних платежу"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "Обраний продукт знайдено, але він не має необхідних даних. Зв'яжіться з підтримкою."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Недійсний продукт"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "Ми досягли максимальної місткості. Спробуйте пізніше."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Сервер заповнений"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Виникла неочікувана помилка"
+  },
   "hosting-marketing.pick-customized-plan": {
     "message": "Виберіть індивідуальний план із необхідними вам характеристиками."
   },
@@ -2537,6 +2759,21 @@
   "layout.footer.about.status": {
     "message": "Статус"
   },
+  "layout.footer.based-on-label": {
+    "message": "На основі"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Режим розробника ввімкнено"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Режим розробника ввімкнено"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Режим розробника вимкнено"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Режим розробника вимкнено"
+  },
   "layout.footer.legal": {
     "message": "Правова інформація"
   },
@@ -2605,6 +2842,9 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.unknown-commit": {
+    "message": "невідомо"
   },
   "layout.menu-toggle.action": {
     "message": "Перемкнути меню"
@@ -2695,6 +2935,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
+  },
+  "modpack-scan-modal.clear-all-groups": {
+    "message": "Очистити всі групи"
   },
   "modpack-scan-modal.failed": {
     "message": "Помилка"
@@ -3002,6 +3245,51 @@
   "muralpay.warning.wallet-address": {
     "message": "Ще раз перевірте адресу свого гаманця. Кошти, надіслані на неправильну адресу, не можуть бути відновлені."
   },
+  "organization.button.manage": {
+    "message": "Керувати"
+  },
+  "organization.button.manage-projects": {
+    "message": "Керувати проєктами"
+  },
+  "organization.label.downloads": {
+    "message": "завантажень"
+  },
+  "organization.label.members": {
+    "message": "членів"
+  },
+  "organization.label.organization": {
+    "message": "Організація"
+  },
+  "organization.label.projects": {
+    "message": "проєктів"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Назва"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "Немає доступних проєктів для перенесення."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Значок {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Перенести проєкти"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "Перенести {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Тип"
+  },
+  "organization.projects.none": {
+    "message": "Ця організація ще не має проєктів."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Ця організація ще не має проєктів. Бажаєте <create-link>створити новий</create-link>?"
+  },
   "profile.bio.fallback.creator": {
     "message": "Творець Modrinth."
   },
@@ -3068,6 +3356,9 @@
   "profile.label.collection": {
     "message": "Добірка"
   },
+  "profile.label.download-count": {
+    "message": "{count, plural, one {завантаження} few {завантаження} many {завантажень} other {завантаження}}"
+  },
   "profile.label.joined": {
     "message": "Приєднався"
   },
@@ -3085,6 +3376,9 @@
   },
   "profile.label.organizations": {
     "message": "Організації"
+  },
+  "profile.label.project-count": {
+    "message": "{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "profile.label.saving": {
     "message": "Збереження…"
@@ -3229,6 +3523,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "Не показувати знову"
+  },
+  "project.actions.edit-project": {
+    "message": "Змінити проєкт"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Пересканувати збірку"
   },
   "project.actions.review-project": {
     "message": "Переглянути проєкт"
@@ -3614,6 +3914,99 @@
   "project.settings.permissions.sort.status": {
     "message": "Статус"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Адреса Bedrock"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "Сервер Java повинний бути доступний, перш ніж зберегти. Переконайтеся, що із сервером можна зв'язатися."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Не вдалося зберегти"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Деталі сервера"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Уведіть адресу"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Адреса Java"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Мови"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Затримка: {latency}мс"
+  },
+  "project.settings.server.optional-label": {
+    "message": "необов'язково"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "Ми не змогли зв'язатися із цим сервером. Його міг заблокувати ваш гост, тому спробуйте перезавантажити його кілька разів. Якщо це не працює, <support-link>зв'яжіться з підтримкою</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Спробувати зв'язатися"
+  },
+  "project.settings.server.region-label": {
+    "message": "Регіон"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Оберіть мови"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Оберіть регіон"
+  },
+  "project.settings.server.server-online": {
+    "message": "Сервер у мережі!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "Якщо ви маєте <srv-tooltip>[записи SRV]</srv-tooltip>, вам не потрібно додавати порт. В іншому випадку, якщо ваш порт не 25565, ви можете додати його як :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "Уведена адреса може містити записи DNS SRV _minecraft._tcp.(ваш домен), який указує на вашу адресу сервера Minecraft та порт."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Ви обрали всі {count} доступних теґів. Будь ласка, оберіть лише ті теґи, які дійсно підходять вашому проєктові."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Оберіть усі категорії, які описують тему чи функціонал {type}."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Основні теґи"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "Ви можете обрати основними до 3 найбільш описових теґів. Інші теґи можуть стати основними, якщо не оберете всі 3."
+  },
+  "project.settings.tags.features-description": {
+    "message": "Оберіть увесь функціонал, який присутній у {type}."
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "Ви обрали {count} теґів роздільної здатності ({tags}). Пакети ресурсів зазвичай повинні містити тільки один теґ роздільної здатності."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Оберіть реалістичний уплив на продуктивність вашого {type}. Оберіть кілька, якщо його можна налаштувати на кілька впливів."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Оберіть роздільні здатності текстур у вашому {type}."
+  },
+  "project.settings.tags.tagging-importance-description": {
+    "message": "Указання правильних теґів необхідне, щоб люди могли легше знайти ваш {type}. Переконайтеся, що ви обрали підхожі теґи."
+  },
+  "project.settings.tags.title": {
+    "message": "Теґи"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "Ви вибрали {count} теґів. Ми рекомендуємо зменшити їхню кількість до 8, щоб ваш проєкт можна було легше знайти."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "Ви вибрали {count} теґів. Зменште їхню кількість до 18, щоб ваш проєкт можна було легше знайти."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Ви вибрали {count} теґів. Ми рекомендуємо зменшити їхню кількість до 12, щоб ваш сервер можна було легше знайти."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Спершу завантажте версію, щоб обирати теґи!"
+  },
   "project.settings.title": {
     "message": "Налаштування"
   },
@@ -3623,8 +4016,50 @@
   "project.status.archived.message": {
     "message": "«{title}» було архівовано. «{title}» не отримуватиме подальших оновлень допоки автор не вирішить розархівувати проєкт."
   },
+  "project.versions.copy-id-option": {
+    "message": "Копіювати ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Копіювати посилання"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Копіювати координати Maven"
+  },
+  "project.versions.delete-button": {
+    "message": "Видалити"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Це видалить цю версію назавжди (ну прям назавжди)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Дійсно видалити цю версію?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Змінити деталі"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Змінити файли"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Змінити метадані"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Змінити версію"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Відкрити в новій укладці"
+  },
+  "project.versions.share-option": {
+    "message": "Поділитися"
+  },
   "project.versions.title": {
     "message": "Версії"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "Цю версію успішно видалено."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Версію видалено"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Будь ласка, надайте підтвердження того, що ви маєте дозвіл на розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
@@ -4033,6 +4468,12 @@
   },
   "servers.plan.small.description": {
     "message": "Прекрасно підходить для 1–5 друзів із кількома легкими модами."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Найпопулярніший"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "на місяць{interval, select, monthly {} other {, оплата {interval, select, quarterly {щоквартально} yearly {щорічно} other {кожні {interval}}}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Завершити налаштування"
@@ -4805,6 +5246,12 @@
   "settings.sidebar.label.display": {
     "message": "Перегляд"
   },
+  "shared-instance.invite.trust.heading": {
+    "message": "Ви знаєте цього користувача?"
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Це запрошення недоступне"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Останні новини від Modrinth"
   },
@@ -4876,6 +5323,18 @@
   },
   "version.environment.unknown.title": {
     "message": "Невідоме середовище"
+  },
+  "version.notification.deleted-text": {
+    "message": "Цю версію успішно видалено."
+  },
+  "version.notification.deleted-title": {
+    "message": "Версію видалено"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "Ваш пакет ресурсів успішно зібрано в мод! Протестуйте його, щоб переконатися у відсутності помилок."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Збірка успішна"
   },
   "version.package-as-mod.button": {
     "message": "Зібрати в мод"
