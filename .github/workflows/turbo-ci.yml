@@ -197,9 +197,9 @@ jobs:
           print_cgroup_file /sys/fs/cgroup/memory/memory.failcnt
           print_cgroup_file /sys/fs/cgroup/memory/memory.oom_control
 
-          echo "::dmesg::"
+          echo "::group::dmesg"
           dmesg | grep -E -i 'sigbus|bus error|segfault'
-          echo "::endsection::"
+          echo "::endgroup::"
 
       - name: Verify intl:extract has been run
         run: |
