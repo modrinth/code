@@ -217,12 +217,6 @@ function expandedCardPosition(index: number) {
 function cardPosition(index: number) {
 	const position = isExpanded.value ? expandedCardPosition(index) : collapsedCardPosition(index)
 	const item = props.items[index]
-	if (index === 0 && singleItemEntrance.value) {
-		return {
-			...position,
-			opacity: 0,
-		}
-	}
 	if (!item || !enteringItemIds.value.has(item.id)) return position
 
 	return {
