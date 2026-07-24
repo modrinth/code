@@ -70,14 +70,13 @@ jobs:
           fi
 
   docker:
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
+    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-large-amd64' || 'ubuntu-latest' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
     env:
       SQLX_OFFLINE: 'true'
       GIT_HASH: ${{ github.sha }}
-      SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
-      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
+      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '20G' || '' }}
       RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
       RUST_MIN_STACK: '16777216'
     steps:
@@ -94,10 +93,10 @@ jobs:
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
       - name: Setup sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Set up caches
+        if: needs.skip-if-clean.outputs.internal == 'true'
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
@@ -105,6 +104,7 @@ jobs:
             apt
 
       - name: Configure sccache
+        if: needs.skip-if-clean.outputs.internal == 'true'
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install build dependencies

@@ -62,7 +62,7 @@ jobs:
 
   build:
     name: Lint and Test
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
+    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-large-amd64' || 'ubuntu-latest' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
 
@@ -102,6 +102,7 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
+        if: needs.skip-if-clean.outputs.internal == 'true'
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
@@ -110,9 +111,11 @@ jobs:
             apt
 
       - name: Set up Turborepo caching
+        if: needs.skip-if-clean.outputs.internal == 'true'
         uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
 
       - name: Configure sccache
+        if: needs.skip-if-clean.outputs.internal == 'true'
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Install apt dependencies
@@ -131,7 +134,6 @@ jobs:
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
       - name: Setup sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
         uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Setup binstall

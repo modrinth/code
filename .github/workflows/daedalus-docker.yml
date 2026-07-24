@@ -73,10 +73,6 @@ jobs:
 
   docker:
     runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
-    env:
-      SCCACHE_DIR: ${{ needs.skip-if-clean.outputs.internal == 'true' && '/mnt/sccache' || '' }}
-      SCCACHE_CACHE_SIZE: ${{ needs.skip-if-clean.outputs.internal == 'true' && '10G' || '' }}
-      RUSTC_WRAPPER: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'sccache' || '' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
     steps:
@@ -91,19 +87,6 @@ jobs:
 
       - name: Setup mold
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
-
-      - name: Set up caches
-        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
-        with:
-          cache: |
-            rust
-
-      - name: Configure sccache
-        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
-
-      - name: Setup sccache
-        if: needs.skip-if-clean.outputs.internal == 'true'
-        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Build daedalus_client
         run: cargo build --release --package daedalus_client
