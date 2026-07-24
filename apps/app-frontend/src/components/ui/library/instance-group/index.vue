@@ -12,6 +12,7 @@ import {
 } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/library/instance-group/instance.vue'
 import type {
 	InstanceCard,
@@ -35,6 +36,7 @@ const {
 
 const instanceComponents = ref<InstanceCard[]>([])
 const groupAccordion = ref<InstanceType<typeof Accordion>>()
+const groupOptions = ref<InstanceType<typeof ContextMenu>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
@@ -79,6 +81,18 @@ function requestGroupDeletion() {
 	}
 }
 
+function openGroupContextMenu(event: MouseEvent) {
+	groupOptions.value?.showMenu(event, props.instanceGroup, [
+		{ name: 'delete_group', color: 'danger' },
+	])
+}
+
+function handleGroupOption({ option }: { option: string }) {
+	if (option === 'delete_group') {
+		requestGroupDeletion()
+	}
+}
+
 function toggleGroup() {
 	if (groupAccordion.value?.isOpen) {
 		groupAccordion.value.close()
@@ -109,6 +123,7 @@ watch(
 			v-if="instanceGroup.key !== 'None'"
 			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5 py-2.5"
 			@click="toggleGroup"
+			@contextmenu.prevent.stop="openGroupContextMenu"
 		>
 			<button
 				class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0"
@@ -178,6 +193,10 @@ watch(
 			</section>
 		</Accordion>
 	</div>
+
+	<ContextMenu ref="groupOptions" @option-clicked="handleGroupOption">
+		<template #delete_group> <TrashIcon /> {{ formatMessage(messages.deleteGroup) }} </template>
+	</ContextMenu>
 
 	<NewModal
 		ref="confirmDeleteGroupModal"
