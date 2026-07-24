@@ -1194,10 +1194,19 @@
     "defaultMessage": "You have obtained special permission to redistribute this work in your modpack."
   },
   "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Remove group"
+    "defaultMessage": "Delete group"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "This will permanently delete this attribution group and all files inside it. This action cannot be undone."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Delete {title}?"
   },
   "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Could not remove group"
+    "defaultMessage": "Could not delete group"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Hold Shift while clicking to skip confirmation."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remove from group"

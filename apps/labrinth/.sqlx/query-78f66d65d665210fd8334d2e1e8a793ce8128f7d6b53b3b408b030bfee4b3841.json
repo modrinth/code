@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT id AS \"id: DBAttributionGroupId\"\n\t\tFROM project_attribution_groups\n\t\tWHERE project_id = $1\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: DBAttributionGroupId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "78f66d65d665210fd8334d2e1e8a793ce8128f7d6b53b3b408b030bfee4b3841"
+}
