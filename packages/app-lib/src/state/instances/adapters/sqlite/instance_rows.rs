@@ -763,12 +763,12 @@ where
     Ok(rows)
 }
 
-pub(crate) async fn list_instance_group_names(
+pub(crate) async fn list_instance_groups(
     pool: &SqlitePool,
-) -> crate::Result<Vec<String>> {
-    let groups = sqlx::query_scalar::<_, String>(
+) -> crate::Result<Vec<(String, String)>> {
+    let groups = sqlx::query_as::<_, (String, String)>(
         "
-		SELECT name
+		SELECT id, name
 		FROM instance_groups
 		ORDER BY name
 		",

@@ -22,7 +22,9 @@ pub use self::export_mrpack::{
     create_mrpack_json, export_mrpack, get_pack_export_candidates,
 };
 pub use self::get::{get, get_many, list};
-pub use self::groups::{create_group, delete_group, list_groups};
+pub use self::groups::{
+    InstanceGroup, create_group, delete_group, list_groups, rename_group,
+};
 pub use self::install::get_optimal_jre_key;
 pub(crate) use self::lifecycle::create;
 pub use self::lifecycle::{edit, edit_icon, remove};

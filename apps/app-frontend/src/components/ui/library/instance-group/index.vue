@@ -5,31 +5,39 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	InlineEditableText,
 	NewModal,
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import Instance from '@/components/ui/library/instance-group/instance.vue'
-import { useLibrary } from '@/components/ui/library/use-library'
 import type {
 	InstanceCard,
 	InstanceGroup as InstanceGroupType,
 } from '@/components/ui/library/use-library'
+import { useLibrary } from '@/components/ui/library/use-library'
 
 const props = defineProps<{
 	instanceGroup: InstanceGroupType
 }>()
 
 const { formatMessage } = useVIntl()
-const { isSectionCollapsed, setSectionCollapsed, deleteGroup, handleInstanceContextMenu } =
-	useLibrary()
+const {
+	isSectionCollapsed,
+	setSectionCollapsed,
+	deleteGroup,
+	isValidGroupName,
+	renameGroup,
+	handleInstanceContextMenu,
+} = useLibrary()
 
 const instanceComponents = ref<InstanceCard[]>([])
 const groupAccordion = ref<InstanceType<typeof Accordion>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
+const groupName = ref(props.instanceGroup.key)
 
 const messages = defineMessages({
 	deleteGroup: {
@@ -78,32 +86,56 @@ function toggleGroup() {
 		groupAccordion.value?.open()
 	}
 }
+
+function validateGroupName(value: string) {
+	return isValidGroupName(value, props.instanceGroup.key)
+}
+
+async function updateGroupName(value: string) {
+	return await renameGroup(props.instanceGroup.id, props.instanceGroup.key, value)
+}
+
+watch(
+	() => props.instanceGroup.key,
+	(value) => {
+		groupName.value = value
+	},
+)
 </script>
 
 <template>
 	<div class="instance-group relative">
 		<div
 			v-if="instanceGroup.key !== 'None'"
-			class="group/header mb-3 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5 py-2.5"
+			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5 py-2.5"
+			@click="toggleGroup"
 		>
 			<button
-				class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-left"
+				class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0"
 				type="button"
-				@click="toggleGroup"
+				:aria-expanded="groupAccordion?.isOpen"
+				:aria-label="groupAccordion?.isOpen ? 'Collapse group' : 'Expand group'"
+				@click.stop="toggleGroup"
 			>
 				<DropdownIcon
 					class="size-5 shrink-0 text-secondary transition-all duration-300 group-hover/header:text-primary"
 					:class="{ 'rotate-180': groupAccordion?.isOpen }"
 				/>
-				<span
-					class="text-base font-semibold text-primary transition-colors group-hover/header:text-contrast"
-				>
-					{{ instanceGroup.key }}
-				</span>
-				<TagItem class="shrink-0 border-surface-3 bg-surface-2">
-					{{ instanceGroup.instances.length }}
-				</TagItem>
 			</button>
+			<InlineEditableText
+				v-model="groupName"
+				class="text-base font-semibold text-primary select-none group-hover/header:text-contrast"
+				:edit-label="formatMessage(commonMessages.renameButton)"
+				max-width="24rem"
+				:max-length="32"
+				:on-change="updateGroupName"
+				:validate="validateGroupName"
+				@click.stop
+			/>
+			<TagItem v-if="instanceGroup.instances.length" class="shrink-0 border-surface-3 bg-surface-2">
+				{{ instanceGroup.instances.length }}
+			</TagItem>
+			<div class="min-w-0 flex-1" />
 			<ButtonStyled circular type="transparent">
 				<button
 					v-tooltip="formatMessage(messages.deleteGroup)"
@@ -111,7 +143,7 @@ function toggleGroup() {
 					type="button"
 					:aria-label="formatMessage(messages.deleteGroup)"
 					:disabled="deletingGroup"
-					@click="requestGroupDeletion"
+					@click.stop="requestGroupDeletion"
 				>
 					<TrashIcon class="!size-4 !min-h-4 !min-w-4" />
 				</button>

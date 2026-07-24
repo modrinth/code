@@ -38,7 +38,7 @@ const {
 		<div class="flex flex-col gap-3">
 			<InstanceGroup
 				v-for="instanceGroup in instanceGroups"
-				:key="instanceGroup.key"
+				:key="instanceGroup.id"
 				:instance-group="instanceGroup"
 			/>
 		</div>
