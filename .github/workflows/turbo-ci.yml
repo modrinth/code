@@ -174,6 +174,11 @@ jobs:
       - name: Lint and test
         run: pnpm run ci
 
+      - name: Post-run checks
+        if: ${{ always() }}
+        run: |
+          df -h
+
       - name: Verify intl:extract has been run
         run: |
           pnpm turbo run intl:extract --force
