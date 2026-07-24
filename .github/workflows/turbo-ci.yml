@@ -178,6 +178,7 @@ jobs:
         if: ${{ always() }}
         run: |
           df -h
+          dd if=/dev/urandom of=a bs=1024 count=8
 
       - name: Verify intl:extract has been run
         run: |
