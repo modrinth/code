@@ -4,12 +4,12 @@
         <description><![CDATA[Keep up-to-date on the latest news from Modrinth.]]></description>
         <link>https://modrinth.com/news/</link>
         <generator>@modrinth/blog</generator>
-        <lastBuildDate>Thu, 23 Jul 2026 23:50:18 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 24 Jul 2026 14:07:14 GMT</lastBuildDate>
         <atom:link href="https://modrinth.com/news/feed/rss.xml" rel="self" type="application/rss+xml"/>
         <language><![CDATA[en]]></language>
         <item>
-            <title><![CDATA[Share content with friends]]></title>
-            <description><![CDATA[Shared instances let you send and update content without sharing `.mrpack` files.]]></description>
+            <title><![CDATA[Share instances with friends]]></title>
+            <description><![CDATA[Send and update content without sharing modpack files.]]></description>
             <link>https://modrinth.com/news/article/shared-instances/</link>
             <guid isPermaLink="false">https://modrinth.com/news/article/shared-instances/</guid>
             <pubDate>Fri, 24 Jul 2026 11:00:00 GMT</pubDate>
