@@ -2,6 +2,7 @@ pub mod admin;
 pub mod affiliate;
 pub mod attribution;
 pub mod billing;
+pub mod blocked_users;
 pub mod campaign;
 pub mod delphi;
 pub mod external_notifications;
@@ -29,6 +30,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("/_internal")
             .wrap(default_cors())
             .configure(admin::config)
+            .configure(blocked_users::config)
             .configure(session::config)
             .configure(flows::config)
             .configure(pats::config)
@@ -65,6 +67,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 	),
 	paths(
 		admin::count_download,
+		blocked_users::block_user,
+		blocked_users::unblock_user,
+		blocked_users::block_status,
 		admin::force_reindex,
 		admin::force_reindex_project,
 		session::list,

@@ -2,6 +2,7 @@ use thiserror::Error;
 
 pub mod affiliate_code_item;
 pub mod analytics_event_item;
+pub mod blocked_user_item;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
