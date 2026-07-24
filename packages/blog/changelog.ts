@@ -11,6 +11,43 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-24T06:01:31+00:00`,
+		product: 'app',
+		version: '0.15.20',
+		body: `## Fixed
+- Fixed loader tags and environment tags not showing up on search result cards.
+- Fixed database issues when adding many external files to an instance.
+- Fixed issues that sometimes occur when installing multiple modpacks at the same time.
+- Fixed case where double clicking really fast when installing on a project would brick an instance as it would become duplicated in the app database.`,
+	},
+	{
+		date: `2026-07-24T06:01:31+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed loader tags and environment tags not showing up on search result cards.`,
+	},
+	{
+		date: `2026-07-22T21:33:46+00:00`,
+		product: 'app',
+		version: '0.15.19',
+		body: `## Added
+- Added project licensing info to project sidebar
+
+## Fixed
+- Fixed project updated date needing to wait for versions to load.
+- Fixed large error notifications going off-screen and being impossible to copy or close.`,
+	},
+	{
+		date: `2026-07-22T21:33:46+00:00`,
+		product: 'web',
+		body: `## Changed
+- Project license info is now prefetched on hover so it loads quicker.
+
+## Fixed
+- Fixed project updated date needing to wait for versions to load.
+- Fixed large error notifications going off-screen and being impossible to copy or close.`,
+	},
+	{
 		date: `2026-07-22T10:46:03+00:00`,
 		product: 'app',
 		version: '0.15.18',

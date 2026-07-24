@@ -1,9 +1,9 @@
 use crate::State;
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
-use crate::state::{CachedEntry, ProjectType};
+use crate::state::{CachedEntry, ProjectType, file_hash_cache_key};
 use chrono::Utc;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
 pub(crate) async fn sync_content_files(
@@ -24,6 +24,7 @@ pub(crate) async fn sync_instance_content_files(
     instance: &Instance,
     state: &State,
 ) -> crate::Result<Vec<InstanceFile>> {
+    let _content_lock = state.lock_instance_content(&instance.id).await;
     let scanned = filesystem::scan_content_files(
         &state.directories.instances_dir(),
         &instance.path,
@@ -43,10 +44,10 @@ pub(crate) async fn sync_instance_content_files(
         .into_iter()
         .map(|hash| {
             (
-                format!(
-                    "{}-{}",
+                file_hash_cache_key(
                     hash.size,
-                    hash.path.trim_end_matches(".disabled")
+                    hash.modified_at_ns,
+                    hash.path.trim_end_matches(".disabled"),
                 ),
                 hash,
             )
@@ -55,6 +56,17 @@ pub(crate) async fn sync_instance_content_files(
     let existing_files =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
+    let scanned_paths = scanned
+        .iter()
+        .map(|file| file.relative_path.clone())
+        .collect::<HashSet<_>>();
+    let missing_file_ids = existing_files
+        .iter()
+        .filter(|file| {
+            !file.missing && !scanned_paths.contains(&file.relative_path)
+        })
+        .map(|file| file.id.clone())
+        .collect::<Vec<_>>();
     let existing_files_by_path = existing_files
         .into_iter()
         .map(|file| (file.relative_path.clone(), file))
@@ -62,13 +74,17 @@ pub(crate) async fn sync_instance_content_files(
 
     let now = Utc::now();
     let mut files = Vec::new();
+    let mut present_without_hash_ids = Vec::new();
 
     for file in scanned {
         let hash_key = file.hash_cache_key.trim_end_matches(".disabled");
+        let existing_file = existing_files_by_path.get(&file.relative_path);
         let Some(hash) = hashes_by_key.get(hash_key) else {
+            if let Some(existing_file) = existing_file {
+                present_without_hash_ids.push(existing_file.id.clone());
+            }
             continue;
         };
-        let existing_file = existing_files_by_path.get(&file.relative_path);
 
         files.push(InstanceFile {
             id: existing_file
@@ -87,16 +103,33 @@ pub(crate) async fn sync_instance_content_files(
     }
 
     let mut tx = state.pool.begin().await?;
-    sqlite::content_rows::mark_instance_files_missing(&instance.id, &mut tx)
+    for file_id in missing_file_ids {
+        sqlite::content_rows::set_instance_file_missing(
+            &file_id, true, &mut tx,
+        )
         .await?;
+    }
 
+    let mut stored_files =
+        Vec::with_capacity(files.len() + present_without_hash_ids.len());
+    for file_id in present_without_hash_ids {
+        if let Some(file) = sqlite::content_rows::set_instance_file_missing(
+            &file_id, false, &mut tx,
+        )
+        .await?
+        {
+            stored_files.push(file);
+        }
+    }
     for file in &files {
-        sqlite::content_rows::upsert_instance_file(file, &mut tx).await?;
+        stored_files.push(
+            sqlite::content_rows::upsert_instance_file(file, &mut tx).await?,
+        );
     }
 
     tx.commit().await?;
 
-    Ok(files)
+    Ok(stored_files)
 }
 
 pub(crate) fn project_type_for_file(

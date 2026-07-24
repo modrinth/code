@@ -18,7 +18,6 @@ use crate::database::models::{
     DBOrganizationId, DBProjectId, DBUserId, DBVersionId, LoaderFieldEnumId,
     LoaderFieldEnumValueId, LoaderFieldId,
 };
-use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{DependencyType, from_duplicate_version_fields};
@@ -29,6 +28,7 @@ use crate::search::{
     UploadSearchVersion,
 };
 use crate::util::error::Context;
+use xredis::RedisPool;
 
 struct PartialProject {
     id: DBProjectId,

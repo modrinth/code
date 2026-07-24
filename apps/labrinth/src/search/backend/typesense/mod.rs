@@ -148,7 +148,6 @@ use serde_json::{Value, json};
 use tracing::{debug, info};
 
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::routes::ApiError;
 use crate::search::backend::{
@@ -165,6 +164,7 @@ use crate::search::{
     UploadSearchVersion,
 };
 use crate::util::error::Context;
+use xredis::RedisPool;
 
 use self::filter::serialize_filter;
 

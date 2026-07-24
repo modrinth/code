@@ -3041,24 +3041,6 @@
   "project-type.shader.singular": {
     "message": "Sombreador"
   },
-  "project.about.details.created": {
-    "message": "Creado el {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Con licencia {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publicado el {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Enviado el {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalles"
-  },
-  "project.about.details.updated": {
-    "message": "Actualizado el {date}"
-  },
   "project.actions.create-server": {
     "message": "Crear un servidor"
   },
@@ -3088,9 +3070,6 @@
   },
   "project.description.title": {
     "message": "Descripción"
-  },
-  "project.details.licensed": {
-    "message": "Con licencia"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} no está soportado para la versión {gameVersion} de {platform}"
@@ -3142,15 +3121,6 @@
   },
   "project.gallery.title": {
     "message": "Galería"
-  },
-  "project.license.error": {
-    "message": "No se pudo recuperar el texto de la licencia."
-  },
-  "project.license.loading": {
-    "message": "Cargando texto de la licencia..."
-  },
-  "project.license.title": {
-    "message": "Licencia"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Tu proyecto es privado, lo que significa que solo tú, o las personas que invites, pueden acceder."

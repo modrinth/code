@@ -3,7 +3,6 @@ use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::{DBOrganizationId, DatabaseError};
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::users::Badges;
@@ -15,10 +14,11 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
+use xredis::RedisPool;
 
-const USERS_NAMESPACE: &str = "users:v1";
-const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v1";
-const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v1";
+const USERS_NAMESPACE: &str = "users:v3";
+const USER_USERNAMES_NAMESPACE: &str = "users_usernames:v3";
+const USERS_PROJECTS_NAMESPACE: &str = "users_projects:v3";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DBUser {
@@ -273,7 +273,7 @@ impl DBUser {
                     })
                     .await?;
 
-                Ok(users)
+                Ok::<_, DatabaseError>(users)
             }).await?;
         Ok(val)
     }
@@ -389,13 +389,10 @@ impl DBUser {
 
         {
             let mut redis = redis.connect().await?;
+            let key = redis.key().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
-            let cached_projects = redis
-                .get_deserialized::<Vec<DBProjectId>>(
-                    USERS_PROJECTS_NAMESPACE,
-                    &user_id.0.to_string(),
-                )
-                .await?;
+            let cached_projects =
+                redis.get_deserialized::<Vec<DBProjectId>>(&key).await?;
 
             if let Some(projects) = cached_projects {
                 return Ok(projects);
@@ -417,15 +414,9 @@ impl DBUser {
         .await?;
 
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(USERS_PROJECTS_NAMESPACE, user_id.0);
 
-        redis
-            .set_serialized(
-                USERS_PROJECTS_NAMESPACE,
-                user_id.0,
-                &db_projects,
-                None,
-            )
-            .await?;
+        redis.set_serialized(&key, &db_projects, None).await?;
 
         Ok(db_projects)
     }
@@ -556,18 +547,24 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
-
-        redis
-            .delete_many(user_ids.iter().flat_map(|(id, username)| {
+        let keys = user_ids
+            .iter()
+            .flat_map(|(id, username)| {
                 [
-                    (USERS_NAMESPACE, Some(id.0.to_string())),
-                    (
-                        USER_USERNAMES_NAMESPACE,
-                        username.clone().map(|i| i.to_lowercase()),
-                    ),
+                    Some(redis.key().entity(USERS_NAMESPACE, id.0)),
+                    username.as_ref().map(|username| {
+                        redis.key().entity(
+                            USER_USERNAMES_NAMESPACE,
+                            username.to_lowercase(),
+                        )
+                    }),
                 ]
-            }))
-            .await?;
+                .into_iter()
+                .flatten()
+            })
+            .collect::<Vec<_>>();
+
+        redis.delete_many(&keys).await?;
         Ok(())
     }
 
@@ -576,14 +573,12 @@ impl DBUser {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let keys = user_ids
+            .iter()
+            .map(|id| redis.key().entity(USERS_PROJECTS_NAMESPACE, id.0))
+            .collect::<Vec<_>>();
 
-        redis
-            .delete_many(
-                user_ids.iter().map(|id| {
-                    (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))
-                }),
-            )
-            .await?;
+        redis.delete_many(&keys).await?;
 
         Ok(())
     }

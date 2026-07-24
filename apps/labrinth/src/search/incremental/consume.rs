@@ -11,9 +11,10 @@ use std::{
     time::{Duration, Instant},
 };
 use tracing::{Instrument, info, info_span};
+use xredis::RedisPool;
 
 use crate::{
-    database::{PgPool, redis::RedisPool},
+    database::PgPool,
     env::ENV,
     models::ids::{ProjectId, VersionId},
     search::{

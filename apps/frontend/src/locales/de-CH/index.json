@@ -3218,24 +3218,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Erstellt {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Lienziert unter {license}"
-  },
-  "project.about.details.published": {
-    "message": "Veröffentlicht {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Eingereicht {date}"
-  },
-  "project.about.details.title": {
-    "message": "Details"
-  },
-  "project.about.details.updated": {
-    "message": "Aktualisiert {date}"
-  },
   "project.actions.create-server": {
     "message": "Erstelle einen Server"
   },
@@ -3265,9 +3247,6 @@
   },
   "project.description.title": {
     "message": "Beschreibung"
-  },
-  "project.details.licensed": {
-    "message": "Lizenziert unter"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Diese Spielversion ist mit dem Basisprojekt nicht kompatibel."
@@ -3421,15 +3400,6 @@
   },
   "project.gallery.title": {
     "message": "Galerie"
-  },
-  "project.license.error": {
-    "message": "Lizenztext konnte nicht abgerufen werden."
-  },
-  "project.license.loading": {
-    "message": "Lade Lizenztext..."
-  },
-  "project.license.title": {
-    "message": "Lizenz"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Dein Projekt ist privat, was bedeutet, dass nur du und von dir eingeladene Personen darauf zugreifen können."

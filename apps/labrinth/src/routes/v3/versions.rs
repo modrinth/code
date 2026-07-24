@@ -13,7 +13,6 @@ use crate::database::models::version_item::{
     DBLoaderVersion, DependencyBuilder,
 };
 use crate::database::models::{DBOrganization, image_item};
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
@@ -35,6 +34,7 @@ use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(super::version_creation::version_create_route)

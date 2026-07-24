@@ -1,4 +1,3 @@
-use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
@@ -14,6 +13,7 @@ use serde_json::Value;
 use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
+use xredis::RedisPool;
 
 pub mod backend;
 pub mod filter;
@@ -144,14 +144,16 @@ async fn hydrate_search_results(
         HashMap::new()
     } else {
         let mut redis = redis_pool.connect().await?;
+        let ping_keys = project_ids
+            .iter()
+            .map(|project_id| {
+                redis_pool
+                    .key()
+                    .entity(server_ping::REDIS_NAMESPACE, project_id)
+            })
+            .collect::<Vec<_>>();
         let ping_results = redis
-            .get_many_deserialized::<JavaServerPing>(
-                server_ping::REDIS_NAMESPACE,
-                &project_ids
-                    .iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>(),
-            )
+            .get_many_deserialized::<JavaServerPing>(&ping_keys)
             .await?;
 
         ping_results

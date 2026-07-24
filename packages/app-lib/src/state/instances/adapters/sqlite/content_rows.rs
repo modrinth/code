@@ -419,33 +419,47 @@ where
     rows.into_iter().map(TryInto::try_into).collect()
 }
 
-pub(crate) async fn mark_instance_files_missing(
-    instance_id: &str,
+pub(crate) async fn set_instance_file_missing(
+    file_id: &str,
+    missing: bool,
     tx: &mut Transaction<'_, Sqlite>,
-) -> crate::Result<()> {
+) -> crate::Result<Option<InstanceFile>> {
+    let missing = i64::from(missing);
     let modified_at = Utc::now().timestamp();
-
-    sqlx::query!(
+    let row = sqlx::query_as!(
+        InstanceFileRow,
         "
 		UPDATE instance_files
 		SET
-			missing = 1,
+			missing = ?,
 			modified_at = ?
-		WHERE instance_id = ?
+		WHERE id = ?
+		RETURNING
+			id,
+			instance_id,
+			relative_path,
+			file_name,
+			enabled,
+			sha1,
+			size,
+			missing,
+			added_at,
+			modified_at
 		",
+        missing,
         modified_at,
-        instance_id,
+        file_id,
     )
-    .execute(&mut **tx)
+    .fetch_optional(&mut **tx)
     .await?;
 
-    Ok(())
+    row.map(TryInto::try_into).transpose()
 }
 
 pub(crate) async fn upsert_instance_file(
     file: &InstanceFile,
     tx: &mut Transaction<'_, Sqlite>,
-) -> crate::Result<()> {
+) -> crate::Result<InstanceFile> {
     let id = file.id.as_str();
     let instance_id = file.instance_id.as_str();
     let relative_path = file.relative_path.as_str();
@@ -457,7 +471,8 @@ pub(crate) async fn upsert_instance_file(
     let added_at = file.added_at.timestamp();
     let modified_at = file.modified_at.timestamp();
 
-    sqlx::query!(
+    let row = sqlx::query_as!(
+        InstanceFileRow,
         "
 		INSERT INTO instance_files (
 			id,
@@ -479,6 +494,17 @@ pub(crate) async fn upsert_instance_file(
 			size = excluded.size,
 			missing = excluded.missing,
 			modified_at = excluded.modified_at
+		RETURNING
+			id,
+			instance_id,
+			relative_path,
+			file_name,
+			enabled,
+			sha1,
+			size,
+			missing,
+			added_at,
+			modified_at
 		",
         id,
         instance_id,
@@ -491,10 +517,10 @@ pub(crate) async fn upsert_instance_file(
         added_at,
         modified_at,
     )
-    .execute(&mut **tx)
+    .fetch_one(&mut **tx)
     .await?;
 
-    Ok(())
+    row.try_into()
 }
 
 pub(crate) async fn get_content_entries<'e, E>(
@@ -575,19 +601,11 @@ pub(crate) async fn get_instance_file_by_relative_path(
 
 pub(crate) async fn upsert_instance_file_from_parts(
     input: UpsertInstanceFile<'_>,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<InstanceFile> {
-    let existing = get_instance_file_by_relative_path(
-        input.instance_id,
-        input.relative_path,
-        pool,
-    )
-    .await?;
+    let now = Utc::now();
     let file = InstanceFile {
-        id: existing
-            .as_ref()
-            .map(|file| file.id.clone())
-            .unwrap_or_else(|| format!("instance-file:{}", Uuid::new_v4())),
+        id: format!("instance-file:{}", Uuid::new_v4()),
         instance_id: input.instance_id.to_string(),
         relative_path: input.relative_path.to_string(),
         file_name: input.file_name.to_string(),
@@ -595,18 +613,11 @@ pub(crate) async fn upsert_instance_file_from_parts(
         sha1: input.sha1.to_string(),
         size: input.size,
         missing: input.missing,
-        added_at: existing
-            .as_ref()
-            .map(|file| file.added_at)
-            .unwrap_or_else(Utc::now),
-        modified_at: Utc::now(),
+        added_at: now,
+        modified_at: now,
     };
 
-    let mut tx = pool.begin().await?;
-    upsert_instance_file(&file, &mut tx).await?;
-    tx.commit().await?;
-
-    Ok(file)
+    upsert_instance_file(&file, tx).await
 }
 
 pub(crate) async fn rename_instance_file(
@@ -615,11 +626,10 @@ pub(crate) async fn rename_instance_file(
     new_relative_path: &str,
     new_file_name: &str,
     enabled: bool,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<Option<InstanceFile>> {
     let enabled = i64::from(enabled);
     let modified_at = Utc::now().timestamp();
-    let mut tx = pool.begin().await?;
 
     let source_id = sqlx::query_scalar!(
         "
@@ -630,7 +640,7 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         old_relative_path,
     )
-    .fetch_optional(&mut *tx)
+    .fetch_optional(&mut **tx)
     .await?;
     let target_id = sqlx::query_scalar!(
         "
@@ -641,7 +651,7 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         new_relative_path,
     )
-    .fetch_optional(&mut *tx)
+    .fetch_optional(&mut **tx)
     .await?;
 
     if let (Some(source_id), Some(target_id)) =
@@ -669,7 +679,7 @@ pub(crate) async fn rename_instance_file(
             target_id,
             source_id,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
 
         sqlx::query!(
@@ -683,7 +693,7 @@ pub(crate) async fn rename_instance_file(
             instance_id,
             target_id,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
 
         sqlx::query!(
@@ -693,7 +703,7 @@ pub(crate) async fn rename_instance_file(
 				",
             target_id,
         )
-        .execute(&mut *tx)
+        .execute(&mut **tx)
         .await?;
     }
 
@@ -715,19 +725,29 @@ pub(crate) async fn rename_instance_file(
         instance_id,
         old_relative_path,
     )
-    .execute(&mut *tx)
+    .execute(&mut **tx)
     .await?;
 
-    tx.commit().await?;
+    let row = sqlx::query_as!(
+        InstanceFileRow,
+        "
+		SELECT *
+		FROM instance_files
+		WHERE instance_id = ? AND relative_path = ?
+		",
+        instance_id,
+        new_relative_path,
+    )
+    .fetch_optional(&mut **tx)
+    .await?;
 
-    get_instance_file_by_relative_path(instance_id, new_relative_path, pool)
-        .await
+    row.map(TryInto::try_into).transpose()
 }
 
 pub(crate) async fn remove_instance_file_by_relative_path(
     instance_id: &str,
     relative_path: &str,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
@@ -737,7 +757,7 @@ pub(crate) async fn remove_instance_file_by_relative_path(
         instance_id,
         relative_path,
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(())
@@ -800,142 +820,202 @@ pub(crate) async fn get_content_entry_by_file(
 
 pub(crate) async fn upsert_content_entry_from_parts(
     input: UpsertContentEntry<'_>,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<ContentEntry> {
-    let existing_id = if let Some(file_id) = input.file_id {
-        sqlx::query_scalar!(
+    let id = format!("content-entry:{}", Uuid::new_v4());
+    let project_type = input.project_type.get_name();
+    let source_kind = input.source_kind.as_str();
+    let server_requirement = input.server_requirement.as_str();
+    let client_requirement = input.client_requirement.as_str();
+    let enabled = i64::from(input.enabled);
+    let now = Utc::now().timestamp();
+    let row = if let Some(file_id) = input.file_id {
+        sqlx::query_as!(
+            ContentEntryRow,
             "
-			SELECT id
-			FROM instance_content_entries
-			WHERE content_set_id = ? AND file_id = ?
-			ORDER BY modified_at DESC
-			LIMIT 1
+			INSERT INTO instance_content_entries (
+				id,
+				instance_id,
+				content_set_id,
+				file_id,
+				project_type,
+				project_id,
+				version_id,
+				source_kind,
+				server_requirement,
+				client_requirement,
+				enabled,
+				added_at,
+				modified_at
+			)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			ON CONFLICT (content_set_id, file_id)
+				WHERE file_id IS NOT NULL
+			DO UPDATE SET
+				instance_id = excluded.instance_id,
+				project_type = excluded.project_type,
+				project_id = excluded.project_id,
+				version_id = excluded.version_id,
+				source_kind = excluded.source_kind,
+				server_requirement = excluded.server_requirement,
+				client_requirement = excluded.client_requirement,
+				enabled = excluded.enabled,
+				modified_at = excluded.modified_at
+			RETURNING
+				id,
+				instance_id,
+				content_set_id,
+				file_id,
+				project_type,
+				project_id,
+				version_id,
+				source_kind,
+				server_requirement,
+				client_requirement,
+				enabled,
+				added_at,
+				modified_at
 			",
+            id,
+            input.instance_id,
             input.content_set_id,
             file_id,
+            project_type,
+            input.project_id,
+            input.version_id,
+            source_kind,
+            server_requirement,
+            client_requirement,
+            enabled,
+            now,
+            now,
         )
-        .fetch_optional(pool)
+        .fetch_one(&mut **tx)
         .await?
     } else if let (Some(project_id), Some(version_id)) =
         (input.project_id, input.version_id)
     {
-        sqlx::query_scalar!(
+        sqlx::query_as!(
+            ContentEntryRow,
             "
-			SELECT id
-			FROM instance_content_entries
-			WHERE content_set_id = ?
-				AND project_id = ?
-				AND version_id = ?
-			ORDER BY modified_at DESC
-			LIMIT 1
+			INSERT INTO instance_content_entries (
+				id,
+				instance_id,
+				content_set_id,
+				file_id,
+				project_type,
+				project_id,
+				version_id,
+				source_kind,
+				server_requirement,
+				client_requirement,
+				enabled,
+				added_at,
+				modified_at
+			)
+			VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			ON CONFLICT (content_set_id, project_id, version_id)
+				WHERE file_id IS NULL
+					AND project_id IS NOT NULL
+					AND version_id IS NOT NULL
+			DO UPDATE SET
+				instance_id = excluded.instance_id,
+				project_type = excluded.project_type,
+				source_kind = excluded.source_kind,
+				server_requirement = excluded.server_requirement,
+				client_requirement = excluded.client_requirement,
+				enabled = excluded.enabled,
+				modified_at = excluded.modified_at
+			RETURNING
+				id,
+				instance_id,
+				content_set_id,
+				file_id,
+				project_type,
+				project_id,
+				version_id,
+				source_kind,
+				server_requirement,
+				client_requirement,
+				enabled,
+				added_at,
+				modified_at
 			",
+            id,
+            input.instance_id,
             input.content_set_id,
+            project_type,
             project_id,
             version_id,
+            source_kind,
+            server_requirement,
+            client_requirement,
+            enabled,
+            now,
+            now,
         )
-        .fetch_optional(pool)
+        .fetch_one(&mut **tx)
         .await?
     } else {
-        None
-    };
-    let now = Utc::now();
-    let entry = ContentEntry {
-        id: existing_id
-            .unwrap_or_else(|| format!("content-entry:{}", Uuid::new_v4())),
-        instance_id: input.instance_id.to_string(),
-        content_set_id: input.content_set_id.to_string(),
-        file_id: input.file_id.map(ToString::to_string),
-        project_type: input.project_type,
-        project_id: input.project_id.map(ToString::to_string),
-        version_id: input.version_id.map(ToString::to_string),
-        source_kind: input.source_kind,
-        server_requirement: input.server_requirement,
-        client_requirement: input.client_requirement,
-        enabled: input.enabled,
-        added_at: now,
-        modified_at: now,
-    };
-
-    let added_at = get_content_entry_by_id(&entry.id, pool)
+        sqlx::query_as!(
+            ContentEntryRow,
+            "
+			INSERT INTO instance_content_entries (
+				id,
+				instance_id,
+				content_set_id,
+				file_id,
+				project_type,
+				project_id,
+				version_id,
+				source_kind,
+				server_requirement,
+				client_requirement,
+				enabled,
+				added_at,
+				modified_at
+			)
+			VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			RETURNING
+				id,
+				instance_id,
+				content_set_id,
+				file_id,
+				project_type,
+				project_id,
+				version_id,
+				source_kind,
+				server_requirement,
+				client_requirement,
+				enabled,
+				added_at,
+				modified_at
+			",
+            id,
+            input.instance_id,
+            input.content_set_id,
+            project_type,
+            input.project_id,
+            input.version_id,
+            source_kind,
+            server_requirement,
+            client_requirement,
+            enabled,
+            now,
+            now,
+        )
+        .fetch_one(&mut **tx)
         .await?
-        .map(|entry| entry.added_at)
-        .unwrap_or(entry.added_at);
-    let id = entry.id.as_str();
-    let entry_instance_id = entry.instance_id.as_str();
-    let content_set_id = entry.content_set_id.as_str();
-    let file_id = entry.file_id.as_deref();
-    let project_type = entry.project_type.get_name();
-    let project_id = entry.project_id.as_deref();
-    let version_id = entry.version_id.as_deref();
-    let source_kind = entry.source_kind.as_str();
-    let server_requirement = entry.server_requirement.as_str();
-    let client_requirement = entry.client_requirement.as_str();
-    let enabled = i64::from(entry.enabled);
-    let added_at = added_at.timestamp();
-    let modified_at = entry.modified_at.timestamp();
+    };
 
-    sqlx::query!(
-        "
-		INSERT INTO instance_content_entries (
-			id,
-			instance_id,
-			content_set_id,
-			file_id,
-			project_type,
-			project_id,
-			version_id,
-			source_kind,
-			server_requirement,
-			client_requirement,
-			enabled,
-			added_at,
-			modified_at
-		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		ON CONFLICT(id) DO UPDATE SET
-			file_id = excluded.file_id,
-			project_type = excluded.project_type,
-			project_id = excluded.project_id,
-			version_id = excluded.version_id,
-			source_kind = excluded.source_kind,
-			server_requirement = excluded.server_requirement,
-			client_requirement = excluded.client_requirement,
-			enabled = excluded.enabled,
-			modified_at = excluded.modified_at
-		",
-        id,
-        entry_instance_id,
-        content_set_id,
-        file_id,
-        project_type,
-        project_id,
-        version_id,
-        source_kind,
-        server_requirement,
-        client_requirement,
-        enabled,
-        added_at,
-        modified_at,
-    )
-    .execute(pool)
-    .await?;
-
-    get_content_entry_by_id(&entry.id, pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Failed to read content entry {} after upsert",
-                entry.id
-            ))
-            .into()
-        })
+    row.try_into()
 }
 
 pub(crate) async fn set_content_entry_enabled_for_file(
     content_set_id: &str,
     file_id: &str,
     enabled: bool,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<bool> {
     let enabled = i64::from(enabled);
     let modified_at = Utc::now().timestamp();
@@ -951,7 +1031,7 @@ pub(crate) async fn set_content_entry_enabled_for_file(
         content_set_id,
         file_id,
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(result.rows_affected() > 0)
@@ -960,7 +1040,7 @@ pub(crate) async fn set_content_entry_enabled_for_file(
 pub(crate) async fn remove_content_entries_for_file(
     content_set_id: &str,
     file_id: &str,
-    pool: &SqlitePool,
+    tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     sqlx::query!(
         "
@@ -970,7 +1050,7 @@ pub(crate) async fn remove_content_entries_for_file(
         content_set_id,
         file_id,
     )
-    .execute(pool)
+    .execute(&mut **tx)
     .await?;
 
     Ok(())

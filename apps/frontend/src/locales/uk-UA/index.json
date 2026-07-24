@@ -3221,24 +3221,6 @@
   "project-type.shader.singular": {
     "message": "Шейдер"
   },
-  "project.about.details.created": {
-    "message": "Створено {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Ліцензія «{license}»"
-  },
-  "project.about.details.published": {
-    "message": "Опубліковано {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Подано на розгляд {date}"
-  },
-  "project.about.details.title": {
-    "message": "Деталі"
-  },
-  "project.about.details.updated": {
-    "message": "Оновлено {date}"
-  },
   "project.actions.create-server": {
     "message": "Створити сервер"
   },
@@ -3268,9 +3250,6 @@
   },
   "project.description.title": {
     "message": "Опис"
-  },
-  "project.details.licensed": {
-    "message": "Ліцензія:"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Ця версія гри несумісна з базовим проєктом."
@@ -3424,15 +3403,6 @@
   },
   "project.gallery.title": {
     "message": "Галерея"
-  },
-  "project.license.error": {
-    "message": "Неможливо отримати текст ліцензії."
-  },
-  "project.license.loading": {
-    "message": "Завантаження тексту ліцензії…"
-  },
-  "project.license.title": {
-    "message": "Ліцензія"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Ваш проєкт є приватним, тобто доступ до нього маєте лише ви та запрошені вами люди."

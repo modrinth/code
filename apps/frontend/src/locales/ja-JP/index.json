@@ -2741,24 +2741,6 @@
   "project-type.shader.singular": {
     "message": "シェーダー"
   },
-  "project.about.details.created": {
-    "message": "{date}に作成"
-  },
-  "project.about.details.licensed": {
-    "message": "ライセンス: {license}"
-  },
-  "project.about.details.published": {
-    "message": "{date} に公開"
-  },
-  "project.about.details.submitted": {
-    "message": "提出時刻: {date}"
-  },
-  "project.about.details.title": {
-    "message": "詳細"
-  },
-  "project.about.details.updated": {
-    "message": "{date} に更新"
-  },
   "project.actions.create-server": {
     "message": "サーバーを作成"
   },
@@ -2788,9 +2770,6 @@
   },
   "project.description.title": {
     "message": "説明"
-  },
-  "project.details.licensed": {
-    "message": "ライセンス"
   },
   "project.download.download": {
     "message": "ダウンロード"
@@ -2845,15 +2824,6 @@
   },
   "project.gallery.title": {
     "message": "ギャラリー"
-  },
-  "project.license.error": {
-    "message": "ライセンステキストを取得できませんでした。"
-  },
-  "project.license.loading": {
-    "message": "ライセンステキストを読み込み中…"
-  },
-  "project.license.title": {
-    "message": "ライセンス"
   },
   "project.moderation.admonition.approved.header": {
     "message": "プロジェクトが承認されました"

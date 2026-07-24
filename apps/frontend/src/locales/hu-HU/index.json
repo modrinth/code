@@ -3116,24 +3116,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Létrehozva {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licesz: {license}"
-  },
-  "project.about.details.published": {
-    "message": "Közzététel: {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Benyújtva {date}"
-  },
-  "project.about.details.title": {
-    "message": "Részletek"
-  },
-  "project.about.details.updated": {
-    "message": "Frissítve {date}"
-  },
   "project.actions.create-server": {
     "message": "Hozz létre egy szervert"
   },
@@ -3163,9 +3145,6 @@
   },
   "project.description.title": {
     "message": "Leírás"
-  },
-  "project.details.licensed": {
-    "message": "Licenszelt"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Ez a játékverzió nem kompatibilis az alap projekttel."
@@ -3316,15 +3295,6 @@
   },
   "project.gallery.title": {
     "message": "Képek"
-  },
-  "project.license.error": {
-    "message": "A licensz szövege nem tölthető le."
-  },
-  "project.license.loading": {
-    "message": "Licensz szövegének betöltése..."
-  },
-  "project.license.title": {
-    "message": "Licensz"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "A projekted privát, vagyis csak te és az általad meghívott személyek férhetnek hozzá."
