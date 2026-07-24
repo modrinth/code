@@ -35,17 +35,13 @@ async function invokeAdsConsentPopupMode(mode) {
 
 	try {
 		if (mode === 'hidden') {
-			await invoke('plugin:ads|hide_ads_consent_overlay', { dpr: window.devicePixelRatio })
+			await invoke('plugin:ads|finish_ads_consent_flow', { dpr: window.devicePixelRatio })
 			return
 		}
 
-		await invoke('plugin:ads|show_ads_consent_overlay', {
+		await invoke('plugin:ads|show_ads_consent_ui', {
 			notificationEnabled: mode === 'custom',
 		})
-
-		if (mode === 'fallback') {
-			await invoke('plugin:ads|show_ads_consent_preferences')
-		}
 	} catch {}
 }
 
@@ -54,5 +50,5 @@ async function expandAdsConsentWebview() {
 	const invoke = getTauriInvoke()
 	if (!invoke) throw new Error('Tauri invoke is unavailable in the ads webview')
 
-	await invoke('plugin:ads|show_ads_consent_preferences')
+	await invoke('plugin:ads|expand_ads_consent_webview')
 }

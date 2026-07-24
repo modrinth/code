@@ -92,10 +92,10 @@ import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import {
 	ads_consent_listener,
-	get_ads_consent_required,
 	hide_ads_window,
 	init_ads_window,
 	perform_ads_consent_action,
+	should_show_ads_consent_popup,
 	show_ads_window,
 } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
@@ -318,7 +318,7 @@ onMounted(async () => {
 	await useCheckDisableMouseover()
 	try {
 		unlistenAdsConsent = await ads_consent_listener(handleAdsConsentRequired)
-		handleAdsConsentRequired(await get_ads_consent_required())
+		handleAdsConsentRequired(await should_show_ads_consent_popup())
 	} catch (error) {
 		handleError(error)
 	}

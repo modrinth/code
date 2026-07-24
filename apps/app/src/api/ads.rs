@@ -363,11 +363,11 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             init_ads_window,
             hide_ads_window,
             show_ads_window,
-            show_ads_consent_overlay,
-            show_ads_consent_preferences,
+            show_ads_consent_ui,
+            expand_ads_consent_webview,
             open_ads_consent_preferences,
-            hide_ads_consent_overlay,
-            get_ads_consent_required,
+            finish_ads_consent_flow,
+            should_show_ads_consent_popup,
             perform_ads_consent_action,
             record_ads_click,
             open_link,
@@ -755,7 +755,7 @@ pub async fn hide_ads_window<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn show_ads_consent_overlay<R: Runtime>(
+pub async fn show_ads_consent_ui<R: Runtime>(
     app: tauri::AppHandle<R>,
     notification_enabled: bool,
 ) -> crate::api::Result<()> {
@@ -790,7 +790,7 @@ pub async fn show_ads_consent_overlay<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn show_ads_consent_preferences<R: Runtime>(
+pub async fn expand_ads_consent_webview<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
@@ -842,7 +842,7 @@ pub async fn open_ads_consent_preferences<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn hide_ads_consent_overlay<R: Runtime>(
+pub async fn finish_ads_consent_flow<R: Runtime>(
     app: tauri::AppHandle<R>,
     dpr: Option<f32>,
 ) -> crate::api::Result<()> {
@@ -883,7 +883,7 @@ pub async fn hide_ads_consent_overlay<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn get_ads_consent_required<R: Runtime>(
+pub async fn should_show_ads_consent_popup<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<bool> {
     let state = app.state::<RwLock<AdsState>>();
