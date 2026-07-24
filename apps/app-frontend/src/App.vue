@@ -1590,6 +1590,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="'Home'"
 				to="/"
+				:is-primary="(route) => route.path === '/'"
 				:is-subpage="
 					() =>
 						route.path.startsWith('/instance') ||

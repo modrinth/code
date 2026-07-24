@@ -179,7 +179,7 @@ watch(
 			</p>
 			<section
 				v-else
-				class="grid w-full grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-3 overflow-y-auto scroll-smooth"
+				class="grid w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
 			>
 				<Instance
 					v-for="instance in instanceGroup.instances"

@@ -1,18 +1,11 @@
 <script setup>
-import {
-	DownloadIcon,
-	GameIcon,
-	PlayIcon,
-	SpinnerIcon,
-	StopCircleIcon,
-	TimerIcon,
-} from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectNotificationManager, useRelativeTime } from '@modrinth/ui'
+import { DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
+import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import InstanceFileIcon from '@/assets/icons/instance-file.svg?component'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
@@ -22,7 +15,6 @@ import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
-const formatRelativeTime = useRelativeTime()
 
 const props = defineProps({
 	instance: {
@@ -30,14 +22,6 @@ const props = defineProps({
 		default() {
 			return {}
 		},
-	},
-	compact: {
-		type: Boolean,
-		default: false,
-	},
-	first: {
-		type: Boolean,
-		default: false,
 	},
 })
 
@@ -51,6 +35,16 @@ const modLoading = computed(
 )
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
+const instanceType = computed(() => {
+	if (
+		props.instance.link?.type === 'server_project' ||
+		props.instance.link?.type === 'server_project_modpack'
+	) {
+		return 'SRV'
+	}
+
+	return props.instance.link?.type === 'modrinth_modpack' ? 'MPK' : 'CST'
+})
 
 const router = useRouter()
 
@@ -152,80 +146,39 @@ onUnmounted(() => unlisten())
 </script>
 
 <template>
-	<template v-if="compact">
-		<div
-			class="card-shadow grid grid-cols-[auto_1fr_auto] bg-bg-raised rounded-xl p-3 pl-4 gap-2 cursor-pointer hover:brightness-90 transition-all"
-			@click="seeInstance"
-			@mouseenter="checkProcess"
-		>
-			<Avatar
-				size="48px"
-				:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-				:tint-by="instance.id"
-				alt="Mod card"
-			/>
-			<div class="h-full flex items-center font-bold text-contrast leading-normal">
-				<span class="line-clamp-2">{{ instance.name }}</span>
-			</div>
-			<div class="flex items-center">
-				<ButtonStyled v-if="playing" color="red" circular @mousehover="checkProcess">
-					<button v-tooltip="'Stop'" @click="(e) => stop(e, 'InstanceCard')">
-						<StopCircleIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else-if="modLoading" color="standard" circular>
-					<button v-tooltip="'Instance is loading...'" disabled>
-						<SpinnerIcon class="animate-spin" />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled
-					v-else-if="!instance.quarantined"
-					:color="first ? 'brand' : 'standard'"
-					circular
+	<div
+		class="group relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all hover:brightness-110 active:scale-[0.98]"
+		@click="seeInstance"
+		@mouseenter="checkProcess"
+	>
+		<Avatar
+			class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[40px] right-[18px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"
+			size="100px"
+			:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+			:tint-by="instance.id"
+			alt=""
+			no-shadow
+		/>
+		<div class="relative z-[1] flex min-w-0 flex-1 items-center gap-2 pr-20">
+			<div class="relative flex size-10 shrink-0 items-center justify-center">
+				<div
+					v-if="!playing && !modLoading && !installing"
+					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-all"
+					:class="{
+						'group-hover:scale-75 group-hover:opacity-0 group-focus-within:scale-75 group-focus-within:opacity-0':
+							!instance.quarantined,
+					}"
 				>
-					<button
-						v-tooltip="'Play'"
-						@click="(e) => play(e, 'InstanceCard')"
-						@mousehover="checkProcess"
-					>
-						<!-- Translate for optical centering -->
-						<PlayIcon class="translate-x-[1px]" />
-					</button>
-				</ButtonStyled>
-			</div>
-			<div class="flex items-center col-span-3 gap-1 text-secondary font-semibold">
-				<TimerIcon />
-				<span class="text-sm">
-					<template v-if="instance.last_played">
-						Played {{ formatRelativeTime(dayjs(instance.last_played).toISOString()) }}
-					</template>
-					<template v-else> Never played </template>
-				</span>
-			</div>
-		</div>
-	</template>
-	<div v-else>
-		<div
-			class="button-base bg-bg-raised p-4 rounded-xl flex gap-3 group"
-			@click="seeInstance"
-			@mouseenter="checkProcess"
-		>
-			<div class="relative flex items-center justify-center">
-				<Avatar
-					size="48px"
-					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-					:tint-by="instance.id"
-					alt="Mod card"
-					:class="`transition-all ${modLoading || installing ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
-				/>
+					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
+					<span class="h-3.5 text-sm font-extrabold leading-[13px]">{{ instanceType }}</span>
+				</div>
 				<div class="absolute inset-0 flex items-center justify-center">
-					<ButtonStyled v-if="playing" size="large" color="red" circular>
+					<ButtonStyled v-if="playing" color="red" circular>
 						<button
 							v-tooltip="'Stop'"
-							:class="{ 'scale-100 opacity-100': playing }"
-							class="transition-all scale-75 origin-bottom opacity-0 card-shadow"
+							class="card-shadow"
 							@click="(e) => stop(e, 'InstanceCard')"
-							@mousehover="checkProcess"
+							@mouseenter="checkProcess"
 						>
 							<StopCircleIcon />
 						</button>
@@ -233,45 +186,37 @@ onUnmounted(() => unlisten())
 					<SpinnerIcon
 						v-else-if="modLoading || installing"
 						v-tooltip="modLoading ? 'Instance is loading...' : 'Installing...'"
-						class="animate-spin w-8 h-8"
+						class="size-8 animate-spin"
 						tabindex="-1"
 					/>
-					<ButtonStyled
-						v-else-if="!installed && !instance.quarantined"
-						size="large"
-						color="brand"
-						circular
-					>
+					<ButtonStyled v-else-if="!installed && !instance.quarantined" color="brand" circular>
 						<button
 							v-tooltip="'Repair'"
-							class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover:scale-100 group-hover:opacity-100 group-focus-within:scale-100 group-focus-within:opacity-100"
 							@click="(e) => repair(e)"
 						>
 							<DownloadIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else-if="!instance.quarantined" size="large" color="brand" circular>
+					<ButtonStyled v-else-if="!instance.quarantined" color="brand" circular>
 						<button
 							v-tooltip="'Play'"
-							class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover:scale-100 group-hover:opacity-100 group-focus-within:scale-100 group-focus-within:opacity-100"
 							@click="(e) => play(e, 'InstanceCard')"
-							@mousehover="checkProcess"
+							@mouseenter="checkProcess"
 						>
-							<PlayIcon class="translate-x-[2px]" />
+							<PlayIcon class="translate-x-px" />
 						</button>
 					</ButtonStyled>
 				</div>
 			</div>
-			<div class="flex flex-col gap-1">
-				<p class="m-0 text-md font-bold text-contrast leading-tight line-clamp-1">
+			<div class="flex min-w-0 flex-1 flex-col justify-center gap-1">
+				<p class="m-0 truncate text-base font-semibold leading-5 text-contrast">
 					{{ instance.name }}
 				</p>
-				<div class="flex items-center col-span-3 gap-1 text-secondary font-semibold mt-auto">
-					<GameIcon class="shrink-0" />
-					<span class="text-sm capitalize">
-						{{ instance.loader }} {{ instance.game_version }}
-					</span>
-				</div>
+				<p class="m-0 truncate text-sm font-medium capitalize leading-[18px] text-primary">
+					{{ instance.loader }} {{ instance.game_version }}
+				</p>
 			</div>
 		</div>
 	</div>
