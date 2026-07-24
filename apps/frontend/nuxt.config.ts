@@ -315,6 +315,12 @@ export default defineNuxtConfig({
 				'Critical-CH': 'Sec-CH-Prefers-Color-Scheme',
 			},
 		},
+		'/news/article/:slug': {
+			redirect: {
+				to: '/news/article/:slug/',
+				statusCode: 301,
+			},
+		},
 		'/dashboard/revenue/withdraw': {
 			redirect: {
 				to: '/dashboard/revenue',
