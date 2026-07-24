@@ -1,15 +1,8 @@
 <template>
-	<div v-if="subtleLauncherRedirectUri">
-		<iframe
-			:src="subtleLauncherRedirectUri"
-			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
-		></iframe>
-	</div>
 	<div
-		v-else
 		class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
-		<template v-if="flow && !subtleLauncherRedirectUri">
+		<template v-if="flow">
 			<div class="flex flex-col items-end gap-4">
 				<div class="flex flex-col gap-1.5">
 					<label for="two-factor-code">
@@ -196,7 +189,6 @@ interface AuthGlobals {
 }
 
 interface Props {
-	subtleLauncherRedirectUri?: string
 	flow?: string
 	redirectTarget?: string
 	routeQuery?: LocationQuery
@@ -208,7 +200,6 @@ interface Props {
 }
 
 const {
-	subtleLauncherRedirectUri = '',
 	flow = '',
 	redirectTarget = '',
 	routeQuery = {},

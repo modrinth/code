@@ -1,12 +1,5 @@
 <template>
-	<div v-if="subtleLauncherRedirectUri">
-		<iframe
-			:src="subtleLauncherRedirectUri"
-			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
-		></iframe>
-	</div>
 	<CreateAccountView
-		v-else
 		v-model:date-of-birth="dateOfBirth"
 		v-model:username="username"
 		v-model:token="token"
@@ -109,7 +102,6 @@ const dateOfBirth = ref('')
 const username = ref(defaultUsername.value)
 const token = ref('')
 const subscribe = ref(false)
-const subtleLauncherRedirectUri = ref<string>()
 
 const captcha = ref<{ reset?: () => void } | null>(null)
 const setCaptchaRef = (captchaRef: unknown) => {
@@ -166,13 +158,10 @@ async function finishSignIn(sessionToken?: string | null) {
 
 		const redirectUrl = `${getLauncherRedirectUrl(route)}/?code=${token}`
 
-		if (redirectUrl.startsWith('https://launcher-files.modrinth.com/')) {
-			await navigateTo(redirectUrl, {
-				external: true,
-			})
-		} else {
-			subtleLauncherRedirectUri.value = redirectUrl
-		}
+		await navigateTo(redirectUrl, {
+			external: true,
+			replace: true,
+		})
 
 		return
 	}
