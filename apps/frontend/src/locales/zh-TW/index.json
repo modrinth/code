@@ -2948,9 +2948,6 @@
   "moderation.page.technicalReview": {
     "message": "技術審查"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "清除所有群組"
-  },
   "modpack-scan-modal.failed": {
     "message": "失敗"
   },
