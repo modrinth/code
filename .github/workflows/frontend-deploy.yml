@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: namespace-profile-large-amd64
+    runs-on: namespace-profile-modrinth-frontend
     permissions:
       contents: read
       deployments: write

@@ -70,7 +70,7 @@ jobs:
           fi
 
   docker:
-    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-large-amd64' || 'ubuntu-latest' }}
+    runs-on: ${{ needs.skip-if-clean.outputs.internal == 'true' && 'namespace-profile-modrinth-labrinth' || 'ubuntu-latest' }}
     needs: [skip-if-clean]
     if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
     env:

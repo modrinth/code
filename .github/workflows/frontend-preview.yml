@@ -39,7 +39,7 @@ jobs:
   deploy-storybook:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     needs: metadata
-    runs-on: namespace-profile-large-amd64
+    runs-on: namespace-profile-modrinth-frontend
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-storybook
       cancel-in-progress: true
