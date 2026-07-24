@@ -245,8 +245,7 @@ impl FriendsSocket {
                             }
                         }
 
-                        if connection_generation_handle
-                            .load(Ordering::Acquire)
+                        if connection_generation_handle.load(Ordering::Acquire)
                             == connection_generation
                         {
                             let mut write = write_handle.write().await;
