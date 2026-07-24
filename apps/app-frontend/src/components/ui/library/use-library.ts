@@ -6,15 +6,14 @@ import { computed, inject, type InjectionKey, provide, type Ref, ref, watchEffec
 import { get_project_v3_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
+import { edit, remove } from '@/helpers/instance'
 import {
 	create_group as createInstanceGroup,
 	delete_group as deleteInstanceGroup,
-	edit,
 	type InstanceGroupDefinition,
 	list_groups as listInstanceGroups,
-	remove,
 	rename_group as renameInstanceGroup,
-} from '@/helpers/instance'
+} from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
 export const libraryFilterOptions = ['All instances', 'Modpacks', 'Servers', 'Custom'] as const
