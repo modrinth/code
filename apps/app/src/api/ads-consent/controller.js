@@ -1,5 +1,6 @@
 const ACTION_TIMEOUT = 10_000
 const LAYOUT_DELAY = 100
+const POPUP_READINESS_TIMEOUT = 10_000
 const SUBMISSION_TIMEOUT = 10_000
 
 class AdsConsentController {
@@ -12,6 +13,9 @@ class AdsConsentController {
 
 		/** @type {ReturnType<typeof setTimeout> | null} */
 		this.submissionTimeout = null
+
+		/** @type {ReturnType<typeof setTimeout> | null} */
+		this.popupReadinessTimeout = null
 	}
 
 	/** @returns {void} */
@@ -22,6 +26,7 @@ class AdsConsentController {
 		const cmpMain = document.getElementById('qc-cmp2-main')
 
 		if (!cmpMain) {
+			this.clearPopupReadinessTimeout()
 			if (this.state.phase === 'idle') {
 				document.documentElement.classList.remove('modrinth-ads-consent-overlay')
 			} else if (this.state.phase !== 'submitting-consent' && this.state.phase !== 'finishing') {
@@ -34,10 +39,40 @@ class AdsConsentController {
 
 		document.documentElement.classList.add('modrinth-ads-consent-overlay')
 		const variant = this.detectVariant()
-		if (!areConsentControlsPresent(variant)) return
+		if (!areConsentControlsPresent(variant)) {
+			this.waitForConsentControls()
+			return
+		}
 
+		this.clearPopupReadinessTimeout()
 		this.state.setState('showing-popup')
 		this.setPopupMode('custom')
+	}
+
+	/** @returns {void} */
+	waitForConsentControls() {
+		if (this.popupReadinessTimeout) return
+
+		this.popupReadinessTimeout = setTimeout(() => {
+			this.popupReadinessTimeout = null
+
+			if (this.state.phase !== 'idle' || !document.getElementById('qc-cmp2-main')) return
+
+			const variant = this.detectVariant()
+			if (areConsentControlsPresent(variant)) {
+				this.syncConsentPopup()
+				return
+			}
+
+			this.state.setState('showing-popup')
+			this.showNativeCmpFallback()
+		}, POPUP_READINESS_TIMEOUT)
+	}
+
+	/** @returns {void} */
+	clearPopupReadinessTimeout() {
+		clearTimeout(this.popupReadinessTimeout ?? undefined)
+		this.popupReadinessTimeout = null
 	}
 
 	/**
@@ -146,6 +181,19 @@ class AdsConsentController {
 			this.state.phase === 'submitting-consent'
 		) {
 			this.finishConsentFlow()
+		}
+	}
+
+	/** @returns {void} */
+	handleTcfClose() {
+		if (this.state.variant !== 'tcf') return
+
+		if (this.state.phase === 'showing-preferences') {
+			this.state.setState('showing-popup')
+			this.concealPreferences()
+			this.setPopupMode('custom')
+		} else if (this.state.phase === 'showing-reopened-preferences') {
+			this.finishReopenedPopup()
 		}
 	}
 
@@ -278,7 +326,7 @@ class AdsConsentController {
 		document.documentElement.classList.toggle('modrinth-ads-consent-overlay', shown)
 		document.documentElement.classList.toggle('modrinth-ads-consent-fallback', mode === 'fallback')
 		if (hidden) this.concealPreferences()
-		invokeAdsConsentPopupMode(mode)
+		void invokeAdsConsentPopupMode(mode)
 	}
 
 	/** @returns {void} */
@@ -300,6 +348,7 @@ class AdsConsentController {
 
 		clearTimeout(this.submissionTimeout ?? undefined)
 		this.submissionTimeout = null
+		this.clearPopupReadinessTimeout()
 		this.preSubmissionPhase = null
 		this.state.setState('finishing')
 		this.setPopupMode('hidden')

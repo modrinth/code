@@ -60,6 +60,10 @@ document.addEventListener(
 		notifyAdClick()
 
 		const target = event.target instanceof Element ? event.target : null
+		if (target?.closest('.qc-cmp2-close-icon')) {
+			setTimeout(() => controller.handleTcfClose())
+		}
+
 		if (target?.closest('#qc-cmp2-usp .qc-usp-ui-form-content button[mode="primary"]')) {
 			controller.beginConsentSubmission()
 		}

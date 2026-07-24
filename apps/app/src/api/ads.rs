@@ -503,7 +503,6 @@ pub async fn init_ads_window<R: Runtime>(
                     // Aditude has separately informed SSPs and IVT vendors that this traffic
                     // originates from a desktop app.
                     .user_agent(ADS_USER_AGENT)
-                    .incognito(true)
                     .zoom_hotkeys_enabled(false)
                     .transparent(true)
                     .on_new_window(|_, _| {

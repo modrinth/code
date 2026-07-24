@@ -27,19 +27,26 @@ function openExternalUrl(url) {
 
 /**
  * @param {AdsConsentPopupMode} mode
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function invokeAdsConsentPopupMode(mode) {
+async function invokeAdsConsentPopupMode(mode) {
 	const invoke = getTauriInvoke()
 	if (!invoke) return
 
-	const show = mode !== 'hidden'
-	const command = show ? 'show_ads_consent_overlay' : 'hide_ads_consent_overlay'
-	const args =
-		mode === 'hidden'
-			? { dpr: window.devicePixelRatio }
-			: { notificationEnabled: mode === 'custom' }
-	void invoke(`plugin:ads|${command}`, args).catch(() => {})
+	try {
+		if (mode === 'hidden') {
+			await invoke('plugin:ads|hide_ads_consent_overlay', { dpr: window.devicePixelRatio })
+			return
+		}
+
+		await invoke('plugin:ads|show_ads_consent_overlay', {
+			notificationEnabled: mode === 'custom',
+		})
+
+		if (mode === 'fallback') {
+			await invoke('plugin:ads|show_ads_consent_preferences')
+		}
+	} catch {}
 }
 
 /** @returns {Promise<void>} */
