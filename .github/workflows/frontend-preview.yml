@@ -39,7 +39,7 @@ jobs:
   deploy-storybook:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     needs: metadata
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: namespace-profile-small-amd64
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-storybook
       cancel-in-progress: true
@@ -58,17 +58,11 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Restore pnpm cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Set up caches
+        uses: namespacelabs/nscloud-cache-action@v1
         with:
-          path: ${{ steps.pnpm-store.outputs.store-path }}
-          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-cache-
+          cache: |
+            pnpm
 
       - name: Install dependencies
         working-directory: ./packages/ui

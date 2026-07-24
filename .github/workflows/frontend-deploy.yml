@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: namespace-profile-small-amd64
     permissions:
       contents: read
       deployments: write
@@ -97,17 +97,16 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Restore pnpm cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Set up caches
+        uses: namespacelabs/nscloud-cache-action@v1
         with:
-          path: ${{ steps.pnpm-store.outputs.store-path }}
-          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-cache-
+          cache: |
+            rust
+            pnpm
+            apt
+
+      - name: Set up Turborepo caching
+        uses: namespace-actions/setup-turbocache@v0
 
       - name: Inject build variables
         working-directory: ./apps/frontend
@@ -158,38 +157,39 @@ jobs:
           wranglerVersion: '4.54.0'
           command: ${{ steps.meta.outputs.cmd }}
 
-      - name: Deploy staging Cloudflare Worker preview
-        if: ${{ inputs.preview }}
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          workingDirectory: ./apps/frontend
-          packageManager: pnpm
-          wranglerVersion: '4.54.0'
-          command: ${{ steps.meta.outputs.staging_cmd }}
+      - parallel:
+          - name: Deploy staging Cloudflare Worker preview
+            if: ${{ inputs.preview }}
+            uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./apps/frontend
+              packageManager: pnpm
+              wranglerVersion: '4.54.0'
+              command: ${{ steps.meta.outputs.staging_cmd }}
 
-      - name: Deploy persistent Cloudflare Worker preview
-        if: ${{ inputs.preview && inputs.branch_alias != '' }}
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          workingDirectory: ./apps/frontend
-          packageManager: pnpm
-          wranglerVersion: '4.54.0'
-          command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true --var CF_PAGES_URL:${{ steps.meta.outputs.branch_alias_url }}
+          - name: Deploy persistent Cloudflare Worker preview
+            if: ${{ inputs.preview && inputs.branch_alias != '' }}
+            uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./apps/frontend
+              packageManager: pnpm
+              wranglerVersion: '4.54.0'
+              command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true --var CF_PAGES_URL:${{ steps.meta.outputs.branch_alias_url }}
 
-      - name: Deploy persistent staging Cloudflare Worker preview
-        if: ${{ inputs.preview && inputs.branch_alias != '' }}
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          workingDirectory: ./apps/frontend
-          packageManager: pnpm
-          wranglerVersion: '4.54.0'
-          command: ${{ steps.meta.outputs.staging_branch_alias_cmd }}
+          - name: Deploy persistent staging Cloudflare Worker preview
+            if: ${{ inputs.preview && inputs.branch_alias != '' }}
+            uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./apps/frontend
+              packageManager: pnpm
+              wranglerVersion: '4.54.0'
+              command: ${{ steps.meta.outputs.staging_branch_alias_cmd }}
 
       - name: Purge cache
         if: github.ref == 'refs/heads/prod'
@@ -206,16 +206,17 @@ jobs:
           echo "${{ steps.meta.outputs.url }}" > deployment-url-production.txt
           echo "${{ steps.meta.outputs.staging_url }}" > deployment-url-staging.txt
 
-      - name: Upload production deployment URL
-        if: ${{ inputs.preview }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: deployment-url-production
-          path: deployment-url-production.txt
+      - parallel:
+          - name: Upload production deployment URL
+            if: ${{ inputs.preview }}
+            uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+            with:
+              name: deployment-url-production
+              path: deployment-url-production.txt
 
-      - name: Upload staging deployment URL
-        if: ${{ inputs.preview }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: deployment-url-staging
-          path: deployment-url-staging.txt
+          - name: Upload staging deployment URL
+            if: ${{ inputs.preview }}
+            uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+            with:
+              name: deployment-url-staging
+              path: deployment-url-staging.txt
