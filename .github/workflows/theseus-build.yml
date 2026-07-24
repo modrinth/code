@@ -92,7 +92,7 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
-        if: contains(matrix.platform, 'windows') || contains(matrix.platform, 'macos')
+        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'macos')
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
@@ -100,7 +100,7 @@ jobs:
             pnpm
 
       - name: Configure sccache
-        if: contains(matrix.platform, 'windows') || contains(matrix.platform, 'macos')
+        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'macos')
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Generate tauri-dev.conf.json
