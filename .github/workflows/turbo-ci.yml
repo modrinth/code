@@ -178,6 +178,8 @@ jobs:
         run: |
           df -h
 
+          dd if=/dev/urandom of=/cache/a.bin bs=1024 count=8
+
           print_cgroup_file() {
             local file="$1"
 
@@ -194,6 +196,10 @@ jobs:
           print_cgroup_file /sys/fs/cgroup/cgroup.events
           print_cgroup_file /sys/fs/cgroup/memory/memory.failcnt
           print_cgroup_file /sys/fs/cgroup/memory/memory.oom_control
+
+          echo "::dmesg::"
+          dmesg | grep -E -i 'sigbus|bus error|segfault'
+          echo "::endsection::"
 
       - name: Verify intl:extract has been run
         run: |
