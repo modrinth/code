@@ -26,9 +26,10 @@ use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
-use sync::friends::{FRIENDS_CHANNEL_NAME, RedisFriendsMessage, handle_pubsub};
+use sync::friends::{self, FRIENDS_CHANNEL_NAME, handle_pubsub};
 use url::Url;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
+//
 
 pub mod auth;
 pub mod background_task;

@@ -198,7 +198,7 @@ jobs:
           print_cgroup_file /sys/fs/cgroup/memory/memory.oom_control
 
           echo "::group::dmesg"
-          dmesg | grep -E -i 'sigbus|bus error|segfault'
+          sudo dmesg | grep -E -i 'sigbus|bus error|segfault'
           echo "::endgroup::"
 
       - name: Verify intl:extract has been run
