@@ -335,6 +335,8 @@ export function flattenStaticVariables(): Record<string, string> {
 	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`
 	vars[`LEARN_MORE_ABOUT_SERVERS_FLINK`] =
 		`[learn more about server projects from our news feed](https://modrinth.com/news/article/introducing-server-projects/)`
+	vars[`SHARED_INSTANCES_FLINK`] =
+		`[Shared Instances](https://modrinth.com/news/article/shared-instances/)`
 
 	return vars
 }
