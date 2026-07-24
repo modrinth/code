@@ -44,42 +44,34 @@ jobs:
     name: Build
     env:
       VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
-      # SCCACHE_DIR: '/mnt/sccache'
-      # SCCACHE_CACHE_SIZE: '10G'
-      # SCCACHE_MULTILEVEL_CHAIN: 'disk,s3'
-      SCCACHE_S3_KEY_PREFIX: '${{ github.repository }}/'
-      SCCACHE_BUCKET: ${{ secrets.SCCACHE_BUCKET }}
-      SCCACHE_REGION: ${{ secrets.SCCACHE_REGION }}
-      SCCACHE_ENDPOINT: ${{ secrets.SCCACHE_ENDPOINT }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.SCCACHE_S3_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCCACHE_S3_SECRET_ACCESS_KEY }}
       RUSTC_WRAPPER: 'sccache'
     strategy:
       fail-fast: false
       matrix:
-        platform: [
-            blacksmith-6vcpu-macos-26,
-            blacksmith-8vcpu-windows-2025, # At time of writing, Windows 4 vCPU VMs don't seem to actually exist
-            blacksmith-4vcpu-ubuntu-2404,
+        platform:
+          [
+            namespace-profile-medium-amd64-macos,
+            namespace-profile-medium-amd64-windows,
+            namespace-profile-medium-amd64,
           ]
         include:
-          - platform: blacksmith-6vcpu-macos-26
+          - platform: namespace-profile-medium-amd64-macos
             artifact-target-name: universal-apple-darwin
-          - platform: blacksmith-8vcpu-windows-2025
+          - platform: namespace-profile-medium-amd64-windows
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: blacksmith-4vcpu-ubuntu-2404
+          - platform: namespace-profile-medium-amd64
             artifact-target-name: x86_64-unknown-linux-gnu
 
     runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7 # v1.16.0
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           rustflags: ''
           target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
@@ -95,10 +87,22 @@ jobs:
         run: corepack enable
 
       - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
-          cache: 'pnpm'
+
+      - name: Set up caches
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        with:
+          cache: |
+            rust
+            pnpm
+
+      - name: Set up Turborepo caching
+        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
+
+      - name: Configure sccache
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Generate tauri-dev.conf.json
         shell: bash
@@ -117,10 +121,9 @@ jobs:
 
       - name: Install Linux build dependencies
         if: contains(matrix.platform, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@acb598e5ddbc6f68a970c5da0688d2f3a9f04d05 # v1.6.0
-        with:
-          packages: libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
-          version: v1 # cache key
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Setup Dasel
         uses: jaxxstorm/action-install-gh-release@25e24d2d23ae098373794ef1d6faecb48ee52da8 # v3.0.0
@@ -146,9 +149,6 @@ jobs:
           dasel put -f apps/app-frontend/package.json -t string -v "${APP_VERSION#v}" 'version'
 
           cp "packages/app-lib/.env.${BUILD_ENVIRONMENT}" packages/app-lib/.env
-
-      - name: Setup Turbo cache
-        uses: rharkor/caching-for-turbo@56219402aacc0d06b650d898c222996dbc1191ec # v2.3.14
 
       - name: Install dependencies
         run: pnpm install

@@ -39,7 +39,7 @@ jobs:
   deploy-storybook:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
     needs: metadata
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: namespace-profile-large-amd64
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-storybook
       cancel-in-progress: true
@@ -48,27 +48,21 @@ jobs:
       deployments: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
 
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "store-path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Restore pnpm cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Set up caches
+        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
-          path: ${{ steps.pnpm-store.outputs.store-path }}
-          key: pnpm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-cache-
+          cache: |
+            pnpm
 
       - name: Install dependencies
         working-directory: ./packages/ui
@@ -86,27 +80,34 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: echo "sha_short=${HEAD_SHA::8}" >> $GITHUB_OUTPUT
 
-      - name: Deploy Storybook preview
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+      - name: Install Wrangler CLI
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./packages/ui
           packageManager: pnpm
-          wranglerVersion: '4.54.0'
-          command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
+          wranglerVersion: '4.112.0'
+          command: --version
 
-      - name: Deploy persistent Storybook preview
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          workingDirectory: ./packages/ui
-          packageManager: pnpm
-          wranglerVersion: '4.54.0'
-          command: versions upload --preview-alias ${{ needs.metadata.outputs.branch-alias }}
+      - parallel:
+          - name: Deploy Storybook preview
+            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./packages/ui
+              command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
+
+          - name: Deploy persistent Storybook preview
+            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            env:
+              NODE_OPTIONS: --max-old-space-size=6144
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./packages/ui
+              command: versions upload --preview-alias ${{ needs.metadata.outputs.branch-alias }}
 
   comment:
     if: |
