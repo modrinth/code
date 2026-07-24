@@ -503,6 +503,7 @@ pub async fn init_ads_window<R: Runtime>(
                     // Aditude has separately informed SSPs and IVT vendors that this traffic
                     // originates from a desktop app.
                     .user_agent(ADS_USER_AGENT)
+                    .incognito(true)
                     .zoom_hotkeys_enabled(false)
                     .transparent(true)
                     .on_new_window(|_, _| {
@@ -593,6 +594,8 @@ pub async fn init_ads_window<R: Runtime>(
                     unsafe { webview2_8.SetIsMuted(true) }.ok();
                 }
             })?;
+
+            webview.open_devtools();
 
             Some(webview)
         } else {
@@ -889,11 +892,9 @@ pub async fn get_ads_consent_required<R: Runtime>(
     let state = app.state::<RwLock<AdsState>>();
     let state = state.read().await;
 
-    Ok(
-        state.shown
-            && state.consent_required
-            && state.consent_notification_enabled,
-    )
+    Ok(state.shown
+        && state.consent_required
+        && state.consent_notification_enabled)
 }
 
 #[tauri::command]

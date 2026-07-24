@@ -1,5 +1,5 @@
 /**
- * @typedef {'idle' | 'initial' | 'reopened' | 'complete'} AdsConsentPhase
+ * @typedef {'idle' | 'showing-popup' | 'showing-preferences' | 'showing-reopened-preferences' | 'submitting-consent' | 'finishing'} AdsConsentPhase
  * @typedef {'usp' | 'tcf'} AdsConsentVariant
  */
 

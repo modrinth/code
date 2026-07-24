@@ -190,9 +190,10 @@ async function setUspToggleStates(checked, controls, timeoutMs) {
 /**
  * @param {ConsentAction} action
  * @param {AdsConsentVariant | null} variant
+ * @param {(() => void) | undefined} onSubmit
  * @returns {Promise<ConsentActionResult>}
  */
-async function performDocumentConsentAction(action, variant) {
+async function performDocumentConsentAction(action, variant, onSubmit) {
 	if (variant === 'usp') {
 		if (action === 'manage') {
 			return 'handled'
@@ -204,6 +205,7 @@ async function performDocumentConsentAction(action, variant) {
 		const settledControls = await setUspToggleStates(action === 'reject', controls, 2_000)
 		if (!settledControls) return 'failed'
 
+		onSubmit?.()
 		settledControls.confirmButton.click()
 		return 'handled'
 	}
@@ -212,6 +214,7 @@ async function performDocumentConsentAction(action, variant) {
 		const button = findTcfConsentButton(action)
 		if (!button) return 'not-ready'
 
+		onSubmit?.()
 		button.click()
 		return 'handled'
 	}

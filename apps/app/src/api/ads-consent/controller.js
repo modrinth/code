@@ -1,21 +1,33 @@
 const ACTION_TIMEOUT = 10_000
 const LAYOUT_DELAY = 100
+const SUBMISSION_TIMEOUT = 10_000
 
 class AdsConsentController {
 	constructor() {
 		/** @type {AdsConsentState} */
 		this.state = new AdsConsentState()
+
+		/** @type {AdsConsentPhase | null} */
+		this.preSubmissionPhase = null
+
+		/** @type {ReturnType<typeof setTimeout> | null} */
+		this.submissionTimeout = null
 	}
 
 	/** @returns {void} */
 	syncConsentPopup() {
+		// The CMP root persists while its internal views change, so only its removal finishes
+		// a normal active flow. Submissions wait for the CMP event or the timeout fallback so
+		// the consent has time to persist before the ads webview is refreshed.
 		const cmpMain = document.getElementById('qc-cmp2-main')
 
-		// no cmp container, remove our popup
 		if (!cmpMain) {
 			if (this.state.phase === 'idle') {
 				document.documentElement.classList.remove('modrinth-ads-consent-overlay')
-			} else if (this.state.phase !== 'complete') {
+			} else if (
+				this.state.phase !== 'submitting-consent' &&
+				this.state.phase !== 'finishing'
+			) {
 				this.finishConsentFlow()
 			}
 			return
@@ -23,12 +35,11 @@ class AdsConsentController {
 
 		if (this.state.phase !== 'idle') return
 
-		// has cmp container, add our popup
 		document.documentElement.classList.add('modrinth-ads-consent-overlay')
 		const variant = this.detectVariant()
 		if (!areConsentControlsPresent(variant)) return
 
-		this.state.setState('initial')
+		this.state.setState('showing-popup')
 		this.setPopupMode('custom')
 	}
 
@@ -56,10 +67,90 @@ class AdsConsentController {
 		}
 
 		try {
-			const result = await performDocumentConsentAction(action, variant)
-			if (result !== 'handled') this.showNativeCmpFallback()
+			const result = await performDocumentConsentAction(action, variant, () =>
+				this.beginConsentSubmission(),
+			)
+			if (result !== 'handled') {
+				this.cancelConsentSubmission()
+				this.showNativeCmpFallback()
+			}
 		} catch {
+			this.cancelConsentSubmission()
 			this.showNativeCmpFallback()
+		}
+	}
+
+	/** @returns {void} */
+	beginConsentSubmission() {
+		if (
+			!['showing-popup', 'showing-preferences', 'showing-reopened-preferences'].includes(
+				this.state.phase,
+			)
+		) {
+			return
+		}
+
+		this.preSubmissionPhase = this.state.phase
+		this.state.setState('submitting-consent')
+		clearTimeout(this.submissionTimeout ?? undefined)
+		this.submissionTimeout = setTimeout(() => {
+			const preSubmissionPhase = this.preSubmissionPhase
+			this.submissionTimeout = null
+			const dialogId = this.state.variant === 'usp' ? 'qc-cmp2-usp' : 'qc-cmp2-ui'
+
+			if (
+				this.state.phase === 'submitting-consent' &&
+				!document.getElementById(dialogId)
+			) {
+				this.finishConsentFlow()
+			} else if (this.state.phase === 'submitting-consent' && preSubmissionPhase) {
+				this.state.setState(preSubmissionPhase)
+				this.preSubmissionPhase = null
+			}
+		}, SUBMISSION_TIMEOUT)
+	}
+
+	/** @returns {void} */
+	cancelConsentSubmission() {
+		clearTimeout(this.submissionTimeout ?? undefined)
+		this.submissionTimeout = null
+
+		if (this.state.phase === 'submitting-consent' && this.preSubmissionPhase) {
+			this.state.setState(this.preSubmissionPhase)
+		}
+		this.preSubmissionPhase = null
+	}
+
+	/**
+	 * @param {{ eventStatus?: string } | null | undefined} tcData
+	 * @param {boolean} success
+	 * @returns {void}
+	 */
+	handleTcfConsentEvent(tcData, success) {
+		if (
+			success &&
+			tcData?.eventStatus === 'useractioncomplete' &&
+			this.state.variant === 'tcf' &&
+			this.state.phase !== 'idle' &&
+			this.state.phase !== 'finishing'
+		) {
+			this.finishConsentFlow()
+		}
+	}
+
+	/**
+	 * @param {{ eventName?: string } | null | undefined} gppData
+	 * @param {boolean} success
+	 * @returns {void}
+	 */
+	handleGppConsentEvent(gppData, success) {
+		if (
+			success &&
+			gppData?.eventName === 'sectionChange' &&
+			this.state.variant === 'usp' &&
+			this.state.phase === 'submitting-consent'
+		) {
+			this.finishConsentFlow()
 		}
 	}
 
@@ -74,7 +165,7 @@ class AdsConsentController {
 			return
 		}
 
-		this.state.setState('reopened')
+		this.state.setState('showing-reopened-preferences')
 		this.preparePreferences()
 
 		try {
@@ -158,6 +249,7 @@ class AdsConsentController {
 
 	/** @returns {Promise<boolean>} */
 	async openPreferences() {
+		this.state.setState('showing-preferences')
 		await this.showExpandedUi()
 
 		if (!(await this.openConsentManagerWhenReady(ACTION_TIMEOUT))) {
@@ -207,11 +299,14 @@ class AdsConsentController {
 
 	/** @returns {void} */
 	finishConsentFlow() {
-		if (this.state.phase === 'idle' || this.state.phase === 'complete') {
+		if (this.state.phase === 'idle' || this.state.phase === 'finishing') {
 			return
 		}
 
-		this.state.setState('complete')
+		clearTimeout(this.submissionTimeout ?? undefined)
+		this.submissionTimeout = null
+		this.preSubmissionPhase = null
+		this.state.setState('finishing')
 		this.setPopupMode('hidden')
 	}
 }

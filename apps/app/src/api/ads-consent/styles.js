@@ -14,6 +14,7 @@ const THEME_STYLE = `
 	}
 
 	#qc-cmp2-usp {
+		outline: none !important;
 		background: var(--modrinth-usp-bg) !important;
 		border: 1px solid var(--modrinth-usp-divider) !important;
 		border-radius: 1rem !important;
