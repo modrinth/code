@@ -30,6 +30,7 @@ pub async fn authenticate_finish_flow(
     .await?;
 
     creds.upsert(&state.pool).await?;
+    state.friends_socket.disconnect().await?;
     state
         .friends_socket
         .connect(&state.pool, &state.api_semaphore, &state.process_manager)
@@ -45,8 +46,8 @@ pub async fn logout() -> crate::Result<()> {
 
     if let Some(current) = current {
         ModrinthCredentials::remove(&current.user_id, &state.pool).await?;
-        state.friends_socket.disconnect().await?;
     }
+    state.friends_socket.disconnect().await?;
 
     Ok(())
 }
@@ -57,6 +58,9 @@ pub async fn get_credentials() -> crate::Result<Option<ModrinthCredentials>> {
     let current =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?;
+    if current.is_none() {
+        state.friends_socket.disconnect().await?;
+    }
 
     Ok(current)
 }
