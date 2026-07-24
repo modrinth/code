@@ -48,15 +48,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [
-            blacksmith-6vcpu-macos-26,
-            blacksmith-8vcpu-windows-2025, # At time of writing, Windows 4 vCPU VMs don't seem to actually exist
+        platform:
+          [
+            namespace-profile-medium-amd64-macos,
+            namespace-profile-medium-amd64-windows,
             namespace-profile-medium-amd64,
           ]
         include:
-          - platform: blacksmith-6vcpu-macos-26
+          - platform: namespace-profile-medium-amd64-macos
             artifact-target-name: universal-apple-darwin
-          - platform: blacksmith-8vcpu-windows-2025
+          - platform: namespace-profile-medium-amd64-windows
             artifact-target-name: x86_64-pc-windows-msvc
           - platform: namespace-profile-medium-amd64
             artifact-target-name: x86_64-unknown-linux-gnu
@@ -96,7 +97,6 @@ jobs:
           cache: |
             rust
             pnpm
-            apt
 
       - name: Set up Turborepo caching
         uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
