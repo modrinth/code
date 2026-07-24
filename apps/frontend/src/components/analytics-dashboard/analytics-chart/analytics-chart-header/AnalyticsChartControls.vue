@@ -39,7 +39,7 @@
 				ref="controlsMenuPanel"
 				role="dialog"
 				:aria-label="formatMessage(analyticsChartMessages.controlsDialogAria)"
-				class="mt-1 flex w-[228px] max-w-[calc(100vw_-_2rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-4 bg-surface-3 text-sm shadow-2xl"
+				class="mt-1 flex w-[238px] max-w-[calc(100vw_-_2rem)] flex-col overflow-hidden rounded-[14px] border border-solid border-surface-4 bg-surface-3 text-sm shadow-2xl"
 			>
 				<div class="flex items-center justify-between gap-3 px-3 py-2.5 text-xs font-medium">
 					<span class="font-semibold text-primary">{{ activeControlCountLabel }}</span>
@@ -68,7 +68,7 @@
 						>
 							<HistoryIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
 							<span class="min-w-0 truncate">
-								{{ formatMessage(analyticsChartMessages.previousPeriod) }}
+								{{ formatMessage(comparisonMessage) }}
 							</span>
 						</label>
 						<Toggle
@@ -172,6 +172,7 @@ const props = defineProps<{
 	showPreviousPeriod: boolean
 	canUseRatioMode: boolean
 	canShowPreviousPeriod: boolean
+	isSameDayLastWeekComparison: boolean
 	hasChartEvents: boolean
 	hasProjectEvents: boolean
 	smallToggles: boolean
@@ -201,6 +202,11 @@ const previousPeriodToggleId = useId()
 const modrinthEventsToggleId = useId()
 const projectEventsToggleId = useId()
 const { formatMessage } = useVIntl()
+const comparisonMessage = computed(() =>
+	props.isSameDayLastWeekComparison
+		? analyticsChartMessages.sameDayLastWeek
+		: analyticsChartMessages.previousPeriod,
+)
 
 const ratioModeModel = computed({
 	get: () => props.ratioMode,

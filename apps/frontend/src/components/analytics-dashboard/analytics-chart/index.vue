@@ -24,6 +24,7 @@
 			:show-top-graph-datasets-button="showTopGraphDatasetsButton"
 			:can-use-ratio-mode="canUseRatioMode"
 			:can-show-previous-period="canShowPreviousPeriodToggle"
+			:is-same-day-last-week-comparison="isSameDayLastWeekComparison"
 			:has-chart-events="hasChartEvents"
 			:has-project-events="hasProjectEvents"
 			:small-toggles="!isMobileLayout"
@@ -66,6 +67,7 @@
 				:fetch-request="fetchRequest"
 				:slice-count="sliceCount"
 				:should-show-previous-period="shouldShowPreviousPeriod"
+				:is-same-day-last-week-comparison="isSameDayLastWeekComparison"
 				:all-chart-datasets="allChartDatasets"
 				:current-legend-entries="currentLegendEntries"
 				:legend-entries="legendEntries"
@@ -130,6 +132,7 @@ const {
 	isGraphDatasetSelectionActive,
 	selectedProjectIds: currentSelectedProjectIds,
 	selectedTimeframeMode,
+	selectedTimeframe,
 	selectedCustomTimeframeStartDate,
 	selectedCustomTimeframeEndDate,
 	selectedGroupBy: selectedDashboardGroupBy,
@@ -140,6 +143,9 @@ const {
 } = dashboardContext
 
 const isDataLoading = computed(() => isLoading.value)
+const isSameDayLastWeekComparison = computed(
+	() => selectedTimeframeMode.value === 'preset' && selectedTimeframe.value === 'yesterday',
+)
 const defaultShowProjectEvents = computed(() =>
 	getDefaultAnalyticsGraphProjectEventsVisibility(currentSelectedProjectIds.value),
 )
@@ -194,6 +200,7 @@ const {
 	allChartDatasets,
 	previousChartDatasets,
 	shouldShowPreviousPeriod,
+	isSameDayLastWeekComparison,
 	isRatioMode,
 	hiddenGraphDatasetIds,
 	selectedBreakdowns,

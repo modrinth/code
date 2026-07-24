@@ -28,6 +28,7 @@
 				:stat-label="card.statLabel"
 				:stat-tooltip="card.statTooltip"
 				:vs-prev-period-percent="card.vsPrevPeriodPercent"
+				:is-same-day-last-week-comparison="isSameDayLastWeekComparison"
 				:icon="card.icon"
 				:active="activeStat === card.key"
 				:disabled="card.disabled"
@@ -61,6 +62,8 @@ const {
 	percentChanges,
 	hasPreviousPeriodComparison,
 	selectedBreakdowns,
+	selectedTimeframeMode,
+	selectedTimeframe,
 	isAnalyticsDashboardStatRelevant,
 } = injectAnalyticsDashboardContext()
 const formatNumber = useFormatNumber()
@@ -70,6 +73,9 @@ const showMonetizationBanner = computed(
 	() => selectedBreakdowns.value.includes('monetization') && !monetizationBannerDismissed.value,
 )
 const MAX_PREVIOUS_PERIOD_PERCENT_DISPLAY = 1000
+const isSameDayLastWeekComparison = computed(
+	() => selectedTimeframeMode.value === 'preset' && selectedTimeframe.value === 'yesterday',
+)
 
 const compactNumberFormatter = computed(
 	() =>
