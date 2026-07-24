@@ -11,6 +11,29 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-24T18:04:04+00:00`,
+		product: 'app',
+		version: '0.16.1',
+		body: `## Changed
+- Updated translations
+
+## Fixed
+- Fixed the "Push update" admonition being invisible until the app was reloaded.`,
+	},
+	{
+		date: `2026-07-24T18:04:04+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations
+- Improved messaging on the accept invite webpage modal.`,
+	},
+	{
+		date: `2026-07-24T18:04:04+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations`,
+	},
+	{
 		date: `2026-07-24T16:57:14+00:00`,
 		product: 'web',
 		body: `## Fixed
