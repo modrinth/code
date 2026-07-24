@@ -13,6 +13,20 @@ use typed_path::{
 #[repr(transparent)]
 pub struct SafeRelativeUtf8UnixPathBuf(Utf8UnixPathBuf);
 
+pub fn is_safe_file_name(file_name: &str) -> bool {
+    if file_name.contains('/') || file_name.contains('\\') {
+        return false;
+    }
+
+    SafeRelativeUtf8UnixPathBuf::try_from(file_name.to_string()).is_ok_and(
+        |path| {
+            path.components()
+                .exactly_one()
+                .is_ok_and(|component| component.is_normal())
+        },
+    )
+}
+
 impl<'de> Deserialize<'de> for SafeRelativeUtf8UnixPathBuf {
     fn deserialize<D: Deserializer<'de>>(
         deserializer: D,
@@ -144,5 +158,34 @@ fn safe_relative_path_deserialization_contract() {
     for path in invalid_paths {
         SafeRelativeUtf8UnixPathBuf::try_from(path.to_string())
             .expect_err("Path should be considered invalid");
+    }
+}
+
+#[test]
+fn safe_file_name_contract() {
+    let valid_file_names = [
+        "file.txt",
+        "file.name.with.dots.tar.gz",
+        "file..name.jar",
+        "123_456-789.file",
+    ];
+    for file_name in valid_file_names {
+        assert!(is_safe_file_name(file_name));
+    }
+
+    let invalid_file_names = [
+        "",
+        ".",
+        "..",
+        "../file.txt",
+        "directory/file.txt",
+        r"..\file.txt",
+        r"directory\file.txt",
+        "C:file.txt",
+        "C:/file.txt",
+        "NUL.txt",
+    ];
+    for file_name in invalid_file_names {
+        assert!(!is_safe_file_name(file_name));
     }
 }

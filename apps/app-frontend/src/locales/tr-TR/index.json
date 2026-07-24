@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "{count} dünya ara..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "İndirme"
-  },
   "app.modal.install-to-play.header": {
     "message": "Oynamak için yükleyin"
   },

@@ -533,15 +533,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "mundo"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "O conteúdo do seu pacote de mods agora pode ser encontrado aqui!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Conteúdo do pacote de mods movido"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Não mostrar novamente"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Conteúdo adicional"
   },

@@ -1502,7 +1502,7 @@ pub async fn create_oauth_account(
     };
 
     if let Some(email) = &user.email {
-        ensure_email_is_usable(email).await?;
+        ensure_email_domain_is_allowed(email)?;
     }
 
     let mut txn = db

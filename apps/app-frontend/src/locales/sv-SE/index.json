@@ -407,9 +407,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Sök {count} världar..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Installera inte"
-  },
   "app.modal.install-to-play.header": {
     "message": "Installera för att spela"
   },

@@ -533,15 +533,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "wereld"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "De inhoud van je modpack is nu hier te vinden!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Inhoud van modpack is verplaatst"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Niet opnieuw tonen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },

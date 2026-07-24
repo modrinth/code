@@ -7,6 +7,7 @@ import svgLoader from 'vite-svg-loader'
 import { GenericModrinthClient, type Labrinth } from '../../packages/api-client/src/index.ts'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const STAGING_SHARED_INSTANCES_API_URL = 'https://staging-shared-instances.modrinth.com'
 const API_CLIENT_SOURCE = fileURLToPath(
 	new URL('../../packages/api-client/src/index.ts', import.meta.url),
 )
@@ -210,6 +211,7 @@ export default defineNuxtConfig({
 		// @ts-ignore
 		rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
 		pyroBaseUrl: process.env.PYRO_BASE_URL,
+		sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 		intercomIdentitySecret:
 			process.env.INTERCOM_IDENTITY_SECRET ??
 			// @ts-ignore
@@ -217,6 +219,7 @@ export default defineNuxtConfig({
 		public: {
 			apiBaseUrl: getApiUrl(),
 			pyroBaseUrl: process.env.PYRO_BASE_URL,
+			sharedInstancesBaseUrl: getSharedInstancesApiUrl(),
 			siteUrl: getDomain(),
 			intercomAppId:
 				process.env.INTERCOM_APP_ID ||
@@ -352,6 +355,15 @@ export default defineNuxtConfig({
 function getApiUrl() {
 	// @ts-ignore
 	return process.env.BROWSER_BASE_URL ?? globalThis.BROWSER_BASE_URL ?? STAGING_API_URL
+}
+
+function getSharedInstancesApiUrl() {
+	return (
+		process.env.SHARED_INSTANCES_API_BASE_URL ??
+		// @ts-ignore
+		globalThis.SHARED_INSTANCES_API_BASE_URL ??
+		STAGING_SHARED_INSTANCES_API_URL
+	)
 }
 
 function isProduction() {

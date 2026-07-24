@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Не встановлювати"
-  },
   "app.modal.install-to-play.header": {
     "message": "Установлення для гри"
   },

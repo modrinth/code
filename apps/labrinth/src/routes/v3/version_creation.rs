@@ -925,9 +925,9 @@ pub async fn upload_file(
         ));
     }
 
-    if file_name.contains('/') {
+    if !path_util::is_safe_file_name(file_name) {
         return Err(CreateError::InvalidInput(
-            "File names must not contain slashes!".to_string(),
+            "file names must be a single safe path component".to_string(),
         ));
     }
 

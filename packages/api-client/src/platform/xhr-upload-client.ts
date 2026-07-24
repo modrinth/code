@@ -21,6 +21,8 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 			baseUrl = this.resolveBaseUrl(this.config.labrinthBaseUrl!)
 		} else if (options.api === 'archon') {
 			baseUrl = this.resolveBaseUrl(this.config.archonBaseUrl!)
+		} else if (options.api === 'sharedinstances') {
+			baseUrl = this.resolveBaseUrl(this.config.sharedInstancesBaseUrl!)
 		} else {
 			baseUrl = options.api
 		}

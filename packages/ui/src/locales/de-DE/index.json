@@ -533,15 +533,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "Welt"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Die Inhalte deines Modpacks findest du jetzt hier!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpack-Inhalte verschoben"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Nicht erneut anzeigen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Zusätzliche Inhalte"
   },
@@ -5802,4 +5793,3 @@
     "defaultMessage": "Typ"
   }
 }
-

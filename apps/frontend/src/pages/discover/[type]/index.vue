@@ -66,7 +66,7 @@ const auth = await useAuth()
 let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
 const HOVER_DURATION_TO_PREFETCH_MS = 500
 
-const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject) => {
+const handleProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
 	const slug = result.slug || result.project_id
 	prefetchTimeout = useTimeoutFn(
 		() => {
@@ -199,24 +199,6 @@ function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject
 	return undefined
 }
 
-type DiscoverProjectSearchHit = Labrinth.Search.v2.ResultSearchProject & {
-	version_id?: string | null
-}
-
-function mapV3ProjectHit(hit: Labrinth.Search.v3.ResultSearchProject): DiscoverProjectSearchHit {
-	return {
-		...hit,
-		project_type: hit.project_types[0] ?? projectTypeId.value,
-		title: hit.name,
-		description: hit.summary,
-		versions: hit.version_id ? [hit.version_id] : [],
-		latest_version: hit.version_id,
-		icon_url: hit.icon_url ?? '',
-		client_side: 'unknown',
-		server_side: 'unknown',
-	}
-}
-
 const hostingContextQuery = computed(() => {
 	const query: LocationQueryRaw = {}
 
@@ -234,6 +216,18 @@ function withHostingContext(path: string) {
 	return hostingContextQuery.value ? { path, query: hostingContextQuery.value } : path
 }
 
+function parseSearchParams(requestParams: string): Labrinth.Search.SearchParams {
+	const params = new URLSearchParams(requestParams.replace(/^\?/, ''))
+
+	return {
+		query: params.get('query') ?? undefined,
+		offset: params.get('offset') ?? undefined,
+		index: params.get('index') ?? undefined,
+		limit: params.get('limit') ?? undefined,
+		new_filters: params.get('new_filters') ?? undefined,
+	}
+}
+
 async function fetchSearch(requestParams: string) {
 	debug('search() called', {
 		requestParams: requestParams.substring(0, 100),
@@ -241,11 +235,7 @@ async function fetchSearch(requestParams: string) {
 		projectTypeId: projectTypeId.value,
 	})
 
-	const raw = await client.request<Labrinth.Search.v3.SearchResults>('/search', {
-		api: 'labrinth',
-		version: 3,
-		method: 'GET',
-		params: Object.fromEntries(new URLSearchParams(requestParams.replace(/^\?/, ''))),
+	const raw = await client.labrinth.projects_v3.search(parseSearchParams(requestParams), {
 		headers: withLabrinthCanaryHeader(),
 	})
 
@@ -261,7 +251,7 @@ async function fetchSearch(requestParams: string) {
 	}
 
 	return {
-		projectHits: raw.hits.map(mapV3ProjectHit),
+		projectHits: raw.hits,
 		serverHits: [],
 		total_hits: raw.total_hits,
 		per_page: raw.hits_per_page,
@@ -277,7 +267,7 @@ async function search(requestParams: string) {
 }
 
 function getCardActions(
-	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+	result: Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
 ): CardAction[] {
 	if (currentProjectType === 'server') return []
@@ -492,7 +482,7 @@ provideBrowseManager({
 	tags,
 	projectType: projectTypeId,
 	...searchState,
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) =>
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
 		withHostingContext(
 			`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
 		),

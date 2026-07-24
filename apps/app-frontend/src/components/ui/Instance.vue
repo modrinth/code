@@ -66,6 +66,7 @@ const checkProcess = async () => {
 
 const play = async (e, context) => {
 	e?.stopPropagation()
+	if (props.instance.quarantined) return
 	loading.value = true
 	await run(props.instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
@@ -94,6 +95,7 @@ const stop = async (e, context) => {
 
 const repair = async (e) => {
 	e?.stopPropagation()
+	if (props.instance.quarantined) return
 
 	if (
 		props.instance.install_stage !== 'pack_installed' &&
@@ -116,6 +118,7 @@ const openFolder = async () => {
 }
 
 const addContent = async () => {
+	if (props.instance.quarantined) return
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 		query: { i: props.instance.id },
@@ -142,7 +145,9 @@ const unlisten = await process_listener((e) => {
 	}
 })
 
-onMounted(() => checkProcess())
+onMounted(() => {
+	checkProcess()
+})
 onUnmounted(() => unlisten())
 </script>
 
@@ -173,7 +178,11 @@ onUnmounted(() => unlisten())
 						<SpinnerIcon class="animate-spin" />
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-else :color="first ? 'brand' : 'standard'" circular>
+				<ButtonStyled
+					v-else-if="!instance.quarantined"
+					:color="first ? 'brand' : 'standard'"
+					circular
+				>
 					<button
 						v-tooltip="'Play'"
 						@click="(e) => play(e, 'InstanceCard')"
@@ -227,7 +236,12 @@ onUnmounted(() => unlisten())
 						class="animate-spin w-8 h-8"
 						tabindex="-1"
 					/>
-					<ButtonStyled v-else-if="!installed" size="large" color="brand" circular>
+					<ButtonStyled
+						v-else-if="!installed && !instance.quarantined"
+						size="large"
+						color="brand"
+						circular
+					>
 						<button
 							v-tooltip="'Repair'"
 							class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"
@@ -236,7 +250,7 @@ onUnmounted(() => unlisten())
 							<DownloadIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else size="large" color="brand" circular>
+					<ButtonStyled v-else-if="!instance.quarantined" size="large" color="brand" circular>
 						<button
 							v-tooltip="'Play'"
 							class="transition-all scale-75 group-hover:scale-100 group-focus-within:scale-100 origin-bottom opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 card-shadow"

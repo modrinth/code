@@ -57,6 +57,10 @@ import { MclogsInsightsV1Module } from './mclogs/insights/v1'
 import { MclogsLogsV1Module } from './mclogs/logs/v1'
 import { PaperVersionsV3Module } from './paper/v3'
 import { PurpurVersionsV2Module } from './purpur/v2'
+import { SharedInstancesInstancesV1Module } from './shared-instances/instances/v1'
+import { SharedInstancesInvitesV1Module } from './shared-instances/invites/v1'
+import { SharedInstancesModerationV1Module } from './shared-instances/moderation/v1'
+import { SharedInstancesUsersV1Module } from './shared-instances/users/v1'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -128,6 +132,10 @@ export const MODULE_REGISTRY = {
 	labrinth_versions_v3: LabrinthVersionsV3Module,
 	paper_versions_v3: PaperVersionsV3Module,
 	purpur_versions_v2: PurpurVersionsV2Module,
+	sharedinstances_invites_v1: SharedInstancesInvitesV1Module,
+	sharedinstances_instances_v1: SharedInstancesInstancesV1Module,
+	sharedinstances_moderation_v1: SharedInstancesModerationV1Module,
+	sharedinstances_users_v1: SharedInstancesUsersV1Module,
 } as const satisfies Record<string, ModuleConstructor>
 
 export type ModuleID = keyof typeof MODULE_REGISTRY

@@ -250,9 +250,9 @@ pub struct SearchResultsV3 {
 pub struct SearchResultV3 {
     pub hits: Vec<serde_json::Value>,
     #[serde(default)]
-    pub offset: u32,
-    #[serde(default)]
-    pub limit: u32,
+    pub page: u32,
+    #[serde(default, alias = "limit")]
+    pub hits_per_page: u32,
     #[serde(default)]
     pub total_hits: u32,
 }
@@ -373,6 +373,8 @@ impl<'de> serde::Deserialize<'de> for CachedFileUpdate {
 pub struct CachedFileHash {
     pub path: String,
     pub size: u64,
+    #[serde(default)]
+    pub modified_at_ns: u64,
     pub hash: String,
     pub project_type: Option<ProjectType>,
     #[serde(default)]
@@ -385,6 +387,37 @@ pub struct CachedFileHash {
 pub struct KnownModrinthFile<'a> {
     pub project_id: &'a str,
     pub version_id: &'a str,
+}
+
+pub(crate) fn file_modified_at_ns(
+    metadata: &std::fs::Metadata,
+) -> std::io::Result<u64> {
+    let elapsed = metadata
+        .modified()?
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(std::io::Error::other)?;
+
+    Ok(elapsed
+        .as_secs()
+        .saturating_mul(1_000_000_000)
+        .saturating_add(u64::from(elapsed.subsec_nanos())))
+}
+
+pub(crate) fn file_hash_cache_key(
+    size: u64,
+    modified_at_ns: u64,
+    path: &str,
+) -> String {
+    format!("v2-{size}-{modified_at_ns}-{path}")
+}
+
+fn file_hash_path_from_cache_key(key: &str) -> Option<&str> {
+    let mut parts = key.splitn(4, '-');
+    (parts.next()? == "v2").then_some(())?;
+    parts.next()?.parse::<u64>().ok()?;
+    parts.next()?.parse::<u64>().ok()?;
+    let path = parts.next()?;
+    (!path.is_empty()).then_some(path)
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -674,13 +707,11 @@ impl CacheValue {
             | CacheValue::GameVersions(_)
             | CacheValue::DonationPlatforms(_) => DEFAULT_ID.to_string(),
 
-            CacheValue::FileHash(hash) => {
-                format!(
-                    "{}-{}",
-                    hash.size,
-                    hash.path.trim_end_matches(".disabled")
-                )
-            }
+            CacheValue::FileHash(hash) => file_hash_cache_key(
+                hash.size,
+                hash.modified_at_ns,
+                hash.path.trim_end_matches(".disabled"),
+            ),
             CacheValue::FileUpdate(hash) => {
                 format!(
                     "{}-{}-{}-{}",
@@ -1518,13 +1549,20 @@ impl CachedEntry {
                     instances_dir: &Path,
                     key: String,
                 ) -> crate::Result<(CachedEntry, bool)> {
-                    let path =
-                        key.split_once('-').map(|x| x.1).unwrap_or_default();
+                    let path = file_hash_path_from_cache_key(&key).ok_or_else(
+                        || {
+                            crate::ErrorKind::InputError(format!(
+                                "Invalid file hash cache key: {key}",
+                            ))
+                        },
+                    )?;
 
                     let full_path = instances_dir.join(path);
 
                     let mut file = tokio::fs::File::open(&full_path).await?;
-                    let size = file.metadata().await?.len();
+                    let metadata = file.metadata().await?;
+                    let size = metadata.len();
+                    let modified_at_ns = file_modified_at_ns(&metadata)?;
 
                     let mut hasher = sha1_smol::Sha1::new();
 
@@ -1544,6 +1582,7 @@ impl CachedEntry {
                         CacheValue::FileHash(CachedFileHash {
                             path: path.to_string(),
                             size,
+                            modified_at_ns,
                             hash,
                             project_type: ProjectType::get_from_parent_folder(
                                 &full_path,
@@ -2139,6 +2178,7 @@ pub async fn cache_file_hash(
     bytes: bytes::Bytes,
     instance_id: &str,
     path: &str,
+    modified_at_ns: u64,
     known_hash: Option<&str>,
     project_type: Option<ProjectType>,
     known_modrinth_file: Option<KnownModrinthFile<'_>>,
@@ -2156,6 +2196,7 @@ pub async fn cache_file_hash(
         instance_id,
         path,
         size as u64,
+        modified_at_ns,
         hash,
         project_type,
         known_modrinth_file,
@@ -2168,6 +2209,7 @@ pub async fn cache_file_hash_metadata(
     instance_id: &str,
     path: &str,
     size: u64,
+    modified_at_ns: u64,
     hash: String,
     project_type: Option<ProjectType>,
     known_modrinth_file: Option<KnownModrinthFile<'_>>,
@@ -2186,6 +2228,7 @@ pub async fn cache_file_hash_metadata(
         &[CacheValue::FileHash(CachedFileHash {
             path: format!("{instance_id}/{path}"),
             size,
+            modified_at_ns,
             hash,
             project_type,
             project_id,

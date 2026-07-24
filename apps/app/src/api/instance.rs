@@ -10,6 +10,8 @@ use theseus::data::{
     EditInstance as CoreEditInstance, InstanceInstallCandidate,
     InstanceInstallTarget, InstanceLaunchOverridesPatch,
     InstanceLink as CoreInstanceLink, InstanceMetadata, LinkedModpackInfo,
+    SharedInstanceAttachment as CoreSharedInstanceAttachment,
+    SharedInstanceRole,
 };
 use theseus::instance::InstallProjectWithDependenciesRequest;
 use theseus::instance::QuickPlayType;
@@ -50,6 +52,15 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_kill,
             instance_edit,
             instance_edit_icon,
+            instance_share_can_current_user_use,
+            instance_share_get_users,
+            instance_share_invite_users,
+            instance_share_create_invite_link,
+            instance_share_remove_users,
+            instance_share_get_publish_preview,
+            instance_share_publish,
+            instance_share_unlink,
+            instance_share_unpublish,
             instance_export_mrpack,
             instance_get_pack_export_candidates,
         ])
@@ -70,6 +81,8 @@ pub struct Instance {
     pub loader_version: Option<String>,
     pub groups: Vec<String>,
     pub link: Option<InstanceLink>,
+    pub shared_instance: Option<SharedInstanceAttachment>,
+    pub quarantined: bool,
     pub update_channel: ReleaseChannel,
     pub created: chrono::DateTime<chrono::Utc>,
     pub modified: chrono::DateTime<chrono::Utc>,
@@ -115,8 +128,38 @@ pub enum InstanceLink {
         active_instance_id: Option<String>,
     },
     SharedInstance {
-        shared_instance_id: String,
+        modpack_project_id: Option<String>,
+        modpack_version_id: Option<String>,
     },
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub struct SharedInstanceAttachment {
+    pub id: String,
+    pub role: SharedInstanceRole,
+    pub manager_id: Option<String>,
+    pub server_manager_name: Option<String>,
+    pub server_manager_icon_url: Option<String>,
+    pub linked_user_id: Option<String>,
+    pub status: String,
+    pub applied_version: Option<i32>,
+    pub latest_version: Option<i32>,
+}
+
+impl From<CoreSharedInstanceAttachment> for SharedInstanceAttachment {
+    fn from(attachment: CoreSharedInstanceAttachment) -> Self {
+        Self {
+            id: attachment.id.to_string(),
+            role: attachment.role,
+            manager_id: attachment.manager_id,
+            server_manager_name: attachment.server_manager_name,
+            server_manager_icon_url: attachment.server_manager_icon_url,
+            linked_user_id: attachment.linked_user_id,
+            status: attachment.status.as_str().to_string(),
+            applied_version: attachment.applied_version,
+            latest_version: attachment.latest_version,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -201,6 +244,8 @@ impl From<InstanceMetadata> for Instance {
             loader_version: metadata.applied_content_set.loader_version,
             groups: metadata.groups,
             link: InstanceLink::from_core(metadata.link),
+            shared_instance: metadata.shared_instance.map(Into::into),
+            quarantined: metadata.quarantined,
             update_channel: metadata.instance.update_channel,
             created: metadata.instance.created,
             modified: metadata.instance.modified,
@@ -268,11 +313,13 @@ impl InstanceLink {
                     .collect(),
                 active_instance_id: active_instance_id.map(|id| id.to_string()),
             }),
-            CoreInstanceLink::SharedInstance { shared_instance_id } => {
-                Some(Self::SharedInstance {
-                    shared_instance_id: shared_instance_id.to_string(),
-                })
-            }
+            CoreInstanceLink::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            } => Some(Self::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            }),
         }
     }
 
@@ -345,19 +392,13 @@ impl InstanceLink {
                     })
                     .transpose()?,
             }),
-            Self::SharedInstance { shared_instance_id } => {
-                Ok(CoreInstanceLink::SharedInstance {
-                    shared_instance_id: shared_instance_id.parse().map_err(
-                        |err| {
-                            theseus::Error::from(
-                                theseus::ErrorKind::InputError(format!(
-                                    "Invalid shared instance id: {err}"
-                                )),
-                            )
-                        },
-                    )?,
-                })
-            }
+            Self::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            } => Ok(CoreInstanceLink::SharedInstance {
+                modpack_project_id,
+                modpack_version_id,
+            }),
         }
     }
 }
@@ -742,5 +783,92 @@ pub async fn instance_edit_icon(
     icon_path: Option<&Path>,
 ) -> Result<()> {
     theseus::instance::edit_icon(instance_id, icon_path).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_can_current_user_use() -> Result<bool> {
+    Ok(theseus::instance::can_active_user_use_shared_instances().await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_get_users(
+    instance_id: &str,
+) -> Result<theseus::instance::SharedInstanceUsers> {
+    Ok(theseus::instance::get_shared_instance_users(instance_id).await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_invite_users(
+    instance_id: &str,
+    user_ids: Vec<String>,
+) -> Result<theseus::instance::SharedInstanceUsers> {
+    Ok(
+        theseus::instance::invite_shared_instance_users(instance_id, user_ids)
+            .await?,
+    )
+}
+
+#[tauri::command]
+pub async fn instance_share_create_invite_link(
+    instance_id: &str,
+    max_age_seconds: Option<i32>,
+    max_uses: Option<i32>,
+    replace_invite_id: Option<String>,
+) -> Result<theseus::instance::SharedInstanceInviteLink> {
+    Ok(theseus::instance::create_shared_instance_invite_link(
+        instance_id,
+        max_age_seconds,
+        max_uses,
+        replace_invite_id,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_remove_users(
+    instance_id: &str,
+    user_ids: Vec<String>,
+    has_pending_recipients: bool,
+) -> Result<theseus::instance::SharedInstanceUsers> {
+    Ok(theseus::instance::remove_shared_instance_users(
+        instance_id,
+        user_ids,
+        has_pending_recipients,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_get_publish_preview(
+    instance_id: &str,
+) -> Result<Option<theseus::instance::SharedInstancePublishPreview>> {
+    Ok(
+        theseus::instance::get_shared_instance_publish_preview(instance_id)
+            .await?,
+    )
+}
+
+#[tauri::command]
+pub async fn instance_share_publish(
+    instance_id: &str,
+    config_paths: Vec<String>,
+) -> Result<SharedInstanceAttachment> {
+    Ok(
+        theseus::instance::publish_shared_instance(instance_id, config_paths)
+            .await?
+            .into(),
+    )
+}
+
+#[tauri::command]
+pub async fn instance_share_unlink(instance_id: &str) -> Result<()> {
+    theseus::instance::unlink_shared_instance(instance_id).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_unpublish(instance_id: &str) -> Result<()> {
+    theseus::instance::unpublish_shared_instance(instance_id).await?;
     Ok(())
 }

@@ -473,15 +473,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "ワールド"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "あなたのModパックのコンテンツは、こちらで確認できます！"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modパックのコンテンツは移動しました"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "再度表示しない"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "追加のコンテンツ"
   },

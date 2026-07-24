@@ -11,6 +11,51 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-24T16:57:14+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fix bad feedback when crypto withdrawals fail due to the wallet not supporting the transaction.
+- Fixed flickering on page headers at a specific window size.`,
+	},
+	{
+		date: `2026-07-24T16:57:14+00:00`,
+		product: 'app',
+		version: '0.16.0',
+		body: `## Added
+- Added shared instances. You can now easily share your instances with your friends - [see the blog post here for more information.](https://modrinth.com/news/article/shared-instances)
+
+## Fixed
+- Privacy consent popup could not be dismissed after choosing an option.
+- Fixed flickering on page headers at a specific window size.
+- Fixed broken links in changelogs when switching the version of a content item in the content tab.
+- Fixed external files having a "Switch version" button which did nothing in the content tab.
+
+## Security
+- Fixed a security issue that was privately reported.`,
+	},
+	{
+		date: `2026-07-24T16:57:14+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed broken warning tooltips on content items in the content tab.`,
+	},
+	{
+		date: `2026-07-24T06:01:31+00:00`,
+		product: 'app',
+		version: '0.15.20',
+		body: `## Fixed
+- Fixed loader tags and environment tags not showing up on search result cards.
+- Fixed database issues when adding many external files to an instance.
+- Fixed issues that sometimes occur when installing multiple modpacks at the same time.
+- Fixed case where double clicking really fast when installing on a project would brick an instance as it would become duplicated in the app database.`,
+	},
+	{
+		date: `2026-07-24T06:01:31+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed loader tags and environment tags not showing up on search result cards.`,
+	},
+	{
 		date: `2026-07-22T21:33:46+00:00`,
 		product: 'app',
 		version: '0.15.19',

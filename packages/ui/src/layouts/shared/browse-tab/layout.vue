@@ -66,13 +66,40 @@ const messages = defineMessages({
 		defaultMessage: 'No results found for your query!',
 	},
 })
+
+function getLoaderFieldValues(
+	result: Labrinth.Search.v3.ResultSearchProject,
+	field: string,
+): string[] {
+	return (result.project_loader_fields?.[field] ?? []).filter(
+		(value): value is string => typeof value === 'string',
+	)
+}
+
+function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, displayOnly: boolean) {
+	const tags = new Set(displayOnly ? result.display_categories : result.categories)
+
+	for (const loader of result.loaders) {
+		if (loader !== 'mrpack') {
+			tags.add(loader)
+		}
+	}
+
+	if (result.loaders.includes('mrpack')) {
+		for (const loader of getLoaderFieldValues(result, 'mrpack_loaders')) {
+			tags.add(loader)
+		}
+	}
+
+	return Array.from(tags)
+}
 </script>
 
 <template>
 	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
 		<div
 			ref="stickyInstallHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 p-3 border-surface-5"
+			class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-3 py-4 border-surface-5"
 			:class="[isInstallHeaderStuck ? 'border-t' : '']"
 		>
 			<BrowseInstallHeader />
@@ -247,8 +274,8 @@ const messages = defineMessages({
 					v-for="result in ctx.projectHits.value"
 					:key="result.project_id"
 					:link="ctx.getProjectLink(result)"
-					:title="result.title"
-					:icon-url="result.icon_url"
+					:title="result.name"
+					:icon-url="result.icon_url ?? undefined"
 					:author="{
 						name: result.organization == null ? result.author : result.organization,
 						link:
@@ -266,9 +293,9 @@ const messages = defineMessages({
 						ctx.effectiveCurrentSortType.value.name === 'newest' ? 'published' : 'updated'
 					"
 					:downloads="result.downloads"
-					:summary="result.description"
-					:tags="result.display_categories"
-					:all-tags="result.categories"
+					:summary="result.summary"
+					:tags="getProjectCardTags(result, true)"
+					:all-tags="getProjectCardTags(result, false)"
 					:deprioritized-tags="ctx.deprioritizedTags.value"
 					:exclude-loaders="ctx.excludeLoaders.value"
 					:followers="result.follows"
@@ -276,10 +303,7 @@ const messages = defineMessages({
 					:color="result.color ?? undefined"
 					:environment="
 						['mod', 'modpack'].includes(ctx.projectType.value)
-							? {
-									clientSide: result.client_side as Labrinth.Projects.v2.Environment,
-									serverSide: result.server_side as Labrinth.Projects.v2.Environment,
-								}
+							? result.project_loader_fields?.environment?.[0]
 							: undefined
 					"
 					:layout="ctx.effectiveLayout.value"

@@ -118,6 +118,7 @@ import _EyeOffIcon from './icons/eye-off.svg?component'
 import _FileIcon from './icons/file.svg?component'
 import _FileArchiveIcon from './icons/file-archive.svg?component'
 import _FileCodeIcon from './icons/file-code.svg?component'
+import _FileCogIcon from './icons/file-cog.svg?component'
 import _FileImageIcon from './icons/file-image.svg?component'
 import _FilePlusIcon from './icons/file-plus.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
@@ -549,6 +550,7 @@ export const EyeOffIcon = _EyeOffIcon
 export const FileIcon = _FileIcon
 export const FileArchiveIcon = _FileArchiveIcon
 export const FileCodeIcon = _FileCodeIcon
+export const FileCogIcon = _FileCogIcon
 export const FileImageIcon = _FileImageIcon
 export const FilePlusIcon = _FilePlusIcon
 export const FileTextIcon = _FileTextIcon

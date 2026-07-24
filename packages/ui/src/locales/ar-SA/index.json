@@ -266,9 +266,6 @@
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
   },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": ""
-  },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"
   },
@@ -735,4 +732,3 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
-

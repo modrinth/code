@@ -530,15 +530,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "dünya"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Mod paketinizin içeriği artık burada bulunabilir!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Mod paketi içeriği taşındı"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Bir daha gösterme"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Fazladan içerik"
   },
