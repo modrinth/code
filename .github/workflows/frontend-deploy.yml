@@ -145,19 +145,27 @@ jobs:
           sourcemaps: ./apps/frontend/.output/server
           url_prefix: '~/'
 
-      - name: Deploy Cloudflare Worker
-        id: wrangler
+      - name: Install Wrangler CLI
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          environment: ${{ steps.meta.outputs.env != 'production' && steps.meta.outputs.env || '' }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
-          wranglerVersion: '4.114.0'
-          command: ${{ steps.meta.outputs.cmd }}
+          version: '4.112.0'
+          command: --version
 
       - parallel:
+          - name: Deploy Cloudflare Worker
+            id: wrangler
+            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              environment: ${{ steps.meta.outputs.env != 'production' && steps.meta.outputs.env || '' }}
+              workingDirectory: ./apps/frontend
+              command: ${{ steps.meta.outputs.cmd }}
+
           - name: Deploy staging Cloudflare Worker preview
             if: ${{ inputs.preview }}
             uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
@@ -165,8 +173,6 @@ jobs:
               apiToken: ${{ secrets.CF_API_TOKEN }}
               accountId: ${{ secrets.CF_ACCOUNT_ID }}
               workingDirectory: ./apps/frontend
-              packageManager: pnpm
-              wranglerVersion: '4.114.0'
               command: ${{ steps.meta.outputs.staging_cmd }}
 
           - name: Deploy persistent Cloudflare Worker preview
@@ -176,8 +182,6 @@ jobs:
               apiToken: ${{ secrets.CF_API_TOKEN }}
               accountId: ${{ secrets.CF_ACCOUNT_ID }}
               workingDirectory: ./apps/frontend
-              packageManager: pnpm
-              wranglerVersion: '4.114.0'
               command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true --var CF_PAGES_URL:${{ steps.meta.outputs.branch_alias_url }}
 
           - name: Deploy persistent staging Cloudflare Worker preview
@@ -187,8 +191,6 @@ jobs:
               apiToken: ${{ secrets.CF_API_TOKEN }}
               accountId: ${{ secrets.CF_ACCOUNT_ID }}
               workingDirectory: ./apps/frontend
-              packageManager: pnpm
-              wranglerVersion: '4.114.0'
               command: ${{ steps.meta.outputs.staging_branch_alias_cmd }}
 
       - name: Purge cache

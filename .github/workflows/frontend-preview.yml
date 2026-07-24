@@ -80,27 +80,38 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: echo "sha_short=${HEAD_SHA::8}" >> $GITHUB_OUTPUT
 
-      - name: Deploy Storybook preview
+      - name: Install Wrangler CLI
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./packages/ui
           packageManager: pnpm
-          wranglerVersion: '4.114.0'
-          command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
+          version: '4.112.0'
+          command: --version
 
-      - name: Deploy persistent Storybook preview
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          workingDirectory: ./packages/ui
-          packageManager: pnpm
-          wranglerVersion: '4.114.0'
-          command: versions upload --preview-alias ${{ needs.metadata.outputs.branch-alias }}
+      - parallel:
+          - name: Deploy Storybook preview
+            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./packages/ui
+              packageManager: pnpm
+              wranglerVersion: '4.114.0'
+              command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
+
+          - name: Deploy persistent Storybook preview
+            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            env:
+              NODE_OPTIONS: --max-old-space-size=6144
+            with:
+              apiToken: ${{ secrets.CF_API_TOKEN }}
+              accountId: ${{ secrets.CF_ACCOUNT_ID }}
+              workingDirectory: ./packages/ui
+              packageManager: pnpm
+              wranglerVersion: '4.114.0'
+              command: versions upload --preview-alias ${{ needs.metadata.outputs.branch-alias }}
 
   comment:
     if: |
