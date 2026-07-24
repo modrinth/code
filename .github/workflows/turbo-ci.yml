@@ -178,7 +178,23 @@ jobs:
         if: ${{ always() }}
         run: |
           df -h
-          dd if=/dev/urandom of=a bs=1024 count=8
+
+          print_cgroup_file() {
+            local file="$1"
+
+            if [ -r "$file" ]; then
+              echo "$file"
+              cat "$file"
+            fi
+          }
+
+          print_cgroup_file /proc/self/cgroup
+          print_cgroup_file /sys/fs/cgroup/memory.peak
+          print_cgroup_file /sys/fs/cgroup/memory.high
+          print_cgroup_file /sys/fs/cgroup/memory.events
+          print_cgroup_file /sys/fs/cgroup/cgroup.events
+          print_cgroup_file /sys/fs/cgroup/memory/memory.failcnt
+          print_cgroup_file /sys/fs/cgroup/memory/memory.oom_control
 
       - name: Verify intl:extract has been run
         run: |
