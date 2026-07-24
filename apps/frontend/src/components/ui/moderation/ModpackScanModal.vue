@@ -9,6 +9,8 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Combobox,
+	type ComboboxOption,
 	ConfirmModal,
 	defineMessages,
 	injectModrinthClient,
@@ -110,9 +112,33 @@ const isLoadingVersions = ref(false)
 const isScanning = ref(false)
 const isClearing = ref(false)
 const versionLoadError = ref<string | null>(null)
-const scanError = ref<string | null>(null)
 const requestId = ref(0)
 const scanRequestId = ref(0)
+
+const DEFAULT_BATCH_AMOUNT = 10
+const batchAmountOptions: ComboboxOption<number>[] = [
+	{ value: 1, label: '1' },
+	{ value: 5, label: '5' },
+	{ value: 10, label: '10' },
+	{ value: 20, label: '20' },
+	{ value: 50, label: '50' },
+]
+const batchAmountValues = batchAmountOptions.map((opt) => opt.value)
+const batchAmountCookie = useCookie<number>('moderation-modpack-scan-batch', {
+	default: () => DEFAULT_BATCH_AMOUNT,
+	maxAge: 60 * 60 * 24 * 365,
+	sameSite: 'lax',
+	path: '/',
+})
+const batchAmount = computed({
+	get() {
+		const value = Number(batchAmountCookie.value)
+		return batchAmountValues.includes(value) ? value : DEFAULT_BATCH_AMOUNT
+	},
+	set(value: number) {
+		batchAmountCookie.value = value
+	},
+})
 
 const columns = computed<TableColumn<ScanTableColumn>[]>(() => [
 	{ key: 'filename', label: formatMessage(messages.packFileName), width: '60%' },
@@ -175,7 +201,6 @@ async function fetchAllVersions() {
 	const currentRequestId = ++requestId.value
 	isLoadingVersions.value = true
 	versionLoadError.value = null
-	scanError.value = null
 	rows.value = {}
 
 	try {
@@ -225,7 +250,6 @@ async function fetchScan(id: string) {
 		rows.value[id].error = undefined
 	} catch (error) {
 		rows.value[id].error = getErrorMessage(error)
-		scanError.value = formatMessage(messages.scanError, { error: rows.value[id].error })
 	} finally {
 		rows.value[id].isScanning = false
 	}
@@ -235,7 +259,6 @@ async function fetchAllScans() {
 	if (isBusy.value) return
 
 	isScanning.value = true
-	scanError.value = null
 
 	Object.entries(rows.value).map(([id, row]) => {
 		rows.value[id] = {
@@ -249,7 +272,7 @@ async function fetchAllScans() {
 	})
 
 	try {
-		await runWithConcurrency(Object.keys(rows.value), 10, async (id: string) => {
+		await runWithConcurrency(Object.keys(rows.value), batchAmount.value, async (id: string) => {
 			await fetchScan(id)
 		})
 	} finally {
@@ -337,6 +360,13 @@ defineExpose({ show, hide })
 					}}
 				</span>
 				<div class="flex items-center gap-2">
+					<Combobox v-model="batchAmount" :options="batchAmountOptions" placeholder="Batch amount">
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<span class="truncate text-contrast">{{ batchAmount }} per batch</span>
+							</span>
+						</template>
+					</Combobox>
 					<ButtonStyled circular color="red" color-fill="none">
 						<button
 							v-tooltip="formatMessage(messages.clearAllGroups)"
