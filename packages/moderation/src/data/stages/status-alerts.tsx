@@ -9,6 +9,7 @@ import {
 	getBooleanChildState,
 	group,
 	isNodeActive,
+	md,
 	resolveChildren,
 	stage,
 	toggle,
@@ -66,18 +67,35 @@ export default function (
 						}),
 					),
 
-				//TODO: chyz combine these
 				toggle('private-use', 'Private use')
-					.shown(computed(() => !project.value.minecraft_server))
 					.suggestedStatus('flagged')
-					.message()
-					.priority(Priorities.alerts),
+					.priority(Priorities.alerts)
+					.rawMessage(async (state) => {
+						let msg
 
-				toggle('private-use-server', 'Private community')
-					.shown(computed(() => !!project.value.minecraft_server))
-					.suggestedStatus('flagged')
-					.message()
-					.priority(Priorities.alerts),
+						if (
+							project.value.minecraft_java_server &&
+							project.value.minecraft_java_server.content?.kind === 'modpack'
+						) {
+							msg =
+								(await md('checklist/messages/status-alerts/private-use/server')(state)) +
+								'\n' +
+								(await md('checklist/messages/status-alerts/private-use/note/shared-instance')(
+									state,
+								))
+						} else {
+							msg = await md('checklist/messages/status-alerts/private-use/project')(state)
+							if (project.value.project_types.includes('modpack')) {
+								msg +=
+									'\n' +
+									(await md('checklist/messages/status-alerts/private-use/note/shared-instance')(
+										state,
+									))
+							}
+						}
+
+						return msg
+					}),
 
 				toggle('server-use', 'Server use')
 					.shown(
