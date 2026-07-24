@@ -290,6 +290,9 @@ const {
 const news = ref([])
 const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
+const serverInvitePopupNotificationIds = new Set()
+let liveNotificationGeneration = 0
+let liveNotificationsEnabled = true
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -786,16 +789,19 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
+	const hadSession = !!credentials.value?.session
 	const refreshId = ++credentialsRefreshId
 	credentials.value = undefined
 
 	const creds = await getCreds().catch(handleError)
 	if (refreshId !== credentialsRefreshId) return
+	if (!creds && hadSession) clearLiveNotifications()
 
 	if (creds && creds.user_id) {
 		if (creds.session && !(await validateSession(creds.session))) {
 			if (refreshId !== credentialsRefreshId) return
 
+			clearLiveNotifications()
 			await logout().catch(handleError)
 			if (refreshId !== credentialsRefreshId) return
 
@@ -806,6 +812,7 @@ async function fetchCredentials() {
 		if (refreshId !== credentialsRefreshId) return
 	}
 	credentials.value = creds ?? null
+	liveNotificationsEnabled = !!creds?.session
 }
 
 async function signIn(flow = 'sign-in') {
@@ -841,6 +848,7 @@ async function logOut() {
 async function performLogOut() {
 	credentialsRefreshId++
 	credentials.value = undefined
+	clearLiveNotifications()
 
 	await logout().catch(handleError)
 	await fetchCredentials()
@@ -962,12 +970,13 @@ function openServerInviteInviterProfile(inviterName) {
 }
 
 async function handleLiveNotification(notification) {
-	if (!notification?.body || notification.read) return
+	if (!liveNotificationsEnabled || !notification?.body || notification.read) return
 	if (await sharedInstanceInviteHandler.value?.handleNotification(notification)) return
 
 	if (notification.body.type === 'server_invite') {
 		if (displayedServerInviteNotifications.has(notification.id)) return
 
+		const generation = liveNotificationGeneration
 		displayedServerInviteNotifications.add(notification.id)
 
 		const serverName =
@@ -975,8 +984,9 @@ async function handleLiveNotification(notification) {
 		const inviterId = notification.body.invited_by
 		const invitedBy =
 			typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+		if (generation !== liveNotificationGeneration) return
 
-		addPopupNotification({
+		const popupNotification = addPopupNotification({
 			title: serverName,
 			autoCloseMs: null,
 			toast: {
@@ -989,7 +999,19 @@ async function handleLiveNotification(notification) {
 				onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
 			},
 		})
+		serverInvitePopupNotificationIds.add(popupNotification.id)
 	}
+}
+
+function clearLiveNotifications() {
+	liveNotificationGeneration++
+	liveNotificationsEnabled = false
+	for (const id of serverInvitePopupNotificationIds) {
+		popupNotificationManager.removeNotification(id)
+	}
+	displayedServerInviteNotifications.clear()
+	serverInvitePopupNotificationIds.clear()
+	sharedInstanceInviteHandler.value?.clearNotifications()
 }
 
 async function handleCommand(e) {
