@@ -7,7 +7,7 @@ use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
 use labrinth::background_task::BackgroundTask;
-use labrinth::database::redis::RedisPool;
+use labrinth::database::redis;
 use labrinth::env::ENV;
 use labrinth::file_hosting::{FileHost, FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
@@ -15,10 +15,7 @@ use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{app_data_config, app_fallback_config, env};
-use labrinth::{
-    app_routes_config_internal, app_routes_config_v2, app_routes_config_v3,
-};
+use labrinth::{app_data_config, app_fallback_config, app_routes_config, env};
 use labrinth::{clickhouse, database, file_hosting};
 use scalar_api_reference::actix_web::config as scalar_config;
 use serde_json::json;
@@ -113,7 +110,7 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new("");
+    let redis_pool = redis::from_env("").await;
 
     let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn FileHost> = match storage_backend {
@@ -275,11 +272,7 @@ async fn app() -> std::io::Result<()> {
             // own - See `sentry::SentryErrorReporting` for why.
             .wrap(labrinth::util::sentry::SentryErrorReporting)
             .configure(|cfg| app_data_config(cfg, labrinth_config.clone()))
-            .configure(|cfg| app_routes_config_v2(cfg, labrinth_config.clone()))
-            .configure(|cfg| app_routes_config_v3(cfg, labrinth_config.clone()))
-            .configure(|cfg| {
-                app_routes_config_internal(cfg, labrinth_config.clone())
-            });
+            .configure(|cfg| app_routes_config(cfg, labrinth_config.clone()));
 
         let scalar_configuration = json!({
             "sources": [

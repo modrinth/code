@@ -407,6 +407,9 @@
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "削除中"
   },
+  "content.dependency-warning.header": {
+    "defaultMessage": "依存関係の警告"
+  },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} 件追加されました"
   },
@@ -469,15 +472,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "ワールド"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "あなたのModパックのコンテンツは、こちらで確認できます！"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modパックのコンテンツは移動しました"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "再度表示しない"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "追加のコンテンツ"
@@ -844,6 +838,12 @@
   },
   "creation-flow.title.set-up-server": {
     "defaultMessage": "サーバーの設定"
+  },
+  "external-files.permissions-card.add-files-modal.confirm": {
+    "defaultMessage": "{count, plural, other {ファイルを追加}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": ""
   },
   "external-files.permissions-card.add-files-to-group": {
     "defaultMessage": "ファイルを追加…"

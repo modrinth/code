@@ -34,6 +34,7 @@
 				</div>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
 					<button
+						v-if="showSize"
 						type="button"
 						class="hidden w-[92px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-semibold hover:text-primary sm:flex"
 						:class="sortField === 'size' ? 'text-contrast' : 'text-secondary'"
@@ -52,6 +53,7 @@
 						/>
 					</button>
 					<button
+						v-if="showModified"
 						type="button"
 						class="hidden w-[132px] appearance-none items-center gap-1 border-0 bg-transparent p-0 text-left font-semibold hover:text-primary sm:flex"
 						:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
@@ -90,8 +92,11 @@
 					{{ formatMessage(messages.parentFolder) }}
 				</span>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
-					<span class="hidden w-[92px] text-left text-sm text-secondary sm:block" />
-					<span class="hidden w-[132px] text-left text-sm text-secondary sm:block" />
+					<span v-if="showSize" class="hidden w-[92px] text-left text-sm text-secondary sm:block" />
+					<span
+						v-if="showModified"
+						class="hidden w-[132px] text-left text-sm text-secondary sm:block"
+					/>
 					<span class="size-4 shrink-0" aria-hidden="true" />
 				</div>
 			</div>
@@ -140,10 +145,16 @@
 					{{ entry.name }}
 				</span>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
-					<span class="hidden w-[92px] truncate text-left text-sm text-secondary sm:block">
+					<span
+						v-if="showSize"
+						class="hidden w-[92px] truncate text-left text-sm text-secondary sm:block"
+					>
 						{{ formatSize(entry) }}
 					</span>
-					<span class="hidden w-[132px] truncate text-left text-sm text-secondary sm:block">
+					<span
+						v-if="showModified"
+						class="hidden w-[132px] truncate text-left text-sm text-secondary sm:block"
+					>
 						{{ formatModified(entry) }}
 					</span>
 					<ChevronRightIcon
@@ -164,8 +175,8 @@
 				<span class="size-4 shrink-0" />
 				<span class="min-w-0 flex-1 truncate text-sm font-medium opacity-0">.</span>
 				<div class="ml-2 flex shrink-0 items-center gap-4">
-					<span class="hidden w-[92px] text-left text-sm sm:block" />
-					<span class="hidden w-[132px] text-left text-sm sm:block" />
+					<span v-if="showSize" class="hidden w-[92px] text-left text-sm sm:block" />
+					<span v-if="showModified" class="hidden w-[132px] text-left text-sm sm:block" />
 					<span class="size-4 shrink-0" />
 				</div>
 			</div>
@@ -262,10 +273,14 @@ const props = withDefaults(
 	defineProps<{
 		items: FileTreeSelectItem[]
 		modelValue: string[]
+		showSize?: boolean
+		showModified?: boolean
 	}>(),
 	{
 		items: () => [],
 		modelValue: () => [],
+		showSize: true,
+		showModified: true,
 	},
 )
 

@@ -2684,9 +2684,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Pemasangan akan diterapkan kepada {count, plural, other {# projek}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Seorang pencipta Modrinth."
   },
@@ -2750,9 +2747,6 @@
   "profile.label.collection": {
     "message": "Koleksi"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, other {muat turun}}"
-  },
   "profile.label.joined": {
     "message": "Telah menyertai"
   },
@@ -2770,9 +2764,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasi"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
@@ -2906,24 +2897,6 @@
   "project-type.shader.singular": {
     "message": "Pembayang"
   },
-  "project.about.details.created": {
-    "message": "Dicipta {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Berlesen {license}"
-  },
-  "project.about.details.published": {
-    "message": "Diterbitkan {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Diserahkan {date}"
-  },
-  "project.about.details.title": {
-    "message": "Butiran"
-  },
-  "project.about.details.updated": {
-    "message": "Dikemas kini {date}"
-  },
   "project.actions.create-server": {
     "message": "Cipta pelayan"
   },
@@ -2953,9 +2926,6 @@
   },
   "project.description.title": {
     "message": "Keterangan"
-  },
-  "project.details.licensed": {
-    "message": "Berlesen"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
@@ -3007,15 +2977,6 @@
   },
   "project.gallery.title": {
     "message": "Galeri"
-  },
-  "project.license.error": {
-    "message": "Teks lesen tidak dapat diambil."
-  },
-  "project.license.loading": {
-    "message": "Sedang memuat teks lesen..."
-  },
-  "project.license.title": {
-    "message": "Lesen"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Projek anda adalah peribadi, yang bermakna ia hanya boleh diakses oleh anda dan orang yang anda jemput."
@@ -3187,9 +3148,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Kunjungi papan pemuka projek"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, other {muat turun}}"
   },
   "project.status.archived.message": {
     "message": "{title} telah diarkibkan. {title} tidak akan menerima sebarang kemas kini lanjut melainkan pengarang memutuskan untuk menyaharkibkan projek."
@@ -3583,9 +3541,6 @@
   },
   "servers.plan.small.description": {
     "message": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "dibilkan {interval, select, monthly {monthly} quarterly {quarterly} yearly {yearly} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Lengkapkan persediaan"

@@ -75,28 +75,42 @@ import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWarningModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
+import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
-import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import OnboardingChecklist from '@/components/ui/onboarding-checklist/index.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
-import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
+import {
+	ads_consent_listener,
+	hide_ads_window,
+	init_ads_window,
+	perform_ads_consent_action,
+	should_show_ads_consent_popup,
+	show_ads_window,
+} from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
-import { list, run } from '@/helpers/instance'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
+import {
+	can_current_user_use_shared_instances,
+	get as getInstance,
+	list,
+	run,
+} from '@/helpers/instance'
+import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -147,6 +161,7 @@ const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
 const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
+let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
 const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
 	sidebarToggled.value = !themeStore.toggleSidebar
@@ -184,12 +199,15 @@ const { handleError, addNotification } = notificationManager
 const popupNotificationManager = new AppPopupNotificationManager()
 providePopupNotificationManager(popupNotificationManager)
 const { addPopupNotification } = popupNotificationManager
+let adsConsentPopupId = null
+let unlistenAdsConsent
 
 const appVersion = getVersion()
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
+	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
 	features: [
 		new NodeAuthFeature({
 			getAuth: () => nodeAuthState.getAuth?.() ?? null,
@@ -213,9 +231,30 @@ const { data: authenticatedModrinthUser } = useQuery({
 	enabled: () => !!credentials.value?.session,
 	retry: false,
 })
+useQuery({
+	queryKey: computed(() => ['shared-instance-eligibility', credentials.value?.user?.id]),
+	queryFn: can_current_user_use_shared_instances,
+	enabled: () => !!credentials.value?.session && !!credentials.value?.user?.id,
+	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: false,
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
+})
+const hasPlus = computed(
+	() =>
+		!!credentials.value?.user &&
+		(hasMidasBadge(credentials.value.user) ||
+			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
+)
+const showAd = computed(
+	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
+)
+const adConsentAvailable = computed(() => credentials.value !== undefined && !hasPlus.value)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
-	showAds: ref(false),
+	showAds: showAd,
+	adConsentAvailable,
 	floatingActionBarOffsets: {
 		left: ref(APP_LEFT_NAV_WIDTH),
 		right: computed(() => (sidebarVisible.value ? `${APP_SIDEBAR_WIDTH}px` : '0px')),
@@ -254,6 +293,9 @@ const showFriendsList = computed(() => !showChecklist.value || hasLoggedIntoModr
 const news = ref([])
 const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
+const serverInvitePopupNotificationIds = new Set()
+let liveNotificationGeneration = 0
+let liveNotificationsEnabled = true
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -297,6 +339,12 @@ const authUnreachable = computed(() => {
 
 onMounted(async () => {
 	await useCheckDisableMouseover()
+	try {
+		unlistenAdsConsent = await ads_consent_listener(handleAdsConsentRequired)
+		handleAdsConsentRequired(await should_show_ads_consent_popup())
+	} catch (error) {
+		handleError(error)
+	}
 
 	document.querySelector('body').addEventListener('click', handleClick)
 	document.querySelector('body').addEventListener('auxclick', handleAuxClick)
@@ -310,6 +358,7 @@ onUnmounted(async () => {
 	unsubscribeSidebarToggle()
 	clearDelayedUpdatePopup()
 
+	await unlistenAdsConsent?.()
 	await unlistenUpdateDownload?.()
 })
 
@@ -334,7 +383,76 @@ const messages = defineMessages({
 		defaultMessage:
 			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
 	},
+	adsConsentTitle: {
+		id: 'app.ads-consent.title',
+		defaultMessage: 'Your privacy and how ads support Modrinth',
+	},
+	adsConsentBody: {
+		id: 'app.ads-consent.body',
+		defaultMessage:
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance.',
+	},
+	adsConsentManage: {
+		id: 'app.ads-consent.manage',
+		defaultMessage: 'Manage preferences',
+	},
+	adsConsentReject: {
+		id: 'app.ads-consent.reject',
+		defaultMessage: 'Reject all',
+	},
+	adsConsentAccept: {
+		id: 'app.ads-consent.accept',
+		defaultMessage: 'Accept all',
+	},
 })
+
+function handleAdsConsentRequired(required) {
+	if (!required) {
+		if (adsConsentPopupId !== null) {
+			popupNotificationManager.removeNotification(adsConsentPopupId)
+			adsConsentPopupId = null
+		}
+		return
+	}
+
+	if (
+		adsConsentPopupId !== null &&
+		popupNotificationManager.getNotifications().some((item) => item.id === adsConsentPopupId)
+	) {
+		return
+	}
+
+	const notification = addPopupNotification({
+		title: formatMessage(messages.adsConsentTitle),
+		text: formatMessage(messages.adsConsentBody),
+		type: 'info',
+		hideIcon: true,
+		autoCloseMs: null,
+		dismissible: false,
+		buttons: [
+			{
+				label: formatMessage(messages.adsConsentManage),
+				action: () => perform_ads_consent_action('manage').catch(handleError),
+				color: 'standard',
+				keepOpen: true,
+			},
+			{
+				label: formatMessage(messages.adsConsentReject),
+				action: () => perform_ads_consent_action('reject').catch(handleError),
+				color: 'brand',
+				keepOpen: true,
+			},
+			{
+				label: formatMessage(messages.adsConsentAccept),
+				action: () => perform_ads_consent_action('accept').catch(handleError),
+				color: 'brand',
+				keepOpen: true,
+			},
+		],
+	})
+
+	adsConsentPopupId = notification.id
+}
 
 async function setupApp() {
 	await onboardingChecklist.initialize()
@@ -399,7 +517,7 @@ async function setupApp() {
 		addNotification({
 			title: 'Warning',
 			text: e.message,
-			type: 'warn',
+			type: 'warning',
 		}),
 	)
 
@@ -584,6 +702,7 @@ watch(stateInitialized, (ready) => {
 const error = useError()
 const errorModal = ref()
 const minecraftAuthErrorModal = ref()
+const minecraftRequiredModal = ref()
 
 const contentInstall = createContentInstall({ router, handleError })
 provideContentInstall(contentInstall)
@@ -633,9 +752,10 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
-const modrinthLoginFlowWaitModal = ref()
+const modrinthLoginModal = ref()
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {
@@ -643,8 +763,12 @@ watch(incompatibilityWarningModal, (modal) => {
 	}
 })
 
-setupAuthProvider(credentials, async (_redirectPath) => {
-	await signIn()
+setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
+	if (options?.showModal === false) {
+		await signIn(flow)
+	} else {
+		await requestSignIn(flow)
+	}
 })
 
 async function validateSession(sessionToken) {
@@ -661,23 +785,35 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
+	const hadSession = !!credentials.value?.session
+	const refreshId = ++credentialsRefreshId
+	credentials.value = undefined
+
 	const creds = await getCreds().catch(handleError)
+	if (refreshId !== credentialsRefreshId) return
+	if (!creds && hadSession) clearLiveNotifications()
+
 	if (creds && creds.user_id) {
 		if (creds.session && !(await validateSession(creds.session))) {
+			if (refreshId !== credentialsRefreshId) return
+
+			clearLiveNotifications()
 			await logout().catch(handleError)
+			if (refreshId !== credentialsRefreshId) return
+
 			credentials.value = null
 			return
 		}
 		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
+		if (refreshId !== credentialsRefreshId) return
 	}
 	credentials.value = creds ?? null
+	liveNotificationsEnabled = !!creds?.session
 }
 
-async function signIn() {
-	modrinthLoginFlowWaitModal.value.show()
-
+async function signIn(flow = 'sign-in') {
 	try {
-		await login()
+		await login(flow)
 		await fetchCredentials()
 	} catch (error) {
 		if (
@@ -689,26 +825,30 @@ async function signIn() {
 		} else {
 			handleError(error)
 		}
-	} finally {
-		modrinthLoginFlowWaitModal.value.hide()
 	}
 }
 
+async function requestSignIn(flow = 'sign-in') {
+	await modrinthLoginModal.value?.showSigningIn(flow)
+}
+
+async function requestModrinthAuth(flow = 'sign-in') {
+	await signIn(flow)
+	return !!credentials.value?.session
+}
+
 async function logOut() {
+	await performLogOut()
+}
+
+async function performLogOut() {
+	credentialsRefreshId++
+	credentials.value = undefined
+	clearLiveNotifications()
+
 	await logout().catch(handleError)
 	await fetchCredentials()
 }
-
-const hasPlus = computed(
-	() =>
-		!!credentials.value?.user &&
-		(hasMidasBadge(credentials.value.user) ||
-			hasActivePride26Midas(authenticatedModrinthUser.value?.campaigns?.pride_26)),
-)
-
-const showAd = computed(
-	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
-)
 
 async function fetchIntercomToken() {
 	const creds = await getCreds()
@@ -736,19 +876,28 @@ async function fetchIntercomToken() {
 	return await response.json()
 }
 
-watch(showAd, () => {
-	if (!showAd.value) {
-		hide_ads_window(true)
-	} else {
-		init_ads_window(true)
-	}
-})
+watch(
+	[showAd, adConsentAvailable],
+	async ([showAds, canManageConsent]) => {
+		if (showAds) {
+			await init_ads_window(true)
+			return
+		}
+
+		await hide_ads_window(true)
+		if (canManageConsent) {
+			await init_ads_window()
+		}
+	},
+	{ immediate: true },
+)
 
 onMounted(() => {
 	invoke('show_window')
 
 	error.setErrorModal(errorModal.value)
 	error.setMinecraftAuthErrorModal(minecraftAuthErrorModal.value)
+	error.setMinecraftRequiredModal(minecraftRequiredModal.value)
 
 	setContentIncompatibilityWarningModal(incompatibilityWarningModal.value)
 	setContentInstallModal(modInstallModal.value)
@@ -817,30 +966,48 @@ function openServerInviteInviterProfile(inviterName) {
 }
 
 async function handleLiveNotification(notification) {
-	if (notification?.body?.type !== 'server_invite' || notification.read) return
-	if (displayedServerInviteNotifications.has(notification.id)) return
+	if (!liveNotificationsEnabled || !notification?.body || notification.read) return
+	if (await sharedInstanceInviteHandler.value?.handleNotification(notification)) return
 
-	displayedServerInviteNotifications.add(notification.id)
+	if (notification.body.type === 'server_invite') {
+		if (displayedServerInviteNotifications.has(notification.id)) return
 
-	const serverName =
-		typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
-	const inviterId = notification.body.invited_by
-	const invitedBy =
-		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+		const generation = liveNotificationGeneration
+		displayedServerInviteNotifications.add(notification.id)
 
-	addPopupNotification({
-		title: serverName,
-		autoCloseMs: null,
-		toast: {
-			type: 'server-invite',
-			actorName: invitedBy?.username ?? null,
-			actorAvatarUrl: invitedBy?.avatar_url ?? null,
-			entityName: serverName,
-			onAccept: () => acceptServerInviteNotification(notification),
-			onDecline: () => declineServerInviteNotification(notification),
-			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
-		},
-	})
+		const serverName =
+			typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
+		const inviterId = notification.body.invited_by
+		const invitedBy =
+			typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+		if (generation !== liveNotificationGeneration) return
+
+		const popupNotification = addPopupNotification({
+			title: serverName,
+			autoCloseMs: null,
+			toast: {
+				type: 'server-invite',
+				actorName: invitedBy?.username ?? null,
+				actorAvatarUrl: invitedBy?.avatar_url ?? null,
+				entityName: serverName,
+				onAccept: () => acceptServerInviteNotification(notification),
+				onDecline: () => declineServerInviteNotification(notification),
+				onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
+			},
+		})
+		serverInvitePopupNotificationIds.add(popupNotification.id)
+	}
+}
+
+function clearLiveNotifications() {
+	liveNotificationGeneration++
+	liveNotificationsEnabled = false
+	for (const id of serverInvitePopupNotificationIds) {
+		popupNotificationManager.removeNotification(id)
+	}
+	displayedServerInviteNotifications.clear()
+	serverInvitePopupNotificationIds.clear()
+	sharedInstanceInviteHandler.value?.clearNotifications()
 }
 
 async function handleCommand(e) {
@@ -867,6 +1034,9 @@ async function handleCommand(e) {
 			})
 		}
 	} else if (e.event === 'LaunchInstance') {
+		const instance = await getInstance(e.id).catch(handleError)
+		if (!instance || instance.quarantined) return
+
 		if (e.server) {
 			await start_join_server(e.id, e.server).catch(handleError)
 		} else if (e.singleplayer_world) {
@@ -874,6 +1044,8 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'InstallSharedInstanceInvite') {
+		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
@@ -1398,7 +1570,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
 		<Suspense>
-			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
+			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
@@ -1498,7 +1670,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</template>
 				<template #sign-out> <LogOutIcon /> Sign out </template>
 			</OverflowMenu>
-			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+			<NavButton
+				v-else
+				v-tooltip.right="'Sign in to a Modrinth account'"
+				:to="() => requestSignIn()"
+			>
 				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
@@ -1656,7 +1832,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
 					>
 						<suspense>
-							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
+							<FriendsList :credentials="credentials" :sign-in="() => requestSignIn()" />
 						</suspense>
 					</div>
 					<PrideFundraiserBanner
@@ -1697,6 +1873,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
+	<MinecraftRequiredModal ref="minecraftRequiredModal" />
 	<ContentInstallModal
 		ref="modInstallModal"
 		:instances="contentInstallInstances"
@@ -1740,6 +1917,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
+	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
 </template>

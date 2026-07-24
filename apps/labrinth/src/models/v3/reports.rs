@@ -1,6 +1,7 @@
 use crate::database::models::report_item::ReportQueryResult as DBReport;
 use crate::models::ids::{ProjectId, ReportId, ThreadId, VersionId};
 use ariadne::ids::UserId;
+use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -10,6 +11,8 @@ pub struct Report {
     pub report_type: String,
     pub item_id: String,
     pub item_type: ItemType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shared_instance_version_id: Option<i32>,
     pub reporter: UserId,
     pub body: String,
     pub created: DateTime<Utc>,
@@ -23,6 +26,7 @@ pub enum ItemType {
     Project,
     Version,
     User,
+    SharedInstance,
     Unknown,
 }
 
@@ -32,6 +36,7 @@ impl ItemType {
             ItemType::Project => "project",
             ItemType::Version => "version",
             ItemType::User => "user",
+            ItemType::SharedInstance => "shared-instance",
             ItemType::Unknown => "unknown",
         }
     }
@@ -41,6 +46,7 @@ impl From<DBReport> for Report {
     fn from(x: DBReport) -> Self {
         let mut item_id = "".to_string();
         let mut item_type = ItemType::Unknown;
+        let mut shared_instance_version_id = None;
 
         if let Some(project_id) = x.project_id {
             item_id = ProjectId::from(project_id).to_string();
@@ -51,6 +57,10 @@ impl From<DBReport> for Report {
         } else if let Some(user_id) = x.user_id {
             item_id = UserId::from(user_id).to_string();
             item_type = ItemType::User;
+        } else if let Some(shared_instance_id) = x.shared_instance_id {
+            item_id = to_base62(shared_instance_id.0 as u64);
+            item_type = ItemType::SharedInstance;
+            shared_instance_version_id = x.shared_instance_version_id;
         }
 
         Report {
@@ -58,6 +68,7 @@ impl From<DBReport> for Report {
             report_type: x.report_type,
             item_id,
             item_type,
+            shared_instance_version_id,
             reporter: x.reporter.into(),
             body: x.body,
             created: x.created,

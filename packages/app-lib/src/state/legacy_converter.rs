@@ -212,7 +212,10 @@ where
                             .find(|x| x.hashes.get("sha512") == Some(&sha512))
                         && let Some(sha1) = file.hashes.get("sha1")
                     {
-                        if let Ok(metadata) = full_path.metadata() {
+                        if let Ok(metadata) = full_path.metadata()
+                            && let Ok(modified_at_ns) =
+                                state::file_modified_at_ns(&metadata)
+                        {
                             let file_name = format!(
                                 "{}/{}",
                                 profile.path,
@@ -224,6 +227,7 @@ where
                                 CachedFileHash {
                                     path: file_name,
                                     size: metadata.len(),
+                                    modified_at_ns,
                                     hash: sha1.clone(),
                                     project_type:
                                         ProjectType::get_from_parent_folder(

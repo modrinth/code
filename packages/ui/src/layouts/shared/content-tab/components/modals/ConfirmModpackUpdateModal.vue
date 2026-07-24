@@ -19,6 +19,9 @@
 					})
 				}}
 			</Admonition>
+			<Admonition v-if="managedWarning" type="warning" :header="managedWarning.header">
+				{{ managedWarning.body }}
+			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
 				:backup-name="backupName"
@@ -65,6 +68,7 @@ import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
 	downgrade?: boolean
+	managedWarning?: { header: string; body: string } | null
 	backupTip?: string
 	actionDisabled?: boolean
 	actionDisabledTooltip?: string

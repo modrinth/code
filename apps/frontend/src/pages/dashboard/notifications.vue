@@ -154,12 +154,15 @@ const { data, isPending, error, refetch } = useQuery({
 		const notifications = await client.labrinth.notifications_v2.getUserNotifications(
 			auth.value?.user?.id,
 		)
+		const visibleNotifications = notifications.filter(
+			(n) => !n.type?.startsWith('shared_instance_'),
+		)
 
 		const typesInFeed = [
-			...new Set(notifications.filter((n) => showRead || !n.read).map((n) => n.type)),
+			...new Set(visibleNotifications.filter((n) => showRead || !n.read).map((n) => n.type)),
 		]
 
-		const filtered = notifications.filter(
+		const filtered = visibleNotifications.filter(
 			(n) =>
 				(selectedType.value === 'all' || n.type === selectedType.value) && (showRead || !n.read),
 		)
@@ -173,7 +176,7 @@ const { data, isPending, error, refetch } = useQuery({
 			notifications: notifs,
 			notifTypes: typesInFeed.length > 1 ? ['all', ...typesInFeed] : typesInFeed,
 			pages,
-			hasRead: notifications.some((n) => n.read),
+			hasRead: visibleNotifications.some((n) => n.read),
 		}))
 	},
 	enabled: computed(() => !!auth.value?.user?.id),

@@ -176,6 +176,7 @@ function refreshServer(address: string, instanceId: string) {
 }
 
 async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
+	if (instance?.quarantined) return
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	if (world.type === 'server') {
 		await start_join_server(world.instance_id, world.address).catch(handleError)
@@ -192,6 +193,7 @@ async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 }
 
 async function playInstance(instance: GameInstance) {
+	if (instance.quarantined) return
 	await run(instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
 		.finally(() => {
@@ -300,6 +302,7 @@ onUnmounted(() => {
 						item.world.type === 'singleplayer' &&
 						hasWorldQuickPlaySupport(gameVersions, item.instance.game_version || '')
 					"
+					:quarantined="item.instance.quarantined"
 					:server-status="
 						item.world.type === 'server' ? serverData[item.world.address].status : undefined
 					"

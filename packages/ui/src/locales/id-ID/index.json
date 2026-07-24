@@ -452,15 +452,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "dunia"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Konten paket mod Anda kini dapat ditemukan di sini!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Konten paket mod telah berpindah"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Jangan tampilkan lagi"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Konten tambahan"
   },
@@ -2997,4 +2988,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

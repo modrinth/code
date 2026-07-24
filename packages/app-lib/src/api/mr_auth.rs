@@ -1,8 +1,19 @@
 use crate::state::ModrinthCredentials;
+use serde::Deserialize;
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ModrinthAuthFlow {
+    SignIn,
+    SignUp,
+}
 
 #[tracing::instrument]
-pub fn authenticate_begin_flow() -> &'static str {
-    crate::state::get_login_url()
+pub fn authenticate_begin_flow(flow: ModrinthAuthFlow) -> &'static str {
+    match flow {
+        ModrinthAuthFlow::SignIn => crate::state::get_login_url(),
+        ModrinthAuthFlow::SignUp => crate::state::get_signup_url(),
+    }
 }
 
 #[tracing::instrument]
@@ -28,6 +39,7 @@ pub async fn authenticate_finish_flow(
         );
     }
 
+    state.friends_socket.disconnect().await?;
     state
         .friends_socket
         .connect(&state.pool, &state.api_semaphore, &state.process_manager)
@@ -43,8 +55,8 @@ pub async fn logout() -> crate::Result<()> {
 
     if let Some(current) = current {
         ModrinthCredentials::remove(&current.user_id, &state.pool).await?;
-        state.friends_socket.disconnect().await?;
     }
+    state.friends_socket.disconnect().await?;
 
     Ok(())
 }
@@ -55,6 +67,9 @@ pub async fn get_credentials() -> crate::Result<Option<ModrinthCredentials>> {
     let current =
         ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
             .await?;
+    if current.is_none() {
+        state.friends_socket.disconnect().await?;
+    }
 
     Ok(current)
 }

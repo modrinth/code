@@ -281,9 +281,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Tilbage til udforsk"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installer indhold til instance"
-  },
   "app.project.versions.already-installed": {
     "message": "Allerede installeret"
   },

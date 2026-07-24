@@ -437,8 +437,35 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Обновлён"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Не устанавливать"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Добавленный"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Удалённый"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Обновлённый"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Всё равно установить"
+  },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Некоторые файлы на вашем сервере распознать не удалось. Это может повлиять на их работу."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Это обновление содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Предупреждение о неизвестных файлах"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Неизвестно"
   },
   "content.filter.disabled": {
     "defaultMessage": "Отключённые"
@@ -478,15 +505,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "мир"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Теперь он находится здесь!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Контент сборки перемещён"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Больше не показывать"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
@@ -4641,7 +4659,7 @@
     "defaultMessage": "Успешная покупка"
   },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "Средства пока не будут списаны."
+    "defaultMessage": "Средства пока не будут списаны."
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "Выберите способ оплаты"
@@ -5461,6 +5479,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Закрыть всё"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Не устанавливать"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Больше не предупреждать"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Подтверждение установки"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Всё равно установить"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Вредоносное ПО часто распространяется через моды на таких платформах, как Discord."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " не опубликован на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Предупреждение о неизвестном файле"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " содержит файлы, которые не опубликованы на Modrinth. Рекомендуется скачивать файлы только из надёжных источников."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Предупреждение о неизвестных файлах"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Нераспознанные файлы"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Этот пользователь присоединился к Modrinth до завершения альфа‑тестирования в ноябре 2020 года."

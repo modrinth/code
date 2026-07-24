@@ -5,7 +5,7 @@ pub mod validate;
 pub use checks::{
     filter_enlisted_projects_ids, filter_enlisted_version_ids,
     filter_visible_collections, filter_visible_project_ids,
-    filter_visible_projects,
+    filter_visible_projects, require_verified_email,
 };
 use serde::{Deserialize, Serialize};
 pub use validate::{
@@ -57,6 +57,12 @@ pub enum AuthenticationError {
     SocketError,
     #[error("Invalid callback URL specified")]
     Url,
+}
+
+impl From<xredis::Error> for AuthenticationError {
+    fn from(error: xredis::Error) -> Self {
+        Self::Database(error.into())
+    }
 }
 
 impl actix_web::ResponseError for AuthenticationError {

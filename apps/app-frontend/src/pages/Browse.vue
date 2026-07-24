@@ -72,6 +72,7 @@ const debugLog = useDebugLogger('Browse')
 const router = useRouter()
 const route = useRoute()
 const themeStore = useTheming()
+const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
 provideServerInstallContent(serverInstallContent)
@@ -490,6 +491,9 @@ function resetInstanceContext() {
 watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
+		if (!browseRouteActive.value) {
+			return
+		}
 		if (isSetupServerContext.value) {
 			enforceSetupModpackRoute(newType)
 			if (newType !== 'modpack') return
@@ -666,7 +670,7 @@ async function getInstallProjectVersions(projectId: string) {
 }
 
 async function chooseInstanceInstallVersion(
-	project: Labrinth.Search.v2.ResultSearchProject & Labrinth.Search.v3.ResultSearchProject,
+	project: Labrinth.Search.v3.ResultSearchProject,
 	projectTypeValue: string,
 ) {
 	const targetInstance = instance.value
@@ -693,16 +697,14 @@ async function chooseInstanceInstallVersion(
 }
 
 function getCardActions(
-	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+	result: Labrinth.Search.v3.ResultSearchProject,
 	currentProjectType: string,
 ): CardAction[] {
 	if (currentProjectType === 'server') {
-		return getServerCardActions(result as Labrinth.Search.v3.ResultSearchProject)
+		return getServerCardActions(result)
 	}
 
-	// Non-server project actions
-	const projectResult = result as (Labrinth.Search.v2.ResultSearchProject &
-		Labrinth.Search.v3.ResultSearchProject) & {
+	const projectResult = result as Labrinth.Search.v3.ResultSearchProject & {
 		installed?: boolean
 		installing?: boolean
 	}
@@ -913,11 +915,9 @@ async function search(requestParams: string) {
 	}
 
 	const hits = rawResults.result.hits.map((hit) => {
-		const mapped = {
+		const mapped: Labrinth.Search.v3.ResultSearchProject & { installed?: boolean } = {
 			...hit,
-			title: hit.name,
-			description: hit.summary,
-		} as unknown as Labrinth.Search.v2.ResultSearchProject & { installed?: boolean }
+		}
 
 		if (instance.value || isServerContext.value) {
 			const installedIds = instance.value
@@ -960,6 +960,7 @@ const lockedFilterMessages = computed(() => ({
 const searchState = useBrowseSearch({
 	projectType,
 	tags,
+	active: browseRouteActive,
 	providedFilters: combinedProvidedFilters,
 	search,
 	persistentQueryParams: ['i', 'ai', 'shi', 'sid', 'wid', 'from'],
@@ -1035,6 +1036,9 @@ onUnmounted(() => {
 })
 
 function getProjectBrowseQuery() {
+	if (!browseRouteActive.value) {
+		return undefined
+	}
 	if (!installContext.value) return undefined
 	return {
 		...route.query,
@@ -1060,7 +1064,7 @@ provideBrowseManager({
 	projectType,
 	...searchState,
 	advancedFiltersCollapsed,
-	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
+	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: getProjectBrowseQuery(),
 	}),
@@ -1139,7 +1143,7 @@ provideBrowseManager({
 			@browse-modpacks="() => {}"
 			@create="handleServerModpackFlowCreate"
 		/>
-		<Teleport to="#sidebar-teleport-target">
+		<Teleport v-if="browseRouteActive" to="#sidebar-teleport-target">
 			<BrowseSidebar />
 		</Teleport>
 	</div>

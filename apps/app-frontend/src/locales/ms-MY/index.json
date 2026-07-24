@@ -272,9 +272,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "Kembali menemukan"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Pasang kandungan ke dalam pemasangan"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Mod pembangun didayakan."
   },

@@ -15,7 +15,7 @@
     "message": "已复制"
   },
   "app.action-bar.install.copy-details": {
-    "message": "复制详情"
+    "message": "复制详细信息"
   },
   "app.action-bar.install.dismiss": {
     "message": "忽略"
@@ -30,13 +30,13 @@
     "message": "由于应用关闭而取消"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "无法读取整合包"
+    "message": "整合包读取失败"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "已取消"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "清理未完成"
+    "message": "未完成清理"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "无法下载文件"
@@ -48,7 +48,7 @@
     "message": "无法保存文件"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "下载无法完成"
+    "message": "无法完成下载"
   },
   "app.action-bar.install.summary.instance-not-found": {
     "message": "无法找到实例"
@@ -413,20 +413,41 @@
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "无视风险继续安装"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "安装"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "这个邀请是由另一位 Modrinth 用户创建的，而不是 Modrinth 官方。只接受你信任的人的邀请。"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "只有上传到 Modrinth 的文件才会经过审核，无论其文件格式如何（包括 .mrpack）。"
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "共享实例"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "这个整合包包含一些未在 Modrinth 发布的文件。我们强烈建议只从你信任的来源安装文件。"
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "未知文件警告"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "未识别文件"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "查看内容"
   },
   "app.modal.update-to-play.header": {
     "message": "更新以游玩"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "已移除"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "需要更新至最新版本才能运行 {name}。请更新后启动游戏。"
@@ -439,9 +460,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "返回发现页"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "将内容安装到实例中"
   },
   "app.project.version.all-versions": {
     "message": "所有版本"

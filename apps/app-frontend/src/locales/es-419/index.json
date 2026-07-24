@@ -413,20 +413,41 @@
   "app.modal.install-to-play.header": {
     "message": "Instalar para jugar"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Instalar de todos modos"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Instalar"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Esta invitación la creó otro usuario de Modrinth, no Modrinth. Solo acepta invitaciones de personas en las que confíes."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Un archivo solo se revisa si se publica en Modrinth, sin importar su formato (incluido el .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instancia compartida"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Este modpack para servidor contiene archivos que no están publicados en Modrinth. Recomendamos encarecidamente instalar únicamente archivos de fuentes de confianza."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Advertencia sobre archivos desconocidos"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Archivos no reconocidos"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Ver contenidos"
   },
   "app.modal.update-to-play.header": {
     "message": "Actualizar para jugar"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Eliminado"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Se requiere una actualización para jugar {name}. Por favor, actualiza a la versión más reciente para iniciar el juego."
@@ -439,9 +460,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Volver al explorador"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Instalar contenido a la instancia"
   },
   "app.project.version.all-versions": {
     "message": "Todas las versiones"

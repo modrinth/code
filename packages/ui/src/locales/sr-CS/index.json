@@ -455,11 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Ažuiralo"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "Ne instaliraj"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "Dodato"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "Smaknuto"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "Ažuirano"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "Svejedno instaliraj"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} izbrisalo"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Deo sadržaja na tvome serveru nije mogao biti analiziran i na njega može uticati ova promena."
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "Ovo ažuiranje sadrži datoteke koje nisu postavljene na Modrinth-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "Upozorenje nepoznatih datoteka"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "Nepoznato"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} ažuiralo"
@@ -505,15 +532,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "svet"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Sadržaj tvog modpacka sada možeš pronaći ovde!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Sadržaj modpacka pomeren"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Ne prikazuj ponovo"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatni sadržaj"
@@ -1132,6 +1150,12 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Dobio si posebnu dozvolu za redistribuciju ovog rada u svom modpacku."
+  },
+  "external-files.permissions-card.remove-group": {
+    "defaultMessage": "Ukloni grupu"
+  },
+  "external-files.permissions-card.remove-group-error.title": {
+    "defaultMessage": "Nije bilo moguće ukloniti grupu"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Ukloni iz grupe"
@@ -2412,7 +2436,7 @@
     "defaultMessage": "Portugalski (Brazil)"
   },
   "locale.pt-PT": {
-    "defaultMessage": "Portugalski (Brazil)"
+    "defaultMessage": "Portugalski (Portugal)"
   },
   "locale.ro-RO": {
     "defaultMessage": "Rumunski"
@@ -5539,6 +5563,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "Odbaci sve"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "Ne instaliraj"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "Ne prikazuj ovo upozorenje ponovo"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "Potvrdi instalaciju"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "Svejedno instaliraj"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "Zlonamerni softver se često distribuira putem datoteka modova deljenjem na platformama poput Discord-a."
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " nije postavljeno na Modrinth-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "Upozorenje nepoznatih datoteka"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " sadrži datoteke koje nisu postavljene na Modrinth-u. Preporučujemo da instaliraš datoteke samo iz izvora kojima veruješ."
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "Upozorenje nepoznatih datoteka"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "Datoteka se pregleda samo ako je postavljena na Modrinth, bez obzira na njen format (uključujući .mrpack)."
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "Nepoznate datoteke"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Ovaj koristnik je tu od Modrinth Alfa, koji je završio u novembru 2020."

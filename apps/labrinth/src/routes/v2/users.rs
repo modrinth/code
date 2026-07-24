@@ -1,5 +1,4 @@
 use crate::database::PgPool;
-use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
 use crate::models::projects::Project;
@@ -12,6 +11,7 @@ use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(user_auth_get);

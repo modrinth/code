@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::io::{Cursor, Read};
 use std::sync::Arc;
+use xredis::RedisPool;
 
 use chrono::Utc;
 use eyre::{Result, eyre};
@@ -17,7 +18,7 @@ use crate::database::models::ids::{
 };
 use crate::database::models::moderation_external_item::ExternalLicense;
 use crate::database::models::{DBFileId, DBUserId, DBVersion};
-use crate::database::{PgPool, PgTransaction, redis::RedisPool};
+use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::error::ApiError;

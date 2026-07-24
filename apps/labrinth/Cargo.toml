@@ -41,7 +41,6 @@ color-eyre = { workspace = true }
 color-thief = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
-deadpool-redis.workspace = true
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
@@ -78,14 +77,22 @@ modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
 murmur2 = { workspace = true }
+neverbounce = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
+postcard = { workspace = true }
 prometheus = { workspace = true }
 quick-xml = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 rdkafka = { workspace = true }
-redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
+redis = { workspace = true, features = [
+  "ahash",
+  "cluster",
+  "cluster-async",
+  "r2d2",
+  "tokio-comp"
+] }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
   "http2",
@@ -138,12 +145,14 @@ webauthn-rs = { workspace = true, features = [
 webauthn-rs-proto = { workspace = true }
 webp = { workspace = true }
 woothee = { workspace = true }
+xredis = { workspace = true }
 yaserde = { workspace = true, features = ["derive"] }
 zip = { workspace = true }
 zxcvbn = { workspace = true }
 
 [dev-dependencies]
 labrinth = { path = ".", features = ["test"] }
+tokio = { workspace = true, features = ["test-util"] }
 
 [build-dependencies]
 chrono = { workspace = true }
@@ -159,7 +168,7 @@ tikv-jemallocator = { workspace = true, features = [
 ] }
 
 [features]
-test = []
+test = ["xredis/test"]
 
 [lints]
 workspace = true

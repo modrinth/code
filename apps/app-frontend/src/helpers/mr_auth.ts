@@ -12,8 +12,10 @@ export type ModrinthCredentials = {
 	active: boolean
 }
 
-export async function login(): Promise<ModrinthCredentials> {
-	return await invoke('plugin:mr-auth|modrinth_login')
+export type ModrinthAuthFlow = 'sign-in' | 'sign-up'
+
+export async function login(flow: ModrinthAuthFlow = 'sign-in'): Promise<ModrinthCredentials> {
+	return await invoke('plugin:mr-auth|modrinth_login', { flow })
 }
 
 export async function logout(): Promise<void> {

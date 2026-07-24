@@ -2,13 +2,14 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::auth::checks::is_visible_organization;
-use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::auth::{
+    filter_visible_projects, get_user_from_headers, require_verified_email,
+};
 use crate::database::PgPool;
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBModerationNote, DBOrganization, generate_organization_id, team_item,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
@@ -27,6 +28,7 @@ use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(organizations_get)
@@ -130,6 +132,8 @@ pub async fn organization_create(
     )
     .await?
     .1;
+
+    require_verified_email(&current_user)?;
 
     let limits =
         UserLimits::get_for_organizations(&current_user, &pool).await?;

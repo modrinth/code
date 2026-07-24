@@ -30,6 +30,26 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         Some(("server", id)) => {
             CommandPayload::InstallServer { id: id.to_string() }
         }
+        // /share/{invite_id}
+        Some(("share", raw)) => {
+            let (raw, _) = raw.split_once('?').unwrap_or((raw, ""));
+
+            match decode(raw) {
+                Ok(decoded) => CommandPayload::InstallSharedInstanceInvite {
+                    invite_id: decoded.to_string(),
+                },
+                Err(e) => {
+                    emit_warning(&format!(
+                        "Invalid UTF-8 in shared instance invite path: {e}"
+                    ))
+                    .await?;
+                    return Err(crate::ErrorKind::InputError(format!(
+                        "Invalid UTF-8 in shared instance invite path: {e}"
+                    ))
+                    .into());
+                }
+            }
+        }
         // /launch/instance/{id}   -    Launches an instance
         Some(("launch", rest)) if rest.starts_with("instance/") => {
             let raw = rest.trim_start_matches("instance/");
@@ -93,7 +113,7 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
 pub async fn parse_command(
     command_string: &str,
 ) -> crate::Result<CommandPayload> {
-    tracing::debug!("Parsing command: {}", &command_string);
+    tracing::debug!("Parsing external command");
 
     // modrinth://some-command
     // This occurs when following a web redirect link

@@ -413,20 +413,41 @@
   "app.modal.install-to-play.header": {
     "message": "Installieren zum Spielen"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Trotzdem Installieren"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installieren"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Diese Einladung wurde von einem anderen Modrinth-Nutzer erstellt, nicht von Modrinth. Nimm nur Einladungen von Personen an, denen du vertraust."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# Mod} other {# Mods}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Eine Datei wird nur geprüft, wenn sie auf Modrinth veröffentlicht wird, unabhängig von ihrem Dateiformat (auch .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Geteilte Instanz"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Dieses Server-Modpack enthält Dateien, die nicht auf Modrinth veröffentlicht sind. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Warnung vor unbekannten Dateien"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Nicht erkannte Dateien"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Inhalte ansehen"
   },
   "app.modal.update-to-play.header": {
     "message": "Aktualisieren zum Spielen"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Entfernt"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Eine aktualisierung zum spielen von {name} ist benötigt. Bitte aktualisiere auf die neuste Version um das Spiel zu starten."
@@ -439,9 +460,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Zurück zu Entdecken"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Inhalt in Instanz installieren"
   },
   "app.project.version.all-versions": {
     "message": "Alle Versionen"

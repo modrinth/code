@@ -128,6 +128,12 @@
   "app.appearance-settings.show-play-time.title": {
     "message": "プレイ時間を表示"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Modパックの重複インストール、通常のコンテンツ削除、一括更新、Modパックのリンク解除、修復の促しなど、リスクの低い確認画面は自動的にスキップされます。危険な警告は引き続き表示されます。"
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "重要でない警告をスキップ"
+  },
   "app.appearance-settings.toggle-sidebar.description": {
     "message": "サイドバーの表示/非表示を切り替える機能を有効にします。"
   },
@@ -158,11 +164,17 @@
   "app.browse.already-added": {
     "message": "すでに追加済み"
   },
+  "app.browse.back-to-instance": {
+    "message": "インスタンスに戻る"
+  },
   "app.browse.discover-content": {
     "message": "コンテンツを探す"
   },
   "app.browse.discover-servers": {
     "message": "サーバーを探す"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "既に追加済みのサーバーを非表示にする"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modパック"

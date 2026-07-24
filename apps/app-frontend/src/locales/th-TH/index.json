@@ -257,9 +257,6 @@
   "app.project.install-context.back-to-browse": {
     "message": "กลับไปที่หน้าค้นหา"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "ติดตั้งเนื้อหาลงสู่อินสแตนซ์"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "โหมดนักพัฒนาเปิดอยู่"
   },

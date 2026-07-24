@@ -33,7 +33,8 @@ import { DropdownIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { computed } from 'vue'
 
-import { ButtonStyled, OverflowMenu } from '../index'
+import ButtonStyled from './ButtonStyled.vue'
+import OverflowMenu from './OverflowMenu.vue'
 
 // TODO: This should be moved to a shared types file.
 type Colors = 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'

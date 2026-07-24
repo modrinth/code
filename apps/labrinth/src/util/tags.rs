@@ -1,7 +1,6 @@
 use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::Loader;
-use crate::database::redis::RedisPool;
 use crate::routes::ApiError;
 use crate::util::error::Context;
 use arc_swap::ArcSwapOption;
@@ -9,6 +8,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
+use xredis::RedisPool;
 
 /// Cached set of valid loaders and game version tags.
 ///

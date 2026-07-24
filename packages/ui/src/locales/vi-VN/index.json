@@ -479,15 +479,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "thế giới"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Nội dung modpack của bạn hiện đã có ở đây!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Nội dung modpack đã được di chuyển"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Không hiển thị lại"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Mod bổ sung"
   },

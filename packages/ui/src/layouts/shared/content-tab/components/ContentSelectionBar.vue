@@ -94,6 +94,7 @@ interface Props {
 	bulkItemCount?: number
 	ariaLabel?: string
 	getItemId?: (item: ContentItem) => string
+	toggleItems?: ContentItem[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -109,6 +110,7 @@ const props = withDefaults(defineProps<Props>(), {
 	bulkItemCount: 0,
 	ariaLabel: undefined,
 	getItemId: undefined,
+	toggleItems: undefined,
 })
 
 const emit = defineEmits<{
@@ -130,8 +132,10 @@ function resolveItemId(item: ContentItem) {
 	return props.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
-const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
-const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
+const toggleActionItems = computed(() => props.toggleItems ?? props.selectedItems)
+const hasToggleActions = computed(() => toggleActionItems.value.length > 0)
+const allDisabled = computed(() => toggleActionItems.value.every((m) => !m.enabled))
+const allEnabled = computed(() => toggleActionItems.value.every((m) => m.enabled))
 
 const selectedCountText = computed(() => {
 	const count = props.isBulkOperating
@@ -231,7 +235,7 @@ const bulkProgressMessage = computed(() => {
 		<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
 			<slot name="actions" />
 
-			<ButtonStyled type="transparent">
+			<ButtonStyled v-if="hasToggleActions" type="transparent">
 				<button
 					v-tooltip="
 						isBusy && busyTooltip
@@ -247,7 +251,7 @@ const bulkProgressMessage = computed(() => {
 					<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
 				</button>
 			</ButtonStyled>
-			<ButtonStyled type="transparent">
+			<ButtonStyled v-if="hasToggleActions" type="transparent">
 				<button
 					v-tooltip="
 						isBusy && busyTooltip

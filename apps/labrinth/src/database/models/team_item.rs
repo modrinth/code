@@ -1,6 +1,6 @@
 use super::{DBOrganization, DBProject, ids::*};
 use crate::{
-    database::{PgTransaction, redis::RedisPool},
+    database::PgTransaction,
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
 use dashmap::DashMap;
@@ -8,8 +8,9 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const TEAMS_NAMESPACE: &str = "teams";
+const TEAMS_NAMESPACE: &str = "teams:v3";
 
 pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,
@@ -253,7 +254,7 @@ impl DBTeamMember {
                     })
                     .await?;
 
-                Ok(teams)
+                Ok::<_, crate::database::models::DatabaseError>(teams)
             },
         ).await?;
 
@@ -265,7 +266,8 @@ impl DBTeamMember {
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
-        redis.delete(TEAMS_NAMESPACE, id.0).await?;
+        let key = redis.key().entity(TEAMS_NAMESPACE, id.0);
+        redis.delete(&key).await?;
         Ok(())
     }
 

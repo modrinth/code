@@ -413,20 +413,41 @@
   "app.modal.install-to-play.header": {
     "message": "Oynamak için yükleyin"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Yine de indir"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Yükle"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Bu davetiye Modrinth tarafından değil, başka bir Modrinth kullanıcısı tarafından oluşturulmuştur. Sadece güvendiğiniz kişilerden gelen davetleri kabul edin."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {#mod} other {#mods}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Dosya formatı ne olursa olsun (.mrpack dahil), bir dosya yalnızca Modrinth'e yüklendiğinde denetlenir."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Paylaşılan Kurulum"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Bilinmeyen dosya uyarısı"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Tanımlanamayan dosyalar"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "İçeriği görüntüle"
   },
   "app.modal.update-to-play.header": {
     "message": "Oynamak için güncelle"
+  },
+  "app.modal.update-to-play.removed": {
+    "message": "Silindi"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
@@ -439,9 +460,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Keşfete geri dön"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "İçeriği kuruluma yükle"
   },
   "app.project.version.all-versions": {
     "message": "Tüm sürümler"

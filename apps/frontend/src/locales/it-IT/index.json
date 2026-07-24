@@ -2990,9 +2990,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Controlla nuovamente il tuo conto. Fondi mandati a un conto errato non possono essere recuperati."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Le modifiche verranno applicate a {count, plural, one {# progetto} other {# progetti}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "Creatore su Modrinth."
   },
@@ -3059,9 +3056,6 @@
   "profile.label.collection": {
     "message": "Raccolta"
   },
-  "profile.label.downloads": {
-    "message": "{count} download"
-  },
   "profile.label.joined": {
     "message": "Iscrizione"
   },
@@ -3079,9 +3073,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizzazioni"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -3218,24 +3209,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Creato {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licenza {license}"
-  },
-  "project.about.details.published": {
-    "message": "Pubblicato {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Inserito {date}"
-  },
-  "project.about.details.title": {
-    "message": "Dettagli"
-  },
-  "project.about.details.updated": {
-    "message": "Aggiornato {date}"
-  },
   "project.actions.create-server": {
     "message": "Crea un server"
   },
@@ -3265,9 +3238,6 @@
   },
   "project.description.title": {
     "message": "Descrizione"
-  },
-  "project.details.licensed": {
-    "message": "Licenza"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Questo progetto non è compatibile con questa versione del gioco."
@@ -3421,15 +3391,6 @@
   },
   "project.gallery.title": {
     "message": "Galleria"
-  },
-  "project.license.error": {
-    "message": "Impossibile ottenere testo licenza."
-  },
-  "project.license.loading": {
-    "message": "Caricamento testo licenza..."
-  },
-  "project.license.title": {
-    "message": "Licenza"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Il progetto è privato: solo tu e chiunque inviti potranno accederci."
@@ -3646,12 +3607,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Visita bacheca del progetto"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count} download"
-  },
-  "project.stats.followers-label": {
-    "message": "{count} follower"
   },
   "project.status.archived.message": {
     "message": "{title} è stato archiviato. {title} non riceverà più aggiornamenti a meno che l'autore decida di rimuoverlo dall'archivio."
@@ -4054,9 +4009,6 @@
   },
   "servers.plan.small.description": {
     "message": "Perfetto per 1–5 giocatori e qualche mod leggera."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "addebitato {interval, select, monthly {mensilmente} quarterly {trimerstralmente} yearly {annualmente} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Completa la configurazione"

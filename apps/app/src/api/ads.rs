@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Manager, PhysicalPosition, PhysicalSize, Runtime};
+use tauri::{Emitter, Manager, PhysicalPosition, PhysicalSize, Rect, Runtime};
 use tauri_plugin_opener::OpenerExt;
 use theseus::settings;
 use tokio::sync::RwLock;
@@ -11,6 +11,8 @@ use tokio::sync::RwLock;
 pub struct AdsState {
     pub shown: bool,
     pub modal_shown: bool,
+    pub consent_required: bool,
+    pub consent_notification_enabled: bool,
     pub consent_overlay_shown: bool,
     pub occluded: bool,
     pub last_click: Option<Instant>,
@@ -18,6 +20,7 @@ pub struct AdsState {
 }
 
 const AD_LINK: &str = "https://modrinth.com/wrapper/app-ads-cookie";
+const ADS_CONSENT_REQUIRED_EVENT: &str = "ads-consent-required";
 const APP_TITLE_BAR_HEIGHT: f32 = 48.0;
 #[cfg(any(windows, target_os = "macos"))]
 pub(super) const OCCLUDED_AREA_THRESHOLD: f64 = 0.5;
@@ -275,6 +278,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             app.manage(RwLock::new(AdsState {
                 shown: true,
                 modal_shown: false,
+                consent_required: false,
+                consent_notification_enabled: false,
                 consent_overlay_shown: false,
                 occluded: false,
                 last_click: None,
@@ -293,6 +298,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                         .map(|state| {
                             state.shown
                                 && !state.modal_shown
+                                && !state.consent_required
                                 && !state.consent_overlay_shown
                                 && !state.occluded
                         })
@@ -357,8 +363,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             init_ads_window,
             hide_ads_window,
             show_ads_window,
-            show_ads_consent_overlay,
-            hide_ads_consent_overlay,
+            show_ads_consent_ui,
+            expand_ads_consent_webview,
+            open_ads_consent_preferences,
+            finish_ads_consent_flow,
+            should_show_ads_consent_popup,
+            perform_ads_consent_action,
             record_ads_click,
             open_link,
             get_ads_personalization,
@@ -466,6 +476,19 @@ pub async fn init_ads_window<R: Runtime>(
 
             Some(webview.clone())
         } else if let Some(window) = app.get_window("main") {
+            let ads_consent_script = [
+                "(() => {",
+                include_str!("ads-consent/state.js"),
+                include_str!("ads-consent/styles.js"),
+                include_str!("ads-consent/bridge.js"),
+                include_str!("ads-consent/cmp.js"),
+                include_str!("ads-consent/media.js"),
+                include_str!("ads-consent/controller.js"),
+                include_str!("ads-consent/index.js"),
+                "})()",
+            ]
+            .join("\n");
+
             #[cfg(windows)]
             let webview_url =
                 WebviewUrl::External("about:blank".parse().unwrap());
@@ -474,9 +497,7 @@ pub async fn init_ads_window<R: Runtime>(
 
             let webview = window.add_child(
                 tauri::webview::WebviewBuilder::new("ads-window", webview_url)
-                    .initialization_script_for_all_frames(include_str!(
-                        "ads-init.js"
-                    ))
+                    .initialization_script_for_all_frames(ads_consent_script)
                     // We use a standard Chrome user agent for compatibility with our ad provider,
                     // since Tauri is not recognized by ad providers by default.
                     // Aditude has separately informed SSPs and IVT vendors that this traffic
@@ -635,6 +656,13 @@ pub async fn init_ads_window<R: Runtime>(
         // });
     }
 
+    if state.shown
+        && state.consent_required
+        && state.consent_notification_enabled
+    {
+        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, true).ok();
+    }
+
     Ok(())
 }
 
@@ -648,6 +676,8 @@ pub async fn show_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
     dpr: f32,
 ) -> crate::api::Result<()> {
+    let mut show_consent_notification = false;
+
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
@@ -667,6 +697,14 @@ pub async fn show_ads_window<R: Runtime>(
             webview.show().ok();
             set_webview_visible_for_window(&app, webview, true);
         }
+
+        show_consent_notification = state.shown
+            && state.consent_required
+            && state.consent_notification_enabled;
+    }
+
+    if show_consent_notification {
+        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, true).ok();
     }
 
     Ok(())
@@ -677,14 +715,17 @@ pub async fn hide_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
     reset: Option<bool>,
 ) -> crate::api::Result<()> {
-    if let Some(webview) = app.webviews().get("ads-window") {
-        let state = app.state::<RwLock<AdsState>>();
-        let mut state = state.write().await;
+    let reset = reset.unwrap_or(false);
+    let state = app.state::<RwLock<AdsState>>();
+    let mut state = state.write().await;
 
-        if reset.unwrap_or(false) {
-            state.shown = false;
-            state.consent_overlay_shown = false;
-        } else {
+    if reset {
+        state.shown = false;
+        state.consent_overlay_shown = false;
+    }
+
+    if let Some(webview) = app.webviews().get("ads-window") {
+        if !reset {
             state.modal_shown = true;
 
             if state.consent_overlay_shown {
@@ -706,27 +747,68 @@ pub async fn hide_ads_window<R: Runtime>(
         webview.hide().ok();
     }
 
+    if reset {
+        app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, false).ok();
+    }
+
     Ok(())
 }
 
 #[tauri::command]
-pub async fn show_ads_consent_overlay<R: Runtime>(
+pub async fn show_ads_consent_ui<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    notification_enabled: bool,
+) -> crate::api::Result<()> {
+    let mut show_notification = false;
+
+    if let Some(webview) = app.webviews().get("ads-window") {
+        let state = app.state::<RwLock<AdsState>>();
+        let mut state = state.write().await;
+
+        // Preserve pending consent while the sidebar is hidden, but keep all visibility
+        // changes gated by `state.shown` so consent events cannot re-enable hidden ads.
+        state.consent_required = true;
+        state.consent_notification_enabled = notification_enabled;
+        state.consent_overlay_shown = false;
+        show_notification = state.shown && notification_enabled;
+
+        if state.shown && !state.modal_shown {
+            let dpr = get_device_pixel_ratio(&app, None);
+            let (position, size) = get_webview_position(&app, dpr)?;
+            webview.set_size(size).ok();
+            webview.set_position(position).ok();
+            webview.show().ok();
+            set_webview_visible_for_window(&app, webview, true);
+        }
+    }
+
+    app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, show_notification)
+        .ok();
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn expand_ads_consent_webview<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
 
-        // dont show for hidden ads so consent events cannot re-enable the webview.
-        if !state.shown {
+        if !state.consent_required {
             return Ok(());
         }
 
         state.consent_overlay_shown = true;
 
         let (position, size) = get_overlay_webview_position(&app)?;
-        webview.set_size(size).ok();
-        webview.set_position(position).ok();
+        webview
+            .set_bounds(Rect {
+                position: position.into(),
+                size: size.into(),
+            })
+            .ok();
         webview.show().ok();
         set_webview_visible_for_window(&app, webview, true);
     }
@@ -735,14 +817,41 @@ pub async fn show_ads_consent_overlay<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn hide_ads_consent_overlay<R: Runtime>(
+pub async fn open_ads_consent_preferences<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> crate::api::Result<()> {
+    let Some(webview) = app.webviews().get("ads-window").cloned() else {
+        return Ok(());
+    };
+
+    {
+        let state = app.state::<RwLock<AdsState>>();
+        let mut state = state.write().await;
+
+        if !state.consent_required {
+            state.consent_notification_enabled = false;
+        }
+        state.consent_required = true;
+        state.consent_overlay_shown = false;
+    }
+
+    webview.eval("window.modrinthPrivacy?.adsReopenConsentPreferences?.()")?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn finish_ads_consent_flow<R: Runtime>(
     app: tauri::AppHandle<R>,
     dpr: Option<f32>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
         let state = app.state::<RwLock<AdsState>>();
         let mut state = state.write().await;
+        let should_reload_ads = state.consent_required;
 
+        state.consent_required = false;
+        state.consent_notification_enabled = false;
         state.consent_overlay_shown = false;
 
         if state.shown && !state.modal_shown {
@@ -759,6 +868,57 @@ pub async fn hide_ads_consent_overlay<R: Runtime>(
                 .ok();
             webview.hide().ok();
         }
+
+        drop(state);
+
+        if should_reload_ads {
+            webview.navigate(AD_LINK.parse().unwrap()).ok();
+        }
+    }
+
+    app.emit_to("main", ADS_CONSENT_REQUIRED_EVENT, false).ok();
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn should_show_ads_consent_popup<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> crate::api::Result<bool> {
+    let state = app.state::<RwLock<AdsState>>();
+    let state = state.read().await;
+
+    Ok(state.shown
+        && state.consent_required
+        && state.consent_notification_enabled)
+}
+
+#[tauri::command]
+pub async fn perform_ads_consent_action<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    action: String,
+) -> crate::api::Result<()> {
+    let script = match action.as_str() {
+        "accept" => "window.modrinthPrivacy?.adsConsentAction?.('accept')",
+        "reject" => "window.modrinthPrivacy?.adsConsentAction?.('reject')",
+        "manage" => "window.modrinthPrivacy?.adsConsentAction?.('manage')",
+        _ => return Ok(()),
+    };
+
+    let state = app.state::<RwLock<AdsState>>();
+    let should_perform = {
+        let state = state.read().await;
+        state.shown
+            && state.consent_required
+            && state.consent_notification_enabled
+    };
+
+    if !should_perform {
+        return Ok(());
+    }
+
+    if let Some(webview) = app.webviews().get("ads-window") {
+        webview.eval(script)?;
     }
 
     Ok(())

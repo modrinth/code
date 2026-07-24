@@ -455,11 +455,38 @@
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
   },
+  "content.diff-modal.dont-install": {
+    "defaultMessage": "不要安裝"
+  },
+  "content.diff-modal.external-diff-type.added": {
+    "defaultMessage": "已新增"
+  },
+  "content.diff-modal.external-diff-type.removed": {
+    "defaultMessage": "已移除"
+  },
+  "content.diff-modal.external-diff-type.updated": {
+    "defaultMessage": "已更新"
+  },
+  "content.diff-modal.install-anyway": {
+    "defaultMessage": "仍要安裝"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "已移除 {count} 個"
   },
+  "content.diff-modal.reviewed-files": {
+    "defaultMessage": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+  },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "你伺服器上的部分內容無法進行分析，且可能會受到這項變更的影響。"
+  },
+  "content.diff-modal.unknown-files-description": {
+    "defaultMessage": "這個更新包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "content.diff-modal.unknown-files-warning": {
+    "defaultMessage": "未知檔案警告"
+  },
+  "content.diff-modal.unknown-project": {
+    "defaultMessage": "未知"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "已更新 {count} 個"
@@ -505,15 +532,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "你模組包的內容現在可以在這裡找到了！"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "模組包內容已移動"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "不再顯示"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
@@ -4728,7 +4746,7 @@
     "defaultMessage": "你暫時還不會被收取費用。"
   },
   "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "選擇一個付款方式"
+    "defaultMessage": "選擇付款方式"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "付款方式"
@@ -5545,6 +5563,39 @@
   },
   "ui.stacked-admonitions.dismiss-all": {
     "defaultMessage": "忽略全部"
+  },
+  "unknown-file-warning-modal.dont-install": {
+    "defaultMessage": "不要安裝"
+  },
+  "unknown-file-warning-modal.dont-show-again": {
+    "defaultMessage": "不要再顯示這則警告"
+  },
+  "unknown-file-warning-modal.header": {
+    "defaultMessage": "確認安裝"
+  },
+  "unknown-file-warning-modal.install-anyway": {
+    "defaultMessage": "仍要安裝"
+  },
+  "unknown-file-warning-modal.malware-warning": {
+    "defaultMessage": "惡意軟體經常透過 Discord 等平臺分享模組檔案來進行傳播。"
+  },
+  "unknown-file-warning-modal.mod-warning-body": {
+    "defaultMessage": " 未在 Modrinth 上發布。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "unknown-file-warning-modal.mod-warning-title": {
+    "defaultMessage": "未知檔案警告"
+  },
+  "unknown-file-warning-modal.modpack-warning-body": {
+    "defaultMessage": " 包含未在 Modrinth 上發布的檔案。強烈建議你僅安裝來自信任來源的檔案。"
+  },
+  "unknown-file-warning-modal.modpack-warning-title": {
+    "defaultMessage": "未知檔案警告"
+  },
+  "unknown-file-warning-modal.reviewed-files": {
+    "defaultMessage": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
+  },
+  "unknown-file-warning-modal.unrecognized-files": {
+    "defaultMessage": "無法辨識的檔案"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "這個使用者自 Modrinth Alpha 時期便已加入，早在該版本於2020年11月結束之前。"

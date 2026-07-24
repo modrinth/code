@@ -395,6 +395,9 @@
   "app.modal.install-to-play.header": {
     "message": "Installera för att spela"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installera andå"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installera"
   },
@@ -410,6 +413,9 @@
   "app.modal.update-to-play.header": {
     "message": "Uppdatera för att spela"
   },
+  "app.modal.update-to-play.removed": {
+    "message": "Tog bort"
+  },
   "app.modal.update-to-play.update-required-description": {
     "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till senaste version för att starta spelet."
   },
@@ -421,9 +427,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Tillbaka till upptäck"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Installera innehåll till instans"
   },
   "app.project.version.all-versions": {
     "message": "Alla versioner"
@@ -600,7 +603,7 @@
     "message": "Logga in"
   },
   "app.skins.sign-in.description": {
-    "message": "Snälla logga in din Minecraft konto att använda hud hantering förmågor i Modrinth appen."
+    "message": "Vänligen logga in på ditt Minecraft-konto för att använda utseendehanteringfunktioner i Modrinth appen."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Exalterad Modrinth bot"
@@ -642,7 +645,7 @@
     "message": "Version {version} har installerats!"
   },
   "app.world.server-modal.placeholder-address": {
-    "message": "example.modrinth.gg"
+    "message": "exempel.modrinth.gg"
   },
   "app.world.server-modal.select-an-option": {
     "message": "Välj ett alternativ"
@@ -717,7 +720,7 @@
     "message": "Sök efter vänner..."
   },
   "friends.section.heading": {
-    "message": "{title}: {count}"
+    "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
@@ -837,19 +840,19 @@
     "message": "Alfa"
   },
   "instance.settings.tabs.general.update-channel.alpha.description": {
-    "message": "Utgåvor, beta och alfa versioner visas som tillgängliga uppdateringar."
+    "message": "Release-, beta- och alfaversioner kommer visas som tillgängliga uppdateringar."
   },
   "instance.settings.tabs.general.update-channel.beta": {
     "message": "Beta"
   },
   "instance.settings.tabs.general.update-channel.beta.description": {
-    "message": "Utgåvor och beta versioner visas som tillgängliga uppdateringar."
+    "message": "Release- och betaversioner kommer visas som tillgängliga uppdateringar."
   },
   "instance.settings.tabs.general.update-channel.release": {
-    "message": "Utgåva"
+    "message": "Release"
   },
   "instance.settings.tabs.general.update-channel.release.description": {
-    "message": "Endast utgivna versioner visas som tillgängliga uppdateringar."
+    "message": "Endast realeseversioner kommer visas som tillgängliga uppdateringar."
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Välj uppdateringskanal"
@@ -915,10 +918,10 @@
     "message": "Anpassad minnestilldelning"
   },
   "instance.settings.tabs.java.enter-environment-variables": {
-    "message": "Skriv in miljövariabler..."
+    "message": "Ange miljövariabler..."
   },
   "instance.settings.tabs.java.enter-java-arguments": {
-    "message": "Skriv in Java-argument..."
+    "message": "Ange Java-argument..."
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Miljövariabler"
@@ -981,13 +984,13 @@
     "message": "Skapa genväg"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Visa inte på Startsidan"
+    "message": "Visa inte på startsidan"
   },
   "instance.worlds.game_already_open": {
     "message": "Instans är redan öppen"
   },
   "instance.worlds.hardcore": {
-    "message": "Hardcore läge"
+    "message": "Hardcore-läge"
   },
   "instance.worlds.incompatible_server": {
     "message": "Servern är inkompatibel"
@@ -999,10 +1002,10 @@
     "message": "Servern kunde inte kontaktas"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Du kan bara hoppa rakt in till servers på Minecraft Alfa 1.0.5+"
+    "message": "Du kan endast gå direkt in i servrar på Minecraft Alfa 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Du kan bara hoppa rakt in till enspelarläge världar på Minecraft 1,20+"
+    "message": "Du kan endast gå direkt in i enspelarläge världar på Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Spela instans"

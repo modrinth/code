@@ -18,6 +18,7 @@
 				<NotificationToast
 					v-if="item.toast"
 					:type="item.toast.type"
+					:action-loading="toastActionLoading(item.id)"
 					:actor-name="item.toast.actorName"
 					:actor-avatar-url="item.toast.actorAvatarUrl"
 					:entity-name="item.toast.entityName"
@@ -29,7 +30,7 @@
 					:progress-type="item.toast.progressType"
 					:progress-current="item.toast.progressCurrent"
 					:progress-total="item.toast.progressTotal"
-					@accept="handleToastAction(item, item.toast.onAccept)"
+					@accept="handleToastAccept(item, item.toast.onAccept)"
 					@decline="handleToastAction(item, item.toast.onDecline)"
 					@dismiss="handleToastAction(item, item.toast.onDismiss)"
 					@launch="handleToastAction(item, item.toast.onLaunch)"
@@ -70,6 +71,7 @@
 								/>
 								<template v-else>
 									<div
+										v-if="!item.hideIcon"
 										class="flex items-center"
 										:class="{
 											'text-red': item.type === 'error',
@@ -92,8 +94,8 @@
 									</div>
 								</template>
 							</div>
-							<ButtonStyled size="small" type="transparent" circular>
-								<button @click="dismiss(item.id)">
+							<ButtonStyled v-if="item.dismissible !== false" type="transparent" circular>
+								<button class="-m-1.5" @click="dismiss(item.id)">
 									<XIcon />
 								</button>
 							</ButtonStyled>
@@ -144,7 +146,7 @@
 							:key="idx"
 							:color="btn.color || (idx === 0 ? 'brand' : undefined)"
 						>
-							<button @click="handleButtonClick(item.id, btn)">
+							<button class="!shadow-none" @click="handleButtonClick(item.id, btn)">
 								<component :is="btn.icon" v-if="btn.icon" />
 								{{ btn.label }}
 							</button>
@@ -166,7 +168,7 @@ import {
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useModalStack } from '../../composables/modal-stack'
 import {
@@ -188,11 +190,13 @@ const hasModalActive = computed(() => stackCount.value > 0)
 const notificationGroupStyle = computed(() => ({
 	zIndex: hasModalActive.value ? 100 + stackCount.value * 10 + 8 : 200,
 }))
+const activeToastActions = ref<Record<string, 'accept'>>({})
 
 const stopTimer = (n: PopupNotification) => popupNotificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: PopupNotification) =>
 	popupNotificationManager.setNotificationTimer(n)
 const dismiss = (id: string | number) => popupNotificationManager.removeNotification(id)
+const toastActionLoading = (id: string | number) => activeToastActions.value[String(id)] ?? null
 
 function isDownloadNotification(item: PopupNotification) {
 	return (
@@ -264,6 +268,26 @@ async function handleToastAction(item: PopupNotification, action?: () => void | 
 	await action?.()
 }
 
+async function handleToastAccept(item: PopupNotification, action?: () => void | Promise<void>) {
+	if (toastActionLoading(item.id) != null) return
+
+	const actionId = String(item.id)
+	popupNotificationManager.stopNotificationTimer(item)
+	activeToastActions.value = {
+		...activeToastActions.value,
+		[actionId]: 'accept',
+	}
+
+	try {
+		await action?.()
+	} finally {
+		activeToastActions.value = Object.fromEntries(
+			Object.entries(activeToastActions.value).filter(([key]) => key !== actionId),
+		)
+		popupNotificationManager.removeNotification(item.id)
+	}
+}
+
 function progressColorForType(type: PopupNotification['type']) {
 	if (type === 'error') {
 		return 'red'
@@ -295,9 +319,9 @@ withDefaults(
 	top: calc(var(--top-bar-height, 3rem) + 1.5rem);
 	right: 1.5rem;
 	z-index: 200;
-	width: min(420px, calc(100vw - 1.5rem));
-	min-width: min(420px, calc(100vw - 1.5rem));
-	max-width: min(420px, calc(100vw - 1.5rem));
+	width: min(440px, calc(100vw - 1.5rem));
+	min-width: min(440px, calc(100vw - 1.5rem));
+	max-width: min(440px, calc(100vw - 1.5rem));
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;

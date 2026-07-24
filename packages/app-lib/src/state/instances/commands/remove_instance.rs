@@ -11,13 +11,25 @@ pub(crate) async fn remove_instance(
         .ok_or_else(|| {
             crate::ErrorKind::InputError("Unknown instance".to_string())
         })?;
+    let _content_lock = state.lock_instance_content(instance_id).await;
 
-    instance_rows::delete_instance_by_id(&instance.id, &state.pool).await?;
+    delete_instance_row_and_locks(&instance.id, state).await?;
 
     let path = state.directories.instances_dir().join(&instance.path);
     if path.exists() {
         io::remove_dir_all(&path).await?;
     }
+
+    Ok(())
+}
+
+async fn delete_instance_row_and_locks(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    // Keep these together so deleted instances cannot leave stale entries in the per-instance lock maps.
+    instance_rows::delete_instance_by_id(instance_id, &state.pool).await?;
+    state.remove_instance_locks(instance_id);
 
     Ok(())
 }
