@@ -17,6 +17,7 @@ pub mod install;
 mod launcher;
 mod logger;
 mod state;
+mod updater;
 
 pub use api::*;
 pub use error::*;
@@ -26,6 +27,7 @@ pub use event::{
 };
 pub use logger::start_logger;
 pub use state::State;
+pub use updater::cleanup_updater_temp_folders;
 pub use util::fetch::DownloadReason;
 
 pub fn launcher_user_agent() -> String {
