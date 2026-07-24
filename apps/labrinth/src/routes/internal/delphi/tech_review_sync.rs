@@ -60,9 +60,11 @@ const DUMMY_ISSUE_TYPE: &str = "__dummy";
 pub enum TechReviewExitReason {
     Resolved,
     FileDeleted,
+    RulesChanged,
 }
 
 struct ProjectTechReviewState {
+    project_id: DBProjectId,
     has_pending_detail: bool,
     has_unsafe_detail: bool,
     has_dummy: bool,
@@ -88,36 +90,35 @@ pub async fn sync_project_tech_review_state(
         r#"
         WITH project_ids AS (
             SELECT unnest($1::bigint[]) AS project_id
+        ),
+        project_detail_state AS (
+            SELECT
+                p.project_id,
+                COALESCE(BOOL_OR(
+                    didws.status = 'pending'
+                    AND NOT didws.hidden
+                    AND dri.issue_type != $3
+                ), FALSE) AS has_pending_detail,
+                COALESCE(BOOL_OR(
+                    didws.status = 'unsafe'
+                    AND NOT didws.hidden
+                    AND dri.issue_type != $3
+                ), FALSE) AS has_unsafe_detail,
+                COALESCE(BOOL_OR(
+                    didws.status = 'pending'
+                    AND dri.issue_type = $3
+                ), FALSE) AS has_dummy
+            FROM project_ids p
+            LEFT JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = p.project_id
+            LEFT JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+            GROUP BY p.project_id
         )
         SELECT
             p.project_id AS "project_id!: DBProjectId",
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-                WHERE
-                    didws.project_id = p.project_id
-                    AND didws.status = 'pending'
-                    AND dri.issue_type != $3
-            ) AS "has_pending_detail!",
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-                WHERE
-                    didws.project_id = p.project_id
-                    AND didws.status = 'unsafe'
-                    AND dri.issue_type != $3
-            ) AS "has_unsafe_detail!",
-            EXISTS(
-                SELECT 1
-                FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-                WHERE
-                    didws.project_id = p.project_id
-                    AND didws.status = 'pending'
-                    AND dri.issue_type = $3
-            ) AS "has_dummy!",
+            p.has_pending_detail AS "has_pending_detail!",
+            p.has_unsafe_detail AS "has_unsafe_detail!",
+            p.has_dummy AS "has_dummy!",
             (
                 SELECT t.id
                 FROM threads t
@@ -144,7 +145,7 @@ pub async fn sync_project_tech_review_state(
                 ORDER BY dr.created DESC, dr.id DESC
                 LIMIT 1
             ) AS "report_id: DelphiReportId"
-        FROM project_ids p
+        FROM project_detail_state p
         "#,
         &project_ids_raw,
         &tech_review_message_types,
@@ -156,6 +157,7 @@ pub async fn sync_project_tech_review_state(
 
     for row in rows {
         let state = ProjectTechReviewState {
+            project_id: row.project_id,
             has_pending_detail: row.has_pending_detail,
             has_unsafe_detail: row.has_unsafe_detail,
             has_dummy: row.has_dummy,
@@ -250,8 +252,23 @@ async fn sync_one_project_tech_review_state(
     exit_reason: TechReviewExitReason,
     txn: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
-    let needs_tech_review =
-        state.has_pending_detail || state.has_unsafe_detail || state.has_dummy;
+    let has_review_detail = state.has_pending_detail || state.has_unsafe_detail;
+
+    if matches!(exit_reason, TechReviewExitReason::RulesChanged)
+        && !has_review_detail
+    {
+        remove_dummy_issue_details(state.project_id, txn).await?;
+
+        if let Some(thread_id) = state.thread_id
+            && should_send_exit(state.last_tech_review_message_type.as_deref())
+        {
+            insert_exit_message(thread_id, exit_reason, txn).await?;
+        }
+
+        return Ok(());
+    }
+
+    let needs_tech_review = has_review_detail || state.has_dummy;
 
     if needs_tech_review {
         if (state.has_pending_detail || state.has_unsafe_detail)
@@ -325,7 +342,9 @@ async fn insert_exit_message(
     txn: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
     let body = match exit_reason {
-        TechReviewExitReason::Resolved => MessageBody::TechReviewExited,
+        TechReviewExitReason::Resolved | TechReviewExitReason::RulesChanged => {
+            MessageBody::TechReviewExited
+        }
         TechReviewExitReason::FileDeleted => {
             MessageBody::TechReviewExitFileDeleted
         }
@@ -340,6 +359,36 @@ async fn insert_exit_message(
     .insert(txn)
     .await
     .wrap_internal_err("failed to add exiting tech review message")?;
+
+    Ok(())
+}
+
+async fn remove_dummy_issue_details(
+    project_id: DBProjectId,
+    txn: &mut PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    sqlx::query!(
+        r#"
+        DELETE FROM delphi_report_issue_details detail
+        USING
+            delphi_report_issues issue,
+            delphi_reports report,
+            files file,
+            versions version
+        WHERE
+            detail.issue_id = issue.id
+            AND issue.issue_type = $2
+            AND issue.report_id = report.id
+            AND report.file_id = file.id
+            AND file.version_id = version.id
+            AND version.mod_id = $1
+        "#,
+        project_id as DBProjectId,
+        DUMMY_ISSUE_TYPE,
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_internal_err("failed to remove dummy Delphi issue details")?;
 
     Ok(())
 }

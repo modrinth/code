@@ -34,6 +34,7 @@ base64 = { workspace = true }
 bitflags = { workspace = true }
 bytes = { workspace = true }
 censor = { workspace = true }
+cel = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 clap = { workspace = true, features = ["derive"] }
 clickhouse = { workspace = true, features = ["time", "uuid"] }

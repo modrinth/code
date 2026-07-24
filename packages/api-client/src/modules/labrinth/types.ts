@@ -2241,6 +2241,111 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type DelphiRule = {
+				id: number
+				name: string
+				rule: string
+				revision: number
+				created_at: string
+				updated_at: string
+				created_by: number | null
+				updated_by: number | null
+				affected_details_count: number
+				affected_details: DelphiRuleAffectedDetail[]
+			}
+
+			export type DelphiRuleAffectedDetail = {
+				detail_id: string
+				issue_id: string
+				project_id: string | null
+				project_name: string | null
+				project_icon_url: string | null
+				version_id: string | null
+				version_name: string | null
+				version_number: string | null
+				issue_type: string
+				key: string
+				jar: string | null
+				file_path: string
+				original_severity: DelphiSeverity
+				severity: DelphiSeverity | null
+				hidden: boolean
+			}
+
+			export type WriteDelphiRule = {
+				name: string
+				rule: string
+			}
+
+			export type TestDelphiRuleTrace = {
+				key: string
+				issue_type: string
+				severity: DelphiSeverity
+				jar: string | null
+				file_path: string
+				data: Record<string, unknown>
+			}
+
+			export type TestDelphiRuleRequest = {
+				rule: string
+				traces: TestDelphiRuleTrace[]
+			}
+
+			export type DelphiRuleEffect = {
+				severity: DelphiSeverity | null
+				hidden: boolean
+			}
+
+			export type DelphiRuleSchema = Record<string, unknown>
+
+			export type DelphiRuleSchemaResponse = {
+				input: DelphiRuleSchema
+				output: DelphiRuleSchema
+				components: Record<string, DelphiRuleSchema>
+			}
+
+			export type RuleInput = {
+				schema_version: number
+				trace: {
+					key: string
+					issue_type: string
+					severity: DelphiSeverity
+					jar: string | null
+					file_path: string
+					data: Record<string, unknown>
+				}
+				scan: {
+					delphi_version: number
+				}
+				artifact: {
+					size: number | null
+					hashes: Record<string, string>
+				}
+				scope: {
+					project_id: string | null
+					version_id: string | null
+					file_id: string | null
+				}
+			}
+
+			export type TestDelphiRuleResponse = {
+				effects: Array<DelphiRuleEffect | null>
+			}
+
+			export type DelphiRuleScanPhase = 'scanning' | 'publishing' | 'complete'
+
+			export type DelphiRuleScanEvent = {
+				phase: DelphiRuleScanPhase
+				revision: number
+				scanned: number
+				total: number
+				effects: number
+			}
+
+			export type DelphiRuleScanErrorEvent = {
+				message: string
+			}
+
 			export type SearchProjectsRequest = {
 				limit?: number
 				page?: number

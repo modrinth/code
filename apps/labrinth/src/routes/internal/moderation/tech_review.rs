@@ -44,10 +44,14 @@ use crate::{
 use eyre::eyre;
 
 pub mod global;
+pub mod rules;
+pub mod rules_scan;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search_projects)
         .configure(global::config)
+        .configure(rules::config)
+        .configure(rules_scan::config)
         .service(get_project_report)
         .service(get_report)
         .service(get_issue)
@@ -250,7 +254,9 @@ pub async fn get_issue(
                         )
                     ), '[]'::jsonb)
                     FROM delphi_issue_details_with_statuses didws
-                    WHERE didws.issue_id = dri.id
+                    WHERE
+                        didws.issue_id = dri.id
+                        AND NOT didws.hidden
                 )
             ) AS "data!: sqlx::types::Json<FileIssue>"
         FROM delphi_report_issues dri
@@ -305,6 +311,16 @@ pub async fn get_report(
                 'file_size', f.size,
                 'flag_reason', 'delphi',
                 'download_url', f.url,
+                'severity', COALESCE((
+                    SELECT MAX(didws.severity)
+                    FROM delphi_report_issues severity_issue
+                    INNER JOIN delphi_issue_details_with_statuses didws
+                        ON didws.issue_id = severity_issue.id
+                    WHERE
+                        severity_issue.report_id = dr.id
+                        AND severity_issue.issue_type != '__dummy'
+                        AND NOT didws.hidden
+                ), 'low'::delphi_severity),
                 -- TODO: replace with `json_array` in Postgres 16
 				'issues', (
 					SELECT coalesce(json_agg(
@@ -327,15 +343,24 @@ pub async fn get_report(
                                     )
                                 ), '[]'::jsonb)
                                 FROM delphi_issue_details_with_statuses didws
-                                WHERE didws.issue_id = dri.id
+                                WHERE
+                                    didws.issue_id = dri.id
+                                    AND NOT didws.hidden
                             )
 						)
 					), '[]'::json)
 					FROM delphi_report_issues dri
 					WHERE
-						dri.report_id = dr.id
+                        dri.report_id = dr.id
                         -- see delphi.rs todo comment
                         AND dri.issue_type != '__dummy'
+                        AND EXISTS (
+                            SELECT 1
+                            FROM delphi_issue_details_with_statuses visible_detail
+                            WHERE
+                                visible_detail.issue_id = dri.id
+                                AND NOT visible_detail.hidden
+                        )
                 )
             ) AS "data!: sqlx::types::Json<FileReport>"
         FROM delphi_reports dr
@@ -530,7 +555,9 @@ async fn fetch_project_reports(
             didws.global_status AS "global_status?: DelphiStatus",
             didws.status AS "status!: DelphiStatus"
         FROM delphi_issue_details_with_statuses didws
-        WHERE didws.issue_id = ANY($1::bigint[])
+        WHERE
+            didws.issue_id = ANY($1::bigint[])
+            AND NOT didws.hidden
         ORDER BY didws.issue_id, didws.id
         "#,
         &issue_ids.iter().map(|i| i.0).collect::<Vec<_>>()
@@ -636,6 +663,10 @@ async fn fetch_project_reports(
                             .get(&issue_row.id)
                             .unwrap_or(&empty_details);
 
+                        if issue_details.is_empty() {
+                            continue;
+                        }
+
                         file_issues.push(FileIssue {
                             id: issue_row.id,
                             report_id: issue_row.report_id,
@@ -644,12 +675,23 @@ async fn fetch_project_reports(
                         });
                     }
 
+                    if file_issues.is_empty() {
+                        continue;
+                    }
+
+                    let severity = file_issues
+                        .iter()
+                        .flat_map(|issue| issue.details.iter())
+                        .map(|detail| detail.severity)
+                        .max()
+                        .unwrap_or(report_row.severity);
+
                     file_reports.push(FileReport {
                         report_id: report_row.report_id,
                         file_id: FileId::from(file_row.file_id),
                         created: report_row.created,
                         flag_reason: FlagReason::Delphi,
-                        severity: report_row.severity,
+                        severity,
                         file_name: file_row.filename.clone(),
                         file_size: file_row.size,
                         download_url: file_row.url.clone(),
@@ -780,6 +822,7 @@ pub async fn search_projects(
             AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
             AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
             AND didws.status = 'pending'
+            AND NOT didws.hidden
             AND (
                 $5::text IS NULL
                 OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
@@ -789,8 +832,8 @@ pub async fn search_projects(
         ORDER BY
             CASE WHEN $3 = 'created_asc'   THEN MIN(dr.created)  ELSE TO_TIMESTAMP(0)        END ASC,
             CASE WHEN $3 = 'created_desc'  THEN MIN(dr.created)  ELSE TO_TIMESTAMP(0)        END DESC,
-            CASE WHEN $3 = 'severity_asc'  THEN MAX(dr.severity) ELSE 'low'::delphi_severity END ASC,
-            CASE WHEN $3 = 'severity_desc' THEN MAX(dr.severity) ELSE 'low'::delphi_severity END DESC,
+            CASE WHEN $3 = 'severity_asc'  THEN MAX(didws.severity) ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $3 = 'severity_desc' THEN MAX(didws.severity) ELSE 'low'::delphi_severity END DESC,
             -- tie-breaker: oldest reports
             MIN(dr.created) ASC
         LIMIT $1 OFFSET $2
@@ -1035,6 +1078,7 @@ pub async fn submit_report(
         WHERE
             m.id = $1
             AND didws.status = 'pending'
+            AND NOT didws.hidden
             -- see delphi.rs todo comment
             AND dri.issue_type != '__dummy'
         "#,

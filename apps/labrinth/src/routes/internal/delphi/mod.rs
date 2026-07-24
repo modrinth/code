@@ -208,6 +208,7 @@ async fn ingest_report_deserialized(
         "Delphi found issues in file",
     );
 
+    let mut inserted_detail_ids = Vec::new();
     for (issue_type, issue_details) in report.issues {
         let issue_id = DBDelphiReportIssue {
             id: DelphiReportIssueId(0), // This will be set by the database
@@ -227,7 +228,7 @@ async fn ingest_report_deserialized(
             let decompiled_source =
                 report.decompiled_sources.get(&issue_detail.file);
 
-            ReportIssueDetail {
+            let detail_id = ReportIssueDetail {
                 id: DelphiReportIssueDetailsId(0), // This will be set by the database
                 issue_id,
                 key: issue_detail.key.0,
@@ -243,8 +244,16 @@ async fn ingest_report_deserialized(
             .insert(&mut transaction)
             .await
             .wrap_internal_err("failed to insert Delphi issue detail")?;
+            inserted_detail_ids.push(detail_id);
         }
     }
+
+    crate::routes::internal::moderation::tech_review::rules_scan::materialize_current_rule_effects(
+        &inserted_detail_ids,
+        &mut transaction,
+    )
+    .await
+    .wrap_internal_err("failed to apply delphi rules to new issue details")?;
 
     tech_review_sync::sync_project_tech_review_state(
         &[DBProjectId::from(report.project_id)],

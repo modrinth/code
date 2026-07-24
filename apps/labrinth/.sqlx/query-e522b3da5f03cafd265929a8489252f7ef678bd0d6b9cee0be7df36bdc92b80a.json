@@ -1,0 +1,66 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tINSERT INTO delphi_rules (\n\t\t\tname,\n\t\t\trule,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t)\n\t\tVALUES ($1, $2, $3, $3)\n\t\tRETURNING\n\t\t\tid,\n\t\t\tname,\n\t\t\trule,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "rule",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "revision",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "e522b3da5f03cafd265929a8489252f7ef678bd0d6b9cee0be7df36bdc92b80a"
+}
