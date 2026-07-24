@@ -212,7 +212,11 @@ const instanceUsers = computed(() => {
 	const managerIds = new Set(
 		invite.value.managers.flatMap((manager) => (manager.type === 'user' ? [manager.id] : [])),
 	)
-	return invite.value.instance_users?.filter((user) => !managerIds.has(user.id)) ?? []
+	return (
+		invite.value.instance_users?.filter(
+			(user) => user.joined_at !== null && !managerIds.has(user.id),
+		) ?? []
+	)
 })
 const visibleInstanceUsers = computed(() => instanceUsers.value.slice(0, 4))
 const hiddenUserCount = computed(() =>

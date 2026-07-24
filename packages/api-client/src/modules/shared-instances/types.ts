@@ -20,6 +20,7 @@ export namespace SharedInstances {
 				id: string
 				name: string
 				avatar?: string | null
+				joined_at: string | null
 			}
 
 			export type Invite = {

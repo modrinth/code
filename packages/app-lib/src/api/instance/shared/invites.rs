@@ -53,9 +53,7 @@ pub async fn invite_shared_instance_users(
     }
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
 
-    let mut users = get_remote_users(&attachment.id, &state).await?;
-    users.include_pending_invites(user_ids);
-    Ok(users)
+    get_remote_users(&attachment.id, &state).await
 }
 
 #[tracing::instrument(skip(replace_invite_id))]

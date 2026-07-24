@@ -49,21 +49,6 @@ impl SharedInstanceUsers {
         }
     }
 
-    pub(super) fn include_pending_invites(&mut self, user_ids: Vec<String>) {
-        for user_id in user_ids {
-            if self.user_ids.iter().any(|id| id == &user_id) {
-                continue;
-            }
-
-            self.user_ids.push(user_id.clone());
-            self.users.push(SharedInstanceUser {
-                id: user_id,
-                joined_at: None,
-                join_type: SharedInstanceJoinType::Invite,
-                last_played: None,
-            });
-        }
-    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
