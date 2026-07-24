@@ -284,6 +284,11 @@ pub(super) async fn execute(
     if let Err(caught_err) = result {
         payout.status = PayoutStatus::Failed;
 
+        error!(
+            payout_request_id = %payout_request.id,
+            "Failed to execute Mural payout request; cancelling unexecuted request: {caught_err:#}"
+        );
+
         // if execution fails, make sure to immediately cancel the payout request
         // we don't want floating payout requests
         if let Err(err) =
