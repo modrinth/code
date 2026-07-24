@@ -1497,7 +1497,7 @@ provideContentManager({
 		enabled: canMutateContent(item) ? item.enabled : undefined,
 		installing: item.installing,
 		hideDelete: !canDeleteContent(item),
-		hideSwitchVersion: !canMutateContent(item),
+		hideSwitchVersion: !canMutateContent(item) || !item.project?.id || !item.version?.id,
 		hasUpdate: canUpdateProject(item),
 	}),
 	filterPersistKey: props.instance.id,
