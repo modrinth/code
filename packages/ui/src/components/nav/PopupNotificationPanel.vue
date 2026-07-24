@@ -18,6 +18,7 @@
 				<NotificationToast
 					v-if="item.toast"
 					:type="item.toast.type"
+					:action-loading="toastActionLoading(item.id)"
 					:actor-name="item.toast.actorName"
 					:actor-avatar-url="item.toast.actorAvatarUrl"
 					:entity-name="item.toast.entityName"
@@ -29,7 +30,7 @@
 					:progress-type="item.toast.progressType"
 					:progress-current="item.toast.progressCurrent"
 					:progress-total="item.toast.progressTotal"
-					@accept="handleToastAction(item, item.toast.onAccept)"
+					@accept="handleToastAccept(item, item.toast.onAccept)"
 					@decline="handleToastAction(item, item.toast.onDecline)"
 					@dismiss="handleToastAction(item, item.toast.onDismiss)"
 					@launch="handleToastAction(item, item.toast.onLaunch)"
@@ -167,7 +168,7 @@ import {
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useModalStack } from '../../composables/modal-stack'
 import {
@@ -189,11 +190,13 @@ const hasModalActive = computed(() => stackCount.value > 0)
 const notificationGroupStyle = computed(() => ({
 	zIndex: hasModalActive.value ? 100 + stackCount.value * 10 + 8 : 200,
 }))
+const activeToastActions = ref<Record<string, 'accept'>>({})
 
 const stopTimer = (n: PopupNotification) => popupNotificationManager.stopNotificationTimer(n)
 const setNotificationTimer = (n: PopupNotification) =>
 	popupNotificationManager.setNotificationTimer(n)
 const dismiss = (id: string | number) => popupNotificationManager.removeNotification(id)
+const toastActionLoading = (id: string | number) => activeToastActions.value[String(id)] ?? null
 
 function isDownloadNotification(item: PopupNotification) {
 	return (
@@ -263,6 +266,26 @@ async function handleButtonClick(id: string | number, btn: PopupNotificationButt
 async function handleToastAction(item: PopupNotification, action?: () => void | Promise<void>) {
 	popupNotificationManager.removeNotification(item.id)
 	await action?.()
+}
+
+async function handleToastAccept(item: PopupNotification, action?: () => void | Promise<void>) {
+	if (toastActionLoading(item.id) != null) return
+
+	const actionId = String(item.id)
+	popupNotificationManager.stopNotificationTimer(item)
+	activeToastActions.value = {
+		...activeToastActions.value,
+		[actionId]: 'accept',
+	}
+
+	try {
+		await action?.()
+	} finally {
+		activeToastActions.value = Object.fromEntries(
+			Object.entries(activeToastActions.value).filter(([key]) => key !== actionId),
+		)
+		popupNotificationManager.removeNotification(item.id)
+	}
 }
 
 function progressColorForType(type: PopupNotification['type']) {

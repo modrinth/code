@@ -16,6 +16,7 @@
 				raised
 				@update-thread="() => updateThreadLocal()"
 			/>
+			<slot name="afterMessages" />
 		</div>
 		<div v-else class="flex flex-col items-center justify-center space-y-3 py-12">
 			<MessageIcon class="size-12 text-secondary" />

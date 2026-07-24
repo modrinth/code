@@ -75,6 +75,7 @@ pub(crate) async fn sync_instance_content_files(
     let now = Utc::now();
     let mut files = Vec::new();
     let mut present_without_hash_ids = Vec::new();
+    let mut restored_without_hash = false;
 
     for file in scanned {
         let hash_key = file.hash_cache_key.trim_end_matches(".disabled");
@@ -82,6 +83,7 @@ pub(crate) async fn sync_instance_content_files(
         let Some(hash) = hashes_by_key.get(hash_key) else {
             if let Some(existing_file) = existing_file {
                 present_without_hash_ids.push(existing_file.id.clone());
+                restored_without_hash |= existing_file.missing;
             }
             continue;
         };
@@ -101,6 +103,19 @@ pub(crate) async fn sync_instance_content_files(
             modified_at: now,
         });
     }
+
+    let content_changed = !missing_file_ids.is_empty()
+        || restored_without_hash
+        || files.iter().any(|file| {
+            existing_files_by_path.get(&file.relative_path).is_none_or(
+                |existing| {
+                    existing.missing
+                        || existing.enabled != file.enabled
+                        || existing.sha1 != file.sha1
+                        || existing.size != file.size
+                },
+            )
+        });
 
     let mut tx = state.pool.begin().await?;
     for file_id in missing_file_ids {
@@ -128,6 +143,10 @@ pub(crate) async fn sync_instance_content_files(
     }
 
     tx.commit().await?;
+
+    if content_changed {
+        super::mark_shared_instance_stale(&instance.id, &state.pool).await?;
+    }
 
     Ok(stored_files)
 }

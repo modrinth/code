@@ -25,6 +25,8 @@ export interface ServerModrinthClientOptions {
 export function useServerModrinthClient(options?: ServerModrinthClientOptions): NuxtModrinthClient {
 	const config = useRuntimeConfig(options?.event)
 	const apiBaseUrl = (config.apiBaseUrl || config.public.apiBaseUrl).replace('/v2/', '/')
+	const sharedInstancesBaseUrl =
+		config.sharedInstancesBaseUrl || config.public.sharedInstancesBaseUrl
 
 	const features = []
 
@@ -39,6 +41,7 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 
 	const clientConfig: NuxtClientConfig = {
 		labrinthBaseUrl: apiBaseUrl,
+		sharedInstancesBaseUrl,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features,
 	}

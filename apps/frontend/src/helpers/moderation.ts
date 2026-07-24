@@ -1,14 +1,6 @@
-import type { Labrinth } from '@modrinth/api-client'
+import type { AbstractModrinthClient, Labrinth, SharedInstances } from '@modrinth/api-client'
 import type { ExtendedReport, OwnershipTarget } from '@modrinth/moderation'
-import type {
-	Organization,
-	Project,
-	Report,
-	TeamMember,
-	Thread,
-	User,
-	Version,
-} from '@modrinth/utils'
+import type { Organization, Project, TeamMember, Thread, User, Version } from '@modrinth/utils'
 
 export const useModerationCache = () => ({
 	threads: useState<Map<string, Thread>>('moderation-report-cache-threads', () => new Map()),
@@ -17,10 +9,17 @@ export const useModerationCache = () => ({
 	versions: useState<Map<string, Version>>('moderation-report-cache-versions', () => new Map()),
 	teams: useState<Map<string, TeamMember[]>>('moderation-report-cache-teams', () => new Map()),
 	orgs: useState<Map<string, Organization>>('moderation-report-cache-orgs', () => new Map()),
+	sharedInstances: useState<Map<string, SharedInstances.Instances.v1.Instance>>(
+		'moderation-report-cache-shared-instances',
+		() => new Map(),
+	),
 })
 
 // TODO: @AlexTMjugador - backend should do all of these functions.
-export async function enrichReportBatch(reports: Report[]): Promise<ExtendedReport[]> {
+export async function enrichReportBatch(
+	reports: Labrinth.Reports.v3.Report[],
+	client: AbstractModrinthClient,
+): Promise<ExtendedReport[]> {
 	if (reports.length === 0) return []
 
 	const cache = useModerationCache()
@@ -41,8 +40,16 @@ export async function enrichReportBatch(reports: Report[]): Promise<ExtendedRepo
 		.filter((r) => r.item_type === 'project')
 		.map((r) => r.item_id)
 		.filter((id) => !cache.projects.value.has(id))
+	const sharedInstanceIDs = [
+		...new Set(
+			reports
+				.filter((r) => r.item_type === 'shared-instance')
+				.map((r) => r.item_id)
+				.filter((id) => !cache.sharedInstances.value.has(id)),
+		),
+	]
 
-	const [newThreads, newVersions, newUsers] = await Promise.all([
+	const [newThreads, newVersions, newUsers, newSharedInstances] = await Promise.all([
 		threadIDs.length > 0
 			? (fetchSegmented(threadIDs, (ids) => `threads?ids=${asEncodedJsonArray(ids)}`) as Promise<
 					Thread[]
@@ -59,11 +66,22 @@ export async function enrichReportBatch(reports: Report[]): Promise<ExtendedRepo
 					(ids) => `users?ids=${asEncodedJsonArray(ids)}`,
 				) as Promise<User[]>)
 			: Promise.resolve([]),
+		Promise.allSettled(
+			sharedInstanceIDs.map(async (instanceId) => ({
+				id: instanceId,
+				instance: await client.sharedinstances.instances_v1.get(instanceId),
+			})),
+		),
 	])
 
 	newThreads.forEach((t) => cache.threads.value.set(t.id, t))
 	newVersions.forEach((v) => cache.versions.value.set(v.id, v))
 	newUsers.forEach((u) => cache.users.value.set(u.id, u))
+	newSharedInstances.forEach((result) => {
+		if (result.status === 'fulfilled') {
+			cache.sharedInstances.value.set(result.value.id, result.value.instance)
+		}
+	})
 
 	const allVersions = [...newVersions, ...Array.from(cache.versions.value.values())]
 	const fullProjectIds = new Set([
@@ -177,6 +195,10 @@ export async function enrichReportBatch(reports: Report[]): Promise<ExtendedRepo
 			user: report.item_type === 'user' ? cache.users.value.get(report.item_id) : undefined,
 			version,
 			target,
+			shared_instance:
+				report.item_type === 'shared-instance'
+					? cache.sharedInstances.value.get(report.item_id)
+					: undefined,
 		}
 	})
 }

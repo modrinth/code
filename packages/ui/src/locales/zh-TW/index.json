@@ -533,15 +533,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "你模組包的內容現在可以在這裡找到了！"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "模組包內容已移動"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "不再顯示"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
   },
@@ -5802,4 +5793,3 @@
     "defaultMessage": "類型"
   }
 }
-

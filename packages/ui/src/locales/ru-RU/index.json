@@ -506,15 +506,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "мир"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Теперь он находится здесь!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Контент сборки перемещён"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Больше не показывать"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
   },

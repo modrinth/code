@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Niet installeren"
-  },
   "app.modal.install-to-play.header": {
     "message": "Installeer om te spelen"
   },

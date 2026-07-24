@@ -422,9 +422,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Szukaj wśród {count} światów..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Nie instaluj"
-  },
   "app.modal.install-to-play.header": {
     "message": "Zainstaluj, aby grać"
   },

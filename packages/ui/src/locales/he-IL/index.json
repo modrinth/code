@@ -257,9 +257,6 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "צור גיבוי"
   },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "אל תציג שוב"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "תוכן נוסף"
   },

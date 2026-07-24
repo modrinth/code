@@ -55,7 +55,6 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_importable_instances",
-                        "import_instance",
                         "is_valid_importable_instance",
                         "get_default_launcher_path",
                     ])
@@ -148,6 +147,11 @@ fn main() {
                         "install_get_modpack_preview",
                         "install_create_instance",
                         "install_create_modpack_instance",
+                        "install_get_shared_instance_preview",
+                        "install_accept_shared_instance_invite",
+                        "install_get_shared_instance_update_preview",
+                        "install_shared_instance",
+                        "install_update_shared_instance",
                         "install_import_instance",
                         "install_duplicate_instance",
                         "install_existing_instance",
@@ -172,6 +176,14 @@ fn main() {
                         "process_kill",
                         "process_wait_for",
                     ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "reports",
+                InlinedPlugin::new()
+                    .commands(&["reports_create"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
@@ -211,6 +223,15 @@ fn main() {
                         "instance_kill",
                         "instance_edit",
                         "instance_edit_icon",
+                        "instance_share_can_current_user_use",
+                        "instance_share_get_users",
+                        "instance_share_invite_users",
+                        "instance_share_create_invite_link",
+                        "instance_share_remove_users",
+                        "instance_share_get_publish_preview",
+                        "instance_share_publish",
+                        "instance_share_unlink",
+                        "instance_share_unpublish",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",
                     ])
@@ -253,6 +274,14 @@ fn main() {
                     ),
             )
             .plugin(
+                "users",
+                InlinedPlugin::new()
+                    .commands(&["search_user"])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
                 "utils",
                 InlinedPlugin::new()
                     .commands(&[
@@ -276,7 +305,6 @@ fn main() {
                     .commands(&[
                         "init_ads_window",
                         "hide_ads_window",
-                        "scroll_ads_window",
                         "show_ads_window",
                         "show_ads_consent_overlay",
                         "show_ads_consent_preferences",
