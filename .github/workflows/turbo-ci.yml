@@ -81,7 +81,7 @@ jobs:
       REDIS_CONNECTION_TYPE: multiplexed
       REDIS_URL: redis://127.0.0.1:7000,redis://127.0.0.1:7001,redis://127.0.0.1:7002,redis://127.0.0.1:7003,redis://127.0.0.1:7004,redis://127.0.0.1:7005
       # Avoid stack overflows in tests
-      RUST_MIN_STACK: 16777216
+      RUST_MIN_STACK: 33554432
 
     steps:
       - name: Check out code
