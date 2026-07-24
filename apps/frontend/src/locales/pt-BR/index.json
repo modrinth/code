@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "Usuário não encontrado"
   },
+  "ads-consent.accept": {
+    "message": "Aceitar todos"
+  },
+  "ads-consent.body": {
+    "message": "Anúncios tornam o Modrinth possível e financiam os pagamentos dos criadores. Nossos parceiros talvez armazenem ou acessem os cookies no site para personalizar anúncios e medir o desempenho."
+  },
+  "ads-consent.manage": {
+    "message": "Gerenciar preferências"
+  },
+  "ads-consent.reject": {
+    "message": "Rejeitar todos"
+  },
+  "ads-consent.title": {
+    "message": "Sua privacidade e como anúncios apoiam o Modrinth"
+  },
   "analytics.action.add": {
     "message": "Adicionar"
   },
@@ -24,7 +39,7 @@
     "message": "País"
   },
   "analytics.breakdown.dependent-on": {
-    "message": "Dependente em"
+    "message": "Requer"
   },
   "analytics.breakdown.dependent-project-download": {
     "message": "Projeto dependente"
@@ -33,7 +48,7 @@
     "message": "Tipo de projeto dependente"
   },
   "analytics.breakdown.download-reason": {
-    "message": "Motivo do download"
+    "message": "Motivo de download"
   },
   "analytics.breakdown.download-source": {
     "message": "Fonte do download"
@@ -42,7 +57,7 @@
     "message": "Versão do jogo"
   },
   "analytics.breakdown.generic": {
-    "message": "Detalhes"
+    "message": "Resumo detalhado"
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
@@ -54,25 +69,25 @@
     "message": "Monetização"
   },
   "analytics.breakdown.none.selected": {
-    "message": "Sem detalhes"
+    "message": "Sem resumo"
   },
   "analytics.breakdown.project": {
     "message": "Projeto"
   },
   "analytics.breakdown.project-status": {
-    "message": "Status do projeto"
+    "message": "Estado do projeto"
   },
   "analytics.breakdown.project-version": {
     "message": "Versão do projeto"
   },
   "analytics.breakdown.selected": {
-    "message": "Detalhes por {breakdown}"
+    "message": "Agrupado por {breakdown}"
   },
   "analytics.chart.action.show-all": {
     "message": "Exibir tudo"
   },
   "analytics.chart.action.show-limited": {
-    "message": "Mostrar apenas"
+    "message": "Exibir menos"
   },
   "analytics.chart.action.show-top-eight": {
     "message": "Exibir top 8"
@@ -96,7 +111,7 @@
     "message": "Controles do gráfico analítico"
   },
   "analytics.chart.controls.display": {
-    "message": "Mostrar"
+    "message": "Visualização"
   },
   "analytics.chart.controls.modrinth-events": {
     "message": "Eventos do Modrinth"
@@ -195,10 +210,10 @@
     "message": "Área"
   },
   "analytics.chart.view.bar": {
-    "message": "Barra"
+    "message": "Barras"
   },
   "analytics.chart.view.line": {
-    "message": "Linha"
+    "message": "Linhas"
   },
   "analytics.download-reason.dependency": {
     "message": "Dependência"
@@ -207,7 +222,7 @@
     "message": "Pacote de mods"
   },
   "analytics.download-reason.standalone": {
-    "message": "Independente"
+    "message": "Direto"
   },
   "analytics.download-reason.update": {
     "message": "Atualização"
@@ -225,25 +240,28 @@
     "message": "Sem dados disponíveis"
   },
   "analytics.empty.no-data-for-analytics": {
-    "message": "Não há dados disponíveis para análise"
+    "message": "Sem dados disponíveis para as análises"
   },
   "analytics.empty.no-projects": {
     "message": "Sem projetos disponíveis"
   },
   "analytics.empty.no-projects-for-analytics": {
-    "message": "Não há projetos disponíveis para análise"
+    "message": "Sem projetos disponíveis para as análises"
   },
   "analytics.empty.select-project": {
     "message": "Selecione pelo menos um projeto para visualizar os dados"
+  },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Falha ao carregar os projetos dependentes"
   },
   "analytics.filter.game-version-type": {
     "message": "Tipo de versão do jogo"
   },
   "analytics.filter.game-version-type.all": {
-    "message": "Tudo"
+    "message": "Todas"
   },
   "analytics.filter.game-version-type.release": {
-    "message": "Release"
+    "message": "Estável"
   },
   "analytics.filter.search.countries": {
     "message": "Buscar países..."
@@ -252,7 +270,7 @@
     "message": "Buscar projetos..."
   },
   "analytics.filter.search.download-sources": {
-    "message": "Buscar fontes dos downloads..."
+    "message": "Buscar fontes de download..."
   },
   "analytics.filter.search.members": {
     "message": "Buscar membros..."
@@ -267,7 +285,7 @@
     "message": "Downloads ao longo do tempo"
   },
   "analytics.graph.title.playtime": {
-    "message": "Tempo jogado ao longo do tempo"
+    "message": "Tempo de jogo ao longo do tempo"
   },
   "analytics.graph.title.revenue": {
     "message": "Receita ao longo do tempo"
@@ -324,16 +342,16 @@
     "message": "Projeto aprovado"
   },
   "analytics.project-event.project-private": {
-    "message": "Projeto definido para privado"
+    "message": "Projeto marcado como privado"
   },
   "analytics.project-event.project-status-changed": {
-    "message": "O status do projeto foi alterado"
+    "message": "Status do projeto alterado"
   },
   "analytics.project-event.project-unlisted": {
-    "message": "Projeto não listado"
+    "message": "Projeto oculto"
   },
   "analytics.project-event.version-released": {
-    "message": "{version} lançada"
+    "message": "Lançamento da versão {version}"
   },
   "analytics.project-event.version-uploaded": {
     "message": "Versão enviada"
@@ -357,7 +375,7 @@
     "message": "Rejeitado"
   },
   "analytics.project-status.unlisted": {
-    "message": "Não listado"
+    "message": "Oculto"
   },
   "analytics.project-status.withheld": {
     "message": "Retido"
@@ -381,7 +399,7 @@
     "message": "Seus projetos"
   },
   "analytics.query.filter.add": {
-    "message": "Adicionar filtro"
+    "message": "Filtrar"
   },
   "analytics.query.label.breakdown": {
     "message": "Detalhes:"
@@ -399,7 +417,7 @@
     "message": "Downloads"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Somente downloads e visualizações feitas através do Modrinth são elegíveis para monetização e devem passar pela filtração anti-fraude. Downloads do Modrinth App também exigem que o usuário esteja conectado. Pois, todos os projetos possuem uma proporção semelhante de downloads monetizados, sua receita não mudaria bastante se todos os downloads fossem contados."
+    "message": "Apenas visualizações e downloads realizados pelo Modrinth são elegíveis para monetização e precisam passar pelos filtros de prevenção contra fraudes. Os downloads feitos pelo Modrinth App também exigem autenticação do usuário. Como a proporção de downloads monetizados é semelhante entre os projetos, incluir todos os downloads não alteraria significativamente a sua receita."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "Saiba mais"
@@ -411,13 +429,13 @@
     "message": "Tempo de jogo"
   },
   "analytics.stat.playtime-hours": {
-    "message": "{hours}h"
+    "message": "{hours} h"
   },
   "analytics.stat.previous-period-comparison": {
-    "message": "vs período anterior"
+    "message": "comparado ao ant."
   },
   "analytics.stat.previous-period-comparison-short": {
-    "message": "vs ant."
+    "message": "vs. ant."
   },
   "analytics.stat.revenue": {
     "message": "Receita"
@@ -438,7 +456,7 @@
     "message": "{start} a {end}"
   },
   "analytics.table.csv.filename": {
-    "message": "Estatísticas do Modrinth: Detalhes por {breakdown} - {dateRange}"
+    "message": "Estatísticas do Modrinth - Resumo por {breakdown} - {dateRange}"
   },
   "analytics.table.csv.header.playtime-seconds": {
     "message": "Tempo de jogo (segundos)"
@@ -456,7 +474,7 @@
     "message": "{count, plural, one {# minuto} other {# minutos}}"
   },
   "analytics.table.empty.no-matching-rows": {
-    "message": "Sem linhas de estatísticas correspondentes"
+    "message": "Nenhum dado correspondente encontrado"
   },
   "analytics.table.export-csv": {
     "message": "Exportar CSV"
@@ -474,28 +492,28 @@
     "message": "Buscar..."
   },
   "analytics.threshold.countries-above": {
-    "message": "Países acima"
+    "message": "Países acima de"
   },
   "analytics.threshold.country-downloads-aria": {
-    "message": "Limite de downloads por país"
+    "message": "Quantidade mínima de downloads"
   },
   "analytics.threshold.game-version-downloads-aria": {
-    "message": "Limite de downloads por versão do jogo"
+    "message": "Quantidade mínima de downloads"
   },
   "analytics.threshold.game-versions-above": {
-    "message": "Versões do jogo acima"
+    "message": "Versões acima de"
   },
   "analytics.threshold.project-downloads-aria": {
-    "message": "Limite de downloads por projeto"
+    "message": "Quantidade mínima de downloads"
   },
   "analytics.threshold.project-version-downloads-aria": {
-    "message": "Limite de downloads por versão do projeto"
+    "message": "Quantidade mínima de downloads"
   },
   "analytics.threshold.project-versions-above": {
-    "message": "Versões do projeto acima"
+    "message": "Versões acima de"
   },
   "analytics.threshold.projects-above": {
-    "message": "Projetos acima"
+    "message": "Projetos acima de"
   },
   "analytics.title": {
     "message": "Estatísticas"
@@ -507,7 +525,7 @@
     "message": "Nenhum"
   },
   "analytics.value.no-dependent-tooltip": {
-    "message": "Instalado por outros motivos além de ser uma dependência"
+    "message": "Baixado por motivos que não envolvem dependências"
   },
   "analytics.value.none": {
     "message": "Nenhum"
@@ -519,7 +537,7 @@
     "message": "Desconhecido"
   },
   "analytics.value.unknown-dependent-tooltip": {
-    "message": "Não há metadados para determinar qual projeto dependente este download é atribuído."
+    "message": "Não é possível determinar o projeto dependente associado a este download."
   },
   "analytics.value.unmonetized": {
     "message": "Não monetizado"
@@ -849,7 +867,7 @@
     "message": "Continuar com chave de acesso"
   },
   "auth.sign-in.create-account": {
-    "message": "Entrar"
+    "message": "Criar conta"
   },
   "auth.sign-in.forgot-password": {
     "message": "Esqueci a senha"
@@ -931,6 +949,12 @@
   },
   "auth.verify-email.title": {
     "message": "Verificar e-mail"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "Enviar ícone"
+  },
+  "collection.button.discover-mods": {
+    "message": "Descobrir mods"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
@@ -1106,6 +1130,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Os arquivos suplementares servem para fornecer recursos de apoio, como código-fonte, e não versões ou variantes alternativas."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Detalhes"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Arquivos"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadados"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "O arquivo primário é o arquivo padrão que um usuário baixa ao instalar o projeto."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Arquivo primário"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Você pode adicionar opcionalmente arquivos suplementares como código-fonte, documentação e pacotes de recursos necessários."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Arquivos suplementares"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Enviar arquivo adicional"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Enviar arquivo"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Enviar arquivos principais e auxiliares"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Arraste e solte os arquivos ou clique para navegar"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Detalhes"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Arquivos"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadados"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Mudanças da versão"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Número da versão"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "O número da versão diferencia esta versão específica das demais."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Insira o número da versão, ex. 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Legenda da versão"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Digite a legenda..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Tipo de versão"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Adicionar dependência"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Dependências"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Detalhes"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Loaders detectados"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Versões detectadas"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Editar"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Ambiente"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Arquivos"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Loaders"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadados"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Os loaders de pacotes de mods não podem ser editados"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "As versões do pacote de mods não podem ser editadas"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "Nenhuma dependência adicionada."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "Nenhum ambiente configurado."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Nenhum loader selecionado."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Sem loader de mods"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "Nenhuma versão selecionada."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Preenchido a partir de uma versão semelhante anterior"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Os loaders de pacotes de recursos não podem ser editados"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Sugerido"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Arquivos enviados"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versões"
+  },
   "create.collection.collection-info": {
     "message": "Sua nova coleção será criada como pública {count, plural, =0 {sem projetos} one {com # projeto} other {com # projetos}}."
   },
@@ -1202,6 +1355,9 @@
   "create.project.name-placeholder": {
     "message": "Insira o nome do projeto..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "Ícone de {name}"
+  },
   "create.project.owner-description": {
     "message": "Defina o dono do projeto como você mesmo ou como uma organização da qual você faz parte."
   },
@@ -1232,8 +1388,14 @@
   "create.project.type-server": {
     "message": "Servidor"
   },
+  "create.project.unknown-user": {
+    "message": "Usuário desconhecido"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Avatar do usuário"
   },
   "create.project.visibility-description": {
     "message": "A visibilidade do seu projeto após sua aprovação."
@@ -1316,6 +1478,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Atualizado recentemente"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Fechar"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Baixar {formType}"
   },
@@ -1342,6 +1507,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Formulário fiscal"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Você não concluiu o formulário de imposto. Por favor, tente novamente."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Formulário de imposto incompleto"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "O Modrinth utiliza o provedor terceirizado Track1099 para coletar e armazenar com segurança seus formulários fiscais. <security-link>Saiba mais aqui.</security-link>"
@@ -1382,6 +1553,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entidade corporativa"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Selecione sua data de nascimento"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Uma entidade corporativa se refere a uma organização registrada, tais como uma corporação, parceria ou LLC."
   },
@@ -1390,6 +1564,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Indivíduo privado"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Buscar países..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Buscar subdivisões..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Selecione seu país"
@@ -1526,6 +1706,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Insira a quantia"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "O valor mínimo é {min}, que excede seu saldo de {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Você precisa de pelo menos {min} para usar este vale-presente."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "Não há valores disponíveis para o seu saldo atual"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Não há valores próximos a essa quantidade"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Não há valores próximos a essa quantidade. O máximo disponível é {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Método de pagamento"
   },
@@ -1540,6 +1735,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Buscar quantia"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Buscar {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Selecionar {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Selecione uma denominação:"
@@ -1558,6 +1759,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "Você selecionou USD para PayPal Internacional. <direct-paypal-link>Alterne para o PayPal direto</direct-paypal-link> para obter taxas melhores (≈2% ao invés de ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "{min} valor mínimo, {max} valor máximo de saque."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "{min} Valor mínimo de saque."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retirar"
@@ -1788,7 +1995,7 @@
     "message": "Sem transações"
   },
   "dashboard.revenue.transactions.none.desc": {
-    "message": "Seus pagamentos e retiradas aparecerão aqui."
+    "message": "Seus pagamentos e saques aparecerão aqui."
   },
   "dashboard.revenue.transactions.period.last-month": {
     "message": "Mês passado"
@@ -1803,7 +2010,7 @@
     "message": "Todos os anos"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
-    "message": "Suas restiradas estão temporariamente bloqueadas devido a seu TIN ou SSN não coincidirem com seus registros do IRS. Por favor, contate o suporte para reestabelecer e reenviar seu formulário fiscal."
+    "message": "Seus saques estão temporariamente bloqueadas devido a seu TIN ou SSN não coincidirem com seus registros do IRS. Por favor, contate o suporte para reestabelecer e reenviar seu formulário fiscal."
   },
   "dashboard.revenue.withdraw.card.description": {
     "message": "Transfira o saldo disponível usando o método de pagamento desejado."
@@ -1920,7 +2127,7 @@
     "message": "Endereço da carteira inválido"
   },
   "dashboard.withdraw.error.minimum-not-met.text": {
-    "message": "A quantidade que retirada (após as taxas) não coincide com o requisito mínimo. Por favor, aumente a quantidade a retirar."
+    "message": "A quantidade de saldo (após as taxas) não coincide com o requisito mínimo. Por favor, aumente a quantia a sacar."
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Quantia muito baixo"
@@ -1932,7 +2139,7 @@
     "message": "Região do PayPal incompatível"
   },
   "dashboard.withdraw.error.tax-form.text": {
-    "message": "Você deve completar o formulário fiscal para enviar seu pedido de retirada."
+    "message": "Você deve completar o formulário fiscal para enviar seu pedido de saque."
   },
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Por favor, complete seu formulário fiscal"
@@ -2222,6 +2429,24 @@
   "hosting-marketing.medal.text-secondary": {
     "message": "Oferta por tempo limitado. Não é necessário cartão de crédito. Disponível para servidores nos EUA."
   },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Erro ao obter os dados de pagamento"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "O produto selecionado foi encontrado, mas não possui os dados necessários. Entre em contato com o suporte."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Produto invalido"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "No momento, atingimos nossa capacidade máxima. Por favor, tente novamente mais tarde."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Servidor com capacidade máxima"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Um erro inesperado aconteceu"
+  },
   "hosting-marketing.pick-customized-plan": {
     "message": "Escolha um plano personalizado com apenas as especificações de que você precisa."
   },
@@ -2502,7 +2727,7 @@
     "message": "Preencha o formulário fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Você já retirou mais de {threshold} do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Suas retiradas ficarão suspensas até que esse formulário seja enviado."
+    "message": "Você já sacou mais de {threshold} do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Seus saques ficarão suspensos até que esse formulário seja enviado."
   },
   "layout.banner.tax.title": {
     "message": "Formulário fiscal necessário"
@@ -2539,6 +2764,21 @@
   },
   "layout.footer.about.status": {
     "message": "Status"
+  },
+  "layout.footer.based-on-label": {
+    "message": "Baseado em"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "O modo de desenvolvedor foi ativado"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Modo desenvolvedor ativado"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Modo desenvolvedor desativado"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Modo de desenvolvedor desativado"
   },
   "layout.footer.legal": {
     "message": "Termos e Políticas"
@@ -2608,6 +2848,9 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.unknown-commit": {
+    "message": "desconhecido"
   },
   "layout.menu-toggle.action": {
     "message": "Alternar menu"
@@ -2698,6 +2941,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisão técnica"
+  },
+  "modpack-scan-modal.clear-all-groups": {
+    "message": "Limpar todos os grupos"
   },
   "modpack-scan-modal.failed": {
     "message": "Falhou"
@@ -3005,6 +3251,51 @@
   "muralpay.warning.wallet-address": {
     "message": "Verifique novamente seu endereço da carteira. Fundos enviados para um endereço incorreto não podem ser recuperados."
   },
+  "organization.button.manage": {
+    "message": "Gerenciar"
+  },
+  "organization.button.manage-projects": {
+    "message": "Gerenciar projetos"
+  },
+  "organization.label.downloads": {
+    "message": "downloads"
+  },
+  "organization.label.members": {
+    "message": "membros"
+  },
+  "organization.label.organization": {
+    "message": "Organização"
+  },
+  "organization.label.projects": {
+    "message": "projetos"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Nome"
+  },
+  "organization.project-transfer.no-projects-available": {
+    "message": "Não há projetos disponíveis para transferir."
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Ícone para {name}"
+  },
+  "organization.project-transfer.title": {
+    "message": "Transferir projetos"
+  },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "Transferir {count, plural, one {# projeto} other {# projetos}}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Tipo"
+  },
+  "organization.projects.none": {
+    "message": "Esta organização ainda não possui nenhum projeto."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Esta organização ainda não tem nenhum projeto. Gostaria de <create-link>criar um</create-link>?"
+  },
   "profile.bio.fallback.creator": {
     "message": "Um criador Modrinth."
   },
@@ -3071,6 +3362,9 @@
   "profile.label.collection": {
     "message": "Coleção"
   },
+  "profile.label.download-count": {
+    "message": "{count, plural, one {download} other {downloads}}"
+  },
   "profile.label.joined": {
     "message": "Entrou"
   },
@@ -3088,6 +3382,9 @@
   },
   "profile.label.organizations": {
     "message": "Organizações"
+  },
+  "profile.label.project-count": {
+    "message": "{count, plural, one {projeto} other {projetos}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -3232,6 +3529,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "Não mostrar novamente"
+  },
+  "project.actions.edit-project": {
+    "message": "Editar projeto"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Rescanear pacote de mods"
   },
   "project.actions.review-project": {
     "message": "Revisar projeto"
@@ -3406,6 +3709,9 @@
   },
   "project.gallery.title": {
     "message": "Galeria"
+  },
+  "project.install-context.back-to-discover": {
+    "message": "Voltar a descobrir"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Seu projeto é privado, o que significa que só você e as pessoas que você convidar podem acessá-lo."
@@ -3617,6 +3923,102 @@
   "project.settings.permissions.sort.status": {
     "message": "Status"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Endereço do Bedrock"
+  },
+  "project.settings.server.cannot-save-text": {
+    "message": "O servidor do Java precisa estar acessível antes de salvar. Certifique-se de que o ping seja bem-sucedido."
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Não é possível salvar"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Detalhes do servidor"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Digitar endereço"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Endereço do Java"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Idiomas"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Latência: {latency}ms"
+  },
+  "project.settings.server.optional-label": {
+    "message": "opcional"
+  },
+  "project.settings.server.ping-failed-message": {
+    "message": "Não conseguimos alcançar este servidor. Ele pode estar bloqueado pelo seu provedor (ou hospedagem), então tente atualizar a página algumas vezes. Se ele ainda não responder, por favor, <support-link>contate o suporte</support-link>."
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Atualizar conexão"
+  },
+  "project.settings.server.region-label": {
+    "message": "Região"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Selecionar idioma"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Selecionar região"
+  },
+  "project.settings.server.server-online": {
+    "message": "O servidor está ativo!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "Se você tiver <srv-tooltip>[registros SRV]</srv-tooltip>, não precisará adicionar uma porta. Caso contrário, se você tiver uma porta que não seja 25565, poderá incluí-la como :12345"
+  },
+  "project.settings.server.srv-records-tooltip": {
+    "message": "O endereço que você inserir aqui pode ter registros DNS SRV _minecraft._tcp.(seu domínio) que apontam para o endereço e porta do seu servidor Minecraft."
+  },
+  "project.settings.tags.all-tags-selected-warning": {
+    "message": "Você selecionou todas as {count} etiquetas disponíveis. Selecione apenas as etiquetas que realmente se aplicam ao seu projeto."
+  },
+  "project.settings.tags.categories-description": {
+    "message": "Selecione todas as categorias que refletem os temas ou a função do seu {type}."
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Etiquetas em destaque"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "Você pode destacar até 3 das suas etiquetas mais relevantes. Outras etiquetas poderão ser promovidas a destaque caso você não selecione todas as 3."
+  },
+  "project.settings.tags.features-description": {
+    "message": "Selecione todas as funcionalidades que o seu {type} utiliza."
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "Você selecionou {count} etiquetas de resolução ({tags}). Os pacotes de recursos devem normalmente ter apenas uma etiqueta de resolução."
+  },
+  "project.settings.tags.performance-impact-description": {
+    "message": "Selecione o impacto realista no desempenho do seu {type}. Selecione vários se o {type} puder ser configurado para diferentes níveis de impacto no desempenho."
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Selecione a(s) resolução(ões) das texturas em seu {type}."
+  },
+  "project.settings.tags.select-at-least-one-category": {
+    "message": "Selecione pelo menos uma categoria para ela ser destacada."
+  },
+  "project.settings.tags.tagging-importance-description": {
+    "message": "Etiquetar corretamente é importante para ajudar as pessoas a encontrarem seu {type}. Certifique-se de selecionar todas as etiquetas aplicáveis."
+  },
+  "project.settings.tags.title": {
+    "message": "Etiquetas"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "Você selecionou {count} etiquetas. Considere reduzir para 8 ou menos para manter seu projeto focado e mais fácil de encontrar."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "Você selecionou {count} etiquetas. Reduzir para 18 ou menos para manter seu projeto focado e mais fácil de encontrar."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "Você selecionou {count} etiquetas. Considere reduzir para 12 ou menos para manter seu projeto focado e mais fácil de encontrar."
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Por favor, envie uma versão primeiro para que as etiquetas possam ser selecionadas!"
+  },
   "project.settings.title": {
     "message": "Configurações"
   },
@@ -3626,8 +4028,50 @@
   "project.status.archived.message": {
     "message": "{title} foi arquivado. {title} não receberá atualizações a menos que o autor decida desarquivar o projeto."
   },
+  "project.versions.copy-id-option": {
+    "message": "Copiar ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Copiar link"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Copiar coordenadas Maven"
+  },
+  "project.versions.delete-button": {
+    "message": "Excluir"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Isto removerá essa versão para sempre (para sempre mesmo)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Tem certeza de que deseja excluir esta versão?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Editar detalhes"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Editar arquivos"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Editar metadados"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Editar versão"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Abrir em nova aba"
+  },
+  "project.versions.share-option": {
+    "message": "Compartilhar"
+  },
   "project.versions.title": {
     "message": "Versões"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "A versão foi excluída com sucesso."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Versão excluída"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Esta versão está atualmente retida e não listada} other {Estas versões estão atualmente retidas e não listadas}} publicamente. Por favor, forneça prova de que você tem permissão para redistribuir certos arquivos incluídos {count, plural, one {na versão} other {nas versões}} do pacote de mods."
@@ -4042,6 +4486,12 @@
   },
   "servers.plan.small.description": {
     "message": "Perfeito para 1–5 amigos e alguns mods leves."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Mais popular"
+  },
+  "servers.purchase.step.plan.per-month-billing": {
+    "message": "/ mês{interval, select, monthly {} other {, cobrado {interval, select, quarterly {trimestralmente} yearly {anualmente} other {{interval}}}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Terminar configuração"
@@ -4885,6 +5335,18 @@
   },
   "version.environment.unknown.title": {
     "message": "Ambiente desconhecido"
+  },
+  "version.notification.deleted-text": {
+    "message": "A versão foi excluída com sucesso."
+  },
+  "version.notification.deleted-title": {
+    "message": "Versão excluída"
+  },
+  "version.notification.packaging-success-text": {
+    "message": "Seu pacote de dados foi empacotado com sucesso como um mod! Certifique-se de testá-lo para verificar se há erros."
+  },
+  "version.notification.packaging-success-title": {
+    "message": "Sucesso no empacotamento"
   },
   "version.package-as-mod.button": {
     "message": "Empacotar como mod"

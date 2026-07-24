@@ -1125,7 +1125,7 @@
     "defaultMessage": "Automatisch toegewezen"
   },
   "external-files.permissions-card.reason.globally-allowed.description": {
-    "defaultMessage": "We hebben dit bestand al eerder gezien en hebben een bronvermelding voor je opgesteld. Mocht er iets niet kloppen, neem dan contact op met Modrinth Support via het Helpcentrum"
+    "defaultMessage": "We hebben dit bestand al eerder gezien en hebben een bronvermelding voor je opgesteld. Mocht er iets niet kloppen, neem dan contact op met Modrinth Support via de klantenservice"
   },
   "external-files.permissions-card.reason.license": {
     "defaultMessage": "Licentie"
@@ -1159,12 +1159,6 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Je hebt speciale toestemming gekregen om dit werk in je modpack te verspreiden."
-  },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Groep verwijderen"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Groep kon niet verwijderd worden"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Uit groep verwijderen"
@@ -2115,10 +2109,10 @@
     "defaultMessage": "Toon compatibele"
   },
   "instances.updater-modal.warning-app": {
-    "defaultMessage": "Een update kan uw instantie onbruikbaar maken. Bekijk eerst het wijzigingslogboeken  van de versie en maak een back-up."
+    "defaultMessage": "Een update kan je instantie onbruikbaar maken. Bekijk eerst de wijzigingen van de versie en maak een back-up."
   },
   "instances.updater-modal.warning-web": {
-    "defaultMessage": "Een update kan je wereld op zijn kop zetten. Bekijk eerst de wijzigingslogboeken van de versie en maak een back-up."
+    "defaultMessage": "Een update kan je wereld verstoren. Bekijk eerst de wijzigingen van de versie en maak een back-up."
   },
   "label.actions": {
     "defaultMessage": "Acties"
@@ -3488,6 +3482,12 @@
   "project.settings.view.title": {
     "defaultMessage": "Bekijk"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {download} other {downloads}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {volger} other {volgers}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -4221,7 +4221,7 @@
     "defaultMessage": "Back-up voltooid"
   },
   "servers.backups.admonition.backup-failed.description": {
-    "defaultMessage": "Er is een fout opgetreden bij het maken van {backupName}. Probeer het nog eens of neem contact op met het Helpcentrum als het probleem zich blijft voordoen."
+    "defaultMessage": "Er is een fout opgetreden bij het maken van {backupName}. Probeer het nog eens of neem contact op met de klantenservice als het probleem zich blijft voordoen."
   },
   "servers.backups.admonition.backup-failed.title": {
     "defaultMessage": "Back-up is mislukt"
@@ -4233,7 +4233,7 @@
     "defaultMessage": "Back-up in de wachtrij"
   },
   "servers.backups.admonition.backup-timed-out.description": {
-    "defaultMessage": "Het aanmaken van {backupName} is verlopen. Je kunt het opnieuw proberen of contact opnemen met het Helpcentrum als het probleem zich blijft voordoen."
+    "defaultMessage": "Het aanmaken van {backupName} is verlopen. Je kunt het opnieuw proberen of contact opnemen met de klantenservice als het probleem zich blijft voordoen."
   },
   "servers.backups.admonition.backup-timed-out.title": {
     "defaultMessage": "Back-up is verlopen"
@@ -4254,7 +4254,7 @@
     "defaultMessage": "Herstellen geannuleerd"
   },
   "servers.backups.admonition.restore-failed.description": {
-    "defaultMessage": "Er is een fout opgetreden tijdens het terugzetten vanuit {backupName}. Probeer het nog eens of neem contact op met het Helpcentrum als het probleem zich blijft voordoen."
+    "defaultMessage": "Er is een fout opgetreden tijdens het terugzetten vanuit {backupName}. Probeer het nog eens of neem contact op met de klantenservice als het probleem zich blijft voordoen."
   },
   "servers.backups.admonition.restore-failed.title": {
     "defaultMessage": "Herstellen is mislukt"
@@ -4272,7 +4272,7 @@
     "defaultMessage": "Herstellen is afgerond"
   },
   "servers.backups.admonition.restore-timed-out.description": {
-    "defaultMessage": "Het terugzetten vanuit {backupName} is verlopen. Je kunt het opnieuw proberen of contact opnemen met het Helpcentrum als het probleem zich blijft voordoen."
+    "defaultMessage": "Het terugzetten vanuit {backupName} is verlopen. Je kunt het opnieuw proberen of contact opnemen met de klantenservice als het probleem zich blijft voordoen."
   },
   "servers.backups.admonition.restore-timed-out.title": {
     "defaultMessage": "Herstellen is verlopen"
@@ -4527,7 +4527,7 @@
     "defaultMessage": "Nieuw"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Uw bestanden worden nog voor <days-remaining>{daysRemaining} {daysRemaining, plural, one {dag} other {dagen}}</days-remaining> bewaard. Neem contact op met het Helpcentrum om de bestanden te downloaden voordat ze worden verwijderd."
+    "defaultMessage": "Uw bestanden worden nog voor <days-remaining>{daysRemaining} {daysRemaining, plural, one {dag} other {dagen}}</days-remaining> bewaard. Neem contact op met de klantenservice om de bestanden te downloaden voordat ze worden verwijderd."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Uw bestanden blijven na opzegging nog 30 dagen bewaard."

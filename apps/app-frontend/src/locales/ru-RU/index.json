@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "Посмотреть журнал"
   },
+  "app.ads-consent.accept": {
+    "message": "Принять всё"
+  },
+  "app.ads-consent.body": {
+    "message": "Реклама обеспечивает работу Modrinth и финансирует выплаты авторам. Наши партнёры могут хранить или получать доступ к файлам cookie в приложении для персонализации рекламы и измерения производительности."
+  },
+  "app.ads-consent.manage": {
+    "message": "Настроить предпочтения"
+  },
+  "app.ads-consent.reject": {
+    "message": "Отклонить всё"
+  },
+  "app.ads-consent.title": {
+    "message": "Конфиденциальность и как реклама помогает Modrinth"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Включает продвинутые эффекты вроде размытия, но может снизить производительность на устройствах без аппаратного ускорения."
   },
@@ -323,6 +338,12 @@
   "app.install.phase.running_loader_processors": {
     "message": "Запуск процессоров загрузчика"
   },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Проверьте изменения"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Проверка..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Все данные сборки будут удалены навсегда, в том числе миры, настройки и весь установленный контент."
   },
@@ -370,6 +391,45 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успешно загружено"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Друзья не приглашены"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Пригласить друзей"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Сменить аккаунт"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Неверный аккаунт"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Что произойдёт?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Отзыв доступа"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Отозвать доступ"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "Аватар {username}"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Войти"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Сборка"
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Войти как"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Необходимо войти в Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "для получения обновлений сборки."
   },
   "app.instance.worlds.add-server": {
     "message": "Добавить сервер"
@@ -419,6 +479,12 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Удаление {name}"
   },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Удалить сборку"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "Не устанавливать"
+  },
   "app.modal.install-to-play.header": {
     "message": "Установка перед запуском"
   },
@@ -433,6 +499,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Спам"
   },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
@@ -457,6 +526,9 @@
   },
   "app.modal.update-to-play.removed": {
     "message": "Удалён"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Требуется обновление"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Обновите {name} до последней версии, чтобы запустить игру."
@@ -487,6 +559,9 @@
   },
   "app.settings.downloading": {
     "message": "Скачивание версии {version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Реклама обеспечивает работу Modrinth и финансирует выплаты авторам. Наши партнёры могут хранить или получать доступ к файлам cookie в приложении для персонализации рекламы и измерения производительности. Вы можете отказаться или настроить предпочтения ниже."
   },
   "app.settings.tabs.appearance": {
     "message": "Внешний вид"
@@ -529,6 +604,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Ошибка обработки файла"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "В этом скине используются функционал мода {ears}"
   },
   "app.skins.edit-button": {
     "message": "Изменить скин"
@@ -656,6 +734,12 @@
   "app.skins.title": {
     "message": "Выбор скина"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Выключить"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Включить"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
@@ -703,6 +787,15 @@
   },
   "app.world.world-item.players-online": {
     "message": "{count} в игре"
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Всё равно удалить"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "Всё равно удалить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
+  },
+  "content.shared-instance.disable-button": {
+    "message": "Всё равно отключить"
   },
   "friends.action.add-friend": {
     "message": "Добавить в друзья"
@@ -767,6 +860,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и следить за ними!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Создать ярлык"
+  },
+  "instance.action.export-modpack": {
+    "message": "Экспортировать сборку"
+  },
+  "instance.action.launch-instance": {
+    "message": "Запустить сборку"
+  },
+  "instance.action.more-actions": {
+    "message": "Дополнительно"
+  },
+  "instance.action.open-folder": {
+    "message": "Открыть папку"
+  },
+  "instance.action.repair": {
+    "message": "Исправить"
+  },
+  "instance.action.settings": {
+    "message": "Настройки сборки"
+  },
+  "instance.action.starting": {
+    "message": "Запуск..."
+  },
+  "instance.action.stopping": {
+    "message": "Остановка..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
   },
@@ -805,6 +925,12 @@
   },
   "instance.files.save-as": {
     "message": "Сохранить как..."
+  },
+  "instance.locked.delete-button": {
+    "message": "Удалить сборку"
+  },
+  "instance.playtime.never-played": {
+    "message": "Не запускалась"
   },
   "instance.server-modal.address": {
     "message": "Адрес"
@@ -1010,6 +1136,12 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Введите ширину..."
   },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Добавлен"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Проверьте изменения"
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"
   },
@@ -1072,6 +1204,54 @@
   },
   "minecraft-account.sign-in": {
     "message": "Войти в Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Для запуска и игры требуется аккаунт Microsoft с приобретённым Minecraft."
+  },
+  "minecraft-required.description-header": {
+    "message": "Войдите в аккаунт Microsoft"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Нет аккаунта?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Приобрести Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Поддержка"
+  },
+  "minecraft-required.header": {
+    "message": "Требуется Minecraft"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Войти в Microsoft"
+  },
+  "modal.modrinth-account-required.cancel-button": {
+    "message": "Отменить"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Продолжите в браузере"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Создать аккаунт"
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Требуется аккаунт"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Войти в Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Войдите в аккаунт Modrinth"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Вход"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Проблемы с входом? <support>Обратитесь в поддержку</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "Ожидание подтверждения браузера..."
   },
   "search.filter.locked.instance": {
     "message": "Управляется сборкой"

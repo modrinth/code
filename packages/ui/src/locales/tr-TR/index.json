@@ -1157,12 +1157,6 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Bu çalışmayı mod paketinizde yeniden dağıtmak için özel izin alınmıştır."
   },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Grubu kaldır"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Grup kaldırılamadı"
-  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Gruptan kaldır"
   },
