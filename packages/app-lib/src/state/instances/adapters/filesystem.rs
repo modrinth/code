@@ -89,6 +89,9 @@ fn is_scannable_project_file(
         ProjectType::Mod => extension.eq_ignore_ascii_case("jar"),
         ProjectType::DataPack
         | ProjectType::ResourcePack
-        | ProjectType::ShaderPack => extension.eq_ignore_ascii_case("zip"),
+        | ProjectType::ShaderPack => {
+            extension.eq_ignore_ascii_case("zip")
+                || extension.eq_ignore_ascii_case("jar")
+        }
     }
 }

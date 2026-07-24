@@ -290,9 +290,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Tìm kiếm {count} world..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Ngừng tải"
-  },
   "app.modal.install-to-play.header": {
     "message": "Tải xuống để chơi"
   },

@@ -45,6 +45,92 @@ export interface InstallPostInstallEdit {
 	link?: InstanceLink | null
 }
 
+export interface SharedInstanceInstallPreview {
+	sharedInstanceId: string
+	version: number
+	name: string
+	iconUrl?: string | null
+	gameVersion: string
+	loader: InstanceLoader
+	modCount: number
+	externalFileCount: number
+	modpackVersionId?: string | null
+	contentVersionIds: string[]
+	externalFiles: SharedInstanceExternalFilePreview[]
+}
+
+export interface SharedInstanceInviteInstallPreview {
+	sharedInstanceId: string
+	managerId?: string | null
+	serverManagerName?: string | null
+	serverManagerIconUrl?: string | null
+	instanceIconUrl?: string | null
+	preview: SharedInstanceInstallPreview
+}
+
+export interface SharedInstanceExternalFilePreview {
+	fileName: string
+	fileType: string
+}
+
+export interface SharedInstanceUpdatePreview {
+	sharedInstanceId: string
+	currentVersion?: number | null
+	latestVersion: number
+	updateAvailable: boolean
+	diffs: SharedInstanceUpdateDiff[]
+}
+
+export interface SharedInstanceUpdateDiff {
+	type:
+		| 'added'
+		| 'removed'
+		| 'updated'
+		| 'modpack_linked'
+		| 'modpack_updated'
+		| 'modpack_unlinked'
+		| 'game_version_updated'
+		| 'loader_updated'
+		| 'config_files_updated'
+	projectId?: string | null
+	projectName?: string | null
+	fileName?: string | null
+	currentVersionName?: string | null
+	newVersionName?: string | null
+	configFileCount?: number | null
+	disabled?: boolean
+}
+
+export const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE = 'shared_instance_unavailable'
+
+export type SharedInstanceUnavailableReason = 'deleted' | 'access_revoked' | 'quarantined'
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null
+}
+
+export function isSharedInstanceUnavailableError(error: unknown) {
+	return getSharedInstanceUnavailableReason(error) !== null
+}
+
+export function getSharedInstanceUnavailableReason(
+	error: unknown,
+): SharedInstanceUnavailableReason | null {
+	if (!isRecord(error) || error.code !== SHARED_INSTANCE_UNAVAILABLE_ERROR_CODE) return null
+	return error.reason === 'deleted' ||
+		error.reason === 'access_revoked' ||
+		error.reason === 'quarantined'
+		? error.reason
+		: null
+}
+
+export function getErrorMessage(error: unknown): string {
+	if (typeof error === 'string') return error
+	if (error instanceof Error) return error.message || 'Unknown error'
+	if (isRecord(error) && typeof error.message === 'string') return error.message
+	return 'Unknown error'
+}
+
 export type InstallJobStatus =
 	| 'queued'
 	| 'running'
@@ -90,6 +176,7 @@ export interface InstallErrorView {
 	code: string
 	phase?: InstallPhaseId | null
 	message: string
+	reason?: SharedInstanceUnavailableReason | null
 	api?: {
 		error: string
 		status?: number | null
@@ -122,6 +209,8 @@ export interface InstallJobSnapshot {
 	kind:
 		| 'create_instance'
 		| 'create_modpack_instance'
+		| 'create_shared_instance'
+		| 'update_shared_instance'
 		| 'import_instance'
 		| 'duplicate_instance'
 		| 'install_existing_instance'
@@ -169,6 +258,58 @@ export async function install_create_modpack_instance(
 	return await invoke<InstallJobSnapshot>('plugin:install|install_create_modpack_instance', {
 		location,
 		postInstallEdit,
+	})
+}
+
+export async function install_get_shared_instance_preview(sharedInstanceId: string, name: string) {
+	return await invoke<SharedInstanceInstallPreview>(
+		'plugin:install|install_get_shared_instance_preview',
+		{
+			sharedInstanceId,
+			name,
+		},
+	)
+}
+
+export async function install_accept_shared_instance_invite(inviteId: string) {
+	return await invoke<SharedInstanceInviteInstallPreview>(
+		'plugin:install|install_accept_shared_instance_invite',
+		{
+			inviteId,
+		},
+	)
+}
+
+export async function install_get_shared_instance_update_preview(instanceId: string) {
+	return await invoke<SharedInstanceUpdatePreview | null>(
+		'plugin:install|install_get_shared_instance_update_preview',
+		{
+			instanceId,
+		},
+	)
+}
+
+export async function install_shared_instance(
+	sharedInstanceId: string,
+	name: string,
+	managerId?: string | null,
+	serverManagerName?: string | null,
+	serverManagerIconUrl?: string | null,
+	instanceIconUrl?: string | null,
+) {
+	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
+		sharedInstanceId,
+		name,
+		managerId,
+		serverManagerName,
+		serverManagerIconUrl,
+		instanceIconUrl,
+	})
+}
+
+export async function install_update_shared_instance(instanceId: string) {
+	return await invoke<InstallJobSnapshot>('plugin:install|install_update_shared_instance', {
+		instanceId,
 	})
 }
 
@@ -249,7 +390,8 @@ export function isInstallJobFinished(status: InstallJobStatus) {
 function settleInstallJob(job: InstallJobSnapshot) {
 	if (job.status === 'succeeded') return job
 
-	throw new Error(job.error?.message ?? `Install job ${job.job_id} ${job.status}`)
+	if (job.error) throw job.error
+	throw new Error(`Install job ${job.job_id} ${job.status}`)
 }
 
 export async function wait_for_install_job(jobId: string) {

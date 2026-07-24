@@ -533,15 +533,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "你现在可以在这里找到你的整合包内容！"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "整合包内容已移动"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "不再显示"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "附加内容"
   },
@@ -5802,4 +5793,3 @@
     "defaultMessage": "类型"
   }
 }
-

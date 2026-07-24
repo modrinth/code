@@ -235,10 +235,7 @@ async function clearAllGroups() {
 		const groups = await client.labrinth.attribution_internal.listProjectAttribution(
 			props.project_id,
 		)
-
-		for (const group of groups) {
-			await client.labrinth.attribution_internal.deleteGroup(group.id)
-		}
+		await client.labrinth.attribution_internal.deleteGroups(groups.map((group) => group.id))
 
 		await queryClient.invalidateQueries({ queryKey: ['project-attribution', props.project_id] })
 	} catch (error) {

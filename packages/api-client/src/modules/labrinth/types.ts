@@ -397,6 +397,14 @@ export namespace Labrinth {
 				attribution: AttributionResolution
 			}
 
+			export type DeleteGroupsRequest = {
+				groups: string[]
+			}
+
+			export type DeleteAllGroupsRequest = {
+				project_id: string
+			}
+
 			export type AssignRequest = {
 				sha1: string
 				target_group_id: number
@@ -434,7 +442,7 @@ export namespace Labrinth {
 				| { context: 'project'; project_id: string }
 				| { context: 'version'; version_id: string }
 				| { context: 'thread_message'; thread_message_id: string }
-				| { context: 'report'; report_id: string }
+				| { context: 'report'; report_id: string | null }
 			)
 
 			export type UploadedImageFor<C extends ImageUploadContext> = Extract<
@@ -450,7 +458,7 @@ export namespace Labrinth {
 				| { context: 'project'; project_id: string }
 				| { context: 'version'; version_id: string }
 				| { context: 'thread_message'; thread_message_id: string }
-				| { context: 'report'; report_id: string }
+				| { context: 'report'; report_id?: string }
 		}
 	}
 
@@ -1917,13 +1925,14 @@ export namespace Labrinth {
 
 	export namespace Reports {
 		export namespace v3 {
-			export type ItemType = 'project' | 'version' | 'user' | 'unknown'
+			export type ItemType = 'project' | 'version' | 'user' | 'shared-instance' | 'unknown'
 
 			export type Report = {
 				id: string
 				report_type: string
 				item_id: string
 				item_type: ItemType
+				shared_instance_version_id?: number
 				reporter: string
 				body: string
 				created: string

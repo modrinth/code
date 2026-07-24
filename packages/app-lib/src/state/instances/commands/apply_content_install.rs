@@ -502,6 +502,13 @@ pub(crate) async fn add_project_bytes(
     version_id: Option<&str>,
     state: &State,
 ) -> crate::Result<String> {
+    if !path_util::is_safe_file_name(file_name) {
+        return Err(crate::ErrorKind::InputError(format!(
+            "Project file {file_name} has an invalid file name"
+        ))
+        .into());
+    }
+
     let _content_lock = state.lock_instance_content(instance_id).await;
     let scope = resolve_content_scope(instance_id, None, state).await?;
     let project_type = match project_type {
@@ -561,6 +568,7 @@ pub(crate) async fn add_project_bytes(
     )
     .await?;
     tx.commit().await?;
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
 
     Ok(relative_path)
 }
@@ -608,6 +616,7 @@ pub(crate) async fn record_project_file(
     )
     .await?;
     tx.commit().await?;
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
 
     Ok(())
 }
@@ -711,6 +720,8 @@ pub(crate) async fn toggle_disable_project(
     }
     tx.commit().await?;
 
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
+
     Ok(new_path)
 }
 
@@ -752,7 +763,34 @@ pub(crate) async fn remove_project(
         tx.commit().await?;
     }
 
+    super::mark_shared_instance_stale(instance_id, &state.pool).await?;
+
     Ok(())
+}
+
+pub(crate) async fn content_source_kind_for_project_path(
+    instance_id: &str,
+    project_path: &str,
+    state: &State,
+) -> crate::Result<Option<ContentSourceKind>> {
+    let scope = resolve_content_scope(instance_id, None, state).await?;
+    let Some(file) = content_rows::get_instance_file_by_relative_path(
+        &scope.instance.id,
+        project_path,
+        &state.pool,
+    )
+    .await?
+    else {
+        return Ok(None);
+    };
+    let entries =
+        content_rows::get_content_entries(&scope.content_set_id, &state.pool)
+            .await?;
+
+    Ok(entries.into_iter().find_map(|entry| {
+        (entry.file_id.as_deref() == Some(file.id.as_str()))
+            .then_some(entry.source_kind)
+    }))
 }
 
 pub(crate) async fn rename_project_companion_file(

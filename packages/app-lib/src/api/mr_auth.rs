@@ -1,8 +1,19 @@
 use crate::state::ModrinthCredentials;
+use serde::Deserialize;
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ModrinthAuthFlow {
+    SignIn,
+    SignUp,
+}
 
 #[tracing::instrument]
-pub fn authenticate_begin_flow() -> &'static str {
-    crate::state::get_login_url()
+pub fn authenticate_begin_flow(flow: ModrinthAuthFlow) -> &'static str {
+    match flow {
+        ModrinthAuthFlow::SignIn => crate::state::get_login_url(),
+        ModrinthAuthFlow::SignUp => crate::state::get_signup_url(),
+    }
 }
 
 #[tracing::instrument]

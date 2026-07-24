@@ -497,15 +497,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "svět"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Obsah modpacku nyní najdeš zde!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Obsah modpacku byl přesunut"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Znovu nezobrazovat"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatečný obsah"
   },
@@ -4569,4 +4560,3 @@
     "defaultMessage": "Typ"
   }
 }
-

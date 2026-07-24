@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pretraži {count} svetova..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Ne instaliraj"
-  },
   "app.modal.install-to-play.header": {
     "message": "Instaliraj da bi igrao"
   },

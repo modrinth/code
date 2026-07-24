@@ -12,9 +12,11 @@ pub mod metadata;
 pub mod minecraft_skins;
 pub mod mr_auth;
 pub mod process;
+pub mod reports;
 pub mod settings;
 pub mod shortcuts;
 pub mod tags;
+pub mod users;
 pub mod utils;
 
 pub mod ads;
@@ -85,9 +87,20 @@ macro_rules! impl_serialize {
                     TheseusSerializableError::Theseus(theseus_error) => {
                         $crate::error::display_tracing_error(theseus_error);
 
-                        let mut state = serializer.serialize_struct("Theseus", 2)?;
+                        let unavailable_reason = match theseus_error.raw.as_ref() {
+                            theseus::ErrorKind::SharedInstanceUnavailable(reason) => Some(reason),
+                            _ => None,
+                        };
+                        let mut state = serializer.serialize_struct(
+                            "Theseus",
+                            if unavailable_reason.is_some() { 4 } else { 2 },
+                        )?;
                         state.serialize_field("field_name", "Theseus")?;
                         state.serialize_field("message", &theseus_error.to_string())?;
+                        if let Some(reason) = unavailable_reason {
+                            state.serialize_field("code", "shared_instance_unavailable")?;
+                            state.serialize_field("reason", reason)?;
+                        }
                         state.end()
                     }
                     $(

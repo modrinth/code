@@ -2921,6 +2921,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "Email verification required"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Automatically install the required game and loader"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Join the shared instance in one click"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Keep shared content updated when the instance changes"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Get Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Managed by"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "The Modrinth App will open automatically..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Opening Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Why use the Modrinth App"
+  },
   "moderation.exclude-technical-review": {
     "message": "Exclude TR"
   },
@@ -3874,6 +3898,21 @@
   },
   "project.settings.permissions.completed.title": {
     "message": "Permissions completed!"
+  },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Delete all groups"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "This will permanently delete all {count, plural, one {# attribution group} other {# attribution groups}} for this project and all files inside them. This action cannot be undone."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Delete all attribution groups?"
+  },
+  "project.settings.permissions.delete-all-groups-error": {
+    "message": "Could not delete all attribution groups"
+  },
+  "project.settings.permissions.delete-all-groups-success": {
+    "message": "All attribution groups were deleted."
   },
   "project.settings.permissions.empty-state.description": {
     "message": "None of your project's versions contain external content, so you don't need to worry about obtaining permissions."
@@ -5263,6 +5302,33 @@
   },
   "settings.sidebar.label.display": {
     "message": "Display"
+  },
+  "shared-instance.invite.accept": {
+    "message": "Accept invite"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "A Modrinth user"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# person has} other {# people have}} already joined"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Loading invite…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} has invited you to play"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Do you know this user?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "It may have expired, reached its use limit, or been removed by the person who shared it."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "This invite isn't available"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Latest news from Modrinth"

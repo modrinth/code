@@ -78,14 +78,15 @@ import UnknownPackWarningModal from '@/components/ui/install_flow/UnknownPackWar
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import MinecraftRequiredModal from '@/components/ui/minecraft-required-modal/MinecraftRequiredModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
-import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
+import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PrideFundraiserBanner from '@/components/ui/PrideFundraiserBanner.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
+import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
@@ -103,8 +104,13 @@ import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
-import { list, run } from '@/helpers/instance'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
+import {
+	can_current_user_use_shared_instances,
+	get as getInstance,
+	list,
+	run,
+} from '@/helpers/instance'
+import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -155,6 +161,7 @@ const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
 const PRIDE_FUNDRAISER_END_DATE = new Date('2026-07-01T00:00:00Z').getTime()
 const credentials = ref()
+let credentialsRefreshId = 0
 const sidebarToggled = ref(true)
 const unsubscribeSidebarToggle = themeStore.$subscribe(() => {
 	sidebarToggled.value = !themeStore.toggleSidebar
@@ -200,6 +207,7 @@ const tauriApiClient = new TauriModrinthClient({
 	userAgent: async () => `modrinth/theseus/${await appVersion} (support@modrinth.com)`,
 	labrinthBaseUrl: config.labrinthBaseUrl,
 	archonBaseUrl: config.archonBaseUrl,
+	sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
 	features: [
 		new NodeAuthFeature({
 			getAuth: () => nodeAuthState.getAuth?.() ?? null,
@@ -222,6 +230,16 @@ const { data: authenticatedModrinthUser } = useQuery({
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
 	enabled: () => !!credentials.value?.session,
 	retry: false,
+})
+useQuery({
+	queryKey: computed(() => ['shared-instance-eligibility', credentials.value?.user?.id]),
+	queryFn: can_current_user_use_shared_instances,
+	enabled: () => !!credentials.value?.session && !!credentials.value?.user?.id,
+	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: false,
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
 })
 const hasPlus = computed(
 	() =>
@@ -735,9 +753,10 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
+const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
-const modrinthLoginFlowWaitModal = ref()
+const modrinthLoginModal = ref()
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {
@@ -745,8 +764,12 @@ watch(incompatibilityWarningModal, (modal) => {
 	}
 })
 
-setupAuthProvider(credentials, async (_redirectPath) => {
-	await signIn()
+setupAuthProvider(credentials, async (_redirectPath, flow, options) => {
+	if (options?.showModal === false) {
+		await signIn(flow)
+	} else {
+		await requestSignIn(flow)
+	}
 })
 
 async function validateSession(sessionToken) {
@@ -763,23 +786,31 @@ async function validateSession(sessionToken) {
 }
 
 async function fetchCredentials() {
+	const refreshId = ++credentialsRefreshId
+	credentials.value = undefined
+
 	const creds = await getCreds().catch(handleError)
+	if (refreshId !== credentialsRefreshId) return
+
 	if (creds && creds.user_id) {
 		if (creds.session && !(await validateSession(creds.session))) {
+			if (refreshId !== credentialsRefreshId) return
+
 			await logout().catch(handleError)
+			if (refreshId !== credentialsRefreshId) return
+
 			credentials.value = null
 			return
 		}
 		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
+		if (refreshId !== credentialsRefreshId) return
 	}
 	credentials.value = creds ?? null
 }
 
-async function signIn() {
-	modrinthLoginFlowWaitModal.value.show()
-
+async function signIn(flow = 'sign-in') {
 	try {
-		await login()
+		await login(flow)
 		await fetchCredentials()
 	} catch (error) {
 		if (
@@ -791,12 +822,26 @@ async function signIn() {
 		} else {
 			handleError(error)
 		}
-	} finally {
-		modrinthLoginFlowWaitModal.value.hide()
 	}
 }
 
+async function requestSignIn(flow = 'sign-in') {
+	await modrinthLoginModal.value?.showSigningIn(flow)
+}
+
+async function requestModrinthAuth(flow = 'sign-in') {
+	await signIn(flow)
+	return !!credentials.value?.session
+}
+
 async function logOut() {
+	await performLogOut()
+}
+
+async function performLogOut() {
+	credentialsRefreshId++
+	credentials.value = undefined
+
 	await logout().catch(handleError)
 	await fetchCredentials()
 }
@@ -917,30 +962,34 @@ function openServerInviteInviterProfile(inviterName) {
 }
 
 async function handleLiveNotification(notification) {
-	if (notification?.body?.type !== 'server_invite' || notification.read) return
-	if (displayedServerInviteNotifications.has(notification.id)) return
+	if (!notification?.body || notification.read) return
+	if (await sharedInstanceInviteHandler.value?.handleNotification(notification)) return
 
-	displayedServerInviteNotifications.add(notification.id)
+	if (notification.body.type === 'server_invite') {
+		if (displayedServerInviteNotifications.has(notification.id)) return
 
-	const serverName =
-		typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
-	const inviterId = notification.body.invited_by
-	const invitedBy =
-		typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+		displayedServerInviteNotifications.add(notification.id)
 
-	addPopupNotification({
-		title: serverName,
-		autoCloseMs: null,
-		toast: {
-			type: 'server-invite',
-			actorName: invitedBy?.username ?? null,
-			actorAvatarUrl: invitedBy?.avatar_url ?? null,
-			entityName: serverName,
-			onAccept: () => acceptServerInviteNotification(notification),
-			onDecline: () => declineServerInviteNotification(notification),
-			onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
-		},
-	})
+		const serverName =
+			typeof notification.body.server_name === 'string' ? notification.body.server_name : 'a server'
+		const inviterId = notification.body.invited_by
+		const invitedBy =
+			typeof inviterId === 'string' ? await get_user(inviterId, 'bypass').catch(() => null) : null
+
+		addPopupNotification({
+			title: serverName,
+			autoCloseMs: null,
+			toast: {
+				type: 'server-invite',
+				actorName: invitedBy?.username ?? null,
+				actorAvatarUrl: invitedBy?.avatar_url ?? null,
+				entityName: serverName,
+				onAccept: () => acceptServerInviteNotification(notification),
+				onDecline: () => declineServerInviteNotification(notification),
+				onOpenActor: () => openServerInviteInviterProfile(invitedBy?.username ?? null),
+			},
+		})
+	}
 }
 
 async function handleCommand(e) {
@@ -967,6 +1016,9 @@ async function handleCommand(e) {
 			})
 		}
 	} else if (e.event === 'LaunchInstance') {
+		const instance = await getInstance(e.id).catch(handleError)
+		if (!instance || instance.quarantined) return
+
 		if (e.server) {
 			await start_join_server(e.id, e.server).catch(handleError)
 		} else if (e.singleplayer_world) {
@@ -974,6 +1026,8 @@ async function handleCommand(e) {
 		} else {
 			await run(e.id).catch(handleError)
 		}
+	} else if (e.event === 'InstallSharedInstanceInvite') {
+		await sharedInstanceInviteHandler.value?.installFromInviteId(e.invite_id)
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
@@ -1498,7 +1552,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
 		<Suspense>
-			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
+			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />
 		</Suspense>
 		<CreationFlowModal
 			ref="installationModal"
@@ -1602,7 +1656,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</template>
 				<template #sign-out> <LogOutIcon /> Sign out </template>
 			</OverflowMenu>
-			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+			<NavButton
+				v-else
+				v-tooltip.right="'Sign in to a Modrinth account'"
+				:to="() => requestSignIn()"
+			>
 				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
@@ -1749,7 +1807,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
-							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
+							<FriendsList :credentials="credentials" :sign-in="() => requestSignIn()" />
 						</suspense>
 					</div>
 					<PrideFundraiserBanner
@@ -1834,6 +1892,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
 		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
 	/>
+	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
 </template>
