@@ -22,9 +22,13 @@ const props = defineProps<{
 	instances: GameInstance[]
 }>()
 
-const { instanceGroups, deleteInstance, handleInstanceOption } = provideLibrary(
-	toRef(props, 'instances'),
-)
+const {
+	instanceGroups,
+	instanceOptions,
+	confirmDeleteModal,
+	deleteInstance,
+	handleInstanceOption,
+} = provideLibrary(toRef(props, 'instances'))
 </script>
 
 <template>

@@ -37,6 +37,10 @@ export async function create_group(name: string): Promise<string> {
 	return await invoke('plugin:instance|instance_create_group', { name })
 }
 
+export async function delete_group(name: string): Promise<void> {
+	return await invoke('plugin:instance|instance_delete_group', { name })
+}
+
 export async function get_projects(
 	instanceId: string,
 	cacheBehaviour?: CacheBehaviour,

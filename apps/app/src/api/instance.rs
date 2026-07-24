@@ -27,6 +27,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_list,
             instance_list_groups,
             instance_create_group,
+            instance_delete_group,
             instance_get_projects,
             instance_get_installed_project_ids,
             instance_get_install_candidates,
@@ -484,6 +485,11 @@ pub async fn instance_list_groups() -> Result<Vec<String>> {
 #[tauri::command]
 pub async fn instance_create_group(name: String) -> Result<String> {
     Ok(theseus::instance::create_group(name).await?)
+}
+
+#[tauri::command]
+pub async fn instance_delete_group(name: String) -> Result<()> {
+    Ok(theseus::instance::delete_group(name).await?)
 }
 
 #[tauri::command]

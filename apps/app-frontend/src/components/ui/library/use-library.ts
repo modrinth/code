@@ -12,9 +12,11 @@ import {
 } from 'vue'
 
 import { get_project_v3_many } from '@/helpers/cache.js'
+import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
 import {
 	create_group as createInstanceGroup,
+	delete_group as deleteInstanceGroup,
 	edit,
 	list_groups as listInstanceGroups,
 	remove,
@@ -148,7 +150,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		try {
 			libraryGroups.value = await listInstanceGroups()
 		} catch (error) {
-			handleError(error)
+			handleError(toError(error))
 		}
 	}
 
@@ -348,7 +350,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			libraryGroups.value = [...new Set([...libraryGroups.value, groupName])]
 			return true
 		} catch (error) {
-			handleError(error)
+			handleError(toError(error))
 			await refreshGroups()
 			return false
 		} finally {
@@ -356,15 +358,27 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}
 	}
 
+	const deleteGroup = async (groupName: string) => {
+		try {
+			await deleteInstanceGroup(groupName)
+			libraryGroups.value = libraryGroups.value.filter((group) => group !== groupName)
+			return true
+		} catch (error) {
+			handleError(toError(error))
+			await refreshGroups()
+			return false
+		}
+	}
+
 	const deleteInstance = async () => {
 		if (!currentDeleteInstanceId.value) return
 
-		await remove(currentDeleteInstanceId.value).catch(handleError)
+		await remove(currentDeleteInstanceId.value).catch((error) => handleError(toError(error)))
 		currentDeleteInstanceId.value = null
 	}
 
 	const duplicateInstance = async (instanceId: string) => {
-		await install_duplicate_instance(instanceId).catch(handleError)
+		await install_duplicate_instance(instanceId).catch((error) => handleError(toError(error)))
 	}
 
 	const handleInstanceContextMenu = (
@@ -431,7 +445,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 					const groupName = currentContextGroupName.value
 					await edit(item.instance.id, {
 						groups: item.instance.groups.filter((group) => group !== groupName),
-					}).catch(handleError)
+					}).catch((error) => handleError(toError(error)))
 				}
 				break
 			case 'delete':
@@ -462,6 +476,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		closeNewGroupModal,
 		toggleNewGroupInstance,
 		createGroup,
+		deleteGroup,
 		deleteInstance,
 		handleInstanceContextMenu,
 		handleInstanceOption,
