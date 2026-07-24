@@ -149,17 +149,16 @@ const banButtonLabel = computed(() => {
 	return 'Ban from shared instances'
 })
 const memberRows = computed<MemberTableRow[]>(() =>
-	[
-		props.details.owner,
-		...props.details.members.filter((user) => user.joined_at != null),
-	].map((user) => ({
-		id: user.id,
-		username: user.username,
-		avatarUrl: user.avatar_url,
-		lastPlayed: user.last_played ?? null,
-		joined: user.joined_at ?? null,
-		method: user.join_type ?? 'invite',
-	})),
+	[props.details.owner, ...props.details.members.filter((user) => user.joined_at != null)].map(
+		(user) => ({
+			id: user.id,
+			username: user.username,
+			avatarUrl: user.avatar_url,
+			lastPlayed: user.last_played ?? null,
+			joined: user.joined_at ?? null,
+			method: user.join_type ?? 'invite',
+		}),
+	),
 )
 
 async function promptBanOwner() {

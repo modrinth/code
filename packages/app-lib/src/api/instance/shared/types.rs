@@ -48,7 +48,6 @@ impl SharedInstanceUsers {
             tokens: 0,
         }
     }
-
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
