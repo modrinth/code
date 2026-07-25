@@ -1,5 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { FunctionalComponent, InjectionKey, Ref, SVGAttributes } from 'vue'
+import { Checkbox, MarkdownEditor, StyledInput, Toggle } from '@modrinth/ui'
+import type { Component, FunctionalComponent, InjectionKey, Ref, SVGAttributes } from 'vue'
 import { markRaw, toValue } from 'vue'
 
 import {
@@ -54,6 +55,7 @@ export type ChildEntry =
 export type NodeType =
 	| 'toggle'
 	| 'check'
+	| 'switch'
 	| 'button'
 	| 'text'
 	| 'markdown'
@@ -433,13 +435,13 @@ export abstract class ValueNodeBuilder extends LabeledNodeBuilder {
 	}
 }
 
+/**
+ * A click-triggered, icon-capable status button (e.g. "flag this issue") — not a plain value
+ * control, so unlike `check`/`toggleSwitch` (`BooleanComponentNodeBuilder`) it isn't built on
+ * `ComponentNodeBuilder` and keeps its own dedicated `NodeRenderer` rendering.
+ */
 export class BooleanNodeBuilder extends ValueNodeBuilder {
-	readonly type: 'toggle' | 'check'
-
-	constructor(id: string, nodeLabel: string, type: 'toggle' | 'check') {
-		super(id, nodeLabel)
-		this.type = type
-	}
+	readonly type = 'toggle' as const
 }
 
 export type OverrideValue = { readonly __override: string }
@@ -449,7 +451,69 @@ export type OnChangeFn = (
 	helpers: { override: (value: string) => OverrideValue },
 ) => OverrideValue | void
 
-export class InputNodeBuilder extends IdentifiedNodeBuilder {
+export interface ComponentNodePropsContext {
+	onImageUpload?: (file: File) => Promise<string>
+}
+
+/**
+ * Base for any node whose value is edited by mounting a real Vue component rather than
+ * something `NodeRenderer` has its own hardcoded markup for. `NodeRenderer` renders every
+ * instance of this the same generic way (`<component :is="node._component" .../>`), so a new
+ * component-backed node type never needs a `NodeRenderer` change — just a subclass (or, for a
+ * one-off, a direct construction) that fills in `_component` and how its value binds.
+ */
+export abstract class ComponentNodeBuilder extends IdentifiedNodeBuilder {
+	_component?: Component
+	/** v-model prop name; the paired event is `update:${_modelProp}`. Defaults to Vue's own convention. */
+	_modelProp: string = 'modelValue'
+	_componentProps?: (ctx: ComponentNodePropsContext) => Record<string, unknown>
+	/** Extra props layered on top of `_componentProps`, e.g. `.props(() => ({ type: 'email' }))` —
+	 *  the escape hatch into whatever the mounted component actually supports, without needing a
+	 *  dedicated builder method for every prop it happens to have. */
+	_extraProps?: (ctx: ComponentNodePropsContext) => Record<string, unknown>
+	_showTooltip?: boolean
+	/** Needs the ref-based setValue()/button-resync DOM-sync workaround — see `NodeRenderer`'s
+	 *  `componentRefs`. Controlled-input-style components typically need this; components that
+	 *  sync themselves off their own `modelValue` watcher (like `MarkdownEditor`) don't. */
+	_imperativeSync?: boolean
+	/** What shape this node's value is, so `NodeRenderer` knows how to read/write it generically
+	 *  (e.g. `getTextState`/`setTextState` for `'string'`, `getBooleanState`/`setBooleanState` for
+	 *  `'boolean'`) without needing a dedicated render branch per node type. */
+	_valueKind: 'string' | 'boolean' = 'string'
+
+	props(fn: (ctx: ComponentNodePropsContext) => Record<string, unknown>): this {
+		this._extraProps = fn
+		return this
+	}
+}
+
+/** A component-backed node builder, plus a callable setter for any prop name that isn't
+ *  already a real method/property on it. */
+export type WithAutoProps<T> = T & { [key: string]: (value: unknown) => T }
+
+/**
+ * Lets a component-backed node builder be called like `.clearable(true)`/`.size('small')` for
+ * any prop the mounted component actually accepts, without a dedicated method for each one —
+ * same underlying mechanism as `.props()`, just spelled as the prop's own name. Falls through to
+ * the real method/property untouched whenever one already exists with that name (e.g. `.icon()`
+ * from `NodeBuilder`, or `.type` on `InputNodeBuilder`), so this only ever fills genuine gaps.
+ */
+function withAutoProps<T extends ComponentNodeBuilder>(builder: T): WithAutoProps<T> {
+	return new Proxy(builder, {
+		get(target, prop, receiver) {
+			if (typeof prop === 'string' && !(prop in target)) {
+				return (value: unknown) => {
+					const prev = target._extraProps
+					target._extraProps = (ctx) => ({ ...prev?.(ctx), [prop]: value })
+					return receiver
+				}
+			}
+			return Reflect.get(target, prop, receiver)
+		},
+	}) as WithAutoProps<T>
+}
+
+export class InputNodeBuilder extends ComponentNodeBuilder {
 	readonly type: 'text' | 'markdown'
 	_placeholder?: Reactive<string>
 	_defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState)
@@ -459,6 +523,20 @@ export class InputNodeBuilder extends IdentifiedNodeBuilder {
 	constructor(id: string, type: 'text' | 'markdown') {
 		super(id)
 		this.type = type
+		if (type === 'text') {
+			this._component = markRaw(StyledInput)
+			this._showTooltip = true
+			this._imperativeSync = true
+			this._componentProps = () => ({ class: 'min-w-40 flex-1', autocomplete: 'off' })
+		} else {
+			this._component = markRaw(MarkdownEditor)
+			this._componentProps = (ctx) => ({
+				maxHeight: 300,
+				disabled: false,
+				headingButtons: false,
+				onImageUpload: ctx.onImageUpload,
+			})
+		}
 	}
 
 	placeholder(p: Reactive<string>): this {
@@ -482,12 +560,49 @@ export class InputNodeBuilder extends IdentifiedNodeBuilder {
 	}
 }
 
+/**
+ * A plain boolean field — `check` renders as a `Checkbox`, `switch` (exposed as the
+ * `toggleSwitch()` factory, since `switch` is a reserved word) as the `Toggle` slider. Distinct
+ * from `toggle()`/`BooleanNodeBuilder`, which is a click-triggered, icon-capable status button
+ * with its own color-coding logic — not a plain value control, so it stays on its own path.
+ */
+export class BooleanComponentNodeBuilder extends ComponentNodeBuilder {
+	readonly type: 'check' | 'switch'
+	label: string
+	_defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState)
+	_required?: boolean
+
+	constructor(id: string, label: string, type: 'check' | 'switch') {
+		super(id)
+		this.type = type
+		this.label = label
+		this._valueKind = 'boolean'
+		if (type === 'check') {
+			this._component = markRaw(Checkbox)
+			this._componentProps = () => ({ label })
+		} else {
+			this._component = markRaw(Toggle)
+		}
+	}
+
+	initial(v: NodeState | ((state: Record<string, NodeState>) => NodeState)): this {
+		this._defaultValue = v
+		return this
+	}
+
+	required(v = true): this {
+		this._required = v
+		return this
+	}
+}
+
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type = 'group' as const
 	_layout?: 'flex' | 'column'
 	_required?: boolean
 	_selectMode?: 'single' | 'multi'
 	_selectId?: string
+	_defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState)
 
 	layout(l: 'flex' | 'column'): this {
 		this._layout = l
@@ -508,6 +623,12 @@ export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 	multiSelect(id?: string): this {
 		this._selectMode = 'multi'
 		if (id !== undefined) this._selectId = id
+		return this
+	}
+
+	/** Selected option(s) to start with before the moderator has touched this group. */
+	initial(v: NodeState | ((state: Record<string, NodeState>) => NodeState)): this {
+		this._defaultValue = v
 		return this
 	}
 }
@@ -591,6 +712,7 @@ function childrenScopePath(node: IdentifiedNodeBuilder): string[] | null {
 	switch (node.type) {
 		case 'toggle':
 		case 'check':
+		case 'switch':
 		case 'option':
 		case 'stage':
 			return node._statePath
@@ -644,6 +766,7 @@ export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 	switch (node.type) {
 		case 'toggle':
 		case 'check':
+		case 'switch':
 		case 'option': {
 			if (typeof state === 'boolean') return state
 			if (state && typeof state === 'object' && !(state instanceof Set)) {
@@ -834,7 +957,7 @@ export function walkNodes(
 				const nestedState = getBooleanChildState(rawChildState)
 				walkNodes(resolveChildren(childId, nestedState), nestedState, visitor)
 			}
-		} else if (node.type === 'toggle' || node.type === 'check') {
+		} else if (node.type === 'toggle' || node.type === 'check' || node.type === 'switch') {
 			const childState = getBooleanChildState(rawNodeState)
 			walkNodes(children, childState, visitor)
 		} else if (
@@ -881,6 +1004,47 @@ export function resolveDefault(
 const defaultingProxyCache = new WeakMap<object, object>()
 
 /**
+ * Id-less nodes (e.g. an unnamed `group()` used purely for layout/title) don't nest state
+ * under their own key, so their children read/write directly into this same scope — flatten
+ * through them so those grandchildren are still reachable for defaulting purposes. A select-mode
+ * group without a structural id still owns a real key (its `_selectId`), same as `walkNodes`'
+ * own stateKey resolution — only flatten when neither is present.
+ */
+function buildChildMap(
+	children: ChildNode[],
+	stateForFlattening: Record<string, NodeState>,
+): Map<string, IdentifiedNodeBuilder> {
+	const childMap = new Map<string, IdentifiedNodeBuilder>()
+	function collect(nodes: ChildNode[]) {
+		for (const child of nodes) {
+			if (!(child instanceof IdentifiedNodeBuilder)) continue
+			const selectId = child instanceof GroupNodeBuilder ? child._selectId : undefined
+			const key = child.id ?? selectId
+			if (key) {
+				childMap.set(key, child)
+			} else {
+				collect(resolveChildren(child, stateForFlattening))
+			}
+		}
+	}
+	collect(children)
+	return childMap
+}
+
+/**
+ * A dropdown's or select-mode group's "children" are its enumerable options, not nested
+ * sub-fields of a container — chaining into them as an empty scope (or a `withDefaults`-wrapped
+ * nested object) would be wrong, and hands back a Proxy where callers expect the option id
+ * itself. Only plain groups/toggles/checks actually nest state under their own key.
+ */
+function isOptionsContainer(child: IdentifiedNodeBuilder): boolean {
+	return (
+		child instanceof DropdownNodeBuilder ||
+		(child instanceof GroupNodeBuilder && child._selectMode !== undefined)
+	)
+}
+
+/**
  * A stand-in for a container that hasn't been written to yet (e.g. a group or toggle
  * nobody has touched), so reads can chain arbitrarily deep without checking existence
  * first. Reads resolve defaults the same way `withDefaults` does. A write cascades back
@@ -891,10 +1055,7 @@ function emptyScope(
 	children: ChildNode[],
 	writeSelf: (patch: Record<string, NodeState>) => void,
 ): Record<string, NodeState> {
-	const childMap = new Map<string, IdentifiedNodeBuilder>()
-	for (const child of children) {
-		if (child instanceof IdentifiedNodeBuilder && child.id) childMap.set(child.id, child)
-	}
+	const childMap = buildChildMap(children, {})
 
 	const resolving = new Set<string>()
 	const emptyCache = new Map<string, Record<string, NodeState>>()
@@ -916,6 +1077,8 @@ function emptyScope(
 						resolving.delete(key)
 					}
 				}
+
+				if (isOptionsContainer(child)) return undefined
 
 				const cached = emptyCache.get(key)
 				if (cached) return cached
@@ -959,21 +1122,7 @@ export function withDefaults<T extends Record<string, NodeState>>(
 	const cached = defaultingProxyCache.get(rawState)
 	if (cached) return cached as T
 
-	// Id-less nodes (e.g. an unnamed `group()` used purely for layout/title) don't nest state
-	// under their own key, so their children read/write directly into this same scope — flatten
-	// through them so those grandchildren are still reachable by id for defaulting purposes.
-	const childMap = new Map<string, IdentifiedNodeBuilder>()
-	function collectChildMap(nodes: ChildNode[]) {
-		for (const child of nodes) {
-			if (!(child instanceof IdentifiedNodeBuilder)) continue
-			if (child.id) {
-				childMap.set(child.id, child)
-			} else {
-				collectChildMap(resolveChildren(child, rawState))
-			}
-		}
-	}
-	collectChildMap(children)
+	const childMap = buildChildMap(children, rawState)
 
 	// Guards a default function that reads its own key from recursing into itself forever.
 	const resolving = new Set<string>()
@@ -1004,7 +1153,7 @@ export function withDefaults<T extends Record<string, NodeState>>(
 				return withDefaults(nested, resolveChildren(child, nested))
 			}
 
-			if (value === undefined && child !== undefined) {
+			if (value === undefined && child !== undefined && !isOptionsContainer(child)) {
 				const cachedEmpty = emptyCache.get(key)
 				if (cachedEmpty) return cachedEmpty
 
@@ -1047,13 +1196,14 @@ export function stageFn(factory: StageFn): StageFn {
 	}
 }
 
-export const toggle = (id: string, nodeLabel: string) =>
-	new BooleanNodeBuilder(id, nodeLabel, 'toggle')
+export const toggle = (id: string, nodeLabel: string) => new BooleanNodeBuilder(id, nodeLabel)
 export const check = (id: string, nodeLabel: string) =>
-	new BooleanNodeBuilder(id, nodeLabel, 'check')
+	withAutoProps(new BooleanComponentNodeBuilder(id, nodeLabel, 'check'))
+export const toggleSwitch = (id: string, nodeLabel: string) =>
+	withAutoProps(new BooleanComponentNodeBuilder(id, nodeLabel, 'switch'))
 export const button = (nodeLabel?: string) => new ButtonNodeBuilder(nodeLabel)
-export const text = (id: string) => new InputNodeBuilder(id, 'text')
-export const markdown = (id: string) => new InputNodeBuilder(id, 'markdown')
+export const text = (id: string) => withAutoProps(new InputNodeBuilder(id, 'text'))
+export const markdown = (id: string) => withAutoProps(new InputNodeBuilder(id, 'markdown'))
 export const group = (id?: string) => new GroupNodeBuilder(id)
 export const dropdown = (id: string) => new DropdownNodeBuilder(id)
 export const option = (id: string, nodeLabel: string) => new OptionNodeBuilder(id, nodeLabel)

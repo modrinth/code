@@ -1065,7 +1065,12 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 				isVisible = true
 				const active = isNodeActive(node, nodeState)
 				const actionState = (() => {
-					if (node.type !== 'toggle' && node.type !== 'check' && node.type !== 'option')
+					if (
+						node.type !== 'toggle' &&
+						node.type !== 'check' &&
+						node.type !== 'switch' &&
+						node.type !== 'option'
+					)
 						return localState
 					const childState = getBooleanChildState(nodeState) as Record<string, NodeState>
 					return withDefaults(childState, resolveChildren(node, childState))
