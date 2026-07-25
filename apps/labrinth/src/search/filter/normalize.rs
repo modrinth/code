@@ -1,5 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
+use smallvec::SmallVec;
+
 use super::{
     FilterComparison, FilterCondition, FilterExpr, FilterField, FilterLiteral,
     FilterPredicate,
@@ -7,9 +9,67 @@ use super::{
 
 pub fn normalize(expression: FilterExpr) -> FilterExpr {
     match expression {
-        FilterExpr::And(expressions) => normalize_and(expressions),
-        FilterExpr::Or(expressions) => normalize_or(expressions),
+        FilterExpr::And(expressions) => normalize_and(*expressions),
+        FilterExpr::Or(expressions) => normalize_or(*expressions),
+        FilterExpr::Not(expression) => normalize_not(*expression),
         FilterExpr::Predicate(predicate) => normalize_predicate(predicate),
+    }
+}
+
+fn normalize_not(expression: FilterExpr) -> FilterExpr {
+    match expression {
+        FilterExpr::And(expressions) => normalize_or(
+            (*expressions)
+                .into_iter()
+                .map(|expression| FilterExpr::Not(Box::new(expression)))
+                .collect(),
+        ),
+        FilterExpr::Or(expressions) => normalize_and(
+            (*expressions)
+                .into_iter()
+                .map(|expression| FilterExpr::Not(Box::new(expression)))
+                .collect(),
+        ),
+        FilterExpr::Not(expression) => normalize(*expression),
+        FilterExpr::Predicate(mut predicate) => {
+            predicate.condition = match predicate.condition {
+                FilterCondition::Compare { comparison, value } => {
+                    FilterCondition::Compare {
+                        comparison: match comparison {
+                            FilterComparison::Equal => {
+                                FilterComparison::NotEqual
+                            }
+                            FilterComparison::NotEqual => {
+                                FilterComparison::Equal
+                            }
+                            FilterComparison::GreaterThan => {
+                                FilterComparison::LessThanOrEqual
+                            }
+                            FilterComparison::GreaterThanOrEqual => {
+                                FilterComparison::LessThan
+                            }
+                            FilterComparison::LessThan => {
+                                FilterComparison::GreaterThanOrEqual
+                            }
+                            FilterComparison::LessThanOrEqual => {
+                                FilterComparison::GreaterThan
+                            }
+                        },
+                        value,
+                    }
+                }
+                FilterCondition::In { values, negated } => {
+                    FilterCondition::In {
+                        values,
+                        negated: !negated,
+                    }
+                }
+                FilterCondition::Exists { negated } => {
+                    FilterCondition::Exists { negated: !negated }
+                }
+            };
+            normalize_predicate(predicate)
+        }
     }
 }
 
@@ -29,30 +89,34 @@ fn normalize_predicate(predicate: FilterPredicate) -> FilterExpr {
     FilterExpr::Predicate(predicate)
 }
 
-fn normalize_and(expressions: Vec<FilterExpr>) -> FilterExpr {
-    let mut normalized = expressions
-        .into_iter()
-        .map(normalize)
-        .flat_map(|expression| match expression {
-            FilterExpr::And(children) => children,
-            expression => vec![expression],
-        })
-        .collect::<Vec<_>>();
+fn normalize_and(expressions: SmallVec<[FilterExpr; 4]>) -> FilterExpr {
+    let mut normalized = expressions.into_iter().map(normalize).fold(
+        SmallVec::<[_; 4]>::new(),
+        |mut flattened, expression| {
+            match expression {
+                FilterExpr::And(children) => flattened.extend(*children),
+                expression => flattened.push(expression),
+            }
+            flattened
+        },
+    );
     normalized.sort();
     normalized.dedup();
 
     FilterExpr::and(normalized).expect("an AND expression is non-empty")
 }
 
-fn normalize_or(expressions: Vec<FilterExpr>) -> FilterExpr {
-    let mut normalized = expressions
-        .into_iter()
-        .map(normalize)
-        .flat_map(|expression| match expression {
-            FilterExpr::Or(children) => children,
-            expression => vec![expression],
-        })
-        .collect::<Vec<_>>();
+fn normalize_or(expressions: SmallVec<[FilterExpr; 4]>) -> FilterExpr {
+    let mut normalized = expressions.into_iter().map(normalize).fold(
+        SmallVec::<[_; 4]>::new(),
+        |mut flattened, expression| {
+            match expression {
+                FilterExpr::Or(children) => flattened.extend(*children),
+                expression => flattened.push(expression),
+            }
+            flattened
+        },
+    );
     normalized.sort();
     normalized.dedup();
 
@@ -210,7 +274,7 @@ fn predicate_clause(
                 _ => None,
             })
             .collect(),
-        FilterExpr::Or(_) => None,
+        FilterExpr::Or(_) | FilterExpr::Not(_) => None,
     }
 }
 
@@ -318,6 +382,24 @@ mod tests {
                 "project_types = modpack AND game_versions IN [{}] AND categories IN [fabric, forge] AND categories = technology",
                 versions.join(", ")
             ))
+            .unwrap(),
+        );
+
+        assert_eq!(normalized, expected);
+    }
+
+    #[test]
+    fn normalizes_unary_not() {
+        let normalized = normalize(
+            parse_expression(
+                r#"NOT"project_id"="8xOSkvVU" AND NOT (downloads > 100 OR open_source = true)"#,
+            )
+            .unwrap(),
+        );
+        let expected = normalize(
+            parse_expression(
+                r#"project_id != "8xOSkvVU" AND downloads <= 100 AND open_source != true"#,
+            )
             .unwrap(),
         );
 

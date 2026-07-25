@@ -158,6 +158,9 @@ fn lower(filter: &FilterExpr, version: bool) -> Result<TypesenseFilter<'_>> {
             validate_predicate(predicate)?;
             Ok(TypesenseFilter::Predicate { predicate, version })
         }
+        FilterExpr::Not(_) => {
+            Err(eyre!("search filter contains an unnormalized negation"))
+        }
     }
 }
 
@@ -199,6 +202,7 @@ fn filter_scope(filter: &FilterExpr) -> FilterScope {
                 FilterScope::Mixed
             }
         }
+        FilterExpr::Not(expression) => filter_scope(expression),
     }
 }
 
@@ -214,7 +218,7 @@ fn to_dnf(filter: &FilterExpr) -> Result<Vec<Vec<&FilterPredicate>>> {
         FilterExpr::Predicate(predicate) => Ok(vec![vec![predicate]]),
         FilterExpr::Or(expressions) => {
             let mut clauses = Vec::new();
-            for expression in expressions {
+            for expression in expressions.iter() {
                 clauses.extend(to_dnf(expression)?);
                 if clauses.len() > MAX_DNF_CLAUSES {
                     return Err(eyre!(
@@ -226,7 +230,7 @@ fn to_dnf(filter: &FilterExpr) -> Result<Vec<Vec<&FilterPredicate>>> {
         }
         FilterExpr::And(expressions) => {
             let mut clauses = vec![Vec::new()];
-            for expression in expressions {
+            for expression in expressions.iter() {
                 let right = to_dnf(expression)?;
                 if clauses.len().saturating_mul(right.len()) > MAX_DNF_CLAUSES {
                     return Err(eyre!(
@@ -245,6 +249,9 @@ fn to_dnf(filter: &FilterExpr) -> Result<Vec<Vec<&FilterPredicate>>> {
                     .collect();
             }
             Ok(clauses)
+        }
+        FilterExpr::Not(_) => {
+            Err(eyre!("search filter contains an unnormalized negation"))
         }
     }
 }
@@ -269,6 +276,10 @@ fn filter_complexity(filter: &FilterExpr) -> (usize, usize) {
                     (nodes + child_nodes, depth.max(child_depth + 1))
                 },
             )
+        }
+        FilterExpr::Not(expression) => {
+            let (nodes, depth) = filter_complexity(expression);
+            (nodes + 1, depth + 1)
         }
     }
 }
@@ -434,6 +445,16 @@ mod tests {
         assert_eq!(
             serialize(r#"license = "value, with (syntax) and `tick`""#),
             r#"license:=`value, with (syntax) and \`tick\``"#,
+        );
+    }
+
+    #[test]
+    fn serializes_legacy_unary_not_filters() {
+        assert_eq!(
+            serialize(
+                r#"NOT"project_id"="8xOSkvVU" AND NOT"project_id"="DRol93FL""#
+            ),
+            "project_id:!=`8xOSkvVU` && project_id:!=`DRol93FL`"
         );
     }
 

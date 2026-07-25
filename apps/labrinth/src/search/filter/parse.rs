@@ -18,16 +18,25 @@ pub struct FilterParseError {
 fn keyword(
     keyword: &'static str,
 ) -> BoxedParser<'static, char, (), Simple<char>> {
-    keyword
-        .chars()
-        .fold(empty().ignored().boxed(), |parser, character| {
-            parser
-                .then_ignore(one_of([
-                    character.to_ascii_lowercase(),
-                    character.to_ascii_uppercase(),
-                ]))
-                .boxed()
-        })
+    let keyword =
+        keyword
+            .chars()
+            .fold(empty().ignored().boxed(), |parser, character| {
+                parser
+                    .then_ignore(one_of([
+                        character.to_ascii_lowercase(),
+                        character.to_ascii_uppercase(),
+                    ]))
+                    .boxed()
+            });
+    let boundary = filter(|character: &char| {
+        !character.is_ascii_alphanumeric() && !"_.".contains(*character)
+    })
+    .rewind()
+    .ignored()
+    .or(end());
+
+    keyword.then_ignore(boundary).boxed()
 }
 
 fn quoted_literal(
@@ -63,8 +72,8 @@ fn literal_parser() -> BoxedParser<'static, char, FilterLiteral, Simple<char>> {
     quoted.or(bare).padded().boxed()
 }
 
-fn parser() -> impl Parser<char, FilterExpr, Error = Simple<char>> {
-    let field = filter(|character: &char| {
+fn field_name_parser() -> BoxedParser<'static, char, String, Simple<char>> {
+    filter(|character: &char| {
         character.is_ascii_alphabetic() || "_.".contains(*character)
     })
     .then(
@@ -73,9 +82,19 @@ fn parser() -> impl Parser<char, FilterExpr, Error = Simple<char>> {
         })
         .repeated(),
     )
-    .map(|(first, rest)| {
-        FilterField::new(std::iter::once(first).chain(rest).collect::<String>())
-    })
+    .map(|(first, rest)| std::iter::once(first).chain(rest).collect::<String>())
+    .boxed()
+}
+
+fn parser() -> impl Parser<char, FilterExpr, Error = Simple<char>> {
+    let field_name = field_name_parser();
+    let field = choice((
+        field_name.clone(),
+        field_name.clone().delimited_by(just('"'), just('"')),
+        field_name.clone().delimited_by(just('\''), just('\'')),
+        field_name.delimited_by(just('`'), just('`')),
+    ))
+    .map(FilterField::new)
     .padded();
 
     let literal = literal_parser();
@@ -131,9 +150,16 @@ fn parser() -> impl Parser<char, FilterExpr, Error = Simple<char>> {
             .clone()
             .or(expression.delimited_by(just('(').padded(), just(')').padded()))
             .padded();
-        let and = atom
+        let unary = keyword("NOT").padded().repeated().then(atom).map(
+            |(operators, expression)| {
+                operators.into_iter().fold(expression, |expression, ()| {
+                    FilterExpr::Not(Box::new(expression))
+                })
+            },
+        );
+        let and = unary
             .clone()
-            .then(keyword("AND").padded().ignore_then(atom).repeated())
+            .then(keyword("AND").padded().ignore_then(unary).repeated())
             .map(|(first, rest)| {
                 FilterExpr::and(std::iter::once(first).chain(rest))
                     .expect("an expression always contains one operand")
@@ -167,7 +193,9 @@ pub fn parse_expression(input: &str) -> Result<FilterExpr, FilterParseError> {
 #[cfg(test)]
 mod tests {
     use super::parse_expression;
-    use crate::search::filter::{FilterCondition, FilterExpr, FilterLiteral};
+    use crate::search::filter::{
+        FilterComparison, FilterCondition, FilterExpr, FilterLiteral,
+    };
 
     #[test]
     fn parses_boolean_precedence() {
@@ -203,5 +231,36 @@ mod tests {
                 ..
             } if value == "value with spaces"
         ));
+    }
+
+    #[test]
+    fn parses_unary_not_with_quoted_field() {
+        let expression =
+            parse_expression(r#"NOT"project_id"="8xOSkvVU""#).unwrap();
+
+        let FilterExpr::Not(expression) = expression else {
+            panic!("expected a NOT expression");
+        };
+        let FilterExpr::Predicate(predicate) = *expression else {
+            panic!("expected a predicate");
+        };
+        assert_eq!(predicate.field.as_str(), "project_id");
+        assert!(matches!(
+            predicate.condition,
+            FilterCondition::Compare {
+                comparison: FilterComparison::Equal,
+                value: FilterLiteral::String(value),
+            } if value == "8xOSkvVU"
+        ));
+    }
+
+    #[test]
+    fn does_not_parse_not_prefix_in_field_name_as_operator() {
+        let expression = parse_expression("notification = true").unwrap();
+
+        let FilterExpr::Predicate(predicate) = expression else {
+            panic!("expected a predicate");
+        };
+        assert_eq!(predicate.field.as_str(), "notification");
     }
 }

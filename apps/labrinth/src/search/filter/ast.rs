@@ -1,26 +1,31 @@
+use smallvec::SmallVec;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum FilterExpr {
-    And(Vec<Self>),
-    Or(Vec<Self>),
+    And(Box<SmallVec<[Self; 4]>>),
+    Or(Box<SmallVec<[Self; 4]>>),
+    Not(Box<Self>),
     Predicate(FilterPredicate),
 }
 
 impl FilterExpr {
     pub fn and(expressions: impl IntoIterator<Item = Self>) -> Option<Self> {
-        let mut expressions = expressions.into_iter().collect::<Vec<_>>();
+        let mut expressions =
+            expressions.into_iter().collect::<SmallVec<[_; 4]>>();
         match expressions.len() {
             0 => None,
             1 => expressions.pop(),
-            _ => Some(Self::And(expressions)),
+            _ => Some(Self::And(Box::new(expressions))),
         }
     }
 
     pub fn or(expressions: impl IntoIterator<Item = Self>) -> Option<Self> {
-        let mut expressions = expressions.into_iter().collect::<Vec<_>>();
+        let mut expressions =
+            expressions.into_iter().collect::<SmallVec<[_; 4]>>();
         match expressions.len() {
             0 => None,
             1 => expressions.pop(),
-            _ => Some(Self::Or(expressions)),
+            _ => Some(Self::Or(Box::new(expressions))),
         }
     }
 }

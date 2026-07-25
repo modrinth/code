@@ -5519,6 +5519,7 @@ dependencies = [
  "serde_with",
  "sha1 0.10.6",
  "sha2",
+ "smallvec",
  "spdx",
  "sqlx",
  "sqlx-tracing",
