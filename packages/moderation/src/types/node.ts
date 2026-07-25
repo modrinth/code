@@ -831,7 +831,8 @@ export function walkNodes(
 						? { ...(rawChildState as NodeStateWithChildren), value: true }
 						: (rawChildState ?? true)
 				visitor(childId, childState, scopedState)
-				walkNodes(resolveChildren(childId, stageState), stageState, visitor)
+				const nestedState = getBooleanChildState(rawChildState)
+				walkNodes(resolveChildren(childId, nestedState), nestedState, visitor)
 			}
 		} else if (node.type === 'toggle' || node.type === 'check') {
 			const childState = getBooleanChildState(rawNodeState)
@@ -856,7 +857,8 @@ export function walkNodes(
 							? { ...(rawChildState as NodeStateWithChildren), value: true }
 							: (rawChildState ?? true)
 					visitor(childId, childState, scopedState)
-					walkNodes(resolveChildren(childId, stageState), stageState, visitor)
+					const nestedState = getBooleanChildState(rawChildState)
+					walkNodes(resolveChildren(childId, nestedState), nestedState, visitor)
 					break
 				}
 			}
@@ -957,10 +959,21 @@ export function withDefaults<T extends Record<string, NodeState>>(
 	const cached = defaultingProxyCache.get(rawState)
 	if (cached) return cached as T
 
+	// Id-less nodes (e.g. an unnamed `group()` used purely for layout/title) don't nest state
+	// under their own key, so their children read/write directly into this same scope — flatten
+	// through them so those grandchildren are still reachable by id for defaulting purposes.
 	const childMap = new Map<string, IdentifiedNodeBuilder>()
-	for (const child of children) {
-		if (child instanceof IdentifiedNodeBuilder && child.id) childMap.set(child.id, child)
+	function collectChildMap(nodes: ChildNode[]) {
+		for (const child of nodes) {
+			if (!(child instanceof IdentifiedNodeBuilder)) continue
+			if (child.id) {
+				childMap.set(child.id, child)
+			} else {
+				collectChildMap(resolveChildren(child, rawState))
+			}
+		}
 	}
+	collectChildMap(children)
 
 	// Guards a default function that reads its own key from recursing into itself forever.
 	const resolving = new Set<string>()

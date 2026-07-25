@@ -64,8 +64,15 @@ export default function () {
 	}
 
 	const SlugStatus = () => {
-		const v = slugValidation.value
-		if (v === null) return null
+		// Untouched — reflect the auto-suggested slug already sitting in the field (the value
+		// that'll actually be used until the moderator overrides it) via the same states below.
+		const v =
+			slugValidation.value ??
+			(autoSlugStatus.value === 'loading'
+				? 'checking'
+				: autoSlugStatus.value === 'unavailable'
+					? 'taken'
+					: 'available')
 		if (v === 'checking')
 			return (
 				<Alert type="checking" class="w-full">
@@ -325,7 +332,7 @@ export default function () {
 								})
 								.fix(
 									fix().project((patch, state) => {
-										const slug = state['correct-slug']
+										const slug = state['correct-slug'] as string
 										if (!slug || slug === project.value.slug) return
 										patch.slug = slug
 									}),

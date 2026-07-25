@@ -1064,10 +1064,12 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 			walkNodes(resolveChildren(stage, stageState), stageState, (node, nodeState, localState) => {
 				isVisible = true
 				const active = isNodeActive(node, nodeState)
-				const actionState =
-					node.type === 'toggle' || node.type === 'check' || node.type === 'option'
-						? (getBooleanChildState(nodeState) as Record<string, NodeState>)
-						: localState
+				const actionState = (() => {
+					if (node.type !== 'toggle' && node.type !== 'check' && node.type !== 'option')
+						return localState
+					const childState = getBooleanChildState(nodeState) as Record<string, NodeState>
+					return withDefaults(childState, resolveChildren(node, childState))
+				})()
 				const isRequired = !!(node as ValueNodeBuilder)._required
 				const nodeActiveActions: ActiveAction[] = []
 
