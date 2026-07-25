@@ -2,7 +2,7 @@ import { VersionIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { dropdown, group, option, stage, text, toggle } from '../../types/node'
+import { check, dropdown, group, stage, text, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -30,13 +30,13 @@ export default function () {
 							.title('Correct Project Type')
 							.none('Unknown')
 							.children(
-								option('modpack', 'Modpack')
+								check('modpack', 'Modpack')
 									.shown(computed(() => !project.value.project_types.includes('modpack')))
 									.message(),
-								option('resourcepack', 'Resource Pack')
+								check('resourcepack', 'Resource Pack')
 									.shown(computed(() => !project.value.project_types.includes('resourcepack')))
 									.message(),
-								option('datapack', 'Data Pack')
+								check('datapack', 'Data Pack')
 									.shown(computed(() => !project.value.loaders.includes('datapack')))
 									.message(),
 							),
@@ -51,9 +51,9 @@ export default function () {
 							.title('Distribution Type')
 							.none('Unknown')
 							.children(
-								option('primary', 'Primary Files').message(),
-								option('additional', 'Additional Files').message(),
-								option('mono', 'Monofile')
+								check('primary', 'Primary Files').message(),
+								check('additional', 'Additional Files').message(),
+								check('mono', 'Monofile')
 									.shown(
 										computed(
 											() =>
@@ -62,13 +62,13 @@ export default function () {
 										),
 									)
 									.message(),
-								option('server', 'Server Files (Primary Files)')
+								check('server', 'Server Files (Primary Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.message(),
-								option('server-additional', 'Server Files (Additional Files)')
+								check('server-additional', 'Server Files (Additional Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.message(),
-								option('zip', 'mods.zip')
+								check('zip', 'mods.zip')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.message(),
 							),

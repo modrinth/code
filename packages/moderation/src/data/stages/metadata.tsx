@@ -3,7 +3,7 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { dropdown, fix, group, md, option, stage, toggle } from '../../types/node'
+import { appComponent, check, dropdown, fix, group, md, stage, toggle } from '../../types/node'
 import { requiresEnvironmentInfo } from '../../utils'
 
 const loaderLabels: Record<string, string> = {
@@ -25,17 +25,11 @@ function formatLoaderLabel(id: string): string {
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
-	const { loaders } = injectTags()
+	const { loaders, gameVersions } = injectTags()
 
-	const possibleLoaders = computed(() => {
-		const projectTypes = new Set(project.value.project_types)
-		const current = new Set(project.value.loaders)
-		return loaders.value.filter(
-			(loader) =>
-				current.has(loader.name) ||
-				loader.supported_project_types.every((t) => projectTypes.has(t)),
-		)
-	})
+	// `game_versions` isn't a fixed field on `Labrinth.Projects.v3.Project` — it's a dynamic
+	// loader field only reachable through the type's untyped index signature.
+	const currentGameVersions = computed(() => (project.value.game_versions as string[] | undefined) ?? [])
 
 	return (
 		stage('metadata', 'Metadata')
@@ -107,14 +101,14 @@ export default function () {
 										.children(
 											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
 												.filter((id) => id !== 'unknown')
-												.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
-											option('mixed', 'Mixed'),
+												.map((id) => check(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
+											check('mixed', 'Mixed'),
 										)
 										.none('Unknown'),
 								),
 						),
 
-					toggle('loader', `Loader${project.value.loaders.length > 1 ? 's' : ''}`)
+					toggle('loader', 'Loaders')
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.rawMessage(async (state) => {
@@ -148,15 +142,60 @@ export default function () {
 							}),
 						)
 						.children(
-							group()
-								.title('Loaders')
-								.multiSelect('loaders')
+							appComponent('loaders', 'loader-picker')
+								.valueKind('set')
 								.initial(() => new Set(project.value.loaders))
-								.children(
-									...possibleLoaders.value.map((loader) =>
-										option(loader.name, formatLoaderLabel(loader.name)),
-									),
-								),
+								.props((ctx) => ({
+									loaders: loaders.value,
+									toggleLoader: ctx.toggleSetValue,
+								})),
+						),
+
+					toggle('game-version', 'Game Versions')
+						.suggestedStatus('flagged')
+						.severity('medium')
+						.rawMessage(async (state) => {
+							const selected =
+								state['game-versions'] instanceof Set
+									? state['game-versions']
+									: new Set(currentGameVersions.value)
+							const current = new Set(currentGameVersions.value)
+							const isCorrected =
+								selected.size !== current.size || [...selected].some((id) => !current.has(id))
+
+							let correct = ''
+							if (isCorrected) {
+								const list = [...selected].join(', ')
+								correct = await md('checklist/messages/metadata/game-version/correction', () => ({
+									GAME_VERSIONS: list || 'none',
+								}))(state)
+							}
+
+							return md('checklist/messages/metadata/game-version/inaccurate', () => ({
+								CORRECT: correct,
+							}))(state)
+						})
+						.fix(
+							fix().project((patch, state) => {
+								const selected =
+									state['game-versions'] instanceof Set
+										? state['game-versions']
+										: new Set(currentGameVersions.value)
+								const next = [...selected]
+								const current = currentGameVersions.value
+								if (next.length === current.length && next.every((id) => current.includes(id)))
+									return
+								patch.game_versions = next
+							}),
+						)
+						.children(
+							appComponent('game-versions', 'game-version-picker')
+								.valueKind('set')
+								.initial(() => new Set(currentGameVersions.value))
+								.props(() => ({
+									gameVersions: gameVersions.value,
+									noHeader: true,
+								})),
 						),
 				),
 			)

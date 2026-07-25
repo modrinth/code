@@ -11,7 +11,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import { md, type NodeState } from '../../types/node'
-import { button, fix, group, option, stage, text, toggle } from '../../types/node'
+import { button, check, fix, group, stage, text, toggle } from '../../types/node'
 
 const STALE_TIME = 1000 * 60 * 5
 
@@ -230,11 +230,11 @@ export default function () {
 								.title('Similarities Additional Info')
 								.multiSelect('options')
 								.children(
-									option('modpack', 'Modpack Named After Mod')
+									check('modpack', 'Modpack Named After Mod')
 										.shown(computed(() => project.value.project_types.includes('modpack')))
 										.message(),
 
-									option('fork', 'Forked Project')
+									check('fork', 'Forked Project')
 										.shown(computed(() => !project.value?.minecraft_server))
 										.message(),
 								),

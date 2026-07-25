@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type {
+	AppComponentNodeBuilder,
 	BooleanNodeBuilder,
 	ButtonNodeBuilder,
 	ChildNode,
@@ -32,7 +33,17 @@ import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
 import { renderHighlightedString, renderString } from '@modrinth/utils'
 import { inject, nextTick, reactive, watchEffect } from 'vue'
 
+import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
+
 import { NODE_META_KEY, STATE_KEY } from './checklist-context'
+
+// Components that live in `apps/frontend` rather than `@modrinth/ui`, so `node.ts` (in
+// `packages/moderation`) can't reference them directly — resolved here by `_rendererKey` instead.
+const appComponentsByKey: Record<string, unknown> = {
+	'loader-picker': LoaderPicker,
+	'game-version-picker': McVersionPicker,
+}
 
 const nodeMetaMap = inject(NODE_META_KEY)
 const injectedGlobalState = inject(STATE_KEY)
@@ -270,17 +281,40 @@ function getPlaceholder(node: InputNodeBuilder): string | undefined {
 	return undefined
 }
 
-function getComponentValue(node: ComponentNodeBuilder): NodeState {
+function toggleMultiSelectValue(node: IdentifiedNodeBuilder, value: string): void {
+	const selected = new Set(getMultiSelectState(node))
+	if (selected.has(value)) selected.delete(value)
+	else selected.add(value)
+	const hasDefault = (node as ValueNodeBuilder)._defaultValue !== undefined
+	setNodeState(node, selected.size > 0 || hasDefault ? selected : undefined)
+}
+
+function resolveComponent(node: ComponentNodeBuilder): unknown {
+	if (node._component) return node._component
+	const rendererKey = (node as AppComponentNodeBuilder)._rendererKey
+	return rendererKey ? appComponentsByKey[rendererKey] : undefined
+}
+
+function getComponentValue(node: ComponentNodeBuilder): NodeState | string[] {
 	const identified = node as IdentifiedNodeBuilder
-	return node._valueKind === 'boolean' ? getBooleanState(identified) : getTextState(identified)
+	if (node._valueKind === 'boolean') return getBooleanState(identified)
+	if (node._valueKind === 'set') {
+		return Array.from(getMultiSelectState(identified))
+	}
+	return getTextState(identified)
 }
 
 function getComponentProps(node: ComponentNodeBuilder): Record<string, unknown> {
-	const ctx: ComponentNodePropsContext = { onImageUpload: props.onImageUpload }
+	const identified = node as IdentifiedNodeBuilder
+	const ctx: ComponentNodePropsContext = {
+		onImageUpload: props.onImageUpload,
+		toggleSetValue:
+			node._valueKind === 'set' ? (value: string) => toggleMultiSelectValue(identified, value) : undefined,
+	}
 	return {
-		id: `node-${(node as IdentifiedNodeBuilder).id}`,
+		id: `node-${identified.id}`,
 		placeholder: getPlaceholder(node as InputNodeBuilder),
-		disabled: !isEnabled(node as IdentifiedNodeBuilder),
+		disabled: !isEnabled(identified),
 		...node._componentProps?.(ctx),
 		...node._extraProps?.(ctx),
 	}
@@ -290,8 +324,15 @@ function getComponentListeners(node: ComponentNodeBuilder): Record<string, (v: u
 	return {
 		[`update:${node._modelProp}`]: (v: unknown) => {
 			const identified = node as IdentifiedNodeBuilder
-			if (node._valueKind === 'boolean') setBooleanState(identified, v as boolean)
-			else setTextState(identified, v as string)
+			if (node._valueKind === 'boolean') {
+				setBooleanState(identified, v as boolean)
+			} else if (node._valueKind === 'set') {
+				const hasDefault = (node as ValueNodeBuilder)._defaultValue !== undefined
+				const next = new Set(v as string[])
+				setNodeState(identified, next.size > 0 || hasDefault ? next : undefined)
+			} else {
+				setTextState(identified, v as string)
+			}
 		},
 	}
 }
@@ -534,7 +575,10 @@ watchEffect(async () => {
 						getBooleanChildState(getNodeState(optNode)) as Record<string, NodeState>,
 					)
 				}
-			} else if (child.type === 'toggle' || child.type === 'check' || child.type === 'switch') {
+			} else if (
+				child.type === 'toggle' ||
+				(child instanceof ComponentNodeBuilder && child._valueKind === 'boolean')
+			) {
 				if (!getBooleanState(childNode)) continue
 				result += await evalNodeTooltip(
 					childNode,
@@ -784,7 +828,7 @@ watchEffect(async () => {
 					<!-- component-backed (text, markdown, check, toggleSwitch, and any future component node) -->
 					<template v-else-if="item instanceof ComponentNodeBuilder">
 						<component
-							:is="asComponentNode(item)._component"
+							:is="resolveComponent(asComponentNode(item))"
 							:ref="(el: any) => (el ? componentRefs.set(item, el) : componentRefs.delete(item))"
 							v-tooltip="
 								asComponentNode(item)._showTooltip ? getTooltipConfig(item, showContext) : undefined
@@ -813,7 +857,8 @@ watchEffect(async () => {
 				v-if="
 					item instanceof NodeBuilder &&
 					isVisible(item) &&
-					(item.type === 'toggle' || item.type === 'check' || item.type === 'switch') &&
+					(item.type === 'toggle' ||
+						(item instanceof ComponentNodeBuilder && item._valueKind === 'boolean')) &&
 					getBooleanState(asIdentified(item)) &&
 					getChildren(asIdentified(item)).length
 				"

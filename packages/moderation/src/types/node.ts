@@ -61,8 +61,8 @@ export type NodeType =
 	| 'markdown'
 	| 'group'
 	| 'dropdown'
-	| 'option'
 	| 'stage'
+	| 'app-component'
 
 // ─── Message helpers ──────────────────────────────────────────────────────────
 
@@ -453,6 +453,11 @@ export type OnChangeFn = (
 
 export interface ComponentNodePropsContext {
 	onImageUpload?: (file: File) => Promise<string>
+	/** For `_valueKind: 'set'` nodes — toggles one value in/out of the underlying `Set`. State
+	 *  mutation only exists in `NodeRenderer` (state lives via Vue's provide/inject, not
+	 *  something `node.ts` can reach), so this is how a `.props()` closure reaches it — map it to
+	 *  whatever prop name the actual mounted component expects (e.g. `toggleLoader`). */
+	toggleSetValue?: (value: string) => void
 }
 
 /**
@@ -476,13 +481,23 @@ export abstract class ComponentNodeBuilder extends IdentifiedNodeBuilder {
 	 *  `componentRefs`. Controlled-input-style components typically need this; components that
 	 *  sync themselves off their own `modelValue` watcher (like `MarkdownEditor`) don't. */
 	_imperativeSync?: boolean
-	/** What shape this node's value is, so `NodeRenderer` knows how to read/write it generically
-	 *  (e.g. `getTextState`/`setTextState` for `'string'`, `getBooleanState`/`setBooleanState` for
-	 *  `'boolean'`) without needing a dedicated render branch per node type. */
-	_valueKind: 'string' | 'boolean' = 'string'
+	/** What shape this node's value is, so `NodeRenderer`/`isNodeActive`/`childrenScopePath` know
+	 *  how to read/write/interpret it generically (`'string'`, `'boolean'`, or `'set'` for a
+	 *  multi-value picker) without needing a dedicated case added per node type. */
+	_valueKind: 'string' | 'boolean' | 'set' = 'string'
 
 	props(fn: (ctx: ComponentNodePropsContext) => Record<string, unknown>): this {
 		this._extraProps = fn
+		return this
+	}
+
+	valueKind(kind: 'string' | 'boolean' | 'set'): this {
+		this._valueKind = kind
+		return this
+	}
+
+	modelProp(name: string): this {
+		this._modelProp = name
 		return this
 	}
 }
@@ -596,6 +611,30 @@ export class BooleanComponentNodeBuilder extends ComponentNodeBuilder {
 	}
 }
 
+/**
+ * A component-backed node whose actual Vue component can't be referenced from `node.ts` — it's
+ * app-specific (e.g. lives in `apps/frontend`), not part of `@modrinth/ui`, which is all
+ * `node.ts` can import. `NodeRenderer` resolves the real component itself from `_rendererKey`
+ * instead of `_component` being set here. Construct directly for a one-off use; wrap in a
+ * dedicated factory/subclass (mirroring `InputNodeBuilder`/`BooleanComponentNodeBuilder`) if it
+ * ends up reused.
+ */
+export class AppComponentNodeBuilder extends ComponentNodeBuilder {
+	readonly type = 'app-component' as const
+	_rendererKey: string
+	_defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState)
+
+	constructor(id: string, rendererKey: string) {
+		super(id)
+		this._rendererKey = rendererKey
+	}
+
+	initial(v: NodeState | ((state: Record<string, NodeState>) => NodeState)): this {
+		this._defaultValue = v
+		return this
+	}
+}
+
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 	readonly type = 'group' as const
 	_layout?: 'flex' | 'column'
@@ -638,12 +677,12 @@ export class DropdownNodeBuilder extends IdentifiedNodeBuilder {
 	_none?: string
 
 	override children(fn: ChildrenFn): this
-	override children(...nodes: OptionNodeBuilder[]): this
-	override children(...args: [ChildrenFn] | OptionNodeBuilder[]): this {
+	override children(...nodes: IdentifiedNodeBuilder[]): this
+	override children(...args: [ChildrenFn] | IdentifiedNodeBuilder[]): this {
 		if (args.length === 1 && typeof args[0] === 'function' && args[0].length >= 1) {
 			super.children(args[0] as ChildrenFn)
 		} else {
-			super.children(...(args as OptionNodeBuilder[]))
+			super.children(...(args as IdentifiedNodeBuilder[]))
 		}
 		return this
 	}
@@ -652,10 +691,6 @@ export class DropdownNodeBuilder extends IdentifiedNodeBuilder {
 		this._none = text
 		return this
 	}
-}
-
-export class OptionNodeBuilder extends LabeledNodeBuilder {
-	readonly type = 'option' as const
 }
 
 export class StageNodeBuilder extends LabeledNodeBuilder {
@@ -709,11 +744,14 @@ export const GLOBAL_STATE_KEY: InjectionKey<Ref<Record<string, Record<string, No
 
 function childrenScopePath(node: IdentifiedNodeBuilder): string[] | null {
 	if (!node._statePath) return null
+	// Boolean-valued component nodes (check/switch/any future one) nest state under their own
+	// key the same way `toggle` does — other value kinds (string, set) don't have "revealed
+	// children" today, so this generalizes instead of needing a case added per node type.
+	if (node instanceof ComponentNodeBuilder) {
+		return node._valueKind === 'boolean' ? node._statePath : null
+	}
 	switch (node.type) {
 		case 'toggle':
-		case 'check':
-		case 'switch':
-		case 'option':
 		case 'stage':
 			return node._statePath
 		case 'group': {
@@ -757,24 +795,32 @@ function stampChildPaths(entries: ChildEntry[], scopePath: string[]): void {
 	}
 }
 
+function isBooleanStateActive(state: NodeState): boolean {
+	if (typeof state === 'boolean') return state
+	if (state && typeof state === 'object' && !(state instanceof Set)) {
+		const v = (state as NodeStateWithChildren).value
+		if (typeof v === 'boolean') return v
+	}
+	return false
+}
+
 /**
  * Whether a node counts as "active" given its resolved state. `state` is expected to already
  * reflect the node's default (see `withDefaults`) when nothing's been explicitly written —
  * this only interprets the value, it doesn't apply any defaulting of its own.
  */
 export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
+	// Component-backed nodes (text/markdown/check/switch/any future one) are dispatched by
+	// their declared value shape instead of by type, so a new node type never needs a case
+	// added here — only a genuinely new *value shape* would.
+	if (node instanceof ComponentNodeBuilder) {
+		if (node._valueKind === 'boolean') return isBooleanStateActive(state)
+		if (node._valueKind === 'set') return state instanceof Set && state.size > 0
+		return typeof state === 'string' && state !== ''
+	}
 	switch (node.type) {
 		case 'toggle':
-		case 'check':
-		case 'switch':
-		case 'option': {
-			if (typeof state === 'boolean') return state
-			if (state && typeof state === 'object' && !(state instanceof Set)) {
-				const v = (state as NodeStateWithChildren).value
-				if (typeof v === 'boolean') return v
-			}
-			return false
-		}
+			return isBooleanStateActive(state)
 		case 'group': {
 			const g = node as GroupNodeBuilder
 			if (g._selectMode === 'single') return typeof state === 'string' && state !== ''
@@ -782,9 +828,6 @@ export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 			return false
 		}
 		case 'dropdown':
-			return typeof state === 'string' && state !== ''
-		case 'text':
-		case 'markdown':
 			return typeof state === 'string' && state !== ''
 		default:
 			return false
@@ -957,7 +1000,10 @@ export function walkNodes(
 				const nestedState = getBooleanChildState(rawChildState)
 				walkNodes(resolveChildren(childId, nestedState), nestedState, visitor)
 			}
-		} else if (node.type === 'toggle' || node.type === 'check' || node.type === 'switch') {
+		} else if (
+			node.type === 'toggle' ||
+			(node instanceof ComponentNodeBuilder && node._valueKind === 'boolean')
+		) {
 			const childState = getBooleanChildState(rawNodeState)
 			walkNodes(children, childState, visitor)
 		} else if (
@@ -1206,5 +1252,6 @@ export const text = (id: string) => withAutoProps(new InputNodeBuilder(id, 'text
 export const markdown = (id: string) => withAutoProps(new InputNodeBuilder(id, 'markdown'))
 export const group = (id?: string) => new GroupNodeBuilder(id)
 export const dropdown = (id: string) => new DropdownNodeBuilder(id)
-export const option = (id: string, nodeLabel: string) => new OptionNodeBuilder(id, nodeLabel)
+export const appComponent = (id: string, rendererKey: string) =>
+	withAutoProps(new AppComponentNodeBuilder(id, rendererKey))
 export const stage = (id: string, title: string) => new StageNodeBuilder(id, title)

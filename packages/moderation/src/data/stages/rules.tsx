@@ -2,7 +2,7 @@ import { ListBulletedIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { group, markdown, option, stage, toggle } from '../../types/node'
+import { check, group, markdown, stage, toggle } from '../../types/node'
 
 //TODO: coolbot have fun :3
 export default function () {
@@ -34,18 +34,18 @@ export default function () {
 							.multiSelect('options')
 							.title('Which Prohibited Content rules does this project violate?')
 							.children(
-								option('objectionable', 'Objectionable').message(),
-								option('discriminatory', 'Discriminatory or Explicit').message(),
-								option('ip-infringement', 'IP Infringement').message(),
-								option('legal-rights', 'Rights Violation').message(),
-								option('illegal-activity', 'Illegal Activity').message(),
-								option('harmful', 'Harmful or Deceptive').message(),
-								option('misleading', 'Misleading claims').message(),
-								option('impersonation', 'Impersonation').message(),
-								option('false-endorsement', 'False Endorsement').message(),
-								option('profanity', 'Profanity').message(),
-								option('undisclosed-upload', 'Undisclosed Data Upload').message(),
-								option('mojang-bypass', 'Mojang Bypass').message(),
+								check('objectionable', 'Objectionable').message(),
+								check('discriminatory', 'Discriminatory or Explicit').message(),
+								check('ip-infringement', 'IP Infringement').message(),
+								check('legal-rights', 'Rights Violation').message(),
+								check('illegal-activity', 'Illegal Activity').message(),
+								check('harmful', 'Harmful or Deceptive').message(),
+								check('misleading', 'Misleading claims').message(),
+								check('impersonation', 'Impersonation').message(),
+								check('false-endorsement', 'False Endorsement').message(),
+								check('profanity', 'Profanity').message(),
+								check('undisclosed-upload', 'Undisclosed Data Upload').message(),
+								check('mojang-bypass', 'Mojang Bypass').message(),
 							),
 					),
 
@@ -69,12 +69,12 @@ export default function () {
 							.multiSelect('options')
 							.title('Which features require a Server-side Opt-in?')
 							.children(
-								option('x-ray', 'X-ray').message(),
-								option('aim-bot', 'Aim Assist').message(),
-								option('movement', 'Movement').message(),
-								option('pvp', 'PvP').message(),
-								option('hiding-mods', 'Anti 3.x').message(),
-								option('item-duplication', 'Dupe').message(),
+								check('x-ray', 'X-ray').message(),
+								check('aim-bot', 'Aim Assist').message(),
+								check('movement', 'Movement').message(),
+								check('pvp', 'PvP').message(),
+								check('hiding-mods', 'Anti 3.x').message(),
+								check('item-duplication', 'Dupe').message(),
 							),
 					),
 
