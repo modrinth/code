@@ -94,12 +94,7 @@ pub trait SearchBackend: Send + Sync {
         info: &SearchRequest,
         redis: &RedisPool,
     ) -> Result<SearchResults, ApiError> {
-        let mut results = self.search_for_project_raw(info).await.map_err(
-            |error| match error {
-                ApiError::Request(error) => ApiError::Internal(error),
-                error => error,
-            },
-        )?;
+        let mut results = self.search_for_project_raw(info).await?;
         hydrate_search_results(&mut results.hits, redis)
             .await
             .map_err(ApiError::Internal)?;
