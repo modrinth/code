@@ -837,24 +837,26 @@ async function batchCheckQueueCandidates(
 ): Promise<Map<string, QueueCandidateCheck>> {
 	const results = new Map<string, QueueCandidateCheck>()
 
+	// Lock checks have no batch endpoint (Labrinth's internal moderation API only exposes
+	// per-project lock checking), but project data does — fetch it once for the whole batch
+	// instead of once per id.
+	const projects = await client.labrinth.projects_v3.getMultiple(projectIds).catch(() => [])
+	const projectsById = new Map(projects.map((project) => [project.id, project]))
+
 	const checks = await Promise.allSettled(
 		projectIds.map(async (id) => {
-			const [lockResponse, projectData] = await Promise.all([
-				moderationQueue.checkLock(id),
-				useBaseFetch(`project/${id}`, { method: 'GET' }).catch(() => null),
-			])
-
-			const status = (projectData as { status?: string } | null)?.status
+			const lockResponse = await moderationQueue.checkLock(id)
+			const project = projectsById.get(id) ?? null
 
 			return {
 				id,
 				locked: lockResponse.locked,
 				expired: lockResponse.expired,
 				isOwnLock: lockResponse.is_own_lock,
-				slug: (projectData as { slug?: string } | null)?.slug,
-				projectType: (projectData as { project_type?: string } | null)?.project_type,
-				status,
-				isProcessing: projectData === null ? true : status === 'processing',
+				slug: project?.slug,
+				projectType: project?.project_types[0],
+				status: project?.status,
+				isProcessing: project === null ? true : project.status === 'processing',
 			}
 		}),
 	)
@@ -1361,23 +1363,7 @@ onMounted(async () => {
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	notifications.setNotificationLocation('left')
 
-	const finishedId = localStorage.getItem('moderation-checklist-finished')
-	if (finishedId === projectV2.value.id) {
-		localStorage.removeItem('moderation-checklist-finished')
-		hasNextProject.value = moderationQueue.queueLength > 0
-		done.value = true
-		return
-	}
-
-	if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
-		alreadyReviewed.value = true
-		return
-	}
-
-	const initialStage = resolvedStages.value[currentStage.value]
-	if (initialStage?._navigate) {
-		router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${initialStage._navigate}`)
-	}
+	if (done.value || alreadyReviewed.value) return
 
 	const result = await moderationQueue.acquireLock(projectV2.value.id)
 
@@ -1645,6 +1631,24 @@ async function generateMessage() {
 }
 
 const hasNextProject = ref(false)
+
+// Decided here (synchronously, during setup) rather than in onMounted so the redirect to the
+// first stage's own route lands before this component's first paint — landing in onMounted means
+// the wrong tab (whatever route was already current) visibly flashes before the swap.
+const finishedId = localStorage.getItem('moderation-checklist-finished')
+if (finishedId === projectV2.value.id) {
+	localStorage.removeItem('moderation-checklist-finished')
+	hasNextProject.value = moderationQueue.queueLength > 0
+	done.value = true
+} else if (projectV2.value.status !== 'processing' && !reviewedAnyway.value) {
+	alreadyReviewed.value = true
+} else {
+	const initialStage = resolvedStages.value[currentStage.value]
+	if (initialStage?._navigate) {
+		navigateTo(`/${projectV2.value.project_type}/${projectV2.value.slug}${initialStage._navigate}`)
+	}
+}
+
 async function refreshModerationCaches(threadId?: string) {
 	const refreshes: Promise<unknown>[] = [
 		invalidate(),
