@@ -4,6 +4,7 @@ use actix_web::{HttpRequest, delete, get, post, put, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 use super::rules_scan::{
     RuleArtifact, RuleInput, RuleScan, RuleScope, RuleTrace,
@@ -16,7 +17,6 @@ use crate::{
             DBProjectId, DBVersionId, DelphiReportIssueDetailsId,
             DelphiReportIssueId, delphi_report_item::DelphiSeverity,
         },
-        redis::RedisPool,
     },
     models::{
         ids::{ProjectId, VersionId},

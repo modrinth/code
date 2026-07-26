@@ -1,0 +1,188 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT\n\t\t\tdelphi_rule.id,\n\t\t\tdelphi_rule.name,\n\t\t\tdelphi_rule.rule,\n\t\t\tdelphi_rule.priority,\n\t\t\tdelphi_rule.revision,\n\t\t\tdelphi_rule.created_at,\n\t\t\tdelphi_rule.updated_at,\n\t\t\tdelphi_rule.created_by,\n\t\t\tdelphi_rule.updated_by,\n\t\t\tCOALESCE(preview.affected_details_count, 0)\n\t\t\t\tAS \"affected_details_count!\",\n\t\t\tpreview.detail_id AS \"detail_id?: DelphiReportIssueDetailsId\",\n\t\t\tpreview.issue_id AS \"issue_id?: DelphiReportIssueId\",\n\t\t\tpreview.project_id AS \"project_id?: DBProjectId\",\n\t\t\tpreview.project_name AS \"project_name?\",\n\t\t\tpreview.project_icon_url AS \"project_icon_url?\",\n\t\t\tpreview.version_id AS \"version_id?: DBVersionId\",\n\t\t\tpreview.version_name AS \"version_name?\",\n\t\t\tpreview.version_number AS \"version_number?\",\n\t\t\tpreview.issue_type AS \"issue_type?\",\n\t\t\tpreview.key AS \"key?\",\n\t\t\tpreview.jar AS \"jar?\",\n\t\t\tpreview.file_path AS \"file_path?\",\n\t\t\tpreview.original_severity AS \"original_severity?: DelphiSeverity\",\n\t\t\tpreview.severity AS \"effect_severity?: DelphiSeverity\",\n\t\t\tpreview.hidden AS \"hidden?\"\n\t\tFROM delphi_rules delphi_rule\n\t\tLEFT JOIN LATERAL (\n\t\t\tSELECT\n\t\t\t\teffect.detail_id,\n\t\t\t\tdetail.issue_id,\n\t\t\t\tversion.mod_id AS project_id,\n\t\t\t\tproject.name AS project_name,\n\t\t\t\tproject.icon_url AS project_icon_url,\n\t\t\t\tversion.id AS version_id,\n\t\t\t\tversion.name AS version_name,\n\t\t\t\tversion.version_number,\n\t\t\t\tissue.issue_type,\n\t\t\t\tdetail.key,\n\t\t\t\tdetail.jar,\n\t\t\t\tdetail.file_path,\n\t\t\t\tdetail.severity AS original_severity,\n\t\t\t\teffect.severity,\n\t\t\t\teffect.hidden,\n\t\t\t\tCOUNT(*) OVER () AS affected_details_count\n\t\t\tFROM delphi_rule_effects effect\n\t\t\tINNER JOIN delphi_rule_revisions published\n\t\t\t\tON published.revision = effect.revision\n\t\t\tINNER JOIN delphi_report_issue_details detail\n\t\t\t\tON detail.id = effect.detail_id\n\t\t\tINNER JOIN delphi_report_issues issue\n\t\t\t\tON issue.id = detail.issue_id\n\t\t\tINNER JOIN delphi_reports report\n\t\t\t\tON report.id = issue.report_id\n\t\t\tLEFT JOIN files file ON file.id = report.file_id\n\t\t\tLEFT JOIN versions version ON version.id = file.version_id\n\t\t\tLEFT JOIN mods project ON project.id = version.mod_id\n\t\t\tWHERE effect.rule_id = delphi_rule.id\n\t\t\tORDER BY effect.detail_id DESC\n\t\t\tLIMIT 3\n\t\t) preview ON TRUE\n\t\tWHERE NOT delphi_rule.delete_on_next_revision\n\t\tORDER BY\n\t\t\tdelphi_rule.priority DESC,\n\t\t\tdelphi_rule.id,\n\t\t\tpreview.detail_id DESC\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "rule",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "priority",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "revision",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "affected_details_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "detail_id?: DelphiReportIssueDetailsId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "issue_id?: DelphiReportIssueId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "project_id?: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "project_name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "project_icon_url?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 15,
+        "name": "version_id?: DBVersionId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "version_name?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "version_number?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 18,
+        "name": "issue_type?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "key?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 20,
+        "name": "jar?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "file_path?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 22,
+        "name": "original_severity?: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 23,
+        "name": "effect_severity?: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 24,
+        "name": "hidden?",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      null,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "8c69ee780e418c4ffd5c7b8d23dea9eb742e7365dd3c93479a9d7a5b6283c9b1"
+}

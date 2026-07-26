@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "LOCK TABLE delphi_report_issue_details IN SHARE MODE",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "62d548639ed397f3619a8c3a4503f472fceb6ee0e120b511c1ed64cb200e0e9c"
+}

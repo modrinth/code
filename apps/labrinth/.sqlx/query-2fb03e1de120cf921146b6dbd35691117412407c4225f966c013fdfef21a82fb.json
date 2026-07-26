@@ -1,0 +1,104 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            detail.id,\n            detail.key,\n            issue.issue_type,\n            detail.severity AS \"severity: DelphiSeverity\",\n            detail.jar,\n            detail.file_path,\n            detail.data AS \"data: Json<HashMap<String, serde_json::Value>>\",\n            report.delphi_version,\n            file.size AS \"size?\",\n            file.id AS \"file_id?\",\n            version.id AS \"version_id?\",\n            version.mod_id AS \"project_id?\",\n            COALESCE(file_hashes.hashes, '{}'::jsonb)\n                AS \"hashes!: Json<BTreeMap<String, String>>\"\n        FROM delphi_report_issue_details detail\n        INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id\n        INNER JOIN delphi_reports report ON report.id = issue.report_id\n        LEFT JOIN files file ON file.id = report.file_id\n        LEFT JOIN versions version ON version.id = file.version_id\n        LEFT JOIN (\n            SELECT\n                file_id,\n                jsonb_object_agg(algorithm, encode(hash, 'hex')) AS hashes\n            FROM hashes\n            GROUP BY file_id\n        ) file_hashes ON file_hashes.file_id = file.id\n        ORDER BY detail.id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "issue_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "severity: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "jar",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "file_path",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "data: Json<HashMap<String, serde_json::Value>>",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "delphi_version",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "size?",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "file_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "version_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "project_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "hashes!: Json<BTreeMap<String, String>>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "2fb03e1de120cf921146b6dbd35691117412407c4225f966c013fdfef21a82fb"
+}

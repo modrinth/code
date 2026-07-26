@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO delphi_rule_effects (\n            revision,\n            detail_id,\n            rule_id,\n            severity,\n            hidden\n        )\n        SELECT $1, effect.*\n        FROM UNNEST(\n            $2::BIGINT[],\n            $3::BIGINT[],\n            $4::delphi_severity[],\n            $5::BOOLEAN[]\n        ) AS effect(detail_id, rule_id, severity, hidden)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8Array",
+        "Int8Array",
+        {
+          "Custom": {
+            "name": "delphi_severity[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "delphi_severity",
+                  "kind": {
+                    "Enum": [
+                      "low",
+                      "medium",
+                      "high",
+                      "severe"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "BoolArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f94722c5b0092d3fcdb340da0402fb5a46f2ab5121a42b00ee8c0498b2871d58"
+}

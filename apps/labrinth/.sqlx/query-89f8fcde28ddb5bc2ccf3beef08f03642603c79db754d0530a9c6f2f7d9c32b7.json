@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH project_membership AS (\n            SELECT\n                detail.project_id,\n                BOOL_OR(\n                    detail.status IN ('pending', 'unsafe')\n                    AND NOT detail.hidden\n                ) AS old_needs_review,\n                BOOL_OR(\n                    detail.status IN ('pending', 'unsafe')\n                    AND NOT COALESCE(new_effect.hidden, FALSE)\n                ) AS new_needs_review\n            FROM delphi_issue_details_with_statuses detail\n            LEFT JOIN delphi_rule_effects new_effect\n                ON new_effect.revision = $1\n                AND new_effect.detail_id = detail.id\n            GROUP BY detail.project_id\n        )\n        SELECT\n            project_id AS \"project_id!: DBProjectId\",\n            new_needs_review AS \"new_needs_review!\"\n        FROM project_membership\n        WHERE old_needs_review IS DISTINCT FROM new_needs_review\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "new_needs_review!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      null
+    ]
+  },
+  "hash": "89f8fcde28ddb5bc2ccf3beef08f03642603c79db754d0530a9c6f2f7d9c32b7"
+}

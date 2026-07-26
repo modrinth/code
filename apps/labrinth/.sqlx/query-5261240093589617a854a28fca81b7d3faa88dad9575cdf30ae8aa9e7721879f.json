@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tUPDATE delphi_rules\n\t\tSET\n\t\t\tname = $2,\n\t\t\trule = $3,\n\t\t\tpriority = $4,\n\t\t\trevision = (\n\t\t\t\tSELECT revision + 1 FROM delphi_rule_revisions LIMIT 1\n\t\t\t),\n\t\t\tupdated_at = CURRENT_TIMESTAMP,\n\t\t\tupdated_by = $5\n\t\tWHERE id = $1 AND NOT delete_on_next_revision\n\t\tRETURNING\n\t\t\tid,\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "rule",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "priority",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "revision",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated_by",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "5261240093589617a854a28fca81b7d3faa88dad9575cdf30ae8aa9e7721879f"
+}

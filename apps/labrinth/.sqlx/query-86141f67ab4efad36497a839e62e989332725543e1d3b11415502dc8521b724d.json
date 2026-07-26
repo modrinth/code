@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT detail.project_id AS \"project_id!: DBProjectId\"\n        FROM delphi_issue_details_with_statuses detail\n        WHERE\n            detail.project_id = ANY($1::bigint[])\n            AND detail.status IN ('pending', 'unsafe')\n            AND NOT detail.hidden\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "86141f67ab4efad36497a839e62e989332725543e1d3b11415502dc8521b724d"
+}

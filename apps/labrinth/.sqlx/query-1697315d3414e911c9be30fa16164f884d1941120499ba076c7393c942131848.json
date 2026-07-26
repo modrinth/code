@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE delphi_rules SET revision = $1 WHERE NOT delete_on_next_revision",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1697315d3414e911c9be30fa16164f884d1941120499ba076c7393c942131848"
+}

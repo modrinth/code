@@ -10,6 +10,7 @@ use sqlx::types::Json;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use utoipa::{PartialSchema, ToSchema};
+use xredis::RedisPool;
 
 use super::rules::DelphiRuleEffect;
 use crate::routes::internal::delphi::tech_review_queue::{
@@ -23,7 +24,6 @@ use crate::{
             DBProjectId, DelphiReportIssueDetailsId,
             delphi_report_item::DelphiSeverity,
         },
-        redis::RedisPool,
     },
     models::pats::Scopes,
     queue::session::AuthQueue,
