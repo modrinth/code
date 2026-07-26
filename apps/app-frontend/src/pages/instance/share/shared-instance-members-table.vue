@@ -11,9 +11,9 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<ButtonStyled>
+					<ButtonStyled type="outlined">
 						<button
-							class="flex !h-10 shrink-0 items-center gap-2"
+							class="flex !h-10 shrink-0 items-center gap-2 !border"
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
 						>

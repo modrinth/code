@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "Günlükleri görüntüle"
   },
+  "app.ads-consent.accept": {
+    "message": "Hepsini kabul et"
+  },
+  "app.ads-consent.body": {
+    "message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir."
+  },
+  "app.ads-consent.manage": {
+    "message": "Tercihleri yönet"
+  },
+  "app.ads-consent.reject": {
+    "message": "Hepsini redder"
+  },
+  "app.ads-consent.title": {
+    "message": "Sizin mahremiyetiniz ve reklamlar Modrinth'i nasıl destekler"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Donanım hızlandırmalı işleme kapalıyken, performans sorunlarına yol açabilecek bulanıklık efektleri gibi gelişmiş işlemeleri aktif eder."
   },
@@ -464,9 +479,6 @@
   "app.modal.update-to-play.removed": {
     "message": "Silindi"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "{name} oyununu oynamak için güncelleme gereklidir. Oyunu başlatmak için lütfen en son sürüme güncelleyin."
-  },
   "app.project.install-button.already-installed": {
     "message": "Bu proje zaten kurulu"
   },
@@ -493,6 +505,9 @@
   },
   "app.settings.downloading": {
     "message": "v{version} indiriliyor"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Reklamlar, Modrinth'i mümkün kılıyor ve içerik üreticilerine yapılan ödemeleri finanse ediyor. Partnerlerimiz, reklamları kişiselleştirmek ve performansı ölçmek amacıyla uygulama içinde çerez depolayabilir veya bunlara erişebilir. Aşağıdan tercihinizi yönetebilir veya vazgeçebilirsiniz."
   },
   "app.settings.tabs.appearance": {
     "message": "Görünüm"
@@ -535,6 +550,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Dosya işlenirken hata oluştu"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Bu skin {ears} modundan özellikler içeriyor"
   },
   "app.skins.edit-button": {
     "message": "Skin'i düzenle"
@@ -662,6 +680,12 @@
   "app.skins.title": {
     "message": "Skin seçici"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Kapat"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Aç"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} indirildi. Güncellemek için yeniden başlatın veya Modrinth App’i kapattığınızda otomatik olarak güncellenecektir."
   },
@@ -773,6 +797,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>Modrinth hesabına giriş yap</link>!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Kısayol oluştur"
+  },
+  "instance.action.export-modpack": {
+    "message": "Mod paketini dışa aktar"
+  },
+  "instance.action.launch-instance": {
+    "message": "Kurulumu başlat"
+  },
+  "instance.action.more-actions": {
+    "message": "Daha fazla seçenek"
+  },
+  "instance.action.open-folder": {
+    "message": "Klasörü aç"
+  },
+  "instance.action.repair": {
+    "message": "Onar"
+  },
+  "instance.action.settings": {
+    "message": "Kurulum ayarları"
+  },
+  "instance.action.starting": {
+    "message": "Başlatılıyor..."
+  },
+  "instance.action.stopping": {
+    "message": "Durduruluyor..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Ekle ve oyna"
   },
@@ -814,6 +865,9 @@
   },
   "instance.files.save-as": {
     "message": "Farklı kaydet..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Hiç oynanmadı"
   },
   "instance.server-modal.address": {
     "message": "Adres"
@@ -1081,6 +1135,27 @@
   },
   "minecraft-account.sign-in": {
     "message": "Minecraft'a giriş yapın"
+  },
+  "minecraft-required.description": {
+    "message": "Oyunu başlatmak ve oynamak için Minecraft'a sahip olan bir Microsoft hesabına ihtiyaç vardır."
+  },
+  "minecraft-required.description-header": {
+    "message": "Bir Microsoft hesabına giriş yap"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Hesabınız yok mu?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Minecraft al"
+  },
+  "minecraft-required.get-support": {
+    "message": "Destek al"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft gereklidir"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Microsoft'a giriş yap"
   },
   "search.filter.locked.instance": {
     "message": "Kurulum tarafından sağlanan"

@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
   },
+  "ads-consent.accept": {
+    "message": "すべて受け入れる"
+  },
+  "ads-consent.body": {
+    "message": "Modrinthは広告収益によって運営され、クリエイターへの報酬も広告収益から支払われています。当社のパートナーは、広告のパーソナライズや効果測定のために、サイト内でCookieを保存・利用する場合があります。"
+  },
+  "ads-consent.manage": {
+    "message": "設定の管理"
+  },
+  "ads-consent.reject": {
+    "message": "すべて拒否する"
+  },
+  "ads-consent.title": {
+    "message": "プライバシーと広告がModrinthを支える仕組み"
+  },
   "analytics.action.add": {
     "message": "追加"
   },
@@ -113,6 +128,9 @@
   "analytics.chart.controls.ratio": {
     "message": ""
   },
+  "analytics.chart.empty.select-table-items": {
+    "message": "以下の表から項目を選択して、データを可視化してください。"
+  },
   "analytics.chart.table-selection.top": {
     "message": "テーブル内の{itemType, select, project {{count, plural, other {プロジェクト}}} country {{count, plural, other {国}}} monetization {{count, plural, other {収益}}} downloadSource {{count, plural, other {ダウンロード元}}} downloadReason {{count, plural, other {ダウンロード理由}}} member {{count, plural, other {メンバー}}} projectVersion {{count, plural, other {プロジェクトバージョン}}} loader {{count, plural, other {ローダー}}} gameVersion {{count, plural, other {ゲームバージョン}}} other {{count, plural, other {項目}}}}上位 {count} 件を表示"
   },
@@ -158,6 +176,9 @@
   "analytics.empty.no-data-for-analytics": {
     "message": "統計に使用可能なデータがありません"
   },
+  "analytics.empty.no-projects": {
+    "message": "利用可能なプロジェクトがありません"
+  },
   "analytics.filter.game-version-type": {
     "message": "ゲームバージョンタイプ"
   },
@@ -189,7 +210,7 @@
     "message": "ダウンロードの推移"
   },
   "analytics.graph.title.playtime": {
-    "message": "プレイ時間の推移"
+    "message": "プレイの推移"
   },
   "analytics.graph.title.revenue": {
     "message": "収益の推移"
@@ -265,6 +286,9 @@
   },
   "analytics.project.select": {
     "message": "プロジェクトを選択"
+  },
+  "analytics.project.user": {
+    "message": "{username}"
   },
   "analytics.project.your": {
     "message": "あなたのプロジェクト"
@@ -584,6 +608,12 @@
   "auth.authorize.redirect-url": {
     "message": "<redirect-url>{url}</redirect-url> に自動的に転送されます"
   },
+  "auth.create-account.page-title": {
+    "message": "アカウントの作成"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "セキュリティチェック"
+  },
   "auth.create-account.title": {
     "message": "アカウントを作成"
   },
@@ -629,6 +659,9 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "コードを入力…"
   },
+  "auth.sign-in.continue-with-email": {
+    "message": "メールアドレスで続ける"
+  },
   "auth.sign-in.create-account": {
     "message": "サインアップ"
   },
@@ -638,17 +671,29 @@
   "auth.sign-in.last-sign-in": {
     "message": "最後に使用"
   },
+  "auth.sign-in.sign-in-with": {
+    "message": "Modrinthへサインイン"
+  },
   "auth.sign-in.title": {
     "message": "ログイン"
   },
+  "auth.sign-up.continue-with-email": {
+    "message": "メールアドレスで続ける"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "アカウントを作成すると、Modrinthの <terms-link>利用規約</terms-link> および <privacy-policy-link>プライバシーポリシー</privacy-policy-link>に同意したものとみなされます。"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "さらに表示"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "すでにアカウントをお持ちですか？"
   },
   "auth.sign-up.title": {
     "message": "アカウント作成"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "アカウントの作成"
   },
   "auth.verify-email.action.account-settings": {
     "message": "アカウント設定"
@@ -671,6 +716,9 @@
   "auth.verify-email.failed-verification.title": {
     "message": "メールアドレスの確認に失敗しました"
   },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "メールが送られました"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "メールアドレスが正常に確認されました！"
   },
@@ -679,6 +727,9 @@
   },
   "auth.verify-email.title": {
     "message": "メールアドレスを確認"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "アイコンをアップロード"
   },
   "collection.button.edit-icon": {
     "message": "アイコンを編集"
@@ -746,6 +797,9 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "送信して承認"
   },
+  "conversation-thread.action.reply": {
+    "message": "返信"
+  },
   "conversation-thread.action.send": {
     "message": "送信"
   },
@@ -754,6 +808,18 @@
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補足ファイルはソースコードなどの支援用リソースのためのものであり、別バージョンや派生版を配布するためのものではありません。"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "ファイル"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "メタデータ"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "アップロードされたファイル"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "バージョン"
   },
   "create.collection.collection-info": {
     "message": "新しいコレクションは、{count, plural, =0 {空の} other {#個のプロジェクトを含む}}公開コレクションとして作成されます。"
@@ -964,6 +1030,9 @@
   },
   "dashboard.collections.sort.recently-updated": {
     "message": "更新順(新しい順)"
+  },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "閉じる"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "{formType} をダウンロード"
@@ -1226,6 +1295,9 @@
   "dashboard.head-title": {
     "message": "ダッシュボード"
   },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "未読の通知はありません"
+  },
   "dashboard.notifications.link.see-all": {
     "message": "すべて見る"
   },
@@ -1255,6 +1327,12 @@
   },
   "dashboard.overview.notifications.button.view-history": {
     "message": "履歴を表示"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "通知は届いていません"
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "通知の読み込み中にエラーが発生しました"
   },
   "dashboard.overview.notifications.history.label": {
     "message": "履歴"
@@ -2536,6 +2614,30 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "もう一度ウォレットアドレスをご確認ください。 誤った口座に送られた資金は回収できません。"
+  },
+  "organization.button.manage": {
+    "message": "編集"
+  },
+  "organization.button.manage-projects": {
+    "message": "プロジェクトを編集"
+  },
+  "organization.label.downloads": {
+    "message": "ダウンロード"
+  },
+  "organization.label.members": {
+    "message": "メンバー"
+  },
+  "organization.label.projects": {
+    "message": "プロジェクト"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "名前"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "タイプ"
   },
   "profile.bio.fallback.creator": {
     "message": "Modrinthの作成者。"

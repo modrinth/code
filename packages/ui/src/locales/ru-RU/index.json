@@ -371,6 +371,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Удалить {itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Отключить {itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Понижение версии} other {Обновление}} может привести к проблемам с совместимостью. Моды или другой контент, который вы установили в сборку, сохранятся, но могут быть несовместимы с новой версией."
   },
@@ -434,6 +437,9 @@
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Отключён"
   },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Удалено (отключено)"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Обновлён"
   },
@@ -449,8 +455,17 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Обновлённый"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Версия игры"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Всё равно установить"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Загрузчик"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Файл проверяется только если он опубликован на Modrinth, независимо от его формата (включая .mrpack)."
@@ -1106,8 +1121,8 @@
   "external-files.permissions-card.remove-group": {
     "defaultMessage": "Удалить группу"
   },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Не удалось удалить группу"
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Удалить {title}?"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Удалить из группы"
@@ -1479,7 +1494,7 @@
     "defaultMessage": "Скопируйте ссылку"
   },
   "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Найдите необходимую вам сборку модов на CurseForge."
+    "defaultMessage": "Найдите необходимую вам сборку на CurseForge."
   },
   "files.zip-url-modal.step-find-title": {
     "defaultMessage": "Найдите сборку"
@@ -2732,8 +2747,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Клиент или сервер"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Выделенный сервер"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Сервер"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Одиночная игра"
   },
   "project-type.all": {
     "defaultMessage": "Всё"
@@ -3007,6 +3028,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Не удалось получить текст лицензии."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Загрузка текста лицензии..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Лицензия"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} в игре"
@@ -3412,6 +3442,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Просмотр"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "А"
@@ -4954,6 +4990,57 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеансы"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Добавить"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Добавлен"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Этот пользователь уже приглашён."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Отменить"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Отменить"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Срок действия"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Ваши друзья - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Пригласить"
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Ссылка скопирована"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Не удалось скопировать ссылку"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Друзья не найдены."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Пользователи не найдены."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Запрос отправлен"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Сохранить"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Введите имя пользователя Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Поиск..."
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

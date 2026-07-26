@@ -69,7 +69,7 @@
     "message": "無法設定載入器"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "無法更新本地資料"
+    "message": "無法更新本機資料"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "無法設定 Minecraft"
@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "查看紀錄"
   },
+  "app.ads-consent.accept": {
+    "message": "全部接受"
+  },
+  "app.ads-consent.body": {
+    "message": "廣告使 Modrinth 得以營運，並為創作者提供收益。我們的合作夥伴可能會在應用程式中儲存或存取 Cookie，以實現個人化廣告並衡量廣告成效。"
+  },
+  "app.ads-consent.manage": {
+    "message": "管理偏好設定"
+  },
+  "app.ads-consent.reject": {
+    "message": "全部拒絕"
+  },
+  "app.ads-consent.title": {
+    "message": "關於你的隱私，以及廣告如何幫助 Modrinth"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "啟用進階繪製（如模糊效果），若無硬體加速可能會導致效能問題。"
   },
@@ -168,7 +183,7 @@
     "message": "最小化啟動器"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "使用系統內建的視窗外框（需要重啟應用程式）。"
+    "message": "使用系統內建的視窗外框（需要重新啟動應用程式）。"
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "原生視窗"
@@ -249,7 +264,7 @@
     "message": "沒有符合 {compatibilityLabel} 的可用版本。請選擇一個版本強制安裝。不會自動安裝相依模組。"
   },
   "app.export-modal.description-placeholder": {
-    "message": "輸入模組包描述……"
+    "message": "輸入模組包描述..."
   },
   "app.export-modal.export-button": {
     "message": "匯出"
@@ -374,6 +389,48 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "已成功上傳"
   },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "邀請好友"
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "你需要以"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "登入才能存取這個頁面。"
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "已連結的帳號"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "會發生什麼事？"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "撤銷存取權"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "撤銷存取權"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username} 的顯示圖片"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "如果你撤銷了 {username} 對這個共用實例的存取權，你需要重新邀請他，他才會收到更新。"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "登入"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "仍要安裝"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "實例"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "已連結的帳號"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "你需要登入 Modrinth"
+  },
   "app.instance.worlds.add-server": {
     "message": "新增伺服器"
   },
@@ -387,10 +444,10 @@
     "message": "刪除世界"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "這個世界將會被永久刪除，此操作無法復原。"
+    "message": "這個世界將從這個實例永久刪除，這項動作無法復原。"
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "即將刪除 {name}"
+    "message": "即將刪除「{name}」"
   },
   "app.instance.worlds.filter-modded": {
     "message": "模組"
@@ -425,6 +482,12 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "搜尋 {count} 個世界..."
   },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "刪除實例"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
+    "message": "不要安裝"
+  },
   "app.modal.install-to-play.header": {
     "message": "安裝以遊玩"
   },
@@ -439,6 +502,21 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# 個模組}}"
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "不支援的圖片格式"
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "這個實例違反了哪一條規則？"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "不恰當內容"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "惡意內容"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "垃圾內容"
   },
   "app.modal.install-to-play.reviewed-files": {
     "message": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
@@ -494,6 +572,9 @@
   "app.settings.downloading": {
     "message": "正在下載 v{version}"
   },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "廣告使 Modrinth 得以營運，並為創作者提供收益。我們的合作夥伴可能會在應用程式中儲存或存取 Cookie，以實現個人化廣告並衡量廣告成效。你可以在下方選擇退出或管理偏好設定。"
+  },
   "app.settings.tabs.appearance": {
     "message": "外觀"
   },
@@ -535,6 +616,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "處理檔案時發生錯誤"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "這個外觀使用了 {ears} 模組的功能"
   },
   "app.skins.edit-button": {
     "message": "編輯外觀"
@@ -662,6 +746,12 @@
   "app.skins.title": {
     "message": "外觀選擇工具"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "關閉"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "開啟"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
   },
@@ -709,6 +799,9 @@
   },
   "app.world.world-item.players-online": {
     "message": "{count} 人在線上"
+  },
+  "content.shared-instance.delete-button": {
+    "message": "仍要刪除"
   },
   "friends.action.add-friend": {
     "message": "新增好友"
@@ -773,6 +866,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看他們正在玩什麼！"
   },
+  "instance.action.create-shortcut": {
+    "message": "建立捷徑"
+  },
+  "instance.action.export-modpack": {
+    "message": "匯出模組包"
+  },
+  "instance.action.launch-instance": {
+    "message": "啟動實例"
+  },
+  "instance.action.more-actions": {
+    "message": "更多動作"
+  },
+  "instance.action.open-folder": {
+    "message": "開啟資料夾"
+  },
+  "instance.action.repair": {
+    "message": "修復"
+  },
+  "instance.action.settings": {
+    "message": "實例設定"
+  },
+  "instance.action.starting": {
+    "message": "正在啟動..."
+  },
+  "instance.action.stopping": {
+    "message": "正在停止..."
+  },
   "instance.add-server.add-and-play": {
     "message": "新增並遊玩"
   },
@@ -814,6 +934,12 @@
   },
   "instance.files.save-as": {
     "message": "另存新檔..."
+  },
+  "instance.locked.delete-button": {
+    "message": "刪除實例"
+  },
+  "instance.playtime.never-played": {
+    "message": "從未遊玩"
   },
   "instance.server-modal.address": {
     "message": "位址"
@@ -1056,7 +1182,7 @@
     "message": "你只能在 Minecraft 1.20 以上版本直接進入單人遊戲世界"
   },
   "instance.worlds.play_instance": {
-    "message": "遊戲實例"
+    "message": "遊玩實例"
   },
   "instance.worlds.view_instance": {
     "message": "檢視實例"
@@ -1081,6 +1207,39 @@
   },
   "minecraft-account.sign-in": {
     "message": "登入 Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "你需要登入擁有 Minecraft 的 Microsoft 帳號才能啟動遊戲。"
+  },
+  "minecraft-required.description-header": {
+    "message": "登入 Microsoft 帳號"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "還沒有帳號嗎？"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "取得 Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "取得支援"
+  },
+  "minecraft-required.header": {
+    "message": "需要 Minecraft"
+  },
+  "minecraft-required.sign-in": {
+    "message": "登入 Microsoft"
+  },
+  "modal.modrinth-account-required.cancel-button": {
+    "message": "取消"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "建立帳號"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "登入 Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "登入 Modrinth 帳號"
   },
   "search.filter.locked.instance": {
     "message": "由該實例提供"

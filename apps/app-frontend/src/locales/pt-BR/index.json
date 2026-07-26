@@ -42,7 +42,7 @@
     "message": "Não foi possível baixar os arquivos"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "O arquivo baixado é corrupto"
+    "message": "O arquivo baixado está corrompido"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Não foi possível salvar os arquivos"
@@ -124,6 +124,21 @@
   },
   "app.action-bar.view-logs": {
     "message": "Ver registros"
+  },
+  "app.ads-consent.accept": {
+    "message": "Aceitar tudo"
+  },
+  "app.ads-consent.body": {
+    "message": "Anúncios tornam o Modrinth possível e financiam os pagamentos dos criadores. Nossos parceiros talvez armazenem ou acessem os cookies no aplicativo para personalizar anúncios e medir o desempenho."
+  },
+  "app.ads-consent.manage": {
+    "message": "Gerenciar preferências"
+  },
+  "app.ads-consent.reject": {
+    "message": "Rejeitar tudo"
+  },
+  "app.ads-consent.title": {
+    "message": "Sua privacidade e como anúncios apoiam o Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Ativa a renderização avançada, como desfoque que talvez afete o desempenho sem renderização acelerada do hardware."
@@ -464,9 +479,6 @@
   "app.modal.update-to-play.removed": {
     "message": "Removido"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Uma atualização é necessária para jogar {name}. Atualize para a versão mais recente para iniciar o jogo."
-  },
   "app.project.install-button.already-installed": {
     "message": "Este projeto já foi instalado"
   },
@@ -493,6 +505,9 @@
   },
   "app.settings.downloading": {
     "message": "Baixando v{version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Anúncios tornam o Modrinth possível e financiam os pagamentos dos criadores. Nossos parceiros talvez armazenem ou acessem os cookies no aplicativo para personalizar anúncios e medir o desempenho. Você pode recusar ou gerenciar suas preferências abaixo."
   },
   "app.settings.tabs.appearance": {
     "message": "Aparência"
@@ -535,6 +550,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Erro ao processar arquivo"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Esta skin usa recursos do mod {ears}"
   },
   "app.skins.edit-button": {
     "message": "Editar skin"
@@ -657,10 +675,16 @@
     "message": "Modrinth Bot animado"
   },
   "app.skins.sign-in.title": {
-    "message": "Por favor, inicie sessão"
+    "message": "Inicie a sessão"
   },
   "app.skins.title": {
     "message": "Seletor de skins"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Desativar"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Ativar"
   },
   "app.update-popup.body.download-complete": {
     "message": "O Modrinth App v{version} já foi instalado. Recarregue para atualizar agora ou ela será feita automaticamente ao fechar o Modrinth App."
@@ -773,6 +797,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Inicie uma sessão com o Modrinth</link> para adicionar amigos e ver o que eles estão jogando!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Criar atalho"
+  },
+  "instance.action.export-modpack": {
+    "message": "Exportar pacote de mods"
+  },
+  "instance.action.launch-instance": {
+    "message": "Iniciar instância"
+  },
+  "instance.action.more-actions": {
+    "message": "Mais ações"
+  },
+  "instance.action.open-folder": {
+    "message": "Abrir pasta"
+  },
+  "instance.action.repair": {
+    "message": "Reparar"
+  },
+  "instance.action.settings": {
+    "message": "Configurações da instância"
+  },
+  "instance.action.starting": {
+    "message": "Iniciando..."
+  },
+  "instance.action.stopping": {
+    "message": "Interrompendo..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Adicionar e jogar"
   },
@@ -814,6 +865,9 @@
   },
   "instance.files.save-as": {
     "message": "Salvar como..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Nunca jogou"
   },
   "instance.server-modal.address": {
     "message": "Endereço"
@@ -1080,7 +1134,28 @@
     "message": "Selecionar conta"
   },
   "minecraft-account.sign-in": {
-    "message": "Inicie sessão no Minecraft"
+    "message": "Iniciar sessão no Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Você precisa de uma conta Microsoft que possui o Minecraft antes de iniciar e jogar."
+  },
+  "minecraft-required.description-header": {
+    "message": "Entrar em uma conta Microsoft"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Não possui uma conta?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Obter Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Obter suporte"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft necessário"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Entrar na Microsoft"
   },
   "search.filter.locked.instance": {
     "message": "Fornecido pela instância"

@@ -147,15 +147,15 @@ const messages = defineMessages({
 	},
 	benefitJoin: {
 		id: 'modal.shared-instance.open-in-app.benefit.join',
-		defaultMessage: 'Join the shared instance in one click',
+		defaultMessage: 'Play the same content as your friends',
 	},
 	benefitInstall: {
 		id: 'modal.shared-instance.open-in-app.benefit.install',
-		defaultMessage: 'Automatically install the required game and loader',
+		defaultMessage: 'Automatically install everything they’re playing',
 	},
 	benefitUpdate: {
 		id: 'modal.shared-instance.open-in-app.benefit.update',
-		defaultMessage: 'Keep shared content updated when the instance changes',
+		defaultMessage: 'Keep shared content up to date as it changes',
 	},
 	openingAutomatically: {
 		id: 'modal.shared-instance.open-in-app.opening-automatically',

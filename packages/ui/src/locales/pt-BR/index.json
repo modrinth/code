@@ -117,13 +117,13 @@
     "defaultMessage": "Você selecionou {count, plural, one {# projeto para instalação. Instale-o agora ou volte sem instalá-lo} other {# projetos para instalação. Instale-os agora ou volte sem instalá-los}}."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
-    "defaultMessage": "Selecione projetos não instalados"
+    "defaultMessage": "Projetos ainda não instalados"
   },
   "browse.selected-projects-leave-modal.discard": {
     "defaultMessage": "Descartar"
   },
   "browse.selected-projects-leave-modal.header": {
-    "defaultMessage": "Projetos selecionados ainda não instalados"
+    "defaultMessage": "Projetos ainda não instalados"
   },
   "browse.view-prefix": {
     "defaultMessage": "Ver:"
@@ -201,7 +201,7 @@
     "defaultMessage": "Seguir"
   },
   "button.hide-snapshots": {
-    "defaultMessage": "Esconder snapshots"
+    "defaultMessage": "Ocultar snapshots"
   },
   "button.install": {
     "defaultMessage": "Instalar"
@@ -225,7 +225,7 @@
     "defaultMessage": "Abrir no navegador"
   },
   "button.open-in-folder": {
-    "defaultMessage": "Abrir na pasta"
+    "defaultMessage": "Abrir pasta"
   },
   "button.open-in-modrinth": {
     "defaultMessage": "Abrir no Modrinth"
@@ -234,7 +234,7 @@
     "defaultMessage": "Jogar"
   },
   "button.refresh": {
-    "defaultMessage": "Recarregar"
+    "defaultMessage": "Atualizar"
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Reinstalar pacote de mods"
@@ -261,10 +261,10 @@
     "defaultMessage": "Redefinir"
   },
   "button.reset-server": {
-    "defaultMessage": "Reiniciar servidor"
+    "defaultMessage": "Redefinir servidor"
   },
   "button.retry": {
-    "defaultMessage": "Retentar"
+    "defaultMessage": "Tentar novamente"
   },
   "button.save": {
     "defaultMessage": "Salvar"
@@ -279,16 +279,16 @@
     "defaultMessage": "Exibir todas as versões"
   },
   "button.show-file": {
-    "defaultMessage": "Mostrar arquivo"
+    "defaultMessage": "Exibir arquivo"
   },
   "button.sign-in": {
     "defaultMessage": "Iniciar sessão"
   },
   "button.sign-out": {
-    "defaultMessage": "Sair"
+    "defaultMessage": "Finalizar sessão"
   },
   "button.sign-up": {
-    "defaultMessage": "Entrar"
+    "defaultMessage": "Criar conta"
   },
   "button.stop": {
     "defaultMessage": "Parar"
@@ -309,7 +309,7 @@
     "defaultMessage": "Atualizar"
   },
   "button.upload-image": {
-    "defaultMessage": "Inserir imagem"
+    "defaultMessage": "Enviar imagem"
   },
   "changelog.justNow": {
     "defaultMessage": "Agora pouco"
@@ -318,7 +318,7 @@
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
-    "defaultMessage": "Hosting"
+    "defaultMessage": "Hospedagem"
   },
   "changelog.product.web": {
     "defaultMessage": "Plataforma"
@@ -564,7 +564,7 @@
     "defaultMessage": "Nenhum conteúdo encontrado."
   },
   "content.page-layout.please-wait": {
-    "defaultMessage": "Por favor, aguarde"
+    "defaultMessage": "Aguarde"
   },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Buscar {count, number} {contentType}..."
@@ -693,10 +693,10 @@
     "defaultMessage": "Selecionar ícone"
   },
   "creation-flow.modal.custom-setup.loader-version-type.latest": {
-    "defaultMessage": "Recente"
+    "defaultMessage": "Última"
   },
   "creation-flow.modal.custom-setup.loader-version-type.other": {
-    "defaultMessage": "Outro"
+    "defaultMessage": "Outra"
   },
   "creation-flow.modal.custom-setup.loader-version-type.stable": {
     "defaultMessage": "Estável"
@@ -723,7 +723,7 @@
     "defaultMessage": "Sem versões disponíveis"
   },
   "creation-flow.modal.final-config.additional-settings.title": {
-    "defaultMessage": "Configurações extras"
+    "defaultMessage": "Configurações adicionais"
   },
   "creation-flow.modal.final-config.backup.before-reset-server.name": {
     "defaultMessage": "Antes do servidor reiniciar"
@@ -1005,13 +1005,13 @@
     "defaultMessage": "Licença"
   },
   "external-files.permissions-card.editor.link-label": {
-    "defaultMessage": "Link para o trabalho"
+    "defaultMessage": "Link para a obra"
   },
   "external-files.permissions-card.editor.link-to-license-url-placeholder": {
     "defaultMessage": "link-para-a-licença"
   },
   "external-files.permissions-card.editor.link-to-work-url-placeholder": {
-    "defaultMessage": "link-para-o-trabalho"
+    "defaultMessage": "link-para-a-obra"
   },
   "external-files.permissions-card.editor.modrinth-link-to-work": {
     "defaultMessage": "Este parece ser um link do Modrinth. Se este conteúdo estiver disponível no Modrinth, é provável que seu pacote tenha sido exportado incorretamente. Se você o baixou de outro site, tente baixar a versão do Modrinth; às vezes, os arquivos não são idênticos."
@@ -1095,7 +1095,7 @@
     "defaultMessage": "Licença:"
   },
   "external-files.permissions-card.link-label": {
-    "defaultMessage": "Link para o trabalho:"
+    "defaultMessage": "Link da obra:"
   },
   "external-files.permissions-card.moderation-reason": {
     "defaultMessage": "Motivo"
@@ -1159,12 +1159,6 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Você obteve permissão especial para redistribuir este trabalho em seu pacote de mods."
-  },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Remover grupo"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Não foi possível remover o grupo"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Remover do grupo"
@@ -2742,22 +2736,22 @@
     "defaultMessage": "American Express"
   },
   "payment-method.card_display": {
-    "defaultMessage": "{card_brand} com final {last_four}"
+    "defaultMessage": "{card_brand} terminado em {last_four}"
   },
   "payment-method.cashapp": {
-    "defaultMessage": "Aplicativo de pagamento"
+    "defaultMessage": "Cash App"
   },
   "payment-method.charity": {
-    "defaultMessage": "Caridade"
+    "defaultMessage": "Instituição de caridade"
   },
   "payment-method.charity-plural": {
-    "defaultMessage": "Caridades"
+    "defaultMessage": "Instituições de caridade"
   },
   "payment-method.diners": {
     "defaultMessage": "Diners Club"
   },
   "payment-method.discover": {
-    "defaultMessage": "Descubrir"
+    "defaultMessage": "Discover"
   },
   "payment-method.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -2766,7 +2760,7 @@
     "defaultMessage": "Vale-presente"
   },
   "payment-method.gift-card-plural": {
-    "defaultMessage": "Vale-presentes"
+    "defaultMessage": "Vales-presente"
   },
   "payment-method.jcb": {
     "defaultMessage": "JCB"
@@ -2778,7 +2772,7 @@
     "defaultMessage": "PayPal"
   },
   "payment-method.paypal_international": {
-    "defaultMessage": "PayPal Internacional"
+    "defaultMessage": "PayPal (internacional)"
   },
   "payment-method.unionpay": {
     "defaultMessage": "UnionPay"
@@ -2816,8 +2810,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Cliente ou servidor"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Servidor dedicado"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Servidor"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Um jogador"
   },
   "project-type.all": {
     "defaultMessage": "Todos"
@@ -3091,6 +3091,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, plural, =0 {Nenhum seguidor} one {{count} seguidor} other {{count} seguidores}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Não foi possível obter o texto da licença."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Carregando texto da licença..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Licença"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, plural, =0 {Ninguém online} other {{count} online}}"
@@ -3493,6 +3502,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Ver"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {download} other {downloads}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {seguidor} other {seguidores}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -4506,7 +4521,7 @@
     "defaultMessage": "Jogue com amigos"
   },
   "servers.list-empty.sign-in-button": {
-    "defaultMessage": "Iniciar sessão"
+    "defaultMessage": "Inicie a sessão"
   },
   "servers.list-empty.simple-setup-description": {
     "defaultMessage": "Configure seu servidor exatamente como um mundo de um jogador."

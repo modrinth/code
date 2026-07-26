@@ -159,7 +159,7 @@
     "defaultMessage": "Seleziona le versioni supportate dal tuo server, scegli un pacchetto di mod, o caricane il tuo."
   },
   "nags.select-compatibility.title": {
-    "defaultMessage": "Seleziona la compatibilità"
+    "defaultMessage": "Seleziona le compatibilità"
   },
   "nags.select-country.description": {
     "defaultMessage": "Fai sapere ai giocatori in che regione si trova il tuo server."

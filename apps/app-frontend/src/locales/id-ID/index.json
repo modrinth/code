@@ -263,9 +263,6 @@
   "app.modal.update-to-play.header": {
     "message": "Perbarui untuk memainkan"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "{name} perlu diperbarui sebelum dimainkan. Mohon perbarui ke versi terkini untuk meluncurkan permainan."
-  },
   "app.project.install-button.already-installed": {
     "message": "Proyek ini sudah terpasang"
   },

@@ -1160,12 +1160,6 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "이 작업물을 모드팩에 재배포할 수 있는 특별 허가를 받았습니다."
   },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "그룹 삭제"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "그룹을 삭제할 수 없습니다"
-  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "그룹에서 제거"
   },
@@ -3092,6 +3086,15 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {팔로워} other {팔로워}}"
   },
+  "project.license.error": {
+    "defaultMessage": "라이선스 텍스트를 가져올 수 없습니다."
+  },
+  "project.license.loading": {
+    "defaultMessage": "라이선스 텍스트를 가져오는 중..."
+  },
+  "project.license.title": {
+    "defaultMessage": "라이선스"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 온라인"
   },
@@ -3496,6 +3499,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "보기"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural,one {다운로드} other {다운로드}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural,one {팔로워} other {팔로워}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
