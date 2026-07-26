@@ -121,7 +121,7 @@ dunce = { workspace = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
-[target.'cfg(windows)'.dependencies]
+[target."cfg(windows)".dependencies]
 windows = { workspace = true, features = ["Networking_Connectivity"] }
 windows-core = { workspace = true }
 winreg = { workspace = true }
