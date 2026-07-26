@@ -2942,9 +2942,6 @@
   "moderation.page.technicalReview": {
     "message": "기술 리뷰"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "모든 그룹 삭제"
-  },
   "modpack-scan-modal.failed": {
     "message": "실패"
   },

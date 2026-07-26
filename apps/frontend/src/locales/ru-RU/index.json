@@ -2960,9 +2960,6 @@
   "moderation.page.technicalReview": {
     "message": "Техпроверка"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "Очистить все группы"
-  },
   "modpack-scan-modal.failed": {
     "message": "Ошибка"
   },

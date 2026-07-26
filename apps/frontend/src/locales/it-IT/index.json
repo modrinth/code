@@ -2957,9 +2957,6 @@
   "moderation.page.technicalReview": {
     "message": "Revisione tecnica"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "Svuota gruppi"
-  },
   "modpack-scan-modal.failed": {
     "message": "Errore"
   },

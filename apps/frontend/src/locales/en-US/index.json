@@ -2972,8 +2972,23 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "Clear All Groups"
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} per batch"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Batch amount"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "This will permanently delete all attribution groups for this project and all files inside them. This action cannot be undone."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Failed to clear all groups: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Clear"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "All groups cleared successfully."
   },
   "modpack-scan-modal.failed": {
     "message": "Failed"
@@ -3006,10 +3021,13 @@
     "message": "Scan All Files"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Some files failed to scan: {error}"
+    "message": "Some files failed to scan: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Scanning..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Success"
   },
   "modpack-scan-modal.title": {
     "message": "Modpack Scan ({scanned}/{total} Files)"

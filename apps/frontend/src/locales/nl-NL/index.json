@@ -2939,9 +2939,6 @@
   "moderation.page.technicalReview": {
     "message": "Technische beoordeling"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "Alle groepen wissen"
-  },
   "modpack-scan-modal.failed": {
     "message": "Mislukt"
   },
