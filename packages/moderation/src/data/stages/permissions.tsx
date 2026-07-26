@@ -5,7 +5,7 @@ import { computed } from 'vue'
 import { group, stage, toggle } from '../../types/node'
 
 export default function () {
-	const { projectV3: project } = injectProjectPageContext()
+	const { projectV3: project, versions } = injectProjectPageContext()
 
 	return stage('permissions', 'Modpack Permissions')
 		.hint("Does this project's external content have any issues?")
@@ -16,7 +16,9 @@ export default function () {
 			computed(
 				() =>
 					(project.value.project_types?.includes('modpack') ?? false) &&
-					!project.value.minecraft_server,
+					!project.value.minecraft_server &&
+					!!versions.value &&
+					versions.value.some((version) => (version.files_missing_attribution?.length ?? 0) >= 1),
 			),
 		)
 		.children(
