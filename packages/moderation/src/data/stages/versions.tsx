@@ -30,15 +30,9 @@ export default function () {
 							.title('Correct Project Type')
 							.none('Unknown')
 							.children(
-								check('modpack', 'Modpack')
-									.shown(computed(() => !project.value.project_types.includes('modpack')))
-									.message(),
-								check('resourcepack', 'Resource Pack')
-									.shown(computed(() => !project.value.project_types.includes('resourcepack')))
-									.message(),
-								check('datapack', 'Data Pack')
-									.shown(computed(() => !project.value.loaders.includes('datapack')))
-									.message(),
+								check('modpack', 'Modpack').message(),
+								check('resourcepack', 'Resource Pack').message(),
+								check('datapack', 'Data Pack').message(),
 							),
 					)
 					.collect(),
