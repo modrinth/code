@@ -1724,18 +1724,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Oprettet {date}"
-  },
-  "project.about.details.published": {
-    "message": "Offentliggjort {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaljer"
-  },
-  "project.about.details.updated": {
-    "message": "Opdateret {date}"
-  },
   "project.actions.create-server": {
     "message": "Lav en server"
   },

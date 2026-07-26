@@ -8,6 +8,7 @@
 		:diffs="normalizedDiffs"
 		:version-date="versionDate"
 		:show-external-warnings="showExternalWarnings"
+		:external-warning-description="formatMessage(messages.externalWarningDescription)"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:removed-label="formatMessage(messages.removed)"
@@ -76,8 +77,13 @@ const { formatMessage } = useVIntl()
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
-defineProps<{
+const { showExternalWarnings } = defineProps<{
 	showExternalWarnings?: boolean
+}>()
+
+const emit = defineEmits<{
+	cancel: []
+	complete: []
 }>()
 
 const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
@@ -87,16 +93,16 @@ const diffs = ref<DependencyDiff[]>([])
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
 
-const normalizedDiffs = computed<ContentDiffItem[]>(() =>
-	diffs.value.map((diff) => ({
+const normalizedDiffs = computed<ContentDiffItem[]>(() => {
+	return diffs.value.map((diff) => ({
 		type: diff.type,
 		external: Boolean(diff.fileName && !diff.project),
 		projectName: diff.project?.title,
 		fileName: diff.fileName,
 		currentVersionName: diff.currentVersion?.version_number,
 		newVersionName: diff.newVersion?.version_number,
-	})),
-)
+	}))
+})
 
 const versionDate = computed(() =>
 	modpackVersion.value?.date_published
@@ -242,7 +248,6 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 }
 
 async function handleUpdate() {
-	hide()
 	const serverProjectId = instance.value?.link?.project_id
 	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
@@ -255,11 +260,12 @@ async function handleUpdate() {
 		console.error('Error updating instance:', error)
 	} finally {
 		if (serverProjectId) stopInstallingServer(serverProjectId)
+		emit('complete')
 	}
 }
 
 function handleDecline() {
-	hide()
+	emit('cancel')
 }
 
 function show(
@@ -293,11 +299,16 @@ const messages = defineMessages({
 	updateRequiredDescription: {
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
-			'An update is required to play {name}. Please update to the latest version to launch the game.',
+			'An update is required to play {name}. Please update to latest version to launch the game.',
 	},
 	removed: {
 		id: 'app.modal.update-to-play.removed',
 		defaultMessage: 'Removed',
+	},
+	externalWarningDescription: {
+		id: 'app.modal.update-to-play.server-modpack-unknown-files-description',
+		defaultMessage:
+			'This server modpack update contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust.',
 	},
 })
 

@@ -1,4 +1,5 @@
 use std::{collections::HashMap, fmt};
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use actix_web::{HttpRequest, get, patch, post, put, web};
@@ -22,7 +23,6 @@ use crate::{
             thread_item::ThreadMessageBuilder,
             version_item::VersionQueryResult,
         },
-        redis::RedisPool,
     },
     models::{
         ids::{FileId, ProjectId, ThreadId, VersionId},

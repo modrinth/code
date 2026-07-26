@@ -29,7 +29,12 @@ async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 
 export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
-	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
+	config: {
+		apiBaseUrl: string
+		archonBaseUrl: string
+		sharedInstancesBaseUrl: string
+		rateLimitKey?: string
+	},
 ): NuxtModrinthClient {
 	const flags = useFeatureFlags()
 	const optionalFeatures = [
@@ -40,6 +45,7 @@ export function createModrinthClient(
 		labrinthBaseUrl: config.apiBaseUrl,
 		archonBaseUrl: () =>
 			withStagingArchonBaseUrl(config.archonBaseUrl, flags.value.archonApiStaging),
+		sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
 		archonSentryCapture: () => flags.value.archonSentryCapture,
 		rateLimitKey: config.rateLimitKey || getRateLimitKeyFromSecretsStore,
 		features: [

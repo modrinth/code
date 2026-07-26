@@ -4,11 +4,10 @@ use super::{
     ProjectViewsFacets,
 };
 use crate::{
-    database::{PgPool, redis::RedisPool},
-    models::v3::analytics::DownloadReason,
-    routes::ApiError,
+    database::PgPool, models::v3::analytics::DownloadReason, routes::ApiError,
     util::tags::valid_download_tags,
 };
+use xredis::RedisPool;
 
 pub async fn fetch(
     pool: &PgPool,

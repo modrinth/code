@@ -24,16 +24,19 @@
     "message": "Відкрити екземпляр"
   },
   "app.action-bar.install.retry": {
-    "message": "Спробувати знову"
+    "message": "Повторити"
   },
   "app.action-bar.install.summary.app-closing": {
-    "message": "Скасовано через закриття додатку"
+    "message": "Скасовано через закриття застосунку"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Не вдалось прочитати збірку модів"
+    "message": "Не вдалося прочитати збірку"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Скасовано"
+  },
+  "app.action-bar.install.summary.cleanup-incomplete": {
+    "message": "Очищення не завершено"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Не вдалося завантажити файли"
@@ -45,25 +48,25 @@
     "message": "Не вдалося зберегти файли"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "Завантаження не вдалося завершити"
+    "message": "Не вдалося завантажити"
   },
   "app.action-bar.install.summary.instance-not-found": {
     "message": "Екземпляр не знайдено"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Шлях до файлу недійсний"
+    "message": "Недійсний шлях до файлу"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "Дані збірки модів недійсні"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Файли збірки модів містять не дійсні метадані"
+    "message": "Файли збірки містять недійсні метадані"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "Не вдалося завершити встановлення Java"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Помилка встановлення завантажувача"
+    "message": "Не вдалося встановити завантажувач"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Не вдалося оновити локальні дані"
@@ -84,7 +87,10 @@
     "message": "Щось пішло не так"
   },
   "app.action-bar.install.unknown-instance": {
-    "message": "Невідомий екземпляр"
+    "message": "Невідомий профіль"
+  },
+  "app.action-bar.installs": {
+    "message": "Установки"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Зробити основним профілем"
@@ -99,7 +105,7 @@
     "message": "Основний профіль"
   },
   "app.action-bar.reload-to-update": {
-    "message": "Перезавантаження для оновлення"
+    "message": "Перезавантажте, щоб оновити"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Показати більше запущених профілів"
@@ -108,7 +114,7 @@
     "message": "Зупинити профіль"
   },
   "app.action-bar.update": {
-    "message": "Оновлення"
+    "message": "Оновити"
   },
   "app.action-bar.view-active-downloads": {
     "message": "Переглянути активні завантаження"
@@ -119,14 +125,29 @@
   "app.action-bar.view-logs": {
     "message": "Переглянути журнали"
   },
+  "app.ads-consent.accept": {
+    "message": "Прийняти всі"
+  },
+  "app.ads-consent.body": {
+    "message": "Реклама підтримує існування Modrinth та фінансує виплати творцям. Наші партнери можуть зберігати та отримувати доступ до cookie в застосунку, аби персоналізувати рекламу та збирати метрики."
+  },
+  "app.ads-consent.manage": {
+    "message": "Налаштувати"
+  },
+  "app.ads-consent.reject": {
+    "message": "Відхилити всі"
+  },
+  "app.ads-consent.title": {
+    "message": "Ваша приватність та як реклама підтримує Modrinth"
+  },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Дозволяє розширене промальовування, як-от ефекти розмиття, які можуть спричиняти проблеми з продуктивністю без апаратно-прискореного промальовування."
+    "message": "Умикає розширене промальовування, як-от ефекти розмиття. Вони можуть спричиняти проблеми з продуктивністю без апаратного прискорення."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Розширене промальовування"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Виберіть бажану колірну тему для Modrinth App."
+    "message": "Оберіть бажану колірну тему для Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Колірна тема"
@@ -153,16 +174,16 @@
     "message": "Уключає нещодавні світи в розділі «Повернутися» на головній сторінці."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
-    "message": "Повернутися у світи"
+    "message": "Повернутися до світів"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Згортає запускач під час запуску процесу Minecraft."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Мінімізувати запускач"
+    "message": "Згортати запускач"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Використовувати рамку системного вікна (потрібно перезапустити програму)."
+    "message": "Використовує рамку системного вікна (необхідно перезапустити застосунок)."
   },
   "app.appearance-settings.native-decorations.title": {
     "message": "Системне оформлення"
@@ -177,7 +198,7 @@
     "message": "Час гри"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Автоматично пропускає підтвердження з низьким рівнем ризику, як-от повторне встановлення збірки модів, видалення звичайного вмісту, масові оновлення, відвʼязування збірки модів та записи на відновлення. Небезпечні попередження все одно зображуватимуться."
+    "message": "Автоматично пропускає низькоризикові підтвердження: установки дубльованих збірок, звичайні видалення вмісту, масові оновлення та запити на відновлення. Попередження з вищим рівнем ризику залишаться."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Пропустити несуттєві попередження"
@@ -225,7 +246,7 @@
     "message": "Дослідити вміст"
   },
   "app.browse.discover-servers": {
-    "message": "Дослідити сервера"
+    "message": "Дослідити сервери"
   },
   "app.browse.hide-added-servers": {
     "message": "Приховати вже додані сервери"
@@ -252,7 +273,7 @@
     "message": "Експортувати збірку"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Назва збірки модів"
+    "message": "Назва збірки"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Назва збірки"
@@ -342,16 +363,25 @@
     "message": "Профіль"
   },
   "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Завантаження проєктів: {current, number}/{total, number}..."
+    "message": "Завантаження проєктів: {current, number}/{total, number}…"
+  },
+  "app.instance.mods.bulk-update.finishing": {
+    "message": "Завершуємо оновлення…"
+  },
+  "app.instance.mods.bulk-update.resolving-versions": {
+    "message": "Знаходимо версії…"
   },
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
   },
+  "app.instance.mods.locked-content": {
+    "message": "Уміст у заблокованих профілях не можна змінювати."
+  },
   "app.instance.mods.project-was-added": {
-    "message": "«{name}» було додано"
+    "message": "«{name}» додано"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} проєктів було додано"
+    "message": "{count} проєктів додано"
   },
   "app.instance.mods.share-text": {
     "message": "Погляньте на проєкти, які я використовую у своїй збірці!"
@@ -362,11 +392,56 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Успішно вивантажено"
   },
+  "app.instance.share.empty.description": {
+    "message": "Ви можете поділитися цим профілем із друзями!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Немає запрошених друзів"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Запросити друзів"
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Ви повинні ввійти як"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "Аватар {username}"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Ви повинні від'єднати цю збірку, аби поділитися своїм профілем"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "Цей спільний профіль уже встановлено як <bold>{instanceName}</bold>. Дійсно встановити ще одну копію?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "Спільний профіль уже встановлено"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Усе одно встановити"
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Увійти як"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Ви повинні ввійти в Modrinth"
+  },
   "app.instance.worlds.add-server": {
     "message": "Додати сервер"
   },
   "app.instance.worlds.browse-servers": {
     "message": "Переглянути сервери"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Видалити світ"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Видалити світ"
+  },
+  "app.instance.worlds.delete-world-modal.warning-body": {
+    "message": "Цей світ буде видалено назавжди з цього екземпляра. Це не можна скасувати."
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Видалення {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Модифіковано"
@@ -386,20 +461,50 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Сервера або світи не додано"
   },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Видалити сервер"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Видалити сервер"
+  },
+  "app.instance.worlds.remove-server-modal.warning-body": {
+    "message": "Цей сервер буде видалено з вашого списку серверів. Ви зможете повернути його, якщо знаєте адресу."
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Видалення {name}"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Пошук {count} світів…"
   },
   "app.modal.install-to-play.header": {
     "message": "Установлення для гри"
   },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Усе одно встановити"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Установити"
+  },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Це запрошення створив інший користувач Modrinth, не сам Modrinth. Приймайте запрошення лише від тих людей, яким довіряєте."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Файл перевірятиметься, лише якщо його завантажено на Modrinth, незалежно від його формату (включно з .mrpack)."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Профіль"
+  },
+  "app.modal.install-to-play.unknown-files-description": {
+    "message": "Ця збірка сервера містить файли, які не є опубліковані на Modrinth. Ми наполегливо рекомендуємо встановлювати лише ті файли, яким довіряєте."
+  },
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "Попередження про невідомі файли"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "Нерозпізнані файли"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Дивитися вміст"
@@ -407,23 +512,38 @@
   "app.modal.update-to-play.header": {
     "message": "Оновлення для гри"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "«{name}» потребує оновлення, щоб грати. Будь ласка, оновіть до останньої версії, щоб запустити гру."
+  "app.modal.update-to-play.removed": {
+    "message": "Видалено"
   },
   "app.project.install-button.already-installed": {
     "message": "Проєкт уже встановлено"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Змінити версію"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Повернутися до дослідження"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Установити вміст до профілю"
+  "app.project.version.all-versions": {
+    "message": "Усі версії"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Завантажити в браузері"
+  },
+  "app.project.version.installing": {
+    "message": "Установлення"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Уже встановлено"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },
   "app.settings.downloading": {
     "message": "Завантаження v{version}"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Реклама підтримує існування Modrinth та фінансує виплати творцям. Наші партнери можуть зберігати та отримувати доступ до cookie в застосунку, аби персоналізувати рекламу та збирати метрики. Ви можете відмовитися від них або керувати налаштуваннями нижче."
   },
   "app.settings.tabs.appearance": {
     "message": "Вигляд"
@@ -466,6 +586,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Помилка обробки файлу"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Цей скін використовує функціонал моду «{ears}»"
   },
   "app.skins.edit-button": {
     "message": "Редагувати скін"
@@ -539,6 +662,9 @@
   "app.skins.section.builders-and-biomes": {
     "message": "Builders & Biomes"
   },
+  "app.skins.section.chaos-cubed": {
+    "message": "Chaos Cubed"
+  },
   "app.skins.section.chase-the-skies": {
     "message": "Chase the Skies"
   },
@@ -589,6 +715,12 @@
   },
   "app.skins.title": {
     "message": "Вибір скіну"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Вимкнути"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Увімкнути"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} завантажено. Перезапустіть, щоб оновити зараз, або це відбудеться автоматично після закриття застосунку."
@@ -701,6 +833,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Увійдіть в обліковий запис Modrinth</link>, щоб додати друзів і бачити, у що вони грають!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Створити ярлик"
+  },
+  "instance.action.export-modpack": {
+    "message": "Експортувати збірку"
+  },
+  "instance.action.launch-instance": {
+    "message": "Запустити профіль"
+  },
+  "instance.action.more-actions": {
+    "message": "Інші дії"
+  },
+  "instance.action.open-folder": {
+    "message": "Відкрити теку"
+  },
+  "instance.action.repair": {
+    "message": "Виправити"
+  },
+  "instance.action.settings": {
+    "message": "Налаштування профілю"
+  },
+  "instance.action.starting": {
+    "message": "Запускаємо…"
+  },
+  "instance.action.stopping": {
+    "message": "Зупиняємо…"
+  },
   "instance.add-server.add-and-play": {
     "message": "Додати та грати"
   },
@@ -742,6 +901,9 @@
   },
   "instance.files.save-as": {
     "message": "Зберегти як..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Не запускався"
   },
   "instance.server-modal.address": {
     "message": "Адреса"
@@ -947,6 +1109,9 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Уведіть ширину…"
   },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Ваш доступ до цього спільного профілю відкликано. Профіль досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "Сервер Minecraft"
   },
@@ -955,6 +1120,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Скопіювати адресу"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Створити ярлик"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Не показувати на головній"
@@ -1006,6 +1174,27 @@
   },
   "minecraft-account.sign-in": {
     "message": "Увійти в Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Ви повинні мати обліковий запис Microsoft із придбаним Minecraft, перш ніж запускати ігри."
+  },
+  "minecraft-required.description-header": {
+    "message": "Увійти в обліковий запис Microsoft"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Не маєте облікового запису?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Отримати Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Отримати підтримку"
+  },
+  "minecraft-required.header": {
+    "message": "Потрібний Minecraft"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Увійти в Microsoft"
   },
   "search.filter.locked.instance": {
     "message": "Надано профілем"

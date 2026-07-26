@@ -6,6 +6,8 @@ import dayjs from 'dayjs'
 import { get_user_many } from '@/helpers/cache'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 
+export const friendsQueryKey = (userId?: string | null) => ['friends', userId ?? null] as const
+
 export type UserStatus = {
 	user_id: string
 	instance_name: string | null
@@ -46,6 +48,111 @@ export type FriendWithUserData = {
 	online: boolean
 	avatar: string
 }
+
+export type FriendCacheUser = {
+	id: string
+	username: string
+	avatarUrl?: string | null
+}
+
+export async function getFriendsWithUserData(
+	credentials: ModrinthCredentials | null,
+): Promise<FriendWithUserData[]> {
+	if (!credentials) return []
+
+	const friendsList = await friends()
+	return await transformFriends(friendsList, credentials)
+}
+
+export function createPendingFriend(
+	user: FriendCacheUser,
+	currentUserId?: string | null,
+): FriendWithUserData {
+	return {
+		id: user.id,
+		friend_id: currentUserId ?? null,
+		status: null,
+		last_updated: null,
+		created: dayjs(),
+		username: user.username,
+		accepted: false,
+		online: false,
+		avatar: user.avatarUrl ?? '',
+	}
+}
+
+export function getFriendUserId(
+	friend: Pick<FriendWithUserData, 'id' | 'friend_id'>,
+	currentUserId?: string | null,
+) {
+	return friend.id === currentUserId && friend.friend_id ? friend.friend_id : friend.id
+}
+
+export function matchesFriend(
+	friend: FriendWithUserData,
+	id: string,
+	username: string,
+	currentUserId?: string | null,
+) {
+	const friendId = getFriendUserId(friend, currentUserId)
+	return (
+		normalizeFriendKey(friendId) === normalizeFriendKey(id) ||
+		normalizeFriendKey(friend.username) === normalizeFriendKey(username)
+	)
+}
+
+export function upsertCachedFriend(
+	friends: FriendWithUserData[],
+	friend: FriendWithUserData,
+	currentUserId?: string | null,
+) {
+	const existingFriend = friends.find((cachedFriend) =>
+		matchesFriend(cachedFriend, friend.id, friend.username, currentUserId),
+	)
+
+	if (!existingFriend) return [friend, ...friends]
+
+	return friends.map((cachedFriend) =>
+		matchesFriend(cachedFriend, friend.id, friend.username, currentUserId)
+			? {
+					...cachedFriend,
+					...friend,
+					id: cachedFriend.id,
+					friend_id: cachedFriend.friend_id,
+				}
+			: cachedFriend,
+	)
+}
+
+export function acceptCachedFriend(
+	friends: FriendWithUserData[],
+	id: string,
+	username: string,
+	currentUserId?: string | null,
+) {
+	return friends.map((friend) =>
+		matchesFriend(friend, id, username, currentUserId)
+			? {
+					...friend,
+					accepted: true,
+				}
+			: friend,
+	)
+}
+
+export function removeCachedFriend(
+	friends: FriendWithUserData[],
+	id: string,
+	username: string,
+	currentUserId?: string | null,
+) {
+	return friends.filter((friend) => !matchesFriend(friend, id, username, currentUserId))
+}
+
+export function normalizeFriendKey(value: string) {
+	return value.trim().toLowerCase()
+}
+
 export async function transformFriends(
 	friends: UserFriend[],
 	credentials: ModrinthCredentials | null,

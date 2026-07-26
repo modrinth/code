@@ -21,7 +21,7 @@ function buildImageQueryParams(
 			params.thread_message_id = target.thread_message_id
 			break
 		case 'report':
-			params.report_id = target.report_id
+			if (target.report_id) params.report_id = target.report_id
 			break
 	}
 	return params

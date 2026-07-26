@@ -1,36 +1,49 @@
-import type { Stage } from '../types/stage'
-import categories from './stages/categories'
-import description from './stages/description'
-import environment from './stages/environment/environment'
-import environmentMultiple from './stages/environment/environment-multiple'
-import gallery from './stages/gallery'
-import license from './stages/license'
-import links from './stages/links'
-import permissions from './stages/permissions'
-import postApproval from './stages/post-approval'
-import reupload from './stages/reupload'
-import ruleFollowing from './stages/rule-following'
-import statusAlerts from './stages/status-alerts'
-import summary from './stages/summary'
-import titleSlug from './stages/title-slug'
-import undefinedProject from './stages/undefined-project'
-import versions from './stages/versions'
+import type { Ref } from 'vue'
+import { provide, ref } from 'vue'
 
-export default [
-	titleSlug,
-	summary,
-	description,
-	links,
-	license,
-	categories,
-	environment,
-	environmentMultiple,
-	gallery,
-	versions,
-	reupload,
-	permissions,
-	ruleFollowing,
-	statusAlerts,
-	undefinedProject,
-	postApproval,
-] as ReadonlyArray<Stage>
+import type { NodeState, StageFn, StageNodeBuilder } from '../types/node'
+import { group, STAGES_KEY } from '../types/node'
+import useCategoriesStage from './stages/categories'
+import useDescriptionStage from './stages/description'
+import useGalleryStage from './stages/gallery'
+import useLicenseStage from './stages/license'
+import useLinksStage from './stages/links'
+import useMetadataStage from './stages/metadata'
+import usePermissionsStage from './stages/permissions'
+import usePostApprovalStage from './stages/post-approval'
+import useReReviewStage from './stages/re-review'
+import useReuploadsStage from './stages/reupload'
+import useOtherRulesStage from './stages/other-rules'
+import useStatusAlertsStage from './stages/status-alerts'
+import useSummaryStage from './stages/summary'
+import useTitleSlugStage from './stages/title-slug'
+import useUndefinedProjectStage from './stages/undefined-project'
+import useVersionsStage from './stages/versions'
+
+export function useStages(
+	globalState: Ref<Record<string, Record<string, NodeState>>>,
+): StageNodeBuilder[] {
+	const mainStages: StageNodeBuilder[] = [
+		usePostApprovalStage(),
+		useUndefinedProjectStage(),
+		useReReviewStage(),
+		useTitleSlugStage(),
+		useSummaryStage(),
+		useDescriptionStage(),
+		useGalleryStage(),
+		useLinksStage(),
+		useLicenseStage(),
+		useCategoriesStage(),
+		useMetadataStage(),
+		useVersionsStage(),
+		useReuploadsStage(),
+		usePermissionsStage(),
+		useOtherRulesStage(),
+	]
+	provide(STAGES_KEY, ref(mainStages))
+	return [...mainStages, useStatusAlertsStage(mainStages, globalState)]
+}
+
+export const stages: ReadonlyArray<StageFn> = []
+
+export default group()

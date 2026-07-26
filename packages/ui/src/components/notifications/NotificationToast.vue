@@ -4,11 +4,11 @@
 	>
 		<div v-if="isInviteNotification" class="flex w-full items-start gap-3">
 			<Avatar
-				:src="actorAvatarUrl"
-				:alt="actorLabel"
-				:tint-by="actorLabel"
+				:src="inviteAvatarUrl"
+				:alt="inviteAvatarLabel"
+				:tint-by="inviteAvatarLabel"
 				size="44px"
-				circle
+				:circle="inviteAvatarCircle"
 				no-shadow
 				class="border border-solid border-surface-5"
 			/>
@@ -35,20 +35,17 @@
 								>.
 							</template>
 							<template v-else>
-								<span class="inline-flex max-w-full items-center gap-[5px] align-[-4px]">
-									<Avatar
-										:src="entityIconUrl"
-										:alt="entityLabel"
-										size="24px"
-										no-shadow
-										raised
-										:tint-by="entityLabel"
-										class="!rounded-[7px]"
-									/>
-									<span class="min-w-0 truncate font-semibold text-contrast">{{
-										entityLabel
-									}}</span> </span
-								>.
+								<Avatar
+									:src="entityIconUrl"
+									:alt="entityLabel"
+									:tint-by="entityLabel"
+									size="28px"
+									no-shadow
+									raised
+									class="inline-block !rounded-lg align-middle"
+								/>
+								<span class="ml-1 font-semibold text-contrast">{{ entityLabel }}</span>
+								<span> instance.</span>
 							</template>
 						</template>
 					</p>
@@ -65,10 +62,17 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<ButtonStyled color="brand">
-						<button @click="$emit('accept')">Accept</button>
+						<button :disabled="actionLoading != null" @click="$emit('accept')">
+							<SpinnerIcon v-if="actionLoading === 'accept'" class="animate-spin" />
+							<CheckIcon v-else />
+							Accept
+						</button>
 					</ButtonStyled>
 					<ButtonStyled type="outlined">
-						<button @click="$emit('decline')">Decline</button>
+						<button :disabled="actionLoading != null" @click="$emit('decline')">
+							<XIcon />
+							Decline
+						</button>
 					</ButtonStyled>
 				</div>
 			</div>
@@ -175,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
+import { CheckIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { useFormatBytes, useFormatNumber } from '../../composables'
@@ -190,10 +194,12 @@ type NotificationToastType =
 	| 'instance-invite'
 	| 'instance-download'
 	| 'instance-ready'
+type NotificationToastAction = 'accept'
 
 const props = withDefaults(
 	defineProps<{
 		type: NotificationToastType
+		actionLoading?: NotificationToastAction | null
 		actorName?: string | null
 		actorAvatarUrl?: string | null
 		entityName?: string
@@ -209,6 +215,7 @@ const props = withDefaults(
 		actions?: PopupNotificationButton[]
 	}>(),
 	{
+		actionLoading: null,
 		actorName: null,
 		actorAvatarUrl: null,
 		entityName: '',
@@ -239,6 +246,9 @@ const isInviteNotification = computed(
 
 const actorLabel = computed(() => props.actorName || 'Someone')
 const entityLabel = computed(() => props.entityName || '')
+const inviteAvatarUrl = computed(() => props.actorAvatarUrl)
+const inviteAvatarLabel = computed(() => actorLabel.value)
+const inviteAvatarCircle = computed(() => true)
 const progressValue = computed(() => Math.max(0, Math.min(1, props.progress ?? 0)))
 const progressPercent = computed(() => Math.round(progressValue.value * 100))
 const isWaitingProgress = computed(() => props.type === 'instance-download' && props.waiting)
@@ -250,7 +260,7 @@ const inviteActionText = computed(() => {
 		return 'invited you to manage the server'
 	}
 
-	return 'invited you to play the instance'
+	return 'invited you to'
 })
 
 const resolvedStatusText = computed(() => {

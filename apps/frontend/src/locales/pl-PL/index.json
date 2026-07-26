@@ -8,6 +8,9 @@
   "admin.billing.error.not-found": {
     "message": "Nie znaleziono użytkownika"
   },
+  "ads-consent.title": {
+    "message": "Twoja prywatność i jak reklamy wspierają Modrinth"
+  },
   "analytics.action.add": {
     "message": "Dodaj"
   },
@@ -132,7 +135,7 @@
     "message": "Pokaż szczegóły analityki monetyzacji"
   },
   "analytics.chart.legend.monetization-details.description": {
-    "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają, że użytkownik jest zalogowany."
+    "message": "Tylko wyświetlenia i pobrania z Modrinth liczą się do monetyzacji, gdzie pobrania wymagają bycia zalogowanym."
   },
   "analytics.chart.legend.monetization-details.title": {
     "message": "Szczegóły analityki monetyzacji"
@@ -1029,7 +1032,7 @@
     "message": "Wyślij "
   },
   "conversation-thread.action.send-to-review": {
-    "message": "Wyślij do sprawdzenia"
+    "message": "Wyślij do przeglądu"
   },
   "conversation-thread.action.send-to-review-with-reply": {
     "message": "Wyślij do przeglądu z odpowiedzią"
@@ -2666,6 +2669,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Ulepsz do Modrinth+"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "Musisz zweryfikować adres e-mail, żeby móc publikować zawartość na Modrinth."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "Wymagana weryfikacja adresu e-mail"
+  },
   "moderation.exclude-technical-review": {
     "message": "Wyklucz RT"
   },
@@ -2993,8 +3002,23 @@
   "muralpay.warning.wallet-address": {
     "message": "Sprawdź podwójnie adres portfela. Fundusze przesłane na nieprawidłowy portfel nie mogą być odzyskane."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Zmiany zostaną zastosowane dla {count, plural, one {# projektu} other {# projektów}}."
+  "organization.button.manage": {
+    "message": "Zarządzaj"
+  },
+  "organization.button.manage-projects": {
+    "message": "Zarządzaj projektami"
+  },
+  "organization.label.downloads": {
+    "message": "pobrań"
+  },
+  "organization.label.members": {
+    "message": "członków"
+  },
+  "organization.label.organization": {
+    "message": "Organizacja"
+  },
+  "organization.label.projects": {
+    "message": "projektów"
   },
   "profile.bio.fallback.creator": {
     "message": "Twórca na Modrinth."
@@ -3062,8 +3086,8 @@
   "profile.label.collection": {
     "message": "Kolekcja"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {pobranie} few {pobrania} other {pobrań}}"
+  "profile.label.download-count": {
+    "message": "{count, plural, one {pobranie} few {pobrania} other {pobrań}}"
   },
   "profile.label.joined": {
     "message": "Dołączył(-a)"
@@ -3083,8 +3107,8 @@
   "profile.label.organizations": {
     "message": "Organizacje"
   },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} few {projekty} other {projektów}}"
+  "profile.label.project-count": {
+    "message": "{count, plural, one {projekt} few {projekty} other {projektów}}"
   },
   "profile.label.saving": {
     "message": "Zapisywanie..."
@@ -3218,24 +3242,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Utworzony {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Pod licencją {license}"
-  },
-  "project.about.details.published": {
-    "message": "Opublikowano {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Przesłano {date}"
-  },
-  "project.about.details.title": {
-    "message": "Szczegóły"
-  },
-  "project.about.details.updated": {
-    "message": "Zaktualizowany {date}"
-  },
   "project.actions.create-server": {
     "message": "Utwórz serwer"
   },
@@ -3244,6 +3250,12 @@
   },
   "project.actions.dont-show-again": {
     "message": "Nie pokazuj ponownie"
+  },
+  "project.actions.edit-project": {
+    "message": "Edytuj projekt"
+  },
+  "project.actions.rescan-modpack": {
+    "message": "Ponownie skanuj paczkę modów"
   },
   "project.actions.review-project": {
     "message": "Przegląd projektu"
@@ -3265,9 +3277,6 @@
   },
   "project.description.title": {
     "message": "Opis"
-  },
-  "project.details.licensed": {
-    "message": "Licencja"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Ta wersja gry jest niekompatybilna z bazowym projektem."
@@ -3421,15 +3430,6 @@
   },
   "project.gallery.title": {
     "message": "Galeria"
-  },
-  "project.license.error": {
-    "message": "Nie można pobrać tekstu licencji."
-  },
-  "project.license.loading": {
-    "message": "Ładowanie tekstu licencji..."
-  },
-  "project.license.title": {
-    "message": "Licencja"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Twój projekt jest prywatny, co oznacza, że jest widoczny tylko dla ciebie i tych, których zaprosisz."
@@ -3646,12 +3646,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Odwiedź pulpit projektów"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {pobranie} few {pobrania} other {pobrań}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {obserwujący} other {obserwujących}}"
   },
   "project.status.archived.message": {
     "message": "{title} zostało zarchiwizowane. {title} nie będzie otrzymywać żadnych dalszych aktualizacji, chyba że autor zdecyduje się przywrócić projekt."
@@ -4072,9 +4066,6 @@
   },
   "servers.plan.small.description": {
     "message": "Idealny dla 1–5 przyjaciół z kilkoma lekkimi modami."
-  },
-  "servers.purchase.step.plan.billed": {
-    "message": "naliczane {interval, select, monthly {miesięcznie} quarterly {co kwartał} yearly {rocznie} other {{interval}}}"
   },
   "settings.account.button.complete-setup": {
     "message": "Zakończ ustawianie"
@@ -4918,6 +4909,9 @@
   },
   "version.environment.unknown.title": {
     "message": "Nieznane środowisko"
+  },
+  "version.notification.deleted-title": {
+    "message": "Wersja usunięta"
   },
   "version.package-as-mod.button": {
     "message": "Zapakuj jako mod"

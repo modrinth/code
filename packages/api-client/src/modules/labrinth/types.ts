@@ -397,6 +397,14 @@ export namespace Labrinth {
 				attribution: AttributionResolution
 			}
 
+			export type DeleteGroupsRequest = {
+				groups: string[]
+			}
+
+			export type DeleteAllGroupsRequest = {
+				project_id: string
+			}
+
 			export type AssignRequest = {
 				sha1: string
 				target_group_id: number
@@ -434,7 +442,7 @@ export namespace Labrinth {
 				| { context: 'project'; project_id: string }
 				| { context: 'version'; version_id: string }
 				| { context: 'thread_message'; thread_message_id: string }
-				| { context: 'report'; report_id: string }
+				| { context: 'report'; report_id: string | null }
 			)
 
 			export type UploadedImageFor<C extends ImageUploadContext> = Extract<
@@ -450,7 +458,7 @@ export namespace Labrinth {
 				| { context: 'project'; project_id: string }
 				| { context: 'version'; version_id: string }
 				| { context: 'thread_message'; thread_message_id: string }
-				| { context: 'report'; report_id: string }
+				| { context: 'report'; report_id?: string }
 		}
 	}
 
@@ -756,6 +764,7 @@ export namespace Labrinth {
 				email: string
 				challenge: string
 				sign_up_newsletter?: boolean
+				account_consent?: boolean
 			}
 
 			export type CreateAccountResponse = {
@@ -773,6 +782,7 @@ export namespace Labrinth {
 				state: string
 				challenge: string
 				sign_up_newsletter: boolean
+				account_consent?: boolean
 			}
 
 			export type CreateOAuthAccountResponse = {
@@ -1748,6 +1758,17 @@ export namespace Labrinth {
 	}
 
 	export namespace Search {
+		export type SearchParams = {
+			query?: string
+			offset?: string | number
+			index?: string
+			limit?: string | number
+			new_filters?: string
+			facets?: string[][]
+			filters?: string
+			version?: string
+		}
+
 		export namespace v2 {
 			export interface ResultSearchProject {
 				project_id: string
@@ -1810,7 +1831,9 @@ export namespace Labrinth {
 				featured_gallery: string | null
 				color: number | null
 				loaders: string[]
-				project_loader_fields?: Record<string, unknown[]>
+				project_loader_fields?: Record<string, unknown[]> & {
+					environment?: Projects.v3.Environment[]
+				}
 				minecraft_server?: Projects.v3.MinecraftServer | null
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
@@ -1902,13 +1925,14 @@ export namespace Labrinth {
 
 	export namespace Reports {
 		export namespace v3 {
-			export type ItemType = 'project' | 'version' | 'user' | 'unknown'
+			export type ItemType = 'project' | 'version' | 'user' | 'shared-instance' | 'unknown'
 
 			export type Report = {
 				id: string
 				report_type: string
 				item_id: string
 				item_type: ItemType
+				shared_instance_version_id?: number
 				reporter: string
 				body: string
 				created: string

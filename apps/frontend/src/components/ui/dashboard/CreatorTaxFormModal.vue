@@ -137,7 +137,9 @@
 				</div>
 				<div class="flex w-full flex-row justify-stretch gap-2">
 					<ButtonStyled>
-						<button class="w-full text-contrast" @click="handleClose">{{ closeButtonText }}</button>
+						<button class="w-full text-contrast" @click="handleClose">
+							{{ props.closeButtonText ?? formatMessage(messages.closeButton) }}
+						</button>
 					</ButtonStyled>
 					<ButtonStyled color="green">
 						<button class="w-full text-contrast" @click="downloadTaxForm">
@@ -182,7 +184,7 @@ const props = withDefaults(
 		emitSuccessOnClose?: boolean
 	}>(),
 	{
-		closeButtonText: 'Close',
+		closeButtonText: undefined,
 		emitSuccessOnClose: true,
 	},
 )
@@ -267,6 +269,18 @@ const messages = defineMessages({
 	downloadButton: {
 		id: 'dashboard.creator-tax-form-modal.confirmation.download-button',
 		defaultMessage: 'Download {formType}',
+	},
+	closeButton: {
+		id: 'dashboard.creator-tax-form-modal.close-button',
+		defaultMessage: 'Close',
+	},
+	incompleteTitle: {
+		id: 'dashboard.creator-tax-form-modal.incomplete.title',
+		defaultMessage: 'Tax form incomplete',
+	},
+	incompleteText: {
+		id: 'dashboard.creator-tax-form-modal.incomplete.text',
+		defaultMessage: 'You have not completed the tax form. Please try again.',
 	},
 })
 
@@ -371,8 +385,8 @@ async function continueForm() {
 			}
 
 			addNotification({
-				title: 'Tax form incomplete',
-				text: 'You have not completed the tax form. Please try again.',
+				title: formatMessage(messages.incompleteTitle),
+				text: formatMessage(messages.incompleteText),
 				type: 'warning',
 			})
 		}

@@ -1,5 +1,5 @@
+use crate::env::ENV;
 use crate::routes::ApiError;
-use crate::{database::redis::RedisPool, env::ENV};
 use actix_web::{
     Error, ResponseError,
     body::{EitherBody, MessageBody},
@@ -10,8 +10,9 @@ use actix_web::{
 use chrono::Utc;
 use std::str::FromStr;
 use std::sync::Arc;
+use xredis::RedisPool;
 
-const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v1";
+const RATE_LIMIT_NAMESPACE: &str = "rate_limit:v3";
 const RATE_LIMIT_EXPIRY: i64 = 300; // 5 minutes
 const MINUTE_IN_NANOS: i64 = 60_000_000_000;
 
@@ -68,9 +69,10 @@ impl AsyncRateLimiter {
 
         // Get current time in nanoseconds since UNIX epoch
         let now = Utc::now().timestamp_nanos_opt().unwrap_or(0);
+        let key = conn.key().with_slot(RATE_LIMIT_NAMESPACE, key, key);
 
         // Get the current TAT from Redis (if it exists)
-        let tat_str = conn.get(RATE_LIMIT_NAMESPACE, key).await.ok().flatten();
+        let tat_str = conn.get(&key).await.ok().flatten();
 
         // Parse the TAT or use current time if not found
         let current_tat = match tat_str {
@@ -102,12 +104,7 @@ impl AsyncRateLimiter {
         let new_tat = std::cmp::max(current_tat + increment, now);
 
         let _ = conn
-            .set(
-                RATE_LIMIT_NAMESPACE,
-                key,
-                &new_tat.to_string(),
-                Some(RATE_LIMIT_EXPIRY),
-            )
+            .set(&key, &new_tat.to_string(), Some(RATE_LIMIT_EXPIRY))
             .await;
 
         let remaining_capacity =

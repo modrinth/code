@@ -27,6 +27,7 @@ interface Props {
 	hideDelete?: boolean
 	hideHeader?: boolean
 	flat?: boolean
+	showItemActions?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 	hideDelete: false,
 	hideHeader: false,
 	flat: false,
+	showItemActions: false,
 })
 
 const stickyHeaderRef = ref<HTMLElement | null>(null)
@@ -67,7 +69,8 @@ const hasEnabledListener = computed(
 const hasAnyActions = computed(() => {
 	// Check if there are listeners for actions
 	const hasListeners =
-		(hasDeleteListener.value && !props.hideDelete) ||
+		(hasDeleteListener.value &&
+			props.items.some((item) => !props.hideDelete && !item.hideDelete)) ||
 		hasUpdateListener.value ||
 		hasSwitchVersionListener.value ||
 		hasEnabledListener.value
@@ -80,7 +83,7 @@ const hasAnyActions = computed(() => {
 			item.enabled !== undefined,
 	)
 
-	return hasListeners || hasItemActions
+	return hasListeners || hasItemActions || props.showItemActions
 })
 
 // Virtualization
@@ -273,7 +276,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:toggle-disabled="item.toggleDisabled"
 					:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 					:show-checkbox="showSelection"
-					:hide-delete="hideDelete"
+					:hide-delete="hideDelete || item.hideDelete"
 					:hide-actions="!hasAnyActions"
 					:selected="isItemSelected(item.id)"
 					:class="[
@@ -296,6 +299,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 						hasSwitchVersionListener ? { switchVersion: () => emit('switchVersion', item.id) } : {}
 					"
 				>
+					<template #title-badges>
+						<slot name="itemTitleBadges" :item="item" :index="visibleRange.start + idx" />
+					</template>
 					<template #additionalButtonsLeft>
 						<slot name="itemButtonsLeft" :item="item" :index="visibleRange.start + idx" />
 					</template>
@@ -326,13 +332,14 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:has-update="item.hasUpdate"
 				:is-client-only="item.isClientOnly"
 				:client-warning="item.clientWarning"
+				:hide-switch-version="item.hideSwitchVersion"
 				:overflow-options="item.overflowOptions"
 				:disabled="item.disabled"
 				:disabled-tooltip="item.disabledTooltip"
 				:toggle-disabled="item.toggleDisabled"
 				:toggle-disabled-tooltip="item.toggleDisabledTooltip"
 				:show-checkbox="showSelection"
-				:hide-delete="hideDelete"
+				:hide-delete="hideDelete || item.hideDelete"
 				:hide-actions="!hasAnyActions"
 				:selected="isItemSelected(item.id)"
 				:class="[
@@ -350,6 +357,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 				@update="emit('update', item.id)"
 				@switch-version="emit('switchVersion', item.id)"
 			>
+				<template #title-badges>
+					<slot name="itemTitleBadges" :item="item" :index="index" />
+				</template>
 				<template #additionalButtonsLeft>
 					<slot name="itemButtonsLeft" :item="item" :index="index" />
 				</template>

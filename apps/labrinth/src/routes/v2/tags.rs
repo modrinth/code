@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use super::ApiError;
 use crate::database::PgPool;
 use crate::database::models::loader_fields::LoaderFieldEnumValue;
-use crate::database::redis::RedisPool;
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
@@ -11,6 +10,7 @@ use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(

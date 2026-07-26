@@ -72,7 +72,7 @@
 					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
 						{{ formatMessage(messages.threadSectionTitle) }}
 					</h2>
-					<div v-if="isStaff(currentMember?.user)" class="flex items-center gap-2">
+					<div v-if="staff" class="flex items-center gap-2">
 						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
 						<label for="moderator-see-user-ui-toggle"> Show member UI </label>
 					</div>
@@ -150,11 +150,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
+
+defineEmits(['on-download', 'delete-version'])
 
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
@@ -207,10 +209,19 @@ const messages = defineMessages({
 })
 
 const { addNotification } = injectNotificationManager()
-const { projectV2: project, currentMember, invalidate, allMembers } = injectProjectPageContext()
+const {
+	projectV2: project,
+	currentMember,
+	invalidate,
+	allMembers,
+	thread,
+} = injectProjectPageContext()
 
 const canAccess = computed(() => !!currentMember.value)
-const userFacingUiVisible = computed(() => !!currentMember.value && moderatorSeeUserUi.value)
+const staff = computed(() => isStaff(currentMember.value?.user))
+const userFacingUiVisible = computed(
+	() => !!currentMember.value && (!staff.value || moderatorSeeUserUi.value),
+)
 
 const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 	switch (project.value?.status) {
@@ -424,12 +435,7 @@ watch(
 const auth = await useAuth()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-
-const { data: thread, isPending: pending } = useQuery({
-	queryKey: computed(() => ['thread', project.value?.thread_id]),
-	queryFn: () => client.labrinth.threads_v3.getThread(project.value.thread_id),
-	enabled: computed(() => !!project.value?.thread_id),
-})
+const pending = computed(() => thread.value === undefined)
 
 function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) {
 	const threadId = newThread?.id ?? project.value?.thread_id

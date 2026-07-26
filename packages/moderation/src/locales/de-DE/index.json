@@ -168,7 +168,7 @@
     "defaultMessage": "Lass die Spieler wissen, in welcher Region sich dein Server befindet."
   },
   "nags.select-country.title": {
-    "defaultMessage": "Wählen eine Region aus"
+    "defaultMessage": "Region auswählen"
   },
   "nags.select-language.description": {
     "defaultMessage": "Wähle die Sprache oder Sprachen, welche auf deinem Server unterstützt werden."

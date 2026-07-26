@@ -287,17 +287,11 @@
   "app.modal.update-to-play.header": {
     "message": "Actualiza para jugar"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Una actualización es requerida para jugar {name}. Por favor actualízala a la versión más reciente para ejecutar el juego."
-  },
   "app.project.install-button.already-installed": {
     "message": "El proyecto ya está instalado"
   },
   "app.project.install-context.back-to-browse": {
     "message": "Volver a descubrir"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Instalar contenido"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."

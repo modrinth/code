@@ -4,12 +4,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use actix_web::web;
-use database::redis::RedisPool;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
 };
 use tracing::{debug, info, warn};
+use xredis::RedisPool;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -26,7 +26,7 @@ use crate::util::archon::ArchonClient;
 use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use crate::util::tiltify::TiltifyClient;
-use sync::friends::handle_pubsub;
+use sync::friends::{FRIENDS_CHANNEL_NAME, handle_pubsub};
 use url::Url;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
 
@@ -290,11 +290,10 @@ pub fn app_setup(
 
     {
         let pool = pool.clone();
-        let redis_client = redis::Client::open(redis_pool.url.clone()).unwrap();
+        let pubsub_messages = redis_pool.subscribe(FRIENDS_CHANNEL_NAME);
         let sockets = active_sockets.clone();
         actix_rt::spawn(async move {
-            let pubsub = redis_client.get_async_pubsub().await.unwrap();
-            handle_pubsub(pubsub, pool, sockets).await;
+            handle_pubsub(pubsub_messages, pool, sockets).await;
         });
     }
 

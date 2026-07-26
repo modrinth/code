@@ -27,14 +27,14 @@ interface BrowseServerInstance {
 interface ContextMenuHandle {
 	showMenu: (
 		event: MouseEvent,
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+		result: Labrinth.Search.v3.ResultSearchProject,
 		options: { name: string }[],
 	) => void
 }
 
 interface ContextMenuOptionClick {
 	option: 'open_link' | 'copy_link'
-	item: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject
+	item: Labrinth.Search.v3.ResultSearchProject
 }
 
 export interface UseAppServerBrowseOptions {
@@ -263,10 +263,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		return actions
 	}
 
-	function handleRightClick(
-		event: MouseEvent,
-		result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-	) {
+	function handleRightClick(event: MouseEvent, result: Labrinth.Search.v3.ResultSearchProject) {
 		contextMenuRef.value?.showMenu(event, result, [{ name: 'open_link' }, { name: 'copy_link' }])
 	}
 
@@ -315,9 +312,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	}
 }
 
-function getProjectUrl(
-	item: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
-) {
-	const projectType = 'project_types' in item ? item.project_types?.[0] : item.project_type
+function getProjectUrl(item: Labrinth.Search.v3.ResultSearchProject) {
+	const projectType = item.project_types?.[0]
 	return `https://modrinth.com/${projectType ?? 'project'}/${item.slug ?? item.project_id}`
 }

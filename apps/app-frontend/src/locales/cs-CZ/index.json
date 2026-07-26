@@ -380,9 +380,6 @@
   "app.modal.update-to-play.header": {
     "message": "Aktualizuj pro hraní"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Pro hraní {name} je vyžadována aktualizace. Prosím aktualizuj na nejnovější verzi, abys mohl hru spustit."
-  },
   "app.project.install-button.already-installed": {
     "message": "Tento projekt je již nainstalován"
   },
@@ -391,9 +388,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "Zpět k Objevování"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Nainstalovat obsah do instance"
   },
   "app.project.version.all-versions": {
     "message": "Všechny verze"

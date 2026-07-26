@@ -260,9 +260,6 @@
   "app.modal.update-to-play.header": {
     "message": "Mag-update upang malaro"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
-  },
   "app.project.install-button.already-installed": {
     "message": "Naka-install na ang proyektong ito"
   },

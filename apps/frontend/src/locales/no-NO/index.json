@@ -2609,9 +2609,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Dobbeltsjekk lommeboksadressa di. Penger sendt til feil adresse kan ikke bli gjenoppretta."
   },
-  "organization.settings.projects.edit-links.affected-projects": {
-    "message": "Endringer blir utført på {count, plural, one {prosjekt} other {prosjekter}}."
-  },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth-skaper."
   },
@@ -2678,9 +2675,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {nedlasting} other {nedlastinger}}"
-  },
   "profile.label.joined": {
     "message": "Blei med"
   },
@@ -2698,9 +2692,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasjoner"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
   },
   "profile.label.saving": {
     "message": "Lagrer..."
@@ -2834,24 +2825,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Oppretta {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Lisensiert {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publisert {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Sendt inn {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaljer"
-  },
-  "project.about.details.updated": {
-    "message": "Oppdatert {date}"
-  },
   "project.actions.create-server": {
     "message": "Lag en server"
   },
@@ -2881,9 +2854,6 @@
   },
   "project.description.title": {
     "message": "Beskrivelse"
-  },
-  "project.details.licensed": {
-    "message": "Lisensert"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} støtter ikke {gameVersion} for {platform}"
@@ -2935,15 +2905,6 @@
   },
   "project.gallery.title": {
     "message": "Galleri"
-  },
-  "project.license.error": {
-    "message": "Lisenstekst kunne ikke bli henta."
-  },
-  "project.license.loading": {
-    "message": "Laster inn linsenstekst..."
-  },
-  "project.license.title": {
-    "message": "Lisens"
   },
   "project.moderation.admonition.approved.header": {
     "message": "Prosjekt godkjent"
@@ -3037,12 +2998,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Besøk prosjekt-dashbordet"
-  },
-  "project.stats.downloads-label": {
-    "message": "{count, plural, one {nedlasting} other {nedlastinger}}"
-  },
-  "project.stats.followers-label": {
-    "message": "{count, plural, one {følger} other {følgere}}"
   },
   "project.status.archived.message": {
     "message": "{title} har blitt arkivert. {title} kommer ikke til å få noen nye oppdateringer, hvis ikke forfatteren bestemmer seg for å dearkivere prosjektet."

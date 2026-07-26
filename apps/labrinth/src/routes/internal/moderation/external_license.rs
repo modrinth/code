@@ -7,11 +7,11 @@ use serde::{Deserialize, Serialize};
 use crate::database::PgPool;
 use crate::database::models::ids::DBUserId;
 use crate::database::models::moderation_external_item::ExternalLicense;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::queue::moderation::ApprovalType;
 use crate::routes::ApiError;
 use crate::{auth::check_is_moderator_from_headers, queue::session::AuthQueue};
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(search)
