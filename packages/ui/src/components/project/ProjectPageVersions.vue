@@ -457,7 +457,7 @@ import {
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
-import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
+import { formatVersionsForDisplay, type GameVersionTag } from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -479,15 +479,12 @@ const formatBytes = useFormatBytes()
 const MAX_GAME_VERSION_TAGS = 5
 const MAX_PLATFORM_TAGS = 3
 
-type VersionWithDisplayUrlEnding = Version & {
+type VersionWithDisplayUrlEnding = Labrinth.Versions.v3.Version & {
 	displayUrlEnding: string
-	environment?: Labrinth.Projects.v3.Environment
-	mrpack_loaders?: string[]
 }
 
 type DisplayVersion = VersionWithDisplayUrlEnding & {
 	noModLoader: boolean
-	files_missing_attribution?: boolean
 }
 
 type VersionTableColumn =
@@ -515,7 +512,7 @@ const props = withDefaults(
 		currentMember?: boolean
 		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
-		versionLink?: (version: Version) => string
+		versionLink?: (version: Labrinth.Versions.v3.Version) => string
 		openModal?: () => void
 		createVersionButtonSecondary?: boolean
 	}>(),

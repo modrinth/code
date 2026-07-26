@@ -1294,7 +1294,9 @@ const { data: thread } = useQuery({
 
 const isSettings = computed(() => route.name.startsWith('type-project-settings'))
 
-// Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
+// Defensively normalize array fields, and substitute the real platform loaders for modpack
+// versions — `loaders` on a modpack version is just `['mrpack']` (a file-format marker), the
+// actual supported loaders live in `mrpack_loaders`.
 const versionsRaw = computed(() => {
 	return (versionsV3.value ?? []).map((version) => {
 		const files = Array.isArray(version.files) ? version.files : []
