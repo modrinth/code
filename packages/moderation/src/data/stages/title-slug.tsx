@@ -6,7 +6,12 @@ import {
 	TagCategoryWandSparklesIcon,
 	UserPlusIcon,
 } from '@modrinth/assets'
-import { Alert, injectModrinthClient, injectProjectPageContext } from '@modrinth/ui'
+import {
+	Alert,
+	injectModrinthClient,
+	injectProjectPageContext,
+	ProjectStatusLink,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
@@ -64,8 +69,6 @@ export default function () {
 	}
 
 	const SlugStatus = () => {
-		// Untouched — reflect the auto-suggested slug already sitting in the field (the value
-		// that'll actually be used until the moderator overrides it) via the same states below.
 		const v =
 			slugValidation.value ??
 			(autoSlugStatus.value === 'loading'
@@ -94,16 +97,10 @@ export default function () {
 		const by = correctSlugConflict.value
 		return (
 			<Alert type="error" class="w-full">
-				Slug taken
-				{by ? (
-					<>
-						{' by '}
-						<a href={`/project/${by.slug}`} target="_blank" class="underline">
-							{by.name}
-						</a>
-						{` (${by.status})`}
-					</>
-				) : null}
+				<div class="flex flex-wrap items-center gap-1.5">
+					Slug taken
+					{by ? <ProjectStatusLink project={by} newTab /> : null}
+				</div>
 			</Alert>
 		)
 	}
@@ -195,12 +192,7 @@ export default function () {
 						{autoSlugStatus.value === 'loading' ? (
 							'...'
 						) : by ? (
-							<>
-								<a href={`/project/${by.slug}`} target="_blank" class="underline">
-									{by.name}
-								</a>
-								{` (${by.status})`}
-							</>
+							<ProjectStatusLink project={by} newTab />
 						) : (
 							'No'
 						)}

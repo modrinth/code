@@ -8,7 +8,6 @@ import type {
 	DropdownNodeBuilder,
 	GroupNodeBuilder,
 	IdentifiedNodeBuilder,
-	InputNodeBuilder,
 	LabeledNodeBuilder,
 	NodeState,
 	NodeStateWithChildren,
@@ -23,6 +22,7 @@ import {
 	flattenProjectVariables,
 	flattenStaticVariables,
 	getBooleanChildState,
+	InputNodeBuilder,
 	NodeBuilder,
 	resolve,
 	resolveChildren,
@@ -309,7 +309,9 @@ function getComponentProps(node: ComponentNodeBuilder): Record<string, unknown> 
 	const ctx: ComponentNodePropsContext = {
 		onImageUpload: props.onImageUpload,
 		toggleSetValue:
-			node._valueKind === 'set' ? (value: string) => toggleMultiSelectValue(identified, value) : undefined,
+			node._valueKind === 'set'
+				? (value: string) => toggleMultiSelectValue(identified, value)
+				: undefined,
 	}
 	return {
 		id: `node-${identified.id}`,
@@ -628,6 +630,24 @@ watchEffect(async () => {
 		}
 	}
 })
+
+// Runs `.onChange()` once for whatever an input node's resolved value already is when it first
+// renders (real stored state or the `.initial()` default), and again if that value ever changes
+// outside of the input itself — not just on a real user edit event. A node's persisted value can
+// otherwise sit unvalidated forever if nothing but a DOM input event ever triggers `.onChange()`.
+const lastSeenTextValue = new Map<InputNodeBuilder, string>()
+
+watchEffect(() => {
+	for (const node of props.nodes) {
+		if (!(node instanceof InputNodeBuilder) || !node._onChange) continue
+		if (!isVisible(node)) continue
+
+		const value = getTextState(node)
+		if (lastSeenTextValue.get(node) === value) continue
+		lastSeenTextValue.set(node, value)
+		setTextState(node, value)
+	}
+})
 </script>
 
 <template>
@@ -652,9 +672,7 @@ watchEffect(async () => {
 
 			<template v-else-if="isVisible(item)">
 				<div
-					:class="
-						item.type === 'group' ? 'w-full' : !getNodeTitle(item) ? 'contents' : undefined
-					"
+					:class="item.type === 'group' ? 'w-full' : !getNodeTitle(item) ? 'contents' : undefined"
 				>
 					<div v-if="getNodeTitle(item)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
 						<span
