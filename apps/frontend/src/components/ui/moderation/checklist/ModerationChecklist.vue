@@ -1510,8 +1510,8 @@ async function assembleFullMessage() {
 
 	return expandVariables(
 		parts
-			.map((p) => p.content)
-			.filter((c) => c.trim().length > 0)
+			.map((p) => p.content.trim())
+			.filter((c) => c.length > 0)
 			.join('\n\n'),
 		projectV2.value,
 		projectV3.value,
