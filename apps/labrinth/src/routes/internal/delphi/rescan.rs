@@ -97,28 +97,23 @@ async fn fetch_unreviewed_tech_review_project_ids(
         r#"
         SELECT DISTINCT m.id
         FROM mods m
+        INNER JOIN delphi_tech_review_queue queue ON queue.project_id = m.id
         WHERE
             EXISTS(
                 SELECT 1
                 FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
                 WHERE
                     didws.project_id = m.id
                     AND didws.status = 'pending'
                     AND NOT didws.hidden
-                    -- see delphi.rs todo comment
-                    AND dri.issue_type != '__dummy'
             )
             AND NOT EXISTS(
                 SELECT 1
                 FROM delphi_issue_details_with_statuses didws
-                INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
                 WHERE
                     didws.project_id = m.id
                     AND didws.status IN ('safe', 'unsafe')
                     AND NOT didws.hidden
-                    -- see delphi.rs todo comment
-                    AND dri.issue_type != '__dummy'
             )
         "#,
     )

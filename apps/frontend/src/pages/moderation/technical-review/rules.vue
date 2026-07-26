@@ -10,6 +10,19 @@
 				placeholder="Known-safe obfuscated bootstrap"
 			/>
 
+			<label class="font-semibold text-contrast" for="rule-priority">Priority</label>
+			<StyledInput
+				id="rule-priority"
+				v-model="form.priority"
+				type="number"
+				:min="-2147483648"
+				:max="2147483647"
+				:step="1"
+			/>
+			<p class="m-0 text-sm text-secondary">
+				Higher-priority rules run first. Rules with the same priority run in creation order.
+			</p>
+
 			<label class="font-semibold text-contrast" for="rule-expression">CEL expression</label>
 			<div
 				class="relative overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
@@ -250,7 +263,9 @@
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div>
 						<h2 class="m-0 text-lg font-bold text-contrast">{{ rule.name }}</h2>
-						<p class="m-0 text-sm text-secondary">Revision {{ rule.revision }}</p>
+						<p class="m-0 text-sm text-secondary">
+							Priority {{ rule.priority }} · Revision {{ rule.revision }}
+						</p>
 					</div>
 					<div class="flex gap-2">
 						<ButtonStyled>
@@ -474,6 +489,7 @@ const expandedAffectedDetails = reactive(
 const loadingAffectedRuleIds = reactive(new Set<number>())
 const form = reactive({
 	name: '',
+	priority: 0 as number | undefined,
 	rule: DEFAULT_RULE,
 })
 let ruleTestRequestId = 0
@@ -753,6 +769,7 @@ function openCreateModal() {
 	if (isScanning.value) return
 	editingRuleId.value = null
 	form.name = ''
+	form.priority = 0
 	form.rule = DEFAULT_RULE
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
@@ -765,6 +782,7 @@ function openEditModal(rule: Labrinth.TechReview.Internal.DelphiRule) {
 	if (isScanning.value) return
 	editingRuleId.value = rule.id
 	form.name = rule.name
+	form.priority = rule.priority
 	form.rule = rule.rule
 	isRuleModalOpen.value = true
 	ruleModal.value?.show()
@@ -787,11 +805,19 @@ function handleRuleModalHide() {
 async function saveRule() {
 	if (isSaving.value || isScanning.value) return
 
-	if (!form.name.trim() || !form.rule.trim()) {
+	const priority = form.priority
+	if (
+		!form.name.trim() ||
+		!form.rule.trim() ||
+		typeof priority !== 'number' ||
+		!Number.isInteger(priority) ||
+		priority < -2147483648 ||
+		priority > 2147483647
+	) {
 		addNotification({
 			type: 'error',
 			title: 'Invalid rule',
-			text: 'Enter a name and a CEL expression.',
+			text: 'Enter a name, an integer priority, and a CEL expression.',
 		})
 		return
 	}
@@ -799,6 +825,7 @@ async function saveRule() {
 	isSaving.value = true
 	const payload = {
 		name: form.name,
+		priority,
 		rule: form.rule,
 	}
 

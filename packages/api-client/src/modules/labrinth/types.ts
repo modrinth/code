@@ -2230,6 +2230,7 @@ export namespace Labrinth {
 				id: number
 				name: string
 				rule: string
+				priority: number
 				revision: number
 				created_at: string
 				updated_at: string
@@ -2260,6 +2261,7 @@ export namespace Labrinth {
 			export type WriteDelphiRule = {
 				name: string
 				rule: string
+				priority: number
 			}
 
 			export type TestDelphiRuleTrace = {

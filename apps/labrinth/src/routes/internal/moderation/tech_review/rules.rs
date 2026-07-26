@@ -45,6 +45,7 @@ pub struct DelphiRule {
     pub id: i64,
     pub name: String,
     pub rule: String,
+    pub priority: i32,
     pub revision: i64,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -77,6 +78,8 @@ pub struct DelphiRuleAffectedDetail {
 pub struct WriteDelphiRule {
     pub name: String,
     pub rule: String,
+    #[serde(default)]
+    pub priority: i32,
 }
 
 #[derive(Debug, Deserialize, utoipa::ToSchema)]
@@ -112,6 +115,7 @@ pub struct DelphiRuleEffect {
 struct ValidatedRule {
     name: String,
     rule: String,
+    priority: i32,
 }
 
 impl WriteDelphiRule {
@@ -142,7 +146,11 @@ impl WriteDelphiRule {
             ApiError::Request(eyre!("invalid cel expression: {error}"))
         })?;
 
-        Ok(ValidatedRule { name, rule })
+        Ok(ValidatedRule {
+            name,
+            rule,
+            priority: self.priority,
+        })
     }
 }
 
@@ -265,6 +273,7 @@ pub async fn get_rules(
 			delphi_rule.id,
 			delphi_rule.name,
 			delphi_rule.rule,
+			delphi_rule.priority,
 			delphi_rule.revision,
 			delphi_rule.created_at,
 			delphi_rule.updated_at,
@@ -323,7 +332,10 @@ pub async fn get_rules(
 			LIMIT 3
 		) preview ON TRUE
 		WHERE NOT delphi_rule.delete_on_next_revision
-		ORDER BY delphi_rule.id, preview.detail_id DESC
+		ORDER BY
+			delphi_rule.priority DESC,
+			delphi_rule.id,
+			preview.detail_id DESC
 		"#,
     )
     .fetch_all(&***ro_pool)
@@ -340,6 +352,7 @@ pub async fn get_rules(
                 id: rule.id,
                 name: rule.name,
                 rule: rule.rule,
+                priority: rule.priority,
                 revision: rule.revision,
                 created_at: rule.created_at,
                 updated_at: rule.updated_at,
@@ -513,6 +526,7 @@ pub async fn create_rule(
 		INSERT INTO delphi_rules (
 			name,
 			rule,
+			priority,
 			revision,
 			created_by,
 			updated_by
@@ -520,14 +534,16 @@ pub async fn create_rule(
 		VALUES (
 			$1,
 			$2,
-			(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),
 			$3,
-			$3
+			(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),
+			$4,
+			$4
 		)
 		RETURNING
 			id,
 			name,
 			rule,
+			priority,
 			revision,
 			created_at,
 			updated_at,
@@ -536,6 +552,7 @@ pub async fn create_rule(
 		"#,
         rule.name,
         rule.rule,
+        rule.priority,
         user_id,
     )
     .fetch_one(&**pool)
@@ -546,6 +563,7 @@ pub async fn create_rule(
         id: rule.id,
         name: rule.name,
         rule: rule.rule,
+        priority: rule.priority,
         revision: rule.revision,
         created_at: rule.created_at,
         updated_at: rule.updated_at,
@@ -591,16 +609,18 @@ pub async fn update_rule(
 		SET
 			name = $2,
 			rule = $3,
+			priority = $4,
 			revision = (
 				SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1
 			),
 			updated_at = CURRENT_TIMESTAMP,
-			updated_by = $4
+			updated_by = $5
 		WHERE id = $1 AND NOT delete_on_next_revision
 		RETURNING
 			id,
 			name,
 			rule,
+			priority,
 			revision,
 			created_at,
 			updated_at,
@@ -610,6 +630,7 @@ pub async fn update_rule(
         id,
         rule.name,
         rule.rule,
+        rule.priority,
         user_id,
     )
     .fetch_optional(&**pool)
@@ -621,6 +642,7 @@ pub async fn update_rule(
         id: rule.id,
         name: rule.name,
         rule: rule.rule,
+        priority: rule.priority,
         revision: rule.revision,
         created_at: rule.created_at,
         updated_at: rule.updated_at,

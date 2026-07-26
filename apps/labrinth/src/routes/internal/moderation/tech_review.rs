@@ -33,10 +33,7 @@ use crate::{
     queue::session::AuthQueue,
     routes::{
         ApiError,
-        internal::{
-            delphi::tech_review_sync::{self, TechReviewExitReason},
-            moderation::Ownership,
-        },
+        internal::{delphi::tech_review_queue, moderation::Ownership},
     },
     search::SearchState,
     util::error::Context,
@@ -318,7 +315,6 @@ pub async fn get_report(
                         ON didws.issue_id = severity_issue.id
                     WHERE
                         severity_issue.report_id = dr.id
-                        AND severity_issue.issue_type != '__dummy'
                         AND NOT didws.hidden
                 ), 'low'::delphi_severity),
                 -- TODO: replace with `json_array` in Postgres 16
@@ -352,8 +348,6 @@ pub async fn get_report(
 					FROM delphi_report_issues dri
 					WHERE
                         dri.report_id = dr.id
-                        -- see delphi.rs todo comment
-                        AND dri.issue_type != '__dummy'
                         AND EXISTS (
                             SELECT 1
                             FROM delphi_issue_details_with_statuses visible_detail
@@ -655,10 +649,6 @@ async fn fetch_project_reports(
                     let mut file_issues = Vec::new();
 
                     for issue_row in report_issues {
-                        if issue_row.issue_type == "__dummy" {
-                            continue;
-                        }
-
                         let issue_details = details_by_issue
                             .get(&issue_row.id)
                             .unwrap_or(&empty_details);
@@ -770,13 +760,15 @@ pub async fn search_projects(
             m.id AS "project_id: DBProjectId",
             MIN(t.id) AS "thread_id!: DBThreadId"
         FROM mods m
+        INNER JOIN delphi_tech_review_queue trq ON trq.project_id = m.id
         INNER JOIN threads t ON t.mod_id = m.id
-        INNER JOIN versions v ON v.mod_id = m.id
-        INNER JOIN files f ON f.version_id = v.id
-        INNER JOIN delphi_reports dr ON dr.file_id = f.id
-        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        INNER JOIN delphi_issue_details_with_statuses didws
+        LEFT JOIN versions v ON v.mod_id = m.id
+        LEFT JOIN files f ON f.version_id = v.id
+        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
+        LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
+        LEFT JOIN delphi_issue_details_with_statuses didws
             ON didws.issue_id = dri.id
+            AND NOT didws.hidden
         LEFT JOIN threads_messages tm_last
             ON tm_last.thread_id = t.id
             AND tm_last.id = (
@@ -820,9 +812,25 @@ pub async fn search_projects(
             )
             AND m.status NOT IN ('draft', 'rejected', 'withheld')
             AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
-            AND (cardinality($7::text[]) = 0 OR dri.issue_type = ANY($7::text[]))
-            AND didws.status = 'pending'
-            AND NOT didws.hidden
+            AND (
+                cardinality($7::text[]) = 0
+                OR EXISTS (
+                    SELECT 1
+                    FROM versions issue_version
+                    INNER JOIN files issue_file
+                        ON issue_file.version_id = issue_version.id
+                    INNER JOIN delphi_reports issue_report
+                        ON issue_report.file_id = issue_file.id
+                    INNER JOIN delphi_report_issues issue
+                        ON issue.report_id = issue_report.id
+                    INNER JOIN delphi_issue_details_with_statuses detail
+                        ON detail.issue_id = issue.id
+                    WHERE
+                        issue_version.mod_id = m.id
+                        AND issue.issue_type = ANY($7::text[])
+                        AND NOT detail.hidden
+                )
+            )
             AND (
                 $5::text IS NULL
                 OR ($5::text = 'unreplied' AND (tm_last.id IS NULL OR u_last.role IS NULL OR u_last.role NOT IN ('moderator', 'admin')))
@@ -832,8 +840,8 @@ pub async fn search_projects(
         ORDER BY
             CASE WHEN $3 = 'created_asc'   THEN MIN(dr.created)  ELSE TO_TIMESTAMP(0)        END ASC,
             CASE WHEN $3 = 'created_desc'  THEN MIN(dr.created)  ELSE TO_TIMESTAMP(0)        END DESC,
-            CASE WHEN $3 = 'severity_asc'  THEN MAX(didws.severity) ELSE 'low'::delphi_severity END ASC,
-            CASE WHEN $3 = 'severity_desc' THEN MAX(didws.severity) ELSE 'low'::delphi_severity END DESC,
+            CASE WHEN $3 = 'severity_asc'  THEN COALESCE(MAX(didws.severity), 'low'::delphi_severity) ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $3 = 'severity_desc' THEN COALESCE(MAX(didws.severity), 'low'::delphi_severity) ELSE 'low'::delphi_severity END DESC,
             -- tie-breaker: oldest reports
             MIN(dr.created) ASC
         LIMIT $1 OFFSET $2
@@ -1079,8 +1087,6 @@ pub async fn submit_report(
             m.id = $1
             AND didws.status = 'pending'
             AND NOT didws.hidden
-            -- see delphi.rs todo comment
-            AND dri.issue_type != '__dummy'
         "#,
         project_id as _,
     )
@@ -1099,24 +1105,18 @@ pub async fn submit_report(
         });
     }
 
-    sqlx::query!(
-        "
-        DELETE FROM delphi_report_issue_details drid
-        WHERE issue_id IN (
-            SELECT dri.id
-            FROM mods m
-            INNER JOIN versions v ON v.mod_id = m.id
-            INNER JOIN files f ON f.version_id = v.id
-            INNER JOIN delphi_reports dr ON dr.file_id = f.id
-            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-            WHERE m.id = $1 AND dri.issue_type = '__dummy'
-        )
-        ",
-        project_id as _,
+    sqlx::query_scalar!(
+        r#"
+        DELETE FROM delphi_tech_review_queue
+        WHERE project_id = $1
+        RETURNING project_id AS "project_id: DBProjectId"
+        "#,
+        project_id as DBProjectId,
     )
-    .execute(&mut txn)
+    .fetch_optional(&mut txn)
     .await
-    .wrap_internal_err("failed to delete dummy issue")?;
+    .wrap_internal_err("failed to remove project from technical review queue")?
+    .ok_or(ApiError::NotFound)?;
 
     let record = sqlx::query!(
         r#"
@@ -1301,10 +1301,6 @@ pub async fn update_issue_details(
                 i.verdict
             FROM incoming i
             INNER JOIN delphi_issue_details_with_statuses didws ON didws.id = i.detail_id
-            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-            WHERE
-                -- see delphi.rs todo comment
-                dri.issue_type != '__dummy'
         ),
         validated AS (
             SELECT
@@ -1364,10 +1360,7 @@ pub async fn update_issue_details(
         r#"
         SELECT DISTINCT didws.project_id AS "project_id!: DBProjectId"
         FROM delphi_issue_details_with_statuses didws
-        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
-        WHERE
-            didws.id = ANY($1::bigint[])
-            AND dri.issue_type != '__dummy'
+        WHERE didws.id = ANY($1::bigint[])
         "#,
         &detail_ids,
     )
@@ -1382,9 +1375,8 @@ pub async fn update_issue_details(
         .map(|row| row.project_id)
         .collect::<Vec<_>>();
 
-    tech_review_sync::sync_project_tech_review_state(
+    tech_review_queue::add_projects_with_review_details(
         &affected_project_ids,
-        TechReviewExitReason::Resolved,
         &mut txn,
     )
     .await?;
@@ -1492,9 +1484,25 @@ pub async fn update_global_issue_details(
     .await
     .wrap_internal_err("failed to update global issue details")?;
 
-    tech_review_sync::sync_detail_key_tech_review_state(
+    let affected_projects = sqlx::query!(
+        r#"
+        SELECT DISTINCT detail.project_id AS "project_id!: DBProjectId"
+        FROM delphi_issue_details_with_statuses detail
+        WHERE detail.key = ANY($1::text[])
+        "#,
         &detail_keys,
-        TechReviewExitReason::Resolved,
+    )
+    .fetch_all(&mut txn)
+    .await
+    .wrap_internal_err(
+        "failed to fetch projects affected by global detail updates",
+    )?;
+
+    tech_review_queue::add_projects_with_review_details(
+        &affected_projects
+            .into_iter()
+            .map(|row| row.project_id)
+            .collect::<Vec<_>>(),
         &mut txn,
     )
     .await?;

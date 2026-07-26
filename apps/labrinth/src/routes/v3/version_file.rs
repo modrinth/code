@@ -934,9 +934,9 @@ pub async fn delete_file(
         database::models::version_item::cleanup_unused_attribution_files_and_groups(&mut transaction)
             .await?;
 
-        delphi::tech_review_sync::sync_project_tech_review_state(
+        delphi::tech_review_queue::remove_projects_without_details(
             &[row.project_id],
-            delphi::tech_review_sync::TechReviewExitReason::FileDeleted,
+            delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
             &mut transaction,
         )
         .await?;

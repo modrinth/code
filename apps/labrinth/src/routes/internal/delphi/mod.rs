@@ -32,7 +32,7 @@ use crate::{
 };
 
 pub mod rescan;
-pub mod tech_review_sync;
+pub mod tech_review_queue;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
@@ -257,9 +257,8 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to apply delphi rules to new issue details")?;
 
-    tech_review_sync::sync_project_tech_review_state(
+    tech_review_queue::add_projects_with_review_details(
         &[DBProjectId::from(report.project_id)],
-        tech_review_sync::TechReviewExitReason::Resolved,
         &mut transaction,
     )
     .await?;

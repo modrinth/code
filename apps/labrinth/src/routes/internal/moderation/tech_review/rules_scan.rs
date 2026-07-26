@@ -12,8 +12,8 @@ use tokio_stream::wrappers::UnboundedReceiverStream;
 use utoipa::{PartialSchema, ToSchema};
 
 use super::rules::DelphiRuleEffect;
-use crate::routes::internal::delphi::tech_review_sync::{
-    self, TechReviewExitReason,
+use crate::routes::internal::delphi::tech_review_queue::{
+    self, TechReviewRemovalReason,
 };
 use crate::{
     auth::check_is_moderator_from_headers,
@@ -32,8 +32,6 @@ use crate::{
 
 const RULE_SCAN_LOCK_ID: i64 = 0x6465_6c70_6869_7275;
 const PROGRESS_INTERVAL: usize = 50;
-const DUMMY_ISSUE_TYPE: &str = "__dummy";
-
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_rule_schema)
         .service(get_detail_rule_input)
@@ -212,12 +210,9 @@ pub async fn get_detail_rule_input(
             FROM hashes
             WHERE hashes.file_id = file.id
         ) file_hashes ON TRUE
-        WHERE
-            detail.id = $1
-            AND issue.issue_type != $2
+        WHERE detail.id = $1
         "#,
             detail_id as DelphiReportIssueDetailsId,
-            DUMMY_ISSUE_TYPE,
         )
         .fetch_optional(&***ro_pool)
         .await,
@@ -384,11 +379,8 @@ async fn run_scan(
     let total = sqlx::query_scalar!(
         r#"
         SELECT COUNT(*) AS "count!"
-        FROM delphi_report_issue_details detail
-        INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
-        WHERE issue.issue_type != $1
+        FROM delphi_report_issue_details
         "#,
-        DUMMY_ISSUE_TYPE,
     )
     .fetch_one(&mut transaction)
     .await
@@ -423,10 +415,8 @@ async fn run_scan(
             FROM hashes
             GROUP BY file_id
         ) file_hashes ON file_hashes.file_id = file.id
-        WHERE issue.issue_type != $1
         ORDER BY detail.id
         "#,
-        DUMMY_ISSUE_TYPE,
     )
     .fetch(&mut transaction);
 
@@ -508,28 +498,25 @@ async fn run_scan(
                 detail.project_id,
                 BOOL_OR(
                     detail.status IN ('pending', 'unsafe')
-                    AND issue.issue_type != $2
                     AND NOT detail.hidden
                 ) AS old_needs_review,
                 BOOL_OR(
                     detail.status IN ('pending', 'unsafe')
-                    AND issue.issue_type != $2
                     AND NOT COALESCE(new_effect.hidden, FALSE)
                 ) AS new_needs_review
             FROM delphi_issue_details_with_statuses detail
-            INNER JOIN delphi_report_issues issue
-                ON issue.id = detail.issue_id
             LEFT JOIN delphi_rule_effects new_effect
                 ON new_effect.revision = $1
                 AND new_effect.detail_id = detail.id
             GROUP BY detail.project_id
         )
-        SELECT project_id AS "project_id!: DBProjectId"
+        SELECT
+            project_id AS "project_id!: DBProjectId",
+            new_needs_review AS "new_needs_review!"
         FROM project_membership
         WHERE old_needs_review IS DISTINCT FROM new_needs_review
         "#,
         revision,
-        DUMMY_ISSUE_TYPE,
     )
     .fetch_all(&mut transaction)
     .await
@@ -547,19 +534,25 @@ async fn run_scan(
         .await
         .wrap_err("failed to publish the delphi rule revision")?;
 
-    tech_review_sync::sync_project_tech_review_state(
+    tech_review_queue::add_projects(
         &affected_projects
             .iter()
+            .filter(|project| project.new_needs_review)
             .map(|project| project.project_id)
             .collect::<Vec<_>>(),
-        TechReviewExitReason::RulesChanged,
         &mut transaction,
     )
-    .await
-    .map_err(|error| {
-        eyre!(error)
-            .wrap_err("failed to sync projects affected by delphi rule changes")
-    })?;
+    .await?;
+    tech_review_queue::remove_projects(
+        &affected_projects
+            .iter()
+            .filter(|project| !project.new_needs_review)
+            .map(|project| project.project_id)
+            .collect::<Vec<_>>(),
+        TechReviewRemovalReason::RulesChanged,
+        &mut transaction,
+    )
+    .await?;
 
     sqlx::query!(
         "DELETE FROM delphi_rule_effects WHERE revision <> $1",
@@ -634,13 +627,10 @@ pub(crate) async fn materialize_current_rule_effects(
             FROM hashes
             WHERE hashes.file_id = file.id
         ) file_hashes ON TRUE
-        WHERE
-            detail.id = ANY($1::bigint[])
-            AND issue.issue_type != $2
+        WHERE detail.id = ANY($1::bigint[])
         ORDER BY detail.id
         "#,
         &detail_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
-        DUMMY_ISSUE_TYPE,
     )
     .fetch_all(&mut *transaction)
     .await
@@ -702,7 +692,7 @@ async fn fetch_compiled_rules(
         SELECT id, rule
         FROM delphi_rules
         WHERE NOT delete_on_next_revision
-        ORDER BY id
+        ORDER BY priority DESC, id
         "#,
     )
     .fetch_all(&mut *transaction)

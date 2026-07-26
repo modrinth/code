@@ -191,7 +191,6 @@ pub async fn search_global_issue_details(
             AND NOT didws.hidden
         LEFT JOIN delphi_report_issues dri
             ON dri.id = didws.issue_id
-            AND dri.issue_type != '__dummy'
         WHERE (
             $1::text IS NULL
             OR dgdv.detail_key ILIKE '%' || $1 || '%'
@@ -250,7 +249,6 @@ pub async fn search_global_issue_details(
             WHERE
                 didws.key = ANY($1::text[])
                 AND NOT didws.hidden
-                AND dri.issue_type != '__dummy'
         )
         SELECT
             detail_key AS "detail_key!",
@@ -372,7 +370,6 @@ pub async fn get_global_issue_detail(
             AND NOT didws.hidden
         LEFT JOIN delphi_report_issues dri
             ON dri.id = didws.issue_id
-            AND dri.issue_type != '__dummy'
         WHERE dgdv.detail_key = $1
         GROUP BY dgdv.detail_key, dgdv.verdict
         "#,
@@ -416,7 +413,6 @@ pub async fn get_global_issue_detail(
             didws.key = $1
             AND ($2::bigint IS NULL OR didws.id > $2)
             AND NOT didws.hidden
-            AND dri.issue_type != '__dummy'
         ORDER BY didws.id
         LIMIT $3
         "#,

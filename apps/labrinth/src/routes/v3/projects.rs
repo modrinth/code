@@ -2746,8 +2746,9 @@ pub async fn project_delete_internal(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
-    delphi::tech_review_sync::sync_deleted_project_tech_review_exit(
-        project.inner.id,
+    delphi::tech_review_queue::remove_projects(
+        &[project.inner.id],
+        delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,
         &mut transaction,
     )
     .await?;
