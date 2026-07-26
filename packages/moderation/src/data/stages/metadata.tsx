@@ -108,7 +108,7 @@ export default function () {
 								),
 						),
 
-					toggle('loader', 'Loaders')
+					toggle('loader', 'Loaders (WIP)')
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.rawMessage(async (state) => {
@@ -151,7 +151,7 @@ export default function () {
 								})),
 						),
 
-					toggle('game-version', 'Game Versions')
+					toggle('game-version', 'Game Versions (WIP)')
 						.suggestedStatus('flagged')
 						.severity('medium')
 						.rawMessage(async (state) => {
