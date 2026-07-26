@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-26T01:32:43+00:00`,
+		product: 'web',
+		body: `## Changed
+- Allow crowdin badges to bypass the image proxy.
+- Bio and Username fields in profile settings now show the character limit.
+
+## Fixed
+- Fixed project moderation page banners and info messages not showing for non-staff users.`,
+	},
+	{
 		date: `2026-07-24T18:04:04+00:00`,
 		product: 'app',
 		version: '0.16.1',
