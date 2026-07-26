@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-26T19:06:47+00:00`,
+		product: 'web',
+		body: `## Changed
+- Changed review estimate text from 24–48 hours to within a week, to set more realistic expectations for now.`,
+	},
+	{
 		date: `2026-07-26T01:32:43+00:00`,
 		product: 'web',
 		body: `## Changed
