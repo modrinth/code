@@ -73,7 +73,12 @@ fn normalize_not(expression: FilterExpr) -> FilterExpr {
     }
 }
 
-fn normalize_predicate(predicate: FilterPredicate) -> FilterExpr {
+fn normalize_predicate(mut predicate: FilterPredicate) -> FilterExpr {
+    if let FilterCondition::In { values, .. } = &mut predicate.condition {
+        values.sort();
+        values.dedup();
+    }
+
     if predicate.field.as_str() == "minecraft_java_server.ping.data"
         && let FilterCondition::Exists { negated } = predicate.condition
     {

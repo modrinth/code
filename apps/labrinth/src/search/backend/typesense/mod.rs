@@ -304,6 +304,8 @@ const fn default_max_candidates() -> usize {
 
 impl TypesenseConfig {
     pub fn new(meta_namespace: Option<String>) -> Self {
+        let use_cache = meta_namespace.is_none() && ENV.TYPESENSE_USE_CACHE;
+
         Self {
             url: ENV.TYPESENSE_URL.clone(),
             api_key: ENV.TYPESENSE_API_KEY.clone(),
@@ -312,7 +314,7 @@ impl TypesenseConfig {
             index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
             import_batch_size: ENV.TYPESENSE_IMPORT_BATCH_SIZE,
             delete_batch_size: ENV.TYPESENSE_DELETE_BATCH_SIZE,
-            use_cache: ENV.TYPESENSE_USE_CACHE,
+            use_cache,
         }
     }
 

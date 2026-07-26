@@ -483,7 +483,7 @@ mod tests {
         assert_eq!(filter.matches("$versions(").count(), 1);
         assert!(filter.contains("license:=`MIT`"));
         assert!(filter.contains(
-            "categories:`fabric` && game_versions:1.20.1 || categories:`forge` && game_versions:1.21.1"
+            "categories:`fabric` && game_versions:`1.20.1` || categories:`forge` && game_versions:`1.21.1`"
         ));
     }
 
