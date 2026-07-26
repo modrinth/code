@@ -5,7 +5,7 @@
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
 			private: isPrivateMessage,
-			'show-private-bg': flags.showModeratorPrivateMessageHighlight,
+			'show-private-bg': settings.get(moderationSettings.General.PrivateMessageHighlight),
 		}"
 	>
 		<template v-if="members[message.author_id]">
@@ -158,6 +158,7 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { moderationSettings } from '@modrinth/moderation'
 import { renderString } from '@modrinth/utils'
 
 import { isStaff } from '~/helpers/users.js'
@@ -194,7 +195,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update-thread'])
-const flags = useFeatureFlags()
+const settings = useModerationSettings()
 
 const formattedMessage = computed(() => {
 	const body = renderString(props.message.body.body)

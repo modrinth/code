@@ -1,6 +1,5 @@
 import type {
 	EnumSettingDefinition,
-	StringSettingDefinition,
 	ToggleSettingDefinition
 } from "../types/settings.ts";
 
@@ -24,6 +23,13 @@ const settings = {
 			description: 'Weather certain keybinds should work without the checklist visible.',
 			default: false,
 		} as ToggleSettingDefinition,
+		PrivateMessageHighlight: {
+			type: 'toggle',
+			id: 'private-message-highlight',
+			title: 'Highlight Private Messages',
+			description: 'Whether private messages should be highlighted in the chat.',
+			default: true,
+		} as ToggleSettingDefinition
 	}
 } as const
 
