@@ -56,16 +56,19 @@ const { formatMessage } = useVIntl()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
 const diffs = computed<ContentDiffItem[]>(
 	() =>
-		preview.value?.diffs.map((diff) => ({
-			type: diff.type,
-			projectName: diff.projectName ?? undefined,
-			fileName: diff.fileName ?? undefined,
-			currentVersionName: diff.currentVersionName ?? undefined,
-			newVersionName: diff.newVersionName ?? undefined,
-			fileCount: diff.configFileCount ?? undefined,
-			disabled: diff.disabled,
-			external: diff.type === 'added' && !diff.projectId && !!diff.fileName,
-		})) ?? [],
+		preview.value?.diffs
+			// TODO: This is TEMP!!! Hashing needs to be done on backend
+			.filter((diff) => !(diff.type === 'updated' && !diff.projectId && diff.fileName))
+			.map((diff) => ({
+				type: diff.type,
+				projectName: diff.projectName ?? undefined,
+				fileName: diff.fileName ?? undefined,
+				currentVersionName: diff.currentVersionName ?? undefined,
+				newVersionName: diff.newVersionName ?? undefined,
+				fileCount: diff.configFileCount ?? undefined,
+				disabled: diff.disabled,
+				external: diff.type === 'added' && !diff.projectId && !!diff.fileName,
+			})) ?? [],
 )
 
 async function update() {

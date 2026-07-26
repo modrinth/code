@@ -90,6 +90,7 @@
 						:requested-label="requestedButtonLabel"
 						:requested-tooltip="requestedTooltip(friend.username)"
 						:user-profile-link="userProfileLink"
+						:disabled="!canInvite"
 						@invite="inviteFriend"
 						@cancel="cancelInvite"
 					/>
@@ -348,6 +349,7 @@ const {
 })
 
 function inviteFriend(friend: InvitePlayersUser) {
+	if (!props.canInvite) return
 	emit('invite', {
 		user: friend,
 		source: 'friend',
@@ -355,6 +357,7 @@ function inviteFriend(friend: InvitePlayersUser) {
 }
 
 function cancelInvite(friend: InvitePlayersUser) {
+	if (!props.canInvite) return
 	emit('cancel', friend)
 }
 

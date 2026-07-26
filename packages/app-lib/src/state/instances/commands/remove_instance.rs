@@ -13,7 +13,7 @@ pub(crate) async fn remove_instance(
         })?;
     let _content_lock = state.lock_instance_content(instance_id).await;
 
-    delete_instance_row_and_content_lock(&instance.id, state).await?;
+    delete_instance_row_and_locks(&instance.id, state).await?;
 
     let path = state.directories.instances_dir().join(&instance.path);
     if path.exists() {
@@ -23,13 +23,13 @@ pub(crate) async fn remove_instance(
     Ok(())
 }
 
-async fn delete_instance_row_and_content_lock(
+async fn delete_instance_row_and_locks(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    // Keep these together so deleted instances cannot leave stale entries in the per-instance lock map.
+    // Keep these together so deleted instances cannot leave stale entries in the per-instance lock maps.
     instance_rows::delete_instance_by_id(instance_id, &state.pool).await?;
-    state.remove_instance_content_lock(instance_id);
+    state.remove_instance_locks(instance_id);
 
     Ok(())
 }

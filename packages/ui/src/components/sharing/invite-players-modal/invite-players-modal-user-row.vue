@@ -37,7 +37,7 @@
 			</button>
 		</ButtonStyled>
 		<ButtonStyled v-else-if="status === 'pending'" type="outlined">
-			<button @click="$emit('cancel', user)">
+			<button :disabled="disabled" @click="$emit('cancel', user)">
 				{{ cancelLabel }}
 			</button>
 		</ButtonStyled>
@@ -49,7 +49,7 @@
 			</ButtonStyled>
 		</span>
 		<ButtonStyled v-else color-fill="none">
-			<button @click="$emit('invite', user)">
+			<button :disabled="disabled" @click="$emit('invite', user)">
 				{{ inviteLabel }}
 			</button>
 		</ButtonStyled>
@@ -74,9 +74,11 @@ const props = withDefaults(
 		inviteLabel: string
 		requestedLabel: string
 		requestedTooltip: string
+		disabled?: boolean
 		userProfileLink?: (username: string) => InvitePlayersUserProfileLink
 	}>(),
 	{
+		disabled: false,
 		userProfileLink: undefined,
 	},
 )

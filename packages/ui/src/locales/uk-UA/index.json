@@ -1115,12 +1115,6 @@
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Ви отримали особливі дозволи для поширення цієї роботи у вашій збірці."
   },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Видалити групу"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Групу не видалено"
-  },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Видалити з групи"
   },
@@ -3047,6 +3041,15 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {відстежує} few {відстежують} other {відстежують}}"
   },
+  "project.license.error": {
+    "defaultMessage": "Не вдалося отримати текст ліцензії."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Завантажуємо текст ліцензії…"
+  },
+  "project.license.title": {
+    "defaultMessage": "Ліцензія"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} у мережі"
   },
@@ -3451,6 +3454,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Переглянути"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {завантаження} few {завантаження} many {завантажень} other {завантаження}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {стежить} few {стежать} many {стежать} other {стежать}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"

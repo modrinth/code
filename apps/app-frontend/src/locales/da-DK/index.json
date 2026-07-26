@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Gem flere kørende instances"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopiere"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopier detaljer"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Tilsidesæt"
   },
@@ -19,6 +25,27 @@
   },
   "app.action-bar.install.retry": {
     "message": "Prøv igen"
+  },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Annulleret på grund af appen blev lukket"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Annulleret"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Kunne ikke download filer"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Downloaded filer er korrupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Kunne ikke gemme filer"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Download kunne ikke blive fuldført"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instance kunne ikke blive fundet"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Ukendt instance"
@@ -286,9 +313,6 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Opdater for at spille"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "En opdatering er krævet for at spille {name}. Venligst opdater til den seneste version for at køre spillet."
   },
   "app.project.install-button.already-installed": {
     "message": "Dette projekt er allerede installeret"

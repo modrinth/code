@@ -198,7 +198,7 @@
     "defaultMessage": "Extraire"
   },
   "button.follow": {
-    "defaultMessage": "J'adore"
+    "defaultMessage": "Suivre"
   },
   "button.hide-snapshots": {
     "defaultMessage": "Masquer les snapshots"
@@ -360,7 +360,7 @@
     "defaultMessage": "Mettre à jour les projets"
   },
   "content.confirm-bulk-update.shift-click-hint": {
-    "defaultMessage": "Maintenez Maj (Shift) en cliquant « Tout mettre à jour » pour passer cette confirmation à l'avenir."
+    "defaultMessage": "Maintenez Maj tout en cliquant « Tout mettre à jour » pour ignorer cette confirmation à l'avenir."
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Mettre à jour {count, plural, one {# projet} other {# projets}}"
@@ -376,6 +376,9 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Supprimer {itemType}"
+  },
+  "content.confirm-disable.header": {
+    "defaultMessage": "Désactiver {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Rétrograder} other {Mettre à jour}} peut causer des erreurs de compatibilité. Les mods ou le contenu ajouté par-dessus le modpack seront gardés, mais il est possible qu'ils ne soient pas compatibles avec la nouvelle version."
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} ajoutés"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Fichiers de configuration modifiés"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Ajouté (dépendance)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Désactivé"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Supprimé (désactivé)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Mis à jour"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Mis à jour"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# fichier} other {# fichiers}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Version du jeu"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Installer quand même"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Modpack lié"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Modpack non lié"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Modpack mis à jour"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Aucun changement de contenu"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} retirés"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} supprimés (désactivés)"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Un fichier est seulement examiné s'il est publié sur Modrinth, peu importe son format (y compris .mrpack)."
@@ -1161,10 +1194,19 @@
     "defaultMessage": "Vous avez obtenu une autorisation spéciale pour redistribuer cette œuvre dans votre modpack."
   },
   "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Retirer le groupe"
+    "defaultMessage": "Supprimer le groupe"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Ce groupe d’attribution et tous les fichiers qu’il contient seront supprimés de manière permanente. Cette action est irréversible."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "Supprimer {title} ?"
   },
   "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Impossible de retirer le groupe"
+    "defaultMessage": "Impossible de supprimer le groupe"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Maintenez Maj tout en cliquant pour passer la confirmation."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Retiré du groupe"
@@ -1473,13 +1515,13 @@
     "defaultMessage": "Annulé"
   },
   "files.upload-dropdown.failed-file-exists": {
-    "defaultMessage": "Échec — Fichier existe déjà"
+    "defaultMessage": "Échec - Fichier existe déjà"
   },
   "files.upload-dropdown.failed-generic": {
-    "defaultMessage": "Échec — {error}"
+    "defaultMessage": "Échec - {error}"
   },
   "files.upload-dropdown.failed-incorrect-type": {
-    "defaultMessage": "Échec — Type de fichier incorrect"
+    "defaultMessage": "Échec - Type de fichier incorrect"
   },
   "files.upload-dropdown.failed-to-upload": {
     "defaultMessage": "Impossible d'importer {fileName}"
@@ -2039,6 +2081,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Aucun contenu trouvé"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Externe"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Ce fichier n'est pas publié sur Modrinth."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Contenu du modpack"
   },
@@ -2047,6 +2095,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Aucun projet correspond à votre recherche."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "Ouvrir dans Slicer"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Rechercher {count, number} {count, plural, one {projet} other {projets}}"
@@ -2810,8 +2861,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Client ou serveur"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Serveur dédié"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Serveur"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Solo"
   },
   "project-type.all": {
     "defaultMessage": "Tout"
@@ -3085,6 +3142,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {adore} other {adorent}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Le texte de la licence n'a pas pu être récupéré."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Chargement du fichier de licence..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Licence"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} en ligne"
@@ -3490,6 +3556,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Voir"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {téléchargement} other {téléchargements}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {adore} other {adorent}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -5001,10 +5073,10 @@
     "defaultMessage": "Résultats de recherche"
   },
   "settings.language.description": {
-    "defaultMessage": "Choisissez votre langue pour {platform}, traduite par des bénévoles <crowdin-link>sur Crowdin</crowdin-link>."
+    "defaultMessage": "Choisissez votre langue préférée {platform}, traduite par des bénévoles <crowdin-link>sur Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
-    "defaultMessage": "Rechercher une langue... "
+    "defaultMessage": "Rechercher une langue..."
   },
   "settings.language.languages.search-results-announcement": {
     "defaultMessage": "{matches, plural, =0 {Aucune langue ne correspond} one {# langue correspond} other {# langues correspondent}} à votre recherche."
@@ -5013,7 +5085,7 @@
     "defaultMessage": "Aucune langue correspond à votre recherche."
   },
   "settings.language.platform.app": {
-    "defaultMessage": "l'appli"
+    "defaultMessage": "de l'application"
   },
   "settings.language.platform.site": {
     "defaultMessage": "du site"
@@ -5022,7 +5094,7 @@
     "defaultMessage": "Langue"
   },
   "settings.language.warning": {
-    "defaultMessage": "Changer la langue {platform} peut entraîner l'affichage de certains contenus en anglais si une traduction n'est pas disponible. Le {platform} n'est pas entièrement traduit, donc certains contenus peuvent rester en anglais selon les langues."
+    "defaultMessage": "Changer la langue {platform} peut entraîner l'affichage de certains contenus en anglais si une traduction n'est pas disponible. Les traductions {platform} ne sont pas encore entièrement faites, donc certains contenus peuvent rester en anglais selon les langues."
   },
   "settings.pats.title": {
     "defaultMessage": "Jetons d'accès personnel"
@@ -5032,6 +5104,81 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Sessions"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Ajouter"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Ajouté"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Cet utilisateur a déjà été invité."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Annuler"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Annuler"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Modifier le lien d'invitation."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Modifier le lien d'invitation"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Date d'expiration"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Vos amis - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Inviter"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Votre lien d'invitation expire dans {duration}."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Ou utiliser un lien d'invitation"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Le lien d'invitation a été copié dans votre presse-papier."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Lien copié"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Impossible de copier le lien"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Utilisations maximales"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Aucun ami trouvé."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Aucun utilisateur correspondant trouvé."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Requête envoyée"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} doit accepter votre demande d'ami en premier"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Enregistrer"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Entrer le nom d'utilisateur Modrinth"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Recherche..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Impossible de mettre à jour le lien d'invitation"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

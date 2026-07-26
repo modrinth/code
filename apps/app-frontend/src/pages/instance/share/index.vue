@@ -11,6 +11,7 @@
 			:link-max-uses="inviteLink.details.value?.maxUses"
 			:update-invite-link="inviteLink.update"
 			:user-profile-link="userProfileLink"
+			:can-invite="!members.exclusiveMutationPending.value && !inviteLink.pending.value"
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
 		/>

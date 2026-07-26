@@ -125,6 +125,21 @@
   "app.action-bar.view-logs": {
     "message": "Bekijk logs"
   },
+  "app.ads-consent.accept": {
+    "message": "Alles accepteren"
+  },
+  "app.ads-consent.body": {
+    "message": "Advertenties maken Modrinth mogelijk en financieren de uitbetalingen aan makers. Onze partners kunnen cookies in de app opslaan of gebruiken om advertenties te personaliseren en de prestaties te meten."
+  },
+  "app.ads-consent.manage": {
+    "message": "Voorkeuren beheren"
+  },
+  "app.ads-consent.reject": {
+    "message": "Alles afwijzen"
+  },
+  "app.ads-consent.title": {
+    "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Activeert geavanceerde weergaves zoals blur effecten die mogelijke prestatieproblemen opleveren zonder hardware-versnelde weergeving."
   },
@@ -464,9 +479,6 @@
   "app.modal.update-to-play.removed": {
     "message": "Verwijderde"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
-  },
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
   },
@@ -476,11 +488,26 @@
   "app.project.install-context.back-to-browse": {
     "message": "Terug naar Ontdekken"
   },
+  "app.project.version.all-versions": {
+    "message": "Alle versies"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Downloaden in de browser"
+  },
+  "app.project.version.installing": {
+    "message": "Wordt geïnstalleerd"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Al geïnstalleerd"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },
   "app.settings.downloading": {
     "message": "v{version} wordt gedownload"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Advertenties maken Modrinth mogelijk en financieren de uitbetalingen aan makers. Onze partners kunnen cookies in de app opslaan of gebruiken om advertenties te personaliseren en de prestaties te meten. Je kunt je hieronder afmelden of je voorkeuren beheren."
   },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
@@ -523,6 +550,9 @@
   },
   "app.skins.dropped-file-error.title": {
     "message": "Fout bij het verwerken van het bestand"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Deze skin maakt gebruik van functies uit de {ears} mod"
   },
   "app.skins.edit-button": {
     "message": "Skin aanpassen"
@@ -650,11 +680,17 @@
   "app.skins.title": {
     "message": "Skinkiezer"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Uitschakelen"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Inschakelen"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} is beschikbaar. Gebruik je pakketbeheerder om te updaten voor de laatste functies en oplossingen!"
+    "message": "De Modrinth-app v{version} is beschikbaar. Gebruik je pakketbeheerder om bij te werken en zo de nieuwste functies en verbeteringen te krijgen!"
   },
   "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
@@ -761,6 +797,33 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Log in op een Modrinth account</link> om vrienden toe te voegen en zien wat zij spelen!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Snelkoppeling maken"
+  },
+  "instance.action.export-modpack": {
+    "message": "Modpack exporteren"
+  },
+  "instance.action.launch-instance": {
+    "message": "Instantie starten"
+  },
+  "instance.action.more-actions": {
+    "message": "Meer acties"
+  },
+  "instance.action.open-folder": {
+    "message": "Map openen"
+  },
+  "instance.action.repair": {
+    "message": "Herstellen"
+  },
+  "instance.action.settings": {
+    "message": "Instellingen voor instantie"
+  },
+  "instance.action.starting": {
+    "message": "Aan het opstarten..."
+  },
+  "instance.action.stopping": {
+    "message": "Aan het stoppen..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Toevoegen en spelen"
   },
@@ -802,6 +865,9 @@
   },
   "instance.files.save-as": {
     "message": "Opslaan als..."
+  },
+  "instance.playtime.never-played": {
+    "message": "Nog nooit gespeeld"
   },
   "instance.server-modal.address": {
     "message": "Adres"
@@ -1069,6 +1135,27 @@
   },
   "minecraft-account.sign-in": {
     "message": "Log in bij Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Je hebt een Microsoft-account nodig waarop Minecraft is geregistreerd voordat je het spel kunt starten en spelen."
+  },
+  "minecraft-required.description-header": {
+    "message": "Meld je aan bij een Microsoft-account"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Heb je nog geen account?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Minecraft kopen"
+  },
+  "minecraft-required.get-support": {
+    "message": "Hulp krijgen"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft vereist"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Aanmelden bij Microsoft"
   },
   "search.filter.locked.instance": {
     "message": "Aangeboden door de instantie"

@@ -287,9 +287,6 @@
   "app.modal.update-to-play.header": {
     "message": "Actualiza para jugar"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Una actualización es requerida para jugar {name}. Por favor actualízala a la versión más reciente para ejecutar el juego."
-  },
   "app.project.install-button.already-installed": {
     "message": "El proyecto ya está instalado"
   },

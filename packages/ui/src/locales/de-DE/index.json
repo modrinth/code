@@ -210,7 +210,7 @@
     "defaultMessage": "Max"
   },
   "button.more-options": {
-    "defaultMessage": "Mehr Optionen"
+    "defaultMessage": "Weitere Optionen"
   },
   "button.move": {
     "defaultMessage": "Verschieben"
@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} löschen"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} deaktivieren"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgraden} other {Aktualiseren}} kann zu Kompatibilitätsproblemen führen. Mods oder Inhalte, die du zusätzlich zum Modpack hinzugefügt hast, bleiben erhalten, sind jedoch eventuell nicht mit der neuen Version kompatibel."
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hinzugefügt"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Geänderte Konfigurationsdateien"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Hinzugefügt (Abhängigkeit)"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "Deaktiviert"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "Entfernt (deaktiviert)"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aktualisiert"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Aktualisiert"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, one {# Datei} other {# Dateien}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Spielversion"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Trotzdem Installieren"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Loader"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "Verknüpftes Modpack"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "Getrenntes Modpack"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "Aktualisiertes Modpack"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Keine Inhaltsänderungen"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} entfernt"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "{count} entfernt (deaktiviert)"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "Eine Datei wird nur geprüft, wenn sie auf Modrinth veröffentlicht wird, unabhängig von ihrem Dateiformat (auch .mrpack)."
@@ -525,7 +558,7 @@
     "defaultMessage": "Instanz"
   },
   "content.inline-backup.shift-click-hint": {
-    "defaultMessage": "Halte die Umschalttaste gedrückt, während du klickst, um die Bestätigung zu überspringen."
+    "defaultMessage": "Halte während du klickst die Umschalttaste gedrückt, um die Bestätigung zu überspringen."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Wir empfehlen, bevor du fortfährst eine Sicherung zu erstellen, damit du deine {type} wiederherstellen kannst, falls etwas schiefgeht."
@@ -978,7 +1011,7 @@
     "defaultMessage": "Andere"
   },
   "external-files.permissions-card.editor.add": {
-    "defaultMessage": "Quellenangabe hinzufügen"
+    "defaultMessage": "Zuordnung hinzufügen"
   },
   "external-files.permissions-card.editor.all-rights-reserved": {
     "defaultMessage": "Alle Rechte vorbehalten/Keine Lizenz"
@@ -1041,7 +1074,7 @@
     "defaultMessage": "Modrinth-Mitarbeiter können die eingereichten Nachweise überprüfen"
   },
   "external-files.permissions-card.editor.save": {
-    "defaultMessage": "Quellenangabe speichern"
+    "defaultMessage": "Zuordnung speichern"
   },
   "external-files.permissions-card.editor.select-license-label": {
     "defaultMessage": "Lizenz auswählen..."
@@ -1074,7 +1107,7 @@
     "defaultMessage": "Erklärung"
   },
   "external-files.permissions-card.fallback-group-title": {
-    "defaultMessage": "Quellangabe-Gruppe {id}"
+    "defaultMessage": "Zuordnungsgruppe {id}"
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# Datei} other {# Dateien}}"
@@ -1086,7 +1119,7 @@
     "defaultMessage": "Enthalten in {count, plural, one {# Version} other {# Versionen}}:"
   },
   "external-files.permissions-card.last-updated": {
-    "defaultMessage": "Zuletzt aktualisiert am {date} von {user}"
+    "defaultMessage": "Zuletzt aktualisiert {date} von {user}"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Unbekannt"
@@ -1125,7 +1158,7 @@
     "defaultMessage": "Automatisch zugeschrieben"
   },
   "external-files.permissions-card.reason.globally-allowed.description": {
-    "defaultMessage": "Wir haben diese Datei bereits gesehen und eine Quellenangabe für dich vorbereitet. Sollte etwas nicht stimmen, wende dich bitte über das Hilfecenter an den Modrinth Support."
+    "defaultMessage": "Wir haben diese Datei bereits gesehen und eine Zuordnung für dich vorbereitet. Sollte etwas nicht stimmen, wende dich bitte über das Hilfecenter an den Modrinth Support"
   },
   "external-files.permissions-card.reason.license": {
     "defaultMessage": "Lizenz"
@@ -1161,10 +1194,19 @@
     "defaultMessage": "Du hast eine Sondergenehmigung erhalten, dieses Werk in deinem Modpack weiterzuverbreiten."
   },
   "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Gruppe entfernen"
+    "defaultMessage": "Gruppe löschen"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "Dadurch wird diese Zuordnungsgruppe und alle darin enthaltenen Dateien endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "{title} löschen?"
   },
   "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Gruppe konnte nicht entfernt werden"
+    "defaultMessage": "Gruppe konnte nicht gelöscht werden"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "Halte während du klickst die Umschalttaste gedrückt, um die Bestätigung zu überspringen."
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Aus Gruppe entfernen"
@@ -1188,10 +1230,10 @@
     "defaultMessage": "Unbekannt"
   },
   "external-project-license-status.with-attribution": {
-    "defaultMessage": "Mit Quellenangabe"
+    "defaultMessage": "Mit Zuordnung"
   },
   "external-project-license-status.with-attribution-and-source": {
-    "defaultMessage": "Mit Quellenangabe und Quelle"
+    "defaultMessage": "Mit Zuordnung und Quelle"
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Ja"
@@ -2045,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Keine Inhalte gefunden"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "Extern"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "Diese Datei ist nicht auf Modrinth veröffentlicht."
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpack-Inhalt"
   },
@@ -2053,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Keine Projekte entsprechen deiner Suche."
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "In Slicer öffnen"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
@@ -2802,10 +2853,10 @@
     "defaultMessage": "Abzeichen"
   },
   "project-card.date.published.tooltip": {
-    "defaultMessage": "Veröffentlicht {date}"
+    "defaultMessage": "Veröffentlicht am {date}"
   },
   "project-card.date.updated.tooltip": {
-    "defaultMessage": "Aktualisiert {date}"
+    "defaultMessage": "Aktualisiert am {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
@@ -2816,8 +2867,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "Client oder Server"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "Dedizierter Server"
+  },
   "project-card.environment.server": {
     "defaultMessage": "Server"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "Einzelspieler"
   },
   "project-type.all": {
     "defaultMessage": "Alle"
@@ -2865,7 +2922,7 @@
     "defaultMessage": "Projekte"
   },
   "project-type.project.lowercase": {
-    "defaultMessage": "{count, plural, one {projekt} other {projekte}}"
+    "defaultMessage": "{count, plural, one {Projekt} other {Projekte}}"
   },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Ressourcenpaket} other {Ressourcenpakete}}"
@@ -2883,7 +2940,7 @@
     "defaultMessage": "Server"
   },
   "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural, one {server} other {server}}"
+    "defaultMessage": "{count, plural, one {Server} other {Server}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shader}}"
@@ -2943,13 +3000,13 @@
     "defaultMessage": "Lizenziert mit {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Veröffentlicht am {date}"
+    "defaultMessage": "Veröffentlicht {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Eingereicht am {date}"
+    "defaultMessage": "Eingereicht {date}"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Aktualisiert am {date}"
+    "defaultMessage": "Aktualisiert {date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "Discordserver beitreten"
@@ -3091,6 +3148,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {Follower} other {Follower}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "Lizenztext konnte nicht abgerufen werden."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Lizenztext wird geladen..."
+  },
+  "project.license.title": {
+    "defaultMessage": "Lizenz"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} online"
@@ -3496,6 +3562,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Ansicht"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {Download} other {Downloads}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {Follower} other {Follower}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -5039,6 +5111,81 @@
   "settings.sessions.title": {
     "defaultMessage": "Sitzungen"
   },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Hinzufügen"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Hinzugefügt"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Dieser Benutzer wurde bereits eingeladen."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "Avatar von {username}"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Abbrechen"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Abbrechen"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Einladungslink bearbeiten."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Einladungslink bearbeiten"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Ablaufdatum"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "Deine Freunde - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Einladen"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "Dein Einladungslink läuft in {duration} ab."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Oder nutze einen Einladungslink"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "Der Einladungslink wurde in deine Zwischenablage kopiert."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link kopiert"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "Link konnte nicht kopiert werden"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "Maximale Nutzungen"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "Keine Freunde gefunden."
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Keine übereinstimmenden Benutzer gefunden."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Anfrage gesendet"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} muss zuerst deine Freundschaftsanfrage annehmen"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Speichern"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Modrinth-Benutzernamen eingeben"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Wird gesucht..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "Einladungslink konnte nicht aktualisiert werden"
+  },
   "tag.category.128x": {
     "defaultMessage": "128x"
   },
@@ -5793,3 +5940,4 @@
     "defaultMessage": "Typ"
   }
 }
+

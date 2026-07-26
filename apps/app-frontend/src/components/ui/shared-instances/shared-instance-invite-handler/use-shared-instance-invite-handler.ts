@@ -47,11 +47,14 @@ export function useSharedInstanceInviteHandler(
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const { handleError } = injectNotificationManager()
-	const { addPopupNotification } = injectPopupNotificationManager()
+	const popupNotificationManager = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
 	const router = useRouter()
 	const themeStore = useTheming()
 	const displayedNotifications = new Set<string | number>()
+	const displayedNotificationKeys = new Set<string>()
+	const popupNotificationIds = new Set<string | number>()
+	let notificationGeneration = 0
 	let pendingAlreadyInstalled:
 		| {
 				instanceId: string
@@ -183,9 +186,23 @@ export function useSharedInstanceInviteHandler(
 		if (!parsedInvite) return false
 		if (displayedNotifications.has(notification.id)) return true
 
+		const generation = notificationGeneration
 		displayedNotifications.add(notification.id)
 		const invite = await resolveInvite(parsedInvite)
-		addPopupNotification({
+		if (generation !== notificationGeneration) return true
+
+		const notificationKey = JSON.stringify([
+			invite.invitedById ?? invite.invitedByUsername,
+			invite.sharedInstanceName,
+			invite.instanceIconUrl,
+		])
+		if (displayedNotificationKeys.has(notificationKey)) {
+			await markNotificationRead(notification).catch((error) => handleError(toError(error)))
+			return true
+		}
+
+		displayedNotificationKeys.add(notificationKey)
+		const popupNotification = popupNotificationManager.addPopupNotification({
 			title: invite.sharedInstanceName,
 			autoCloseMs: null,
 			toast: {
@@ -204,7 +221,19 @@ export function useSharedInstanceInviteHandler(
 				},
 			},
 		})
+		popupNotificationIds.add(popupNotification.id)
 		return true
+	}
+
+	function clearNotifications() {
+		notificationGeneration++
+		for (const id of popupNotificationIds) {
+			popupNotificationManager.removeNotification(id)
+		}
+		displayedNotifications.clear()
+		displayedNotificationKeys.clear()
+		popupNotificationIds.clear()
+		pendingAlreadyInstalled = undefined
 	}
 
 	async function requireAccount() {
@@ -245,6 +274,7 @@ export function useSharedInstanceInviteHandler(
 	return {
 		handleNotification,
 		installFromInviteId,
+		clearNotifications,
 		handleAlreadyInstalledCancel,
 		handleAlreadyInstalledGoToInstance,
 		handleAlreadyInstalledInstallAnyway,

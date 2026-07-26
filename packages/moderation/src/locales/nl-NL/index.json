@@ -12,10 +12,10 @@
     "defaultMessage": "Voeg een icoon toe"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Voeg het IP adres en poort toe die Java Editie spelers kunnen gebruiken om je server te joinen."
+    "defaultMessage": "Voeg het IP-adres en de poort toe die spelers van Java-editie kunnen gebruiken om verbinding te maken met je server."
   },
   "nags.add-java-address.title": {
-    "defaultMessage": "Voeg een Java adres toe"
+    "defaultMessage": "Java-adres toevoegen"
   },
   "nags.add-license-details.description": {
     "defaultMessage": "Voer een geldige URL en een naam of SPDX-identificatie in voor je aangepaste licentie."

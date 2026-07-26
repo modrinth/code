@@ -263,9 +263,6 @@
   "app.modal.update-to-play.header": {
     "message": "อัปเดตเพื่อเล่น"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "จำเป็นต้องอัปเดตเพื่อเล่น {name} กรุณาอัปเดตเป็นเวอร์ชันล่าสุดเพื่อเปิดเกม"
-  },
   "app.project.install-button.already-installed": {
     "message": "โปรเจคนี้ถูกติดตั้งแล้ว"
   },

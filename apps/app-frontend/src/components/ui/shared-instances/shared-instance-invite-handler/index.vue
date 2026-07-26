@@ -28,6 +28,7 @@ const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModa
 const {
 	handleNotification,
 	installFromInviteId,
+	clearNotifications,
 	handleAlreadyInstalledCancel,
 	handleAlreadyInstalledGoToInstance,
 	handleAlreadyInstalledInstallAnyway,
@@ -42,5 +43,6 @@ async function requestAuth(flow: ModrinthAuthFlow) {
 defineExpose<SharedInstanceInviteHandler>({
 	handleNotification,
 	installFromInviteId,
+	clearNotifications,
 })
 </script>

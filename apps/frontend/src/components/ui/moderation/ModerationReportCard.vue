@@ -123,7 +123,10 @@
 								{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
 							</span>
 							<span
-								v-if="report.item_type === 'shared-instance' && report.shared_instance_version_id"
+								v-if="
+									report.item_type === 'shared-instance' &&
+									report.shared_instance_version_id !== undefined
+								"
 								class="text-sm text-secondary"
 							>
 								Version {{ report.shared_instance_version_id }}
@@ -520,9 +523,10 @@ async function loadSharedInstanceDetails() {
 			}
 
 			const reportedVersion = props.report.shared_instance_version_id
-			const versionNumbers = reportedVersion
-				? Array.from({ length: reportedVersion }, (_, index) => reportedVersion - index)
-				: []
+			const versionNumbers =
+				reportedVersion !== undefined
+					? Array.from({ length: reportedVersion + 1 }, (_, index) => reportedVersion - index)
+					: []
 			const [versionDetails, otherInstancesResult] = await Promise.all([
 				Promise.all(
 					versionNumbers.map(async (versionNumber) => {
