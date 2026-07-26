@@ -333,10 +333,11 @@ const moderationAdmonition = computed<{
 							defaultMessage:
 								"You can still modify your project, it won't affect your position in the queue.",
 						}),
+						// temp moved 24-48 hr below to keep old translation for future
 						defineMessage({
-							id: 'project.moderation.admonition.under-review.body.4',
+							id: 'project.moderation.admonition.under-review.body.4.alt-week',
 							defaultMessage:
-								'We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+								'We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission.',
 						}),
 					],
 				},
@@ -401,6 +402,13 @@ const moderationAdmonition = computed<{
 	}
 
 	return null
+})
+
+// unused 24-48hr message still defined here for later
+defineMessage({
+	id: 'project.moderation.admonition.under-review.body.4',
+	defaultMessage:
+		'We aim to review submissions in 24–48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
 })
 
 const moderatorSeeUserUi = computed<boolean>({
