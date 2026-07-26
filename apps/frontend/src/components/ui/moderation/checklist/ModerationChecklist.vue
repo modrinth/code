@@ -30,8 +30,13 @@
 						/>
 						{{ checklistTitleText }}
 						<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
-							<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-							<span>
+							<component
+								:is="opt.icon"
+								v-if="opt.icon"
+								class="mr-2"
+								:class="{ 'opacity-50': opt.visited }"
+							/>
+							<span :class="{ 'opacity-50': opt.visited }">
 								{{ opt.text }}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
 							</span>
 							<span v-if="opt.messages" class="ml-auto pl-2 font-semibold opacity-75">{{
@@ -273,8 +278,13 @@
 									<ListBulletedIcon />
 									<span class="sr-only">Stages</span>
 									<template v-for="opt in stageOptions" #[opt.id] :key="opt.id">
-										<component :is="opt.icon" v-if="opt.icon" class="mr-2" />
-										<span>
+										<component
+											:is="opt.icon"
+											v-if="opt.icon"
+											class="mr-2"
+											:class="{ 'opacity-50': opt.visited }"
+										/>
+										<span :class="{ 'opacity-50': opt.visited }">
 											{{ opt.text
 											}}<span v-if="opt.requiredMissing" class="font-bold text-red">*</span>
 										</span>
@@ -439,6 +449,10 @@ import { computed, nextTick, provide, ref, toRaw, watch } from 'vue'
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
+import {
+	getSessionChecklistState,
+	patchSessionChecklistState,
+} from '~/services/moderation-checklist-session-storage.ts'
 import {
 	clearChecklistState,
 	loadChecklistState,
@@ -670,6 +684,21 @@ const persistedState = import.meta.client
 	? await loadChecklistState(checklistPersistenceProjectId)
 	: null
 nodeStates.value = persistedState?.state ?? {}
+const visitedStages = ref<Set<string>>(
+	new Set(
+		import.meta.client
+			? (getSessionChecklistState(checklistPersistenceProjectId).visitedStages ?? [])
+			: [],
+	),
+)
+
+function markStageVisited(stageId: string | undefined) {
+	if (!stageId || visitedStages.value.has(stageId)) return
+	visitedStages.value.add(stageId)
+	patchSessionChecklistState(checklistPersistenceProjectId, {
+		visitedStages: [...visitedStages.value],
+	})
+}
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction[] | null>(null)
@@ -1201,6 +1230,7 @@ async function persistStateImmediately(open: boolean, resetReviewAnyway = false)
 watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
 watch(message, persistState)
+watch(currentStageObj, (stage) => markStageVisited(stage.id), { immediate: true })
 
 watch(
 	nodeStates,
@@ -1857,6 +1887,7 @@ interface StageOption {
 	messages?: number
 	fixes?: number
 	requiredMissing?: boolean
+	visited?: boolean
 }
 
 const stageOptions = computed<StageOption[]>(() => {
@@ -1876,6 +1907,9 @@ const stageOptions = computed<StageOption[]>(() => {
 				messages: countStageActions(stage) || undefined,
 				fixes: countStageFixes(stage) || undefined,
 				requiredMissing: hasRequiredMissing(stage) || undefined,
+				visited:
+					(index !== currentStage.value && stage.id && visitedStages.value.has(stage.id)) ||
+					undefined,
 			}
 		})
 		.filter((opt): opt is StageOption => opt !== null)
