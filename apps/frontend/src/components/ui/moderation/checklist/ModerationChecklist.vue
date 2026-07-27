@@ -1169,6 +1169,7 @@ const restoredStage = persistedState
 	: -1
 const currentStage = ref(restoredStage >= 0 ? restoredStage : findFirstValidStage())
 const initialAutoStage = currentStage.value
+const needsInitialStageSettle = !persistedState && thread.value === undefined
 
 // Thread data may not be loaded when currentStage is first set, so stages that depend on it
 // (like re-review) may be invisible initially. Re-evaluate once thread loads.
@@ -1181,6 +1182,8 @@ if (!persistedState) {
 				const firstValid = findFirstValidStage()
 				if (firstValid !== currentStage.value) {
 					currentStage.value = firstValid
+				} else if (needsInitialStageSettle) {
+					markStageVisited(currentStageObj.value.id)
 				}
 			}
 		},
@@ -1241,7 +1244,7 @@ watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
 watch(activatedStages, persistState, { deep: true })
 watch(message, persistState)
-watch(currentStageObj, (stage) => markStageVisited(stage.id), { immediate: true })
+watch(currentStageObj, (stage) => markStageVisited(stage.id), { immediate: !needsInitialStageSettle })
 
 watch(
 	nodeStates,
