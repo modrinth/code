@@ -13,7 +13,12 @@ const INSTANCE_ICON_MAX_BYTES: usize = 4 * 1024 * 1024;
 const INSTANCE_ICON_MAX_DIMENSION: u32 = 512;
 const INSTANCE_ICON_MAX_SOURCE_DIMENSION: u32 = 8_192;
 const INSTANCE_ICON_MAX_DECODE_BYTES: u64 = 64 * 1024 * 1024;
-const INSTANCE_ICON_MAX_SVG_SOURCE_BYTES: u64 = 16 * 1024 * 1024;
+
+enum LegacyIconAction {
+    Keep,
+    Normalize,
+    Remove,
+}
 
 pub async fn edit_icon(
     instance_id: &str,
@@ -40,10 +45,10 @@ pub(crate) async fn cache_icon(
 ) -> crate::Result<PathBuf> {
     let bytes = tokio::task::spawn_blocking(move || {
         if looks_like_svg(&bytes) {
-            normalize_svg(&bytes, None)
-        } else {
-            normalize_raster(Cursor::new(bytes))
+            return Err(svg_not_supported_error());
         }
+
+        normalize_raster(Cursor::new(bytes))
     })
     .await??;
 
@@ -56,17 +61,27 @@ pub(crate) async fn cache_icon_from_path(
 ) -> crate::Result<PathBuf> {
     let icon_path = icon_path.to_path_buf();
     let bytes = tokio::task::spawn_blocking(move || {
-        if has_svg_extension(&icon_path) {
-            normalize_svg_from_path(&icon_path)
-        } else {
-            let file = StdFile::open(&icon_path).map_err(|error| {
+        let file = StdFile::open(&icon_path).map_err(|error| {
+            crate::ErrorKind::InputError(format!(
+                "Could not open instance icon {}: {error}",
+                icon_path.display()
+            ))
+        })?;
+        let mut reader = BufReader::new(file);
+        let looks_like_svg = {
+            let bytes = reader.fill_buf().map_err(|error| {
                 crate::ErrorKind::InputError(format!(
-                    "Could not open instance icon {}: {error}",
+                    "Could not inspect instance icon {}: {error}",
                     icon_path.display()
                 ))
             })?;
-            normalize_raster(BufReader::new(file))
+            looks_like_svg(bytes)
+        };
+        if has_svg_extension(&icon_path) || looks_like_svg {
+            return Err(svg_not_supported_error());
         }
+
+        normalize_raster(reader)
     })
     .await??;
 
@@ -81,8 +96,8 @@ pub(crate) async fn migrate_legacy_icons() -> crate::Result<()> {
         let Some(icon_path) = instance.icon_path.as_deref() else {
             continue;
         };
-        let metadata = match io::metadata(icon_path).await {
-            Ok(metadata) => metadata,
+        let action = match inspect_legacy_icon(Path::new(icon_path)) {
+            Ok(action) => action,
             Err(error) => {
                 tracing::warn!(
                     instance_id = instance.id,
@@ -93,19 +108,33 @@ pub(crate) async fn migrate_legacy_icons() -> crate::Result<()> {
                 continue;
             }
         };
-        if metadata.len() <= INSTANCE_ICON_MAX_BYTES as u64 {
-            continue;
-        }
 
-        if let Err(error) =
-            edit_icon(&instance.id, Some(Path::new(icon_path))).await
-        {
-            tracing::warn!(
-                instance_id = instance.id,
-                icon_path,
-                error = %error,
-                "Failed to normalize oversized legacy instance icon"
-            );
+        match action {
+            LegacyIconAction::Keep => {}
+            LegacyIconAction::Normalize => {
+                if let Err(error) =
+                    edit_icon(&instance.id, Some(Path::new(icon_path))).await
+                {
+                    tracing::warn!(
+                        instance_id = instance.id,
+                        icon_path,
+                        error = %error,
+                        "Failed to normalize legacy instance icon"
+                    );
+                }
+            }
+            LegacyIconAction::Remove => {
+                if let Err(error) =
+                    apply_instance_icon(&instance.id, None, &state).await
+                {
+                    tracing::warn!(
+                        instance_id = instance.id,
+                        icon_path,
+                        error = %error,
+                        "Failed to remove legacy SVG instance icon"
+                    );
+                }
+            }
         }
     }
 
@@ -156,7 +185,7 @@ async fn write_cached_icon(
     bytes: Bytes,
     state: &State,
 ) -> crate::Result<PathBuf> {
-    if bytes.len() > INSTANCE_ICON_MAX_BYTES {
+    if bytes.len() >= INSTANCE_ICON_MAX_BYTES {
         return Err(icon_too_large_error());
     }
 
@@ -216,79 +245,42 @@ where
     validate_normalized_icon(normalized.into_inner())
 }
 
-fn normalize_svg_from_path(icon_path: &Path) -> crate::Result<Bytes> {
+fn inspect_legacy_icon(icon_path: &Path) -> crate::Result<LegacyIconAction> {
     let metadata = std::fs::metadata(icon_path).map_err(|error| {
         crate::ErrorKind::InputError(format!(
             "Could not inspect instance icon {}: {error}",
             icon_path.display()
         ))
     })?;
-    if metadata.len() > INSTANCE_ICON_MAX_SVG_SOURCE_BYTES {
-        return Err(crate::ErrorKind::InputError(format!(
-			"SVG instance icons cannot exceed {INSTANCE_ICON_MAX_SVG_SOURCE_BYTES} bytes before normalization"
-		))
-		.into());
-    }
-
-    let bytes = std::fs::read(icon_path).map_err(|error| {
+    let file = StdFile::open(icon_path).map_err(|error| {
         crate::ErrorKind::InputError(format!(
-            "Could not read instance icon {}: {error}",
+            "Could not open instance icon {}: {error}",
             icon_path.display()
         ))
     })?;
-    normalize_svg(&bytes, icon_path.parent())
-}
-
-fn normalize_svg(
-    bytes: &[u8],
-    resources_dir: Option<&Path>,
-) -> crate::Result<Bytes> {
-    if bytes.len() as u64 > INSTANCE_ICON_MAX_SVG_SOURCE_BYTES {
-        return Err(crate::ErrorKind::InputError(format!(
-			"SVG instance icons cannot exceed {INSTANCE_ICON_MAX_SVG_SOURCE_BYTES} bytes before normalization"
-		))
-		.into());
-    }
-
-    let mut options = resvg::usvg::Options {
-        resources_dir: resources_dir.map(Path::to_path_buf),
-        ..Default::default()
-    };
-    options.fontdb_mut().load_system_fonts();
-    let tree =
-        resvg::usvg::Tree::from_data(bytes, &options).map_err(|error| {
-            crate::ErrorKind::InputError(format!(
-                "Could not decode SVG instance icon: {error}"
-            ))
-        })?;
-    let size = tree.size();
-    let scale = (INSTANCE_ICON_MAX_DIMENSION as f32
-        / size.width().max(size.height()))
-    .min(1.0);
-    let width = (size.width() * scale).ceil().max(1.0) as u32;
-    let height = (size.height() * scale).ceil().max(1.0) as u32;
-    let mut pixmap =
-        resvg::tiny_skia::Pixmap::new(width, height).ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Could not allocate SVG instance icon output".to_string(),
-            )
-        })?;
-    resvg::render(
-        &tree,
-        resvg::tiny_skia::Transform::from_scale(scale, scale),
-        &mut pixmap.as_mut(),
-    );
-    let normalized = pixmap.encode_png().map_err(|error| {
+    let mut reader = BufReader::new(file);
+    let bytes = reader.fill_buf().map_err(|error| {
         crate::ErrorKind::InputError(format!(
-            "Could not encode SVG instance icon as PNG: {error}"
+            "Could not inspect instance icon {}: {error}",
+            icon_path.display()
         ))
     })?;
 
-    validate_normalized_icon(normalized)
+    if has_svg_extension(icon_path) || looks_like_svg(bytes) {
+        return Ok(LegacyIconAction::Remove);
+    }
+
+    if metadata.len() < INSTANCE_ICON_MAX_BYTES as u64
+        && image::guess_format(bytes).ok() == Some(image::ImageFormat::Png)
+    {
+        return Ok(LegacyIconAction::Keep);
+    }
+
+    Ok(LegacyIconAction::Normalize)
 }
 
 fn validate_normalized_icon(normalized: Vec<u8>) -> crate::Result<Bytes> {
-    if normalized.len() > INSTANCE_ICON_MAX_BYTES {
+    if normalized.len() >= INSTANCE_ICON_MAX_BYTES {
         return Err(icon_too_large_error());
     }
 
@@ -296,6 +288,10 @@ fn validate_normalized_icon(normalized: Vec<u8>) -> crate::Result<Bytes> {
 }
 
 fn looks_like_svg(bytes: &[u8]) -> bool {
+    if image::guess_format(bytes).is_ok() {
+        return false;
+    }
+
     bytes[..bytes.len().min(1_024)]
         .windows(4)
         .any(|window| window.eq_ignore_ascii_case(b"<svg"))
@@ -309,7 +305,14 @@ fn has_svg_extension(path: &Path) -> bool {
 
 fn icon_too_large_error() -> crate::Error {
     crate::ErrorKind::InputError(format!(
-        "Instance icons cannot exceed {INSTANCE_ICON_MAX_BYTES} bytes"
+        "Instance icons must be smaller than {INSTANCE_ICON_MAX_BYTES} bytes"
     ))
+    .into()
+}
+
+fn svg_not_supported_error() -> crate::Error {
+    crate::ErrorKind::InputError(
+        "SVG instance icons are not supported".to_string(),
+    )
     .into()
 }

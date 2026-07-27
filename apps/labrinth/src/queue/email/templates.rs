@@ -329,15 +329,19 @@ async fn resolve_report_title(
         return Ok(title);
     }
 
-    let Some(shared_instance_id) = DBReport::get(report_id, &mut *exec)
-        .await?
-        .and_then(|report| report.shared_instance_id)
-    else {
+    let Some(report) = DBReport::get(report_id, &mut *exec).await? else {
+        return Ok(title);
+    };
+    let Some(shared_instance_id) = report.shared_instance_id else {
         return Ok(title);
     };
 
     let instance_id = to_base62(shared_instance_id.0 as u64);
-    let fallback = format!("shared instance {instance_id}");
+    let with_version = |name: String| match report.shared_instance_version_id {
+        Some(version) => format!("{name} (version {version})"),
+        None => name,
+    };
+    let fallback = with_version(format!("shared instance {instance_id}"));
     let response = HTTP_CLIENT
         .get(format!(
             "{}/v1/instances/{instance_id}",
@@ -362,7 +366,7 @@ async fn resolve_report_title(
     };
 
     match response.json::<SharedInstance>().await {
-        Ok(instance) => Ok(instance.name),
+        Ok(instance) => Ok(with_version(instance.name)),
         Err(error) => {
             warn!(
                 %error,
