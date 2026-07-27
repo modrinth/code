@@ -67,7 +67,11 @@
 		>
 			<template #empty-state
 				><div class="flex h-64 items-center justify-center text-secondary">
-					No users match your filters.
+					{{
+						formatMessage(
+							rows.length === 0 ? messages.noUsersJoined : messages.noUsersMatchFilters,
+						)
+					}}
 				</div></template
 			>
 			<template #cell-username="{ row }">
@@ -299,6 +303,14 @@ const messages = defineMessages({
 	pushUpdate: {
 		id: 'app.instance.admonitions.shared-instance.publish-button',
 		defaultMessage: 'Push update',
+	},
+	noUsersJoined: {
+		id: 'app.instance.share.members.empty',
+		defaultMessage: 'No users have joined yet',
+	},
+	noUsersMatchFilters: {
+		id: 'app.instance.share.members.no-filter-results',
+		defaultMessage: 'No users match your filters.',
 	},
 })
 function userProfileLink(username: string) {

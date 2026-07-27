@@ -47,8 +47,10 @@
 			@state-change="publishState = $event"
 		/>
 
+		<div v-if="membersTableLoading" class="h-64" aria-hidden="true" />
+
 		<SharedInstanceMembersTable
-			v-if="members.rows.value.length > 0"
+			v-else-if="showMembersTable"
 			:rows="members.rows.value"
 			:actions-locked="sharedInstanceActionsLocked"
 			:invite-disabled="!hasRemainingUserSlots"
@@ -256,6 +258,23 @@ const lockedActionButton = computed(() =>
 const sharedInstanceUnavailableReason = sharedInstanceState.unavailableReason
 const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
 const sharedInstanceUnavailableManager = sharedInstanceState.unavailableManager
+const membersTableLoading = computed(
+	() =>
+		members.rows.value.length === 0 &&
+		!!props.instance.shared_instance &&
+		(members.query.data.value === undefined || members.query.isFetching.value) &&
+		!sharedInstanceUnavailable.value &&
+		!sharedInstanceActionsLocked.value,
+)
+const showMembersTable = computed(
+	() =>
+		members.rows.value.length > 0 ||
+		(!!props.instance.shared_instance &&
+			members.query.data.value !== undefined &&
+			!members.query.isFetching.value &&
+			!sharedInstanceUnavailable.value &&
+			!sharedInstanceActionsLocked.value),
+)
 const requiresUnlink = computed(
 	() =>
 		props.instance.link?.type === 'imported_modpack' &&

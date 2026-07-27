@@ -110,8 +110,9 @@ pub use self::install::{
 };
 pub use self::invites::{
     accept_pending_shared_instance_invite, create_shared_instance_invite_link,
-    decline_pending_shared_instance_invite, get_shared_instance_users,
-    invite_shared_instance_users, remove_shared_instance_users,
+    decline_pending_shared_instance_invite, get_shared_instance_invites,
+    get_shared_instance_users, invite_shared_instance_users,
+    remove_shared_instance_users, revoke_shared_instance_invite,
 };
 pub use self::publish::{
     get_shared_instance_publish_preview, publish_shared_instance,
@@ -119,8 +120,9 @@ pub use self::publish::{
 };
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
-    SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
-    SharedInstanceJoinType, SharedInstancePublishPreview,
+    SharedInstanceInvite, SharedInstanceInviteInstallPreview,
+    SharedInstanceInviteLink, SharedInstanceJoinType,
+    SharedInstancePublishPreview,
     SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
     SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };

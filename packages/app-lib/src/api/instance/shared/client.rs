@@ -74,6 +74,14 @@ pub(super) struct CreateInstanceInviteResponse {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+pub(super) struct InstanceInviteResponse {
+    pub(super) id: String,
+    pub(super) expiration: DateTime<Utc>,
+    pub(super) max_uses: i32,
+    pub(super) uses: i32,
+}
+
+#[derive(Clone, Debug, Deserialize)]
 pub(super) struct BlacklistStatusResponse {
     pub(super) blacklisted: bool,
 }
@@ -496,6 +504,20 @@ pub(super) async fn delete_remote_invite(
         Method::DELETE,
         &path,
         "/instances/:instance_id/invites/:invite_id",
+        None,
+        state,
+    )
+    .await
+}
+
+pub(super) async fn get_remote_invites(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<Vec<InstanceInviteResponse>> {
+    request_json(
+        "get_instance_invites",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/invites"),
         None,
         state,
     )
