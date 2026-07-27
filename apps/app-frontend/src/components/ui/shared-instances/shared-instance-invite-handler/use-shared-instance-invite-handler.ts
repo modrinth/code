@@ -6,11 +6,9 @@ import {
 	injectPopupNotificationManager,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { type Ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { config } from '@/config'
 import { get_user } from '@/helpers/cache'
 import { toError } from '@/helpers/errors'
 import {
@@ -216,7 +214,7 @@ export function useSharedInstanceInviteHandler(
 					markNotificationRead(notification).catch((error) => handleError(toError(error))),
 				onOpenActor: () => {
 					if (invite.invitedByUsername) {
-						openUrl(`${config.siteUrl}/user/${encodeURIComponent(invite.invitedByUsername)}`)
+						void router.push(`/user/${encodeURIComponent(invite.invitedByUsername)}`)
 					}
 				},
 			},
