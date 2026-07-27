@@ -2,6 +2,7 @@ use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::models::DBUser;
 use crate::database::models::blocked_user_item::DBBlockedUser;
+use crate::database::models::friend_item::DBFriend;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -43,12 +44,18 @@ pub async fn block_user(
         return Err(ApiError::Request(eyre!("you cannot block yourself")));
     }
 
+    let mut transaction = pool.begin().await?;
+
+    DBFriend::remove(user.id.into(), blocked.id, &mut transaction).await?;
+
     DBBlockedUser {
         user_id: user.id.into(),
         blocked_id: blocked.id,
     }
-    .insert(&**pool)
+    .insert(&mut transaction)
     .await?;
+
+    transaction.commit().await?;
 
     Ok(())
 }
