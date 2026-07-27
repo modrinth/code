@@ -58,6 +58,7 @@ export function useSharedInstanceMembers(options: {
 		queryFn: ({ queryKey }) => fetchRows(queryKey),
 		enabled: () =>
 			options.isSignedIn.value && !!options.instance.value.id && !options.actionsLocked.value,
+		retry: false,
 		staleTime: Infinity,
 		refetchOnMount: 'always',
 		refetchOnReconnect: false,

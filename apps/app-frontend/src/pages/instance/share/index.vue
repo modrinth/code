@@ -47,7 +47,13 @@
 			@state-change="publishState = $event"
 		/>
 
-		<div v-if="membersTableLoading" class="h-64" aria-hidden="true" />
+		<SharedInstanceShareEmptyState
+			v-if="unableToConnect"
+			:heading="formatMessage(messages.unableToConnectHeading)"
+			:description="formatMessage(messages.unableToConnectDescription)"
+		/>
+
+		<div v-else-if="membersTableLoading" class="h-64" aria-hidden="true" />
 
 		<SharedInstanceMembersTable
 			v-else-if="showMembersTable"
@@ -150,7 +156,7 @@ import {
 	type InvitePlayersUser,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, toRef, watch } from 'vue'
 
@@ -158,9 +164,10 @@ import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountR
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
 import {
 	getSharedInstanceUnavailableReason,
+	isSharedInstancesApiError,
 	isSharedInstanceUnavailableError,
 } from '@/helpers/install'
-import { edit } from '@/helpers/instance'
+import { can_current_user_use_shared_instances, edit } from '@/helpers/instance'
 import type { ModrinthAuthFlow } from '@/helpers/mr_auth.ts'
 import {
 	sharedInstanceErrorMessages,
@@ -196,6 +203,7 @@ const actionsLocked = sharedInstanceState.shareActionsLocked
 const sharedInstanceActionsLocked = actionsLocked
 const currentUserId = computed(() => auth.user.value?.id ?? null)
 const isSignedIn = computed(() => !!auth.session_token.value)
+const sharedInstancesApiUnavailable = ref(false)
 const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
@@ -212,9 +220,21 @@ function notifyOperationError(error: unknown) {
 			sharedInstanceState.unavailableManager.value,
 		)
 	} else {
+		if (isSharedInstancesApiError(error)) sharedInstancesApiUnavailable.value = true
 		notifySharedInstanceError(error)
 	}
 }
+
+const eligibilityQuery = useQuery({
+	queryKey: computed(() => ['shared-instance-eligibility', currentUserId.value]),
+	queryFn: can_current_user_use_shared_instances,
+	enabled: () => isSignedIn.value && !!currentUserId.value,
+	retry: false,
+	staleTime: Infinity,
+	refetchOnMount: 'always',
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
+})
 
 const members = useSharedInstanceMembers({
 	instance,
@@ -258,6 +278,12 @@ const lockedActionButton = computed(() =>
 const sharedInstanceUnavailableReason = sharedInstanceState.unavailableReason
 const sharedInstanceUnavailable = computed(() => !!sharedInstanceUnavailableReason.value)
 const sharedInstanceUnavailableManager = sharedInstanceState.unavailableManager
+const unableToConnect = computed(
+	() =>
+		sharedInstancesApiUnavailable.value ||
+		isSharedInstancesApiError(eligibilityQuery.error.value) ||
+		isSharedInstancesApiError(members.query.error.value),
+)
 const membersTableLoading = computed(
 	() =>
 		members.rows.value.length === 0 &&
@@ -289,6 +315,15 @@ const importedModpackBackupTip = computed(() =>
 
 const messages = defineMessages({
 	signInButton: { id: 'app.instance.share.sign-in.button', defaultMessage: 'Sign in' },
+	unableToConnectHeading: {
+		id: 'app.instance.share.unable-to-connect.heading',
+		defaultMessage: 'Unable to connect',
+	},
+	unableToConnectDescription: {
+		id: 'app.instance.share.unable-to-connect.description',
+		defaultMessage:
+			'The shared instances service is not accessible at the moment, please try again later',
+	},
 	noFriendsInvitedHeading: {
 		id: 'app.instance.share.empty.heading',
 		defaultMessage: 'No friends invited',
@@ -396,6 +431,23 @@ function signInToShare(event?: MouseEvent) {
 	void accountRequiredModal.value?.show(event)
 }
 
+watch(
+	[eligibilityQuery.error, members.query.error],
+	(errors) => {
+		for (const error of errors) {
+			if (isSharedInstancesApiError(error)) notifyOperationError(error)
+		}
+	},
+	{ immediate: true },
+)
+watch(
+	[eligibilityQuery.data, members.query.data],
+	([eligibility, memberRows]) => {
+		if (eligibility !== undefined && memberRows !== undefined) {
+			sharedInstancesApiUnavailable.value = false
+		}
+	},
+)
 watch(
 	() => props.instance.id,
 	() => {

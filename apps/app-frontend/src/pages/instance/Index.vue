@@ -590,17 +590,16 @@ const startInstance = async (context: string) => {
 		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
 
 	if (canCheckSharedInstanceUpdate) {
-		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>>
+		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>> = null
 		checkingSharedInstanceLaunch.value = true
 		try {
 			preview = await refreshSharedInstanceUpdatePreview()
 		} catch (error) {
 			if (isSharedInstanceUnavailableError(error)) {
 				await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
-			} else {
-				notifySharedInstanceError(error)
+				return
 			}
-			return
+			notifySharedInstanceError(error)
 		} finally {
 			checkingSharedInstanceLaunch.value = false
 		}
@@ -707,7 +706,7 @@ async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false
 		if (closeUpdateModal) sharedInstanceUpdateModal.value?.hide()
 		sharedInstanceReportModal.value?.showReport(preview, event)
 	} catch (error) {
-		handleError(error as Error)
+		notifySharedInstanceError(error)
 	}
 }
 

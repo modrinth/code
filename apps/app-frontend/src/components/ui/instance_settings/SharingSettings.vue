@@ -72,7 +72,6 @@ import {
 	ButtonStyled,
 	CopyCode,
 	defineMessages,
-	injectNotificationManager,
 	Table,
 	type TableColumn,
 	useFormatDateTime,
@@ -86,10 +85,11 @@ import ConfirmRevokeSharedInstanceInviteModal from '@/components/ui/shared-insta
 import SharedInstanceInstallationSettingsControls from '@/components/ui/shared-instances/SharedInstanceInstallationSettingsControls.vue'
 import { config } from '@/config'
 import { type SharedInstanceInvite, unpublish_shared_instance } from '@/helpers/instance'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
 const { instance, offline, onUnlinked } = injectInstanceSettings()
-const { handleError } = injectNotificationManager()
+const { notifySharedInstanceError } = useSharedInstanceErrors()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 const unpublishing = ref(false)
@@ -162,7 +162,7 @@ async function unpublishSharedInstance() {
 		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', instance.value.id] })
 		onUnlinked()
 	} catch (error) {
-		handleError(error)
+		notifySharedInstanceError(error)
 	} finally {
 		unpublishing.value = false
 	}

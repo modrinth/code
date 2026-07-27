@@ -19,6 +19,7 @@ import {
 	install_shared_instance,
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import { useTheming } from '@/store/state'
 
 import { parseSharedInstanceInviteNotification } from './shared-instance-invite-parser'
@@ -47,6 +48,8 @@ export function useSharedInstanceInviteHandler(
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const { handleError } = injectNotificationManager()
+	const { notifySharedInstanceConnectionError, notifySharedInstanceError } =
+		useSharedInstanceErrors()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
 	const router = useRouter()
@@ -78,7 +81,10 @@ export function useSharedInstanceInviteHandler(
 			!invite.invitedByUsername && invite.invitedById
 				? get_user(invite.invitedById, 'bypass').catch(() => null)
 				: null,
-			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => null),
+			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => {
+				notifySharedInstanceConnectionError()
+				return null
+			}),
 		])
 
 		return {
@@ -177,7 +183,7 @@ export function useSharedInstanceInviteHandler(
 				() => markNotificationRead(notification),
 			)
 		} catch (error) {
-			handleError(toError(error))
+			notifySharedInstanceError(error)
 		}
 	}
 
@@ -267,7 +273,7 @@ export function useSharedInstanceInviteHandler(
 				await queryClient.invalidateQueries({ queryKey: ['instances'] })
 			})
 		} catch (error) {
-			handleError(toError(error))
+			notifySharedInstanceError(error)
 		}
 	}
 
