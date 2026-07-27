@@ -6,13 +6,15 @@ use crate::database::models::friend_item::DBFriend;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use actix_web::{HttpRequest, delete, post, web};
+use actix_web::{HttpRequest, delete, get, post, web};
+use ariadne::ids::UserId;
 use eyre::eyre;
 use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(block_user);
     cfg.service(unblock_user);
+    cfg.service(get_blocked_users);
 }
 
 /// Block a user.
@@ -88,4 +90,32 @@ pub async fn unblock_user(
     DBBlockedUser::remove(user.id.into(), blocked.id, &**pool).await?;
 
     Ok(())
+}
+
+/// List the users blocked by the current user.
+#[utoipa::path(tag = "blocked_users", responses((status = OK, body = Vec<UserId>)))]
+#[get("/blocks")]
+pub async fn get_blocked_users(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<UserId>>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::USER_READ,
+    )
+    .await?
+    .1;
+
+    let blocked = DBBlockedUser::get_blocked_for_user(user.id.into(), &**pool)
+        .await?
+        .into_iter()
+        .map(UserId::from)
+        .collect();
+
+    Ok(web::Json(blocked))
 }

@@ -231,6 +231,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		friends::friends,
 		blocked_users::block_user,
 		blocked_users::unblock_user,
+		blocked_users::get_blocked_users,
 		content::resolve_content,
 	),
 	modifiers(&V3PathModifier, &SecurityAddon)

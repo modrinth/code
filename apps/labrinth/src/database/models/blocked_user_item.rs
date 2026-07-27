@@ -47,6 +47,29 @@ impl DBBlockedUser {
         Ok(blocked.is_some())
     }
 
+    pub async fn get_blocked_for_user<'a, E>(
+        user_id: DBUserId,
+        exec: E,
+    ) -> Result<Vec<DBUserId>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let blocked = sqlx::query_scalar!(
+            "
+            SELECT blocked_id FROM blocked_users
+            WHERE user_id = $1
+            ",
+            user_id.0,
+        )
+        .fetch_all(exec)
+        .await?
+        .into_iter()
+        .map(DBUserId)
+        .collect();
+
+        Ok(blocked)
+    }
+
     pub async fn remove<'a, E>(
         user_id: DBUserId,
         blocked_id: DBUserId,
