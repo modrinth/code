@@ -9,7 +9,7 @@
     "defaultMessage": "Neuen Partnercode erstellen"
   },
   "affiliate.create.title.description": {
-    "defaultMessage": "Gib deinem Partnerlink einen Namen, damit du weist, von wo Leute kommen!"
+    "defaultMessage": "Gib deinem Partnerlink einen Namen, damit du weißt, von wo Leute kommen!"
   },
   "affiliate.create.title.label": {
     "defaultMessage": "Titel des Partnerlinks"
@@ -114,7 +114,7 @@
     "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}} ausgewählt"
   },
   "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "Du hast {count, plural, one {# Projekt} other {# Projekte}} zur Installation ausgewählt. Installiere {count, plural, one {es} other {sie}} jetzt oder gehe ohne installation zurück."
+    "defaultMessage": "Du hast {count, plural, one {# Projekt} other {# Projekte}} zur Installation ausgewählt. Installiere {count, plural, one {es} other {sie}} jetzt oder gehe zurück, ohne diese zu Installieren."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Ausgewählte Projekte noch nicht installiert"
@@ -303,7 +303,7 @@
     "defaultMessage": "Entfolgen"
   },
   "button.unlink-modpack": {
-    "defaultMessage": "Version wechseln"
+    "defaultMessage": "Modpack trennen"
   },
   "button.update": {
     "defaultMessage": "Aktualisieren"
@@ -1224,7 +1224,7 @@
     "defaultMessage": "Nein"
   },
   "external-project-license-status.permanent-no": {
-    "defaultMessage": "Permanentes nein"
+    "defaultMessage": "Permanentes Nein"
   },
   "external-project-license-status.unidentified": {
     "defaultMessage": "Unbekannt"
@@ -1875,10 +1875,10 @@
     "defaultMessage": "Spielversion auswählen"
   },
   "installation-settings.aria.select-loader-version": {
-    "defaultMessage": "{loader}version auswählen"
+    "defaultMessage": "{loader}-Version auswählen"
   },
   "installation-settings.aria.select-platform": {
-    "defaultMessage": "Platform wählen"
+    "defaultMessage": "Plattform wählen"
   },
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Bestätigen"
@@ -1932,7 +1932,7 @@
     "defaultMessage": "Serverprojekt"
   },
   "installation-settings.loader-version": {
-    "defaultMessage": "{loader}version"
+    "defaultMessage": "{loader}-Version"
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Du musst deinen Server zurücksetzen, um den Loader zu wechseln."
@@ -2136,10 +2136,10 @@
     "defaultMessage": "Version auswählen"
   },
   "instances.updater-modal.incompatible-update.description": {
-    "defaultMessage": "{version} ist nicht als kompatibel mit dieser Installation markiert. Sie wird sich villeicht unerwartet verhalten."
+    "defaultMessage": "{version} ist nicht als mit dieser Installation kompatibel markiert. Es kann sein, dass sie nicht startet oder sich unerwartet verhält."
   },
   "instances.updater-modal.incompatible-update.header": {
-    "defaultMessage": "Auf eine kompatible Version aktualisieren?"
+    "defaultMessage": "Auf eine inkompatible Version aktualisieren?"
   },
   "instances.updater-modal.incompatible-update.proceed": {
     "defaultMessage": "Trotzdem aktualisieren"
@@ -3480,7 +3480,7 @@
     "defaultMessage": "Dein Projekt hat mehrere Umgebungen"
   },
   "project.settings.environment.notice.review-options.description": {
-    "defaultMessage": "Wir haben kürzlich das Umgebungssystem auf Modrinth überarbeitet, und neue Optionen sind jetzt verfügbar. Bitte stelle sicher, dass unten die richtige Option ausgewählt ist, und klicke anschließend auf ‚Überprüfen‘!"
+    "defaultMessage": "Wir haben kürzlich das Umgebungssystem auf Modrinth überarbeitet, und neue Optionen sind jetzt verfügbar. Bitte stelle sicher, dass unten die richtige Option ausgewählt ist, und klicke anschließend auf ‚Bestätigen‘!"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Bitte überprüfe die untenstehenden Optionen"

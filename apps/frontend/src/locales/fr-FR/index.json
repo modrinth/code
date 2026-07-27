@@ -126,7 +126,7 @@
     "message": "Période précédente"
   },
   "analytics.chart.controls.project-events": {
-    "message": "Événements projet"
+    "message": "Événements de projet"
   },
   "analytics.chart.controls.ratio": {
     "message": "Ratio"
@@ -417,7 +417,7 @@
     "message": "Téléchargements"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Seules les vues et les téléchargements effectués via Modrinth sont éligibles à la monétisation et doivent passer un filtrage de prévention de la fraude. Les téléchargements de l'application Modrinth exigent également que l'utilisateur soit connecté. Parce que tous les projets ont un ratio similaire de téléchargements monétisés, vos revenus ne changeraient pas de manière significative si tous les téléchargements étaient comptés."
+    "message": "Seuls les vues et les téléchargements effectués via Modrinth sont éligibles à la monétisation et doivent passer un filtrage de prévention de la fraude. Les téléchargements de l'application Modrinth exigent également que l'utilisateur soit connecté. Parce que tous les projets ont un ratio similaire de téléchargements monétisés, vos revenus ne changeraient pas de manière significative si tous les téléchargements étaient comptés."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "En savoir plus"
@@ -438,7 +438,7 @@
     "message": "vs préc."
   },
   "analytics.stat.revenue": {
-    "message": "Revenue"
+    "message": "Revenus"
   },
   "analytics.stat.revenue-value": {
     "message": "${value}"
@@ -450,7 +450,7 @@
     "message": "Statistique non disponible pour la requête actuelle"
   },
   "analytics.stat.views": {
-    "message": "Vus"
+    "message": "Vues"
   },
   "analytics.table.csv.date-range": {
     "message": "{start} à {end}"
@@ -1757,6 +1757,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
     "message": "{min} montant de retrait minimum, {max} montant de retrait maximum."
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "{min} montant de retrait minimum."
+  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Retrait"
   },
@@ -1941,19 +1944,19 @@
     "message": "Signalements"
   },
   "dashboard.revenue.available-now": {
-    "message": "Disponible Maintenant"
+    "message": "Disponible maintenant"
   },
   "dashboard.revenue.balance": {
-    "message": "Balance"
+    "message": "Solde"
   },
   "dashboard.revenue.estimated-tooltip.msg1": {
-    "message": "Les revenus estimés peuvent être modifiés jusqu'à leur publication."
+    "message": "Les revenus estimés peuvent changer jusqu’à leur disponibilité."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Cliquez pour lire comment Modrinth gère votre revenu."
+    "message": "Cliquez pour lire comment Modrinth gère vos revenus."
   },
   "dashboard.revenue.estimated-with-date": {
-    "message": "Estimé pour {date}"
+    "message": "Estimé pour le {date}"
   },
   "dashboard.revenue.processing": {
     "message": "Traitement"
@@ -1983,7 +1986,7 @@
     "message": "Transactions"
   },
   "dashboard.revenue.transactions.none": {
-    "message": "Aucune Transaction"
+    "message": "Aucune transaction"
   },
   "dashboard.revenue.transactions.none.desc": {
     "message": "Vos paiements et retraits apparaîtront ici."
@@ -2037,7 +2040,7 @@
     "message": "Projets"
   },
   "dashboard.sidebar.label.revenue": {
-    "message": "Revenu"
+    "message": "Revenus"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Compte"
@@ -2426,8 +2429,17 @@
   "hosting-marketing.medal.text-secondary": {
     "message": "Offre à durée limitée. Aucune carte de crédit requise. Disponible pour les serveurs américains."
   },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Erreur lors de la récupération des données de paiement"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "Le produit sélectionné a été trouvé, mais certaines données nécessaires sont manquantes. Veuillez contacter le support."
+  },
   "hosting-marketing.notification.invalid-product-title": {
     "message": "Produit invalide"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "Nous avons actuellement atteint notre capacité maximale. Veuillez réessayer plus tard."
   },
   "hosting-marketing.notification.server-capacity-full-title": {
     "message": "Capacité maximale du serveur atteinte"
@@ -2892,7 +2904,7 @@
     "message": "Projets"
   },
   "layout.nav.revenue": {
-    "message": "Revenu"
+    "message": "Revenus"
   },
   "layout.nav.saved-projects": {
     "message": "Projets sauvegardés"
@@ -2910,13 +2922,13 @@
     "message": "Vérification de l'adresse e-mail requise"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Automatiquement installer le jeu requis and le loader"
+    "message": "Installez automatiquement tout ce à quoi ils jouent"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Rejoindre l'instance partagée en un clic"
+    "message": "Jouez le même contenu que vos amis"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
-    "message": "Gardez le contenu partagé à jour quand l'instance change"
+    "message": "Gardez le contenu partagé à jour dès qu'il change"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Obtenir l'application Modrinth"
@@ -2954,6 +2966,9 @@
   "moderation.page.technicalReview": {
     "message": "Revue technique"
   },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Effacer"
+  },
   "modpack-scan-modal.failed": {
     "message": "Échec"
   },
@@ -2985,10 +3000,13 @@
     "message": "Scanner tous les fichiers"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Certains fichiers n'ont pas réussi à scanner : {error}"
+    "message": "Certains fichiers n'ont pas pu être scannés : \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Scan en cours..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Succès"
   },
   "modpack-scan-modal.title": {
     "message": "Scan du modpack ({scanned}/{total} fichiers)"
@@ -3764,9 +3782,6 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Vous pouvez toujours modifier votre projet, cela n'affectera pas votre position dans la file d'attente."
   },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Nous visons à examiner les soumissions dans les 24 à 48 heures, mais certains projets peuvent être menacés. Cela ne reflète pas un problème avec votre soumission."
-  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Nous apprécions votre patience pendant que nos modérateurs travaillent dur pour garder Modrinth en sécurité, et nous sommes impatients de vous aider à partager votre contenu !</emphasis>"
   },
@@ -3886,6 +3901,12 @@
   },
   "project.settings.permissions.delete-all-groups": {
     "message": "Supprimer tous les groupes"
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.description": {
+    "message": "Cela supprimera définitivement {count, plural, one {# groupe d'attribution} other {tous les # groupes d'attribution}} de ce projet ainsi que tous les fichiers qu'{count, plural, one {il contient} other {ils contiennent}}. Cette action est irréversible."
+  },
+  "project.settings.permissions.delete-all-groups-confirmation.title": {
+    "message": "Supprimer tous les groupes d'attribution ?"
   },
   "project.settings.permissions.empty-state.description": {
     "message": "Aucune des versions de votre projet ne contient de contenu externe, vous n'avez donc pas à vous soucier d'obtenir des autorisations."
@@ -4039,6 +4060,9 @@
   },
   "project.versions.copy-link-option": {
     "message": "Copier le lien"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Copier les coordonnées Maven"
   },
   "project.versions.delete-button": {
     "message": "Supprimer"
@@ -5270,6 +5294,9 @@
   "shared-instance.invite.inviter.unknown": {
     "message": "Un utilisateur Modrinth"
   },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# personne a} other {# personnes ont}} déjà rejoint"
+  },
   "shared-instance.invite.loading": {
     "message": "Chargement de l'invitation…"
   },
@@ -5367,7 +5394,7 @@
     "message": "Version supprimée"
   },
   "version.notification.packaging-success-text": {
-    "message": "Votre pack de données a été packagé avec succès en un mod ! Assurez vous de tester pour vérifier la présence d'erreurs."
+    "message": "Votre pack de données a été empaqueté avec succès en un mod ! Assurez-vous de le tester pour vérifier la présence d'erreurs."
   },
   "version.notification.packaging-success-title": {
     "message": "Succès d'empaquetage"

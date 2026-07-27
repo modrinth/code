@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "刪除{itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "停用{itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}可能會導致相容性問題。你額外新增至模組包的模組或內容將保留，但可能與新版本不相容。"
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "已新增 {count} 個"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "已變更設定檔"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "已停用"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "已移除（停用）"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
@@ -479,8 +488,23 @@
   "content.diff-modal.loader-updated": {
     "defaultMessage": "載入器"
   },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "已連結模組包"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "已取消連結模組包"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "已更新模組包"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "內容無變更"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "已移除 {count} 個"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "已移除 {count} 個（停用）"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
@@ -2063,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "找不到內容"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "外部"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "模組包內容"
   },
@@ -2071,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "沒有專案符合你的搜尋字詞。"
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "在 Slicer 中開啟"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
@@ -3699,7 +3732,7 @@
     "defaultMessage": "載入器"
   },
   "search.server_content_type.modpack": {
-    "defaultMessage": "模組支援"
+    "defaultMessage": "含模組"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
@@ -5078,6 +5111,12 @@
   "settings.sessions.title": {
     "defaultMessage": "工作階段"
   },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "新增"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "已加入"
+  },
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "這個使用者已經被邀請。"
   },
@@ -5109,7 +5148,7 @@
     "defaultMessage": "你的邀請連結會在 {duration} 後過期。"
   },
   "sharing.invite-players-modal.invite-link-heading": {
-    "defaultMessage": "或者使用邀請連結"
+    "defaultMessage": "或者，使用邀請連結"
   },
   "sharing.invite-players-modal.link-copied-text": {
     "defaultMessage": "邀請連結已複製到剪貼簿。"
@@ -5121,7 +5160,7 @@
     "defaultMessage": "無法複製連結"
   },
   "sharing.invite-players-modal.max-uses-label": {
-    "defaultMessage": "最大使用次數"
+    "defaultMessage": "使用次數上限"
   },
   "sharing.invite-players-modal.no-friends": {
     "defaultMessage": "沒有找到好友。"
@@ -5340,7 +5379,7 @@
     "defaultMessage": "生物"
   },
   "tag.category.modded": {
-    "defaultMessage": "模組支援"
+    "defaultMessage": "含模組"
   },
   "tag.category.models": {
     "defaultMessage": "模型"

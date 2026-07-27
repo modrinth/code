@@ -332,6 +332,9 @@
   "collection-widget.no-search-results": {
     "defaultMessage": "該当するプロジェクトがありません。"
   },
+  "collection-widget.project-count": {
+    "defaultMessage": "{count, plural, one {# プロジェクト} other {# プロジェクト}}"
+  },
   "collection-widget.search-placeholder": {
     "defaultMessage": "プロジェクトを検索"
   },
@@ -340,6 +343,9 @@
   },
   "content-type.content.lowercase": {
     "defaultMessage": "コンテンツ"
+  },
+  "content-type.item.lowercase": {
+    "defaultMessage": "{count, plural, one {項目} other {項目}}"
   },
   "content.card.select-project": {
     "defaultMessage": "{project}を選択"
@@ -371,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType}を削除"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType}を無効にする"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select,downgrade {ダウングレード} other {更新中}}互換性の問題が発生する可能性があります。Modパックに追加したモッドやコンテンツは保持されますが、新しいバージョンとの互換性がなくなる場合があります。\n"
   },
@@ -395,6 +404,15 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "リンクを解除"
   },
+  "content.dependency-warning.admonition-header": {
+    "defaultMessage": "このコンテンツはほかのコンテンツを必要とします"
+  },
+  "content.dependency-warning.affected-dependents-label": {
+    "defaultMessage": "{count, plural, one {プロジェクト} other {プロジェクト}}に影響を与えました"
+  },
+  "content.dependency-warning.bulk-admonition-body": {
+    "defaultMessage": "一部のプロジェクトは依存関係としてインストールされています。これらを削除すると、{context} が動作しなくなったり、依存するコンテンツが正しく読み込まれなくなったりする可能性があります。"
+  },
   "content.dependency-warning.context.instance": {
     "defaultMessage": "インスタンス"
   },
@@ -404,11 +422,26 @@
   "content.dependency-warning.delete-anyway-button": {
     "defaultMessage": "とにかく削除する"
   },
+  "content.dependency-warning.delete-many-anyway-button": {
+    "defaultMessage": "それでも {count, number} 項目の {itemType} を削除する"
+  },
   "content.dependency-warning.deleting-label": {
     "defaultMessage": "削除中"
   },
+  "content.dependency-warning.disable-dependents-label": {
+    "defaultMessage": "削除後に依存関係を無効にする"
+  },
+  "content.dependency-warning.effect-dependent-content": {
+    "defaultMessage": "依存コンテンツの読み込みに失敗したり、無効化されたりする可能性があります"
+  },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "{context}がクラッシュしたり、起動しなかったり、予期しない動作をしたりする可能性があります"
+  },
   "content.dependency-warning.header": {
     "defaultMessage": "依存関係の警告"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} は依存関係としてインストールされています。これを削除すると、{context} が動作しなくなったり、依存するコンテンツが正しく読み込まれなくなったりする可能性があります。"
   },
   "content.dependency-warning.what-happens-label": {
     "defaultMessage": "何が起こりますか？"
@@ -2868,7 +2901,7 @@
     "defaultMessage": "{date}に作成"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "ライセンス: {license}"
+    "defaultMessage": "ライセンス {license}"
   },
   "project.about.details.published": {
     "defaultMessage": "{date} に公開"
@@ -4967,8 +5000,38 @@
   "unknown-file-warning-modal.malware-warning": {
     "defaultMessage": "一般的にマルウェアは、Discord等のプラットフォーム上でModファイルを配布して拡散されます"
   },
+  "user.profile.badge.alpha.about.1": {
+    "defaultMessage": "2020年11月までのModrinthがAlpha版だった頃から活動しています"
+  },
+  "user.profile.badge.alpha.name": {
+    "defaultMessage": "Alpha Tester"
+  },
+  "user.profile.badge.beta.about.1": {
+    "defaultMessage": "2022年2月までのModrinthがBeta版だった頃から活動しています"
+  },
+  "user.profile.badge.beta.link": {
+    "defaultMessage": "クリックすると、ModrinthのBeta版のリリース記事を読むことができます。"
+  },
+  "user.profile.badge.beta.name": {
+    "defaultMessage": "Beta Tester"
+  },
+  "user.profile.badge.downloads.about.1": {
+    "defaultMessage": "ダウンロード回数が累計{download_sum}回を達成しました"
+  },
+  "user.profile.badge.downloads.name": {
+    "defaultMessage": "{download_sum} Downloads"
+  },
   "user.profile.badge.moderator.name": {
     "defaultMessage": "コンテンツモデレーター"
+  },
+  "user.profile.badge.plus.name": {
+    "defaultMessage": "Modrinth+ Member"
+  },
+  "user.profile.badge.staff.about.1": {
+    "defaultMessage": "Modrinthのスタッフです"
+  },
+  "user.profile.badge.staff.name": {
+    "defaultMessage": "Modrinth Team"
   },
   "version.content.name": {
     "defaultMessage": "名前"
