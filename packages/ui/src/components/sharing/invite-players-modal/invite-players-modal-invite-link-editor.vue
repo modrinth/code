@@ -21,9 +21,9 @@
 					v-model="maxUses"
 					type="number"
 					:min="1"
-					:max="2147483647"
+					:max="maximumUses"
 					:step="1"
-					:disabled="saving"
+					:disabled="saving || maximumUses === 0"
 				/>
 			</div>
 		</div>
@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import { SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectNotificationManager } from '../../../providers'
@@ -59,11 +59,17 @@ import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 import type { InviteLinkSettings } from './types'
 
-const props = defineProps<{
-	linkExpiresAt?: string | Date | null
-	linkMaxUses: number
-	updateInviteLink?: (settings: InviteLinkSettings) => Promise<void>
-}>()
+const props = withDefaults(
+	defineProps<{
+		linkExpiresAt?: string | Date | null
+		linkMaxUses: number
+		linkMaxUsesLimit?: number
+		updateInviteLink?: (settings: InviteLinkSettings) => Promise<void>
+	}>(),
+	{
+		linkMaxUsesLimit: 2147483647,
+	},
+)
 const { formatMessage } = useVIntl()
 const notificationManager = injectNotificationManager(null)
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
@@ -72,6 +78,7 @@ const maxUses = ref<number>()
 const minimumExpiry = ref(new Date())
 const maximumExpiry = ref(new Date())
 const saving = ref(false)
+const maximumUses = computed(() => Math.max(0, Math.floor(props.linkMaxUsesLimit)))
 
 const messages = defineMessages({
 	title: {
@@ -109,7 +116,7 @@ const canSave = computed(() => {
 		date <= maximumExpiry.value &&
 		Number.isInteger(maxUses.value ?? 0) &&
 		(maxUses.value ?? 0) > 0 &&
-		(maxUses.value ?? 0) <= 2147483647
+		(maxUses.value ?? 0) <= maximumUses.value
 	)
 })
 
@@ -141,16 +148,17 @@ function show() {
 				? maximumExpiry.value
 				: currentExpiry
 	expiry.value = formatLocalDate(date)
-	maxUses.value = props.linkMaxUses
+	maxUses.value = Math.min(props.linkMaxUses, maximumUses.value)
 	modal.value?.show()
 }
 
 async function save() {
 	const date = parseLocalDate(expiry.value)
 	if (!canSave.value || !date || !props.updateInviteLink) return
+	const clampedMaxUses = Math.min(maxUses.value ?? 1, maximumUses.value)
 	saving.value = true
 	try {
-		await props.updateInviteLink({ expiresAt: date, maxUses: maxUses.value ?? 1 })
+		await props.updateInviteLink({ expiresAt: date, maxUses: clampedMaxUses })
 		modal.value?.hide()
 	} catch (error) {
 		notificationManager?.addNotification({
@@ -162,6 +170,10 @@ async function save() {
 		saving.value = false
 	}
 }
+
+watch([maxUses, maximumUses], ([uses, limit]) => {
+	if (uses !== undefined && uses > limit) maxUses.value = limit
+})
 
 defineExpose({ show })
 </script>

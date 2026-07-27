@@ -25,7 +25,7 @@
 					<ButtonStyled color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
-							:disabled="invitePending"
+							:disabled="invitePending || inviteDisabled"
 							@click="emit('invite', $event)"
 						>
 							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
@@ -171,6 +171,7 @@ import {
 const props = defineProps<{
 	rows: ShareRow[]
 	actionsLocked?: boolean
+	inviteDisabled?: boolean
 	invitePending?: boolean
 	pushUpdateDisabled?: boolean
 	pushUpdatePending?: boolean

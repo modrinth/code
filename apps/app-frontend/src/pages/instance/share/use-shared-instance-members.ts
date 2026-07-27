@@ -12,7 +12,11 @@ import {
 } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
-import { normalizeInviteKey, type ShareRow } from './shared-instance-share-types'
+import {
+	normalizeInviteKey,
+	SHARED_INSTANCE_USER_LIMIT,
+	type ShareRow,
+} from './shared-instance-share-types'
 
 type MembersQueryKey = readonly ['sharedInstanceUsers', string]
 
@@ -139,6 +143,7 @@ export function useSharedInstanceMembers(options: {
 		if (
 			options.actionsLocked.value ||
 			exclusiveMutationPending.value ||
+			rows.value.length >= SHARED_INSTANCE_USER_LIMIT ||
 			invitingUserIds.has(normalizedId) ||
 			find(user.id, user.username)
 		) {

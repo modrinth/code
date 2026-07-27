@@ -9,9 +9,19 @@
 			:link="inviteLink.link.value"
 			:link-expires-at="inviteLink.details.value?.expiresAt"
 			:link-max-uses="inviteLink.details.value?.maxUses"
+			:link-max-uses-limit="remainingUserSlots"
 			:update-invite-link="inviteLink.update"
 			:user-profile-link="userProfileLink"
-			:can-invite="!members.exclusiveMutationPending.value && !inviteLink.pending.value"
+			:can-invite="
+				hasRemainingUserSlots &&
+				!members.exclusiveMutationPending.value &&
+				!inviteLink.pending.value
+			"
+			:invite-disabled-message="
+				hasRemainingUserSlots
+					? undefined
+					: formatMessage(messages.userLimitReached, { limit: SHARED_INSTANCE_USER_LIMIT })
+			"
 			@invite="invitePlayer"
 			@cancel="cancelInvite"
 		/>
@@ -41,6 +51,7 @@
 			v-if="members.rows.value.length > 0"
 			:rows="members.rows.value"
 			:actions-locked="sharedInstanceActionsLocked"
+			:invite-disabled="!hasRemainingUserSlots"
 			:invite-pending="inviteLink.pending.value"
 			:push-update-disabled="
 				instance.install_stage !== 'installed' || publishState !== 'idle' || !!offline
@@ -107,7 +118,7 @@
 				<ButtonStyled color="brand"
 					><button
 						class="!h-10"
-						:disabled="inviteLink.pending.value"
+						:disabled="inviteLink.pending.value || !hasRemainingUserSlots"
 						@click="showInvitePlayers($event)"
 					>
 						<SpinnerIcon
@@ -160,7 +171,7 @@ import { injectSharedInstanceState } from '../use-shared-instance-state'
 import SharedInstanceMembersTable from './shared-instance-members-table.vue'
 import SharedInstanceRemoveMemberModal from './shared-instance-remove-member-modal.vue'
 import SharedInstanceShareEmptyState from './shared-instance-share-empty-state.vue'
-import type { ShareRow } from './shared-instance-share-types'
+import { SHARED_INSTANCE_USER_LIMIT, type ShareRow } from './shared-instance-share-types'
 import { useSharedInstanceInviteCandidates } from './use-shared-instance-invite-candidates'
 import { useSharedInstanceInviteLink } from './use-shared-instance-invite-link'
 import { useSharedInstanceMembers } from './use-shared-instance-members'
@@ -210,6 +221,10 @@ const members = useSharedInstanceMembers({
 	actionsLocked,
 	onError: notifyOperationError,
 })
+const remainingUserSlots = computed(() =>
+	Math.max(0, SHARED_INSTANCE_USER_LIMIT - members.rows.value.length),
+)
+const hasRemainingUserSlots = computed(() => remainingUserSlots.value > 0)
 const {
 	inviteFriends,
 	search: searchInviteUsers,
@@ -222,6 +237,7 @@ const {
 })
 const inviteLink = useSharedInstanceInviteLink(
 	computed(() => props.instance.id),
+	remainingUserSlots,
 	notifyOperationError,
 )
 
@@ -266,6 +282,10 @@ const messages = defineMessages({
 		id: 'app.instance.share.empty.invite-friends-button',
 		defaultMessage: 'Invite friends',
 	},
+	userLimitReached: {
+		id: 'app.instance.share.invite-modal.user-limit-reached',
+		defaultMessage: 'This instance has reached the {limit}-user limit.',
+	},
 	shareModalHeader: {
 		id: 'app.instance.share.invite-modal.heading',
 		defaultMessage: 'Share {name}',
@@ -305,7 +325,7 @@ const messages = defineMessages({
 })
 
 function invitePlayer(payload: InvitePlayersInvitePayload) {
-	if (actionsLocked.value) return
+	if (actionsLocked.value || !hasRemainingUserSlots.value) return
 	if (payload.source === 'search') void requestFriend(payload.user)
 	members.invite(payload.user)
 }
@@ -316,6 +336,7 @@ function cancelInvite(user: InvitePlayersUser) {
 async function showInvitePlayers(event?: MouseEvent) {
 	if (actionsLocked.value) return
 	if (!isSignedIn.value) return signInToShare(event)
+	if (!hasRemainingUserSlots.value) return
 	if (requiresUnlink.value) return unlinkModal.value?.show()
 	if (await inviteLink.ensure()) invitePlayersModal.value?.show(event)
 }
