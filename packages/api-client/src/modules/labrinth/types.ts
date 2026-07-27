@@ -2288,18 +2288,9 @@ export namespace Labrinth {
 				priority: number
 			}
 
-			export type TestDelphiRuleTrace = {
-				key: string
-				issue_type: string
-				severity: DelphiSeverity
-				jar: string | null
-				file_path: string
-				data: Record<string, unknown>
-			}
-
 			export type TestDelphiRuleRequest = {
 				rule: string
-				traces: TestDelphiRuleTrace[]
+				inputs: RuleInput[]
 			}
 
 			export type DelphiRuleEffect = {

@@ -434,26 +434,62 @@ const RULE_EDITOR_OPTIONS: Partial<Ace.EditorOptions> = {
 	useSoftTabs: true,
 }
 
-const TEST_TRACES: Labrinth.TechReview.Internal.TestDelphiRuleTrace[] = [
+const TEST_INPUTS: Labrinth.TechReview.Internal.RuleInput[] = [
 	{
-		key: 'known-safe:obfuscated-bootstrap',
-		issue_type: 'OBFUSCATED_NAMES',
-		severity: 'high',
-		jar: 'META-INF/jars/embedded.jar',
-		file_path: 'com/example/Bootstrap.class',
-		data: {
-			confidence: 0.97,
-			symbol_count: 42,
+		schema_version: 1,
+		trace: {
+			key: 'known-safe:obfuscated-bootstrap',
+			issue_type: 'OBFUSCATED_NAMES',
+			severity: 'high',
+			jar: 'META-INF/jars/embedded.jar',
+			file_path: 'com/example/Bootstrap.class',
+			data: {
+				confidence: 0.97,
+				symbol_count: 42,
+			},
+		},
+		scan: {
+			delphi_version: 17,
+		},
+		artifact: {
+			size: 412_892,
+			hashes: {
+				sha1: '0123456789abcdef',
+				sha512: 'fedcba9876543210',
+			},
+		},
+		scope: {
+			project_id: 'example-project',
+			version_id: 'example-version',
+			file_id: 'example-file',
 		},
 	},
 	{
-		key: 'network/known-telemetry-host',
-		issue_type: 'SUSPICIOUS_NETWORK_ACCESS',
-		severity: 'medium',
-		jar: null,
-		file_path: 'com/example/Telemetry.class',
-		data: {
-			host: 'telemetry.example.com',
+		schema_version: 1,
+		trace: {
+			key: 'network/known-telemetry-host',
+			issue_type: 'SUSPICIOUS_NETWORK_ACCESS',
+			severity: 'medium',
+			jar: null,
+			file_path: 'com/example/Telemetry.class',
+			data: {
+				host: 'telemetry.example.com',
+			},
+		},
+		scan: {
+			delphi_version: 18,
+		},
+		artifact: {
+			size: 98_304,
+			hashes: {
+				sha1: 'abcdef0123456789',
+				sha512: '0123456789abcdef',
+			},
+		},
+		scope: {
+			project_id: 'telemetry-project',
+			version_id: 'telemetry-version',
+			file_id: 'telemetry-file',
 		},
 	},
 ]
@@ -511,7 +547,7 @@ const ruleOutputSchemaText = computed(() =>
 	ruleSchema.value ? formatRuleSchema(ruleSchema.value.output, ruleSchema.value.components) : '',
 )
 const previewExamples = computed(() =>
-	TEST_TRACES.map((original, index) => {
+	TEST_INPUTS.map(({ trace: original }, index) => {
 		const effect = ruleTestEffects.value[index] ?? null
 		const effectiveSeverity = effect?.severity ?? original.severity
 		let summary: string
@@ -665,7 +701,7 @@ async function testRule() {
 	try {
 		const response = await client.labrinth.tech_review_internal.testRule({
 			rule,
-			traces: TEST_TRACES,
+			inputs: TEST_INPUTS,
 		})
 		if (requestId !== ruleTestRequestId) return
 

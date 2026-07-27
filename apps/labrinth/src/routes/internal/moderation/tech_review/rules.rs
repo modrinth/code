@@ -1,14 +1,11 @@
-use std::collections::{BTreeMap, HashMap};
-
 use actix_web::{HttpRequest, delete, get, post, put, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 use xredis::RedisPool;
 
-use super::rules_scan::{
-    RuleArtifact, RuleInput, RuleScan, RuleScope, RuleTrace,
-};
+use super::rules_scan::RuleInput;
 use crate::{
     auth::check_is_moderator_from_headers,
     database::{
@@ -25,12 +22,8 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::ApiError,
-    util::error::Context,
+    util::{error::Context, validate::validation_errors_to_string},
 };
-
-const MAX_RULE_NAME_LENGTH: usize = 256;
-const MAX_RULE_EXPRESSION_LENGTH: usize = 65_536;
-const MAX_RULE_TEST_TRACES: usize = 10;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(get_rules)
@@ -75,28 +68,22 @@ pub struct DelphiRuleAffectedDetail {
     pub hidden: bool,
 }
 
-#[derive(Debug, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
 pub struct WriteDelphiRule {
+    #[validate(length(min = 1, max = 256))]
     pub name: String,
+    #[validate(length(min = 1, max = 65536))]
     pub rule: String,
     #[serde(default)]
     pub priority: i32,
 }
 
-#[derive(Debug, Deserialize, utoipa::ToSchema)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct TestDelphiRule {
+    #[validate(length(min = 1, max = 65536))]
     pub rule: String,
-    pub traces: Vec<TestDelphiRuleTrace>,
-}
-
-#[derive(Debug, Deserialize, Serialize, utoipa::ToSchema)]
-pub struct TestDelphiRuleTrace {
-    pub key: String,
-    pub issue_type: String,
-    pub severity: DelphiSeverity,
-    pub jar: Option<String>,
-    pub file_path: String,
-    pub data: HashMap<String, serde_json::Value>,
+    #[validate(length(max = 10))]
+    pub inputs: Vec<RuleInput>,
 }
 
 #[derive(Debug, Serialize, utoipa::ToSchema)]
@@ -120,36 +107,24 @@ struct ValidatedRule {
 }
 
 impl WriteDelphiRule {
-    fn validate(self) -> Result<ValidatedRule, ApiError> {
-        let name = self.name.trim().to_string();
-        if name.is_empty() {
-            return Err(ApiError::Request(eyre!("rule name cannot be empty")));
-        }
-        if name.chars().count() > MAX_RULE_NAME_LENGTH {
-            return Err(ApiError::Request(eyre!(
-                "rule name cannot exceed {MAX_RULE_NAME_LENGTH} characters"
-            )));
-        }
-
-        let rule = self.rule.trim().to_string();
-        if rule.is_empty() {
-            return Err(ApiError::Request(eyre!(
-                "rule expression cannot be empty"
-            )));
-        }
-        if rule.len() > MAX_RULE_EXPRESSION_LENGTH {
-            return Err(ApiError::Request(eyre!(
-                "rule expression cannot exceed {MAX_RULE_EXPRESSION_LENGTH} bytes"
-            )));
-        }
-
-        cel::Program::compile(&rule).map_err(|error| {
-            ApiError::Request(eyre!("invalid cel expression: {error}"))
+    async fn validate(mut self) -> Result<ValidatedRule, ApiError> {
+        self.name = self.name.trim().to_string();
+        self.rule = self.rule.trim().to_string();
+        Validate::validate(&self).map_err(|error| {
+            ApiError::Validation(validation_errors_to_string(error, None))
         })?;
 
+        let expression = self.rule.clone();
+        tokio::task::spawn_blocking(move || cel::Program::compile(&expression))
+            .await
+            .wrap_internal_err("failed to join cel compilation task")?
+            .map_err(|error| {
+                ApiError::Request(eyre!("invalid cel expression: {error}"))
+            })?;
+
         Ok(ValidatedRule {
-            name,
-            rule,
+            name: self.name,
+            rule: self.rule,
             priority: self.priority,
         })
     }
@@ -180,68 +155,33 @@ pub async fn test_rule(
     )
     .await?;
 
-    let request = body.into_inner();
-    let rule = request.rule.trim();
-    if rule.is_empty() {
-        return Err(ApiError::Request(eyre!(
-            "rule expression cannot be empty"
-        )));
-    }
-    if rule.len() > MAX_RULE_EXPRESSION_LENGTH {
-        return Err(ApiError::Request(eyre!(
-            "rule expression cannot exceed {MAX_RULE_EXPRESSION_LENGTH} bytes"
-        )));
-    }
-    if request.traces.len() > MAX_RULE_TEST_TRACES {
-        return Err(ApiError::Request(eyre!(
-            "cannot test more than {MAX_RULE_TEST_TRACES} traces at once"
-        )));
-    }
-
-    let program = cel::Program::compile(rule).map_err(|error| {
-        ApiError::Request(eyre!("invalid cel expression: {error}"))
+    let mut request = body.into_inner();
+    request.rule = request.rule.trim().to_string();
+    request.validate().map_err(|error| {
+        ApiError::Validation(validation_errors_to_string(error, None))
     })?;
-    let mut effects = Vec::with_capacity(request.traces.len());
 
-    for (index, trace) in request.traces.iter().enumerate() {
-        let input = test_rule_input(trace);
+    let rule = request.rule;
+    let program =
+        tokio::task::spawn_blocking(move || cel::Program::compile(&rule))
+            .await
+            .wrap_internal_err("failed to join cel compilation task")?
+            .map_err(|error| {
+                ApiError::Request(eyre!("invalid cel expression: {error}"))
+            })?;
+    let mut effects = Vec::with_capacity(request.inputs.len());
+
+    for (index, input) in request.inputs.iter().enumerate() {
         let effect = super::rules_scan::evaluate_rule(&program, input)
             .map_err(|error| {
                 ApiError::Request(eyre!(
-                    "failed to evaluate test trace {index}: {error}"
+                    "failed to evaluate test input {index}: {error}"
                 ))
             })?;
         effects.push(effect);
     }
 
     Ok(web::Json(TestDelphiRuleResponse { effects }))
-}
-
-fn test_rule_input(trace: &TestDelphiRuleTrace) -> RuleInput {
-    RuleInput {
-        schema_version: 1,
-        trace: RuleTrace {
-            key: trace.key.clone(),
-            issue_type: trace.issue_type.clone(),
-            severity: trace.severity,
-            jar: trace.jar.clone(),
-            file_path: trace.file_path.clone(),
-            data: trace.data.clone(),
-        },
-        scan: RuleScan { delphi_version: 17 },
-        artifact: RuleArtifact {
-            size: Some(412_892),
-            hashes: BTreeMap::from([
-                ("sha1".to_string(), "0123456789abcdef".to_string()),
-                ("sha512".to_string(), "fedcba9876543210".to_string()),
-            ]),
-        },
-        scope: RuleScope {
-            project_id: Some("example-project".to_string()),
-            version_id: Some("example-version".to_string()),
-            file_id: Some("example-file".to_string()),
-        },
-    }
 }
 
 /// List all Delphi rules that are not pending deletion.
@@ -345,26 +285,7 @@ pub async fn get_rules(
 
     let mut response = Vec::<DelphiRule>::new();
     for rule in rules {
-        if response
-            .last()
-            .is_none_or(|existing| existing.id != rule.id)
-        {
-            response.push(DelphiRule {
-                id: rule.id,
-                name: rule.name,
-                rule: rule.rule,
-                priority: rule.priority,
-                revision: rule.revision,
-                created_at: rule.created_at,
-                updated_at: rule.updated_at,
-                created_by: rule.created_by,
-                updated_by: rule.updated_by,
-                affected_details_count: rule.affected_details_count,
-                affected_details: Vec::new(),
-            });
-        }
-
-        if let (
+        let affected_detail = if let (
             Some(detail_id),
             Some(issue_id),
             Some(issue_type),
@@ -381,28 +302,49 @@ pub async fn get_rules(
             rule.original_severity,
             rule.hidden,
         ) {
-            response
-                .last_mut()
-                .expect("a delphi rule was inserted above")
-                .affected_details
-                .push(DelphiRuleAffectedDetail {
-                    detail_id,
-                    issue_id,
-                    project_id: rule.project_id.map(ProjectId::from),
-                    project_name: rule.project_name,
-                    project_icon_url: rule.project_icon_url,
-                    version_id: rule.version_id.map(VersionId::from),
-                    version_name: rule.version_name,
-                    version_number: rule.version_number,
-                    issue_type,
-                    key,
-                    jar: rule.jar,
-                    file_path,
-                    original_severity,
-                    severity: rule.effect_severity,
-                    hidden,
-                });
+            Some(DelphiRuleAffectedDetail {
+                detail_id,
+                issue_id,
+                project_id: rule.project_id.map(ProjectId::from),
+                project_name: rule.project_name,
+                project_icon_url: rule.project_icon_url,
+                version_id: rule.version_id.map(VersionId::from),
+                version_name: rule.version_name,
+                version_number: rule.version_number,
+                issue_type,
+                key,
+                jar: rule.jar,
+                file_path,
+                original_severity,
+                severity: rule.effect_severity,
+                hidden,
+            })
+        } else {
+            None
+        };
+
+        if let Some(existing) = response.last_mut()
+            && existing.id == rule.id
+        {
+            if let Some(affected_detail) = affected_detail {
+                existing.affected_details.push(affected_detail);
+            }
+            continue;
         }
+
+        response.push(DelphiRule {
+            id: rule.id,
+            name: rule.name,
+            rule: rule.rule,
+            priority: rule.priority,
+            revision: rule.revision,
+            created_at: rule.created_at,
+            updated_at: rule.updated_at,
+            created_by: rule.created_by,
+            updated_by: rule.updated_by,
+            affected_details_count: rule.affected_details_count,
+            affected_details: affected_detail.into_iter().collect(),
+        });
     }
 
     Ok(web::Json(response))
@@ -519,7 +461,7 @@ pub async fn create_rule(
         Scopes::PROJECT_WRITE,
     )
     .await?;
-    let rule = body.into_inner().validate()?;
+    let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
 
     let rule = sqlx::query!(
@@ -601,7 +543,7 @@ pub async fn update_rule(
     )
     .await?;
     let (id,) = path.into_inner();
-    let rule = body.into_inner().validate()?;
+    let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
 
     let rule = sqlx::query!(

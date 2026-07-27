@@ -5,7 +5,7 @@ use ariadne::ids::base62_impl::to_base62;
 use bytes::Bytes;
 use eyre::{Context as _, Result, eyre};
 use futures_util::{StreamExt, TryStreamExt};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
@@ -52,7 +52,7 @@ struct RuleScanErrorEvent<'a> {
     message: &'a str,
 }
 
-#[derive(Serialize, utoipa::ToSchema)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct RuleInput {
     pub schema_version: u32,
     pub trace: RuleTrace,
@@ -61,7 +61,7 @@ pub struct RuleInput {
     pub scope: RuleScope,
 }
 
-#[derive(Serialize, utoipa::ToSchema)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct RuleTrace {
     pub key: String,
     pub issue_type: String,
@@ -71,18 +71,18 @@ pub struct RuleTrace {
     pub data: HashMap<String, serde_json::Value>,
 }
 
-#[derive(Serialize, utoipa::ToSchema)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct RuleScan {
     pub delphi_version: i32,
 }
 
-#[derive(Serialize, utoipa::ToSchema)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct RuleArtifact {
     pub size: Option<i32>,
     pub hashes: BTreeMap<String, String>,
 }
 
-#[derive(Serialize, utoipa::ToSchema)]
+#[derive(Deserialize, Serialize, utoipa::ToSchema)]
 pub struct RuleScope {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
@@ -238,9 +238,9 @@ pub async fn get_detail_rule_input(
             hashes: detail.hashes.0,
         },
         scope: RuleScope {
-            project_id: detail.project_id.map(to_public_id),
-            version_id: detail.version_id.map(to_public_id),
-            file_id: detail.file_id.map(to_public_id),
+            project_id: detail.project_id.map(|id| to_base62(id as u64)),
+            version_id: detail.version_id.map(|id| to_base62(id as u64)),
+            file_id: detail.file_id.map(|id| to_base62(id as u64)),
         },
     }))
 }
@@ -316,27 +316,28 @@ pub async fn scan_rules(
     actix_web::rt::spawn(async move {
         match run_scan(transaction, &sender).await {
             Ok(summary) => {
-                send_event(
-                    &sender,
-                    "complete",
-                    &RuleScanEvent {
-                        phase: "complete",
-                        revision: summary.revision,
-                        scanned: summary.scanned,
-                        total: summary.total,
-                        effects: summary.effects,
-                    },
-                );
+                let event = RuleScanEvent {
+                    phase: "complete",
+                    revision: summary.revision,
+                    scanned: summary.scanned,
+                    total: summary.total,
+                    effects: summary.effects,
+                };
+                if let Ok(data) = serde_json::to_string(&event) {
+                    let _ = sender.send(Bytes::from(format!(
+                        "event: complete\ndata: {data}\n\n"
+                    )));
+                }
             }
             Err(error) => {
                 tracing::error!(error = ?error, "delphi rule scan failed");
-                send_event(
-                    &sender,
-                    "failed",
-                    &RuleScanErrorEvent {
-                        message: &error.to_string(),
-                    },
-                );
+                let message = error.to_string();
+                let event = RuleScanErrorEvent { message: &message };
+                if let Ok(data) = serde_json::to_string(&event) {
+                    let _ = sender.send(Bytes::from(format!(
+                        "event: failed\ndata: {data}\n\n"
+                    )));
+                }
             }
         }
     });
@@ -422,7 +423,17 @@ async fn run_scan(
 
     let mut effects = Vec::new();
     let mut scanned = 0;
-    send_progress(sender, "scanning", revision, 0, total, 0);
+    let event = RuleScanEvent {
+        phase: "scanning",
+        revision,
+        scanned: 0,
+        total,
+        effects: 0,
+    };
+    if let Ok(data) = serde_json::to_string(&event) {
+        let _ = sender
+            .send(Bytes::from(format!("event: progress\ndata: {data}\n\n")));
+    }
 
     while let Some(detail) = details
         .try_next()
@@ -448,9 +459,9 @@ async fn run_scan(
                 hashes: detail.hashes.0,
             },
             scope: RuleScope {
-                project_id: detail.project_id.map(to_public_id),
-                version_id: detail.version_id.map(to_public_id),
-                file_id: detail.file_id.map(to_public_id),
+                project_id: detail.project_id.map(|id| to_base62(id as u64)),
+                version_id: detail.version_id.map(|id| to_base62(id as u64)),
+                file_id: detail.file_id.map(|id| to_base62(id as u64)),
             },
         };
 
@@ -474,20 +485,34 @@ async fn run_scan(
 
         scanned += 1;
         if scanned % PROGRESS_INTERVAL == 0 || scanned == total {
-            send_progress(
-                sender,
-                "scanning",
+            let event = RuleScanEvent {
+                phase: "scanning",
                 revision,
                 scanned,
                 total,
-                effects.len(),
-            );
+                effects: effects.len(),
+            };
+            if let Ok(data) = serde_json::to_string(&event) {
+                let _ = sender.send(Bytes::from(format!(
+                    "event: progress\ndata: {data}\n\n"
+                )));
+            }
             tokio::task::yield_now().await;
         }
     }
     drop(details);
 
-    send_progress(sender, "publishing", revision, total, total, effects.len());
+    let event = RuleScanEvent {
+        phase: "publishing",
+        revision,
+        scanned: total,
+        total,
+        effects: effects.len(),
+    };
+    if let Ok(data) = serde_json::to_string(&event) {
+        let _ = sender
+            .send(Bytes::from(format!("event: progress\ndata: {data}\n\n")));
+    }
 
     insert_materialized_effects(revision, &effects, &mut transaction).await?;
 
@@ -656,9 +681,9 @@ pub(crate) async fn materialize_current_rule_effects(
                 hashes: detail.hashes.0,
             },
             scope: RuleScope {
-                project_id: detail.project_id.map(to_public_id),
-                version_id: detail.version_id.map(to_public_id),
-                file_id: detail.file_id.map(to_public_id),
+                project_id: detail.project_id.map(|id| to_base62(id as u64)),
+                version_id: detail.version_id.map(|id| to_base62(id as u64)),
+                file_id: detail.file_id.map(|id| to_base62(id as u64)),
             },
         };
 
@@ -687,7 +712,7 @@ pub(crate) async fn materialize_current_rule_effects(
 async fn fetch_compiled_rules(
     transaction: &mut PgTransaction<'_>,
 ) -> Result<Vec<CompiledRule>> {
-    sqlx::query!(
+    let rules = sqlx::query!(
         r#"
         SELECT id AS "id!: DelphiRuleId", rule
         FROM delphi_rules
@@ -697,18 +722,28 @@ async fn fetch_compiled_rules(
     )
     .fetch_all(&mut *transaction)
     .await
-    .wrap_err("failed to fetch delphi rules")?
-    .into_iter()
-    .map(|rule| {
-        let program = cel::Program::compile(&rule.rule).map_err(|error| {
-            eyre!("failed to compile delphi rule {}: {error}", rule.id.0)
-        })?;
-        Ok(CompiledRule {
-            id: rule.id,
-            program,
-        })
+    .wrap_err("failed to fetch delphi rules")?;
+
+    tokio::task::spawn_blocking(move || {
+        rules
+            .into_iter()
+            .map(|rule| {
+                let program =
+                    cel::Program::compile(&rule.rule).map_err(|error| {
+                        eyre!(
+                            "failed to compile delphi rule {}: {error}",
+                            rule.id.0
+                        )
+                    })?;
+                Ok(CompiledRule {
+                    id: rule.id,
+                    program,
+                })
+            })
+            .collect()
     })
-    .collect()
+    .await
+    .wrap_err("failed to join cel compilation task")?
 }
 
 async fn insert_materialized_effects(
@@ -789,41 +824,4 @@ pub(super) fn evaluate_rule(
             .map(Some)
             .wrap_err("cel expression returned an invalid rule effect"),
     }
-}
-
-fn to_public_id(id: i64) -> String {
-    to_base62(id as u64)
-}
-
-fn send_progress(
-    sender: &mpsc::UnboundedSender<Bytes>,
-    phase: &'static str,
-    revision: i64,
-    scanned: usize,
-    total: usize,
-    effects: usize,
-) {
-    send_event(
-        sender,
-        "progress",
-        &RuleScanEvent {
-            phase,
-            revision,
-            scanned,
-            total,
-            effects,
-        },
-    );
-}
-
-fn send_event(
-    sender: &mpsc::UnboundedSender<Bytes>,
-    event: &str,
-    data: &impl Serialize,
-) {
-    let Ok(data) = serde_json::to_string(data) else {
-        return;
-    };
-    let _ =
-        sender.send(Bytes::from(format!("event: {event}\ndata: {data}\n\n")));
 }
