@@ -402,7 +402,11 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { UserBadge } from '@modrinth/utils'
+import {
+	isModrinthUser as checkIsModrinthUser,
+	isOfficialAccount as checkIsOfficialAccount,
+	UserBadge,
+} from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -716,8 +720,8 @@ const earliestProjectByType = computed(() => {
 	return earliest
 })
 
-const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
-const isOfficialAccount = computed(() => isModrinthUser.value || user.value?.id === 'GVFjtWTf')
+const isModrinthUser = computed(() => checkIsModrinthUser(user.value?.id))
+const isOfficialAccount = computed(() => checkIsOfficialAccount(user.value?.id))
 const isSelf = computed(() => auth.user.value?.id === user.value?.id)
 const isAdminViewing = computed(() => auth.user.value?.role === 'admin')
 const isStaffViewing = computed(
