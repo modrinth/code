@@ -1,6 +1,10 @@
 <template>
 	<template v-if="user">
-			<NewModal ref="editRoleModal" :header="formatMessage(messages.editRoleButton)">
+			<NewModal
+				v-if="variant === 'web'"
+				ref="editRoleModal"
+				:header="formatMessage(messages.editRoleButton)"
+			>
 				<div class="flex w-80 flex-col gap-4">
 					<Combobox
 						v-model="selectedRole"
@@ -35,7 +39,7 @@
 			</NewModal>
 
 			<NewModal
-				v-if="isStaffViewing"
+				v-if="variant === 'web' && isStaffViewing"
 				ref="userDetailsModal"
 				:header="formatMessage(messages.userDetailsTitle)"
 			>
@@ -152,6 +156,7 @@
 						:is-self="isSelf"
 						:is-admin="isAdminViewing"
 						:is-staff="isStaffViewing"
+						:show-staff-actions="variant === 'web'"
 						:projects-count="projects.length"
 						:downloads="sumDownloads"
 						@manage-projects="openPath('/dashboard/projects')"
@@ -198,36 +203,37 @@
 						<NavTabs :links="navLinks" replace />
 					</div>
 
-					<ProjectCardList
-						v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
-						:layout="displayMode"
-					>
-						<ProjectCard
-							v-for="project in filteredProjects"
-							:key="project.id"
-							:link="projectLink(project)"
-							:title="project.title"
-							:icon-url="project.icon_url"
-							:date-updated="project.updated"
-							:downloads="project.downloads"
-							:summary="project.description"
-							:tags="[...project.categories, ...project.loaders]"
-							:all-tags="[
-								...project.categories,
-								...project.loaders,
-								...project.additional_categories,
-							]"
-							:followers="project.followers"
-							:banner="project.gallery?.find((image) => image.featured)?.url"
-							:color="project.color"
-							:environment="{
-								clientSide: project.client_side,
-								serverSide: project.server_side,
-							}"
-							:layout="displayMode === 'list' ? 'list' : 'grid'"
-							:status="project.status"
-						/>
-					</ProjectCardList>
+					<div class="flex flex-col gap-3">
+						<ProjectCardList
+							v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
+							:layout="displayMode"
+						>
+							<ProjectCard
+								v-for="project in filteredProjects"
+								:key="project.id"
+								:link="projectLink(project)"
+								:title="project.title"
+								:icon-url="project.icon_url"
+								:date-updated="project.updated"
+								:downloads="project.downloads"
+								:summary="project.description"
+								:tags="[...project.categories, ...project.loaders]"
+								:all-tags="[
+									...project.categories,
+									...project.loaders,
+									...project.additional_categories,
+								]"
+								:followers="project.followers"
+								:banner="project.gallery?.find((image) => image.featured)?.url"
+								:color="project.color"
+								:environment="{
+									clientSide: project.client_side,
+									serverSide: project.server_side,
+								}"
+								:layout="displayMode === 'list' ? 'list' : 'grid'"
+								:status="project.status"
+							/>
+						</ProjectCardList>
 
 					<EmptyState
 						v-if="showProjectsEmptyState"
@@ -313,22 +319,25 @@
 						</SmartClickable>
 					</ProjectCardList>
 
-					<EmptyState
-						v-if="showCollectionsEmptyState"
-						type="empty"
-						:heading="formatMessage(messages.profileNoCollectionsLabel)"
-						:description="
-							isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
-						"
-					>
-						<template v-if="isSelf" #actions>
-							<ButtonStyled color="brand">
-								<button type="button" @click="createCollection">
-									{{ formatMessage(messages.createCollectionButton) }}
-								</button>
-							</ButtonStyled>
-						</template>
-					</EmptyState>
+						<EmptyState
+							v-if="showCollectionsEmptyState"
+							type="empty"
+							:heading="formatMessage(messages.profileNoCollectionsLabel)"
+							:description="
+								isSelf
+									? formatMessage(messages.profileNoCollectionsAuthDescription)
+									: undefined
+							"
+						>
+							<template v-if="isSelf" #actions>
+								<ButtonStyled color="brand">
+									<button type="button" @click="createCollection">
+										{{ formatMessage(messages.createCollectionButton) }}
+									</button>
+								</ButtonStyled>
+							</template>
+						</EmptyState>
+					</div>
 				</div>
 
 				<template #sidebar>
@@ -619,21 +628,25 @@ const messages = defineMessages({
 const userQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId]),
 	queryFn: () => userProfile.getUser(props.userId),
+	enabled: computed(() => Boolean(props.userId)),
 	staleTime: 30_000,
 })
 const projectsQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId, 'projects']),
 	queryFn: () => userProfile.getProjects(props.userId),
+	enabled: computed(() => Boolean(props.userId)),
 	staleTime: 30_000,
 })
 const organizationsQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId, 'organizations']),
 	queryFn: () => userProfile.getOrganizations(props.userId),
+	enabled: computed(() => Boolean(props.userId)),
 	staleTime: 30_000,
 })
 const collectionsQuery = useQuery({
 	queryKey: computed(() => ['user', props.userId, 'collections']),
 	queryFn: () => userProfile.getCollections(props.userId),
+	enabled: computed(() => Boolean(props.userId)),
 	staleTime: 30_000,
 })
 
@@ -683,7 +696,7 @@ const projectTypes = computed(() => {
 
 const navLinks = computed(() => {
 	if (!user.value) return []
-	const profilePath = `/user/${encodeURIComponent(user.value.username)}`
+	const profilePath = `/user/${encodeURIComponent(props.userId)}`
 	return [
 		{
 			label: formatMessage(commonMessages.allProjectType),

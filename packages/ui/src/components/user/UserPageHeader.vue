@@ -179,6 +179,7 @@ const props = withDefaults(
 		isSelf?: boolean
 		isAdmin?: boolean
 		isStaff?: boolean
+		showStaffActions?: boolean
 		projectsCount?: number
 		downloads?: number
 	}>(),
@@ -193,6 +194,7 @@ const props = withDefaults(
 		isSelf: false,
 		isAdmin: false,
 		isStaff: false,
+		showStaffActions: false,
 		projectsCount: 0,
 		downloads: 0,
 	},
@@ -253,14 +255,14 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	},
 	{
 		divider: true,
-		shown: props.isAdmin,
+		shown: props.showStaffActions && (props.isAdmin || props.isStaff),
 	},
 	{
 		id: 'open-billing',
 		label: formatMessage(messages.billingButton),
 		icon: CurrencyIcon,
 		action: () => emit('openBilling'),
-		shown: props.isStaff,
+		shown: props.showStaffActions && props.isStaff,
 	},
 	{
 		id: 'toggle-affiliate',
@@ -269,7 +271,7 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 			: formatMessage(messages.setAffiliateButton),
 		icon: AffiliateIcon,
 		action: () => emit('toggleAffiliate'),
-		shown: props.isAdmin,
+		shown: props.showStaffActions && props.isAdmin,
 		remainOnClick: true,
 		color: props.isAffiliate ? 'red' : 'orange',
 	},
@@ -278,21 +280,21 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		label: formatMessage(messages.infoButton),
 		icon: InfoIcon,
 		action: () => emit('openInfo'),
-		shown: props.isStaff,
+		shown: props.showStaffActions && props.isStaff,
 	},
 	{
 		id: 'open-analytics',
 		label: formatMessage(messages.analyticsButton),
 		icon: ChartIcon,
 		action: () => emit('openAnalytics'),
-		shown: props.isAdmin,
+		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
 		id: 'edit-role',
 		label: formatMessage(messages.editRoleButton),
 		icon: EditIcon,
 		action: () => emit('editRole'),
-		shown: props.isAdmin,
+		shown: props.showStaffActions && props.isAdmin,
 	},
 ])
 </script>
