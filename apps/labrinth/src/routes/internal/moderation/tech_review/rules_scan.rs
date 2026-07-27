@@ -21,7 +21,7 @@ use crate::{
     database::{
         PgPool, PgTransaction, ReadOnlyPgPool,
         models::{
-            DBProjectId, DelphiReportIssueDetailsId,
+            DBProjectId, DelphiReportIssueDetailsId, DelphiRuleId,
             delphi_report_item::DelphiSeverity,
         },
     },
@@ -90,13 +90,13 @@ pub struct RuleScope {
 }
 
 struct CompiledRule {
-    id: i64,
+    id: DelphiRuleId,
     program: cel::Program,
 }
 
 struct MaterializedEffect {
     detail_id: i64,
-    rule_id: i64,
+    rule_id: DelphiRuleId,
     effect: DelphiRuleEffect,
 }
 
@@ -459,7 +459,7 @@ async fn run_scan(
                 .wrap_err_with(|| {
                     format!(
                         "failed to evaluate delphi rule {} for detail {detail_id}",
-                        rule.id
+                        rule.id.0
                     )
                 })?;
             if let Some(effect) = effect {
@@ -667,7 +667,7 @@ pub(crate) async fn materialize_current_rule_effects(
                 evaluate_rule(&rule.program, &input).wrap_err_with(|| {
                     format!(
                         "failed to evaluate delphi rule {} for detail {}",
-                        rule.id, detail.id
+                        rule.id.0, detail.id
                     )
                 })?;
             if let Some(effect) = effect {
@@ -689,7 +689,7 @@ async fn fetch_compiled_rules(
 ) -> Result<Vec<CompiledRule>> {
     sqlx::query!(
         r#"
-        SELECT id, rule
+        SELECT id AS "id!: DelphiRuleId", rule
         FROM delphi_rules
         WHERE NOT delete_on_next_revision
         ORDER BY priority DESC, id
@@ -701,7 +701,7 @@ async fn fetch_compiled_rules(
     .into_iter()
     .map(|rule| {
         let program = cel::Program::compile(&rule.rule).map_err(|error| {
-            eyre!("failed to compile delphi rule {}: {error}", rule.id)
+            eyre!("failed to compile delphi rule {}: {error}", rule.id.0)
         })?;
         Ok(CompiledRule {
             id: rule.id,
@@ -726,7 +726,7 @@ async fn insert_materialized_effects(
         .collect::<Vec<_>>();
     let rule_ids = effects
         .iter()
-        .map(|effect| effect.rule_id)
+        .map(|effect| effect.rule_id.0)
         .collect::<Vec<_>>();
     let severities = effects
         .iter()

@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id, rule\n        FROM delphi_rules\n        WHERE NOT delete_on_next_revision\n        ORDER BY priority DESC, id\n        ",
+  "query": "\n        SELECT id AS \"id!: DelphiRuleId\", rule\n        FROM delphi_rules\n        WHERE NOT delete_on_next_revision\n        ORDER BY priority DESC, id\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "id!: DelphiRuleId",
         "type_info": "Int8"
       },
       {
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "9a93028d19a05ebffb654fbb84ce2326fde91ed9762ad05ee0acda7fdf0245b5"
+  "hash": "3f1aaeed6e394294fa32da7e7f83765fb64bd9499a796470d544466886e1a808"
 }

@@ -15,7 +15,8 @@ use crate::{
         PgPool, ReadOnlyPgPool,
         models::{
             DBProjectId, DBVersionId, DelphiReportIssueDetailsId,
-            DelphiReportIssueId, delphi_report_item::DelphiSeverity,
+            DelphiReportIssueId, DelphiRuleId,
+            delphi_report_item::DelphiSeverity,
         },
     },
     models::{
@@ -42,7 +43,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Debug, Serialize, utoipa::ToSchema)]
 pub struct DelphiRule {
-    pub id: i64,
+    pub id: DelphiRuleId,
     pub name: String,
     pub rule: String,
     pub priority: i32,
@@ -270,7 +271,7 @@ pub async fn get_rules(
     let rules = sqlx::query!(
         r#"
 		SELECT
-			delphi_rule.id,
+			delphi_rule.id AS "id!: DelphiRuleId",
 			delphi_rule.name,
 			delphi_rule.rule,
 			delphi_rule.priority,
@@ -421,7 +422,7 @@ pub async fn get_rule_affected_details(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(i64,)>,
+    path: web::Path<(DelphiRuleId,)>,
 ) -> Result<web::Json<Vec<DelphiRuleAffectedDetail>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -464,7 +465,7 @@ pub async fn get_rule_affected_details(
 		WHERE effect.rule_id = $1
 		ORDER BY effect.detail_id DESC
 		"#,
-        rule_id,
+        rule_id as DelphiRuleId,
     )
     .fetch_all(&***ro_pool)
     .await
@@ -540,7 +541,7 @@ pub async fn create_rule(
 			$4
 		)
 		RETURNING
-			id,
+			id AS "id!: DelphiRuleId",
 			name,
 			rule,
 			priority,
@@ -588,7 +589,7 @@ pub async fn update_rule(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(i64,)>,
+    path: web::Path<(DelphiRuleId,)>,
     body: web::Json<WriteDelphiRule>,
 ) -> Result<web::Json<DelphiRule>, ApiError> {
     let user = check_is_moderator_from_headers(
@@ -617,7 +618,7 @@ pub async fn update_rule(
 			updated_by = $5
 		WHERE id = $1 AND NOT delete_on_next_revision
 		RETURNING
-			id,
+			id AS "id!: DelphiRuleId",
 			name,
 			rule,
 			priority,
@@ -627,7 +628,7 @@ pub async fn update_rule(
 			created_by,
 			updated_by
 		"#,
-        id,
+        id as DelphiRuleId,
         rule.name,
         rule.rule,
         rule.priority,
@@ -666,7 +667,7 @@ pub async fn delete_rule(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    path: web::Path<(i64,)>,
+    path: web::Path<(DelphiRuleId,)>,
 ) -> Result<(), ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -691,7 +692,7 @@ pub async fn delete_rule(
 		WHERE id = $1 AND NOT delete_on_next_revision
 		RETURNING id
 		"#,
-        id,
+        id as DelphiRuleId,
         user.id.0 as i64,
     )
     .fetch_optional(&**pool)

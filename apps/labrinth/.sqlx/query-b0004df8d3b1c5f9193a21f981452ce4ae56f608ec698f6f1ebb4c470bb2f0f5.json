@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tUPDATE delphi_rules\n\t\tSET\n\t\t\tname = $2,\n\t\t\trule = $3,\n\t\t\tpriority = $4,\n\t\t\trevision = (\n\t\t\t\tSELECT revision + 1 FROM delphi_rule_revisions LIMIT 1\n\t\t\t),\n\t\t\tupdated_at = CURRENT_TIMESTAMP,\n\t\t\tupdated_by = $5\n\t\tWHERE id = $1 AND NOT delete_on_next_revision\n\t\tRETURNING\n\t\t\tid,\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
+  "query": "\n\t\tINSERT INTO delphi_rules (\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t)\n\t\tVALUES (\n\t\t\t$1,\n\t\t\t$2,\n\t\t\t$3,\n\t\t\t(SELECT revision + 1 FROM delphi_rule_revisions LIMIT 1),\n\t\t\t$4,\n\t\t\t$4\n\t\t)\n\t\tRETURNING\n\t\t\tid AS \"id!: DelphiRuleId\",\n\t\t\tname,\n\t\t\trule,\n\t\t\tpriority,\n\t\t\trevision,\n\t\t\tcreated_at,\n\t\t\tupdated_at,\n\t\t\tcreated_by,\n\t\t\tupdated_by\n\t\t",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "id!: DelphiRuleId",
         "type_info": "Int8"
       },
       {
@@ -51,7 +51,6 @@
     ],
     "parameters": {
       "Left": [
-        "Int8",
         "Varchar",
         "Varchar",
         "Int4",
@@ -70,5 +69,5 @@
       true
     ]
   },
-  "hash": "5261240093589617a854a28fca81b7d3faa88dad9575cdf30ae8aa9e7721879f"
+  "hash": "b0004df8d3b1c5f9193a21f981452ce4ae56f608ec698f6f1ebb4c470bb2f0f5"
 }
