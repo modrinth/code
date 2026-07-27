@@ -3374,6 +3374,15 @@
   "profile.collection.projects-count": {
     "message": "{count, plural, one {# project} other {# projects}}"
   },
+  "profile.details.error.github-popup-blocked": {
+    "message": "Allow pop-ups for Modrinth, then try again."
+  },
+  "profile.details.error.github-profile-message": {
+    "message": "The GitHub profile could not be retrieved. Please try again."
+  },
+  "profile.details.error.github-profile-title": {
+    "message": "Unable to open GitHub profile"
+  },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
   },
@@ -3389,8 +3398,14 @@
   "profile.details.label.has-totp": {
     "message": "Has TOTP"
   },
+  "profile.details.label.loading-github-profile": {
+    "message": "Loading..."
+  },
   "profile.details.label.payment-methods": {
     "message": "Payment methods"
+  },
+  "profile.details.label.view-github-profile": {
+    "message": "View profile"
   },
   "profile.details.tooltip.email-not-verified": {
     "message": "Email not verified"
