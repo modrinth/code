@@ -280,9 +280,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 						name: result.organization == null ? result.author : result.organization,
 						link:
 							result.organization_id == null
-								? ctx.variant === 'web'
-									? `/user/${result.author_id ?? result.author}`
-									: `https://modrinth.com/user/${result.author_id ?? result.author}`
+								? `/user/${encodeURIComponent(result.author_id ?? result.author)}`
 								: ctx.variant === 'web'
 									? `/organization/${result.organization_id}`
 									: `https://modrinth.com/organization/${result.organization_id}`,
