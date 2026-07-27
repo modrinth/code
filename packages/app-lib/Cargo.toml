@@ -47,9 +47,9 @@ governor = { workspace = true }
 heck = { workspace = true }
 hickory-resolver = { workspace = true }
 httpdate = { workspace = true }
+image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
-image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
