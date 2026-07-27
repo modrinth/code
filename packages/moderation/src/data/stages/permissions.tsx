@@ -1,11 +1,29 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { SignatureIcon } from '@modrinth/assets'
-import { injectProjectPageContext } from '@modrinth/ui'
+import { injectModrinthClient, injectProjectPageContext } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { group, stage, toggle } from '../../types/node'
 
+function needsModerationApproval(attributionGroup: Labrinth.Attribution.Internal.AttributionGroup) {
+	const attribution = attributionGroup.attribution
+	if (!attribution || attribution.kind === 'globally_allowed') return false
+	return !attribution.moderation_status
+}
+
 export default function () {
-	const { projectV3: project, versions } = injectProjectPageContext()
+	const { projectV3: project } = injectProjectPageContext()
+	const { labrinth } = injectModrinthClient()
+
+	const { data: attributionData } = useQuery({
+		queryKey: ['project-attribution', project.value.id],
+		queryFn: () => labrinth.attribution_internal.listProjectAttribution(project.value.id),
+	})
+
+	const pendingApprovalCount = computed(
+		() => (attributionData.value ?? []).filter(needsModerationApproval).length,
+	)
 
 	return stage('permissions', 'Modpack Permissions')
 		.hint("Does this project's external content have any issues?")
@@ -17,8 +35,7 @@ export default function () {
 				() =>
 					(project.value.project_types?.includes('modpack') ?? false) &&
 					!project.value.minecraft_server &&
-					!!versions.value &&
-					versions.value.some((version) => (version.files_missing_attribution?.length ?? 0) >= 1),
+					pendingApprovalCount.value > 0,
 			),
 		)
 		.children(

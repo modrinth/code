@@ -38,8 +38,6 @@ import McVersionPicker from '~/components/ui/create-project-version/components/M
 
 import { NODE_META_KEY, STATE_KEY } from './checklist-context'
 
-// Components that live in `apps/frontend` rather than `@modrinth/ui`, so `node.ts` (in
-// `packages/moderation`) can't reference them directly — resolved here by `_rendererKey` instead.
 const appComponentsByKey: Record<string, unknown> = {
 	'loader-picker': LoaderPicker,
 	'game-version-picker': McVersionPicker,
@@ -209,8 +207,6 @@ function getDropdownOptions(node: DropdownNodeBuilder) {
 	]
 }
 
-// Trigger padding (px-4 * 2) + the gap before the chevron (gap-2.5) + the chevron itself
-// (size-5), matching Combobox's own trigger markup — plus a couple px of rounding slack.
 const DROPDOWN_TRIGGER_CHROME_PX = 16 * 2 + 10 + 20 + 2
 
 let measureEl: HTMLSpanElement | null = null
@@ -232,9 +228,6 @@ function measureLabelWidth(label: string): number {
 	return measureEl.getBoundingClientRect().width
 }
 
-// The dropdown's own options are teleported out of the layout tree, so the trigger can't size
-// itself to its widest option via CSS alone — measure each label offscreen with the actual
-// trigger styling instead, so the trigger doesn't jump around as the selection changes.
 const dropdownMinWidthCache = new Map<string, string>()
 function getDropdownMinWidth(node: DropdownNodeBuilder): string {
 	const options = getDropdownOptions(node)
@@ -428,8 +421,6 @@ function toggleChip(parent: IdentifiedNodeBuilder, child: IdentifiedNodeBuilder)
 	} else {
 		selected.add(child.id!)
 	}
-	// A group with a default falls back to it whenever state is unset — so an empty selection
-	// has to be written explicitly, or clearing the last item just snaps back to the default.
 	const hasDefault = (parent as GroupNodeBuilder)._defaultValue !== undefined
 	setNodeState(parent, selected.size > 0 || hasDefault ? selected : undefined)
 }
@@ -502,7 +493,6 @@ function getTooltipConfig(node: NodeBuilder, state?: Record<string, NodeState>) 
 }
 
 watchEffect(async () => {
-	// Read all reactive state synchronously before any await so Vue tracks dependencies
 	const buttonTasks: Array<{ node: BooleanNodeBuilder; state: Record<string, NodeState> }> = []
 
 	for (const node of props.nodes) {
@@ -631,10 +621,6 @@ watchEffect(async () => {
 	}
 })
 
-// Runs `.onChange()` once for whatever an input node's resolved value already is when it first
-// renders (real stored state or the `.initial()` default), and again if that value ever changes
-// outside of the input itself — not just on a real user edit event. A node's persisted value can
-// otherwise sit unvalidated forever if nothing but a DOM input event ever triggers `.onChange()`.
 const lastSeenTextValue = new Map<InputNodeBuilder, string>()
 
 watchEffect(() => {

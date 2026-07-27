@@ -633,7 +633,6 @@ function handleLockUnavailable() {
 }
 
 async function navigateToNextUnlockedProject(): Promise<boolean> {
-	// Remove stale entries first
 	const now = Date.now()
 	prefetchQueue.value = prefetchQueue.value.filter((p) => now - p.validatedAt < PREFETCH_STALE_MS)
 
@@ -651,10 +650,8 @@ async function navigateToNextUnlockedProject(): Promise<boolean> {
 		}
 	}
 
-	// Remove from queue after validation
 	prefetchQueue.value.shift()
 
-	// Mark skipped projects as completed
 	await Promise.all(
 		next.skippedIds.map((id) => moderationQueue.completeCurrentProject(id, 'skipped')),
 	)
@@ -786,11 +783,9 @@ function reviewAnyway() {
 	alreadyReviewed.value = false
 	reviewedAnyway.value = true
 	persistState()
-	// Start prefetching the next project in the background
 	maintainPrefetchQueue()
 }
 
-// Batch check locks, processing status, and fetch project metadata in parallel
 interface QueueCandidateCheck {
 	locked: boolean
 	expired?: boolean
@@ -837,9 +832,6 @@ async function batchCheckQueueCandidates(
 ): Promise<Map<string, QueueCandidateCheck>> {
 	const results = new Map<string, QueueCandidateCheck>()
 
-	// Lock checks have no batch endpoint (Labrinth's internal moderation API only exposes
-	// per-project lock checking), but project data does — fetch it once for the whole batch
-	// instead of once per id.
 	const projects = await client.labrinth.projects_v3.getMultiple(projectIds).catch(() => [])
 	const projectsById = new Map(projects.map((project) => [project.id, project]))
 
@@ -894,7 +886,6 @@ async function findNextEligibleQueueProject(candidateIds: string[]) {
 	return null
 }
 
-// Maintain a queue of prefetched unlocked projects for instant navigation
 async function maintainPrefetchQueue() {
 	if (isPrefetching.value) return
 	if (!moderationQueue.isQueueMode) return
@@ -904,21 +895,17 @@ async function maintainPrefetchQueue() {
 	isPrefetching.value = true
 
 	try {
-		// 1. Remove stale entries (validated > 30s ago)
 		const now = Date.now()
 		prefetchQueue.value = prefetchQueue.value.filter((p) => now - p.validatedAt < PREFETCH_STALE_MS)
 
-		// 2. Remove entries for current project
 		if (currentProjectId) {
 			prefetchQueue.value = prefetchQueue.value.filter((p) => p.projectId !== currentProjectId)
 		}
 
-		// 3. If queue is full enough, exit early
 		if (prefetchQueue.value.length >= PREFETCH_TARGET_COUNT) {
 			return
 		}
 
-		// 4. Get remaining queue items (excluding current and already prefetched)
 		const prefetchedIds = new Set(prefetchQueue.value.map((p) => p.projectId))
 		const queueItems = [...moderationQueue.currentQueue.items]
 		const currentIndex = currentProjectId ? queueItems.indexOf(currentProjectId) : -1
@@ -963,11 +950,9 @@ async function maintainPrefetchQueue() {
 	}
 }
 
-// Debounced prefetch to prevent spam from rapid stage changes
 const debouncedPrefetch = useDebounceFn(maintainPrefetchQueue, 300)
 
 async function skipToNextProject() {
-	// Skip the current project
 	const currentProjectId = projectV2.value?.id
 	if (!currentProjectId) {
 		console.warn('[skipToNextProject] No current project ID, aborting')
@@ -981,7 +966,6 @@ async function skipToNextProject() {
 	debug('[skipToNextProject] Queue after complete:', [...moderationQueue.currentQueue.items])
 	debug('[skipToNextProject] hasItems:', moderationQueue.hasItems)
 
-	// Use prefetched data if available
 	if (await navigateToNextUnlockedProject()) {
 		debug('[skipToNextProject] Used prefetch, returning')
 		return
@@ -1348,11 +1332,10 @@ function handleKeybinds(event: KeyboardEvent) {
 	)
 }
 
-// Trigger debounced prefetch when user progresses through stages
 watch(currentStage, () => {
 	// Only prefetch if we're past the first stage (user is actively moderating)
 	if (currentStage.value > 0) {
-		debouncedPrefetch() // Use debounced version to prevent spam
+		debouncedPrefetch()
 	}
 })
 
@@ -1380,7 +1363,6 @@ onMounted(async () => {
 		}
 		lockError.value = false
 
-		// Start countdown timer
 		updateLockCountdown()
 		lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)
 	} else {
@@ -1426,7 +1408,6 @@ onUnmounted(() => {
 		void moderationQueue.releaseLock(projectId)
 	}
 
-	// Clear prefetch state to prevent memory leaks
 	prefetchQueue.value = []
 	isPrefetching.value = false
 })
@@ -1443,9 +1424,6 @@ watch(
 	{ immediate: true },
 )
 
-// Version data feeds multiple stages' `.shown()` conditions now, not just the Versions stage
-// itself, so it needs to load immediately rather than waiting until the moderator navigates
-// to that specific stage.
 loadVersions()
 
 function countStageActions(stage: StageNodeBuilder): number {
@@ -1627,9 +1605,6 @@ async function generateMessage() {
 
 const hasNextProject = ref(false)
 
-// Decided here (synchronously, during setup) rather than in onMounted so the redirect to the
-// first stage's own route lands before this component's first paint — landing in onMounted means
-// the wrong tab (whatever route was already current) visibly flashes before the swap.
 const finishedId = localStorage.getItem('moderation-checklist-finished')
 if (finishedId === projectV2.value.id) {
 	localStorage.removeItem('moderation-checklist-finished')
@@ -1658,7 +1633,6 @@ async function refreshModerationCaches(threadId?: string) {
 }
 
 async function sendMessage(status: ProjectStatus) {
-	// Capture project data upfront to avoid null issues during async operations
 	const projectId = projectV2.value?.id
 	const threadId = projectV2.value?.thread_id
 
