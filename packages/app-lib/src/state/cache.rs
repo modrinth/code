@@ -510,7 +510,7 @@ pub struct DonationLink {
     pub url: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Eq, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub enum SideType {
     Required,

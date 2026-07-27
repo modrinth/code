@@ -5,9 +5,10 @@ import { computed, ref, watch } from 'vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonProjectTypeCategoryMessages, normalizeProjectType } from '#ui/utils/common-messages'
 
-import type { ClientWarningType, ContentItem } from '../types'
+import type { ClientWarningType, ContentItem, ContentSideType } from '../types'
 
 const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'singleplayer_only'])
+const SERVER_ONLY_ENVIRONMENTS = new Set(['server_only', 'dedicated_server_only'])
 
 export function isClientOnlyEnvironment(env?: string | null): boolean {
 	return !!env && CLIENT_ONLY_ENVIRONMENTS.has(env)
@@ -20,6 +21,20 @@ export function getClientWarningType(item: ContentItem): ClientWarningType | nul
 	return null
 }
 
+function isSideActive(side?: ContentSideType | null): boolean {
+	return side === 'required' || side === 'optional'
+}
+
+export function matchesClientFilter(item: ContentItem): boolean {
+	if (getClientWarningType(item) !== null) return true
+	return isSideActive(item.client_side) && !isSideActive(item.server_side)
+}
+
+export function matchesServerFilter(item: ContentItem): boolean {
+	if (item.environment && SERVER_ONLY_ENVIRONMENTS.has(item.environment)) return true
+	return isSideActive(item.server_side) && !isSideActive(item.client_side)
+}
+
 export interface ContentFilterOption {
 	id: string
 	label: string
@@ -29,6 +44,8 @@ export interface ContentFilterConfig {
 	showTypeFilters?: boolean
 	showUpdateFilter?: boolean
 	showWarningsFilter?: boolean
+	showClientFilter?: boolean
+	showServerFilter?: boolean
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
 }
@@ -49,6 +66,14 @@ const messages = defineMessages({
 	disabled: {
 		id: 'content.filter.disabled',
 		defaultMessage: 'Disabled',
+	},
+	client: {
+		id: 'content.filter.client-only',
+		defaultMessage: 'Client-Only',
+	},
+	server: {
+		id: 'content.filter.server-only',
+		defaultMessage: 'Server-Only',
 	},
 })
 
@@ -99,6 +124,14 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			})
 		}
 
+		if (config?.showClientFilter && items.value.some((m) => matchesClientFilter(m))) {
+			options.push({ id: 'client', label: formatMessage(messages.client) })
+		}
+
+		if (config?.showServerFilter && items.value.some((m) => matchesServerFilter(m))) {
+			options.push({ id: 'server', label: formatMessage(messages.server) })
+		}
+
 		return options
 	})
 
@@ -138,7 +171,14 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 	function applyFilters(source: ContentItem[]): ContentItem[] {
 		if (selectedFilters.value.length === 0) return source
 
-		const attributeFilters = new Set(['updates', 'enabled', 'disabled', 'warnings'])
+		const attributeFilters = new Set([
+			'updates',
+			'enabled',
+			'disabled',
+			'warnings',
+			'client',
+			'server',
+		])
 		const typeFilters = selectedFilters.value.filter((f) => !attributeFilters.has(f))
 		const activeAttributes = selectedFilters.value.filter((f) => attributeFilters.has(f))
 
@@ -155,6 +195,8 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 				if (filter === 'enabled' && !item.enabled) return false
 				if (filter === 'disabled' && item.enabled) return false
 				if (filter === 'warnings' && getClientWarningType(item) === null) return false
+				if (filter === 'client' && !matchesClientFilter(item)) return false
+				if (filter === 'server' && !matchesServerFilter(item)) return false
 			}
 
 			return true

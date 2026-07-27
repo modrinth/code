@@ -524,11 +524,17 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
   },
+  "content.filter.client-only": {
+    "defaultMessage": "Client-Only"
+  },
   "content.filter.disabled": {
     "defaultMessage": "Disabled"
   },
   "content.filter.enabled": {
     "defaultMessage": "Enabled"
+  },
+  "content.filter.server-only": {
+    "defaultMessage": "Server-Only"
   },
   "content.filter.updates": {
     "defaultMessage": "Updates"

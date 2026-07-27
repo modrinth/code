@@ -232,6 +232,8 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 		showTypeFilters: true,
 		showUpdateFilter: ctx.hasUpdateSupport,
 		showWarningsFilter: true,
+		showClientFilter: true,
+		showServerFilter: true,
 		isPackLocked: ctx.isPackLocked,
 		persistKey: ctx.filterPersistKey,
 	},

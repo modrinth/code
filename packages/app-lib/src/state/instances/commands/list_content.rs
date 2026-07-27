@@ -529,6 +529,8 @@ pub(crate) async fn dependencies_to_content_items(
                 update_version_id: None,
                 date_added: None,
                 source_kind: None,
+                client_side: Some(project.client_side),
+                server_side: Some(project.server_side),
             })
         })
         .collect::<Vec<_>>();
@@ -906,6 +908,8 @@ async fn content_files_to_content_items(
                 update_version_id: file.update_version_id.clone(),
                 date_added: modification_times[index].clone(),
                 source_kind: file.source_kind,
+                client_side: project.map(|project| project.client_side),
+                server_side: project.map(|project| project.server_side),
             }
         })
         .collect::<Vec<_>>();

@@ -31,6 +31,8 @@ export type ContentSourceKind =
 	| 'imported_modpack'
 	| 'shared_instance'
 
+export type ContentSideType = 'required' | 'optional' | 'unsupported' | 'unknown'
+
 export interface ContentActionWarning {
 	admonitionHeader: string
 	admonitionBody: string
@@ -84,6 +86,8 @@ export interface ContentItem extends Omit<
 	environment?: string
 	pack_client_retained?: boolean
 	pack_client_depends?: boolean
+	client_side?: ContentSideType
+	server_side?: ContentSideType
 	installing?: boolean
 	source_kind?: ContentSourceKind | null
 	external?: boolean
