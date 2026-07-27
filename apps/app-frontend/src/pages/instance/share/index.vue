@@ -341,9 +341,7 @@ function removeMember(row: ShareRow) {
 	members.remove(row.id)
 }
 function userProfileLink(username: string) {
-	return !username || username.includes('@')
-		? undefined
-		: `/user/${encodeURIComponent(username)}`
+	return !username || username.includes('@') ? undefined : `/user/${encodeURIComponent(username)}`
 }
 async function requestAuth(flow: ModrinthAuthFlow) {
 	await auth.requestSignIn(`/instance/${encodeURIComponent(props.instance.id)}/share`, flow, {

@@ -104,15 +104,10 @@ import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metada
 import PageHeaderMetadataTimeItem from '#ui/components/base/page-header/metadata/page-header-metadata-time-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import type { Item as TeleportOverflowMenuItem } from '#ui/components/base/TeleportOverflowMenu.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import { defineMessages, useFormatDateTime, useFormatNumber, useVIntl } from '#ui/composables'
 import type { AuthUser } from '#ui/providers/auth'
-import {
-	defineMessages,
-	useFormatDateTime,
-	useFormatNumber,
-	useVIntl,
-} from '#ui/composables'
 import { commonMessages } from '#ui/utils'
 
 const messages = defineMessages({

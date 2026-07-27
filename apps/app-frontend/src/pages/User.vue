@@ -12,10 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	provideUserProfile,
-	UserProfilePageLayout,
-} from '@modrinth/ui'
+import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'

@@ -1838,9 +1838,6 @@
   "muralpay.placeholder.cuit-cuil": {
     "message": "أدخل CUIT أو CUIL"
   },
-  "profile.user-id": {
-    "message": "معرّف المستخدم: {id}"
-  },
   "project-member-header.success-decline": {
     "message": "لقد رفضت دعوة الفريق"
   },

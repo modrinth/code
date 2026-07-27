@@ -61,8 +61,7 @@ export function resolveProjectType(
 	const projectLoaders = new Set(project.loaders)
 	const supportsType = (type: string) =>
 		loaders.some(
-			(loader) =>
-				projectLoaders.has(loader.name) && loader.supported_project_types.includes(type),
+			(loader) => projectLoaders.has(loader.name) && loader.supported_project_types.includes(type),
 		)
 
 	if (supportsType('datapack')) return 'datapack'

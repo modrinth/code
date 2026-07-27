@@ -293,9 +293,7 @@ const messages = defineMessages({
 	},
 })
 function userProfileLink(username: string) {
-	return !username || username.includes('@')
-		? undefined
-		: `/user/${encodeURIComponent(username)}`
+	return !username || username.includes('@') ? undefined : `/user/${encodeURIComponent(username)}`
 }
 function setUsernameRef(id: string, element: Element | null) {
 	usernameRefs.value[id] = element instanceof HTMLElement ? element : null

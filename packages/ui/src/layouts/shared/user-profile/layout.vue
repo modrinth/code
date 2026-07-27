@@ -1,239 +1,233 @@
 <template>
 	<template v-if="user">
-			<NewModal
-				v-if="variant === 'web'"
-				ref="editRoleModal"
-				:header="formatMessage(messages.editRoleButton)"
-			>
-				<div class="flex w-80 flex-col gap-4">
-					<Combobox
-						v-model="selectedRole"
-						:options="roleOptions"
-						:placeholder="formatMessage(messages.selectRolePlaceholder)"
-					/>
-					<div class="flex justify-end gap-2">
-						<ButtonStyled>
-							<button type="button" @click="cancelRoleEdit">
-								<XIcon />
-								{{ formatMessage(commonMessages.cancelButton) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="brand">
-							<button
-								type="button"
-								:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
-								@click="saveRoleEdit"
-							>
-								<template v-if="isSavingRole">
-									<SpinnerIcon class="animate-spin" />
-									{{ formatMessage(messages.savingLabel) }}
-								</template>
-								<template v-else>
-									<SaveIcon />
-									{{ formatMessage(commonMessages.saveChangesButton) }}
-								</template>
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-			</NewModal>
-
-			<NewModal
-				v-if="variant === 'web' && isStaffViewing"
-				ref="userDetailsModal"
-				:header="formatMessage(messages.userDetailsTitle)"
-			>
-				<div class="flex flex-col gap-3">
-					<div v-if="isAdminViewing" class="flex flex-col gap-1">
-						<span class="text-lg font-bold text-primary">
-							{{ formatMessage(commonMessages.emailLabel) }}
-						</span>
-						<span
-							v-tooltip="
-								user.email_verified
-									? formatMessage(messages.emailVerifiedTooltip)
-									: formatMessage(messages.emailNotVerifiedTooltip)
-							"
-							class="flex w-fit items-center gap-1"
+		<NewModal
+			v-if="variant === 'web'"
+			ref="editRoleModal"
+			:header="formatMessage(messages.editRoleButton)"
+		>
+			<div class="flex w-80 flex-col gap-4">
+				<Combobox
+					v-model="selectedRole"
+					:options="roleOptions"
+					:placeholder="formatMessage(messages.selectRolePlaceholder)"
+				/>
+				<div class="flex justify-end gap-2">
+					<ButtonStyled>
+						<button type="button" @click="cancelRoleEdit">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							type="button"
+							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+							@click="saveRoleEdit"
 						>
-							<span>{{ user.email }}</span>
-							<CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
-							<XIcon v-else class="h-4 w-4 text-red" />
-						</span>
-					</div>
-
-					<div v-else class="flex flex-col gap-1">
-						<span class="text-lg font-bold text-primary">
-							{{ formatMessage(messages.emailVerifiedLabel) }}
-						</span>
-						<span class="flex w-fit items-center gap-1">
-							<CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
-							<XIcon v-else class="h-4 w-4 text-red" />
-							{{
-								user.email_verified
-									? formatMessage(commonMessages.yesLabel)
-									: formatMessage(commonMessages.noLabel)
-							}}
-						</span>
-					</div>
-
-					<div v-if="isAdminViewing" class="flex flex-col gap-1">
-						<span class="text-lg font-bold text-primary">
-							{{ formatMessage(messages.authProvidersLabel) }}
-						</span>
-						<span>{{ user.auth_providers?.join(', ') || '—' }}</span>
-					</div>
-
-					<div v-if="isAdminViewing" class="flex flex-col gap-1">
-						<span class="text-lg font-bold text-primary">
-							{{ formatMessage(messages.paymentMethodsLabel) }}
-						</span>
-						<span>
-							<template v-if="user.payout_data?.paypal_address">
-								Paypal ({{ user.payout_data.paypal_address }}
-								<template v-if="user.payout_data.paypal_country">
-									- {{ user.payout_data.paypal_country }}
-								</template>
-								)
+							<template v-if="isSavingRole">
+								<SpinnerIcon class="animate-spin" />
+								{{ formatMessage(messages.savingLabel) }}
 							</template>
-							<template
-								v-if="user.payout_data?.paypal_address && user.payout_data?.venmo_handle"
-							>
-								,
+							<template v-else>
+								<SaveIcon />
+								{{ formatMessage(commonMessages.saveChangesButton) }}
 							</template>
-							<template v-if="user.payout_data?.venmo_handle">
-								Venmo ({{ user.payout_data.venmo_handle }})
-							</template>
-							<template
-								v-if="
-									!user.payout_data?.paypal_address && !user.payout_data?.venmo_handle
-								"
-							>
-								—
-							</template>
-						</span>
-					</div>
-
-					<div class="flex flex-col gap-1">
-						<span class="text-lg font-bold text-primary">
-							{{ formatMessage(messages.hasPasswordLabel) }}
-						</span>
-						<span>
-							{{
-								user.has_password
-									? formatMessage(commonMessages.yesLabel)
-									: formatMessage(commonMessages.noLabel)
-							}}
-						</span>
-					</div>
-
-					<div class="flex flex-col gap-1">
-						<span class="text-lg font-bold text-primary">
-							{{ formatMessage(messages.hasTotpLabel) }}
-						</span>
-						<span>
-							{{
-								user.has_totp
-									? formatMessage(commonMessages.yesLabel)
-									: formatMessage(commonMessages.noLabel)
-							}}
-						</span>
-					</div>
+						</button>
+					</ButtonStyled>
 				</div>
-			</NewModal>
+			</div>
+		</NewModal>
 
-			<NormalPage :sidebar="sidebarPosition">
-				<template #header>
-					<UserPageHeader
-						:user="user"
-						:summary="isModrinthUser ? null : profileHeaderSummary"
-						:auth-user="auth.user.value"
-						:edit-profile-link="editProfileLink"
-						:is-modrinth-user="isModrinthUser"
-						:is-official-account="isOfficialAccount"
-						:show-affiliate-badge="isAdminViewing && isAffiliate"
-						:is-affiliate="isAffiliate"
-						:is-self="isSelf"
-						:is-admin="isAdminViewing"
-						:is-staff="isStaffViewing"
-						:show-staff-actions="variant === 'web'"
-						:projects-count="projects.length"
-						:downloads="sumDownloads"
-						@manage-projects="openPath('/dashboard/projects')"
-						@report="reportProfile"
-						@copy-id="copyId"
-						@copy-permalink="copyPermalink"
-						@open-billing="openPath(`/admin/billing/${user.id}`)"
-						@toggle-affiliate="toggleAffiliate"
-						@open-info="openUserDetails"
-						@open-analytics="
-							openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
+		<NewModal
+			v-if="variant === 'web' && isStaffViewing"
+			ref="userDetailsModal"
+			:header="formatMessage(messages.userDetailsTitle)"
+		>
+			<div class="flex flex-col gap-3">
+				<div v-if="isAdminViewing" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">
+						{{ formatMessage(commonMessages.emailLabel) }}
+					</span>
+					<span
+						v-tooltip="
+							user.email_verified
+								? formatMessage(messages.emailVerifiedTooltip)
+								: formatMessage(messages.emailNotVerifiedTooltip)
 						"
-						@edit-role="openRoleEditModal"
+						class="flex w-fit items-center gap-1"
 					>
-						<template v-if="isModrinthUser" #summary>
-							<IntlFormatted :message-id="messages.officialAccountBio">
-								<template #support-link>
-									<a
-										href="https://support.modrinth.com"
-										class="text-link"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										https://support.modrinth.com
-									</a>
-								</template>
-								<template #email>
-									<a
-										href="mailto:support@modrinth.com"
-										class="text-link"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										support@modrinth.com
-									</a>
-								</template>
-							</IntlFormatted>
+						<span>{{ user.email }}</span>
+						<CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
+						<XIcon v-else class="h-4 w-4 text-red" />
+					</span>
+				</div>
+
+				<div v-else class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">
+						{{ formatMessage(messages.emailVerifiedLabel) }}
+					</span>
+					<span class="flex w-fit items-center gap-1">
+						<CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
+						<XIcon v-else class="h-4 w-4 text-red" />
+						{{
+							user.email_verified
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
+					</span>
+				</div>
+
+				<div v-if="isAdminViewing" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">
+						{{ formatMessage(messages.authProvidersLabel) }}
+					</span>
+					<span>{{ user.auth_providers?.join(', ') || '—' }}</span>
+				</div>
+
+				<div v-if="isAdminViewing" class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">
+						{{ formatMessage(messages.paymentMethodsLabel) }}
+					</span>
+					<span>
+						<template v-if="user.payout_data?.paypal_address">
+							Paypal ({{ user.payout_data.paypal_address }}
+							<template v-if="user.payout_data.paypal_country">
+								- {{ user.payout_data.paypal_country }}
+							</template>
+							)
 						</template>
-					</UserPageHeader>
-				</template>
+						<template v-if="user.payout_data?.paypal_address && user.payout_data?.venmo_handle">
+							,
+						</template>
+						<template v-if="user.payout_data?.venmo_handle">
+							Venmo ({{ user.payout_data.venmo_handle }})
+						</template>
+						<template v-if="!user.payout_data?.paypal_address && !user.payout_data?.venmo_handle">
+							—
+						</template>
+					</span>
+				</div>
 
-				<div class="flex flex-col gap-4">
-					<div v-if="navLinks.length > 2" class="max-w-full overflow-x-auto">
-						<NavTabs :links="navLinks" replace />
-					</div>
+				<div class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">
+						{{ formatMessage(messages.hasPasswordLabel) }}
+					</span>
+					<span>
+						{{
+							user.has_password
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
+					</span>
+				</div>
 
-					<div class="flex flex-col gap-3">
-						<ProjectCardList
-							v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
-							:layout="displayMode"
-						>
-							<ProjectCard
-								v-for="project in filteredProjects"
-								:key="project.id"
-								:link="projectLink(project)"
-								:title="project.title"
-								:icon-url="project.icon_url"
-								:date-updated="project.updated"
-								:downloads="project.downloads"
-								:summary="project.description"
-								:tags="[...project.categories, ...project.loaders]"
-								:all-tags="[
-									...project.categories,
-									...project.loaders,
-									...project.additional_categories,
-								]"
-								:followers="project.followers"
-								:banner="project.gallery?.find((image) => image.featured)?.url"
-								:color="project.color"
-								:environment="{
-									clientSide: project.client_side,
-									serverSide: project.server_side,
-								}"
-								:layout="displayMode === 'list' ? 'list' : 'grid'"
-								:status="project.status"
-							/>
-						</ProjectCardList>
+				<div class="flex flex-col gap-1">
+					<span class="text-lg font-bold text-primary">
+						{{ formatMessage(messages.hasTotpLabel) }}
+					</span>
+					<span>
+						{{
+							user.has_totp
+								? formatMessage(commonMessages.yesLabel)
+								: formatMessage(commonMessages.noLabel)
+						}}
+					</span>
+				</div>
+			</div>
+		</NewModal>
+
+		<NormalPage :sidebar="sidebarPosition">
+			<template #header>
+				<UserPageHeader
+					:user="user"
+					:summary="isModrinthUser ? null : profileHeaderSummary"
+					:auth-user="auth.user.value"
+					:edit-profile-link="editProfileLink"
+					:is-modrinth-user="isModrinthUser"
+					:is-official-account="isOfficialAccount"
+					:show-affiliate-badge="isAdminViewing && isAffiliate"
+					:is-affiliate="isAffiliate"
+					:is-self="isSelf"
+					:is-admin="isAdminViewing"
+					:is-staff="isStaffViewing"
+					:show-staff-actions="variant === 'web'"
+					:projects-count="projects.length"
+					:downloads="sumDownloads"
+					@manage-projects="openPath('/dashboard/projects')"
+					@report="reportProfile"
+					@copy-id="copyId"
+					@copy-permalink="copyPermalink"
+					@open-billing="openPath(`/admin/billing/${user.id}`)"
+					@toggle-affiliate="toggleAffiliate"
+					@open-info="openUserDetails"
+					@open-analytics="
+						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
+					"
+					@edit-role="openRoleEditModal"
+				>
+					<template v-if="isModrinthUser" #summary>
+						<IntlFormatted :message-id="messages.officialAccountBio">
+							<template #support-link>
+								<a
+									href="https://support.modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									https://support.modrinth.com
+								</a>
+							</template>
+							<template #email>
+								<a
+									href="mailto:support@modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									support@modrinth.com
+								</a>
+							</template>
+						</IntlFormatted>
+					</template>
+				</UserPageHeader>
+			</template>
+
+			<div class="flex flex-col gap-4">
+				<div v-if="navLinks.length > 2" class="max-w-full overflow-x-auto">
+					<NavTabs :links="navLinks" replace />
+				</div>
+
+				<div class="flex flex-col gap-3">
+					<ProjectCardList
+						v-if="selectedProjectType !== 'collection' && filteredProjects.length > 0"
+						:layout="displayMode"
+					>
+						<ProjectCard
+							v-for="project in filteredProjects"
+							:key="project.id"
+							:link="projectLink(project)"
+							:title="project.title"
+							:icon-url="project.icon_url"
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:summary="project.description"
+							:tags="[...project.categories, ...project.loaders]"
+							:all-tags="[
+								...project.categories,
+								...project.loaders,
+								...project.additional_categories,
+							]"
+							:followers="project.followers"
+							:banner="project.gallery?.find((image) => image.featured)?.url"
+							:color="project.color"
+							:environment="{
+								clientSide: project.client_side,
+								serverSide: project.server_side,
+							}"
+							:layout="displayMode === 'list' ? 'list' : 'grid'"
+							:status="project.status"
+						/>
+					</ProjectCardList>
 
 					<EmptyState
 						v-if="showProjectsEmptyState"
@@ -319,68 +313,63 @@
 						</SmartClickable>
 					</ProjectCardList>
 
-						<EmptyState
-							v-if="showCollectionsEmptyState"
-							type="empty"
-							:heading="formatMessage(messages.profileNoCollectionsLabel)"
-							:description="
-								isSelf
-									? formatMessage(messages.profileNoCollectionsAuthDescription)
-									: undefined
-							"
-						>
-							<template v-if="isSelf" #actions>
-								<ButtonStyled color="brand">
-									<button type="button" @click="createCollection">
-										{{ formatMessage(messages.createCollectionButton) }}
-									</button>
-								</ButtonStyled>
-							</template>
-						</EmptyState>
-					</div>
+					<EmptyState
+						v-if="showCollectionsEmptyState"
+						type="empty"
+						:heading="formatMessage(messages.profileNoCollectionsLabel)"
+						:description="
+							isSelf ? formatMessage(messages.profileNoCollectionsAuthDescription) : undefined
+						"
+					>
+						<template v-if="isSelf" #actions>
+							<ButtonStyled color="brand">
+								<button type="button" @click="createCollection">
+									{{ formatMessage(messages.createCollectionButton) }}
+								</button>
+							</ButtonStyled>
+						</template>
+					</EmptyState>
 				</div>
+			</div>
 
-				<template #sidebar>
-					<div class="flex flex-col" :class="{ 'gap-4': variant === 'web' }">
-						<div
-							v-if="sortedOrganizations.length > 0"
-							:class="sidebarSectionClass"
-						>
-							<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
-								{{ formatMessage(messages.profileOrganizations) }}
-							</h2>
-							<div class="flex flex-wrap gap-2">
-								<AutoLink
-									v-for="organization in sortedOrganizations"
-									:key="organization.id"
-									v-tooltip="organization.name"
-									:to="organizationLink(organization.slug)"
-									link-class="!inline-flex"
-								>
-									<Avatar
-										:src="organization.icon_url"
-										:alt="`Icon for ${organization.name}`"
-										size="3rem"
-									/>
-								</AutoLink>
-							</div>
+			<template #sidebar>
+				<div class="flex flex-col" :class="{ 'gap-4': variant === 'web' }">
+					<div v-if="sortedOrganizations.length > 0" :class="sidebarSectionClass">
+						<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.profileOrganizations) }}
+						</h2>
+						<div class="flex flex-wrap gap-2">
+							<AutoLink
+								v-for="organization in sortedOrganizations"
+								:key="organization.id"
+								v-tooltip="organization.name"
+								:to="organizationLink(organization.slug)"
+								link-class="!inline-flex"
+							>
+								<Avatar
+									:src="organization.icon_url"
+									:alt="`Icon for ${organization.name}`"
+									size="3rem"
+								/>
+							</AutoLink>
 						</div>
-
-						<UserBadges
-							:downloads="sumDownloads"
-							:join-date="new Date(user.created)"
-							:role="user.role"
-							:badges="user.badges"
-							:has-midas="hasMidas"
-							:has-pride="hasPride26Badge(user)"
-							:earliest-project-by-type="earliestProjectByType"
-							:class="sidebarSectionClass"
-						/>
-
-						<slot name="sidebar" />
 					</div>
-				</template>
-			</NormalPage>
+
+					<UserBadges
+						:downloads="sumDownloads"
+						:join-date="new Date(user.created)"
+						:role="user.role"
+						:badges="user.badges"
+						:has-midas="hasMidas"
+						:has-pride="hasPride26Badge(user)"
+						:earliest-project-by-type="earliestProjectByType"
+						:class="sidebarSectionClass"
+					/>
+
+					<slot name="sidebar" />
+				</div>
+			</template>
+		</NormalPage>
 	</template>
 
 	<div v-else class="flex min-h-[24rem] items-center justify-center p-6">
@@ -433,16 +422,8 @@ import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import UserBadges from '#ui/components/user/UserBadges.vue'
 import UserPageHeader from '#ui/components/user/UserPageHeader.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
-import {
-	injectAuth,
-	injectNotificationManager,
-	injectPageContext,
-	injectTags,
-} from '#ui/providers'
-import {
-	commonMessages,
-	getProjectTypeTitleMessage,
-} from '#ui/utils'
+import { injectAuth, injectNotificationManager, injectPageContext, injectTags } from '#ui/providers'
+import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
 
 import { injectUserProfile } from './providers'
 import {
@@ -680,8 +661,7 @@ const sortedOrganizations = computed(() =>
 )
 const sortedCollections = computed(() =>
 	collections.value.slice().sort((first, second) => {
-		const updatedDifference =
-			new Date(second.updated).getTime() - new Date(first.updated).getTime()
+		const updatedDifference = new Date(second.updated).getTime() - new Date(first.updated).getTime()
 		if (updatedDifference !== 0) return updatedDifference
 		return new Date(second.created).getTime() - new Date(first.created).getTime()
 	}),
@@ -737,21 +717,15 @@ const earliestProjectByType = computed(() => {
 })
 
 const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
-const isOfficialAccount = computed(
-	() => isModrinthUser.value || user.value?.id === 'GVFjtWTf',
-)
+const isOfficialAccount = computed(() => isModrinthUser.value || user.value?.id === 'GVFjtWTf')
 const isSelf = computed(() => auth.user.value?.id === user.value?.id)
 const isAdminViewing = computed(() => auth.user.value?.role === 'admin')
 const isStaffViewing = computed(
 	() => auth.user.value?.role === 'admin' || auth.user.value?.role === 'moderator',
 )
-const isAffiliate = computed(
-	() => Boolean((user.value?.badges ?? 0) & UserBadge.AFFILIATE),
-)
+const isAffiliate = computed(() => Boolean((user.value?.badges ?? 0) & UserBadge.AFFILIATE))
 const hasMidas = computed(
-	() =>
-		Boolean((user.value?.badges ?? 0) & UserBadge.MIDAS) ||
-		hasActivePride26Midas(user.value),
+	() => Boolean((user.value?.badges ?? 0) & UserBadge.MIDAS) || hasActivePride26Midas(user.value),
 )
 const showProjectsEmptyState = computed(
 	() =>

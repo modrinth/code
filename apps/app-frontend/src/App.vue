@@ -1658,8 +1658,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:options="[
 					{
 						id: 'view-profile',
-						action: () =>
-							router.push(`/user/${encodeURIComponent(credentials.user.username)}`),
+						action: () => router.push(`/user/${encodeURIComponent(credentials.user.username)}`),
 					},
 					{
 						id: 'sign-out',
