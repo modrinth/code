@@ -1949,9 +1949,6 @@
   "layout.nav.discover": {
     "message": "Objevit"
   },
-  "layout.nav.discover-content": {
-    "message": "Objevit obsah"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Získat Modrinth App"
   },

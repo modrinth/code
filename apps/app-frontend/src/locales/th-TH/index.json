@@ -155,9 +155,6 @@
   "app.browse.back-to-instance": {
     "message": "กลับสู่อินสแตนซ์"
   },
-  "app.browse.discover-content": {
-    "message": "สำรวจเนื้อหา"
-  },
   "app.browse.discover-servers": {
     "message": "สำรวจเซิร์ฟเวอร์"
   },

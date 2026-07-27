@@ -245,9 +245,6 @@
   "app.browse.back-to-instance": {
     "message": "Voltar à instância"
   },
-  "app.browse.discover-content": {
-    "message": "Descobrir conteúdo"
-  },
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"
   },
@@ -880,9 +877,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "Inicie a sessão"
-  },
-  "app.skins.title": {
-    "message": "Seletor de skins"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Desativar"

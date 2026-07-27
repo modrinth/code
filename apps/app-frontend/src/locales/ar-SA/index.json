@@ -236,9 +236,6 @@
   "app.browse.back-to-instance": {
     "message": "العودة للنموذج"
   },
-  "app.browse.discover-content": {
-    "message": "استكشف محتوى"
-  },
   "app.browse.discover-servers": {
     "message": "استكشف خوادم"
   },
@@ -655,9 +652,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "الرجاء تسجيل الدخول"
-  },
-  "app.skins.title": {
-    "message": "اختيار المظهر"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "إيقاف"

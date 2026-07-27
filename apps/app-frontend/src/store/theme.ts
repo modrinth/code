@@ -5,7 +5,6 @@ let systemThemeMq: MediaQueryList | null = null
 export const DEFAULT_FEATURE_FLAGS = {
 	project_background: false,
 	page_path: false,
-	worlds_tab: false,
 	worlds_in_home: true,
 	server_project_qa: false,
 	show_version_environment_column: false,

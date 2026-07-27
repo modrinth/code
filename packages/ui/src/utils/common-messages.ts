@@ -111,6 +111,10 @@ export const commonMessages = defineMessages({
 		id: 'label.details',
 		defaultMessage: 'Details',
 	},
+	discoverContentLabel: {
+		id: 'label.discover-content',
+		defaultMessage: 'Discover content',
+	},
 	downloadButton: {
 		id: 'button.download',
 		defaultMessage: 'Download',
@@ -322,6 +326,10 @@ export const commonMessages = defineMessages({
 	singleplayerLabel: {
 		id: 'label.singleplayer',
 		defaultMessage: 'Singleplayer',
+	},
+	skinSelectorLabel: {
+		id: 'label.skin-selector',
+		defaultMessage: 'Skin selector',
 	},
 	sortByLabel: {
 		id: 'label.sort-by',

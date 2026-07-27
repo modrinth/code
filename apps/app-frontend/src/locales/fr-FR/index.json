@@ -245,9 +245,6 @@
   "app.browse.back-to-instance": {
     "message": "Retour à l'instance"
   },
-  "app.browse.discover-content": {
-    "message": "Découvrir du contenu"
-  },
   "app.browse.discover-servers": {
     "message": "Découvrir des serveurs"
   },
@@ -880,9 +877,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "Veuillez vous connecter"
-  },
-  "app.skins.title": {
-    "message": "Sélecteur de skin"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Désactiver"

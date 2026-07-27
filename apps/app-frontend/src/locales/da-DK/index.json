@@ -221,9 +221,6 @@
   "app.browse.back-to-instance": {
     "message": "Tilbage til instance"
   },
-  "app.browse.discover-content": {
-    "message": "Opdag indhold"
-  },
   "app.browse.discover-servers": {
     "message": "Opdag servere"
   },
@@ -616,9 +613,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "Venligst log ind"
-  },
-  "app.skins.title": {
-    "message": "Skin vælger"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Slå fra"

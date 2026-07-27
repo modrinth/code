@@ -245,9 +245,6 @@
   "app.browse.back-to-instance": {
     "message": "Kuruluma dön"
   },
-  "app.browse.discover-content": {
-    "message": "İçerik keşfet"
-  },
   "app.browse.discover-servers": {
     "message": "Sunucuları keşfet"
   },
@@ -757,9 +754,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "Lütfen giriş yapın"
-  },
-  "app.skins.title": {
-    "message": "Skin seçici"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Kapat"

@@ -68,10 +68,6 @@ const PENDING_SKIN_REFRESH_DELAY_MS = 11_000
 const DEFAULT_SKIN_SECTION_SORT_ORDER = ['Default skins', 'Modrinth Pride']
 const EARS_NOTICE_PLACEHOLDER = '__EARS_MOD_NAME__'
 const messages = defineMessages({
-	skinSelectorTitle: {
-		id: 'app.skins.title',
-		defaultMessage: 'Skin selector',
-	},
 	modrinthPrideSection: {
 		id: 'app.skins.section.modrinth-pride',
 		defaultMessage: 'Modrinth Pride',
@@ -1071,7 +1067,7 @@ await loadSkins()
 	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
 		<div class="sticky top-6 self-start p-2 pt-0">
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
-				{{ formatMessage(messages.skinSelectorTitle) }}
+				{{ formatMessage(commonMessages.skinSelectorLabel) }}
 			</h1>
 			<div
 				class="ml-5 mt-4 flex h-[calc(80vh-1rem)] items-center justify-center max-[700px]:h-[calc(50vh-1rem)]"

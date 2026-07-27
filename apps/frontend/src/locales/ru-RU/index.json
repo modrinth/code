@@ -2873,9 +2873,6 @@
   "layout.nav.discover": {
     "message": "Найти"
   },
-  "layout.nav.discover-content": {
-    "message": "Найти проекты"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Скачать Modrinth App"
   },

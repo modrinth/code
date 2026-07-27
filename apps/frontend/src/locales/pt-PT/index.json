@@ -2183,9 +2183,6 @@
   "layout.nav.discover": {
     "message": "Descobrir"
   },
-  "layout.nav.discover-content": {
-    "message": "Descobrir conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Obter a Modrinth App"
   },

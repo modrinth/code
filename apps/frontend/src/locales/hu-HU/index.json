@@ -2699,9 +2699,6 @@
   "layout.nav.discover": {
     "message": "Felfedezés"
   },
-  "layout.nav.discover-content": {
-    "message": "Tartalom felfedezése"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Szerezd meg a Modrinth Appot"
   },

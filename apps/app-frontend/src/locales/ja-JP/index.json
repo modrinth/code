@@ -242,9 +242,6 @@
   "app.browse.back-to-instance": {
     "message": "インスタンスに戻る"
   },
-  "app.browse.discover-content": {
-    "message": "コンテンツを探す"
-  },
   "app.browse.discover-servers": {
     "message": "サーバーを探す"
   },
@@ -850,9 +847,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "サインインしてください"
-  },
-  "app.skins.title": {
-    "message": "スキンセレクター"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "オフに切り替え"

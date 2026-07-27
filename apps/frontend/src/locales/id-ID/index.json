@@ -1841,9 +1841,6 @@
   "layout.nav.discover": {
     "message": "Temukan"
   },
-  "layout.nav.discover-content": {
-    "message": "Temukan konten"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
   },

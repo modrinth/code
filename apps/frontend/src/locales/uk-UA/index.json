@@ -2870,9 +2870,6 @@
   "layout.nav.discover": {
     "message": "Дослідити"
   },
-  "layout.nav.discover-content": {
-    "message": "Дослідити вміст"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Установити Modrinth App"
   },

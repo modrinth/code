@@ -227,9 +227,6 @@
   "app.browse.back-to-instance": {
     "message": "Nazad na instancu"
   },
-  "app.browse.discover-content": {
-    "message": "Otkrij sadržaj"
-  },
   "app.browse.discover-servers": {
     "message": "Otkrij servere"
   },
@@ -655,9 +652,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "Molimo prijavi se"
-  },
-  "app.skins.title": {
-    "message": "Selektor skina"
   },
   "app.update-popup.body.download-complete": {
     "message": "Preuzimanje Modrinth aplikacije v{version} je završeno. Ponovo učitaj da bi ažurirao sada ili automatski kada zatvoriš Modrinth aplikaciju."

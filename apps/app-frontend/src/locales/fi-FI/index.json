@@ -173,9 +173,6 @@
   "app.browse.back-to-instance": {
     "message": "Takaisin instanssiin"
   },
-  "app.browse.discover-content": {
-    "message": "Löydä sisältöä"
-  },
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
   },
@@ -565,9 +562,6 @@
   },
   "app.skins.sign-in.title": {
     "message": "Kirjaudu sisään"
-  },
-  "app.skins.title": {
-    "message": "Skinivalinta"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Poista käytöstä"

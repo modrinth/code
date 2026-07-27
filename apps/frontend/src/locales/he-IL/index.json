@@ -1580,9 +1580,6 @@
   "layout.nav.discover": {
     "message": "גלה"
   },
-  "layout.nav.discover-content": {
-    "message": "גלה תוכן"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "להוריד אפליקציאת Modrinth"
   },
