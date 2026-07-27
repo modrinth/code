@@ -46,6 +46,7 @@ const groupOptions = ref<InstanceType<typeof ContextMenu>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
+const isUngrouped = computed(() => props.instanceGroup.key === 'None')
 
 useDroppable({
 	id: computed(() => `instance-group:${props.instanceGroup.id}`),
@@ -57,6 +58,10 @@ useDroppable({
 })
 
 const messages = defineMessages({
+	ungrouped: {
+		id: 'app.library.group.ungrouped',
+		defaultMessage: 'Ungrouped',
+	},
 	deleteGroup: {
 		id: 'app.library.group.delete',
 		defaultMessage: 'Delete group',
@@ -95,6 +100,8 @@ async function removeGroup() {
 }
 
 function requestGroupDeletion() {
+	if (isUngrouped.value) return
+
 	if (props.instanceGroup.instances.length > 0) {
 		confirmDeleteGroupModal.value?.show()
 	} else {
@@ -103,6 +110,8 @@ function requestGroupDeletion() {
 }
 
 function openGroupContextMenu(event: MouseEvent) {
+	if (isUngrouped.value) return
+
 	groupOptions.value?.showMenu(event, props.instanceGroup, [
 		{ name: 'delete_group', color: 'danger' },
 	])
@@ -149,7 +158,6 @@ watch(
 			class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent brightness-125 transition-opacity"
 		/>
 		<div
-			v-if="instanceGroup.key !== 'None'"
 			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5 py-2.5"
 			@click="toggleGroup"
 			@contextmenu.prevent.stop="openGroupContextMenu"
@@ -167,6 +175,7 @@ watch(
 				/>
 			</button>
 			<InlineEditableText
+				v-if="!isUngrouped"
 				v-model="groupName"
 				class="text-base font-semibold text-primary select-none group-hover/header:text-contrast"
 				:edit-label="formatMessage(commonMessages.renameButton)"
@@ -176,11 +185,17 @@ watch(
 				:validate="validateGroupName"
 				@click.stop
 			/>
+			<span
+				v-else
+				class="text-base font-semibold text-primary select-none group-hover/header:text-contrast"
+			>
+				{{ formatMessage(messages.ungrouped) }}
+			</span>
 			<TagItem v-if="instanceGroup.instances.length" class="shrink-0 border-surface-3 bg-surface-2">
 				{{ instanceGroup.instances.length }}
 			</TagItem>
 			<div class="min-w-0 flex-1" />
-			<ButtonStyled circular type="transparent">
+			<ButtonStyled v-if="!isUngrouped" circular type="transparent">
 				<button
 					v-tooltip="formatMessage(messages.deleteGroup)"
 					class="opacity-0 !transition-all duration-150 group-hover/header:opacity-100 -m-1.5"

@@ -287,15 +287,19 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}))
 
 		if (displayState.value.sortBy === 'Name') {
-			groups.sort((a, b) => {
-				if (a.key === 'None') return -1
-				if (b.key === 'None') return 1
-				return a.key.localeCompare(b.key)
-			})
+			groups.sort((a, b) => a.key.localeCompare(b.key))
 		}
 
 		if (displayState.value.group === 'Game version') {
 			groups.sort((a, b) => a.key.localeCompare(b.key, undefined, { numeric: true }))
+		}
+
+		if (displayState.value.group === 'Group') {
+			groups.sort((a, b) => {
+				if (a.key === 'None') return 1
+				if (b.key === 'None') return -1
+				return 0
+			})
 		}
 
 		return groups
