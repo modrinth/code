@@ -1,7 +1,7 @@
 export type InstanceGroupMove = {
 	instanceId: string
 	fromGroup: string | null
-	toGroup: string
+	toGroup: string | null
 }
 
-export type MoveInstanceBetweenGroups = (move: InstanceGroupMove) => Promise<void>
+export type MoveInstanceBetweenGroups = (move: InstanceGroupMove) => Promise<boolean>

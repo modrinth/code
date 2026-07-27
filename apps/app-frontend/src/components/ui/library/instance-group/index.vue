@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDroppable } from '@dnd-kit/vue'
 import { DropdownIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
@@ -10,7 +11,7 @@ import {
 	TagItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/library/instance-group/instance.vue'
@@ -32,14 +33,28 @@ const {
 	isValidGroupName,
 	renameGroup,
 	handleInstanceContextMenu,
+	displayState,
+	activeInstanceGroupDrag,
+	instanceGroupDragTarget,
+	getInstanceGroupDropState,
 } = useLibrary()
 
-const instanceComponents = ref<InstanceCard[]>([])
+const instanceComponents = new Map<string, InstanceCard>()
+const groupDropTarget = ref<HTMLElement>()
 const groupAccordion = ref<InstanceType<typeof Accordion>>()
 const groupOptions = ref<InstanceType<typeof ContextMenu>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
+
+useDroppable({
+	id: computed(() => `instance-group:${props.instanceGroup.id}`),
+	element: groupDropTarget,
+	disabled: computed(() => displayState.value.group !== 'Group'),
+	data: computed(() => ({
+		groupName: props.instanceGroup.key,
+	})),
+})
 
 const messages = defineMessages({
 	deleteGroup: {
@@ -53,12 +68,18 @@ const messages = defineMessages({
 })
 
 function openInstanceContextMenu(event: MouseEvent, instanceId: string, instanceGroupName: string) {
-	const instanceComponent = instanceComponents.value.find(
-		(component) => component.instance.id === instanceId,
-	)
+	const instanceComponent = instanceComponents.get(instanceId)
 	if (!instanceComponent) return
 
 	handleInstanceContextMenu(event, instanceComponent, instanceGroupName)
+}
+
+function setInstanceComponent(instanceId: string, component: unknown) {
+	if (component) {
+		instanceComponents.set(instanceId, component as InstanceCard)
+	} else {
+		instanceComponents.delete(instanceId)
+	}
 }
 
 async function removeGroup() {
@@ -118,7 +139,15 @@ watch(
 </script>
 
 <template>
-	<div class="instance-group relative">
+	<div ref="groupDropTarget" class="instance-group relative select-none pb-3">
+		<div
+			v-if="
+				activeInstanceGroupDrag &&
+				instanceGroupDragTarget === instanceGroup.key &&
+				getInstanceGroupDropState(instanceGroup.key).canDrop
+			"
+			class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent brightness-125 transition-opacity"
+		/>
 		<div
 			v-if="instanceGroup.key !== 'None'"
 			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5 py-2.5"
@@ -171,25 +200,25 @@ watch(
 			@on-open="setSectionCollapsed(instanceGroup.key, false)"
 			@on-close="setSectionCollapsed(instanceGroup.key, true)"
 		>
-			<p
-				v-if="instanceGroup.instances.length === 0"
-				class="m-0 py-2.5 pl-0.5 text-base font-medium text-secondary"
-			>
-				No instances in this group.
-			</p>
 			<section
-				v-else
-				class="grid w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
+				class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
 			>
-				<Instance
-					v-for="instance in instanceGroup.instances"
-					ref="instanceComponents"
-					:key="instance.id + instance.install_stage"
-					:instance="instance"
-					@contextmenu.prevent.stop="
-						(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.key)
-					"
-				/>
+				<div v-for="instance in instanceGroup.instances" :key="instance.id" class="min-w-0 w-full">
+					<Instance
+						:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
+						:instance="instance"
+						:instance-group-name="instanceGroup.key"
+						@contextmenu.prevent.stop="
+							(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.key)
+						"
+					/>
+				</div>
+				<p
+					v-if="instanceGroup.instances.length === 0"
+					class="col-span-full m-0 py-2.5 pl-0.5 text-base font-medium text-secondary"
+				>
+					No instances in this group.
+				</p>
 			</section>
 		</Accordion>
 	</div>

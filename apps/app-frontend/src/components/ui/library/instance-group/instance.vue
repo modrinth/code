@@ -1,4 +1,5 @@
 <script setup>
+import { useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -16,7 +17,7 @@ import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
-const { selectedInstanceIds, toggleInstanceSelection } = useLibrary()
+const { displayState, selectedInstanceIds, toggleInstanceSelection } = useLibrary()
 
 const props = defineProps({
 	instance: {
@@ -25,8 +26,13 @@ const props = defineProps({
 			return {}
 		},
 	},
+	instanceGroupName: {
+		type: String,
+		required: true,
+	},
 })
 
+const instanceCard = ref()
 const playing = ref(false)
 const loading = ref(false)
 const selectionControlActive = ref(false)
@@ -39,6 +45,16 @@ const modLoading = computed(
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
 const selected = computed(() => selectedInstanceIds.value.has(props.instance.id))
+const { isDragging } = useDraggable({
+	id: computed(() => `instance:${props.instanceGroupName}:${props.instance.id}`),
+	element: instanceCard,
+	disabled: computed(() => displayState.value.group !== 'Group'),
+	data: computed(() => ({
+		instanceId: props.instance.id,
+		fromGroup: props.instanceGroupName,
+	})),
+})
+
 const instanceType = computed(() => {
 	if (
 		props.instance.link?.type === 'server_project' ||
@@ -151,10 +167,12 @@ onUnmounted(() => unlisten())
 
 <template>
 	<div
-		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all hover:brightness-110 active:scale-[0.98]"
+		ref="instanceCard"
+		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all hover:brightness-110 active:scale-[0.98] select-none"
 		:class="{
 			'border-primary': selected,
 			'!scale-100 !brightness-100': selectionControlActive,
+			'!scale-100': isDragging,
 		}"
 		@click="seeInstance"
 		@mouseenter="checkProcess"
