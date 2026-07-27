@@ -122,9 +122,9 @@ pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteInstallPreview,
     SharedInstanceInviteLink, SharedInstanceJoinType,
-    SharedInstancePublishPreview,
-    SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
-    SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
+    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
+    SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
+    SharedInstanceUser, SharedInstanceUsers,
 };
 
 pub async fn can_active_user_use_shared_instances() -> crate::Result<bool> {
