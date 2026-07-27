@@ -177,7 +177,7 @@
 
 		<div class="flex flex-col gap-4">
 			<div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
-			<ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" />
+			<ReportCard v-for="report in paginatedReports" :key="report.id" :report="report" :collapsed="true" />
 		</div>
 
 		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
