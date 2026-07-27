@@ -76,7 +76,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const newGroupName = ref('')
 	const newGroupSearch = ref('')
 	const selectedNewGroupInstanceIds = ref(new Set<string>())
-	const selectedInstanceIds = ref(new Set<string>())
+	/** Instance-level selection shared by every group representation of an instance. */
+	const selectedLibraryInstanceIds = ref(new Set<string>())
+	const isLibraryInstanceSelectionActive = computed(
+		() => selectedLibraryInstanceIds.value.size > 0,
+	)
 	const creatingGroup = ref(false)
 	const activeInstanceGroupDrag = ref<Omit<InstanceGroupMove, 'toGroup'> | null>(null)
 	const instanceGroupDragTarget = ref<string | null>(null)
@@ -468,16 +472,16 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		selectedNewGroupInstanceIds.value = selectedIds
 	}
 
-	const clearInstanceSelection = () => {
-		selectedInstanceIds.value = new Set()
+	const clearLibraryInstanceSelection = () => {
+		selectedLibraryInstanceIds.value = new Set()
 	}
 
-	const setSelectedInstanceIds = (instanceIds: Iterable<string>) => {
-		selectedInstanceIds.value = new Set(instanceIds)
+	const setSelectedLibraryInstanceIds = (instanceIds: Iterable<string>) => {
+		selectedLibraryInstanceIds.value = new Set(instanceIds)
 	}
 
-	const toggleInstanceSelection = (instanceId: string) => {
-		const selectedIds = new Set(selectedInstanceIds.value)
+	const toggleLibraryInstanceSelection = (instanceId: string) => {
+		const selectedIds = new Set(selectedLibraryInstanceIds.value)
 
 		if (selectedIds.has(instanceId)) {
 			selectedIds.delete(instanceId)
@@ -485,8 +489,14 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			selectedIds.add(instanceId)
 		}
 
-		selectedInstanceIds.value = selectedIds
+		selectedLibraryInstanceIds.value = selectedIds
 	}
+
+	useEventListener(window, 'keydown', (event) => {
+		if (event.key === 'Escape' && isLibraryInstanceSelectionActive.value) {
+			clearLibraryInstanceSelection()
+		}
+	})
 
 	const createGroup = async () => {
 		if (!canCreateGroup.value) return false
@@ -689,7 +699,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		newGroupName,
 		newGroupSearch,
 		selectedNewGroupInstanceIds,
-		selectedInstanceIds,
+		selectedLibraryInstanceIds,
+		isLibraryInstanceSelectionActive,
 		activeInstanceGroupDrag,
 		instanceGroupDragTarget,
 		instanceGroupDragPointer,
@@ -712,9 +723,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		openNewGroupModal,
 		closeNewGroupModal,
 		toggleNewGroupInstance,
-		clearInstanceSelection,
-		setSelectedInstanceIds,
-		toggleInstanceSelection,
+		clearLibraryInstanceSelection,
+		setSelectedLibraryInstanceIds,
+		toggleLibraryInstanceSelection,
 		createGroup,
 		deleteGroup,
 		isValidGroupName,

@@ -17,7 +17,12 @@ import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 
 const { handleError } = injectNotificationManager()
-const { displayState, selectedInstanceIds, toggleInstanceSelection } = useLibrary()
+const {
+	displayState,
+	selectedLibraryInstanceIds,
+	isLibraryInstanceSelectionActive,
+	toggleLibraryInstanceSelection,
+} = useLibrary()
 
 const props = defineProps({
 	instance: {
@@ -35,7 +40,6 @@ const props = defineProps({
 const instanceCard = ref()
 const playing = ref(false)
 const loading = ref(false)
-const selectionControlActive = ref(false)
 const modLoading = computed(
 	() =>
 		loading.value ||
@@ -44,7 +48,7 @@ const modLoading = computed(
 )
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
-const selected = computed(() => selectedInstanceIds.value.has(props.instance.id))
+const selected = computed(() => selectedLibraryInstanceIds.value.has(props.instance.id))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupName}:${props.instance.id}`),
 	element: instanceCard,
@@ -70,6 +74,30 @@ const router = useRouter()
 
 const seeInstance = async () => {
 	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
+}
+
+const toggleSelection = () => {
+	toggleLibraryInstanceSelection(props.instance.id)
+}
+
+const activateCard = () => {
+	if (isLibraryInstanceSelectionActive.value) {
+		toggleSelection()
+	} else {
+		void seeInstance()
+	}
+}
+
+const handleCardKeydown = (event) => {
+	if (event.target !== event.currentTarget) return
+
+	if (event.key === 'Enter') {
+		event.preventDefault()
+		activateCard()
+	} else if (event.key === ' ' && isLibraryInstanceSelectionActive.value) {
+		event.preventDefault()
+		toggleSelection()
+	}
 }
 
 const checkProcess = async () => {
@@ -168,13 +196,21 @@ onUnmounted(() => unlisten())
 <template>
 	<div
 		ref="instanceCard"
-		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left !outline-0 transition-all hover:brightness-110 active:scale-[0.98] select-none"
+		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all hover:brightness-110 active:scale-[0.98] select-none"
 		:class="{
 			'border-primary': selected,
-			'!scale-100 !brightness-100': selectionControlActive,
 			'!scale-100': isDragging,
 		}"
-		@click="seeInstance"
+		role="button"
+		tabindex="0"
+		:aria-label="
+			isLibraryInstanceSelectionActive
+				? `${selected ? 'Deselect' : 'Select'} ${instance.name}`
+				: `Open ${instance.name}`
+		"
+		:aria-pressed="isLibraryInstanceSelectionActive ? selected : undefined"
+		@click="activateCard"
+		@keydown="handleCardKeydown"
 		@mouseenter="checkProcess"
 	>
 		<Avatar
@@ -187,18 +223,14 @@ onUnmounted(() => unlisten())
 		/>
 		<button
 			type="button"
-			class="group/selection absolute right-0 top-0 z-[2] flex size-[50px] cursor-pointer items-center justify-center border-0 bg-transparent p-0"
+			class="group/selection absolute right-0 top-0 z-[2] flex size-[50px] h-full cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
 			:aria-label="selected ? 'Deselect instance' : 'Select instance'"
 			:aria-pressed="selected"
-			@mouseenter="selectionControlActive = true"
-			@mouseleave="selectionControlActive = false"
-			@focus="selectionControlActive = true"
-			@blur="selectionControlActive = false"
-			@click.stop="toggleInstanceSelection(instance.id)"
+			@click.stop="toggleSelection"
 		>
 			<span
 				v-tooltip="selected ? 'Deselect instance' : 'Select instance'"
-				class="flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-focus-within/card:opacity-100 group-hover/selection:brightness-125"
+				class="flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
 				:class="{
 					'border-0 bg-primary !opacity-100': selected,
 					'border-2 border-solid border-primary bg-transparent': !selected,
@@ -213,8 +245,8 @@ onUnmounted(() => unlisten())
 					v-if="!playing && !modLoading && !installing"
 					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-opacity"
 					:class="{
-						'group-hover/card:scale-75 group-hover/card:opacity-0 group-focus-within/card:scale-75 group-focus-within/card:opacity-0':
-							!instance.quarantined && !selectionControlActive,
+						'group-hover/card:scale-75 group-hover/card:opacity-0':
+							!instance.quarantined && !isLibraryInstanceSelectionActive,
 					}"
 				>
 					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
@@ -237,27 +269,27 @@ onUnmounted(() => unlisten())
 						class="size-8 animate-spin"
 						tabindex="-1"
 					/>
-					<ButtonStyled v-else-if="!installed && !instance.quarantined" color="brand" circular>
+					<ButtonStyled
+						v-else-if="!isLibraryInstanceSelectionActive && !installed && !instance.quarantined"
+						color="brand"
+						circular
+					>
 						<button
 							v-tooltip="'Repair'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity"
-							:class="{
-								'group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100':
-									!selectionControlActive,
-							}"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
 							@click="(e) => repair(e)"
 						>
 							<DownloadIcon />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else-if="!instance.quarantined" color="brand" circular>
+					<ButtonStyled
+						v-else-if="!isLibraryInstanceSelectionActive && !instance.quarantined"
+						color="brand"
+						circular
+					>
 						<button
 							v-tooltip="'Play'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity"
-							:class="{
-								'group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100':
-									!selectionControlActive,
-							}"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100"
 							@click="(e) => play(e, 'InstanceCard')"
 							@mouseenter="checkProcess"
 						>
