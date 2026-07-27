@@ -332,6 +332,14 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		selectedNewGroupInstanceIds.value = selectedIds
 	}
 
+	const clearInstanceSelection = () => {
+		selectedInstanceIds.value = new Set()
+	}
+
+	const setSelectedInstanceIds = (instanceIds: Iterable<string>) => {
+		selectedInstanceIds.value = new Set(instanceIds)
+	}
+
 	const toggleInstanceSelection = (instanceId: string) => {
 		const selectedIds = new Set(selectedInstanceIds.value)
 
@@ -557,6 +565,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		openNewGroupModal,
 		closeNewGroupModal,
 		toggleNewGroupInstance,
+		clearInstanceSelection,
+		setSelectedInstanceIds,
 		toggleInstanceSelection,
 		createGroup,
 		deleteGroup,

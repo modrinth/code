@@ -151,10 +151,10 @@ onUnmounted(() => unlisten())
 
 <template>
 	<div
-		class="relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all"
+		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all hover:brightness-110 active:scale-[0.98]"
 		:class="{
-			'group/card hover:brightness-110 active:scale-[0.98]': !selectionControlActive,
 			'border-primary': selected,
+			'!scale-100 !brightness-100': selectionControlActive,
 		}"
 		@click="seeInstance"
 		@mouseenter="checkProcess"
@@ -180,13 +180,10 @@ onUnmounted(() => unlisten())
 		>
 			<span
 				v-tooltip="selected ? 'Deselect instance' : 'Select instance'"
-				class="flex size-[24px] items-center justify-center rounded-full transition-all group-hover/selection:brightness-125"
+				class="flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-focus-within/card:opacity-100 group-hover/selection:brightness-125"
 				:class="{
-					'border-0 bg-primary': selected,
+					'border-0 bg-primary !opacity-100': selected,
 					'border-2 border-solid border-primary bg-transparent': !selected,
-					'opacity-100': selected || selectionControlActive,
-					'opacity-0 group-hover/card:opacity-100 group-focus-within/card:opacity-100':
-						!selected && !selectionControlActive,
 				}"
 			>
 				<CheckIcon v-if="selected" class="size-4 invert [stroke-width:3] top-px" />
@@ -199,7 +196,7 @@ onUnmounted(() => unlisten())
 					class="flex w-10 flex-col items-center gap-px overflow-clip rounded-[14px] px-[3px] py-0.5 text-primary transition-opacity"
 					:class="{
 						'group-hover/card:scale-75 group-hover/card:opacity-0 group-focus-within/card:scale-75 group-focus-within/card:opacity-0':
-							!instance.quarantined,
+							!instance.quarantined && !selectionControlActive,
 					}"
 				>
 					<InstanceFileIcon class="h-[21px] w-[31px] shrink-0 text-primary [&_path]:fill-current" />
@@ -225,7 +222,11 @@ onUnmounted(() => unlisten())
 					<ButtonStyled v-else-if="!installed && !instance.quarantined" color="brand" circular>
 						<button
 							v-tooltip="'Repair'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity"
+							:class="{
+								'group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100':
+									!selectionControlActive,
+							}"
 							@click="(e) => repair(e)"
 						>
 							<DownloadIcon />
@@ -234,7 +235,11 @@ onUnmounted(() => unlisten())
 					<ButtonStyled v-else-if="!instance.quarantined" color="brand" circular>
 						<button
 							v-tooltip="'Play'"
-							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100"
+							class="card-shadow origin-bottom scale-75 opacity-0 transition-opacity"
+							:class="{
+								'group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-within/card:scale-100 group-focus-within/card:opacity-100':
+									!selectionControlActive,
+							}"
 							@click="(e) => play(e, 'InstanceCard')"
 							@mouseenter="checkProcess"
 						>

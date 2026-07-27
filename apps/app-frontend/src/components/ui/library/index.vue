@@ -13,6 +13,7 @@ import { toRef } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
+import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import { provideLibrary } from '@/components/ui/library/use-library'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
@@ -43,6 +44,7 @@ const {
 			/>
 		</div>
 	</section>
+	<LibrarySelectionActionBar />
 	<ConfirmDeleteInstanceModal ref="confirmDeleteModal" @delete="deleteInstance" />
 	<ContextMenu ref="instanceOptions" @option-clicked="handleInstanceOption">
 		<template #play> <PlayIcon /> Play </template>
