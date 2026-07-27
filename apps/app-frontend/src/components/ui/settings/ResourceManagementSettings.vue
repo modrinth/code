@@ -98,16 +98,16 @@ async function findLauncherDir() {
 				</template>
 			</StyledInput>
 			<p class="m-0 leading-tight text-secondary">
-				The directory where the launcher stores all of its files. Changes will be applied after
-				restarting the launcher.
+				Where Modrinth App stores instances and other files. Changes take effect after restarting
+				the app.
 			</p>
 		</div>
 
 		<div class="flex flex-col gap-2.5">
 			<ConfirmModalWrapper
 				ref="purgeCacheConfirmModal"
-				title="Are you sure you want to purge the cache?"
-				description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
+				title="Purge the app cache?"
+				description="The app may load more slowly until the cache is rebuilt."
 				:has-to-type="false"
 				proceed-label="Purge cache"
 				:show-ad-on-close="false"
@@ -119,8 +119,8 @@ async function findLauncherDir() {
 				Purge cache
 			</button>
 			<p class="m-0 leading-tight text-secondary">
-				The Modrinth app stores a cache of data to speed up loading. This can be purged to force the
-				app to reload data. This may slow down the app temporarily.
+				Clear cached data and download it again from Modrinth. The app may load more slowly until
+				the cache is rebuilt.
 			</p>
 		</div>
 
@@ -134,8 +134,8 @@ async function findLauncherDir() {
 				:step="1"
 			/>
 			<p class="m-0 leading-tight text-secondary">
-				The maximum amount of files the launcher can download at the same time. Set this to a lower
-				value if you have a poor internet connection. (app restart required to take effect)
+				Number of files the app can download at once. Lower this if downloads are unreliable on your
+				connection. Requires an app restart.
 			</p>
 		</div>
 
@@ -149,8 +149,8 @@ async function findLauncherDir() {
 				:step="1"
 			/>
 			<p class="m-0 leading-tight text-secondary">
-				The maximum amount of files the launcher can write to the disk at once. Set this to a lower
-				value if you are frequently getting I/O errors. (app restart required to take effect)
+				Number of files the app can write to disk at once. Lower this if you frequently encounter
+				I/O errors. Requires an app restart.
 			</p>
 		</div>
 

@@ -188,9 +188,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "네이티브 제목 표시줄"
   },
-  "app.appearance-settings.select-option": {
-    "message": "옵션 선택"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "인스턴스의 플레이 시간을 표시합니다."
   },

@@ -6,6 +6,7 @@ import {
 	LanguagesIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
+	Settings2Icon,
 	SettingsIcon,
 	ShieldIcon,
 	ToggleRightIcon,
@@ -21,8 +22,9 @@ import {
 } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
+import AppBehaviorSettings from '@/components/ui/settings/AppBehaviorSettings.vue'
 import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
 import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
@@ -45,63 +47,96 @@ const developerModeEnabled = defineMessage({
 	defaultMessage: 'Developer mode enabled.',
 })
 
+const tabCategories = defineMessages({
+	display: {
+		id: 'settings.sidebar.label.display',
+		defaultMessage: 'Display',
+	},
+	account: {
+		id: 'settings.sidebar.label.account',
+		defaultMessage: 'Account',
+	},
+	instances: {
+		id: 'app.settings.sidebar.label.instances',
+		defaultMessage: 'Instances',
+	},
+})
+
 const tabs = [
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.appearance',
 			defaultMessage: 'Appearance',
 		}),
+		category: tabCategories.display,
 		icon: PaintbrushIcon,
 		content: AppearanceSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.behavior',
+			defaultMessage: 'Behaviour',
+		}),
+		category: tabCategories.display,
+		icon: Settings2Icon,
+		content: AppBehaviorSettings,
 	},
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.language',
 			defaultMessage: 'Language',
 		}),
+		category: tabCategories.display,
 		icon: LanguagesIcon,
 		content: LanguageSettings,
 		badge: commonMessages.beta,
+	},
+	{
+		name: commonSettingsMessages.featureFlags,
+		category: tabCategories.display,
+		icon: ToggleRightIcon,
+		content: FeatureFlagSettings,
+		developerOnly: true,
 	},
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.privacy',
 			defaultMessage: 'Privacy',
 		}),
+		category: tabCategories.account,
 		icon: ShieldIcon,
 		content: PrivacySettings,
-	},
-	{
-		name: defineMessage({
-			id: 'app.settings.tabs.java-installations',
-			defaultMessage: 'Java installations',
-		}),
-		icon: CoffeeIcon,
-		content: JavaSettings,
 	},
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.default-instance-options',
 			defaultMessage: 'Default instance options',
 		}),
+		category: tabCategories.instances,
 		icon: GameIcon,
 		content: DefaultInstanceSettings,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.java-installations',
+			defaultMessage: 'Java installations',
+		}),
+		category: tabCategories.instances,
+		icon: CoffeeIcon,
+		content: JavaSettings,
 	},
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.resource-management',
 			defaultMessage: 'Resource management',
 		}),
+		category: tabCategories.instances,
 		icon: GaugeIcon,
 		content: ResourceManagementSettings,
 	},
-	{
-		name: commonSettingsMessages.featureFlags,
-		icon: ToggleRightIcon,
-		content: FeatureFlagSettings,
-		developerOnly: true,
-	},
 ]
+
+const availableTabs = computed(() => tabs.filter((tab) => !tab.developerOnly || themeStore.devMode))
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
@@ -129,12 +164,15 @@ watch(
 function devModeCount() {
 	devModeCounter.value++
 	if (devModeCounter.value > 5) {
+		const selectedTab = modal.value ? availableTabs.value[modal.value.selectedTab] : undefined
+
 		themeStore.devMode = !themeStore.devMode
 		settings.value.developer_mode = !!themeStore.devMode
 		devModeCounter.value = 0
 
-		if (!themeStore.devMode && tabs[modal.value!.selectedTab].developerOnly) {
-			modal.value!.setTab(0)
+		if (modal.value) {
+			const selectedTabIndex = selectedTab ? availableTabs.value.indexOf(selectedTab) : -1
+			modal.value.setTab(selectedTabIndex >= 0 ? selectedTabIndex : 0)
 		}
 	}
 }
@@ -147,7 +185,7 @@ const messages = defineMessages({
 })
 </script>
 <template>
-	<TabbedModal ref="modal" :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
+	<TabbedModal ref="modal" :tabs="availableTabs" :width="'min(928px, calc(95vw - 10rem))'">
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
 				<SettingsIcon /> Settings

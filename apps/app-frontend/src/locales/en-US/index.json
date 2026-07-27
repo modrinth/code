@@ -144,19 +144,19 @@
     "message": "Your privacy and how ads support Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+    "message": "Enable visual effects such as background blur. This may reduce performance without hardware acceleration."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Advanced rendering"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Select your preferred color theme for Modrinth App."
+    "message": "Choose the color theme used by Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Change the page to which the launcher opens on."
+    "message": "Choose the page shown when Modrinth App opens."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
@@ -168,52 +168,49 @@
     "message": "Default landing page"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Disables the nametag above your player on the skins page."
+    "message": "Hide your username above the player preview on the Skins page."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Hide nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Includes recent worlds in the \"Jump back in\" section on the Home page."
+    "message": "Show recently played worlds in the \"Jump back in\" section on the Home page."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Jump back into worlds"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimize the launcher when a Minecraft process starts."
+    "message": "Minimize Modrinth App when Minecraft starts."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimize launcher"
+    "message": "Minimize app"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Use system window frame (app restart required)."
+    "message": "Use your operating system's title bar and window controls. Requires an app restart."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Native decorations"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Select an option"
+    "message": "System window frame"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Displays how much time you've spent playing an instance."
+    "message": "Show how long you've played each instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Show play time"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Automatically skips low-risk confirmations like duplicate modpack installs, normal content deletion, bulk updates, unlinking modpacks, and repair prompts. Dangerous warnings will still be shown."
+    "message": "Skip confirmations for low-risk actions such as duplicate installs, normal content deletion, bulk updates, unlinking, and repairs. Warnings for dangerous actions are always shown."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Skip non-essential warnings"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Enables the ability to toggle the sidebar."
+    "message": "Hide the right sidebar by default and add a button to show or hide it."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Toggle sidebar"
+    "message": "Hide right sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it."
+    "message": "Show a safety warning before installing a Modrinth Pack (.mrpack) that isn't hosted on Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Warn me before installing unknown modpacks"
@@ -223,6 +220,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmations"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Home and content"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Startup and navigation"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adding server to instance"
@@ -711,10 +717,16 @@
     "message": "Downloading v{version}"
   },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
+    "message": "Control how advertising partners use cookies to personalize ads and measure performance. Ads fund Modrinth and creator payouts."
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instances"
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Behaviour"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Default instance options"
@@ -1558,5 +1570,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Account"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Display"
   }
 }

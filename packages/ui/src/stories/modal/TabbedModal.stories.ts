@@ -232,46 +232,55 @@ export const ManyTabs: StoryObj = {
 			const tabs = [
 				{
 					name: { id: 'general', defaultMessage: 'General' },
+					category: { id: 'display-category', defaultMessage: 'Display' },
 					icon: InfoIcon,
 					content: makeTabContent('General'),
 				},
 				{
 					name: { id: 'appearance', defaultMessage: 'Appearance' },
+					category: { id: 'display-category', defaultMessage: 'Display' },
 					icon: PaintbrushIcon,
 					content: makeTabContent('Appearance'),
 				},
 				{
 					name: { id: 'language', defaultMessage: 'Language' },
+					category: { id: 'display-category', defaultMessage: 'Display' },
 					icon: LanguagesIcon,
 					content: makeTabContent('Language'),
 				},
 				{
 					name: { id: 'privacy', defaultMessage: 'Privacy' },
+					category: { id: 'account-category', defaultMessage: 'Account' },
 					icon: ShieldIcon,
 					content: makeTabContent('Privacy'),
 				},
 				{
 					name: { id: 'java', defaultMessage: 'Java and memory' },
+					category: { id: 'instances-category', defaultMessage: 'Instances' },
 					icon: CoffeeIcon,
 					content: makeTabContent('Java and memory'),
 				},
 				{
 					name: { id: 'instances', defaultMessage: 'Default instance options' },
+					category: { id: 'instances-category', defaultMessage: 'Instances' },
 					icon: GameIcon,
 					content: makeTabContent('Default instance options'),
 				},
 				{
 					name: { id: 'resources', defaultMessage: 'Resource management' },
+					category: { id: 'instances-category', defaultMessage: 'Instances' },
 					icon: GaugeIcon,
 					content: makeTabContent('Resource management'),
 				},
 				{
 					name: { id: 'window', defaultMessage: 'Window' },
+					category: { id: 'advanced-category', defaultMessage: 'Advanced' },
 					icon: MonitorIcon,
 					content: makeTabContent('Window'),
 				},
 				{
 					name: { id: 'hooks', defaultMessage: 'Launch hooks' },
+					category: { id: 'advanced-category', defaultMessage: 'Advanced' },
 					icon: WrenchIcon,
 					content: makeTabContent('Launch hooks'),
 				},

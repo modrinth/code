@@ -188,9 +188,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "原生視窗"
   },
-  "app.appearance-settings.select-option": {
-    "message": "選擇選項"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "顯示你在該實例的遊玩時數。"
   },

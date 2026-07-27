@@ -170,9 +170,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Inbyggda fönsterdekorationer"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Välj ett alternativ"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Visar hur mycket tid du spelat på en instans."
   },

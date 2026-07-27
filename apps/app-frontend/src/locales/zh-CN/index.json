@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "原生窗口"
   },
-  "app.appearance-settings.select-option": {
-    "message": "选择一个选项"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "显示你在每个实例中游玩的时间。"
   },

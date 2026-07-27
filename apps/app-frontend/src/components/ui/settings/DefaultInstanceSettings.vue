@@ -57,7 +57,7 @@ watch(
 				<div class="flex flex-col gap-1">
 					<h3 class="m-0 text-lg font-semibold text-contrast">Fullscreen</h3>
 					<p class="m-0 leading-tight">
-						Overwrites the options.txt file to start in full screen when launched.
+						Start instances in fullscreen by updating their options.txt file.
 					</p>
 				</div>
 
@@ -101,7 +101,7 @@ watch(
 
 		<div class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2.5">
-				<h2 class="m-0 text-lg font-semibold text-contrast">Memory allocated</h2>
+				<h2 class="m-0 text-lg font-semibold text-contrast">Memory allocation</h2>
 				<Slider
 					id="max-memory"
 					v-model="settings.memory.maximum"
@@ -112,7 +112,7 @@ watch(
 					:snap-range="512"
 					unit="MB"
 				/>
-				<p class="m-0 mt-1 leading-tight">The memory allocated to each instance when it is ran.</p>
+				<p class="m-0 mt-1 leading-tight">Maximum memory available to each instance.</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -125,18 +125,20 @@ watch(
 					placeholder="Enter java arguments..."
 					wrapper-class="w-full"
 				/>
+				<p class="m-0 leading-tight">Arguments passed to Java when launching an instance.</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<h2 class="m-0 text-lg font-semibold text-contrast">Environmental variables</h2>
+				<h2 class="m-0 text-lg font-semibold text-contrast">Environment variables</h2>
 				<StyledInput
 					id="env-vars"
 					v-model="settings.envVars"
 					autocomplete="off"
 					type="text"
-					placeholder="Enter environmental variables..."
+					placeholder="Enter environment variables..."
 					wrapper-class="w-full"
 				/>
+				<p class="m-0 leading-tight">Environment variables set when launching an instance.</p>
 			</div>
 		</div>
 
@@ -144,7 +146,7 @@ watch(
 
 		<div class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2.5">
-				<h3 class="m-0 text-lg font-semibold text-contrast">Pre launch hook</h3>
+				<h3 class="m-0 text-lg font-semibold text-contrast">Pre-launch hook</h3>
 				<StyledInput
 					id="pre-launch"
 					v-model="settings.hooks.pre_launch"
@@ -153,7 +155,7 @@ watch(
 					placeholder="Enter pre-launch command..."
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Ran before the instance is launched.</p>
+				<p class="m-0 leading-tight">Runs before the instance starts.</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -166,11 +168,11 @@ watch(
 					placeholder="Enter wrapper command..."
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Wrapper command for launching Minecraft.</p>
+				<p class="m-0 leading-tight">Command used to wrap the Minecraft launch process.</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<h3 class="m-0 text-lg font-semibold text-contrast">Post exit hook</h3>
+				<h3 class="m-0 text-lg font-semibold text-contrast">Post-exit hook</h3>
 				<StyledInput
 					id="post-exit"
 					v-model="settings.hooks.post_exit"
@@ -179,7 +181,7 @@ watch(
 					placeholder="Enter post-exit command..."
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Ran after the game closes.</p>
+				<p class="m-0 leading-tight">Runs after the game closes.</p>
 			</div>
 		</div>
 	</div>
