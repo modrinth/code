@@ -8,6 +8,18 @@
   "admin.billing.error.not-found": {
     "message": "Nie znaleziono użytkownika"
   },
+  "ads-consent.accept": {
+    "message": "Zaakceptuj wszystko"
+  },
+  "ads-consent.body": {
+    "message": "Reklamy pozwalają na dalsze działanie Modrinth i finansują dochody dla twórców. Nasi partnerzy mogą gromadzić i uzyskiwać dostęp do plików cookies w celu personalizacji reklam i mierzenia skuteczności​."
+  },
+  "ads-consent.manage": {
+    "message": "Zarządzaj preferencjami"
+  },
+  "ads-consent.reject": {
+    "message": "Odrzuć wszystko"
+  },
   "ads-consent.title": {
     "message": "Twoja prywatność i jak reklamy wspierają Modrinth"
   },
@@ -932,6 +944,12 @@
   "auth.verify-email.title": {
     "message": "Zweryfikuj e-mail"
   },
+  "collection.aria-label.upload-icon": {
+    "message": "Prześlij ikonę"
+  },
+  "collection.button.discover-mods": {
+    "message": "Odkrywaj modyfikacje"
+  },
   "collection.button.edit-icon": {
     "message": "Edytuj ikonę"
   },
@@ -1106,6 +1124,135 @@
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Pliki uzupełniające to np. kod źródłowy, a nie alternatywne wersje lub wariacje."
   },
+  "create-project-version.create-modal.stage.add-files.details-tab": {
+    "message": "Szczegóły"
+  },
+  "create-project-version.create-modal.stage.add-files.files-tab": {
+    "message": "Pliki"
+  },
+  "create-project-version.create-modal.stage.add-files.metadata-tab": {
+    "message": "Metadane"
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-description": {
+    "message": "Główny plik to ten, który zostanie domyślnie pobrany przez użytkownika instalującego ten projekt."
+  },
+  "create-project-version.create-modal.stage.add-files.primary-file-label": {
+    "message": "Plik główny"
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-description": {
+    "message": "Możesz opcjonalnie przesłać pliki dopełniające, takie jak kod źródłowy, dokumentacja lub wymagane paczki zasobów."
+  },
+  "create-project-version.create-modal.stage.add-files.supplementary-files-label": {
+    "message": "Pliki dodatkowe"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-additional-file-aria-label": {
+    "message": "Prześlij plik dodatkowy"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Prześlij plik"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-primary-prompt": {
+    "message": "Prześlij główny plik oraz pliki pomocnicze"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Przeciągnij i upuść pliki tutaj, lub kliknij, aby przeglądać pliki"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Szczegóły"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Pliki"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadane"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Zmiany w wersji"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Numer wersji"
+  },
+  "create-project-version.create-modal.stage.details.version-number-description": {
+    "message": "Numer wersji odróżnia tę wersję od innych."
+  },
+  "create-project-version.create-modal.stage.details.version-number-placeholder": {
+    "message": "Wprowadź numer wersji, np. 1.2.3-alpha.1"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle": {
+    "message": "Podtytuł wersji"
+  },
+  "create-project-version.create-modal.stage.details.version-subtitle-placeholder": {
+    "message": "Wprowadź podtytuł..."
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Rodzaj wersji"
+  },
+  "create-project-version.create-modal.stage.metadata.add-dependency": {
+    "message": "Dodaj zależność"
+  },
+  "create-project-version.create-modal.stage.metadata.dependencies": {
+    "message": "Zależności"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Szczegóły"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-loaders": {
+    "message": "Wykryte loadery"
+  },
+  "create-project-version.create-modal.stage.metadata.detected-versions": {
+    "message": "Wykryte wersje"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Edytuj"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Środowisko"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Pliki"
+  },
+  "create-project-version.create-modal.stage.metadata.loaders": {
+    "message": "Loadery"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadane"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-loaders-tooltip": {
+    "message": "Loadery paczek modów nie mogą być edytowane"
+  },
+  "create-project-version.create-modal.stage.metadata.modpack-versions-tooltip": {
+    "message": "Wersje gry paczek modów nie mogą być edytowane"
+  },
+  "create-project-version.create-modal.stage.metadata.no-dependencies-added": {
+    "message": "Nie dodano żadnych zależności."
+  },
+  "create-project-version.create-modal.stage.metadata.no-environment-set": {
+    "message": "Nie ustawiono środowiska."
+  },
+  "create-project-version.create-modal.stage.metadata.no-loaders-selected": {
+    "message": "Nie wybrano żadnych loaderów."
+  },
+  "create-project-version.create-modal.stage.metadata.no-mod-loader": {
+    "message": "Brak loadera modów"
+  },
+  "create-project-version.create-modal.stage.metadata.no-versions-selected": {
+    "message": "Nie wybrano żadnych wersji."
+  },
+  "create-project-version.create-modal.stage.metadata.prefilled-environment-tooltip": {
+    "message": "Wypełnione na wzór poprzedniej, podobnej wersji"
+  },
+  "create-project-version.create-modal.stage.metadata.resource-pack-loaders-tooltip": {
+    "message": "Loadery paczek zasobów nie mogą być edytowane"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Sugerowane"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Przesłane pliki"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Wersje"
+  },
   "create.collection.collection-info": {
     "message": "Twoja nowa kolekcja zostanie stworzona jako publiczna kolekcja {count, plural, =0 {bez żadnych projektów} one {z # projektem} other {z # projektami}}."
   },
@@ -1202,6 +1349,9 @@
   "create.project.name-placeholder": {
     "message": "Wprowadź nazwę projektu..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "Ikona {name}"
+  },
   "create.project.owner-description": {
     "message": "Ustaw siebie lub organizację, do której należysz, jako właściciela projektu."
   },
@@ -1232,8 +1382,14 @@
   "create.project.type-server": {
     "message": "Serwer"
   },
+  "create.project.unknown-user": {
+    "message": "Nieznany użytkownik"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Awatar użytkownika"
   },
   "create.project.visibility-description": {
     "message": "Widoczność Twojego projektu po zatwierdzeniu."
@@ -1316,6 +1472,9 @@
   "dashboard.collections.sort.recently-updated": {
     "message": "Ostatnio zaktualizowane"
   },
+  "dashboard.creator-tax-form-modal.close-button": {
+    "message": "Zamknij"
+  },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Pobierz {formType}"
   },
@@ -1342,6 +1501,12 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Formularz podatkowy"
+  },
+  "dashboard.creator-tax-form-modal.incomplete.text": {
+    "message": "Nie skończono wypełniać formularza podatkowego. Spróbuj ponownie."
+  },
+  "dashboard.creator-tax-form-modal.incomplete.title": {
+    "message": "Formularz podatkowy nie jest kompletny"
   },
   "dashboard.creator-tax-form-modal.security.description": {
     "message": "Modrinth używa dostawcy będącego stroną trzecią, Track1099, by bezpiecznie zbierać i przechowywać Twoje formularze podatkowe. <security-link>Dowiedz się więcej.</security-link>"
@@ -1382,6 +1547,9 @@
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Podmiot gospodarczy"
   },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth-placeholder": {
+    "message": "Wprowadź datę urodzenia"
+  },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Podmiot gospodarczy to na przykład korporacja, spółka osobowa bądź sp. z.o.o."
   },
@@ -1390,6 +1558,12 @@
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Osoba prywatna"
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-countries-placeholder": {
+    "message": "Szukaj kraju..."
+  },
+  "dashboard.creator-withdraw-modal.kyc.search-subdivisions-placeholder": {
+    "message": "Wyszukaj podstrefy..."
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Wybierz swój kraj"
@@ -1526,6 +1700,21 @@
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Wprowadź kwotę"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.minimum-denomination-exceeds-balance": {
+    "message": "Minimalna wartość wynosi {min}, wykraczając poza twój balans wynoszący {balance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.need-at-least-gift-card": {
+    "message": "Potrzebujesz co najmniej {min} aby móc użyć tej kart podarunkowej."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-denominations-available": {
+    "message": "Brak kart o wartości mniejszej niż twój balans"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-no-max": {
+    "message": "Brak kart o wartości bliskiej szukanej"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.no-suggestions-with-max": {
+    "message": "Brak kart o wartości bliskiej szukanej. Najwyższa dostępna wartość to {max}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Metoda płatności"
   },
@@ -1540,6 +1729,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Szukaj kwoty"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Wyszukaj {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Wybierz {category}"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Wybierz nominał:"
@@ -1558,6 +1753,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "Wybrano walutę USD w opcji międzynarodowej PayPal. <direct-paypal-link>Przełącz się na bezpośredni PayPal</direct-paypal-link> dla niższych opłat (≈2% zamiast ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-max": {
+    "message": "Minimalnie {min}, maksymalnie {max} możliwe do odebrania."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.withdrawal-amount-min-only": {
+    "message": "Minimalnie {min} możliwe do odebrania."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Wypłać"
@@ -1922,6 +2123,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Zbyt niska kwota"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Ta metoda wypłaty została zablokowana przez dostawcę płatności. Użyj innej metody wypłaty lub skontaktuj się z obsługą klienta."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Metoda wypłaty jest niedostępna"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Proszę użyć poprawnej opcji transferu Paypal dla twojego regionu(Stany Zjednoczone lub Międzynarodowe)."
   },
@@ -2218,6 +2425,24 @@
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "Oferta ograniczona czasowo. Karta kredytowa nie jest wymagana. Dostępne dla serwerów w USA."
+  },
+  "hosting-marketing.notification.error-fetching-payment-data-title": {
+    "message": "Błąd podczas pobierania danych o płatności"
+  },
+  "hosting-marketing.notification.invalid-product-text": {
+    "message": "Wybrany produkt został znaleziony, ale brakuje mu potrzebnych danych. Skontaktuj się z obsługą klienta."
+  },
+  "hosting-marketing.notification.invalid-product-title": {
+    "message": "Nieprawidłowy produkt"
+  },
+  "hosting-marketing.notification.server-capacity-full-text": {
+    "message": "Nasz serwer jest obecnie przepełniony. Spróbuj ponownie później."
+  },
+  "hosting-marketing.notification.server-capacity-full-title": {
+    "message": "Serwer przepełniony"
+  },
+  "hosting-marketing.notification.unexpected-error-text": {
+    "message": "Wystąpił nieoczekiwany błąd"
   },
   "hosting-marketing.pick-customized-plan": {
     "message": "Wybierz spersonalizowany plan z parametrami, których potrzebujesz."
@@ -2537,6 +2762,21 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
+  "layout.footer.based-on-label": {
+    "message": "Na podstawie"
+  },
+  "layout.footer.developer-mode-activated.text": {
+    "message": "Tryb dewelopera został włączony"
+  },
+  "layout.footer.developer-mode-activated.title": {
+    "message": "Włączono tryb dewelopera"
+  },
+  "layout.footer.developer-mode-deactivated.text": {
+    "message": "Tryb dewelopera został wyłączony"
+  },
+  "layout.footer.developer-mode-deactivated.title": {
+    "message": "Wyłączono tryb dewelopera"
+  },
   "layout.footer.legal": {
     "message": "Polityka"
   },
@@ -2605,6 +2845,9 @@
   },
   "layout.footer.social.x": {
     "message": "X"
+  },
+  "layout.footer.unknown-commit": {
+    "message": "nieznany"
   },
   "layout.menu-toggle.action": {
     "message": "Przełącz menu"
@@ -2675,6 +2918,30 @@
   "layout.publish.email-verification-required.title": {
     "message": "Wymagana weryfikacja adresu e-mail"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "Automatycznie instaluj to, w co grają"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Graj w to samo, co Twoi znajomi"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "Otrzymuj aktualizacje do udostępnionej zawartości, gdy zostanie zmieniona"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Pobierz Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "Zarządzane przez"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App zostanie otwarte automatycznie..."
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Otwieranie Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Czemu warto używać Modrinth App"
+  },
   "moderation.exclude-technical-review": {
     "message": "Wyklucz RT"
   },
@@ -2695,6 +2962,15 @@
   },
   "moderation.page.technicalReview": {
     "message": "Przegląd techniczny"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} na stronę"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Ilość elementów na stronę"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Wyczyść"
   },
   "modpack-scan-modal.failed": {
     "message": "Błąd"
@@ -2727,10 +3003,13 @@
     "message": "Zeskanuj wszystkie pliki"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Nie udało się zeskanować niektórych plików: {error}"
+    "message": "Nie udało się zeskanować niektórych plików: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Skanowanie..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Sukces"
   },
   "modpack-scan-modal.title": {
     "message": "Skanowanie paczki modów ({scanned}/{total} plików)"
@@ -3019,6 +3298,24 @@
   },
   "organization.label.projects": {
     "message": "projektów"
+  },
+  "organization.project-transfer.id-column": {
+    "message": "ID"
+  },
+  "organization.project-transfer.name-column": {
+    "message": "Nazwa"
+  },
+  "organization.project-transfer.project-icon-alt": {
+    "message": "Ikona {name}"
+  },
+  "organization.project-transfer.type-column": {
+    "message": "Rodzaj"
+  },
+  "organization.projects.none": {
+    "message": "Ta organizacja nie ma jeszcze żadnych projektów."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Ta organizacja nie ma jeszcze żadnych projektów. Czy chcesz <create-link>utworzyć nowy</create-link>?"
   },
   "profile.bio.fallback.creator": {
     "message": "Twórca na Modrinth."
@@ -3431,6 +3728,9 @@
   "project.gallery.title": {
     "message": "Galeria"
   },
+  "project.install-context.back-to-discover": {
+    "message": "Powróć do odkrywania"
+  },
   "project.moderation.admonition.approved.body.private": {
     "message": "Twój projekt jest prywatny, co oznacza, że jest widoczny tylko dla ciebie i tych, których zaprosisz."
   },
@@ -3475,6 +3775,9 @@
   },
   "project.moderation.admonition.under-review.body.4": {
     "message": "Staramy się zakończyć przegląd w 24-48 godzin, ale sprawdzanie niektórych projektów może zająć dłużej. Nie oznacza to, że coś jest nie tak z Twoim projektem."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Staramy się zakończyć przegląd w tydzień, ale sprawdzanie niektórych projektów może zająć dłużej. Nie oznacza to, że coś jest nie tak z Twoim projektem."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Dziękujemy za cierpliwość podczas gdy nasi moderatorzy pracują ciężko by zapewnić, że Modrinth jest bezpiecznym miejscem i żeby Twój projekt został opublikowany! 💚</emphasis>"
@@ -3593,6 +3896,9 @@
   "project.settings.permissions.completed.title": {
     "message": "Uprawnienia gotowe!"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Usuń wszystkie grupy"
+  },
   "project.settings.permissions.empty-state.description": {
     "message": "Żadne z wersji Twojego projektu nie zawierają zewnętrznej zawartości, więc nie musisz martwić się o uzyskanie zezwoleń."
   },
@@ -3641,6 +3947,60 @@
   "project.settings.permissions.sort.status": {
     "message": "Status"
   },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Adres Bedrock"
+  },
+  "project.settings.server.cannot-save-title": {
+    "message": "Nie udało się zapisać"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Szczegóły o serwerze"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Wprowadź adres"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Adres Java"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Języki"
+  },
+  "project.settings.server.optional-label": {
+    "message": "opcjonalne"
+  },
+  "project.settings.server.refresh-ping-tooltip": {
+    "message": "Odśwież ping"
+  },
+  "project.settings.server.region-label": {
+    "message": "Region"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Wybierz języki"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Wybierz region"
+  },
+  "project.settings.server.server-online": {
+    "message": "Serwer jest online!"
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Wyróżnione tagi"
+  },
+  "project.settings.tags.featured-tags-description": {
+    "message": "Możesz wyróżnić 3 z najlepiej pasujących do Twojego projektu tagów. Inne tagi mogą zostać pokazane jako wyróżnione, jeżeli nie wybierzesz wszystkich trzech."
+  },
+  "project.settings.tags.features-description": {
+    "message": "Wszystkie funkcjonalności, których używa {type}"
+  },
+  "project.settings.tags.resolutions-description": {
+    "message": "Rozdzielczość tekstur, którą ma {type}."
+  },
+  "project.settings.tags.title": {
+    "message": "Tagi"
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Prześlij wersję, by móc wybierać tagi!"
+  },
   "project.settings.title": {
     "message": "Ustawienia"
   },
@@ -3650,8 +4010,50 @@
   "project.status.archived.message": {
     "message": "{title} zostało zarchiwizowane. {title} nie będzie otrzymywać żadnych dalszych aktualizacji, chyba że autor zdecyduje się przywrócić projekt."
   },
+  "project.versions.copy-id-option": {
+    "message": "Kopiuj ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Kopiuj łącze"
+  },
+  "project.versions.copy-maven-coordinates-option": {
+    "message": "Kopiuj koordynaty Maven"
+  },
+  "project.versions.delete-button": {
+    "message": "Usuń"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Usunie to wersję na zawsze (na serio na zawsze)."
+  },
+  "project.versions.delete-confirm.title": {
+    "message": "Czy na pewno chcesz usunąć tę wersję?"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Edytuj szczegóły"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Edytuj pliki"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Edytuj metadane"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Edytuj wersję"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Otwórz w nowej karcie"
+  },
+  "project.versions.share-option": {
+    "message": "Udostępnij"
+  },
   "project.versions.title": {
     "message": "Wersje"
+  },
+  "project.versions.version-deleted-text": {
+    "message": "Wersja została usunięta pomyślnie."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Wersja usunięta"
   },
   "project.versions.withheld-versions-warning.description": {
     "message": "{count, plural, one {Ta wersja jest} other {Te wersje są}} obecnie wstrzymane i nie widnieją na publicznej liście. Proszę o przesłanie potwierdzenia posiadania zgody na redystrybucję określonych plików zawartych w {count, plural, one {tej wersji} other {tych wersjach}} modpacka."
@@ -4066,6 +4468,9 @@
   },
   "servers.plan.small.description": {
     "message": "Idealny dla 1–5 przyjaciół z kilkoma lekkimi modami."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Najbardziej popularny"
   },
   "settings.account.button.complete-setup": {
     "message": "Zakończ ustawianie"
@@ -4838,6 +5243,33 @@
   "settings.sidebar.label.display": {
     "message": "Wyświetlanie"
   },
+  "shared-instance.invite.accept": {
+    "message": "Zaakceptuj zaproszenie"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "Użytkownik Modrinth"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# osoba już dołączyła} other {# osób już dołączyło}}"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Ładowanie zaproszenia…"
+  },
+  "shared-instance.invite.title": {
+    "message": "Użytkownik {name} zaprosił Cię do grania w"
+  },
+  "shared-instance.invite.trust.description": {
+    "message": "To zaproszenie zostało utworzone przez innego użytkownika Modrinth, na przez Modrinth. Akceptuj zaproszenia tylko od osób, którym ufasz."
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Czy znasz tego użytkownika?"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "Mogło ono wygasnąć, przekroczyć limit użyć lub zostać usunięte przez osobę, która go udostępniła."
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "To zaproszenie jest niedostępne"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Najnowsze aktualności z Modrinth"
   },
@@ -4909,6 +5341,9 @@
   },
   "version.environment.unknown.title": {
     "message": "Nieznane środowisko"
+  },
+  "version.notification.deleted-text": {
+    "message": "Wersja została usunięta pomyślnie."
   },
   "version.notification.deleted-title": {
     "message": "Wersja usunięta"

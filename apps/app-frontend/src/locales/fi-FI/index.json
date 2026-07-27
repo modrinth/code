@@ -308,6 +308,9 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Onnistuneesti ladattu"
   },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Kaikki laitteeseen jo asennetut kopiot säilyvät laitteessa"
+  },
   "app.instance.worlds.add-server": {
     "message": "Lisää palvelin"
   },

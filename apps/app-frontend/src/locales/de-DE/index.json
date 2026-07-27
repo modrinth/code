@@ -393,7 +393,7 @@
     "message": "Instanz"
   },
   "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "{current, number}/{total, number} Projekte werden heruntergelanden..."
+    "message": "{current, number}/{total, number} Projekte werden heruntergeladen..."
   },
   "app.instance.mods.bulk-update.finishing": {
     "message": "Update wird fertiggestellt..."
@@ -453,7 +453,7 @@
     "message": "Falsches Konto"
   },
   "app.instance.share.remove-user-modal.effect-access": {
-    "message": "Diese Person wird für diese geteilte Instanz erhalten keine Updates mehr erhalten"
+    "message": "Diese Person wird für diese geteilte Instanz keine Updates mehr erhalten"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
     "message": "Jede bereits installierte Kopie bleibt auf deren Gerät erhalten"

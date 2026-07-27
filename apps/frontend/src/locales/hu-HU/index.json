@@ -588,7 +588,7 @@
     "message": "{author} által"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "A Modrinth könnyűvé teszi az összes telepített modjaidnak a kezelését egy helyen. Telepíthetsz, eltávolíthatsz és frissíthetsz modokat egyetlen kattintással."
+    "message": "A Modrinth könnyűvé teszi az összes telepített modod a kezelését egy helyen. Telepíthetsz, eltávolíthatsz és frissíthetsz modokat egyetlen kattintással."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Telepített modok"
@@ -804,13 +804,13 @@
     "message": "Visszaállítási e-mail küldése"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Írd be az e-mail címedet az alábbi mezőbe, és küldünk neked egy hivatkozást, amivel vissza tudja állítani a fiókod."
+    "message": "Írd be az e-mail címedet az alábbi mezőbe, és küldünk neked egy hivatkozást, amivel vissza tudod állítani a fiókod."
   },
   "auth.reset-password.notification.email-sent.text": {
-    "message": "Egy e-mail el lett küldve önnek az email-címére amennyiben az email-cím el volt mente a fiókjában."
+    "message": "Egy e-mail el lett küldve az e-mail címedre amennyiben az email-cím el volt mente a fiókodban."
   },
   "auth.reset-password.notification.email-sent.title": {
-    "message": "E-mail küldve"
+    "message": "E-mail eküldve"
   },
   "auth.reset-password.notification.password-reset.text": {
     "message": "Most már be tud lépni a fiókjába az új jelszavával."
@@ -843,7 +843,7 @@
     "message": "Kód beírása..."
   },
   "auth.sign-in.continue-with-email": {
-    "message": "Továbblépés Email-lel"
+    "message": "Folytatás e-maillel"
   },
   "auth.sign-in.continue-with-passkey": {
     "message": "Továbblépés biztonsági kulccsal"
@@ -870,7 +870,7 @@
     "message": "Korhatár"
   },
   "auth.sign-up.continue-with-email": {
-    "message": "Folytatás Email-lel"
+    "message": "Folytatás e-maillel"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "Fiók létrehozásával elfogadod a Modrinth <terms-link>Felhasználási feltételeit</terms-link> és <privacy-policy-link>Adatvédelmi irányelveit</privacy-policy-link>."
@@ -915,10 +915,10 @@
     "message": "Az e-mail cím hitelesítés sikertelen"
   },
   "auth.verify-email.notification.email-sent.description": {
-    "message": "Egy Emailt kapott egy linkkel fiókja hitelesítéséhez ezen az Email címen: {email}."
+    "message": "Egy e-mailt kaptál egy linkkel a fiókod hitelesítéséhez ezen az e-mail címen: {email}."
   },
   "auth.verify-email.notification.email-sent.title": {
-    "message": "Email elküldve"
+    "message": "E-mail eküldve"
   },
   "auth.verify-email.notification.error-occurred.title": {
     "message": "Egy hiba történt"
@@ -930,7 +930,7 @@
     "message": "E-mail cím hitelesítése"
   },
   "auth.verify-email.title": {
-    "message": "Email-cím hitelesítése"
+    "message": "E-mail cím hitelesítése"
   },
   "collection.aria-label.upload-icon": {
     "message": "Ikon feltöltése"
@@ -954,7 +954,7 @@
     "message": "Ikon kiválasztása"
   },
   "collection.button.unfollow-project": {
-    "message": "Projektek kikövetése"
+    "message": "Projekt kikövetése"
   },
   "collection.delete-modal.description": {
     "message": "Ezzel véglegesen törlöd ezt a gyűjteményt. Ez a művelet nem vonható vissza."
@@ -1653,7 +1653,7 @@
     "message": "Válassz kategóriát a folytatáshoz"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "Hitelesítetlen e-mail"
+    "message": "Hitelesítetlen e-mail cím"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "A kiszállítási e-mail cím, amit megadtál nincs hozzákapcsolva a Modrinth fiókodhoz. A Modrinth nem tudja visszaállítani a jutalmakat, amik rossz e-mail címre lettek küldve."
@@ -1974,7 +1974,7 @@
     "message": "A pénzfelvétel előtt ellenőrizned kell az e-mail címedet."
   },
   "dashboard.withdraw.error.email-verification.title": {
-    "message": "E-mail hítelesítés szükséges"
+    "message": "E-mail hitelesítés szükséges"
   },
   "dashboard.withdraw.error.generic.text": {
     "message": "Nem tudtuk elküldeni a kifizetési kérelmed, kérjük, ellenőrizd az adataid, vagy vedd fel a kapcsolatot az ügyfélszolgálattal.\n{error}"
@@ -2526,7 +2526,7 @@
     "message": "Technikai áttekintés"
   },
   "layout.avatar.alt": {
-    "message": "Avatárod"
+    "message": "Az avatárod"
   },
   "layout.banner.account-action": {
     "message": "Fiók akció szükséges"
@@ -2741,6 +2741,12 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Frissíts a Modrinth+-ra"
   },
+  "layout.publish.email-verification-required.description": {
+    "message": "A Modrinthon való közzététel előtt hitelesítened kell az e-mail címedet."
+  },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-mail hitelesítés szükséges"
+  },
   "moderation.moderate": {
     "message": "Moderálás"
   },
@@ -2782,9 +2788,6 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Összes fájl beolvasása"
-  },
-  "modpack-scan-modal.scan-error": {
-    "message": "Pár fájlt nem sikerült beolvasni: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Beolvasás..."
@@ -3114,7 +3117,7 @@
     "message": "Kifizetési módok"
   },
   "profile.details.tooltip.email-not-verified": {
-    "message": "Nem hitelesített email"
+    "message": "Nem hitelesített e-mail"
   },
   "profile.details.tooltip.email-verified": {
     "message": "E-mail cím hitelesítve"
@@ -3613,6 +3616,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "Állapot"
+  },
+  "project.settings.tags.multiple-resolution-tags-warning": {
+    "message": "{count} felbontási címkét választottál ki ({tags}). A forráscsomagoknak általában csak egy felbontási címkéjük lehet."
   },
   "project.settings.title": {
     "message": "Beállítások"
@@ -4239,7 +4245,7 @@
     "message": "Átírányítás URI hozzáadása"
   },
   "settings.applications.button.cancel": {
-    "message": "Megszakítás"
+    "message": "Mégse"
   },
   "settings.applications.button.create": {
     "message": "Alkalmazás létrehozása"
@@ -4735,6 +4741,9 @@
   },
   "settings.sidebar.label.display": {
     "message": "Megjelenés"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count} személy már csatlakozott"
   },
   "ui.latest-news-row.latest-news": {
     "message": "A legújabb hírek a Modrinthról"

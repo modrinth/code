@@ -222,7 +222,7 @@
     "defaultMessage": "Відкрити теку"
   },
   "button.open-in-browser": {
-    "defaultMessage": "Відкрити в браузері"
+    "defaultMessage": "Відкрити в переглядачу"
   },
   "button.open-in-folder": {
     "defaultMessage": "Відкрити в теці"
@@ -1086,7 +1086,7 @@
     "defaultMessage": "Ліцензія"
   },
   "external-files.permissions-card.reason.license.description": {
-    "defaultMessage": "Ліцензія цієї роботи дозволяє вам поширювати її у вашій збірці."
+    "defaultMessage": "Цю роботу можна поширювати у вашій збірці згідно з її ліцензією."
   },
   "external-files.permissions-card.reason.license.proof-images-description": {
     "defaultMessage": "Завантажте підтверджувальну документацію щодо цієї ліцензії."
@@ -1737,7 +1737,7 @@
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "Короткочасне посилення ЦП дозволяє вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
+    "defaultMessage": "Короткочасне посилення ЦП дає змогу вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} ГБ ОЗП"

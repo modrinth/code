@@ -378,7 +378,7 @@
     "defaultMessage": "Radera {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "{action, select, downgrade {Att nedgradera} other {Att uppdatera}} kan orsaka kompatibilitetsproblem. Moddar eller innehåller du har lagt till själv kommer behållas, men kanske inte är kompatibel med nya versionen."
+    "defaultMessage": "Att {action, select, downgrade {nedgradera} other {uppdatera}} kan orsaka kompatibilitetsproblem. Moddar eller innehåller du själv lagt till kommer behållas, men är kanske inte kompatibel med den nya versionen."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Varning om att {action, select, downgrade {nedgradera} other {uppdatera}}"
@@ -446,11 +446,14 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} tillagd"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Ändrade konfigurationsfiler"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Lade till (beroende)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Inaktiverad"
+    "defaultMessage": "Inaktiverade"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Uppdaterade"
@@ -459,7 +462,7 @@
     "defaultMessage": "Installera inte"
   },
   "content.diff-modal.external-diff-type.added": {
-    "defaultMessage": "Tillagd"
+    "defaultMessage": "Lade till"
   },
   "content.diff-modal.external-diff-type.removed": {
     "defaultMessage": "Borttagen"
@@ -467,8 +470,14 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "Uppdaterad"
   },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "Spelversion"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Installera ändå"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "Inga innehållsändringar"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} borttagna"
@@ -1581,7 +1590,7 @@
     "defaultMessage": "Ominstallerar modpack"
   },
   "installation-settings.removed-incompatible": {
-    "defaultMessage": "Tog bort (ej kompatibel)"
+    "defaultMessage": "Tog bort (inkompatibel)"
   },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Ominstallerar Minecraft-beroenden och tittar efter korruption. Detta kan lösa problem om ditt spel inte startar på grund av launcher-relaterade problem."
@@ -1620,7 +1629,7 @@
     "defaultMessage": "Verifierar..."
   },
   "instance.confirm-reinstall.admonition-body": {
-    "defaultMessage": "Ominstallering kommer att ställa om alla installerade eller ändrade innehåll till det som är givet av modpaketet, vilket kommer ta bort moddar eller innehåll som du lagt över den originella installationen."
+    "defaultMessage": "Ominstallering kommer att återställa allt installerat eller modifierat till det som är försett av modpaketet, vilket tar bort moddar eller innehåll du själv lagt till utöver den originella installationen."
   },
   "instance.confirm-reinstall.admonition-header": {
     "defaultMessage": "Ominstalleringsvarning"
@@ -3276,7 +3285,7 @@
     "defaultMessage": "Sök åtgärder..."
   },
   "servers.access-page.activity-log-filter.action.addon-added": {
-    "defaultMessage": "Tillagt innehåll"
+    "defaultMessage": "Lade till innehåll"
   },
   "servers.access-page.activity-log-filter.action.addon-deleted": {
     "defaultMessage": "Raderade innehåll"
@@ -3333,7 +3342,7 @@
     "defaultMessage": "Ändrade modpaket"
   },
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
-    "defaultMessage": "Avlänkat modpaket"
+    "defaultMessage": "Avlänkade modpaket"
   },
   "servers.access-page.activity-log-filter.action.server-created": {
     "defaultMessage": "Skapade server"
@@ -3341,8 +3350,17 @@
   "servers.access-page.activity-log-filter.action.server-killed": {
     "defaultMessage": "Dödade server"
   },
+  "servers.access-page.activity-log-filter.action.server-plan-changed": {
+    "defaultMessage": "Ändrade paket"
+  },
   "servers.access-page.activity-log-filter.action.server-properties-modified": {
     "defaultMessage": "Modifierade server-egenskaper"
+  },
+  "servers.access-page.activity-log-filter.action.server-repaired": {
+    "defaultMessage": "Lagade server"
+  },
+  "servers.access-page.activity-log-filter.action.server-reset": {
+    "defaultMessage": "Återställde server"
   },
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Startade om server"
@@ -3366,7 +3384,7 @@
     "defaultMessage": "Bjöd in användare"
   },
   "servers.access-page.activity-log-filter.action.user-permission-modified": {
-    "defaultMessage": "Ändrade användartillåtelser"
+    "defaultMessage": "Ändrade användarbehörighet"
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
     "defaultMessage": "Återkallade åtkomst"
@@ -3540,7 +3558,7 @@
     "defaultMessage": "Utför en åtgärd på din server och så ser du det här!"
   },
   "servers.audit-log.event.addon-added": {
-    "defaultMessage": "Tillagt innehåll <content></content>"
+    "defaultMessage": "Lade till innehåll <content></content>"
   },
   "servers.audit-log.event.addon-changed": {
     "defaultMessage": "Ändrade innehåll <content></content>"
@@ -3603,7 +3621,7 @@
     "defaultMessage": "Ändrade fil <file></file>"
   },
   "servers.audit-log.event.file-deleted": {
-    "defaultMessage": "Radera fil <file></file>"
+    "defaultMessage": "Raderade fil <file></file>"
   },
   "servers.audit-log.event.file-edited": {
     "defaultMessage": "Redigerade fil <file></file>"
@@ -3763,6 +3781,9 @@
   },
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Återställer från säkerhetskopia"
+  },
+  "servers.backups.delete-modal.admonition-body": {
+    "defaultMessage": "När {count, plural, one {denna säkerhetskopia raderas kan den} other {dessa säkerhetskopior raderas kan de}} inte återställas. Radering är permanent."
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
@@ -4811,6 +4832,9 @@
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Du har osparade ändringar."
   },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "Du har osparade ändringar som kommer gå förlorade om du lämnar sidan."
+  },
   "ui.confirm-leave-modal.header": {
     "defaultMessage": "Du har osparade ändringar"
   },
@@ -4894,6 +4918,9 @@
   },
   "version.section.dependencies.unavailable-version": {
     "defaultMessage": "Otillgänglig version"
+  },
+  "version.section.dependencies.unavailable-version.description": {
+    "defaultMessage": "Denna version kan ha raderats eller så är den under granskning av moderatorer."
   },
   "version.section.files": {
     "defaultMessage": "Filer"

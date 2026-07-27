@@ -18,7 +18,7 @@
     "message": "复制详细信息"
   },
   "app.action-bar.install.dismiss": {
-    "message": "忽略"
+    "message": "隐藏"
   },
   "app.action-bar.install.open-instance": {
     "message": "打开实例"
@@ -30,19 +30,19 @@
     "message": "由于应用关闭而取消"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "整合包读取失败"
+    "message": "无法读取整合包"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "已取消"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "未完成清理"
+    "message": "未能完成清理"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "无法下载文件"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "下载的文件已损坏"
+    "message": "下载的文件是损坏的"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "无法保存文件"
@@ -60,7 +60,7 @@
     "message": "整合包数据无效"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "整合包文件含有无效元数据"
+    "message": "整合包文件含有无效的元数据"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "无法完成 Java 配置"
@@ -69,22 +69,22 @@
     "message": "加载器配置失败"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "无法更新本地数据"
+    "message": "无法更新本地的数据"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "Minecraft 配置失败"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "无法连接 Modrinth"
+    "message": "无法连接Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "没有写入权限"
+    "message": "没有写入的权限"
   },
   "app.action-bar.install.summary.pack-download-failed": {
-    "message": "无法下载包"
+    "message": "无法下载整合包"
   },
   "app.action-bar.install.summary.unexpected-error": {
-    "message": "出错了"
+    "message": "出现了一些问题"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "未知的实例"
@@ -222,7 +222,7 @@
     "message": "无法连接到身份验证服务器"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "添加服务器到实例"
+    "message": "添加实例到服务器"
   },
   "app.browse.add-to-an-instance": {
     "message": "添加到实例"
@@ -294,7 +294,7 @@
     "message": "正在下载包文件"
   },
   "app.install.phase.extracting_overrides": {
-    "message": "提取覆盖项"
+    "message": "正在解压覆盖项"
   },
   "app.install.phase.finalizing": {
     "message": "完成"
@@ -309,7 +309,7 @@
     "message": "正在下载 Java {version}"
   },
   "app.install.phase.preparing_java.extracting": {
-    "message": "正在提取 Java {version}"
+    "message": "正在解压 Java {version}"
   },
   "app.install.phase.preparing_java.fetching-metadata": {
     "message": "正在获取 Java {version}"
@@ -333,7 +333,7 @@
     "message": "正在解析内容"
   },
   "app.install.phase.rolling_back": {
-    "message": "回滚"
+    "message": "回滚中"
   },
   "app.install.phase.running_loader_processors": {
     "message": "正在运行加载处理器"
@@ -450,7 +450,7 @@
     "message": "切换账号"
   },
   "app.instance.share.locked.wrong-account-heading": {
-    "message": "账号不正确"
+    "message": "账号错误"
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "对方将不再收到该共享实例的后续更新"
@@ -537,7 +537,7 @@
     "message": "正在删除 {name}"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "含模组"
+    "message": "适配模组"
   },
   "app.instance.worlds.filter-offline": {
     "message": "离线"
@@ -942,10 +942,10 @@
     "message": "部分选中的项目属于共享实例的一部分。删除它们只会修改你的本地副本，未来的共享实例更新可能会再次将其恢复或更改。"
   },
   "content.shared-instance.delete-button": {
-    "message": "就要删除"
+    "message": "仍要删除"
   },
   "content.shared-instance.delete-many-button": {
-    "message": "就要删除{count, number}"
+    "message": "仍要删除 {count, number} 个项目"
   },
   "content.shared-instance.delete-single-body": {
     "message": "删除它只会修改你的本地副本。未来的共享实例更新可能会再次将其恢复或更改。"
@@ -954,10 +954,10 @@
     "message": "部分选中的项目属于共享实例的一部分。禁用它们只会修改你的本地副本，未来的共享实例更新可能会再次重新启用、恢复或更改它们。"
   },
   "content.shared-instance.disable-button": {
-    "message": "坚持禁用"
+    "message": "仍要禁用"
   },
   "content.shared-instance.disable-many-button": {
-    "message": "坚持禁用这 {count, number} 个项目"
+    "message": "仍要禁用 {count, number} 个项目"
   },
   "content.shared-instance.disable-single-body": {
     "message": "禁用它只会修改你的本地副本。未来的共享实例更新可能会再次将其启用、恢复或更改。"
@@ -1206,7 +1206,7 @@
     "message": "库分组"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "创建新的分组"
+    "message": "新建分组"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "库分组功能可以让你将实例整理到库中的不同部分。"
@@ -1506,7 +1506,7 @@
     "message": "请在你的浏览器中继续"
   },
   "modal.modrinth-account-required.create-account-button": {
-    "message": "创建账户"
+    "message": "新建账户"
   },
   "modal.modrinth-account-required.description": {
     "message": "在使用这个功能之前，你需要登入你的Modrinth账户。"

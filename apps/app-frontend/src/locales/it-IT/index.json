@@ -27,7 +27,7 @@
     "message": "Riprova"
   },
   "app.action-bar.install.summary.app-closing": {
-    "message": "Annullato per app chiusa"
+    "message": "Annullato per chiusura app"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
     "message": "Impossibile leggere il pacchetto"
@@ -486,7 +486,7 @@
     "message": "Scollega prima di condividere"
   },
   "app.instance.shared-instance-already-installed.body": {
-    "message": "Questa istanza condivisa è già installata come <bold>{instanceName}</bold>. Vuoi installarne un'altra copia?"
+    "message": "Questa istanza condivisa è già installata come <bold>{instanceName}</bold>. Vuoi davvero installarne un'altra copia?"
   },
   "app.instance.shared-instance-already-installed.header": {
     "message": "Istanza condivisa già installata"
@@ -969,7 +969,7 @@
     "message": "Stringi un'amicizia"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count, plural, one {# richiesta} other {# richieste}} d''amicizia"
+    "message": "{count, plural, one {# richiesta} other {# richieste}} d'amicizia"
   },
   "friends.add-friend.submit": {
     "message": "Invia richiesta d'amicizia"
