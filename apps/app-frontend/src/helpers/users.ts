@@ -1,6 +1,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { invoke } from '@tauri-apps/api/core'
 
+// Converts user profile links from rendered Markdown/any dynamic content into app routes.
 export function parse_modrinth_user_link(href: string): string | null {
 	try {
 		const url = new URL(href)
@@ -20,15 +21,11 @@ export async function search_user(query: string): Promise<Labrinth.Users.v3.Sear
 	return await invoke<Labrinth.Users.v3.SearchUser[]>('plugin:users|search_user', { query })
 }
 
-export async function get_user_profile(
-	userId: string,
-): Promise<Labrinth.Users.v3.User> {
+export async function get_user_profile(userId: string): Promise<Labrinth.Users.v3.User> {
 	return await invoke<Labrinth.Users.v3.User>('plugin:users|get_user_profile', { userId })
 }
 
-export async function get_user_projects(
-	userId: string,
-): Promise<Labrinth.Projects.v2.Project[]> {
+export async function get_user_projects(userId: string): Promise<Labrinth.Projects.v2.Project[]> {
 	return await invoke<Labrinth.Projects.v2.Project[]>('plugin:users|get_user_projects', {
 		userId,
 	})
@@ -46,10 +43,9 @@ export async function get_user_organizations(
 export async function get_user_collections(
 	userId: string,
 ): Promise<Labrinth.Collections.Collection[]> {
-	return await invoke<Labrinth.Collections.Collection[]>(
-		'plugin:users|get_user_collections',
-		{ userId },
-	)
+	return await invoke<Labrinth.Collections.Collection[]>('plugin:users|get_user_collections', {
+		userId,
+	})
 }
 
 export async function patch_user(
