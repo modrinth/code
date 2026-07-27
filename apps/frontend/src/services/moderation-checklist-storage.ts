@@ -9,6 +9,7 @@ export interface PersistedChecklistState {
 	stage?: string
 	message?: string
 	state?: Record<string, Record<string, NodeState>>
+	activatedStages?: string[]
 }
 
 const STORE = 'checklist'

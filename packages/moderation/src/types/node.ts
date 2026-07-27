@@ -634,21 +634,21 @@ export class StageNodeBuilder extends LabeledNodeBuilder {
 	readonly type = 'stage' as const
 	_hint?: string
 	_guidanceUrl?: string
-	_icon?: FunctionalComponent<SVGAttributes>
 	_navigate?: string
+	_shownSticky?: boolean
 
 	hint(h: string): this {
 		this._hint = h
 		return this
 	}
 
-	guidance(url: string): this {
-		this._guidanceUrl = url
+	sticky(): this {
+		this._shownSticky = true
 		return this
 	}
 
-	icon(i: FunctionalComponent<SVGAttributes>): this {
-		this._icon = markRaw(i)
+	guidance(url: string): this {
+		this._guidanceUrl = url
 		return this
 	}
 

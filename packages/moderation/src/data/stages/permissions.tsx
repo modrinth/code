@@ -38,6 +38,7 @@ export default function () {
 					pendingApprovalCount.value > 0,
 			),
 		)
+		.sticky()
 		.children(
 			group().children(
 				toggle('invalid-permissions', 'Invalid permissions')

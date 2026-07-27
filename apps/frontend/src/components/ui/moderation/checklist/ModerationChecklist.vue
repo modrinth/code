@@ -444,7 +444,7 @@ import type { ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import type { Component } from 'vue'
-import { computed, nextTick, provide, ref, toRaw, watch } from 'vue'
+import { computed, nextTick, provide, ref, toRaw, watch, watchEffect } from 'vue'
 
 import { useGeneratedState } from '~/composables/generated'
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -681,6 +681,7 @@ const persistedState = import.meta.client
 	? await loadChecklistState(checklistPersistenceProjectId)
 	: null
 nodeStates.value = persistedState?.state ?? {}
+const activatedStages = ref<Set<string>>(new Set(persistedState?.activatedStages ?? []))
 const visitedStages = ref<Set<string>>(
 	new Set(
 		import.meta.client
@@ -1017,12 +1018,14 @@ const checklistHasState = computed(() =>
 function resetProgress() {
 	if (!isPseudoStage.value && currentStageHasState.value) {
 		Reflect.deleteProperty(nodeStates.value, currentStageObj.value.id!)
+		activatedStages.value.delete(currentStageObj.value.id!)
 		clearGeneratedMessageState()
 		return
 	}
 
 	currentStage.value = findFirstValidStage()
 	nodeStates.value = {}
+	activatedStages.value = new Set()
 
 	done.value = false
 	clearGeneratedMessageState()
@@ -1055,6 +1058,23 @@ const checklistTitleText = computed(() => {
 
 	return currentStageObj.value.label ?? kebabToTitleCase(currentStageObj.value.id)
 })
+function isStageLive(stage: StageNodeBuilder): boolean {
+	return stage._shown === undefined || resolve(stage._shown)
+}
+
+function isStageEffectivelyShown(stage: StageNodeBuilder): boolean {
+	if (isStageLive(stage)) return true
+	return stage._shownSticky === true && activatedStages.value.has(stage.id!)
+}
+
+watchEffect(() => {
+	for (const stage of resolvedStages.value) {
+		if (stage._shownSticky && isStageLive(stage) && !activatedStages.value.has(stage.id!)) {
+			activatedStages.value.add(stage.id!)
+		}
+	}
+})
+
 const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 	const map = new Map<IdentifiedNodeBuilder, LiveNode>()
 
@@ -1067,7 +1087,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 		let hasRequiredMissing = false
 		const stageActiveActions: ActiveAction[] = []
 
-		if (stage._shown === undefined || resolve(stage._shown)) {
+		if (isStageEffectivelyShown(stage)) {
 			if (stage._segments.length > 0) {
 				messageCount++
 				stageActiveActions.push({
@@ -1186,7 +1206,9 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 		currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
 	const messageVal = message.value ?? undefined
 	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
-	if (!openVal && !reviewAnywayVal && !stageVal && !messageVal && !stateVal) {
+	const activatedStagesVal =
+		activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
+	if (!openVal && !reviewAnywayVal && !stageVal && !messageVal && !stateVal && !activatedStagesVal) {
 		return clearChecklistState(checklistPersistenceProjectId)
 	}
 	return saveChecklistState(checklistPersistenceProjectId, {
@@ -1195,6 +1217,7 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 		...(stageVal && { stage: stageVal }),
 		...(messageVal && { message: messageVal }),
 		...(stateVal && { state: stateVal }),
+		...(activatedStagesVal && { activatedStages: activatedStagesVal }),
 	})
 }
 
@@ -1215,6 +1238,7 @@ async function persistStateImmediately(open: boolean, resetReviewAnyway = false)
 
 watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
+watch(activatedStages, persistState, { deep: true })
 watch(message, persistState)
 watch(currentStageObj, (stage) => markStageVisited(stage.id), { immediate: true })
 
@@ -1829,6 +1853,7 @@ async function clearProjectLocalStorage() {
 	cancelPendingPersistence()
 
 	nodeStates.value = {}
+	activatedStages.value = new Set()
 	message.value = null
 	await clearChecklistState(checklistPersistenceProjectId)
 }
