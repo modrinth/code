@@ -24,6 +24,12 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+export const IconActivated: Story = {
+	args: {
+		activationMode: 'icon',
+	},
+}
+
 export const ConstrainedWidth: Story = {
 	args: {
 		maxWidth: '12rem',

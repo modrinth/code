@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useDroppable } from '@dnd-kit/vue'
-import { DropdownIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { DropdownIcon, EditIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	injectNotificationManager,
 	InlineEditableText,
 	NewModal,
 	TagItem,
@@ -26,6 +27,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const {
 	isSectionCollapsed,
 	setSectionCollapsed,
@@ -43,10 +45,13 @@ const instanceComponents = new Map<string, InstanceCard>()
 const groupDropTarget = ref<HTMLElement>()
 const groupAccordion = ref<InstanceType<typeof Accordion>>()
 const groupOptions = ref<InstanceType<typeof ContextMenu>>()
+const groupNameInput = ref<InstanceType<typeof InlineEditableText>>()
 const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
 const isUngrouped = computed(() => props.instanceGroup.key === 'None')
+let shouldSkipGroupToggle = false
+let groupToggleEventToSkip: MouseEvent | undefined
 
 useDroppable({
 	id: computed(() => `instance-group:${props.instanceGroup.id}`),
@@ -65,6 +70,30 @@ const messages = defineMessages({
 	deleteGroup: {
 		id: 'app.library.group.delete',
 		defaultMessage: 'Delete group',
+	},
+	editGroupName: {
+		id: 'app.library.group.edit-name',
+		defaultMessage: 'Edit name',
+	},
+	renameGroupFailed: {
+		id: 'app.library.group.rename-failed',
+		defaultMessage: 'Unable to rename group',
+	},
+	groupNameEmpty: {
+		id: 'app.library.group.name-empty',
+		defaultMessage: 'Group names cannot be empty.',
+	},
+	groupNameTooLong: {
+		id: 'app.library.group.name-too-long',
+		defaultMessage: 'Group names cannot be longer than 32 characters.',
+	},
+	groupNameReserved: {
+		id: 'app.library.group.name-reserved',
+		defaultMessage: '"None" is reserved and cannot be used as a group name.',
+	},
+	groupNameDuplicate: {
+		id: 'app.library.group.name-duplicate',
+		defaultMessage: 'A group with this name already exists.',
 	},
 	deleteGroupDescription: {
 		id: 'app.library.group.delete-description',
@@ -113,17 +142,41 @@ function openGroupContextMenu(event: MouseEvent) {
 	if (isUngrouped.value) return
 
 	groupOptions.value?.showMenu(event, props.instanceGroup, [
+		{ name: 'edit_name' },
+		{ type: 'divider' },
 		{ name: 'delete_group', color: 'danger' },
 	])
 }
 
 function handleGroupOption({ option }: { option: string }) {
+	if (option === 'edit_name') {
+		void groupNameInput.value?.startEditing()
+		return
+	}
+
 	if (option === 'delete_group') {
 		requestGroupDeletion()
 	}
 }
 
-function toggleGroup() {
+function prepareGroupToggle(event: PointerEvent) {
+	const editor = groupNameInput.value
+	shouldSkipGroupToggle = Boolean(
+		editor?.isEditing && event.target instanceof Node && !editor.$el.contains(event.target),
+	)
+}
+
+function captureGroupClick(event: MouseEvent) {
+	groupToggleEventToSkip = shouldSkipGroupToggle ? event : undefined
+	shouldSkipGroupToggle = false
+}
+
+function toggleGroup(event: MouseEvent) {
+	if (event === groupToggleEventToSkip) {
+		groupToggleEventToSkip = undefined
+		return
+	}
+
 	if (groupAccordion.value?.isOpen) {
 		groupAccordion.value.close()
 	} else {
@@ -132,7 +185,29 @@ function toggleGroup() {
 }
 
 function validateGroupName(value: string) {
-	return isValidGroupName(value, props.instanceGroup.key)
+	const normalizedGroupName = value.trim()
+	let reason: string | undefined
+
+	if (normalizedGroupName.length === 0) {
+		reason = formatMessage(messages.groupNameEmpty)
+	} else if (normalizedGroupName.length > 32) {
+		reason = formatMessage(messages.groupNameTooLong)
+	} else if (normalizedGroupName.toLowerCase() === 'none') {
+		reason = formatMessage(messages.groupNameReserved)
+	} else if (!isValidGroupName(normalizedGroupName, props.instanceGroup.key)) {
+		reason = formatMessage(messages.groupNameDuplicate)
+	}
+
+	if (reason) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.renameGroupFailed),
+			text: reason,
+		})
+		return false
+	}
+
+	return true
 }
 
 async function updateGroupName(value: string) {
@@ -158,9 +233,11 @@ watch(
 			class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent brightness-125 transition-opacity"
 		/>
 		<div
-			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5 py-2.5"
+			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			@click="toggleGroup"
+			@click.capture="captureGroupClick"
 			@contextmenu.prevent.stop="openGroupContextMenu"
+			@pointerdown.capture="prepareGroupToggle"
 		>
 			<button
 				class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0"
@@ -176,14 +253,15 @@ watch(
 			</button>
 			<InlineEditableText
 				v-if="!isUngrouped"
+				ref="groupNameInput"
 				v-model="groupName"
-				class="text-base font-semibold text-primary select-none group-hover/header:text-contrast"
+				activation-mode="icon"
+				class="text-base font-semibold !h-10 text-primary select-none group-hover/header:text-contrast"
 				:edit-label="formatMessage(commonMessages.renameButton)"
 				max-width="24rem"
 				:max-length="32"
 				:on-change="updateGroupName"
 				:validate="validateGroupName"
-				@click.stop
 			/>
 			<span
 				v-else
@@ -239,6 +317,7 @@ watch(
 	</div>
 
 	<ContextMenu ref="groupOptions" @option-clicked="handleGroupOption">
+		<template #edit_name> <EditIcon /> {{ formatMessage(messages.editGroupName) }} </template>
 		<template #delete_group> <TrashIcon /> {{ formatMessage(messages.deleteGroup) }} </template>
 	</ContextMenu>
 

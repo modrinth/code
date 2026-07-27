@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { EditIcon } from '@modrinth/assets'
 import { computed, nextTick, ref, watch } from 'vue'
 
 const model = defineModel<string>({ default: '' })
@@ -10,6 +11,7 @@ const props = withDefaults(
 		maxWidth?: string
 		maxLength?: number
 		editLabel?: string
+		activationMode?: 'text' | 'icon'
 		validate?: (value: string) => boolean
 		onChange?: (value: string) => boolean | void | Promise<boolean | void>
 	}>(),
@@ -19,6 +21,7 @@ const props = withDefaults(
 		maxWidth: '100%',
 		maxLength: undefined,
 		editLabel: 'Edit',
+		activationMode: 'text',
 		validate: undefined,
 		onChange: undefined,
 	},
@@ -123,12 +126,17 @@ function handleKeydown(event: KeyboardEvent) {
 		cancelEditing()
 	}
 }
+
+defineExpose({
+	isEditing,
+	startEditing,
+})
 </script>
 
 <template>
 	<div
 		:data-value="sizingValue"
-		class="group relative flex h-6 min-w-10 min-h-0 max-w-full flex-col justify-center border-b font-medium"
+		class="group/editable relative flex h-6 min-w-10 min-h-0 max-w-full flex-col justify-center border-b font-medium"
 		:class="
 			isEditing
 				? [
@@ -151,8 +159,26 @@ function handleKeydown(event: KeyboardEvent) {
 			:placeholder="placeholder"
 			class="absolute inset-0 top-px w-full !h-full !min-h-0 min-w-0 truncate bg-transparent !p-0 text-inherit !border-b-2 border-0 !border-brand !border-solid !shadow-none [font:inherit] !outline-none"
 			@blur="applyValue"
+			@click.stop
 			@keydown="handleKeydown"
 		/>
+		<div v-else-if="activationMode === 'icon'" class="flex min-w-0 max-w-full items-center">
+			<span class="min-w-0 truncate select-text" :title="model || displayValue">
+				{{ displayValue }}
+			</span>
+			<span
+				class="flex max-w-0 shrink-0 translate-x-1 overflow-hidden opacity-0 transition-all duration-150 group-hover/editable:max-w-6 group-hover/editable:translate-x-0 group-hover/editable:opacity-100 group-focus-within/editable:max-w-6 group-focus-within/editable:translate-x-0 group-focus-within/editable:opacity-100"
+			>
+				<button
+					type="button"
+					class="ml-1 flex size-5 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-secondary transition-colors hover:text-brand focus-visible:text-contrast"
+					:aria-label="`${editLabel}: ${displayValue}`"
+					@click.stop="startEditing"
+				>
+					<EditIcon class="size-4" aria-hidden="true" />
+				</button>
+			</span>
+		</div>
 		<button
 			v-else
 			type="button"
