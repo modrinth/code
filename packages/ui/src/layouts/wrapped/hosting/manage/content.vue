@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Archon, Labrinth } from '@modrinth/api-client'
+import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntervalFn } from '@vueuse/core'
@@ -7,6 +7,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
+import UnknownFileWarningModal from '#ui/components/modal/UnknownFileWarningModal.vue'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -124,6 +125,10 @@ const contentUploadSession = useUploadSessionUpload({
 	uploadState,
 	cancelUpload,
 })
+const unknownFileWarningModal = ref<InstanceType<typeof UnknownFileWarningModal> | null>()
+const unknownFileName = ref('')
+let resolveUnknownFileConfirmation: ((confirmed: boolean) => void) | null = null
+const skipUnknownFileWarningKey = 'hosting-skip-unknown-file-warning'
 const { addNotification } = injectNotificationManager()
 const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const { canSetup, permissionDeniedMessage } = useServerPermissions()
@@ -932,8 +937,18 @@ function handleUploadFiles() {
 		if (!wid) return
 
 		try {
+			const fileRecognition = await Promise.all(files.map(isFileOnModrinth))
+			const unrecognizedFileSet = new Set(files.filter((_, index) => !fileRecognition[index]))
+			const confirmedFiles: File[] = []
+			for (const file of files) {
+				if (!unrecognizedFileSet.has(file) || (await confirmUnknownFileInstallation(file.name))) {
+					confirmedFiles.push(file)
+				}
+			}
+			if (confirmedFiles.length === 0) return
+
 			const result = await contentUploadSession.uploadFiles(
-				files.map((file) => ({ file, filename: file.name })),
+				confirmedFiles.map((file) => ({ file, filename: file.name })),
 			)
 			if (result === 'completed') await contentQuery.refetch()
 		} catch (err) {
@@ -945,6 +960,45 @@ function handleUploadFiles() {
 		}
 	}
 	input.click()
+}
+
+async function isFileOnModrinth(file: File) {
+	const buffer = await file.arrayBuffer()
+	const digest = await crypto.subtle.digest('SHA-1', buffer)
+	const hash = Array.from(new Uint8Array(digest), (byte) =>
+		byte.toString(16).padStart(2, '0'),
+	).join('')
+
+	try {
+		await client.labrinth.versions_v2.getVersionFromFileHash(hash, 'sha1')
+		return true
+	} catch (error) {
+		return !(error instanceof ModrinthApiError && error.statusCode === 404)
+	}
+}
+
+function confirmUnknownFileInstallation(fileName: string) {
+	if (localStorage.getItem(skipUnknownFileWarningKey) === 'true') {
+		return Promise.resolve(true)
+	}
+
+	unknownFileName.value = fileName
+	return new Promise<boolean>((resolve) => {
+		resolveUnknownFileConfirmation = resolve
+		void nextTick(() => unknownFileWarningModal.value?.show())
+	})
+}
+
+function resolveUnknownFileWarning(confirmed: boolean) {
+	const resolve = resolveUnknownFileConfirmation
+	resolveUnknownFileConfirmation = null
+	unknownFileName.value = ''
+	resolve?.(confirmed)
+}
+
+function handleUnknownFileContinue(dontShowAgain: boolean) {
+	if (dontShowAgain) localStorage.setItem(skipUnknownFileWarningKey, 'true')
+	resolveUnknownFileWarning(true)
 }
 
 function addonToContentItem(addon: AddonWithUiState): ContentItem {
@@ -1380,6 +1434,13 @@ provideContentManager({
 	<ReadyTransition :pending="contentReadyPending">
 		<ContentPageLayout :bottom-padding="false">
 			<template #modals>
+				<UnknownFileWarningModal
+					ref="unknownFileWarningModal"
+					mode="mod"
+					:file-name="unknownFileName"
+					@cancel="resolveUnknownFileWarning(false)"
+					@continue="handleUnknownFileContinue"
+				/>
 				<ConfirmUnlinkModal
 					ref="modpackUnlinkModal"
 					server

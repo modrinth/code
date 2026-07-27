@@ -79,28 +79,7 @@
 				:result-count="resultCount"
 				:refreshing="refreshing"
 			/>
-			<div
-				v-if="filterType.display === 'toggle'"
-				:class="innerPanelClass ? innerPanelClass : ''"
-				class="flex flex-col gap-3"
-			>
-				<label
-					v-for="option in filterType.options"
-					:key="`${filterType.id}-toggle-${option.id}`"
-					class="flex cursor-pointer items-center justify-between text-secondary gap-3 font-semibold"
-				>
-					<span class="text-sm">{{ option.formatted_name ?? option.id }}</span>
-					<Toggle
-						:model-value="isExcluded(option)"
-						small
-						class="shrink-0"
-						@update:model-value="toggleNegativeFilter(option)"
-					/>
-				</label>
-			</div>
-			<template
-				v-if="filterType.display !== 'toggle' && filterType.display !== 'depends-on-project'"
-			>
+			<template v-if="filterType.display !== 'depends-on-project'">
 				<StyledInput
 					v-if="filterType.searchable"
 					:id="`search-${filterType.id}`"
@@ -122,7 +101,7 @@
 								:key="`${filterType.id}-group-${groupName}`"
 								:group-name="groupName"
 								:options="options"
-								:supports-negative-filter="filterType.supports_negative_filter"
+								:supports="filterType.supports"
 								:included="isIncluded"
 								:excluded="isExcluded"
 								@toggle="toggleFilter"
@@ -136,7 +115,7 @@
 								:option="option"
 								:included="isIncluded(option)"
 								:excluded="isExcluded(option)"
-								:supports-negative-filter="filterType.supports_negative_filter"
+								:supports="filterType.supports"
 								:class="{
 									'mr-3': scrollable,
 								}"
@@ -223,7 +202,6 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import Toggle from '../base/Toggle.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
 import SearchDependsOnFilter from './SearchDependsOnFilter.vue'
 import SearchFilterGroup from './SearchFilterGroup.vue'

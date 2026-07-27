@@ -9,7 +9,6 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { useMagicKeys } from '@vueuse/core'
-import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -186,25 +185,14 @@ const deleteHovered = ref(false)
 							{{ project.title }}
 						</AutoLink>
 						<slot name="title-badges" />
-						<Tooltip
+						<span
 							v-if="isClientOnly"
-							theme="dismissable-prompt"
-							class="inline-flex shrink-0"
-							:triggers="['hover', 'focus']"
-							no-auto-focus
+							v-tooltip="formatMessage(clientWarningMessage)"
+							class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
+							tabindex="0"
 						>
-							<span
-								class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
-								tabindex="0"
-							>
-								<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
-							</span>
-							<template #popper>
-								<div class="max-w-[18rem] text-sm">
-									{{ formatMessage(clientWarningMessage) }}
-								</div>
-							</template>
-						</Tooltip>
+							<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
+						</span>
 					</div>
 
 					<div class="flex min-w-0 items-center gap-1">

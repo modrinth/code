@@ -213,6 +213,10 @@ export const analyticsMessages = defineMessages({
 		id: 'analytics.filter.game-version-type.all',
 		defaultMessage: 'All',
 	},
+	dependentProjectSearchFailedTitle: {
+		id: 'analytics.filter.dependent-project-search-failed-title',
+		defaultMessage: 'Dependent projects failed to load',
+	},
 })
 
 export const analyticsStatMessages = defineMessages({

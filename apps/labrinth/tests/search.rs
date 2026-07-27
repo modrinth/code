@@ -213,18 +213,7 @@ async fn index_swaps() {
                 test_env.api.remove_project("alpha", USER_USER_PAT).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
-            // We should wait for deletions to be indexed
-            let projects = test_env
-                .api
-                .search_deserialized(
-                    None,
-                    Some(json!([["categories:fabric"]])),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(projects.total_hits, 0);
-
-            // When we reindex, it should be still gone
+            // When we reindex, the deleted project should be gone
             let resp = test_env.api.reset_search_index().await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 

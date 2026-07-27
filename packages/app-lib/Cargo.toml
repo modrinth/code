@@ -43,8 +43,10 @@ flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
 futures-lite = { workspace = true }
+governor = { workspace = true }
 heck = { workspace = true }
 hickory-resolver = { workspace = true }
+httpdate = { workspace = true }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
 modrinth-content-management = { workspace = true }
@@ -119,7 +121,7 @@ dunce = { workspace = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 cidre = { workspace = true, features = ["blocks", "nw"] }
 
-[target.'cfg(windows)'.dependencies]
+[target."cfg(windows)".dependencies]
 windows = { workspace = true, features = ["Networking_Connectivity"] }
 windows-core = { workspace = true }
 winreg = { workspace = true }

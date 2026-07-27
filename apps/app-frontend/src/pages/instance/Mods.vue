@@ -2,6 +2,13 @@
 	<ReadyTransition :pending="loading">
 		<ContentPageLayout>
 			<template #modals>
+				<UnknownFileWarningModal
+					ref="unknownFileWarningModal"
+					mode="mod"
+					:file-name="unknownFileName"
+					@cancel="resolveUnknownFileWarning(false)"
+					@continue="handleUnknownFileContinue"
+				/>
 				<ShareModalWrapper
 					ref="shareModal"
 					:share-title="formatMessage(messages.shareTitle)"
@@ -12,13 +19,25 @@
 					ref="modpackContentModal"
 					:modpack-name="displayedModpackProject?.title"
 					:modpack-icon-url="displayedModpackProject?.icon_url ?? undefined"
-					:enable-toggle="!props.isServerInstance"
+					:enable-toggle="!props.isServerInstance && !isSharedMember && !isQuarantined"
 					:busy="isBulkOperating"
 					:get-overflow-options="getOverflowOptions"
-					:switch-version="handleSwitchVersion"
+					:switch-version="
+						props.isServerInstance || isSharedMember || isQuarantined
+							? undefined
+							: handleSwitchVersion
+					"
 					@update:enabled="handleModpackContentToggle"
 					@bulk:enable="(items) => handleModpackContentBulkToggle(items, true)"
 					@bulk:disable="(items) => handleModpackContentBulkToggle(items, false)"
+				/>
+				<ConfirmDisableModal
+					ref="sharedDisableConfirmModal"
+					:count="pendingModpackDisableItems.length"
+					:item-type="formatMessage(messages.contentTypeProject)"
+					:warning="managedContentPolicy.disableWarning(pendingModpackDisableItems)"
+					:action-disabled="isInstanceBusy"
+					@disable="confirmPendingModpackContentDisable"
 				/>
 				<ConfirmModpackUpdateModal
 					ref="modpackUpdateConfirmModal"
@@ -31,7 +50,11 @@
 					@confirm="handleModpackUpdateConfirm"
 					@cancel="handleModpackUpdateCancel"
 				/>
-				<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+				<ExportModal
+					v-if="projects.length > 0 && !instance.quarantined"
+					ref="exportModal"
+					:instance="instance"
+				/>
 				<ContentUpdaterModal
 					v-if="updatingProject || updatingModpack"
 					ref="contentUpdaterModal"
@@ -71,6 +94,7 @@ import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
 	type BulkOperationStatus,
 	commonMessages,
+	ConfirmDisableModal,
 	ConfirmModpackUpdateModal,
 	ContentCardLayout as ContentPageLayout,
 	type ContentItem,
@@ -84,9 +108,9 @@ import {
 	ModpackContentModal,
 	type ModpackContentModalState,
 	type OverflowMenuOption,
-	provideAppBackup,
 	provideContentManager,
 	ReadyTransition,
+	UnknownFileWarningModal,
 	useDebugLogger,
 	useVIntl,
 	versionChangesGameVersion,
@@ -101,6 +125,7 @@ import { useRouter } from 'vue-router'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
+import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version, get_version_many } from '@/helpers/cache.js'
 import {
@@ -108,12 +133,11 @@ import {
 	instance_listener,
 	type InstanceBulkUpdateProgress,
 } from '@/helpers/events.js'
-import { install_duplicate_instance, installJobInstanceId } from '@/helpers/install'
 import {
 	add_project_from_path,
 	edit,
 	get_linked_modpack_content,
-	list,
+	is_file_on_modrinth,
 	remove_project,
 	switch_project_version_with_dependencies,
 	toggle_disable_project,
@@ -121,10 +145,13 @@ import {
 	update_managed_modrinth_version,
 } from '@/helpers/instance'
 import { type InstanceContentData, loadInstanceContentData } from '@/helpers/instance-content'
+import { get as getSettings, set as setSettings } from '@/helpers/settings'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInInstance } from '@/helpers/utils.js'
 import { injectContentInstall } from '@/providers/content-install'
+import { provideInstanceBackup } from '@/providers/instance-backup'
 import { useTheming } from '@/store/state'
+import type { FeatureFlag } from '@/store/theme'
 
 const messages = defineMessages({
 	shareTitle: {
@@ -147,6 +174,10 @@ const messages = defineMessages({
 		id: 'app.instance.mods.projects-were-added',
 		defaultMessage: '{count} projects were added',
 	},
+	lockedContent: {
+		id: 'app.instance.mods.locked-content',
+		defaultMessage: 'Content in locked instances cannot be changed.',
+	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
@@ -167,6 +198,13 @@ const messages = defineMessages({
 
 let savedModalState: ModpackContentModalState | null = null
 
+function contentOwnerLink(owner: ContentOwner): NonNullable<ContentOwner['link']> {
+	if (owner.type === 'user') return `/user/${encodeURIComponent(owner.id)}`
+	return () => {
+		void openUrl(`https://modrinth.com/organization/${owner.id}`)
+	}
+}
+
 const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
 const { installingItems, installRevisionByInstance, installFailureRevisionByInstance } =
@@ -175,6 +213,7 @@ const router = useRouter()
 const queryClient = useQueryClient()
 const debug = useDebugLogger('Mods:ContentUpdate')
 const themeStore = useTheming()
+const skipUnknownFileWarningFeatureFlag = 'skip_unknown_pack_warning' as FeatureFlag
 const skipNonEssentialWarnings = computed(() =>
 	themeStore.getFeatureFlag('skip_non_essential_warnings'),
 )
@@ -185,6 +224,13 @@ const props = defineProps<{
 	openSettings?: () => void
 	preloadedContent?: InstanceContentData | null
 }>()
+const managedContentPolicy = useManagedContentPolicy(computed(() => props.instance))
+const {
+	isManagedModpack: isSharedMember,
+	isQuarantined,
+	canMutateContent,
+	canUpdateContent: canUpdateProject,
+} = managedContentPolicy
 
 function hasPreloadedContent(contentData: InstanceContentData | null | undefined) {
 	return contentData?.path === props.instance.id
@@ -275,6 +321,7 @@ const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
 const isPackLocked = computed(
 	() =>
+		props.instance.quarantined ||
 		props.instance?.link?.type === 'modrinth_modpack' ||
 		props.instance?.link?.type === 'server_project_modpack',
 )
@@ -284,6 +331,11 @@ const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
 const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
+const sharedDisableConfirmModal = ref<InstanceType<typeof ConfirmDisableModal> | null>()
+const pendingModpackDisableItems = ref<ContentItem[]>([])
+const unknownFileWarningModal = ref<InstanceType<typeof UnknownFileWarningModal> | null>()
+const unknownFileName = ref('')
+let resolveUnknownFileConfirmation: ((confirmed: boolean) => void) | null = null
 
 const modpackContentQueryKey = computed(() => ['linkedModpackContent', props.instance.id])
 const modpackContentQuery = useQuery({
@@ -362,8 +414,8 @@ function hasContentOperation(item: ContentItem) {
 	return keys.some((key) => activeContentOperationKeys.value.has(key))
 }
 
-function canUpdateProject(item: ContentItem) {
-	return !!item.file_path && !!item.has_update && !!item.update_version_id
+function canDeleteContent(item: ContentItem) {
+	return canMutateContent(item)
 }
 
 function setContentItemBusy(item: ContentItem, busy: boolean, originalFileName = item.file_name) {
@@ -471,7 +523,7 @@ async function getUpdaterProjectVersions(projectId: string, pinnedVersionId?: st
 }
 
 async function handleBrowseContent() {
-	if (!props.instance) return
+	if (!props.instance || props.instance.quarantined) return
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'resourcepack' : 'mod'}`,
 		query: { i: props.instance.id },
@@ -479,29 +531,60 @@ async function handleBrowseContent() {
 }
 
 async function handleUploadFiles() {
-	if (!props.instance) return
+	if (!props.instance || props.instance.quarantined) return
 	const files = await open({ multiple: true })
 	if (!files) return
-
-	const addedFiles: string[] = []
+	const selectedFiles: Array<{ path: string; filename: string }> = []
 	for (const file of files) {
 		const path = (file as { path?: string }).path ?? file
-		const fileName = typeof path === 'string' ? (path.split('/').pop() ?? path) : String(path)
-		try {
-			await add_project_from_path(props.instance.id, path)
-			addedFiles.push(fileName)
-		} catch (e) {
-			handleError(e as Error)
-		}
+		if (typeof path !== 'string') continue
+		selectedFiles.push({
+			path,
+			filename: path.split(/[\\/]/).pop() ?? path,
+		})
 	}
-	await initProjects()
 
-	if (addedFiles.length > 0) {
-		const names = addedFiles.map((f) => {
-			const item = projects.value.find(
-				(p) => p.file_name === f || p.file_name === f.replace('.zip', '.jar'),
-			)
-			return item?.project?.title ?? f
+	const fileRecognition = await Promise.all(
+		selectedFiles.map(async ({ path }) => {
+			try {
+				return await is_file_on_modrinth(path)
+			} catch {
+				return true
+			}
+		}),
+	)
+
+	const confirmedFiles: Array<{ path: string; filename: string }> = []
+	for (const [index, { path, filename }] of selectedFiles.entries()) {
+		if (!fileRecognition[index] && !(await confirmUnknownFileInstallation(filename))) {
+			continue
+		}
+		confirmedFiles.push({ path, filename })
+	}
+
+	const addedFiles = (
+		await Promise.all(
+			confirmedFiles.map(async ({ path, filename }) => {
+				try {
+					const installedPath = await add_project_from_path(props.instance.id, path)
+					return { filename, installedPath }
+				} catch (error) {
+					handleError(error as Error)
+					return null
+				}
+			}),
+		)
+	).filter((result): result is { filename: string; installedPath: string } => result !== null)
+	const uniqueAddedFiles = [
+		...new Map(addedFiles.map((file) => [file.installedPath, file])).values(),
+	]
+
+	await initProjects('must_revalidate')
+
+	if (uniqueAddedFiles.length > 0) {
+		const names = uniqueAddedFiles.map(({ filename, installedPath }) => {
+			const item = projects.value.find((project) => project.file_path === installedPath)
+			return item?.project?.title ?? filename
 		})
 		addNotification({
 			type: 'success',
@@ -512,6 +595,39 @@ async function handleUploadFiles() {
 					: formatMessage(messages.projectsWereAdded, { count: names.length }),
 		})
 	}
+}
+
+function confirmUnknownFileInstallation(fileName: string) {
+	if (themeStore.getFeatureFlag(skipUnknownFileWarningFeatureFlag)) {
+		return Promise.resolve(true)
+	}
+
+	unknownFileName.value = fileName
+	return new Promise<boolean>((resolve) => {
+		resolveUnknownFileConfirmation = resolve
+		void nextTick(() => unknownFileWarningModal.value?.show())
+	})
+}
+
+function resolveUnknownFileWarning(confirmed: boolean) {
+	const resolve = resolveUnknownFileConfirmation
+	resolveUnknownFileConfirmation = null
+	unknownFileName.value = ''
+	resolve?.(confirmed)
+}
+
+async function handleUnknownFileContinue(dontShowAgain: boolean) {
+	if (dontShowAgain) {
+		themeStore.featureFlags[skipUnknownFileWarningFeatureFlag] = true
+		try {
+			const settings = await getSettings()
+			settings.feature_flags[skipUnknownFileWarningFeatureFlag] = true
+			await setSettings(settings)
+		} catch (error) {
+			handleError(error as Error)
+		}
+	}
+	resolveUnknownFileWarning(true)
 }
 
 async function toggleDisableMod(mod: ContentItem, desiredEnabled?: boolean) {
@@ -716,6 +832,7 @@ async function updateProject(mod: ContentItem) {
 }
 
 async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
+	if (!canMutateContent(mod)) return
 	if (!mod.file_path) return
 	const operation = beginContentOperation(mod)
 	if (!operation) return
@@ -852,6 +969,7 @@ async function handleUpdate(id: string) {
 }
 
 async function handleSwitchVersion(item: ContentItem) {
+	if (!canMutateContent(item)) return
 	if (!item.project?.id || !item.version?.id) return
 
 	const requestId = beginUpdateRequest()
@@ -879,10 +997,32 @@ async function handleSwitchVersion(item: ContentItem) {
 }
 
 async function handleModpackContentToggle(item: ContentItem, enabled: boolean) {
+	if (!enabled && managedContentPolicy.disableWarning([item])) {
+		pendingModpackDisableItems.value = [item]
+		sharedDisableConfirmModal.value?.show()
+		return
+	}
+
 	await toggleDisableDebounced(item, enabled)
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[], enabled: boolean) {
+	if (!enabled && managedContentPolicy.disableWarning(items)) {
+		pendingModpackDisableItems.value = items
+		sharedDisableConfirmModal.value?.show()
+		return
+	}
+
+	await setModpackContentEnabled(items, enabled)
+}
+
+async function confirmPendingModpackContentDisable() {
+	const items = [...pendingModpackDisableItems.value]
+	pendingModpackDisableItems.value = []
+	await setModpackContentEnabled(items, false)
+}
+
+async function setModpackContentEnabled(items: ContentItem[], enabled: boolean) {
 	await Promise.all(items.map((item) => toggleDisableMod(item, enabled)))
 }
 
@@ -1232,29 +1372,7 @@ function applyContentData(contentData: InstanceContentData) {
 	return true
 }
 
-provideAppBackup({
-	async createBackup() {
-		const allInstances = await list()
-		const prefix = `${props.instance.name} - Backup #`
-		const existingNums = allInstances
-			.filter((p) => p.name.startsWith(prefix))
-			.map((p) => parseInt(p.name.slice(prefix.length), 10))
-			.filter((n) => !isNaN(n))
-		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const job = await install_duplicate_instance(props.instance.id)
-		const newInstanceId = installJobInstanceId(job)
-		if (newInstanceId) {
-			await edit(newInstanceId, { name: `${prefix}${nextNum}` })
-		}
-	},
-})
-
-const CONTENT_HINT_KEY = 'content-tab-modpack-hint-dismissed'
-const showContentHint = ref(localStorage.getItem(CONTENT_HINT_KEY) === null)
-function dismissContentHint() {
-	showContentHint.value = false
-	localStorage.setItem(CONTENT_HINT_KEY, 'true')
-}
+provideInstanceBackup(() => props.instance)
 
 provideContentManager({
 	items: mergedProjects,
@@ -1279,10 +1397,7 @@ provideContentManager({
 				owner: linkedModpackOwner.value
 					? {
 							...linkedModpackOwner.value,
-							link: () =>
-								openUrl(
-									`https://modrinth.com/${linkedModpackOwner.value!.type}/${linkedModpackOwner.value!.id}`,
-								),
+							link: contentOwnerLink(linkedModpackOwner.value),
 						}
 					: undefined,
 				categories: linkedModpackCategories.value,
@@ -1310,21 +1425,31 @@ provideContentManager({
 	}),
 	isPackLocked,
 	isBusy: isInstanceBusy,
+	disableAddContent: isQuarantined,
+	disableAddContentTooltip: formatMessage(messages.lockedContent),
 	isBulkOperating,
 	skipNonEssentialWarnings,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableDebounced,
 	bulkEnableItems: (items: ContentItem[]) =>
 		Promise.all(
-			items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item, true)),
+			items
+				.filter((item) => canMutateContent(item) && !item.enabled)
+				.map((item) => toggleDisableMod(item, true)),
 		).then(() => {}),
 	bulkDisableItems: (items: ContentItem[]) =>
 		Promise.all(
-			items.filter((item) => item.enabled).map((item) => toggleDisableMod(item, false)),
+			items
+				.filter((item) => canMutateContent(item) && item.enabled)
+				.map((item) => toggleDisableMod(item, false)),
 		).then(() => {}),
 	deleteItem: removeMod,
 	bulkDeleteItems: (items: ContentItem[]) =>
-		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+		Promise.all(items.filter(canMutateContent).map((item) => removeMod(item))).then(() => {}),
+	canDeleteItem: canDeleteContent,
+	canToggleItem: canMutateContent,
+	getDeleteWarning: managedContentPolicy.deleteWarning,
+	getDisableWarning: managedContentPolicy.disableWarning,
 	getDeleteDependencyWarning,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
@@ -1333,14 +1458,15 @@ provideContentManager({
 	updateItem: handleUpdate,
 	bulkUpdateAll: bulkUpdateAllProjects,
 	bulkUpdateItem: updateProject,
-	updateModpack: props.isServerInstance ? undefined : handleModpackUpdate,
+	updateModpack:
+		props.isServerInstance || isSharedMember.value || isQuarantined.value
+			? undefined
+			: handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairInstance,
 	openSettings: props.openSettings,
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
-	showContentHint,
-	dismissContentHint,
 	shareItems: handleShareItems,
 	getItemId: getContentItemId,
 	mapToTableItem: (item: ContentItem) => ({
@@ -1369,11 +1495,14 @@ provideContentManager({
 		owner: item.owner
 			? {
 					...item.owner,
-					link: () => openUrl(`https://modrinth.com/${item.owner!.type}/${item.owner!.id}`),
+					link: contentOwnerLink(item.owner),
 				}
 			: undefined,
-		enabled: item.enabled,
+		enabled: canMutateContent(item) ? item.enabled : undefined,
 		installing: item.installing,
+		hideDelete: !canDeleteContent(item),
+		hideSwitchVersion: !canMutateContent(item) || !item.project?.id || !item.version?.id,
+		hasUpdate: canUpdateProject(item),
 	}),
 	filterPersistKey: props.instance.id,
 })

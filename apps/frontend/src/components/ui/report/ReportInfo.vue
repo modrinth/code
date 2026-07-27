@@ -63,6 +63,18 @@
 				</nuxt-link>
 			</template>
 		</div>
+		<div v-else-if="report.item_type === 'shared-instance'" class="item-info">
+			<div class="backed-svg" :class="{ raised: raised }">
+				<BoxesIcon />
+			</div>
+			<div class="stacked">
+				<span class="title">Shared instance</span>
+				<span>
+					Version {{ report.shared_instance_version_id ?? 'unknown' }} ·
+					<CopyCode :text="report.item_id" />
+				</span>
+			</div>
+		</div>
 		<div v-else class="item-info">
 			<div class="backed-svg" :class="{ raised: raised }">
 				<UnknownIcon />
@@ -106,7 +118,7 @@
 </template>
 
 <script setup>
-import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
+import { BoxesIcon, ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
 import { Avatar, Badge, CopyCode, useFormatDateTime, useRelativeTime } from '@modrinth/ui'
 import { formatProjectType, renderHighlightedString } from '@modrinth/utils'
 

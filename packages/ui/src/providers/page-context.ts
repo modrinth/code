@@ -6,6 +6,7 @@ export interface PageContext {
 	// pages may render sidebar content in #sidebar-teleport-target instead of in the main layout when true
 	hierarchicalSidebarAvailable: Ref<boolean>
 	showAds: Ref<boolean>
+	adConsentAvailable: Ref<boolean>
 	floatingActionBarOffsets?: {
 		left: Ref<string> | ComputedRef<string>
 		right: Ref<string> | ComputedRef<string>

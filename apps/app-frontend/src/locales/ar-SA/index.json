@@ -125,6 +125,15 @@
   "app.action-bar.view-logs": {
     "message": "عرض التسجيل"
   },
+  "app.ads-consent.accept": {
+    "message": "قبول الكل"
+  },
+  "app.ads-consent.manage": {
+    "message": "إدارة التفضيلات"
+  },
+  "app.ads-consent.reject": {
+    "message": "رفض الكل"
+  },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "يتيح العرض المتقدم لتأثيرات مثل التشويش الذي قد تسبب مشكلات في الأداء دون استخدام العرض المسرع بالأجهزة."
   },
@@ -425,11 +434,11 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ابحث بين ال{count} عوالم..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "المحتوى مطلوب"
-  },
   "app.modal.install-to-play.header": {
     "message": "نزل للعب"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "تثبيت على أي حال"
   },
   "app.modal.install-to-play.install-button": {
     "message": "تثبيت"
@@ -437,29 +446,23 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "حُزْمَة التعديل مطلوبة"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "لا يتم مراجعة الملف إلا إذا تم نشره على Modrinth، بغض النظر عن صيغته (بما في ذلك .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "النماذج المشتركة"
   },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "نماذج الخادم مشتركة"
+  "app.modal.install-to-play.unknown-files-warning": {
+    "message": "تحذير ملفات غير معروفة"
+  },
+  "app.modal.install-to-play.unrecognized-files": {
+    "message": "ملفات غير متعرّف عليها"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "عرض المحتويات"
   },
   "app.modal.update-to-play.header": {
     "message": "حدث للعب"
-  },
-  "app.modal.update-to-play.update-required": {
-    "message": "يلزم التحديث"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "هناك تحديث مطلوب للعب بـ {name}. الرجاء التحديث إلى أحدث اصدار لتشغيل اللعبة."
   },
   "app.project.install-button.already-installed": {
     "message": "هذا المشروع مُثبَّت بالفعل"
@@ -469,9 +472,6 @@
   },
   "app.project.install-context.back-to-browse": {
     "message": "العودة إلى الاستكشاف"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "تثبيت المحتويات الى النموذج"
   },
   "app.project.version.all-versions": {
     "message": "جميع الإصدارات"
@@ -659,6 +659,12 @@
   "app.skins.title": {
     "message": "اختيار المظهر"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "إيقاف"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "تشغيل"
+  },
   "app.update-popup.body.download-complete": {
     "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
   },
@@ -770,6 +776,24 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>سجّل الدخول إلى حساب Modrinth</link> لإضافة الأصدقاء ومعرفة ما الذي يلعبونه!"
   },
+  "instance.action.create-shortcut": {
+    "message": "إنشاء اختصار"
+  },
+  "instance.action.more-actions": {
+    "message": "مزيد من الخيارات"
+  },
+  "instance.action.open-folder": {
+    "message": "فتح المجلد"
+  },
+  "instance.action.repair": {
+    "message": "إصلاح"
+  },
+  "instance.action.starting": {
+    "message": "قيد التشغيل..."
+  },
+  "instance.action.stopping": {
+    "message": "قيد الإيقاف..."
+  },
   "instance.add-server.add-and-play": {
     "message": "إضافة واللعب"
   },
@@ -811,6 +835,9 @@
   },
   "instance.files.save-as": {
     "message": "حفظ ك..."
+  },
+  "instance.playtime.never-played": {
+    "message": "لم تُلعب من قبل"
   },
   "instance.server-modal.address": {
     "message": "العنوان"
@@ -1102,26 +1129,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "يتم توفير المحمّل من قبل الخادم"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "لا تتم مراجعة الملف إلا إذا تم تحميله على Modrinth، بغض النظر عن تنسيق الملف (بما في ذلك .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "لا تعرض هذا التحذير مجددا"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "تأكيد التثبيت"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "التثبيت على أي حال"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "غالبًا ما يتم توزيع البرامج الضارة عبر ملفات الحزم المعدلة من خلال مشاركتها على منصات مثل Discord."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "لم نتمكن من العثور على هذا الملف على موقع Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر موثوقة."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "تحذير بشأن ملف مجهول"
   }
 }

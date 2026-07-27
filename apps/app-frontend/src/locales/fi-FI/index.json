@@ -20,6 +20,18 @@
   "app.action-bar.install.retry": {
     "message": "Yritä uudelleen"
   },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Peruutettu"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Ei voitu ladata tiedostoja"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Ladattu tiedosto on vioittunut"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Ei voitu tallentaa tiedostoja"
+  },
   "app.action-bar.install.unknown-instance": {
     "message": "Tuntematon instanssi"
   },
@@ -299,6 +311,9 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Onnistuneesti ladattu"
   },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Kaikki laitteeseen jo asennetut kopiot säilyvät laitteessa"
+  },
   "app.instance.worlds.add-server": {
     "message": "Lisää palvelin"
   },
@@ -350,11 +365,11 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Hae {count} maailmasta..."
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "Sisältö vaaditaan"
-  },
   "app.modal.install-to-play.header": {
     "message": "Asenna pelataksesi"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Asenna silti"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Asenna"
@@ -362,17 +377,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modia}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "Vaadittu modipaketti"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tämä palvelin vaatii modeja toimiakseen. Klikkaa Asenna ladataksesi vaaditut tiedostot Modrinthista, ja käynnistä peli suoraan palvelimelle."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Jaettu instanssi"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "Jaettu palvelininstanssi"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "Tarkastele sisältöä"
@@ -380,20 +386,17 @@
   "app.modal.update-to-play.header": {
     "message": "Päivitä pelataksesi"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "Päivitys vaaditaan"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Pävitys vaaditaan pelataksesi {name}. Päivitä viimeisimpään versioon pelataksesi."
-  },
   "app.project.install-button.already-installed": {
     "message": "Tämä projekti on jo asennettu"
   },
   "app.project.install-context.back-to-browse": {
     "message": "Takaisin sisällön löytöön"
   },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "Asenna sisältöä instanssiin"
+  "app.project.version.installing": {
+    "message": "Asennetaan"
+  },
+  "app.project.versions.already-installed": {
+    "message": "On jo asennettu"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Kehittäjätila käytössä."
@@ -566,6 +569,12 @@
   "app.skins.title": {
     "message": "Skinivalinta"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Poista käytöstä"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Ota käyttöön"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App versio {version} on ladattu. Voit käynnistää sovelluksen uudelleen päivittääksesi heti tai antaa päivityksen asentua automaattisesti, kun suljet Modrinth Appin."
   },
@@ -676,6 +685,9 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Kirjaudu Modrinth-tilille</link> lisätäksesi ystäviä ja nähdäksesi mitä he pelaavat!"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Luo pikakuvake"
   },
   "instance.add-server.add-and-play": {
     "message": "Lisää ja pelaa"
@@ -1009,26 +1021,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Modialusta on palvelimen tarjoama"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "Tiedosto tarkistetaan vain jos se on ladattu Modrinthiin, riippumatta tiedoston muodosta (mukaanlukien .mrpack)."
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "Älä näytä tätä varoitusta uudestaan"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "Vahvista asennus"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "Asenna jokatapauksessa"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "Haittaohjelmia levitetään usein modipaketti tiedostojen kautta jakamalla niitä alustoilla kuten Discordissa."
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "Emme löytäneet tätä tiedostoa Modrinthista. Suosittelemme vahvasti että asennat tiedostoja vain lähteistä joihin luotat."
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "Tuntematon tiedosto varoitus"
   }
 }

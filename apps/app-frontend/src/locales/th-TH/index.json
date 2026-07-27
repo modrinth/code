@@ -11,6 +11,21 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "ซ่อนอินสแตนซ์ที่ทำงานอยู่เพิ่มเติม"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "คัดลอก"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "คัดลอก รายระเอียด"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "ปิด"
+  },
+  "app.action-bar.install.retry": {
+    "message": "ลองอีกครั้ง"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ยกเลิกสำเร็จ"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "กำหนดอินสแตนซ์หลัก"
   },
@@ -245,9 +260,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ค้าหาโลกทั้งหมด {count} โลก"
   },
-  "app.modal.install-to-play.content-required": {
-    "message": "เนื้อหาที่จำเป็น"
-  },
   "app.modal.install-to-play.header": {
     "message": "ติดตั้งเพื่อเล่น"
   },
@@ -257,17 +269,8 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# ม็อด}}"
   },
-  "app.modal.install-to-play.required-modpack": {
-    "message": "มอดแพ็กที่จำเป็น"
-  },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "เซิร์ฟเวอร์ดังกล่าวจำเป็นต้องใช้ม็อดเพื่อเล่น โปรดติดตั้งและตั้งค่าไฟล์อื่นใดที่จำเป็นจาก Modrinth ก่อน จากนั้นถึงจะสามารถเข้าเล่นเซิร์ฟเวอร์ได้"
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "โปรแกรมที่มีร่วมกัน"
-  },
-  "app.modal.install-to-play.shared-server-instance": {
-    "message": "เซิร์ฟเวอร์ของโปรแกรมที่มีร่วมกัน"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "ดูเนื้อหา"
@@ -275,20 +278,11 @@
   "app.modal.update-to-play.header": {
     "message": "อัปเดตเพื่อเล่น"
   },
-  "app.modal.update-to-play.update-required": {
-    "message": "จำเป็นต้องอัปเดต"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "จำเป็นต้องอัปเดตเพื่อเล่น {name} กรุณาอัปเดตเป็นเวอร์ชันล่าสุดเพื่อเปิดเกม"
-  },
   "app.project.install-button.already-installed": {
     "message": "โปรเจคนี้ถูกติดตั้งแล้ว"
   },
   "app.project.install-context.back-to-browse": {
     "message": "กลับไปที่หน้าค้นหา"
-  },
-  "app.project.install-context.install-content-to-instance": {
-    "message": "ติดตั้งเนื้อหาลงสู่อินสแตนซ์"
   },
   "app.settings.developer-mode-enabled": {
     "message": "โหมดนักพัฒนาเปิดอยู่"
@@ -850,26 +844,5 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "ตัวรันถูกกำหนดโดยเซิร์ฟเวอร์แล้ว"
-  },
-  "unknown-pack-warning-modal.body": {
-    "message": "ไฟล์จะได้รับการตรวจสอบโดยไม่คำนึงถึงประเภทของไฟล์ (รวมทั้ง .mrpack) เมื่อไฟล์ถูกอัปโหลดขึ้น Modrinth"
-  },
-  "unknown-pack-warning-modal.dont-show-again": {
-    "message": "อย่าแสดงคำเตือนนี้อีก"
-  },
-  "unknown-pack-warning-modal.header": {
-    "message": "ยืนยันการติดตั้ง"
-  },
-  "unknown-pack-warning-modal.install-anyway": {
-    "message": "ดำเนินการติดตั้งต่อไป"
-  },
-  "unknown-pack-warning-modal.malware-statement": {
-    "message": "มัลแวร์มักแฝงตัวมากับไฟล์แพ็กม็อดผ่านการแชร์ผ่านแพลตฟอร์มที่ไม่ใช่แพลตฟอร์มเฉพาะ เช่น ดิสคอร์ด"
-  },
-  "unknown-pack-warning-modal.warning.body": {
-    "message": "เราไม่สามารถค้นหาไฟล์ดังกล่าวได้บน Modrinth พวกเราขอแนะนำอย่างมากกว่าควรติดตั้งไฟล์จากแหล่งที่น่าเชื่อถือเท่านั้น"
-  },
-  "unknown-pack-warning-modal.warning.title": {
-    "message": "แจ้งเตือนไฟล์ไม่รู้จัก"
   }
 }

@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "משתמש לא קיים"
   },
+  "analytics.action.add": {
+    "message": "לְהוֹסִיף"
+  },
+  "analytics.action.cancel": {
+    "message": "ביטול"
+  },
+  "analytics.breakdown.project": {
+    "message": "פּרוֹיֶקט"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "רק צפיות והורדות שבוצעו דרך Modrinth נספרות לצורך מונטיזציה, והורדות מחייבות את המשתמשים להיות מחוברים לחשבונם."
+  },
+  "analytics.chart.render-limit.header": {
+    "message": "להציג את כל {count} הקווים בגרף?"
+  },
   "app-marketing.download.description": {
     "message": "היישום השולחני שלנו זמין לכל הפלטפורמות. אנא בחר את הגרסה הרצויה."
   },
@@ -1763,105 +1778,6 @@
   "muralpay.warning.wallet-address": {
     "message": "בדוק היטב את כתובת הארנק שלך. לא ניתן לשחזר כספים שנשלחו לכתובת שגויה."
   },
-  "profile.bio.fallback.creator": {
-    "message": "יוצר ב-Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "משתמש ב-Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "נהל את חיוב המשתמש"
-  },
-  "profile.button.edit-role": {
-    "message": "עריכת תפקיד"
-  },
-  "profile.button.info": {
-    "message": "הצג את הפרטים של המשתמש"
-  },
-  "profile.button.manage-projects": {
-    "message": "ניהול פרויקטים"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "הסרה מתוכנית השותפים"
-  },
-  "profile.button.set-affiliate": {
-    "message": "הגדר כשותף"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "ספקי אימות זהות"
-  },
-  "profile.details.label.email": {
-    "message": "אימייל"
-  },
-  "profile.details.label.email-verified": {
-    "message": "כתובת האימייל אומתה"
-  },
-  "profile.details.label.has-password": {
-    "message": "יש סיסמה"
-  },
-  "profile.details.label.has-totp": {
-    "message": "אימות דו-שלבי פעיל"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "שיטת תשלום"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "כתובת האימייל טרם אומתה"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "כתובת האימייל אומתה"
-  },
-  "profile.error.not-found": {
-    "message": "המשתמש לא נמצא"
-  },
-  "profile.label.affiliate": {
-    "message": "שותף או משתמש שותף"
-  },
-  "profile.label.badges": {
-    "message": "תגים"
-  },
-  "profile.label.collection": {
-    "message": "אוסף"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "הצטרף ב-"
-  },
-  "profile.label.no-collections": {
-    "message": "למשתמש זה אין אוספים!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "אין לך אוספים.\nהאם תרצה <create-link>ליצור אחד</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "למשתמש זה אין פרויקטים!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "אין לך פרויקטים.\nהאם תרצה <create-link>ליצור אחד</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "ארגונים"
-  },
-  "profile.label.projects": {
-    "message": "{count} {countPlural, plural, one {project} other {projects}}"
-  },
-  "profile.label.saving": {
-    "message": "שומר..."
-  },
-  "profile.meta.description": {
-    "message": "הורד את הפרויקטים של {username} ב-Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - הורד את הפרויקטים של {username} ב-Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
-  },
-  "profile.user-id": {
-    "message": "מזהה משתמש: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "הפעולה לדחיית ההזמנה לצוות נכשלה"
   },
@@ -1976,24 +1892,6 @@
   "project-type.shader.singular": {
     "message": "שיידר"
   },
-  "project.about.details.created": {
-    "message": "נוצר ב-{date}"
-  },
-  "project.about.details.licensed": {
-    "message": "ברישיון {license}"
-  },
-  "project.about.details.published": {
-    "message": "פורסם {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "נשלח ב-{date}"
-  },
-  "project.about.details.title": {
-    "message": "פרטים"
-  },
-  "project.about.details.updated": {
-    "message": "עודכן ב-{date}"
-  },
   "project.actions.create-server": {
     "message": "צור שרת"
   },
@@ -2023,9 +1921,6 @@
   },
   "project.description.title": {
     "message": "תיאור"
-  },
-  "project.details.licensed": {
-    "message": "ברישיון"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{gameVersion} עבור {platform}"
@@ -2077,15 +1972,6 @@
   },
   "project.gallery.title": {
     "message": "גלריה"
-  },
-  "project.license.error": {
-    "message": "לא ניתן היה לשלוף את טקסט הרישיון."
-  },
-  "project.license.loading": {
-    "message": "טוען את טקסט הרישיון..."
-  },
-  "project.license.title": {
-    "message": "רישיון"
   },
   "project.moderation.title": {
     "message": "פיקוח ובקרה"

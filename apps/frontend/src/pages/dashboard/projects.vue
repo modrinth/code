@@ -188,22 +188,25 @@
 					</div>
 				</template>
 				<template #header-select>
-					<div v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)">
+					<div
+						v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)"
+						class="h-full w-full"
+					>
 						<Checkbox
+							class="h-full w-full justify-center"
 							:model-value="allBulkEditableProjectsSelected"
 							@update:model-value="toggleAllBulkEditableProjects()"
 						/>
 					</div>
 				</template>
 				<template #cell-select="{ row: project }">
-					<div>
-						<Checkbox
-							v-tooltip="getBulkEditDisabledTooltip(project)"
-							:disabled="isProjectBulkEditDisabled(project)"
-							:model-value="isProjectSelected(project)"
-							@update:model-value="toggleProjectSelection(project)"
-						/>
-					</div>
+					<Checkbox
+						v-tooltip="getBulkEditDisabledTooltip(project)"
+						class="h-full w-full justify-center"
+						:disabled="isProjectBulkEditDisabled(project)"
+						:model-value="isProjectSelected(project)"
+						@update:model-value="toggleProjectSelection(project)"
+					/>
 				</template>
 				<template #cell-name="{ row: project }">
 					<nuxt-link class="project-name-cell" :to="getProjectUrl(project)">
@@ -542,8 +545,8 @@ const projectTableColumns = computed(() => [
 	{
 		key: 'select',
 		width: '3rem',
-		headerClass: '!text-center',
-		cellClass: '!overflow-visible',
+		headerClass: '!p-0',
+		cellClass: '!overflow-visible !p-0',
 	},
 	{
 		key: 'name',

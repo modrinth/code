@@ -1,7 +1,7 @@
 <template>
 	<nav :aria-label="ariaLabel" class="w-full">
 		<ul
-			class="card-shadow m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
+			class="card-shadow m-0 mb-3 flex list-none flex-col items-start gap-1.5 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
 			:class="{ 'pt-3': filteredItems?.[0]?.type === 'heading' }"
 		>
 			<slot v-if="hasSlotContent" />

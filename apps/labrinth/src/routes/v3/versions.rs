@@ -13,7 +13,6 @@ use crate::database::models::version_item::{
     DBLoaderVersion, DependencyBuilder,
 };
 use crate::database::models::{DBOrganization, image_item};
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models;
 use crate::models::ids::VersionId;
@@ -27,8 +26,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::file_scan::get_files_missing_attribution;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
-use crate::search::{SearchBackend, SearchState};
-use crate::util::error::Context;
+use crate::search::SearchState;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
@@ -36,6 +34,7 @@ use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(super::version_creation::version_create_route)
@@ -853,14 +852,20 @@ pub async fn version_edit_helper(
             transaction.commit().await?;
             database::models::DBVersion::clear_cache(&version_item, &redis)
                 .await?;
-            super::projects::clear_project_cache_and_queue_search(
-                &redis,
-                &search_state,
+            database::models::DBProject::clear_cache(
                 version_item.inner.project_id,
                 None,
                 Some(true),
+                &redis,
             )
             .await?;
+            search_state
+                .queue
+                .push_version_changes(
+                    version_item.inner.project_id.into(),
+                    [VersionId::from(version_item.inner.id)],
+                )
+                .await;
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(
@@ -1129,19 +1134,9 @@ pub async fn version_delete_route(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_backend: web::Data<dyn SearchBackend>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
-    version_delete(
-        req,
-        info,
-        pool,
-        redis,
-        session_queue,
-        search_backend,
-        search_state,
-    )
-    .await
+    version_delete(req, info, pool, redis, session_queue, search_state).await
 }
 
 pub async fn version_delete(
@@ -1150,7 +1145,6 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_backend: web::Data<dyn SearchBackend>,
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -1246,18 +1240,20 @@ pub async fn version_delete(
 
     transaction.commit().await?;
 
-    super::projects::clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
+    database::models::DBProject::clear_cache(
         version.inner.project_id,
         None,
         Some(true),
+        &redis,
     )
     .await?;
-    search_backend
-        .remove_documents(&[version.inner.id.into()])
-        .await
-        .wrap_internal_err("failed to remove documents")?;
+    search_state
+        .queue
+        .push_version_changes(
+            version.inner.project_id.into(),
+            [VersionId::from(version.inner.id)],
+        )
+        .await;
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {

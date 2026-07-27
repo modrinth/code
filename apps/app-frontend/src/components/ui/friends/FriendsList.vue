@@ -10,18 +10,12 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { friend_listener } from '@/helpers/events'
-import {
-	add_friend,
-	friends,
-	type FriendWithUserData,
-	remove_friend,
-	transformFriends,
-} from '@/helpers/friends.ts'
+import { useFriends } from '@/composables/use-friends'
+import type { FriendWithUserData } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
 
 const { formatMessage } = useVIntl()
@@ -35,36 +29,23 @@ const props = defineProps<{
 }>()
 
 const userCredentials = computed(() => props.credentials)
+const {
+	friends: userFriends,
+	loading,
+	requestFriend,
+	acceptFriend,
+	removeFriend: removeFriendRecord,
+} = useFriends({
+	currentUserId: () => userCredentials.value?.user_id,
+	getCredentials: () => userCredentials.value,
+	onError: handleError,
+})
 
 const search = ref('')
 const friendInvitesModal = ref()
-
 const username = ref('')
 const addFriendModal = ref()
-async function addFriendFromModal() {
-	addFriendModal.value.hide()
-	await add_friend(username.value).catch(handleError)
-	username.value = ''
-	await loadFriends()
-}
 
-async function addFriend(friend: FriendWithUserData) {
-	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
-	if (id) {
-		await add_friend(id).catch(handleError)
-		await loadFriends()
-	}
-}
-
-async function removeFriend(friend: FriendWithUserData) {
-	const id = friend.id === userCredentials.value?.user_id ? friend.friend_id : friend.id
-	if (id) {
-		await remove_friend(id).catch(handleError)
-		await loadFriends()
-	}
-}
-
-const userFriends = ref<FriendWithUserData[]>([])
 const sortedFriends = computed<FriendWithUserData[]>(() =>
 	userFriends.value.slice().sort((a, b) => {
 		if (a.last_updated === null && b.last_updated === null) {
@@ -108,42 +89,22 @@ const incomingRequests = computed(() =>
 		.sort((a, b) => b.created.diff(a.created)),
 )
 
-const loading = ref(true)
-async function loadFriends(timeout = false) {
-	loading.value = timeout
+function addFriendFromModal() {
+	const target = username.value.trim()
+	if (!target) return
 
-	try {
-		const friendsList = await friends()
-		userFriends.value = await transformFriends(friendsList, userCredentials.value)
-		loading.value = false
-	} catch (e) {
-		console.error('Error loading friends', e)
-		if (timeout) {
-			setTimeout(() => loadFriends(), 15 * 1000)
-		}
-	}
+	addFriendModal.value.hide()
+	requestFriend({ id: target, username: target })
+	username.value = ''
 }
 
-watch(
-	userCredentials,
-	() => {
-		if (userCredentials.value === undefined) {
-			userFriends.value = []
-			loading.value = false
-		} else if (userCredentials.value === null) {
-			userFriends.value = []
-			loading.value = false
-		} else {
-			loadFriends(true)
-		}
-	},
-	{ immediate: true },
-)
+function addFriend(friend: FriendWithUserData) {
+	acceptFriend(friend)
+}
 
-const unlisten = await friend_listener(() => loadFriends())
-onUnmounted(() => {
-	unlisten()
-})
+function removeFriend(friend: FriendWithUserData) {
+	removeFriendRecord(friend)
+}
 
 const messages = defineMessages({
 	addFriend: {

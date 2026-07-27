@@ -101,6 +101,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/user/:user/:projectType?',
+			name: 'User',
+			component: Pages.User,
+			meta: {
+				breadcrumb: [{ name: '?User' }],
+			},
+		},
+		{
 			path: '/library',
 			name: 'Library',
 			component: Library.Index,
@@ -213,6 +221,15 @@ export default new createRouter({
 					meta: {
 						useRootContext: true,
 						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Worlds' }],
+					},
+				},
+				{
+					path: 'share',
+					name: 'InstanceShare',
+					component: Instance.Share,
+					meta: {
+						useRootContext: true,
+						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Share' }],
 					},
 				},
 				{

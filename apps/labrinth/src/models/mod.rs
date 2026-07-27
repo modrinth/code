@@ -18,7 +18,6 @@ pub use v3::payouts;
 pub use v3::projects;
 pub use v3::reports;
 pub use v3::sessions;
-pub use v3::shared_instances;
 pub use v3::teams;
 pub use v3::threads;
 pub use v3::users;

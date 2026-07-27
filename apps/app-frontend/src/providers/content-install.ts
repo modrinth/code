@@ -475,7 +475,7 @@ export function createContentInstall(opts: {
 										name: owner.user.username,
 										iconUrl: owner.user.avatar_url,
 										circle: true,
-										link: () => openUrl(`https://modrinth.com/user/${owner.user.username}`),
+										link: `/user/${encodeURIComponent(owner.user.username)}`,
 									},
 								}
 							}
@@ -806,6 +806,11 @@ export function createContentInstall(opts: {
 		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) {
 		const project: Labrinth.Projects.v2.Project = await get_project(projectId, 'must_revalidate')
+
+		if (!project) {
+			opts.handleError(`Project not found: '${projectId}'`)
+			return
+		}
 
 		if (project.project_type === 'modpack') {
 			const version = versionId ?? project.versions[project.versions.length - 1]

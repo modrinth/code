@@ -15,7 +15,6 @@ pub mod payouts;
 pub mod projects;
 pub mod reports;
 pub mod sessions;
-pub mod shared_instances;
 pub mod teams;
 pub mod threads;
 pub mod user_limits;

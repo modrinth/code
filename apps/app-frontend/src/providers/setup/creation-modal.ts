@@ -110,7 +110,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 				}
 				const preview = await install_get_modpack_preview(location)
 
-				if (preview.unknownFile) {
+				if (preview.unknownFile || preview.externalFilesInModpack.length > 0) {
 					const splitPath = config.modpackFilePath.value.split(/[\\/]/)
 					const fileName = splitPath
 						? splitPath[splitPath.length - 1]
@@ -119,6 +119,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 						unknownPackWarningModal.value?.show(
 							() => install_create_modpack_instance(location).then(() => undefined),
 							fileName,
+							preview.externalFilesInModpack,
 						)
 					} else {
 						await install_create_modpack_instance(location)

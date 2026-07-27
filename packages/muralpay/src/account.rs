@@ -1,5 +1,5 @@
 use {
-	crate::{Blockchain, FiatAmount, UsdSymbol, WalletDetails},
+    crate::{Blockchain, FiatAmount, UsdSymbol, WalletDetails},
     chrono::{DateTime, Utc},
     derive_more::{Deref, Display},
     rust_decimal::Decimal,
@@ -133,17 +133,17 @@ pub struct AccountDetails {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Balance {
     #[serde(rename_all = "camelCase")]
-	Blockchain {
-		token_symbol: String,
-		exponent: u32,
+    Blockchain {
+        token_symbol: String,
+        exponent: u32,
         #[serde(with = "rust_decimal::serde::str")]
         value: Decimal,
         blockchain: Blockchain,
     },
     #[serde(rename_all = "camelCase")]
-	Fiat {
-		currency_symbol: UsdSymbol,
-		exponent: u32,
+    Fiat {
+        currency_symbol: UsdSymbol,
+        exponent: u32,
         #[serde(with = "rust_decimal::serde::str")]
         value: Decimal,
     },

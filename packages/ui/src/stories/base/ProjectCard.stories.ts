@@ -63,7 +63,7 @@ export const AllTypes: Story = {
 					:followers="25000"
 					date-updated="2023-06-01T00:00:00Z"
 					:tags="['utility']"
-					:environment="{ clientSide: 'unsupported', serverSide: 'required' }"
+					environment="server_only"
 				/>
 				<ProjectCard
 					link="/modpack/example-modpack"

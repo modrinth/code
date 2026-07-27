@@ -1,14 +1,14 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
-use crate::database::redis::RedisPool;
 use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
-const COLLECTIONS_NAMESPACE: &str = "collections";
+const COLLECTIONS_NAMESPACE: &str = "collections:v3";
 
 #[derive(Clone)]
 pub struct CollectionBuilder {
@@ -204,7 +204,7 @@ impl DBCollection {
                     })
                     .await?;
 
-                    Ok(collections)
+                    Ok::<_, DatabaseError>(collections)
                 },
             )
             .await?;
@@ -217,8 +217,9 @@ impl DBCollection {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         let mut redis = redis.connect().await?;
+        let key = redis.key().entity(COLLECTIONS_NAMESPACE, id.0);
 
-        redis.delete(COLLECTIONS_NAMESPACE, id.0).await?;
+        redis.delete(&key).await?;
         Ok(())
     }
 }

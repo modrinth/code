@@ -383,15 +383,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "verden"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Modpakkeinnholdet ditt kan nå bli funnet her!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Modpakkeinnhold flytta"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Ikke vis igjen"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Yttligere innhold"
   },
