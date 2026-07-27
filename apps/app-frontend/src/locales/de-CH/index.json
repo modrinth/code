@@ -15,7 +15,7 @@
     "message": "Kopiert"
   },
   "app.action-bar.install.copy-details": {
-    "message": "Details kopieren"
+    "message": "Kopier Details"
   },
   "app.action-bar.install.dismiss": {
     "message": "Ignorieren"
@@ -27,16 +27,16 @@
     "message": "Wiederholen"
   },
   "app.action-bar.install.summary.app-closing": {
-    "message": "Aufgrund von Schließung der App abgebrochen"
+    "message": "Abbroche will app gschlosse worde isch"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Modpack konnte nicht gelesen werden"
+    "message": "Modpack kud nöd glese werde"
   },
   "app.action-bar.install.summary.canceled": {
-    "message": "Abgebrochen"
+    "message": "Abbroche"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Bereinigung konnte nicht abgeschlossen werden"
+    "message": "Ufrume kunnti nöt beendet werde"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Dateien konnten nicht heruntergeladen werden"
@@ -456,7 +456,7 @@
     "message": "Falsches Konto"
   },
   "app.instance.share.remove-user-modal.effect-access": {
-    "message": "Diese Person wird für diese geteilte Instanz erhalten keine Updates mehr erhalten"
+    "message": "Diese Person wird für diese geteilte Instanz keine Updates mehr erhalten"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
     "message": "Jede bereits installierte Kopie bleibt auf deren Gerät erhalten"
