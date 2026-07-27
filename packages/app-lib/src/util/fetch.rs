@@ -14,10 +14,9 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use std::ffi::OsStr;
 use std::future::Future;
 use std::num::NonZeroU32;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock};
 use std::time::{self, Duration, Instant, SystemTime};
@@ -905,33 +904,6 @@ pub async fn copy(
         dest.display()
     );
     Ok(())
-}
-
-// Writes a icon to the cache and returns the absolute path of the icon within the cache directory
-#[tracing::instrument(skip(bytes, semaphore))]
-pub async fn write_cached_icon(
-    icon_path: &str,
-    cache_dir: &Path,
-    bytes: Bytes,
-    semaphore: &IoSemaphore,
-) -> crate::Result<PathBuf> {
-    let hash = sha1_async(bytes.clone()).await?;
-    let path = cache_dir
-        .join("icons")
-        .join(cached_icon_file_name(icon_path, &hash));
-
-    write(&path, &bytes, semaphore).await?;
-
-    let path = io::canonicalize(path)?;
-    Ok(path)
-}
-
-fn cached_icon_file_name(icon_path: &str, hash: &str) -> String {
-    let path = icon_path.split(['?', '#']).next().unwrap_or(icon_path);
-    match Path::new(path).extension().and_then(OsStr::to_str) {
-        Some(extension) => format!("{hash}.{extension}"),
-        None => hash.to_string(),
-    }
 }
 
 pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {

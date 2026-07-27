@@ -49,6 +49,7 @@ hickory-resolver = { workspace = true }
 httpdate = { workspace = true }
 indicatif = { workspace = true, optional = true }
 itertools = { workspace = true }
+image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
 modrinth-content-management = { workspace = true }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
@@ -74,6 +75,7 @@ reqwest = { workspace = true, features = [
   "rustls-tls-webpki-roots",
   "stream",
 ] }
+resvg = { workspace = true }
 rgb = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_ini = { workspace = true }

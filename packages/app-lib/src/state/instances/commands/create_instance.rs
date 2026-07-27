@@ -8,7 +8,7 @@ use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
     State,
 };
-use crate::util::fetch::{self, write_cached_icon};
+use crate::util::fetch;
 use crate::util::io;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -174,10 +174,8 @@ async fn resolve_icon_path(
         return Ok(None);
     };
 
-    let (bytes, file_name) = if icon.starts_with("https://")
-        || icon.starts_with("http://")
-    {
-        let fetched = fetch::fetch(
+    let file = if icon.starts_with("https://") || icon.starts_with("http://") {
+        let bytes = fetch::fetch(
             icon,
             None,
             None,
@@ -186,20 +184,14 @@ async fn resolve_icon_path(
             &state.pool,
         )
         .await?;
-        let name = icon.rsplit('/').next().unwrap_or("icon").to_string();
-        (fetched, name)
+        crate::api::instance::cache_icon(bytes, state).await?
     } else {
-        let data = io::read(state.directories.caches_dir().join(icon)).await?;
-        (bytes::Bytes::from(data), icon.to_string())
+        crate::api::instance::cache_icon_from_path(
+            &state.directories.caches_dir().join(icon),
+            state,
+        )
+        .await?
     };
-
-    let file = write_cached_icon(
-        &file_name,
-        &state.directories.caches_dir(),
-        bytes,
-        &state.io_semaphore,
-    )
-    .await?;
 
     Ok(Some(file.to_string_lossy().to_string()))
 }

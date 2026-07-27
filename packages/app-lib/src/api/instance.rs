@@ -4,6 +4,7 @@ mod content;
 mod content_set_diff;
 mod export_mrpack;
 mod get;
+mod icon;
 mod install;
 mod lifecycle;
 mod paths;
@@ -21,9 +22,13 @@ pub use self::export_mrpack::{
     create_mrpack_json, export_mrpack, get_pack_export_candidates,
 };
 pub use self::get::{get, get_many, list};
+pub use self::icon::edit_icon;
+pub(crate) use self::icon::{
+    cache_icon, cache_icon_from_path, migrate_legacy_icons,
+};
 pub use self::install::get_optimal_jre_key;
 pub(crate) use self::lifecycle::create;
-pub use self::lifecycle::{edit, edit_icon, remove};
+pub use self::lifecycle::{edit, remove};
 pub use self::paths::{get_full_path, get_mod_full_path};
 pub use self::projects::{
     InstallProjectWithDependenciesRequest, add_project_from_path,
