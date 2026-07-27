@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} öğesini sil"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "{itemType} öğesini sil"
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
   },

@@ -975,8 +975,10 @@ const searchState = useBrowseSearch({
 watch(
 	[
 		() => searchState.query.value,
-		() => searchState.currentFilters.value,
-		() => searchState.serverCurrentFilters.value,
+		() =>
+			searchState.isServerType.value
+				? searchState.serverCurrentFilters.value
+				: searchState.currentFilters.value,
 		() => projectType.value,
 	],
 	() => {

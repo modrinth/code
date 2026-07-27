@@ -756,7 +756,7 @@
     "message": "Erforderliche Abfrageparameter für OAuth fehlen."
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "Keine Weiterleitungsziel in Antwort gefunden"
+    "message": "Kein Weiterleitungsziel in Antwort gefunden"
   },
   "auth.authorize.errro-title": {
     "message": "Ein Fehler ist aufgetreten"
@@ -1968,7 +1968,7 @@
     "message": "In Verarbeitung"
   },
   "dashboard.revenue.processing.tooltip": {
-    "message": "Einnahmen bleiben in bearbeitung bis zum ende des Monats, und werden 60 Tage danach verfügbar."
+    "message": "Die Einnahmen bleiben bis zum Monatsende in Bearbeitung und werden 60 Tage später verfügbar."
   },
   "dashboard.revenue.stats.received": {
     "message": "Erhalten"
@@ -2013,7 +2013,7 @@
     "message": "Deine Auszahlungen sind vorrübergehend gesperrt, da deine TIN oder SSN nicht mit den IRS-Aufzeichnungen übereinstimmt. Bitte kontaktiere den Support um dein Steuerformular zurückzusetzen und erneut einzureichen."
   },
   "dashboard.revenue.withdraw.card.description": {
-    "message": "Hebe von deinem Verfügbaren Guthaben über einen Zahlungsmethode ab."
+    "message": "Hebe von deinem verfügbaren Guthaben über eine Zahlungsmethode ab."
   },
   "dashboard.revenue.withdraw.card.title": {
     "message": "Auszahlen"
@@ -2175,7 +2175,7 @@
     "message": "Durchsuche {projectType}"
   },
   "discover.seo.title-with-query": {
-    "message": "Durchsuche {projectType} {query}"
+    "message": "Durchsuche {projectType} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Eventuell hast du die URL der Kollektion falsch eingegeben."
@@ -2928,13 +2928,13 @@
     "message": "E-Mail-Bestätigung erforderlich"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Installiere automatisch das erforderliche Spiel und den erforderlichen Loader"
+    "message": "Installiere automatisch alles, was gerade gespielt wird"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Tritt der geteilten Instanz mit einem Klick bei"
+    "message": "Spiele dieselben Inhalte wie deine Freunde"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
-    "message": "Halte geteilte Inhalte aktuell, wenn sich die Instanz ändert"
+    "message": "Halte gemeinsame Inhalte immer aktuell"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Modrinth App herunterladen"
@@ -3001,9 +3001,6 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Alle Dateien scannen"
-  },
-  "modpack-scan-modal.scan-error": {
-    "message": "Einige Dateien konnten nicht gescannt werden: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Wird gescannt..."
@@ -3417,10 +3414,10 @@
     "message": "Speichert..."
   },
   "profile.meta.description": {
-    "message": "Lade {username}'s Projekte auf Modrinth herunter"
+    "message": "Lade Projekte von {username} auf Modrinth herunter"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} - Lade {username}s Projekte auf Modrinth herunter"
+    "message": "{bio} - Lade Projekte von {username} auf Modrinth herunter"
   },
   "profile.official-account": {
     "message": "Offizielles Konto von Modrinth"
@@ -3690,7 +3687,7 @@
     "message": "Spielversion auswählen"
   },
   "project.download.select-platform": {
-    "message": "Platftorm auswählen"
+    "message": "Plattform auswählen"
   },
   "project.download.show-all-versions": {
     "message": "Alle Versionen anzeigen"
@@ -3781,9 +3778,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Du kannst dein Projekt weiterhin bearbeiten, dies hat keinen Einfluss auf deinen Platz in der Warteschlange."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Wir bemühen uns, Einsendungen innerhalb von 24 bis 48 Stunden zu überprüfen, doch bei einigen Projekten kann es zu Verzögerungen kommen. Dies bedeutet nicht, dass mit deiner Einreichung etwas nicht in Ordnung ist."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Wir danken dir für deine Geduld, während unsere Moderatoren daran arbeiten, Modrinth sicher zu halten, und freuen uns darauf, dir dabei zu helfen, deine Inhalte zu teilen! 💚</emphasis>"
@@ -4839,7 +4833,7 @@
     "message": "Möchtest du diese Anwendung wirklich löschen?"
   },
   "settings.applications.description.intro": {
-    "message": "Anwendungen können verwendet werden, um Modrinth-Benutzer mit deinen Produkten zu authentifizieren. Weitere Informationen findest du in der <docs-link>Modrinth's API-Dokumentation</docs-link>."
+    "message": "Anwendungen können verwendet werden, um Modrinth-Benutzer mit deinen Produkten zu authentifizieren. Weitere Informationen findest du in der <docs-link>API-Dokumentation von Modrinth</docs-link>."
   },
   "settings.applications.field.description": {
     "message": "Beschreibung"

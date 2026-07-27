@@ -2972,9 +2972,6 @@
   "modpack-scan-modal.scan-all-files": {
     "message": "전체 파일 스캔"
   },
-  "modpack-scan-modal.scan-error": {
-    "message": "일부 파일을 스캔하지 못했습니다: {error}"
-  },
   "modpack-scan-modal.scanning": {
     "message": "스캔중..."
   },
@@ -3751,9 +3748,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "프로젝트를 수정해도 대기열 우선 순위에는 영향을 미치지 않습니다."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "제출한 내용을 24~48시간 이내에 검토하는 것을 목표로 하고 있으나, 일부 프로젝트의 경우 지연될 수 있습니다. 이는 제출한 내용에 문제가 있다는 것을 의미하지 않습니다."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>운영진들이 Modrinth의 안전한 환경을 유지하기 위해 최선을 다하고 있는 동안 기다려 주셔서 감사합니다. 여러분의 콘텐츠를 공유하실 수 있도록 도와드릴 수 있기를 기대합니다! 💚</emphasis>"
