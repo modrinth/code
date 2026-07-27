@@ -1,12 +1,8 @@
 <script lang="ts" setup>
 import type {
 	AppComponentNodeBuilder,
-	BooleanNodeBuilder,
-	ButtonNodeBuilder,
 	ChildNode,
 	ComponentNodePropsContext,
-	DropdownNodeBuilder,
-	GroupNodeBuilder,
 	IdentifiedNodeBuilder,
 	LabeledNodeBuilder,
 	NodeState,
@@ -15,13 +11,17 @@ import type {
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
+	BooleanNodeBuilder,
+	ButtonNodeBuilder,
 	ComponentNodeBuilder,
+	DropdownNodeBuilder,
 	evalSegment,
 	expandVariables,
 	flattenProjectV3Variables,
 	flattenProjectVariables,
 	flattenStaticVariables,
 	getBooleanChildState,
+	GroupNodeBuilder,
 	InputNodeBuilder,
 	NodeBuilder,
 	resolve,
@@ -67,8 +67,8 @@ function titleClass(depth: number): string {
 
 function isVisible(node: NodeBuilder): boolean {
 	if (node._shown !== undefined) return resolve(node._shown)
-	if (node.type === 'group') {
-		const children = getChildren(node as IdentifiedNodeBuilder)
+	if (node instanceof GroupNodeBuilder) {
+		const children = getChildren(node)
 		return children.some((c) => !(c instanceof NodeBuilder) || isVisible(c))
 	}
 	return true
@@ -456,8 +456,8 @@ function childScopedContext(child: IdentifiedNodeBuilder): Record<string, NodeSt
 }
 
 function getChildrenContext(node: IdentifiedNodeBuilder): Record<string, NodeState> {
-	if (node.type === 'dropdown') return props.showContext
-	if (node.type === 'group' && asGroup(node)._selectMode) return props.showContext
+	if (node instanceof DropdownNodeBuilder) return props.showContext
+	if (node instanceof GroupNodeBuilder && node._selectMode) return props.showContext
 	return childScopedContext(node)
 }
 
@@ -497,10 +497,9 @@ watchEffect(async () => {
 
 	for (const node of props.nodes) {
 		if (!(node instanceof NodeBuilder)) continue
-		if (node.type === 'toggle' && isVisible(node)) {
-			const boolNode = asBool(node)
-			if (boolNode._segments.some((s) => s.type !== 'collect')) {
-				const nodeState = getNodeState(boolNode)
+		if (node instanceof BooleanNodeBuilder && isVisible(node)) {
+			if (node._segments.some((s) => s.type !== 'collect')) {
+				const nodeState = getNodeState(node)
 				const childState =
 					nodeState && typeof nodeState === 'object' && !(nodeState instanceof Set)
 						? (() => {
@@ -509,10 +508,10 @@ watchEffect(async () => {
 								return rest
 							})()
 						: {}
-				buttonTasks.push({ node: boolNode, state: childState })
+				buttonTasks.push({ node, state: childState })
 			}
 		}
-		if (node.type === 'group' && asGroup(node)._selectMode === 'multi' && isVisible(node)) {
+		if (node instanceof GroupNodeBuilder && node._selectMode === 'multi' && isVisible(node)) {
 			for (const child of visibleChildren(asIdentified(node))) {
 				const opt = child as IdentifiedNodeBuilder
 				if (opt._segments.some((s) => s.type !== 'collect')) {
@@ -529,8 +528,8 @@ watchEffect(async () => {
 			if (!(child instanceof NodeBuilder)) continue
 			if (!isVisible(child)) continue
 			const childNode = asIdentified(child)
-			if (child.type === 'group') {
-				const grp = asGroup(childNode)
+			if (child instanceof GroupNodeBuilder) {
+				const grp = child
 				if (grp._selectMode === 'multi') {
 					const selected = getMultiSelectState(childNode)
 					for (const opt of getChildren(childNode)) {
@@ -556,7 +555,7 @@ watchEffect(async () => {
 				} else {
 					result += await evalCollectedChildren(childNode)
 				}
-			} else if (child.type === 'dropdown') {
+			} else if (child instanceof DropdownNodeBuilder) {
 				const selected = getSelectState(childNode)
 				for (const opt of getChildren(childNode)) {
 					if (!(opt instanceof NodeBuilder) || !isVisible(opt)) continue
@@ -568,7 +567,7 @@ watchEffect(async () => {
 					)
 				}
 			} else if (
-				child.type === 'toggle' ||
+				child instanceof BooleanNodeBuilder ||
 				(child instanceof ComponentNodeBuilder && child._valueKind === 'boolean')
 			) {
 				if (!getBooleanState(childNode)) continue
@@ -642,9 +641,11 @@ watchEffect(() => {
 			v-for="(item, idx) in nodes"
 			:key="
 				item instanceof NodeBuilder
-					? item.type === 'button'
+					? item instanceof ButtonNodeBuilder
 						? `button-${asButton(item).label}`
-						: (asIdentified(item)._statePath?.join('/') ?? asIdentified(item).id ?? item.type)
+						: (asIdentified(item)._statePath?.join('/') ??
+							asIdentified(item).id ??
+							item.constructor.name)
 					: typeof item === 'string'
 						? `s-${item}`
 						: `display-${idx}`
@@ -658,7 +659,13 @@ watchEffect(() => {
 
 			<template v-else-if="isVisible(item)">
 				<div
-					:class="item.type === 'group' ? 'w-full' : !getNodeTitle(item) ? 'contents' : undefined"
+					:class="
+						item instanceof GroupNodeBuilder
+							? 'w-full'
+							: !getNodeTitle(item)
+								? 'contents'
+								: undefined
+					"
 				>
 					<div v-if="getNodeTitle(item)" class="mb-2" :class="titleClass(titleDepth ?? 0)">
 						<span
@@ -667,7 +674,7 @@ watchEffect(() => {
 					</div>
 
 					<!-- group -->
-					<template v-if="item.type === 'group'">
+					<template v-if="item instanceof GroupNodeBuilder">
 						<!-- multi-select (chips) mode -->
 						<template v-if="asGroup(item)._selectMode === 'multi'">
 							<div class="flex flex-wrap gap-2">
@@ -770,7 +777,7 @@ watchEffect(() => {
 					</template>
 
 					<!-- dropdown -->
-					<template v-else-if="item.type === 'dropdown'">
+					<template v-else-if="item instanceof DropdownNodeBuilder">
 						<Combobox
 							class="!w-auto max-w-full"
 							:style="{ minWidth: getDropdownMinWidth(asDropdown(item)) }"
@@ -800,7 +807,7 @@ watchEffect(() => {
 					</template>
 
 					<!-- button -->
-					<template v-else-if="item.type === 'button'">
+					<template v-else-if="item instanceof ButtonNodeBuilder">
 						<ButtonStyled :circular="!!item._icon && !asButton(item).label">
 							<button
 								v-tooltip="getTooltipConfig(item, showContext)"
@@ -815,7 +822,7 @@ watchEffect(() => {
 					</template>
 
 					<!-- toggle -->
-					<template v-else-if="item.type === 'toggle'">
+					<template v-else-if="item instanceof BooleanNodeBuilder">
 						<ButtonStyled :color="getBooleanColor(asBool(item))" :circular="!!item._icon">
 							<button
 								v-tooltip="getTooltipConfig(asBool(item))"
@@ -851,9 +858,13 @@ watchEffect(() => {
 			v-for="(item, idx) in nodes"
 			:key="
 				item instanceof NodeBuilder
-					? item.type === 'button'
+					? item instanceof ButtonNodeBuilder
 						? `children-button-${asButton(item).label}`
-						: `children-${asIdentified(item)._statePath?.join('/') ?? asIdentified(item).id ?? item.type}`
+						: `children-${
+								asIdentified(item)._statePath?.join('/') ??
+								asIdentified(item).id ??
+								item.constructor.name
+							}`
 					: `children-display-${idx}`
 			"
 		>
@@ -861,7 +872,7 @@ watchEffect(() => {
 				v-if="
 					item instanceof NodeBuilder &&
 					isVisible(item) &&
-					(item.type === 'toggle' ||
+					(item instanceof BooleanNodeBuilder ||
 						(item instanceof ComponentNodeBuilder && item._valueKind === 'boolean')) &&
 					getBooleanState(asIdentified(item)) &&
 					getChildren(asIdentified(item)).length

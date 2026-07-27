@@ -1,16 +1,11 @@
-import type { Labrinth } from '@modrinth/api-client'
-import { Checkbox, MarkdownEditor, StyledInput, Toggle } from '@modrinth/ui'
-import type { Component, FunctionalComponent, InjectionKey, Ref, SVGAttributes } from 'vue'
-import { markRaw, toValue } from 'vue'
+import type {Labrinth} from "@modrinth/api-client"
+import {Checkbox, MarkdownEditor, StyledInput, Toggle} from "@modrinth/ui"
+import type {Component, FunctionalComponent, InjectionKey, Ref, SVGAttributes} from "vue"
+import {markRaw, toValue} from "vue"
 
-import {
-	expandVariables,
-	flattenProjectV3Variables,
-	flattenProjectVariables,
-	flattenStaticVariables,
-} from '../utils'
-import type { ModerationSeverity, ModerationStatus } from './actions'
-import type { Priority } from './priority.ts'
+import {expandVariables, flattenProjectV3Variables, flattenProjectVariables, flattenStaticVariables} from "../utils"
+import type {ModerationSeverity, ModerationStatus} from "./actions"
+import type {Priority} from "./priority.ts"
 
 export type NodeState =
 	| boolean
@@ -48,18 +43,6 @@ export type ChildEntry =
 	| Ref<NodeBuilder | null>
 	| ((state?: Record<string, NodeState>) => NodeBuilder | NodeBuilder[] | null)
 
-export type NodeType =
-	| 'toggle'
-	| 'check'
-	| 'switch'
-	| 'button'
-	| 'text'
-	| 'markdown'
-	| 'group'
-	| 'dropdown'
-	| 'stage'
-	| 'app-component'
-
 const messageFiles = import.meta.glob('../data/messages/**/*.md', {
 	query: '?raw',
 	import: 'default',
@@ -74,10 +57,6 @@ export function mdOptional(
 		if (!loader) return ''
 		return loadMd(path, state, _project!.value, _projectV2!.value, getVars)
 	})
-}
-
-export function mdEscape(text: string): string {
-	return text.replace(/[\\*_`[~]/g, '\\$&')
 }
 
 const USER_CONTENT_KEYS = [
@@ -108,7 +87,7 @@ export async function loadMd(
 		...flattenProjectV3Variables(project),
 	}
 	for (const key of USER_CONTENT_KEYS) {
-		if (key in vars) vars[key] = mdEscape(vars[key])
+		if (key in vars) vars[key] = vars[key].replace(/[\\*_`[~]/g, '\\$&')
 	}
 	if (extraVars) {
 		for (const [k, v] of Object.entries(extraVars)) {
@@ -257,7 +236,6 @@ export async function evalSegment(
 }
 
 export abstract class NodeBuilder {
-	abstract readonly type: NodeType
 	_shown?: Reactive<boolean>
 	_title?: Reactive<string>
 	_icon?: FunctionalComponent<SVGAttributes>
@@ -285,7 +263,6 @@ export abstract class NodeBuilder {
 }
 
 export class ButtonNodeBuilder extends NodeBuilder {
-	readonly type = 'button' as const
 	readonly label?: string
 	_onClick?: (state: Record<string, NodeState>) => void
 	_enabled?: Reactive<boolean> | ((state: Record<string, NodeState>) => boolean)
@@ -422,9 +399,7 @@ export abstract class ValueNodeBuilder extends LabeledNodeBuilder {
 	}
 }
 
-export class BooleanNodeBuilder extends ValueNodeBuilder {
-	readonly type = 'toggle' as const
-}
+export class BooleanNodeBuilder extends ValueNodeBuilder {}
 
 export type OverrideValue = { readonly __override: string }
 
@@ -558,7 +533,6 @@ export class BooleanComponentNodeBuilder extends ComponentNodeBuilder {
 }
 
 export class AppComponentNodeBuilder extends ComponentNodeBuilder {
-	readonly type = 'app-component' as const
 	_rendererKey: string
 	_defaultValue?: NodeState | ((state: Record<string, NodeState>) => NodeState)
 
@@ -574,7 +548,6 @@ export class AppComponentNodeBuilder extends ComponentNodeBuilder {
 }
 
 export class GroupNodeBuilder extends IdentifiedNodeBuilder {
-	readonly type = 'group' as const
 	_layout?: 'flex' | 'column'
 	_required?: boolean
 	_selectMode?: 'single' | 'multi'
@@ -610,7 +583,6 @@ export class GroupNodeBuilder extends IdentifiedNodeBuilder {
 }
 
 export class DropdownNodeBuilder extends IdentifiedNodeBuilder {
-	readonly type = 'dropdown' as const
 	_none?: string
 
 	override children(fn: ChildrenFn): this
@@ -631,7 +603,6 @@ export class DropdownNodeBuilder extends IdentifiedNodeBuilder {
 }
 
 export class StageNodeBuilder extends LabeledNodeBuilder {
-	readonly type = 'stage' as const
 	_hint?: string
 	_guidanceUrl?: string
 	_navigate?: string
@@ -682,22 +653,16 @@ function childrenScopePath(node: IdentifiedNodeBuilder): string[] | null {
 	if (node instanceof ComponentNodeBuilder) {
 		return node._valueKind === 'boolean' ? node._statePath : null
 	}
-	switch (node.type) {
-		case 'toggle':
-		case 'stage':
-			return node._statePath
-		case 'group': {
-			const g = node as GroupNodeBuilder
-			if (g._selectMode) {
-				return node._statePath.slice(0, -1)
-			}
-			return node._statePath
-		}
-		case 'dropdown':
-			return node._statePath.slice(0, -1)
-		default:
-			return null
+	if (node instanceof BooleanNodeBuilder || node instanceof StageNodeBuilder) {
+		return node._statePath
 	}
+	if (node instanceof GroupNodeBuilder) {
+		return node._selectMode ? node._statePath.slice(0, -1) : node._statePath
+	}
+	if (node instanceof DropdownNodeBuilder) {
+		return node._statePath.slice(0, -1)
+	}
+	return null
 }
 
 function stampChildPaths(entries: ChildEntry[], scopePath: string[]): void {
@@ -737,20 +702,18 @@ export function isNodeActive(node: NodeBuilder, state: NodeState): boolean {
 		if (node._valueKind === 'set') return state instanceof Set && state.size > 0
 		return typeof state === 'string' && state !== ''
 	}
-	switch (node.type) {
-		case 'toggle':
-			return isBooleanStateActive(state)
-		case 'group': {
-			const g = node as GroupNodeBuilder
-			if (g._selectMode === 'single') return typeof state === 'string' && state !== ''
-			if (g._selectMode === 'multi') return state instanceof Set && state.size > 0
-			return false
-		}
-		case 'dropdown':
-			return typeof state === 'string' && state !== ''
-		default:
-			return false
+	if (node instanceof BooleanNodeBuilder) {
+		return isBooleanStateActive(state)
 	}
+	if (node instanceof GroupNodeBuilder) {
+		if (node._selectMode === 'single') return typeof state === 'string' && state !== ''
+		if (node._selectMode === 'multi') return state instanceof Set && state.size > 0
+		return false
+	}
+	if (node instanceof DropdownNodeBuilder) {
+		return typeof state === 'string' && state !== ''
+	}
+	return false
 }
 
 export function getBooleanChildState(nodeState: NodeState): Record<string, NodeState> {
@@ -842,45 +805,39 @@ export function walkNodes(
 		if (!(node instanceof NodeBuilder)) continue
 		if (node._shown !== undefined && !resolve(node._shown)) continue
 
-		if (node.type === 'stage') {
-			const identified = node as IdentifiedNodeBuilder
-			if (identified.id) {
-				const raw = stageState[identified.id]
+		if (node instanceof StageNodeBuilder) {
+			if (node.id) {
+				const raw = stageState[node.id]
 				const childState =
 					raw && typeof raw === 'object' && !(raw instanceof Set)
 						? (raw as Record<string, NodeState>)
 						: {}
-				walkNodes(resolveChildren(identified, childState), childState, visitor)
+				walkNodes(resolveChildren(node, childState), childState, visitor)
 			} else {
-				walkNodes(resolveChildren(identified, stageState), stageState, visitor)
+				walkNodes(resolveChildren(node, stageState), stageState, visitor)
 			}
 			continue
 		}
 
-		if (node.type === 'group') {
-			const g = node as GroupNodeBuilder
-			if (!g._selectMode) {
-				if (g.id) {
-					const raw = stageState[g.id]
-					const childState =
-						raw && typeof raw === 'object' && !(raw instanceof Set)
-							? (raw as Record<string, NodeState>)
-							: {}
-					walkNodes(resolveChildren(g, childState), childState, visitor)
-				} else {
-					walkNodes(resolveChildren(g, stageState), stageState, visitor)
-				}
-				continue
+		if (node instanceof GroupNodeBuilder && !node._selectMode) {
+			if (node.id) {
+				const raw = stageState[node.id]
+				const childState =
+					raw && typeof raw === 'object' && !(raw instanceof Set)
+						? (raw as Record<string, NodeState>)
+						: {}
+				walkNodes(resolveChildren(node, childState), childState, visitor)
+			} else {
+				walkNodes(resolveChildren(node, stageState), stageState, visitor)
 			}
+			continue
 		}
 
-		if (node.type === 'button') continue
+		if (node instanceof ButtonNodeBuilder) continue
 
 		const identified = node as IdentifiedNodeBuilder
 		const stateKey =
-			node.type === 'group'
-				? ((node as GroupNodeBuilder)._selectId ?? identified.id!)
-				: identified.id!
+			node instanceof GroupNodeBuilder ? (node._selectId ?? identified.id!) : identified.id!
 		const rawNodeState = stageState[stateKey]
 		const nodeState = scopedState[stateKey]
 		visitor(identified, nodeState, scopedState)
@@ -889,7 +846,7 @@ export function walkNodes(
 		const children = resolveChildren(identified, stageState)
 		if (children.length === 0 || !active) continue
 
-		if (node.type === 'group' && (node as GroupNodeBuilder)._selectMode === 'multi') {
+		if (node instanceof GroupNodeBuilder && node._selectMode === 'multi') {
 			const selected = nodeState instanceof Set ? nodeState : new Set<string>()
 			for (const child of children) {
 				const childId = child as IdentifiedNodeBuilder
@@ -909,14 +866,14 @@ export function walkNodes(
 				walkNodes(resolveChildren(childId, nestedState), nestedState, visitor)
 			}
 		} else if (
-			node.type === 'toggle' ||
+			node instanceof BooleanNodeBuilder ||
 			(node instanceof ComponentNodeBuilder && node._valueKind === 'boolean')
 		) {
 			const childState = getBooleanChildState(rawNodeState)
 			walkNodes(children, childState, visitor)
 		} else if (
-			(node.type === 'group' && (node as GroupNodeBuilder)._selectMode === 'single') ||
-			node.type === 'dropdown'
+			(node instanceof GroupNodeBuilder && node._selectMode === 'single') ||
+			node instanceof DropdownNodeBuilder
 		) {
 			const selectedId = typeof nodeState === 'string' ? nodeState : undefined
 			if (selectedId) {

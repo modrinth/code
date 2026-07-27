@@ -409,6 +409,7 @@ import type {
 	ValueNodeBuilder,
 } from '@modrinth/moderation'
 import {
+	BooleanNodeBuilder,
 	ComponentNodeBuilder,
 	createTrackedPatch,
 	evalSegment,
@@ -1102,7 +1103,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 				const active = isNodeActive(node, nodeState)
 				const actionState = (() => {
 					const isBooleanValued =
-						node.type === 'toggle' ||
+						node instanceof BooleanNodeBuilder ||
 						(node instanceof ComponentNodeBuilder && node._valueKind === 'boolean')
 					if (!isBooleanValued) return localState
 					const childState = getBooleanChildState(nodeState) as Record<string, NodeState>

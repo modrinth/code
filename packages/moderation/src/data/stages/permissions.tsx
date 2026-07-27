@@ -6,10 +6,11 @@ import { computed } from 'vue'
 
 import { group, stage, toggle } from '../../types/node'
 
-function needsModerationApproval(attributionGroup: Labrinth.Attribution.Internal.AttributionGroup) {
+function isResolved(attributionGroup: Labrinth.Attribution.Internal.AttributionGroup): boolean {
 	const attribution = attributionGroup.attribution
-	if (!attribution || attribution.kind === 'globally_allowed') return false
-	return !attribution.moderation_status
+	if (!attribution) return false
+	if (attribution.kind === 'globally_allowed') return true
+	return attribution.moderation_status?.kind === 'approved'
 }
 
 export default function () {
@@ -21,8 +22,8 @@ export default function () {
 		queryFn: () => labrinth.attribution_internal.listProjectAttribution(project.value.id),
 	})
 
-	const pendingApprovalCount = computed(
-		() => (attributionData.value ?? []).filter(needsModerationApproval).length,
+	const unresolvedCount = computed(
+		() => (attributionData.value ?? []).filter((g) => !isResolved(g)).length,
 	)
 
 	return stage('permissions', 'Modpack Permissions')
@@ -35,7 +36,7 @@ export default function () {
 				() =>
 					(project.value.project_types?.includes('modpack') ?? false) &&
 					!project.value.minecraft_server &&
-					pendingApprovalCount.value > 0,
+					unresolvedCount.value > 0,
 			),
 		)
 		.sticky()
