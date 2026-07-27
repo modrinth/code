@@ -704,6 +704,12 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
+  "app.resource-management-settings.always-show-copy-details.description": {
+    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+  },
+  "app.resource-management-settings.always-show-copy-details.title": {
+    "message": "Always show copy details"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
