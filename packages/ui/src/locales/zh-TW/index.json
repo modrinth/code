@@ -377,6 +377,9 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "刪除{itemType}"
   },
+  "content.confirm-disable.header": {
+    "defaultMessage": "停用{itemType}"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}可能會導致相容性問題。你額外新增至模組包的模組或內容將保留，但可能與新版本不相容。"
   },
@@ -446,11 +449,17 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "已新增 {count} 個"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "已變更設定檔"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
   },
   "content.diff-modal.diff-type.removed": {
     "defaultMessage": "已停用"
+  },
+  "content.diff-modal.diff-type.removed-disabled": {
+    "defaultMessage": "已移除（停用）"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
@@ -467,11 +476,35 @@
   "content.diff-modal.external-diff-type.updated": {
     "defaultMessage": "已更新"
   },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count, plural, other {# 個檔案}}"
+  },
+  "content.diff-modal.game-version-updated": {
+    "defaultMessage": "遊戲版本"
+  },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "仍要安裝"
   },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "載入器"
+  },
+  "content.diff-modal.modpack-linked": {
+    "defaultMessage": "已連結模組包"
+  },
+  "content.diff-modal.modpack-unlinked": {
+    "defaultMessage": "已取消連結模組包"
+  },
+  "content.diff-modal.modpack-updated": {
+    "defaultMessage": "已更新模組包"
+  },
+  "content.diff-modal.no-content-changes": {
+    "defaultMessage": "內容無變更"
+  },
   "content.diff-modal.removed-count": {
     "defaultMessage": "已移除 {count} 個"
+  },
+  "content.diff-modal.removed-disabled-count": {
+    "defaultMessage": "已移除 {count} 個（停用）"
   },
   "content.diff-modal.reviewed-files": {
     "defaultMessage": "只有在 Modrinth 上發布的檔案才會經過審查，無論其檔案格式為何（包含 .mrpack）。"
@@ -532,15 +565,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "世界"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "你模組包的內容現在可以在這裡找到了！"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "模組包內容已移動"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "不再顯示"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
@@ -1170,10 +1194,19 @@
     "defaultMessage": "你取得了特別授權，允許你在模組包中重新發布這個作品。"
   },
   "external-files.permissions-card.remove-group": {
-    "defaultMessage": "移除群組"
+    "defaultMessage": "刪除群組"
+  },
+  "external-files.permissions-card.remove-group-confirmation.description": {
+    "defaultMessage": "這會永久刪除這個引用標註群組及其中的所有檔案，這項動作無法復原。"
+  },
+  "external-files.permissions-card.remove-group-confirmation.title": {
+    "defaultMessage": "刪除 {title}？"
   },
   "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "無法移除群組"
+    "defaultMessage": "無法刪除群組"
+  },
+  "external-files.permissions-card.remove-group-shift-hint": {
+    "defaultMessage": "按住 Shift 鍵並點選以跳過確認。"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "從群組中移除"
@@ -2054,6 +2087,12 @@
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "找不到內容"
   },
+  "instances.modpack-content-modal.external-content": {
+    "defaultMessage": "外部"
+  },
+  "instances.modpack-content-modal.external-content-description": {
+    "defaultMessage": "這個檔案未在 Modrinth 上發布。"
+  },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "模組包內容"
   },
@@ -2062,6 +2101,9 @@
   },
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "沒有專案符合你的搜尋字詞。"
+  },
+  "instances.modpack-content-modal.open-in-slicer": {
+    "defaultMessage": "在 Slicer 中開啟"
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} {count, plural, other {個專案}}"
@@ -2825,8 +2867,14 @@
   "project-card.environment.client-or-server": {
     "defaultMessage": "用戶端或伺服器端"
   },
+  "project-card.environment.dedicated-server": {
+    "defaultMessage": "專用伺服器"
+  },
   "project-card.environment.server": {
     "defaultMessage": "伺服器"
+  },
+  "project-card.environment.singleplayer": {
+    "defaultMessage": "單人遊戲"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -3100,6 +3148,15 @@
   },
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} 位{count, plural, other {追蹤者}}"
+  },
+  "project.license.error": {
+    "defaultMessage": "取得授權條款文字內容時發生錯誤。"
+  },
+  "project.license.loading": {
+    "defaultMessage": "正在載入授權條款文字..."
+  },
+  "project.license.title": {
+    "defaultMessage": "授權條款"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} 人在線上"
@@ -3506,6 +3563,12 @@
   "project.settings.view.title": {
     "defaultMessage": "檢視"
   },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, other {次下載}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, other {位追蹤者}}"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3669,7 +3732,7 @@
     "defaultMessage": "載入器"
   },
   "search.server_content_type.modpack": {
-    "defaultMessage": "模組支援"
+    "defaultMessage": "含模組"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "原版"
@@ -4437,7 +4500,7 @@
     "defaultMessage": "輸入 Modrinth 使用者名稱"
   },
   "servers.grant-access-modal.target.searching": {
-    "defaultMessage": "搜尋中..."
+    "defaultMessage": "正在搜尋..."
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "無法安裝"
@@ -5048,6 +5111,81 @@
   "settings.sessions.title": {
     "defaultMessage": "工作階段"
   },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "新增"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "已加入"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "這個使用者已經被邀請。"
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "取消"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "編輯邀請連結。"
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "編輯邀請連結"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "有效期限"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "你的好友 - {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "邀請"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "你的邀請連結會在 {duration} 後過期。"
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "或者，使用邀請連結"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "邀請連結已複製到剪貼簿。"
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "連結已複製"
+  },
+  "sharing.invite-players-modal.link-copy-failed-title": {
+    "defaultMessage": "無法複製連結"
+  },
+  "sharing.invite-players-modal.max-uses-label": {
+    "defaultMessage": "使用次數上限"
+  },
+  "sharing.invite-players-modal.no-friends": {
+    "defaultMessage": "沒有找到好友。"
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "沒有找到使用者。"
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "已送出邀請"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} 需要先接受你的好友邀請"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "儲存"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "輸入 Modrinth 使用者名稱"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "正在搜尋..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "無法更新邀請連結"
+  },
   "tag.category.128x": {
     "defaultMessage": "128×"
   },
@@ -5241,7 +5379,7 @@
     "defaultMessage": "生物"
   },
   "tag.category.modded": {
-    "defaultMessage": "模組支援"
+    "defaultMessage": "含模組"
   },
   "tag.category.models": {
     "defaultMessage": "模型"

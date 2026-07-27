@@ -267,6 +267,12 @@ pub enum ApiError {
     },
 }
 
+impl From<xredis::Error> for ApiError {
+    fn from(error: xredis::Error) -> Self {
+        Self::Database(error.into())
+    }
+}
+
 impl ApiError {
     pub fn delphi(err: impl Into<eyre::Error>) -> Self {
         Self::Delphi(err.into())

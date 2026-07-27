@@ -1985,24 +1985,6 @@
   "project-type.shader.singular": {
     "message": "שיידר"
   },
-  "project.about.details.created": {
-    "message": "נוצר ב-{date}"
-  },
-  "project.about.details.licensed": {
-    "message": "ברישיון {license}"
-  },
-  "project.about.details.published": {
-    "message": "פורסם {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "נשלח ב-{date}"
-  },
-  "project.about.details.title": {
-    "message": "פרטים"
-  },
-  "project.about.details.updated": {
-    "message": "עודכן ב-{date}"
-  },
   "project.actions.create-server": {
     "message": "צור שרת"
   },
@@ -2032,9 +2014,6 @@
   },
   "project.description.title": {
     "message": "תיאור"
-  },
-  "project.details.licensed": {
-    "message": "ברישיון"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} אינו תומך ב-{gameVersion} עבור {platform}"
@@ -2086,15 +2065,6 @@
   },
   "project.gallery.title": {
     "message": "גלריה"
-  },
-  "project.license.error": {
-    "message": "לא ניתן היה לשלוף את טקסט הרישיון."
-  },
-  "project.license.loading": {
-    "message": "טוען את טקסט הרישיון..."
-  },
-  "project.license.title": {
-    "message": "רישיון"
   },
   "project.moderation.title": {
     "message": "פיקוח ובקרה"

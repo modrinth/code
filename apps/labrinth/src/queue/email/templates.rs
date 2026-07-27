@@ -7,7 +7,6 @@ use crate::database::models::notifications_template_item::{
 use crate::database::models::{
     DBOrganization, DBProject, DBUser, DatabaseError,
 };
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
@@ -20,6 +19,7 @@ use sqlx::query;
 use std::collections::HashMap;
 use std::time::Duration;
 use tracing::{error, warn};
+use xredis::RedisPool;
 
 const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";

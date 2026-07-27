@@ -72,25 +72,12 @@ pub enum DatabaseError {
     RandomId,
     #[error("Error while interacting with the cache: {0}")]
     CacheError(#[from] redis::RedisError),
-    #[error("Redis Pool Error: {0}")]
-    RedisPool(#[from] deadpool_redis::PoolError),
     #[error("Error while serializing with the cache: {0}")]
     SerdeCacheError(#[from] serde_json::Error),
     #[error("error while encoding or decoding the cache: {0}")]
     PostcardCacheError(#[from] postcard::Error),
+    #[error(transparent)]
+    Redis(#[from] xredis::Error),
     #[error("Schema error: {0}")]
     SchemaError(String),
-    #[error(
-        "Timeout waiting on Redis cache lock ({locks_released}/{locks_waiting} released, spent {time_spent_pool_wait_ms}ms/{time_spent_total_ms}ms waiting on connections from pool)"
-    )]
-    CacheTimeout {
-        locks_released: usize,
-        locks_waiting: usize,
-        time_spent_pool_wait_ms: u64,
-        time_spent_total_ms: u64,
-    },
-    #[error(
-        "Timeout waiting on local cache lock ({released}/{total} released)"
-    )]
-    LocalCacheTimeout { released: usize, total: usize },
 }

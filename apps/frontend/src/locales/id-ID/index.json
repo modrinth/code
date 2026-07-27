@@ -2366,24 +2366,6 @@
   "project-type.shader.singular": {
     "message": "Efek Gambar"
   },
-  "project.about.details.created": {
-    "message": "Dibuat {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Berlisensi {license}"
-  },
-  "project.about.details.published": {
-    "message": "Diterbitkan {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Diserahkan {date}"
-  },
-  "project.about.details.title": {
-    "message": "Perincian"
-  },
-  "project.about.details.updated": {
-    "message": "Diperbarui {date}"
-  },
   "project.actions.create-server": {
     "message": "Buat server"
   },
@@ -2413,9 +2395,6 @@
   },
   "project.description.title": {
     "message": "Keterangan"
-  },
-  "project.details.licensed": {
-    "message": "Berlisensi"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak mendukung {gameVersion} untuk {platform}"
@@ -2467,15 +2446,6 @@
   },
   "project.gallery.title": {
     "message": "Galeri"
-  },
-  "project.license.error": {
-    "message": "Teks lisensi tidak dapat diperoleh."
-  },
-  "project.license.loading": {
-    "message": "Memuat teks lisensi..."
-  },
-  "project.license.title": {
-    "message": "Lisensi"
   },
   "project.moderation.title": {
     "message": "Moderasi"

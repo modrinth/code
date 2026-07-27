@@ -44,6 +44,7 @@ const { addNotification } = injectNotificationManager()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 const searchAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('searchAccordionRef')
 const filesAccordionRef = useTemplateRef<InstanceType<typeof Accordion>>('filesAccordionRef')
+const searchInputRef = useTemplateRef<InstanceType<typeof StyledInput>>('searchInputRef')
 
 const query = ref('')
 const isLoading = ref(false)
@@ -169,6 +170,11 @@ async function handleSubmit() {
 function show(event?: MouseEvent) {
 	resetForm()
 	modalRef.value?.show(event)
+
+	// delay so input has time to actually be mounted
+	setTimeout(() => {
+		searchInputRef.value?.focus()
+	}, 100)
 }
 
 function hide() {
@@ -212,6 +218,7 @@ defineExpose({ show, hide })
 						@submit.prevent="executeSearch"
 					>
 						<StyledInput
+							ref="searchInputRef"
 							v-model="query"
 							:icon="SearchIcon"
 							type="text"

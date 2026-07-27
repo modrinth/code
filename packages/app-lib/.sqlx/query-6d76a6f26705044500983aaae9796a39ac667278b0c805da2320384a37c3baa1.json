@@ -1,0 +1,74 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_files\n\t\tSET\n\t\t\tmissing = ?,\n\t\t\tmodified_at = ?\n\t\tWHERE id = ?\n\t\tRETURNING\n\t\t\tid,\n\t\t\tinstance_id,\n\t\t\trelative_path,\n\t\t\tfile_name,\n\t\t\tenabled,\n\t\t\tsha1,\n\t\t\tsize,\n\t\t\tmissing,\n\t\t\tadded_at,\n\t\t\tmodified_at\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "instance_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "relative_path",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "file_name",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "enabled",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "sha1",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "size",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "missing",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "added_at",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "modified_at",
+        "ordinal": 9,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6d76a6f26705044500983aaae9796a39ac667278b0c805da2320384a37c3baa1"
+}

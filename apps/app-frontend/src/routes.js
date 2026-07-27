@@ -216,6 +216,15 @@ export default new createRouter({
 					},
 				},
 				{
+					path: 'share',
+					name: 'InstanceShare',
+					component: Instance.Share,
+					meta: {
+						useRootContext: true,
+						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Share' }],
+					},
+				},
+				{
 					path: '',
 					name: 'Mods',
 					component: Instance.Mods,

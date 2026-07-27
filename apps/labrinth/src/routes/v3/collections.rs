@@ -6,7 +6,6 @@ use crate::database::PgPool;
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
@@ -28,6 +27,7 @@ use eyre::eyre;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(collections_get)

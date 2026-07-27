@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Javaアドレスを追加する"
   },
+  "nags.add-license-details.description": {
+    "defaultMessage": "カスタムライセンスを有効にするためには、有効なURLとライセンス名またはSPDX識別子を追加する必要があります。"
+  },
+  "nags.add-license-details.title": {
+    "defaultMessage": "ライセンス詳細を追加"
+  },
   "nags.add-links-server.description": {
     "defaultMessage": "Modrinth以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
   },
@@ -28,6 +34,12 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "外部リンクを追加する"
+  },
+  "nags.all-languages.description": {
+    "defaultMessage": "すべての利用可能な言語オプションを選択しました。サーバーが実際にサポートしている言語のみを一覧表示してください。"
+  },
+  "nags.all-languages.title": {
+    "defaultMessage": "正確な言語を選択してください"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}のすべてを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
@@ -140,6 +152,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Modpack に外部コンテンツを配布する許可を持っていることを証明する資料を必ず提供してください。"
+  },
   "nags.review-permissions.title": {
     "defaultMessage": "外部権限を確認する"
   },
@@ -160,6 +175,9 @@
   },
   "nags.select-language.title": {
     "defaultMessage": "言語を選択"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "{type} が配布されるライセンスを選択してください。"
   },
   "nags.select-license.title": {
     "defaultMessage": "ライセンスを選択"
@@ -214,6 +232,9 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
+  },
+  "nags.too-many-languages.description": {
+    "defaultMessage": "{languageCount, plural, one {# language} other {# languages}}を選択しました。サーバーが実際にサポートしている言語のみを一覧表示してください。"
   },
   "nags.too-many-languages.title": {
     "defaultMessage": "適切な言語を選択する"

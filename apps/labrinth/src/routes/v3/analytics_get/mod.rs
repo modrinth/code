@@ -7,6 +7,8 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
+use xredis::RedisPool;
+
 pub mod facets;
 mod metrics;
 pub mod old;
@@ -36,7 +38,6 @@ use crate::{
             DBAffiliateCode, DBAffiliateCodeId, DBProjectId, DBUser, DBVersion,
             DBVersionId,
         },
-        redis::RedisPool,
     },
     models::{
         ids::{AffiliateCodeId, ProjectId, VersionId},

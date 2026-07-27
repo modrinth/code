@@ -6,6 +6,7 @@ import { createContext } from '#ui/providers/create-context'
 
 import type {
 	BulkOperationStatus,
+	ContentActionWarning,
 	ContentCardTableItem,
 	ContentItem,
 	ContentModpackCardCategory,
@@ -65,6 +66,10 @@ export interface ContentManagerContext {
 	bulkDeleteItems?: (items: ContentItem[]) => Promise<void>
 	bulkEnableItems?: (items: ContentItem[]) => Promise<void>
 	bulkDisableItems?: (items: ContentItem[]) => Promise<void>
+	canDeleteItem?: (item: ContentItem) => boolean
+	canToggleItem?: (item: ContentItem) => boolean
+	getDeleteWarning?: (items: ContentItem[]) => ContentActionWarning | null
+	getDisableWarning?: (items: ContentItem[]) => ContentActionWarning | null
 	getDeleteDependencyWarning?: (
 		items: ContentItem[],
 	) => ContentDependencyWarning | null | Promise<ContentDependencyWarning | null>
@@ -99,10 +104,6 @@ export interface ContentManagerContext {
 
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'
-
-	// One-time content hint (optional — shows tooltip on modpack content button)
-	showContentHint?: Ref<boolean>
-	dismissContentHint?: () => void
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem

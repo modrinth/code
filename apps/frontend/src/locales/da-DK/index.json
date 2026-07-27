@@ -8,6 +8,237 @@
   "admin.billing.error.not-found": {
     "message": "Bruger ikke fundet"
   },
+  "ads-consent.accept": {
+    "message": "Tillad alle"
+  },
+  "ads-consent.body": {
+    "message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies på hjemmesiden for at personliggøre."
+  },
+  "ads-consent.title": {
+    "message": "Dit privatliv og hvordan reklamer hjælper Modrinth"
+  },
+  "analytics.action.add": {
+    "message": "Tilføj"
+  },
+  "analytics.action.cancel": {
+    "message": "Annuller"
+  },
+  "analytics.action.refresh": {
+    "message": "Genindlæs"
+  },
+  "analytics.action.reset": {
+    "message": "Nulstil"
+  },
+  "analytics.breakdown.country": {
+    "message": "Land"
+  },
+  "analytics.breakdown.dependent-on": {
+    "message": "Afhængig af"
+  },
+  "analytics.breakdown.game-version": {
+    "message": "Spil version"
+  },
+  "analytics.breakdown.members": {
+    "message": "Medlem"
+  },
+  "analytics.breakdown.project": {
+    "message": "Projekt"
+  },
+  "analytics.breakdown.project-status": {
+    "message": "Projekt status"
+  },
+  "analytics.chart.action.show-all": {
+    "message": "Vis alle"
+  },
+  "analytics.chart.action.show-limited": {
+    "message": "Vis begrænset"
+  },
+  "analytics.chart.action.show-top-eight": {
+    "message": "Vis top 8"
+  },
+  "analytics.chart.axis.playtime-hours": {
+    "message": "{hours} t"
+  },
+  "analytics.chart.controls.active-count": {
+    "message": "{count} aktive"
+  },
+  "analytics.chart.controls.previous-period": {
+    "message": "Tidligere periode"
+  },
+  "analytics.chart.controls.ratio": {
+    "message": "Ratio"
+  },
+  "analytics.chart.events.project-title": {
+    "message": "<project>{projectName}</project>: {title}"
+  },
+  "analytics.chart.tooltip.hide-entry": {
+    "message": "Skjul {name} i graf"
+  },
+  "analytics.chart.tooltip.total": {
+    "message": "Total"
+  },
+  "analytics.chart.view.area": {
+    "message": "Areal"
+  },
+  "analytics.chart.view.bar": {
+    "message": "Søjle"
+  },
+  "analytics.chart.view.line": {
+    "message": "Linje"
+  },
+  "analytics.download-reason.modpack": {
+    "message": "Modpack"
+  },
+  "analytics.download-reason.update": {
+    "message": "Opdatering"
+  },
+  "analytics.download-source.app": {
+    "message": "Modrinth App"
+  },
+  "analytics.empty.no-data": {
+    "message": "Ingen data tilgængelig"
+  },
+  "analytics.empty.no-projects": {
+    "message": "Ingen projekter tilgængelige"
+  },
+  "analytics.filter.game-version-type.all": {
+    "message": "Alle"
+  },
+  "analytics.filter.game-version-type.release": {
+    "message": "Udgivelse"
+  },
+  "analytics.filter.search.countries": {
+    "message": "Søg efter lande..."
+  },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Søg efter projekter..."
+  },
+  "analytics.filter.search.download-sources": {
+    "message": "Søg efter download kilder..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Søg efter medlemmer..."
+  },
+  "analytics.filter.search.project-versions": {
+    "message": "Søg efter projekt versioner..."
+  },
+  "analytics.filter.search.versions": {
+    "message": "Søg versioner..."
+  },
+  "analytics.graph.title.downloads": {
+    "message": "Downloads over tid"
+  },
+  "analytics.graph.title.playtime": {
+    "message": "Spilletid over tid"
+  },
+  "analytics.graph.title.revenue": {
+    "message": "Omsætning over tid"
+  },
+  "analytics.graph.title.views": {
+    "message": "Visninger over tid"
+  },
+  "analytics.group-by.1h": {
+    "message": "1t"
+  },
+  "analytics.group-by.6h": {
+    "message": "6t"
+  },
+  "analytics.group-by.date": {
+    "message": "Dato"
+  },
+  "analytics.group-by.day": {
+    "message": "Dag"
+  },
+  "analytics.group-by.month": {
+    "message": "Måned"
+  },
+  "analytics.group-by.selected.day": {
+    "message": "Grupper per dag"
+  },
+  "analytics.group-by.selected.hour": {
+    "message": "Grupper per time"
+  },
+  "analytics.group-by.selected.month": {
+    "message": "Grupper per måned"
+  },
+  "analytics.group-by.selected.six-hours": {
+    "message": "Grupper per 6 timer"
+  },
+  "analytics.group-by.selected.week": {
+    "message": "Grupper per uge"
+  },
+  "analytics.group-by.selected.year": {
+    "message": "Grupper per år"
+  },
+  "analytics.group-by.week": {
+    "message": "Uge"
+  },
+  "analytics.group-by.year": {
+    "message": "År"
+  },
+  "analytics.loading.fetching-results": {
+    "message": "Henter resultater..."
+  },
+  "analytics.options.loading": {
+    "message": "Indlæser..."
+  },
+  "analytics.project-status.approved": {
+    "message": "Godkendt"
+  },
+  "analytics.project-status.archived": {
+    "message": "Arkiveret"
+  },
+  "analytics.project-status.draft": {
+    "message": "Kladde"
+  },
+  "analytics.project-status.private": {
+    "message": "Privat"
+  },
+  "analytics.project-status.rejected": {
+    "message": "Afvist"
+  },
+  "analytics.project.your": {
+    "message": "Dine projekter"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Lær mere"
+  },
+  "analytics.stat.playtime": {
+    "message": "Spilletid"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} timer"
+  },
+  "analytics.stat.revenue-value": {
+    "message": "${value}"
+  },
+  "analytics.stat.unavailable": {
+    "message": "N/A"
+  },
+  "analytics.stat.views": {
+    "message": "Visninger"
+  },
+  "analytics.table.csv.date-range": {
+    "message": "{start} til {end}"
+  },
+  "analytics.table.csv.header.playtime-seconds": {
+    "message": "Spilletid (sekunder)"
+  },
+  "analytics.table.duration.days": {
+    "message": "{count, plural, one {# dag} other {# dage}}"
+  },
+  "analytics.table.duration.hours": {
+    "message": "{count, plural, one {# time} other {# timer}}"
+  },
+  "analytics.table.duration.minutes": {
+    "message": "{count, plural, one {# minut} other {# minutter}}"
+  },
+  "analytics.table.export-csv": {
+    "message": "Eksporter CSV"
+  },
+  "analytics.table.search.placeholder": {
+    "message": "Søg..."
+  },
   "app-marketing.download.description": {
     "message": "Vores skrivebords-app er tilgængelig til alle platforme, vælg din ønsket version."
   },
@@ -96,7 +327,7 @@
     "message": "Offline tilstand"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinths launcher er fuldt open source. Du kan se kildekoden på vores `<github-link>GitHub</github-link>!"
+    "message": "Modrinths launcher er fuldt open source. Du kan se kildekoden på vores <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
@@ -147,7 +378,7 @@
     "message": "Brug Modrinth App til at hente og spille med dine foretrukne mods og modpakker."
   },
   "app-marketing.features.play.title": {
-    "message": "Leg med dine yndlingsmods"
+    "message": "Spil med dine yndlingsmods"
   },
   "app-marketing.features.sharing.description": {
     "message": "Opret, del og spil modpakker med tusindvis af mods og modpakker, der er vært her på Modrinth."
@@ -218,8 +449,47 @@
   "auth.authorize.error.no-redirect-url": {
     "message": "Ingen omdirigeringslokation fundet i svaret"
   },
+  "auth.authorize.errro-title": {
+    "message": "Der opsted en fejl"
+  },
   "auth.authorize.redirect-url": {
     "message": "Du bliver omdirigeret til <redirect-url>{url}</redirect-url>"
+  },
+  "auth.continue-with-provider": {
+    "message": "Fortsæt med {provider}"
+  },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "Alderskrav"
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "Ugyldig fødselsdag"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "Fødselsdag"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "Vælg din fødselsdag"
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "Fødselsdag påkrævet"
+  },
+  "auth.create-account.info-panel.source-code-link": {
+    "message": "Relevant kildekode"
+  },
+  "auth.create-account.page-title": {
+    "message": "Opret konto"
+  },
+  "auth.create-account.security-check.label": {
+    "message": "Sikkerhedstjek"
+  },
+  "auth.create-account.title": {
+    "message": "Opret en konto"
+  },
+  "auth.create-account.username.label": {
+    "message": "Brugernavn"
+  },
+  "auth.create-account.username.placeholder": {
+    "message": "Indtast brugernavn"
   },
   "auth.reset-password.method-choice.action": {
     "message": "Send gendannelses e-mail"
@@ -249,7 +519,7 @@
     "message": "Indtast din nye adgangskode nedenfor for at få adgang til din konto."
   },
   "auth.reset-password.title": {
-    "message": "Nulstil adgangskoden"
+    "message": "Nulstil Adgangskode"
   },
   "auth.reset-password.title.long": {
     "message": "Nulstil din adgangskode"
@@ -257,11 +527,38 @@
   "auth.sign-in.2fa.placeholder": {
     "message": "Indtast kode..."
   },
+  "auth.sign-in.continue-with-email": {
+    "message": "Fortsæt med email"
+  },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "Fortsæt med passkey"
+  },
+  "auth.sign-in.forgot-password": {
+    "message": "Glemt adgangskode"
+  },
+  "auth.sign-in.last-sign-in": {
+    "message": "Sidst brugt"
+  },
+  "auth.sign-in.no-account": {
+    "message": "Har du ikke en konto?"
+  },
   "auth.sign-in.title": {
     "message": "Log ind"
   },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "Alderskrav"
+  },
+  "auth.sign-up.continue-with-email": {
+    "message": "Fortsæt med email"
+  },
   "auth.sign-up.legal-dislaimer": {
     "message": "Ved at oprette en konto, accepterer du Modrinth's <terms-link>Vilkår</terms-link> og <privacy-policy-link>Privatlivspolitik</privacy-policy-link>."
+  },
+  "auth.sign-up.show-fewer-options": {
+    "message": "Vis færre muligheder"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Vis andre muligheder"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Har du allerede en konto?"
@@ -269,8 +566,14 @@
   "auth.sign-up.title": {
     "message": "Tilmeld"
   },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Opret en konto"
+  },
   "auth.verify-email.action.account-settings": {
     "message": "Kontoindstillinger"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "Udforsk mods"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Din e-mail er allerede bekræftet!"
@@ -290,6 +593,12 @@
   "auth.verify-email.failed-verification.title": {
     "message": "E-mailbekræftelse mislykkedes"
   },
+  "auth.verify-email.notification.email-sent.title": {
+    "message": "Email sendt"
+  },
+  "auth.verify-email.notification.error-occurred.title": {
+    "message": "Der opstod en fejl"
+  },
   "auth.verify-email.post-verification.description": {
     "message": "Din e-mailadresse er blevet bekræftet!"
   },
@@ -298,6 +607,12 @@
   },
   "auth.verify-email.title": {
     "message": "Bekræft E-mail"
+  },
+  "collection.aria-label.upload-icon": {
+    "message": "Upload ikon"
+  },
+  "collection.button.discover-mods": {
+    "message": "Udforsk mods"
   },
   "collection.button.edit-icon": {
     "message": "Rediger ikon"
@@ -359,8 +674,89 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "conversation-thread.action.approve": {
+    "message": "Godkend"
+  },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Godkend med svar"
+  },
+  "conversation-thread.action.close-thread": {
+    "message": "Luk tråd"
+  },
+  "conversation-thread.action.close-with-reply": {
+    "message": "Luk med svar"
+  },
+  "conversation-thread.action.reject": {
+    "message": "Afvis"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Afvis med svar"
+  },
+  "conversation-thread.action.reopen-thread": {
+    "message": "Genåbn tråd"
+  },
+  "conversation-thread.action.reply": {
+    "message": "Svar"
+  },
+  "conversation-thread.action.send": {
+    "message": "Send"
+  },
+  "conversation-thread.action.send-to-review": {
+    "message": "Send til gennemgang"
+  },
+  "conversation-thread.action.send-to-review-with-reply": {
+    "message": "Send til gennemgang med svar"
+  },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Supplerende filer er til understøttende ressourcer som kildekode, ikke til alternative versioner eller varianter."
+  },
+  "create-project-version.create-modal.stage.add-files.upload-file-aria-label": {
+    "message": "Upload fil"
+  },
+  "create-project-version.create-modal.stage.add-files.upload-secondary-prompt": {
+    "message": "Træk og slip filer eller klik for at finde"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "Detaljer"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "Filer"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "Version ændringslog"
+  },
+  "create-project-version.create-modal.stage.details.version-number": {
+    "message": "Versionsnummer"
+  },
+  "create-project-version.create-modal.stage.details.version-type": {
+    "message": "Version type"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "Detaljer"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "Rediger"
+  },
+  "create-project-version.create-modal.stage.metadata.environment": {
+    "message": "Miljø"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "Filer"
+  },
+  "create-project-version.create-modal.stage.metadata.metadata-tab": {
+    "message": "Metadata"
+  },
+  "create-project-version.create-modal.stage.metadata.suggested": {
+    "message": "Forslået"
+  },
+  "create-project-version.create-modal.stage.metadata.uploaded-files": {
+    "message": "Uploadet filer"
+  },
+  "create-project-version.create-modal.stage.metadata.versions": {
+    "message": "Versioner"
   },
   "create.collection.collection-info": {
     "message": "Din nye samling vil blive skabt som en offentlig samling med {count, plural, =0 {ingen projekter} one {# projekt} other {# projekter}}."
@@ -446,6 +842,9 @@
   "create.project.name-placeholder": {
     "message": "Indtast projekt navn..."
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name} Ikon"
+  },
   "create.project.owner-description": {
     "message": "Det projekt ejeren som dig selv eller en organisation du medlem af."
   },
@@ -476,8 +875,14 @@
   "create.project.type-server": {
     "message": "Server"
   },
+  "create.project.unknown-user": {
+    "message": "Ukendt bruger"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.user-avatar-alt": {
+    "message": "Bruger Avatar"
   },
   "create.project.visibility-description": {
     "message": "Dit projekts synlighed efter det er blevet godkendt."
@@ -512,6 +917,12 @@
   "dashboard.affiliate-links.search": {
     "message": "Søg partnerskabs-links..."
   },
+  "dashboard.analytics.total-downloads": {
+    "message": "Totale downloads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Totale følgere"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Opret ny"
   },
@@ -529,6 +940,12 @@
   },
   "dashboard.collections.long-title": {
     "message": "Dine samlinger"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Søg efter samlinger..."
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Navn (A-Z)"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
@@ -629,6 +1046,9 @@
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
     "message": "Indtast pas nummer"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Netværk"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Konto"
   },
@@ -683,6 +1103,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
     "message": "Antal søgte"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-category-placeholder": {
+    "message": "Søg efter {category}..."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-category-placeholder": {
+    "message": "Vælg {category}"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Ubekræftet email"
   },
@@ -695,11 +1121,119 @@
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Hæve grænse"
   },
+  "dashboard.discord-roles.banner.cta": {
+    "message": "Forbind Discord"
+  },
+  "dashboard.discord-roles.role.big-creator": {
+    "message": "1M+ Downloads"
+  },
+  "dashboard.discord-roles.role.creator": {
+    "message": "Skaber"
+  },
+  "dashboard.discord-roles.role.pride": {
+    "message": "Pride 2026"
+  },
+  "dashboard.head-title": {
+    "message": "Kontrolpanel"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "Se alle"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "Vis notifkations historik"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Opret organisation"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Lav en organisation!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Kunne ikke hente organisationer"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {medlem} other {medlemmer}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organisationer"
+  },
+  "dashboard.overview.notifications.button.mark-all-as-read": {
+    "message": "Marker alle som læst"
+  },
+  "dashboard.overview.notifications.button.view-history": {
+    "message": "Se historik"
+  },
+  "dashboard.overview.notifications.empty.no-unread": {
+    "message": "Du har ingen ulæste notifikationer."
+  },
+  "dashboard.overview.notifications.error.loading": {
+    "message": "Fejl ved indlæsning af notifikationer:"
+  },
+  "dashboard.overview.notifications.history.label": {
+    "message": "Historik"
+  },
+  "dashboard.overview.notifications.history.title": {
+    "message": "Notifkations historik"
+  },
+  "dashboard.overview.notifications.loading": {
+    "message": "Indlæser notifikationer..."
+  },
+  "dashboard.projects.empty": {
+    "message": "Du har ikke nogle projekter endnu. Klik den grønne knap ovenfor for at begynde."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projekter"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "og {count} mere..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Fjern link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Ændr links"
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "Et invitations link til din Discord server."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord invitation"
+  },
+  "dashboard.projects.links.header.edit": {
+    "message": "Ændr links"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Indtast et gyldigt Discord invitations URL"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Indtast et gyldigt URL"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Vis alle projekter"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Kildekode"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Navn"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Type"
+  },
   "dashboard.revenue.available-now": {
     "message": "Tilgængelige nu"
   },
   "dashboard.revenue.balance": {
     "message": "Saldo"
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Klik for at læse hvordan Modrinth håndtere din omsætning."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Anslået {date}"
@@ -719,20 +1253,56 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Download som CSV"
   },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Transaktions historik"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transaktioner"
   },
   "dashboard.revenue.transactions.none": {
     "message": "Ingen transaktioner"
   },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Dine udbetalinger og hævninger vil blive vist her."
+  },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Sidste måned"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "Denne måned"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "Se alle"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "Alle år"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Hæv fra din tilgængelige saldo til hvilken som helst udbetalingsmetode."
   },
   "dashboard.revenue.withdraw.card.title": {
     "message": "Hæv"
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Hæv"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Kontrolpanel"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifikationer"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organisationer"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Overblik"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projekter"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Indtægter"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Konto"
@@ -754,6 +1324,9 @@
   },
   "dashboard.withdraw.completion.method": {
     "message": "Metode"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Nettobeløb"
   },
   "dashboard.withdraw.completion.recipient": {
     "message": "Modtager"
@@ -805,6 +1378,18 @@
   },
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Antal er for lavt"
+  },
+  "discover.install.back-to-server": {
+    "message": "Tilbage til server"
+  },
+  "discover.install.back-to-setup": {
+    "message": "Tilbage til opsætning"
+  },
+  "discover.seo.title": {
+    "message": "Søg efter {projectType}"
+  },
+  "discover.seo.title-with-query": {
+    "message": "Søg efter {projectType} | {query}"
   },
   "error.collection.404.list_item.1": {
     "message": "Du har måske tastefejl i samlingen's URL."
@@ -912,7 +1497,7 @@
     "message": "Spar 16% med betaling hvert kvartal!"
   },
   "hosting-marketing.billing.starting-at": {
-    "message": "Start ved {price} / måned"
+    "message": "Starter ved {price} / måned"
   },
   "hosting-marketing.billing.yearly": {
     "message": "Betal hvert år"
@@ -987,7 +1572,7 @@
     "message": "Host din næste server med Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting er den nemmeste måde at host din egen Minecraft: Java Edition server. Nemt installer og spil dine favorit mods og modpacks, alt sammen inde på Modrinth platformen."
+    "message": "Modrinth Hosting er den nemmeste måde at hoste din egen Minecraft: Java Edition server. Nemt installer og spil dine favorit mods og modpacks, alt sammen inde på Modrinth platformen."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Avanceret netværksstyring"
@@ -1014,7 +1599,7 @@
     "message": "Nem filhåndtering"
   },
   "hosting-marketing.included.file-manager.description": {
-    "message": "Søg, administrer. rediger, og upload filer direkte til din server uden problemer."
+    "message": "Søg, administrer, rediger og upload filer direkte til din server uden problemer."
   },
   "hosting-marketing.included.heading": {
     "message": "Kommer med alle de funktioner du har behov for."
@@ -1041,7 +1626,7 @@
     "message": "Inkluderet med din server"
   },
   "hosting-marketing.know-what-you-need": {
-    "message": "Hvad har du præcis brug for?"
+    "message": "Ved du lige hvad du har brug for?"
   },
   "hosting-marketing.medal.info": {
     "message": "Prøv en gratis <orange>3 GB server</orange> i 5 dage drevet af <orange>Medal</orange>"
@@ -1068,7 +1653,7 @@
     "message": "Hele tiden hurtig"
   },
   "hosting-marketing.why.consistently-fast.description": {
-    "message": "Vores infrastruktur er aldrig overbelastet, hvilket betyder at alle servere hosted med Modrinth altid køre med fuld ydeevne."
+    "message": "Vores infrastruktur er aldrig overbelastet, hvilket betyder at alle servere hosted med Modrinth altid kører med fuld ydeevne."
   },
   "hosting-marketing.why.description": {
     "message": "Vælg imellem tusinder af modpacks på Modrinth eller lav din egen. Inviter dine venner når du klar til at spille."
@@ -1080,7 +1665,7 @@
     "message": "Oplev moderne, pålidelig hosting"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Modrinth Hosting servere er hosted på <contrast>AMD CPUer med høj ydeevne med DDR5 RAM</contrast>, køre på specialudviklet for at sikre din server køre uden problemer."
+    "message": "Modrinth Hosting servere er hosted på <contrast>AMD CPUer med høj ydeevne med DDR5 RAM</contrast>, køre på specialudviklet software for at sikre din server køre uden problemer."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Spil hvor dine mods er"
@@ -1238,6 +1823,9 @@
   "layout.action.create-new": {
     "message": "Opret ny..."
   },
+  "layout.action.external-projects": {
+    "message": "Eksterne projekter"
+  },
   "layout.action.manage-affiliates": {
     "message": "Styr patnerskabs-links"
   },
@@ -1253,6 +1841,12 @@
   "layout.action.new-project": {
     "message": "Nyt projekt"
   },
+  "layout.action.new-server-project": {
+    "message": "Ny server"
+  },
+  "layout.action.publish": {
+    "message": "Udgiv"
+  },
   "layout.action.reports": {
     "message": "Gennemgå rapporter"
   },
@@ -1267,6 +1861,9 @@
   },
   "layout.banner.add-email.button": {
     "message": "Gå til kontoindstillinger"
+  },
+  "layout.banner.staging.title": {
+    "message": "Du ser Modrinth's test miljø"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Opdater betalingsoplysninger"
@@ -1364,6 +1961,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "ukendt"
+  },
   "layout.menu-toggle.action": {
     "message": "Vis/skjul menu"
   },
@@ -1427,8 +2027,23 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Opgrader til Modrinth+"
   },
+  "layout.publish.email-verification-required.title": {
+    "message": "E-mailbekræftelse påkrævet"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Hent Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Åbner Modrinth App"
+  },
+  "moderation.page.external-projects": {
+    "message": "Eksterne projekter"
+  },
   "moderation.page.projects": {
     "message": "Projekter"
+  },
+  "moderation.page.reports": {
+    "message": "Rapporter"
   },
   "muralpay.country.at": {
     "message": "Østrig"
@@ -1556,6 +2171,15 @@
   "muralpay.rail.fiat-zar.name": {
     "message": "Bank Overførsel (ZAR)"
   },
+  "organization.project-transfer.type-column": {
+    "message": "Type"
+  },
+  "organization.projects.none": {
+    "message": "Denne organisation har ikke nogle projekter endnu."
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "Denne organisation har ikke nogle projekter endnu. Kunnde dig tænke dig at <create-link>oprette et</create-link>?"
+  },
   "profile.bio.fallback.creator": {
     "message": "En Modrinth skaber."
   },
@@ -1595,8 +2219,14 @@
   "profile.error.not-found": {
     "message": "Bruger ikke fundet"
   },
+  "profile.label.badges": {
+    "message": "Emblemer"
+  },
   "profile.label.collection": {
     "message": "Samling"
+  },
+  "profile.label.download-count": {
+    "message": "{count, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Tilsluttet"
@@ -1665,13 +2295,19 @@
     "message": "Du skal gennemføre de nødvendige trin i tjeklisten for udgivelse!"
   },
   "project-moderation-nags.submit-for-review": {
-    "message": "Indsende til godkendelse"
+    "message": "Indsend til godkendelse"
   },
   "project-moderation-nags.submit-for-review-button": {
-    "message": "Indsende til godkendelse"
+    "message": "Indsend til godkendelse"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Dit projekt kan kun ses a medlemmer af projektet. Det skal gennemses af moderatorer før det kan blive udgivet."
   },
   "project-moderation-nags.suggestion": {
     "message": "Forslag"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Se moderations side"
   },
   "project-moderation-nags.warning": {
     "message": "Advarsel"
@@ -1687,6 +2323,9 @@
   },
   "project-type.datapack.singular": {
     "message": "Datapakke"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
   },
   "project-type.mod.plural": {
     "message": "Mods"
@@ -1718,23 +2357,17 @@
   "project-type.resourcepack.singular": {
     "message": "Ressourcepakke"
   },
+  "project-type.server.plural": {
+    "message": "Servere"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
+  },
   "project-type.shader.plural": {
     "message": "Shaders"
   },
   "project-type.shader.singular": {
     "message": "Shader"
-  },
-  "project.about.details.created": {
-    "message": "Oprettet {date}"
-  },
-  "project.about.details.published": {
-    "message": "Offentliggjort {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaljer"
-  },
-  "project.about.details.updated": {
-    "message": "Opdateret {date}"
   },
   "project.actions.create-server": {
     "message": "Lav en server"
@@ -1745,8 +2378,14 @@
   "project.actions.dont-show-again": {
     "message": "Vis ikke igen"
   },
+  "project.actions.edit-project": {
+    "message": "Rediger projekt"
+  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting er den nemmeste måde at spille med dine venner uden problemer!"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Starter ved {price}<small> / måned</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Lav en server"
@@ -1760,11 +2399,32 @@
   "project.description.title": {
     "message": "Beskrivelse"
   },
+  "project.download.dependency-download-file": {
+    "message": "Download {filename}"
+  },
+  "project.download.dependency-download-file-with-size": {
+    "message": "Download {filename} ({size})"
+  },
+  "project.download.download": {
+    "message": "Download"
+  },
+  "project.download.download-as-zip": {
+    "message": "Download som .zip"
+  },
+  "project.download.download-version": {
+    "message": "Download {version}"
+  },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} understøtter ikke {gameVersion} til {platform}"
   },
+  "project.download.manually": {
+    "message": "Download manuelt"
+  },
   "project.download.no-app": {
     "message": "Har ikke Modrinth App?"
+  },
+  "project.download.no-game-versions-found": {
+    "message": "Ingen spil versioner fundet"
   },
   "project.download.platform-unsupported-tooltip": {
     "message": "{title} understøtter ikke {platform} til {gameVersion}"
@@ -1781,6 +2441,9 @@
   "project.download.title": {
     "message": "Download {title}"
   },
+  "project.download.zip-failed-title": {
+    "message": "Kunne ikke downloade filer"
+  },
   "project.environment.migration.learn-more": {
     "message": "Lær mere omkring denne ændring"
   },
@@ -1792,6 +2455,18 @@
   },
   "project.gallery.title": {
     "message": "Galleri"
+  },
+  "project.install-context.back-to-discover": {
+    "message": "Tilbage til udforsk"
+  },
+  "project.moderation.admonition.under-review.body.1": {
+    "message": "Dit projekt er i kø til at blive gennemgået af Modrinth's moderatorteam."
+  },
+  "project.moderation.admonition.under-review.body.2": {
+    "message": "Dit projekt vil blive skannet og efterfølgende gennemgået af menneskelige moderators, for at sikre sig at det opretholder Modrinth's <rules-link>Indholsregler</rules-link> og <terms-link>Vilkår for brug</terms-link>."
+  },
+  "project.moderation.admonition.under-review.header": {
+    "message": "Projekt under gennemgang"
   },
   "project.moderation.title": {
     "message": "Moderation"
@@ -1832,17 +2507,119 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
+  "project.settings.permissions.delete-all-groups": {
+    "message": "Slet alle grupper"
+  },
+  "project.settings.permissions.expand-all": {
+    "message": "Udvid alle"
+  },
+  "project.settings.permissions.learn-more": {
+    "message": "Lær mere"
+  },
+  "project.settings.permissions.search-placeholder": {
+    "message": "Søg {count} {count, plural, one {projekt} other {projekter}}..."
+  },
+  "project.settings.permissions.sort.most-files": {
+    "message": "Flest filer"
+  },
+  "project.settings.permissions.sort.recently-edited": {
+    "message": "Nyligt ændret"
+  },
+  "project.settings.permissions.sort.rejected": {
+    "message": "Afvist"
+  },
+  "project.settings.permissions.sort.status": {
+    "message": "Status"
+  },
+  "project.settings.server.bedrock-address-label": {
+    "message": "Bedrock adresse"
+  },
+  "project.settings.server.details-heading": {
+    "message": "Server detaljer"
+  },
+  "project.settings.server.enter-address-placeholder": {
+    "message": "Indtast adresse"
+  },
+  "project.settings.server.java-address-label": {
+    "message": "Java adresse"
+  },
+  "project.settings.server.languages-label": {
+    "message": "Sprog"
+  },
+  "project.settings.server.latency-label": {
+    "message": "Forsinkelse: {latency}ms"
+  },
+  "project.settings.server.region-label": {
+    "message": "Region"
+  },
+  "project.settings.server.select-languages-placeholder": {
+    "message": "Vælg sprog"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "Vælg region"
+  },
+  "project.settings.server.server-online": {
+    "message": "Serveren er online!"
+  },
+  "project.settings.tags.featured-tags": {
+    "message": "Fremhævet tags"
+  },
+  "project.settings.tags.title": {
+    "message": "Tags"
+  },
+  "project.settings.tags.upload-version-first": {
+    "message": "Upload venligst en version først for at kunne vælge tags!"
+  },
   "project.settings.title": {
     "message": "Indstillinger"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Gå til projekt kontrolpanel"
   },
   "project.status.archived.message": {
     "message": "{title} er blevet arkiveret. {title} vil ikke modtage flere opdateringer medmindre forfatteren beslutter sig for at fjerne projektet fra arkivet."
   },
+  "project.versions.copy-id-option": {
+    "message": "Kopier ID"
+  },
+  "project.versions.copy-link-option": {
+    "message": "Kopier link"
+  },
+  "project.versions.delete-button": {
+    "message": "Slet"
+  },
+  "project.versions.edit-details-option": {
+    "message": "Rediger detaljer"
+  },
+  "project.versions.edit-files-option": {
+    "message": "Rediger filer"
+  },
+  "project.versions.edit-metadata-option": {
+    "message": "Rediger metadata"
+  },
+  "project.versions.edit-version-tooltip": {
+    "message": "Rediger version"
+  },
+  "project.versions.open-in-new-tab-option": {
+    "message": "Åbn i en ny fane"
+  },
+  "project.versions.share-option": {
+    "message": "Del"
+  },
   "project.versions.title": {
     "message": "Versioner"
   },
+  "project.versions.version-deleted-text": {
+    "message": "Denne version er blevet slettet."
+  },
+  "project.versions.version-deleted-title": {
+    "message": "Version slettet"
+  },
   "report.already-reported": {
     "message": "Du har allerede rapporteret {title}"
+  },
+  "report.back-to-item": {
+    "message": "Tilbage til {item}"
   },
   "report.body.description": {
     "message": "Inkluder links og billeder hvis muligt og relevant. Tomme eller upræcise rapporter vil blive lukket eller ignoreret."
@@ -1850,8 +2627,17 @@
   "report.body.title": {
     "message": "Venligst tilføj mere information omkring din anmeldelse"
   },
+  "report.could-not-find": {
+    "message": "Kunne ikke finde {item}"
+  },
   "report.for.violation.description": {
     "message": "Eksempler inkluderer ondsindet, spam, stødende, vildledende, misvisende og ulovligt indhold."
+  },
+  "report.go-to-report": {
+    "message": "Gå til raport"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Fejl rapporter"
   },
   "report.not-for.dmca": {
     "message": "DMCA-fjernelser"
@@ -1870,6 +2656,30 @@
   },
   "report.submit": {
     "message": "Indsend anmeldelse"
+  },
+  "scopes.category.collections": {
+    "message": "Samlinger"
+  },
+  "scopes.category.notifications": {
+    "message": "Notifikationer"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisationer"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Udbetalinger"
+  },
+  "scopes.category.projects": {
+    "message": "Projekter"
+  },
+  "scopes.category.reports": {
+    "message": "Rapporter"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessioner"
   },
   "scopes.collectionCreate.description": {
     "message": "Opret samlinger"
@@ -1901,6 +2711,318 @@
   "scopes.notificationRead.label": {
     "message": "Læs notifikationer"
   },
+  "scopes.performAnalytics.description": {
+    "message": "Udfør analysehandlinger"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Udfør analyser"
+  },
+  "scopes.projectCreate.description": {
+    "message": "Opret nye projekter"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Opret projekter"
+  },
+  "scopes.projectDelete.description": {
+    "message": "Slet dine projekter"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Slet projekter"
+  },
+  "scopes.projectRead.description": {
+    "message": "Læs alle dine projekter"
+  },
+  "scopes.projectRead.label": {
+    "message": "Læs projekter"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Skriv til projektdata"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Skriv projekter"
+  },
+  "scopes.reportCreate.description": {
+    "message": "Opret rapporter"
+  },
+  "scopes.reportCreate.label": {
+    "message": "Opret rapporter"
+  },
+  "scopes.reportDelete.description": {
+    "message": "Slet rapporter"
+  },
+  "scopes.reportDelete.label": {
+    "message": "Slet rapporter"
+  },
+  "scopes.reportRead.description": {
+    "message": "Læs rapporter"
+  },
+  "scopes.reportRead.label": {
+    "message": "Læs rapporter"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Rediger rapporter"
+  },
+  "scopes.reportWrite.label": {
+    "message": "Skriv rapporter"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "Tilgå sessioner"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Slet sessioner"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Slet sessioner"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Læs aktive sessioner"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Læs sessioner"
+  },
+  "scopes.threadRead.description": {
+    "message": "Læs tråde"
+  },
+  "scopes.threadRead.label": {
+    "message": "Læs tråde"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Skriv til tråde"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Skriv tråde"
+  },
+  "scopes.userRead.label": {
+    "message": "Læs brugerdata"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Opret nye versioner"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Opret versioner"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Slet en version"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Slet versioner"
+  },
+  "scopes.versionRead.description": {
+    "message": "Læs alle versioner"
+  },
+  "scopes.versionRead.label": {
+    "message": "Læs versioner"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Skriv til versiondata"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Skriv versioner"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Synkroniser med server"
+  },
+  "servers.notice.expires": {
+    "message": "Udløber"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "message": "Mest populær"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Download eksport"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Generer eksport"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Generere eksport..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Anmod om en kopi af alt dit personlige data du har uploaded til Modrinth. Dette kan tage flere minutter at færdiggøre. "
+  },
+  "settings.account.data-export.title": {
+    "message": "Data eksport"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Dette vil **med det samme slette alt dit bruger data og følgere**. Dine projekter vil ikke blive slettet. Sletning af din konto kan ikke blive fortrudt.<br><br>Hvis du har brug for hjælp med din konto, kan du få support på [Modrinth Discord'en](https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Slet denne konto"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Er du sikker på at du vil slette din konto?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Slet konto"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Når du først har slettet din konto, kan du ikke fortryde. Sletning af din konto vil fjerne alt relateret data udover projekter fra vores servere."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Slet konto"
+  },
+  "settings.account.email.action.save": {
+    "message": "Gem email"
+  },
+  "settings.account.email.field.label": {
+    "message": "Email adresse"
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Tilføj email"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Skift email"
+  },
+  "settings.account.password.action.remove": {
+    "message": "Fjern adgangskode"
+  },
+  "settings.account.password.action.save": {
+    "message": "Gem adgangskode"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Adgangskoderne er ikke ens!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Indtast venligst din adgangskode for at fortsætte."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Bekræft adgangskode"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Bekræft adgangskode"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Bekræft nye adgangskode"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Bekræft nye adgangskode"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Nye adgangskode"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Nye adgangskode"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Gamle adgangskode"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Gamle adgangskode"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Tilføj adgangskode"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Skift adgangskode"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Fjern adgangskode"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Tilføj"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Handlinger"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Tilføj email"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Skift email"
+  },
+  "settings.account.security.email.description": {
+    "message": "Ændrer emailen tilknyttet til din konto."
+  },
+  "settings.account.security.email.title": {
+    "message": "Email"
+  },
+  "settings.account.security.passkey.add-modal.name.description": {
+    "message": "Vær sikker på at vælge noget du kan huske, så du kan identificere denne passkey senere."
+  },
+  "settings.account.security.passkey.add-modal.name.label": {
+    "message": "Navn"
+  },
+  "settings.account.security.passkey.add-modal.name.placeholder": {
+    "message": "Min passkey"
+  },
+  "settings.account.security.passkey.add-modal.title": {
+    "message": "Tilføj passkey"
+  },
+  "settings.account.security.passkey.add.button": {
+    "message": "Tilføj passkey"
+  },
+  "settings.account.security.passkey.button": {
+    "message": "Administrer passkeys"
+  },
+  "settings.account.security.passkey.modal.added": {
+    "message": "Tilføjet {ago}"
+  },
+  "settings.account.security.passkey.modal.last-used": {
+    "message": "Sidst brugt {ago}"
+  },
+  "settings.account.security.passkey.modal.loading": {
+    "message": "Indlæser passkeys..."
+  },
+  "settings.account.security.passkey.modal.never-used": {
+    "message": "Aldrig brugt"
+  },
+  "settings.account.security.passkey.remove.button": {
+    "message": "Slet passkey"
+  },
+  "settings.account.security.passkey.rename-modal.header": {
+    "message": "Omdøb passkey"
+  },
+  "settings.account.security.passkey.title": {
+    "message": "Administrer passkeys"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Tilføj adgangskode"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Skift adgangskode"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Skift adgangskoden der bliver brugt til at logge ind på din konto."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Sæt en permanent adgangskode til at logge ind på din konto."
+  },
+  "settings.account.security.password.title": {
+    "message": "Adgangskode"
+  },
+  "settings.account.security.title": {
+    "message": "Konto sikkerhed"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Fjern 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Opsæt 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Tilføj et ekstra lag af sikkerhed til din konto når du logger ind."
+  },
+  "settings.account.security.two-factor.modal.remove.header": {
+    "message": "Fjern 2FA"
+  },
+  "settings.account.security.two-factor.modal.setup.header": {
+    "message": "Opsæt 2FA"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Tofaktorgodkendelse"
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Indtast to-faktor-kode"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Indtast kode..."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Verificer kode"
+  },
   "settings.applications.about": {
     "message": "Om"
   },
@@ -1910,11 +3032,17 @@
   "settings.applications.button.cancel": {
     "message": "Annuller"
   },
+  "settings.applications.button.create": {
+    "message": "Opret app"
+  },
   "settings.applications.button.delete": {
     "message": "Slet"
   },
   "settings.applications.button.edit": {
     "message": "Rediger"
+  },
+  "settings.applications.button.new": {
+    "message": "Ny applikation"
   },
   "settings.applications.button.save-changes": {
     "message": "Gem ændringer"
@@ -1928,26 +3056,224 @@
   "settings.applications.created-on": {
     "message": "Oprettet {date}"
   },
+  "settings.applications.delete.confirm.button": {
+    "message": "Slet denne applikation"
+  },
   "settings.applications.field.description": {
     "message": "Beskrivelse"
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikon"
+  },
+  "settings.applications.field.name": {
+    "message": "Navn"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.head-title": {
+    "message": "Applikationer"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Omkring denne app"
+  },
+  "settings.authorizations.by": {
+    "message": "af"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "Tidligere opkrævninger"
+  },
+  "settings.billing.expires": {
+    "message": "Udløber {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "måned"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "kvartal"
+  },
+  "settings.billing.interval.year": {
+    "message": "år"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Reklamefri browsing på modrinth.com og Modrinth App"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Modrinth+ emblem på din profil"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Støt Modrinth og skabere direkte"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Fordele"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Spar {amount}/år ved at skifte til årlig betaling!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Du har opsagt dit abonnement."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Bliv en abonnent til Modrinth Plus!"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "Opsig abonnement"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Fjern denne betalingsmetode"
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Er du sikker på, at du vil slette denne betalingsmetode?"
+  },
+  "settings.billing.next": {
+    "message": "Næste:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Eller {price} / år (spar {percent}%)!"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Tilføj betalingsmetode"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Se tidligere opkrævninger"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Gør primær"
   },
   "settings.billing.payment_method.card_expiry": {
     "message": "Udløber {month}/{year}"
   },
+  "settings.billing.payment_method.none": {
+    "message": "Du har ikke tilføjet nogle betalingsmetoder."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primær"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Betalingsmetoder"
+  },
+  "settings.billing.plan.title": {
+    "message": "{size} plan"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "Server ID: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe ID: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Din betaling bliver behandlet. Din server vil aktivere når din betaling er færdig."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Administrer dine Modrinth Server abonnementer."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Server abonnomenter"
+  },
+  "settings.billing.renews": {
+    "message": "Fornyer {date}"
+  },
+  "settings.billing.since": {
+    "message": "Siden {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Abonner"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Administrer dine Modrinth abonnementer."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Abonnementer"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Månedlig betaling vil koste dig {amount} yderligere om året"
+  },
+  "settings.billing.update-method": {
+    "message": "Opdater betalingsmetode"
+  },
+  "settings.billing.upgrade": {
+    "message": "Opgrader"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Side til datapakker"
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Mods side"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galleri"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Gitter"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Rækker"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Modpacks side"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Plugins side"
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Side til ressourcepakker"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Servere side"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Side til shaders"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Projektlistelayouts"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Samling"
   },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
     "message": "Flytter sidebjælken til venstre for sidens indhold."
   },
+  "settings.display.theme.title": {
+    "message": "Farvetema"
+  },
+  "settings.pats.action.create": {
+    "message": "Opret en PAT"
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Opret PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Udløber"
+  },
   "settings.pats.modal.create.name.label": {
     "message": "Navn"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Indtast PAT's navn..."
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Slet denne token"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Rediger token"
   },
   "settings.pats.token.expired-ago": {
     "message": "Udløb {ago}"
@@ -1970,6 +3296,9 @@
   "settings.profile.description": {
     "message": "Dine profiloplysninger kan ses offentligt på Modrinth og via <docs-link>Modrinth API</docs-link>."
   },
+  "settings.profile.head-title": {
+    "message": "Profil indstillinger"
+  },
   "settings.profile.profile-info": {
     "message": "Profiloplysninger"
   },
@@ -1978,6 +3307,9 @@
   },
   "settings.profile.username.description": {
     "message": "Et unikt, ikke-versalfølsomt navn til at identificere din profil."
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Inddrag adgang"
   },
   "settings.sessions.created-ago": {
     "message": "Oprettet {ago}"
@@ -2003,13 +3335,112 @@
   "settings.sidebar.label.developer": {
     "message": "Udvikler"
   },
+  "shared-instance.invite.accept": {
+    "message": "Accepter invitation"
+  },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "En Modrinth bruger"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "{count, plural, one {# person har} other {# personer har}} allerede tilsluttet sig"
+  },
+  "shared-instance.invite.loading": {
+    "message": "Indlæser inviation…"
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} har inviteret dig til at spille"
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "Kender du denne bruger?"
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "Denne invitation er ikke tilgængelig"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Seneste nyheder fra Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Vis alle nyheder"
   },
+  "ui.newsletter-button.subscribe": {
+    "message": "Abonner"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Abonneret!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Abonner på Modrinth nyhedsbrevet"
+  },
+  "version.all-versions": {
+    "message": "Alle versioner"
+  },
+  "version.confirm-delete.proceed": {
+    "message": "Slet version"
+  },
+  "version.dependency.view-project": {
+    "message": "Vis projekt"
+  },
+  "version.dependency.view-version": {
+    "message": "Vis version"
+  },
+  "version.download.download-dependency": {
+    "message": "Vælg en version for at downloade"
+  },
+  "version.download.no-primary-file": {
+    "message": "Fejl: Ingen primært fil fundet"
+  },
+  "version.download.required-resource-pack": {
+    "message": "Påkrævet ressourcepakke"
+  },
+  "version.download.version": {
+    "message": "Download {version} ({size})"
+  },
+  "version.edit.button": {
+    "message": "Rediger"
+  },
+  "version.edit.details": {
+    "message": "Rediger detaljer"
+  },
+  "version.edit.files": {
+    "message": "Rediger filer"
+  },
+  "version.edit.metadata": {
+    "message": "Rediger metadata"
+  },
+  "version.environment.none.title": {
+    "message": "Intet miljø sat"
+  },
   "version.environment.unknown.title": {
     "message": "Ukendt miljø"
+  },
+  "version.notification.deleted-title": {
+    "message": "Version slettet"
+  },
+  "version.package-as-mod.button": {
+    "message": "Pak som mod"
+  },
+  "version.package-as-mod.header": {
+    "message": "Pak datapakke som mod"
+  },
+  "version.package-as-mod.submit-button": {
+    "message": "Pak datapakke"
+  },
+  "version.section.content.dev-info": {
+    "message": "Udvikler information"
+  },
+  "version.section.content.dev-info.gradle-snippet": {
+    "message": "build.gradle:"
+  },
+  "version.section.content.dev-info.maven-coordinates": {
+    "message": "Maven koordinater:"
+  },
+  "version.section.content.dev-info.version-id": {
+    "message": "Version ID:"
+  },
+  "version.supplementary-resources.copy-hash-sha1": {
+    "message": "Kopier SHA-1"
+  },
+  "version.supplementary-resources.copy-hash-sha512": {
+    "message": "Kopier SHA-512"
   }
 }

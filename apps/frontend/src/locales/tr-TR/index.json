@@ -3,7 +3,7 @@
     "message": "İptal"
   },
   "action.continue": {
-    "message": "Devam"
+    "message": "Devam et"
   },
   "admin.billing.error.not-found": {
     "message": "Kullanıcı bulunamadı"
@@ -12,7 +12,7 @@
     "message": "Ekle"
   },
   "analytics.action.cancel": {
-    "message": "Vazgeç"
+    "message": "İptal"
   },
   "analytics.action.refresh": {
     "message": "Yenile"
@@ -51,7 +51,7 @@
     "message": "Üye"
   },
   "analytics.breakdown.monetization": {
-    "message": "Para Kazanma"
+    "message": "Monetizasyon"
   },
   "analytics.breakdown.none.selected": {
     "message": "Analiz yok"
@@ -75,10 +75,10 @@
     "message": "Sınırlı sayıda göster"
   },
   "analytics.chart.action.show-top-eight": {
-    "message": "Üst 8'i göster"
+    "message": "En yüksek 8'ini göster"
   },
   "analytics.chart.axis.playtime-hours": {
-    "message": "{hours} sa"
+    "message": "{hours} saat"
   },
   "analytics.chart.controls.active-count": {
     "message": "{count} çevrimiçi"
@@ -87,7 +87,7 @@
     "message": "Rahatsız ediciler"
   },
   "analytics.chart.controls.aria": {
-    "message": "Analitik grafik denetimleri: {activeCount}"
+    "message": "Analitik grafik kontrolleri: {activeCount}"
   },
   "analytics.chart.controls.button": {
     "message": "Kontroller"
@@ -2723,9 +2723,6 @@
   "modpack-scan-modal.scan-all-files": {
     "message": "Tüm Dosyaları Tara"
   },
-  "modpack-scan-modal.scan-error": {
-    "message": "Bazı dosyalar taranamadı:{error}"
-  },
   "modpack-scan-modal.scanning": {
     "message": "Taranıyor..."
   },
@@ -3218,24 +3215,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "{date} oluşturuldu"
-  },
-  "project.about.details.licensed": {
-    "message": "{license} lisanslı"
-  },
-  "project.about.details.published": {
-    "message": "{date} yayınlandı"
-  },
-  "project.about.details.submitted": {
-    "message": "{date} sunuldu"
-  },
-  "project.about.details.title": {
-    "message": "Detaylar"
-  },
-  "project.about.details.updated": {
-    "message": "{date} güncellendi"
-  },
   "project.actions.create-server": {
     "message": "Sunucu oluştur"
   },
@@ -3265,9 +3244,6 @@
   },
   "project.description.title": {
     "message": "Açıklama"
-  },
-  "project.details.licensed": {
-    "message": "Lisans:"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Bu oyun sürümü projenin bu sürümü ile uygun değil."
@@ -3422,15 +3398,6 @@
   "project.gallery.title": {
     "message": "Galeri"
   },
-  "project.license.error": {
-    "message": "Lisans yazısı getirilemedi."
-  },
-  "project.license.loading": {
-    "message": "Lisans yazısı yükleniyor..."
-  },
-  "project.license.title": {
-    "message": "Lisans"
-  },
   "project.moderation.admonition.approved.body.private": {
     "message": "Projeniz özeldir, yani yalnızca siz ve davet ettiğiniz kişiler tarafından erişilebilir."
   },
@@ -3466,9 +3433,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Projenizi değiştirmeye devam edebilirsiniz, bu kuyruktaki konumunuzu etkilemeyecektir."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Gönderileri 24-48 saat içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum gönderinizle ilgili bir sorun olduğu anlamına gelmez."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Moderatörlerimiz Modrinth'i güvende tutmak için çok çalışırken gösterdiğiniz sabır için teşekkür ediyor ve içeriğinizi paylaşmanıza yardımcı olmayı dört gözle bekliyoruz! 💚</emphasis>"

@@ -2708,24 +2708,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Criado {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Licenciado {license}"
-  },
-  "project.about.details.published": {
-    "message": "Publicado {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Enviado {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detalhes"
-  },
-  "project.about.details.updated": {
-    "message": "Atualizado {date}"
-  },
   "project.actions.create-server": {
     "message": "Criar um servidor"
   },
@@ -2755,9 +2737,6 @@
   },
   "project.description.title": {
     "message": "Descrição"
-  },
-  "project.details.licensed": {
-    "message": "Licenciado"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} não suporta {gameVersion} para {platform}"
@@ -2809,15 +2788,6 @@
   },
   "project.gallery.title": {
     "message": "Galeria"
-  },
-  "project.license.error": {
-    "message": "Não foi possível obter o texto da licença."
-  },
-  "project.license.loading": {
-    "message": "A carregar texto da licença..."
-  },
-  "project.license.title": {
-    "message": "Licença"
   },
   "project.moderation.title": {
     "message": "Moderação"

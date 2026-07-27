@@ -1,4 +1,3 @@
-use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
@@ -14,8 +13,10 @@ use serde_json::Value;
 use std::{collections::HashMap, str::FromStr, sync::Arc};
 use thiserror::Error;
 use utoipa::ToSchema;
+use xredis::RedisPool;
 
 pub mod backend;
+pub mod filter;
 pub mod incremental;
 pub mod indexing;
 
@@ -105,23 +106,16 @@ pub trait SearchBackend: Send + Sync {
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError>;
 
-    async fn index_projects(
+    async fn rebuild_index(
         &self,
         ro_pool: PgPool,
         redis: RedisPool,
     ) -> eyre::Result<()>;
 
-    async fn index_documents(
+    async fn apply_update(
         &self,
-        documents: &[UploadSearchProject],
+        update: SearchIndexUpdate<'_>,
     ) -> eyre::Result<()>;
-
-    async fn remove_project_documents(
-        &self,
-        ids: &[ProjectId],
-    ) -> eyre::Result<()>;
-
-    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
 
     async fn tasks(&self) -> eyre::Result<Value>;
 
@@ -150,14 +144,16 @@ async fn hydrate_search_results(
         HashMap::new()
     } else {
         let mut redis = redis_pool.connect().await?;
+        let ping_keys = project_ids
+            .iter()
+            .map(|project_id| {
+                redis_pool
+                    .key()
+                    .entity(server_ping::REDIS_NAMESPACE, project_id)
+            })
+            .collect::<Vec<_>>();
         let ping_results = redis
-            .get_many_deserialized::<JavaServerPing>(
-                server_ping::REDIS_NAMESPACE,
-                &project_ids
-                    .iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>(),
-            )
+            .get_many_deserialized::<JavaServerPing>(&ping_keys)
             .await?;
 
         ping_results
@@ -233,8 +229,12 @@ impl FromStr for SearchBackendKind {
     }
 }
 
+/// Nullable fields in Typesense-bound documents should use
+/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
+/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
+    /// ID of the most recently published version.
     pub version_id: String,
     pub project_id: String,
     //
@@ -244,20 +244,25 @@ pub struct UploadSearchProject {
     pub slug: Option<String>,
     pub author: String,
     pub author_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub organization: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<String>,
     pub indexed_author: String,
     pub name: String,
     pub indexed_name: String,
     pub summary: String,
     pub categories: Vec<String>,
+    pub project_categories: Vec<String>,
     pub display_categories: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
     pub log_downloads: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
     pub license: String,
     pub gallery: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub featured_gallery: Option<String>,
     /// RFC 3339 formatted creation date of the project
     pub date_created: DateTime<Utc>,
@@ -267,9 +272,10 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
-    /// Unix timestamp of the publication date of the version
+    /// Unix timestamp of the most recently published version.
     pub version_published_timestamp: i64,
     pub open_source: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<u32>,
     #[serde(default)]
     pub dependency_project_ids: Vec<String>,
@@ -288,12 +294,45 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct UploadSearchVersion {
+    pub version_id: String,
+    pub project_id: String,
+    pub categories: Vec<String>,
+    pub project_types: Vec<String>,
+    pub version_published_timestamp: i64,
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+}
+
+#[derive(Debug, Default)]
+pub struct SearchDocumentBatch {
+    pub projects: Vec<UploadSearchProject>,
+    pub versions: Vec<UploadSearchVersion>,
+}
+
+/// A logical search index mutation. Removals are applied before replacements,
+/// so a document may be present in both a removed and replacement field.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct SearchIndexUpdate<'a> {
+    pub projects: &'a [UploadSearchProject],
+    pub versions: &'a [UploadSearchVersion],
+    /// Projects and all of their version documents to remove.
+    pub removed_projects: &'a [ProjectId],
+    pub removed_versions: &'a [VersionId],
+}
+
+/// Nullable fields in Typesense-bound documents should use
+/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
+/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct SearchProjectDependency {
     pub project_id: String,
     pub dependency_type: DependencyType,
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
 }
 
@@ -307,6 +346,7 @@ pub struct SearchResults {
 
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct ResultSearchProject {
+    /// ID of the most recently published version.
     pub version_id: String,
     pub project_id: String,
     pub project_types: Vec<String>,

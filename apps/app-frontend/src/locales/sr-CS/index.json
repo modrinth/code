@@ -425,9 +425,6 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Pretraži {count} svetova..."
   },
-  "app.modal.install-to-play.dont-install": {
-    "message": "Ne instaliraj"
-  },
   "app.modal.install-to-play.header": {
     "message": "Instaliraj da bi igrao"
   },
@@ -466,9 +463,6 @@
   },
   "app.modal.update-to-play.removed": {
     "message": "Smaknuto"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Potrebno je ažuriranje da biste igrali {name}. Molimo te da ažuriraš na najnoviju verziju da bi pokrenuo igru."
   },
   "app.project.install-button.already-installed": {
     "message": "Ovaj projekat je već instaliran"

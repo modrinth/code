@@ -65,8 +65,7 @@ async function duplicateInstance(p) {
 const handleRightClick = (event, instanceId) => {
 	const item = instanceComponents.value.find((x) => x.instance.id === instanceId)
 	const baseOptions = [
-		{ name: 'add_content' },
-		{ type: 'divider' },
+		...(item.instance.quarantined ? [] : [{ name: 'add_content' }, { type: 'divider' }]),
 		{ name: 'edit' },
 		{ name: 'duplicate' },
 		{ name: 'open' },
@@ -90,10 +89,14 @@ const handleRightClick = (event, instanceId) => {
 					...baseOptions,
 				]
 			: [
-					{
-						name: 'play',
-						color: 'primary',
-					},
+					...(item.instance.quarantined
+						? []
+						: [
+								{
+									name: 'play',
+									color: 'primary',
+								},
+							]),
 					...baseOptions,
 				],
 	)

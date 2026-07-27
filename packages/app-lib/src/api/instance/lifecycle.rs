@@ -101,12 +101,27 @@ pub async fn edit_icon(
     crate::state::edit_instance(
         instance_id,
         EditInstance {
-            icon_path: Some(icon_path),
+            icon_path: Some(icon_path.clone()),
             ..EditInstance::default()
         },
         &state.pool,
     )
     .await?;
+
+    if let Err(error) = super::shared::sync_shared_instance_icon(
+        instance_id,
+        icon_path.as_deref(),
+        &state,
+    )
+    .await
+    {
+        tracing::warn!(
+            instance_id,
+            error = %error,
+            "Failed to sync shared instance icon"
+        );
+    }
+
     emit_instance(&instance.id, InstancePayloadType::Edited).await?;
 
     Ok(())

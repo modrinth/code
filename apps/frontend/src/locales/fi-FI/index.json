@@ -971,20 +971,11 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.title": {
-    "message": "Yksityiskohdat"
-  },
   "project.description.title": {
     "message": "Kuvaus"
   },
-  "project.details.licensed": {
-    "message": "Lisenssoitu"
-  },
   "project.gallery.title": {
     "message": "Galleria"
-  },
-  "project.license.title": {
-    "message": "Lisenssi"
   },
   "project.moderation.title": {
     "message": "Moderaatio"

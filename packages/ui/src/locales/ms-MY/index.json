@@ -437,15 +437,6 @@
   "content.inline-backup.world-label": {
     "defaultMessage": "dunia"
   },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Kandungan pek mod anda kini boleh didapati di sini!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Kandungan pek mod telah berpindah"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Jangan tunjukkan lagi"
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Kandungan tambahan"
   },

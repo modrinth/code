@@ -1,6 +1,14 @@
 <script setup>
 import { BoxIcon, FolderOpenIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, Slider, StyledInput } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	Slider,
+	StyledInput,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
@@ -11,9 +19,23 @@ import { showAppDbBackupsFolder } from '@/helpers/utils.js'
 import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const themeStore = useTheming()
 const settings = ref(await get())
 const purgeCacheConfirmModal = ref(null)
+const alwaysShowCopyDetailsFlag = 'always_show_copy_details'
+
+const messages = defineMessages({
+	alwaysShowCopyDetailsTitle: {
+		id: 'app.resource-management-settings.always-show-copy-details.title',
+		defaultMessage: 'Always show copy details',
+	},
+	alwaysShowCopyDetailsDescription: {
+		id: 'app.resource-management-settings.always-show-copy-details.description',
+		defaultMessage:
+			'Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs.',
+	},
+})
 
 watch(
 	settings,
@@ -152,6 +174,28 @@ async function findLauncherDir() {
 				The maximum amount of files the launcher can write to the disk at once. Set this to a lower
 				value if you are frequently getting I/O errors. (app restart required to take effect)
 			</p>
+		</div>
+
+		<div class="flex items-center justify-between gap-4">
+			<div>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.alwaysShowCopyDetailsTitle) }}
+				</h2>
+				<p class="m-0 mt-1">
+					{{ formatMessage(messages.alwaysShowCopyDetailsDescription) }}
+				</p>
+			</div>
+			<Toggle
+				id="always-show-copy-details"
+				:model-value="themeStore.getFeatureFlag(alwaysShowCopyDetailsFlag)"
+				@update:model-value="
+					() => {
+						const newValue = !themeStore.getFeatureFlag(alwaysShowCopyDetailsFlag)
+						themeStore.featureFlags[alwaysShowCopyDetailsFlag] = newValue
+						settings.feature_flags[alwaysShowCopyDetailsFlag] = newValue
+					}
+				"
+			/>
 		</div>
 
 		<div class="flex flex-col gap-2.5">

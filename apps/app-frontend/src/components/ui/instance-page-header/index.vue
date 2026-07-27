@@ -4,23 +4,57 @@
 			<Avatar :src="iconSrc" :alt="instance.name" size="64px" :tint-by="instance.id" />
 		</template>
 
+		<template v-if="instance.shared_instance || instance.quarantined" #badges>
+			<PageHeaderBadgeItem
+				v-if="instance.quarantined"
+				:icon="LockIcon"
+				aria-label="Locked instance information"
+				class="!border-orange !bg-highlight-orange !text-orange"
+			>
+				Locked
+			</PageHeaderBadgeItem>
+			<PageHeaderBadgeItem
+				v-else
+				:icon="UnknownIcon"
+				:tooltip="sharedInstanceTooltip"
+				aria-label="Shared instance information"
+				class="!border-blue !bg-highlight-blue !text-blue"
+			>
+				Shared
+			</PageHeaderBadgeItem>
+		</template>
+
 		<template #metadata>
-			<InstanceHeaderServerMetadata
-				v-if="isServerInstance"
-				:loading-server-ping="loadingServerPing"
-				:players-online="playersOnline"
-				:status-online="statusOnline"
-				:recent-plays="recentPlays"
-				:ping="ping"
-				:minecraft-server="minecraftServer"
-				:linked-project-v3="linkedProjectV3"
-				:instance-id="instance.id"
-			/>
+			<div v-if="isServerInstance" class="flex flex-wrap items-center gap-2">
+				<InstanceHeaderServerMetadata
+					:loading-server-ping="loadingServerPing"
+					:players-online="playersOnline"
+					:status-online="statusOnline"
+					:recent-plays="recentPlays"
+					:ping="ping"
+					:minecraft-server="minecraftServer"
+					:linked-project-v3="linkedProjectV3"
+					:instance-id="instance.id"
+				/>
+				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
+					{{ sharedInstanceManagerLabel }}
+					<Avatar
+						:src="sharedInstanceManager.avatarUrl"
+						:alt="sharedInstanceManager.name"
+						:tint-by="sharedInstanceManager.tintBy"
+						size="24px"
+						:circle="sharedInstanceManager.type === 'user'"
+						no-shadow
+					/>
+					<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
+				</PageHeaderMetadataItem>
+			</div>
 			<PageHeaderMetadata v-else>
 				<PageHeaderMetadataItem :icon="Gamepad2Icon" tooltip="Minecraft version">
 					Minecraft {{ instance.game_version }}
 				</PageHeaderMetadataItem>
 				<PageHeaderMetadataItem
+					v-if="sharedInstanceManager?.type !== 'user'"
 					:icon="ServerLoaderIcon"
 					:icon-props="{ loader: loaderDisplayName }"
 					tooltip="Mod loader"
@@ -34,6 +68,18 @@
 				>
 					{{ playtimeLabel }}
 				</PageHeaderMetadataItem>
+				<PageHeaderMetadataItem v-if="sharedInstanceManager" :action="sharedInstanceManagerAction">
+					{{ sharedInstanceManagerLabel }}
+					<Avatar
+						:src="sharedInstanceManager.avatarUrl"
+						:alt="sharedInstanceManager.name"
+						:tint-by="sharedInstanceManager.tintBy"
+						size="24px"
+						:circle="sharedInstanceManager.type === 'user'"
+						no-shadow
+					/>
+					<span class="min-w-0 truncate">{{ sharedInstanceManager.name }}</span>
+				</PageHeaderMetadataItem>
 			</PageHeaderMetadata>
 		</template>
 
@@ -44,18 +90,24 @@
 						{{ formatMessage(commonMessages.installingLabel) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
-					<button type="button" @click="emit('repair')">
-						<DownloadIcon />
-						{{ formatMessage(messages.repair) }}
-					</button>
-				</ButtonStyled>
 				<ButtonStyled v-else-if="playing" color="red" size="large">
 					<button type="button" :disabled="stopping" @click="emit('stop')">
 						<StopCircleIcon />
 						{{
 							stopping ? formatMessage(messages.stopping) : formatMessage(commonMessages.stopButton)
 						}}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="instance.quarantined" color="brand" size="large">
+					<button v-tooltip="formatMessage(messages.lockedPlayTooltip)" type="button" disabled>
+						<PlayIcon />
+						{{ formatMessage(commonMessages.playButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand" size="large">
+					<button type="button" @click="emit('repair')">
+						<DownloadIcon />
+						{{ formatMessage(messages.repair) }}
 					</button>
 				</ButtonStyled>
 				<JoinedButtons
@@ -104,13 +156,16 @@ import {
 	DownloadIcon,
 	ExternalIcon,
 	FolderOpenIcon,
+	LockIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
+	ReportIcon,
 	SettingsIcon,
 	StopCircleIcon,
 	TagCategoryGamepad2Icon as Gamepad2Icon,
 	TimerIcon,
+	UnknownIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -123,6 +178,7 @@ import {
 	LoaderIcon as ServerLoaderIcon,
 	PageHeader,
 	PageHeaderActions,
+	PageHeaderBadgeItem,
 	PageHeaderMetadata,
 	PageHeaderMetadataItem,
 	type ServerLoader,
@@ -130,6 +186,7 @@ import {
 	type TeleportOverflowMenuItem,
 	useVIntl,
 } from '@modrinth/ui'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
@@ -169,6 +226,10 @@ const messages = defineMessages({
 		id: 'instance.action.repair',
 		defaultMessage: 'Repair',
 	},
+	lockedPlayTooltip: {
+		id: 'instance.locked.play-tooltip',
+		defaultMessage: 'This instance has been locked',
+	},
 	starting: {
 		id: 'instance.action.starting',
 		defaultMessage: 'Starting...',
@@ -176,6 +237,14 @@ const messages = defineMessages({
 	stopping: {
 		id: 'instance.action.stopping',
 		defaultMessage: 'Stopping...',
+	},
+	sharedInstanceTooltip: {
+		id: 'instance.shared-instance.tooltip',
+		defaultMessage: "This instance's content is being managed by someone else.",
+	},
+	sharedInstanceOwnerTooltip: {
+		id: 'instance.shared-instance.owner-tooltip',
+		defaultMessage: "This instance's content is being shared to other users.",
 	},
 })
 
@@ -196,6 +265,12 @@ const props = withDefaults(
 		ping?: number
 		minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
 		linkedProjectV3?: Labrinth.Projects.v3.Project
+		sharedInstanceManager?: {
+			type: 'user' | 'server'
+			name: string
+			avatarUrl?: string
+			tintBy: string
+		} | null
 	}>(),
 	{
 		iconSrc: null,
@@ -212,6 +287,7 @@ const props = withDefaults(
 		ping: undefined,
 		minecraftServer: undefined,
 		linkedProjectV3: undefined,
+		sharedInstanceManager: null,
 	},
 )
 
@@ -224,6 +300,7 @@ const emit = defineEmits<{
 	openFolder: []
 	export: []
 	createShortcut: []
+	report: [event?: MouseEvent]
 }>()
 
 const installingStages = [
@@ -241,6 +318,21 @@ const loaderDisplayName = computed(() => formatLoaderLabel(props.instance.loader
 const loaderLabel = computed(() =>
 	[loaderDisplayName.value, props.instance.loader_version].filter(Boolean).join(' '),
 )
+const sharedInstanceTooltip = computed(() =>
+	formatMessage(
+		props.instance.shared_instance?.role === 'owner'
+			? messages.sharedInstanceOwnerTooltip
+			: messages.sharedInstanceTooltip,
+	),
+)
+const sharedInstanceManagerLabel = computed(() =>
+	props.sharedInstanceManager?.type === 'server' ? 'Linked to' : 'Managed by',
+)
+const sharedInstanceManagerAction = computed(() => {
+	const manager = props.sharedInstanceManager
+	if (manager?.type !== 'user') return undefined
+	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(manager.name)}`)
+})
 const playtimeLabel = computed(() => {
 	if (props.timePlayed <= 0) return formatMessage(messages.neverPlayed)
 
@@ -271,24 +363,46 @@ const serverPlayActions = computed<JoinedButtonAction[]>(() => [
 		action: () => emit('play'),
 	},
 ])
-const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
-	{
-		id: 'open-folder',
-		label: formatMessage(messages.openFolder),
-		icon: FolderOpenIcon,
-		action: () => emit('openFolder'),
-	},
-	{
-		id: 'export-mrpack',
-		label: formatMessage(messages.exportModpack),
-		icon: PackageIcon,
-		action: () => emit('export'),
-	},
-	{
-		id: 'create-shortcut',
-		label: formatMessage(messages.createShortcut),
-		icon: ExternalIcon,
-		action: () => emit('createShortcut'),
-	},
-])
+const moreActions = computed<TeleportOverflowMenuItem[]>(() => {
+	const actions: TeleportOverflowMenuItem[] = [
+		{
+			id: 'open-folder',
+			label: formatMessage(messages.openFolder),
+			icon: FolderOpenIcon,
+			action: () => emit('openFolder'),
+		},
+	]
+
+	if (!props.instance.quarantined) {
+		actions.push(
+			{
+				id: 'export-mrpack',
+				label: formatMessage(messages.exportModpack),
+				icon: PackageIcon,
+				action: () => emit('export'),
+			},
+			{
+				id: 'create-shortcut',
+				label: formatMessage(messages.createShortcut),
+				icon: ExternalIcon,
+				action: () => emit('createShortcut'),
+			},
+		)
+	}
+
+	if (props.instance.shared_instance?.role === 'member') {
+		actions.push(
+			{ divider: true },
+			{
+				id: 'report-shared-instance',
+				label: formatMessage(commonMessages.reportButton),
+				icon: ReportIcon,
+				color: 'red',
+				action: (event) => emit('report', event),
+			},
+		)
+	}
+
+	return actions
+})
 </script>

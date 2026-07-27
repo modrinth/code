@@ -89,11 +89,14 @@
   "app.action-bar.install.unknown-instance": {
     "message": "Onbekende instantie"
   },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Gedeelde inhoud bijwerken"
+  },
   "app.action-bar.installs": {
     "message": "Installaties"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Maak primaire instantie"
+    "message": "Tot hoofdinstantie maken"
   },
   "app.action-bar.no-instances-running": {
     "message": "Geen actieve instanties"
@@ -102,7 +105,7 @@
     "message": "Offline"
   },
   "app.action-bar.primary-instance": {
-    "message": "Primaire instantie"
+    "message": "Hoofdinstantie"
   },
   "app.action-bar.reload-to-update": {
     "message": "Herlaadt om te updaten"
@@ -124,6 +127,21 @@
   },
   "app.action-bar.view-logs": {
     "message": "Bekijk logs"
+  },
+  "app.ads-consent.accept": {
+    "message": "Alles accepteren"
+  },
+  "app.ads-consent.body": {
+    "message": "Advertenties maken Modrinth mogelijk en financieren de uitbetalingen aan makers. Onze partners kunnen cookies in de app opslaan of gebruiken om advertenties te personaliseren en de prestaties te meten."
+  },
+  "app.ads-consent.manage": {
+    "message": "Voorkeuren beheren"
+  },
+  "app.ads-consent.reject": {
+    "message": "Alles afwijzen"
+  },
+  "app.ads-consent.title": {
+    "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Activeert geavanceerde weergaves zoals blur effecten die mogelijke prestatieproblemen opleveren zonder hardware-versnelde weergeving."
@@ -323,6 +341,36 @@
   "app.install.phase.running_loader_processors": {
     "message": "Loader-processors aan het uitvoeren"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Toegevoegd"
+  },
+  "app.instance.admonitions.shared-instance.changes-body": {
+    "message": "Je lokale instantie loopt voor op de gebruikers met wie je deze hebt gedeeld."
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "message": "Je wijzigingen zijn nog niet gedeeld"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "message": "Update verzenden"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "message": "Verzenden..."
+  },
+  "app.instance.admonitions.shared-instance.removed-label": {
+    "message": "Verwijderd"
+  },
+  "app.instance.admonitions.shared-instance.review-admonition-header": {
+    "message": "Update verzenden"
+  },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Bekijk de inhoudelijke wijzigingen die met alle gebruikers van deze instantie zullen worden gedeeld."
+  },
+  "app.instance.admonitions.shared-instance.review-header": {
+    "message": "Wijzigingen bekijken"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "message": "Controleren..."
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
   },
@@ -359,6 +407,9 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
+  "app.instance.mods.locked-content": {
+    "message": "De inhoud van vergrendelde instanties kan niet worden gewijzigd."
+  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was toegevoegd"
   },
@@ -373,6 +424,102 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Succesvol geüpload"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Je kunt deze instantie met je vrienden delen!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Geen vrienden uitgenodigd"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Vrienden uitnodigen"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "{name} delen"
+  },
+  "app.instance.share.locked.empty-description-prefix": {
+    "message": "Je moet je aanmelden als"
+  },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "om deze pagina te openen."
+  },
+  "app.instance.share.locked.linked-account-fallback": {
+    "message": "het gekoppelde account"
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Niet aangemeld"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Van account wisselen"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Verkeerd account"
+  },
+  "app.instance.share.remove-user-modal.effect-access": {
+    "message": "Ze zullen geen updates meer ontvangen voor deze gedeelde instantie"
+  },
+  "app.instance.share.remove-user-modal.effect-installed-copy": {
+    "message": "Elke versie die ze al hebben geïnstalleerd, blijft op hun apparaat staan"
+  },
+  "app.instance.share.remove-user-modal.effect-invite-again": {
+    "message": "Je kunt ze later opnieuw uitnodigen"
+  },
+  "app.instance.share.remove-user-modal.effect-last-user": {
+    "message": "Dit is de laatste gebruiker; delen wordt voor deze instantie uitgeschakeld"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Wat gebeurt er dan?"
+  },
+  "app.instance.share.remove-user-modal.header": {
+    "message": "Toegang intrekken"
+  },
+  "app.instance.share.remove-user-modal.remove-button": {
+    "message": "Toegang intrekken"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "Avatar van {username}"
+  },
+  "app.instance.share.remove-user-modal.warning-body": {
+    "message": "Als je de toegang van {username} tot deze gedeelde instantie intrekt, moet je die persoon opnieuw uitnodigen voordat die updates kunnen ontvangen."
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Aanmelden"
+  },
+  "app.instance.share.unlink.body": {
+    "message": "Je moet dit modpack ontkoppelen om je instantie te kunnen delen"
+  },
+  "app.instance.share.unlink.header": {
+    "message": "Om te delen moet je ontkoppelen"
+  },
+  "app.instance.shared-instance-already-installed.body": {
+    "message": "Deze gedeelde instantie is al geïnstalleerd als <bold>{instanceName}</bold>. Weet je zeker dat je nog een exemplaar wilt installeren?"
+  },
+  "app.instance.shared-instance-already-installed.header": {
+    "message": "Gedeelde instantie al geïnstalleerd"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Toch installeren"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instantie"
+  },
+  "app.instance.shared-instance-wrong-account.fallback-username": {
+    "message": "het gekoppelde account"
+  },
+  "app.instance.shared-instance-wrong-account.owner-admonition-body-v2": {
+    "message": "om deze gedeelde instantie te beheren. Je kunt geen updates naar gebruikers verzenden."
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Log in als"
+  },
+  "app.instance.shared-instance-wrong-account.signed-out-header": {
+    "message": "Je moet je aanmelden bij Modrinth"
+  },
+  "app.instance.shared-instance-wrong-account.user-admonition-body-v2": {
+    "message": "om updates voor deze gedeelde instantie te ontvangen."
+  },
+  "app.instance.shared-instance-wrong-account.warning-header": {
+    "message": "Je gebruikt het verkeerde Modrinth-account"
   },
   "app.instance.worlds.add-server": {
     "message": "Voeg server toe"
@@ -425,7 +572,19 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Zoek werelden"
   },
-  "app.modal.install-to-play.dont-install": {
+  "app.modal.install-to-play.additional-context": {
+    "message": "Aanvullende context"
+  },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "Voeg links en afbeeldingen toe als dat mogelijk en relevant is"
+  },
+  "app.modal.install-to-play.content-you-are-reporting": {
+    "message": "Instantie die je meldt"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Instantie verwijderen"
+  },
+  "app.modal.install-to-play.external-files-dont-install": {
     "message": "Niet installeren"
   },
   "app.modal.install-to-play.header": {
@@ -443,11 +602,50 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "Gebruik dit formulier om instanties te melden die mogelijk in strijd zijn met onze <rules-link>Regels</rules-link> of <terms-link>Gebruiksvoorwaarden</terms-link>."
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Bestand is geen ondersteund afbeeldingstype"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Bestand overschrijdt maximale grootte van 1 MiB"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "Voor DMCA-meldingen of andere juridische vorderingen, zie ons <copyright-link>auteursrechtbeleid</copyright-link>."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Welke regel wordt in deze instantie overtreden?"
+  },
+  "app.modal.install-to-play.report-reason.inappropriate": {
+    "message": "Ongepast"
+  },
+  "app.modal.install-to-play.report-reason.malicious": {
+    "message": "Kwaadaardig"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Spam"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Gedeelde instantie melden"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Melding ingediend"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "Neem voor ondersteuningsverzoeken contact op met ons <support-link>ondersteuningsteam</support-link>. Voor bugmeldingen kun je een <github-link>GitHub-issue</github-link> aanmaken."
+  },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Een bestand wordt alleen beoordeeld als het op Modrinth wordt gepubliceerd, ongeacht het bestandsformaat (inclusief .mrpack)."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Gedeelde instantie"
+  },
+  "app.modal.install-to-play.shared-instance-content": {
+    "message": "Inhoud van de gedeelde instantie"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Deze gedeelde instantie bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Dit server-modpack bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
@@ -467,8 +665,23 @@
   "app.modal.update-to-play.removed": {
     "message": "Verwijderde"
   },
+  "app.modal.update-to-play.server-modpack-unknown-files-description": {
+    "message": "Deze update voor de server-modpack bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
+  },
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Toegevoegd"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Verwijderd"
+  },
+  "app.modal.update-to-play.shared-instance-unknown-files-description": {
+    "message": "Deze update voor de gedeelde instantie bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Update vereist"
+  },
   "app.modal.update-to-play.update-required-description": {
-    "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
+    "message": "Er is een update nodig om {name} te spelen. Werk het spel bij naar de nieuwste versie om het te kunnen starten."
   },
   "app.project.install-button.already-installed": {
     "message": "Dit project is al geïnstalleerd"
@@ -479,11 +692,26 @@
   "app.project.install-context.back-to-browse": {
     "message": "Terug naar Ontdekken"
   },
+  "app.project.version.all-versions": {
+    "message": "Alle versies"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Downloaden in de browser"
+  },
+  "app.project.version.installing": {
+    "message": "Wordt geïnstalleerd"
+  },
+  "app.project.versions.already-installed": {
+    "message": "Al geïnstalleerd"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },
   "app.settings.downloading": {
     "message": "v{version} wordt gedownload"
+  },
+  "app.settings.privacy.ads-consent.intro": {
+    "message": "Advertenties maken Modrinth mogelijk en financieren de uitbetalingen aan makers. Onze partners kunnen cookies in de app opslaan of gebruiken om advertenties te personaliseren en de prestaties te meten. Je kunt je hieronder afmelden of je voorkeuren beheren."
   },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
@@ -519,13 +747,16 @@
     "message": "De geselecteerde skin wordt permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt."
   },
   "app.skins.delete-modal.title": {
-    "message": "Weet u zeker dat u deze skin wilt verwijderen?"
+    "message": "Weet je zeker dat je deze skin wilt verwijderen?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Kan het neergezette bestand niet lezen."
   },
   "app.skins.dropped-file-error.title": {
     "message": "Fout bij het verwerken van het bestand"
+  },
+  "app.skins.ears-feature-notice": {
+    "message": "Deze skin maakt gebruik van functies uit de {ears} mod"
   },
   "app.skins.edit-button": {
     "message": "Skin aanpassen"
@@ -585,7 +816,7 @@
     "message": "Voorvertonen"
   },
   "app.skins.rate-limit.text": {
-    "message": "U verandert te snel van skin. Mojang's servers hebben nieuwe aanvragen tijdelijk geblokkeerd. Wacht een moment voordat u het opnieuw probeert."
+    "message": "Je verandert je skin te vaak. De servers van Mojang hebben verdere verzoeken tijdelijk geblokkeerd. Wacht even voordat je het opnieuw probeert."
   },
   "app.skins.rate-limit.title": {
     "message": "Rustig aan!"
@@ -618,7 +849,7 @@
     "message": "Modrinth Pride"
   },
   "app.skins.section.modrinth-pride.tooltip": {
-    "message": "U heeft deze skins ontvangen omdat u tijdens Pride Month heeft gedoneerd aan een Modrinth Pride-inzamelingsactie."
+    "message": "Je hebt deze skins ontvangen omdat je tijdens Pride Month een donatie hebt gedaan aan een inzamelingsactie van Modrinth Pride."
   },
   "app.skins.section.mounts-of-mayhem": {
     "message": "Mounts of Mayhem"
@@ -642,22 +873,28 @@
     "message": "Inloggen"
   },
   "app.skins.sign-in.description": {
-    "message": "Log in op je Minecraft-account om de skinbeheerfuncties van de Modrinth-app te gebruiken."
+    "message": "Log in op je Minecraft-account om de functies voor het beheren van skins in de Modrinth-app te kunnen gebruiken."
   },
   "app.skins.sign-in.rinthbot-alt": {
     "message": "Excited Modrinth Bot"
   },
   "app.skins.sign-in.title": {
-    "message": "Log in"
+    "message": "Graag inloggen"
   },
   "app.skins.title": {
     "message": "Skinkiezer"
+  },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Uitschakelen"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Inschakelen"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} is beschikbaar. Gebruik je pakketbeheerder om te updaten voor de laatste functies en oplossingen!"
+    "message": "De Modrinth-app v{version} is beschikbaar. Gebruik je pakketbeheerder om bij te werken en zo de nieuwste functies en verbeteringen te krijgen!"
   },
   "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
@@ -701,6 +938,39 @@
   "app.world.world-item.players-online": {
     "message": "{count} online"
   },
+  "content.shared-instance.change-version-body": {
+    "message": "Als je de versie wijzigt, wordt alleen je lokale kopie aangepast. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
+  },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "Sommige geselecteerde projecten maken deel uit van de gedeelde instantie. Als je ze verwijdert, wordt alleen je lokale kopie aangepast; bij toekomstige updates van de gedeelde instantie kunnen ze weer worden hersteld of opnieuw worden gewijzigd."
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Toch verwijderen"
+  },
+  "content.shared-instance.delete-many-button": {
+    "message": "{count, plural, one {# project} other {# projecten}} toch verwijderen"
+  },
+  "content.shared-instance.delete-single-body": {
+    "message": "Het verwijderen past alleen je lokale kopie aan. Bij toekomstige updates van de gedeelde instantie kan deze weer worden teruggezet of opnieuw worden gewijzigd."
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "Sommige geselecteerde projecten maken deel uit van de gedeelde instantie. Als je ze uitschakelt, heeft dit alleen gevolgen voor je lokale kopie; bij toekomstige updates van de gedeelde instantie kunnen ze opnieuw worden ingeschakeld, hersteld of gewijzigd."
+  },
+  "content.shared-instance.disable-button": {
+    "message": "Toch uitschakelen"
+  },
+  "content.shared-instance.disable-many-button": {
+    "message": "{count, plural, one {# project} other {# projecten}} toch uitschakelen"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "Het uitschakelen heeft alleen gevolgen voor je lokale kopie. Bij toekomstige updates van de gedeelde instantie kan deze functie opnieuw worden ingeschakeld, hersteld of gewijzigd."
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "Het ontkoppelen heeft alleen invloed op je lokale kopie. Bij toekomstige updates van de gedeelde instantie kan deze weer worden hersteld of opnieuw worden gewijzigd."
+  },
+  "content.shared-instance.warning-header": {
+    "message": "Dit maakt deel uit van de gedeelde instantie"
+  },
   "friends.action.add-friend": {
     "message": "Voeg een vriend toe"
   },
@@ -720,7 +990,7 @@
     "message": "Voer Modrinth gebruikersnaam in..."
   },
   "friends.add-friend.username.title": {
-    "message": "Wat is de Modrinth gebruikersnaam van jouw vriend?"
+    "message": "Wat is de Modrinth-gebruikersnaam van je vriend(in)?"
   },
   "friends.add-friends-to-share": {
     "message": "<link>Voeg vrienden toe</link> om te zien wat zij spelen!"
@@ -762,7 +1032,76 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Log in op een Modrinth account</link> om vrienden toe te voegen en zien wat zij spelen!"
+    "message": "<link>Log in op een Modrinth-account</link> om vrienden toe te voegen en te zien wat zij spelen!"
+  },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Gekoppelde gedeelde instantie"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "Instantie terugtrekken"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Gedeelde instantie ontkoppelen"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "Koppel deze lokale instantie los van toekomstige gedeelde updates."
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Ontkoppelen..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Gedeelde instantie terugtrekken"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Verwijder deze gedeelde instantie uit Modrinth en stuur geen updates meer naar gebruikers ervan. Je lokale instantie merkt hier geen gevolgen van."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Terugtrekken..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "Dit heeft alleen gevolgen voor je lokale instantie. Je geïnstalleerde inhoud blijft op dit apparaat staan, en de gedeelde instantie en andere gebruikers ervan ondervinden hier geen hinder van."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "Gedeelde instantie ontkoppelen"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "Gedeelde instantie ontkoppelen"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "Hiermee wordt de gedeelde instantie van de servers van Modrinth verwijderd. Gebruikers die deze instantie in de Modrinth-app gebruiken, ontvangen geen updates meer, maar je lokale instantie en de inhoud daarvan blijven op dit apparaat staan."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Gedeelde instantie terugtrekken"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Gedeelde instantie terugtrekken"
+  },
+  "instance.action.create-shortcut": {
+    "message": "Snelkoppeling maken"
+  },
+  "instance.action.export-modpack": {
+    "message": "Modpack exporteren"
+  },
+  "instance.action.launch-instance": {
+    "message": "Instantie starten"
+  },
+  "instance.action.more-actions": {
+    "message": "Meer acties"
+  },
+  "instance.action.open-folder": {
+    "message": "Map openen"
+  },
+  "instance.action.repair": {
+    "message": "Herstellen"
+  },
+  "instance.action.settings": {
+    "message": "Instellingen voor instantie"
+  },
+  "instance.action.starting": {
+    "message": "Aan het opstarten..."
+  },
+  "instance.action.stopping": {
+    "message": "Aan het stoppen..."
   },
   "instance.add-server.add-and-play": {
     "message": "Toevoegen en spelen"
@@ -805,6 +1144,15 @@
   },
   "instance.files.save-as": {
     "message": "Opslaan als..."
+  },
+  "instance.locked.delete-button": {
+    "message": "Instantie verwijderen"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Deze instantie is vergrendeld"
+  },
+  "instance.playtime.never-played": {
+    "message": "Nog nooit gespeeld"
   },
   "instance.server-modal.address": {
     "message": "Adres"
@@ -941,6 +1289,9 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versie {loader}"
   },
+  "instance.settings.tabs.installation.locked": {
+    "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
+  },
   "instance.settings.tabs.java": {
     "message": "Java en geheugen"
   },
@@ -980,6 +1331,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "//pad/naar/java"
   },
+  "instance.settings.tabs.sharing": {
+    "message": "Delen"
+  },
   "instance.settings.tabs.window": {
     "message": "Venster"
   },
@@ -1009,6 +1363,57 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Voer breedte in..."
+  },
+  "instance.shared-instance.error.title": {
+    "message": "Er is iets misgegaan"
+  },
+  "instance.shared-instance.owner-tooltip": {
+    "message": "De inhoud van deze instantie wordt gedeeld met andere gebruikers."
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Toegevoegd"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Update naar spelers verzenden"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Configuratiebestanden selecteren"
+  },
+  "instance.shared-instance.publish-review.description": {
+    "message": "Bekijk de inhoudelijke wijzigingen en selecteer de configuratiebestanden die je in deze update wilt opnemen."
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Wijzigingen bekijken"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Update verzenden"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Verwijderd"
+  },
+  "instance.shared-instance.tooltip": {
+    "message": "De inhoud van deze instantie wordt door iemand anders beheerd."
+  },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Je toegang tot de gedeelde instantie is ingetrokken. Deze instantie is nog steeds beschikbaar, maar is niet langer gekoppeld en ontvangt geen updates meer."
+  },
+  "instance.shared-instance.unavailable.deleted-text": {
+    "message": "De hoofdinstantie is verwijderd. Deze instantie is nog steeds beschikbaar, maar is niet meer gekoppeld en ontvangt geen updates meer."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "Deze gedeelde instantie is vergrendeld door het inhoudsmoderatieteam. De instantie ontvangt geen updates meer van de hoofdinstantie en je kunt er niet meer in spelen."
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "Instantie vergrendeld"
+  },
+  "instance.shared-instance.unavailable.manager-fallback": {
+    "message": "de instantiebeheerder"
+  },
+  "instance.shared-instance.unavailable.text": {
+    "message": "Je lokale instantie is nog steeds beschikbaar, maar is niet langer gekoppeld en ontvangt geen updates meer."
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "Gedeelde instantie niet meer beschikbaar"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Een Minecraft server"
@@ -1062,7 +1467,7 @@
     "message": "Minecraft account"
   },
   "minecraft-account.not-signed-in": {
-    "message": "Niet ingelogd"
+    "message": "Niet aangemeld"
   },
   "minecraft-account.remove-account": {
     "message": "Verwijder account"
@@ -1071,7 +1476,64 @@
     "message": "Selecteer account"
   },
   "minecraft-account.sign-in": {
-    "message": "Log in bij Minecraft"
+    "message": "Meld je aan bij Minecraft"
+  },
+  "minecraft-required.description": {
+    "message": "Je hebt een Microsoft-account nodig waarop Minecraft is geregistreerd voordat je het spel kunt starten en spelen."
+  },
+  "minecraft-required.description-header": {
+    "message": "Meld je aan bij een Microsoft-account"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Heb je nog geen account?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Minecraft kopen"
+  },
+  "minecraft-required.get-support": {
+    "message": "Hulp krijgen"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft vereist"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Aanmelden bij Microsoft"
+  },
+  "modal.modrinth-account-required.browser-description": {
+    "message": "Er is een nieuw tabblad geopend om je aan te melden. Log daar in en ga vervolgens terug naar de app."
+  },
+  "modal.modrinth-account-required.cancel-button": {
+    "message": "Annuleren"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Doorgaan in je browser"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Een account aanmaken"
+  },
+  "modal.modrinth-account-required.description": {
+    "message": "Je moet je aanmelden bij je Modrinth-account voordat je deze functie kunt gebruiken."
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Account vereist"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Opnieuw de browser openen"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Bij Modrinth aanmelden"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Meld je aan bij een Modrinth-account"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Aanmelden"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Problemen bij het aanmelden? <support>Hulp krijgen</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "Wachten op bevestiging van de browser..."
   },
   "search.filter.locked.instance": {
     "message": "Aangeboden door de instantie"

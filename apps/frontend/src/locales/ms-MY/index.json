@@ -2897,24 +2897,6 @@
   "project-type.shader.singular": {
     "message": "Pembayang"
   },
-  "project.about.details.created": {
-    "message": "Dicipta {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "Berlesen {license}"
-  },
-  "project.about.details.published": {
-    "message": "Diterbitkan {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Diserahkan {date}"
-  },
-  "project.about.details.title": {
-    "message": "Butiran"
-  },
-  "project.about.details.updated": {
-    "message": "Dikemas kini {date}"
-  },
   "project.actions.create-server": {
     "message": "Cipta pelayan"
   },
@@ -2944,9 +2926,6 @@
   },
   "project.description.title": {
     "message": "Keterangan"
-  },
-  "project.details.licensed": {
-    "message": "Berlesen"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} tidak menyokong {gameVersion} untuk {platform}"
@@ -2999,15 +2978,6 @@
   "project.gallery.title": {
     "message": "Galeri"
   },
-  "project.license.error": {
-    "message": "Teks lesen tidak dapat diambil."
-  },
-  "project.license.loading": {
-    "message": "Sedang memuat teks lesen..."
-  },
-  "project.license.title": {
-    "message": "Lesen"
-  },
   "project.moderation.admonition.approved.body.private": {
     "message": "Projek anda adalah peribadi, yang bermakna ia hanya boleh diakses oleh anda dan orang yang anda jemput."
   },
@@ -3049,9 +3019,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Anda masih boleh mengubah suai projek anda, ia tidak akan menjejaskan kedudukan anda dalam barisan."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Kami menyasarkan untuk menyemak penyerahan dalam masa 24-48 jam, tetapi sesetengah projek mungkin menghadapi kelewatan. Ini tidak mencerminkan masalah dengan penyerahan anda."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Kami menghargai kesabaran anda sementara penyederhana kami berusaha keras untuk memastikan Modrinth kekal selamat, dan berharap dapat membantu anda berkongsi kandungan anda!💚</emphasis>"

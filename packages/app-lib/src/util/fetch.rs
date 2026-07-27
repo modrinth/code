@@ -915,18 +915,23 @@ pub async fn write_cached_icon(
     bytes: Bytes,
     semaphore: &IoSemaphore,
 ) -> crate::Result<PathBuf> {
-    let extension = Path::new(&icon_path).extension().and_then(OsStr::to_str);
     let hash = sha1_async(bytes.clone()).await?;
-    let path = cache_dir.join("icons").join(if let Some(ext) = extension {
-        format!("{hash}.{ext}")
-    } else {
-        hash
-    });
+    let path = cache_dir
+        .join("icons")
+        .join(cached_icon_file_name(icon_path, &hash));
 
     write(&path, &bytes, semaphore).await?;
 
     let path = io::canonicalize(path)?;
     Ok(path)
+}
+
+fn cached_icon_file_name(icon_path: &str, hash: &str) -> String {
+    let path = icon_path.split(['?', '#']).next().unwrap_or(icon_path);
+    match Path::new(path).extension().and_then(OsStr::to_str) {
+        Some(extension) => format!("{hash}.{extension}"),
+        None => hash.to_string(),
+    }
 }
 
 pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {

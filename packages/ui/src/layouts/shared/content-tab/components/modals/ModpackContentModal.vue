@@ -2,6 +2,7 @@
 import {
 	ArrowLeftRightIcon,
 	BoxIcon,
+	ExternalIcon,
 	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
@@ -13,6 +14,7 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -33,6 +35,7 @@ import ContentSelectionBar from '../ContentSelectionBar.vue'
 const { formatMessage } = useVIntl()
 
 interface Props {
+	header?: string
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
@@ -43,6 +46,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	header: undefined,
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
@@ -84,6 +88,18 @@ const messages = defineMessages({
 		id: 'instances.modpack-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
+	externalContent: {
+		id: 'instances.modpack-content-modal.external-content',
+		defaultMessage: 'External',
+	},
+	externalContentDescription: {
+		id: 'instances.modpack-content-modal.external-content-description',
+		defaultMessage: 'This file is not published on Modrinth.',
+	},
+	openInSlicer: {
+		id: 'instances.modpack-content-modal.open-in-slicer',
+		defaultMessage: 'Open in Slicer',
+	},
 })
 
 export interface ModpackContentModalState {
@@ -104,18 +120,17 @@ const selectedFilters = ref<string[]>([])
 const selectedIds = ref<string[]>([])
 
 const selectedItems = computed(() =>
-	items.value.filter((item) => selectedIds.value.includes(item.file_name)),
+	items.value.filter((item) => selectedIds.value.includes(item.id)),
 )
 
 const allSelected = computed(() => {
 	if (filteredItems.value.length === 0) return false
-	return filteredItems.value.every((item) => selectedIds.value.includes(item.file_name))
+	return filteredItems.value.every((item) => selectedIds.value.includes(item.id))
 })
 
 const someSelected = computed(() => {
 	return (
-		filteredItems.value.some((item) => selectedIds.value.includes(item.file_name)) &&
-		!allSelected.value
+		filteredItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
 	)
 })
 
@@ -123,7 +138,7 @@ function toggleSelectAll() {
 	if (allSelected.value || someSelected.value) {
 		selectedIds.value = []
 	} else {
-		selectedIds.value = filteredItems.value.map((item) => item.file_name)
+		selectedIds.value = filteredItems.value.map((item) => item.id)
 	}
 }
 
@@ -160,7 +175,7 @@ const filterOptions = computed(() => {
 		options.push({ id: 'warnings', label: 'Warnings' })
 	}
 
-	if (items.value.some((item) => !item.enabled)) {
+	if (props.enableToggle && items.value.some((item) => item.enabled === false)) {
 		options.push({ id: 'disabled', label: 'Disabled' })
 	}
 
@@ -190,7 +205,7 @@ const attributeFilterIds = new Set(['disabled', 'warnings'])
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
 	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-	const hasDisabledFilter = selectedFilters.value.includes('disabled')
+	const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 	const hasWarningsFilter = selectedFilters.value.includes('warnings')
 	return items.value.filter((item) => {
 		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
@@ -208,16 +223,12 @@ const filteredItems = computed(() => {
 	if (query) {
 		result = fuse.search(query).map(({ item }) => item)
 	} else {
-		result = [...items.value].sort((a, b) => {
-			const nameA = a.project?.title ?? a.file_name
-			const nameB = b.project?.title ?? b.file_name
-			return nameA.toLowerCase().localeCompare(nameB.toLowerCase())
-		})
+		result = sortContentItems(items.value)
 	}
 
 	if (selectedFilters.value.length > 0) {
 		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
-		const hasDisabledFilter = selectedFilters.value.includes('disabled')
+		const hasDisabledFilter = props.enableToggle && selectedFilters.value.includes('disabled')
 		const hasWarningsFilter = selectedFilters.value.includes('warnings')
 		result = result.filter((item) => {
 			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
@@ -228,21 +239,21 @@ const filteredItems = computed(() => {
 		})
 	}
 
-	return result
+	return sortContentItems(result, !query)
 })
 
 const tableItems = computed<ContentCardTableItem[]>(() =>
 	filteredItems.value.map((item) => ({
-		id: item.file_name,
+		id: item.id,
 		project: item.project ?? {
-			id: item.file_name,
+			id: item.id,
 			slug: null,
 			title: item.file_name,
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
+		projectLink: !item.external && item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
-			id: item.file_name,
+			id: item.id,
 			version_number: 'Unknown',
 			file_name: item.file_name,
 		},
@@ -278,6 +289,20 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		],
 	})),
 )
+const externalItemIds = computed(
+	() => new Set(items.value.filter((item) => item.external).map((item) => item.id)),
+)
+const externalSlicerUrls = computed(() => {
+	const urls: Record<string, string> = {}
+	for (const item of items.value) {
+		if (item.external && item.external_url) {
+			urls[item.id] = `https://slicer.run/?url=${encodeURIComponent(item.external_url)}`
+		}
+	}
+	return urls
+})
+const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
+const showTableActions = computed(() => props.enableToggle || hasExternalSlicerUrls.value)
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -293,9 +318,23 @@ function getTypeIcon(type: string) {
 	}
 }
 
-function handleEnabledChange(fileName: string, value: boolean) {
+function sortContentItems(contentItems: ContentItem[], sortByName = true) {
+	return [...contentItems].sort((a, b) => {
+		const externalDiff = Number(b.external === true) - Number(a.external === true)
+		if (externalDiff !== 0) return externalDiff
+		if (!sortByName) return 0
+
+		return itemDisplayName(a).toLowerCase().localeCompare(itemDisplayName(b).toLowerCase())
+	})
+}
+
+function itemDisplayName(item: ContentItem) {
+	return item.project?.title ?? item.file_name
+}
+
+function handleEnabledChange(id: string, value: boolean) {
 	if (props.actionDisabled) return
-	const item = items.value.find((i) => i.file_name === fileName)
+	const item = items.value.find((item) => item.id === id)
 	if (!item) return
 	emit('update:enabled', item, value)
 }
@@ -388,9 +427,10 @@ function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled
 }
 
 function setItems(contentItems: ContentItem[]) {
+	const contentIds = new Set(contentItems.map((item) => item.id))
 	const contentFileNames = new Set(contentItems.map((item) => item.file_name))
 	items.value = contentItems.map((item) => ({ ...item }))
-	selectedIds.value = selectedIds.value.filter((id) => contentFileNames.has(id))
+	selectedIds.value = selectedIds.value.filter((id) => contentIds.has(id))
 	disabledIds.value = new Set([...disabledIds.value].filter((id) => contentFileNames.has(id)))
 	loading.value = false
 }
@@ -414,7 +454,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				:tint-by="props.modpackName"
 			/>
 			<span class="text-lg font-extrabold text-contrast">
-				{{ formatMessage(messages.header) }}
+				{{ props.header ?? formatMessage(messages.header) }}
 			</span>
 		</template>
 		<div class="flex flex-col h-[min(600px,calc(95vh-10rem))]">
@@ -498,7 +538,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						<div
 							class="flex min-w-0 items-center gap-4"
 							:class="
-								props.enableToggle
+								showTableActions
 									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
@@ -517,13 +557,13 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 						</div>
 						<div
 							class="hidden @[800px]:flex"
-							:class="props.enableToggle ? 'flex-1 min-w-0' : 'flex-1'"
+							:class="showTableActions ? 'flex-1 min-w-0' : 'flex-1'"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.versionLabel)
 							}}</span>
 						</div>
-						<div v-if="props.enableToggle" class="min-w-[160px] shrink-0 text-right">
+						<div v-if="showTableActions" class="min-w-[160px] shrink-0 text-right">
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.actionsLabel)
 							}}</span>
@@ -534,6 +574,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 							v-model:selected-ids="selectedIds"
 							:items="tableItems"
 							:show-selection="props.enableToggle"
+							:show-item-actions="hasExternalSlicerUrls"
 							hide-delete
 							hide-header
 							flat
@@ -542,7 +583,30 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
 									: {}
 							"
-						/>
+						>
+							<template #itemTitleBadges="{ item }">
+								<span
+									v-if="externalItemIds.has(item.id)"
+									v-tooltip="formatMessage(messages.externalContentDescription)"
+									class="inline-flex shrink-0 items-center rounded-full border border-solid border-orange bg-orange-highlight px-2 py-0.5 text-xs font-semibold leading-4 text-orange"
+								>
+									{{ formatMessage(messages.externalContent) }}
+								</span>
+							</template>
+							<template #itemButtonsRight="{ item }">
+								<ButtonStyled v-if="externalSlicerUrls[item.id]" circular type="transparent">
+									<a
+										v-tooltip="formatMessage(messages.openInSlicer)"
+										:aria-label="formatMessage(messages.openInSlicer)"
+										:href="externalSlicerUrls[item.id]"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<ExternalIcon class="size-4" />
+									</a>
+								</ButtonStyled>
+							</template>
+						</ContentCardTable>
 					</div>
 				</div>
 			</div>

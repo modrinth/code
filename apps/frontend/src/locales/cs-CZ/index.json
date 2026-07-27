@@ -2315,24 +2315,6 @@
   "project-type.shader.singular": {
     "message": "Shader"
   },
-  "project.about.details.created": {
-    "message": "Vytvořeno {date}"
-  },
-  "project.about.details.licensed": {
-    "message": "License {license}"
-  },
-  "project.about.details.published": {
-    "message": "Zveřejněno {date}"
-  },
-  "project.about.details.submitted": {
-    "message": "Odesláno {date}"
-  },
-  "project.about.details.title": {
-    "message": "Detaily"
-  },
-  "project.about.details.updated": {
-    "message": "Aktualizováno {date}"
-  },
   "project.actions.create-server": {
     "message": "Vytvořit server"
   },
@@ -2359,9 +2341,6 @@
   },
   "project.description.title": {
     "message": "Popisek"
-  },
-  "project.details.licensed": {
-    "message": "Licencováno"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} nepodporuje {gameVersion} pro {platform}"
@@ -2392,15 +2371,6 @@
   },
   "project.gallery.title": {
     "message": "Galerie"
-  },
-  "project.license.error": {
-    "message": "Text licence se nepodařilo načíst."
-  },
-  "project.license.loading": {
-    "message": "Načítání textu licence..."
-  },
-  "project.license.title": {
-    "message": "Licence"
   },
   "project.moderation.admonition.approved.body.private": {
     "message": "Váš projekt je soukromý, což znamená, že k němu máte přístup pouze vy a lidé, které pozvete."

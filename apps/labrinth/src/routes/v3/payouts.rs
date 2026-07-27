@@ -3,7 +3,6 @@ use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
-use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
@@ -29,6 +28,7 @@ use sha2::Sha256;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
+use xredis::RedisPool;
 
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
