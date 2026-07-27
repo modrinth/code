@@ -3804,7 +3804,10 @@
     "message": "You can still modify your project, it won't affect your position in the queue."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission."
+    "message": "We aim to review submissions in 24–48 hours, but some projects may face delays. This does not reflect an issue with your submission."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>"
