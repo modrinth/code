@@ -2921,9 +2921,6 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Anda masih boleh mengubah suai projek anda, ia tidak akan menjejaskan kedudukan anda dalam barisan."
   },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Kami menyasarkan untuk menyemak penyerahan dalam masa 24-48 jam, tetapi sesetengah projek mungkin menghadapi kelewatan. Ini tidak mencerminkan masalah dengan penyerahan anda."
-  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Kami menghargai kesabaran anda sementara penyederhana kami berusaha keras untuk memastikan Modrinth kekal selamat, dan berharap dapat membantu anda berkongsi kandungan anda!💚</emphasis>"
   },

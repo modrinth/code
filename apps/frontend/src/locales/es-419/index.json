@@ -2723,9 +2723,6 @@
   "modpack-scan-modal.scan-all-files": {
     "message": "Escanear todos los archivos"
   },
-  "modpack-scan-modal.scan-error": {
-    "message": "No se pudieron escanear algunos archivos: {error}"
-  },
   "modpack-scan-modal.scanning": {
     "message": "Escaneando..."
   },
@@ -3337,9 +3334,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Aún puedes modificar tu proyecto, no afectará tu posición en la cola."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Nuestro objetivo es revisar envíos en un plazo de 24-48 horas, pero algunos proyectos pueden sufrir retrasos. Esto no indica que haya algún problema con tu envío."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>¡Apreciamos tu paciencia mientras nuestros moderadores trabajan duro para mantener Modrinth seguro, y estaremos encantados de poder ayudarte a compartir tu contenido! 💚</emphasis>"

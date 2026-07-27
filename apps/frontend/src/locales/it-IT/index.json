@@ -2123,6 +2123,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Importo troppo basso"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "Questo metodo di prelievo è stato disabilitato dal PSP. Usane uno diverso o contatta l'assistenza."
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Metodo di prelievo non disponibile"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "Si prega di usare l'opzione di trasferimento PayPal corretta per la tua regione (Stati Uniti o Internazionale)."
   },
@@ -2913,13 +2919,13 @@
     "message": "Verifica email richiesta"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Installa automaticamente il gioco e il loader richiesto"
+    "message": "Installa automaticamente ciò a cui stanno giocando"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Entra nell'istanza condivisa in un clic"
+    "message": "Gioca allo stesso modo dei tuoi amici"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
-    "message": "Mantieni i contenuti condivisi aggiornati con l'istanza"
+    "message": "Aggiorna i contenuti non appena lo fanno loro"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Scarica Modrinth App"
@@ -2957,6 +2963,24 @@
   "moderation.page.technicalReview": {
     "message": "Revisione tecnica"
   },
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} alla volta"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Ammontare"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "Questi gruppi di attribuzione e i file all'interno saranno rimossi per sempre da questo progetto. Quest'azione non può essere annullata."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Errore nell'eliminazione dei gruppi: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Procedi"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "Tutti i gruppi eliminati con successo."
+  },
   "modpack-scan-modal.failed": {
     "message": "Errore"
   },
@@ -2988,10 +3012,13 @@
     "message": "Scansiona tutto"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Alcuni file non sono stati scansionati: {error}"
+    "message": "Alcuni file non sono stati scansionati: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Scansione..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Successo"
   },
   "modpack-scan-modal.title": {
     "message": "Scansione del pacchetto ({scanned}/{total} file)"
@@ -3657,7 +3684,10 @@
     "message": "Puoi ancora modificare il progetto; non influirà sulla tua posizione in coda."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "Puntiamo a revisionare i progetti entro le 24-48 ore, ma potrebbero esserci dei ritardi; ciò non vuol dire che abbiamo trovato un problema."
+    "message": "Puntiamo a revisionare i progetti entro le 24–48 ore, ma potrebbero esserci dei ritardi; Ciò non vuol dire che abbiamo trovato un problema."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "Puntiamo a revisionare i progetti entro una settimana, ma potrebbero esserci dei ritardi. Ciò non vuol dire che abbiamo trovato un problema."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Apprezziamo la tua pazienza. Mentre i nostri moderatori si impegnano a tenere Modrinth un posto sicuro, non vediamo l'ora di aiutare a condividere i tuoi contenuti! 💚</emphasis>"

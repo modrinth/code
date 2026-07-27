@@ -341,6 +341,9 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Törlési figyelmeztetés"
   },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "{count, number} {itemType} törlése"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {A verzió visszaváltása} other {A frissítés}} kompatibilitási problémákat okozhat. A modcsomaghoz hozzáadott modok vagy tartalmak megmaradnak, de előfordulhat, hogy nem lesznek kompatibilisek az új verzióval."
   },
@@ -417,7 +420,10 @@
     "defaultMessage": "Letiltva"
   },
   "content.diff-modal.diff-type.updated": {
-    "defaultMessage": "Frissítve"
+    "defaultMessage": "Frissítve:"
+  },
+  "content.diff-modal.file-count": {
+    "defaultMessage": "{count} fájl"
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} eltávolítva"
@@ -1401,7 +1407,7 @@
     "defaultMessage": "A tartalom engedélyezése nem sikerült"
   },
   "hosting.content.failed-to-bulk-update": {
-    "defaultMessage": "Tartalom frissítése sikertelen"
+    "defaultMessage": "A tartalom frissítése sikertelen"
   },
   "hosting.content.failed-to-install": {
     "defaultMessage": "A tartalom telepítése nem sikerült"
@@ -1662,7 +1668,7 @@
     "defaultMessage": "Projekt letöltése"
   },
   "instances.content-install.incompatible-tooltip": {
-    "defaultMessage": "Ez az példány olyan betöltőt vagy játékverziót használ, amelyet ez a projekt nem támogat."
+    "defaultMessage": "Ez a játékpéldány olyan betöltőt vagy játékverziót használ, amelyet ez a projekt nem támogat."
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Letöltés"
@@ -2570,6 +2576,9 @@
   "project.about.compatibility.platforms": {
     "defaultMessage": "Platformok"
   },
+  "project.about.compatibility.platforms-plural": {
+    "defaultMessage": "{count, plural, one {Platform} other {Platformok}}"
+  },
   "project.about.compatibility.title": {
     "defaultMessage": "Kompatibilitás"
   },
@@ -3122,6 +3131,9 @@
   "project.stats.downloads-label": {
     "defaultMessage": "letöltés"
   },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count} követő"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -3337,6 +3349,9 @@
   },
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
     "defaultMessage": "Leválasztott modcsomag"
+  },
+  "servers.access-page.activity-log-filter.action.server-restarted": {
+    "defaultMessage": "Újraindított szerver"
   },
   "servers.access-page.activity-log-filter.instances": {
     "defaultMessage": "Játékpéldányok"
@@ -3686,8 +3701,11 @@
   "servers.busy.installing": {
     "defaultMessage": "A szerver települ"
   },
+  "servers.grant-access-modal.add-as-friend": {
+    "defaultMessage": "Barátkérelem küldése is"
+  },
   "servers.grant-access-modal.already-member-tooltip": {
-    "defaultMessage": "Ez a felhasználó már meg lett meghíva"
+    "defaultMessage": "Ez a felhasználó már meg lett hívva"
   },
   "servers.grant-access-modal.cancel": {
     "defaultMessage": "Mégse"
@@ -3726,7 +3744,7 @@
     "defaultMessage": "Modrinth felhasználónév"
   },
   "servers.grant-access-modal.target.no-suggestions": {
-    "defaultMessage": "Nem találtunk megfelelő felhasználókat."
+    "defaultMessage": "Nem található a keresésnek megfelelő felhasználó."
   },
   "servers.grant-access-modal.target.placeholder": {
     "defaultMessage": "Modrinth felhasználónév megadása"
@@ -3836,6 +3854,9 @@
   "servers.listing.notice.subscription-cancelled-payment-failed": {
     "defaultMessage": "Előfizetésed fizetési hiba miatt töröltük."
   },
+  "servers.listing.owner-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
   "servers.listing.server-icon-alt": {
     "defaultMessage": "Szerverikon"
   },
@@ -3913,6 +3934,9 @@
   },
   "servers.medal-listing.notice.suspended-with-reason": {
     "defaultMessage": "A szerveredet felfüggesztettük: {reason}. Kérlek, frissítsd a számlázási adataidat, vagy további információkért vedd fel a kapcsolatot a Modrinth ügyfélszolgálatával."
+  },
+  "servers.medal-listing.owner-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "Szerverikon"
@@ -4033,6 +4057,9 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Nyugat-Európa"
+  },
+  "servers.remove-access-modal.user-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."
@@ -4177,6 +4204,72 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Munkamenetek"
+  },
+  "sharing.invite-players-modal.add": {
+    "defaultMessage": "Hozzáadás"
+  },
+  "sharing.invite-players-modal.added": {
+    "defaultMessage": "Hozzáadva"
+  },
+  "sharing.invite-players-modal.already-invited": {
+    "defaultMessage": "Ez a felhasználó már meg lett hívva."
+  },
+  "sharing.invite-players-modal.avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
+  "sharing.invite-players-modal.cancel": {
+    "defaultMessage": "Mégse"
+  },
+  "sharing.invite-players-modal.cancel-button": {
+    "defaultMessage": "Mégse"
+  },
+  "sharing.invite-players-modal.edit-invite-link": {
+    "defaultMessage": "Meghívólink szerkesztése."
+  },
+  "sharing.invite-players-modal.edit-invite-link-title": {
+    "defaultMessage": "Meghívólink szerkesztése"
+  },
+  "sharing.invite-players-modal.expiry-label": {
+    "defaultMessage": "Lejárati dátum"
+  },
+  "sharing.invite-players-modal.friends-heading": {
+    "defaultMessage": "A barátaid – {count}"
+  },
+  "sharing.invite-players-modal.invite": {
+    "defaultMessage": "Meghívás"
+  },
+  "sharing.invite-players-modal.invite-expiry-description": {
+    "defaultMessage": "A meghívólink lejár {duration}on belül."
+  },
+  "sharing.invite-players-modal.invite-link-heading": {
+    "defaultMessage": "Vagy használj egy meghívólinket"
+  },
+  "sharing.invite-players-modal.link-copied-text": {
+    "defaultMessage": "A meghívólink a vágólapra lett másolva."
+  },
+  "sharing.invite-players-modal.link-copied-title": {
+    "defaultMessage": "Link kimásolva"
+  },
+  "sharing.invite-players-modal.no-search-results": {
+    "defaultMessage": "Nem található a keresésnek megfelelő felhasználó."
+  },
+  "sharing.invite-players-modal.requested": {
+    "defaultMessage": "Kérelem elküldve"
+  },
+  "sharing.invite-players-modal.requested-tooltip": {
+    "defaultMessage": "{username} felhasználónak először el kell fogadnia a barátkérelmet"
+  },
+  "sharing.invite-players-modal.save-button": {
+    "defaultMessage": "Mentés"
+  },
+  "sharing.invite-players-modal.search-placeholder": {
+    "defaultMessage": "Modrinth felhasználónév megadása"
+  },
+  "sharing.invite-players-modal.searching": {
+    "defaultMessage": "Keresés..."
+  },
+  "sharing.invite-players-modal.update-invite-link-failed-title": {
+    "defaultMessage": "A meghívólink frissítése sikertelen"
   },
   "tag.category.128x": {
     "defaultMessage": "128x"

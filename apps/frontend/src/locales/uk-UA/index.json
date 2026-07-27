@@ -1176,7 +1176,7 @@
     "message": "Номер версії"
   },
   "create-project-version.create-modal.stage.details.version-number-description": {
-    "message": "Номер версії дозволяє відрізнити цю версію від інших."
+    "message": "Номер версії дає змогу відрізнити цю версію від інших."
   },
   "create-project-version.create-modal.stage.details.version-number-placeholder": {
     "message": "Уведіть номер версії. Наприклад, 1.2.3-alpha.1"
@@ -2126,8 +2126,11 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "Замала сума"
   },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "Метод оплати недоступний"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
-    "message": "Будь ласка, використовуйте правильний варіант переказу PayPal для вашого регіону (США або міжнародний)."
+    "message": "Будь ласка, скористуйтеся правильним варіантом переказу PayPal для вашого регіону (США або міжнародним)."
   },
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "Невідповідний регіон PayPal"
@@ -2544,7 +2547,7 @@
     "message": "Відстежуйте проєкти, які любите"
   },
   "landing.feature.launcher.description": {
-    "message": "Відкрите API Modrinth дозволяє запускачам реалізувати глибоку інтеграцію з Modrinth. Ви можете користуватися Modrinth у <link>нашому застосунку</link>, або через деякі найпопулярніші запускачі, наприклад, ATLauncher, MultiMC, або Prism Launcher."
+    "message": "Відкрите API Modrinth дає змогу запускачам реалізувати глибоку інтеграцію з Modrinth. Ви можете користуватися Modrinth у <link>нашому застосунку</link> або певних запускачах, як-от ATLauncher, MultiMC і Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Грайте з вашим улюбленим запускачем"
@@ -2915,6 +2918,18 @@
   "layout.publish.email-verification-required.title": {
     "message": "Необхідно підтвердити електронну пошту"
   },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "Можна грати в те саме, що й ваші друзі"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Завантажити Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App відкриється автоматично…"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Навіщо використовувати Modrinth App"
+  },
   "moderation.exclude-technical-review": {
     "message": "Виключити технічні розгляди"
   },
@@ -2965,9 +2980,6 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Сканувати всі файли"
-  },
-  "modpack-scan-modal.scan-error": {
-    "message": "Деякі файли не вдалося просканувати: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Скануємо…"
@@ -3632,9 +3644,6 @@
   "project.moderation.admonition.under-review.body.3": {
     "message": "Ви все ще можете змінити свій проєкт, це не вплине на вашу позицію в черзі."
   },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Ми прагнемо розглядати подання протягом 24–48 годин, але деякі проєкти можуть затримуватися. Це не свідчить про проблему з вашим поданням."
-  },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Ми цінуємо ваше терпіння, поки наші модератори наполегливо працюють над безпекою Modrinth, і сподіваємося допомогти вам поділитися своїм умістом! 💚</emphasis>"
   },
@@ -3825,7 +3834,7 @@
     "message": "Затримка: {latency}мс"
   },
   "project.settings.server.optional-label": {
-    "message": "необов'язково"
+    "message": "необов’язково"
   },
   "project.settings.server.ping-failed-message": {
     "message": "Ми не змогли зв'язатися із цим сервером. Його міг заблокувати ваш гост, тому спробуйте перезавантажити його кілька разів. Якщо це не працює, <support-link>зв'яжіться з підтримкою</support-link>."

@@ -45,10 +45,10 @@
     "message": "依存プロジェクトのタイプ"
   },
   "analytics.breakdown.download-reason": {
-    "message": "ダウンロードの追加情報"
+    "message": "ダウンロードの理由"
   },
   "analytics.breakdown.download-source": {
-    "message": "プラットフォーム"
+    "message": "ソース"
   },
   "analytics.breakdown.game-version": {
     "message": "ゲームのバージョン"
@@ -57,7 +57,7 @@
     "message": "内訳"
   },
   "analytics.breakdown.loader": {
-    "message": "ゲームのローダー"
+    "message": "ローダー"
   },
   "analytics.breakdown.members": {
     "message": "メンバー"
@@ -283,6 +283,9 @@
   },
   "analytics.project.all": {
     "message": "全てのプロジェクト"
+  },
+  "analytics.project.icon-alt": {
+    "message": "{name}のアイコン"
   },
   "analytics.project.select": {
     "message": "プロジェクトを選択"
@@ -608,6 +611,33 @@
   "auth.authorize.redirect-url": {
     "message": "<redirect-url>{url}</redirect-url> に自動的に転送されます"
   },
+  "auth.create-account.age-requirement.warning-title": {
+    "message": "年齢制限"
+  },
+  "auth.create-account.complete-sign-up": {
+    "message": "サインアップを完了する"
+  },
+  "auth.create-account.date-of-birth.invalid.title": {
+    "message": "入力された生年月日が無効です"
+  },
+  "auth.create-account.date-of-birth.label": {
+    "message": "生年月日"
+  },
+  "auth.create-account.date-of-birth.placeholder": {
+    "message": "生年月日を選んでください"
+  },
+  "auth.create-account.date-of-birth.required.text": {
+    "message": "続行する前に生年月日を入力してください。"
+  },
+  "auth.create-account.date-of-birth.required.title": {
+    "message": "生年月日が必要です"
+  },
+  "auth.create-account.date-of-birth.under13-helper": {
+    "message": "Modrinthアカウントを作成するための年齢を満たしていません。"
+  },
+  "auth.create-account.info-panel.text": {
+    "message": "入力された生年月日は保存されません。登録時にCOPPA（児童オンラインプライバシー保護法）への準拠を確認するためにのみ使用いたします。"
+  },
   "auth.create-account.page-title": {
     "message": "アカウントの作成"
   },
@@ -662,6 +692,9 @@
   "auth.sign-in.continue-with-email": {
     "message": "メールアドレスで続ける"
   },
+  "auth.sign-in.continue-with-passkey": {
+    "message": "パスキーで続ける"
+  },
   "auth.sign-in.create-account": {
     "message": "サインアップ"
   },
@@ -671,11 +704,17 @@
   "auth.sign-in.last-sign-in": {
     "message": "最後に使用"
   },
+  "auth.sign-in.no-account": {
+    "message": "アカウントを持っていませんか？"
+  },
   "auth.sign-in.sign-in-with": {
     "message": "Modrinthへサインイン"
   },
   "auth.sign-in.title": {
     "message": "ログイン"
+  },
+  "auth.sign-up.age-requirement.warning-title": {
+    "message": "年齢制限"
   },
   "auth.sign-up.continue-with-email": {
     "message": "メールアドレスで続ける"
@@ -697,6 +736,9 @@
   },
   "auth.verify-email.action.account-settings": {
     "message": "アカウント設定"
+  },
+  "auth.verify-email.action.discover-mods": {
+    "message": "早速Modを探す"
   },
   "auth.verify-email.already-verified.description": {
     "message": "メールアドレスはすでに承認されています！"
@@ -730,6 +772,9 @@
   },
   "collection.aria-label.upload-icon": {
     "message": "アイコンをアップロード"
+  },
+  "collection.button.discover-mods": {
+    "message": "Modを探す"
   },
   "collection.button.edit-icon": {
     "message": "アイコンを編集"
@@ -803,6 +848,9 @@
   "conversation-thread.action.send": {
     "message": "送信"
   },
+  "conversation-thread.action.set-to-draft": {
+    "message": "下書きとして保存"
+  },
   "conversation-thread.reply-editor.placeholder.send": {
     "message": "メッセージを送る…"
   },
@@ -814,6 +862,27 @@
   },
   "create-project-version.create-modal.stage.add-files.metadata-tab": {
     "message": "メタデータ"
+  },
+  "create-project-version.create-modal.stage.details.details-tab": {
+    "message": "詳細"
+  },
+  "create-project-version.create-modal.stage.details.files-tab": {
+    "message": "ファイル"
+  },
+  "create-project-version.create-modal.stage.details.metadata-tab": {
+    "message": "メタデータ"
+  },
+  "create-project-version.create-modal.stage.details.version-changelog": {
+    "message": "バージョン履歴"
+  },
+  "create-project-version.create-modal.stage.metadata.details-tab": {
+    "message": "詳細"
+  },
+  "create-project-version.create-modal.stage.metadata.edit-button": {
+    "message": "編集"
+  },
+  "create-project-version.create-modal.stage.metadata.files-tab": {
+    "message": "ファイル"
   },
   "create-project-version.create-modal.stage.metadata.uploaded-files": {
     "message": "アップロードされたファイル"
@@ -917,6 +986,9 @@
   "create.project.name-placeholder": {
     "message": "プロジェクト名を入力…"
   },
+  "create.project.organization-icon-alt": {
+    "message": "{name}アイコン"
+  },
   "create.project.owner-description": {
     "message": "プロジェクトオーナーを自分自身または自身が所属している組織に設定してください。"
   },
@@ -946,6 +1018,9 @@
   },
   "create.project.type-server": {
     "message": "サーバー"
+  },
+  "create.project.unknown-user": {
+    "message": "不明なユーザー"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1288,6 +1363,9 @@
   },
   "dashboard.discord-roles.banner.cta": {
     "message": "Discordをリンクする"
+  },
+  "dashboard.discord-roles.banner.title": {
+    "message": "Discordのロールを獲得"
   },
   "dashboard.discord-roles.role.creator": {
     "message": "クリエイター"
@@ -2267,6 +2345,9 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.footer.unknown-commit": {
+    "message": "不明"
+  },
   "layout.menu-toggle.action": {
     "message": "メニューを切り替える"
   },
@@ -2329,6 +2410,15 @@
   },
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
+  },
+  "modal.shared-instance.open-in-app.get-app": {
+    "message": "Modrinth Appを取得"
+  },
+  "modal.shared-instance.open-in-app.title": {
+    "message": "Modrinth Appで開く"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "Modrinth Appの良いところ"
   },
   "moderation.moderate": {
     "message": "適度"

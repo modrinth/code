@@ -163,19 +163,57 @@ pub async fn retry_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     job.state.progress.phase = InstallPhaseId::PreparingInstance;
     job.state.progress.progress = None;
     job.state.progress.details = InstallPhaseDetails::Empty;
-    prepare_initial_instance(&mut job.state, &state).await?;
+    if let Err(error) = prepare_initial_instance(&mut job.state, &state).await {
+        if let Err(cleanup_error) =
+            recovery::apply_cleanup(&job.state, &state).await
+        {
+            tracing::error!(
+                "Error cleaning up install job {job_id} retry preparation: {cleanup_error}"
+            );
+        }
+        return Err(error);
+    }
     job.state.record_event(InstallJobEventKind::JobQueued {
         kind: job.state.request.kind(),
     });
 
-    let record = store::update_status(
+    let record = match store::update_status(
         job_id,
         InstallJobStatus::Queued,
         &job.state,
         &state,
     )
-    .await?;
-    lock_existing_instance_if_needed(&job.state, &state).await?;
+    .await
+    {
+        Ok(record) => record,
+        Err(error) => {
+            if let Err(cleanup_error) =
+                recovery::apply_cleanup(&job.state, &state).await
+            {
+                tracing::error!(
+                    "Error cleaning up unqueued install job {job_id}: {cleanup_error}"
+                );
+            }
+            return Err(error);
+        }
+    };
+    if let Err(error) =
+        lock_existing_instance_if_needed(&job.state, &state).await
+    {
+        let error_view = install_error_view(
+            job.state.progress.phase,
+            &error,
+            job.state.context.clone(),
+        );
+        if let Err(terminal_error) =
+            terminalize_failed_job(job_id, job.state, error_view, &state).await
+        {
+            tracing::error!(
+                "Failed to terminalize retried install job {job_id}: {terminal_error}"
+            );
+        }
+        return Err(error);
+    }
     emit_install_job(&record.snapshot()).await?;
     spawn_job(job_id);
 
@@ -206,31 +244,50 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .record_event(InstallJobEventKind::RollbackStarted {
             cleanup: job.state.cleanup.clone(),
         });
-    match recovery::apply_cleanup(&job.state, &state).await {
-        Ok(()) => job
-            .state
-            .record_event(InstallJobEventKind::RollbackCompleted),
-        Err(error) => {
-            job.state.rollback_error = Some(InstallErrorView::from_error(
-                "rollback_error",
-                InstallPhaseId::RollingBack,
-                &error,
-                None,
-            ));
-            job.state.record_event(InstallJobEventKind::RollbackFailed {
-                message: error.to_string(),
-            });
-        }
-    }
-    clear_deleted_new_instance_id(&mut job.state);
-    let record = store::update_status(
+    let status_updated = store::update_status_if(
         job_id,
-        InstallJobStatus::Canceled,
+        InstallJobStatus::Queued,
+        InstallJobStatus::Running,
         &job.state,
         &state,
     )
-    .await?;
-    if job.state.rollback_error.is_none() {
+    .await?
+    .is_some();
+    if !status_updated {
+        return Err(crate::ErrorKind::InputError(
+            "Install job is no longer queued".to_string(),
+        )
+        .into());
+    }
+    let cleanup_succeeded =
+        match recovery::apply_cleanup(&job.state, &state).await {
+            Ok(()) => {
+                job.state
+                    .record_event(InstallJobEventKind::RollbackCompleted);
+                clear_deleted_new_instance_id(&mut job.state);
+                true
+            }
+            Err(error) => {
+                job.state.rollback_error = Some(InstallErrorView::from_error(
+                    "rollback_error",
+                    InstallPhaseId::RollingBack,
+                    &error,
+                    None,
+                ));
+                job.state.record_event(InstallJobEventKind::RollbackFailed {
+                    message: error.to_string(),
+                });
+                false
+            }
+        };
+    let status = if cleanup_succeeded {
+        InstallJobStatus::Canceled
+    } else {
+        InstallJobStatus::Failed
+    };
+    let record =
+        store::update_status(job_id, status, &job.state, &state).await?;
+    if cleanup_succeeded {
         recovery::clear_staging_dir(&job.state).await;
     }
     emit_install_job(&record.snapshot()).await?;
@@ -247,10 +304,53 @@ async fn start(request: InstallRequest) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let id = Uuid::new_v4();
     let mut job_state = InstallJobState::new(request);
-    prepare_initial_instance(&mut job_state, &state).await?;
-    let record =
-        store::insert(id, &job_state, InstallJobStatus::Queued, &state).await?;
-    lock_existing_instance_if_needed(&job_state, &state).await?;
+    if let Err(error) = prepare_initial_instance(&mut job_state, &state).await {
+        if let Err(cleanup_error) =
+            recovery::apply_cleanup(&job_state, &state).await
+        {
+            tracing::error!(
+                "Error cleaning up install job preparation: {cleanup_error}"
+            );
+        }
+        return Err(error);
+    }
+    let record = match store::insert(
+        id,
+        &job_state,
+        InstallJobStatus::Queued,
+        &state,
+    )
+    .await
+    {
+        Ok(record) => record,
+        Err(error) => {
+            if let Err(cleanup_error) =
+                recovery::apply_cleanup(&job_state, &state).await
+            {
+                tracing::error!(
+                    "Error cleaning up untracked install job {id}: {cleanup_error}"
+                );
+            }
+            return Err(error);
+        }
+    };
+    if let Err(error) =
+        lock_existing_instance_if_needed(&job_state, &state).await
+    {
+        let error_view = install_error_view(
+            job_state.progress.phase,
+            &error,
+            job_state.context.clone(),
+        );
+        if let Err(terminal_error) =
+            terminalize_failed_job(id, job_state, error_view, &state).await
+        {
+            tracing::error!(
+                "Failed to terminalize install job {id} after setup error: {terminal_error}"
+            );
+        }
+        return Err(error);
+    }
     emit_install_job(&record.snapshot()).await?;
     spawn_job(id);
     Ok(record.snapshot())
@@ -370,9 +470,9 @@ async fn prepare_initial_instance(
                 metadata.instance.icon_path,
             );
             let instance_id = metadata.instance.id;
+            set_instance_id(job_state, instance_id.clone());
             attach_pending_shared_instance(&instance_id, &data, state).await?;
             emit_instance(&instance_id, InstancePayloadType::Edited).await?;
-            set_instance_id(job_state, instance_id);
         }
         InstallRequest::ImportInstance {
             instance_folder, ..
@@ -433,9 +533,14 @@ async fn prepare_initial_instance(
 fn spawn_job(job_id: Uuid) {
     tokio::spawn(async move {
         if let Err(error) = Box::pin(run_job(job_id)).await {
-            tracing::error!(
-                "Install job {job_id} failed to update state: {error}"
-            );
+            let failure = error.to_string();
+            tracing::error!("Install job {job_id} terminated: {failure}");
+            if let Err(error) = terminalize_stranded_job(job_id, failure).await
+            {
+                tracing::error!(
+                    "Failed to terminalize stranded install job {job_id}: {error}"
+                );
+            }
         }
     });
 }
@@ -457,13 +562,17 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
 
     let mut job_state = job.state.clone();
     job_state.record_event(InstallJobEventKind::JobStarted);
-    let record = store::update_status(
+    let Some(record) = store::update_status_if(
         job_id,
+        InstallJobStatus::Queued,
         InstallJobStatus::Running,
         &job_state,
         &state,
     )
-    .await?;
+    .await?
+    else {
+        return Ok(());
+    };
     emit_install_job(&record.snapshot()).await?;
 
     let result = Box::pin(run_request(job_id, &mut job_state, &state)).await;
@@ -472,19 +581,21 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
     }
 
     let result = match result {
-        Ok(instance_id) => {
-            if let Some(instance_id) = instance_id {
-                set_instance_id(&mut job_state, instance_id);
-            }
-            finalize_existing_instance_success(&job_state, &state).await
+        Ok(Some(instance_id)) => {
+            set_instance_id(&mut job_state, instance_id.clone());
+            Ok(instance_id)
         }
+        Ok(None) => Err(crate::ErrorKind::InputError(
+            "Install job completed without an instance id".to_string(),
+        )
+        .into()),
         Err(error) => Err(error),
     };
 
     match result {
-        Ok(()) => {
+        Ok(instance_id) => {
             job_state.record_event(InstallJobEventKind::JobSucceeded {
-                instance_id: current_instance_id(&job_state),
+                instance_id: Some(instance_id.clone()),
             });
             job_state.progress.phase = InstallPhaseId::Finalizing;
             job_state.progress.progress = None;
@@ -492,66 +603,114 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
             job_state.error = None;
             job_state.rollback_error = None;
             job_state.context = None;
-            let record = store::update_status(
-                job_id,
-                InstallJobStatus::Succeeded,
-                &job_state,
-                &state,
-            )
-            .await?;
-            recovery::clear_staging_dir(&job_state).await;
-            emit_install_job(&record.snapshot()).await?;
+            if let Some(record) =
+                store::complete_success(job_id, &job_state, &state).await?
+            {
+                recovery::clear_staging_dir(&job_state).await;
+                if let Err(error) =
+                    emit_instance(&instance_id, InstancePayloadType::Edited)
+                        .await
+                {
+                    tracing::warn!(
+                        "Failed to emit completed instance {instance_id}: {error}"
+                    );
+                }
+                emit_install_job(&record.snapshot()).await?;
+            }
         }
         Err(error) => {
-            let failed_phase = job_state.progress.phase;
+            tracing::error!("Install job {job_id} failed: {error}");
             let error_view = install_error_view(
-                failed_phase,
+                job_state.progress.phase,
                 &error,
                 job_state.context.clone(),
             );
-            job_state.record_event(InstallJobEventKind::Failed {
-                phase: failed_phase,
-                code: error_view.code.clone(),
-                message: error_view.message.clone(),
-            });
-            job_state.error = Some(error_view);
-            job_state.progress.phase = InstallPhaseId::RollingBack;
-            job_state.progress.progress = None;
-            job_state.progress.details = InstallPhaseDetails::Empty;
-            job_state.record_event(InstallJobEventKind::RollbackStarted {
-                cleanup: job_state.cleanup.clone(),
-            });
-            if let Err(rollback_error) =
-                recovery::apply_cleanup(&job_state, &state).await
-            {
-                tracing::error!(
-                    "Error rolling back failed install job {job_id}: {rollback_error}"
-                );
-                job_state.rollback_error = Some(install_error_view(
-                    InstallPhaseId::RollingBack,
-                    &rollback_error,
-                    None,
-                ));
-                job_state.record_event(InstallJobEventKind::RollbackFailed {
-                    message: rollback_error.to_string(),
-                });
-            } else {
-                job_state.record_event(InstallJobEventKind::RollbackCompleted);
-            }
-            clear_deleted_new_instance_id(&mut job_state);
-            let record = store::update_status(
-                job_id,
-                InstallJobStatus::Failed,
-                &job_state,
-                &state,
-            )
-            .await?;
-            if job_state.rollback_error.is_none() {
-                recovery::clear_staging_dir(&job_state).await;
-            }
-            emit_install_job(&record.snapshot()).await?;
-            return Err(error);
+            terminalize_failed_job(job_id, job_state, error_view, &state)
+                .await?;
         }
+    }
+
+    Ok(())
+}
+
+async fn terminalize_stranded_job(
+    job_id: Uuid,
+    message: String,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let job = store::get_required(job_id, &state).await?;
+    if !matches!(
+        job.status,
+        InstallJobStatus::Queued | InstallJobStatus::Running
+    ) {
+        return Ok(());
+    }
+
+    let error_view = InstallErrorView::from_message(
+        "install_worker_terminated",
+        job.state.progress.phase,
+        message,
+    );
+    terminalize_failed_job(job_id, job.state, error_view, &state).await
+}
+
+async fn terminalize_failed_job(
+    job_id: Uuid,
+    mut job_state: InstallJobState,
+    error_view: InstallErrorView,
+    state: &State,
+) -> crate::Result<()> {
+    let failed_phase = job_state.progress.phase;
+    job_state.record_event(InstallJobEventKind::Failed {
+        phase: failed_phase,
+        code: error_view.code.clone(),
+        message: error_view.message.clone(),
+    });
+    job_state.error = Some(error_view);
+    job_state.rollback_error = None;
+    job_state.progress.phase = InstallPhaseId::RollingBack;
+    job_state.progress.progress = None;
+    job_state.progress.details = InstallPhaseDetails::Empty;
+    job_state.record_event(InstallJobEventKind::RollbackStarted {
+        cleanup: job_state.cleanup.clone(),
+    });
+
+    let cleanup_succeeded = match recovery::apply_cleanup(&job_state, state)
+        .await
+    {
+        Ok(()) => {
+            job_state.record_event(InstallJobEventKind::RollbackCompleted);
+            clear_deleted_new_instance_id(&mut job_state);
+            true
+        }
+        Err(rollback_error) => {
+            tracing::error!(
+                "Error rolling back failed install job {job_id}: {rollback_error}"
+            );
+            job_state.rollback_error = Some(install_error_view(
+                InstallPhaseId::RollingBack,
+                &rollback_error,
+                None,
+            ));
+            job_state.record_event(InstallJobEventKind::RollbackFailed {
+                message: rollback_error.to_string(),
+            });
+            false
+        }
+    };
+
+    if let Some(record) = store::finish_active(
+        job_id,
+        InstallJobStatus::Failed,
+        &job_state,
+        state,
+    )
+    .await?
+    {
+        if cleanup_succeeded {
+            recovery::clear_staging_dir(&job_state).await;
+        }
+        emit_install_job(&record.snapshot()).await?;
     }
 
     Ok(())
@@ -1172,25 +1331,6 @@ async fn lock_existing_instance(
     )
     .await?;
     emit_instance(instance_id, InstancePayloadType::Edited).await?;
-
-    Ok(())
-}
-
-async fn finalize_existing_instance_success(
-    job_state: &InstallJobState,
-    state: &State,
-) -> crate::Result<()> {
-    if let InstallCleanup::RestoreExistingInstance { instance_id } =
-        &job_state.cleanup
-    {
-        crate::state::instances::commands::set_instance_install_stage(
-            instance_id,
-            InstanceInstallStage::Installed,
-            &state.pool,
-        )
-        .await?;
-        emit_instance(instance_id, InstancePayloadType::Edited).await?;
-    }
 
     Ok(())
 }

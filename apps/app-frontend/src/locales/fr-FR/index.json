@@ -36,7 +36,7 @@
     "message": "Annulé"
   },
   "app.action-bar.install.summary.cleanup-incomplete": {
-    "message": "Le nettoyage n'a pas terminé"
+    "message": "Le nettoyage n'a pas pu terminer"
   },
   "app.action-bar.install.summary.content-download-failed": {
     "message": "Impossible de télécharger les fichiers"
@@ -132,7 +132,7 @@
     "message": "Tout accepter"
   },
   "app.ads-consent.body": {
-    "message": "Les publicités rendent Modrinth possible et financent les rémunérations des créateurs. Nos partenaires peuvent stocker des cookies ou y accéder au sein de l'application afin de personnaliser les publicités et de mesurer les performances."
+    "message": "Les publicités rendent Modrinth possible et financent la rémunération des créateurs. Nos partenaires peuvent stocker des cookies ou y accéder au sein de l'application afin de personnaliser les publicités et de mesurer les performances."
   },
   "app.ads-consent.manage": {
     "message": "Gérer les préférences"
@@ -180,7 +180,7 @@
     "message": "Mondes sur partie rapide"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimiser le lanceur quand Minecraft démarre."
+    "message": "Minimiser le launcher quand a processus Minecraft démarre."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimiser le lanceur"
@@ -294,7 +294,7 @@
     "message": "Téléchargement de Minecraft"
   },
   "app.install.phase.downloading_pack_file": {
-    "message": "Téléchargement le fichier de pack"
+    "message": "Téléchargement du fichier de pack"
   },
   "app.install.phase.extracting_overrides": {
     "message": "Extraction des fichiers personnalisés"
@@ -522,7 +522,7 @@
     "message": "Vous utilisez le mauvais compte Modrinth"
   },
   "app.instance.worlds.add-server": {
-    "message": "Ajouter le serveur"
+    "message": "Ajouter un serveur"
   },
   "app.instance.worlds.browse-servers": {
     "message": "Parcourir des serveurs"
@@ -555,13 +555,13 @@
     "message": "Ajouter un serveur ou parcourir pour commencer"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "Aucun serveur ou monde ajoutés"
+    "message": "Aucun serveur ou monde ajouté"
   },
   "app.instance.worlds.remove-server-modal.remove-button": {
-    "message": "Enlever le serveur"
+    "message": "Supprimer le serveur"
   },
   "app.instance.worlds.remove-server-modal.title": {
-    "message": "Enlever le serveur"
+    "message": "Supprimer le serveur"
   },
   "app.instance.worlds.remove-server-modal.warning-body": {
     "message": "Ce serveur sera enlevé de votre liste de serveur et de la liste de serveur en jeu. Vous pourrez le rajouter plus tard si vous connaissez son adresse."
@@ -611,6 +611,9 @@
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Le fichier dépasse la limite de 1 MiB"
   },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "Pour les notifications DMCA ou autres réclamations juridiques, veuillez consulter notre <copyright-link>Politique relative aux droits d'auteur</copyright-link>."
+  },
   "app.modal.install-to-play.report-reason": {
     "message": "Quelle règle cette instance enfreint-elle ?"
   },
@@ -629,6 +632,9 @@
   "app.modal.install-to-play.report-submitted": {
     "message": "Signalement soumis"
   },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "Pour des demandes de support, contactez notre <support-link>équipe de support</support-link>. Pour signaler des bugs, ouvrez <github-link>une issue Github</github-link>."
+  },
   "app.modal.install-to-play.reviewed-files": {
     "message": "Un fichier est seulement examiné s'il est publié sur Modrinth, peu importe son extension (y compris .mrpack)."
   },
@@ -637,6 +643,9 @@
   },
   "app.modal.install-to-play.shared-instance-content": {
     "message": "Contenu de l'instance partagée"
+  },
+  "app.modal.install-to-play.shared-instance-unknown-files-description": {
+    "message": "Cette instance partagée contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons fortement de seulement installer des fichiers de sources en qui vous avez confiance."
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ce modpack de serveur contient des fichiers qui ne sont pas publiés sur Modrinth. Nous recommandons fortement de seulement installer des fichiers de sources en qui vous avez confiance."
@@ -723,7 +732,7 @@
     "message": "Gestion des ressources"
   },
   "app.skins.add-button": {
-    "message": "Ajouter une skin"
+    "message": "Ajouter un skin"
   },
   "app.skins.add-button.drag-and-drop": {
     "message": "Glisser et déposer"
@@ -738,7 +747,7 @@
     "message": "Cela va supprimer de manière permanente ce skin. Cette action est irréversible."
   },
   "app.skins.delete-modal.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer cette skin ?"
+    "message": "Êtes-vous sûr de vouloir supprimer ce skin ?"
   },
   "app.skins.dropped-file-error.text": {
     "message": "Impossible de lire le fichier déposé."
@@ -753,13 +762,13 @@
     "message": "Modifier le skin"
   },
   "app.skins.modal.add-skin-button": {
-    "message": "Ajouter une skin"
+    "message": "Ajouter un skin"
   },
   "app.skins.modal.add-title": {
-    "message": "Ajouter une skin"
+    "message": "Ajouter un skin"
   },
   "app.skins.modal.arm-style-section": {
-    "message": "Bras"
+    "message": "Style du bras"
   },
   "app.skins.modal.arm-style-slim": {
     "message": "Mince"
@@ -929,17 +938,35 @@
   "content.shared-instance.change-version-body": {
     "message": "Changer la version change seulement votre copie locale. Des futures mises à jour d'instance partagées peuvent restaurer ou changer la version."
   },
+  "content.shared-instance.delete-bulk-body": {
+    "message": "Certains projets sélectionnés font partie de l'instance partagée. Les supprimer changerait seulement votre copie locale, et de futures mises à jour d'instance partagées peuvent restaurer ou les changer de nouveau."
+  },
   "content.shared-instance.delete-button": {
     "message": "Supprimer quand même"
   },
   "content.shared-instance.delete-many-button": {
     "message": "Supprimer {count, number} projets quand même"
   },
+  "content.shared-instance.delete-single-body": {
+    "message": "Le supprimer change seulement votre copie locale. De futures mises à jour d'instance partagées peuvent restaurer ou changer la version."
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "Certains projets sélectionnés font partie de l'instance partagée. Les désactiver changerait seulement votre copie locale, et de futures mises à jour d'instance partagées peuvent restaurer ou les changer de nouveau."
+  },
   "content.shared-instance.disable-button": {
     "message": "Désactiver quand même"
   },
   "content.shared-instance.disable-many-button": {
     "message": "Désactiver {count, number} projets quand même"
+  },
+  "content.shared-instance.disable-single-body": {
+    "message": "Le désactiver change seulement votre copie locale. De futures mises à jour d'instance partagées peuvent restaurer ou changer la version."
+  },
+  "content.shared-instance.unlink-body": {
+    "message": "Le délier change seulement votre copie locale. De futures mises à jour d'instance partagées peuvent restaurer ou changer la version."
+  },
+  "content.shared-instance.warning-header": {
+    "message": "Ceci fait partie de l'instance partagée"
   },
   "friends.action.add-friend": {
     "message": "Ajouter un ami"
@@ -975,7 +1002,7 @@
     "message": "La demande d'ami a été envoyé"
   },
   "friends.friend.view-profile": {
-    "message": "Voir le profile"
+    "message": "Voir le profil"
   },
   "friends.heading": {
     "message": "Amis"
@@ -1003,6 +1030,48 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Créer un compte Modrinth</link> pour ajouter des amis et voir à quoi ils jouent !"
+  },
+  "installation-settings.shared-instance.linked-title": {
+    "message": "Instance partagée liée"
+  },
+  "installation-settings.shared-instance.title": {
+    "message": "Dépublier l'instance"
+  },
+  "installation-settings.shared-instance.unlink-button": {
+    "message": "Dissocier l'instance partagée"
+  },
+  "installation-settings.shared-instance.unlink-description": {
+    "message": "Déconnecter cette instance locale de futures mises à jour partagées."
+  },
+  "installation-settings.shared-instance.unlinking-button": {
+    "message": "Dissociation..."
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "message": "Dépublier l'instance partagée"
+  },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "Supprime cette instance partagée de Modrinth et arrête d'envoyer des mises à jour à toute personne l'utilisant. Votre copie locale ne sera pas affectée."
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "message": "Dépublication..."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-body": {
+    "message": "Cela affecte seulement votre instance locale. Votre contenu installé restera sur cet appareil, et l'instance partagée et les autres personnes l'utilisant ne seront pas affectés."
+  },
+  "installation-settings.unlink-shared-instance.modal.admonition-header": {
+    "message": "Dissociation de l'instance partagée"
+  },
+  "installation-settings.unlink-shared-instance.modal.header": {
+    "message": "Dissocier l'instance partagée"
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans l'application Modrinth vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "message": "Dépublication de l'instance partagée"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "message": "Dépublier l'instance partagée"
   },
   "instance.action.create-shortcut": {
     "message": "Créer un raccourci"
@@ -1217,6 +1286,9 @@
   "instance.settings.tabs.installation.loader-version": {
     "message": "Version de {loader}"
   },
+  "instance.settings.tabs.installation.locked": {
+    "message": "Les paramètres d'installation ne sont pas disponible pendant que cette instance est verrouillée."
+  },
   "instance.settings.tabs.java": {
     "message": "Java et mémoire"
   },
@@ -1319,8 +1391,14 @@
   "instance.shared-instance.tooltip": {
     "message": "Le contenu de cette instance est gérée par quelqu'un d'autre."
   },
+  "instance.shared-instance.unavailable.access-revoked-text": {
+    "message": "Votre accès à l'instance partagée a été révoqué. Cette instance reste disponible, mais n'est plus liée et ne recevra plus de mises à jour."
+  },
   "instance.shared-instance.unavailable.deleted-text": {
     "message": "L'instance principale a été supprimée. Cette instance est encore disponible, mais n'est plus liée et va cesser de recevoir des mises à jour."
+  },
+  "instance.shared-instance.unavailable.locked-text": {
+    "message": "Cette instance partagée a été verrouillée par la Team de Modération de Contenu. Elle ne recevra plus de mises à jour de l'instance primaire et ne peut plus être jouée."
   },
   "instance.shared-instance.unavailable.locked-title": {
     "message": "Instance verrouillée"

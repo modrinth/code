@@ -747,7 +747,7 @@
     "message": "拒絕"
   },
   "auth.authorize.app-info": {
-    "message": "由 <creator-link>{creator}</creator-link> 開發的「<strong>{appName}</strong>」將可執行下列操作："
+    "message": "由 <creator-link>{creator}</creator-link> 開發的「<strong>{appName}</strong>」將可執行下列動作："
   },
   "auth.authorize.authorize-app-name": {
     "message": "授權「{appName}」"
@@ -2132,6 +2132,12 @@
   "dashboard.withdraw.error.minimum-not-met.title": {
     "message": "金額過低"
   },
+  "dashboard.withdraw.error.payout-method-disabled.text": {
+    "message": "這個付款方式已被付款服務提供商停用。請改用其他付款方式，或聯絡客服。"
+  },
+  "dashboard.withdraw.error.payout-method-disabled.title": {
+    "message": "無法使用付款方式"
+  },
   "dashboard.withdraw.error.paypal-country-mismatch.text": {
     "message": "請使用適合你所在地區的 PayPal 轉帳選項（美國或國際）。"
   },
@@ -2769,13 +2775,13 @@
     "message": "基於"
   },
   "layout.footer.developer-mode-activated.text": {
-    "message": "已啟用開發人員模式"
+    "message": "開發人員模式已被啟用"
   },
   "layout.footer.developer-mode-activated.title": {
     "message": "開發人員模式已啟用"
   },
   "layout.footer.developer-mode-deactivated.text": {
-    "message": "已停用開發人員模式"
+    "message": "開發人員模式已被停用"
   },
   "layout.footer.developer-mode-deactivated.title": {
     "message": "開發人員模式已停用"
@@ -2921,11 +2927,29 @@
   "layout.publish.email-verification-required.title": {
     "message": "需要驗證電子郵件地址"
   },
+  "modal.shared-instance.open-in-app.benefit.install": {
+    "message": "自動安裝好友遊玩的所有內容"
+  },
+  "modal.shared-instance.open-in-app.benefit.join": {
+    "message": "與好友遊玩相同內容"
+  },
+  "modal.shared-instance.open-in-app.benefit.update": {
+    "message": "當共用內容變更時及時更新"
+  },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "取得 Modrinth App"
   },
+  "modal.shared-instance.open-in-app.managed-by": {
+    "message": "管理者："
+  },
+  "modal.shared-instance.open-in-app.opening-automatically": {
+    "message": "Modrinth App 將自動開啟..."
+  },
   "modal.shared-instance.open-in-app.title": {
     "message": "正在開啟 Modrinth App"
+  },
+  "modal.shared-instance.open-in-app.why-use": {
+    "message": "為何使用 Modrinth App"
   },
   "moderation.exclude-technical-review": {
     "message": "排除技術審查"
@@ -2947,6 +2971,24 @@
   },
   "moderation.page.technicalReview": {
     "message": "技術審查"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "每批 {amount} 個"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "批量數量"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "這會永久刪除這個專案的所有引用標註群組及其中的所有檔案，這項動作無法復原。"
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "無法清除所有群組：{error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "清除"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "已成功清除所有群組。"
   },
   "modpack-scan-modal.failed": {
     "message": "失敗"
@@ -2979,10 +3021,13 @@
     "message": "掃描所有檔案"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "無法掃描部分檔案：{error}"
+    "message": "無法掃描部分檔案：\n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "正在掃描..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "成功"
   },
   "modpack-scan-modal.title": {
     "message": "模組包掃描（{scanned}/{total} 個檔案）"
@@ -3649,6 +3694,9 @@
   },
   "project.moderation.admonition.under-review.body.4": {
     "message": "我們的目標是在 24 至 48 小時內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "我們的目標是在一週內審查你提交的專案。部分專案可能需要較長時間，但這不代表你的專案有問題。"
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>感謝你的耐心等候，我們的管理員正努力維護 Modrinth 的安全，我們期待能協助你分享你的內容！💚</emphasis>"
@@ -4986,7 +5034,7 @@
     "message": "開發者模式已被停用"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
-    "message": "開發者模式已停用"
+    "message": "開發人員模式已停用"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "資料包頁面"
@@ -5174,8 +5222,29 @@
   "shared-instance.invite.accept": {
     "message": "接受邀請"
   },
+  "shared-instance.invite.inviter.unknown": {
+    "message": "一位 Modrinth 使用者"
+  },
+  "shared-instance.invite.joined-count": {
+    "message": "已有 {count, plural, other {# 人}}加入"
+  },
+  "shared-instance.invite.loading": {
+    "message": "正在載入邀請資訊..."
+  },
+  "shared-instance.invite.title": {
+    "message": "{name} 邀請你一起遊玩"
+  },
   "shared-instance.invite.trust.description": {
     "message": "這份邀請是由另一位 Modrinth 使用者建立，並非由 Modrinth 官方建立。請僅接受來自你信任的人的邀請。"
+  },
+  "shared-instance.invite.trust.heading": {
+    "message": "你認識這位使用者嗎？"
+  },
+  "shared-instance.invite.unavailable.description": {
+    "message": "邀請可能已過期、達到使用次數上限，或是已被共用者撤銷。"
+  },
+  "shared-instance.invite.unavailable.title": {
+    "message": "這個邀請無法使用"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"
@@ -5196,7 +5265,7 @@
     "message": "所有版本"
   },
   "version.confirm-delete.description": {
-    "message": "這個版本將永久刪除。這個操作無法復原。"
+    "message": "這個版本將永久刪除，這項動作無法復原。"
   },
   "version.confirm-delete.proceed": {
     "message": "刪除版本"

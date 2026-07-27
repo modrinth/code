@@ -8,6 +8,21 @@
   "admin.billing.error.not-found": {
     "message": "Không tìm thấy người dùng"
   },
+  "ads-consent.accept": {
+    "message": "Chấp nhận tất cả"
+  },
+  "ads-consent.body": {
+    "message": "Quảng cáo giúp Modrinth hoạt động và tài trợ cho việc thanh toán cho người sáng tạo nội dung. Các đối tác của chúng tôi có thể lưu trữ hoặc truy cập cookie trong ứng dụng để cá nhân hóa quảng cáo và đo lường hiệu suất."
+  },
+  "ads-consent.manage": {
+    "message": "Quản lý tuỳ chọn"
+  },
+  "ads-consent.reject": {
+    "message": "Từ chối tất cả"
+  },
+  "ads-consent.title": {
+    "message": "Quyền riêng tư của bạn và cách quảng cáo hỗ trợ Modrinth"
+  },
   "analytics.action.add": {
     "message": "Thêm"
   },
@@ -23,6 +38,12 @@
   "analytics.breakdown.country": {
     "message": "Quốc gia"
   },
+  "analytics.breakdown.dependent-project-download": {
+    "message": "Dự án phụ thuộc"
+  },
+  "analytics.breakdown.dependent-project-type": {
+    "message": "Loại dự án phụ thuộc"
+  },
   "analytics.breakdown.download-reason": {
     "message": "Lý do tải"
   },
@@ -37,6 +58,9 @@
   },
   "analytics.breakdown.loader": {
     "message": "Loader"
+  },
+  "analytics.breakdown.members": {
+    "message": "Thành viên"
   },
   "analytics.breakdown.monetization": {
     "message": "Lợi nhuận"
@@ -140,6 +164,18 @@
   "analytics.chart.table-selection.count": {
     "message": "Đang hiện {count} {itemType, select, project {{count, plural, other {dự án}}} country {{count, plural, other {quốc gia}}} monetization {{count, plural, other {giá trị doanh thu}}} downloadSource {{count, plural, other {nguồn tải}}} downloadReason {{count, plural, other {lý do tải}}} member {{count, plural, other {thành viên}}} projectVersion {{count, plural, other {phiên bản dự án}}} loader {{count, plural, other {mod loader}}} gameVersion {{count, plural, other {phiên bản trò chơi}}} other {{count, plural, other {vật phẩm}}}} từ bảng"
   },
+  "analytics.chart.table-selection.limited": {
+    "message": "Đang hiện {limit} {itemType, select, project {{limit, plural, one {dự án} other {dự án}}} country {{limit, plural, one {quốc gia} other {quốc gia}}} monetization {{limit, plural, one {doanh thu} other {doanh thu}}} downloadSource {{limit, plural, one {nguồn tải} other {nguồn tải}}} downloadReason {{limit, plural, one {lý do tải} other {lý do tải}}} member {{limit, plural, one {thành viên} other {thành viên}}} projectVersion {{limit, plural, one {phiên bản dự án} other {phiên bản dự án}}} loader {{limit, plural, one {trình chạy} other {trình chạy}}} gameVersion {{limit, plural, one {phiên bản game} other {phiên bản game}}} other {{limit, plural, one {mục} other {mục}}}} từ bảng"
+  },
+  "analytics.chart.table-selection.top": {
+    "message": "Đang hiện top {count} {itemType, select, project {{count, plural, one {dự án} other {dự án}}} country {{count, plural, one {quốc gia} other {quốc gia}}} monetization {{count, plural, one {doanh thu} other {doanh thu}}} downloadSource {{count, plural, one {nguồn tải} other {nguồn tải}}} downloadReason {{count, plural, one {lý do tải} other {lý do tải}}} member {{count, plural, one {thành viên} other {thành viên}}} projectVersion {{count, plural, one {phiên bản dự án} other {phiên bản dự án}}} loader {{count, plural, one {trình chạy} other {trình chạy}}} gameVersion {{count, plural, one {phiên bản game} other {phiên bản game}}} other {{count, plural, one {mục} other {mục}}}} từ bảng"
+  },
+  "analytics.chart.tooltip.dependent-on-project": {
+    "message": "Phụ thuộc vào {project}"
+  },
+  "analytics.chart.tooltip.dependent-project-version": {
+    "message": "{dependentProject} phụ thuộc vào {dependencyProject}, {version}"
+  },
   "analytics.chart.tooltip.duration.days": {
     "message": "{count, plural, other {# ngày}}"
   },
@@ -212,6 +248,9 @@
   "analytics.empty.select-project": {
     "message": "Sử dụng ít nhất một dự án để xem dữ liệu"
   },
+  "analytics.filter.dependent-project-search-failed-title": {
+    "message": "Không thể tải dự án phụ thuộc"
+  },
   "analytics.filter.game-version-type": {
     "message": "Loại phiên bản game"
   },
@@ -224,8 +263,14 @@
   "analytics.filter.search.countries": {
     "message": "Tìm quốc gia..."
   },
+  "analytics.filter.search.dependent-projects": {
+    "message": "Tìm dự án..."
+  },
   "analytics.filter.search.download-sources": {
     "message": "Tìm nguồn tải..."
+  },
+  "analytics.filter.search.members": {
+    "message": "Tìm thành viên..."
   },
   "analytics.filter.search.project-versions": {
     "message": "Tìm phiên bản dự án..."
@@ -472,6 +517,12 @@
   },
   "analytics.value.monetized": {
     "message": "Kiếm tiền"
+  },
+  "analytics.value.no-dependent": {
+    "message": "Không có"
+  },
+  "analytics.value.no-dependent-tooltip": {
+    "message": "Lượt tải xuống cho những lý do khác ngoài phụ thuộc"
   },
   "analytics.value.none": {
     "message": "Không có"
@@ -3028,9 +3079,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Bạn có thể thay đổi dự án mà không làm ảnh hưởng đến thứ tự trong hàng của bạn."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Chúng tôi hướng tới việc kiểm duyệt trong vòng 24-48 giờ, nhưng một số dự án có thể bị trì hoãn. Điều này không có nghĩa là có vấn đề trong dự án bạn gửi."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Chúng tôi rất cảm ơn sự kiên nhẫn của bạn trong khi đội ngũ kiểm duyệt chúng tôi đang nỗ lực giữ cho Modrinth an toàn, và mong được hỗ trợ bạn để chia sẻ nội dung của mình!💚</emphasis>"
