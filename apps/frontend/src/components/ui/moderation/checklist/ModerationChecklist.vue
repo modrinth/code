@@ -1104,7 +1104,7 @@ const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
 					const childState = getBooleanChildState(nodeState) as Record<string, NodeState>
 					return withDefaults(childState, resolveChildren(node, childState))
 				})()
-				const isRequired = !!(node as ValueNodeBuilder)._required
+				const isRequired = (node as ValueNodeBuilder)._required
 				const nodeActiveActions: ActiveAction[] = []
 
 				let isFixActionable = false
@@ -1443,15 +1443,10 @@ watch(
 	{ immediate: true },
 )
 
-watch(
-	() => currentStageObj.value.id,
-	(stageId) => {
-		if (stageId === 'versions') {
-			loadVersions()
-		}
-	},
-	{ immediate: true },
-)
+// Version data feeds multiple stages' `.shown()` conditions now, not just the Versions stage
+// itself, so it needs to load immediately rather than waiting until the moderator navigates
+// to that specific stage.
+loadVersions()
 
 function countStageActions(stage: StageNodeBuilder): number {
 	const actions = checklistLive.value.get(stage)?.activeActions ?? []
