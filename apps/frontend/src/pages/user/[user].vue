@@ -382,7 +382,13 @@ import {
 	UserBadges,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import {
+	isAdmin,
+	isModrinthUser as checkIsModrinthUser,
+	isOfficialAccount as checkIsOfficialAccount,
+	isStaff,
+	UserBadge,
+} from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
@@ -582,11 +588,8 @@ const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
 )
 
-const isModrinthUser = computed(() => user.value?.id === '2REoufqX')
-const isAutoMod = computed(() => user.value?.id === '')
-const isOfficialAccount = computed(
-	() => isModrinthUser.value || isAutoMod.value || user.value?.id === 'GVFjtWTf',
-)
+const isModrinthUser = computed(() => checkIsModrinthUser(user.value?.id))
+const isOfficialAccount = computed(() => checkIsOfficialAccount(user.value?.id))
 
 const sortedCollections = computed(() => {
 	const list = collections.value

@@ -422,6 +422,7 @@ html {
 }
 
 .retro-mode {
+	@extend .dark-mode;
 	--surface-2-5: #3a3c3e;
 	--brand-gradient-strong-bg: #3a3b38;
 }

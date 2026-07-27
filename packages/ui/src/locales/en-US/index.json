@@ -2318,6 +2318,9 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.permissions": {
+    "defaultMessage": "Permissions"
+  },
   "label.plan-custom": {
     "defaultMessage": "Custom"
   },

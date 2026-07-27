@@ -3026,12 +3026,6 @@
   "settings.authorizations.about-this-app": {
     "message": "Tungkol sa app"
   },
-  "settings.authorizations.by": {
-    "message": "ni/ng"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
-  },
   "settings.authorizations.head-title": {
     "message": "Mga pagpapahintulot"
   },

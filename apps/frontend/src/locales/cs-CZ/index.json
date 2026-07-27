@@ -2936,9 +2936,6 @@
   "settings.authorizations.about-this-app": {
     "message": "O této aplikaci"
   },
-  "settings.authorizations.by": {
-    "message": "od"
-  },
   "settings.authorizations.head-title": {
     "message": "Autorizace"
   },

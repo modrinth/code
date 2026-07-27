@@ -3845,14 +3845,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Mengenai aplikasi ini"
   },
-  "settings.authorizations.by": {
-    "message": "oleh"
-  },
   "settings.authorizations.description": {
     "message": "Apabila anda membenarkan aplikasi ini dengan akaun Modrinth anda, anda memberikannya akses kepada akaun anda. Anda boleh mengurus dan menyemak akses kepada akaun anda di sini pada bila-bila masa."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kami tidak dapat memaparkan aplikasi yang dibenarkan oleh anda pada masa ini, kami sedang berusaha untuk memperbaikinya. Sila kunjungi laman ini pada tarikh yang akan datang!"
   },
   "settings.authorizations.head-title": {
     "message": "Kebenaran"

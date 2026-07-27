@@ -4316,14 +4316,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Bu uygulama hakkında"
   },
-  "settings.authorizations.by": {
-    "message": "tarafından"
-  },
   "settings.authorizations.description": {
     "message": "Modrinth hesabınızla bir uygulamayı yetkilendirdiğinizde, ona hesabınıza erişim izni vermiş olursunuz. Hesabınıza verilen erişimi dilediğiniz zaman burada yönetebilir ve gözden geçirebilirsiniz."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Yetkilendirdiğiniz uygulamalar şu anda görüntülenemiyor, bunu düzeltmek için çalışıyoruz. Lütfen bu sayfayı daha sonra tekrar ziyaret edin."
   },
   "settings.authorizations.head-title": {
     "message": "Yetkiler"

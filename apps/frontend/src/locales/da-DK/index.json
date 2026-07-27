@@ -3080,9 +3080,6 @@
   "settings.authorizations.about-this-app": {
     "message": "Omkring denne app"
   },
-  "settings.authorizations.by": {
-    "message": "af"
-  },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"
   },

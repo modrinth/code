@@ -4835,14 +4835,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Про застосунок"
   },
-  "settings.authorizations.by": {
-    "message": "від"
-  },
   "settings.authorizations.description": {
     "message": "Коли ви авторизуєтеся у застосунку за допомогою Modrinth, ви надаєте йому доступ до вашого облікового запису. Ви завжди можете переглядати й керувати доступом до свого облікового запису тут."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Наразі ми не можемо показати ваші авторизовані застосунки, але ми працюємо, щоб виправити це. Будь ласка, завітайте на цю сторінку пізніше!"
   },
   "settings.authorizations.head-title": {
     "message": "Авторизації"
