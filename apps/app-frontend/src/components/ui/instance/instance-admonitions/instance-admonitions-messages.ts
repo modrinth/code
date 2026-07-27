@@ -21,6 +21,19 @@ export const instanceAdmonitionsMessages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.reviewing-button',
 		defaultMessage: 'Reviewing...',
 	},
+	sharedInstanceUpdateAvailableHeader: {
+		id: 'app.instance.admonitions.shared-instance.update-available-header',
+		defaultMessage: 'An update is available',
+	},
+	sharedInstanceUpdateAvailableBody: {
+		id: 'app.instance.admonitions.shared-instance.update-available-body',
+		defaultMessage:
+			'An update is required to play {name}. Please update to latest version to launch the game.',
+	},
+	sharedInstanceReviewUpdateButton: {
+		id: 'app.instance.admonitions.shared-instance.review-update-button',
+		defaultMessage: 'Review update',
+	},
 	sharedInstanceReviewHeader: {
 		id: 'app.instance.admonitions.shared-instance.review-header',
 		defaultMessage: 'Review changes',
