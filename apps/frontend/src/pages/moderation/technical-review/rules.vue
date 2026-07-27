@@ -401,16 +401,16 @@ import { type Labrinth, SseParser } from '@modrinth/api-client'
 import {
 	ArrowLeftIcon,
 	EditIcon,
-	EyeOffIcon,
 	ExternalIcon,
+	EyeOffIcon,
 	LoaderCircleIcon,
 	PlayIcon,
 	PlusIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
-	ButtonStyled,
 	Avatar,
+	ButtonStyled,
 	ConfirmModal,
 	EmptyState,
 	injectModrinthClient,
