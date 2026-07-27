@@ -185,6 +185,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		v-if="ctx.isServerType.value"
 		v-model:selected-filters="ctx.serverCurrentFilters.value"
 		:filters="ctx.serverFilterTypes.value"
+		:project-type="ctx.projectType.value"
 		:provided-filters="[]"
 		:overridden-provided-filter-types="[]"
 	/>
@@ -196,6 +197,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 				(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
 			)
 		"
+		:project-type="ctx.projectType.value"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
 		:provided-message="lockedMessages?.providedBy"

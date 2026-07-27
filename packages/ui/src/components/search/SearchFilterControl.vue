@@ -1,15 +1,25 @@
 <template>
 	<div class="flex flex-wrap items-center gap-1 empty:hidden">
 		<TagItem
-			v-if="selectedItems.length > 1"
+			v-if="selectedTagCount > 1"
 			class="transition-transform active:scale-[0.95]"
 			:action="clearFilters"
 		>
 			<XCircleIcon />
 			Clear all filters
 		</TagItem>
+		<TagItem v-if="selectedIncludedProjectItems.length > 0" :action="removeIncludedProjectFilters">
+			<XIcon />
+			{{
+				formatMessage(includedProjectsMessage, {
+					projects: selectedIncludedProjectItems
+						.map((item) => dependentProjectNames.get(item.option) ?? item.option)
+						.join(', '),
+				})
+			}}
+		</TagItem>
 		<TagItem
-			v-for="selectedItem in selectedItems"
+			v-for="selectedItem in otherSelectedItems"
 			:key="`remove-filter-${selectedItem.type}-${selectedItem.option}`"
 			:action="() => removeFilter(selectedItem)"
 		>
@@ -52,6 +62,7 @@ const selectedFilters = defineModel<FilterValue[]>('selectedFilters', { required
 
 const props = defineProps<{
 	filters: FilterType[]
+	projectType: string
 	providedFilters: FilterValue[]
 	overriddenProvidedFilterTypes: string[]
 	providedMessage?: MessageDescriptor | string
@@ -64,6 +75,10 @@ const defaultProvidedMessage = defineMessage({
 const dependentProjectMessage = defineMessage({
 	id: 'search.filter.dependent_project',
 	defaultMessage: 'Depends on: {project}',
+})
+const includedProjectsMessage = defineMessage({
+	id: 'search.filter.included_projects',
+	defaultMessage: 'Includes: {projects}',
 })
 
 type Item = {
@@ -146,10 +161,29 @@ const items: ComputedRef<Item[]> = computed(() => {
 })
 
 const selectedItems = computed(() => items.value.filter((x) => !x.provided))
+const selectedIncludedProjectItems = computed(() =>
+	props.projectType === 'modpack'
+		? selectedItems.value.filter((item) => item.type === 'compatible_dependency_project_ids')
+		: [],
+)
+const otherSelectedItems = computed(() =>
+	props.projectType === 'modpack'
+		? selectedItems.value.filter((item) => item.type !== 'compatible_dependency_project_ids')
+		: selectedItems.value,
+)
+const selectedTagCount = computed(
+	() => otherSelectedItems.value.length + (selectedIncludedProjectItems.value.length > 0 ? 1 : 0),
+)
 
 function removeFilter(filter: Item) {
 	selectedFilters.value = selectedFilters.value.filter(
 		(x) => x.type !== filter.type || x.option !== filter.option,
+	)
+}
+
+function removeIncludedProjectFilters() {
+	selectedFilters.value = selectedFilters.value.filter(
+		(filter) => filter.type !== 'compatible_dependency_project_ids',
 	)
 }
 
