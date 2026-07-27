@@ -108,7 +108,7 @@ function getQueuedInstallOwnerFallback(project: InstallableSearchResult) {
 		id: ownerId,
 		name: project.author,
 		type: 'user' as const,
-		link: `https://modrinth.com/user/${ownerId}`,
+		link: `/user/${encodeURIComponent(ownerId)}`,
 	}
 }
 
@@ -144,7 +144,7 @@ async function getQueuedInstallOwner(
 				name: owner.username,
 				type: 'user' as const,
 				avatar_url: owner.avatar_url,
-				link: `https://modrinth.com/user/${owner.username}`,
+				link: `/user/${encodeURIComponent(owner.username)}`,
 			}
 		}
 	} catch {
