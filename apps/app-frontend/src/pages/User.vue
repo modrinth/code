@@ -3,6 +3,7 @@
 		<UserProfilePageLayout
 			:user-id="userId"
 			:project-type="projectType"
+			variant="app"
 			site-url="https://modrinth.com"
 			project-link-mode="app"
 			external-navigation

@@ -246,61 +246,72 @@
 						</template>
 					</EmptyState>
 
-					<div
+					<ProjectCardList
 						v-if="selectedProjectType === null || selectedProjectType === 'collection'"
-						class="grid grid-cols-1 gap-4 min-[800px]:grid-cols-2"
+						layout="grid"
 					>
-						<AutoLink
+						<SmartClickable
 							v-for="collection in sortedCollections"
 							:key="collection.id"
-							:to="collectionLink(collection.id)"
-							link-class="!flex !m-0 box-border w-full flex-col gap-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 text-left"
+							class="h-full w-full"
 						>
-							<div class="grid grid-cols-[auto_1fr] gap-4">
-								<Avatar :src="collection.icon_url" size="64px" />
-								<div class="flex min-w-0 flex-col gap-2">
-									<h2 class="m-0 truncate text-lg font-bold text-contrast">
-										{{ collection.name }}
-									</h2>
+							<template #clickable>
+								<AutoLink
+									:to="collectionLink(collection.id)"
+									class="no-click-animation custom-focus-indicator rounded-xl no-outline"
+								/>
+							</template>
+							<div
+								class="smart-clickable:outline-on-focus smart-clickable:highlight-on-hover flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all"
+							>
+								<div class="grid grid-cols-[auto_1fr] gap-4">
+									<Avatar :src="collection.icon_url" size="64px" no-shadow />
+									<div class="flex min-w-0 flex-col gap-2">
+										<h2
+											class="smart-clickable:underline-on-hover m-0 truncate text-lg font-semibold text-contrast"
+										>
+											{{ collection.name }}
+										</h2>
+										<div class="flex items-center gap-1">
+											<LibraryIcon aria-hidden="true" />
+											{{ formatMessage(messages.collectionLabel) }}
+										</div>
+									</div>
+								</div>
+								<div class="grow text-primary">
+									{{ collection.description }}
+								</div>
+								<div class="mt-auto flex flex-wrap items-center gap-4">
 									<div class="flex items-center gap-1">
-										<LibraryIcon aria-hidden="true" />
-										{{ formatMessage(messages.collectionLabel) }}
+										<BoxIcon />
+										{{
+											formatMessage(messages.collectionProjectsCount, {
+												count: collection.projects.length,
+											})
+										}}
+									</div>
+									<div class="flex items-center gap-1">
+										<template v-if="collection.status === 'listed'">
+											<GlobeIcon />
+											{{ formatMessage(commonMessages.publicLabel) }}
+										</template>
+										<template v-else-if="collection.status === 'unlisted'">
+											<LinkIcon />
+											{{ formatMessage(commonMessages.unlistedLabel) }}
+										</template>
+										<template v-else-if="collection.status === 'private'">
+											<LockIcon />
+											{{ formatMessage(commonMessages.privateLabel) }}
+										</template>
+										<template v-else-if="collection.status === 'rejected'">
+											<XIcon />
+											{{ formatMessage(commonMessages.rejectedLabel) }}
+										</template>
 									</div>
 								</div>
 							</div>
-							<div class="grow text-primary">
-								{{ collection.description }}
-							</div>
-							<div class="mt-auto flex flex-wrap items-center gap-4">
-								<div class="flex items-center gap-1">
-									<BoxIcon />
-									{{
-										formatMessage(messages.collectionProjectsCount, {
-											count: collection.projects.length,
-										})
-									}}
-								</div>
-								<div class="flex items-center gap-1">
-									<template v-if="collection.status === 'listed'">
-										<GlobeIcon />
-										{{ formatMessage(commonMessages.publicLabel) }}
-									</template>
-									<template v-else-if="collection.status === 'unlisted'">
-										<LinkIcon />
-										{{ formatMessage(commonMessages.unlistedLabel) }}
-									</template>
-									<template v-else-if="collection.status === 'private'">
-										<LockIcon />
-										{{ formatMessage(commonMessages.privateLabel) }}
-									</template>
-									<template v-else-if="collection.status === 'rejected'">
-										<XIcon />
-										{{ formatMessage(commonMessages.rejectedLabel) }}
-									</template>
-								</div>
-							</div>
-						</AutoLink>
-					</div>
+						</SmartClickable>
+					</ProjectCardList>
 
 					<EmptyState
 						v-if="showCollectionsEmptyState"
@@ -321,10 +332,10 @@
 				</div>
 
 				<template #sidebar>
-					<div class="flex flex-col gap-4">
+					<div class="flex flex-col" :class="{ 'gap-4': variant === 'web' }">
 						<div
 							v-if="sortedOrganizations.length > 0"
-							class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
+							:class="sidebarSectionClass"
 						>
 							<h2 class="m-0 mb-2 text-lg font-semibold text-contrast">
 								{{ formatMessage(messages.profileOrganizations) }}
@@ -354,7 +365,7 @@
 							:has-midas="hasMidas"
 							:has-pride="hasPride26Badge(user)"
 							:earliest-project-by-type="earliestProjectByType"
-							class="rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
+							:class="sidebarSectionClass"
 						/>
 
 						<slot name="sidebar" />
@@ -405,6 +416,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
+import SmartClickable from '#ui/components/base/SmartClickable.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import NormalPage from '#ui/components/page/NormalPage.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
@@ -453,6 +465,7 @@ const props = withDefaults(
 		projectType?: string
 		displayMode?: DisplayMode
 		sidebarPosition?: 'left' | 'right'
+		variant?: 'web' | 'app'
 		siteUrl?: string
 		externalNavigation?: boolean
 		projectLinkMode?: 'website' | 'app'
@@ -463,6 +476,7 @@ const props = withDefaults(
 		projectType: undefined,
 		displayMode: 'list',
 		sidebarPosition: 'right',
+		variant: 'web',
 		siteUrl: 'https://modrinth.com',
 		externalNavigation: false,
 		projectLinkMode: 'website',
@@ -480,6 +494,11 @@ const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
 const { formatMessage } = useVIntl()
+const sidebarSectionClass = computed(() =>
+	props.variant === 'app'
+		? 'border-0 border-b-[1px] border-solid border-[--brand-gradient-border] p-4'
+		: 'rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4',
+)
 
 const messages = defineMessages({
 	collectionProjectsCount: {
