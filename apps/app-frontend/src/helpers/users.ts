@@ -1,6 +1,21 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { invoke } from '@tauri-apps/api/core'
 
+export function parse_modrinth_user_link(href: string): string | null {
+	try {
+		const url = new URL(href)
+		if (url.hostname !== 'modrinth.com' && url.hostname !== 'www.modrinth.com') return null
+
+		const segments = url.pathname.split('/').filter(Boolean)
+		if (segments[0]?.toLowerCase() !== 'user' || !segments[1] || segments.length > 3) return null
+
+		const path = `/user/${encodeURIComponent(decodeURIComponent(segments[1]))}`
+		return segments[2] ? `${path}/${encodeURIComponent(decodeURIComponent(segments[2]))}` : path
+	} catch {
+		return null
+	}
+}
+
 export async function search_user(query: string): Promise<Labrinth.Users.v3.SearchUser[]> {
 	return await invoke<Labrinth.Users.v3.SearchUser[]>('plugin:users|search_user', { query })
 }

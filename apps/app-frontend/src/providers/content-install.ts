@@ -475,7 +475,7 @@ export function createContentInstall(opts: {
 										name: owner.user.username,
 										iconUrl: owner.user.avatar_url,
 										circle: true,
-										link: () => openUrl(`https://modrinth.com/user/${owner.user.username}`),
+										link: `/user/${encodeURIComponent(owner.user.username)}`,
 									},
 								}
 							}

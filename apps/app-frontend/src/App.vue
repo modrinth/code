@@ -115,6 +115,7 @@ import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { hasActivePride26Midas, hasMidasBadge } from '@/helpers/user-campaigns.ts'
+import { parse_modrinth_user_link } from '@/helpers/users'
 import {
 	areUpdatesEnabled,
 	enqueueUpdateForInstallation,
@@ -265,7 +266,14 @@ providePageContext({
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
 		),
 	},
-	openExternalUrl: (url) => openUrl(url),
+	openExternalUrl: (url) => {
+		const userPath = parse_modrinth_user_link(url)
+		if (userPath) {
+			void router.push(userPath)
+		} else {
+			void openUrl(url)
+		}
+	},
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
@@ -966,7 +974,7 @@ async function declineServerInviteNotification(notification) {
 
 function openServerInviteInviterProfile(inviterName) {
 	if (!inviterName) return
-	openUrl(`${config.siteUrl}/user/${encodeURIComponent(inviterName)}`)
+	void router.push(`/user/${encodeURIComponent(inviterName)}`)
 }
 
 async function handleLiveNotification(notification) {
@@ -1407,8 +1415,11 @@ function handleClick(e) {
 				!target.href.startsWith('https://tauri.localhost') &&
 				!target.href.startsWith('http://tauri.localhost')
 			) {
+				const userPath = parse_modrinth_user_link(target.href)
 				const parsed = parseModrinthLink(target.href)
-				if (target.target !== '_blank' && parsed) {
+				if (userPath) {
+					void router.push(userPath)
+				} else if (target.target !== '_blank' && parsed) {
 					void openModrinthProjectLinkInApp(parsed)
 				} else {
 					openUrl(target.href)
@@ -1654,7 +1665,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:options="[
 					{
 						id: 'view-profile',
-						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
+						action: () =>
+							router.push(`/user/${encodeURIComponent(credentials.user.username)}`),
 					},
 					{
 						id: 'sign-out',

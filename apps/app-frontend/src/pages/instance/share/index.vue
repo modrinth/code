@@ -138,7 +138,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref, toRef, watch } from 'vue'
 
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
@@ -344,7 +343,7 @@ function removeMember(row: ShareRow) {
 function userProfileLink(username: string) {
 	return !username || username.includes('@')
 		? undefined
-		: () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
+		: `/user/${encodeURIComponent(username)}`
 }
 async function requestAuth(flow: ModrinthAuthFlow) {
 	await auth.requestSignIn(`/instance/${encodeURIComponent(props.instance.id)}/share`, flow, {

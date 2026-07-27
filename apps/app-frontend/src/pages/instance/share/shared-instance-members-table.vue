@@ -157,7 +157,6 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref } from 'vue'
 
 import {
@@ -296,7 +295,7 @@ const messages = defineMessages({
 function userProfileLink(username: string) {
 	return !username || username.includes('@')
 		? undefined
-		: () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
+		: `/user/${encodeURIComponent(username)}`
 }
 function setUsernameRef(id: string, element: Element | null) {
 	usernameRefs.value[id] = element instanceof HTMLElement ? element : null

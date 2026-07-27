@@ -17,7 +17,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 
 import {
 	get_user_collections,
@@ -48,35 +48,50 @@ const projectType = computed(() => {
 	return Array.isArray(value) ? value[0] : value
 })
 
-if (userId.value) {
+async function ensureUserProfileData(id: string): Promise<void> {
+	if (!id) return
+
+	let breadcrumbName = id
 	try {
-		await queryClient.ensureQueryData({
-			queryKey: ['user', userId.value],
-			queryFn: () => userProfile.getUser(userId.value),
+		const user = await queryClient.ensureQueryData({
+			queryKey: ['user', id],
+			queryFn: () => userProfile.getUser(id),
 			staleTime: 30_000,
 		})
+		breadcrumbName = user.username
 	} catch {
 		// Let the mounted layout's useQuery surface errors; do not fail route setup.
 	}
 
 	await Promise.allSettled([
 		queryClient.ensureQueryData({
-			queryKey: ['user', userId.value, 'projects'],
-			queryFn: () => userProfile.getProjects(userId.value),
+			queryKey: ['user', id, 'projects'],
+			queryFn: () => userProfile.getProjects(id),
 			staleTime: 30_000,
 		}),
 		queryClient.ensureQueryData({
-			queryKey: ['user', userId.value, 'organizations'],
-			queryFn: () => userProfile.getOrganizations(userId.value),
+			queryKey: ['user', id, 'organizations'],
+			queryFn: () => userProfile.getOrganizations(id),
 			staleTime: 30_000,
 		}),
 		queryClient.ensureQueryData({
-			queryKey: ['user', userId.value, 'collections'],
-			queryFn: () => userProfile.getCollections(userId.value),
+			queryKey: ['user', id, 'collections'],
+			queryFn: () => userProfile.getCollections(id),
 			staleTime: 30_000,
 		}),
 	])
+
+	breadcrumbs.setName('User', breadcrumbName)
 }
+
+onBeforeRouteUpdate(async (to) => {
+	const value = to.params.user
+	const id = Array.isArray(value) ? (value[0] ?? '') : (value ?? '')
+	await ensureUserProfileData(id)
+})
+
+breadcrumbs.setName('User', userId.value)
+await ensureUserProfileData(userId.value)
 
 const { data: user } = useQuery({
 	queryKey: computed(() => ['user', userId.value]),
@@ -86,11 +101,9 @@ const { data: user } = useQuery({
 })
 
 watch(
-	user,
-	(value) => {
-		if (value?.username) {
-			breadcrumbs.setName('User', value.username)
-		}
+	[userId, user],
+	([currentUserId, value]) => {
+		breadcrumbs.setName('User', value?.username ?? currentUserId)
 	},
 	{ immediate: true },
 )
