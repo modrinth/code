@@ -286,6 +286,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 			toggleDisabled: ctx.isBusy.value,
 			toggleDisabledTooltip: ctx.isBusy.value ? (ctx.busyMessage?.value ?? null) : null,
 			installing: item.installing === true,
+			installProgress: item.installProgress,
 			hasUpdate: base.hasUpdate ?? item.has_update,
 			isClientOnly:
 				isClientOnlyEnvironment(item.environment) ||

@@ -96,6 +96,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const fsAuth = ref<{ url: string; token: string } | null>(null)
 	const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 	const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
+	const installProgressItems = ref<Archon.Websocket.v0.InstallProgressItem[]>([])
 	const connectedSocketServerId = ref<string | null>(null)
 	const socketUnsubscribers = ref<SocketUnsubscriber[]>([])
 	const cpuData = ref<number[]>([])
@@ -265,6 +266,11 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		startUptimeTicker()
 	}
 
+	const handleInstallProgress = (data: Archon.Websocket.v0.WSInstallProgressEvent) => {
+		if (!shouldProcessEvent()) return
+		installProgressItems.value = data.items
+	}
+
 	const handleAuthIncorrect = () => {
 		if (!shouldProcessEvent()) return
 		isWsAuthIncorrect.value = true
@@ -301,6 +307,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		serverPowerState.value = 'stopped'
 		powerStateDetails.value = undefined
 		uptimeSeconds.value = 0
+		installProgressItems.value = []
 	}
 
 	const connectSocket = async (
@@ -317,6 +324,20 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		disconnectSocket(connectedSocketServerId.value ?? undefined)
 
 		try {
+			const baseSubscriptions: SocketUnsubscriber[] = [
+				client.archon.sockets.on(targetServerId, 'log', handleLog),
+				client.archon.sockets.on(targetServerId, 'log4j', handleLog4j),
+				client.archon.sockets.on(targetServerId, 'stats', handleStats),
+				client.archon.sockets.on(targetServerId, 'state', handleState),
+				client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),
+				client.archon.sockets.on(targetServerId, 'uptime', handleUptime),
+				client.archon.sockets.on(targetServerId, 'install-progress', handleInstallProgress),
+				client.archon.sockets.on(targetServerId, 'auth-incorrect', handleAuthIncorrect),
+				client.archon.sockets.on(targetServerId, 'auth-ok', handleAuthOk),
+			]
+			const extraSubscriptions = connectOptions.extraSubscriptions?.(targetServerId) ?? []
+			socketUnsubscribers.value = [...baseSubscriptions, ...extraSubscriptions]
+
 			const safeConnectOptions = connectOptions.force ? { force: true } : undefined
 			await client.archon.sockets.safeConnect(targetServerId, safeConnectOptions)
 			connectedSocketServerId.value = targetServerId
@@ -326,21 +347,10 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			modrinthServersConsole.clear()
 			modrinthServersConsole.beginInitialLogHydration()
 
-			const baseSubscriptions: SocketUnsubscriber[] = [
-				client.archon.sockets.on(targetServerId, 'log', handleLog),
-				client.archon.sockets.on(targetServerId, 'log4j', handleLog4j),
-				client.archon.sockets.on(targetServerId, 'stats', handleStats),
-				client.archon.sockets.on(targetServerId, 'state', handleState),
-				client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),
-				client.archon.sockets.on(targetServerId, 'uptime', handleUptime),
-				client.archon.sockets.on(targetServerId, 'auth-incorrect', handleAuthIncorrect),
-				client.archon.sockets.on(targetServerId, 'auth-ok', handleAuthOk),
-			]
-			const extraSubscriptions = connectOptions.extraSubscriptions?.(targetServerId) ?? []
-			socketUnsubscribers.value = [...baseSubscriptions, ...extraSubscriptions]
 			return true
 		} catch (error) {
 			console.error('[hosting/manage] Failed to connect server socket:', error)
+			clearSocketListeners()
 			isConnected.value = false
 			return false
 		}
@@ -402,6 +412,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		isServerRunning,
 		stats,
 		uptimeSeconds,
+		installProgressItems,
 		isSyncingContent: options.isSyncingContent as Ref<boolean>,
 		busyReasons,
 		fsAuth,
@@ -437,6 +448,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		isConnected,
 		isServerRunning,
 		isWsAuthIncorrect,
+		installProgressItems,
 		powerStateDetails,
 		ramData,
 		refreshFsAuth,

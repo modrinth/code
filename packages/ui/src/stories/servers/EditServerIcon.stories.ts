@@ -71,6 +71,7 @@ const meta = {
 					isServerRunning: computed(() => true),
 					stats,
 					uptimeSeconds: ref(0),
+					installProgressItems: ref<Archon.Websocket.v0.InstallProgressItem[]>([]),
 					isSyncingContent: ref(false),
 					busyReasons: computed(() => []),
 					fsAuth: ref(null),
