@@ -440,14 +440,11 @@ watch(
 	},
 	{ immediate: true },
 )
-watch(
-	[eligibilityQuery.data, members.query.data],
-	([eligibility, memberRows]) => {
-		if (eligibility !== undefined && memberRows !== undefined) {
-			sharedInstancesApiUnavailable.value = false
-		}
-	},
-)
+watch([eligibilityQuery.data, members.query.data], ([eligibility, memberRows]) => {
+	if (eligibility !== undefined && memberRows !== undefined) {
+		sharedInstancesApiUnavailable.value = false
+	}
+})
 watch(
 	() => props.instance.id,
 	() => {

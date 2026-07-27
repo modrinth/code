@@ -59,10 +59,7 @@
 			:unpublish="unpublishSharedInstance"
 		/>
 
-		<ConfirmRevokeSharedInstanceInviteModal
-			ref="revokeInviteModal"
-			@revoke="revokeInvite"
-		/>
+		<ConfirmRevokeSharedInstanceInviteModal ref="revokeInviteModal" @revoke="revokeInvite" />
 	</div>
 </template>
 

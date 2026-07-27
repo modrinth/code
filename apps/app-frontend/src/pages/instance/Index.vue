@@ -572,10 +572,7 @@ function hideAcceptedSharedInstanceUpdate() {
 }
 
 function handleSharedInstanceUpdateComplete(successful: boolean) {
-	if (
-		!successful &&
-		hiddenSharedInstanceUpdateKey.value === sharedInstanceUpdateKey.value
-	) {
+	if (!successful && hiddenSharedInstanceUpdateKey.value === sharedInstanceUpdateKey.value) {
 		hiddenSharedInstanceUpdateKey.value = null
 	}
 }

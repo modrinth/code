@@ -68,9 +68,7 @@
 			<template #empty-state
 				><div class="flex h-64 items-center justify-center text-secondary">
 					{{
-						formatMessage(
-							rows.length === 0 ? messages.noUsersJoined : messages.noUsersMatchFilters,
-						)
+						formatMessage(rows.length === 0 ? messages.noUsersJoined : messages.noUsersMatchFilters)
 					}}
 				</div></template
 			>
@@ -197,9 +195,7 @@ const methodFilterOptions: Array<{ id: ShareMethod; label: string }> = [
 	{ id: 'direct', label: methodLabels.direct },
 	{ id: 'link', label: methodLabels.link },
 ]
-const hasMultipleMethods = computed(
-	() => new Set(props.rows.map((row) => row.method)).size > 1,
-)
+const hasMultipleMethods = computed(() => new Set(props.rows.map((row) => row.method)).size > 1)
 const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
 	const result: TableColumn<ShareTableColumn>[] = [
 		{
