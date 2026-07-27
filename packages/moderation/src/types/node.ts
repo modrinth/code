@@ -4,8 +4,10 @@ import type {Component, FunctionalComponent, InjectionKey, Ref, SVGAttributes} f
 import {markRaw, toValue} from "vue"
 
 import {expandVariables, flattenProjectV3Variables, flattenProjectVariables, flattenStaticVariables} from "../utils"
-import type {ModerationSeverity, ModerationStatus} from "./actions"
 import type {Priority} from "./priority.ts"
+
+export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
+export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
 export type NodeState =
 	| boolean
