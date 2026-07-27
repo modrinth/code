@@ -29,6 +29,7 @@ const {
 	displayState,
 	selectedLibraryInstanceIds,
 	isLibraryInstanceSelectionActive,
+	activeDraggedInstanceIds,
 	toggleLibraryInstanceSelection,
 } = useLibrary()
 
@@ -50,6 +51,7 @@ const modLoading = computed(
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
 const selected = computed(() => selectedLibraryInstanceIds.value.has(props.instance.id))
+const isPartOfActiveDrag = computed(() => activeDraggedInstanceIds.value.has(props.instance.id))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupName}:${props.instance.id}`),
 	element: instanceCard,
@@ -198,8 +200,12 @@ onUnmounted(() => unlisten())
 		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all hover:brightness-110 active:scale-[0.98] select-none"
 		:class="{
 			'border-primary': selected,
-			'!scale-100 opacity-50': isDragging,
+			'!scale-100': isDragging,
+			'opacity-50': isPartOfActiveDrag,
 		}"
+		data-library-instance-card
+		:data-instance-id="instance.id"
+		:data-instance-group="instanceGroupName"
 		role="button"
 		tabindex="0"
 		:aria-label="

@@ -4,7 +4,6 @@ import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, inject, type InjectionKey, provide, type Ref, ref, watchEffect } from 'vue'
 
-import type { InstanceGroupMove } from '@/components/ui/library/instance-group/dnd'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
 import { install_duplicate_instance } from '@/helpers/install'
@@ -38,6 +37,12 @@ export type InstanceGroup = {
 	id: string
 	key: string
 	instances: GameInstance[]
+}
+
+export type ActiveInstanceGroupDrag = {
+	instanceIds: string[]
+	primaryInstanceId: string
+	fromGroup: string | null
 }
 
 export type InstanceCard = {
@@ -78,11 +83,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const selectedNewGroupInstanceIds = ref(new Set<string>())
 	/** Instance-level selection shared by every group representation of an instance. */
 	const selectedLibraryInstanceIds = ref(new Set<string>())
-	const isLibraryInstanceSelectionActive = computed(
-		() => selectedLibraryInstanceIds.value.size > 0,
-	)
+	const isLibraryInstanceSelectionActive = computed(() => selectedLibraryInstanceIds.value.size > 0)
 	const creatingGroup = ref(false)
-	const activeInstanceGroupDrag = ref<Omit<InstanceGroupMove, 'toGroup'> | null>(null)
+	const activeInstanceGroupDrag = ref<ActiveInstanceGroupDrag | null>(null)
+	const activeDraggedInstanceIds = computed(
+		() => new Set(activeInstanceGroupDrag.value?.instanceIds ?? []),
+	)
 	const instanceGroupDragTarget = ref<string | null>(null)
 	const instanceGroupDragPointer = ref({ x: 0, y: 0 })
 	const isAddingInstanceToGroup = ref(false)
@@ -351,8 +357,18 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	) => {
 		if (displayState.value.group !== 'Group') return
 
+		const instanceIds = selectedLibraryInstanceIds.value.has(instanceId)
+			? [
+					instanceId,
+					...[...selectedLibraryInstanceIds.value].filter(
+						(selectedId) => selectedId !== instanceId,
+					),
+				].filter((selectedId) => instances.value.some((instance) => instance.id === selectedId))
+			: [instanceId]
+
 		activeInstanceGroupDrag.value = {
-			instanceId,
+			instanceIds,
+			primaryInstanceId: instanceId,
 			fromGroup: normalizeInstanceGroupName(groupName),
 		}
 		updateInstanceGroupDrag(pointer, altKey)
@@ -370,64 +386,76 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	const getInstanceGroupDropState = (groupName: string) => {
 		const drag = activeInstanceGroupDrag.value
-		const instance = drag
-			? instances.value.find((candidate) => candidate.id === drag.instanceId)
-			: undefined
+		const draggedInstances = drag
+			? instances.value.filter((instance) => drag.instanceIds.includes(instance.id))
+			: []
 		const toGroup = normalizeInstanceGroupName(groupName)
-		const alreadyInGroup =
-			!!drag &&
-			!!instance &&
-			(toGroup === null ? drag.fromGroup === null : instance.groups.includes(toGroup))
 		const operation = isAddingInstanceToGroup.value ? 'add' : 'move'
 		const canAddToGroup = operation !== 'add' || toGroup !== null
+		const hasChanges = draggedInstances.some((instance) => {
+			if (operation === 'add') {
+				return toGroup !== null && !instance.groups.includes(toGroup)
+			}
+
+			return toGroup === null
+				? instance.groups.length > 0
+				: instance.groups.length !== 1 || instance.groups[0] !== toGroup
+		})
 
 		return {
-			alreadyInGroup,
-			canDrop: !!drag && !!instance && !alreadyInGroup && canAddToGroup,
+			alreadyInGroup: draggedInstances.length > 0 && !hasChanges,
+			canDrop: !!drag && draggedInstances.length > 0 && hasChanges && canAddToGroup,
 			operation,
 		} as const
 	}
 
 	const instanceGroupDragStatus = computed(() => {
 		const target = instanceGroupDragTarget.value
-		if (target && getInstanceGroupDropState(target).alreadyInGroup) {
-			return
+		if (target) {
+			const dropState = getInstanceGroupDropState(target)
+			if (!dropState.canDrop || dropState.operation !== 'add') return
+
+			const count = activeInstanceGroupDrag.value?.instanceIds.length ?? 0
+			return count > 1 ? `Add ${count} instances to group` : 'Add to group'
 		}
-		if (
-			(target && getInstanceGroupDropState(target).operation === 'add') ||
-			(!target && isAddingInstanceToGroup.value)
-		) {
-			return 'Duplicate into group'
-		}
+
+		if (isAddingInstanceToGroup.value) return 'Add to group'
 		return
 	})
 
-	const moveDraggedInstanceToGroup = async (groupName: string, addToGroup = false) => {
+	const moveDraggedInstancesToGroup = async (groupName: string, addToGroup = false) => {
 		const drag = activeInstanceGroupDrag.value
 		const toGroup = normalizeInstanceGroupName(groupName)
 		if (!drag) return false
-
-		const instance = instances.value.find((candidate) => candidate.id === drag.instanceId)
-		if (!instance) return false
 
 		const dropState = getInstanceGroupDropState(groupName)
 		if (!dropState.canDrop) return false
 
 		const shouldAdd = addToGroup && toGroup !== null
-		const nextGroups = shouldAdd
-			? [...instance.groups]
-			: instance.groups.filter((group) => group !== drag.fromGroup)
-		if (toGroup && !nextGroups.includes(toGroup)) {
-			nextGroups.push(toGroup)
+		const draggedInstances = instances.value.filter((instance) =>
+			drag.instanceIds.includes(instance.id),
+		)
+		const results = await Promise.allSettled(
+			draggedInstances.map((instance) => {
+				const nextGroups = shouldAdd ? [...instance.groups] : toGroup ? [toGroup] : []
+				if (shouldAdd && toGroup && !nextGroups.includes(toGroup)) {
+					nextGroups.push(toGroup)
+				}
+
+				return edit(instance.id, { groups: nextGroups })
+			}),
+		)
+		let movedInstanceCount = 0
+
+		for (const result of results) {
+			if (result.status === 'rejected') {
+				handleError(toError(result.reason))
+			} else {
+				movedInstanceCount++
+			}
 		}
 
-		try {
-			await edit(instance.id, { groups: nextGroups })
-			return true
-		} catch (error) {
-			handleError(toError(error))
-			return false
-		}
+		return movedInstanceCount > 0
 	}
 
 	useEventListener(window, 'keydown', (event) => {
@@ -702,6 +730,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		selectedLibraryInstanceIds,
 		isLibraryInstanceSelectionActive,
 		activeInstanceGroupDrag,
+		activeDraggedInstanceIds,
 		instanceGroupDragTarget,
 		instanceGroupDragPointer,
 		instanceGroupDragStatus,
@@ -719,7 +748,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		finishInstanceGroupDrag,
 		setInstanceGroupDragTarget,
 		getInstanceGroupDropState,
-		moveDraggedInstanceToGroup,
+		moveDraggedInstancesToGroup,
 		openNewGroupModal,
 		closeNewGroupModal,
 		toggleNewGroupInstance,
