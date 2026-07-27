@@ -224,14 +224,23 @@ watch(
 
 <template>
 	<div ref="groupDropTarget" class="instance-group relative select-none pb-3">
-		<div
-			v-if="
-				activeInstanceGroupDrag &&
-				instanceGroupDragTarget === instanceGroup.key &&
-				getInstanceGroupDropState(instanceGroup.key).canDrop
-			"
-			class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent brightness-125 transition-opacity"
-		/>
+		<Transition
+			enter-active-class="transition-opacity duration-150 ease-out"
+			enter-from-class="!opacity-0"
+			enter-to-class="opacity-100"
+			leave-active-class="transition-opacity duration-150 ease-in"
+			leave-from-class="opacity-100"
+			leave-to-class="!opacity-0"
+		>
+			<div
+				v-if="
+					activeInstanceGroupDrag &&
+					instanceGroupDragTarget === instanceGroup.key &&
+					getInstanceGroupDropState(instanceGroup.key).canDrop
+				"
+				class="pointer-events-none absolute -inset-2 inset-y-0 z-20 rounded-xl border-2 opacity-50 border-dashed border-brand bg-transparent"
+			/>
+		</Transition>
 		<div
 			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			@click="toggleGroup"

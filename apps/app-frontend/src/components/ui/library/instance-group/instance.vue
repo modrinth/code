@@ -168,7 +168,7 @@ onUnmounted(() => unlisten())
 <template>
 	<div
 		ref="instanceCard"
-		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left shadow-[0_1px_1px_0_rgba(0,0,0,0.12)] transition-all hover:brightness-110 active:scale-[0.98] select-none"
+		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left !outline-0 transition-all hover:brightness-110 active:scale-[0.98] select-none"
 		:class="{
 			'border-primary': selected,
 			'!scale-100 !brightness-100': selectionControlActive,
