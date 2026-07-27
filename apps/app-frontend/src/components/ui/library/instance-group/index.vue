@@ -50,6 +50,10 @@ const confirmDeleteGroupModal = ref<InstanceType<typeof NewModal>>()
 const deletingGroup = ref(false)
 const groupName = ref(props.instanceGroup.key)
 const isUngrouped = computed(() => props.instanceGroup.key === 'None')
+const groupContextMenuOpen = ref(false)
+const isGroupToggleBlocked = computed(
+	() => groupContextMenuOpen.value || Boolean(groupNameInput.value?.isEditing),
+)
 let shouldSkipGroupToggle = false
 let groupToggleEventToSkip: MouseEvent | undefined
 
@@ -141,6 +145,7 @@ function requestGroupDeletion() {
 function openGroupContextMenu(event: MouseEvent) {
 	if (isUngrouped.value) return
 
+	groupContextMenuOpen.value = true
 	groupOptions.value?.showMenu(event, props.instanceGroup, [
 		{ name: 'edit_name' },
 		{ type: 'divider' },
@@ -161,8 +166,14 @@ function handleGroupOption({ option }: { option: string }) {
 
 function prepareGroupToggle(event: PointerEvent) {
 	const editor = groupNameInput.value
+	const contextMenuWasOpen = groupContextMenuOpen.value
+	if (contextMenuWasOpen) {
+		groupOptions.value?.hideMenu()
+	}
+
 	shouldSkipGroupToggle = Boolean(
-		editor?.isEditing && event.target instanceof Node && !editor.$el.contains(event.target),
+		contextMenuWasOpen ||
+		(editor?.isEditing && event.target instanceof Node && !editor.$el.contains(event.target)),
 	)
 }
 
@@ -242,14 +253,16 @@ watch(
 			/>
 		</Transition>
 		<div
-			class="group/header mb-3 flex w-full cursor-pointer items-center gap-2 border-0 border-b border-solid border-b-surface-5"
+			class="group/header mb-3 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
+			:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
 			@click="toggleGroup"
 			@click.capture="captureGroupClick"
 			@contextmenu.prevent.stop="openGroupContextMenu"
 			@pointerdown.capture="prepareGroupToggle"
 		>
 			<button
-				class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0"
+				class="flex shrink-0 items-center border-0 bg-transparent p-0"
+				:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
 				type="button"
 				:aria-expanded="groupAccordion?.isOpen"
 				:aria-label="groupAccordion?.isOpen ? 'Collapse group' : 'Expand group'"
@@ -325,7 +338,11 @@ watch(
 		</Accordion>
 	</div>
 
-	<ContextMenu ref="groupOptions" @option-clicked="handleGroupOption">
+	<ContextMenu
+		ref="groupOptions"
+		@menu-closed="groupContextMenuOpen = false"
+		@option-clicked="handleGroupOption"
+	>
 		<template #edit_name> <EditIcon /> {{ formatMessage(messages.editGroupName) }} </template>
 		<template #delete_group> <TrashIcon /> {{ formatMessage(messages.deleteGroup) }} </template>
 	</ContextMenu>

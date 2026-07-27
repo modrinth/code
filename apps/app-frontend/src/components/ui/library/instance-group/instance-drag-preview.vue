@@ -3,7 +3,7 @@ import { Avatar } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed } from 'vue'
 
-import InstanceFileIcon from '@/assets/icons/instance-file.svg?component'
+import InstanceFileIcon from '@/assets/icons/instance-file.svg'
 import type { GameInstance } from '@/helpers/types'
 
 const props = defineProps<{
@@ -25,7 +25,7 @@ const instanceType = computed(() => {
 <template>
 	<div
 		aria-hidden="true"
-		class="relative flex min-h-[76px] w-full items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left opacity-70 shadow-lg select-none"
+		class="relative flex min-h-[76px] w-full items-center justify-center gap-2 overflow-clip rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left opacity-90 shadow-lg select-none"
 	>
 		<Avatar
 			class="pointer-events-none !border-none !bg-transparent !rounded-[26px] !rounded-br-[42px] !absolute -top-[40px] right-[18px] opacity-50 [mask-image:linear-gradient(135deg,transparent_16%,black_100%)]"

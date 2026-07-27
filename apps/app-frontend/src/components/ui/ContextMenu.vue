@@ -35,6 +35,11 @@ const left = ref('0px')
 const top = ref('0px')
 const shown = ref(false)
 
+const hideContextMenu = () => {
+	shown.value = false
+	emit('menu-closed')
+}
+
 defineExpose({
 	showMenu: (event, passedItem, passedOptions) => {
 		item.value = passedItem
@@ -62,6 +67,7 @@ defineExpose({
 			}
 		})
 	},
+	hideMenu: hideContextMenu,
 })
 
 const isInstanceLink = (item) => {
@@ -71,11 +77,6 @@ const isInstanceLink = (item) => {
 		return true
 	}
 	return false
-}
-
-const hideContextMenu = () => {
-	shown.value = false
-	emit('menu-closed')
 }
 
 const optionClicked = (option) => {

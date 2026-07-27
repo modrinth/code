@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
@@ -6,15 +6,23 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import InstanceFileIcon from '@/assets/icons/instance-file.svg?component'
+import InstanceFileIcon from '@/assets/icons/instance-file.svg'
 import { useLibrary } from '@/components/ui/library/use-library'
 import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import { kill, run } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
+import type { GameInstance } from '@/helpers/types'
 import { showInstanceInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
+
+type ProcessEvent = 'installing' | 'launched' | 'finished'
+
+type ProcessEventPayload = {
+	instance_id: string
+	event: ProcessEvent
+}
 
 const { handleError } = injectNotificationManager()
 const {
@@ -24,22 +32,15 @@ const {
 	toggleLibraryInstanceSelection,
 } = useLibrary()
 
-const props = defineProps({
-	instance: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	instanceGroupName: {
-		type: String,
-		required: true,
-	},
-})
+const props = defineProps<{
+	instance: GameInstance
+	instanceGroupName: string
+}>()
 
-const instanceCard = ref()
+const instanceCard = ref<HTMLElement | null>(null)
 const playing = ref(false)
 const loading = ref(false)
+const currentEvent = ref<ProcessEvent | null>(null)
 const modLoading = computed(
 	() =>
 		loading.value ||
@@ -88,7 +89,7 @@ const activateCard = () => {
 	}
 }
 
-const handleCardKeydown = (event) => {
+const handleCardKeydown = (event: KeyboardEvent) => {
 	if (event.target !== event.currentTarget) return
 
 	if (event.key === 'Enter') {
@@ -101,13 +102,13 @@ const handleCardKeydown = (event) => {
 }
 
 const checkProcess = async () => {
-	const runningProcesses = await get_by_instance_id(props.instance.id).catch(handleError)
+	const runningProcesses = (await get_by_instance_id(props.instance.id).catch(handleError)) ?? []
 
 	playing.value = runningProcesses.length > 0
 }
 
-const play = async (e, context) => {
-	e?.stopPropagation()
+const play = async (event: MouseEvent | null, context: string) => {
+	event?.stopPropagation()
 	if (props.instance.quarantined) return
 	loading.value = true
 	await run(props.instance.id)
@@ -122,8 +123,8 @@ const play = async (e, context) => {
 	loading.value = false
 }
 
-const stop = async (e, context) => {
-	e?.stopPropagation()
+const stop = async (event: MouseEvent | null, context: string) => {
+	event?.stopPropagation()
 	playing.value = false
 
 	await kill(props.instance.id).catch(handleError)
@@ -135,8 +136,8 @@ const stop = async (e, context) => {
 	})
 }
 
-const repair = async (e) => {
-	e?.stopPropagation()
+const repair = async (event: MouseEvent) => {
+	event.stopPropagation()
 	if (props.instance.quarantined) return
 
 	if (
@@ -176,12 +177,10 @@ defineExpose({
 	instance: props.instance,
 })
 
-const currentEvent = ref(null)
-
-const unlisten = await process_listener((e) => {
-	if (e.instance_id === props.instance.id) {
-		currentEvent.value = e.event
-		if (e.event === 'finished') {
+const unlisten = await process_listener((event: ProcessEventPayload) => {
+	if (event.instance_id === props.instance.id) {
+		currentEvent.value = event.event
+		if (event.event === 'finished') {
 			playing.value = false
 		}
 	}
@@ -199,7 +198,7 @@ onUnmounted(() => unlisten())
 		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all hover:brightness-110 active:scale-[0.98] select-none"
 		:class="{
 			'border-primary': selected,
-			'!scale-100': isDragging,
+			'!scale-100 opacity-50': isDragging,
 		}"
 		role="button"
 		tabindex="0"
