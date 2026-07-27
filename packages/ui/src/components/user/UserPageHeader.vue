@@ -58,10 +58,10 @@
 		<template #actions>
 			<PageHeaderActions>
 				<ButtonStyled v-if="isSelf" size="large">
-					<nuxt-link to="/settings/profile">
+					<AutoLink :to="editProfileLink">
 						<EditIcon />
 						{{ formatMessage(commonMessages.editButton) }}
-					</nuxt-link>
+					</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled circular size="large" type="transparent">
 					<TeleportOverflowMenu
@@ -93,24 +93,27 @@ import {
 	MoreVerticalIcon,
 	ReportIcon,
 } from '@modrinth/assets'
+import { computed } from 'vue'
+
+import AutoLink from '#ui/components/base/AutoLink.vue'
+import Avatar from '#ui/components/base/Avatar.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import PageHeader from '#ui/components/base/page-header/index.vue'
+import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
+import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metadata/page-header-metadata-number-item.vue'
+import PageHeaderMetadataTimeItem from '#ui/components/base/page-header/metadata/page-header-metadata-time-item.vue'
+import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
+import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import type { Item as TeleportOverflowMenuItem } from '#ui/components/base/TeleportOverflowMenu.vue'
+import type { AuthUser } from '#ui/providers/auth'
 import {
-	Avatar,
-	ButtonStyled,
-	commonMessages,
 	defineMessages,
-	PageHeader,
-	PageHeaderActions,
-	PageHeaderBadgeItem,
-	PageHeaderMetadata,
-	PageHeaderMetadataNumberItem,
-	PageHeaderMetadataTimeItem,
-	TeleportOverflowMenu,
-	type TeleportOverflowMenuItem,
 	useFormatDateTime,
 	useFormatNumber,
 	useVIntl,
-} from '@modrinth/ui'
-import { computed } from 'vue'
+} from '#ui/composables'
+import { commonMessages } from '#ui/utils'
 
 const messages = defineMessages({
 	affiliateLabel: {
@@ -167,7 +170,8 @@ const props = withDefaults(
 	defineProps<{
 		user: Labrinth.Users.v3.User
 		summary?: string | null
-		authUser?: Labrinth.Users.v3.User | null
+		authUser?: AuthUser | null
+		editProfileLink?: string | (() => void)
 		isModrinthUser?: boolean
 		isOfficialAccount?: boolean
 		showAffiliateBadge?: boolean
@@ -181,6 +185,7 @@ const props = withDefaults(
 	{
 		summary: null,
 		authUser: null,
+		editProfileLink: '/settings/profile',
 		isModrinthUser: false,
 		isOfficialAccount: false,
 		showAffiliateBadge: false,
@@ -206,7 +211,6 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-
 const formatNumber = useFormatNumber()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
