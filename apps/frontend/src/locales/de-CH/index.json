@@ -2928,13 +2928,13 @@
     "message": "E-Mail-Bestätigung erforderlich"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Installiere automatisch das erforderliche Spiel und den erforderlichen Loader"
+    "message": "Installiere automatisch alles, was gerade gespielt wird"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Tritt der geteilten Instanz mit einem Klick bei"
+    "message": "Spiele dieselben Inhalte wie deine Freunde"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
-    "message": "Halte geteilte Inhalte aktuell, wenn sich die Instanz ändert"
+    "message": "Halte gemeinsame Inhalte immer aktuell"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Modrinth App herunterladen"
@@ -3001,9 +3001,6 @@
   },
   "modpack-scan-modal.scan-all-files": {
     "message": "Alle Dateien scannen"
-  },
-  "modpack-scan-modal.scan-error": {
-    "message": "Einige Dateien konnten nicht gescannt werden: {error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Wird gescannt..."
@@ -3781,9 +3778,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Du kannst dein Projekt weiterhin ändern, dies hat keinen Einfluss auf deine Position in der Warteschlange."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Wir streben an, Einreichungen innerhalb von 24 bis 48 Stunden zu überprüfen, aber bei einigen Projekten kann es zu Verzögerungen kommen. Dies deutet nicht auf ein Problem mit deiner Einreichung hin."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>Wir schätzen deine Geduld, während unsere Moderatoren hart daran arbeiten, Modrinth sicher zu halten, und freuen uns darauf, dir dabei zu helfen, deine Inhalte zu teilen! 💚</emphasis>"
