@@ -253,7 +253,7 @@ watch(
 			/>
 		</Transition>
 		<div
-			class="group/header mb-3 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
+			class="group/header h-10 mb-3 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
 			@click="toggleGroup"
 			@click.capture="captureGroupClick"
