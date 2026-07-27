@@ -49,6 +49,7 @@ export interface ModrinthServerContext {
 	readonly isServerRunning: ComputedRef<boolean>
 	readonly stats: Ref<ServerStats>
 	readonly uptimeSeconds: Ref<number>
+	readonly installProgressItems: Ref<Archon.Websocket.v0.InstallProgressItem[]>
 
 	// Content sync state
 	readonly isSyncingContent: Ref<boolean>

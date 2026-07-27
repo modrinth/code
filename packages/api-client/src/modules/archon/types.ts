@@ -1111,6 +1111,50 @@ export namespace Archon {
 				version_id: string
 			}
 
+			export type InstallProgressFileKey = {
+				type: 'file'
+				parent_directory: string
+				filename: string
+				install_type: 'install' | 'update'
+			}
+
+			export type InstallProgressModrinthModpackKey = {
+				type: 'modrinth_modpack'
+				project_id: string
+				version_id: string
+			}
+
+			export type InstallProgressLocalModpackKey = {
+				type: 'local_modpack'
+				filename: string
+			}
+
+			export type InstallProgressPlatformKey = {
+				type: 'platform'
+				platform: 'forge' | 'neoforge' | 'fabric' | 'quilt' | 'paper' | 'purpur' | 'vanilla'
+				platform_version: string
+				game_version: string
+			}
+
+			export type InstallProgressKey =
+				| InstallProgressFileKey
+				| InstallProgressModrinthModpackKey
+				| InstallProgressLocalModpackKey
+				| InstallProgressPlatformKey
+
+			export type InstallProgressItem = {
+				world_id: string
+				key: InstallProgressKey
+				id: string
+				progress: number | null
+				error: string | null
+			}
+
+			export type WSInstallProgressEvent = {
+				event: 'install-progress'
+				items: InstallProgressItem[]
+			}
+
 			export type FilesystemOpKind = 'unarchive'
 
 			export type FilesystemOpState =
@@ -1208,6 +1252,7 @@ export namespace Archon {
 				| WSInstallationResultEvent
 				| WSUptimeEvent
 				| WSNewModEvent
+				| WSInstallProgressEvent
 				| WSFilesystemOpsEvent
 
 			export type WSEventType = WSEvent['event']

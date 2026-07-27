@@ -104,20 +104,24 @@ defineExpose({
 })
 
 // Selection logic
+const selectableItems = computed(() => props.items.filter((item) => !item.disabled))
+
 const allSelected = computed(() => {
-	if (props.items.length === 0) return false
-	return props.items.every((item) => selectedIds.value.includes(item.id))
+	if (selectableItems.value.length === 0) return false
+	return selectableItems.value.every((item) => selectedIds.value.includes(item.id))
 })
 
 const someSelected = computed(() => {
-	return props.items.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
+	return (
+		selectableItems.value.some((item) => selectedIds.value.includes(item.id)) && !allSelected.value
+	)
 })
 
 function toggleSelectAll() {
 	if (allSelected.value || someSelected.value) {
 		selectedIds.value = []
 	} else {
-		selectedIds.value = props.items.map((item) => item.id)
+		selectedIds.value = selectableItems.value.map((item) => item.id)
 	}
 }
 
@@ -132,7 +136,10 @@ function toggleItemSelection(
 	if (selected && event?.shiftKey && lastSelectedIndex.value !== null && index !== undefined) {
 		const start = Math.min(lastSelectedIndex.value, index)
 		const end = Math.max(lastSelectedIndex.value, index)
-		const rangeIds = props.items.slice(start, end + 1).map((item) => item.id)
+		const rangeIds = props.items
+			.slice(start, end + 1)
+			.filter((item) => !item.disabled)
+			.map((item) => item.id)
 		const merged = new Set([...selectedIds.value, ...rangeIds])
 		selectedIds.value = [...merged]
 	} else if (selected) {
@@ -192,6 +199,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:model-value="allSelected"
 					:indeterminate="someSelected"
 					:aria-label="formatMessage(commonMessages.selectAllLabel)"
+					:disabled="selectableItems.length === 0"
 					class="shrink-0"
 					@update:model-value="toggleSelectAll"
 				/>
@@ -266,6 +274,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:owner="item.owner"
 					:enabled="item.enabled"
 					:installing="item.installing"
+					:install-progress="item.installProgress"
 					:has-update="item.hasUpdate"
 					:is-client-only="item.isClientOnly"
 					:client-warning="item.clientWarning"
@@ -329,6 +338,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:owner="item.owner"
 				:enabled="item.enabled"
 				:installing="item.installing"
+				:install-progress="item.installProgress"
 				:has-update="item.hasUpdate"
 				:is-client-only="item.isClientOnly"
 				:client-warning="item.clientWarning"
