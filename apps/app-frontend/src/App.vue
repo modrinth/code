@@ -266,14 +266,7 @@ providePageContext({
 			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
 		),
 	},
-	openExternalUrl: (url) => {
-		const userPath = parse_modrinth_user_link(url)
-		if (userPath) {
-			void router.push(userPath)
-		} else {
-			void openUrl(url)
-		}
-	},
+	openExternalUrl: (url) => void openUrl(url),
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
