@@ -167,7 +167,7 @@ defineExpose({
 				{{ displayValue }}
 			</span>
 			<span
-				class="flex max-w-0 shrink-0 translate-x-1 overflow-hidden opacity-0 transition-all duration-150 group-hover/editable:max-w-6 group-hover/editable:translate-x-0 group-hover/editable:opacity-100 group-focus-within/editable:max-w-6 group-focus-within/editable:translate-x-0 group-focus-within/editable:opacity-100"
+				class="flex max-w-0 shrink-0 translate-x-1 overflow-hidden opacity-0 transition-all delay-[300ms] duration-150 group-hover/editable:max-w-6 group-hover/editable:translate-x-0 group-hover/editable:opacity-100 group-hover/editable:delay-0 group-focus-within/editable:max-w-6 group-focus-within/editable:translate-x-0 group-focus-within/editable:opacity-100 group-focus-within/editable:delay-0"
 			>
 				<button
 					type="button"
@@ -175,7 +175,7 @@ defineExpose({
 					:aria-label="`${editLabel}: ${displayValue}`"
 					@click.stop="startEditing"
 				>
-					<EditIcon class="size-4" aria-hidden="true" />
+					<EditIcon class="size-5" aria-hidden="true" />
 				</button>
 			</span>
 		</div>
