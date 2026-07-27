@@ -719,6 +719,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	return {
+		instances,
 		search,
 		activeFilter,
 		displayState,

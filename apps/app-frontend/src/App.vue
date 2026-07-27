@@ -13,12 +13,12 @@ import {
 	ChangeSkinIcon,
 	CompassIcon,
 	ExternalIcon,
-	HomeIcon,
 	LeftArrowIcon,
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
 	NotepadTextIcon,
+	PlayIcon,
 	PlusIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
@@ -1593,12 +1593,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:is-primary="(route) => route.path === '/'"
 				:is-subpage="
 					() =>
-						route.path.startsWith('/instance') ||
-						((route.path.startsWith('/browse') || route.path.startsWith('/project')) &&
-							route.query.i)
+						(route.path.startsWith('/browse') || route.path.startsWith('/project')) && route.query.i
 				"
 			>
-				<HomeIcon />
+				<PlayIcon />
 			</NavButton>
 			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
 				<WorldIcon />
