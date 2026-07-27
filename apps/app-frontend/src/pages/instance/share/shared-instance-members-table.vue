@@ -35,7 +35,7 @@
 					</ButtonStyled>
 				</template>
 			</div>
-			<div class="flex flex-wrap items-center gap-1.5">
+			<div v-if="hasMultipleMethods" class="flex flex-wrap items-center gap-1.5">
 				<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 				<button
 					:class="filterClass(methodFilter === 'all')"
@@ -158,7 +158,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import {
 	type MethodFilter,
@@ -193,6 +193,9 @@ const methodFilterOptions: Array<{ id: ShareMethod; label: string }> = [
 	{ id: 'direct', label: methodLabels.direct },
 	{ id: 'link', label: methodLabels.link },
 ]
+const hasMultipleMethods = computed(
+	() => new Set(props.rows.map((row) => row.method)).size > 1,
+)
 const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
 	const result: TableColumn<ShareTableColumn>[] = [
 		{
@@ -287,6 +290,10 @@ function filterClass(active: boolean) {
 			: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5',
 	]
 }
+
+watch(hasMultipleMethods, (multiple) => {
+	if (!multiple) methodFilter.value = 'all'
+})
 
 const messages = defineMessages({
 	pushUpdate: {
