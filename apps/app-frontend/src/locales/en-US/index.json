@@ -578,6 +578,51 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
+  "app.java-detection.cancel": {
+    "message": "Cancel"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Actions"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Path"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Version"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "No Java installations found."
+  },
+  "app.java-detection.select": {
+    "message": "Select"
+  },
+  "app.java-detection.selected": {
+    "message": "Selected"
+  },
+  "app.java-detection.title": {
+    "message": "Select Java installation"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Already installed"
+  },
+  "app.java-selector.browse": {
+    "message": "Browse"
+  },
+  "app.java-selector.detect": {
+    "message": "Detect"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Install recommended"
+  },
+  "app.java-selector.installing": {
+    "message": "Installing..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/path/to/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Test Java installation"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Additional context"
   },
@@ -710,14 +755,206 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Environment variables set when launching an instance."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Enter environment variables..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Environment variables"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Start instances in fullscreen by updating their options.txt file."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Fullscreen"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "The height of the game window when launched."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Enter height..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Height"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Arguments passed to Java when launching an instance."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Enter Java arguments..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java arguments"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Maximum memory available to each instance."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Memory allocation"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Runs after the game closes."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Enter post-exit command..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Post-exit hook"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Runs before the instance starts."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Enter pre-launch command..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Pre-launch hook"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "The width of the game window when launched."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Enter width..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Width"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Command used to wrap the Minecraft launch process."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Enter wrapper command..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Wrapper hook"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Toggle developer mode"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
   "app.settings.downloading": {
     "message": "Downloading v{version}"
   },
+  "app.settings.feature-flags.advanced-filters-collapsed": {
+    "message": "Collapse advanced filters"
+  },
+  "app.settings.feature-flags.always-show-app-controls": {
+    "message": "Always show app controls"
+  },
+  "app.settings.feature-flags.i18n-debug": {
+    "message": "Internationalization debug"
+  },
+  "app.settings.feature-flags.page-path": {
+    "message": "Page path"
+  },
+  "app.settings.feature-flags.pride-fundraiser": {
+    "message": "Pride fundraiser"
+  },
+  "app.settings.feature-flags.project-background": {
+    "message": "Project background"
+  },
+  "app.settings.feature-flags.reset-to-default": {
+    "message": "Reset to default"
+  },
+  "app.settings.feature-flags.server-project-qa": {
+    "message": "Server project QA"
+  },
+  "app.settings.feature-flags.server-ram-as-bytes-always-on": {
+    "message": "Always show server RAM in bytes"
+  },
+  "app.settings.feature-flags.show-instance-play-time": {
+    "message": "Show instance play time"
+  },
+  "app.settings.feature-flags.show-version-environment-column": {
+    "message": "Show version environment column"
+  },
+  "app.settings.feature-flags.skip-non-essential-warnings": {
+    "message": "Skip non-essential warnings"
+  },
+  "app.settings.feature-flags.skip-unknown-pack-warning": {
+    "message": "Skip unknown pack warning"
+  },
+  "app.settings.feature-flags.worlds-in-home": {
+    "message": "Worlds on Home"
+  },
+  "app.settings.feature-flags.worlds-tab": {
+    "message": "Worlds tab"
+  },
+  "app.settings.java-installations.location.title": {
+    "message": "Java {version, number} location"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
-    "message": "Control how advertising partners use cookies to personalize ads and measure performance. Ads fund Modrinth and creator payouts."
+    "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Show Modrinth App as your current activity on Discord. This does not affect Rich Presence added to instances by mods. Requires an app restart."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetry"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "The app may load more slowly until the cache is rebuilt."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Purge the app cache?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Purge cache"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App cache"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Backups of important app data are stored here in case you need to recover them later."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Open backups folder"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "App database backups"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Browse for an app directory"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Where Modrinth App stores instances and other files. Changes take effect after restarting the app."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Select a new app directory"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "App directory"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Number of files the app can download at once. Lower this if downloads are unreliable on your connection. Requires an app restart."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maximum concurrent downloads"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Number of files the app can write to disk at once. Lower this if you frequently encounter I/O errors. Requires an app restart."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Maximum concurrent writes"
   },
   "app.settings.sidebar.label.instances": {
     "message": "Instances"

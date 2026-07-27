@@ -182,13 +182,26 @@ const messages = defineMessages({
 		id: 'app.settings.downloading',
 		defaultMessage: 'Downloading v{version}',
 	},
+	appVersion: {
+		id: 'app.settings.app-version',
+		defaultMessage: 'Modrinth App {version}',
+	},
+	macos: {
+		id: 'app.settings.operating-system.macos',
+		defaultMessage: 'macOS',
+	},
+	developerModeButtonLabel: {
+		id: 'app.settings.developer-mode-button.label',
+		defaultMessage: 'Toggle developer mode',
+	},
 })
 </script>
 <template>
 	<TabbedModal ref="modal" :tabs="availableTabs" :width="'min(928px, calc(95vw - 10rem))'">
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
-				<SettingsIcon /> Settings
+				<SettingsIcon aria-hidden="true" />
+				{{ formatMessage(commonMessages.settingsLabel) }}
 			</span>
 		</template>
 		<template #footer>
@@ -206,6 +219,7 @@ const messages = defineMessages({
 				</p>
 				<div class="flex items-center gap-3">
 					<button
+						:aria-label="formatMessage(messages.developerModeButtonLabel)"
 						class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
 						:class="{
 							'text-brand': themeStore.devMode,
@@ -213,12 +227,14 @@ const messages = defineMessages({
 						}"
 						@click="devModeCount"
 					>
-						<ModrinthIcon class="w-6 h-6" />
+						<ModrinthIcon aria-hidden="true" class="w-6 h-6" />
 					</button>
 					<div class="max-w-[200px]">
-						<p class="m-0">Modrinth App {{ version }}</p>
 						<p class="m-0">
-							<span v-if="osPlatform === 'macos'">macOS</span>
+							{{ formatMessage(messages.appVersion, { version }) }}
+						</p>
+						<p class="m-0">
+							<span v-if="osPlatform === 'macos'">{{ formatMessage(messages.macos) }}</span>
 							<span v-else class="capitalize">{{ osPlatform }}</span>
 							{{ osVersion }}
 						</p>

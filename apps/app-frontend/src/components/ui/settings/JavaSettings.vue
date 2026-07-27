@@ -1,11 +1,19 @@
 <script setup>
-import { injectNotificationManager } from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { get_java_versions, set_java_version } from '@/helpers/jre'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	javaLocation: {
+		id: 'app.settings.java-installations.location.title',
+		defaultMessage: 'Java {version, number} location',
+	},
+})
 
 const javaVersions = ref(await get_java_versions().catch(handleError))
 async function updateJavaVersion(version) {
@@ -28,7 +36,7 @@ async function updateJavaVersion(version) {
 			class="flex flex-col gap-2.5"
 		>
 			<h2 class="m-0 text-lg font-semibold text-contrast" :class="{ 'mt-4': index !== 0 }">
-				Java {{ javaVersion }} location
+				{{ formatMessage(messages.javaLocation, { version: javaVersion }) }}
 			</h2>
 			<JavaSelector
 				:id="'java-selector-' + javaVersion"

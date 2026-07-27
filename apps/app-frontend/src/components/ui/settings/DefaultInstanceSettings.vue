@@ -1,11 +1,122 @@
 <script setup lang="ts">
-import { injectNotificationManager, Slider, StyledInput, Toggle } from '@modrinth/ui'
+import {
+	defineMessages,
+	injectNotificationManager,
+	Slider,
+	StyledInput,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
 import { get, set } from '@/helpers/settings.ts'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	fullscreenTitle: {
+		id: 'app.settings.default-instance-options.fullscreen.title',
+		defaultMessage: 'Fullscreen',
+	},
+	fullscreenDescription: {
+		id: 'app.settings.default-instance-options.fullscreen.description',
+		defaultMessage: 'Start instances in fullscreen by updating their options.txt file.',
+	},
+	widthTitle: {
+		id: 'app.settings.default-instance-options.width.title',
+		defaultMessage: 'Width',
+	},
+	widthDescription: {
+		id: 'app.settings.default-instance-options.width.description',
+		defaultMessage: 'The width of the game window when launched.',
+	},
+	widthPlaceholder: {
+		id: 'app.settings.default-instance-options.width.placeholder',
+		defaultMessage: 'Enter width...',
+	},
+	heightTitle: {
+		id: 'app.settings.default-instance-options.height.title',
+		defaultMessage: 'Height',
+	},
+	heightDescription: {
+		id: 'app.settings.default-instance-options.height.description',
+		defaultMessage: 'The height of the game window when launched.',
+	},
+	heightPlaceholder: {
+		id: 'app.settings.default-instance-options.height.placeholder',
+		defaultMessage: 'Enter height...',
+	},
+	memoryAllocationTitle: {
+		id: 'app.settings.default-instance-options.memory-allocation.title',
+		defaultMessage: 'Memory allocation',
+	},
+	memoryAllocationDescription: {
+		id: 'app.settings.default-instance-options.memory-allocation.description',
+		defaultMessage: 'Maximum memory available to each instance.',
+	},
+	javaArgumentsTitle: {
+		id: 'app.settings.default-instance-options.java-arguments.title',
+		defaultMessage: 'Java arguments',
+	},
+	javaArgumentsPlaceholder: {
+		id: 'app.settings.default-instance-options.java-arguments.placeholder',
+		defaultMessage: 'Enter Java arguments...',
+	},
+	javaArgumentsDescription: {
+		id: 'app.settings.default-instance-options.java-arguments.description',
+		defaultMessage: 'Arguments passed to Java when launching an instance.',
+	},
+	environmentVariablesTitle: {
+		id: 'app.settings.default-instance-options.environment-variables.title',
+		defaultMessage: 'Environment variables',
+	},
+	environmentVariablesPlaceholder: {
+		id: 'app.settings.default-instance-options.environment-variables.placeholder',
+		defaultMessage: 'Enter environment variables...',
+	},
+	environmentVariablesDescription: {
+		id: 'app.settings.default-instance-options.environment-variables.description',
+		defaultMessage: 'Environment variables set when launching an instance.',
+	},
+	preLaunchHookTitle: {
+		id: 'app.settings.default-instance-options.pre-launch-hook.title',
+		defaultMessage: 'Pre-launch hook',
+	},
+	preLaunchHookPlaceholder: {
+		id: 'app.settings.default-instance-options.pre-launch-hook.placeholder',
+		defaultMessage: 'Enter pre-launch command...',
+	},
+	preLaunchHookDescription: {
+		id: 'app.settings.default-instance-options.pre-launch-hook.description',
+		defaultMessage: 'Runs before the instance starts.',
+	},
+	wrapperHookTitle: {
+		id: 'app.settings.default-instance-options.wrapper-hook.title',
+		defaultMessage: 'Wrapper hook',
+	},
+	wrapperHookPlaceholder: {
+		id: 'app.settings.default-instance-options.wrapper-hook.placeholder',
+		defaultMessage: 'Enter wrapper command...',
+	},
+	wrapperHookDescription: {
+		id: 'app.settings.default-instance-options.wrapper-hook.description',
+		defaultMessage: 'Command used to wrap the Minecraft launch process.',
+	},
+	postExitHookTitle: {
+		id: 'app.settings.default-instance-options.post-exit-hook.title',
+		defaultMessage: 'Post-exit hook',
+	},
+	postExitHookPlaceholder: {
+		id: 'app.settings.default-instance-options.post-exit-hook.placeholder',
+		defaultMessage: 'Enter post-exit command...',
+	},
+	postExitHookDescription: {
+		id: 'app.settings.default-instance-options.post-exit-hook.description',
+		defaultMessage: 'Runs after the game closes.',
+	},
+})
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
@@ -55,9 +166,11 @@ watch(
 		<div class="flex flex-col gap-6">
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex flex-col gap-1">
-					<h3 class="m-0 text-lg font-semibold text-contrast">Fullscreen</h3>
+					<h3 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.fullscreenTitle) }}
+					</h3>
 					<p class="m-0 leading-tight">
-						Start instances in fullscreen by updating their options.txt file.
+						{{ formatMessage(messages.fullscreenDescription) }}
 					</p>
 				</div>
 
@@ -66,8 +179,12 @@ watch(
 
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex flex-col gap-1">
-					<h3 class="m-0 text-lg font-semibold text-contrast">Width</h3>
-					<p class="m-0 leading-tight">The width of the game window when launched.</p>
+					<h3 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.widthTitle) }}
+					</h3>
+					<p class="m-0 leading-tight">
+						{{ formatMessage(messages.widthDescription) }}
+					</p>
 				</div>
 
 				<StyledInput
@@ -76,14 +193,18 @@ watch(
 					:disabled="settings.force_fullscreen"
 					autocomplete="off"
 					type="number"
-					placeholder="Enter width..."
+					:placeholder="formatMessage(messages.widthPlaceholder)"
 				/>
 			</div>
 
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex flex-col gap-1">
-					<h3 class="m-0 text-lg font-semibold text-contrast">Height</h3>
-					<p class="m-0 leading-tight">The height of the game window when launched.</p>
+					<h3 class="m-0 text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.heightTitle) }}
+					</h3>
+					<p class="m-0 leading-tight">
+						{{ formatMessage(messages.heightDescription) }}
+					</p>
 				</div>
 
 				<StyledInput
@@ -92,7 +213,7 @@ watch(
 					:disabled="settings.force_fullscreen"
 					autocomplete="off"
 					type="number"
-					placeholder="Enter height..."
+					:placeholder="formatMessage(messages.heightPlaceholder)"
 				/>
 			</div>
 		</div>
@@ -101,7 +222,9 @@ watch(
 
 		<div class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2.5">
-				<h2 class="m-0 text-lg font-semibold text-contrast">Memory allocation</h2>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.memoryAllocationTitle) }}
+				</h2>
 				<Slider
 					id="max-memory"
 					v-model="settings.memory.maximum"
@@ -112,33 +235,43 @@ watch(
 					:snap-range="512"
 					unit="MB"
 				/>
-				<p class="m-0 mt-1 leading-tight">Maximum memory available to each instance.</p>
+				<p class="m-0 mt-1 leading-tight">
+					{{ formatMessage(messages.memoryAllocationDescription) }}
+				</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<h2 class="m-0 text-lg font-semibold text-contrast">Java arguments</h2>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.javaArgumentsTitle) }}
+				</h2>
 				<StyledInput
 					id="java-args"
 					v-model="settings.launchArgs"
 					autocomplete="off"
 					type="text"
-					placeholder="Enter java arguments..."
+					:placeholder="formatMessage(messages.javaArgumentsPlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Arguments passed to Java when launching an instance.</p>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.javaArgumentsDescription) }}
+				</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<h2 class="m-0 text-lg font-semibold text-contrast">Environment variables</h2>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.environmentVariablesTitle) }}
+				</h2>
 				<StyledInput
 					id="env-vars"
 					v-model="settings.envVars"
 					autocomplete="off"
 					type="text"
-					placeholder="Enter environment variables..."
+					:placeholder="formatMessage(messages.environmentVariablesPlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Environment variables set when launching an instance.</p>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.environmentVariablesDescription) }}
+				</p>
 			</div>
 		</div>
 
@@ -146,42 +279,54 @@ watch(
 
 		<div class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2.5">
-				<h3 class="m-0 text-lg font-semibold text-contrast">Pre-launch hook</h3>
+				<h3 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.preLaunchHookTitle) }}
+				</h3>
 				<StyledInput
 					id="pre-launch"
 					v-model="settings.hooks.pre_launch"
 					autocomplete="off"
 					type="text"
-					placeholder="Enter pre-launch command..."
+					:placeholder="formatMessage(messages.preLaunchHookPlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Runs before the instance starts.</p>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.preLaunchHookDescription) }}
+				</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<h3 class="m-0 text-lg font-semibold text-contrast">Wrapper hook</h3>
+				<h3 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.wrapperHookTitle) }}
+				</h3>
 				<StyledInput
 					id="wrapper"
 					v-model="settings.hooks.wrapper"
 					autocomplete="off"
 					type="text"
-					placeholder="Enter wrapper command..."
+					:placeholder="formatMessage(messages.wrapperHookPlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Command used to wrap the Minecraft launch process.</p>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.wrapperHookDescription) }}
+				</p>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<h3 class="m-0 text-lg font-semibold text-contrast">Post-exit hook</h3>
+				<h3 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.postExitHookTitle) }}
+				</h3>
 				<StyledInput
 					id="post-exit"
 					v-model="settings.hooks.post_exit"
 					autocomplete="off"
 					type="text"
-					placeholder="Enter post-exit command..."
+					:placeholder="formatMessage(messages.postExitHookPlaceholder)"
 					wrapper-class="w-full"
 				/>
-				<p class="m-0 leading-tight">Runs after the game closes.</p>
+				<p class="m-0 leading-tight">
+					{{ formatMessage(messages.postExitHookDescription) }}
+				</p>
 			</div>
 		</div>
 	</div>
