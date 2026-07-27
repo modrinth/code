@@ -27,7 +27,7 @@ const messages = defineMessages({
 	adsConsentIntro: {
 		id: 'app.settings.privacy.ads-consent.intro',
 		defaultMessage:
-			'Control how advertising partners use cookies to personalize ads and measure performance. Ads fund Modrinth and creator payouts.',
+			'Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below.',
 	},
 	adsConsentManage: {
 		id: 'app.ads-consent.manage',
@@ -66,17 +66,19 @@ watch(
 					{{ formatMessage(messages.adsConsentManage) }}
 				</button>
 			</ButtonStyled>
-			<p class="m-0 text-sm">
+			<div>
 				{{ formatMessage(messages.adsConsentIntro) }}
-			</p>
+			</div>
 		</div>
 	</div>
 
 	<div class="mt-8 flex items-center justify-between gap-4">
 		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">Share analytics</h2>
-			<p class="m-0 mt-1 text-sm">
-				Share anonymous usage and analytics data to help improve Modrinth App.
+			<h2 class="m-0 text-lg font-semibold text-contrast">Telemetry</h2>
+			<p class="m-0 mt-1">
+				Modrinth collects anonymized analytics and usage data to improve our user experience and
+				customize your experience. By disabling this option, you opt out and your data will no
+				longer be collected.
 			</p>
 		</div>
 		<Toggle id="opt-out-analytics" v-model="settings.telemetry" />
@@ -84,9 +86,9 @@ watch(
 
 	<div class="mt-4 flex items-center justify-between gap-4">
 		<div>
-			<h2 class="m-0 text-lg font-semibold text-contrast">Discord activity</h2>
-			<p class="m-0 mt-1 text-sm">
-				Show Modrinth App as your current activity on Discord. This does not affect Discord activity
+			<h2 class="m-0 text-lg font-semibold text-contrast">Discord Rich Presence</h2>
+			<p class="m-0 mt-1">
+				Show Modrinth App as your current activity on Discord. This does not affect Rich Presence
 				added to instances by mods. Requires an app restart.
 			</p>
 		</div>
