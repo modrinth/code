@@ -7,7 +7,6 @@ import {
 	ModrinthIcon,
 	PaintbrushIcon,
 	Settings2Icon,
-	SettingsIcon,
 	ShieldIcon,
 	ToggleRightIcon,
 } from '@modrinth/assets'
@@ -199,8 +198,7 @@ const messages = defineMessages({
 <template>
 	<TabbedModal ref="modal" :tabs="availableTabs" :width="'min(928px, calc(95vw - 10rem))'">
 		<template #title>
-			<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
-				<SettingsIcon aria-hidden="true" />
+			<span class="text-2xl font-semibold text-contrast">
 				{{ formatMessage(commonMessages.settingsLabel) }}
 			</span>
 		</template>
