@@ -70,7 +70,7 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'instance.settings.sharing.revoke-invite.admonition-body',
 		defaultMessage:
-			'The invite code <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access.',
+			'The invite link <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access.',
 	},
 	revokeButton: {
 		id: 'instance.settings.sharing.revoke-invite.confirm',

@@ -19,7 +19,7 @@
 				<template #cell-id="{ row }">
 					<CopyCode
 						:text="`${config.siteUrl}/share/${encodeURIComponent(row.id)}`"
-						:display-text="row.id"
+						:display-text="`/${row.id}`"
 					/>
 				</template>
 				<template #cell-uses="{ row }">
@@ -172,11 +172,11 @@ const messages = defineMessages({
 	},
 	activeInvitesDescription: {
 		id: 'instance.settings.sharing.active-invites.description',
-		defaultMessage: 'Anyone with one of these invite codes can join while it remains active.',
+		defaultMessage: 'Anyone with one of these invite links can join while it remains active.',
 	},
 	inviteCodeLabel: {
 		id: 'instance.settings.sharing.active-invites.code',
-		defaultMessage: 'Invite code',
+		defaultMessage: 'Invite link',
 	},
 	usesLabel: {
 		id: 'instance.settings.sharing.active-invites.uses',

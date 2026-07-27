@@ -623,6 +623,9 @@
   "app.modal.install-to-play.invite-warning": {
     "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
   },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust."
+  },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
@@ -1194,10 +1197,10 @@
     "message": "Actions"
   },
   "instance.settings.sharing.active-invites.code": {
-    "message": "Invite code"
+    "message": "Invite link"
   },
   "instance.settings.sharing.active-invites.description": {
-    "message": "Anyone with one of these invite codes can join while it remains active."
+    "message": "Anyone with one of these invite links can join while it remains active."
   },
   "instance.settings.sharing.active-invites.empty": {
     "message": "There are no active invites."
@@ -1218,7 +1221,7 @@
     "message": "Uses"
   },
   "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "The invite code <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access."
+    "message": "The invite link <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access."
   },
   "instance.settings.sharing.revoke-invite.admonition-header": {
     "message": "This action cannot be undone"

@@ -70,10 +70,7 @@
 					:values="{ username: creator.username }"
 				>
 					<template #creator="{ children }">
-						<AutoLink
-							:to="creatorProfileLink"
-							class="inline-flex items-center gap-1 align-middle font-medium text-contrast hover:underline"
-						>
+						<AutoLink :to="creatorProfileLink" class="font-medium text-contrast hover:underline">
 							<Avatar
 								:src="creator.avatarUrl"
 								:alt="creator.username"
@@ -81,8 +78,9 @@
 								size="24px"
 								circle
 								no-shadow
+								class="mr-1 inline-block align-middle"
 							/>
-							<component :is="() => children" />
+							<span><component :is="() => children" /></span>
 						</AutoLink>
 					</template>
 				</IntlFormatted>
