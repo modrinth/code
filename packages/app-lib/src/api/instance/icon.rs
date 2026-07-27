@@ -224,11 +224,11 @@ fn normalize_svg_from_path(icon_path: &Path) -> crate::Result<Bytes> {
         ))
     })?;
     if metadata.len() > INSTANCE_ICON_MAX_SVG_SOURCE_BYTES {
-		return Err(crate::ErrorKind::InputError(format!(
+        return Err(crate::ErrorKind::InputError(format!(
 			"SVG instance icons cannot exceed {INSTANCE_ICON_MAX_SVG_SOURCE_BYTES} bytes before normalization"
 		))
 		.into());
-	}
+    }
 
     let bytes = std::fs::read(icon_path).map_err(|error| {
         crate::ErrorKind::InputError(format!(
@@ -244,16 +244,16 @@ fn normalize_svg(
     resources_dir: Option<&Path>,
 ) -> crate::Result<Bytes> {
     if bytes.len() as u64 > INSTANCE_ICON_MAX_SVG_SOURCE_BYTES {
-		return Err(crate::ErrorKind::InputError(format!(
+        return Err(crate::ErrorKind::InputError(format!(
 			"SVG instance icons cannot exceed {INSTANCE_ICON_MAX_SVG_SOURCE_BYTES} bytes before normalization"
 		))
 		.into());
-	}
+    }
 
-	let mut options = resvg::usvg::Options {
-		resources_dir: resources_dir.map(Path::to_path_buf),
-		..Default::default()
-	};
+    let mut options = resvg::usvg::Options {
+        resources_dir: resources_dir.map(Path::to_path_buf),
+        ..Default::default()
+    };
     options.fontdb_mut().load_system_fonts();
     let tree =
         resvg::usvg::Tree::from_data(bytes, &options).map_err(|error| {
@@ -308,8 +308,8 @@ fn has_svg_extension(path: &Path) -> bool {
 }
 
 fn icon_too_large_error() -> crate::Error {
-	crate::ErrorKind::InputError(format!(
-		"Instance icons cannot exceed {INSTANCE_ICON_MAX_BYTES} bytes"
-	))
+    crate::ErrorKind::InputError(format!(
+        "Instance icons cannot exceed {INSTANCE_ICON_MAX_BYTES} bytes"
+    ))
     .into()
 }
