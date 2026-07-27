@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { EditIcon } from '@modrinth/assets'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 
 const model = defineModel<string>({ default: '' })
 
@@ -31,8 +31,10 @@ const isEditing = ref(false)
 const isSaving = ref(false)
 const isInvalid = ref(false)
 const input = ref<HTMLInputElement>()
+const isEditIconVisible = ref(false)
 const draft = ref(model.value)
 const originalValue = ref('')
+let editIconHideTimeout: ReturnType<typeof setTimeout> | undefined
 
 const displayValue = computed(() => model.value || props.defaultValue || props.placeholder)
 const sizingValue = computed(() => {
@@ -49,9 +51,40 @@ watch(model, (value) => {
 	}
 })
 
+function clearEditIconHideTimeout() {
+	if (editIconHideTimeout) {
+		clearTimeout(editIconHideTimeout)
+		editIconHideTimeout = undefined
+	}
+}
+
+function showEditIcon() {
+	isEditIconVisible.value = true
+}
+
+function keepEditIconVisible() {
+	clearEditIconHideTimeout()
+	isEditIconVisible.value = true
+}
+
+function hideEditIcon() {
+	if (!editIconHideTimeout) {
+		isEditIconVisible.value = false
+	}
+}
+
+function handleEditIconMouseleave() {
+	clearEditIconHideTimeout()
+	editIconHideTimeout = setTimeout(() => {
+		isEditIconVisible.value = false
+		editIconHideTimeout = undefined
+	}, 1000)
+}
+
 async function startEditing() {
 	if (isEditing.value) return
 
+	clearEditIconHideTimeout()
 	originalValue.value = model.value
 	draft.value = model.value
 	isInvalid.value = false
@@ -127,6 +160,8 @@ function handleKeydown(event: KeyboardEvent) {
 	}
 }
 
+onUnmounted(clearEditIconHideTimeout)
+
 defineExpose({
 	isEditing,
 	startEditing,
@@ -136,7 +171,7 @@ defineExpose({
 <template>
 	<div
 		:data-value="sizingValue"
-		class="group/editable relative flex h-6 min-w-3 min-h-0 max-w-full flex-col justify-center border-b font-medium"
+		class="relative flex h-6 min-w-3 min-h-0 max-w-full flex-col justify-center border-b font-medium"
 		:class="
 			isEditing
 				? [
@@ -162,12 +197,24 @@ defineExpose({
 			@click.stop
 			@keydown="handleKeydown"
 		/>
-		<div v-else-if="activationMode === 'icon'" class="flex min-w-0 max-w-full items-center">
+		<div
+			v-else-if="activationMode === 'icon'"
+			class="group/edit-icon flex min-w-0 max-w-full items-center"
+			@mouseenter="showEditIcon"
+			@mouseleave="hideEditIcon"
+		>
 			<span class="min-w-0 truncate select-text" :title="model || displayValue">
 				{{ displayValue }}
 			</span>
 			<span
-				class="flex max-w-0 shrink-0 translate-x-1 overflow-hidden opacity-0 transition-all delay-[300ms] duration-150 group-hover/editable:max-w-6 group-hover/editable:translate-x-0 group-hover/editable:opacity-100 group-hover/editable:delay-0 group-focus-within/editable:max-w-6 group-focus-within/editable:translate-x-0 group-focus-within/editable:opacity-100 group-focus-within/editable:delay-0"
+				class="flex shrink-0 overflow-hidden transition-all duration-150"
+				:class="
+					isEditIconVisible
+						? 'max-w-6 translate-x-0 opacity-100'
+						: 'max-w-0 translate-x-1 opacity-0'
+				"
+				@mouseenter="keepEditIconVisible"
+				@mouseleave="handleEditIconMouseleave"
 			>
 				<button
 					type="button"
