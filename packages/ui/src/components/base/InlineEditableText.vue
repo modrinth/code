@@ -136,7 +136,7 @@ defineExpose({
 <template>
 	<div
 		:data-value="sizingValue"
-		class="group/editable relative flex h-6 min-w-10 min-h-0 max-w-full flex-col justify-center border-b font-medium"
+		class="group/editable relative flex h-6 min-w-3 min-h-0 max-w-full flex-col justify-center border-b font-medium"
 		:class="
 			isEditing
 				? [
