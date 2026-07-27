@@ -40,9 +40,9 @@
 					}}
 				</button>
 				<button
+					v-tooltip="formatMessage(messages.removeIncludedProjectTooltip)"
 					type="button"
 					class="flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0 text-secondary hover:text-contrast"
-					v-tooltip="formatMessage(messages.removeIncludedProjectTooltip)"
 					:aria-label="
 						formatMessage(messages.removeIncludedProject, {
 							project: dependentProjectMap.get(projectId)?.title ?? projectId,

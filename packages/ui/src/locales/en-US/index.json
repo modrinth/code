@@ -3797,8 +3797,14 @@
   "search.filter.included_content.remove_project": {
     "defaultMessage": "Remove {project}"
   },
+  "search.filter.included_content.remove_project.tooltip": {
+    "defaultMessage": "Remove project"
+  },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Search content..."
+  },
+  "search.filter.included_projects": {
+    "defaultMessage": "Includes: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"
