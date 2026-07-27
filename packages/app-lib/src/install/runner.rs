@@ -25,10 +25,7 @@ use crate::state::{
     ContentSourceKind, InstanceInstallStage, InstanceLink, ModLoader, State,
 };
 use crate::util::fetch::DownloadReason;
-use futures::FutureExt;
-use std::any::Any;
 use std::collections::HashSet;
-use std::panic::AssertUnwindSafe;
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -247,7 +244,7 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         .record_event(InstallJobEventKind::RollbackStarted {
             cleanup: job.state.cleanup.clone(),
         });
-    let Some(_) = store::update_status_if(
+    let status_updated = store::update_status_if(
         job_id,
         InstallJobStatus::Queued,
         InstallJobStatus::Running,
@@ -255,12 +252,13 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
         &state,
     )
     .await?
-    else {
+    .is_some();
+    if !status_updated {
         return Err(crate::ErrorKind::InputError(
             "Install job is no longer queued".to_string(),
         )
         .into());
-    };
+    }
     let cleanup_succeeded =
         match recovery::apply_cleanup(&job.state, &state).await {
             Ok(()) => {
@@ -534,19 +532,8 @@ async fn prepare_initial_instance(
 
 fn spawn_job(job_id: Uuid) {
     tokio::spawn(async move {
-        let outcome = AssertUnwindSafe(Box::pin(run_job(job_id)))
-            .catch_unwind()
-            .await;
-        let failure = match outcome {
-            Ok(Ok(())) => None,
-            Ok(Err(error)) => Some(error.to_string()),
-            Err(payload) => Some(format!(
-                "Install worker panicked: {}",
-                panic_message(payload.as_ref())
-            )),
-        };
-
-        if let Some(failure) = failure {
+        if let Err(error) = Box::pin(run_job(job_id)).await {
+            let failure = error.to_string();
             tracing::error!("Install job {job_id} terminated: {failure}");
             if let Err(error) = terminalize_stranded_job(job_id, failure).await
             {
@@ -727,14 +714,6 @@ async fn terminalize_failed_job(
     }
 
     Ok(())
-}
-
-fn panic_message(payload: &(dyn Any + Send)) -> String {
-    payload
-        .downcast_ref::<&str>()
-        .map(|message| (*message).to_string())
-        .or_else(|| payload.downcast_ref::<String>().cloned())
-        .unwrap_or_else(|| "unknown panic".to_string())
 }
 
 async fn run_request(
