@@ -49,9 +49,18 @@ import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
-const { server, serverId, worldId, isSyncingContent, busyReasons } = injectModrinthServerContext()
+const {
+	beginInstallation,
+	busyReasons,
+	cancelOptimisticInstallation,
+	installation,
+	server,
+	serverId,
+	worldId,
+} = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+const serverDetailQueryKey = ['servers', 'detail', serverId] as const
 const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
@@ -106,19 +115,7 @@ const emit = defineEmits<{
 	'reinstall-failed': []
 }>()
 
-const isInstalling = computed(() => {
-	const val =
-		server.value?.status === 'installing' || isSyncingContent.value || busyReasons.value.length > 0
-	debug(
-		'isInstalling:',
-		val,
-		'server.status:',
-		server.value?.status,
-		'isSyncingContent:',
-		isSyncingContent.value,
-	)
-	return val
-})
+const isInstalling = computed(() => busyReasons.value.length > 0)
 const setupActionDisabled = computed(() => !canSetup.value || isInstalling.value)
 const setupActionDisabledMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
@@ -297,6 +294,67 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	return loader as Archon.Content.v1.Modloader
 }
 
+type InstallationCacheSnapshot = {
+	server: Archon.Servers.v0.Server | undefined
+	addons: Archon.Content.v1.Addons | undefined
+}
+
+async function applyOptimisticInstallation(
+	platform: string,
+	gameVersion: string,
+	loaderVersion: string | null,
+): Promise<InstallationCacheSnapshot> {
+	await Promise.all([
+		queryClient.cancelQueries({ queryKey: serverDetailQueryKey, exact: true }),
+		queryClient.cancelQueries({ queryKey: contentListQueryKey.value, exact: true }),
+	])
+
+	const snapshot = {
+		server: queryClient.getQueryData<Archon.Servers.v0.Server>(serverDetailQueryKey),
+		addons: queryClient.getQueryData<Archon.Content.v1.Addons>(contentListQueryKey.value),
+	}
+	const resolvedLoaderVersion = platform === 'vanilla' ? null : loaderVersion
+	beginInstallation({
+		type: 'platform',
+		platform: platform as Extract<
+			Archon.Websocket.v0.InstallProgressKey,
+			{ type: 'platform' }
+		>['platform'],
+		platform_version: resolvedLoaderVersion ?? '',
+		game_version: gameVersion,
+	})
+
+	queryClient.setQueryData<Archon.Servers.v0.Server>(serverDetailQueryKey, (current) =>
+		current
+			? {
+					...current,
+					status: 'installing',
+					loader: formatLoaderLabel(platform) as Archon.Servers.v0.Loader,
+					loader_version: resolvedLoaderVersion,
+					mc_version: gameVersion,
+				}
+			: current,
+	)
+	queryClient.setQueryData<Archon.Content.v1.Addons>(contentListQueryKey.value, (current) =>
+		current
+			? {
+					...current,
+					modloader: toApiLoader(platform),
+					modloader_version: resolvedLoaderVersion,
+					game_version: gameVersion,
+				}
+			: current,
+	)
+
+	return snapshot
+}
+
+function rollbackOptimisticInstallation(snapshot: InstallationCacheSnapshot) {
+	cancelOptimisticInstallation()
+	queryClient.setQueryData(serverDetailQueryKey, snapshot.server)
+	queryClient.setQueryData(contentListQueryKey.value, snapshot.addons)
+}
+
 async function uploadLocalModpackWithSoftOverride() {
 	const picked = await filePicker.pickModpackFile()
 	if (!picked?.file) return false
@@ -308,8 +366,11 @@ async function uploadLocalModpackWithSoftOverride() {
 		{ softOverride: true },
 	)
 	await uploadProgressModal.value!.track(handle)
+	beginInstallation({
+		type: 'local_modpack',
+		filename: picked.file.name,
+	})
 	emit('reinstall')
-	await invalidateServerState()
 	return true
 }
 
@@ -468,6 +529,7 @@ provideInstallationSettings({
 		const gameVersionChanged = gameVersion !== currentGameVersion.value
 		const loaderVersionChanged =
 			loaderVersionId !== null && loaderVersionId !== currentLoaderVersion.value
+		if (!platformChanged && !gameVersionChanged && !loaderVersionChanged) return
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -475,6 +537,11 @@ provideInstallationSettings({
 			resolvedLoaderVersion = versions[0]?.id ?? null
 		}
 
+		const snapshot = await applyOptimisticInstallation(
+			platform,
+			gameVersion,
+			resolvedLoaderVersion,
+		)
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
@@ -497,10 +564,10 @@ provideInstallationSettings({
 				debug('save: game version only, calling applyGameVersionUpdate', gameVersion)
 				await client.archon.content_v1.applyGameVersionUpdate(serverId, worldId.value!, gameVersion)
 			}
-			debug('save: succeeded, invalidating')
-			invalidateServerState()
+			debug('save: succeeded')
 		} catch (err) {
 			debug('save: failed, emitting reinstall-failed', err)
+			rollbackOptimisticInstallation(snapshot)
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -513,10 +580,10 @@ provideInstallationSettings({
 	async repair() {
 		if (setupActionDisabled.value) return
 		debug('repair: called')
+		beginInstallation({ type: 'unknown' })
 		try {
 			await client.archon.content_v1.repair(serverId, worldId.value!)
-			debug('repair: API succeeded, invalidating')
-			await invalidateServerState()
+			debug('repair: API succeeded')
 			addNotification({
 				type: 'success',
 				title: formatMessage(messages.repairStartedTitle),
@@ -524,6 +591,7 @@ provideInstallationSettings({
 			})
 		} catch (err) {
 			debug('repair: failed', err)
+			cancelOptimisticInstallation()
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
@@ -555,6 +623,11 @@ provideInstallationSettings({
 			modpack.value.spec.version_id,
 		)
 		debug('reinstallModpack: emitting reinstall before API call')
+		beginInstallation({
+			type: 'modrinth_modpack',
+			project_id: modpack.value.spec.project_id,
+			version_id: modpack.value.spec.version_id,
+		})
 		emit('reinstall')
 		try {
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
@@ -566,10 +639,10 @@ provideInstallationSettings({
 				},
 				soft_override: true,
 			})
-			debug('reinstallModpack: installContent succeeded, invalidating')
-			invalidateServerState()
+			debug('reinstallModpack: installContent succeeded')
 		} catch (err) {
 			debug('reinstallModpack: failed, emitting reinstall-failed', err)
+			cancelOptimisticInstallation()
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -619,14 +692,7 @@ provideInstallationSettings({
 			})
 		} finally {
 			debug('unlinkModpack: invalidating queries')
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: ['servers', 'detail', serverId],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: contentListQueryKey.value,
-				}),
-			])
+			await invalidateServerState()
 			debug('unlinkModpack: invalidation complete')
 		}
 	},
@@ -670,6 +736,11 @@ provideInstallationSettings({
 		if (!modpackProjectId.value) return
 		debug('onModpackVersionConfirm: called, version:', version.id)
 		debug('onModpackVersionConfirm: emitting reinstall before API call')
+		beginInstallation({
+			type: 'modrinth_modpack',
+			project_id: modpackProjectId.value,
+			version_id: version.id,
+		})
 		emit('reinstall')
 		try {
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
@@ -681,10 +752,10 @@ provideInstallationSettings({
 				},
 				soft_override: true,
 			})
-			debug('onModpackVersionConfirm: installContent succeeded, invalidating')
-			invalidateServerState()
+			debug('onModpackVersionConfirm: installContent succeeded')
 		} catch (err) {
 			debug('onModpackVersionConfirm: failed, emitting reinstall-failed', err)
+			cancelOptimisticInstallation()
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -768,6 +839,11 @@ provideInstallationSettings({
 			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
 			resolvedLoaderVersion = versions[0]?.id ?? null
 		}
+		const snapshot = await applyOptimisticInstallation(
+			platform,
+			gameVersion,
+			resolvedLoaderVersion,
+		)
 		emit('reinstall', { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion })
 		try {
 			const request: Archon.Content.v1.InstallWorldContent = {
@@ -779,10 +855,10 @@ provideInstallationSettings({
 			}
 			debug('saveWithoutAutoFix: calling installContent', request)
 			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			debug('saveWithoutAutoFix: succeeded, invalidating')
-			invalidateServerState()
+			debug('saveWithoutAutoFix: succeeded')
 		} catch (err) {
 			debug('saveWithoutAutoFix: failed', err)
+			rollbackOptimisticInstallation(snapshot)
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
@@ -843,10 +919,28 @@ watch(
 )
 
 function onReinstall(event?: unknown) {
-	if (resetServerDisabled.value) return
+	if (resetServerDisabled.value && !installation.value) return
 	installationSettingsLayout.value?.cancelEditing()
 	modrinthServersConsole.clear()
 	queryClient.removeQueries({ queryKey: ['servers', 'ws-state', serverId] })
+	if (!installation.value) {
+		const args = event as
+			| { loader?: string; lVersion?: string; mVersion?: string | null }
+			| undefined
+		if (args?.loader && args.mVersion) {
+			beginInstallation({
+				type: 'platform',
+				platform: args.loader as Extract<
+					Archon.Websocket.v0.InstallProgressKey,
+					{ type: 'platform' }
+				>['platform'],
+				platform_version: args.lVersion ?? '',
+				game_version: args.mVersion,
+			})
+		} else {
+			beginInstallation({ type: 'unknown' })
+		}
+	}
 	emit('reinstall', event)
 	serverSettings.closeModal?.()
 }

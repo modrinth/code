@@ -21,20 +21,12 @@ const powerActionMap = {
 export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { formatMessage } = useVIntl()
 	const client = injectModrinthClient()
-	const { serverId, worldId, server, powerState, isSyncingContent, busyReasons } =
-		injectModrinthServerContext()
+	const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 	const { addNotification } = injectNotificationManager()
 	const { canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
 
-	const isInstalling = computed(
-		() =>
-			server.value.status === 'installing' ||
-			isSyncingContent.value ||
-			busyReasons.value.some(
-				(r) =>
-					r.reason.id === 'servers.busy.installing' ||
-					r.reason.id === 'servers.busy.syncing-content',
-			),
+	const isInstalling = computed(() =>
+		busyReasons.value.some((reason) => reason.reason.id === 'servers.busy.installing'),
 	)
 	const isRunning = computed(() => powerState.value === 'running')
 	const isStopping = computed(() => powerState.value === 'stopping')

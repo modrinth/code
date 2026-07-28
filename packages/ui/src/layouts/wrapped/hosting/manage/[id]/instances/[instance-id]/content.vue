@@ -120,7 +120,6 @@ const {
 	serverId,
 	worldId,
 	busyReasons,
-	isSyncingContent,
 	installProgressItems,
 	uploadState,
 	cancelUpload,
@@ -188,16 +187,11 @@ const setupActionBusyMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
 
 	const bannerCoversInstalling =
-		server.value?.status === 'installing' ||
-		isSyncingContent.value ||
-		busyReasons.value.some(
-			(r) =>
-				r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content',
-		)
+		busyReasons.value.some((r) => r.reason.id === 'servers.busy.installing')
 	const filteredReasons = busyReasons.value.filter((r) => {
 		if (
 			bannerCoversInstalling &&
-			(r.reason.id === 'servers.busy.installing' || r.reason.id === 'servers.busy.syncing-content')
+			r.reason.id === 'servers.busy.installing'
 		)
 			return false
 		if (
@@ -213,40 +207,20 @@ const setupActionBusyMessage = computed(() => {
 const currentWorldInstallProgressItems = computed(() =>
 	installProgressItems.value.filter((item) => item.world_id === worldId.value),
 )
-const isIndividualContentSync = ref(false)
-
-watch(
-	[currentWorldInstallProgressItems, isSyncingContent],
-	([items, syncing]) => {
-		if (!syncing) {
-			isIndividualContentSync.value = false
-			return
-		}
-		if (items.some((item) => item.key.type !== 'file')) {
-			isIndividualContentSync.value = false
-			return
-		}
-		if (items.length > 0) {
-			isIndividualContentSync.value = true
-		}
-	},
-	{ immediate: true },
+const hasActiveFileInstallProgress = computed(() =>
+	currentWorldInstallProgressItems.value.some(
+		(item) =>
+			item.key.type === 'file' &&
+			item.error == null &&
+			item.progress != null &&
+			item.progress < 100,
+	),
 )
 
-const contentBusyReasons = computed(() => {
-	if (!isIndividualContentSync.value) return busyReasons.value
-	return busyReasons.value.filter(
-		(reason) =>
-			reason.reason.id !== 'servers.busy.installing' &&
-			reason.reason.id !== 'servers.busy.syncing-content',
-	)
-})
-const contentActionDisabled = computed(() => !canSetup.value || contentBusyReasons.value.length > 0)
+const contentActionDisabled = computed(() => !canSetup.value || busyReasons.value.length > 0)
 const contentActionBusyMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
-	return contentBusyReasons.value.length > 0
-		? formatMessage(contentBusyReasons.value[0].reason)
-		: null
+	return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null
 })
 
 const modpackProjectId = computed(() => {
@@ -471,6 +445,9 @@ function fileInstallProgressToContentItem(
 }
 
 const pendingServerContentInstalls = ref<PendingServerContentInstall[]>([])
+const isContentInstallActive = computed(
+	() => hasActiveFileInstallProgress.value || pendingServerContentInstalls.value.length > 0,
+)
 const lastStableContentKeys = ref<Set<string>>(new Set())
 const contentInstallBaselineKeys = ref<Set<string> | null>(null)
 const contentInstallAddedKeys = ref<Set<string>>(new Set())
@@ -601,7 +578,7 @@ function syncContentInstallKeys(
 	addons: Archon.Content.v1.Addon[] = contentQuery.data.value?.addons ?? [],
 ) {
 	const currentKeys = getAddonInstallKeys(addons)
-	if (isSyncingContent.value) {
+	if (isContentInstallActive.value) {
 		if (!contentInstallBaselineKeys.value) {
 			contentInstallBaselineKeys.value =
 				readPendingServerContentInstallBaseline(serverId, worldId.value) ??
@@ -855,7 +832,7 @@ function mergeFragileContentItems(items: ContentItem[]) {
 watch(
 	[
 		rawContentItems,
-		isSyncingContent,
+		isContentInstallActive,
 		() => contentQuery.isFetching.value,
 		() => contentQuery.isLoading.value,
 	],
@@ -873,7 +850,7 @@ watch(
 )
 
 watch(
-	[isSyncingContent, () => contentQuery.data.value?.addons],
+	[isContentInstallActive, () => contentQuery.data.value?.addons],
 	([, addons]) => {
 		syncContentInstallKeys(addons ?? [])
 	},
