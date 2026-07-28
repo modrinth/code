@@ -173,9 +173,6 @@
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer launcher"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Vælg en mulighed"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Vis hvor meget tid du har brugt på at spille en instance."
   },

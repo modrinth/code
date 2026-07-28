@@ -1,5 +1,9 @@
 <template>
-	<ModalWrapper ref="detectJavaModal" header="Select java version" :show-ad-on-close="false">
+	<ModalWrapper
+		ref="detectJavaModal"
+		:header="formatMessage(messages.title)"
+		:show-ad-on-close="false"
+	>
 		<div class="flex flex-col gap-4">
 			<Table :columns="javaInstallColumns" :data="chosenInstallOptions" row-key="path">
 				<template #cell-version="{ value }">
@@ -11,15 +15,23 @@
 				<template #cell-actions="{ row }">
 					<div class="flex items-center justify-end">
 						<ButtonStyled v-if="currentSelected.path === row.path">
-							<button class="!shadow-none" disabled><CheckIcon /> Selected</button>
+							<button class="!shadow-none" disabled>
+								<CheckIcon aria-hidden="true" />
+								{{ formatMessage(messages.selected) }}
+							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else>
-							<button class="!shadow-none" @click="setJavaInstall(row)"><PlusIcon /> Select</button>
+							<button class="!shadow-none" @click="setJavaInstall(row)">
+								<PlusIcon aria-hidden="true" />
+								{{ formatMessage(messages.select) }}
+							</button>
 						</ButtonStyled>
 					</div>
 				</template>
 				<template #empty-state>
-					<div class="p-4 text-secondary">No java installations found!</div>
+					<div class="p-4 text-secondary">
+						{{ formatMessage(messages.noInstallationsFound) }}
+					</div>
 				</template>
 			</Table>
 			<div class="flex justify-end">
@@ -28,8 +40,8 @@
 						class="!shadow-none !border-surface-4 !border"
 						@click="$refs.detectJavaModal.hide()"
 					>
-						<XIcon />
-						Cancel
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(messages.cancel) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -38,23 +50,70 @@
 </template>
 <script setup>
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, Table } from '@modrinth/ui'
-import { ref } from 'vue'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	Table,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { find_filtered_jres } from '@/helpers/jre.js'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	title: {
+		id: 'app.java-detection.title',
+		defaultMessage: 'Select Java installation',
+	},
+	versionColumn: {
+		id: 'app.java-detection.columns.version',
+		defaultMessage: 'Version',
+	},
+	pathColumn: {
+		id: 'app.java-detection.columns.path',
+		defaultMessage: 'Path',
+	},
+	actionsColumn: {
+		id: 'app.java-detection.columns.actions',
+		defaultMessage: 'Actions',
+	},
+	selected: {
+		id: 'app.java-detection.selected',
+		defaultMessage: 'Selected',
+	},
+	select: {
+		id: 'app.java-detection.select',
+		defaultMessage: 'Select',
+	},
+	noInstallationsFound: {
+		id: 'app.java-detection.no-installations-found',
+		defaultMessage: 'No Java installations found.',
+	},
+	cancel: {
+		id: 'app.java-detection.cancel',
+		defaultMessage: 'Cancel',
+	},
+})
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)
 const currentSelected = ref({})
-const javaInstallColumns = [
-	{ key: 'version', label: 'Version', width: '9rem' },
-	{ key: 'path', label: 'Path' },
-	{ key: 'actions', label: 'Actions', align: 'right', width: '10rem' },
-]
+const javaInstallColumns = computed(() => [
+	{ key: 'version', label: formatMessage(messages.versionColumn), width: '9rem' },
+	{ key: 'path', label: formatMessage(messages.pathColumn) },
+	{
+		key: 'actions',
+		label: formatMessage(messages.actionsColumn),
+		align: 'right',
+		width: '10rem',
+	},
+])
 
 defineExpose({
 	show: async (version, currentSelectedJava) => {

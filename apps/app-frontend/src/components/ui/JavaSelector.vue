@@ -6,7 +6,7 @@
 				autocomplete="off"
 				:disabled="props.disabled"
 				:model-value="props.modelValue ? props.modelValue.path : ''"
-				:placeholder="placeholder ?? '/path/to/java'"
+				:placeholder="placeholder ?? formatMessage(messages.pathPlaceholder)"
 				wrapper-class="installation-input"
 				@update:model-value="
 					(val) => {
@@ -28,6 +28,7 @@
 				color-fill="text"
 			>
 				<button
+					:aria-label="formatMessage(messages.testJavaInstallation)"
 					class="!shadow-none"
 					:disabled="testingJava || props.disabled"
 					@click="runTest(props.modelValue?.path)"
@@ -47,25 +48,31 @@
 		<span class="installation-buttons">
 			<ButtonStyled v-if="props.version">
 				<button
-					v-tooltip="testingJavaSuccess === true ? 'Already installed' : undefined"
+					v-tooltip="
+						testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
+					"
 					class="!shadow-none"
 					:disabled="props.disabled || installingJava || testingJavaSuccess === true"
 					@click="reinstallJava"
 				>
 					<DownloadIcon />
-					{{ installingJava ? 'Installing...' : 'Install recommended' }}
+					{{
+						installingJava
+							? formatMessage(messages.installing)
+							: formatMessage(messages.installRecommended)
+					}}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled>
 				<button class="!shadow-none" :disabled="props.disabled" @click="autoDetect">
 					<SearchIcon />
-					Detect
+					{{ formatMessage(messages.detect) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled>
 				<button class="!shadow-none" :disabled="props.disabled" @click="handleJavaFileInput()">
 					<FolderSearchIcon />
-					Browse
+					{{ formatMessage(messages.browse) }}
 				</button>
 			</ButtonStyled>
 		</span>
@@ -82,7 +89,13 @@ import {
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	StyledInput,
+	useVIntl,
+} from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
 import { ref, watch } from 'vue'
 
@@ -92,6 +105,38 @@ import { trackEvent } from '@/helpers/analytics'
 import { auto_install_java, find_filtered_jres, get_jre } from '@/helpers/jre.js'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	pathPlaceholder: {
+		id: 'app.java-selector.path.placeholder',
+		defaultMessage: '/path/to/java',
+	},
+	testJavaInstallation: {
+		id: 'app.java-selector.test-installation',
+		defaultMessage: 'Test Java installation',
+	},
+	alreadyInstalled: {
+		id: 'app.java-selector.already-installed',
+		defaultMessage: 'Already installed',
+	},
+	installing: {
+		id: 'app.java-selector.installing',
+		defaultMessage: 'Installing...',
+	},
+	installRecommended: {
+		id: 'app.java-selector.install-recommended',
+		defaultMessage: 'Install recommended',
+	},
+	detect: {
+		id: 'app.java-selector.detect',
+		defaultMessage: 'Detect',
+	},
+	browse: {
+		id: 'app.java-selector.browse',
+		defaultMessage: 'Browse',
+	},
+})
 
 const props = defineProps({
 	id: {

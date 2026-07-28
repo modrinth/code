@@ -144,19 +144,19 @@
     "message": "Your privacy and how ads support Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+    "message": "Enable visual effects such as background blur. This may reduce performance without hardware acceleration."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Advanced rendering"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Select your preferred color theme for Modrinth App."
+    "message": "Choose the color theme used by Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Change the page to which the launcher opens on."
+    "message": "Choose the page shown when Modrinth App opens."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
@@ -168,52 +168,49 @@
     "message": "Default landing page"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Disables the nametag above your player on the skins page."
+    "message": "Hide your username above the player preview on the Skin selector page."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Hide nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Includes recent worlds in the \"Jump back in\" section on the Home page."
+    "message": "Show recently played worlds in the \"Jump back in\" section on the Home page."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Jump back into worlds"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimize the launcher when a Minecraft process starts."
+    "message": "Minimize Modrinth App when Minecraft starts."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimize launcher"
+    "message": "Minimize app"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Use system window frame (app restart required)."
+    "message": "Use your operating system's title bar and window controls. Requires an app restart."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Native decorations"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Select an option"
+    "message": "System window frame"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Displays how much time you've spent playing an instance."
+    "message": "Show how long you've played each instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Show play time"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Automatically skips low-risk confirmations like duplicate modpack installs, normal content deletion, bulk updates, unlinking modpacks, and repair prompts. Dangerous warnings will still be shown."
+    "message": "Skip confirmations for low-risk actions such as duplicate installs, normal content deletion, bulk updates, unlinking, and repairs. Warnings for dangerous actions are always shown."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Skip non-essential warnings"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Enables the ability to toggle the sidebar."
+    "message": "Hide the right sidebar by default and add a button to show or hide it."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Toggle sidebar"
+    "message": "Hide right sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it."
+    "message": "Show a safety warning before installing a Modrinth Pack (.mrpack) that isn't hosted on Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Warn me before installing unknown modpacks"
@@ -223,6 +220,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmations"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Home and content"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Startup and navigation"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adding server to instance"
@@ -572,6 +578,51 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
+  "app.java-detection.cancel": {
+    "message": "Cancel"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Actions"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Path"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Version"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "No Java installations found."
+  },
+  "app.java-detection.select": {
+    "message": "Select"
+  },
+  "app.java-detection.selected": {
+    "message": "Selected"
+  },
+  "app.java-detection.title": {
+    "message": "Select Java installation"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Already installed"
+  },
+  "app.java-selector.browse": {
+    "message": "Browse"
+  },
+  "app.java-selector.detect": {
+    "message": "Detect"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Install recommended"
+  },
+  "app.java-selector.installing": {
+    "message": "Installing..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/path/to/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Test Java installation"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Additional context"
   },
@@ -704,11 +755,86 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
-  "app.resource-management-settings.always-show-copy-details.description": {
-    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
   },
-  "app.resource-management-settings.always-show-copy-details.title": {
-    "message": "Always show copy details"
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Environment variables set when launching an instance."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Enter environment variables..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Environment variables"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Start instances in fullscreen by updating their options.txt file."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Fullscreen"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "The height of the game window when launched."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Enter height..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Height"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Arguments passed to Java when launching an instance."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Enter Java arguments..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java arguments"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Maximum memory available to each instance."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Memory allocation"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Runs after the game closes."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Enter post-exit command..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Post-exit hook"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Runs before the instance starts."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Enter pre-launch command..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Pre-launch hook"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "The width of the game window when launched."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Enter width..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Width"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Command used to wrap the Minecraft launch process."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Enter wrapper command..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Wrapper hook"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Toggle developer mode"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
@@ -716,11 +842,89 @@
   "app.settings.downloading": {
     "message": "Downloading v{version}"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "Java {version, number} location"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
   },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Show Modrinth App as your current activity on Discord. This does not affect Rich Presence added to instances by mods. Requires an app restart."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetry"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Always show copy details"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "The app may load more slowly until the cache is rebuilt."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Purge the app cache?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Purge cache"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App cache"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Backups of important app data are stored here in case you need to recover them later."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Open backups folder"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "App database backups"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Browse for an app directory"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Where Modrinth App stores instances and other files. Changes take effect after restarting the app."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Select a new app directory"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "App directory"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Number of files the app can download at once. Lower this if downloads are unreliable on your connection. Requires an app restart."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maximum concurrent downloads"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Number of files the app can write to disk at once. Lower this if you frequently encounter I/O errors. Requires an app restart."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Maximum concurrent writes"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instances"
+  },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
+  },
+  "app.settings.tabs.behavior": {
+    "message": "Behavior"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Default instance options"
@@ -1564,5 +1768,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Account"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Display"
   }
 }

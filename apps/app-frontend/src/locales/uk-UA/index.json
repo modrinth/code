@@ -188,9 +188,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Системне оформлення"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Оберіть опцію"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показує, скільки часу ви провели в цьому профілі."
   },

@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Системное оформление"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Выберите вариант"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показывать время, проведённое в сборке."
   },

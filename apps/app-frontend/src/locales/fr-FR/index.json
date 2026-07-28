@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Décorations natives"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Sélectionnez une option"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Affiche combien de temps vous avez passé sur une instance."
   },

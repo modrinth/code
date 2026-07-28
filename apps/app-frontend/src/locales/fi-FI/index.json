@@ -119,9 +119,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Natiivit koristukset"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Valitse vaihtoehto"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Näyttää, kuinka paljon aikaa olet käyttänyt instanssin pelaamiseen."
   },
