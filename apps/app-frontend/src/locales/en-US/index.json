@@ -761,6 +761,36 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to latest version to launch the game."
   },
+  "app.nav.create-new-instance": {
+    "message": "Create new instance"
+  },
+  "app.nav.home": {
+    "message": "Home"
+  },
+  "app.nav.library": {
+    "message": "Library"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth account"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Sign in to a Modrinth account"
+  },
+  "app.nav.signed-in-as": {
+    "message": "Signed in as <user>{username}</user>"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Upgrade to Modrinth+"
+  },
+  "app.news.title": {
+    "message": "News"
+  },
+  "app.news.view-all": {
+    "message": "View all news"
+  },
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
   },
@@ -784,6 +814,15 @@
   },
   "app.project.versions.already-installed": {
     "message": "Already installed"
+  },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Drag to show recent instances"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Drag to resize"
+  },
+  "app.restarting": {
+    "message": "Restarting..."
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -971,6 +1010,9 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
+  "app.sidebar.playing-as": {
+    "message": "Playing as"
+  },
   "app.skins.add-button": {
     "message": "Add skin"
   },
@@ -1129,6 +1171,21 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "Toggle on"
+  },
+  "app.survey.body": {
+    "message": "Would you mind answering a few questions about your experience with Modrinth App?"
+  },
+  "app.survey.footer": {
+    "message": "This feedback will go directly to the Modrinth team and help guide future updates!"
+  },
+  "app.survey.no-thanks": {
+    "message": "No thanks"
+  },
+  "app.survey.take-survey": {
+    "message": "Take survey"
+  },
+  "app.survey.title": {
+    "message": "Hey there Modrinth user!"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."

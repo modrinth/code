@@ -2630,9 +2630,6 @@
   "layout.nav.discover": {
     "message": "Keşfet"
   },
-  "layout.nav.discover-content": {
-    "message": "İçerik keşfet"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth App yükle"
   },

@@ -2630,9 +2630,6 @@
   "layout.nav.discover": {
     "message": "Descubre"
   },
-  "layout.nav.discover-content": {
-    "message": "Descubrir contenido"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Obtener la Modrinth App"
   },

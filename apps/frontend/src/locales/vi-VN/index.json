@@ -2519,9 +2519,6 @@
   "layout.nav.discover": {
     "message": "Khám phá"
   },
-  "layout.nav.discover-content": {
-    "message": "Khám phá nội dung"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Tải ứng dụng Modrinth"
   },
