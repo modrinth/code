@@ -2879,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "发现"
   },
-  "layout.nav.discover-content": {
-    "message": "发现内容"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "获取 Modrinth App"
   },

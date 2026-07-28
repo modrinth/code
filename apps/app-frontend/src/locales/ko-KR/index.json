@@ -242,9 +242,6 @@
   "app.browse.back-to-instance": {
     "message": "인스턴스로 돌아가기"
   },
-  "app.browse.discover-content": {
-    "message": "콘텐츠 탐색하기"
-  },
   "app.browse.discover-servers": {
     "message": "서버 탐색하기"
   },

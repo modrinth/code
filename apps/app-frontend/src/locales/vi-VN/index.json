@@ -233,9 +233,6 @@
   "app.browse.back-to-instance": {
     "message": "Quay lại phiên bản"
   },
-  "app.browse.discover-content": {
-    "message": "Khám phá nội dung"
-  },
   "app.browse.discover-servers": {
     "message": "Khám phá máy chủ"
   },

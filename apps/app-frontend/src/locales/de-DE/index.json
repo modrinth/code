@@ -242,9 +242,6 @@
   "app.browse.back-to-instance": {
     "message": "Zurück zur Instanz"
   },
-  "app.browse.discover-content": {
-    "message": "Inhalte entdecken"
-  },
   "app.browse.discover-servers": {
     "message": "Server entdecken"
   },

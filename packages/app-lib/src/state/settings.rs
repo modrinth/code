@@ -53,7 +53,6 @@ pub struct Settings {
 pub enum FeatureFlag {
     PagePath,
     ProjectBackground,
-    WorldsTab,
     WorldsInHome,
     ServerRamAsBytesAlwaysOn,
     AlwaysShowAppControls,

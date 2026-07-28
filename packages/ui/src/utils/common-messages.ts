@@ -111,6 +111,10 @@ export const commonMessages = defineMessages({
 		id: 'label.details',
 		defaultMessage: 'Details',
 	},
+	discoverContentLabel: {
+		id: 'label.discover-content',
+		defaultMessage: 'Discover content',
+	},
 	downloadButton: {
 		id: 'button.download',
 		defaultMessage: 'Download',

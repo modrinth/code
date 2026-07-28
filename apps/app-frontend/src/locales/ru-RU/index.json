@@ -242,9 +242,6 @@
   "app.browse.back-to-instance": {
     "message": "Вернуться к сборке"
   },
-  "app.browse.discover-content": {
-    "message": "Поиск проектов"
-  },
   "app.browse.discover-servers": {
     "message": "Поиск серверов"
   },

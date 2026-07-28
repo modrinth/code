@@ -86,6 +86,14 @@
 										icon: ServerIcon,
 									}
 								: null,
+							isStaff(auth.user) ? { type: 'heading', label: 'Staff' } : null,
+							isStaff(auth.user)
+								? {
+										link: '/settings/moderation',
+										label: 'Moderation',
+										icon: ScaleIcon,
+									}
+								: null,
 						].filter(Boolean)
 					"
 				/>
@@ -103,6 +111,7 @@ import {
 	LanguagesIcon,
 	MonitorSmartphoneIcon,
 	PaintbrushIcon,
+	ScaleIcon,
 	ServerIcon,
 	ShieldIcon,
 	ToggleRightIcon,
@@ -115,6 +124,7 @@ import {
 	NormalPage,
 	useVIntl,
 } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
 

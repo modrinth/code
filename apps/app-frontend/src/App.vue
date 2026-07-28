@@ -10,7 +10,6 @@ import {
 } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
-	ChangeSkinIcon,
 	CompassIcon,
 	HomeIcon,
 	LeftArrowIcon,
@@ -18,15 +17,13 @@ import {
 	LogInIcon,
 	LogOutIcon,
 	NewspaperIcon,
-	NotepadTextIcon,
 	PlusIcon,
 	RefreshCwIcon,
 	RightArrowIcon,
 	ServerStackIcon,
 	SettingsIcon,
+	ShirtIcon,
 	UserIcon,
-	WorldIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -38,6 +35,7 @@ import {
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
+	IntlFormatted,
 	LoadingBar,
 	NewsArticleCard,
 	NotificationPanel,
@@ -62,7 +60,6 @@ import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
@@ -87,6 +84,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import SharedInstanceInviteHandler from '@/components/ui/shared-instances/shared-instance-invite-handler/index.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import SurveyPopup from '@/components/ui/SurveyPopup.vue'
 import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
@@ -103,12 +101,7 @@ import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, notification_listener, warning_listener } from '@/helpers/events.js'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
-import {
-	can_current_user_use_shared_instances,
-	get as getInstance,
-	list,
-	run,
-} from '@/helpers/instance'
+import { can_current_user_use_shared_instances, get as getInstance, run } from '@/helpers/instance'
 import { get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { mergeUrlQuery, parseModrinthLink } from '@/helpers/project-links.ts'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -147,6 +140,7 @@ import { setupAuthProvider } from '@/providers/setup/auth'
 import { setupLoadingStateProvider } from '@/providers/setup/loading-state'
 import { useError } from '@/store/error.js'
 import { useTheming } from '@/store/state'
+import { appMessages } from '@/utils/app-messages'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
@@ -289,7 +283,6 @@ const {
 } = setupProviders(notificationManager, popupNotificationManager)
 
 const news = ref([])
-const availableSurvey = ref(false)
 const displayedServerInviteNotifications = new Set()
 const serverInvitePopupNotificationIds = new Set()
 let liveNotificationGeneration = 0
@@ -402,6 +395,54 @@ const messages = defineMessages({
 	adsConsentAccept: {
 		id: 'app.ads-consent.accept',
 		defaultMessage: 'Accept all',
+	},
+	home: {
+		id: 'app.nav.home',
+		defaultMessage: 'Home',
+	},
+	library: {
+		id: 'app.nav.library',
+		defaultMessage: 'Library',
+	},
+	modrinthHosting: {
+		id: 'app.nav.modrinth-hosting',
+		defaultMessage: 'Modrinth Hosting',
+	},
+	createNewInstance: {
+		id: 'app.nav.create-new-instance',
+		defaultMessage: 'Create new instance',
+	},
+	modrinthAccount: {
+		id: 'app.nav.modrinth-account',
+		defaultMessage: 'Modrinth account',
+	},
+	signedInAs: {
+		id: 'app.nav.signed-in-as',
+		defaultMessage: 'Signed in as <user>{username}</user>',
+	},
+	signInToModrinthAccount: {
+		id: 'app.nav.sign-in-to-modrinth-account',
+		defaultMessage: 'Sign in to a Modrinth account',
+	},
+	restarting: {
+		id: 'app.restarting',
+		defaultMessage: 'Restarting...',
+	},
+	upgradeToModrinthPlus: {
+		id: 'app.nav.upgrade-to-modrinth-plus',
+		defaultMessage: 'Upgrade to Modrinth+',
+	},
+	news: {
+		id: 'app.news.title',
+		defaultMessage: 'News',
+	},
+	viewAllNews: {
+		id: 'app.news.view-all',
+		defaultMessage: 'View all news',
+	},
+	playingAs: {
+		id: 'app.sidebar.playing-as',
+		defaultMessage: 'Playing as',
 	},
 })
 
@@ -570,12 +611,6 @@ async function setupApp() {
 		const settings = await getSettings()
 		settings.pending_update_toast_for_version = null
 		await setSettings(settings)
-	}
-
-	if (osType === 'windows') {
-		await processPendingSurveys()
-	} else {
-		console.info('Skipping user surveys on non-Windows platforms')
 	}
 }
 
@@ -1441,115 +1476,6 @@ function handleAuxClick(e) {
 	}
 }
 
-function cleanupOldSurveyDisplayData() {
-	const threeWeeksAgo = new Date()
-	threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21)
-
-	for (let i = 0; i < localStorage.length; i++) {
-		const key = localStorage.key(i)
-
-		if (key.startsWith('survey-') && key.endsWith('-display')) {
-			const dateValue = new Date(localStorage.getItem(key))
-			if (dateValue < threeWeeksAgo) {
-				localStorage.removeItem(key)
-			}
-		}
-	}
-}
-
-async function openSurvey() {
-	if (!availableSurvey.value) {
-		console.error('No survey to open')
-		return
-	}
-
-	const creds = await getCreds().catch(handleError)
-	const userId = creds?.user_id
-
-	const formId = availableSurvey.value.tally_id
-
-	const popupOptions = {
-		layout: 'modal',
-		width: 700,
-		autoClose: 2000,
-		hideTitle: true,
-		hiddenFields: {
-			user_id: userId,
-		},
-		onOpen: () => console.info('Opened user survey'),
-		onClose: () => {
-			console.info('Closed user survey')
-			show_ads_window()
-		},
-		onSubmit: () => console.info('Active user survey submitted'),
-	}
-
-	try {
-		hide_ads_window()
-		if (window.Tally?.openPopup) {
-			console.info(`Opening Tally popup for user survey (form ID: ${formId})`)
-			dismissSurvey()
-			window.Tally.openPopup(formId, popupOptions)
-		} else {
-			console.warn('Tally script not yet loaded')
-			show_ads_window()
-		}
-	} catch (e) {
-		console.error('Error opening Tally popup:', e)
-		show_ads_window()
-	}
-
-	console.info(`Found user survey to show with tally_id: ${formId}`)
-	window.Tally.openPopup(formId, popupOptions)
-}
-
-function dismissSurvey() {
-	localStorage.setItem(`survey-${availableSurvey.value.id}-display`, new Date())
-	availableSurvey.value = undefined
-}
-
-async function processPendingSurveys() {
-	function isWithinLastTwoWeeks(date) {
-		const twoWeeksAgo = new Date()
-		twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
-		return date >= twoWeeksAgo
-	}
-
-	cleanupOldSurveyDisplayData()
-
-	const creds = await getCreds().catch(handleError)
-	const userId = creds?.user_id
-
-	const instances = (await list().catch(handleError)) ?? []
-	const isActivePlayer = instances.some(
-		(instance) =>
-			isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
-	)
-
-	let surveys = []
-	try {
-		surveys = await $fetch('https://api.modrinth.com/v2/surveys')
-	} catch (e) {
-		console.error('Error fetching surveys:', e)
-	}
-
-	const surveyToShow = surveys.find(
-		(survey) =>
-			!!(
-				localStorage.getItem(`survey-${survey.id}-display`) === null &&
-				survey.type === 'tally_app' &&
-				((survey.condition === 'active_player' && isActivePlayer) ||
-					(survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
-			),
-	)
-
-	if (surveyToShow) {
-		availableSurvey.value = surveyToShow
-	} else {
-		console.info('No user survey to show')
-	}
-}
-
 provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
@@ -1572,7 +1498,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					class="flex items-center gap-4 text-contrast font-semibold text-xl select-none cursor-default"
 				>
 					<RefreshCwIcon data-tauri-drag-region class="animate-spin w-6 h-6" />
-					Restarting...
+					{{ formatMessage(messages.restarting) }}
 				</span>
 			</div>
 		</Transition>
@@ -1595,27 +1521,24 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
-			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-1.5 w-[--left-bar-width]"
+			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.25rem] w-[--left-bar-width]"
 		>
-			<NavButton v-tooltip.right="'Home'" to="/">
+			<NavButton v-tooltip.right="formatMessage(messages.home)" to="/">
 				<HomeIcon />
 			</NavButton>
-			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
-				<WorldIcon />
-			</NavButton>
 			<NavButton
-				v-tooltip.right="'Discover content'"
+				v-tooltip.right="formatMessage(commonMessages.discoverContentLabel)"
 				to="/browse/modpack"
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
 				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
 			>
 				<CompassIcon />
 			</NavButton>
-			<NavButton v-tooltip.right="'Skin selector'" to="/skins">
-				<ChangeSkinIcon />
+			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
+				<ShirtIcon />
 			</NavButton>
 			<NavButton
-				v-tooltip.right="'Library'"
+				v-tooltip.right="formatMessage(messages.library)"
 				to="/library"
 				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
 				:is-subpage="
@@ -1628,19 +1551,18 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LibraryIcon />
 			</NavButton>
 			<NavButton
-				v-tooltip.right="'Modrinth Hosting'"
+				v-tooltip.right="formatMessage(messages.modrinthHosting)"
 				to="/hosting/manage"
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
 				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
 			>
 				<ServerStackIcon />
 			</NavButton>
-			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
 				<QuickInstanceSwitcher />
 			</suspense>
 			<NavButton
-				v-tooltip.right="'Create new instance'"
+				v-tooltip.right="formatMessage(messages.createNewInstance)"
 				:to="() => installationModal?.show()"
 				:disabled="offline"
 			>
@@ -1655,7 +1577,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<OverflowMenu
 				v-if="credentials?.user"
-				v-tooltip.right="`Modrinth account`"
+				v-tooltip.right="formatMessage(messages.modrinthAccount)"
 				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
 				:options="[
 					{
@@ -1674,18 +1596,27 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<template #view-profile>
 					<UserIcon />
 					<span class="inline-flex items-center gap-1">
-						Signed in as
-						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
-							<Avatar :src="credentials?.user?.avatar_url" alt="" size="20px" circle />
-							{{ credentials?.user?.username }}
-						</span>
+						<IntlFormatted
+							:message-id="messages.signedInAs"
+							:values="{ username: credentials?.user?.username }"
+						>
+							<template #user="{ children }">
+								<span class="inline-flex items-center gap-1 text-contrast font-semibold">
+									<Avatar :src="credentials?.user?.avatar_url" alt="" size="20px" circle />
+									<component :is="() => children" />
+								</span>
+							</template>
+						</IntlFormatted>
 					</span>
 				</template>
-				<template #sign-out> <LogOutIcon /> Sign out </template>
+				<template #sign-out>
+					<LogOutIcon />
+					{{ formatMessage(commonMessages.signOutButton) }}
+				</template>
 			</OverflowMenu>
 			<NavButton
 				v-else
-				v-tooltip.right="'Sign in to a Modrinth account'"
+				v-tooltip.right="formatMessage(messages.signInToModrinthAccount)"
 				:to="() => requestSignIn()"
 			>
 				<LogInIcon class="text-brand" />
@@ -1742,28 +1673,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		}"
 	>
 		<div class="app-viewport flex-grow router-view">
-			<transition name="popup-survey">
-				<div
-					v-if="availableSurvey"
-					class="w-[400px] z-20 fixed -bottom-12 pb-16 right-[--right-bar-width] mr-4 rounded-t-2xl card-shadow bg-bg-raised border-surface-5 border-[1px] border-solid border-b-0 p-4"
-				>
-					<h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
-					<p class="m-0 leading-tight">
-						Would you mind answering a few questions about your experience with Modrinth App?
-					</p>
-					<p class="mt-3 mb-4 leading-tight">
-						This feedback will go directly to the Modrinth team and help guide future updates!
-					</p>
-					<div class="flex gap-2">
-						<ButtonStyled color="brand">
-							<button @click="openSurvey"><NotepadTextIcon /> Take survey</button>
-						</ButtonStyled>
-						<ButtonStyled>
-							<button @click="dismissSurvey"><XIcon /> No thanks</button>
-						</ButtonStyled>
-					</div>
-				</div>
-			</transition>
+			<SurveyPopup />
 			<div
 				class="loading-indicator-container h-8 fixed z-50 pointer-events-none"
 				:style="{
@@ -1827,7 +1737,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
+						<h3 class="text-base text-primary font-medium m-0">
+							{{ formatMessage(messages.playingAs) }}
+						</h3>
 						<suspense>
 							<AccountsCard ref="accounts" />
 						</suspense>
@@ -1842,7 +1754,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
 					/>
 					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
-						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
+						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">
+							{{ formatMessage(messages.news) }}
+						</h3>
 						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
 								v-for="(item, index) in news"
@@ -1851,7 +1765,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							/>
 							<ButtonStyled color="brand" size="large">
 								<a href="https://modrinth.com/news" target="_blank" class="my-4">
-									<NewspaperIcon /> View all news
+									<NewspaperIcon />
+									{{ formatMessage(messages.viewAllNews) }}
 								</a>
 							</ButtonStyled>
 						</div>
@@ -1864,7 +1779,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					class="absolute bottom-[250px] w-full flex justify-center items-center gap-1 px-4 py-3 text-purple font-medium hover:underline z-10"
 					target="_blank"
 				>
-					<ArrowBigUpDashIcon class="text-2xl" /> Upgrade to Modrinth+
+					<ArrowBigUpDashIcon class="text-2xl" />
+					{{ formatMessage(messages.upgradeToModrinthPlus) }}
 				</a>
 				<PromotionWrapper />
 			</template>
@@ -2074,26 +1990,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 
 .sidebar-teleport-content:empty + .sidebar-default-content.sidebar-enabled {
 	display: contents;
-}
-
-.popup-survey-enter-active {
-	transition:
-		opacity 0.25s ease,
-		transform 0.25s cubic-bezier(0.51, 1.08, 0.35, 1.15);
-	transform-origin: top center;
-}
-
-.popup-survey-leave-active {
-	transition:
-		opacity 0.25s ease,
-		transform 0.25s cubic-bezier(0.68, -0.17, 0.23, 0.11);
-	transform-origin: top center;
-}
-
-.popup-survey-enter-from,
-.popup-survey-leave-to {
-	opacity: 0;
-	transform: translateY(10rem) scale(0.8) scaleY(1.6);
 }
 
 @media (prefers-reduced-motion: no-preference) {

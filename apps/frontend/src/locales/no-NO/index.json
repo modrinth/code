@@ -2285,9 +2285,6 @@
   "layout.nav.discover": {
     "message": "Utforsk"
   },
-  "layout.nav.discover-content": {
-    "message": "Utforsk innhold"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Skaff deg Modrinth App-en"
   },

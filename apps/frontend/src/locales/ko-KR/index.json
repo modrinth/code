@@ -2873,9 +2873,6 @@
   "layout.nav.discover": {
     "message": "탐색"
   },
-  "layout.nav.discover-content": {
-    "message": "콘텐츠 탐색하기"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth App 받기"
   },
