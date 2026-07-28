@@ -2,10 +2,10 @@
 import { Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
-	libraryGroupOptions,
-	librarySortOptions,
 	type LibraryGroupBy,
+	libraryGroupOptions,
 	type LibrarySort,
+	librarySortOptions,
 	useLibrary,
 } from '@/components/ui/library/use-library'
 
@@ -20,8 +20,8 @@ const groupOptions: ComboboxOption<LibraryGroupBy>[] = [...libraryGroupOptions]
 
 <template>
 	<Combobox
-		class="w-max"
 		v-model="displayState.sortBy"
+		class="w-max"
 		:options="sortOptions"
 		:show-icon-in-selected="false"
 	>
@@ -30,8 +30,8 @@ const groupOptions: ComboboxOption<LibraryGroupBy>[] = [...libraryGroupOptions]
 		</template>
 	</Combobox>
 	<Combobox
-		class="w-max"
 		v-model="displayState.group"
+		class="w-max"
 		:options="groupOptions"
 		:show-icon-in-selected="false"
 	>

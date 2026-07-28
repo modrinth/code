@@ -573,7 +573,7 @@
     "message": "Instances in this group will be ungrouped."
   },
   "app.library.group.edit-name": {
-    "message": "Edit name"
+    "message": "Edit group name"
   },
   "app.library.group.name-duplicate": {
     "message": "A group with this name already exists."

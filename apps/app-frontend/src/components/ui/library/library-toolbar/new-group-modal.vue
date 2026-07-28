@@ -62,7 +62,7 @@
 						/>
 						<div class="flex min-w-0 items-center gap-2">
 							<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
-							<TagItem class="shrink-0" v-if="instance.groups[0]">
+							<TagItem v-if="instance.groups[0]" class="shrink-0">
 								{{ instance.groups[0] }}
 							</TagItem>
 						</div>

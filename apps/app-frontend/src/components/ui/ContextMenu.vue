@@ -34,6 +34,8 @@ const options = ref([])
 const left = ref('0px')
 const top = ref('0px')
 const shown = ref(false)
+const contextMenuId = Symbol()
+const contextMenuOpenEvent = 'modrinth-context-menu-open'
 
 const hideContextMenu = () => {
 	shown.value = false
@@ -42,6 +44,8 @@ const hideContextMenu = () => {
 
 defineExpose({
 	showMenu: (event, passedItem, passedOptions) => {
+		window.dispatchEvent(new CustomEvent(contextMenuOpenEvent, { detail: contextMenuId }))
+
 		item.value = passedItem
 		options.value = passedOptions
 
@@ -93,6 +97,12 @@ const onEscKeyRelease = (event) => {
 	}
 }
 
+const handleContextMenuOpen = (event) => {
+	if (shown.value && event.detail !== contextMenuId) {
+		hideContextMenu()
+	}
+}
+
 const handleClickOutside = (event) => {
 	const elements = document.elementsFromPoint(event.clientX, event.clientY)
 	if (
@@ -106,11 +116,13 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
 	window.addEventListener('click', handleClickOutside)
+	window.addEventListener(contextMenuOpenEvent, handleContextMenuOpen)
 	document.body.addEventListener('keyup', onEscKeyRelease)
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener('click', handleClickOutside)
+	window.removeEventListener(contextMenuOpenEvent, handleContextMenuOpen)
 	document.removeEventListener('keyup', onEscKeyRelease)
 })
 </script>
