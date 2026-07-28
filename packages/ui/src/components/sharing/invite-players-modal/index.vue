@@ -135,6 +135,7 @@
 		ref="inviteLinkEditor"
 		:link-expires-at="linkExpiresAt"
 		:link-max-uses="linkMaxUses"
+		:link-max-uses-limit="linkMaxUsesLimit"
 		:update-invite-link="updateInviteLink"
 	/>
 </template>
@@ -169,6 +170,7 @@ const props = withDefaults(
 		link?: string
 		linkExpiresAt?: string | Date | null
 		linkMaxUses?: number
+		linkMaxUsesLimit?: number
 		updateInviteLink?: (settings: InviteLinkSettings) => Promise<void>
 		friendsLabel?: string
 		searchPlaceholder?: string
@@ -188,6 +190,7 @@ const props = withDefaults(
 		suggestions: () => [],
 		canInvite: true,
 		linkMaxUses: 10,
+		linkMaxUsesLimit: 2147483647,
 	},
 )
 

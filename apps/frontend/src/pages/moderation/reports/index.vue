@@ -235,9 +235,12 @@ const { data: allReports } = await useLazyAsyncData('new-moderation-reports', as
 	let reports: Labrinth.Reports.v3.Report[]
 	let hasMoreReports = true
 	while (hasMoreReports) {
-		reports = (await useBaseFetch(`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}`, {
-			apiVersion: 3,
-		})) as Labrinth.Reports.v3.Report[]
+		reports = (await useBaseFetch(
+			`report?count=${REPORT_ENDPOINT_COUNT}&offset=${currentOffset}&all=true`,
+			{
+				apiVersion: 3,
+			},
+		)) as Labrinth.Reports.v3.Report[]
 
 		hasMoreReports = reports.length > 0
 		if (!hasMoreReports) {

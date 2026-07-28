@@ -5240,6 +5240,9 @@
   "sharing.invite-players-modal.already-invited": {
     "defaultMessage": "This user has already been invited."
   },
+  "sharing.invite-players-modal.apply-button": {
+    "defaultMessage": "Apply"
+  },
   "sharing.invite-players-modal.avatar-alt": {
     "defaultMessage": "{username}'s avatar"
   },
@@ -5249,11 +5252,35 @@
   "sharing.invite-players-modal.cancel-button": {
     "defaultMessage": "Cancel"
   },
+  "sharing.invite-players-modal.custom-expiry": {
+    "defaultMessage": "Custom..."
+  },
+  "sharing.invite-players-modal.custom-expiry-value": {
+    "defaultMessage": "Custom: {date}"
+  },
   "sharing.invite-players-modal.edit-invite-link": {
     "defaultMessage": "Edit invite link."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
     "defaultMessage": "Edit invite link"
+  },
+  "sharing.invite-players-modal.expiry-in-one-day": {
+    "defaultMessage": "In 1 day"
+  },
+  "sharing.invite-players-modal.expiry-in-one-hour": {
+    "defaultMessage": "In 1 hour"
+  },
+  "sharing.invite-players-modal.expiry-in-seven-days": {
+    "defaultMessage": "In 7 days"
+  },
+  "sharing.invite-players-modal.expiry-in-six-hours": {
+    "defaultMessage": "In 6 hours"
+  },
+  "sharing.invite-players-modal.expiry-in-three-days": {
+    "defaultMessage": "In 3 days"
+  },
+  "sharing.invite-players-modal.expiry-in-twelve-hours": {
+    "defaultMessage": "In 12 hours"
   },
   "sharing.invite-players-modal.expiry-label": {
     "defaultMessage": "Expiry date"

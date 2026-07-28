@@ -374,8 +374,17 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Review changes"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Review update"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Reviewing..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "An update is required to play {name}. Please update to latest version to launch the game."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "An update is available"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
@@ -443,6 +452,9 @@
   "app.instance.share.invite-modal.heading": {
     "message": "Share {name}"
   },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "This instance has reached the {limit}-user limit."
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "You need to sign in as"
   },
@@ -460,6 +472,12 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Wrong account"
+  },
+  "app.instance.share.members.empty": {
+    "message": "No users have joined yet"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "No users match your filters."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "They will no longer receive updates for this shared instance"
@@ -490,6 +508,12 @@
   },
   "app.instance.share.sign-in.button": {
     "message": "Sign in"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "The shared instances service is not accessible at the moment, please try again later"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Unable to connect"
   },
   "app.instance.share.unlink.body": {
     "message": "You must unlink this modpack to share your instance"
@@ -649,6 +673,9 @@
   },
   "app.modal.install-to-play.invite-warning": {
     "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
@@ -1376,6 +1403,45 @@
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Actions"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Invite link"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Anyone with one of these invite links can join while it remains active."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "There are no active invites."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Expires"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Revoke invite"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Revoke invite {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Active invites"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Uses"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "The invite link <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "This action cannot be undone"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Revoke invite"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Revoke invite"
+  },
   "instance.settings.tabs.general": {
     "message": "General"
   },
@@ -1576,6 +1642,12 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
+  },
+  "instance.shared-instance.network-error.text": {
+    "message": "Unable to connect to shared instances API"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Network error"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "This instance's content is being shared to other users."

@@ -1433,6 +1433,7 @@ fn install_error_code(
         ErrorKind::SharedInstanceUnavailable(_) => {
             "shared_instance_unavailable"
         }
+        ErrorKind::SharedInstancesApiError(_) => "shared_instances_api_error",
         ErrorKind::InputError(_) => match phase {
             PreparingInstance | Finalizing => "instance_error",
             ResolvingPack | DownloadingPackFile | ReadingPackManifest => {

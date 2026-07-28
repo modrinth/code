@@ -64,7 +64,29 @@
 				</div>
 			</Admonition>
 			<p v-else class="m-0 text-primary">
-				{{ formatMessage(messages.inviteWarning) }}
+				<IntlFormatted
+					v-if="creator"
+					:message-id="messages.inviteWarningWithCreator"
+					:values="{ username: creator.username }"
+				>
+					<template #creator="{ children }">
+						<AutoLink :to="creatorProfileLink" class="font-medium text-contrast hover:underline">
+							<Avatar
+								:src="creator.avatarUrl"
+								:alt="creator.username"
+								:tint-by="creator.username"
+								size="24px"
+								circle
+								no-shadow
+								class="mr-1 inline-block align-middle"
+							/>
+							<span><component :is="() => children" /></span>
+						</AutoLink>
+					</template>
+				</IntlFormatted>
+				<template v-else>
+					{{ formatMessage(messages.inviteWarning) }}
+				</template>
 			</p>
 			<SharedInstanceInstallSummary
 				:preview="preview"
@@ -226,6 +248,7 @@ import { BanIcon, DownloadIcon, ReportIcon, SendIcon, SpinnerIcon, XIcon } from 
 import {
 	Admonition,
 	AutoLink,
+	Avatar,
 	ButtonStyled,
 	Checkbox,
 	Combobox,
@@ -243,8 +266,10 @@ import {
 	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
+import { config } from '@/config'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
@@ -258,11 +283,16 @@ type ExternalFileRow = {
 	id: string
 	name: string
 }
+type SharedInstanceCreator = {
+	username: string
+	avatarUrl: string | null
+}
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const contentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
+const creator = ref<SharedInstanceCreator | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
 const reportOnly = ref(false)
@@ -302,6 +332,12 @@ const reportReasonOptions = computed<ComboboxOption<ReportReason>[]>(() => [
 const canSubmitReport = computed(
 	() => Boolean(preview.value && additionalContext.value.trim()) && !submitLoading.value,
 )
+const creatorProfileLink = computed(() => {
+	const username = creator.value?.username
+	return username
+		? () => openUrl(`${config.siteUrl}/user/${encodeURIComponent(username)}`)
+		: undefined
+})
 
 async function accept() {
 	hide()
@@ -381,6 +417,7 @@ function handleCancel() {
 }
 function handleHide() {
 	resetReportState()
+	creator.value = null
 	show_ads_window()
 }
 function resetReportState() {
@@ -395,14 +432,17 @@ function resetReportState() {
 function show(
 	previewValue: SharedInstanceInstallPreview,
 	installValue: () => void | Promise<void>,
+	creatorValue?: SharedInstanceCreator,
 	event?: MouseEvent,
 ) {
 	resetReportState()
+	creator.value = creatorValue ?? null
 	install.value = installValue
 	showPreview(previewValue, event)
 }
 function showReport(previewValue: SharedInstanceInstallPreview, event?: MouseEvent) {
 	resetReportState()
+	creator.value = null
 	reportMode.value = true
 	reportOnly.value = true
 	install.value = () => {}
@@ -436,6 +476,11 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.invite-warning',
 		defaultMessage:
 			'This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust.',
+	},
+	inviteWarningWithCreator: {
+		id: 'app.modal.install-to-play.invite-warning-with-creator',
+		defaultMessage:
+			'This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust.',
 	},
 	reportDescription: {
 		id: 'app.modal.install-to-play.report-description',

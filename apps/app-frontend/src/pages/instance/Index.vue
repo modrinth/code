@@ -16,6 +16,8 @@
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<SharedInstanceUpdateModal
 				ref="sharedInstanceUpdateModal"
+				@accepted="hideAcceptedSharedInstanceUpdate"
+				@complete="handleSharedInstanceUpdateComplete"
 				@shared-instance-unavailable="handleSharedInstanceUnavailable"
 				@report="(event) => reportSharedInstance(event, true)"
 			/>
@@ -62,8 +64,10 @@
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
+				:shared-instance-update-available="showSharedInstanceUpdateAdmonition"
 				@published="fetchInstance"
 				@delete="requestInstanceDeletion"
+				@review-update="reviewSharedInstanceUpdate"
 			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
@@ -223,6 +227,7 @@ const sharedInstanceUpdateModal = ref<InstanceType<typeof SharedInstanceUpdateMo
 const sharedInstanceReportModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
 const deleteConfirmModal = ref<InstanceType<typeof ConfirmDeleteInstanceModal>>()
 const selectedInstanceToDelete = ref<GameInstance | null>(null)
+const hiddenSharedInstanceUpdateKey = ref<string | null>(null)
 
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 
@@ -253,8 +258,19 @@ const {
 	signedOut: sharedInstanceSignedOut,
 	unavailableManager: sharedInstanceUnavailableManager,
 	unavailableReason: sharedInstanceUnavailableReason,
+	updatePreview: sharedInstanceUpdatePreview,
 	wrongAccount: sharedInstanceWrongAccount,
 } = sharedInstanceState
+const sharedInstanceUpdateKey = computed(() => {
+	const instanceId = instance.value?.id
+	const latestVersion = sharedInstanceUpdatePreview.value?.latestVersion
+	return instanceId && latestVersion !== undefined ? `${instanceId}:${latestVersion}` : null
+})
+const showSharedInstanceUpdateAdmonition = computed(
+	() =>
+		sharedInstanceUpdatePreview.value?.updateAvailable === true &&
+		sharedInstanceUpdateKey.value !== hiddenSharedInstanceUpdateKey.value,
+)
 
 watch(
 	() => router.currentRoute.value,
@@ -530,6 +546,37 @@ async function handleSharedInstanceUnavailable(
 	setSharedInstanceUnavailable(reason)
 }
 
+function reviewSharedInstanceUpdate(event: MouseEvent) {
+	const currentInstance = instance.value
+	const preview = sharedInstanceUpdatePreview.value
+	if (
+		!currentInstance ||
+		currentInstance.shared_instance?.role !== 'member' ||
+		!preview?.updateAvailable
+	) {
+		return
+	}
+
+	sharedInstanceUpdateModal.value?.show(
+		currentInstance,
+		preview,
+		async () => {
+			await fetchInstance()
+		},
+		event,
+	)
+}
+
+function hideAcceptedSharedInstanceUpdate() {
+	hiddenSharedInstanceUpdateKey.value = sharedInstanceUpdateKey.value
+}
+
+function handleSharedInstanceUpdateComplete(successful: boolean) {
+	if (!successful && hiddenSharedInstanceUpdateKey.value === sharedInstanceUpdateKey.value) {
+		hiddenSharedInstanceUpdateKey.value = null
+	}
+}
+
 const startInstance = async (context: string) => {
 	if (!instance.value || instance.value.quarantined) return
 	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
@@ -540,17 +587,16 @@ const startInstance = async (context: string) => {
 		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
 
 	if (canCheckSharedInstanceUpdate) {
-		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>>
+		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>> = null
 		checkingSharedInstanceLaunch.value = true
 		try {
 			preview = await refreshSharedInstanceUpdatePreview()
 		} catch (error) {
 			if (isSharedInstanceUnavailableError(error)) {
 				await handleSharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
-			} else {
-				notifySharedInstanceError(error)
+				return
 			}
-			return
+			notifySharedInstanceError(error)
 		} finally {
 			checkingSharedInstanceLaunch.value = false
 		}
@@ -657,7 +703,7 @@ async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false
 		if (closeUpdateModal) sharedInstanceUpdateModal.value?.hide()
 		sharedInstanceReportModal.value?.showReport(preview, event)
 	} catch (error) {
-		handleError(error as Error)
+		notifySharedInstanceError(error)
 	}
 }
 

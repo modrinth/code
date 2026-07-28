@@ -5,8 +5,6 @@ use crate::state::{
     CreateInstance, EditInstance, InstanceLink, InstanceMetadata, ModLoader,
     State,
 };
-use crate::util::io;
-use std::path::Path;
 
 #[tracing::instrument]
 #[allow(clippy::too_many_arguments)]
@@ -71,60 +69,6 @@ pub async fn edit(
     emit_instance(&instance.instance.id, InstancePayloadType::Edited).await?;
 
     Ok(instance)
-}
-
-pub async fn edit_icon(
-    instance_id: &str,
-    icon_path: Option<&Path>,
-) -> crate::Result<()> {
-    let state = State::get().await?;
-    let instance =
-        instance_rows::get_instance_display_info(instance_id, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
-    let icon_path = if let Some(icon) = icon_path {
-        let bytes = io::read(icon).await?;
-        let file = crate::util::fetch::write_cached_icon(
-            &icon.to_string_lossy(),
-            &state.directories.caches_dir(),
-            bytes::Bytes::from(bytes),
-            &state.io_semaphore,
-        )
-        .await?;
-        Some(file.to_string_lossy().to_string())
-    } else {
-        None
-    };
-
-    crate::state::edit_instance(
-        instance_id,
-        EditInstance {
-            icon_path: Some(icon_path.clone()),
-            ..EditInstance::default()
-        },
-        &state.pool,
-    )
-    .await?;
-
-    if let Err(error) = super::shared::sync_shared_instance_icon(
-        instance_id,
-        icon_path.as_deref(),
-        &state,
-    )
-    .await
-    {
-        tracing::warn!(
-            instance_id,
-            error = %error,
-            "Failed to sync shared instance icon"
-        );
-    }
-
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
-
-    Ok(())
 }
 
 #[tracing::instrument]

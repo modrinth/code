@@ -604,13 +604,18 @@ async function loadSharedInstanceVersionContent(
 		dependency.project_id ? [dependency.project_id] : [],
 	)
 	const projectIds = [
-		...new Set([...versions.map((version) => version.project_id), ...dependencyProjectIds]),
+		...new Set([
+			...versions.map((version) => version.project_id),
+			...dependencyProjectIds,
+			...(modpackVersion ? [modpackVersion.project_id] : []),
+		]),
 	]
 	const projects = projectIds.length
 		? await client.labrinth.projects_v2.getMultiple(projectIds)
 		: []
 	const versionsById = new Map(versions.map((version) => [version.id, version]))
 	const projectsById = new Map(projects.map((project) => [project.id, project]))
+	const modpackProject = modpackVersion ? projectsById.get(modpackVersion.project_id) : undefined
 
 	const directContent: ContentItem[] = [...new Set(directVersionIds)].flatMap((versionId) => {
 		const version = versionsById.get(versionId)
@@ -633,13 +638,19 @@ async function loadSharedInstanceVersionContent(
 		const fileName =
 			primaryFile?.filename ?? dependency.file_name ?? project?.title ?? version?.name ?? 'Unknown'
 
-		return sharedInstanceContentItem(
+		const item = sharedInstanceContentItem(
 			version,
 			project,
 			fileName,
 			dependency.project_id ?? fileName,
 			!project && !version,
 		)
+		return modpackProject
+			? {
+					...item,
+					source: { project: modpackProject },
+				}
+			: item
 	})
 
 	const externalContent: ContentItem[] = instanceVersion.external_files.map((file, index) => ({

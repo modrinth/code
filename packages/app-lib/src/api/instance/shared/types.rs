@@ -118,6 +118,15 @@ pub struct SharedInstanceInviteLink {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SharedInstanceInvite {
+    pub id: String,
+    pub expiration: DateTime<Utc>,
+    pub max_uses: i32,
+    pub uses: i32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInviteInstallPreview {
     pub shared_instance_id: String,
     pub manager_id: Option<String>,

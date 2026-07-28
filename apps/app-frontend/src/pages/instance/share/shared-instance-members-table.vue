@@ -25,7 +25,7 @@
 					<ButtonStyled color="brand">
 						<button
 							class="flex !h-10 shrink-0 items-center gap-2"
-							:disabled="invitePending"
+							:disabled="invitePending || inviteDisabled"
 							@click="emit('invite', $event)"
 						>
 							<SpinnerIcon v-if="invitePending" class="animate-spin" aria-hidden="true" />
@@ -35,7 +35,7 @@
 					</ButtonStyled>
 				</template>
 			</div>
-			<div class="flex flex-wrap items-center gap-1.5">
+			<div v-if="hasMultipleMethods" class="flex flex-wrap items-center gap-1.5">
 				<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
 				<button
 					:class="filterClass(methodFilter === 'all')"
@@ -67,7 +67,9 @@
 		>
 			<template #empty-state
 				><div class="flex h-64 items-center justify-center text-secondary">
-					No users match your filters.
+					{{
+						formatMessage(rows.length === 0 ? messages.noUsersJoined : messages.noUsersMatchFilters)
+					}}
 				</div></template
 			>
 			<template #cell-username="{ row }">
@@ -157,7 +159,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import {
 	type MethodFilter,
@@ -170,6 +172,7 @@ import {
 const props = defineProps<{
 	rows: ShareRow[]
 	actionsLocked?: boolean
+	inviteDisabled?: boolean
 	invitePending?: boolean
 	pushUpdateDisabled?: boolean
 	pushUpdatePending?: boolean
@@ -191,6 +194,7 @@ const methodFilterOptions: Array<{ id: ShareMethod; label: string }> = [
 	{ id: 'direct', label: methodLabels.direct },
 	{ id: 'link', label: methodLabels.link },
 ]
+const hasMultipleMethods = computed(() => new Set(props.rows.map((row) => row.method)).size > 1)
 const columns = computed<TableColumn<ShareTableColumn>[]>(() => {
 	const result: TableColumn<ShareTableColumn>[] = [
 		{
@@ -286,10 +290,22 @@ function filterClass(active: boolean) {
 	]
 }
 
+watch(hasMultipleMethods, (multiple) => {
+	if (!multiple) methodFilter.value = 'all'
+})
+
 const messages = defineMessages({
 	pushUpdate: {
 		id: 'app.instance.admonitions.shared-instance.publish-button',
 		defaultMessage: 'Push update',
+	},
+	noUsersJoined: {
+		id: 'app.instance.share.members.empty',
+		defaultMessage: 'No users have joined yet',
+	},
+	noUsersMatchFilters: {
+		id: 'app.instance.share.members.no-filter-results',
+		defaultMessage: 'No users match your filters.',
 	},
 })
 function userProfileLink(username: string) {

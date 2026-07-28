@@ -320,15 +320,12 @@ pub struct ReportsRequestOptions {
     pub count: u16,
     #[serde(default)]
     pub offset: u32,
-    #[serde(default = "default_all")]
+    #[serde(default)]
     pub all: bool,
 }
 
 fn default_count() -> u16 {
     100
-}
-fn default_all() -> bool {
-    true
 }
 
 #[utoipa::path(
