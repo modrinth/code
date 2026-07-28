@@ -129,3 +129,63 @@ pub async fn patch_user(user_id: &str, patch: Value) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[tracing::instrument]
+pub async fn block_user(user_id: &str) -> crate::Result<()> {
+    let state = State::get().await?;
+    let user_id = urlencoding::encode(user_id);
+
+    fetch_advanced(
+        Method::POST,
+        &format!("{}block/{}", env!("MODRINTH_API_URL_V3"), user_id),
+        None,
+        None,
+        None,
+        None,
+        None,
+        Some("/v3/block/:id"),
+        &state.api_semaphore,
+        &state.pool,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tracing::instrument]
+pub async fn unblock_user(user_id: &str) -> crate::Result<()> {
+    let state = State::get().await?;
+    let user_id = urlencoding::encode(user_id);
+
+    fetch_advanced(
+        Method::DELETE,
+        &format!("{}block/{}", env!("MODRINTH_API_URL_V3"), user_id),
+        None,
+        None,
+        None,
+        None,
+        None,
+        Some("/v3/block/:id"),
+        &state.api_semaphore,
+        &state.pool,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tracing::instrument]
+pub async fn get_blocked_users() -> crate::Result<Vec<String>> {
+    let state = State::get().await?;
+
+    fetch_json(
+        Method::GET,
+        &format!("{}blocks", env!("MODRINTH_API_URL_V3")),
+        None,
+        None,
+        Some("/v3/blocks"),
+        &state.api_semaphore,
+        &state.pool,
+    )
+    .await
+}

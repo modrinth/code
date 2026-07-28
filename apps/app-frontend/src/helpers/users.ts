@@ -54,3 +54,17 @@ export async function patch_user(
 ): Promise<void> {
 	await invoke('plugin:users|patch_user', { userId, patch })
 }
+
+export async function block_user(userId: string): Promise<void> {
+	await invoke('plugin:users|block_user', { userId })
+}
+
+export async function unblock_user(userId: string): Promise<void> {
+	await invoke('plugin:users|unblock_user', { userId })
+}
+
+export async function get_blocked_users(): Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]> {
+	return await invoke<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
+		'plugin:users|get_blocked_users',
+	)
+}

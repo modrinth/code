@@ -24,6 +24,8 @@ import { LabrinthAttributionInternalModule } from './labrinth/attribution/intern
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
 import { LabrinthAuthV2Module } from './labrinth/auth/v2'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
+import { LabrinthBlockedUsersInternalModule } from './labrinth/blocked-users/internal'
+import { LabrinthBlockedUsersV3Module } from './labrinth/blocked-users/v3'
 import { LabrinthCampaignInternalModule } from './labrinth/campaign/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthContentV3Module } from './labrinth/content/v3'
@@ -100,6 +102,8 @@ export const MODULE_REGISTRY = {
 	labrinth_auth_v2: LabrinthAuthV2Module,
 	labrinth_attribution_internal: LabrinthAttributionInternalModule,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
+	labrinth_blocked_users_internal: LabrinthBlockedUsersInternalModule,
+	labrinth_blocked_users_v3: LabrinthBlockedUsersV3Module,
 	labrinth_campaign_internal: LabrinthCampaignInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_content_v3: LabrinthContentV3Module,

@@ -1691,6 +1691,18 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace BlockedUsers {
+		export namespace Internal {
+			export type BlockStatus = {
+				blocked: boolean
+			}
+		}
+
+		export namespace v3 {
+			export type BlockedUserId = string
+		}
+	}
+
 	export namespace ServerPing {
 		export namespace Internal {
 			export type MinecraftJavaPingRequest = {
