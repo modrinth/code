@@ -10,7 +10,6 @@ import {
 } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
-	ChangeSkinIcon,
 	CompassIcon,
 	HomeIcon,
 	LeftArrowIcon,
@@ -23,6 +22,7 @@ import {
 	RightArrowIcon,
 	ServerStackIcon,
 	SettingsIcon,
+	ShirtIcon,
 	UserIcon,
 } from '@modrinth/assets'
 import {
@@ -1518,7 +1518,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
-			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
+			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.25rem] w-[--left-bar-width]"
 		>
 			<NavButton v-tooltip.right="formatMessage(messages.home)" to="/">
 				<HomeIcon />
@@ -1532,7 +1532,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<CompassIcon />
 			</NavButton>
 			<NavButton v-tooltip.right="formatMessage(appMessages.skinSelectorLabel)" to="/skins">
-				<ChangeSkinIcon />
+				<ShirtIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(messages.library)"

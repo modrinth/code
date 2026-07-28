@@ -244,6 +244,7 @@ import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
 import _ShieldCheckIcon from './icons/shield-check.svg?component'
+import _ShirtIcon from './icons/shirt.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
 import _SignatureIcon from './icons/signature.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
@@ -676,6 +677,7 @@ export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon
 export const ShieldCheckIcon = _ShieldCheckIcon
+export const ShirtIcon = _ShirtIcon
 export const SignalIcon = _SignalIcon
 export const SignatureIcon = _SignatureIcon
 export const SkullIcon = _SkullIcon
