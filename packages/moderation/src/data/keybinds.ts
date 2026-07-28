@@ -32,7 +32,6 @@ const keybinds: { [id: string]: KeybindListener } = {
 		keybind: 'ArrowRight',
 		description: 'Go to next stage',
 		scope: 'checklist',
-		enabled: (ctx) => !ctx.state.isDone,
 		action: (ctx) => ctx.actions.tryGoNext(),
 	},
 	'previous-stage': {
