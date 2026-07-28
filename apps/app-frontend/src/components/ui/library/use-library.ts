@@ -437,10 +437,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			if (!dropState.canDrop || dropState.operation !== 'add') return
 
 			const count = activeInstanceGroupDrag.value?.instanceIds.length ?? 0
-			return count > 1 ? `Add ${count} instances to group` : 'Add to group'
+			return count > 1 ? `Duplicate ${count} instances to group` : 'Duplicate into group'
 		}
 
-		if (isAddingInstanceToGroup.value) return 'Add to group'
+		if (isAddingInstanceToGroup.value) return 'Duplicate to group'
 		return
 	})
 

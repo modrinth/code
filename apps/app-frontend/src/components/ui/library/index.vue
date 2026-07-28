@@ -9,7 +9,7 @@ import {
 	StopCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { toRef } from 'vue'
+import { computed, toRef } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
@@ -31,6 +31,12 @@ const {
 	deleteInstance,
 	handleInstanceOption,
 } = provideLibrary(toRef(props, 'instances'))
+
+const visibleInstanceGroups = computed(() =>
+	instanceGroups.value.filter(
+		(instanceGroup) => instanceGroup.key !== 'None' || instanceGroup.instances.length > 0,
+	),
+)
 </script>
 
 <template>
@@ -40,8 +46,9 @@ const {
 			<LibraryToolbar />
 			<div class="flex flex-col">
 				<InstanceGroup
-					v-for="instanceGroup in instanceGroups"
+					v-for="instanceGroup in visibleInstanceGroups"
 					:key="instanceGroup.id"
+					:hide-header="instanceGroup.key === 'None' && visibleInstanceGroups.length === 1"
 					:instance-group="instanceGroup"
 				/>
 			</div>

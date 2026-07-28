@@ -27,6 +27,14 @@ export const Default: Story = {}
 export const IconActivated: Story = {
 	args: {
 		activationMode: 'icon',
+		iconTextClass: '!text-brand',
+	},
+}
+
+export const CustomClasses: Story = {
+	args: {
+		buttonClass: '!rounded-lg !bg-surface-3 !px-2',
+		inputClass: '!text-brand',
 	},
 }
 

@@ -20,6 +20,7 @@
 				v-model="newGroupName"
 				placeholder="Enter group name"
 				:maxlength="32"
+				@click="groupNameInput?.select()"
 			/>
 			<span v-if="newGroupNameExists" class="text-sm font-medium text-red">
 				A group with this name already exists.
@@ -61,8 +62,8 @@
 						/>
 						<div class="flex min-w-0 items-center gap-2">
 							<span class="truncate font-semibold text-contrast">{{ instance.name }}</span>
-							<TagItem class="shrink-0">
-								{{ instance.groups[0] ?? 'Ungrouped' }}
+							<TagItem class="shrink-0" v-if="instance.groups[0]">
+								{{ instance.groups[0] }}
 							</TagItem>
 						</div>
 					</div>
@@ -105,16 +106,10 @@
 </template>
 
 <script setup lang="ts">
-import {
-	CheckIcon,
-	PlusIcon,
-	SearchIcon,
-	SpinnerIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { CheckIcon, PlusIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, NewModal, StyledInput, TagItem } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { nextTick, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
 
@@ -138,11 +133,6 @@ const groupNameInput = ref<InstanceType<typeof StyledInput>>()
 watch(isNewGroupModalOpen, (open) => {
 	if (open) {
 		modal.value?.show()
-		nextTick(() => {
-			setTimeout(() => {
-				groupNameInput.value?.select()
-			}, 100)
-		})
 	}
 })
 

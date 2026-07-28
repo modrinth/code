@@ -12,6 +12,9 @@ const props = withDefaults(
 		maxLength?: number
 		editLabel?: string
 		activationMode?: 'text' | 'icon'
+		inputClass?: string
+		buttonClass?: string
+		iconTextClass?: string
 		validate?: (value: string) => boolean
 		onChange?: (value: string) => boolean | void | Promise<boolean | void>
 	}>(),
@@ -193,6 +196,7 @@ defineExpose({
 			:maxlength="maxLength"
 			:placeholder="placeholder"
 			class="absolute inset-0 top-px w-full !h-full !min-h-0 min-w-0 truncate bg-transparent !p-0 text-inherit !border-b-2 border-0 !border-brand !border-solid !shadow-none [font:inherit] !outline-none"
+			:class="inputClass"
 			@blur="applyValue"
 			@click.stop
 			@keydown="handleKeydown"
@@ -203,7 +207,7 @@ defineExpose({
 			@mouseenter="showEditIcon"
 			@mouseleave="hideEditIcon"
 		>
-			<span class="min-w-0 truncate select-text" :title="model || displayValue">
+			<span class="min-w-0 truncate" :class="iconTextClass" :title="model || displayValue">
 				{{ displayValue }}
 			</span>
 			<span
@@ -230,6 +234,7 @@ defineExpose({
 			v-else
 			type="button"
 			class="flex w-full max-w-full items-center gap-2 truncate border-0 bg-transparent p-0 text-left text-inherit transition-colors hover:text-brand focus-visible:text-contrast [font:inherit]"
+			:class="buttonClass"
 			:aria-label="`${editLabel}: ${displayValue}`"
 			:title="model || displayValue"
 			@click="startEditing"

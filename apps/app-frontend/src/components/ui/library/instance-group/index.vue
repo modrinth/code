@@ -22,9 +22,15 @@ import type {
 } from '@/components/ui/library/use-library'
 import { useLibrary } from '@/components/ui/library/use-library'
 
-const props = defineProps<{
-	instanceGroup: InstanceGroupType
-}>()
+const props = withDefaults(
+	defineProps<{
+		hideHeader?: boolean
+		instanceGroup: InstanceGroupType
+	}>(),
+	{
+		hideHeader: false,
+	},
+)
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -231,6 +237,16 @@ watch(
 		groupName.value = value
 	},
 )
+
+watch(
+	() => props.hideHeader,
+	(hideHeader) => {
+		if (hideHeader) {
+			groupAccordion.value?.open()
+		}
+	},
+	{ flush: 'post' },
+)
 </script>
 
 <template>
@@ -256,6 +272,7 @@ watch(
 			/>
 		</Transition>
 		<div
+			v-if="!hideHeader"
 			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			@contextmenu.prevent.stop="openGroupContextMenu"
 		>
@@ -287,6 +304,7 @@ watch(
 					class="text-base font-semibold !h-10 text-primary select-none group-hover/open-target:text-contrast"
 					:edit-label="formatMessage(commonMessages.renameButton)"
 					max-width="24rem"
+					icon-text-class="select-none"
 					:max-length="32"
 					:on-change="updateGroupName"
 					:validate="validateGroupName"
@@ -320,13 +338,13 @@ watch(
 		</div>
 		<Accordion
 			ref="groupAccordion"
-			:open-by-default="!isSectionCollapsed(instanceGroup.key)"
+			:open-by-default="hideHeader || !isSectionCollapsed(instanceGroup.key)"
 			class="w-full"
 			@on-open="setSectionCollapsed(instanceGroup.key, false)"
 			@on-close="setSectionCollapsed(instanceGroup.key, true)"
 		>
 			<section
-				class="grid min-h-[45px] mt-3 w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
+				class="grid min-h-[45px] mt-2.5 w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
 			>
 				<div v-for="instance in instanceGroup.instances" :key="instance.id" class="min-w-0 w-full">
 					<Instance
