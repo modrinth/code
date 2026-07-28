@@ -26,9 +26,11 @@ const props = withDefaults(
 	defineProps<{
 		hideHeader?: boolean
 		instanceGroup: InstanceGroupType
+		selectionAnchorInstanceId?: string | null
 	}>(),
 	{
 		hideHeader: false,
+		selectionAnchorInstanceId: null,
 	},
 )
 
@@ -62,6 +64,10 @@ const isGroupToggleBlocked = computed(
 )
 let shouldSkipGroupToggle = false
 let groupToggleEventToSkip: MouseEvent | undefined
+
+const emit = defineEmits<{
+	(e: 'toggle-selection', instanceId: string, shiftKey: boolean): void
+}>()
 
 useDroppable({
 	id: computed(() => `instance-group:${props.instanceGroup.id}`),
@@ -351,6 +357,10 @@ watch(
 						:ref="(component: unknown) => setInstanceComponent(instance.id, component)"
 						:instance="instance"
 						:instance-group-name="instanceGroup.key"
+						:is-selection-anchor="selectionAnchorInstanceId === instance.id"
+						@toggle-selection="
+							(shiftKey: boolean) => emit('toggle-selection', instance.id, shiftKey)
+						"
 						@contextmenu.prevent.stop="
 							(event: MouseEvent) => openInstanceContextMenu(event, instance.id, instanceGroup.key)
 						"

@@ -3,6 +3,7 @@ import { useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { useMagicKeys } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -30,12 +31,16 @@ const {
 	selectedLibraryInstanceIds,
 	isLibraryInstanceSelectionActive,
 	activeDraggedInstanceIds,
-	toggleLibraryInstanceSelection,
 } = useLibrary()
 
 const props = defineProps<{
 	instance: GameInstance
 	instanceGroupName: string
+	isSelectionAnchor?: boolean
+}>()
+
+const emit = defineEmits<{
+	(e: 'toggle-selection', shiftKey: boolean): void
 }>()
 
 const instanceCard = ref<HTMLElement | null>(null)
@@ -51,6 +56,8 @@ const modLoading = computed(
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
 const selected = computed(() => selectedLibraryInstanceIds.value.has(props.instance.id))
+const keys = useMagicKeys()
+const holdingShift = computed(() => keys.shift.value)
 const isPartOfActiveDrag = computed(() => activeDraggedInstanceIds.value.has(props.instance.id))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupName}:${props.instance.id}`),
@@ -79,13 +86,13 @@ const seeInstance = async () => {
 	await router.push(`/instance/${encodeURIComponent(props.instance.id)}`)
 }
 
-const toggleSelection = () => {
-	toggleLibraryInstanceSelection(props.instance.id)
+const toggleSelection = (event?: MouseEvent) => {
+	emit('toggle-selection', event?.shiftKey ?? false)
 }
 
-const activateCard = () => {
-	if (isLibraryInstanceSelectionActive.value) {
-		toggleSelection()
+const activateCard = (event: MouseEvent) => {
+	if (isLibraryInstanceSelectionActive.value || event.shiftKey) {
+		toggleSelection(event)
 	} else {
 		void seeInstance()
 	}
@@ -96,7 +103,11 @@ const handleCardKeydown = (event: KeyboardEvent) => {
 
 	if (event.key === 'Enter') {
 		event.preventDefault()
-		activateCard()
+		if (isLibraryInstanceSelectionActive.value) {
+			toggleSelection()
+		} else {
+			void seeInstance()
+		}
 	} else if (event.key === ' ' && isLibraryInstanceSelectionActive.value) {
 		event.preventDefault()
 		toggleSelection()
@@ -239,6 +250,8 @@ onUnmounted(() => unlisten())
 				:class="{
 					'border-0 bg-primary !opacity-100': selected,
 					'border-2 border-solid border-primary bg-transparent': !selected,
+					'[outline:3px_solid_var(--color-purple)] outline-offset-1':
+						holdingShift && selected && isSelectionAnchor,
 				}"
 			>
 				<CheckIcon v-if="selected" class="size-4 invert [stroke-width:3] top-px" />

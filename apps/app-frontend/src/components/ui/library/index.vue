@@ -9,7 +9,7 @@ import {
 	StopCircleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, toRef } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
@@ -30,12 +30,73 @@ const {
 	confirmDeleteModal,
 	deleteInstance,
 	handleInstanceOption,
+	selectedLibraryInstanceIds,
+	setSelectedLibraryInstanceIds,
+	toggleLibraryInstanceSelection,
 } = provideLibrary(toRef(props, 'instances'))
 
 const visibleInstanceGroups = computed(() =>
 	instanceGroups.value.filter(
 		(instanceGroup) => instanceGroup.key !== 'None' || instanceGroup.instances.length > 0,
 	),
+)
+
+const anchorInstance = ref<{ groupId: string; instanceId: string } | null>(null)
+
+function handleToggleInstance(groupId: string, instanceId: string, shiftKey: boolean) {
+	const displayedInstances = visibleInstanceGroups.value.flatMap((group) =>
+		group.instances.map((instance) => ({
+			groupId: group.id,
+			instanceId: instance.id,
+		})),
+	)
+	const anchor = anchorInstance.value
+
+	if (shiftKey && anchor && displayedInstances.length) {
+		const anchorIndex = displayedInstances.findIndex(
+			(instance) =>
+				instance.groupId === anchor.groupId && instance.instanceId === anchor.instanceId,
+		)
+		const targetIndex = displayedInstances.findIndex(
+			(instance) => instance.groupId === groupId && instance.instanceId === instanceId,
+		)
+
+		if (anchorIndex === -1 || targetIndex === -1) {
+			toggleLibraryInstanceSelection(instanceId)
+			return
+		}
+
+		const start = Math.min(anchorIndex, targetIndex)
+		const end = Math.max(anchorIndex, targetIndex)
+		const range = displayedInstances.slice(start, end + 1)
+		const nextSelectedIds = new Set(selectedLibraryInstanceIds.value)
+
+		if (nextSelectedIds.has(instanceId)) {
+			for (const instance of range) {
+				nextSelectedIds.delete(instance.instanceId)
+			}
+		} else {
+			for (const instance of range) {
+				nextSelectedIds.add(instance.instanceId)
+			}
+		}
+
+		setSelectedLibraryInstanceIds(nextSelectedIds)
+		anchorInstance.value = null
+		return
+	}
+
+	toggleLibraryInstanceSelection(instanceId)
+	anchorInstance.value = { groupId, instanceId }
+}
+
+watch(
+	() => selectedLibraryInstanceIds.value.size,
+	(selectedInstanceCount) => {
+		if (selectedInstanceCount === 0) {
+			anchorInstance.value = null
+		}
+	},
 )
 </script>
 
@@ -50,6 +111,13 @@ const visibleInstanceGroups = computed(() =>
 					:key="instanceGroup.id"
 					:hide-header="instanceGroup.key === 'None' && visibleInstanceGroups.length === 1"
 					:instance-group="instanceGroup"
+					:selection-anchor-instance-id="
+						anchorInstance?.groupId === instanceGroup.id ? anchorInstance.instanceId : null
+					"
+					@toggle-selection="
+						(instanceId: string, shiftKey: boolean) =>
+							handleToggleInstance(instanceGroup.id, instanceId, shiftKey)
+					"
 				/>
 			</div>
 		</section>
