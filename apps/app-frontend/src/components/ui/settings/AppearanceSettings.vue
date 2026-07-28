@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Combobox, defineMessages, ThemeSelector, Toggle, useVIntl } from '@modrinth/ui'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
 import { getOS } from '@/helpers/utils'
@@ -123,6 +123,11 @@ const messages = defineMessages({
 
 const os = ref(await getOS())
 const settings = ref(await get())
+const themeOptions = computed(() =>
+	themeStore
+		.getThemeOptions()
+		.filter((theme) => theme !== 'retro' || themeStore.devMode || settings.value.theme === 'retro'),
+)
 
 watch(
 	settings,
@@ -146,7 +151,7 @@ watch(
 			}
 		"
 		:current-theme="settings.theme"
-		:theme-options="themeStore.getThemeOptions()"
+		:theme-options="themeOptions"
 		system-theme-color="system"
 	/>
 
