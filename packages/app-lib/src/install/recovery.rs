@@ -262,29 +262,51 @@ async fn copy_symlink(source: &Path, target: &Path) -> crate::Result<()> {
 pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
     let jobs = store::list_interrupted_candidates(state).await?;
 
-    for mut job in jobs {
-        if job.state.display.is_none() {
-            job.state.display = display_from_request(&job.state);
+    for job in jobs {
+        let job_id = job.id;
+        if let Err(error) = recover_interrupted_job(job, state).await {
+            tracing::error!(
+                "Error recovering interrupted install job {job_id}: {error}"
+            );
         }
-        let interrupted_phase = job.state.progress.phase;
-        job.state.record_event(InstallJobEventKind::Interrupted {
-            reason: InstallInterruptReason::AppClosed,
-            phase: interrupted_phase,
-        });
-        job.state.progress.phase = InstallPhaseId::RollingBack;
-        job.state.progress.progress = None;
-        job.state.progress.details = InstallPhaseDetails::Empty;
-        job.state.error = Some(InstallErrorView::from_message(
-            "app_closed",
-            interrupted_phase,
-            "App closed while install was running",
-        ));
+    }
 
-        job.state
-            .record_event(InstallJobEventKind::RollbackStarted {
-                cleanup: job.state.cleanup.clone(),
-            });
-        if let Err(error) = apply_cleanup(&job.state, state).await {
+    Ok(())
+}
+
+async fn recover_interrupted_job(
+    mut job: store::InstallJobRecord,
+    state: &State,
+) -> crate::Result<()> {
+    if job.state.display.is_none() {
+        job.state.display = display_from_request(&job.state);
+    }
+    let interrupted_phase = job.state.progress.phase;
+    job.state.record_event(InstallJobEventKind::Interrupted {
+        reason: InstallInterruptReason::AppClosed,
+        phase: interrupted_phase,
+    });
+    job.state.progress.phase = InstallPhaseId::RollingBack;
+    job.state.progress.progress = None;
+    job.state.progress.details = InstallPhaseDetails::Empty;
+    job.state.error = Some(InstallErrorView::from_message(
+        "app_closed",
+        interrupted_phase,
+        "App closed while install was running",
+    ));
+
+    job.state
+        .record_event(InstallJobEventKind::RollbackStarted {
+            cleanup: job.state.cleanup.clone(),
+        });
+    let cleanup_succeeded = match apply_cleanup(&job.state, state).await {
+        Ok(()) => {
+            job.state
+                .record_event(InstallJobEventKind::RollbackCompleted);
+            clear_deleted_new_instance_id(&mut job.state);
+            true
+        }
+        Err(error) => {
             tracing::error!(
                 "Error cleaning up interrupted install job {}: {error}",
                 job.id
@@ -298,20 +320,19 @@ pub async fn recover_interrupted_jobs(state: &State) -> crate::Result<()> {
             job.state.record_event(InstallJobEventKind::RollbackFailed {
                 message: error.to_string(),
             });
-        } else {
-            job.state
-                .record_event(InstallJobEventKind::RollbackCompleted);
+            false
         }
-        clear_deleted_new_instance_id(&mut job.state);
+    };
 
-        let record = store::update_status(
-            job.id,
-            InstallJobStatus::Interrupted,
-            &job.state,
-            state,
-        )
-        .await?;
-        if job.state.rollback_error.is_none() {
+    if let Some(record) = store::finish_active(
+        job.id,
+        InstallJobStatus::Interrupted,
+        &job.state,
+        state,
+    )
+    .await?
+    {
+        if cleanup_succeeded {
             clear_staging_dir(&job.state).await;
         }
         emit_install_job(&record.snapshot()).await?;
@@ -383,10 +404,20 @@ pub async fn apply_cleanup(
     match &job_state.cleanup {
         InstallCleanup::DeleteNewInstance { instance_id } => {
             if let Some(instance_id) = instance_id {
-                let _ = crate::state::remove_instance(instance_id, state).await;
-                let _ =
+                if crate::state::get_instance(instance_id, &state.pool)
+                    .await?
+                    .is_some()
+                {
+                    crate::state::remove_instance(instance_id, state).await?;
+                }
+                if let Err(error) =
                     emit_instance(instance_id, InstancePayloadType::Removed)
-                        .await;
+                        .await
+                {
+                    tracing::warn!(
+                        "Failed to emit removed instance {instance_id}: {error}"
+                    );
+                }
             }
         }
         InstallCleanup::RestoreExistingInstance { instance_id } => {
@@ -410,7 +441,14 @@ pub async fn apply_cleanup(
                     )
                     .await?;
                 }
-                emit_instance(instance_id, InstancePayloadType::Edited).await?;
+                if let Err(error) =
+                    emit_instance(instance_id, InstancePayloadType::Edited)
+                        .await
+                {
+                    tracing::warn!(
+                        "Failed to emit restored instance {instance_id}: {error}"
+                    );
+                }
             }
         }
     }

@@ -1220,51 +1220,6 @@
   "muralpay.field.phone-number": {
     "message": "Broj telefona"
   },
-  "profile.button.analytics": {
-    "message": "Pregled analitike korisnika"
-  },
-  "profile.button.billing": {
-    "message": "Upravljaj naplatom korisnika"
-  },
-  "profile.button.info": {
-    "message": "Prikaži podatke o korisniku"
-  },
-  "profile.button.manage-projects": {
-    "message": "Upravljaj projektima"
-  },
-  "profile.error.not-found": {
-    "message": "Korisnik nije pronađen"
-  },
-  "profile.label.badges": {
-    "message": "Bedževi"
-  },
-  "profile.label.no-collections": {
-    "message": "Ovaj korisnik nema kolekcija!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Nemaš nijednu kolekciju.\nDa li želiš da <create-link>kreiraš jednu</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Ovaj korisnik nema projekata!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Nemaš nijedan projekat.\nDa li želiš da <create-link>kreiraš jedan</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizacije"
-  },
-  "profile.meta.description": {
-    "message": "Preuzmi projekte korisnika {username} na Modrinthu"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Preuzmi projekte korisnika {username} na Modrinthu"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> pratilac projekta} few {<stat>{count}</stat> pratioca projekta} other {<stat>{count}</stat> pratilaca projekta}}"
-  },
-  "profile.user-id": {
-    "message": "ID korisnika: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Neuspešno odbijanje poziva tima"
   },
@@ -1723,9 +1678,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "O ovoj aplikaciji"
-  },
-  "settings.authorizations.by": {
-    "message": "od"
   },
   "settings.authorizations.revoke.action": {
     "message": "Oduzmi"

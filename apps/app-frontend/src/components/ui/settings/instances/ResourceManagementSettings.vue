@@ -6,6 +6,7 @@ import {
 	injectNotificationManager,
 	Slider,
 	StyledInput,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -22,6 +23,7 @@ const { formatMessage } = useVIntl()
 const themeStore = useTheming()
 const settings = ref(await get())
 const purgeCacheConfirmModal = ref(null)
+const alwaysShowCopyDetailsFlag = 'always_show_copy_details'
 
 const messages = defineMessages({
 	appDirectoryTitle: {
@@ -79,6 +81,15 @@ const messages = defineMessages({
 		id: 'app.settings.resource-management.maximum-concurrent-writes.description',
 		defaultMessage:
 			'Number of files the app can write to disk at once. Lower this if you frequently encounter I/O errors. Requires an app restart.',
+	},
+	alwaysShowCopyDetailsTitle: {
+		id: 'app.settings.resource-management.always-show-copy-details.title',
+		defaultMessage: 'Always show copy details',
+	},
+	alwaysShowCopyDetailsDescription: {
+		id: 'app.settings.resource-management.always-show-copy-details.description',
+		defaultMessage:
+			'Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs.',
 	},
 	appDatabaseBackupsTitle: {
 		id: 'app.settings.resource-management.app-database-backups.title',
@@ -187,6 +198,28 @@ async function findLauncherDir() {
 			<p class="m-0 leading-tight text-secondary">
 				{{ formatMessage(messages.appDirectoryDescription) }}
 			</p>
+		</div>
+
+		<div class="flex items-center justify-between gap-4">
+			<div>
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.alwaysShowCopyDetailsTitle) }}
+				</h2>
+				<p class="m-0 mt-1">
+					{{ formatMessage(messages.alwaysShowCopyDetailsDescription) }}
+				</p>
+			</div>
+			<Toggle
+				id="always-show-copy-details"
+				:model-value="themeStore.getFeatureFlag(alwaysShowCopyDetailsFlag)"
+				@update:model-value="
+					() => {
+						const newValue = !themeStore.getFeatureFlag(alwaysShowCopyDetailsFlag)
+						themeStore.featureFlags[alwaysShowCopyDetailsFlag] = newValue
+						settings.feature_flags[alwaysShowCopyDetailsFlag] = newValue
+					}
+				"
+			/>
 		</div>
 
 		<div class="flex flex-col gap-2.5">

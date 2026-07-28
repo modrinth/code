@@ -863,6 +863,12 @@
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetry"
   },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Always show copy details"
+  },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "The app may load more slowly until the cache is rebuilt."
   },

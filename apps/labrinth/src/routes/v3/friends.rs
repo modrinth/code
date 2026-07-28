@@ -1,5 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
+use crate::database::models::blocked_user_item::DBBlockedUser;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::models::{DBUser, DBUserId};
 use crate::models::pats::Scopes;
@@ -48,6 +49,18 @@ pub async fn add_friend(
     let Some(friend) = DBUser::get(&string, &**pool, &redis).await? else {
         return Err(ApiError::NotFound);
     };
+
+    if DBBlockedUser::is_blocked(friend.id, user.id.into(), &**pool).await? {
+        return Err(ApiError::InvalidInput(
+            "You've been blocked the other user!".to_string(),
+        ));
+    } else if DBBlockedUser::is_blocked(user.id.into(), friend.id, &**pool)
+        .await?
+    {
+        return Err(ApiError::InvalidInput(
+            "You've blocked the other user!".to_string(),
+        ));
+    }
 
     let mut transaction = pool.begin().await?;
 

@@ -260,7 +260,10 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		owner: item.owner
 			? {
 					...item.owner,
-					link: `https://modrinth.com/${item.owner.type}/${item.owner.id}`,
+					link:
+						item.owner.type === 'user'
+							? `/user/${encodeURIComponent(item.owner.id)}`
+							: `https://modrinth.com/organization/${item.owner.id}`,
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),

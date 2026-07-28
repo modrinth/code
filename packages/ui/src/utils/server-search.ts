@@ -157,7 +157,7 @@ export function useServerSearch(opts: {
 					supported_project_types: ['server'],
 					display: 'all',
 					query_param: 'sc',
-					supports_negative_filter: true,
+					supports: ['include', 'exclude'],
 					searchable: false,
 					options: [],
 				}
@@ -204,7 +204,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sct',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: false,
 				options: [
 					{
@@ -250,7 +250,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'scrollable',
 				query_param: 'sgv',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: true,
 				options: (tags.value?.gameVersions ?? []).map((gv) => ({
 					id: gv.version,
@@ -271,7 +271,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sr',
-				supports_negative_filter: true,
+				supports: ['include', 'exclude'],
 				searchable: false,
 				options: sortedRegions.map(([code, name]) => ({
 					id: code,
@@ -291,7 +291,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'scrollable',
 				query_param: 'sl',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: true,
 				options: sortedLanguages.map(([code, name]) => ({
 					id: code,
@@ -312,7 +312,7 @@ export function useServerSearch(opts: {
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sst',
-				supports_negative_filter: false,
+				supports: ['include'],
 				searchable: false,
 				options: [
 					{

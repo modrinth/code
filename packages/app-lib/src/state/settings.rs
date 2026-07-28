@@ -65,6 +65,7 @@ pub enum FeatureFlag {
     ShowInstancePlayTime,
     SkipNonEssentialWarnings,
     AdvancedFiltersCollapsed,
+    AlwaysShowCopyDetails,
 }
 
 impl Settings {
@@ -328,6 +329,7 @@ pub enum Theme {
     Dark,
     Light,
     Oled,
+    Retro,
     System,
 }
 
@@ -337,6 +339,7 @@ impl Theme {
             Theme::Dark => "dark",
             Theme::Light => "light",
             Theme::Oled => "oled",
+            Theme::Retro => "retro",
             Theme::System => "system",
         }
     }
@@ -346,6 +349,7 @@ impl Theme {
             "dark" => Theme::Dark,
             "light" => Theme::Light,
             "oled" => Theme::Oled,
+            "retro" => Theme::Retro,
             "system" => Theme::System,
             _ => Theme::Dark,
         }

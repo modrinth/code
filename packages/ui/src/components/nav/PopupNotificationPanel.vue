@@ -52,6 +52,7 @@
 							:progress-current="progressItem.progressCurrent"
 							:progress-total="progressItem.progressTotal"
 							:actions="progressItem.buttons"
+							:dismissible="progressItem.dismissible"
 							@dismiss="handleProgressItemDismiss(item, progressItem)"
 							@action="(index) => handleProgressItemAction(progressItem, index)"
 						/>

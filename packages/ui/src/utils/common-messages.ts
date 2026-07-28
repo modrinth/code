@@ -287,6 +287,10 @@ export const commonMessages = defineMessages({
 		id: 'label.scopes',
 		defaultMessage: 'Scopes',
 	},
+	permissionsLabel: {
+		id: 'label.permissions',
+		defaultMessage: 'Permissions',
+	},
 	searchLabel: {
 		id: 'label.search',
 		defaultMessage: 'Search',
