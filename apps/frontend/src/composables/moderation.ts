@@ -1,7 +1,7 @@
-import {type KeybindDefinition, Keybinds, Settings,} from '@modrinth/moderation'
+import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation'
+import { computed } from 'vue'
 
-import type {CookieOptions} from '#app'
-import {computed} from "vue";
+import type { CookieOptions } from '#app'
 
 const moderationKeybindsId = 'moderation-keybinds'
 const moderationSettingsId = 'moderation-settings'
@@ -9,8 +9,8 @@ const moderationSettingsId = 'moderation-settings'
 type StoredKeybinds = { [id: string]: KeybindDefinition[] }
 type StoredSettings = { [id: string]: any }
 type StoredOptions = {
-	keybinds: Partial<StoredKeybinds>,
-	settings: Partial<StoredSettings>,
+	keybinds: Partial<StoredKeybinds>
+	settings: Partial<StoredSettings>
 }
 
 const getCookieOptions = <T>() =>
@@ -23,13 +23,16 @@ const getCookieOptions = <T>() =>
 	}) satisfies CookieOptions<T>
 
 const useModerationCookies = () => {
-	const keybindCookie = useCookie<Partial<StoredKeybinds> | null>(moderationKeybindsId, getCookieOptions())
+	const keybindCookie = useCookie<Partial<StoredKeybinds> | null>(
+		moderationKeybindsId,
+		getCookieOptions(),
+	)
 	const optionsCookie = useCookie<Partial<StoredOptions>>(moderationSettingsId, getCookieOptions())
 
 	if (keybindCookie.value && !optionsCookie.value) {
 		optionsCookie.value = {
 			keybinds: keybindCookie.value,
-			settings: {}
+			settings: {},
 		}
 		keybindCookie.value = null
 	} else if (keybindCookie.value && optionsCookie.value) {
@@ -40,7 +43,7 @@ const useModerationCookies = () => {
 }
 
 const useModerationOptions = () =>
-	useState<{ keybinds: StoredKeybinds, settings: StoredSettings, }>(moderationKeybindsId, () => {
+	useState<{ keybinds: StoredKeybinds; settings: StoredSettings }>(moderationKeybindsId, () => {
 		const cookie = useModerationCookies()
 
 		const keybindOutput: StoredKeybinds = {}
@@ -61,13 +64,11 @@ const useModerationOptions = () =>
 		}
 	})
 
-export const useModerationKeybinds = () => computed(() =>
-	new Keybinds(useModerationOptions().value.keybinds)
-)
+export const useModerationKeybinds = () =>
+	computed(() => new Keybinds(useModerationOptions().value.keybinds))
 
-export const useModerationSettings = () => computed(() =>
-	new Settings(useModerationOptions().value.settings, saveModerationOptions)
-)
+export const useModerationSettings = () =>
+	computed(() => new Settings(useModerationOptions().value.settings, saveModerationOptions))
 
 export const saveModerationOptions = () => {
 	const options = useModerationOptions()

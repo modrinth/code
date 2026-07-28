@@ -1,7 +1,4 @@
-import type {
-	EnumSettingDefinition,
-	ToggleSettingDefinition
-} from "../types/settings.ts";
+import type { EnumSettingDefinition, ToggleSettingDefinition } from '../types/settings.ts'
 
 const settings = {
 	General: {
@@ -29,8 +26,8 @@ const settings = {
 			title: 'Highlight Private Messages',
 			description: 'Whether private messages should be highlighted in the chat.',
 			default: true,
-		} as ToggleSettingDefinition
-	}
+		} as ToggleSettingDefinition,
+	},
 } as const
 
 export default settings

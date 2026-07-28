@@ -13,11 +13,11 @@
 		tabindex="0"
 		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
 		:class="{
-		'!w-fit': collapsed,
-		 locked: isLockedByOther,
-		 'right-4': settings.get(moderationSettings.General.ChecklistPosition) === 'right',
-		 'left-4': settings.get(moderationSettings.General.ChecklistPosition) === 'left',
-	}"
+			'!w-fit': collapsed,
+			locked: isLockedByOther,
+			'right-4': settings.get(moderationSettings.General.ChecklistPosition) === 'right',
+			'left-4': settings.get(moderationSettings.General.ChecklistPosition) === 'left',
+		}"
 	>
 		<div class="flex grow-0 flex-col gap-1">
 			<div class="flex items-center gap-2">
@@ -382,8 +382,8 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	moderationSettings,
 	type IdentifiedNodeBuilder,
+	moderationSettings,
 	type NodeState,
 	type Priority,
 	type StageNodeBuilder,
@@ -1221,45 +1221,42 @@ interface MessagePart {
 }
 
 function handleKeybinds(event: KeyboardEvent) {
-	keybinds.value.handle(
-		event,
-		{
-			project: projectV2.value,
-			scope: 'checklist',
-			state: {
-				currentStage: currentStage.value,
-				totalStages: resolvedStages.value.length,
-				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value.label,
+	keybinds.value.handle(event, {
+		project: projectV2.value,
+		scope: 'checklist',
+		state: {
+			currentStage: currentStage.value,
+			totalStages: resolvedStages.value.length,
+			currentStageId: currentStageObj.value.id,
+			currentStageTitle: currentStageObj.value.label,
 
-				isCollapsed: props.collapsed,
-				isDone: done.value,
-				hasGeneratedMessage: generatedMessage.value,
-				isLoadingMessage: loadingMessage.value,
+			isCollapsed: props.collapsed,
+			isDone: done.value,
+			hasGeneratedMessage: generatedMessage.value,
+			isLoadingMessage: loadingMessage.value,
 
-				futureProjectCount: moderationQueue.queueLength,
-				visibleActionsCount: resolveChildren(
-					currentStageObj.value,
-					nodeStates.value[currentStageObj.value.id!] ?? {},
-				).filter((c) => c instanceof NodeBuilder).length,
-			},
-			actions: {
-				tryGoNext: nextStage,
-				tryGoBack: previousStage,
-				tryGenerateMessage: generateMessage,
-				trySkipProject: skipCurrentProject,
-
-				tryToggleCollapse: () => emit('toggleCollapsed'),
-				tryResetProgress: resetProgress,
-				tryExitModeration: handleExit,
-
-				tryApprove: () => sendMessage(approveSendStatus.value),
-				tryReject: () => sendMessage('rejected'),
-				tryWithhold: () => sendMessage('withheld'),
-				tryEditMessage: previousStage,
-			},
+			futureProjectCount: moderationQueue.queueLength,
+			visibleActionsCount: resolveChildren(
+				currentStageObj.value,
+				nodeStates.value[currentStageObj.value.id!] ?? {},
+			).filter((c) => c instanceof NodeBuilder).length,
 		},
-	)
+		actions: {
+			tryGoNext: nextStage,
+			tryGoBack: previousStage,
+			tryGenerateMessage: generateMessage,
+			trySkipProject: skipCurrentProject,
+
+			tryToggleCollapse: () => emit('toggleCollapsed'),
+			tryResetProgress: resetProgress,
+			tryExitModeration: handleExit,
+
+			tryApprove: () => sendMessage(approveSendStatus.value),
+			tryReject: () => sendMessage('rejected'),
+			tryWithhold: () => sendMessage('withheld'),
+			tryEditMessage: previousStage,
+		},
+	})
 }
 
 // Trigger debounced prefetch when user progresses through stages

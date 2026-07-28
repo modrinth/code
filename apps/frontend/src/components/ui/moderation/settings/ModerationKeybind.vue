@@ -1,11 +1,14 @@
 <template>
 	<div>
-		<span class="flex flex-row text-sm text-secondary items-center gap-2">
-			<GlobeIcon v-if="props.global" v-tooltip="'Can be used without the checklist open if setting enabled.'"/>
+		<span class="flex flex-row items-center gap-2 text-sm text-secondary">
+			<GlobeIcon
+				v-if="props.global"
+				v-tooltip="'Can be used without the checklist open if setting enabled.'"
+			/>
 			{{ props.title }}
 			<ButtonStyled size="small" circular type="transparent">
 				<Button :disabled="!hasChanged" @click="resetToDefault">
-					<RotateCounterClockwiseIcon/>
+					<RotateCounterClockwiseIcon />
 				</Button>
 			</ButtonStyled>
 		</span>
@@ -14,20 +17,20 @@
 				v-if="definitions.length === 0"
 				ref="keybinding"
 				class="cursor-pointer border-2 !text-lg font-bold text-secondary"
-				:class="{editing: editing === 0}"
+				:class="{ editing: editing === 0 }"
 				@click="startEditing(0)"
 			>
 				Not Bound
 			</kbd>
 			<kbd
-				v-else
 				v-for="(definition, index) in definitions"
+				v-else
 				:key="`keybind-${index}`"
 				ref="keybinding"
 				class="cursor-pointer border-2 !text-lg font-bold"
 				:class="{
-				editing: editing === index,
-			}"
+					editing: editing === index,
+				}"
 				@click="startEditing(index)"
 			>
 				{{ toDisplay(definition) }}
@@ -37,26 +40,25 @@
 </template>
 
 <script setup lang="ts">
-import {
-	type KeybindDefinition,
-	toKeybindDefinition
-} from '@modrinth/moderation'
-import {onUnmounted} from 'vue'
-import {Button, ButtonStyled} from "@modrinth/ui";
-import {RotateCounterClockwiseIcon, GlobeIcon} from "@modrinth/assets";
+import { GlobeIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
+import { type KeybindDefinition, toKeybindDefinition } from '@modrinth/moderation'
+import { Button, ButtonStyled } from '@modrinth/ui'
+import { onUnmounted } from 'vue'
 
 const props = defineProps<{
-	title: string,
-	global: boolean,
-	definitions: KeybindDefinition[],
-	default: KeybindDefinition[],
+	title: string
+	global: boolean
+	definitions: KeybindDefinition[]
+	default: KeybindDefinition[]
 	onChange: (definitions: KeybindDefinition[]) => void
 }>()
 
 const keybinding = useTemplateRef('keybinding')
 const definitions = ref(JSON.parse(JSON.stringify(props.definitions)))
 const editing = ref(-1)
-const hasChanged = computed(() => JSON.stringify(definitions.value) !== JSON.stringify(props.default))
+const hasChanged = computed(
+	() => JSON.stringify(definitions.value) !== JSON.stringify(props.default),
+)
 const isMac = ref(false)
 
 function startEditing(index: number) {
@@ -82,7 +84,9 @@ function resetToDefault() {
 
 function handleMouse(event: MouseEvent) {
 	if (keybinding.value && event.target && event.target instanceof Node && editing.value != -1) {
-		const editingRef = Array.isArray(keybinding.value) ? keybinding.value[editing.value] : keybinding.value
+		const editingRef = Array.isArray(keybinding.value)
+			? keybinding.value[editing.value]
+			: keybinding.value
 		if (editingRef === event.target || editingRef.contains(event.target)) {
 			return
 		}

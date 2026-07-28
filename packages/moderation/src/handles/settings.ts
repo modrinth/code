@@ -1,10 +1,13 @@
-import type {SettingDefinitionBase} from "../types/settings.ts";
+import type { SettingDefinitionBase } from '../types/settings.ts'
 
 export class Settings {
 	private readonly settings: { [id: string]: any }
 	private readonly onChange: () => void
 
-	constructor(settings: { [id: string]: any } | undefined = undefined, onChange: () => void = () => {}) {
+	constructor(
+		settings: { [id: string]: any } | undefined = undefined,
+		onChange: () => void = () => {},
+	) {
 		this.settings = settings || {}
 		this.onChange = onChange
 	}

@@ -1,17 +1,22 @@
 import {
-	type KeybindDefinition, type KeybindListener, matchesKeybind,
-	type ModerationContext, normalizeKeybind
-} from "../types/keybinds.ts";
-import keybinds from "../data/keybinds.ts";
+	type KeybindDefinition,
+	type KeybindListener,
+	matchesKeybind,
+	type ModerationContext,
+	normalizeKeybind,
+} from '../types/keybinds.ts'
+import keybinds from '../data/keybinds.ts'
 
-function normalizeKeybinds(keybind: KeybindDefinition | KeybindDefinition[] | string | string[]): KeybindDefinition[] {
+function normalizeKeybinds(
+	keybind: KeybindDefinition | KeybindDefinition[] | string | string[],
+): KeybindDefinition[] {
 	return Array.isArray(keybind) ? keybind.map(normalizeKeybind) : [normalizeKeybind(keybind)]
 }
 
 export type KeybindListenerWithDefault = KeybindListener & {
-	keybind: KeybindDefinition[],
-	defaultKeybind: KeybindDefinition[],
-};
+	keybind: KeybindDefinition[]
+	defaultKeybind: KeybindDefinition[]
+}
 
 export class Keybinds {
 	private readonly configured: { [id: string]: KeybindDefinition[] } = {}
@@ -20,13 +25,16 @@ export class Keybinds {
 		this.configured = keybinds
 	}
 
-	* [Symbol.iterator](): IterableIterator<[string, KeybindListenerWithDefault]> {
+	*[Symbol.iterator](): IterableIterator<[string, KeybindListenerWithDefault]> {
 		for (const [id, keybind] of Object.entries(keybinds)) {
-			yield [id, {
-				...keybind,
-				keybind: this.configured[id] ?? normalizeKeybinds(keybind.keybind),
-				defaultKeybind: normalizeKeybinds(keybind.keybind),
-			}]
+			yield [
+				id,
+				{
+					...keybind,
+					keybind: this.configured[id] ?? normalizeKeybinds(keybind.keybind),
+					defaultKeybind: normalizeKeybinds(keybind.keybind),
+				},
+			]
 		}
 	}
 
@@ -71,5 +79,4 @@ export class Keybinds {
 
 		return false
 	}
-
 }

@@ -102,7 +102,8 @@ import {
 	KeyIcon,
 	LanguagesIcon,
 	MonitorSmartphoneIcon,
-	PaintbrushIcon, ScaleIcon,
+	PaintbrushIcon,
+	ScaleIcon,
 	ServerIcon,
 	ShieldIcon,
 	ToggleRightIcon,
@@ -115,9 +116,9 @@ import {
 	NormalPage,
 	useVIntl,
 } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
-import {isStaff} from "@modrinth/utils";
 
 const { formatMessage } = useVIntl()
 

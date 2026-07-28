@@ -501,6 +501,7 @@ import {
 	SettingsIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	Admonition,
 	Avatar,
@@ -531,8 +532,7 @@ import {
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
-import {formatProjectType, isStaff} from '@modrinth/utils'
-import { moderationSettings } from '@modrinth/moderation'
+import { formatProjectType, isStaff } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
@@ -1971,15 +1971,16 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeybinds))
 
 function handleKeybinds(event) {
 	if (!isStaff(auth.value.user)) return
-	if (!showModerationChecklist.value && !modSettings.value.get(moderationSettings.General.ProjectKeybinds)) return
-
-	keybinds.value.handle(
-		event,
-		{
-			project: projectRaw.value,
-			scope: 'project',
-		},
+	if (
+		!showModerationChecklist.value &&
+		!modSettings.value.get(moderationSettings.General.ProjectKeybinds)
 	)
+		return
+
+	keybinds.value.handle(event, {
+		project: projectRaw.value,
+		scope: 'project',
+	})
 }
 
 const navLinks = computed(() => {

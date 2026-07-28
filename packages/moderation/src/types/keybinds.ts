@@ -40,8 +40,8 @@ export type ModerationProjectContext = {
 export type ModerationChecklistContext = {
 	project: Labrinth.Projects.v2.Project
 	scope: 'checklist'
-	state: ModerationState,
-	actions: ModerationActions,
+	state: ModerationState
+	actions: ModerationActions
 }
 
 export type ModerationContext = ModerationProjectContext | ModerationChecklistContext
@@ -63,8 +63,12 @@ export type BaseKeybindListener<T> = {
 	action: (ctx: T) => void
 }
 
-export type KeybindProjectListener = BaseKeybindListener<ModerationProjectContext> & { scope: 'project' }
-export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistContext> & { scope: 'checklist' }
+export type KeybindProjectListener = BaseKeybindListener<ModerationProjectContext> & {
+	scope: 'project'
+}
+export type KeybindChecklistListener = BaseKeybindListener<ModerationChecklistContext> & {
+	scope: 'checklist'
+}
 export type KeybindListener = KeybindProjectListener | KeybindChecklistListener
 
 export function parseKeybind(keybindString: string): KeybindDefinition {

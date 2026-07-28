@@ -5,7 +5,7 @@ const copyProjectLink = async (
 	project: Labrinth.Projects.v2.Project,
 	permalink: boolean,
 	relative: boolean,
-	page: boolean
+	page: boolean,
 ) => {
 	let url = ``
 	if (relative) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ModerationKeybinds from "~/components/ui/moderation/settings/ModerationKeybinds.vue";
-import ModerationSettings from "~/components/ui/moderation/settings/ModerationSettings.vue";
+import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
+import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 
 useSeoMeta({
 	robots: 'noindex',
@@ -8,6 +8,6 @@ useSeoMeta({
 </script>
 
 <template>
-	<ModerationKeybinds/>
-	<ModerationSettings/>
+	<ModerationKeybinds />
+	<ModerationSettings />
 </template>

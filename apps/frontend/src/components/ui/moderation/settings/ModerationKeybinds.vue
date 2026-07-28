@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ModerationKeybind from "~/components/ui/moderation/settings/ModerationKeybind.vue";
+import ModerationKeybind from '~/components/ui/moderation/settings/ModerationKeybind.vue'
 
 const keybinds = useModerationKeybinds()
 </script>
@@ -16,11 +16,11 @@ const keybinds = useModerationKeybinds()
 				:definitions="keybind.keybind"
 				:default="keybind.defaultKeybind"
 				:on-change="
-							(definitions) => {
-								keybinds.set(id, definitions)
-								saveModerationOptions()
-							}
-						"
+					(definitions) => {
+						keybinds.set(id, definitions)
+						saveModerationOptions()
+					}
+				"
 			/>
 		</div>
 	</div>

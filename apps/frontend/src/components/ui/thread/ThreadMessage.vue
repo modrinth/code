@@ -149,6 +149,7 @@ import {
 	ScaleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	AutoLink,
 	Avatar,
@@ -158,7 +159,6 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { moderationSettings } from '@modrinth/moderation'
 import { renderString } from '@modrinth/utils'
 
 import { isStaff } from '~/helpers/users.js'
