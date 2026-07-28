@@ -56,8 +56,16 @@ import {
 	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/state'
+
+useRootBreadcrumb({
+	slot: 'root',
+	id: 'skins',
+	label: 'Skin selector',
+	to: '/skins',
+})
 
 type UnlistenFn = () => void
 type VirtualSkinSectionListExpose = {

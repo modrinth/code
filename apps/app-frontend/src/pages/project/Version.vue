@@ -95,12 +95,12 @@ import {
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, shallowRef, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons'
 import { get_project_many, get_version_many } from '@/helpers/cache.js'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumb } from '@/providers/breadcrumbs'
 
 const { formatMessage } = useVIntl()
 
@@ -119,8 +119,18 @@ const messages = defineMessages({
 	},
 })
 
-const breadcrumbs = useBreadcrumbs()
 const route = useRoute()
+const router = useRouter()
+const displayedVersionRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.name === 'Version') {
+			displayedVersionRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
 
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project
@@ -133,9 +143,33 @@ const props = defineProps<{
 }>()
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
-if (version.value) {
-	breadcrumbs.setName('Version', version.value.name)
-}
+const versionsBreadcrumb = useBreadcrumb({
+	slot: 'project-section',
+	id: () => `project-versions:${props.project.id}`,
+	label: 'Versions',
+	to: () => ({
+		name: 'Versions',
+		params: { id: props.project.id },
+		query: displayedVersionRoute.value.query,
+	}),
+})
+useBreadcrumb(
+	{
+		slot: 'project-version',
+		id: () =>
+			`version:${props.project.id}:${String(
+				displayedVersionRoute.value.params.version ?? '',
+			)}`,
+		label: () =>
+			version.value?.name ??
+			String(
+				displayedVersionRoute.value.params.version ??
+					formatMessage(commonMessages.loadingLabel),
+			),
+		to: () => displayedVersionRoute.value.fullPath,
+	},
+	{ parent: versionsBreadcrumb },
+)
 
 const enrichment = ref<Labrinth.Projects.v2.DependencyInfo | undefined>(undefined)
 const enrichmentLoading = ref(false)
@@ -203,13 +237,10 @@ async function refreshEnrichment() {
 }
 
 watch(
-	() => props.versions,
+	[() => props.versions, () => route.params.version],
 	async () => {
 		if (route.params.version) {
 			version.value = props.versions.find((v) => v.id === route.params.version)
-			if (version.value) {
-				breadcrumbs.setName('Version', version.value.name)
-			}
 			await refreshEnrichment()
 		}
 	},

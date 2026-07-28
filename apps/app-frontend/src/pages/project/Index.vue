@@ -298,7 +298,10 @@ import { getServerAddress } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { createServerInstallContent } from '@/providers/setup/server-install-content'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import {
+	provideBreadcrumbParent,
+	useBreadcrumb,
+} from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -307,8 +310,17 @@ const { handleError } = injectNotificationManager()
 const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
+const displayedProjectRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.path.startsWith('/project/')) {
+			displayedProjectRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
 const queryClient = useQueryClient()
-const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
 
@@ -331,6 +343,21 @@ const { installingServerProjects, playServerProject, showAddServerToInstanceModa
 	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
+const projectBreadcrumbLabel = ref(
+	String(route.params.id ?? formatMessage(commonMessages.loadingLabel)),
+)
+const projectBreadcrumb = useBreadcrumb({
+	slot: 'project',
+	id: () => `project:${String(displayedProjectRoute.value.params.id ?? '')}`,
+	label: projectBreadcrumbLabel,
+	to: () => ({
+		name: 'Description',
+		params: { id: displayedProjectRoute.value.params.id },
+		query: displayedProjectRoute.value.query,
+	}),
+})
+provideBreadcrumbParent(projectBreadcrumb)
+
 const versions = shallowRef([])
 const members = shallowRef([])
 const categories = shallowRef([])
@@ -607,6 +634,9 @@ function reportProject() {
 }
 
 async function fetchProjectData() {
+	projectBreadcrumbLabel.value = String(
+		route.params.id ?? formatMessage(commonMessages.loadingLabel),
+	)
 	const [project, projectV3Result] = await Promise.all([
 		get_project(route.params.id, 'must_revalidate').catch(handleError),
 		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),
@@ -619,6 +649,7 @@ async function fetchProjectData() {
 	}
 
 	data.value = project
+	projectBreadcrumbLabel.value = project.title
 	;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
 		await Promise.all([
 			get_version_many(project.versions, 'must_revalidate').catch(handleError),
@@ -646,8 +677,6 @@ async function fetchProjectData() {
 
 	isServerProject.value = projectV3.value?.minecraft_server != null
 	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
-
-	breadcrumbs.setName('Project', data.value.title)
 
 	fetchDeferredServerData(project)
 }

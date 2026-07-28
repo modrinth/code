@@ -15,26 +15,26 @@
 			:class="{ 'breadcrumbs-scroll': isAnimating }"
 			@animationiteration="onAnimationIteration"
 		>
-			{{ breadcrumbData.resetToNames(breadcrumbs) }}
-			<template v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name">
+			<template v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.slot">
 				<router-link
-					v-if="breadcrumb.link"
-					:to="{
-						path: breadcrumb.link.replace('{id}', encodeURIComponent($route.params.id as string)),
-						query: breadcrumb.query,
-					}"
+					v-if="index < breadcrumbs.length - 1 && breadcrumb.to"
+					:to="breadcrumb.to"
 					class="shrink-0 whitespace-nowrap text-primary"
 				>
-					{{ resolveLabel(breadcrumb.name) }}
+					{{ breadcrumb.label }}
 				</router-link>
 				<span
 					v-else
 					data-tauri-drag-region
 					class="shrink-0 whitespace-nowrap text-contrast font-semibold cursor-default select-none"
 				>
-					{{ resolveLabel(breadcrumb.name) }}
+					{{ breadcrumb.label }}
 				</span>
-				<ChevronRightIcon v-if="breadcrumb.link" data-tauri-drag-region class="w-5 h-5 shrink-0" />
+				<ChevronRightIcon
+					v-if="index < breadcrumbs.length - 1"
+					data-tauri-drag-region
+					class="w-5 h-5 shrink-0"
+				/>
 			</template>
 		</div>
 	</div>
@@ -42,34 +42,11 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { injectBreadcrumbManager } from '@/providers/breadcrumbs'
 
-interface Breadcrumb {
-	name: string
-	link?: string
-	query?: Record<string, string>
-}
-
-const route = useRoute()
-const breadcrumbData = useBreadcrumbs()
-
-const breadcrumbs = computed<Breadcrumb[]>(() => {
-	const additionalContext =
-		route.meta.useContext === true
-			? breadcrumbData.context
-			: route.meta.useRootContext === true
-				? breadcrumbData.rootContext
-				: null
-	const crumbs = (route.meta.breadcrumb ?? []) as Breadcrumb[]
-	return additionalContext ? [additionalContext as Breadcrumb, ...crumbs] : crumbs
-})
-
-function resolveLabel(name: string): string {
-	return name.charAt(0) === '?' ? breadcrumbData.getName(name.slice(1)) : name
-}
+const { entries: breadcrumbs } = injectBreadcrumbManager()
 
 // Overflow detection
 const outerRef = ref<HTMLDivElement | null>(null)

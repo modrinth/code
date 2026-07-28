@@ -7,14 +7,18 @@ import { useRoute } from 'vue-router'
 import { NewInstanceImage } from '@/assets/icons'
 import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
-import { useBreadcrumbs } from '@/store/breadcrumbs.js'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 const { handleError } = injectNotificationManager()
 const showCreationModal = inject('showCreationModal')
 const route = useRoute()
-const breadcrumbs = useBreadcrumbs()
 
-breadcrumbs.setRootContext({ name: 'Library', link: route.path })
+useRootBreadcrumb({
+	slot: 'root',
+	id: 'library',
+	label: 'Library',
+	to: '/library',
+})
 
 const instances = shallowRef(await list().catch(handleError))
 

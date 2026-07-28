@@ -31,9 +31,9 @@ import {
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Ref } from 'vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
@@ -58,7 +58,10 @@ import {
 	createServerInstallContent,
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import {
+	useBreadcrumb,
+	useRootBreadcrumb,
+} from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
@@ -71,6 +74,16 @@ const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
+const displayedBrowseRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(nextRoute) => {
+		if (nextRoute.path.startsWith('/browse/')) {
+			displayedBrowseRoute.value = nextRoute
+		}
+	},
+	{ immediate: true },
+)
 const themeStore = useTheming()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
@@ -111,25 +124,6 @@ const {
 	markServerProjectInstalled,
 } = serverInstallContent
 
-debugLog('fetching tags (categories, loaders, gameVersions)')
-const [categories, loaders, availableGameVersions] = await Promise.all([
-	get_categories()
-		.catch(handleError)
-		.then(ref<Labrinth.Tags.v2.Category[]>),
-	get_loaders()
-		.catch(handleError)
-		.then(ref<Labrinth.Tags.v2.Loader[]>),
-	get_game_versions()
-		.catch(handleError)
-		.then(ref<Labrinth.Tags.v2.GameVersion[]>),
-])
-
-const tags: Ref<Tags> = computed(() => ({
-	gameVersions: availableGameVersions.value ?? [],
-	loaders: loaders.value ?? [],
-	categories: categories.value ?? [],
-}))
-
 type Instance = {
 	game_version: string
 	loader: string
@@ -151,6 +145,92 @@ const newlyInstalled = ref<string[]>([])
 const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
 const hiddenInstanceProjectIdsInitialized = ref(false)
 const isServerInstance = ref(false)
+
+const breadcrumbLabel = ref(
+	displayedBrowseRoute.value.query.from === 'worlds'
+		? 'Discover servers'
+		: 'Discover content',
+)
+const instanceBreadcrumb = route.query.i
+	? useBreadcrumb({
+			slot: 'instance',
+			id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
+			label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+			to: () =>
+				`/instance/${encodeURIComponent(String(displayedBrowseRoute.value.query.i ?? ''))}`,
+		})
+	: undefined
+const instanceSectionBreadcrumb = instanceBreadcrumb
+	? useBreadcrumb(
+			{
+				slot: 'instance-section',
+				id: () =>
+					`instance-section:${String(displayedBrowseRoute.value.query.i ?? '')}:${
+						displayedBrowseRoute.value.query.from === 'worlds' ? 'worlds' : 'content'
+					}`,
+				label: () =>
+					displayedBrowseRoute.value.query.from === 'worlds' ? 'Worlds' : 'Content',
+				to: () => {
+					const instancePath = `/instance/${encodeURIComponent(
+						String(displayedBrowseRoute.value.query.i ?? ''),
+					)}`
+					return displayedBrowseRoute.value.query.from === 'worlds'
+						? `${instancePath}/worlds`
+						: instancePath
+				},
+			},
+			{ parent: instanceBreadcrumb },
+		)
+	: undefined
+const serverBreadcrumbTo = ref(serverBackUrl.value)
+watch(serverBackUrl, (value) => {
+	if (route.path.startsWith('/browse/')) {
+		serverBreadcrumbTo.value = value
+	}
+})
+const serverBreadcrumb = !instanceBreadcrumb && serverIdQuery.value
+	? useBreadcrumb({
+			slot: 'server',
+			id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
+			label: () =>
+				serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
+			to: serverBreadcrumbTo,
+		})
+	: undefined
+const breadcrumbParent = instanceSectionBreadcrumb ?? serverBreadcrumb
+const breadcrumbDefinition = {
+	slot: 'browse',
+	id: () =>
+		`browse:${String(displayedBrowseRoute.value.params.projectType ?? '')}:${String(
+			displayedBrowseRoute.value.query.i ?? '',
+		)}:${String(displayedBrowseRoute.value.query.sid ?? '')}:${String(
+			displayedBrowseRoute.value.query.from ?? '',
+		)}`,
+	label: breadcrumbLabel,
+	to: () => displayedBrowseRoute.value.fullPath,
+}
+const browseBreadcrumb = breadcrumbParent
+	? useBreadcrumb(breadcrumbDefinition, { parent: breadcrumbParent })
+	: useRootBreadcrumb(breadcrumbDefinition)
+
+debugLog('fetching tags (categories, loaders, gameVersions)')
+const [categories, loaders, availableGameVersions] = await Promise.all([
+	get_categories()
+		.catch(handleError)
+		.then(ref<Labrinth.Tags.v2.Category[]>),
+	get_loaders()
+		.catch(handleError)
+		.then(ref<Labrinth.Tags.v2.Loader[]>),
+	get_game_versions()
+		.catch(handleError)
+		.then(ref<Labrinth.Tags.v2.GameVersion[]>),
+])
+
+const tags: Ref<Tags> = computed(() => ({
+	gameVersions: availableGameVersions.value ?? [],
+	loaders: loaders.value ?? [],
+	categories: categories.value ?? [],
+}))
 
 if (isFromWorlds.value && route.params.projectType !== 'server') {
 	router.replace({
@@ -448,28 +528,16 @@ const messages = defineMessages({
 	},
 })
 
-const breadcrumbs = useBreadcrumbs()
 const browseTitle = computed(() =>
 	formatMessage(isFromWorlds.value ? messages.discoverServers : messages.discoverContent),
 )
-breadcrumbs.setName('BrowseTitle', browseTitle.value)
-if (instance.value) {
-	const instanceLink = `/instance/${encodeURIComponent(instance.value.id)}`
-	breadcrumbs.setContext({
-		name: instance.value.name,
-		link: isFromWorlds.value ? `${instanceLink}/worlds` : instanceLink,
-	})
-} else {
-	breadcrumbs.setContext(null)
-}
-
-onBeforeRouteLeave(() => {
-	breadcrumbs.setContext({
-		name: browseTitle.value,
-		link: `/browse/${projectType.value}`,
-		query: route.query,
-	})
-})
+watch(
+	browseTitle,
+	(value) => {
+		breadcrumbLabel.value = value
+	},
+	{ immediate: true },
+)
 
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 
@@ -484,8 +552,7 @@ function resetInstanceContext() {
 	hiddenInstanceProjectIds.value = new Set()
 	hiddenInstanceProjectIdsInitialized.value = false
 	isServerInstance.value = false
-	breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
-	breadcrumbs.setContext(null)
+	browseBreadcrumb.reset()
 }
 
 watch(

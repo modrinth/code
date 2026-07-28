@@ -4,11 +4,20 @@ import { injectModrinthClient, ServersManagePageIndex } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+
 import { config } from '../config'
 
 const stripePublishableKey = (config.stripePublishableKey as string) || ''
 
 const client = injectModrinthClient()
+
+useRootBreadcrumb({
+	slot: 'root',
+	id: 'servers',
+	label: 'Servers',
+	to: '/hosting/manage/',
+})
 
 const { data: products } = useQuery({
 	queryKey: ['billing', 'products'],

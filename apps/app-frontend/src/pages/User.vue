@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 
 import {
@@ -24,11 +24,10 @@ import {
 	get_user_projects,
 	patch_user,
 } from '@/helpers/users'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 const route = useRoute()
 const queryClient = useQueryClient()
-const breadcrumbs = useBreadcrumbs()
 const userProfile = provideUserProfile({
 	getUser: get_user_profile,
 	getProjects: get_user_projects,
@@ -46,17 +45,43 @@ const projectType = computed(() => {
 	return Array.isArray(value) ? value[0] : value
 })
 
+const { data: user } = useQuery({
+	queryKey: computed(() => ['user', userId.value]),
+	queryFn: () => userProfile.getUser(userId.value),
+	enabled: false,
+	staleTime: 30_000,
+})
+
+const breadcrumbUserId = ref(userId.value)
+const breadcrumbLabel = ref(userId.value)
+const breadcrumbTo = ref(route.fullPath)
+watch(
+	[userId, user, () => route.fullPath],
+	([currentUserId, currentUser, currentPath]) => {
+		if (route.name !== 'User') return
+		breadcrumbUserId.value = currentUserId
+		breadcrumbLabel.value = currentUser?.username ?? currentUserId
+		breadcrumbTo.value = currentPath
+	},
+	{ immediate: true, flush: 'sync' },
+)
+
+useRootBreadcrumb({
+	slot: 'root',
+	id: () => `user:${breadcrumbUserId.value}`,
+	label: breadcrumbLabel,
+	to: breadcrumbTo,
+})
+
 async function ensureUserProfileData(id: string): Promise<void> {
 	if (!id) return
 
-	let breadcrumbName = id
 	try {
-		const user = await queryClient.ensureQueryData({
+		await queryClient.ensureQueryData({
 			queryKey: ['user', id],
 			queryFn: () => userProfile.getUser(id),
 			staleTime: 30_000,
 		})
-		breadcrumbName = user.username
 	} catch {
 		// Let the mounted layout's useQuery surface errors; do not fail route setup.
 	}
@@ -78,8 +103,6 @@ async function ensureUserProfileData(id: string): Promise<void> {
 			staleTime: 30_000,
 		}),
 	])
-
-	breadcrumbs.setName('User', breadcrumbName)
 }
 
 onBeforeRouteUpdate(async (to) => {
@@ -88,21 +111,5 @@ onBeforeRouteUpdate(async (to) => {
 	await ensureUserProfileData(id)
 })
 
-breadcrumbs.setName('User', userId.value)
 await ensureUserProfileData(userId.value)
-
-const { data: user } = useQuery({
-	queryKey: computed(() => ['user', userId.value]),
-	queryFn: () => userProfile.getUser(userId.value),
-	enabled: false,
-	staleTime: 30_000,
-})
-
-watch(
-	[userId, user],
-	([currentUserId, value]) => {
-		breadcrumbs.setName('User', value?.username ?? currentUserId)
-	},
-	{ immediate: true },
-)
 </script>
