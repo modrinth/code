@@ -542,7 +542,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	}
 
 	useEventListener(window, 'keydown', (event) => {
-		if (event.key === 'Escape' && isLibraryInstanceSelectionActive.value) {
+		if (
+			event.key === 'Escape' &&
+			!event.defaultPrevented &&
+			isLibraryInstanceSelectionActive.value
+		) {
 			clearLibraryInstanceSelection()
 		}
 	})

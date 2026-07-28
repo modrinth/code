@@ -20,7 +20,7 @@ type InstanceDragData = {
 	fromGroup: string
 }
 
-type InstanceGroupDropData = {
+type InstanceGroupDndDropData = {
 	groupName: string
 }
 
@@ -133,12 +133,12 @@ function handleDragMove(event: DragMoveEvent) {
 }
 
 function handleDragOver(event: DragOverEvent) {
-	const targetData = event.operation.target?.data as InstanceGroupDropData | undefined
+	const targetData = event.operation.target?.data as InstanceGroupDndDropData | undefined
 	setInstanceGroupDragTarget(targetData?.groupName ?? null)
 }
 
 function handleDragEnd(event: DragEndEvent) {
-	const targetData = event.operation.target?.data as InstanceGroupDropData | undefined
+	const targetData = event.operation.target?.data as InstanceGroupDndDropData | undefined
 	if (!event.canceled && targetData) {
 		const dropState = getInstanceGroupDropState(targetData.groupName)
 		if (dropState.canDrop) {

@@ -13,7 +13,7 @@ import { computed, ref, toRef, watch } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
-import GroupDnd from '@/components/ui/library/instance-group/group-dnd.vue'
+import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
 import { provideLibrary } from '@/components/ui/library/use-library'
@@ -101,7 +101,7 @@ watch(
 </script>
 
 <template>
-	<GroupDnd :instances="instances">
+	<InstanceGroupDnd :instances="instances">
 		<section class="flex flex-col gap-3 pb-16">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Library</h2>
 			<LibraryToolbar />
@@ -121,7 +121,7 @@ watch(
 				/>
 			</div>
 		</section>
-	</GroupDnd>
+	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />
 	<ConfirmDeleteInstanceModal ref="confirmDeleteModal" @delete="deleteInstance" />
 	<ContextMenu ref="instanceOptions" @option-clicked="handleInstanceOption">

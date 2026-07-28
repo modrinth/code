@@ -208,11 +208,13 @@ onUnmounted(() => unlisten())
 <template>
 	<div
 		ref="instanceCard"
-		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all hover:brightness-110 active:scale-[0.98] select-none"
+		class="group/card relative flex min-h-[76px] w-full cursor-pointer items-center justify-center gap-2 -outline-offset-2 overflow-clip focus-visible:!outline-2 rounded-[20px] border border-solid border-surface-4 bg-surface-3 p-4 text-left transition-all hover:brightness-110 select-none"
 		:class="{
 			'border-primary': selected,
 			'!scale-100': isDragging,
 			'opacity-50': isPartOfActiveDrag,
+			'[&:active:not(:has(.selection-button:active))]:scale-[0.95]':
+				!isLibraryInstanceSelectionActive,
 		}"
 		data-library-instance-card
 		:data-instance-id="instance.id"
@@ -239,7 +241,7 @@ onUnmounted(() => unlisten())
 		/>
 		<button
 			type="button"
-			class="group/selection absolute right-0 top-0 z-[2] flex size-[50px] h-full cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
+			class="selection-button group/selection absolute right-0 top-0 z-[2] flex size-[50px] h-full cursor-pointer items-start pt-4 justify-center border-0 bg-transparent p-0"
 			:aria-label="selected ? 'Deselect instance' : 'Select instance'"
 			:aria-pressed="selected"
 			@click.stop="toggleSelection"
