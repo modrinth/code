@@ -11,6 +11,7 @@ import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
 import type { BusyReason, CancelUploadHandler, ServerStats } from '../providers/server-context'
 import { defineMessage } from './i18n'
+import { useServerInstallationTracker } from './server-installation-tracker'
 import { useModrinthServersConsole } from './server-console'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
@@ -26,7 +27,6 @@ type UseServerManageCoreRuntimeOptions = {
 	worldId: ReadableRef<string | null>
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
 	serverFull?: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
-	isSyncingContent: ReadableRef<boolean>
 	extraBusyReasons?: ComputedRef<BusyReason[]>
 	setDisconnectedOnAuthIncorrect?: boolean
 	syncUptimeFromState?: boolean
@@ -96,7 +96,19 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const fsAuth = ref<{ url: string; token: string } | null>(null)
 	const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 	const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
-	const installProgressItems = ref<Archon.Websocket.v0.InstallProgressItem[]>([])
+	const {
+		begin: beginInstallation,
+		cancelOptimistic: cancelOptimisticInstallation,
+		dismiss: dismissInstallation,
+		handleProgress: handleInstallProgress,
+		installation,
+		installProgressItems,
+		isBlocking: isInstallationBlocking,
+		reset: resetInstallation,
+	} = useServerInstallationTracker({
+		worldId: options.worldId,
+		server: options.server,
+	})
 	const connectedSocketServerId = ref<string | null>(null)
 	const socketUnsubscribers = ref<SocketUnsubscriber[]>([])
 	const cpuData = ref<number[]>([])
@@ -108,19 +120,11 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	const busyReasons = computed<BusyReason[]>(() => {
 		const reasons: BusyReason[] = []
-		if (options.server.value?.status === 'installing') {
+		if (isInstallationBlocking.value) {
 			reasons.push({
 				reason: defineMessage({
 					id: 'servers.busy.installing',
 					defaultMessage: 'Server is installing',
-				}),
-			})
-		}
-		if (options.isSyncingContent.value) {
-			reasons.push({
-				reason: defineMessage({
-					id: 'servers.busy.syncing-content',
-					defaultMessage: 'Content sync in progress',
 				}),
 			})
 		}
@@ -266,9 +270,9 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		startUptimeTicker()
 	}
 
-	const handleInstallProgress = (data: Archon.Websocket.v0.WSInstallProgressEvent) => {
+	const handleInstallProgressEvent = (data: Archon.Websocket.v0.WSInstallProgressEvent) => {
 		if (!shouldProcessEvent()) return
-		installProgressItems.value = data.items
+		handleInstallProgress(data.items)
 	}
 
 	const handleAuthIncorrect = () => {
@@ -307,7 +311,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		serverPowerState.value = 'stopped'
 		powerStateDetails.value = undefined
 		uptimeSeconds.value = 0
-		installProgressItems.value = []
+		resetInstallation()
 	}
 
 	const connectSocket = async (
@@ -331,7 +335,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 				client.archon.sockets.on(targetServerId, 'state', handleState),
 				client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),
 				client.archon.sockets.on(targetServerId, 'uptime', handleUptime),
-				client.archon.sockets.on(targetServerId, 'install-progress', handleInstallProgress),
+				client.archon.sockets.on(targetServerId, 'install-progress', handleInstallProgressEvent),
 				client.archon.sockets.on(targetServerId, 'auth-incorrect', handleAuthIncorrect),
 				client.archon.sockets.on(targetServerId, 'auth-ok', handleAuthOk),
 			]
@@ -413,7 +417,10 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		stats,
 		uptimeSeconds,
 		installProgressItems,
-		isSyncingContent: options.isSyncingContent as Ref<boolean>,
+		installation,
+		beginInstallation,
+		cancelOptimisticInstallation,
+		dismissInstallation,
 		busyReasons,
 		fsAuth,
 		fsOps,
@@ -434,17 +441,21 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	return {
 		activeOperations,
+		beginInstallation,
 		busyReasons,
 		cancelUpload,
+		cancelOptimisticInstallation,
 		cleanupCoreRuntime,
 		connectSocket,
 		connectedSocketServerId,
 		cpuData,
 		disconnectSocket,
+		dismissInstallation,
 		dismissOperation,
 		fsAuth,
 		fsOps,
 		fsQueuedOps,
+		installation,
 		isConnected,
 		isServerRunning,
 		isWsAuthIncorrect,

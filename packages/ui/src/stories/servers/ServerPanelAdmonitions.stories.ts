@@ -89,7 +89,10 @@ const meta = {
 					stats,
 					uptimeSeconds: ref(0),
 					installProgressItems: ref<Archon.Websocket.v0.InstallProgressItem[]>([]),
-					isSyncingContent: ref(false),
+					installation: computed(() => null),
+					beginInstallation: () => {},
+					cancelOptimisticInstallation: () => {},
+					dismissInstallation: () => {},
 					busyReasons: computed(() => [
 						{ reason: defineMessage({ id: 's.bg', defaultMessage: 'Background task running' }) },
 					]),
