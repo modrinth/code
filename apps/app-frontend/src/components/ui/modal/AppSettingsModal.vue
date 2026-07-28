@@ -3,6 +3,7 @@ import {
 	CoffeeIcon,
 	GameIcon,
 	GaugeIcon,
+	HeartHandshakeIcon,
 	LanguagesIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
@@ -24,6 +25,7 @@ import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/
 import { computed, ref, watch } from 'vue'
 
 import PrivacySettings from '@/components/ui/settings/account/PrivacySettings.vue'
+import SafetySettings from '@/components/ui/settings/account/SafetySettings.vue'
 import AppearanceSettings from '@/components/ui/settings/display/AppearanceSettings.vue'
 import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
@@ -97,6 +99,15 @@ const tabs = [
 		icon: ToggleRightIcon,
 		content: FeatureFlagSettings,
 		developerOnly: true,
+	},
+	{
+		name: defineMessage({
+			id: 'app.settings.tabs.safety',
+			defaultMessage: 'Safety',
+		}),
+		category: tabCategories.account,
+		icon: HeartHandshakeIcon,
+		content: SafetySettings,
 	},
 	{
 		name: defineMessage({
