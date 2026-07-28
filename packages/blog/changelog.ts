@@ -10,62 +10,62 @@ export type VersionEntry = {
 }
 
 const VERSIONS: VersionEntry[] = [
-	// 	{
-	// 		date: `2026-07-28T20:40:11+00:00`,
-	// 		product: 'app',
-	// 		version: '0.17.0',
-	// 		body: `## Added
-	// - Added user pages.
-	// - Added a banner for users of a shared instance which let's them know that they need to review an update to play the instance - alongside the existing checks when you click Play.
-	// - Added a way to see and manage the invite links you have created for a shared instance in the Sharing tab of the Instance Settings modal.
-	// - Added a way to see where a shared instance content is coming from when in the Install to play modal, either the linked modpack or if it was added on top. Content which is a part of the linked modpack will show the modpack information underneath it's name.
-	// - Added user blocking
-	// 	- You can block users on their profile page.
-	// 	- You can block users when reporting a shared instance. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
-	// 	- You can manage who you've blocked in the new Social settings in the app's Settings menu, or on the Modrinth website.
-	// - Added the ability to edit your Modrinth profile in the app's Settings menu.
-	// - Added the ability to adjust the amount of quick instances shown in the sidebar by dragging the divider up and down.
-	// - Added an option to always show "Copy details" on the installation job notifications, rather than just on failed and interrupted instance install jobs.
-	//
-	// ## Changed
-	// - More than three instances now show up in the left sidebar's quick instance selection area for larger window sizes.
-	// - Updated Modrinth App logo to just use the standard Modrinth logo to save space.
-	// - Updated the design of the back/forward buttons.
-	// - Clicking on friends in the friends list will take you to their profile page.
-	// - Limited shared instances to 50 users.
-	// - Changed the expiry date picker in the shared instance invite edit modal to be a dropdown of common dates, rather than a complicated date picker. You can still use the fine-grained date picker by choosing "Custom"
-	// - Instance icons must now be smaller than 4MB - any existing instances will have their icons compressed to 512x512px size to conform to the new limit. This will break any instances which have .GIF icons.
-	// - Split up the App Settings modal into categories.
-	// - Moved out behavioural settings into it's own subpage, rather than being in Appearance settings.
-	// - Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
-	// - Re-aligned the traffic light buttons on macOS with the top bar.
-	// - Updated translations. Want to help translate the Modrinth App? [Click here](https://translate.modrinth.com)
-	//
-	// ## Fixed
-	// - Fixed issue where when browsing content for an instance, when visiting a project page and going back to search, it would reset the page back to one.
-	// - Refactored how breadcrumbs work in the app, this should solve many issues you might have encountered using the back and forward navigation buttons in the app header.
-	// - Fixed error spam when the shared instances API is not accessible, it will cleanly provide feedback that the app cannot connect.`,
-	// 	},
-	// 	{
-	// 		date: `2026-07-28T20:40:11+00:00`,
-	// 		product: 'web',
-	// 		body: `## Added
-	// - You can now block users on their profile page. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
-	// - Added new social settings page, where you can manage users you have blocked and in the future set who can send you friend requests and invitations to shared instances and Modrinth Hosting server panels.
-	//
-	// ## Changed
-	// - Cleaned up the layout of and renamed the Public profile settings page to Profile settings.
-	// - Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
-	// - Updated translations. Want to help translate Modrinth's website? [Click here](https://translate.modrinth.com)
-	//
-	// ## Fixed
-	// - Fixed profile pictures still being deleted after resetting a pending removal in Profile settings.
-	// - Fixed shared instance reports not showing up in the dashboard's Reports page.
-	// - Fixed shared instance report emails saying "Unknown" rather than the shared instance's name.
-	// - Fixed the settings page for Authorized apps being broken.
-	// - Broken Retro theme colors
-	// - Improved vertical alignment of status indicators in notifications.`,
-	// 	},
+	{
+		date: `2026-07-28T20:40:11+00:00`,
+		product: 'app',
+		version: '0.17.1',
+		body: `## Added
+	- Added user pages.
+	- Added a banner for users of a shared instance which let's them know that they need to review an update to play the instance - alongside the existing checks when you click Play.
+	- Added a way to see and manage the invite links you have created for a shared instance in the Sharing tab of the Instance Settings modal.
+	- Added a way to see where a shared instance content is coming from when in the Install to play modal, either the linked modpack or if it was added on top. Content which is a part of the linked modpack will show the modpack information underneath it's name.
+	- Added user blocking
+		- You can block users on their profile page.
+		- You can block users when reporting a shared instance. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
+		- You can manage who you've blocked in the new Social settings in the app's Settings menu, or on the Modrinth website.
+	- Added the ability to edit your Modrinth profile in the app's Settings menu.
+	- Added the ability to adjust the amount of quick instances shown in the sidebar by dragging the divider up and down.
+	- Added an option to always show "Copy details" on the installation job notifications, rather than just on failed and interrupted instance install jobs.
+
+	## Changed
+	- More than three instances now show up in the left sidebar's quick instance selection area for larger window sizes.
+	- Updated Modrinth App logo to just use the standard Modrinth logo to save space.
+	- Updated the design of the back/forward buttons.
+	- Clicking on friends in the friends list will take you to their profile page.
+	- Limited shared instances to 50 users.
+	- Changed the expiry date picker in the shared instance invite edit modal to be a dropdown of common dates, rather than a complicated date picker. You can still use the fine-grained date picker by choosing "Custom"
+	- Instance icons must now be smaller than 4MB - any existing instances will have their icons compressed to 512x512px size to conform to the new limit. This will break any instances which have .GIF icons.
+	- Split up the App Settings modal into categories.
+	- Moved out behavioural settings into it's own subpage, rather than being in Appearance settings.
+	- Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
+	- Re-aligned the traffic light buttons on macOS with the top bar.
+	- Updated translations. Want to help translate the Modrinth App? [Click here](https://translate.modrinth.com)
+
+	## Fixed
+	- Fixed issue where when browsing content for an instance, when visiting a project page and going back to search, it would reset the page back to one.
+	- Refactored how breadcrumbs work in the app, this should solve many issues you might have encountered using the back and forward navigation buttons in the app header.
+	- Fixed error spam when the shared instances API is not accessible, it will cleanly provide feedback that the app cannot connect.`,
+	},
+	{
+		date: `2026-07-28T20:40:11+00:00`,
+		product: 'web',
+		body: `## Added
+	- You can now block users on their profile page. This prevents the user from sending you invites to shared instances and Modrinth Hosting server panels.
+	- Added new social settings page, where you can manage users you have blocked and in the future set who can send you friend requests and invitations to shared instances and Modrinth Hosting server panels.
+
+	## Changed
+	- Cleaned up the layout of and renamed the Public profile settings page to Profile settings.
+	- Updated "Advanced" toggle filter design to be the same as the other filters, just with only an exclude button as the primary action.
+	- Updated translations. Want to help translate Modrinth's website? [Click here](https://translate.modrinth.com)
+
+	## Fixed
+	- Fixed profile pictures still being deleted after resetting a pending removal in Profile settings.
+	- Fixed shared instance reports not showing up in the dashboard's Reports page.
+	- Fixed shared instance report emails saying "Unknown" rather than the shared instance's name.
+	- Fixed the settings page for Authorized apps being broken.
+	- Broken Retro theme colors
+	- Improved vertical alignment of status indicators in notifications.`,
+	},
 	{
 		date: `2026-07-28T20:40:11+00:00`,
 		product: 'hosting',
