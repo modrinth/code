@@ -3914,56 +3914,14 @@
   "servers.busy.installing": {
     "defaultMessage": "Đang cài máy chủ"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Đang đồng bộ nội dung"
-  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Tải thất bại"
-  },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Đã xảy ra lỗi nội bộ trong quá trình cài đặt nền tảng. Thử lại."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Không thể tải loader hoặc phiên bản Minecraft đã chọn. Nó có thể không phù hợp hoặc không được hỗ trợ."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpack này không thể tải được. Nó có thể bị hỏng hoặc không tương thích."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Phiên bản modpack này không chứa tệp có thể tải xuống. Nó có thể không được làm đúng cách."
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Có lỗi lạ xảy ra trong khi tải."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Phiên bản minecraft hoặc loader hiện không được hỗ trợ bởi Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Đang cài addon..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Đang cài modpack..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Đang cài platform..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Chúng tôi đang sửa máy chủ của bạn"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Đang thêm Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Đang chỉnh sửa máy chủ..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Đang tải mod..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Đang sắp sếp tệp..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Đang thiết lập môi trường..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Đã có máy chủ rồi?"
@@ -5085,4 +5043,3 @@
     "defaultMessage": "Đội ngũ Modrinth"
   }
 }
-

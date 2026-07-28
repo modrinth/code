@@ -4415,9 +4415,6 @@
   "servers.busy.installing": {
     "defaultMessage": "正在安裝伺服器"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "正在同步內容"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "同時傳送好友邀請"
   },
@@ -4472,50 +4469,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "無法安裝"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "安裝平臺時發生內部錯誤，請再試一次。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "無法安裝指定的載入器或 Minecraft 版本。該載入器或版本可能無效或不受支援。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "無法安裝模組包。該模組包可能已損毀或不相容。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "這個模組包版本不包含可下載檔案。可能是打包時出了問題。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安裝時發生非預期的錯誤。"
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting 尚不支援這個 Minecraft 版本或載入器。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "正在安裝額外內容..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "正在安裝模組包..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "正在安裝平臺..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "我們正在為你準備伺服器"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "正在新增 Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "正在設定伺服器..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "正在下載模組..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "正在整理檔案..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "正在設定環境..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"
@@ -5901,4 +5859,3 @@
     "defaultMessage": "類型"
   }
 }
-

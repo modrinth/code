@@ -4088,9 +4088,6 @@
   "servers.busy.installing": {
     "defaultMessage": "サーバーがインストール中です"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "コンテンツの同期処理中です"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "フレンドのリクエストも送信する"
   },
@@ -4145,50 +4142,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "インストールが失敗しました"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "プラットフォームのインストール中、内部エラーが発生しました。もう一度お試しください。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "特定のModローダーMinecraftのバージョンをインストールできませんでした。いずれかが非対応または無効である可能性があります。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "このModパックをインストールすることができませんでした。Modが非対応または破損している可能性があります。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "このModパックのバージョンには、ダウンロード可能なファイルが含まれていません。パッケージ化が正しく行われていない可能性があります。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "インストール中に予期せぬエラーが発生しました。"
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "このMinecraftのバージョンまたはModローダーはModrinthホスティングでまだ対応されていません。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "アドオンをインストールしています…"
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modパックをインストールしています…"
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "プラットフォームをインストールしています…"
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "あなたのサーバーを準備しています"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Javaを追加しています…"
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "サーバーの設定をしています…"
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Modをダウンロードしています…"
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "ファイルを整理しています…"
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "環境を整えています…"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "既にサーバーをお持ちですか？"

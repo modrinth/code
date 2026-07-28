@@ -11,8 +11,8 @@ import type { FileOperation } from '../layouts/shared/files-tab/types'
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
 import type { BusyReason, CancelUploadHandler, ServerStats } from '../providers/server-context'
 import { defineMessage } from './i18n'
-import { useServerInstallationTracker } from './server-installation-tracker'
 import { useModrinthServersConsole } from './server-console'
+import { useServerInstallationTracker } from './server-installation-tracker'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 type SocketUnsubscriber = () => void

@@ -4448,9 +4448,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Server is installing"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Content sync in progress"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Also send a friend request"
   },
@@ -4502,53 +4499,41 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Searching..."
   },
+  "servers.installing-banner.description.applying": {
+    "defaultMessage": "Applying your installation changes..."
+  },
+  "servers.installing-banner.description.controls": {
+    "defaultMessage": "Server controls will unlock when installation finishes."
+  },
+  "servers.installing-banner.description.duration": {
+    "defaultMessage": "This installation may take several minutes..."
+  },
+  "servers.installing-banner.description.preparing": {
+    "defaultMessage": "Preparing your server..."
+  },
+  "servers.installing-banner.description.still-working": {
+    "defaultMessage": "Still working—your installation is in progress..."
+  },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation failed"
-  },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "An internal error occurred while installing the platform. Please try again."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "The specified loader or Minecraft version could not be installed. It may be invalid or unsupported."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "The modpack could not be installed. It may be corrupted or incompatible."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "This modpack version does not include a downloadable file. It may have been packaged incorrectly."
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "An unexpected error occurred during installation."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "This version of Minecraft or loader is not yet supported by Modrinth Hosting."
+  "servers.installing-banner.installing-local-modpack": {
+    "defaultMessage": "Installing {filename}"
   },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installing addons..."
+  "servers.installing-banner.installing-minecraft": {
+    "defaultMessage": "Installing Minecraft {version}"
   },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Installing modpack..."
+  "servers.installing-banner.installing-modpack": {
+    "defaultMessage": "Installing modpack"
   },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Installing platform..."
+  "servers.installing-banner.installing-platform": {
+    "defaultMessage": "Installing {loader} for Minecraft {version}"
   },
   "servers.installing-banner.preparing.header": {
-    "defaultMessage": "We're preparing your server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Adding Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Configuring server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Downloading mods..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizing files..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Setting up environment..."
+    "defaultMessage": "Preparing your server"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"

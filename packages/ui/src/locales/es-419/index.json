@@ -4370,9 +4370,6 @@
   "servers.busy.installing": {
     "defaultMessage": "El servidor se está instalando"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Sincronización de contenido en curso"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Mandar solicitud de amistad también"
   },
@@ -4427,50 +4424,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Fallo en la instalación"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Se ha producido un error interno durante la instalación de la plataforma. Por favor, inténtalo de nuevo."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "No se pudo instalar el loader o la versión de Minecraft especificados. Es posible que no sean válidos o que no sean compatibles."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "No se pudo instalar el modpack. Es posible que esté dañado o que no sea compatible."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Esta versión del modpack no incluye ningún archivo descargable. Es posible que se haya empaquetado incorrectamente."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Se produjo un error inesperado durante la instalación."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Esta versión de Minecraft o del loader aún no es compatible con Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Instalando addons..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Instalando modpack..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Instalando plataforma..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Estamos preparando tu servidor"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Añadiendo java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Configurando servidor..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Descargando mods..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizando archivos..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Preparando entorno..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "¿Ya tienes un servidor?"
@@ -5787,4 +5745,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

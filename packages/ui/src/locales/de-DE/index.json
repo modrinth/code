@@ -4448,9 +4448,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Server wird installiert"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Inhalt wird synchronisiert"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Auch eine Freundschaftsanfrage senden"
   },
@@ -4505,50 +4502,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installation fehlgeschlagen"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Während der Installation der Plattform ist ein interner Fehler aufgetreten. Bitte versuche es erneut."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Die angegebene Loader- oder Minecraft-Version konnte nicht installiert werden. Sie ist möglicherweise ungültig oder wird nicht unterstützt."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Das Modpack konnte nicht installiert werden. Es ist eventuell beschädigt oder nicht kompatibel."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Diese Modpack-Version enthält keine herunterladbare Datei. Es wurde eventuell falsch gepackt."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Während der Installation ist ein unerwarteter Fehler aufgetreten."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Diese Version von Minecraft oder des Loaders wird aktuell noch nicht von Modrinth Hosting unterstützt."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Addons werden installiert..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modpack wird installiert..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Plattform wird installiert..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Wir bereiten deinen Server vor"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java wird hinzugefügt..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Server wird konfiguriert..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Mods werden heruntergeladen..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Dateien werden organisiert..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Umgebung wird eingerichtet..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Du hast bereits einen Server?"
@@ -5940,4 +5898,3 @@
     "defaultMessage": "Typ"
   }
 }
-

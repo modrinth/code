@@ -3875,9 +3875,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Pelayan sedang dipasang"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Penyegerakan kandungan sedang dijalankan"
-  },
   "servers.grant-access-modal.cancel": {
     "defaultMessage": "Batal"
   },
@@ -3908,44 +3905,8 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Pemasangan gagal"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Sebuah ralat dalaman telah berlaku semasa memasang platform. Sila cuba lagi kemudian."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Pemuat atau versi Minecraft yang dinyatakan tidak dapat dipasang. Ia mungkin tidak sah atau tidak disokong."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Versi pek mod ini tidak menyertakan fail yang boleh dimuat turun. Ia mungkin telah dibungkus secara salah."
-  },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Versi Minecraft atau pemuat ini belum disokong oleh Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Sedang memasang tambahan..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Sedang memasang pek mod..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Sedang memasang platform..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Kami sedang menyediakan pelayan anda"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Sedang menambah Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Sedang mengkonfigurasikan pelayan..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Sedang memuat turun mod..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Sedang menyusun fail..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Sedang menyediakan persekitaran..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Sudah mempunyai pelayan?"
@@ -5037,4 +4998,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

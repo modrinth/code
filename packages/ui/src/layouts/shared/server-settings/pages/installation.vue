@@ -637,11 +637,7 @@ provideInstallationSettings({
 			resolvedLoaderVersion = versions[0]?.id ?? null
 		}
 
-		const snapshot = await applyOptimisticInstallation(
-			platform,
-			gameVersion,
-			resolvedLoaderVersion,
-		)
+		const snapshot = await applyOptimisticInstallation(platform, gameVersion, resolvedLoaderVersion)
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
@@ -937,11 +933,7 @@ provideInstallationSettings({
 			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
 			resolvedLoaderVersion = versions[0]?.id ?? null
 		}
-		const snapshot = await applyOptimisticInstallation(
-			platform,
-			gameVersion,
-			resolvedLoaderVersion,
-		)
+		const snapshot = await applyOptimisticInstallation(platform, gameVersion, resolvedLoaderVersion)
 		emit('reinstall', { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion })
 		try {
 			const request: Archon.Content.v1.InstallWorldContent = {

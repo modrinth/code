@@ -116,14 +116,8 @@ const messages = defineMessages({
 })
 
 const client = injectModrinthClient()
-const {
-	server,
-	worldId,
-	busyReasons,
-	installProgressItems,
-	uploadState,
-	cancelUpload,
-} = injectModrinthServerContext()
+const { server, worldId, busyReasons, installProgressItems, uploadState, cancelUpload } =
+	injectModrinthServerContext()
 const contentUploadSession = useUploadSessionUpload({
 	client,
 	scope: 'content',
@@ -181,14 +175,11 @@ const setupActionDisabled = computed(() => !canSetup.value || busyReasons.value.
 const setupActionBusyMessage = computed(() => {
 	if (!canSetup.value) return permissionDeniedMessage.value
 
-	const bannerCoversInstalling =
-		busyReasons.value.some((r) => r.reason.id === 'servers.busy.installing')
+	const bannerCoversInstalling = busyReasons.value.some(
+		(r) => r.reason.id === 'servers.busy.installing',
+	)
 	const filteredReasons = busyReasons.value.filter((r) => {
-		if (
-			bannerCoversInstalling &&
-			r.reason.id === 'servers.busy.installing'
-		)
-			return false
+		if (bannerCoversInstalling && r.reason.id === 'servers.busy.installing') return false
 		if (
 			r.reason.id === 'servers.busy.backup-creating' ||
 			r.reason.id === 'servers.busy.backup-restoring'
@@ -325,8 +316,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 		})) as ContentModpackCardCategory[],
 		hasUpdate: !!mp.has_update || !!newestModpackUpdateVersion.value,
 		disabled: setupActionDisabled.value,
-		disabledText:
-			setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
+		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
 	}
 })
 
@@ -1485,7 +1475,8 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	if (
 		(updatingModpack.value && setupActionDisabled.value) ||
 		(!updatingModpack.value && contentActionDisabled.value)
-	) return
+	)
+		return
 	const item = updatingProject.value
 	if (item) {
 		setAddonInstalling(item.file_name, true)

@@ -17,8 +17,8 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
+import ProgressSpinner from '#ui/components/base/ProgressSpinner.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -161,10 +161,7 @@ const installTooltip = computed(() => {
 				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
 				:class="enabled === false && !disabled ? 'grayscale opacity-50' : ''"
 			>
-				<div
-					v-tooltip="installTooltip"
-					class="relative flex shrink-0 items-center"
-				>
+				<div v-tooltip="installTooltip" class="relative flex shrink-0 items-center">
 					<Avatar
 						:src="project.icon_url"
 						:alt="project.title"

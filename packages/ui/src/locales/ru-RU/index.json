@@ -4328,9 +4328,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Сервер устанавливается"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Синхронизация контента в процессе"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Также отправить запрос в друзья"
   },
@@ -4385,50 +4382,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Установка не удалась"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Во время установки платформы произошла внутренняя ошибка. Попробуйте ещё раз."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Не удалось установить указанную версию загрузчика или Minecraft. Возможно, она недействительна или не поддерживается."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Не удалось установить сборку модов. Возможно, она повреждена или несовместима."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Эта версия сборки не содержит загрузочного файла. Возможно, она была собрана неправильно."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Во время установки произошла непредвиденная ошибка."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Эта версия Minecraft или загрузчика пока не поддерживается Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Установка дополнений..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Установка сборки..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Установка платформы..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Подготовка сервера"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Добавление Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Настройка сервера..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Скачивание модов..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Упорядочивание файлов..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Настройка среды..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"

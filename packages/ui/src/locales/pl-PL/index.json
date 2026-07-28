@@ -4367,9 +4367,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Serwer jest instalowany"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Synchronizacja zawartości w toku"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Wyślij także zaproszenie do znajomych"
   },
@@ -4424,50 +4421,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Instalacja nie powiodła się"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Wystąpił wewnętrzny błąd podczas instalowania platformy. Spróbuj ponownie później."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Nie udało się zainstalować podanego loadera lub podanej wersji Minecraft. Mogą być niepoprawne lub niewspierane."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Nie udało się zainstalować paczki modów. Może być zepsuta lub niekompatybilna."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Ta wersja paczki modów nie zawiera pliku do pobrania. Możliwe, że została niepoprawnie zapakowana."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Wystąpił nieoczekiwany błąd podczas instalacji."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Ta wersja Minecraft lub loader nie są jeszcze wspierane przez Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Instalowanie dodatków..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Instalowanie paczki modów..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Instalowanie platformy..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Przygotowujemy Twój serwer"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Dodawanie Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Ustawianie serwera..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Pobieranie modów..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizowanie plików..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ustawianie środowiska..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Posiadasz już serwer?"

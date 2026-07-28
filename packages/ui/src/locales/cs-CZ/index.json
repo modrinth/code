@@ -3686,35 +3686,8 @@
   "servers.grant-access-modal.target.searching": {
     "defaultMessage": "Vyhledávání..."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting tuto verzi Minecraftu nebo loaderu zatím nepodporuje."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Instalování addonů..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Instalování modpacku..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Instalování platformy..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Připravujeme váš server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Přidávání Javy..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurování serveru..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Stahování módů..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organizování souborů..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Nastavování prostředí..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Už máte server?"
@@ -4560,4 +4533,3 @@
     "defaultMessage": "Typ"
   }
 }
-

@@ -3848,35 +3848,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installering misslyckades"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Ett internt fel inträffade när plattformen installerades. Vänligen försök igen."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Modpaketet kunde inte installeras. Det kanske är korrumperad eller inkompatibel."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Ett oväntat fel inträffade under installeringen."
   },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Installerar tillägg..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Vi förbereder din server"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Lägger till Java..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Konfigurerar server..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Laddar ner moddar..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Organiserar filer..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Ställer in miljö..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Har du redan en server?"
@@ -4911,4 +4887,3 @@
     "defaultMessage": "Typ"
   }
 }
-

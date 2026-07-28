@@ -4367,9 +4367,6 @@
   "servers.busy.installing": {
     "defaultMessage": "De server wordt geïnstalleerd"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Inhoud wordt gesynchroniseerd"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Ook een vriendschapsverzoek sturen"
   },
@@ -4424,50 +4421,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Installeren is mislukt"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Er is een interne fout opgetreden tijdens het installeren van het platform. Probeer het nog eens."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "De opgegeven loader of Minecraft-versie kon niet worden geïnstalleerd. Deze is mogelijk ongeldig of wordt niet ondersteund."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Het modpack kon niet worden geïnstalleerd. Het is mogelijk beschadigd of niet compatibel."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Deze versie van het modpack bevat geen downloadbaar bestand. Mogelijk is het pakket niet correct samengesteld."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Tijdens de installatie is er een onverwachte fout opgetreden."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Deze versie van Minecraft of loader wordt nog niet ondersteund door Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Add-ons aan het installeren..."
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Modpack aan het installeren..."
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Platform aan het installeren..."
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "We zijn je server aan het klaarmaken"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Java toevoegen..."
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Server wordt geconfigureerd..."
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Mods worden gedownload..."
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Bestanden worden geordend..."
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Omgeving wordt opgezet..."
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Heb je al een server?"

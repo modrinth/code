@@ -4448,9 +4448,6 @@
   "servers.busy.installing": {
     "defaultMessage": "正在安装服务器"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "正在同步內容"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "同时发送好友邀请"
   },
@@ -4505,50 +4502,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "安装失败"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "安装平台时发生内部错误，请重试。"
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "指定的加载器或 Minecraft 版本无法安装。它可能无效或不受支持。"
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "整合包无法安装。它可能已损坏或不兼容。"
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "这个整合包版本不包含可下载的文件，可能是打包方式有问题。"
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "安装过程中发生意外错误。"
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Modrinth Hosting 目前尚不支持此版本的 Minecraft 或加载器。"
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "正在安装组件……"
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "正在安装整合包……"
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "正在安装平台……"
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "我们正在准备你的服务器"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "正在添加 Java……"
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "正在配置服务器……"
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "正在下载模组……"
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "正在整理文件……"
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "正在设置运行环境……"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已经有服务器了吗？"
@@ -5940,4 +5898,3 @@
     "defaultMessage": "类型"
   }
 }
-
