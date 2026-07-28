@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ChangeSkinIcon,
 	CheckIcon,
 	EditIcon,
 	ExcitedRinthbot,
@@ -65,6 +66,7 @@ useRootBreadcrumb({
 	id: 'skins',
 	label: 'Skin selector',
 	to: '/skins',
+	visual: { type: 'icon', component: ChangeSkinIcon },
 })
 
 type UnlistenFn = () => void

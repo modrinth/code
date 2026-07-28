@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { HomeIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import type { SearchResult } from '@modrinth/utils'
 import dayjs from 'dayjs'
@@ -19,6 +20,7 @@ useRootBreadcrumb({
 	id: 'home',
 	label: 'Home',
 	to: '/',
+	visual: { type: 'icon', component: HomeIcon },
 })
 
 const instances = ref<GameInstance[]>([])

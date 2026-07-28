@@ -3,9 +3,11 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	ClipboardCopyIcon,
+	CompassIcon,
 	ExternalIcon,
 	GlobeIcon,
 	PlusIcon,
+	ServerStackIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import type { BrowseInstallContentType, CardAction, ProjectType, Tags } from '@modrinth/ui'
@@ -15,6 +17,7 @@ import {
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
+	formatProjectTypeSentence,
 	getLatestMatchingInstallVersion,
 	getSelectedInstallPreferences,
 	getTargetInstallPreferences,
@@ -59,6 +62,7 @@ import {
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
 import {
+	type BreadcrumbDefinition,
 	useBreadcrumb,
 	useRootBreadcrumb,
 } from '@/providers/breadcrumbs'
@@ -84,6 +88,30 @@ watch(
 	},
 	{ immediate: true },
 )
+const breadcrumbMessages = defineMessages({
+	discoverProjectType: {
+		id: 'app.browse.discover-project-type',
+		defaultMessage: 'Discover {projectType}',
+	},
+	discoverServers: {
+		id: 'app.browse.discover-servers',
+		defaultMessage: 'Discover servers',
+	},
+})
+const breadcrumbLabel = computed(() => {
+	const browseRoute = displayedBrowseRoute.value
+	if (browseRoute.query.from === 'worlds' || browseRoute.params.projectType === 'server') {
+		return formatMessage(breadcrumbMessages.discoverServers)
+	}
+
+	return formatMessage(breadcrumbMessages.discoverProjectType, {
+		projectType: formatProjectTypeSentence(
+			formatMessage,
+			String(browseRoute.params.projectType ?? ''),
+			2,
+		),
+	})
+})
 const themeStore = useTheming()
 const browseRouteActive = computed(() => route.path.startsWith('/browse/'))
 const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
@@ -138,7 +166,10 @@ type Instance = {
 	}
 }
 
-const instance: Ref<Instance | null> = ref(null)
+const initialInstanceId = String(route.query.i ?? '')
+const instance: Ref<Instance | null> = ref(
+	queryClient.getQueryData<Instance>(['instances', 'summary', initialInstanceId]) ?? null,
+)
 const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
@@ -146,41 +177,26 @@ const hiddenInstanceProjectIds = ref<Set<string>>(new Set())
 const hiddenInstanceProjectIdsInitialized = ref(false)
 const isServerInstance = ref(false)
 
-const breadcrumbLabel = ref(
-	displayedBrowseRoute.value.query.from === 'worlds'
-		? 'Discover servers'
-		: 'Discover content',
-)
 const instanceBreadcrumb = route.query.i
 	? useBreadcrumb({
 			slot: 'instance',
 			id: () => `instance:${String(displayedBrowseRoute.value.query.i ?? '')}`,
 			label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
-			to: () =>
-				`/instance/${encodeURIComponent(String(displayedBrowseRoute.value.query.i ?? ''))}`,
-		})
-	: undefined
-const instanceSectionBreadcrumb = instanceBreadcrumb
-	? useBreadcrumb(
-			{
-				slot: 'instance-section',
-				id: () =>
-					`instance-section:${String(displayedBrowseRoute.value.query.i ?? '')}:${
-						displayedBrowseRoute.value.query.from === 'worlds' ? 'worlds' : 'content'
-					}`,
-				label: () =>
-					displayedBrowseRoute.value.query.from === 'worlds' ? 'Worlds' : 'Content',
-				to: () => {
-					const instancePath = `/instance/${encodeURIComponent(
-						String(displayedBrowseRoute.value.query.i ?? ''),
-					)}`
-					return displayedBrowseRoute.value.query.from === 'worlds'
-						? `${instancePath}/worlds`
-						: instancePath
-				},
+			visual: () => ({
+				type: 'image',
+				src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+				alt: instance.value?.name,
+				tintBy: String(displayedBrowseRoute.value.query.i ?? ''),
+			}),
+			to: () => {
+				const instancePath = `/instance/${encodeURIComponent(
+					String(displayedBrowseRoute.value.query.i ?? ''),
+				)}`
+				return displayedBrowseRoute.value.query.from === 'worlds'
+					? `${instancePath}/worlds`
+					: instancePath
 			},
-			{ parent: instanceBreadcrumb },
-		)
+		})
 	: undefined
 const serverBreadcrumbTo = ref(serverBackUrl.value)
 watch(serverBackUrl, (value) => {
@@ -194,10 +210,11 @@ const serverBreadcrumb = !instanceBreadcrumb && serverIdQuery.value
 			id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
 			label: () =>
 				serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
+			visual: { type: 'icon', component: ServerStackIcon },
 			to: serverBreadcrumbTo,
 		})
 	: undefined
-const breadcrumbParent = instanceSectionBreadcrumb ?? serverBreadcrumb
+const breadcrumbParent = instanceBreadcrumb ?? serverBreadcrumb
 const breadcrumbDefinition = {
 	slot: 'browse',
 	id: () =>
@@ -208,7 +225,8 @@ const breadcrumbDefinition = {
 		)}`,
 	label: breadcrumbLabel,
 	to: () => displayedBrowseRoute.value.fullPath,
-}
+	visual: { type: 'icon', component: CompassIcon },
+} satisfies BreadcrumbDefinition
 const browseBreadcrumb = breadcrumbParent
 	? useBreadcrumb(breadcrumbDefinition, { parent: breadcrumbParent })
 	: useRootBreadcrumb(breadcrumbDefinition)
@@ -465,14 +483,6 @@ const messages = defineMessages({
 		id: 'app.browse.add-to-an-instance',
 		defaultMessage: 'Add to an instance',
 	},
-	discoverContent: {
-		id: 'app.browse.discover-content',
-		defaultMessage: 'Discover content',
-	},
-	discoverServers: {
-		id: 'app.browse.discover-servers',
-		defaultMessage: 'Discover servers',
-	},
 	environmentProvidedByServer: {
 		id: 'search.filter.locked.server-environment.title',
 		defaultMessage: 'Only client-side mods can be added to the server instance',
@@ -527,17 +537,6 @@ const messages = defineMessages({
 		defaultMessage: 'Sync with instance',
 	},
 })
-
-const browseTitle = computed(() =>
-	formatMessage(isFromWorlds.value ? messages.discoverServers : messages.discoverContent),
-)
-watch(
-	browseTitle,
-	(value) => {
-		breadcrumbLabel.value = value
-	},
-	{ immediate: true },
-)
 
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 

@@ -95,7 +95,6 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
-import { useBreadcrumb } from '@/providers/breadcrumbs'
 
 const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 
@@ -110,16 +109,6 @@ const props = defineProps({
 		type: Object,
 		default: () => ({}),
 	},
-})
-
-useBreadcrumb({
-	slot: 'project-section',
-	id: () => `project-gallery:${props.project?.id ?? ''}`,
-	label: 'Gallery',
-	to: () => ({
-		name: 'Gallery',
-		params: { id: props.project?.id ?? '' },
-	}),
 })
 
 const filteredGallery = computed(

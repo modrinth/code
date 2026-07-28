@@ -11,10 +11,11 @@ import {
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
+	ChevronLeftIcon,
+	ChevronRightIcon,
 	CompassIcon,
 	ExternalIcon,
 	HomeIcon,
-	LeftArrowIcon,
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
@@ -163,6 +164,17 @@ const router = useRouter()
 const route = useRoute()
 const breadcrumbManager = createBreadcrumbManager()
 provideBreadcrumbManager(breadcrumbManager)
+const canNavigateBack = ref(false)
+const canNavigateForward = ref(false)
+
+function updateHistoryNavigationState() {
+	const historyState = window.history.state
+	canNavigateBack.value = historyState?.back != null
+	canNavigateForward.value = historyState?.forward != null
+}
+
+updateHistoryNavigationState()
+
 const APP_LEFT_NAV_WIDTH = '4rem'
 const APP_SIDEBAR_WIDTH = 300
 const INTERCOM_BUBBLE_DEFAULT_PADDING = 20
@@ -626,6 +638,7 @@ router.beforeEach(() => {
 	routerToken = loading.begin()
 })
 router.afterEach((to, from, failure) => {
+	updateHistoryNavigationState()
 	trackEvent('PageView', {
 		path: to.path,
 		fromPath: from.path,
@@ -1697,23 +1710,31 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-			<div data-tauri-drag-region class="flex min-w-0 flex-1 overflow-hidden p-3">
+			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
 				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
-				<div data-tauri-drag-region class="flex shrink-0 items-center gap-1 ml-3">
-					<button
-						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
-						@click="router.back()"
-					>
-						<LeftArrowIcon />
-					</button>
-					<button
-						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
-						@click="router.forward()"
-					>
-						<RightArrowIcon />
-					</button>
+				<div data-tauri-drag-region class="ml-4 flex shrink-0 items-center gap-2">
+					<ButtonStyled type="outlined" circular>
+						<button
+							class="!h-8 !min-w-8 !w-8 !border !border-surface-4 !p-0"
+							:disabled="!canNavigateBack"
+							aria-label="Go back"
+							@click="router.back()"
+						>
+							<ChevronLeftIcon class="!size-4 !text-primary" />
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="outlined" circular>
+						<button
+							class="!h-8 !min-w-8 !w-8 !border !border-surface-4 !p-0"
+							:disabled="!canNavigateForward"
+							aria-label="Go forward"
+							@click="router.forward()"
+						>
+							<ChevronRightIcon class="!size-4 !text-primary" />
+						</button>
+					</ButtonStyled>
 				</div>
-				<Breadcrumbs class="pt-[2px]" />
+				<Breadcrumbs />
 			</div>
 			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<ButtonStyled

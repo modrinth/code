@@ -82,12 +82,11 @@ import {
 	ProjectPageVersions,
 	useVIntl,
 } from '@modrinth/ui'
-import { ref, shallowRef, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons/index.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
-import { useBreadcrumb } from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/theme.ts'
 
 const { formatMessage } = useVIntl()
@@ -133,28 +132,6 @@ const props = defineProps({
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
-const router = useRouter()
-const displayedVersionsRoute = shallowRef(router.currentRoute.value)
-watch(
-	() => router.currentRoute.value,
-	(nextRoute) => {
-		if (nextRoute.name === 'Versions') {
-			displayedVersionsRoute.value = nextRoute
-		}
-	},
-	{ immediate: true },
-)
-
-useBreadcrumb({
-	slot: 'project-section',
-	id: () => `project-versions:${props.project?.id ?? ''}`,
-	label: 'Versions',
-	to: () => ({
-		name: 'Versions',
-		params: { id: props.project?.id ?? route.params.id },
-		query: displayedVersionsRoute.value.query,
-	}),
-})
 
 function buildProjectHref(path) {
 	const params = new URLSearchParams()

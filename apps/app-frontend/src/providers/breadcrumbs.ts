@@ -1,6 +1,7 @@
 import { createContext } from '@modrinth/ui'
 import {
 	computed,
+	type Component,
 	type MaybeRefOrGetter,
 	type ComputedRef,
 	shallowRef,
@@ -9,11 +10,25 @@ import {
 } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
+export type BreadcrumbVisual =
+	| {
+			type: 'icon'
+			component: Component
+	  }
+	| {
+			type: 'image'
+			src?: string | null
+			alt?: string
+			circle?: boolean
+			tintBy?: string | null
+	  }
+
 export interface BreadcrumbDefinition {
 	slot: string
 	id: MaybeRefOrGetter<string>
 	label: MaybeRefOrGetter<string>
 	to?: MaybeRefOrGetter<RouteLocationRaw | undefined>
+	visual?: MaybeRefOrGetter<BreadcrumbVisual | undefined>
 }
 
 export interface ResolvedBreadcrumb {
@@ -21,6 +36,7 @@ export interface ResolvedBreadcrumb {
 	id: string
 	label: string
 	to?: RouteLocationRaw
+	visual?: BreadcrumbVisual
 }
 
 export interface BreadcrumbHandle {
@@ -158,6 +174,7 @@ export function createBreadcrumbManager(): BreadcrumbManager {
 			id: toValue(definition.id),
 			label: toValue(definition.label),
 			to: definition.to === undefined ? undefined : toValue(definition.to),
+			visual: definition.visual === undefined ? undefined : toValue(definition.visual),
 		})),
 	)
 

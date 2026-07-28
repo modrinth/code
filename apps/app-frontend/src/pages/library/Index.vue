@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PlusIcon } from '@modrinth/assets'
+import { LibraryIcon, PlusIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NavTabs } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
@@ -18,6 +18,7 @@ useRootBreadcrumb({
 	id: 'library',
 	label: 'Library',
 	to: '/library',
+	visual: { type: 'icon', component: LibraryIcon },
 })
 
 const instances = shallowRef(await list().catch(handleError))

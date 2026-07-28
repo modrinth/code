@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { WorldIcon } from '@modrinth/assets'
+
 import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 
 useRootBreadcrumb({
@@ -6,6 +8,7 @@ useRootBreadcrumb({
 	id: 'worlds',
 	label: 'Worlds',
 	to: '/worlds',
+	visual: { type: 'icon', component: WorldIcon },
 })
 </script>
 <template>

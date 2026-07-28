@@ -48,6 +48,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
+import { ServerStackIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	injectAuth,
@@ -127,6 +128,7 @@ const serverBreadcrumb = useBreadcrumb({
 	slot: 'server',
 	id: () => `server:${breadcrumbServerId.value}`,
 	label: breadcrumbLabel,
+	visual: { type: 'icon', component: ServerStackIcon },
 	to: () => `/hosting/manage/${encodeURIComponent(breadcrumbServerId.value)}`,
 })
 provideBreadcrumbParent(serverBreadcrumb)

@@ -85,6 +85,7 @@ import {
 	ExternalIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	VersionIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -144,38 +145,18 @@ const props = defineProps<{
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
 const versionBreadcrumbLabel = computed(() => {
-	const versionName = version.value?.name
-	if (!versionName) {
-		return formatMessage(commonMessages.loadingLabel)
-	}
-
-	const projectNamePrefix = `${props.project.title} `
-	return versionName.startsWith(projectNamePrefix)
-		? versionName.slice(projectNamePrefix.length).trim() || versionName
-		: versionName
+	const versionNumber = version.value?.version_number
+	const versionLabel = formatMessage(commonMessages.versionLabel)
+	return versionNumber ? `${versionLabel} ${versionNumber}` : versionLabel
 })
-const versionsBreadcrumb = useBreadcrumb({
-	slot: 'project-section',
-	id: () => `project-versions:${props.project.id}`,
-	label: 'Versions',
-	to: () => ({
-		name: 'Versions',
-		params: { id: props.project.id },
-		query: displayedVersionRoute.value.query,
-	}),
+useBreadcrumb({
+	slot: 'project-version',
+	id: () =>
+		`version:${props.project.id}:${String(displayedVersionRoute.value.params.version ?? '')}`,
+	label: versionBreadcrumbLabel,
+	visual: { type: 'icon', component: VersionIcon },
+	to: () => displayedVersionRoute.value.fullPath,
 })
-useBreadcrumb(
-	{
-		slot: 'project-version',
-		id: () =>
-			`version:${props.project.id}:${String(
-				displayedVersionRoute.value.params.version ?? '',
-			)}`,
-		label: versionBreadcrumbLabel,
-		to: () => displayedVersionRoute.value.fullPath,
-	},
-	{ parent: versionsBreadcrumb },
-)
 
 const enrichment = ref<Labrinth.Projects.v2.DependencyInfo | undefined>(undefined)
 const enrichmentLoading = ref(false)

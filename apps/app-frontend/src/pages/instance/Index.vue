@@ -194,11 +194,7 @@ import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import {
-	provideBreadcrumbParent,
-	useBreadcrumb,
-	useRootBreadcrumb,
-} from '@/providers/breadcrumbs'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/state'
 
 import { provideSharedInstanceState, useSharedInstanceState } from './use-shared-instance-state'
@@ -230,41 +226,19 @@ const initialInstanceId = String(displayedInstanceRoute.value.params.id ?? '')
 const instance = ref<GameInstance | undefined>(
 	queryClient.getQueryData<GameInstance>(['instances', 'summary', initialInstanceId]),
 )
-const instanceBreadcrumb = useRootBreadcrumb({
+useRootBreadcrumb({
 	slot: 'instance',
 	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
 	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
+	visual: () => ({
+		type: 'image',
+		src: instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : undefined,
+		alt: instance.value?.name,
+		tintBy: instance.value?.id ?? String(displayedInstanceRoute.value.params.id ?? ''),
+	}),
 	to: () =>
 		`/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
 })
-provideBreadcrumbParent(instanceBreadcrumb)
-
-const instanceSection = computed(() => {
-	switch (displayedInstanceRoute.value.name) {
-		case 'InstanceWorlds':
-			return { id: 'worlds', label: 'Worlds' }
-		case 'InstanceShare':
-			return { id: 'share', label: 'Share' }
-		case 'Files':
-			return { id: 'files', label: 'Files' }
-		case 'Logs':
-			return { id: 'logs', label: 'Logs' }
-		default:
-			return { id: 'content', label: 'Content' }
-	}
-})
-useBreadcrumb(
-	{
-		slot: 'instance-section',
-		id: () =>
-			`instance-section:${String(displayedInstanceRoute.value.params.id ?? '')}:${
-				instanceSection.value.id
-			}`,
-		label: () => instanceSection.value.label,
-		to: () => displayedInstanceRoute.value.fullPath,
-	},
-	{ parent: instanceBreadcrumb },
-)
 
 const preloadedContent = ref<InstanceContentData | null>(null)
 const playing = ref(false)

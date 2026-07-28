@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { ServerStackIcon } from '@modrinth/assets'
 import { injectModrinthClient, ServersManagePageIndex } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
@@ -17,6 +18,7 @@ useRootBreadcrumb({
 	id: 'servers',
 	label: 'Servers',
 	to: '/hosting/manage/',
+	visual: { type: 'icon', component: ServerStackIcon },
 })
 
 const { data: products } = useQuery({

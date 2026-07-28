@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
@@ -45,6 +46,10 @@ const projectType = computed(() => {
 	return Array.isArray(value) ? value[0] : value
 })
 
+function getCachedUserSummary(id: string) {
+	return queryClient.getQueryData<Labrinth.Users.v3.User>(['users', 'summary', id])
+}
+
 const { data: user } = useQuery({
 	queryKey: computed(() => ['user', userId.value]),
 	queryFn: () => userProfile.getUser(userId.value),
@@ -53,7 +58,7 @@ const { data: user } = useQuery({
 })
 
 const breadcrumbUserId = ref(userId.value)
-const breadcrumbLabel = ref(userId.value)
+const breadcrumbLabel = ref(getCachedUserSummary(userId.value)?.username ?? userId.value)
 const breadcrumbTo = ref(route.fullPath)
 watch(
 	[userId, user, () => route.fullPath],
@@ -71,6 +76,13 @@ useBreadcrumb({
 	id: () => `user:${breadcrumbUserId.value}`,
 	label: breadcrumbLabel,
 	to: breadcrumbTo,
+	visual: () => ({
+		type: 'image',
+		src: user.value?.avatar_url ?? getCachedUserSummary(breadcrumbUserId.value)?.avatar_url,
+		alt: breadcrumbLabel.value,
+		circle: true,
+		tintBy: breadcrumbUserId.value,
+	}),
 })
 
 async function ensureUserProfileData(id: string): Promise<void> {

@@ -320,6 +320,18 @@ watch(
 	},
 	{ immediate: true },
 )
+const projectBreadcrumbTo = computed(() => {
+	const currentRoute = displayedProjectRoute.value
+	if (currentRoute.name === 'Version') {
+		return {
+			name: 'Versions',
+			params: { id: currentRoute.params.id },
+			query: currentRoute.query,
+		}
+	}
+
+	return currentRoute.fullPath
+})
 const queryClient = useQueryClient()
 const themeStore = useTheming()
 const { formatMessage } = useVIntl()
@@ -344,13 +356,15 @@ const { installingServerProjects, playServerProject, showAddServerToInstanceModa
 const installing = ref(false)
 const data = shallowRef(null)
 
-function getProjectBreadcrumbLabel(projectId) {
+function getProjectBreadcrumbSummary(projectId) {
 	const identifier = Array.isArray(projectId) ? projectId[0] : projectId
-	if (typeof identifier !== 'string' || !identifier) {
-		return formatMessage(commonMessages.loadingLabel)
-	}
+	if (typeof identifier !== 'string' || !identifier) return undefined
 
-	const summary = queryClient.getQueryData(['projects', 'summary', identifier])
+	return queryClient.getQueryData(['projects', 'summary', identifier])
+}
+
+function getProjectBreadcrumbLabel(projectId) {
+	const summary = getProjectBreadcrumbSummary(projectId)
 	return summary?.name ?? summary?.title ?? formatMessage(commonMessages.loadingLabel)
 }
 
@@ -359,11 +373,19 @@ const projectBreadcrumb = useBreadcrumb({
 	slot: 'project',
 	id: () => `project:${String(displayedProjectRoute.value.params.id ?? '')}`,
 	label: projectBreadcrumbLabel,
-	to: () => ({
-		name: 'Description',
-		params: { id: displayedProjectRoute.value.params.id },
-		query: displayedProjectRoute.value.query,
-	}),
+	visual: () => {
+		const identifier = String(displayedProjectRoute.value.params.id ?? '')
+		const loadedProject =
+			data.value?.id === identifier || data.value?.slug === identifier ? data.value : undefined
+		const project = loadedProject ?? getProjectBreadcrumbSummary(identifier)
+		return {
+			type: 'image',
+			src: project?.icon_url,
+			alt: projectBreadcrumbLabel.value,
+			tintBy: identifier,
+		}
+	},
+	to: projectBreadcrumbTo,
 })
 provideBreadcrumbParent(projectBreadcrumb)
 
@@ -665,6 +687,14 @@ async function fetchProjectData() {
 			route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
 			route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
 		])
+
+	for (const member of members.value ?? []) {
+		for (const identifier of [member.user.id, member.user.username]) {
+			if (identifier) {
+				queryClient.setQueryData(['users', 'summary', identifier], member.user)
+			}
+		}
+	}
 
 	versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
