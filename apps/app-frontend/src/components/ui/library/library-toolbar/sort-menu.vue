@@ -1,36 +1,42 @@
 <script setup lang="ts">
-import { DropdownSelect } from '@modrinth/ui'
+import { Combobox, type ComboboxOption } from '@modrinth/ui'
 
 import {
 	libraryGroupOptions,
 	librarySortOptions,
+	type LibraryGroupBy,
+	type LibrarySort,
 	useLibrary,
 } from '@/components/ui/library/use-library'
 
 const { displayState } = useLibrary()
+
+const sortOptions: ComboboxOption<LibrarySort>[] = librarySortOptions.map((option) => ({
+	value: option,
+	label: option,
+}))
+const groupOptions: ComboboxOption<LibraryGroupBy>[] = [...libraryGroupOptions]
 </script>
 
 <template>
-	<DropdownSelect
-		v-slot="{ selected }"
+	<Combobox
+		class="w-max"
 		v-model="displayState.sortBy"
-		name="Sort Dropdown"
-		class="max-w-[16rem]"
-		:options="[...librarySortOptions]"
-		placeholder="Select..."
+		:options="sortOptions"
+		:show-icon-in-selected="false"
 	>
-		<span class="font-semibold text-primary">Sort by: </span>
-		<span class="font-semibold text-secondary">{{ selected }}</span>
-	</DropdownSelect>
-	<DropdownSelect
-		v-slot="{ selected }"
+		<template #prefix>
+			<span class="font-semibold text-primary">Sort by:</span>
+		</template>
+	</Combobox>
+	<Combobox
+		class="w-max"
 		v-model="displayState.group"
-		class="max-w-[16rem]"
-		name="Group Dropdown"
-		:options="[...libraryGroupOptions]"
-		placeholder="Select..."
+		:options="groupOptions"
+		:show-icon-in-selected="false"
 	>
-		<span class="font-semibold text-primary">Group by: </span>
-		<span class="font-semibold text-secondary">{{ selected }}</span>
-	</DropdownSelect>
+		<template #prefix>
+			<span class="font-semibold text-primary">Group by:</span>
+		</template>
+	</Combobox>
 </template>

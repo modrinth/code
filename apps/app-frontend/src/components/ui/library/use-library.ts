@@ -17,21 +17,25 @@ import {
 } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
-export const libraryFilterOptions = ['All instances', 'Modpacks', 'Servers', 'Custom'] as const
-
 export const librarySortOptions = [
+	'Manual',
 	'Name',
 	'Last played',
+	'Hours played',
 	'Date created',
 	'Date modified',
-	'Game version',
 ] as const
 
-export const libraryGroupOptions = ['Group', 'Loader', 'Game version', 'None'] as const
+export const libraryGroupOptions = [
+	{ value: 'Group', label: 'Custom group' },
+	{ value: 'Loader', label: 'Loader' },
+	{ value: 'Game version', label: 'Game version' },
+	{ value: 'None', label: 'No grouping' },
+] as const
 
 export type LibrarySort = (typeof librarySortOptions)[number]
-export type LibraryGroupBy = (typeof libraryGroupOptions)[number]
-export type LibraryFilter = (typeof libraryFilterOptions)[number]
+export type LibraryGroupBy = (typeof libraryGroupOptions)[number]['value']
+export type LibraryFilters = Record<'instanceType' | 'gameVersion' | 'loader', string[]>
 
 export type InstanceGroup = {
 	id: string
@@ -73,7 +77,11 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { formatMessage } = useVIntl()
 
 	const search = ref('')
-	const activeFilter = ref<LibraryFilter>('All instances')
+	const filters = ref<LibraryFilters>({
+		instanceType: [],
+		gameVersion: [],
+		loader: [],
+	})
 	const serverProjectIds = ref(new Set<string>())
 	const libraryGroups = ref<InstanceGroupDefinition[]>([])
 	const groupIdsByName = ref(new Map<string, string>())
@@ -111,6 +119,10 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		localStorage,
 		{ mergeDefaults: true },
 	)
+
+	if (!librarySortOptions.includes(displayState.value.sortBy)) {
+		displayState.value.sortBy = 'Name'
+	}
 
 	const linkedInstances = computed(() => instances.value.filter((instance) => instance.link))
 	const collapsedSectionKeys = computed(() => new Set(displayState.value.collapsedGroups))
@@ -196,22 +208,26 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		}
 	})
 
-	const filteredInstances = computed(() => {
-		switch (activeFilter.value) {
-			case 'Modpacks':
-				return linkedInstances.value.filter(
-					(instance) => !serverProjectIds.value.has(instance.link?.project_id ?? ''),
-				)
-			case 'Servers':
-				return linkedInstances.value.filter((instance) =>
-					serverProjectIds.value.has(instance.link?.project_id ?? ''),
-				)
-			case 'Custom':
-				return instances.value.filter((instance) => !instance.link)
-			default:
-				return instances.value
-		}
-	})
+	const getInstanceType = (instance: GameInstance) => {
+		if (!instance.link) return 'custom'
+		if (serverProjectIds.value.has(instance.link.project_id ?? '')) return 'server'
+		return 'modpack'
+	}
+
+	const filteredInstances = computed(() =>
+		instances.value.filter((instance) => {
+			const instanceTypeMatches =
+				filters.value.instanceType.length === 0 ||
+				filters.value.instanceType.includes(getInstanceType(instance))
+			const gameVersionMatches =
+				filters.value.gameVersion.length === 0 ||
+				filters.value.gameVersion.includes(instance.game_version)
+			const loaderMatches =
+				filters.value.loader.length === 0 || filters.value.loader.includes(instance.loader)
+
+			return instanceTypeMatches && gameVersionMatches && loaderMatches
+		}),
+	)
 
 	const instanceGroups = computed<InstanceGroup[]>(() => {
 		const visibleInstances = filteredInstances.value.filter((instance) =>
@@ -219,16 +235,21 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 
 		switch (displayState.value.sortBy) {
+			case 'Manual':
+				break
 			case 'Name':
 				visibleInstances.sort((a, b) => a.name.localeCompare(b.name))
 				break
-			case 'Game version':
-				visibleInstances.sort((a, b) =>
-					a.game_version.localeCompare(b.game_version, undefined, { numeric: true }),
-				)
-				break
 			case 'Last played':
 				visibleInstances.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))
+				break
+			case 'Hours played':
+				visibleInstances.sort(
+					(a, b) =>
+						b.recent_time_played +
+						b.submitted_time_played -
+						(a.recent_time_played + a.submitted_time_played),
+				)
 				break
 			case 'Date created':
 				visibleInstances.sort((a, b) => dayjs(b.created).diff(dayjs(a.created)))
@@ -721,7 +742,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	return {
 		instances,
 		search,
-		activeFilter,
+		filters,
 		displayState,
 		instanceGroups,
 		isNewGroupModalOpen,

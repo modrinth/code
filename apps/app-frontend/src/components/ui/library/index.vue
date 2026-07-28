@@ -35,7 +35,7 @@ const {
 
 <template>
 	<InstanceGroupDnd :instances="instances">
-		<section class="flex flex-col gap-3">
+		<section class="flex flex-col gap-3 pb-16">
 			<h2 class="m-0 text-2xl font-semibold text-contrast">Library</h2>
 			<LibraryToolbar />
 			<div class="flex flex-col">
