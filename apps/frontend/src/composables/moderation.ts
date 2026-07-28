@@ -27,7 +27,10 @@ const useModerationCookies = () => {
 		moderationKeybindsId,
 		getCookieOptions(),
 	)
-	const optionsCookie = useCookie<Partial<StoredOptions>>(moderationSettingsId, getCookieOptions())
+	const optionsCookie = useCookie<Partial<StoredOptions> | null>(
+		moderationSettingsId,
+		getCookieOptions(),
+	)
 
 	if (keybindCookie.value && !optionsCookie.value) {
 		optionsCookie.value = {
@@ -45,16 +48,17 @@ const useModerationCookies = () => {
 const useModerationOptions = () =>
 	useState<{ keybinds: StoredKeybinds; settings: StoredSettings }>(moderationKeybindsId, () => {
 		const cookie = useModerationCookies()
+		const stored = cookie.value ?? {}
 
 		const keybindOutput: StoredKeybinds = {}
 
-		for (const [id, definition] of Object.entries(cookie.value.keybinds || {})) {
+		for (const [id, definition] of Object.entries(stored.keybinds || {})) {
 			if (!definition) continue
 			keybindOutput[id] = definition
 		}
 
 		const settingsOutput: StoredSettings = {}
-		for (const [id, setting] of Object.entries(cookie.value.settings || {})) {
+		for (const [id, setting] of Object.entries(stored.settings || {})) {
 			settingsOutput[id] = setting
 		}
 
