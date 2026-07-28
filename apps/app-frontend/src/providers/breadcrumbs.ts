@@ -1,9 +1,9 @@
 import { createContext } from '@modrinth/ui'
 import {
-	computed,
 	type Component,
-	type MaybeRefOrGetter,
+	computed,
 	type ComputedRef,
+	type MaybeRefOrGetter,
 	shallowRef,
 	toValue,
 	watch,
@@ -87,15 +87,11 @@ export function createBreadcrumbManager(): BreadcrumbManager {
 
 	function findParentIndex(entry: InternalBreadcrumb): number {
 		if (entry.parentToken) {
-			const tokenIndex = stack.value.findIndex(
-				(candidate) => candidate.token === entry.parentToken,
-			)
+			const tokenIndex = stack.value.findIndex((candidate) => candidate.token === entry.parentToken)
 			if (tokenIndex !== -1) return tokenIndex
 		}
 		if (entry.parentSlot) {
-			return stack.value.findIndex(
-				(candidate) => candidate.definition.slot === entry.parentSlot,
-			)
+			return stack.value.findIndex((candidate) => candidate.definition.slot === entry.parentSlot)
 		}
 		return stack.value.length - 1
 	}
@@ -182,15 +178,11 @@ export function createBreadcrumbManager(): BreadcrumbManager {
 		entries,
 		reset,
 		push,
-		find: (slot) =>
-			stack.value.find((entry) => entry.definition.slot === slot)?.handle,
+		find: (slot) => stack.value.find((entry) => entry.definition.slot === slot)?.handle,
 	}
 }
 
-function watchBreadcrumbIdentity(
-	definition: BreadcrumbDefinition,
-	handle: BreadcrumbHandle,
-) {
+function watchBreadcrumbIdentity(definition: BreadcrumbDefinition, handle: BreadcrumbHandle) {
 	watch(
 		() => toValue(definition.id),
 		() => handle.activate(),

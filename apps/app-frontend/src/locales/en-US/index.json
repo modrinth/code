@@ -251,8 +251,8 @@
   "app.browse.back-to-instance": {
     "message": "Back to instance"
   },
-  "app.browse.discover-content": {
-    "message": "Discover content"
+  "app.browse.discover-project-type": {
+    "message": "Discover {projectType}"
   },
   "app.browse.discover-servers": {
     "message": "Discover servers"

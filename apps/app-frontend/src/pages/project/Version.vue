@@ -223,15 +223,12 @@ async function refreshEnrichment() {
 	}
 }
 
-watch(
-	[() => props.versions, () => route.params.version],
-	async () => {
-		if (route.params.version) {
-			version.value = props.versions.find((v) => v.id === route.params.version)
-			await refreshEnrichment()
-		}
-	},
-)
+watch([() => props.versions, () => route.params.version], async () => {
+	if (route.params.version) {
+		version.value = props.versions.find((v) => v.id === route.params.version)
+		await refreshEnrichment()
+	}
+})
 
 await refreshEnrichment()
 </script>

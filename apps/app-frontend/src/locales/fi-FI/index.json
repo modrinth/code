@@ -170,9 +170,6 @@
   "app.browse.back-to-instance": {
     "message": "Takaisin instanssiin"
   },
-  "app.browse.discover-content": {
-    "message": "Löydä sisältöä"
-  },
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"
   },

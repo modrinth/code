@@ -99,7 +99,7 @@ const messages = defineMessages({
 	},
 })
 
-const props = defineProps({
+defineProps({
 	project: {
 		type: Object,
 		default: () => {},

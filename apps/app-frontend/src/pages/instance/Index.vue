@@ -192,9 +192,9 @@ import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import type { GameInstance } from '@/helpers/types'
 import { createInstanceShortcut, showInstanceInFolder } from '@/helpers/utils.js'
 import { refreshWorlds, type ServerStatus } from '@/helpers/worlds'
+import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/state'
 
 import { provideSharedInstanceState, useSharedInstanceState } from './use-shared-instance-state'
@@ -236,8 +236,7 @@ useRootBreadcrumb({
 		alt: instance.value?.name,
 		tintBy: instance.value?.id ?? String(displayedInstanceRoute.value.params.id ?? ''),
 	}),
-	to: () =>
-		`/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
+	to: () => `/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
 })
 
 const preloadedContent = ref<InstanceContentData | null>(null)

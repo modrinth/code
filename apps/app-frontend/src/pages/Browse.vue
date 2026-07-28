@@ -55,17 +55,17 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_instance_worlds } from '@/helpers/worlds'
+import {
+	type BreadcrumbDefinition,
+	useBreadcrumb,
+	useRootBreadcrumb,
+} from '@/providers/breadcrumbs'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import {
 	createServerInstallContent,
 	provideServerInstallContent,
 } from '@/providers/setup/server-install-content'
-import {
-	type BreadcrumbDefinition,
-	useBreadcrumb,
-	useRootBreadcrumb,
-} from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/state'
 
 const { handleError } = injectNotificationManager()
@@ -204,16 +204,17 @@ watch(serverBackUrl, (value) => {
 		serverBreadcrumbTo.value = value
 	}
 })
-const serverBreadcrumb = !instanceBreadcrumb && serverIdQuery.value
-	? useBreadcrumb({
-			slot: 'server',
-			id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
-			label: () =>
-				serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
-			visual: { type: 'icon', component: ServerStackIcon },
-			to: serverBreadcrumbTo,
-		})
-	: undefined
+const serverBreadcrumb =
+	!instanceBreadcrumb && serverIdQuery.value
+		? useBreadcrumb({
+				slot: 'server',
+				id: () => `server:${String(displayedBrowseRoute.value.query.sid ?? '')}`,
+				label: () =>
+					serverContextServerData.value?.name ?? formatMessage(commonMessages.loadingLabel),
+				visual: { type: 'icon', component: ServerStackIcon },
+				to: serverBreadcrumbTo,
+			})
+		: undefined
 const breadcrumbParent = instanceBreadcrumb ?? serverBreadcrumb
 const breadcrumbDefinition = {
 	slot: 'browse',

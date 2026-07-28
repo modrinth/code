@@ -63,10 +63,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
-import {
-	provideBreadcrumbParent,
-	useBreadcrumb,
-} from '@/providers/breadcrumbs'
+import { provideBreadcrumbParent, useBreadcrumb } from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/theme'
 
 const route = useRoute()
@@ -110,8 +107,7 @@ watch(
 	(value) => {
 		if (!route.path.startsWith('/hosting/manage/') || route.name === 'Servers') return
 		breadcrumbServerId.value = value
-		breadcrumbLabel.value =
-			getCachedServerName(value) ?? formatMessage(commonMessages.loadingLabel)
+		breadcrumbLabel.value = getCachedServerName(value) ?? formatMessage(commonMessages.loadingLabel)
 	},
 	{ flush: 'sync' },
 )

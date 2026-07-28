@@ -138,11 +138,8 @@ import {
 	openAppUpdateChangelog,
 	setAppUpdateActions,
 } from '@/providers/app-update.ts'
+import { createBreadcrumbManager, provideBreadcrumbManager } from '@/providers/breadcrumbs'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
-import {
-	createBreadcrumbManager,
-	provideBreadcrumbManager,
-} from '@/providers/breadcrumbs'
 import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,

@@ -17,17 +17,9 @@
 		>
 			<template v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.slot">
 				<component
-					:is="
-						index < breadcrumbs.length - 1 && breadcrumb.to ? RouterLink : 'span'
-					"
-					v-bind="
-						index < breadcrumbs.length - 1 && breadcrumb.to
-							? { to: breadcrumb.to }
-							: {}
-					"
-					:data-tauri-drag-region="
-						index === breadcrumbs.length - 1 ? '' : undefined
-					"
+					:is="index < breadcrumbs.length - 1 && breadcrumb.to ? RouterLink : 'span'"
+					v-bind="index < breadcrumbs.length - 1 && breadcrumb.to ? { to: breadcrumb.to } : {}"
+					:data-tauri-drag-region="index === breadcrumbs.length - 1 ? '' : undefined"
 					class="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-base font-medium leading-6"
 					:class="
 						index === breadcrumbs.length - 1
