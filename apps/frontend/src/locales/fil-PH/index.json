@@ -2153,99 +2153,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Pakisuri muli ng iyong wallet address. Ang mga pundong nahatid sa maling address ay hindi na mababawi."
   },
-  "profile.bio.fallback.creator": {
-    "message": "Isang tagagawa sa Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Isang tagagamit sa Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Pamahalaan ang billing ng tagagamit"
-  },
-  "profile.button.edit-role": {
-    "message": "Baguhin ang tungkulin"
-  },
-  "profile.button.info": {
-    "message": "Tingang ang mga detalye ng tagagamit"
-  },
-  "profile.button.manage-projects": {
-    "message": "Pamahalaan ang mga proyekto"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Tanggalin bilang affiliate"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Itakda bilang affiliate"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Mga auth provider"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Napatunayan na email"
-  },
-  "profile.details.label.has-password": {
-    "message": "May password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "May TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Mga paraan ng pagbabayad"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Hindi napatunayang email"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Napatunayan na email"
-  },
-  "profile.error.not-found": {
-    "message": "Hindi mahanap na tagagamit"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Tsapa"
-  },
-  "profile.label.collection": {
-    "message": "Koleksiyon"
-  },
-  "profile.label.joined": {
-    "message": "Sumali"
-  },
-  "profile.label.no-collections": {
-    "message": "Walang mga koleksiyon ang tagagamit na ito!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Wala kang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Walang mga proyekto ang tagagmit na ito!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Wala kang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Mga organisasyon"
-  },
-  "profile.label.saving": {
-    "message": "Sine-save..."
-  },
-  "profile.meta.description": {
-    "message": "Magdownload ng mga proyekto ni {username} sa Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Magdownload ng mga proyekto ni {username} sa Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> follower ng proyekto} other {<stat>{count}</stat> na follower ng proyekto}}"
-  },
-  "profile.user-id": {
-    "message": "User ID: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Bigong matanggihan ang anyaya sa koponan"
   },
@@ -3025,12 +2932,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Tungkol sa app"
-  },
-  "settings.authorizations.by": {
-    "message": "ni/ng"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
   },
   "settings.authorizations.head-title": {
     "message": "Mga pagpapahintulot"

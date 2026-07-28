@@ -17,9 +17,10 @@ export const DEFAULT_FEATURE_FLAGS = {
 	i18n_debug: false,
 	show_instance_play_time: true,
 	advanced_filters_collapsed: true,
+	always_show_copy_details: false,
 }
 
-export const THEME_OPTIONS = ['dark', 'light', 'oled', 'system'] as const
+export const THEME_OPTIONS = ['dark', 'light', 'oled', 'retro', 'system'] as const
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
 export type FeatureFlags = Record<FeatureFlag, boolean>

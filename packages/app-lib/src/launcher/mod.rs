@@ -603,19 +603,21 @@ pub async fn install_minecraft_with_reporter(
 
     let protocol_version = read_protocol_version_from_jar(client_path).await?;
 
-    crate::state::instances::commands::set_instance_install_stage(
-        &instance.id,
-        InstanceInstallStage::Installed,
-        &state.pool,
-    )
-    .await?;
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
     crate::state::instances::commands::set_applied_content_set_protocol_version(
         &instance.id,
         protocol_version,
         &state.pool,
     )
     .await?;
+	if reporter.is_none() {
+		crate::state::instances::commands::set_instance_install_stage(
+			&instance.id,
+			InstanceInstallStage::Installed,
+			&state.pool,
+		)
+		.await?;
+		emit_instance(&instance.id, InstancePayloadType::Edited).await?;
+	}
     if let Some(loading_bar) = &loading_bar {
         emit_loading(loading_bar, 1.0, Some("Finished installing"))?;
     }

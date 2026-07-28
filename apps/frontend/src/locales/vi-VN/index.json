@@ -2843,111 +2843,6 @@
   "muralpay.warning.wallet-address": {
     "message": "Hãy kiểm tra kỹ địa chỉ ví. Số tiền gửi đến địa chỉ không chính xác sẽ không thể khôi phục."
   },
-  "profile.bio.fallback.creator": {
-    "message": "Một nhà sáng tạo trên Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Một người dùng Modrinth."
-  },
-  "profile.button.analytics": {
-    "message": "Xem phân tích người dùng"
-  },
-  "profile.button.billing": {
-    "message": "Quản lý thanh toán người dùng"
-  },
-  "profile.button.edit-role": {
-    "message": "Chỉnh sửa vai trò"
-  },
-  "profile.button.info": {
-    "message": "Xem chi tiết người dùng"
-  },
-  "profile.button.manage-projects": {
-    "message": "Quản lý dự án"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Xóa affiliate"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Đặt làm affiliate"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, other {# dự án}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Nhà cung cấp xác thực"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email đã được xác minh"
-  },
-  "profile.details.label.has-password": {
-    "message": "Có mật khẩu"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Có TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Phương thức thanh toán"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email chưa được xác minh"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email đã được xác minh"
-  },
-  "profile.error.not-found": {
-    "message": "Không tìm thấy người dùng"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Huy hiệu"
-  },
-  "profile.label.collection": {
-    "message": "Bộ sưu tập"
-  },
-  "profile.label.joined": {
-    "message": "Đã tham gia"
-  },
-  "profile.label.no-collections": {
-    "message": "Người dùng này chưa có bộ sưu tập nào!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Bạn chưa có bộ sưu tập nào.\nBạn có muốn <create-link>tạo một bộ sưu tập</create-link> không?"
-  },
-  "profile.label.no-projects": {
-    "message": "Người dùng này chưa có dự án nào!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Bạn chưa có dự án nào.\nBạn có muốn <create-link>tạo một dự án</create-link> không?"
-  },
-  "profile.label.organizations": {
-    "message": "Tổ chức"
-  },
-  "profile.label.saving": {
-    "message": "Đang lưu..."
-  },
-  "profile.meta.description": {
-    "message": "Tải xuống các dự án của {username} trên Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Tải xuống các dự án của {username} trên Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Tài khoản chính thúc bởi Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Tài khoản chính thức của Modrinth. Nhận hỗ trợ từ <support-link></support-link> hoặc qua email tại <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
-  },
-  "profile.user-id": {
-    "message": "ID người dùng: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Không thể từ chối lời mời vào nhóm"
   },
@@ -4016,14 +3911,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Về ứng dụng này"
   },
-  "settings.authorizations.by": {
-    "message": "bởi"
-  },
   "settings.authorizations.description": {
     "message": "Khi bạn ủy quyền cho một ứng dụng bằng tài khoản Modrinth của mình, bạn đã cấp cho ứng dụng đó quyền truy cập vào tài khoản của bạn. Bạn có thể quản lý và xem lại quyền truy cập vào tài khoản của mình tại đây bất cứ lúc nào."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Hiện tại chúng tôi không thể hiển thị các ứng dụng đã ủy quyền của bạn, chúng tôi đang nỗ lực khắc phục sự cố này. Vui lòng quay lại trang này sau!"
   },
   "settings.authorizations.head-title": {
     "message": "Quyền hạn"

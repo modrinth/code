@@ -101,6 +101,14 @@ export default new createRouter({
 			},
 		},
 		{
+			path: '/user/:user/:projectType?',
+			name: 'User',
+			component: Pages.User,
+			meta: {
+				breadcrumb: [{ name: '?User' }],
+			},
+		},
+		{
 			path: '/library',
 			name: 'Library',
 			component: Library.Index,

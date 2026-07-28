@@ -3320,117 +3320,6 @@
   "organization.projects.none-with-create-prompt": {
     "message": "У этой организации ещё нет проектов. Хотите <create-link>создать новый</create-link>?"
   },
-  "profile.bio.fallback.creator": {
-    "message": "Автор на Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Пользователь Modrinth."
-  },
-  "profile.button.analytics": {
-    "message": "Посмотреть аналитику"
-  },
-  "profile.button.billing": {
-    "message": "Управление платежами"
-  },
-  "profile.button.edit-role": {
-    "message": "Изменить роль"
-  },
-  "profile.button.info": {
-    "message": "Посмотреть подробности"
-  },
-  "profile.button.manage-projects": {
-    "message": "Управление проектами"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Убрать из партнёров"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Сделать партнёром"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# проект} few {# проекта} other {# проектов}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Сервисы входа"
-  },
-  "profile.details.label.email": {
-    "message": "Почта"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Почта подтверждена"
-  },
-  "profile.details.label.has-password": {
-    "message": "Есть пароль"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Есть TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Способы оплаты"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Почта не подтверждена"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Почта подтверждена"
-  },
-  "profile.error.not-found": {
-    "message": "Пользователь не найден"
-  },
-  "profile.label.affiliate": {
-    "message": "Партнёр"
-  },
-  "profile.label.badges": {
-    "message": "Значки"
-  },
-  "profile.label.collection": {
-    "message": "Коллекция"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
-  },
-  "profile.label.joined": {
-    "message": "Регистрация:"
-  },
-  "profile.label.no-collections": {
-    "message": "У этого пользователя нет коллекций!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "У вас ещё нет коллекций.\nХотите <create-link>создать новую</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "У этого пользователя нет проектов!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "У вас ещё нет проектов.\nХотите <create-link>создать новый</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Организации"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {проект} few {проекта} other {проектов}}"
-  },
-  "profile.label.saving": {
-    "message": "Сохранение..."
-  },
-  "profile.meta.description": {
-    "message": "Скачать проекты {username} на Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — Скачать проекты {username} на Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Официальный аккаунт Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Официальный аккаунт Modrinth. Связаться с поддержкой можно по ссылке <support-link></support-link> или по электронной почте: <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} other {<stat>{count}</stat> подписчиков}} у проектов"
-  },
-  "profile.user-id": {
-    "message": "ID пользователя: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Не удалось отклонить приглашение в команду"
   },
@@ -4859,14 +4748,8 @@
   "settings.authorizations.about-this-app": {
     "message": "О приложении"
   },
-  "settings.authorizations.by": {
-    "message": "от"
-  },
   "settings.authorizations.description": {
     "message": "Авторизованные приложения получают доступ к аккаунту Modrinth. Здесь можно просматривать и отзывать этот доступ."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Список приложений временно недоступен. Мы работаем над исправлением — загляните сюда позже."
   },
   "settings.authorizations.head-title": {
     "message": "Авторизации"

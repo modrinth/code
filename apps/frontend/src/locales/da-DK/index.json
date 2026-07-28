@@ -2180,87 +2180,6 @@
   "organization.projects.none-with-create-prompt": {
     "message": "Denne organisation har ikke nogle projekter endnu. Kunnde dig tænke dig at <create-link>oprette et</create-link>?"
   },
-  "profile.bio.fallback.creator": {
-    "message": "En Modrinth skaber."
-  },
-  "profile.bio.fallback.user": {
-    "message": "En Modrinth bruger."
-  },
-  "profile.button.edit-role": {
-    "message": "Rediger rolle"
-  },
-  "profile.button.info": {
-    "message": "Vis bruger detaljer"
-  },
-  "profile.button.manage-projects": {
-    "message": "Administrer projekter"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email bekræftet"
-  },
-  "profile.details.label.has-password": {
-    "message": "Har adgangskode"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Har TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Betalingsmetoder"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email ikke bekræftet"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email bekræftet"
-  },
-  "profile.error.not-found": {
-    "message": "Bruger ikke fundet"
-  },
-  "profile.label.badges": {
-    "message": "Emblemer"
-  },
-  "profile.label.collection": {
-    "message": "Samling"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Tilsluttet"
-  },
-  "profile.label.no-collections": {
-    "message": "Denne bruger har ingen samlinger!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Du har ingen samlinger.\nKunne du tænke dig at <create-link>oprette en</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Denne bruger har ingen projekter!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Du har ingen projekter.\nKunne du tænke dig at <create-link>oprette en</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organisationer"
-  },
-  "profile.label.saving": {
-    "message": "Gemmer..."
-  },
-  "profile.meta.description": {
-    "message": "Download {username}'s projekter på Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Download {username}'s projekter på Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt følger} other {<stat>{count}</stat> projekt følgere}}"
-  },
-  "profile.user-id": {
-    "message": "Bruger-ID: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Afvisning af hold invitation fejlede"
   },
@@ -3079,9 +2998,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "Omkring denne app"
-  },
-  "settings.authorizations.by": {
-    "message": "af"
   },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"

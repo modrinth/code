@@ -2729,96 +2729,6 @@
   "organization.project-transfer.type-column": {
     "message": "タイプ"
   },
-  "profile.bio.fallback.creator": {
-    "message": "Modrinthの作成者。"
-  },
-  "profile.bio.fallback.user": {
-    "message": "Modrinthのユーザー。"
-  },
-  "profile.button.billing": {
-    "message": "ユーザー課金管理"
-  },
-  "profile.button.edit-role": {
-    "message": "ロールを編集"
-  },
-  "profile.button.info": {
-    "message": "ユーザー情報を表示"
-  },
-  "profile.button.manage-projects": {
-    "message": "プロジェクトを管理"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "アフィリエイトを解除する"
-  },
-  "profile.button.set-affiliate": {
-    "message": "アフィリエイトとして設定する"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "認証プロバイダー"
-  },
-  "profile.details.label.email": {
-    "message": "メールドレス"
-  },
-  "profile.details.label.email-verified": {
-    "message": "メールアドレス認証済み"
-  },
-  "profile.details.label.has-password": {
-    "message": "パスワードがすでにあります"
-  },
-  "profile.details.label.has-totp": {
-    "message": "TOTPがあります"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "支払い方法"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "メールアドレス未認証"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "メールアドレス認証済み"
-  },
-  "profile.error.not-found": {
-    "message": "ユーザーが見つかりませんでした"
-  },
-  "profile.label.affiliate": {
-    "message": "アフィリエイト"
-  },
-  "profile.label.badges": {
-    "message": "バッジ"
-  },
-  "profile.label.collection": {
-    "message": "コレクション"
-  },
-  "profile.label.joined": {
-    "message": "参加: "
-  },
-  "profile.label.no-collections": {
-    "message": "このユーザーのコレクションはありません！"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "コレクションがありません。\n <create-link>コレクションを作成しますか</create-link>？"
-  },
-  "profile.label.no-projects": {
-    "message": "このユーザーのプロジェクトはありません！"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "プロジェクトがありません\nプロジェクトを<create-link>作成しますか</create-link>？"
-  },
-  "profile.label.organizations": {
-    "message": "組織"
-  },
-  "profile.label.saving": {
-    "message": "保存中…"
-  },
-  "profile.meta.description": {
-    "message": "Modrinthで{username}のプロジェクトをダウンロードする"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Modrinthで{username}のプロジェクトをダウンロードする"
-  },
-  "profile.user-id": {
-    "message": "ユーザーID: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "チームへの招待の辞退に失敗しました"
   },
@@ -3803,14 +3713,8 @@
   "settings.authorizations.about-this-app": {
     "message": "このアプリについて"
   },
-  "settings.authorizations.by": {
-    "message": "作成者"
-  },
   "settings.authorizations.description": {
     "message": "Modrinthアカウントでアプリケーションを承認することにより、アプリケーションがあなたのアカウントにアクセスできるようになります。 アクセス権はいつでも確認でき、変更可能です。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "現在承認済みアプリを表示することができません。現在修正中のため、また後ほど確認ください！"
   },
   "settings.authorizations.head-title": {
     "message": "承認"

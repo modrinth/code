@@ -8,13 +8,14 @@ import {
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type { FriendWithUserData } from '@/helpers/friends.ts'
 
 const { formatMessage } = useVIntl()
+const router = useRouter()
 
 const props = withDefaults(
 	defineProps<{
@@ -54,7 +55,7 @@ function createContextMenuOptions(friend: FriendWithUserData) {
 }
 
 function openProfile(username: string) {
-	openUrl('https://modrinth.com/user/' + username)
+	void router.push(`/user/${encodeURIComponent(username)}`)
 }
 
 const friendOptions = useTemplateRef('friendOptions')

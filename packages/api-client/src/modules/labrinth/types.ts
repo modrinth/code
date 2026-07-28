@@ -1663,6 +1663,8 @@ export namespace Labrinth {
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
 				github_id?: number
+				discord_id?: string
+				steam_id?: string
 			}
 
 			export type SearchUser = {

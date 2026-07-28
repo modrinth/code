@@ -1214,60 +1214,6 @@
   "muralpay.rail.fiat-usd.name": {
     "message": "Transfer bancar (USD)"
   },
-  "profile.bio.fallback.creator": {
-    "message": "Un creator Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Un utilizator Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Administrează facturarea utilizatorului"
-  },
-  "profile.button.edit-role": {
-    "message": "Editează rolul"
-  },
-  "profile.button.info": {
-    "message": "Vizualizează detaliile utilizatorului"
-  },
-  "profile.button.manage-projects": {
-    "message": "Administrează proiectele"
-  },
-  "profile.error.not-found": {
-    "message": "Utilizatorul nu a fost găsit"
-  },
-  "profile.label.badges": {
-    "message": "Insigne"
-  },
-  "profile.label.no-collections": {
-    "message": "Acest utilizator nu are colecții!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Nu ai nicio colecție.\nVrei să <create-link>creezi una</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Acest utilizator nu are proiecte!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Nu aveți proiecte.\nDoriți să <create-link>creați unul</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizații"
-  },
-  "profile.label.saving": {
-    "message": "Salvare..."
-  },
-  "profile.meta.description": {
-    "message": "Descarcă proiectele lui {username} pe Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Descarcă proiectele lui {username} pe Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> urmăritor} other {<stat>{count}</stat> urmăritori}}"
-  },
-  "profile.user-id": {
-    "message": "ID-ul utilizatorului: {id}"
-  },
   "project-member-header.error-decline": {
     "message": "Refuzarea invitației în echipă a eșuat"
   },

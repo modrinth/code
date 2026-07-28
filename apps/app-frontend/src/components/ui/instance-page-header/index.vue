@@ -186,8 +186,8 @@ import {
 	type TeleportOverflowMenuItem,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import type { GameInstance } from '@/helpers/types'
 
@@ -247,6 +247,7 @@ const messages = defineMessages({
 		defaultMessage: "This instance's content is being shared to other users.",
 	},
 })
+const router = useRouter()
 
 const props = withDefaults(
 	defineProps<{
@@ -331,7 +332,7 @@ const sharedInstanceManagerLabel = computed(() =>
 const sharedInstanceManagerAction = computed(() => {
 	const manager = props.sharedInstanceManager
 	if (manager?.type !== 'user') return undefined
-	return () => openUrl(`https://modrinth.com/user/${encodeURIComponent(manager.name)}`)
+	return () => router.push(`/user/${encodeURIComponent(manager.name)}`)
 })
 const playtimeLabel = computed(() => {
 	if (props.timePlayed <= 0) return formatMessage(messages.neverPlayed)
