@@ -3,39 +3,49 @@ import { SpinnerIcon } from '@modrinth/assets'
 import { Avatar, injectNotificationManager } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import { onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import NavButton from '@/components/ui/NavButton.vue'
 import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
 
+const ITEM_SIZE = 52
+const USED_VERTICAL_SPACE = 538
+
 const { handleError } = injectNotificationManager()
 
-const recentInstances = ref([])
+const maxVisible = ref(0)
+const allInstances = ref([])
+
+const recentInstances = computed(() => allInstances.value.slice(0, maxVisible.value))
+
+const updateMaxVisible = () => {
+	maxVisible.value = Math.max(0, Math.floor((window.innerHeight - USED_VERTICAL_SPACE) / ITEM_SIZE))
+}
+
 const getInstances = async () => {
 	const instances = await list().catch(handleError)
 
-	recentInstances.value = instances
-		.sort((a, b) => {
-			const dateACreated = dayjs(a.created)
-			const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
+	allInstances.value = instances.sort((a, b) => {
+		const dateACreated = dayjs(a.created)
+		const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
 
-			const dateBCreated = dayjs(b.created)
-			const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
+		const dateBCreated = dayjs(b.created)
+		const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
 
-			const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
-			const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
+		const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+		const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
 
-			if (dateA.isSame(dateB)) {
-				return a.name.localeCompare(b.name)
-			}
+		if (dateA.isSame(dateB)) {
+			return a.name.localeCompare(b.name)
+		}
 
-			return dateB - dateA
-		})
-		.slice(0, 3)
+		return dateB - dateA
+	})
 }
 
 await getInstances()
+updateMaxVisible()
 
 const unlistenInstance = await instance_listener(async (event) => {
 	if (event.event !== 'synced') {
@@ -43,7 +53,12 @@ const unlistenInstance = await instance_listener(async (event) => {
 	}
 })
 
+onMounted(() => {
+	window.addEventListener('resize', updateMaxVisible)
+})
+
 onUnmounted(() => {
+	window.removeEventListener('resize', updateMaxVisible)
 	unlistenInstance()
 })
 </script>

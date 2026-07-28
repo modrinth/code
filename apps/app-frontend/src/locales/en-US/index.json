@@ -809,6 +809,9 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
+  "app.restarting": {
+    "message": "Restarting..."
+  },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
   },
@@ -889,9 +892,6 @@
   },
   "app.settings.developer-mode-button.label": {
     "message": "Toggle developer mode"
-  },
-  "app.restarting": {
-    "message": "Restarting..."
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
