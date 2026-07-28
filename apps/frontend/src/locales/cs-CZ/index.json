@@ -2975,12 +2975,6 @@
   "settings.pats.modal.delete.description": {
     "message": "Toto vymaže tento token navždy (jako opravdu navždy)."
   },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilový obrázek"
-  },
   "settings.sidebar.label.developer": {
     "message": "Vývojář"
   },

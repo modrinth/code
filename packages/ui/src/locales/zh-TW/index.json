@@ -5105,9 +5105,6 @@
   "settings.pats.title": {
     "defaultMessage": "個人存取權杖"
   },
-  "settings.profile.title": {
-    "defaultMessage": "公開個人檔案"
-  },
   "settings.sessions.title": {
     "defaultMessage": "工作階段"
   },
@@ -5940,4 +5937,3 @@
     "defaultMessage": "類型"
   }
 }
-

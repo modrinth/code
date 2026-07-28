@@ -4574,27 +4574,6 @@
   "settings.pats.token.never-used": {
     "message": "Sohasem volt használva"
   },
-  "settings.profile.bio.description": {
-    "message": "Egy rövid leírás, hogy mindenki megismerjen téged."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bemutatkozás"
-  },
-  "settings.profile.description": {
-    "message": "A profiladataid nyilvánosan megtekinthetők a Modrinthon és a <docs-link>Modrinth API</docs-link>-n keresztül."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilbeállítások"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformációk"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilkép"
-  },
-  "settings.profile.username.description": {
-    "message": "Egyedi, kis- és nagybetűktől független név a profilod azonosításához."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Munkamenet visszavonása"
   },

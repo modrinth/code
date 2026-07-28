@@ -5105,9 +5105,6 @@
   "settings.pats.title": {
     "defaultMessage": "个人访问令牌"
   },
-  "settings.profile.title": {
-    "defaultMessage": "公开信息"
-  },
   "settings.sessions.title": {
     "defaultMessage": "会话"
   },
@@ -5940,4 +5937,3 @@
     "defaultMessage": "类型"
   }
 }
-

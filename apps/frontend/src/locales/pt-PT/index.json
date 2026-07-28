@@ -3779,27 +3779,6 @@
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
   },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para que todos possam saber mais sobre ti."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biografia"
-  },
-  "settings.profile.description": {
-    "message": "As informações do teu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Definições do perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Imagem do perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas de minúsculas para identificar o teu perfil."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Revogar sessão"
   },

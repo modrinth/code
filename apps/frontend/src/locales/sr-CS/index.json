@@ -1973,27 +1973,6 @@
   "settings.pats.token.never-used": {
     "message": "Nikada korišćen"
   },
-  "settings.profile.bio.description": {
-    "message": "Kratak opis kojim ćete drugima reći nešto o sebi."
-  },
-  "settings.profile.bio.title": {
-    "message": "Opis"
-  },
-  "settings.profile.description": {
-    "message": "Informacije na vašem profilu su javno vidljive na Modrinthu i putem <docs-link>Modrinth API-ja</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Podešavanja profila"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informacije o profilu"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilna slika"
-  },
-  "settings.profile.username.description": {
-    "message": "Jedinstveno ime, bez razlikovanja velikih i malih slova, koje identifikuje vaš profil."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Opozovi sesiju"
   },

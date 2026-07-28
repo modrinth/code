@@ -5084,27 +5084,6 @@
   "settings.pats.token.never-used": {
     "message": "사용된 적 없음"
   },
-  "settings.profile.bio.description": {
-    "message": "모든 사람에게 당신을 소개하는 간단한 설명입니다."
-  },
-  "settings.profile.bio.title": {
-    "message": "자기소개"
-  },
-  "settings.profile.description": {
-    "message": "당신의 프로필 정보는 Modrinth 나 <docs-link>Modrinth API</docs-link>를 통해 공개될 수 있습니다."
-  },
-  "settings.profile.head-title": {
-    "message": "프로필 설정"
-  },
-  "settings.profile.profile-info": {
-    "message": "프로필 정보"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "프로필 사진"
-  },
-  "settings.profile.username.description": {
-    "message": "대소문자 구분 없이 프로필을 식별할 수 있는 이름"
-  },
   "settings.sessions.action.revoke-session": {
     "message": "세션 제거"
   },

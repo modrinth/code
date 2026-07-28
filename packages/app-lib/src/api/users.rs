@@ -1,7 +1,5 @@
 use crate::State;
-use crate::util::fetch::{
-    fetch_advanced, fetch_advanced_bytes, fetch_json,
-};
+use crate::util::fetch::{fetch_advanced, fetch_advanced_bytes, fetch_json};
 use bytes::Bytes;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -169,11 +167,7 @@ pub async fn delete_user_avatar(user_id: &str) -> crate::Result<()> {
 
     fetch_advanced(
         Method::DELETE,
-        &format!(
-            "{}user/{}/icon",
-            env!("MODRINTH_API_URL"),
-            user_id
-        ),
+        &format!("{}user/{}/icon", env!("MODRINTH_API_URL"), user_id),
         None,
         None,
         None,

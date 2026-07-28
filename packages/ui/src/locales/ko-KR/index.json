@@ -5039,9 +5039,6 @@
   "settings.pats.title": {
     "defaultMessage": "개인 액세스 토큰"
   },
-  "settings.profile.title": {
-    "defaultMessage": "공개 프로필"
-  },
   "settings.sessions.title": {
     "defaultMessage": "세션"
   },

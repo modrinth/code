@@ -3977,27 +3977,6 @@
   "settings.pats.token.never-used": {
     "message": "Aldri brukt"
   },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivelse sånn at alle veit litt om deg."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilinnstillinger"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformasjon"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbilde"
-  },
-  "settings.profile.username.description": {
-    "message": "Et unikt navn (som ikke skiller mellom store og små bokstaver) for å identifisere profilen din."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Tilbakekall økta"
   },

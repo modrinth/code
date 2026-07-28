@@ -5084,27 +5084,6 @@
   "settings.pats.token.never-used": {
     "message": "Не використовувався"
   },
-  "settings.profile.bio.description": {
-    "message": "Короткий опис, щоб розповісти всім трохи про себе."
-  },
-  "settings.profile.bio.title": {
-    "message": "Про себе"
-  },
-  "settings.profile.description": {
-    "message": "Інформація з вашого профілю є загальнодоступною на Modrinth та через <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Налаштування профілю"
-  },
-  "settings.profile.profile-info": {
-    "message": "Інформація про профіль"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Зображення профілю"
-  },
-  "settings.profile.username.description": {
-    "message": "Унікальне ім’я без урахування регістру, для ідентифікації вашого профілю."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"
   },

@@ -2042,24 +2042,6 @@
   "settings.pats.token.never-used": {
     "message": "N-a fost folosit niciodată"
   },
-  "settings.profile.bio.description": {
-    "message": "O scurtă descriere pentru a le spune tuturor câte ceva despre tine."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biografie"
-  },
-  "settings.profile.description": {
-    "message": "Informațiile profilului tău sunt vizibile public pe Modrinth și prin intermediul <docs-link>API-ului Modrinth</docs-link>."
-  },
-  "settings.profile.profile-info": {
-    "message": "Informațiile profilului"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Imagine de profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Un nume unic care nu ține cont de majuscule, pentru a-ți identifica profilul."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Anulează sesiunea"
   },

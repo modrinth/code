@@ -7,10 +7,7 @@
 			fade="danger"
 			max-width="500px"
 		>
-			<Admonition
-				type="critical"
-				:header="formatMessage(messages.blockUserAdmonitionTitle)"
-			>
+			<Admonition type="critical" :header="formatMessage(messages.blockUserAdmonitionTitle)">
 				{{ formatMessage(messages.blockUserAdmonitionBody, { username: user.username }) }}
 			</Admonition>
 
@@ -839,9 +836,7 @@ const showCollectionsEmptyState = computed(
 )
 
 const normalizedSiteUrl = computed(() => props.siteUrl.replace(/\/$/, ''))
-const editProfileLink = computed(
-	() => props.editProfileLink ?? linkTarget('/settings/profile'),
-)
+const editProfileLink = computed(() => props.editProfileLink ?? linkTarget('/settings/profile'))
 
 function externalUrl(path: string): string {
 	return `${normalizedSiteUrl.value}${path.startsWith('/') ? path : `/${path}`}`

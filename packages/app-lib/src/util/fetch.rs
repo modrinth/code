@@ -590,9 +590,9 @@ pub async fn fetch_advanced_with_client(
     .await
 }
 
-#[tracing::instrument(
-    skip(json_body, bytes_body, semaphore, client, progress)
-)]
+#[tracing::instrument(skip(
+    json_body, bytes_body, semaphore, client, progress
+))]
 #[allow(clippy::too_many_arguments)]
 async fn fetch_advanced_with_client_and_progress(
     method: Method,

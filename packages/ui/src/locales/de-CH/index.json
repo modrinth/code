@@ -5105,9 +5105,6 @@
   "settings.pats.title": {
     "defaultMessage": "Persöhnlich Zugangstoken"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Öffentliches Profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sitzungen"
   },
@@ -5940,4 +5937,3 @@
     "defaultMessage": "Typ"
   }
 }
-

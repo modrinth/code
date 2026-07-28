@@ -3170,27 +3170,6 @@
   "settings.pats.token.never-used": {
     "message": "Hindi ginamit"
   },
-  "settings.profile.bio.description": {
-    "message": "Isang maikling paglalarawan upang maipaalam sa lahat ang maliit na sipi ukol sa iyo."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biyograpiya"
-  },
-  "settings.profile.description": {
-    "message": "Makikita ng publiko ang impormasyon ng iyong profile at sa <docs-link>API ng Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Settings ng profile"
-  },
-  "settings.profile.profile-info": {
-    "message": "Impormasyon ng profile"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profile picture"
-  },
-  "settings.profile.username.description": {
-    "message": "Isang natatanging case-insensitive na pangalan upang matukoy ang iyong profile."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Bawiin ang sesyon"
   },

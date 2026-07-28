@@ -25,18 +25,11 @@
 	</EmptyState>
 
 	<div v-else class="flex flex-col gap-4">
-		<p
-			class="m-0 text-secondary"
-			:class="{ 'order-last': disclaimerPosition === 'bottom' }"
-		>
+		<p class="m-0 text-secondary" :class="{ 'order-last': disclaimerPosition === 'bottom' }">
 			<IntlFormatted :message-id="messages.description">
 				<template #profile-link="{ children }">
 					<RouterLink v-slot="{ href, navigate }" :to="profilePath" custom>
-						<a
-							:href="href"
-							class="text-link"
-							@click="handleProfileLinkClick($event, navigate)"
-						>
+						<a :href="href" class="text-link" @click="handleProfileLinkClick($event, navigate)">
 							<component :is="() => children" />
 						</a>
 					</RouterLink>
@@ -61,12 +54,7 @@
 					{{ formatMessage(messages.profilePicture) }}
 				</h2>
 				<div class="flex items-center gap-4">
-					<Avatar
-						:src="displayedAvatarUrl"
-						size="md"
-						circle
-						:alt="auth.user.value.username"
-					/>
+					<Avatar :src="displayedAvatarUrl" size="md" circle :alt="auth.user.value.username" />
 					<div class="flex flex-col gap-2">
 						<ButtonStyled>
 							<FileInput
@@ -153,11 +141,7 @@ import FileInput from '#ui/components/base/FileInput.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables'
-import {
-	type AuthUser,
-	injectAuth,
-	injectNotificationManager,
-} from '#ui/providers'
+import { type AuthUser, injectAuth, injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils'
 
 type ProfileFields = {

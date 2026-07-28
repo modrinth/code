@@ -4124,27 +4124,6 @@
   "settings.pats.token.never-used": {
     "message": "Aldrig använd"
   },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivning för att berätta lite om dig själv."
-  },
-  "settings.profile.bio.title": {
-    "message": "Om mig"
-  },
-  "settings.profile.description": {
-    "message": "Din profilinformation visas offentligt på Modrinth och genom <docs-link>Modrinth API:t</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilinställningar"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformation"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbild"
-  },
-  "settings.profile.username.description": {
-    "message": "Ett unikt skift-känsligt namn för att identifiera din profil."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Återkalla session"
   },

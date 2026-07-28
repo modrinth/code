@@ -76,7 +76,5 @@ export async function unblock_user(userId: string): Promise<void> {
 }
 
 export async function get_blocked_users(): Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]> {
-	return await invoke<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
-		'plugin:users|get_blocked_users',
-	)
+	return await invoke<Labrinth.BlockedUsers.v3.BlockedUserId[]>('plugin:users|get_blocked_users')
 }

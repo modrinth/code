@@ -403,9 +403,7 @@ async function submitReport() {
 					queryClient.setQueryData<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
 						blockedUsersQueryKey(authUserId),
 						(blockedUsers = []) =>
-							blockedUsers.includes(blockTarget)
-								? blockedUsers
-								: [...blockedUsers, blockTarget],
+							blockedUsers.includes(blockTarget) ? blockedUsers : [...blockedUsers, blockTarget],
 					)
 				}
 				addNotification({

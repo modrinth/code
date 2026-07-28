@@ -169,12 +169,8 @@ const originalUnsavedChangesState = computed(
 const modifiedUnsavedChangesState = computed(
 	() => unsavedChangesController.value?.getModified() ?? emptyUnsavedChangesState,
 )
-const savingUnsavedChanges = computed(
-	() => unsavedChangesController.value?.isSaving() ?? false,
-)
-const hasUnsavedChanges = computed(
-	() => unsavedChangesController.value?.hasChanges() ?? false,
-)
+const savingUnsavedChanges = computed(() => unsavedChangesController.value?.isSaving() ?? false)
+const hasUnsavedChanges = computed(() => unsavedChangesController.value?.hasChanges() ?? false)
 
 function canLeaveCurrentTab(): boolean {
 	if (!unsavedChangesController.value?.hasChanges()) return true

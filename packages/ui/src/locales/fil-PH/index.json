@@ -2294,9 +2294,6 @@
   "settings.pats.title": {
     "defaultMessage": "Mga personal na access token"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Pampublikong profile"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Mga sesyon"
   },
@@ -2769,4 +2766,3 @@
     "defaultMessage": "Uri"
   }
 }
-

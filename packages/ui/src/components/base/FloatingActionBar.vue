@@ -207,11 +207,7 @@ defineExpose({ nudge })
 				v-if="shown"
 				ref="barEl"
 				class="floating-action-bar drop-shadow-2xl"
-				:class="
-					inline
-						? 'floating-action-bar--inline z-10'
-						: 'fixed bottom-0 p-4'
-				"
+				:class="inline ? 'floating-action-bar--inline z-10' : 'fixed bottom-0 p-4'"
 				:style="inline ? undefined : barStyle"
 				aria-live="polite"
 			>

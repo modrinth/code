@@ -39,12 +39,8 @@ pub async fn change_user_avatar(
     extension: &str,
 ) -> Result<()> {
     Ok(
-        theseus::users::change_user_avatar(
-            user_id,
-            image.into(),
-            extension,
-        )
-        .await?,
+        theseus::users::change_user_avatar(user_id, image.into(), extension)
+            .await?,
     )
 }
 
