@@ -131,7 +131,7 @@ const tabs = [
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.default-instance-options',
-			defaultMessage: 'Default instance options',
+			defaultMessage: 'Default game options',
 		}),
 		category: tabCategories.instances,
 		icon: GameIcon,
