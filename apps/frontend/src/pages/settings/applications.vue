@@ -549,7 +549,7 @@ async function onImageSelection(files) {
 		const file = files[0]
 		const extFromType = file.type.split('/')[1]
 
-		await client.labrinth.oauth_internal.uploadAppIcon(editingId.value, file, extFromType).promise
+		await client.labrinth.oauth_internal.uploadAppIcon(editingId.value, file, extFromType)
 
 		await refresh()
 
