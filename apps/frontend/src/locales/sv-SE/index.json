@@ -2552,9 +2552,6 @@
   "layout.nav.discover": {
     "message": "Utforska"
   },
-  "layout.nav.discover-content": {
-    "message": "Utforska innehåll"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Installera Modrinth App"
   },

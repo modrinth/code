@@ -1985,9 +1985,6 @@
   "layout.nav.discover": {
     "message": "Opdag"
   },
-  "layout.nav.discover-content": {
-    "message": "Opdag indhold"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Hent Modrinth-app"
   },

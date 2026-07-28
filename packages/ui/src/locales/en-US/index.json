@@ -2240,6 +2240,9 @@
   "label.details": {
     "defaultMessage": "Details"
   },
+  "label.discover-content": {
+    "defaultMessage": "Discover content"
+  },
   "label.done": {
     "defaultMessage": "Done"
   },

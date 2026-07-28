@@ -242,9 +242,6 @@
   "app.browse.back-to-instance": {
     "message": "回到實例"
   },
-  "app.browse.discover-content": {
-    "message": "探索內容"
-  },
   "app.browse.discover-servers": {
     "message": "探索伺服器"
   },

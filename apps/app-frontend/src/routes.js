@@ -21,14 +21,6 @@ export default new createRouter({
 			},
 		},
 		{
-			path: '/worlds',
-			name: 'Worlds',
-			component: Pages.Worlds,
-			meta: {
-				breadcrumb: [{ name: 'Worlds' }],
-			},
-		},
-		{
 			path: '/hosting/manage/',
 			name: 'Servers',
 			component: Pages.Servers,

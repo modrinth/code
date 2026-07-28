@@ -224,9 +224,6 @@
   "app.browse.back-to-instance": {
     "message": "Volver a instancia"
   },
-  "app.browse.discover-content": {
-    "message": "Descubrir contenido"
-  },
   "app.browse.discover-servers": {
     "message": "Descubrir servidores"
   },

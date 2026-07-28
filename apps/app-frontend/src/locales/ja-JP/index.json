@@ -239,9 +239,6 @@
   "app.browse.back-to-instance": {
     "message": "インスタンスに戻る"
   },
-  "app.browse.discover-content": {
-    "message": "コンテンツを探す"
-  },
   "app.browse.discover-servers": {
     "message": "サーバーを探す"
   },

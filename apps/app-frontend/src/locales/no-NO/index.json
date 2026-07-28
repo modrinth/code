@@ -140,9 +140,6 @@
   "app.browse.back-to-instance": {
     "message": "Tilbake til tilfelle"
   },
-  "app.browse.discover-content": {
-    "message": "Oppdag innhold"
-  },
   "app.browse.discover-servers": {
     "message": "Oppdag servere"
   },

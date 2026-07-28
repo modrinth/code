@@ -385,10 +385,6 @@ const messages = defineMessages({
 		id: 'app.browse.add-to-an-instance',
 		defaultMessage: 'Add to an instance',
 	},
-	discoverContent: {
-		id: 'app.browse.discover-content',
-		defaultMessage: 'Discover content',
-	},
 	discoverServers: {
 		id: 'app.browse.discover-servers',
 		defaultMessage: 'Discover servers',
@@ -450,7 +446,9 @@ const messages = defineMessages({
 
 const breadcrumbs = useBreadcrumbs()
 const browseTitle = computed(() =>
-	formatMessage(isFromWorlds.value ? messages.discoverServers : messages.discoverContent),
+	formatMessage(
+		isFromWorlds.value ? messages.discoverServers : commonMessages.discoverContentLabel,
+	),
 )
 breadcrumbs.setName('BrowseTitle', browseTitle.value)
 if (instance.value) {
@@ -484,7 +482,7 @@ function resetInstanceContext() {
 	hiddenInstanceProjectIds.value = new Set()
 	hiddenInstanceProjectIdsInitialized.value = false
 	isServerInstance.value = false
-	breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
+	breadcrumbs.setName('BrowseTitle', formatMessage(commonMessages.discoverContentLabel))
 	breadcrumbs.setContext(null)
 }
 
