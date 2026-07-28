@@ -18,11 +18,14 @@ import { computed, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 
 import {
+	block_user,
+	get_blocked_users,
 	get_user_collections,
 	get_user_organizations,
 	get_user_profile,
 	get_user_projects,
 	patch_user,
+	unblock_user,
 } from '@/helpers/users'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
@@ -35,6 +38,9 @@ const userProfile = provideUserProfile({
 	getOrganizations: get_user_organizations,
 	getCollections: get_user_collections,
 	patchUser: patch_user,
+	getBlockedUsers: get_blocked_users,
+	blockUser: block_user,
+	unblockUser: unblock_user,
 })
 
 const userId = computed(() => {

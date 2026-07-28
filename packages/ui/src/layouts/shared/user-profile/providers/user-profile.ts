@@ -11,7 +11,13 @@ export interface UserProfileContext {
 		userId: string,
 		patch: Partial<Pick<Labrinth.Users.v3.User, 'badges' | 'role'>>,
 	) => Promise<void>
+	getBlockedUsers: () => Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]>
+	blockUser: (userId: string) => Promise<void>
+	unblockUser: (userId: string) => Promise<void>
 }
+
+export const blockedUsersQueryKey = (userId?: string | null) =>
+	['blocked-users', userId ?? null] as const
 
 export const [injectUserProfile, provideUserProfile] = createContext<UserProfileContext>(
 	'UserProfilePageLayout',

@@ -82,6 +82,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	AffiliateIcon,
 	BadgeCheckIcon,
+	BanIcon,
 	BoxIcon,
 	CalendarIcon,
 	ChartIcon,
@@ -122,6 +123,14 @@ const messages = defineMessages({
 	billingButton: {
 		id: 'profile.button.billing',
 		defaultMessage: 'Manage user billing',
+	},
+	blockButton: {
+		id: 'profile.button.block',
+		defaultMessage: 'Block',
+	},
+	unblockButton: {
+		id: 'profile.button.unblock',
+		defaultMessage: 'Unblock',
 	},
 	editRoleButton: {
 		id: 'profile.button.edit-role',
@@ -175,6 +184,7 @@ const props = withDefaults(
 		isAdmin?: boolean
 		isStaff?: boolean
 		showStaffActions?: boolean
+		isBlocked?: boolean
 		projectsCount?: number
 		downloads?: number
 	}>(),
@@ -190,6 +200,7 @@ const props = withDefaults(
 		isAdmin: false,
 		isStaff: false,
 		showStaffActions: false,
+		isBlocked: false,
 		projectsCount: 0,
 		downloads: 0,
 	},
@@ -198,6 +209,7 @@ const props = withDefaults(
 const emit = defineEmits<{
 	manageProjects: []
 	report: []
+	block: []
 	copyId: []
 	copyPermalink: []
 	openBilling: []
@@ -233,6 +245,14 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		label: formatMessage(commonMessages.reportButton),
 		icon: ReportIcon,
 		action: () => emit('report'),
+		color: 'red',
+		shown: props.authUser?.id !== props.user.id,
+	},
+	{
+		id: 'block',
+		label: formatMessage(props.isBlocked ? messages.unblockButton : messages.blockButton),
+		icon: BanIcon,
+		action: () => emit('block'),
 		color: 'red',
 		shown: props.authUser?.id !== props.user.id,
 	},
