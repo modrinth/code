@@ -4757,14 +4757,8 @@
   "settings.authorizations.about-this-app": {
     "message": "À propos de cette application"
   },
-  "settings.authorizations.by": {
-    "message": "par"
-  },
   "settings.authorizations.description": {
     "message": "Lorsque vous autorisez une application avec votre compte Modrinth, vous lui accordez l’accès à votre compte. Vous pouvez gérer et consulter les accès à votre compte ici à tout moment."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Nous ne pouvons pas afficher vos applications autorisées pour le moment, nous travaillons à résoudre ce problème. Veuillez revenir sur cette page ultérieurement !"
   },
   "settings.authorizations.head-title": {
     "message": "Autorisations"

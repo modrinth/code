@@ -2,6 +2,7 @@
 import {
 	Admonition,
 	AutoLink,
+	commonSettingsMessages,
 	IntlFormatted,
 	LanguageSelector,
 	languageSelectorMessages,
@@ -43,7 +44,9 @@ async function onLocaleChange(newLocale: string) {
 </script>
 
 <template>
-	<h2 class="m-0 text-lg font-semibold text-contrast">Language</h2>
+	<h2 class="m-0 text-lg font-semibold text-contrast">
+		{{ formatMessage(commonSettingsMessages.language) }}
+	</h2>
 
 	<Admonition type="warning" class="mt-2 mb-4">
 		{{ formatMessage(languageSelectorMessages.languageWarning, { platform }) }}

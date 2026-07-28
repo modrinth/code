@@ -3908,14 +3908,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Về ứng dụng này"
   },
-  "settings.authorizations.by": {
-    "message": "bởi"
-  },
   "settings.authorizations.description": {
     "message": "Khi bạn ủy quyền cho một ứng dụng bằng tài khoản Modrinth của mình, bạn đã cấp cho ứng dụng đó quyền truy cập vào tài khoản của bạn. Bạn có thể quản lý và xem lại quyền truy cập vào tài khoản của mình tại đây bất cứ lúc nào."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Hiện tại chúng tôi không thể hiển thị các ứng dụng đã ủy quyền của bạn, chúng tôi đang nỗ lực khắc phục sự cố này. Vui lòng quay lại trang này sau!"
   },
   "settings.authorizations.head-title": {
     "message": "Quyền hạn"

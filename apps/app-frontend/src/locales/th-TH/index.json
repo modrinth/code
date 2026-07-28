@@ -107,9 +107,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "ของตกแต่งดั้งเดิม"
   },
-  "app.appearance-settings.select-option": {
-    "message": "เลือกตัวเลือก"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "แสดงเวลาที่คุณใช้เล่นในแต่ละอินสแตนซ์"
   },

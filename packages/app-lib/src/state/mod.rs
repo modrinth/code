@@ -150,6 +150,10 @@ impl State {
             )
             .await;
 
+            if let Err(e) = crate::api::instance::migrate_legacy_icons().await {
+                tracing::error!("Error migrating legacy instance icons: {e}");
+            }
+
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 instances::refresh_all_instances(),

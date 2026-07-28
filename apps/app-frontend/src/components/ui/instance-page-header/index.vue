@@ -15,12 +15,12 @@
 			</PageHeaderBadgeItem>
 			<PageHeaderBadgeItem
 				v-else
-				:icon="UnknownIcon"
 				:tooltip="sharedInstanceTooltip"
 				aria-label="Shared instance information"
 				class="!border-blue !bg-highlight-blue !text-blue"
 			>
 				Shared
+				<UnknownIcon class="block size-4 shrink-0 text-current" aria-hidden="true" />
 			</PageHeaderBadgeItem>
 		</template>
 

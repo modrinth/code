@@ -188,9 +188,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Decorações nativas"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Seleciona uma opção"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Apresenta quanto tempo passou a jogar uma instância."
   },

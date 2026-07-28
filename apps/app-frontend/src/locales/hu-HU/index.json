@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Rendszer ablakkeret használata"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Válassz egy lehetőséget"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Megmutatja, mennyi időt töltöttél egy játékpéldányban."
   },

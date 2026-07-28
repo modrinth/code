@@ -4,7 +4,7 @@
 		:title="formatMessage(copiedMessage)"
 		@click="copyText"
 	>
-		<span>{{ text }}</span>
+		<span>{{ displayText ?? text }}</span>
 		<CheckIcon v-if="copied" />
 		<ClipboardCopyIcon v-else />
 	</button>
@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, ClipboardCopyIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 
 import { defineMessage, useVIntl } from '../../composables/i18n'
 
@@ -22,12 +22,22 @@ const copiedMessage = defineMessage({
 })
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{ text: string }>()
+const props = defineProps<{
+	text: string
+	displayText?: string
+}>()
 
 const copied = ref(false)
+let copiedResetTimeout: ReturnType<typeof setTimeout> | undefined
 
 async function copyText() {
 	await navigator.clipboard.writeText(props.text)
 	copied.value = true
+	clearTimeout(copiedResetTimeout)
+	copiedResetTimeout = setTimeout(() => {
+		copied.value = false
+	}, 2000)
 }
+
+onBeforeUnmount(() => clearTimeout(copiedResetTimeout))
 </script>

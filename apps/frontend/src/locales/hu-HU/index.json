@@ -4220,14 +4220,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Az alkalmazásról"
   },
-  "settings.authorizations.by": {
-    "message": "által"
-  },
   "settings.authorizations.description": {
     "message": "Amikor engedélyezel egy alkalmazást a Modrinth fiókoddal, hozzáférést biztosítasz számára a fiókodhoz. A fiókodhoz való hozzáférést bármikor kezelheted és ellenőrizheted itt."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Jelenleg nem tudjuk megjeleníteni az azonosított alkalmazásokat, dolgozunk a probléma megoldásán. Kérlek látogasd meg ezt az oldalt később!"
   },
   "settings.authorizations.head-title": {
     "message": "Engedélyek"

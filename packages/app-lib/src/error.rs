@@ -124,6 +124,9 @@ pub enum ErrorKind {
     #[error("Shared instance unavailable: {0}")]
     SharedInstanceUnavailable(SharedInstanceUnavailableReason),
 
+    #[error("Shared instances API request failed: {0}")]
+    SharedInstancesApiError(String),
+
     #[error("Join handle error: {0}")]
     JoinError(#[from] tokio::task::JoinError),
 

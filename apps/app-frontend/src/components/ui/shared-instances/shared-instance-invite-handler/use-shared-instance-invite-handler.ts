@@ -17,6 +17,7 @@ import {
 	install_shared_instance,
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
+import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import { useTheming } from '@/store/state'
 
 import { parseSharedInstanceInviteNotification } from './shared-instance-invite-parser'
@@ -26,7 +27,13 @@ type InstallModal = {
 	show(
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
 		install: () => Promise<void>,
+		creator?: SharedInstanceCreator,
 	): void
+}
+
+type SharedInstanceCreator = {
+	username: string
+	avatarUrl: string | null
 }
 
 type AccountRequiredModal = {
@@ -45,6 +52,8 @@ export function useSharedInstanceInviteHandler(
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const { handleError } = injectNotificationManager()
+	const { notifySharedInstanceConnectionError, notifySharedInstanceError } =
+		useSharedInstanceErrors()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const queryClient = useQueryClient()
 	const router = useRouter()
@@ -58,6 +67,7 @@ export function useSharedInstanceInviteHandler(
 				instanceId: string
 				preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>
 				install: () => Promise<void>
+				creator?: SharedInstanceCreator
 				onGoToInstance?: () => void | Promise<void>
 		  }
 		| undefined
@@ -73,10 +83,13 @@ export function useSharedInstanceInviteHandler(
 
 	async function resolveInvite(invite: SharedInstanceInvite) {
 		const [invitedBy, sharedInstance] = await Promise.all([
-			!invite.invitedByUsername && invite.invitedById
+			(!invite.invitedByUsername || !invite.invitedByAvatarUrl) && invite.invitedById
 				? get_user(invite.invitedById, 'bypass').catch(() => null)
 				: null,
-			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => null),
+			client.sharedinstances.instances_v1.get(invite.sharedInstanceId).catch(() => {
+				notifySharedInstanceConnectionError()
+				return null
+			}),
 		])
 
 		return {
@@ -90,15 +103,17 @@ export function useSharedInstanceInviteHandler(
 	function showInstall(
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
 		install: () => Promise<void>,
+		creator?: SharedInstanceCreator,
 	) {
 		if (!installModal.value) throw new Error('Shared instance install modal is not available.')
-		installModal.value.show(preview, install)
+		installModal.value.show(preview, install, creator)
 	}
 
 	async function showInstallOrAlreadyInstalled(
 		sharedInstanceId: string,
 		preview: Awaited<ReturnType<typeof install_get_shared_instance_preview>>,
 		install: () => Promise<void>,
+		creator?: SharedInstanceCreator,
 		onGoToInstance?: () => void | Promise<void>,
 	) {
 		const existingInstance = (await list()).find(
@@ -106,7 +121,7 @@ export function useSharedInstanceInviteHandler(
 		)
 
 		if (!existingInstance || themeStore.getFeatureFlag('skip_non_essential_warnings')) {
-			showInstall(preview, install)
+			showInstall(preview, install, creator)
 			return
 		}
 
@@ -118,6 +133,7 @@ export function useSharedInstanceInviteHandler(
 			instanceId: existingInstance.id,
 			preview,
 			install,
+			creator,
 			onGoToInstance,
 		}
 		alreadyInstalledModal.value.show(existingInstance.name)
@@ -146,7 +162,7 @@ export function useSharedInstanceInviteHandler(
 		const pending = pendingAlreadyInstalled
 		pendingAlreadyInstalled = undefined
 		if (!pending) return
-		showInstall(pending.preview, pending.install)
+		showInstall(pending.preview, pending.install, pending.creator)
 	}
 
 	async function acceptNotification(notification: AppNotification, invite: SharedInstanceInvite) {
@@ -172,10 +188,16 @@ export function useSharedInstanceInviteHandler(
 					await markNotificationRead(notification)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},
+				invite.invitedByUsername
+					? {
+							username: invite.invitedByUsername,
+							avatarUrl: invite.invitedByAvatarUrl,
+						}
+					: undefined,
 				() => markNotificationRead(notification),
 			)
 		} catch (error) {
-			handleError(toError(error))
+			notifySharedInstanceError(error)
 		}
 	}
 
@@ -253,19 +275,32 @@ export function useSharedInstanceInviteHandler(
 		try {
 			if (!(await requireAccount())) return
 			const invite = await install_accept_shared_instance_invite(inviteId)
-			await showInstallOrAlreadyInstalled(invite.sharedInstanceId, invite.preview, async () => {
-				await install_shared_instance(
-					invite.sharedInstanceId,
-					invite.preview.name,
-					invite.managerId,
-					invite.serverManagerName,
-					invite.serverManagerIconUrl,
-					invite.instanceIconUrl,
-				)
-				await queryClient.invalidateQueries({ queryKey: ['instances'] })
-			})
+			const manager = invite.managerId
+				? await get_user(invite.managerId, 'bypass').catch(() => null)
+				: null
+			await showInstallOrAlreadyInstalled(
+				invite.sharedInstanceId,
+				invite.preview,
+				async () => {
+					await install_shared_instance(
+						invite.sharedInstanceId,
+						invite.preview.name,
+						invite.managerId,
+						invite.serverManagerName,
+						invite.serverManagerIconUrl,
+						invite.instanceIconUrl,
+					)
+					await queryClient.invalidateQueries({ queryKey: ['instances'] })
+				},
+				manager
+					? {
+							username: manager.username,
+							avatarUrl: manager.avatar_url ?? null,
+						}
+					: undefined,
+			)
 		} catch (error) {
-			handleError(toError(error))
+			notifySharedInstanceError(error)
 		}
 	}
 

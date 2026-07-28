@@ -92,9 +92,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Hiasan asli"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Pilih satu pilihan"
-  },
   "app.appearance-settings.skip-non-essential-warnings.description": {
     "message": "Melangkau pengesahan berisiko rendah secara automatik seperti pemasangan pek mod pendua, pemadaman kandungan biasa, kemas kini pukal, menyahpautkan pek mod dan gesaan pembaikan. Amaran berbahaya masih akan ditunjukkan."
   },

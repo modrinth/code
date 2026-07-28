@@ -113,9 +113,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Systémové dekorace"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Vyberte možnost"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zobrazuje, kolik času jsi strávil hraním instance."
   },

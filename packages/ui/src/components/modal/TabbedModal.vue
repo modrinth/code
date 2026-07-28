@@ -9,6 +9,7 @@ import { useScrollIndicator } from '../../composables/scroll-indicator'
 import NewModal from './NewModal.vue'
 export interface Tab {
 	name: MessageDescriptor
+	category?: MessageDescriptor
 	icon: Component
 	content?: Component
 	href?: string
@@ -61,6 +62,11 @@ function hide() {
 	modal.value?.hide()
 }
 
+function startsCategory(index: number) {
+	const category = visibleTabs.value[index]?.category
+	return !!category && category.id !== visibleTabs.value[index - 1]?.category?.id
+}
+
 defineExpose({ show, hide, selectedTab, setTab })
 </script>
 <template>
@@ -81,26 +87,32 @@ defineExpose({ show, hide, selectedTab, setTab })
 			<div
 				class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]"
 			>
-				<component
-					:is="tab.href ? 'a' : 'button'"
-					v-for="(tab, index) in visibleTabs"
-					:key="index"
-					:href="tab.href ?? undefined"
-					:target="tab.href ? '_blank' : undefined"
-					:rel="tab.href ? 'noopener noreferrer' : undefined"
-					:class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
-					@click="!tab.href && setTab(index)"
-				>
-					<component :is="tab.icon" class="w-4 h-4 flex-shrink-0" />
-					<span>{{ formatMessage(tab.name) }}</span>
-					<span
-						v-if="tab.badge"
-						class="rounded-full px-1.5 py-0.5 text-xs font-bold bg-brand-highlight text-brand-green"
+				<template v-for="(tab, index) in visibleTabs" :key="index">
+					<div
+						v-if="startsCategory(index) && tab.category"
+						class="px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
 					>
-						{{ formatMessage(tab.badge) }}
-					</span>
-					<RightArrowIcon v-if="tab.href" class="size-4 ml-auto" />
-				</component>
+						{{ formatMessage(tab.category) }}
+					</div>
+					<component
+						:is="tab.href ? 'a' : 'button'"
+						:href="tab.href ?? undefined"
+						:target="tab.href ? '_blank' : undefined"
+						:rel="tab.href ? 'noopener noreferrer' : undefined"
+						:class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
+						@click="!tab.href && setTab(index)"
+					>
+						<component :is="tab.icon" class="w-4 h-4 flex-shrink-0" />
+						<span>{{ formatMessage(tab.name) }}</span>
+						<span
+							v-if="tab.badge"
+							class="rounded-full px-1.5 py-0.5 text-xs font-bold bg-brand-highlight text-brand-green"
+						>
+							{{ formatMessage(tab.badge) }}
+						</span>
+						<RightArrowIcon v-if="tab.href" class="size-4 ml-auto" />
+					</component>
+				</template>
 
 				<slot name="footer" />
 			</div>

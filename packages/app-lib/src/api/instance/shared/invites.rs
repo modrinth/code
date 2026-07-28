@@ -125,6 +125,44 @@ pub async fn create_shared_instance_invite_link(
 }
 
 #[tracing::instrument]
+pub async fn get_shared_instance_invites(
+    instance_id: &str,
+) -> crate::Result<Vec<SharedInstanceInvite>> {
+    let state = State::get().await?;
+    let Some(attachment) = shared_attachment(instance_id, &state).await? else {
+        return Ok(Vec::new());
+    };
+    ensure_owner(&attachment)?;
+
+    Ok(get_remote_invites(&attachment.id, &state)
+        .await?
+        .into_iter()
+        .map(|invite| SharedInstanceInvite {
+            id: invite.id,
+            expiration: invite.expiration,
+            max_uses: invite.max_uses,
+            uses: invite.uses,
+        })
+        .collect())
+}
+
+#[tracing::instrument(skip(invite_id))]
+pub async fn revoke_shared_instance_invite(
+    instance_id: &str,
+    invite_id: String,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let _shared_instance_lock = state.lock_shared_instance(instance_id).await;
+    let Some(attachment) = shared_attachment(instance_id, &state).await? else {
+        return Ok(());
+    };
+    ensure_owner(&attachment)?;
+
+    delete_remote_invite(&attachment.id, &invite_id, &state).await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await
+}
+
+#[tracing::instrument]
 pub async fn remove_shared_instance_users(
     instance_id: &str,
     user_ids: Vec<String>,

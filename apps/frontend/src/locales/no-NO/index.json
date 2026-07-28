@@ -3629,14 +3629,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Om denne appen"
   },
-  "settings.authorizations.by": {
-    "message": "fra"
-  },
   "settings.authorizations.description": {
     "message": "Når du autoriserer en applikasjon med Modrinth-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Vi kan ikke vise de autoriserte appene dine akkurat nå, vi jobber med å fikse det. Vær så snill å besøk denne sida seinere!"
   },
   "settings.authorizations.head-title": {
     "message": "Autoriseringer"

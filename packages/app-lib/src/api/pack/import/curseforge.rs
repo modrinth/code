@@ -7,10 +7,7 @@ use crate::{
     install::{InstallPhaseDetails, InstallProgressReporter},
     prelude::ModLoader,
     state::{AppliedContentSetPatch, EditInstance, InstanceInstallStage},
-    util::{
-        fetch::{fetch, write_cached_icon},
-        io,
-    },
+    util::{fetch::fetch, io},
 };
 
 use super::{finish_import, recache_icon};
@@ -90,18 +87,8 @@ pub async fn import_curseforge(
             &state.pool,
         )
         .await?;
-        let filename = thumbnail_url.rsplit('/').next_back();
-        if let Some(filename) = filename {
-            icon = Some(
-                write_cached_icon(
-                    filename,
-                    &state.directories.caches_dir(),
-                    icon_bytes,
-                    &state.io_semaphore,
-                )
-                .await?,
-            );
-        }
+        icon =
+            Some(crate::api::instance::cache_icon(icon_bytes, &state).await?);
     }
 
     // base mod loader is always None for vanilla

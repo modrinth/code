@@ -188,9 +188,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "OSのウィンドウUIを使用"
   },
-  "app.appearance-settings.select-option": {
-    "message": "オプションを選択してください"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "インスタンスのプレイ時間を表示します。"
   },

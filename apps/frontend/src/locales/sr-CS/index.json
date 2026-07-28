@@ -1679,9 +1679,6 @@
   "settings.authorizations.about-this-app": {
     "message": "O ovoj aplikaciji"
   },
-  "settings.authorizations.by": {
-    "message": "od"
-  },
   "settings.authorizations.revoke.action": {
     "message": "Oduzmi"
   },

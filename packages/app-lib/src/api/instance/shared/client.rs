@@ -74,6 +74,14 @@ pub(super) struct CreateInstanceInviteResponse {
 }
 
 #[derive(Clone, Debug, Deserialize)]
+pub(super) struct InstanceInviteResponse {
+    pub(super) id: String,
+    pub(super) expiration: DateTime<Utc>,
+    pub(super) max_uses: i32,
+    pub(super) uses: i32,
+}
+
+#[derive(Clone, Debug, Deserialize)]
 pub(super) struct BlacklistStatusResponse {
     pub(super) blacklisted: bool,
 }
@@ -502,6 +510,20 @@ pub(super) async fn delete_remote_invite(
     .await
 }
 
+pub(super) async fn get_remote_invites(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<Vec<InstanceInviteResponse>> {
+    request_json(
+        "get_instance_invites",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}/invites"),
+        None,
+        state,
+    )
+    .await
+}
+
 pub(super) async fn get_shared_instance_invite_info(
     invite_id: &str,
     state: &State,
@@ -691,9 +713,17 @@ where
     let body = match response.text().await {
         Ok(body) => body,
         Err(error) if strip_response_url => {
-            return Err(error.without_url().into());
+            return Err(crate::ErrorKind::SharedInstancesApiError(
+                error.without_url().to_string(),
+            )
+            .into());
         }
-        Err(error) => return Err(error.into()),
+        Err(error) => {
+            return Err(crate::ErrorKind::SharedInstancesApiError(
+                error.to_string(),
+            )
+            .into());
+        }
     };
     serde_json::from_str::<T>(&body).map_err(|error| {
 		tracing::warn!(
@@ -707,7 +737,7 @@ where
             error_column = error.column(),
             "Shared instances API returned an invalid JSON response"
 		);
-		crate::ErrorKind::OtherError(format!(
+		crate::ErrorKind::SharedInstancesApiError(format!(
 			"Shared instances API request {operation} {method} {log_path} returned invalid JSON with status {status}"
 		))
 		.into()
@@ -848,7 +878,12 @@ pub(super) async fn send_bytes_request_to_url(
         .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
         .body(body)
         .send()
-        .await?;
+        .await
+        .map_err(|error| {
+            crate::ErrorKind::SharedInstancesApiError(
+                error.without_url().to_string(),
+            )
+        })?;
 
     if response.status().is_success() {
         let request_id = response_request_id(&response);
@@ -938,9 +973,17 @@ async fn send_request_with_auth_and_log_path(
     let response = match request.send().await {
         Ok(response) => response,
         Err(error) if path != log_path => {
-            return Err(error.without_url().into());
+            return Err(crate::ErrorKind::SharedInstancesApiError(
+                error.without_url().to_string(),
+            )
+            .into());
         }
-        Err(error) => return Err(error.into()),
+        Err(error) => {
+            return Err(crate::ErrorKind::SharedInstancesApiError(
+                error.to_string(),
+            )
+            .into());
+        }
     };
     if response.status().is_success() {
         let request_id = response_request_id(&response);
@@ -973,10 +1016,14 @@ pub(super) async fn shared_instances_request_error<T>(
         request_id = request_id.as_deref().unwrap_or("none"),
         "Shared instances API request failed"
     );
-    Err(crate::ErrorKind::OtherError(format!(
+    let message = format!(
         "Shared instances API request {operation} {method} {path} failed with status {status}"
-    ))
-    .into())
+    );
+    if status.is_server_error() {
+        return Err(crate::ErrorKind::SharedInstancesApiError(message).into());
+    }
+
+    Err(crate::ErrorKind::OtherError(message).into())
 }
 
 pub(super) fn response_request_id(

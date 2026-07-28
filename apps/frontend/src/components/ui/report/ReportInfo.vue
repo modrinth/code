@@ -64,11 +64,18 @@
 			</template>
 		</div>
 		<div v-else-if="report.item_type === 'shared-instance'" class="item-info">
-			<div class="backed-svg" :class="{ raised: raised }">
+			<Avatar
+				v-if="report.shared_instance"
+				:src="report.shared_instance.icon"
+				size="xs"
+				no-shadow
+				:raised="raised"
+			/>
+			<div v-else class="backed-svg" :class="{ raised: raised }">
 				<BoxesIcon />
 			</div>
 			<div class="stacked">
-				<span class="title">Shared instance</span>
+				<span class="title">{{ report.shared_instance?.name ?? 'Shared instance' }}</span>
 				<span>
 					Version {{ report.shared_instance_version_id ?? 'unknown' }} ·
 					<CopyCode :text="report.item_id" />
@@ -89,8 +96,7 @@
 		<ThreadSummary
 			v-if="thread"
 			:thread="thread"
-			class="thread-summary"
-			:raised="raised"
+			class="thread-summary !bg-surface-2"
 			:link="`/${moderation ? 'moderation' : 'dashboard'}/report/${report.id}`"
 			:auth="auth"
 		/>

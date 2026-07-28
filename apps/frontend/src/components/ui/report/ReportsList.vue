@@ -19,7 +19,7 @@
 		:moderation="moderation"
 		raised
 		:auth="auth"
-		class="universal-card recessed"
+		class="card-shadow mb-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
 	/>
 	<p v-if="filteredReports.length === 0">You don't have any active reports.</p>
 </template>
@@ -51,7 +51,7 @@ const MAX_REPORTS = 1500
 
 const { data: rawReportsData } = useQuery({
 	queryKey: ['reports', MAX_REPORTS],
-	queryFn: () => client.labrinth.reports_v3.list({ count: MAX_REPORTS }),
+	queryFn: () => client.labrinth.reports_v3.list({ count: MAX_REPORTS, all: false }),
 	placeholderData: [],
 })
 
@@ -66,6 +66,13 @@ const versionReports = computed(() =>
 )
 const versionIds = computed(() => [
 	...new Set(versionReports.value.map((report) => report.item_id)),
+])
+const sharedInstanceIds = computed(() => [
+	...new Set(
+		rawReports.value
+			.filter((report) => report.item_type === 'shared-instance')
+			.map((report) => report.item_id),
+	),
 ])
 const userIds = computed(() => [...new Set(reporterUsers.value.concat(reportedUsers.value))])
 const threadIds = computed(() => [
@@ -91,6 +98,21 @@ const { data: versions } = useQuery({
 	queryFn: () =>
 		fetchSegmentedWith(versionIds.value, (ids) => client.labrinth.versions_v2.getVersions(ids)),
 	enabled: computed(() => versionIds.value.length > 0),
+	placeholderData: [],
+})
+
+const { data: sharedInstances } = useQuery({
+	queryKey: computed(() => ['shared-instances', sharedInstanceIds.value]),
+	queryFn: async () => {
+		const results = await Promise.allSettled(
+			sharedInstanceIds.value.map(async (id) => ({
+				id,
+				instance: await client.sharedinstances.instances_v1.get(id),
+			})),
+		)
+		return results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
+	},
+	enabled: computed(() => sharedInstanceIds.value.length > 0),
 	placeholderData: [],
 })
 
@@ -123,6 +145,9 @@ const { data: projects } = useQuery({
 const userMap = computed(() => new Map(users.value.map((u) => [u.id, u])))
 const versionMap = computed(() => new Map(versions.value.map((v) => [v.id, v])))
 const projectMap = computed(() => new Map(projects.value.map((p) => [p.id, p])))
+const sharedInstanceMap = computed(
+	() => new Map(sharedInstances.value.map(({ id, instance }) => [id, instance])),
+)
 const threadMap = computed(() => new Map(threads.value.map((t) => [t.id, t])))
 
 const reports = computed(() =>
@@ -136,6 +161,8 @@ const reports = computed(() =>
 		} else if (report.item_type === 'version') {
 			enrichedReport.version = versionMap.value.get(report.item_id)
 			enrichedReport.project = projectMap.value.get(enrichedReport.version?.project_id)
+		} else if (report.item_type === 'shared-instance') {
+			enrichedReport.shared_instance = sharedInstanceMap.value.get(report.item_id)
 		}
 		if (report.thread_id) {
 			const thread = threadMap.value.get(report.thread_id)
@@ -149,7 +176,7 @@ const reports = computed(() =>
 const filteredReports = computed(() =>
 	reports.value?.filter(
 		(x) =>
-			(props.moderation || x.reporterUser?.id === props.auth.user.id) &&
+			(props.moderation || x.reporter === props.auth.user.id) &&
 			(viewMode.value === 'open' ? x.open : !x.open) &&
 			(reasonFilter.value === 'All' || reasonFilter.value === x.report_type),
 	),

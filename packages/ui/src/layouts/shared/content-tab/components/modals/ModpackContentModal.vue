@@ -20,6 +20,7 @@ import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowM
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectPageContext } from '#ui/providers/page-context'
 import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
@@ -28,11 +29,12 @@ import {
 } from '#ui/utils/common-messages'
 
 import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
-import type { ContentCardTableItem, ContentItem } from '../../types'
+import type { ContentCardProject, ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 
 const { formatMessage } = useVIntl()
+const pageContext = injectPageContext(null)
 
 interface Props {
 	header?: string
@@ -266,6 +268,12 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 							: `https://modrinth.com/organization/${item.owner.id}`,
 				}
 			: undefined,
+		source: item.source
+			? {
+					...item.source,
+					link: item.source.link ?? sourceProjectLink(item.source.project),
+				}
+			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
@@ -293,7 +301,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 	})),
 )
 const externalItemIds = computed(
-	() => new Set(items.value.filter((item) => item.external).map((item) => item.id)),
+	() => new Set(items.value.filter((item) => item.external && !item.source).map((item) => item.id)),
 )
 const externalSlicerUrls = computed(() => {
 	const urls: Record<string, string> = {}
@@ -333,6 +341,12 @@ function sortContentItems(contentItems: ContentItem[], sortByName = true) {
 
 function itemDisplayName(item: ContentItem) {
 	return item.project?.title ?? item.file_name
+}
+
+function sourceProjectLink(project: ContentCardProject) {
+	const projectId = project.slug ?? project.id
+	const url = `https://modrinth.com/modpack/${encodeURIComponent(projectId)}`
+	return pageContext ? () => pageContext.openExternalUrl(url) : url
 }
 
 function handleEnabledChange(id: string, value: boolean) {

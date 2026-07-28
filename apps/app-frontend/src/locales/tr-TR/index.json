@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Yerel pencere öğeleri"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Bir seçenek seçin"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Bir oyun oturumunda ne kadar zaman geçirdiğinizi gösterir."
   },
