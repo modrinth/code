@@ -395,7 +395,7 @@ import {
 	moderationSettings,
 	useStages,
 } from '@modrinth/moderation'
-import type { NodeState, StageNode } from '@modrinth/moderation/src/types/node'
+import type { ActiveAction2, NodeState, StageNode } from '@modrinth/moderation/src/types/node'
 import {
 	CHECKLIST_META_KEY,
 	collectActiveActions,
@@ -450,7 +450,7 @@ import {
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
-import { type ActiveAction, type LiveNode, STATE_KEY } from './checklist-context'
+import { type LiveNode, STATE_KEY } from './checklist-context'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
@@ -686,7 +686,7 @@ function markStageVisited(stageId: string | undefined) {
 }
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
-const generatedActiveActions = ref<ActiveAction[] | null>(null)
+const generatedActiveActions = ref<ActiveAction2[] | null>(null)
 const resolvedMessageAvailability = ref<Map<object, boolean>>(new Map())
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
@@ -1099,7 +1099,7 @@ function computeStageLiveNode(stage: StageNode, stageState: Record<string, NodeS
 	const actions = collectActiveActions(stageChildren, stageState, [stage.id])
 
 	if (stage._segments.length > 0) {
-		actions.unshift({ node: stage, state: stageState, statePath: [stage.id] })
+		actions.unshift({ node: stage, state: stageState, statePath: [stage.id], active: true })
 	}
 
 	return {
@@ -1399,18 +1399,12 @@ function hasRequiredMissing(stage: StageNode): boolean {
 	return checklistLive.value.get(stage)?.hasRequiredMissing ?? false
 }
 
-function collectAllActiveActions(): ActiveAction[] {
+function collectAllActiveActions(): ActiveAction2[] {
 	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
-function byPriority(a: ActiveAction, b: ActiveAction): number {
+function byPriority(a: ActiveAction2, b: ActiveAction2): number {
 	return ((a.node as any)._priority as Priority).compareTo((b.node as any)._priority as Priority)
-}
-
-function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
-	return (
-		childPath.length > ancestorPath.length && ancestorPath.every((key, i) => childPath[i] === key)
-	)
 }
 
 async function assembleFullMessage() {
@@ -1419,32 +1413,10 @@ async function assembleFullMessage() {
 
 	const consumed = new Set<object>()
 
-	async function evalEntry(entry: ActiveAction): Promise<string> {
-		let result = ''
-		for (const seg of (entry.node as any)._segments) {
-			if (seg.type === 'collect') {
-				let collected = ''
-				for (const childEntry of allEntries) {
-					if (consumed.has(childEntry.node)) continue
-					if (!isDescendant(childEntry.statePath, entry.statePath)) continue
-					consumed.add(childEntry.node)
-					collected += await evalEntry(childEntry)
-				}
-				if (!collected.trim() && seg.fallback) {
-					collected = await evalSegment(seg.fallback, entry.state, entry.statePath)
-				}
-				result += collected
-			} else {
-				result += await evalSegment(seg, entry.state, entry.statePath)
-			}
-		}
-		return result
-	}
-
-	const parts: { entry: ActiveAction; content: string }[] = []
+	const parts: { entry: ActiveAction2; content: string }[] = []
 	for (const entry of allEntries) {
 		if (consumed.has(entry.node)) continue
-		const content = await evalEntry(entry)
+		const content = await evalActiveAction(entry, allEntries, consumed)
 		if (content.trim()) {
 			parts.push({ entry, content })
 		}

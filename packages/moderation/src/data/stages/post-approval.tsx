@@ -41,12 +41,12 @@ export default function () {
 					.children(
 						toggle('dependencies', 'Missing Dependencies')
 							.message((state) => ({
-								DEPENDENCY_NAME: state['dependency-name'],
-								DEPENDENCY_LINK: state['dependency-link'],
+								DEPENDENCY_NAME: state['name'],
+								DEPENDENCY_LINK: state['link'],
 							}))
 							.children(
-								text('dependency-name').title('Dependency name').required(),
-								text('dependency-link').title('Dependency link').required(),
+								text('name').title('Dependency name').required(),
+								text('link').title('Dependency link').required(),
 							),
 
 						toggle('mc-versions', 'Game versions')

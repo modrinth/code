@@ -7,6 +7,7 @@ export interface ActiveAction2 {
 	node: object
 	state: Record<string, NodeState>
 	statePath: string[]
+	active: boolean
 }
 
 export function collectActiveActions(
@@ -23,7 +24,7 @@ export function collectActiveActions(
 			const segments = node._segments as MessageSegment[]
 			if (segments.length === 0) return
 			if (!isNodeActive(node, nodeState, localState)) return
-			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path })
+			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path, active: true })
 		},
 		basePath,
 	)
@@ -43,7 +44,8 @@ export function collectMessageNodes(
 			if (!hasCap(node, '_segments')) return
 			const segments = node._segments as MessageSegment[]
 			if (segments.length === 0) return
-			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path })
+			const active = isNodeActive(node, nodeState, localState)
+			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path, active })
 		},
 		basePath,
 	)
@@ -68,6 +70,7 @@ export async function evalActiveAction(
 				if (consumed.has(child.node)) continue
 				if (!isDescendant(child.statePath, entry.statePath)) continue
 				consumed.add(child.node)
+				if (!child.active) continue
 				collected += await evalActiveAction(child, allActions, consumed)
 			}
 			if (!collected.trim() && seg.fallback) {
