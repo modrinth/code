@@ -234,7 +234,10 @@ watch(
 </script>
 
 <template>
-	<div ref="groupDropTarget" class="instance-group relative select-none pb-3">
+	<div
+		ref="groupDropTarget"
+		class="instance-group group/instance-container relative select-none pb-3"
+	>
 		<Transition
 			enter-active-class="transition-opacity duration-150 ease-out"
 			enter-from-class="!opacity-0"
@@ -253,52 +256,59 @@ watch(
 			/>
 		</Transition>
 		<div
-			class="group/header h-10 mb-3 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
-			:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
-			@click="toggleGroup"
-			@click.capture="captureGroupClick"
+			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
 			@contextmenu.prevent.stop="openGroupContextMenu"
-			@pointerdown.capture="prepareGroupToggle"
 		>
-			<button
-				class="flex shrink-0 items-center border-0 bg-transparent p-0"
+			<div
+				class="group/open-target flex min-w-0 items-center gap-2"
 				:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
-				type="button"
-				:aria-expanded="groupAccordion?.isOpen"
-				:aria-label="groupAccordion?.isOpen ? 'Collapse group' : 'Expand group'"
-				@click.stop="toggleGroup"
+				@click="toggleGroup"
+				@click.capture="captureGroupClick"
+				@pointerdown.capture="prepareGroupToggle"
 			>
-				<DropdownIcon
-					class="size-5 shrink-0 text-secondary transition-all duration-300 group-hover/header:text-primary"
-					:class="{ 'rotate-180': groupAccordion?.isOpen }"
+				<button
+					class="flex shrink-0 items-center border-0 bg-transparent p-0"
+					:class="isGroupToggleBlocked ? 'cursor-default' : 'cursor-pointer'"
+					type="button"
+					:aria-expanded="groupAccordion?.isOpen"
+					:aria-label="groupAccordion?.isOpen ? 'Collapse group' : 'Expand group'"
+					@click.stop="toggleGroup"
+				>
+					<DropdownIcon
+						class="size-5 shrink-0 text-secondary transition-all duration-300 group-hover/open-target:text-primary"
+						:class="{ 'rotate-180': groupAccordion?.isOpen }"
+					/>
+				</button>
+				<InlineEditableText
+					v-if="!isUngrouped"
+					ref="groupNameInput"
+					v-model="groupName"
+					activation-mode="icon"
+					class="text-base font-semibold !h-10 text-primary select-none group-hover/open-target:text-contrast"
+					:edit-label="formatMessage(commonMessages.renameButton)"
+					max-width="24rem"
+					:max-length="32"
+					:on-change="updateGroupName"
+					:validate="validateGroupName"
 				/>
-			</button>
-			<InlineEditableText
-				v-if="!isUngrouped"
-				ref="groupNameInput"
-				v-model="groupName"
-				activation-mode="icon"
-				class="text-base font-semibold !h-10 text-primary select-none group-hover/header:text-contrast"
-				:edit-label="formatMessage(commonMessages.renameButton)"
-				max-width="24rem"
-				:max-length="32"
-				:on-change="updateGroupName"
-				:validate="validateGroupName"
-			/>
-			<span
-				v-else
-				class="text-base font-semibold text-primary select-none group-hover/header:text-contrast"
-			>
-				{{ formatMessage(messages.ungrouped) }}
-			</span>
-			<TagItem v-if="instanceGroup.instances.length" class="shrink-0 border-surface-3 bg-surface-2">
-				{{ instanceGroup.instances.length }}
-			</TagItem>
+				<span
+					v-else
+					class="text-base font-semibold text-primary select-none group-hover/open-target:text-contrast"
+				>
+					{{ formatMessage(messages.ungrouped) }}
+				</span>
+				<TagItem
+					v-if="instanceGroup.instances.length"
+					class="shrink-0 border-surface-3 bg-surface-2"
+				>
+					{{ instanceGroup.instances.length }}
+				</TagItem>
+			</div>
 			<div class="min-w-0 flex-1" />
 			<ButtonStyled v-if="!isUngrouped" circular type="transparent">
 				<button
 					v-tooltip="formatMessage(messages.deleteGroup)"
-					class="opacity-0 !transition-all duration-150 group-hover/header:opacity-100 -m-1.5"
+					class="opacity-0 !transition-all duration-150 group-hover/instance-container:opacity-100 -m-1.5"
 					type="button"
 					:aria-label="formatMessage(messages.deleteGroup)"
 					:disabled="deletingGroup"
@@ -316,7 +326,7 @@ watch(
 			@on-close="setSectionCollapsed(instanceGroup.key, true)"
 		>
 			<section
-				class="grid min-h-[45px] w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
+				class="grid min-h-[45px] mt-3 w-full grid-cols-[repeat(auto-fill,minmax(20rem,22rem))] gap-3 overflow-y-auto scroll-smooth"
 			>
 				<div v-for="instance in instanceGroup.instances" :key="instance.id" class="min-w-0 w-full">
 					<Instance
