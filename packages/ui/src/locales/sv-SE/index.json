@@ -4340,9 +4340,6 @@
   "settings.pats.title": {
     "defaultMessage": "Personliga åtkomstnycklar"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Offentlig profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"
   },
@@ -4938,4 +4935,3 @@
     "defaultMessage": "Typ"
   }
 }
-

@@ -1,11 +1,12 @@
 <template>
-	<div class="w-full pt-2">
+	<div class="w-full px-2 pt-2">
 		<UserProfilePageLayout
 			:user-id="userId"
 			:project-type="projectType"
 			variant="app"
 			site-url="https://modrinth.com"
 			project-link-mode="app"
+			:edit-profile-link="openProfileSettings"
 			external-navigation
 		/>
 	</div>
@@ -14,19 +15,24 @@
 <script setup lang="ts">
 import { provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, watch } from 'vue'
+import { computed, inject, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 
 import {
+	block_user,
+	get_blocked_users,
 	get_user_collections,
 	get_user_organizations,
 	get_user_profile,
 	get_user_projects,
 	patch_user,
+	unblock_user,
 } from '@/helpers/users'
+import { appSettingsModalOpenProfileKey } from '@/providers/app-settings-modal'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const route = useRoute()
+const openProfileSettings = inject(appSettingsModalOpenProfileKey, () => {})
 const queryClient = useQueryClient()
 const breadcrumbs = useBreadcrumbs()
 const userProfile = provideUserProfile({
@@ -35,6 +41,9 @@ const userProfile = provideUserProfile({
 	getOrganizations: get_user_organizations,
 	getCollections: get_user_collections,
 	patchUser: patch_user,
+	getBlockedUsers: get_blocked_users,
+	blockUser: block_user,
+	unblockUser: unblock_user,
 })
 
 const userId = computed(() => {

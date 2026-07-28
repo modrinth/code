@@ -5099,27 +5099,6 @@
   "settings.pats.token.never-used": {
     "message": "Не использовался"
   },
-  "settings.profile.bio.description": {
-    "message": "Возможность кратко рассказать всем о себе."
-  },
-  "settings.profile.bio.title": {
-    "message": "О себе"
-  },
-  "settings.profile.description": {
-    "message": "Информация в вашем профиле доступна публично на Modrinth и через <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Настройки профиля"
-  },
-  "settings.profile.profile-info": {
-    "message": "Информация в профиле"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Изображение профиля"
-  },
-  "settings.profile.username.description": {
-    "message": "Уникальное имя для идентификации профиля. Регистр не имеет значения."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Завершить сеанс"
   },

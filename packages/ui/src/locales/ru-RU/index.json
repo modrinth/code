@@ -5018,9 +5018,6 @@
   "settings.pats.title": {
     "defaultMessage": "Личные токены доступа"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Публичный профиль"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Сеансы"
   },

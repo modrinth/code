@@ -4061,27 +4061,6 @@
   "settings.pats.token.never-used": {
     "message": "未使用"
   },
-  "settings.profile.bio.description": {
-    "message": "あなたのことをみんなに知ってもらうための簡単な自己紹介。"
-  },
-  "settings.profile.bio.title": {
-    "message": "自己紹介"
-  },
-  "settings.profile.description": {
-    "message": "あなたのプロフィール情報は、Modrinth上および<docs-link>Modrinth API</docs-link>を通じて一般公開されます。"
-  },
-  "settings.profile.head-title": {
-    "message": "プロフィール設定"
-  },
-  "settings.profile.profile-info": {
-    "message": "プロフィール情報"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "プロフィール写真"
-  },
-  "settings.profile.username.description": {
-    "message": "大文字・小文字を区別しない、プロフィールを識別するための固有の名前。"
-  },
   "settings.sessions.action.revoke-session": {
     "message": "セッションを取り消す"
   },

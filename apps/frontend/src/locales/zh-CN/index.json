@@ -5159,27 +5159,6 @@
   "settings.pats.token.never-used": {
     "message": "从未使用"
   },
-  "settings.profile.bio.description": {
-    "message": "做个简短的自我介绍吧。"
-  },
-  "settings.profile.bio.title": {
-    "message": "个人简介"
-  },
-  "settings.profile.description": {
-    "message": "你的个人资料信息在 Modrinth 网站及<docs-link>其 API </docs-link>上均公开可见。"
-  },
-  "settings.profile.head-title": {
-    "message": "个人资料设置"
-  },
-  "settings.profile.profile-info": {
-    "message": "个人资料信息"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "头像"
-  },
-  "settings.profile.username.description": {
-    "message": "不区分大小写的唯一名称，用于识别你的个人资料。"
-  },
   "settings.sessions.action.revoke-session": {
     "message": "登出设备"
   },

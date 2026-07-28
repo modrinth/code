@@ -5096,9 +5096,6 @@
   "settings.pats.title": {
     "defaultMessage": "Persoonlijke toegangstokens"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Openbaar profiel"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessies"
   },

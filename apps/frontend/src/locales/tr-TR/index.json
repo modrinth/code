@@ -4568,27 +4568,6 @@
   "settings.pats.token.never-used": {
     "message": "Hiç kullanılmadı"
   },
-  "settings.profile.bio.description": {
-    "message": "Herkese kendinden biraz bahsedebileceğin kısa tanım."
-  },
-  "settings.profile.bio.title": {
-    "message": "Hakkında"
-  },
-  "settings.profile.description": {
-    "message": "Profil bilgin Modrinth'te ve <docs-link>Modrinth API</docs-link> herkese açık görüntülenebilir."
-  },
-  "settings.profile.head-title": {
-    "message": "Profil Ayarları"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profil bilgisi"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profil resmi"
-  },
-  "settings.profile.username.description": {
-    "message": "Profilini tanımlamak için büyük-küçük harf hassasiyetli özel bir ad."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Oturumu iptal et"
   },

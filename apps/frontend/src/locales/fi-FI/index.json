@@ -1055,9 +1055,6 @@
   "settings.pats.token.never-used": {
     "message": "Ei koskaan käytetty"
   },
-  "settings.profile.bio.title": {
-    "message": "Kuvaus"
-  },
   "settings.sessions.unknown-os": {
     "message": "Tuntematon käyttöjärjestelmä"
   }

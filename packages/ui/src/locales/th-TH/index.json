@@ -661,9 +661,5 @@
   },
   "settings.language.title": {
     "defaultMessage": "ภาษา"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "โปรไฟล์สาธารณะ"
   }
 }
-

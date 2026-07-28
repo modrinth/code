@@ -146,6 +146,7 @@ import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
 import { AppPopupNotificationManager } from './providers/app-popup-notifications'
+import { appSettingsModalOpenProfileKey } from './providers/app-settings-modal'
 
 const themeStore = useTheming()
 const router = useRouter()
@@ -795,6 +796,8 @@ const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginModal = ref()
+const appSettingsModal = ref()
+provide(appSettingsModalOpenProfileKey, () => appSettingsModal.value?.showProfile())
 
 watch(incompatibilityWarningModal, (modal) => {
 	if (modal) {
@@ -1500,7 +1503,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</div>
 		</Transition>
 		<Suspense>
-			<AppSettingsModal ref="settingsModal" />
+			<AppSettingsModal ref="appSettingsModal" />
 		</Suspense>
 		<Suspense>
 			<ModrinthAccountRequiredModal ref="modrinthLoginModal" :request-auth="requestModrinthAuth" />
@@ -1568,7 +1571,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<div class="flex flex-grow"></div>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
-				:to="() => $refs.settingsModal.show()"
+				:to="() => appSettingsModal?.show()"
 			>
 				<SettingsIcon />
 			</NavButton>

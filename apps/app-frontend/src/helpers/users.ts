@@ -50,7 +50,31 @@ export async function get_user_collections(
 
 export async function patch_user(
 	userId: string,
-	patch: Partial<Pick<Labrinth.Users.v3.User, 'badges' | 'role'>>,
+	patch: Partial<Pick<Labrinth.Users.v2.User, 'badges' | 'bio' | 'role' | 'username'>>,
 ): Promise<void> {
 	await invoke('plugin:users|patch_user', { userId, patch })
+}
+
+export async function change_user_avatar(
+	userId: string,
+	image: Uint8Array,
+	extension: string,
+): Promise<void> {
+	await invoke('plugin:users|change_user_avatar', { userId, image, extension })
+}
+
+export async function delete_user_avatar(userId: string): Promise<void> {
+	await invoke('plugin:users|delete_user_avatar', { userId })
+}
+
+export async function block_user(userId: string): Promise<void> {
+	await invoke('plugin:users|block_user', { userId })
+}
+
+export async function unblock_user(userId: string): Promise<void> {
+	await invoke('plugin:users|unblock_user', { userId })
+}
+
+export async function get_blocked_users(): Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]> {
+	return await invoke<Labrinth.BlockedUsers.v3.BlockedUserId[]>('plugin:users|get_blocked_users')
 }

@@ -5087,9 +5087,6 @@
   "settings.pats.title": {
     "defaultMessage": "Klucze dostępu osobistego"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Profil publiczny"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sesje"
   },

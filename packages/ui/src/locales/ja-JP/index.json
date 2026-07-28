@@ -4526,9 +4526,6 @@
   "settings.pats.title": {
     "defaultMessage": "個人用アクセストークン"
   },
-  "settings.profile.title": {
-    "defaultMessage": "公開プロフィール"
-  },
   "settings.sessions.title": {
     "defaultMessage": "セッション"
   },

@@ -1,6 +1,36 @@
 <template>
 	<template v-if="user">
 		<NewModal
+			ref="blockUserModal"
+			:header="formatMessage(messages.blockUserTitle, { username: user.username })"
+			:closable="!isBlockingUser"
+			fade="danger"
+			max-width="500px"
+		>
+			<Admonition type="critical" :header="formatMessage(messages.blockUserAdmonitionTitle)">
+				{{ formatMessage(messages.blockUserAdmonitionBody, { username: user.username }) }}
+			</Admonition>
+
+			<template #actions>
+				<div class="flex justify-end gap-2">
+					<ButtonStyled type="outlined">
+						<button type="button" :disabled="isBlockingUser" @click="blockUserModal?.hide()">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="red">
+						<button type="button" :disabled="isBlockingUser" @click="confirmBlockUser">
+							<SpinnerIcon v-if="isBlockingUser" class="animate-spin" />
+							<BanIcon v-else />
+							{{ formatMessage(messages.blockButton) }}
+						</button>
+					</ButtonStyled>
+				</div>
+			</template>
+		</NewModal>
+
+		<NewModal
 			v-if="variant === 'web'"
 			ref="editRoleModal"
 			:header="formatMessage(messages.editRoleButton)"
@@ -151,10 +181,12 @@
 					:is-admin="isAdminViewing"
 					:is-staff="isStaffViewing"
 					:show-staff-actions="variant === 'web'"
+					:is-blocked="isBlocked"
 					:projects-count="projects.length"
 					:downloads="sumDownloads"
 					@manage-projects="openPath('/dashboard/projects')"
 					@report="reportProfile"
+					@block="handleBlockAction"
 					@copy-id="copyId"
 					@copy-permalink="copyPermalink"
 					@open-billing="openPath(`/admin/billing/${user.id}`)"
@@ -392,6 +424,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BanIcon,
 	BoxIcon,
 	CheckIcon,
 	GlobeIcon,
@@ -411,6 +444,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -429,7 +463,7 @@ import { defineMessages, useVIntl } from '#ui/composables'
 import { injectAuth, injectNotificationManager, injectPageContext, injectTags } from '#ui/providers'
 import { commonMessages, getProjectTypeTitleMessage } from '#ui/utils'
 
-import { injectUserProfile } from './providers'
+import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import {
 	hasActivePride26Midas,
 	hasPride26Badge,
@@ -463,6 +497,7 @@ const props = withDefaults(
 		siteUrl?: string
 		externalNavigation?: boolean
 		projectLinkMode?: 'website' | 'app'
+		editProfileLink?: string | (() => void)
 		onCreateProject?: (event?: MouseEvent) => void
 		onCreateCollection?: (event?: MouseEvent) => void
 	}>(),
@@ -474,6 +509,7 @@ const props = withDefaults(
 		siteUrl: 'https://modrinth.com',
 		externalNavigation: false,
 		projectLinkMode: 'website',
+		editProfileLink: undefined,
 		onCreateProject: undefined,
 		onCreateCollection: undefined,
 	},
@@ -608,6 +644,55 @@ const messages = defineMessages({
 		id: 'profile.role.update-error-description',
 		defaultMessage: 'An error occurred while updating the user role. Please try again.',
 	},
+	blockButton: {
+		id: 'profile.button.block',
+		defaultMessage: 'Block',
+	},
+	unblockUserSuccessTitle: {
+		id: 'profile.unblock-user.success-title',
+		defaultMessage: 'User unblocked',
+	},
+	unblockUserSuccessDescription: {
+		id: 'profile.unblock-user.success-description',
+		defaultMessage: '{username} has been unblocked.',
+	},
+	unblockUserErrorTitle: {
+		id: 'profile.unblock-user.error-title',
+		defaultMessage: 'Failed to unblock user',
+	},
+	unblockUserErrorDescription: {
+		id: 'profile.unblock-user.error-description',
+		defaultMessage: 'An error occurred while unblocking this user. Please try again.',
+	},
+	blockUserTitle: {
+		id: 'profile.block-user.title',
+		defaultMessage: 'Block {username}',
+	},
+	blockUserAdmonitionTitle: {
+		id: 'profile.block-user.admonition-title',
+		defaultMessage: 'Are you sure you want to block this user?',
+	},
+	blockUserAdmonitionBody: {
+		id: 'profile.block-user.admonition-body',
+		defaultMessage:
+			'{username} will not be able to send you friend requests, invite you to shared instances or invite you to Modrinth Hosting servers.',
+	},
+	blockUserSuccessTitle: {
+		id: 'profile.block-user.success-title',
+		defaultMessage: 'User blocked',
+	},
+	blockUserSuccessDescription: {
+		id: 'profile.block-user.success-description',
+		defaultMessage: '{username} has been blocked.',
+	},
+	blockUserErrorTitle: {
+		id: 'profile.block-user.error-title',
+		defaultMessage: 'Failed to block user',
+	},
+	blockUserErrorDescription: {
+		id: 'profile.block-user.error-description',
+		defaultMessage: 'An error occurred while blocking this user. Please try again.',
+	},
 })
 
 const userQuery = useQuery({
@@ -634,6 +719,12 @@ const collectionsQuery = useQuery({
 	enabled: computed(() => Boolean(props.userId)),
 	staleTime: 30_000,
 })
+const blockedUsersQuery = useQuery({
+	queryKey: computed(() => blockedUsersQueryKey(auth.user.value?.id)),
+	queryFn: userProfile.getBlockedUsers,
+	enabled: computed(() => Boolean(auth.user.value)),
+	staleTime: 30_000,
+})
 
 const user = computed(() => userQuery.data.value)
 const projects = computed<ResolvedProject[]>(() =>
@@ -644,6 +735,9 @@ const projects = computed<ResolvedProject[]>(() =>
 )
 const organizations = computed(() => organizationsQuery.data.value ?? [])
 const collections = computed(() => collectionsQuery.data.value ?? [])
+const isBlocked = computed(() =>
+	user.value ? (blockedUsersQuery.data.value ?? []).includes(user.value.id) : false,
+)
 
 const selectedProjectType = computed(() => {
 	const projectType = props.projectType
@@ -742,7 +836,7 @@ const showCollectionsEmptyState = computed(
 )
 
 const normalizedSiteUrl = computed(() => props.siteUrl.replace(/\/$/, ''))
-const editProfileLink = computed(() => linkTarget('/settings/profile'))
+const editProfileLink = computed(() => props.editProfileLink ?? linkTarget('/settings/profile'))
 
 function externalUrl(path: string): string {
 	return `${normalizedSiteUrl.value}${path.startsWith('/') ? path : `/${path}`}`
@@ -826,8 +920,11 @@ async function retryQueries(): Promise<void> {
 
 const userDetailsModal = ref<ModalRef | null>(null)
 const editRoleModal = ref<ModalRef | null>(null)
+const blockUserModal = ref<ModalRef | null>(null)
 const selectedRole = ref<Labrinth.Users.v3.Role | null>(null)
 const isSavingRole = ref(false)
+const isBlockingUser = ref(false)
+const isUnblockingUser = ref(false)
 const roleOptions = [
 	{ value: 'developer', label: 'Developer' },
 	{ value: 'moderator', label: 'Moderator' },
@@ -849,6 +946,82 @@ function openUserDetails(): void {
 function openRoleEditModal(): void {
 	selectedRole.value = user.value?.role ?? null
 	editRoleModal.value?.show()
+}
+
+async function handleBlockAction(): Promise<void> {
+	if (!auth.user.value) {
+		await auth.requestSignIn(route.fullPath)
+		return
+	}
+
+	if (isBlocked.value) {
+		await unblockCurrentUser()
+		return
+	}
+
+	blockUserModal.value?.show()
+}
+
+async function confirmBlockUser(): Promise<void> {
+	if (!user.value || isBlockingUser.value) return
+
+	const blockedUser = user.value
+	const authUserId = auth.user.value?.id
+	isBlockingUser.value = true
+	try {
+		await userProfile.blockUser(blockedUser.id)
+		queryClient.setQueryData<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
+			blockedUsersQueryKey(authUserId),
+			(blockedUsers = []) =>
+				blockedUsers.includes(blockedUser.id) ? blockedUsers : [...blockedUsers, blockedUser.id],
+		)
+		blockUserModal.value?.hide()
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.blockUserSuccessTitle),
+			text: formatMessage(messages.blockUserSuccessDescription, {
+				username: blockedUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.blockUserErrorTitle),
+			text: formatMessage(messages.blockUserErrorDescription),
+		})
+	} finally {
+		isBlockingUser.value = false
+	}
+}
+
+async function unblockCurrentUser(): Promise<void> {
+	if (!user.value || isUnblockingUser.value) return
+
+	const blockedUser = user.value
+	const authUserId = auth.user.value?.id
+	isUnblockingUser.value = true
+	try {
+		await userProfile.unblockUser(blockedUser.id)
+		queryClient.setQueryData<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
+			blockedUsersQueryKey(authUserId),
+			(blockedUsers = []) => blockedUsers.filter((userId) => userId !== blockedUser.id),
+		)
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.unblockUserSuccessTitle),
+			text: formatMessage(messages.unblockUserSuccessDescription, {
+				username: blockedUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.unblockUserErrorTitle),
+			text: formatMessage(messages.unblockUserErrorDescription),
+		})
+	} finally {
+		isUnblockingUser.value = false
+	}
 }
 
 function cancelRoleEdit(): void {

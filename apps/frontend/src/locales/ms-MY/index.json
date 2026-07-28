@@ -4103,27 +4103,6 @@
   "settings.pats.token.never-used": {
     "message": "Tidak pernah digunakan"
   },
-  "settings.profile.bio.description": {
-    "message": "Keterangan ringkas untuk memberitahu semua orang serba sedikit tentang anda."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Maklumat profil anda boleh dilihat secara terbuka pada Modrinth dan melalui <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Tetapan profil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Maklumat profil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Gambar profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Nama unik (tidak sensitif huruf besar dan kecil) untuk mengenal pasti profil anda."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"
   },
