@@ -343,9 +343,20 @@ const { installingServerProjects, playServerProject, showAddServerToInstanceModa
 	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
-const projectBreadcrumbLabel = ref(
-	String(route.params.id ?? formatMessage(commonMessages.loadingLabel)),
-)
+
+function getProjectBreadcrumbLabel(projectId) {
+	const identifier = Array.isArray(projectId) ? projectId[0] : projectId
+	if (typeof identifier !== 'string' || !identifier) {
+		return formatMessage(commonMessages.loadingLabel)
+	}
+
+	return (
+		queryClient.getQueryData(['projects', 'summary', identifier])?.name ??
+		formatMessage(commonMessages.loadingLabel)
+	)
+}
+
+const projectBreadcrumbLabel = ref(getProjectBreadcrumbLabel(route.params.id))
 const projectBreadcrumb = useBreadcrumb({
 	slot: 'project',
 	id: () => `project:${String(displayedProjectRoute.value.params.id ?? '')}`,
@@ -634,9 +645,7 @@ function reportProject() {
 }
 
 async function fetchProjectData() {
-	projectBreadcrumbLabel.value = String(
-		route.params.id ?? formatMessage(commonMessages.loadingLabel),
-	)
+	projectBreadcrumbLabel.value = getProjectBreadcrumbLabel(route.params.id)
 	const [project, projectV3Result] = await Promise.all([
 		get_project(route.params.id, 'must_revalidate').catch(handleError),
 		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),

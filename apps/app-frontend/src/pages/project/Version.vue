@@ -95,7 +95,7 @@ import {
 	useVIntl,
 	VersionPage,
 } from '@modrinth/ui'
-import { ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { SwapIcon } from '@/assets/icons'
@@ -143,6 +143,17 @@ const props = defineProps<{
 }>()
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
+const versionBreadcrumbLabel = computed(() => {
+	const versionName = version.value?.name
+	if (!versionName) {
+		return formatMessage(commonMessages.loadingLabel)
+	}
+
+	const projectNamePrefix = `${props.project.title} `
+	return versionName.startsWith(projectNamePrefix)
+		? versionName.slice(projectNamePrefix.length).trim() || versionName
+		: versionName
+})
 const versionsBreadcrumb = useBreadcrumb({
 	slot: 'project-section',
 	id: () => `project-versions:${props.project.id}`,
@@ -160,12 +171,7 @@ useBreadcrumb(
 			`version:${props.project.id}:${String(
 				displayedVersionRoute.value.params.version ?? '',
 			)}`,
-		label: () =>
-			version.value?.name ??
-			String(
-				displayedVersionRoute.value.params.version ??
-					formatMessage(commonMessages.loadingLabel),
-			),
+		label: versionBreadcrumbLabel,
 		to: () => displayedVersionRoute.value.fullPath,
 	},
 	{ parent: versionsBreadcrumb },

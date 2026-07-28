@@ -970,6 +970,14 @@ async function search(requestParams: string) {
 		}
 	}
 
+	for (const hit of rawResults.result.hits) {
+		for (const identifier of [hit.project_id, hit.slug]) {
+			if (identifier) {
+				queryClient.setQueryData(['projects', 'summary', identifier], hit)
+			}
+		}
+	}
+
 	if (isServer) {
 		const hits = rawResults.result.hits ?? []
 		updateServerHits(hits)

@@ -83,20 +83,34 @@ const serverId = computed(() => {
 	return Array.isArray(rawId) ? (rawId[0] ?? '') : (rawId ?? '')
 })
 
+function getCachedServerName(id: string): string | undefined {
+	return queryClient
+		.getQueryData<Archon.Servers.v0.ServerGetResponse>(['servers'])
+		?.servers.find((server) => server.server_id === id)?.name
+}
+
 const { data: serverData } = useQuery({
 	queryKey: computed(() => ['servers', 'detail', serverId.value]),
-	queryFn: () => null as unknown as Archon.Servers.v0.Server,
-	enabled: false,
+	queryFn: () => client.archon.servers_v0.get(serverId.value),
+	enabled: computed(() => Boolean(serverId.value)),
+	placeholderData: () =>
+		queryClient
+			.getQueryData<Archon.Servers.v0.ServerGetResponse>(['servers'])
+			?.servers.find((server) => server.server_id === serverId.value),
+	staleTime: 30_000,
 })
 
 const breadcrumbServerId = ref(serverId.value)
-const breadcrumbLabel = ref(formatMessage(commonMessages.loadingLabel))
+const breadcrumbLabel = ref(
+	getCachedServerName(serverId.value) ?? formatMessage(commonMessages.loadingLabel),
+)
 watch(
 	serverId,
 	(value) => {
 		if (!route.path.startsWith('/hosting/manage/') || route.name === 'Servers') return
 		breadcrumbServerId.value = value
-		breadcrumbLabel.value = formatMessage(commonMessages.loadingLabel)
+		breadcrumbLabel.value =
+			getCachedServerName(value) ?? formatMessage(commonMessages.loadingLabel)
 	},
 	{ flush: 'sync' },
 )
@@ -116,18 +130,6 @@ const serverBreadcrumb = useBreadcrumb({
 	to: () => `/hosting/manage/${encodeURIComponent(breadcrumbServerId.value)}`,
 })
 provideBreadcrumbParent(serverBreadcrumb)
-
-if (serverId.value) {
-	try {
-		await queryClient.ensureQueryData({
-			queryKey: ['servers', 'detail', serverId.value],
-			queryFn: () => client.archon.servers_v0.get(serverId.value)!,
-			staleTime: 30_000,
-		})
-	} catch {
-		// Let mounted layouts' useQuery surface errors; do not fail route setup.
-	}
-}
 
 watch(
 	() => auth.user.value,

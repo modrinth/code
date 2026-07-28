@@ -197,6 +197,7 @@ import { handleSevereError } from '@/store/error.js'
 import {
 	provideBreadcrumbParent,
 	useBreadcrumb,
+	useRootBreadcrumb,
 } from '@/providers/breadcrumbs'
 import { useTheming } from '@/store/state'
 
@@ -226,7 +227,7 @@ window.addEventListener('online', () => {
 })
 
 const instance = ref<GameInstance>()
-const instanceBreadcrumb = useBreadcrumb({
+const instanceBreadcrumb = useRootBreadcrumb({
 	slot: 'instance',
 	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
 	label: () =>
