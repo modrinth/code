@@ -89,7 +89,7 @@ const messages = defineMessages({
 	},
 	editGroupName: {
 		id: 'app.library.group.edit-name',
-		defaultMessage: 'Edit name',
+		defaultMessage: 'Edit group name',
 	},
 	renameGroupFailed: {
 		id: 'app.library.group.rename-failed',
@@ -259,6 +259,7 @@ watch(
 	<div
 		ref="groupDropTarget"
 		class="instance-group group/instance-container relative select-none pb-3"
+		@contextmenu.prevent.stop="openGroupContextMenu"
 	>
 		<Transition
 			enter-active-class="transition-opacity duration-150 ease-out"
@@ -280,7 +281,6 @@ watch(
 		<div
 			v-if="!hideHeader"
 			class="group/header h-10 flex w-full items-center gap-2 border-0 border-b border-solid border-b-surface-5"
-			@contextmenu.prevent.stop="openGroupContextMenu"
 		>
 			<div
 				class="group/open-target flex min-w-0 items-center gap-2"
