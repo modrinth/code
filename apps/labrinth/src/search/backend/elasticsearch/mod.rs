@@ -233,7 +233,7 @@ impl ElasticsearchClient {
 			.request(
 				Method::POST,
 				&format!(
-					"/{index}/_delete_by_query?conflicts=proceed&refresh=true"
+					"/{index}/_delete_by_query?conflicts=proceed&refresh=false"
 				),
 			)
 			.json(&json!({"query": query}))
@@ -261,6 +261,21 @@ impl ElasticsearchClient {
 			.await
 			.wrap_err("failed to refresh Elasticsearch index")?;
 		response_json(response, "refresh Elasticsearch index").await?;
+		Ok(())
+	}
+
+	async fn force_merge(&self, index: &str) -> Result<()> {
+		let response = self
+			.request(
+				Method::POST,
+				&format!(
+					"/{index}/_forcemerge?max_num_segments=1&flush=true"
+				),
+			)
+			.send()
+			.await
+			.wrap_err("failed to force-merge Elasticsearch index")?;
+		response_json(response, "force-merge Elasticsearch index").await?;
 		Ok(())
 	}
 }
@@ -301,7 +316,51 @@ impl Elasticsearch {
 			"settings": {
 				"number_of_shards": 3,
 				"number_of_replicas": 1,
-				"index.mapping.total_fields.limit": 5000
+				"refresh_interval": "30s",
+				"index.mapping.total_fields.limit": 5000,
+				"analysis": {
+					"char_filter": {
+						"hyphen_separator": {
+							"type": "pattern_replace",
+							"pattern": "-",
+							"replacement": " "
+						},
+						"strip_symbols": {
+							"type": "pattern_replace",
+							"pattern": r"[^\p{L}\p{N}\s]",
+							"replacement": ""
+						}
+					},
+					"filter": {
+						"typesense_stemmer": {
+							"type": "stemmer",
+							"language": "light_english"
+						}
+					},
+					"analyzer": {
+						"typesense_text": {
+							"type": "custom",
+							"char_filter": ["strip_symbols"],
+							"tokenizer": "whitespace",
+							"filter": ["lowercase"]
+						},
+						"typesense_hyphen_text": {
+							"type": "custom",
+							"char_filter": [
+								"hyphen_separator",
+								"strip_symbols"
+							],
+							"tokenizer": "whitespace",
+							"filter": ["lowercase"]
+						},
+						"typesense_stemmed_text": {
+							"type": "custom",
+							"char_filter": ["strip_symbols"],
+							"tokenizer": "whitespace",
+							"filter": ["lowercase", "typesense_stemmer"]
+						}
+					}
+				}
 			},
 			"mappings": {
 				"dynamic_templates": [
@@ -318,7 +377,8 @@ impl Elasticsearch {
 				"properties": {
 					"document_type": {
 						"type": "join",
-						"relations": {"project": "version"}
+						"relations": {"project": "version"},
+						"eager_global_ordinals": true
 					},
 					"version_id": {"type": "keyword"},
 					"project_id": {"type": "keyword"},
@@ -326,26 +386,72 @@ impl Elasticsearch {
 					"all_project_types": {"type": "keyword"},
 					"slug": {
 						"type": "text",
+						"analyzer": "typesense_text",
+						"index_options": "docs",
+						"norms": false,
+						"index_prefixes": {
+							"min_chars": 1,
+							"max_chars": 10
+						},
 						"fields": {
 							"keyword": {"type": "keyword", "ignore_above": 8191}
 						}
 					},
 					"author": {
 						"type": "text",
+						"analyzer": "typesense_hyphen_text",
+						"index_options": "docs",
+						"norms": false,
+						"index_prefixes": {
+							"min_chars": 1,
+							"max_chars": 10
+						},
 						"fields": {
 							"keyword": {"type": "keyword", "ignore_above": 8191}
 						}
 					},
-					"indexed_author": {"type": "text"},
+					"indexed_author": {
+						"type": "text",
+						"analyzer": "typesense_text",
+						"index_options": "docs",
+						"norms": false,
+						"index_prefixes": {
+							"min_chars": 1,
+							"max_chars": 10
+						}
+					},
 					"name": {
 						"type": "text",
+						"analyzer": "typesense_hyphen_text",
+						"index_options": "docs",
+						"norms": false,
+						"index_prefixes": {
+							"min_chars": 1,
+							"max_chars": 10
+						},
 						"fields": {
 							"keyword": {"type": "keyword", "ignore_above": 8191}
 						}
 					},
-					"indexed_name": {"type": "text"},
+					"indexed_name": {
+						"type": "text",
+						"analyzer": "typesense_stemmed_text",
+						"index_options": "docs",
+						"norms": false,
+						"index_prefixes": {
+							"min_chars": 1,
+							"max_chars": 10
+						}
+					},
 					"summary": {
 						"type": "text",
+						"analyzer": "typesense_text",
+						"index_options": "docs",
+						"norms": false,
+						"index_prefixes": {
+							"min_chars": 1,
+							"max_chars": 10
+						},
 						"fields": {
 							"keyword": {"type": "keyword", "ignore_above": 8191}
 						}
@@ -395,38 +501,109 @@ impl Elasticsearch {
 			return json!({"match_all": {}});
 		}
 
+		let tokens = query.split_whitespace().collect_vec();
+		if tokens.is_empty() {
+			return json!({"match_all": {}});
+		}
 		let fields = [
-			"name^15",
-			"indexed_name^15",
-			"slug^10",
-			"author^3",
-			"indexed_author^3",
-			"summary",
+			("name", 15),
+			("indexed_name", 15),
+			("slug", 10),
+			("author", 3),
+			("indexed_author", 3),
+			("summary", 1),
 		];
-		json!({
-			"bool": {
-				"should": [
-					{
-						"multi_match": {
-							"query": query,
-							"fields": fields,
-							"type": "best_fields",
-							"operator": "and",
-							"fuzziness": "AUTO",
-							"prefix_length": 1
-						}
-					},
-					{
-						"multi_match": {
-							"query": query,
-							"fields": fields,
-							"type": "phrase_prefix"
-						}
+		let token_queries =
+			|token: &str, prefix: bool, exact_boost: bool| {
+				let mut queries = Vec::with_capacity(fields.len() * 3);
+				for (field, weight) in fields {
+					if exact_boost && field != "indexed_name" {
+						queries.push(json!({
+							"constant_score": {
+								"filter": {
+									"match": {
+										(field): {
+											"query": token,
+											"fuzziness": 0
+										}
+									}
+								},
+								"boost": weight + 1
+							}
+						}));
 					}
-				],
-				"minimum_should_match": 1
+					if prefix {
+						queries.push(json!({
+							"constant_score": {
+								"filter": {
+									"match_bool_prefix": {
+										(field): {"query": token}
+									}
+								},
+								"boost": weight
+							}
+						}));
+					}
+					queries.push(json!({
+						"constant_score": {
+							"filter": {
+								"match": {
+									(field): {
+										"query": token,
+										"fuzziness": "AUTO:4,7",
+										"prefix_length": 1,
+										"max_expansions": 2
+									}
+								}
+							},
+							"boost": weight
+						}
+					}));
+				}
+				queries
+			};
+		let queries_by_token = tokens
+			.iter()
+			.enumerate()
+			.map(|(index, token)| {
+				// Typesense caps candidates globally, while Elasticsearch
+				// expands them per field and shard. These bounds keep broad
+				// prefixes and stem-only matches out of the top relevance
+				// bucket while preserving short autocomplete queries.
+				let is_last = index == tokens.len() - 1;
+				let prefix =
+					is_last && (tokens.len() == 1 || token.chars().count() < 6);
+				let exact_boost =
+					tokens.len() > 1 || token.chars().count() >= 6;
+				token_queries(token, prefix, exact_boost)
+			})
+			.collect_vec();
+		let scoring_query = json!({
+			"dis_max": {
+				"queries": queries_by_token.iter().flatten().collect_vec(),
+				"tie_breaker": 0
 			}
-		})
+		});
+		if tokens.len() == 1 {
+			scoring_query
+		} else {
+			json!({
+				"bool": {
+					"must": [scoring_query],
+					"filter": queries_by_token
+						.into_iter()
+						.map(|queries| {
+							json!({
+								"dis_max": {
+									"queries": queries,
+									"tie_breaker": 0
+								}
+							})
+						})
+						.collect_vec()
+				}
+			})
+		}
 	}
 
 	fn sort(index: SearchIndex) -> Vec<Value> {
@@ -729,6 +906,8 @@ impl SearchBackend for Elasticsearch {
 		}
 
 		self.client.refresh(&next).await?;
+		info!("force-merging Elasticsearch shadow index");
+		self.client.force_merge(&next).await?;
 		info!("swapping Elasticsearch index alias");
 		self.client
 			.swap_alias(&alias, current.as_deref(), &next)
@@ -757,13 +936,6 @@ impl SearchBackend for Elasticsearch {
 			.removed_versions
 			.iter()
 			.map(ToString::to_string)
-			.chain(
-				update
-					.versions
-					.iter()
-					.map(|document| document.version_id.clone()),
-			)
-			.unique()
 			.collect::<Vec<_>>();
 		if !version_ids.is_empty() {
 			self.delete_ids("version_id", &version_ids).await?;
