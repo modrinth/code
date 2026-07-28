@@ -21,7 +21,6 @@ export interface EnumSettingDefinition extends SettingDefinitionBase<string> {
 
 export interface StringSettingDefinition extends SettingDefinitionBase<string> {
 	type: 'string',
-	multiline?: boolean,
 }
 
 export type SettingDefinition = ToggleSettingDefinition | EnumSettingDefinition | StringSettingDefinition
