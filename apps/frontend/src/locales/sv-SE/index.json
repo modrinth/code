@@ -3791,9 +3791,6 @@
   "settings.authorizations.about-this-app": {
     "message": "Om appen"
   },
-  "settings.authorizations.by": {
-    "message": "av"
-  },
   "settings.authorizations.head-title": {
     "message": "Autentiseringar"
   },

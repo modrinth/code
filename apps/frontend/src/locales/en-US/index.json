@@ -4802,17 +4802,23 @@
   "settings.authorizations.about-this-app": {
     "message": "About this app"
   },
-  "settings.authorizations.by": {
-    "message": "by"
+  "settings.authorizations.created-by": {
+    "message": "Created by {user}"
   },
   "settings.authorizations.description": {
     "message": "When you authorize an application with your Modrinth account, you grant it access to your account. You can manage and review access to your account here at any time."
   },
-  "settings.authorizations.empty-state": {
-    "message": "We currently can't display your authorized apps, we're working to fix this. Please visit this page at a later date!"
+  "settings.authorizations.empty-state.description": {
+    "message": "Applications you authorize will appear here."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "No authorized apps"
   },
   "settings.authorizations.head-title": {
     "message": "Authorizations"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "This app is created by an official Modrinth account."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revoke"
@@ -4822,6 +4828,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Are you sure you want to revoke this application?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "This app is not affiliated with Modrinth in any way, despite its name."
   },
   "settings.billing.charges.description": {
     "message": "All of your past charges to your Modrinth account will be listed here:"

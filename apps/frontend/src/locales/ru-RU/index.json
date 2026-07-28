@@ -4748,14 +4748,8 @@
   "settings.authorizations.about-this-app": {
     "message": "О приложении"
   },
-  "settings.authorizations.by": {
-    "message": "от"
-  },
   "settings.authorizations.description": {
     "message": "Авторизованные приложения получают доступ к аккаунту Modrinth. Здесь можно просматривать и отзывать этот доступ."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Список приложений временно недоступен. Мы работаем над исправлением — загляните сюда позже."
   },
   "settings.authorizations.head-title": {
     "message": "Авторизации"

@@ -4802,14 +4802,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre este aplicativo"
   },
-  "settings.authorizations.by": {
-    "message": "por"
-  },
   "settings.authorizations.description": {
     "message": "Ao autorizar um aplicativo com sua conta do Modrinth, você concede acesso à sua conta. Você pode gerenciar e revisar o acesso à sua conta aqui a qualquer momento."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "No momento, não podemos exibir seus aplicativos autorizados. Estamos trabalhando para corrigir isso. Visite esta página novamente mais tarde!"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"

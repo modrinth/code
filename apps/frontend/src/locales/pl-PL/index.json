@@ -4715,14 +4715,8 @@
   "settings.authorizations.about-this-app": {
     "message": "O aplikacji"
   },
-  "settings.authorizations.by": {
-    "message": "od"
-  },
   "settings.authorizations.description": {
     "message": "Kiedy autoryzujesz aplikacje ze swoim kontem Modrinth, dajesz jej dostęp do swojego konta. Możesz tutaj zawsze zarządzać oraz przeglądać stan aplikacji z dostępem do Twojego konta."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Nie udało się nam wyświetlić twoich zautoryzowanych aplikacji, pracujemy nad tym, aby to naprawić. Odwiedź tę stronę później!"
   },
   "settings.authorizations.head-title": {
     "message": "Autoryzacje"

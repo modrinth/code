@@ -4799,14 +4799,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Over deze app"
   },
-  "settings.authorizations.by": {
-    "message": "door"
-  },
   "settings.authorizations.description": {
     "message": "Wanneer je een app via je Modrinth-account autoriseert, verleen je die app toegang tot je account. Je kunt de toegang tot je account hier op elk moment beheren en bekijken."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "We kunnen je geautoriseerde apps momenteel niet weergeven, maar we werken eraan om dit te verhelpen. Kom later nog eens terug op deze pagina!"
   },
   "settings.authorizations.head-title": {
     "message": "Toestemmingen"

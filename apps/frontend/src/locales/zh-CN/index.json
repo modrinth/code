@@ -4802,14 +4802,8 @@
   "settings.authorizations.about-this-app": {
     "message": "关于此应用"
   },
-  "settings.authorizations.by": {
-    "message": "by"
-  },
   "settings.authorizations.description": {
     "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "我们目前无法显示您授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
   },
   "settings.authorizations.head-title": {
     "message": "授权"

@@ -3713,14 +3713,8 @@
   "settings.authorizations.about-this-app": {
     "message": "このアプリについて"
   },
-  "settings.authorizations.by": {
-    "message": "作成者"
-  },
   "settings.authorizations.description": {
     "message": "Modrinthアカウントでアプリケーションを承認することにより、アプリケーションがあなたのアカウントにアクセスできるようになります。 アクセス権はいつでも確認でき、変更可能です。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "現在承認済みアプリを表示することができません。現在修正中のため、また後ほど確認ください！"
   },
   "settings.authorizations.head-title": {
     "message": "承認"
