@@ -11,6 +11,23 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-07-28T23:36:10+00:00`,
+		product: 'web',
+		body: `## Changed
+- Added message to legacy moderation threads showing that there may be undocumented moderation history.
+
+## Fixed
+- Fixed OAuth application icon upload not working.
+- Fixed moderation messages not showing.`,
+	},
+	{
+		date: `2026-07-28T23:36:10+00:00`,
+		product: 'app',
+		version: '0.17.2',
+		body: `## Fixed
+- Fixed broken shared instances invite management table.`,
+	},
+	{
 		date: `2026-07-28T20:40:11+00:00`,
 		product: 'app',
 		version: '0.17.1',
