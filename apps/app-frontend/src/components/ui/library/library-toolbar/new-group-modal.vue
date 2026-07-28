@@ -74,7 +74,9 @@
 							<CheckIcon v-if="selectedNewGroupInstanceIds.has(instance.id)" />
 							{{
 								selectedNewGroupInstanceIds.has(instance.id)
-									? 'Added'
+									? instance.groups.length > 0
+										? 'Moved'
+										: 'Added'
 									: instance.groups.length > 0
 										? 'Move'
 										: 'Add'

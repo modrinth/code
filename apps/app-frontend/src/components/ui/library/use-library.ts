@@ -329,7 +329,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			groups.sort((a, b) => {
 				if (a.key === 'None') return 1
 				if (b.key === 'None') return -1
-				return 0
+				return a.key.localeCompare(b.key)
 			})
 		}
 
