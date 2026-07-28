@@ -220,7 +220,6 @@ export default function () {
 						.children(
 							group()
 								.title('Similarities Additional Info')
-								.multiSelect('options')
 								.children(
 									check('modpack', 'Modpack Named After Mod')
 										.shown(computed(() => project.value.project_types.includes('modpack')))
@@ -239,7 +238,6 @@ export default function () {
 				.shown(computed(() => hasCustomSlug(project.value)))
 				.children(
 					group()
-						.multiSelect('issues')
 						.children(
 							toggle('misused', 'Misused')
 								.children(
@@ -247,7 +245,7 @@ export default function () {
 										.title('Correct Slug')
 										.children(
 											text('correct-slug')
-												.initial(() => resolvedAutoSlug.value ?? project.value.slug)
+												.initial(() => resolvedAutoSlug.value ?? project.value.slug ?? "")
 												.onChange((value, { override }) => {
 													if (!value) return override(project.value.slug ?? '')
 													clearTimeout(slugDebounceTimer)
@@ -277,8 +275,8 @@ export default function () {
 														resolvedAutoSlug.value !== null &&
 														resolvedAutoSlug.value !== currentSlug(state),
 												)
-												.onClick((state) => {
-													if (resolvedAutoSlug.value) state['correct-slug'] = resolvedAutoSlug.value
+												.onClick((_state, write) => {
+													if (resolvedAutoSlug.value) write('correct-slug', resolvedAutoSlug.value)
 												}),
 
 											button()
@@ -294,16 +292,16 @@ export default function () {
 														ownerUsername.value !== null &&
 														!currentSlug(state)?.includes(ownerUsername.value),
 												)
-												.onClick((state) => {
-													state['correct-slug'] = `${currentSlug(state)}-${ownerUsername.value}`
+												.onClick((state, write) => {
+													write('correct-slug', `${currentSlug(state)}-${ownerUsername.value}`)
 												}),
 
 											button()
 												.icon(TagCategoryRefreshCcwIcon)
 												.tooltip(computed(() => project.value.slug ?? ''))
 												.enabled((state) => currentSlug(state) !== project.value.slug)
-												.onClick((state) => {
-													state['correct-slug'] = project.value.slug
+												.onClick((_state, write) => {
+													write('correct-slug', project.value.slug)
 												}),
 
 											SlugStatus,

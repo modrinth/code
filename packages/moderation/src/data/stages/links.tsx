@@ -4,14 +4,14 @@ import type { Ref } from 'vue'
 import { computed } from 'vue'
 
 import { group, md, mdOptional, stage, toggle } from '../../types/node'
-import type { ChildEntry, GroupNodeBuilder } from '../../types/node'
+import type { ChildEntry, GroupNode } from '../../types/node'
 import { promptSourceRequired } from '../..'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 	const linkNames: Record<string, string> = {}
 
-	type LinkSectionBuilder = GroupNodeBuilder & {
+	type LinkSectionBuilder = GroupNode & {
 		children(...extras: ChildEntry[]): LinkSectionBuilder
 		label(badge: Ref<boolean>): LinkSectionBuilder
 	}

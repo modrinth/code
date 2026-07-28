@@ -27,7 +27,6 @@ export default function () {
 						.children(
 							group()
 								.title('Why is this Description Insufficient?')
-								.multiSelect('reason')
 								.children(
 									toggle('custom', 'Custom').children(
 										markdown('explainer')
@@ -44,8 +43,7 @@ export default function () {
 								`insufficient/default/${project.value?.minecraft_java_server ? 'servers' : project.value?.project_types?.includes('modpack') ? 'packs' : 'projects'}`,
 						)
 						.rawMessage(async (state) => {
-							const reasons = state?.reason instanceof Set ? state.reason : new Set<string>()
-							return SHOW_SPOILER_ADVICE.some((reason) => reasons.has(reason))
+							return SHOW_SPOILER_ADVICE.some((reason) => state?.[reason] === true)
 								? await md('checklist/messages/description/insufficient/piece/spoiler-guide')(state)
 								: ''
 						}),

@@ -237,23 +237,11 @@
 					<div v-else class="flex min-h-0 flex-1 flex-col">
 						<NodeRenderer
 							class="min-h-0 flex-1 overflow-y-auto p-1"
-							:nodes="
-								resolveChildren(
-									currentStageObj,
-									(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
-								)
-							"
-							:show-context="
-								withDefaults(
-									(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
-									resolveChildren(
-										currentStageObj,
-										(nodeStates[currentStageObj.id!] ?? {}) as Record<string, NodeState>,
-									),
-								)
-							"
+							:nodes="stageNodes"
+							:state="stageState"
+							:write="stageWriter"
 							:on-image-upload="onUploadHandler"
-							:parent-state-path="currentStageObj._statePath ?? []"
+							:app-components="appComponentsByKey"
 						/>
 					</div>
 				</div>
@@ -401,33 +389,26 @@ import {
 	UndoIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type {
-	IdentifiedNodeBuilder,
-	NodeState,
-	Priority,
-	StageNodeBuilder,
-	ValueNodeBuilder,
-} from '@modrinth/moderation'
+import type { Priority } from '@modrinth/moderation'
+import { expandVariables, handleKeybind, kebabToTitleCase, useStages } from '@modrinth/moderation'
+import type { NodeState, StageNode } from '@modrinth/moderation/src/types/node'
 import {
-	BooleanNodeBuilder,
-	ComponentNodeBuilder,
+	CHECKLIST_META_KEY,
+	collectActiveActions,
+	computeAttentionMap,
+	computeNodeMeta,
 	createTrackedPatch,
 	evalSegment,
-	expandVariables,
-	getBooleanChildState,
-	GLOBAL_STATE_KEY,
-	handleKeybind,
-	isNodeActive,
-	kebabToTitleCase,
-	NodeBuilder,
 	resolve,
 	resolveChildren,
 	setMessageProject,
 	setMissingMdHandler,
-	useStages,
-	walkNodes,
-	withDefaults,
-} from '@modrinth/moderation'
+} from '@modrinth/moderation/src/types/node'
+import NodeRenderer from '@modrinth/moderation/src/types/node/components/NodeRenderer.vue'
+import type { FixBuilder } from '@modrinth/moderation/src/types/node/fix'
+import type { Writer } from '@modrinth/moderation/src/types/node/mutate'
+import LoaderPicker from '~/components/ui/create-project-version/components/LoaderPicker.vue'
+import McVersionPicker from '~/components/ui/create-project-version/components/McVersionPicker.vue'
 import {
 	Avatar,
 	ButtonStyled,
@@ -462,9 +443,8 @@ import {
 import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
-import { type ActiveAction, type LiveNode, NODE_META_KEY, STATE_KEY } from './checklist-context'
+import { type ActiveAction, type LiveNode, STATE_KEY } from './checklist-context'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
-import NodeRenderer from './NodeRenderer.vue'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
@@ -701,7 +681,7 @@ function markStageVisited(stageId: string | undefined) {
 const reviewedAnyway = ref(persistedState?.reviewAnyway ?? false)
 const message = ref<string | null>(persistedState?.message ?? null)
 const generatedActiveActions = ref<ActiveAction[] | null>(null)
-const resolvedMessageAvailability = ref<Map<IdentifiedNodeBuilder, boolean>>(new Map())
+const resolvedMessageAvailability = ref<Map<object, boolean>>(new Map())
 const generatedMessage = computed(() => message.value !== null)
 const loadingMessage = ref(false)
 const moderationDecision = ref<ProjectStatus | null>(null)
@@ -1059,106 +1039,82 @@ const checklistTitleText = computed(() => {
 
 	return currentStageObj.value.label ?? kebabToTitleCase(currentStageObj.value.id)
 })
-function isStageLive(stage: StageNodeBuilder): boolean {
+function isStageLive(stage: StageNode): boolean {
 	return stage._shown === undefined || resolve(stage._shown)
 }
 
-function isStageEffectivelyShown(stage: StageNodeBuilder): boolean {
+function isStageEffectivelyShown(stage: StageNode): boolean {
 	if (isStageLive(stage)) return true
-	return stage._shownSticky === true && activatedStages.value.has(stage.id!)
+	return stage._shownSticky === true && activatedStages.value.has(stage.id)
 }
 
 watchEffect(() => {
 	for (const stage of resolvedStages.value) {
-		if (stage._shownSticky && isStageLive(stage) && !activatedStages.value.has(stage.id!)) {
-			activatedStages.value.add(stage.id!)
+		if (stage._shownSticky && isStageLive(stage) && !activatedStages.value.has(stage.id)) {
+			activatedStages.value.add(stage.id)
 		}
 	}
 })
 
-const checklistLive = computed<Map<IdentifiedNodeBuilder, LiveNode>>(() => {
-	const map = new Map<IdentifiedNodeBuilder, LiveNode>()
+function isFixActionable(fixes: FixBuilder[], state: Record<string, NodeState>): boolean {
+	return fixes.some((f) => {
+		if (f._projectFn) {
+			const { proxy, changes } = createTrackedPatch(projectV3.value as any)
+			f._projectFn(proxy as any, state)
+			return Object.keys(changes()).length > 0
+		}
+		if (f._versionFn) {
+			const version = versions.value?.[0]
+			if (!version) return true
+			const { proxy, changes } = createTrackedPatch(version as any)
+			f._versionFn(proxy as any, state)
+			return Object.keys(changes()).length > 0
+		}
+		return false
+	})
+}
+
+function computeStageLiveNode(stage: StageNode, stageState: Record<string, NodeState>): LiveNode {
+	if (!isStageEffectivelyShown(stage)) {
+		return {
+			isActive: true,
+			isVisible: false,
+			isFixActionable: false,
+			messageCount: 0,
+			fixCount: 0,
+			hasRequiredMissing: false,
+			activeActions: [],
+		}
+	}
+
+	const stageChildren = resolveChildren(stage, stageState)
+	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
+	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
+	const actions = collectActiveActions(stageChildren, stageState, [stage.id])
+
+	if (stage._segments.length > 0) {
+		actions.unshift({ node: stage, state: stageState, statePath: [stage.id] })
+	}
+
+	return {
+		isActive: true,
+		isVisible: metaMap.size > 0,
+		isFixActionable: false,
+		messageCount: actions.length,
+		fixCount: [...metaMap.values()].filter((m) => m.isFixActionable).length,
+		hasRequiredMissing: stageChildren.some(
+			(child) => typeof child === 'object' && child !== null && attentionMap.get(child) === true,
+		),
+		activeActions: actions,
+	}
+}
+
+const checklistLive = computed<Map<object, LiveNode>>(() => {
+	const map = new Map<object, LiveNode>()
 
 	for (const stage of resolvedStages.value) {
-		const stageState = (nodeStates.value[stage.id!] ?? {}) as Record<string, NodeState>
-
-		let isVisible = false
-		let messageCount = 0
-		let fixCount = 0
-		let hasRequiredMissing = false
-		const stageActiveActions: ActiveAction[] = []
-
-		if (isStageEffectivelyShown(stage)) {
-			if (stage._segments.length > 0) {
-				messageCount++
-				stageActiveActions.push({
-					node: stage,
-					state: stageState,
-					statePath: stage._statePath ?? [],
-				})
-			}
-
-			walkNodes(resolveChildren(stage, stageState), stageState, (node, nodeState, localState) => {
-				isVisible = true
-				const active = isNodeActive(node, nodeState)
-				const actionState = (() => {
-					const isBooleanValued =
-						node instanceof BooleanNodeBuilder ||
-						(node instanceof ComponentNodeBuilder && node._valueKind === 'boolean')
-					if (!isBooleanValued) return localState
-					const childState = getBooleanChildState(nodeState) as Record<string, NodeState>
-					return withDefaults(childState, resolveChildren(node, childState))
-				})()
-				const isRequired = (node as ValueNodeBuilder)._required
-				const nodeActiveActions: ActiveAction[] = []
-
-				let isFixActionable = false
-				if (active) {
-					if (node._segments.length > 0) {
-						messageCount++
-						nodeActiveActions.push({ node, state: actionState, statePath: node._statePath ?? [] })
-						stageActiveActions.push({ node, state: actionState, statePath: node._statePath ?? [] })
-					}
-					isFixActionable = node._fixes.some((f) => {
-						if (f._projectFn) {
-							const { proxy, changes } = createTrackedPatch(projectV3.value as any)
-							f._projectFn(proxy as any, actionState)
-							return Object.keys(changes()).length > 0
-						}
-						if (f._versionFn) {
-							const version = versions.value?.[0]
-							if (!version) return true
-							const { proxy, changes } = createTrackedPatch(version as any)
-							f._versionFn(proxy as any, actionState)
-							return Object.keys(changes()).length > 0
-						}
-						return false
-					})
-					if (isFixActionable) fixCount++
-				}
-
-				if (isRequired && !active) hasRequiredMissing = true
-				map.set(node, {
-					isActive: active,
-					isVisible: node._shown === undefined || resolve(node._shown),
-					isFixActionable,
-					messageCount: active && node._segments.some((s) => s.type !== 'collect') ? 1 : 0,
-					fixCount: isFixActionable ? 1 : 0,
-					hasRequiredMissing: isRequired && !active,
-					activeActions: nodeActiveActions,
-				})
-			})
-		}
-
-		map.set(stage, {
-			isActive: true,
-			isVisible,
-			isFixActionable: false,
-			messageCount,
-			fixCount,
-			hasRequiredMissing,
-			activeActions: stageActiveActions,
-		})
+		const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
+		map.set(stage, computeStageLiveNode(stage, stageState))
 	}
 
 	return map
@@ -1249,15 +1205,15 @@ watch(currentStageObj, (stage) => markStageVisited(stage.id), { immediate: !need
 watch(
 	nodeStates,
 	async () => {
-		const active = collectActiveActions()
-		const newMap = new Map<IdentifiedNodeBuilder, boolean>()
+		const active = collectAllActiveActions()
+		const newMap = new Map<object, boolean>()
 		await Promise.all(
 			active
-				.filter((a) => a.node._segments.some((s) => s.type !== 'collect'))
+				.filter((a) => (a.node as any)._segments.some((s: any) => s.type !== 'collect'))
 				.map(async ({ node, state, statePath }) => {
 					try {
 						let hasContent = false
-						for (const seg of node._segments) {
+						for (const seg of (node as any)._segments) {
 							if (seg.type === 'collect') continue
 							const text = await evalSegment(seg, state, statePath)
 							if (text?.trim()) {
@@ -1304,8 +1260,8 @@ function handleKeybinds(event: KeyboardEvent) {
 				futureProjectCount: moderationQueue.queueLength,
 				visibleActionsCount: resolveChildren(
 					currentStageObj.value,
-					nodeStates.value[currentStageObj.value.id!] ?? {},
-				).filter((c) => c instanceof NodeBuilder).length,
+					nodeStates.value[currentStageObj.value.id] ?? {},
+				).filter((c) => typeof c === 'object' && c !== null).length,
 
 				focusedActionIndex: null,
 				focusedActionType: null,
@@ -1454,24 +1410,24 @@ watch(
 
 loadVersions()
 
-function countStageActions(stage: StageNodeBuilder): number {
+function countStageActions(stage: StageNode): number {
 	const actions = checklistLive.value.get(stage)?.activeActions ?? []
 	const resolved = resolvedMessageAvailability.value
 	return actions.filter((a) => {
-		if (a.node._segments.every((s) => s.type === 'collect')) return false
+		if ((a.node as any)._segments.every((s: any) => s.type === 'collect')) return false
 		return resolved.get(a.node) ?? true
 	}).length
 }
 
-function countStageFixes(stage: StageNodeBuilder): number {
+function countStageFixes(stage: StageNode): number {
 	return checklistLive.value.get(stage)?.fixCount ?? 0
 }
 
-function hasRequiredMissing(stage: StageNodeBuilder): boolean {
+function hasRequiredMissing(stage: StageNode): boolean {
 	return checklistLive.value.get(stage)?.hasRequiredMissing ?? false
 }
 
-function collectActiveActions(): ActiveAction[] {
+function collectAllActiveActions(): ActiveAction[] {
 	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
@@ -1482,14 +1438,14 @@ function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
 }
 
 async function assembleFullMessage() {
-	const allEntries = collectActiveActions()
+	const allEntries = collectAllActiveActions()
 	generatedActiveActions.value = allEntries
 
-	const consumed = new Set<IdentifiedNodeBuilder>()
+	const consumed = new Set<object>()
 
 	async function evalEntry(entry: ActiveAction): Promise<string> {
 		let result = ''
-		for (const seg of entry.node._segments) {
+		for (const seg of (entry.node as any)._segments) {
 			if (seg.type === 'collect') {
 				let collected = ''
 				for (const childEntry of allEntries) {
@@ -1514,7 +1470,7 @@ async function assembleFullMessage() {
 		if (consumed.has(entry.node)) continue
 		const content = await evalEntry(entry)
 		if (content.trim()) {
-			parts.push({ priority: entry.node._priority, content })
+			parts.push({ priority: (entry.node as any)._priority, content })
 		}
 	}
 
@@ -1535,11 +1491,40 @@ async function assembleFullMessage() {
 	)
 }
 
-provide(NODE_META_KEY, checklistLive)
-provide(STATE_KEY, nodeStates)
-provide(GLOBAL_STATE_KEY, nodeStates)
+const stageMeta = computed(() => {
+	const stage = currentStageObj.value
+	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
+	const stageChildren = resolveChildren(stage, stageState)
+	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
+	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
+	return { metaMap, attentionMap }
+})
 
-function shouldShowStage(stage: StageNodeBuilder): boolean {
+const appComponentsByKey: Record<string, Component> = {
+	'loader-picker': LoaderPicker,
+	'game-version-picker': McVersionPicker,
+}
+
+const stageState = computed(() => (nodeStates.value[currentStageObj.value.id] ?? {}) as Record<string, NodeState>)
+const stageNodes = computed(() => resolveChildren(currentStageObj.value, stageState.value))
+
+const stageWriter: Writer = (id, value) => {
+	const stageId = currentStageObj.value.id
+	const existing = nodeStates.value[stageId]
+	const next: Record<string, NodeState> = existing ? { ...existing } : {}
+	if (value === undefined) delete next[id]
+	else next[id] = value
+	if (Object.keys(next).length === 0) {
+		if (existing !== undefined) delete nodeStates.value[stageId]
+	} else {
+		nodeStates.value[stageId] = next
+	}
+}
+
+provide(CHECKLIST_META_KEY, stageMeta)
+provide(STATE_KEY, nodeStates)
+
+function shouldShowStage(stage: StageNode): boolean {
 	return checklistLive.value.get(stage)?.isVisible ?? false
 }
 
@@ -1673,8 +1658,8 @@ async function sendMessage(status: ProjectStatus) {
 		return
 	}
 
-	const active = generatedActiveActions.value ?? collectActiveActions()
-	const shouldApplyFixes = active.some((a) => a.node._applyFixes)
+	const active = generatedActiveActions.value ?? collectAllActiveActions()
+	const shouldApplyFixes = active.some((a) => (a.node as any)._applyFixes)
 
 	moderationDecision.value = status
 	try {
@@ -1702,7 +1687,7 @@ async function sendMessage(status: ProjectStatus) {
 				projectV3.value as any,
 			)
 			for (const { node, state } of active) {
-				for (const f of node._fixes) {
+				for (const f of (node as any)._fixes) {
 					f._projectFn?.(projectProxy, state)
 				}
 			}
@@ -1713,7 +1698,7 @@ async function sendMessage(status: ProjectStatus) {
 
 			if (versions.value) {
 				const versionFixes = active.flatMap(({ node, state }) =>
-					node._fixes.filter((f) => f._versionFn).map((f) => ({ fix: f, state })),
+					(node as any)._fixes.filter((f: FixBuilder) => f._versionFn).map((f: FixBuilder) => ({ fix: f, state })),
 				)
 				if (versionFixes.length > 0) {
 					await Promise.all(

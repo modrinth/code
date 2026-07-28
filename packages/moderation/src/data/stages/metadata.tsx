@@ -3,7 +3,7 @@ import { DatabaseIcon } from '@modrinth/assets'
 import { ENVIRONMENTS_COPY, injectProjectPageContext, injectTags } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { appComponent, check, dropdown, fix, group, md, stage, toggle } from '../../types/node'
+import { appComponent, dropdown, fix, group, md, option, stage, toggle } from '../../types/node'
 import { requiresEnvironmentInfo } from '../../utils'
 
 const loaderLabels: Record<string, string> = {
@@ -27,9 +27,7 @@ export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 	const { loaders, gameVersions } = injectTags()
 
-	// `game_versions` isn't a fixed field on `Labrinth.Projects.v3.Project` — it's a dynamic
-	// loader field only reachable through the type's untyped index signature.
-	const currentGameVersions = computed(() => (project.value.game_versions as string[] | undefined) ?? [])
+			const currentGameVersions = computed(() => (project.value.game_versions as string[] | undefined) ?? [])
 
 	return (
 		stage('metadata', 'Metadata')
@@ -98,11 +96,11 @@ export default function () {
 								.title('Correct Environment')
 								.children(
 									dropdown('correct-environment')
-										.children(
+										.options(
 											...(Object.keys(ENVIRONMENTS_COPY) as Labrinth.Projects.v3.Environment[])
 												.filter((id) => id !== 'unknown')
-												.map((id) => check(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
-											check('mixed', 'Mixed'),
+												.map((id) => option(id, ENVIRONMENTS_COPY[id].title.defaultMessage ?? id)),
+											option('mixed', 'Mixed'),
 										)
 										.none('Unknown'),
 								),

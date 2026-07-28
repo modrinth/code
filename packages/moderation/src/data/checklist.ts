@@ -1,8 +1,6 @@
 import type { Ref } from 'vue'
-import { provide, ref } from 'vue'
 
-import type { NodeState, StageFn, StageNodeBuilder } from '../types/node'
-import { group, STAGES_KEY } from '../types/node'
+import type { NodeState, StageNode } from '../types/node'
 import useCategoriesStage from './stages/categories'
 import useDescriptionStage from './stages/description'
 import useGalleryStage from './stages/gallery'
@@ -20,10 +18,8 @@ import useTitleSlugStage from './stages/title-slug'
 import useUndefinedProjectStage from './stages/undefined-project'
 import useVersionsStage from './stages/versions'
 
-export function useStages(
-	globalState: Ref<Record<string, Record<string, NodeState>>>,
-): StageNodeBuilder[] {
-	const mainStages: StageNodeBuilder[] = [
+export function useStages(globalState: Ref<Record<string, Record<string, NodeState>>>): StageNode[] {
+	const mainStages: StageNode[] = [
 		usePostApprovalStage(),
 		useUndefinedProjectStage(),
 		useReReviewStage(),
@@ -40,10 +36,5 @@ export function useStages(
 		usePermissionsStage(),
 		useRulesStage(),
 	]
-	provide(STAGES_KEY, ref(mainStages))
 	return [...mainStages, useStatusAlertsStage(mainStages, globalState)]
 }
-
-export const stages: ReadonlyArray<StageFn> = []
-
-export default group()

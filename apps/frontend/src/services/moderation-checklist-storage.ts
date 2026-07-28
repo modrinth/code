@@ -1,4 +1,4 @@
-import type { NodeState } from '@modrinth/moderation'
+import type { NodeState } from '@modrinth/moderation/src/types/node'
 
 import { dbDelete, dbGet, dbPut, dbScan } from './moderation-db.ts'
 

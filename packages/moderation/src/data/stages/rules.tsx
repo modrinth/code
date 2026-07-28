@@ -2,9 +2,8 @@ import { ListBulletedIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { check, group, markdown, stage, toggle } from '../../types/node'
+import { toggle, group, markdown, stage } from '../../types/node'
 
-//TODO: coolbot have fun :3
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
 
@@ -23,7 +22,6 @@ export default function () {
 					.severity('critical')
 					.message(),
 
-				// TODO: chyz, the lists built by these message have empty line gaps.
 				toggle('prohibited-content', 'Prohibited Content')
 					.suggestedStatus('rejected')
 					.severity('critical')
@@ -31,21 +29,20 @@ export default function () {
 					.collect()
 					.children(
 						group()
-							.multiSelect('options')
 							.title('Which Prohibited Content rules does this project violate?')
 							.children(
-								check('objectionable', 'Objectionable').message(),
-								check('discriminatory', 'Discriminatory or Explicit').message(),
-								check('ip-infringement', 'IP Infringement').message(),
-								check('legal-rights', 'Rights Violation').message(),
-								check('illegal-activity', 'Illegal Activity').message(),
-								check('harmful', 'Harmful or Deceptive').message(),
-								check('misleading', 'Misleading claims').message(),
-								check('impersonation', 'Impersonation').message(),
-								check('false-endorsement', 'False Endorsement').message(),
-								check('profanity', 'Profanity').message(),
-								check('undisclosed-upload', 'Undisclosed Data Upload').message(),
-								check('mojang-bypass', 'Mojang Bypass').message(),
+								toggle('objectionable', 'Objectionable').message(),
+								toggle('discriminatory', 'Discriminatory or Explicit').message(),
+								toggle('ip-infringement', 'IP Infringement').message(),
+								toggle('legal-rights', 'Rights Violation').message(),
+								toggle('illegal-activity', 'Illegal Activity').message(),
+								toggle('harmful', 'Harmful or Deceptive').message(),
+								toggle('misleading', 'Misleading claims').message(),
+								toggle('impersonation', 'Impersonation').message(),
+								toggle('false-endorsement', 'False Endorsement').message(),
+								toggle('profanity', 'Profanity').message(),
+								toggle('undisclosed-upload', 'Undisclosed Data Upload').message(),
+								toggle('mojang-bypass', 'Mojang Bypass').message(),
 							),
 					),
 
@@ -66,15 +63,14 @@ export default function () {
 					.collect()
 					.children(
 						group()
-							.multiSelect('options')
 							.title('Which features require a Server-side Opt-in?')
 							.children(
-								check('x-ray', 'X-ray').message(),
-								check('aim-bot', 'Aim Assist').message(),
-								check('movement', 'Movement').message(),
-								check('pvp', 'PvP').message(),
-								check('hiding-mods', 'Anti 3.x').message(),
-								check('item-duplication', 'Dupe').message(),
+								toggle('x-ray', 'X-ray').message(),
+								toggle('aim-bot', 'Aim Assist').message(),
+								toggle('movement', 'Movement').message(),
+								toggle('pvp', 'PvP').message(),
+								toggle('hiding-mods', 'Anti 3.x').message(),
+								toggle('item-duplication', 'Dupe').message(),
 							),
 					),
 

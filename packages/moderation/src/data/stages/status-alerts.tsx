@@ -3,22 +3,12 @@ import { injectProjectPageContext } from '@modrinth/ui'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-import type { NodeState, StageNodeBuilder } from '../../types/node'
-import {
-	NodeBuilder,
-	getBooleanChildState,
-	group,
-	isNodeActive,
-	md,
-	resolveChildren,
-	stage,
-	toggle,
-	walkNodes,
-} from '../../types/node'
+import type { ChildNode, NodeState, StageNode } from '../../types/node'
+import { getBooleanChildState, group, isNodeActive, md, resolveChildren, stage, toggle, walkNodes } from '../../types/node'
 import { Priorities } from '../priorities.ts'
 
 export default function (
-	mainStages: StageNodeBuilder[],
+	mainStages: StageNode[],
 	globalState: Ref<Record<string, Record<string, NodeState>>>,
 ) {
 	const { projectV3: project } = injectProjectPageContext()
@@ -47,18 +37,19 @@ export default function (
 					.priority(Priorities.alerts)
 					.applyFixes()
 					.children(
-						computed<NodeBuilder | null>(() => {
-							const fixNodes: NodeBuilder[] = []
+						computed<ChildNode | null>(() => {
+							const fixNodes: ChildNode[] = []
 							walkNodes(
 								[group().children(...mainStages)],
 								(globalState.value ?? {}) as unknown as Record<string, NodeState>,
 								(node, nodeState) => {
-									if (!node._fixes.length) return
+									if (!('_fixes' in node) || !(node as { _fixes: unknown[] })._fixes.length) return
 									if (!isNodeActive(node, nodeState)) return
 									const childState = getBooleanChildState(nodeState)
 									fixNodes.push(
-										...resolveChildren(node, childState).filter(
-											(c): c is NodeBuilder => c instanceof NodeBuilder,
+										...resolveChildren(node as never, childState).filter(
+											(c): c is Exclude<ChildNode, string | (() => unknown)> =>
+												typeof c === 'object' && c !== null,
 										),
 									)
 								},

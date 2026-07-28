@@ -2,7 +2,7 @@ import { VersionIcon } from '@modrinth/assets'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { check, dropdown, group, stage, text, toggle } from '../../types/node'
+import { dropdown, group, option, stage, text, toggle } from '../../types/node'
 
 export default function () {
 	const { projectV3: project } = injectProjectPageContext()
@@ -29,10 +29,10 @@ export default function () {
 						dropdown('type')
 							.title('Correct Project Type')
 							.none('Unknown')
-							.children(
-								check('modpack', 'Modpack').message(),
-								check('resourcepack', 'Resource Pack').message(),
-								check('datapack', 'Data Pack').message(),
+							.options(
+								option('modpack', 'Modpack').message(),
+								option('resourcepack', 'Resource Pack').message(),
+								option('datapack', 'Data Pack').message(),
 							),
 					)
 					.collect(),
@@ -44,10 +44,10 @@ export default function () {
 						dropdown('distribution')
 							.title('Distribution Type')
 							.none('Unknown')
-							.children(
-								check('primary', 'Primary Files').message(),
-								check('additional', 'Additional Files').message(),
-								check('mono', 'Monofile')
+							.options(
+								option('primary', 'Primary Files').message(),
+								option('additional', 'Additional Files').message(),
+								option('mono', 'Monofile')
 									.shown(
 										computed(
 											() =>
@@ -56,13 +56,13 @@ export default function () {
 										),
 									)
 									.message(),
-								check('server', 'Server Files (Primary Files)')
+								option('server', 'Server Files (Primary Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.message(),
-								check('server-additional', 'Server Files (Additional Files)')
+								option('server-additional', 'Server Files (Additional Files)')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.message(),
-								check('zip', 'mods.zip')
+								option('zip', 'mods.zip')
 									.shown(computed(() => project.value.project_types.includes('modpack')))
 									.message(),
 							),
