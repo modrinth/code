@@ -230,10 +230,7 @@ const instance = ref<GameInstance>()
 const instanceBreadcrumb = useRootBreadcrumb({
 	slot: 'instance',
 	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
-	label: () =>
-		instance.value?.id === displayedInstanceRoute.value.params.id
-			? instance.value.name
-			: formatMessage(commonMessages.loadingLabel),
+	label: () => instance.value?.name ?? formatMessage(commonMessages.loadingLabel),
 	to: () =>
 		`/instance/${encodeURIComponent(String(displayedInstanceRoute.value.params.id ?? ''))}`,
 })
