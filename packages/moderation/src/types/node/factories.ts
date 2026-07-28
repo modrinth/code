@@ -18,6 +18,7 @@ import {
   withRequired,
   withSelectable,
   withStageMeta,
+  withStateOrigin,
   withTitle,
   withTooltip,
   withShown,
@@ -37,12 +38,12 @@ function getBooleanValue(raw: NodeState): boolean {
   return false
 }
 
-function setBooleanValue(raw: NodeState, next: boolean): NodeState {
+function setBooleanValue(raw: NodeState, next: boolean, isDefault?: boolean): NodeState {
   if (raw && typeof raw === "object" && !(raw instanceof Set)) {
     const {value: _v, ...children} = raw as NodeStateWithChildren & Record<string, NodeState>
-    if (Object.keys(children).length > 0) return {...children, value: next}
+    if (Object.keys(children).length > 0) return isDefault ? children : {...children, value: next}
   }
-  return next
+  return isDefault ? undefined : next
 }
 
 export const booleanValue = {
@@ -61,10 +62,10 @@ export function toggle(id: string, label: string) {
     withTooltip,
     withTitle,
     withMessaging,
+    withPriority,
     withRequired,
     withFix,
     withEnabled,
-    withPriority,
     (n) => withValue(n, booleanValue),
     (n) =>
       withComponent(n, {
@@ -101,6 +102,7 @@ export function check(id: string, label: string) {
       withTooltip,
       withTitle,
       withMessaging,
+      withPriority,
       withRequired,
       withFix,
       withEnabled,
@@ -125,6 +127,7 @@ export function toggleSwitch(id: string, label: string) {
       withTooltip,
       withTitle,
       withMessaging,
+      withPriority,
       withRequired,
       withFix,
       withEnabled,
@@ -150,12 +153,22 @@ export function group(id?: string) {
 
 export type GroupNode = ReturnType<typeof group>
 
+export function externalGroup(path: string[]) {
+  return pipe(
+    {} as {},
+    withChildren,
+    withShown,
+    (n) => withStateOrigin(n).stateOrigin(path),
+  )
+}
+
 export function option(value: string, label: string) {
   return pipe(
     {value, label} as { value: string; label: string },
     withChildren,
     withShown,
     withMessaging,
+    withPriority,
   )
 }
 
@@ -177,11 +190,20 @@ function withOptions<T extends object>(node: T): T & HasOptions {
 }
 
 function getStringValue(raw: NodeState): string {
-  return typeof raw === "string" ? raw : ""
+  if (typeof raw === "string") return raw
+  if (raw && typeof raw === "object" && !(raw instanceof Set)) {
+    const v = (raw as NodeStateWithChildren).value
+    if (typeof v === "string") return v
+  }
+  return ""
 }
 
-function setStringValue(_raw: NodeState, next: string): NodeState {
-  return next || undefined
+function setStringValue(raw: NodeState, next: string, isDefault?: boolean): NodeState {
+  if (raw && typeof raw === "object" && !(raw instanceof Set)) {
+    const {value: _v, ...children} = raw as NodeStateWithChildren & Record<string, NodeState>
+    if (Object.keys(children).length > 0) return isDefault ? children : {...children, value: next || undefined}
+  }
+  return isDefault ? undefined : next || undefined
 }
 
 const dropdownValue = {
@@ -225,6 +247,7 @@ export function stage(id: string, title: string) {
     withIcon,
     withStageMeta,
     withMessaging,
+    withPriority,
   )
 }
 
@@ -242,6 +265,7 @@ export function text(id: string) {
       withTooltip,
       withTitle,
       withMessaging,
+      withPriority,
       withRequired,
       withFix,
       withEnabled,
@@ -268,6 +292,7 @@ export function markdown(id: string) {
       withTooltip,
       withTitle,
       withMessaging,
+      withPriority,
       withRequired,
       withFix,
       withEnabled,
@@ -292,8 +317,8 @@ function getSetValue(raw: NodeState): string[] {
   return raw instanceof Set ? Array.from(raw) : []
 }
 
-function setSetValue(_raw: NodeState, next: string[]): NodeState {
-  return next.length > 0 ? new Set(next) : undefined
+function setSetValue(_raw: NodeState, next: string[], isDefault?: boolean): NodeState {
+  return isDefault || next.length === 0 ? undefined : new Set(next)
 }
 
 const setValue = {
@@ -313,6 +338,7 @@ export function appComponent(id: string, rendererKey: string) {
     withTooltip,
     withTitle,
     withMessaging,
+    withPriority,
     withRequired,
     withFix,
     withEnabled,

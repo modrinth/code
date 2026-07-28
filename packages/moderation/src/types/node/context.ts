@@ -5,6 +5,7 @@ import type { NodeMeta } from './node-meta'
 export interface ChecklistMetaContext {
 	metaMap: Map<object, NodeMeta>
 	attentionMap: Map<object, boolean>
+	tooltipHtml: Map<object, string>
 }
 
 export const CHECKLIST_META_KEY: InjectionKey<Ref<ChecklistMetaContext>> = Symbol('checklistMeta')

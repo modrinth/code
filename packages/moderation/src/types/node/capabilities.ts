@@ -1,11 +1,10 @@
 import type { Component, FunctionalComponent, SVGAttributes } from 'vue'
 
 import type { FixBuilder } from './fix'
-import type { Priority } from '../priority.ts'
+import { Priority } from '../priority.ts'
 import type {
 	GetVarsFn,
 	MessageSegment,
-	ModerationSeverity,
 	ModerationStatus,
 	NodeState,
 	Reactive,
@@ -90,18 +89,41 @@ export function withId<T extends object>(node: T, id: string): T & Identified {
 	})
 }
 
+export interface Prioritizable {
+	_priority: Priority
+	priority(this: this, p: Priority): this
+}
+
+export function withPriority<T extends object>(node: T): T & Prioritizable {
+	return Object.assign(node, {
+		_priority: new Priority(),
+		priority(this: any, p: Priority) {
+			this._priority = p
+			return this
+		},
+	})
+}
+
 export interface Messageable {
 	_segments: MessageSegment[]
 	_suggestedStatus?: ModerationStatus
-	_severity?: ModerationSeverity
 	suggestedStatus(this: this, status: ModerationStatus): this
-	severity(this: this, severity: ModerationSeverity): this
-	message(this: this, path?: string | (() => string), getVars?: GetVarsFn): this
+	message(this: this, path?: string | (() => string) | GetVarsFn, getVars?: GetVarsFn): this
 	rawMessage(
 		this: this,
 		content: string | ((state: Record<string, NodeState>) => string | Promise<string>),
 	): this
-	collect(this: this, path?: string | (() => string), getVars?: GetVarsFn): this
+	collect(this: this, path?: string | (() => string) | GetVarsFn, getVars?: GetVarsFn): this
+}
+
+function splitPathAndVars(
+	pathOrGetVars: string | (() => string) | GetVarsFn | undefined,
+	getVars: GetVarsFn | undefined,
+): { path: string | (() => string) | undefined; getVars: GetVarsFn | undefined } {
+	if (typeof pathOrGetVars === 'function' && pathOrGetVars.length >= 1) {
+		return { path: undefined, getVars: pathOrGetVars as GetVarsFn }
+	}
+	return { path: pathOrGetVars as string | (() => string) | undefined, getVars }
 }
 
 export function withMessaging<T extends object>(node: T): T & Messageable {
@@ -111,11 +133,8 @@ export function withMessaging<T extends object>(node: T): T & Messageable {
 			this._suggestedStatus = status
 			return this
 		},
-		severity(this: any, severity: ModerationSeverity) {
-			this._severity = severity
-			return this
-		},
-		message(this: any, path?: string | (() => string), getVars?: GetVarsFn) {
+		message(this: any, pathOrGetVars?: string | (() => string) | GetVarsFn, getVarsArg?: GetVarsFn) {
+			const { path, getVars } = splitPathAndVars(pathOrGetVars, getVarsArg)
 			const segment: MessageSegment =
 				path === undefined
 					? { type: 'auto', ...(getVars && { getVars }) }
@@ -131,7 +150,8 @@ export function withMessaging<T extends object>(node: T): T & Messageable {
 			this._segments.push({ type: 'fn', fn })
 			return this
 		},
-		collect(this: any, path?: string | (() => string), getVars?: GetVarsFn) {
+		collect(this: any, pathOrGetVars?: string | (() => string) | GetVarsFn, getVarsArg?: GetVarsFn) {
+			const { path, getVars } = splitPathAndVars(pathOrGetVars, getVarsArg)
 			const fallback: MessageSegment | undefined =
 				path !== undefined || getVars !== undefined
 					? path === undefined
@@ -198,7 +218,7 @@ export function withEnabled<T extends object>(node: T): T & Enableable {
 export interface HasValue<V = unknown> {
 	_defaultValue?: V | ((state: Record<string, NodeState>) => V)
 	_getValue: (raw: NodeState) => V
-	_setValue: (raw: NodeState, next: V) => NodeState
+	_setValue: (raw: NodeState, next: V, isDefault?: boolean) => NodeState
 	_isActive: (value: V) => boolean
 	initial(this: this, v: V | ((state: Record<string, NodeState>) => V)): this
 }
@@ -259,21 +279,6 @@ export function withComponent<T extends object>(
 		_rendererKey: opts.rendererKey,
 		_componentProps: opts.componentProps,
 		_modelProp: opts.modelProp ?? 'modelValue',
-	})
-}
-
-export interface Prioritizable {
-	_priority: Priority | undefined
-	priority(this: this, p: Priority): this
-}
-
-export function withPriority<T extends object>(node: T): T & Prioritizable {
-	return Object.assign(node, {
-		_priority: undefined as Priority | undefined,
-		priority(this: any, p: Priority) {
-			this._priority = p
-			return this
-		},
 	})
 }
 
@@ -396,6 +401,21 @@ export function withEditable<T extends object>(node: T): T & Editable {
 		},
 		onChange(this: any, fn: OnChangeFn) {
 			this._onChange = fn
+			return this
+		},
+	})
+}
+
+export interface StateOrigin {
+	_stateOrigin: string[] | undefined
+	stateOrigin(this: this, path: string[]): this
+}
+
+export function withStateOrigin<T extends object>(node: T): T & StateOrigin {
+	return Object.assign(node, {
+		_stateOrigin: undefined as string[] | undefined,
+		stateOrigin(this: any, path: string[]) {
+			this._stateOrigin = path
 			return this
 		},
 	})

@@ -22,7 +22,6 @@ export default function () {
 				.children(
 					toggle('insufficient', 'Insufficient')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message('insufficient/header', (s) => ({ CUSTOM_ADVICE: s.custom?.explainer }))
 						.children(
 							group()
@@ -50,7 +49,6 @@ export default function () {
 
 					toggle('non-english', 'Non-english')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message(() => `non-english${project.value.minecraft_java_server ? '-server' : ''}`)
 						.shown(
 							computed(() => {
@@ -63,22 +61,18 @@ export default function () {
 
 					toggle('headers-as-body', 'Headers as body text')
 						.suggestedStatus('flagged')
-						.severity('low')
 						.message(),
 
 					toggle('image-only', 'Image-only')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message(),
 
 					toggle('non-standard-text', 'Non-standard text')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message(),
 
 					toggle('clarity', 'Unclear / Misleading')
 						.suggestedStatus('rejected')
-						.severity('high')
 						.message(),
 				),
 		)

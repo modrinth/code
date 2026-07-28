@@ -242,6 +242,7 @@
 							:write="stageWriter"
 							:on-image-upload="onUploadHandler"
 							:app-components="appComponentsByKey"
+							:global-state="nodeStates"
 						/>
 					</div>
 				</div>
@@ -395,9 +396,11 @@ import type { NodeState, StageNode } from '@modrinth/moderation/src/types/node'
 import {
 	CHECKLIST_META_KEY,
 	collectActiveActions,
+	collectMessageNodes,
 	computeAttentionMap,
 	computeNodeMeta,
 	createTrackedPatch,
+	evalActiveAction,
 	evalSegment,
 	resolve,
 	resolveChildren,
@@ -422,6 +425,7 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
+import { renderHighlightedString } from '@modrinth/utils'
 import type { ProjectStatus } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
@@ -1232,11 +1236,6 @@ watch(
 	{ deep: true, immediate: true },
 )
 
-interface MessagePart {
-	priority?: Priority
-	content: string
-}
-
 function ignoreLegacyActionKeybind() {
 	return undefined
 }
@@ -1431,6 +1430,10 @@ function collectAllActiveActions(): ActiveAction[] {
 	return resolvedStages.value.flatMap((s) => checklistLive.value.get(s)?.activeActions ?? [])
 }
 
+function byPriority(a: ActiveAction, b: ActiveAction): number {
+	return ((a.node as any)._priority as Priority).compareTo((b.node as any)._priority as Priority)
+}
+
 function isDescendant(childPath: string[], ancestorPath: string[]): boolean {
 	return (
 		childPath.length > ancestorPath.length && ancestorPath.every((key, i) => childPath[i] === key)
@@ -1465,21 +1468,16 @@ async function assembleFullMessage() {
 		return result
 	}
 
-	const parts: MessagePart[] = []
+	const parts: { entry: ActiveAction; content: string }[] = []
 	for (const entry of allEntries) {
 		if (consumed.has(entry.node)) continue
 		const content = await evalEntry(entry)
 		if (content.trim()) {
-			parts.push({ priority: (entry.node as any)._priority, content })
+			parts.push({ entry, content })
 		}
 	}
 
-	parts.sort((a, b) => {
-		if (!a.priority && !b.priority) return 0
-		if (!a.priority) return 1
-		if (!b.priority) return -1
-		return a.priority.compareTo(b.priority)
-	})
+	parts.sort((a, b) => byPriority(a.entry, b.entry))
 
 	return expandVariables(
 		parts
@@ -1491,13 +1489,41 @@ async function assembleFullMessage() {
 	)
 }
 
+const tooltipHtmlMap = ref(new Map<object, string>())
+
+watchEffect(async () => {
+	const stage = currentStageObj.value
+	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
+	const stageChildren = resolveChildren(stage, stageState)
+	const actions = collectMessageNodes(stageChildren, stageState, [stage.id])
+
+	const newMap = new Map<object, string>()
+	await Promise.all(
+		actions.map(async (entry) => {
+			try {
+				const raw = await evalActiveAction(entry, actions, new Set())
+				const expanded = expandVariables(raw, projectV2.value, projectV3.value).trim()
+				newMap.set(
+					entry.node,
+					expanded
+						? `<div class="markdown-body moderation-tooltip-markdown">${renderHighlightedString(expanded)}</div>`
+						: '',
+				)
+			} catch {
+				newMap.set(entry.node, '')
+			}
+		}),
+	)
+	tooltipHtmlMap.value = newMap
+})
+
 const stageMeta = computed(() => {
 	const stage = currentStageObj.value
 	const stageState = (nodeStates.value[stage.id] ?? {}) as Record<string, NodeState>
 	const stageChildren = resolveChildren(stage, stageState)
 	const metaMap = computeNodeMeta(stageChildren, stageState, isFixActionable)
 	const attentionMap = computeAttentionMap(stageChildren, stageState, metaMap)
-	return { metaMap, attentionMap }
+	return { metaMap, attentionMap, tooltipHtml: tooltipHtmlMap.value }
 })
 
 const appComponentsByKey: Record<string, Component> = {
@@ -1658,7 +1684,7 @@ async function sendMessage(status: ProjectStatus) {
 		return
 	}
 
-	const active = generatedActiveActions.value ?? collectAllActiveActions()
+	const active = [...(generatedActiveActions.value ?? collectAllActiveActions())].sort(byPriority)
 	const shouldApplyFixes = active.some((a) => (a.node as any)._applyFixes)
 
 	moderationDecision.value = status
@@ -1687,6 +1713,7 @@ async function sendMessage(status: ProjectStatus) {
 				projectV3.value as any,
 			)
 			for (const { node, state } of active) {
+				if (!('_fixes' in (node as object))) continue
 				for (const f of (node as any)._fixes) {
 					f._projectFn?.(projectProxy, state)
 				}
@@ -1698,7 +1725,9 @@ async function sendMessage(status: ProjectStatus) {
 
 			if (versions.value) {
 				const versionFixes = active.flatMap(({ node, state }) =>
-					(node as any)._fixes.filter((f: FixBuilder) => f._versionFn).map((f: FixBuilder) => ({ fix: f, state })),
+					'_fixes' in (node as object)
+						? (node as any)._fixes.filter((f: FixBuilder) => f._versionFn).map((f: FixBuilder) => ({ fix: f, state }))
+						: [],
 				)
 				if (versionFixes.length > 0) {
 					await Promise.all(

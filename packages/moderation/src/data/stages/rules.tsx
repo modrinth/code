@@ -19,12 +19,10 @@ export default function () {
 				toggle('paid-access-server', 'Paid access server')
 					.shown(computed(() => !!project.value.minecraft_server))
 					.suggestedStatus('rejected')
-					.severity('critical')
 					.message(),
 
 				toggle('prohibited-content', 'Prohibited Content')
 					.suggestedStatus('rejected')
-					.severity('critical')
 					.message('prohibited-content-header')
 					.collect()
 					.children(
@@ -48,17 +46,14 @@ export default function () {
 
 				toggle('cheat-or-hack-advertising', 'Hacks')
 					.suggestedStatus('rejected')
-					.severity('critical')
 					.message(),
 
 				toggle('server-side-opt-out', 'Opt-out')
 					.suggestedStatus('flagged')
-					.severity('high')
 					.message(),
 
 				toggle('server-side-opt-in', 'Opt-in')
 					.suggestedStatus('flagged')
-					.severity('high')
 					.message('server-side-opt-in-header')
 					.collect()
 					.children(
@@ -84,13 +79,11 @@ export default function () {
 						),
 					)
 					.suggestedStatus('flagged')
-					.severity('low')
 					.message(),
 
 				toggle('rule-breaking-other', 'Other')
 					.suggestedStatus('rejected')
-					.severity('critical')
-					.message(undefined, (state) => ({ MESSAGE: state.message }))
+					.message((state) => ({ MESSAGE: state.message }))
 					.children(
 						markdown('message').title('Explain how it infringes on content rules.').required(),
 					),

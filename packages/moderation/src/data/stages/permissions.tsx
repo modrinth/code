@@ -44,23 +44,19 @@ export default function () {
 			group().children(
 				toggle('invalid-permissions', 'Invalid permissions')
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 
 				toggle('prohibited-external-content', 'Prohibited externals')
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 
 				toggle('missing-permissions', 'Missing permissions')
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 
 				toggle('non-commercial-external-content', 'Non-commercial externals')
 					.shown(computed(() => project.value.monetization_status === 'monetized'))
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 			),
 		)

@@ -75,7 +75,6 @@ export default function () {
 		.navigate('/settings/links')
 		.shown(computed(() => Object.keys(project.value.link_urls).length > 0))
 		.suggestedStatus('flagged')
-		.severity('low')
 		.rawMessage(async (state) => {
 			const sections = Object.entries(state).filter(
 				([, s]) => s && typeof s === 'object' && !(s instanceof Set),

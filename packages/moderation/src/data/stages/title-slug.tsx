@@ -205,17 +205,14 @@ export default function () {
 				.children(
 					toggle('useless-info', 'Contains Useless Info')
 						.suggestedStatus('flagged')
-						.severity('low')
 						.message(),
 
 					toggle('minecraft-branding', 'Minecraft Title')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message(),
 
 					toggle('similarities', 'Title Similarities')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message()
 						.children(
 							group()

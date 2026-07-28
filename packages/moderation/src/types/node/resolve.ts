@@ -188,6 +188,16 @@ export function withDefaults<T extends Record<string, NodeState>>(rawState: T, c
 	return proxy
 }
 
+export function resolveActionState(
+	node: object,
+	nodeState: NodeState,
+	localState: Record<string, NodeState>,
+): Record<string, NodeState> {
+	if (!hasValueCap(node)) return localState
+	const childState = getBooleanChildState(nodeState)
+	return hasChildrenCap(node) ? withDefaults(childState, resolveChildren(node, childState)) : childState
+}
+
 function emptyScope(children: ChildNode[]): Record<string, NodeState> {
 	const childMap = buildChildMap(children, {})
 	const resolving = new Set<string>()

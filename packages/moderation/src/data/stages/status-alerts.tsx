@@ -4,7 +4,7 @@ import type { Ref } from 'vue'
 import { computed } from 'vue'
 
 import type { ChildNode, NodeState, StageNode } from '../../types/node'
-import { getBooleanChildState, group, isNodeActive, md, resolveChildren, stage, toggle, walkNodes } from '../../types/node'
+import { externalGroup, getBooleanChildState, group, isNodeActive, md, resolveChildren, stage, toggle, walkNodes } from '../../types/node'
 import { Priorities } from '../priorities.ts'
 
 export default function (
@@ -38,23 +38,22 @@ export default function (
 					.applyFixes()
 					.children(
 						computed<ChildNode | null>(() => {
-							const fixNodes: ChildNode[] = []
+							const fixGroups: ChildNode[] = []
 							walkNodes(
 								[group().children(...mainStages)],
 								(globalState.value ?? {}) as unknown as Record<string, NodeState>,
-								(node, nodeState) => {
+								(node, nodeState, _localState, path) => {
 									if (!('_fixes' in node) || !(node as { _fixes: unknown[] })._fixes.length) return
 									if (!isNodeActive(node, nodeState)) return
-									const childState = getBooleanChildState(nodeState)
-									fixNodes.push(
-										...resolveChildren(node as never, childState).filter(
-											(c): c is Exclude<ChildNode, string | (() => unknown)> =>
-												typeof c === 'object' && c !== null,
-										),
+									const children = resolveChildren(node as never, getBooleanChildState(nodeState)).filter(
+										(c): c is Exclude<ChildNode, string | (() => unknown)> =>
+											typeof c === 'object' && c !== null,
 									)
+									if (children.length === 0) return
+									fixGroups.push(externalGroup(path).children(...children))
 								},
 							)
-							return fixNodes.length > 0 ? group().children(...fixNodes) : null
+							return fixGroups.length > 0 ? group().children(...fixGroups) : null
 						}),
 					),
 

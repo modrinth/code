@@ -66,7 +66,6 @@ export default function () {
 					toggle('environment', 'Environment')
 						.shown(computed(() => requiresEnvironmentInfo(project.value.project_types)))
 						.suggestedStatus('flagged')
-						.severity('low')
 						.rawMessage(async (state) => {
 							const correctEnvironment = state?.['correct-environment'] as string | undefined
 
@@ -106,9 +105,12 @@ export default function () {
 								),
 						),
 
+          toggle('dependencies', 'Dependencies')
+            .suggestedStatus('flagged')
+            .message(),
+
 					toggle('loader', 'Loaders (WIP)')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.rawMessage(async (state) => {
 							const selected =
 								state.loaders instanceof Set ? state.loaders : new Set(project.value.loaders)
@@ -151,7 +153,6 @@ export default function () {
 
 					toggle('game-version', 'Game Versions (WIP)')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.rawMessage(async (state) => {
 							const selected =
 								state['game-versions'] instanceof Set

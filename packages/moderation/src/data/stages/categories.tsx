@@ -36,7 +36,7 @@ export default function () {
 			),
 
 			group().children(
-				toggle('inaccurate', 'Inaccurate').suggestedStatus('flagged').severity('low').message(),
+				toggle('inaccurate', 'Inaccurate').suggestedStatus('flagged').message(),
 
 				toggle('optimization-misused', 'Optimization')
 					.shown(
@@ -47,7 +47,6 @@ export default function () {
 						),
 					)
 					.suggestedStatus('flagged')
-					.severity('low')
 					.rawMessage(optimizationMsg)
 					.fix(
 						fix().project((patch) => {
@@ -61,7 +60,6 @@ export default function () {
 				toggle('resolutions-misused', 'Resolutions')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
 					.suggestedStatus('flagged')
-					.severity('low')
 					.rawMessage(resolutionsMsg)
 					.fix(
 						fix().project((patch) => {

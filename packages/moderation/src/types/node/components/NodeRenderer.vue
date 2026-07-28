@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { ButtonStyled } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
-import { inject } from 'vue'
+import { computed, inject, watchEffect } from 'vue'
 import type { Component } from 'vue'
 
 import type { AnyNode, ChildNode, HasChildren } from '../builder'
 import type { ComponentNodePropsContext, Enableable, HasValue, Identified, OnChangeFn } from '../capabilities'
 import { CHECKLIST_META_KEY } from '../context'
-import { childWriter, writeNodeValue } from '../mutate'
+import ActionButton from './ActionButton.vue'
+import { childWriter, originScope, writeNodeValue } from '../mutate'
 import type { Writer } from '../mutate'
 import {
 	getBooleanChildState,
@@ -20,6 +21,7 @@ import {
 	isNodeActive,
 	isShown,
 	resolveChildren,
+	withDefaults,
 } from '../resolve'
 import type { NodeState, Reactive } from '../state'
 import { resolve } from '../state'
@@ -34,6 +36,7 @@ const props = defineProps<{
 	flex?: boolean
 	titleDepth?: number
 	appComponents?: Record<string, Component>
+	globalState?: Record<string, Record<string, NodeState>>
 }>()
 
 type RenderableValueNode = AnyNode &
@@ -73,18 +76,20 @@ function isFixActionable(node: object): boolean {
 	return metaCtx?.value.metaMap.get(node)?.isFixActionable ?? false
 }
 
+const wrappedState = computed(() => withDefaults(props.state, props.nodes))
+
 function isEnabled(node: Partial<Enableable>): boolean {
 	if (node._enabled === undefined) return true
-	if (typeof node._enabled === 'function') return node._enabled(props.state)
+	if (typeof node._enabled === 'function') return node._enabled(wrappedState.value)
 	return resolve(node._enabled)
 }
 
 function toggleSetValue(node: RenderableValueNode, value: string): void {
-	const current = getEffectiveValue(node, props.state[node.id], props.state) as unknown as string[]
+	const current = getEffectiveValue(node, props.state[node.id], wrappedState.value) as unknown as string[]
 	const set = new Set(Array.isArray(current) ? current : [])
 	if (set.has(value)) set.delete(value)
 	else set.add(value)
-	writeNodeValue(node, props.state, props.write, Array.from(set) as never)
+	writeNodeValue(node, props.state, props.write, Array.from(set) as never, wrappedState.value)
 }
 
 const DROPDOWN_TRIGGER_CHROME_PX = 16 * 2 + 10 + 20 + 2
@@ -123,6 +128,7 @@ function componentProps(node: RenderableValueNode): Record<string, unknown> {
 		onImageUpload: props.onImageUpload,
 		toggleSetValue: (value) => toggleSetValue(node, value),
 		nodeFacts: { needsAttention: needsAttention(node), fixActionable: isFixActionable(node) },
+		tooltip: resolveTooltip(node),
 	}
 	const dropdownStyle = hasOptionsCap(node)
 		? {
@@ -142,6 +148,9 @@ function containerScope(node: HasChildren & Partial<Identified>): {
 	state: Record<string, NodeState>
 	write: Writer
 } {
+	if (hasCap(node, '_stateOrigin') && node._stateOrigin && props.globalState) {
+		return originScope(props.globalState, node._stateOrigin as string[])
+	}
 	if (!hasIdCap(node)) return { state: props.state, write: props.write }
 	const raw = props.state[node.id]
 	const state = raw && typeof raw === 'object' && !(raw instanceof Set) ? (raw as Record<string, NodeState>) : {}
@@ -153,17 +162,27 @@ function valueScope(node: HasValue & Identified): { state: Record<string, NodeSt
 	return { state, write: childWriter(props.state, props.write, node.id) }
 }
 
-function resolveTooltip(node: object): { content: string } | undefined {
-	if (!hasCap(node, '_tooltip')) return undefined
-	const t = node._tooltip as Reactive<string> | ((state: Record<string, NodeState>) => string) | undefined
-	if (t === undefined) return undefined
-	const content = typeof t === 'function' ? t(props.state) : resolve(t)
-	return content ? { content } : undefined
+const TOOLTIP_BASE = {
+	delay: { show: 500, hide: 0 },
+	triggers: ['hover', 'focus'],
+	placement: 'top',
+}
+
+function resolveTooltip(node: object): Record<string, unknown> | undefined {
+	if (hasCap(node, '_tooltip')) {
+		const t = node._tooltip as Reactive<string> | ((state: Record<string, NodeState>) => string) | undefined
+		if (t !== undefined) {
+			const content = typeof t === 'function' ? t(wrappedState.value) : resolve(t)
+			if (content) return { ...TOOLTIP_BASE, content }
+		}
+	}
+	const html = hasCap(node, '_segments') ? metaCtx?.value.tooltipHtml.get(node) : undefined
+	return html ? { ...TOOLTIP_BASE, content: html, html: true } : undefined
 }
 
 function clickButton(node: object): void {
 	if (!hasCap(node, '_onClick')) return
-	;(node._onClick as (state: Record<string, NodeState>, write: Writer) => void)?.(props.state, props.write)
+	;(node._onClick as (state: Record<string, NodeState>, write: Writer) => void)?.(wrappedState.value, props.write)
 }
 
 function nodeKey(item: ChildNode, idx: number): string {
@@ -183,12 +202,27 @@ function updateValue(item: RenderableValueNode, v: unknown): void {
 	if (onChange) {
 		const result = onChange(v as string, { override: (ov) => ({ __override: ov }) })
 		if (result && typeof result === 'object' && '__override' in result) {
-			writeNodeValue(item, props.state, props.write, result.__override as never)
+			writeNodeValue(item, props.state, props.write, result.__override as never, wrappedState.value)
 			return
 		}
 	}
-	writeNodeValue(item, props.state, props.write, v as never)
+	writeNodeValue(item, props.state, props.write, v as never, wrappedState.value)
 }
+
+const seenOnChangeValues = new Map<object, unknown>()
+
+watchEffect(() => {
+	for (const node of props.nodes) {
+		if (typeof node !== 'object' || node === null) continue
+		if (!hasCap(node, '_onChange') || !(node as { _onChange: unknown })._onChange) continue
+		if (!hasValueCap(node) || !hasIdCap(node)) continue
+		if (!isShown(node as AnyNode)) continue
+		const value = getEffectiveValue(node, props.state[node.id], wrappedState.value)
+		if (seenOnChangeValues.has(node) && seenOnChangeValues.get(node) === value) continue
+		seenOnChangeValues.set(node, value)
+		updateValue(node as RenderableValueNode, value)
+	}
+})
 </script>
 
 <template>
@@ -222,6 +256,7 @@ function updateValue(item: RenderableValueNode, v: unknown): void {
 							:write="containerScope(item).write"
 							:on-image-upload="onImageUpload"
 							:app-components="appComponents"
+							:global-state="globalState"
 							:flex="(item as any)._layout !== 'column'"
 							:title-depth="getTitle(item) !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
 						/>
@@ -230,8 +265,9 @@ function updateValue(item: RenderableValueNode, v: unknown): void {
 					<template v-else-if="hasValueCap(item) && hasIdCap(item)">
 						<component
 							:is="resolveComponent(item as RenderableValueNode)"
+							v-tooltip="resolveComponent(item as RenderableValueNode) === ActionButton ? undefined : resolveTooltip(item)"
 							v-bind="componentProps(item as RenderableValueNode)"
-							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], state)"
+							:[modelProp(item)]="getEffectiveValue(item as RenderableValueNode, state[item.id], wrappedState)"
 							@[updateEvent(item)]="(v: unknown) => updateValue(item as RenderableValueNode, v)"
 						/>
 					</template>
@@ -262,7 +298,7 @@ function updateValue(item: RenderableValueNode, v: unknown): void {
 					hasValueCap(item) &&
 					hasIdCap(item) &&
 					hasChildrenCap(item) &&
-					isNodeActive(item, state[item.id], state) &&
+					isNodeActive(item, state[item.id], wrappedState) &&
 					resolveChildren(item, valueScope(item).state).length
 				"
 				:nodes="resolveChildren(item, valueScope(item).state)"
@@ -270,6 +306,7 @@ function updateValue(item: RenderableValueNode, v: unknown): void {
 				:write="valueScope(item).write"
 				:on-image-upload="onImageUpload"
 				:app-components="appComponents"
+				:global-state="globalState"
 				:title-depth="getTitle(item) !== undefined ? (titleDepth ?? 0) + 1 : titleDepth"
 				class="w-full"
 			/>

@@ -1,6 +1,6 @@
 import type { AnyNode, ChildNode, HasChildren } from './builder'
 import type { FixBuilder } from './fix'
-import { getBooleanChildState, hasCap, hasChildrenCap, hasIdCap, hasOptionsCap, hasValueCap, isNodeActive, isShown, resolveChildren, walkNodes } from './resolve'
+import { getBooleanChildState, hasCap, hasChildrenCap, hasIdCap, hasOptionsCap, hasValueCap, isNodeActive, isShown, resolveActionState, resolveChildren, walkNodes } from './resolve'
 import type { NodeState } from './state'
 
 export interface NodeMeta {
@@ -25,8 +25,7 @@ export function computeNodeMeta(
 		if (active && hasCap(node, '_fixes')) {
 			const fixes = node._fixes as FixBuilder[]
 			if (fixes.length > 0) {
-				const actionState = hasValueCap(node) ? getBooleanChildState(nodeState) : localState
-				fixActionable = isFixActionable(fixes, actionState)
+				fixActionable = isFixActionable(fixes, resolveActionState(node, nodeState, localState))
 			}
 		}
 

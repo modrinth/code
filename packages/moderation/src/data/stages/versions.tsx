@@ -19,12 +19,10 @@ export default function () {
 			group().children(
 				toggle('incorrect-additional-files', 'Incorrect additional files')
 					.suggestedStatus('flagged')
-					.severity('medium')
 					.message(),
 
 				toggle('incorrect-project-type', 'Incorrect Project Type')
 					.suggestedStatus('rejected')
-					.severity('medium')
 					.children(
 						dropdown('type')
 							.title('Correct Project Type')
@@ -39,7 +37,6 @@ export default function () {
 
 				toggle('alternate-versions', 'Alternate Versions')
 					.suggestedStatus('rejected')
-					.severity('high')
 					.children(
 						dropdown('distribution')
 							.title('Distribution Type')
@@ -72,7 +69,6 @@ export default function () {
 				toggle('vanilla-assets', 'Vanilla Assets')
 					.shown(computed(() => project.value.project_types.includes('resourcepack')))
 					.suggestedStatus('rejected')
-					.severity('medium')
 					.message(),
 
 				toggle('redist-libs', 'Packed Libs')
@@ -84,18 +80,15 @@ export default function () {
 						),
 					)
 					.suggestedStatus('rejected')
-					.severity('medium')
 					.message(),
 
 				toggle('duplicate-primary-files', 'Duplicate Primary Files')
 					.suggestedStatus('flagged')
-					.severity('medium')
 					.message(),
 
 				toggle('unsupported', 'Unsupported')
 					.suggestedStatus('rejected')
-					.severity('medium')
-					.message(undefined, (state) => ({
+					.message((state) => ({
 						INVALID_TYPE: state['invalid-type'],
 					}))
 					.children(text('invalid-type').title('Unsupported Type').required()),

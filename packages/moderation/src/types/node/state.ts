@@ -2,7 +2,6 @@ import type { Ref } from 'vue'
 import { toValue } from 'vue'
 
 export type ModerationStatus = 'approved' | 'rejected' | 'flagged'
-export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
 export type NodeState =
 	| boolean

@@ -1,5 +1,15 @@
 import type { HasValue, Identified } from './capabilities'
+import { getEffectiveValue } from './resolve'
 import type { NodeState } from './state'
+
+function valuesEqual(a: unknown, b: unknown): boolean {
+	if (Array.isArray(a) && Array.isArray(b)) {
+		if (a.length !== b.length) return false
+		const setB = new Set(b)
+		return a.every((v) => setB.has(v))
+	}
+	return a === b
+}
 
 export type Writer = (id: string, value: NodeState) => void
 
@@ -27,6 +37,25 @@ export function writeNodeValue<V>(
 	read: Record<string, NodeState>,
 	write: Writer,
 	next: V,
+	contextState: Record<string, NodeState> = read,
 ): void {
-	write(node.id, node._setValue(read[node.id], next))
+	const isDefault = valuesEqual(next, getEffectiveValue(node, undefined, contextState))
+	write(node.id, node._setValue(read[node.id], next, isDefault))
+}
+
+export function originScope(
+	root: Record<string, NodeState>,
+	path: string[],
+): { state: Record<string, NodeState>; write: Writer } {
+	let state = root
+	let write: Writer = (id, value) => {
+		if (value === undefined) delete root[id]
+		else root[id] = value
+	}
+	for (const segment of path) {
+		write = childWriter(state, write, segment)
+		const raw = state[segment]
+		state = raw && typeof raw === 'object' && !(raw instanceof Set) ? (raw as Record<string, NodeState>) : {}
+	}
+	return { state, write }
 }

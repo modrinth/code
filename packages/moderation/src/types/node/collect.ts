@@ -1,14 +1,5 @@
 import { evalSegment } from './messages'
-import {
-	getBooleanChildState,
-	hasCap,
-	hasChildrenCap,
-	hasValueCap,
-	isNodeActive,
-	resolveChildren,
-	walkNodes,
-	withDefaults,
-} from './resolve'
+import { hasCap, isNodeActive, resolveActionState, walkNodes } from './resolve'
 import type { ChildNode } from './builder'
 import type { MessageSegment, NodeState } from './state'
 
@@ -32,12 +23,27 @@ export function collectActiveActions(
 			const segments = node._segments as MessageSegment[]
 			if (segments.length === 0) return
 			if (!isNodeActive(node, nodeState, localState)) return
-			const state = ((): Record<string, NodeState> => {
-				if (!hasValueCap(node)) return localState
-				const childState = getBooleanChildState(nodeState)
-				return hasChildrenCap(node) ? withDefaults(childState, resolveChildren(node, childState)) : childState
-			})()
-			actions.push({ node, state, statePath: path })
+			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path })
+		},
+		basePath,
+	)
+	return actions
+}
+
+export function collectMessageNodes(
+	children: ChildNode[],
+	stageState: Record<string, NodeState>,
+	basePath: string[] = [],
+): ActiveAction2[] {
+	const actions: ActiveAction2[] = []
+	walkNodes(
+		children,
+		stageState,
+		(node, nodeState, localState, path) => {
+			if (!hasCap(node, '_segments')) return
+			const segments = node._segments as MessageSegment[]
+			if (segments.length === 0) return
+			actions.push({ node, state: resolveActionState(node, nodeState, localState), statePath: path })
 		},
 		basePath,
 	)

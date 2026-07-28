@@ -31,20 +31,17 @@ export default function () {
 					toggle('insufficient', 'Insufficient')
 						.enabled((state) => !state['repeat-title'])
 						.suggestedStatus('flagged')
-						.severity('low')
 						.message(),
 
 					toggle('repeat-title', 'Repeat of Title')
 						.enabled((state) => !state.insufficient)
 						.suggestedStatus('flagged')
-						.severity('low')
 						.message(),
 
-					toggle('formatting', 'Formatting').suggestedStatus('flagged').severity('low').message(),
+					toggle('formatting', 'Formatting').suggestedStatus('flagged').message(),
 
 					toggle('non-english', 'Non-english')
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message()
 						.shown(
 							computed(() => {
@@ -62,7 +59,6 @@ export default function () {
 					toggle('repeat-ip', 'Repeat of IP')
 						.shown(computed(() => !!project.value?.minecraft_server))
 						.suggestedStatus('flagged')
-						.severity('medium')
 						.message(),
 				),
 		)

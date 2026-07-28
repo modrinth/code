@@ -16,17 +16,15 @@ export default function () {
 		.navigate('/gallery')
 		.children(
 			group().children(
-				toggle('insufficient', 'Insufficient').suggestedStatus('flagged').severity('low').message(),
+				toggle('insufficient', 'Insufficient').suggestedStatus('flagged').message(),
 
 				toggle('not-relevant', 'Not relevant')
 					.shown(computed(() => project.value.gallery.length > 0))
 					.suggestedStatus('flagged')
-					.severity('low')
 					.message(),
 
 				toggle('showcase-clarity', 'Showcase Clarity')
 					.suggestedStatus('rejected')
-					.severity('high')
 					.message(),
 			),
 		)

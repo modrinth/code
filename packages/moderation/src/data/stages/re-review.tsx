@@ -32,12 +32,10 @@ export default function () {
 			group().children(
 				toggle('ignored', 'Yes')
 					.suggestedStatus('flagged')
-					.severity('medium')
 					.message()
 					.children(
 						toggle('warning', 'Multiple times in a row')
 							.suggestedStatus('rejected')
-							.severity('high')
 							.message(),
 					)
 					.collect(),
