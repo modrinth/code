@@ -131,6 +131,8 @@ const headerLabel = computed(() => {
 		case 'unknown':
 			return formatMessage(messages.preparingHeader)
 	}
+
+	return formatMessage(messages.preparingHeader)
 })
 
 const descriptionIndex = ref(0)
@@ -155,9 +157,7 @@ const descriptionLabel = computed(() => {
 	}
 })
 
-const errorLabel = computed(
-	() => installation.value?.error ?? formatMessage(messages.unknownError),
-)
+const errorLabel = computed(() => installation.value?.error ?? formatMessage(messages.unknownError))
 
 const progressValue = computed(() => {
 	const current = installation.value

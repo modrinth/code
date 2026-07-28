@@ -4340,9 +4340,6 @@
   "servers.busy.installing": {
     "defaultMessage": "Сервер установлюється"
   },
-  "servers.busy.syncing-content": {
-    "defaultMessage": "Триває синхронізація вмісту"
-  },
   "servers.grant-access-modal.add-as-friend": {
     "defaultMessage": "Також відправити запит у друзі"
   },
@@ -4397,50 +4394,11 @@
   "servers.installing-banner.error.header": {
     "defaultMessage": "Не вдалося встановити"
   },
-  "servers.installing-banner.error.internal-platform": {
-    "defaultMessage": "Під час установлення платформи сталася внутрішня помилка. Спробуйте ще раз."
-  },
-  "servers.installing-banner.error.invalid-loader-version": {
-    "defaultMessage": "Не вдалося встановити вказаний завантажувач або версію Minecraft. Він може бути недійсним або не підтримуватися."
-  },
-  "servers.installing-banner.error.modpack-install-failed": {
-    "defaultMessage": "Збірку не вдалося встановити. Вона може бути пошкоджена або несумісна."
-  },
-  "servers.installing-banner.error.no-primary-file": {
-    "defaultMessage": "Ця версія збірки не містить завантажуваних файлів. Можливо, вона була неправильно впакований."
-  },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "Під час встановлення сталася неочікувана помилка."
   },
-  "servers.installing-banner.error.unsupported-loader-version": {
-    "defaultMessage": "Ця версія Minecraft або завантажувача ще не підтримується Modrinth Hosting."
-  },
-  "servers.installing-banner.phase.installing-addons": {
-    "defaultMessage": "Установлення доповнень…"
-  },
-  "servers.installing-banner.phase.installing-modpack": {
-    "defaultMessage": "Установлення збірки…"
-  },
-  "servers.installing-banner.phase.installing-platform": {
-    "defaultMessage": "Установлення платформи…"
-  },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Ми підготовлюємо ваш сервер"
-  },
-  "servers.installing-banner.ticker.adding-java": {
-    "defaultMessage": "Додання Java…"
-  },
-  "servers.installing-banner.ticker.configuring-server": {
-    "defaultMessage": "Налаштування сервера…"
-  },
-  "servers.installing-banner.ticker.downloading-mods": {
-    "defaultMessage": "Завантаження модів…"
-  },
-  "servers.installing-banner.ticker.organizing-files": {
-    "defaultMessage": "Організування файлів…"
-  },
-  "servers.installing-banner.ticker.setting-up-environment": {
-    "defaultMessage": "Налаштування середовища…"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже маєте сервер?"

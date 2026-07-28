@@ -159,9 +159,7 @@ export function useServerInstallationTracker(options: UseServerInstallationTrack
 
 	function begin(key: ServerInstallationKey) {
 		const id =
-			key.type === 'unknown'
-				? `unknown:${++unknownInstallationId}`
-				: installationKeyId(key)
+			key.type === 'unknown' ? `unknown:${++unknownInstallationId}` : installationKeyId(key)
 		const nextDismissedIds = new Set(dismissedIds.value)
 		nextDismissedIds.delete(id)
 		dismissedIds.value = nextDismissedIds

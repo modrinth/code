@@ -224,10 +224,7 @@
 								</template>
 							</Tooltip>
 							<ButtonStyled circular type="transparent" size="large">
-								<TeleportOverflowMenu
-									:options="serverMenuOptions"
-									aria-label="More server options"
-								>
+								<TeleportOverflowMenu :options="serverMenuOptions" aria-label="More server options">
 									<MoreVerticalIcon aria-hidden="true" />
 								</TeleportOverflowMenu>
 							</ButtonStyled>
@@ -1296,8 +1293,7 @@ function applyInstallationTarget(current: ServerInstallationState) {
 	const patch: Partial<Archon.Servers.v0.Server> = { status: 'installing' }
 	if (current.key.type === 'platform') {
 		patch.loader = formatLoaderLabel(current.key.platform) as Archon.Servers.v0.Loader
-		patch.loader_version =
-			current.key.platform === 'vanilla' ? null : current.key.platform_version
+		patch.loader_version = current.key.platform === 'vanilla' ? null : current.key.platform_version
 		patch.mc_version = current.key.game_version
 	}
 
@@ -1372,8 +1368,7 @@ function applyInstallationCompletion(key: ServerInstallationKey) {
 	const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
 	if (platformKey) {
 		patch.loader = formatLoaderLabel(platformKey.platform) as Archon.Servers.v0.Loader
-		patch.loader_version =
-			platformKey.platform === 'vanilla' ? null : platformKey.platform_version
+		patch.loader_version = platformKey.platform === 'vanilla' ? null : platformKey.platform_version
 		patch.mc_version = platformKey.game_version
 	}
 
@@ -1388,8 +1383,7 @@ function applyInstallationCompletion(key: ServerInstallationKey) {
 		queryClient.setQueryData(key, {
 			...data,
 			modloader: platformKey.platform === 'neoforge' ? 'neo_forge' : platformKey.platform,
-			modloader_version:
-				platformKey.platform === 'vanilla' ? null : platformKey.platform_version,
+			modloader_version: platformKey.platform === 'vanilla' ? null : platformKey.platform_version,
 			game_version: platformKey.game_version,
 		})
 	}
