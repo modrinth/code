@@ -350,10 +350,8 @@ function getProjectBreadcrumbLabel(projectId) {
 		return formatMessage(commonMessages.loadingLabel)
 	}
 
-	return (
-		queryClient.getQueryData(['projects', 'summary', identifier])?.name ??
-		formatMessage(commonMessages.loadingLabel)
-	)
+	const summary = queryClient.getQueryData(['projects', 'summary', identifier])
+	return summary?.name ?? summary?.title ?? formatMessage(commonMessages.loadingLabel)
 }
 
 const projectBreadcrumbLabel = ref(getProjectBreadcrumbLabel(route.params.id))

@@ -642,6 +642,21 @@ const projects = computed<ResolvedProject[]>(() =>
 		resolvedProjectType: resolveProjectType(project, tags?.loaders.value ?? []),
 	})),
 )
+watch(
+	() => projectsQuery.data.value,
+	(projects) => {
+		if (props.projectLinkMode !== 'app') return
+
+		for (const project of projects ?? []) {
+			for (const identifier of [project.id, project.slug]) {
+				if (identifier) {
+					queryClient.setQueryData(['projects', 'summary', identifier], project)
+				}
+			}
+		}
+	},
+	{ immediate: true },
+)
 const organizations = computed(() => organizationsQuery.data.value ?? [])
 const collections = computed(() => collectionsQuery.data.value ?? [])
 

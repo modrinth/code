@@ -1,6 +1,7 @@
 <script setup>
 import { SpinnerIcon } from '@modrinth/assets'
 import { Avatar, injectNotificationManager } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { onUnmounted, ref } from 'vue'
@@ -10,10 +11,15 @@ import { instance_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/instance'
 
 const { handleError } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 const recentInstances = ref([])
 const getInstances = async () => {
 	const instances = await list().catch(handleError)
+
+	for (const instance of instances) {
+		queryClient.setQueryData(['instances', 'summary', instance.id], instance)
+	}
 
 	recentInstances.value = instances
 		.sort((a, b) => {

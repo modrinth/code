@@ -226,7 +226,10 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
-const instance = ref<GameInstance>()
+const initialInstanceId = String(displayedInstanceRoute.value.params.id ?? '')
+const instance = ref<GameInstance | undefined>(
+	queryClient.getQueryData<GameInstance>(['instances', 'summary', initialInstanceId]),
+)
 const instanceBreadcrumb = useRootBreadcrumb({
 	slot: 'instance',
 	id: () => `instance:${String(displayedInstanceRoute.value.params.id ?? '')}`,
@@ -387,6 +390,9 @@ async function fetchInstance() {
 	}
 
 	instance.value = nextInstance ?? undefined
+	if (nextInstance) {
+		queryClient.setQueryData(['instances', 'summary', nextInstance.id], nextInstance)
+	}
 	displayedInstanceRoute.value = nextRoute
 	sharedInstanceState.reset()
 	sharedInstanceState.refreshAvailability()
