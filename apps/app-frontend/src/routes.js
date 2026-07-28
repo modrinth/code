@@ -108,41 +108,6 @@ export default new createRouter({
 			},
 		},
 		{
-			path: '/library',
-			name: 'Library',
-			component: Library.Index,
-			meta: {
-				breadcrumb: [{ name: 'Library' }],
-			},
-			children: [
-				{
-					path: '',
-					name: 'Overview',
-					component: Library.Overview,
-				},
-				{
-					path: 'downloaded',
-					name: 'Downloaded',
-					component: Library.Downloaded,
-				},
-				{
-					path: 'modpacks',
-					name: 'Modpacks',
-					component: Library.Modpacks,
-				},
-				{
-					path: 'servers',
-					name: 'LibraryServers',
-					component: Library.Servers,
-				},
-				{
-					path: 'custom',
-					name: 'Custom',
-					component: Library.Custom,
-				},
-			],
-		},
-		{
 			path: '/:projectType(mod|plugin|datapack|resourcepack|shader|modpack)/:id/:rest(.*)*',
 			redirect: (to) => {
 				const rest = to.params.rest ? `/${[].concat(to.params.rest).join('/')}` : ''
