@@ -12,7 +12,6 @@ import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
 	CompassIcon,
-	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
@@ -1593,7 +1592,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		/>
 		<UnknownPackWarningModal ref="unknownPackWarningModal" />
 		<div
-			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
+			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-1.5 w-[--left-bar-width]"
 		>
 			<NavButton v-tooltip.right="'Home'" to="/">
 				<HomeIcon />
@@ -1678,7 +1677,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							{{ credentials?.user?.username }}
 						</span>
 					</span>
-					<ExternalIcon />
 				</template>
 				<template #sign-out> <LogOutIcon /> Sign out </template>
 			</OverflowMenu>

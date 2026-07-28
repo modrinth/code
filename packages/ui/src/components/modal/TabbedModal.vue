@@ -116,7 +116,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 
 				<slot name="footer" />
 			</div>
-			<div class="relative">
+			<div class="relative min-h-[min(65vh,600px)]">
 				<Transition
 					enter-active-class="transition-all duration-200 ease-out"
 					enter-from-class="opacity-0 max-h-0"
@@ -133,7 +133,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 
 				<div
 					ref="scrollContainer"
-					class="overflow-y-auto px-6 pb-6 h-screen max-h-[min(65vh,600px)]"
+					class="absolute inset-0 overflow-y-auto px-6 pb-6"
 					@scroll="checkScrollState"
 				>
 					<Suspense>

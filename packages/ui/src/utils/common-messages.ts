@@ -1075,6 +1075,10 @@ export const commonSettingsMessages = defineMessages({
 		id: 'settings.sessions.title',
 		defaultMessage: 'Sessions',
 	},
+	social: {
+		id: 'settings.social.title',
+		defaultMessage: 'Social',
+	},
 })
 
 export const commonProjectSettingsMessages = defineMessages({

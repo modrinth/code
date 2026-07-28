@@ -25,7 +25,7 @@ import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/
 import { computed, ref, watch } from 'vue'
 
 import PrivacySettings from '@/components/ui/settings/account/PrivacySettings.vue'
-import SafetySettings from '@/components/ui/settings/account/SafetySettings.vue'
+import SocialSettings from '@/components/ui/settings/account/SocialSettings.vue'
 import AppearanceSettings from '@/components/ui/settings/display/AppearanceSettings.vue'
 import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
@@ -101,13 +101,10 @@ const tabs = [
 		developerOnly: true,
 	},
 	{
-		name: defineMessage({
-			id: 'app.settings.tabs.safety',
-			defaultMessage: 'Safety',
-		}),
+		name: commonSettingsMessages.social,
 		category: tabCategories.account,
 		icon: HeartHandshakeIcon,
-		content: SafetySettings,
+		content: SocialSettings,
 	},
 	{
 		name: defineMessage({

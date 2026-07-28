@@ -38,6 +38,13 @@
 								: null,
 							auth.user
 								? {
+										link: '/settings/social',
+										label: formatMessage(commonSettingsMessages.social),
+										icon: HeartHandshakeIcon,
+									}
+								: null,
+							auth.user
+								? {
 										link: '/settings/account',
 										label: formatMessage(commonSettingsMessages.account),
 										icon: ShieldIcon,
@@ -91,6 +98,7 @@
 import {
 	CardIcon,
 	GridIcon,
+	HeartHandshakeIcon,
 	KeyIcon,
 	LanguagesIcon,
 	MonitorSmartphoneIcon,

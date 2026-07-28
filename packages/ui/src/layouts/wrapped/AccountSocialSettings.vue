@@ -1,5 +1,30 @@
 <template>
-	<div class="flex flex-col gap-8">
+	<EmptyState
+		v-if="!auth.user.value"
+		type="empty"
+		class="[&>div:last-child]:!mt-6"
+		:heading="formatMessage(messages.signInRequiredTitle)"
+		:description="formatMessage(messages.signInRequiredDescription)"
+	>
+		<template #illustration>
+			<div class="relative mb-4 h-[200px]">
+				<img :src="ThinkingRinthbot" alt="" class="h-full w-auto object-contain" />
+				<div
+					class="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-bg-raised to-transparent"
+				/>
+			</div>
+		</template>
+		<template #actions>
+			<ButtonStyled color="brand" size="large">
+				<button type="button" @click="requestSignIn">
+					<LogInIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.signInButton) }}
+				</button>
+			</ButtonStyled>
+		</template>
+	</EmptyState>
+
+	<div v-else class="flex flex-col gap-8">
 		<section class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2.5">
 				<h2 class="m-0 text-lg font-semibold text-contrast">
@@ -93,9 +118,6 @@
 										</button>
 									</ButtonStyled>
 								</div>
-								<span v-else-if="!auth.user.value">
-									{{ formatMessage(messages.signInRequired) }}
-								</span>
 								<span v-else>{{ formatMessage(messages.noBlockedUsers) }}</span>
 							</div>
 						</template>
@@ -168,13 +190,14 @@
 <script setup lang="ts">
 // TODO this will be moved in with the rest of the xplat settings.
 import type { Labrinth } from '@modrinth/api-client'
-import { SpinnerIcon } from '@modrinth/assets'
+import { LogInIcon, SpinnerIcon, ThinkingRinthbot } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
+import EmptyState from '#ui/components/base/EmptyState.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'
 import { defineMessages, useScrollIndicator, useVIntl } from '#ui/composables'
 import { injectAuth, injectNotificationManager } from '#ui/providers'
@@ -214,7 +237,7 @@ function formatInteractionSource(source: FriendRequestSource | SharedInstanceInv
 		case 'everyone':
 			return formatMessage(messages.everyone)
 		case 'mutuals':
-			return formatMessage(messages.mutuals)
+			return formatMessage(messages.friendsOfFriends)
 		case 'friends':
 			return formatMessage(messages.friends)
 		case 'no-one':
@@ -281,6 +304,10 @@ async function retry(): Promise<void> {
 	}
 }
 
+async function requestSignIn(): Promise<void> {
+	await auth.requestSignIn('')
+}
+
 async function unblock(user: BlockedUser): Promise<void> {
 	if (unblockingUserId.value) return
 
@@ -298,14 +325,6 @@ async function unblock(user: BlockedUser): Promise<void> {
 			blockedUsersQueryKey(auth.user.value?.id),
 			remainingIds,
 		)
-
-		notificationManager.addNotification({
-			type: 'success',
-			title: formatMessage(messages.userUnblocked),
-			text: formatMessage(messages.userUnblockedDescription, {
-				username: user.username,
-			}),
-		})
 	} catch {
 		notificationManager.addNotification({
 			type: 'error',
@@ -319,111 +338,108 @@ async function unblock(user: BlockedUser): Promise<void> {
 
 const messages = defineMessages({
 	friendRequestsTitle: {
-		id: 'settings.safety.friend-requests.title',
+		id: 'settings.social.friend-requests.title',
 		defaultMessage: 'Friend requests',
 	},
 	friendRequestsDescription: {
-		id: 'settings.safety.friend-requests.description',
+		id: 'settings.social.friend-requests.description',
 		defaultMessage: 'Control who can send you friend requests on Modrinth.',
 	},
 	sharedInstanceInvitesTitle: {
-		id: 'settings.safety.shared-instance-invites.title',
+		id: 'settings.social.shared-instance-invites.title',
 		defaultMessage: 'Shared instance invites',
 	},
 	sharedInstanceInvitesDescription: {
-		id: 'settings.safety.shared-instance-invites.description',
+		id: 'settings.social.shared-instance-invites.description',
 		defaultMessage: 'Control who can send you invites to shared instances on Modrinth.',
 	},
 	everyone: {
-		id: 'settings.safety.interaction-source.everyone',
+		id: 'settings.social.interaction-source.everyone',
 		defaultMessage: 'Everyone',
 	},
-	mutuals: {
-		id: 'settings.safety.interaction-source.mutuals',
-		defaultMessage: 'Mutuals',
+	friendsOfFriends: {
+		id: 'settings.social.interaction-source.friends-of-friends',
+		defaultMessage: 'Friends of friends',
 	},
 	friends: {
-		id: 'settings.safety.interaction-source.friends',
+		id: 'settings.social.interaction-source.friends',
 		defaultMessage: 'Friends',
 	},
 	noOne: {
-		id: 'settings.safety.interaction-source.no-one',
+		id: 'settings.social.interaction-source.no-one',
 		defaultMessage: 'No one',
 	},
 	comingSoon: {
-		id: 'settings.safety.interaction-source.coming-soon',
+		id: 'settings.social.interaction-source.coming-soon',
 		defaultMessage: 'Coming soon!',
 	},
 	blockedUsersTitle: {
-		id: 'settings.safety.blocked-users.title',
+		id: 'settings.social.blocked-users.title',
 		defaultMessage: 'Blocked users',
 	},
 	blockedUsersDescription: {
-		id: 'settings.safety.blocked-users.description',
+		id: 'settings.social.blocked-users.description',
 		defaultMessage: 'These are the users you have blocked on Modrinth. They cannot:',
 	},
 	friendRequestsRestriction: {
-		id: 'settings.safety.blocked-users.restriction.friend-requests',
+		id: 'settings.social.blocked-users.restriction.friend-requests',
 		defaultMessage: 'Send you friend requests',
 	},
 	sharedInstancesRestriction: {
-		id: 'settings.safety.blocked-users.restriction.shared-instances',
+		id: 'settings.social.blocked-users.restriction.shared-instances',
 		defaultMessage: 'Invite you to shared instances',
 	},
 	hostingRestriction: {
-		id: 'settings.safety.blocked-users.restriction.hosting',
+		id: 'settings.social.blocked-users.restriction.hosting',
 		defaultMessage: 'Invite you to manage a Modrinth Hosting server.',
 	},
 	userColumn: {
-		id: 'settings.safety.blocked-users.column.user',
+		id: 'settings.social.blocked-users.column.user',
 		defaultMessage: 'User',
 	},
 	actionsColumn: {
-		id: 'settings.safety.blocked-users.column.actions',
+		id: 'settings.social.blocked-users.column.actions',
 		defaultMessage: 'Actions',
 	},
 	unblockButton: {
-		id: 'settings.safety.blocked-users.unblock',
+		id: 'settings.social.blocked-users.unblock',
 		defaultMessage: 'Unblock',
 	},
 	unblockUserAriaLabel: {
-		id: 'settings.safety.blocked-users.unblock-user',
+		id: 'settings.social.blocked-users.unblock-user',
 		defaultMessage: 'Unblock {username}',
 	},
 	loadingBlockedUsers: {
-		id: 'settings.safety.blocked-users.loading',
+		id: 'settings.social.blocked-users.loading',
 		defaultMessage: 'Loading blocked users…',
 	},
 	noBlockedUsers: {
-		id: 'settings.safety.blocked-users.empty',
+		id: 'settings.social.blocked-users.empty',
 		defaultMessage: "You haven't blocked anyone.",
 	},
-	signInRequired: {
-		id: 'settings.safety.blocked-users.sign-in-required',
-		defaultMessage: 'Sign in to manage your blocked users.',
+	signInRequiredTitle: {
+		id: 'settings.social.sign-in-required.title',
+		defaultMessage: 'Modrinth account required',
+	},
+	signInRequiredDescription: {
+		id: 'settings.social.sign-in-required.description',
+		defaultMessage:
+			'You can control who can interact with you, and manage blocked users with a Modrinth Account',
 	},
 	loadError: {
-		id: 'settings.safety.blocked-users.load-error',
+		id: 'settings.social.blocked-users.load-error',
 		defaultMessage: 'Blocked users could not be loaded.',
 	},
 	userAvatarAlt: {
-		id: 'settings.safety.blocked-users.user-avatar',
+		id: 'settings.social.blocked-users.user-avatar',
 		defaultMessage: "{username}'s avatar",
 	},
-	userUnblocked: {
-		id: 'settings.safety.blocked-users.unblocked',
-		defaultMessage: 'User unblocked',
-	},
-	userUnblockedDescription: {
-		id: 'settings.safety.blocked-users.unblocked-description',
-		defaultMessage: '{username} has been unblocked.',
-	},
 	unblockError: {
-		id: 'settings.safety.blocked-users.unblock-error',
+		id: 'settings.social.blocked-users.unblock-error',
 		defaultMessage: 'Failed to unblock user',
 	},
 	unblockErrorDescription: {
-		id: 'settings.safety.blocked-users.unblock-error-description',
+		id: 'settings.social.blocked-users.unblock-error-description',
 		defaultMessage: 'An error occurred while unblocking this user. Please try again.',
 	},
 })

@@ -1,5 +1,5 @@
 <template>
-	<AccountSafetySettings
+	<AccountSocialSettings
 		:get-blocked-users="get_blocked_users"
 		:get-users="getUsers"
 		:unblock-user="unblock_user"
@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { AccountSafetySettings, injectModrinthClient } from '@modrinth/ui'
+import { AccountSocialSettings, injectModrinthClient } from '@modrinth/ui'
 
 import { get_blocked_users, unblock_user } from '@/helpers/users'
 
