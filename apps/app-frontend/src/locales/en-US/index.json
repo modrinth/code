@@ -770,6 +770,9 @@
   "app.project.install-context.back-to-browse": {
     "message": "Back to discover"
   },
+  "app.project.install-context.back-to-instance": {
+    "message": "Back to instance"
+  },
   "app.project.version.all-versions": {
     "message": "All versions"
   },

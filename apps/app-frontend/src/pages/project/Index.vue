@@ -338,6 +338,10 @@ const messages = defineMessages({
 		id: 'app.project.install-context.back-to-browse',
 		defaultMessage: 'Back to discover',
 	},
+	backToInstance: {
+		id: 'app.project.install-context.back-to-instance',
+		defaultMessage: 'Back to instance',
+	},
 	alreadyInstalled: {
 		id: 'app.project.install-button.already-installed',
 		defaultMessage: 'This project is already installed',
@@ -465,9 +469,18 @@ const projectGalleryHref = computed(() => buildProjectHref(`/project/${route.par
 const projectBrowseBackUrl = computed(() => {
 	const browsePath = route.query.b
 	if (typeof browsePath === 'string' && browsePath.startsWith('/browse/')) return browsePath
+	const instanceId = route.query.i
+	if (typeof instanceId === 'string' && instanceId) {
+		return `/instance/${encodeURIComponent(instanceId)}`
+	}
 	const type = data.value?.project_type ? `${data.value.project_type}` : 'mod'
 	return buildBrowseHref(`/browse/${type}`)
 })
+const projectBackLabel = computed(() =>
+	typeof route.query.i === 'string' && typeof route.query.b !== 'string'
+		? formatMessage(messages.backToInstance)
+		: formatMessage(messages.backToBrowse),
+)
 
 const projectInstallContext = computed(() => {
 	const serverData = serverInstallContent.serverContextServerData.value
@@ -481,7 +494,7 @@ const projectInstallContext = computed(() => {
 			iconSrc: null,
 			isMedal: serverData.is_medal,
 			backUrl: projectBrowseBackUrl.value,
-			backLabel: formatMessage(messages.backToBrowse),
+			backLabel: projectBackLabel.value,
 			heading: serverInstallContent.serverBrowseHeading.value,
 			queuedCount: serverInstallContent.queuedServerInstallCount.value,
 			selectedProjects: serverInstallContent.selectedServerInstallProjects.value,
@@ -501,7 +514,7 @@ const projectInstallContext = computed(() => {
 			gameVersion: instance.value.game_version,
 			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
 			backUrl: projectBrowseBackUrl.value,
-			backLabel: formatMessage(messages.backToBrowse),
+			backLabel: projectBackLabel.value,
 			heading: formatMessage(commonMessages.installingContentLabel),
 		}
 	}
