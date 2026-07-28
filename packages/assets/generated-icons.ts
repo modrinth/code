@@ -66,7 +66,6 @@ import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CalendarArrowDownIcon from './icons/calendar-arrow-down.svg?component'
 import _CardIcon from './icons/card.svg?component'
-import _ChangeSkinIcon from './icons/change-skin.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
 import _ChartAreaIcon from './icons/chart-area.svg?component'
 import _ChartColumnBigIcon from './icons/chart-column-big.svg?component'
@@ -499,7 +498,6 @@ export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon
 export const CalendarArrowDownIcon = _CalendarArrowDownIcon
 export const CardIcon = _CardIcon
-export const ChangeSkinIcon = _ChangeSkinIcon
 export const ChartIcon = _ChartIcon
 export const ChartAreaIcon = _ChartAreaIcon
 export const ChartColumnBigIcon = _ChartColumnBigIcon
