@@ -246,15 +246,16 @@ onUnmounted(() => unlisten())
 		>
 			<span
 				v-tooltip="selected ? 'Deselect instance' : 'Select instance'"
-				class="flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
+				class="relative flex size-[24px] items-center justify-center rounded-full opacity-0 transition-opacity duration-200 ease-out group-hover/card:opacity-100 group-hover/selection:brightness-125"
 				:class="{
-					'border-0 bg-primary !opacity-100': selected,
+					'border-0 !opacity-100': selected,
 					'border-2 border-solid border-primary bg-transparent': !selected,
 					'[outline:3px_solid_var(--color-purple)] outline-offset-1':
-						holdingShift && selected && isSelectionAnchor,
+						holdingShift && isSelectionAnchor,
 				}"
 			>
-				<CheckIcon v-if="selected" class="size-4 invert [stroke-width:3] top-px" />
+				<span v-if="selected" class="absolute inset-0 rounded-full bg-primary" />
+				<CheckIcon v-if="selected" class="relative size-4 invert [stroke-width:3] top-px" />
 			</span>
 		</button>
 		<div class="relative z-[1] flex min-w-0 flex-1 items-center gap-2 pr-20">
