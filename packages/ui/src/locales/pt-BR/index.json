@@ -5102,9 +5102,6 @@
   "settings.pats.title": {
     "defaultMessage": "Token de acesso pessoal"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Perfil público"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessões"
   },

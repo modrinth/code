@@ -5072,27 +5072,6 @@
   "settings.pats.token.never-used": {
     "message": "Nigdy nie użyty"
   },
-  "settings.profile.bio.description": {
-    "message": "Krótki opis, aby powiedzieć wszystkim trochę o Tobie."
-  },
-  "settings.profile.bio.title": {
-    "message": "O mnie"
-  },
-  "settings.profile.description": {
-    "message": "Twoje informacje profilowe są publicznie dostępnie na Modrinth i poprzez <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Ustawienia konta"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informacje profilowe"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Zdjęcie profilowe"
-  },
-  "settings.profile.username.description": {
-    "message": "Unikatowa bez uwzględniania wielkości liter nazwa identyfikująca Twój profil."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Unieważnij sesję"
   },

@@ -4199,9 +4199,6 @@
   "settings.pats.title": {
     "defaultMessage": "Személyes hozzáférési tokenek"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Nyilvános profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Munkamenetek"
   },

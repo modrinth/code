@@ -32,6 +32,7 @@ type InstallModal = {
 }
 
 type SharedInstanceCreator = {
+	id: string | null
 	username: string
 	avatarUrl: string | null
 }
@@ -190,6 +191,7 @@ export function useSharedInstanceInviteHandler(
 				},
 				invite.invitedByUsername
 					? {
+							id: invite.invitedById,
 							username: invite.invitedByUsername,
 							avatarUrl: invite.invitedByAvatarUrl,
 						}
@@ -294,6 +296,7 @@ export function useSharedInstanceInviteHandler(
 				},
 				manager
 					? {
+							id: manager.id,
 							username: manager.username,
 							avatarUrl: manager.avatar_url ?? null,
 						}

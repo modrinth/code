@@ -3,12 +3,14 @@ import {
 	CoffeeIcon,
 	GameIcon,
 	GaugeIcon,
+	HeartHandshakeIcon,
 	LanguagesIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
 	Settings2Icon,
 	ShieldIcon,
 	ToggleRightIcon,
+	UserIcon,
 } from '@modrinth/assets'
 import {
 	commonMessages,
@@ -17,13 +19,16 @@ import {
 	defineMessages,
 	ProgressBar,
 	TabbedModal,
+	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
-import { computed, ref, watch } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 
 import PrivacySettings from '@/components/ui/settings/account/PrivacySettings.vue'
+import ProfileSettings from '@/components/ui/settings/account/ProfileSettings.vue'
+import SocialSettings from '@/components/ui/settings/account/SocialSettings.vue'
 import AppearanceSettings from '@/components/ui/settings/display/AppearanceSettings.vue'
 import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
@@ -32,6 +37,10 @@ import DefaultInstanceSettings from '@/components/ui/settings/instances/DefaultI
 import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
 import { get, set } from '@/helpers/settings.ts'
+import {
+	appSettingsModalContextKey,
+	type UnsavedChangesController,
+} from '@/providers/app-settings-modal'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 import { useTheming } from '@/store/state'
 
@@ -99,6 +108,18 @@ const tabs = [
 		developerOnly: true,
 	},
 	{
+		name: commonSettingsMessages.profile,
+		category: tabCategories.account,
+		icon: UserIcon,
+		content: ProfileSettings,
+	},
+	{
+		name: commonSettingsMessages.social,
+		category: tabCategories.account,
+		icon: HeartHandshakeIcon,
+		content: SocialSettings,
+	},
+	{
 		name: defineMessage({
 			id: 'app.settings.tabs.privacy',
 			defaultMessage: 'Privacy',
@@ -110,7 +131,7 @@ const tabs = [
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.default-instance-options',
-			defaultMessage: 'Default instance options',
+			defaultMessage: 'Default game options',
 		}),
 		category: tabCategories.instances,
 		icon: GameIcon,
@@ -139,12 +160,58 @@ const tabs = [
 const availableTabs = computed(() => tabs.filter((tab) => !tab.developerOnly || themeStore.devMode))
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
+const unsavedChangesPopup = ref<{ nudge: () => void } | null>(null)
+const unsavedChangesController = ref<UnsavedChangesController | null>(null)
+const emptyUnsavedChangesState: Record<string, unknown> = {}
+const originalUnsavedChangesState = computed(
+	() => unsavedChangesController.value?.getOriginal() ?? emptyUnsavedChangesState,
+)
+const modifiedUnsavedChangesState = computed(
+	() => unsavedChangesController.value?.getModified() ?? emptyUnsavedChangesState,
+)
+const savingUnsavedChanges = computed(() => unsavedChangesController.value?.isSaving() ?? false)
+const hasUnsavedChanges = computed(() => unsavedChangesController.value?.hasChanges() ?? false)
+
+function canLeaveCurrentTab(): boolean {
+	if (!unsavedChangesController.value?.hasChanges()) return true
+	unsavedChangesPopup.value?.nudge()
+	return false
+}
+
+function close(): boolean {
+	return modal.value?.hide() ?? false
+}
+
+function registerUnsavedChangesController(controller: UnsavedChangesController | null): void {
+	unsavedChangesController.value = controller
+}
+
+provide(appSettingsModalContextKey, {
+	close,
+	registerUnsavedChangesController,
+})
+
+function resetUnsavedChanges(): void {
+	unsavedChangesController.value?.reset()
+}
+
+function saveUnsavedChanges(): void {
+	void unsavedChangesController.value?.save()
+}
 
 function show() {
 	modal.value?.show()
 }
 
-defineExpose({ show })
+function showProfile(): void {
+	const profileTabIndex = availableTabs.value.findIndex((tab) => tab.content === ProfileSettings)
+	if (profileTabIndex >= 0) {
+		modal.value?.setTab(profileTabIndex)
+	}
+	modal.value?.show()
+}
+
+defineExpose({ show, showProfile })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 
@@ -197,11 +264,29 @@ const messages = defineMessages({
 })
 </script>
 <template>
-	<TabbedModal ref="modal" :tabs="availableTabs" :width="'min(928px, calc(95vw - 10rem))'">
+	<TabbedModal
+		ref="modal"
+		:tabs="availableTabs"
+		:width="'min(928px, calc(95vw - 10rem))'"
+		:before-hide="canLeaveCurrentTab"
+		:before-tab-change="canLeaveCurrentTab"
+		:floating-action-bar-shown="hasUnsavedChanges"
+	>
 		<template #title>
 			<span class="text-2xl font-semibold text-contrast">
 				{{ formatMessage(commonMessages.settingsLabel) }}
 			</span>
+		</template>
+		<template #floating-action-bar>
+			<UnsavedChangesPopup
+				ref="unsavedChangesPopup"
+				:original="originalUnsavedChangesState"
+				:modified="modifiedUnsavedChangesState"
+				:saving="savingUnsavedChanges"
+				inline
+				@reset="resetUnsavedChanges"
+				@save="saveUnsavedChanges"
+			/>
 		</template>
 		<template #footer>
 			<div class="mt-auto text-secondary text-sm">

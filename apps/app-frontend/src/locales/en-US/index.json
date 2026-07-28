@@ -653,6 +653,9 @@
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "Include links and images if possible and relevant"
   },
+  "app.modal.install-to-play.block-user": {
+    "message": "Block user"
+  },
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "Instance you’re reporting"
   },
@@ -733,6 +736,9 @@
   },
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Unrecognized files"
+  },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "User blocked"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
@@ -996,7 +1002,7 @@
     "message": "Behavior"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Default instance options"
+    "message": "Default game options"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"

@@ -4268,27 +4268,6 @@
   "settings.pats.token.never-used": {
     "message": "Chưa từng sử dụng"
   },
-  "settings.profile.bio.description": {
-    "message": "Mô tả ngắn để giới thiệu đôi chút về bạn."
-  },
-  "settings.profile.bio.title": {
-    "message": "Tiểu sử"
-  },
-  "settings.profile.description": {
-    "message": "Thông tin hồ sơ của bạn được hiển thị công khai trên Modrinth và thông qua <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Cài đặt hồ sơ"
-  },
-  "settings.profile.profile-info": {
-    "message": "Thông tin hồ sơ"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Ảnh hồ sơ"
-  },
-  "settings.profile.username.description": {
-    "message": "Tên duy nhất (không phân biệt chữ hoa/thường) dùng để nhận diện hồ sơ của bạn."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Thu hồi phiên"
   },

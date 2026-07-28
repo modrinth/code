@@ -2567,9 +2567,6 @@
   "settings.pats.title": {
     "defaultMessage": "Token akses pribadi"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Profil publik"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sesi"
   },
@@ -2988,4 +2985,3 @@
     "defaultMessage": "Anda memiliki perubahan yang belum tersimpan."
   }
 }
-

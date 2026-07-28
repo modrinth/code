@@ -2150,9 +2150,6 @@
   "settings.pats.title": {
     "defaultMessage": "Personlige adgangstokens"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Offentlig profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"
   },
@@ -2241,4 +2238,3 @@
     "defaultMessage": "Vanilla Shader"
   }
 }
-

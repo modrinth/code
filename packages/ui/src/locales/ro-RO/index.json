@@ -3029,9 +3029,6 @@
   "settings.pats.title": {
     "defaultMessage": "Token-urile personale de acces"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Profil public"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Sesiuni"
   },

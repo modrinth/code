@@ -2305,11 +2305,5 @@
   },
   "settings.pats.modal.create.name.label": {
     "message": "שם"
-  },
-  "settings.profile.bio.title": {
-    "message": "תיאור"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "תמונת פרופיל"
   }
 }

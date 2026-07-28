@@ -5159,27 +5159,6 @@
   "settings.pats.token.never-used": {
     "message": "從未使用"
   },
-  "settings.profile.bio.description": {
-    "message": "簡單介紹一下你自己。"
-  },
-  "settings.profile.bio.title": {
-    "message": "關於我"
-  },
-  "settings.profile.description": {
-    "message": "你的個人檔案資訊會公開顯示在 Modrinth 上，並可透過 <docs-link>Modrinth API</docs-link> 查詢。"
-  },
-  "settings.profile.head-title": {
-    "message": "個人設定"
-  },
-  "settings.profile.profile-info": {
-    "message": "個人檔案資訊"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "頭貼"
-  },
-  "settings.profile.username.description": {
-    "message": "獨特且不區分大小寫的名稱，用於識別你的個人檔案。"
-  },
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"
   },

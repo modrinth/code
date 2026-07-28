@@ -285,6 +285,9 @@ fn main() {
                         "get_user_organizations",
                         "get_user_collections",
                         "patch_user",
+                        "block_user",
+                        "unblock_user",
+                        "get_blocked_users",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

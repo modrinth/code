@@ -5174,27 +5174,6 @@
   "settings.pats.token.never-used": {
     "message": "Never used"
   },
-  "settings.profile.bio.description": {
-    "message": "A short description to tell everyone a little bit about you."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profile settings"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profile information"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profile picture"
-  },
-  "settings.profile.username.description": {
-    "message": "A unique case-insensitive name to identify your profile."
-  },
   "settings.sessions.action.revoke-session": {
     "message": "Revoke session"
   },

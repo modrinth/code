@@ -714,7 +714,7 @@ async function reportSharedInstance(event?: MouseEvent, closeUpdateModal = false
 		)
 		if (instance.value?.id !== reportInstance.id) return
 		if (closeUpdateModal) sharedInstanceUpdateModal.value?.hide()
-		sharedInstanceReportModal.value?.showReport(preview, event)
+		sharedInstanceReportModal.value?.showReport(preview, sharedInstance.manager_id, event)
 	} catch (error) {
 		notifySharedInstanceError(error)
 	}

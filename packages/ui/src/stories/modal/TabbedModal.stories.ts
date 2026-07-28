@@ -15,6 +15,7 @@ import type { StoryObj } from '@storybook/vue3-vite'
 import { defineComponent, h, ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
+import UnsavedChangesPopup from '../../components/base/UnsavedChangesPopup.vue'
 import TabbedModal from '../../components/modal/TabbedModal.vue'
 
 function makeTabContent(label: string, lines = 3) {
@@ -145,6 +146,47 @@ export const WithFooter: StoryObj = {
 							<p class="m-0">App v1.0.0</p>
 							<p class="m-0">macOS 15.0</p>
 						</div>
+					</template>
+				</TabbedModal>
+			</div>
+		`,
+	}),
+}
+
+export const WithFloatingActionBar: StoryObj = {
+	render: () => ({
+		components: { TabbedModal, ButtonStyled, UnsavedChangesPopup },
+		setup() {
+			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
+			const dirty = ref(true)
+			const tabs = [
+				{
+					name: { id: 'general', defaultMessage: 'General' },
+					icon: InfoIcon,
+					content: makeTabContent('General', 20),
+				},
+			]
+			return { modalRef, dirty, tabs }
+		},
+		template: /* html */ `
+			<div>
+				<ButtonStyled color="brand">
+					<button @click="dirty = true; modalRef?.show()">Open with Floating Action Bar</button>
+				</ButtonStyled>
+				<TabbedModal
+					ref="modalRef"
+					header="Settings"
+					:tabs="tabs"
+					:floating-action-bar-shown="dirty"
+				>
+					<template #floating-action-bar>
+						<UnsavedChangesPopup
+							:original="{ dirty: false }"
+							:modified="{ dirty }"
+							inline
+							@save="dirty = false"
+							@reset="dirty = false"
+						/>
 					</template>
 				</TabbedModal>
 			</div>
