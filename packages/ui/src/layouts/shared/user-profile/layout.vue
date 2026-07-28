@@ -500,6 +500,7 @@ const props = withDefaults(
 		siteUrl?: string
 		externalNavigation?: boolean
 		projectLinkMode?: 'website' | 'app'
+		editProfileLink?: string | (() => void)
 		onCreateProject?: (event?: MouseEvent) => void
 		onCreateCollection?: (event?: MouseEvent) => void
 	}>(),
@@ -511,6 +512,7 @@ const props = withDefaults(
 		siteUrl: 'https://modrinth.com',
 		externalNavigation: false,
 		projectLinkMode: 'website',
+		editProfileLink: undefined,
 		onCreateProject: undefined,
 		onCreateCollection: undefined,
 	},
@@ -837,7 +839,9 @@ const showCollectionsEmptyState = computed(
 )
 
 const normalizedSiteUrl = computed(() => props.siteUrl.replace(/\/$/, ''))
-const editProfileLink = computed(() => linkTarget('/settings/profile'))
+const editProfileLink = computed(
+	() => props.editProfileLink ?? linkTarget('/settings/profile'),
+)
 
 function externalUrl(path: string): string {
 	return `${normalizedSiteUrl.value}${path.startsWith('/') ? path : `/${path}`}`

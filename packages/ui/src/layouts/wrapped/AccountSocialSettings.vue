@@ -347,11 +347,12 @@ const messages = defineMessages({
 	},
 	sharedInstanceInvitesTitle: {
 		id: 'settings.social.shared-instance-invites.title',
-		defaultMessage: 'Shared instance invites',
+		defaultMessage: 'Invitations',
 	},
 	sharedInstanceInvitesDescription: {
 		id: 'settings.social.shared-instance-invites.description',
-		defaultMessage: 'Control who can send you invites to shared instances on Modrinth.',
+		defaultMessage:
+			'Control who can send you invites to shared instances and Modrinth Hosting panels.',
 	},
 	everyone: {
 		id: 'settings.social.interaction-source.everyone',

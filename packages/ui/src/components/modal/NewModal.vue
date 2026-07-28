@@ -175,6 +175,7 @@ const props = withDefaults(
 		onHide?: () => void
 		onAfterHide?: () => void
 		onShow?: () => void
+		beforeHide?: () => boolean
 		mergeHeader?: boolean
 		scrollable?: boolean
 		maxContentHeight?: string
@@ -202,6 +203,7 @@ const props = withDefaults(
 		onHide: () => {},
 		onAfterHide: () => {},
 		onShow: () => {},
+		beforeHide: undefined,
 		mergeHeader: false,
 		// TODO: migrate all modals to use scrollable and remove this prop
 		scrollable: false,
@@ -279,9 +281,12 @@ function show(event?: MouseEvent) {
 	}, 50)
 }
 
-function hide() {
+function hide(): boolean {
 	if (props.disableClose) {
-		return
+		return false
+	}
+	if (props.beforeHide?.() === false) {
+		return false
 	}
 	props.onHide?.()
 	resetMousePosition()
@@ -302,6 +307,7 @@ function hide() {
 		hideTimeout = null
 		nextTick(() => props.onAfterHide?.())
 	}, 300)
+	return true
 }
 
 async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {

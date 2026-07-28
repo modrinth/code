@@ -33,6 +33,27 @@ pub async fn patch_user(user_id: &str, patch: Value) -> Result<()> {
 }
 
 #[tauri::command]
+pub async fn change_user_avatar(
+    user_id: &str,
+    image: Vec<u8>,
+    extension: &str,
+) -> Result<()> {
+    Ok(
+        theseus::users::change_user_avatar(
+            user_id,
+            image.into(),
+            extension,
+        )
+        .await?,
+    )
+}
+
+#[tauri::command]
+pub async fn delete_user_avatar(user_id: &str) -> Result<()> {
+    Ok(theseus::users::delete_user_avatar(user_id).await?)
+}
+
+#[tauri::command]
 pub async fn block_user(user_id: &str) -> Result<()> {
     Ok(theseus::users::block_user(user_id).await?)
 }
@@ -56,6 +77,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_user_organizations,
             get_user_collections,
             patch_user,
+            change_user_avatar,
+            delete_user_avatar,
             block_user,
             unblock_user,
             get_blocked_users,

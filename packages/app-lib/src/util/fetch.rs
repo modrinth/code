@@ -428,6 +428,7 @@ pub async fn fetch_with_client_progress(
         sha1,
         None,
         None,
+        None,
         download_meta,
         None,
         uri_path,
@@ -493,6 +494,35 @@ pub async fn fetch_advanced(
     .await
 }
 
+#[tracing::instrument(skip(body, semaphore))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_bytes(
+    method: Method,
+    url: &str,
+    body: Bytes,
+    header: Option<(&str, &str)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        None,
+        None,
+        Some(body),
+        header,
+        None,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        None,
+    )
+    .await
+}
+
 #[tracing::instrument(skip(json_body, semaphore, progress))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_progress(
@@ -513,6 +543,7 @@ pub async fn fetch_advanced_with_progress(
         url,
         sha1,
         json_body,
+        None,
         header,
         download_meta,
         loading_bar,
@@ -546,6 +577,7 @@ pub async fn fetch_advanced_with_client(
         url,
         sha1,
         json_body,
+        None,
         header,
         download_meta,
         loading_bar,
@@ -558,13 +590,16 @@ pub async fn fetch_advanced_with_client(
     .await
 }
 
-#[tracing::instrument(skip(json_body, semaphore, client, progress))]
+#[tracing::instrument(
+    skip(json_body, bytes_body, semaphore, client, progress)
+)]
 #[allow(clippy::too_many_arguments)]
 async fn fetch_advanced_with_client_and_progress(
     method: Method,
     url: &str,
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
+    bytes_body: Option<Bytes>,
     header: Option<(&str, &str)>,
     download_meta: Option<&DownloadMeta>,
     loading_bar: Option<(&LoadingBarId, f64)>,
@@ -611,6 +646,8 @@ async fn fetch_advanced_with_client_and_progress(
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
+        } else if let Some(body) = bytes_body.clone() {
+            req = req.body(body);
         }
 
         if let Some(header) = header {

@@ -50,9 +50,21 @@ export async function get_user_collections(
 
 export async function patch_user(
 	userId: string,
-	patch: Partial<Pick<Labrinth.Users.v3.User, 'badges' | 'role'>>,
+	patch: Partial<Pick<Labrinth.Users.v2.User, 'badges' | 'bio' | 'role' | 'username'>>,
 ): Promise<void> {
 	await invoke('plugin:users|patch_user', { userId, patch })
+}
+
+export async function change_user_avatar(
+	userId: string,
+	image: Uint8Array,
+	extension: string,
+): Promise<void> {
+	await invoke('plugin:users|change_user_avatar', { userId, image, extension })
+}
+
+export async function delete_user_avatar(userId: string): Promise<void> {
+	await invoke('plugin:users|delete_user_avatar', { userId })
 }
 
 export async function block_user(userId: string): Promise<void> {

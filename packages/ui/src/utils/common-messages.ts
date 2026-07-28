@@ -1068,8 +1068,8 @@ export const commonSettingsMessages = defineMessages({
 		defaultMessage: 'Personal access tokens',
 	},
 	profile: {
-		id: 'settings.profile.title',
-		defaultMessage: 'Public profile',
+		id: 'settings.profile.navigation-title',
+		defaultMessage: 'Profile',
 	},
 	sessions: {
 		id: 'settings.sessions.title',

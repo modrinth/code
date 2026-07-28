@@ -28,6 +28,9 @@ const props = withDefaults(
 		closable?: boolean
 		onHide?: () => void
 		onShow?: () => void
+		beforeHide?: () => boolean
+		beforeTabChange?: (fromIndex: number, toIndex: number) => boolean
+		floatingActionBarShown?: boolean
 	}>(),
 	{
 		header: undefined,
@@ -36,6 +39,9 @@ const props = withDefaults(
 		closable: true,
 		onHide: undefined,
 		onShow: undefined,
+		beforeHide: undefined,
+		beforeTabChange: undefined,
+		floatingActionBarShown: false,
 	},
 )
 
@@ -50,6 +56,8 @@ const { showTopFade, showBottomFade, checkScrollState, forceCheck } =
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 
 function setTab(index: number) {
+	if (index === selectedTab.value) return
+	if (props.beforeTabChange?.(selectedTab.value, index) === false) return
 	selectedTab.value = index
 	nextTick(() => forceCheck())
 }
@@ -58,8 +66,8 @@ function show(event?: MouseEvent) {
 	modal.value?.show(event)
 }
 
-function hide() {
-	modal.value?.hide()
+function hide(): boolean {
+	return modal.value?.hide() ?? false
 }
 
 function startsCategory(index: number) {
@@ -78,6 +86,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 		:closable="closable"
 		:on-hide="onHide"
 		:on-show="onShow"
+		:before-hide="beforeHide"
 		no-padding
 	>
 		<template v-if="$slots.title" #title>
@@ -133,7 +142,8 @@ defineExpose({ show, hide, selectedTab, setTab })
 
 				<div
 					ref="scrollContainer"
-					class="absolute inset-0 overflow-y-auto px-6 pb-6"
+					class="absolute inset-0 overflow-y-auto px-6"
+					:class="floatingActionBarShown ? 'pb-24' : 'pb-6'"
 					@scroll="checkScrollState"
 				>
 					<Suspense>
@@ -157,6 +167,12 @@ defineExpose({ show, hide, selectedTab, setTab })
 						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-16 bg-gradient-to-t from-bg-raised to-transparent"
 					/>
 				</Transition>
+
+				<div class="pointer-events-none absolute bottom-3 left-6 right-6 z-20">
+					<div class="pointer-events-auto">
+						<slot name="floating-action-bar" />
+					</div>
+				</div>
 			</div>
 		</div>
 	</NewModal>
