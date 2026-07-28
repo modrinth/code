@@ -809,6 +809,12 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Drag to show recent instances"
+  },
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Drag to resize"
+  },
   "app.restarting": {
     "message": "Restarting..."
   },
