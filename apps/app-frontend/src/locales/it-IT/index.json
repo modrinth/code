@@ -875,6 +875,9 @@
   "app.skins.sign-in.title": {
     "message": "Effettua l'accesso"
   },
+  "app.skins.title": {
+    "message": "Seleziona una skin"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Disattiva"
   },

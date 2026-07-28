@@ -434,6 +434,9 @@
   "app.skins.sign-in.title": {
     "message": "Silakan masuk"
   },
+  "app.skins.title": {
+    "message": "Pemilih rupa"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
   },

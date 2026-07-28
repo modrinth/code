@@ -878,6 +878,9 @@
   "app.skins.sign-in.title": {
     "message": "Bitte melde dich an"
   },
+  "app.skins.title": {
+    "message": "Skin-Auswahl"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Deaktivieren"
   },

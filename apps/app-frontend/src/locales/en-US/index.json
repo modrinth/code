@@ -920,6 +920,9 @@
   "app.skins.sign-in.title": {
     "message": "Please sign in"
   },
+  "app.skins.title": {
+    "message": "Skin selector"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Toggle off"
   },

@@ -2390,9 +2390,6 @@
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
   },
-  "label.skin-selector": {
-    "defaultMessage": "Skin selector"
-  },
   "label.sort-by": {
     "defaultMessage": "Sort by: "
   },

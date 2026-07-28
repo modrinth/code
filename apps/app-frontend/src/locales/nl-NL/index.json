@@ -878,6 +878,9 @@
   "app.skins.sign-in.title": {
     "message": "Graag inloggen"
   },
+  "app.skins.title": {
+    "message": "Skinkiezer"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Uitschakelen"
   },

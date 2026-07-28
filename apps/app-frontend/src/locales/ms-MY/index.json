@@ -407,6 +407,9 @@
   "app.skins.sign-in.title": {
     "message": "Sila daftar masuk"
   },
+  "app.skins.title": {
+    "message": "Pemilih kekulit"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} sudah selesai dimuat turun! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
   },

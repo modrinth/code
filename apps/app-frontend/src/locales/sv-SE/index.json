@@ -764,6 +764,9 @@
   "app.skins.sign-in.title": {
     "message": "Vänligen logga in"
   },
+  "app.skins.title": {
+    "message": "Utseende väljare"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
   },

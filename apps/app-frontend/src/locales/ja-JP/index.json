@@ -848,6 +848,9 @@
   "app.skins.sign-in.title": {
     "message": "サインインしてください"
   },
+  "app.skins.title": {
+    "message": "スキンセレクター"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "オフに切り替え"
   },

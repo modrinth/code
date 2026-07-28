@@ -812,6 +812,9 @@
   "app.skins.sign-in.title": {
     "message": "Zaloguj się"
   },
+  "app.skins.title": {
+    "message": "Wybór skórki"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Wyłącz"
   },

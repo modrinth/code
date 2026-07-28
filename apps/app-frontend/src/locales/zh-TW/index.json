@@ -878,6 +878,9 @@
   "app.skins.sign-in.title": {
     "message": "請登入"
   },
+  "app.skins.title": {
+    "message": "外觀選擇工具"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "關閉"
   },

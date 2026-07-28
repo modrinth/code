@@ -458,6 +458,9 @@
   "app.skins.sign-in.title": {
     "message": "Por favor, inicia sesión"
   },
+  "app.skins.title": {
+    "message": "Selector de Skin"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} se ha descargado. Actualiza la página ahora o espera a que se actualice automáticamente al cerrar Modrinth App."
   },

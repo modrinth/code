@@ -818,6 +818,9 @@
   "app.skins.sign-in.title": {
     "message": "Войдите"
   },
+  "app.skins.title": {
+    "message": "Выбор скина"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Выключить"
   },

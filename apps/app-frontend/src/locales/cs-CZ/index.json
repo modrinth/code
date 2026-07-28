@@ -566,6 +566,9 @@
   "app.skins.sign-in.title": {
     "message": "Přihlaš se prosím"
   },
+  "app.skins.title": {
+    "message": "Výběr skinu"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Stahování Modrinth App v{version} bylo dokončeno. Aktualizujte ji znovunačtením nebo se automaticky aktualizuje po zavření."
   },

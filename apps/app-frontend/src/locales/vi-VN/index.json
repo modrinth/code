@@ -611,6 +611,9 @@
   "app.skins.sign-in.title": {
     "message": "Đăng nhập đã"
   },
+  "app.skins.title": {
+    "message": "Đổi skin"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Phiên bản v{version} của Modrinth đã sẵn sàng để có thể cài đặt. Khởi động lại ứng dụng để cập nhật ngay bây giờ, hoặc tự động cập nhật sau khi bạn tắt Modrinth."
   },

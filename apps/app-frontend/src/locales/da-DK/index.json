@@ -614,6 +614,9 @@
   "app.skins.sign-in.title": {
     "message": "Venligst log ind"
   },
+  "app.skins.title": {
+    "message": "Skin vælger"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Slå fra"
   },

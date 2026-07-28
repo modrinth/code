@@ -815,6 +815,9 @@
   "app.skins.sign-in.title": {
     "message": "Kérlek jelentkezz be"
   },
+  "app.skins.title": {
+    "message": "Kinézetváltó"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "Kikapcsolás"
   },

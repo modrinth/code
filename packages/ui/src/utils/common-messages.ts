@@ -327,10 +327,6 @@ export const commonMessages = defineMessages({
 		id: 'label.singleplayer',
 		defaultMessage: 'Singleplayer',
 	},
-	skinSelectorLabel: {
-		id: 'label.skin-selector',
-		defaultMessage: 'Skin selector',
-	},
 	sortByLabel: {
 		id: 'label.sort-by',
 		defaultMessage: 'Sort by: ',

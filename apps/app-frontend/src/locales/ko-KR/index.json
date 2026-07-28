@@ -824,6 +824,9 @@
   "app.skins.sign-in.title": {
     "message": "로그인하세요"
   },
+  "app.skins.title": {
+    "message": "스킨 선택"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "끄기"
   },

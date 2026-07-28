@@ -58,6 +58,7 @@ import {
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
 import { handleSevereError } from '@/store/error'
 import { useTheming } from '@/store/state'
+import { appMessages } from '@/utils/app-messages'
 
 type UnlistenFn = () => void
 type VirtualSkinSectionListExpose = {
@@ -1067,7 +1068,7 @@ await loadSkins()
 	<div v-if="currentUser" class="skin-layout box-border min-h-full p-4">
 		<div class="sticky top-6 self-start p-2 pt-0">
 			<h1 class="m-0 text-2xl font-bold flex items-center gap-2">
-				{{ formatMessage(commonMessages.skinSelectorLabel) }}
+				{{ formatMessage(appMessages.skinSelectorLabel) }}
 			</h1>
 			<div
 				class="ml-5 mt-4 flex h-[calc(80vh-1rem)] items-center justify-center max-[700px]:h-[calc(50vh-1rem)]"

@@ -653,6 +653,9 @@
   "app.skins.sign-in.title": {
     "message": "الرجاء تسجيل الدخول"
   },
+  "app.skins.title": {
+    "message": "اختيار المظهر"
+  },
   "app.skins.toggle-ears-features-off": {
     "message": "إيقاف"
   },
