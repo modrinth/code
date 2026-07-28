@@ -23,18 +23,19 @@ import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
 import { computed, ref, watch } from 'vue'
 
-import AppBehaviorSettings from '@/components/ui/settings/AppBehaviorSettings.vue'
-import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
-import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
-import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
-import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
-import LanguageSettings from '@/components/ui/settings/LanguageSettings.vue'
-import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
-import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
+import PrivacySettings from '@/components/ui/settings/account/PrivacySettings.vue'
+import AppearanceSettings from '@/components/ui/settings/display/AppearanceSettings.vue'
+import BehaviorSettings from '@/components/ui/settings/display/BehaviorSettings.vue'
+import FeatureFlagSettings from '@/components/ui/settings/display/FeatureFlagSettings.vue'
+import LanguageSettings from '@/components/ui/settings/display/LanguageSettings.vue'
+import DefaultInstanceSettings from '@/components/ui/settings/instances/DefaultInstanceSettings.vue'
+import JavaSettings from '@/components/ui/settings/instances/JavaSettings.vue'
+import ResourceManagementSettings from '@/components/ui/settings/instances/ResourceManagementSettings.vue'
 import { get, set } from '@/helpers/settings.ts'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 import { useTheming } from '@/store/state'
 
+// TODO: Apply COMPONENT_STRUCTURE.md here and extract out common setting option components
 const themeStore = useTheming()
 
 const { formatMessage } = useVIntl()
@@ -74,11 +75,11 @@ const tabs = [
 	{
 		name: defineMessage({
 			id: 'app.settings.tabs.behavior',
-			defaultMessage: 'Behaviour',
+			defaultMessage: 'Behavior',
 		}),
 		category: tabCategories.display,
 		icon: Settings2Icon,
-		content: AppBehaviorSettings,
+		content: BehaviorSettings,
 	},
 	{
 		name: defineMessage({

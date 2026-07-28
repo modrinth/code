@@ -84,7 +84,7 @@ const messages = defineMessages({
 	},
 	hideNametagDescription: {
 		id: 'app.appearance-settings.hide-nametag.description',
-		defaultMessage: 'Hide your username above the player preview on the Skins page.',
+		defaultMessage: 'Hide your username above the player preview on the Skin selector page.',
 	},
 	unknownPackWarningTitle: {
 		id: 'app.appearance-settings.unknown-pack-warning.title',
