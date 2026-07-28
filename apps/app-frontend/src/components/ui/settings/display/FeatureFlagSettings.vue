@@ -25,7 +25,7 @@ watch(
 )
 </script>
 <template>
-	<div class="flex flex-col gap-2.5 min-w-[600px]">
+	<div class="flex flex-col gap-2.5">
 		<div v-for="option in options" :key="option" class="flex items-center justify-between">
 			<div>
 				<h2 class="m-0 text-lg font-semibold text-contrast capitalize">

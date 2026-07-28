@@ -365,6 +365,13 @@ export interface SharedInstanceInviteLink {
 	maxUses: number
 }
 
+export interface SharedInstanceInvite {
+	id: string
+	expiration: string
+	maxUses: number
+	uses: number
+}
+
 export async function can_current_user_use_shared_instances(): Promise<boolean> {
 	return await invoke('plugin:instance|instance_share_can_current_user_use')
 }
@@ -392,6 +399,19 @@ export async function create_shared_instance_invite_link(
 		instanceId,
 		...options,
 	})
+}
+
+export async function get_shared_instance_invites(
+	instanceId: string,
+): Promise<SharedInstanceInvite[]> {
+	return await invoke('plugin:instance|instance_share_get_invites', { instanceId })
+}
+
+export async function revoke_shared_instance_invite(
+	instanceId: string,
+	inviteId: string,
+): Promise<void> {
+	return await invoke('plugin:instance|instance_share_revoke_invite', { instanceId, inviteId })
 }
 
 export async function remove_shared_instance_users(

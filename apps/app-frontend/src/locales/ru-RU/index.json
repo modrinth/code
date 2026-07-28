@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Системное оформление"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Выберите вариант"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Показывать время, проведённое в сборке."
   },
@@ -244,9 +241,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Вернуться к сборке"
-  },
-  "app.browse.discover-content": {
-    "message": "Поиск проектов"
   },
   "app.browse.discover-servers": {
     "message": "Поиск серверов"

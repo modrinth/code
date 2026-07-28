@@ -2183,9 +2183,6 @@
   "layout.nav.discover": {
     "message": "Descobrir"
   },
-  "layout.nav.discover-content": {
-    "message": "Descobrir conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Obter a Modrinth App"
   },
@@ -2500,99 +2497,6 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Confirme o endereço da carteira. Fundos enviados para um endereço errado não podem ser recuperados."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Um criador Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Um utilizador Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Gerir faturação do utilizador"
-  },
-  "profile.button.edit-role": {
-    "message": "Editar cargo"
-  },
-  "profile.button.info": {
-    "message": "Ver detalhes de utilizador"
-  },
-  "profile.button.manage-projects": {
-    "message": "Gerir projetos"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remover como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Definir como afiliado"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Fornecedores de Autenticação"
-  },
-  "profile.details.label.email": {
-    "message": "E-mail"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.details.label.has-password": {
-    "message": "Tem password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Tem TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Métodos de pagamento"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-mail não verificado"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.error.not-found": {
-    "message": "Utilizador não encontrado"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliado"
-  },
-  "profile.label.badges": {
-    "message": "Emblemas"
-  },
-  "profile.label.collection": {
-    "message": "Coleção"
-  },
-  "profile.label.joined": {
-    "message": "Entrou"
-  },
-  "profile.label.no-collections": {
-    "message": "Este utilizador não tem coleções!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Não tens nenhuma coleção.\nQueres <create-link>criar uma</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Este utilizador não tem projetos!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Não tens nenhum projeto.\nQueres <create-link>criar um</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizações"
-  },
-  "profile.label.saving": {
-    "message": "A guardar..."
-  },
-  "profile.meta.description": {
-    "message": "Transfere os projetos de {username} no Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Transfere os projetos de {username} no Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> seguidor do projeto} other {<stat>{count}</stat> seguidores do projeto}}"
-  },
-  "profile.user-id": {
-    "message": "ID do utilizador: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Falha a rejeitar o convite de equipa"
@@ -3536,14 +3440,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre esta aplicação"
   },
-  "settings.authorizations.by": {
-    "message": "por"
-  },
   "settings.authorizations.description": {
     "message": "Quando autorizas uma aplicação com a tua conta Modrinth, dás-lhe acesso à tua conta. Podes gerir e rever acesso à tua conta aqui quando quiseres."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Neste momento, não conseguimos mostrar as tuas aplicações autorizadas, estamos a tentar corrigir isto. Por favor tenta novamente mais tarde!"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
@@ -3877,27 +3775,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
-  },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para que todos possam saber mais sobre ti."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biografia"
-  },
-  "settings.profile.description": {
-    "message": "As informações do teu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Definições do perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Imagem do perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas de minúsculas para identificar o teu perfil."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revogar sessão"

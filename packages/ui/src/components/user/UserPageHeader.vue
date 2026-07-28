@@ -58,10 +58,10 @@
 		<template #actions>
 			<PageHeaderActions>
 				<ButtonStyled v-if="isSelf" size="large">
-					<nuxt-link to="/settings/profile">
+					<AutoLink :to="editProfileLink">
 						<EditIcon />
 						{{ formatMessage(commonMessages.editButton) }}
-					</nuxt-link>
+					</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled circular size="large" type="transparent">
 					<TeleportOverflowMenu
@@ -82,6 +82,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	AffiliateIcon,
 	BadgeCheckIcon,
+	BanIcon,
 	BoxIcon,
 	CalendarIcon,
 	ChartIcon,
@@ -93,24 +94,22 @@ import {
 	MoreVerticalIcon,
 	ReportIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
-	ButtonStyled,
-	commonMessages,
-	defineMessages,
-	PageHeader,
-	PageHeaderActions,
-	PageHeaderBadgeItem,
-	PageHeaderMetadata,
-	PageHeaderMetadataNumberItem,
-	PageHeaderMetadataTimeItem,
-	TeleportOverflowMenu,
-	type TeleportOverflowMenuItem,
-	useFormatDateTime,
-	useFormatNumber,
-	useVIntl,
-} from '@modrinth/ui'
 import { computed } from 'vue'
+
+import AutoLink from '#ui/components/base/AutoLink.vue'
+import Avatar from '#ui/components/base/Avatar.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import PageHeader from '#ui/components/base/page-header/index.vue'
+import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
+import PageHeaderMetadataNumberItem from '#ui/components/base/page-header/metadata/page-header-metadata-number-item.vue'
+import PageHeaderMetadataTimeItem from '#ui/components/base/page-header/metadata/page-header-metadata-time-item.vue'
+import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
+import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
+import type { Item as TeleportOverflowMenuItem } from '#ui/components/base/TeleportOverflowMenu.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import { defineMessages, useFormatDateTime, useFormatNumber, useVIntl } from '#ui/composables'
+import type { AuthUser } from '#ui/providers/auth'
+import { commonMessages } from '#ui/utils'
 
 const messages = defineMessages({
 	affiliateLabel: {
@@ -124,6 +123,14 @@ const messages = defineMessages({
 	billingButton: {
 		id: 'profile.button.billing',
 		defaultMessage: 'Manage user billing',
+	},
+	blockButton: {
+		id: 'profile.button.block',
+		defaultMessage: 'Block',
+	},
+	unblockButton: {
+		id: 'profile.button.unblock',
+		defaultMessage: 'Unblock',
 	},
 	editRoleButton: {
 		id: 'profile.button.edit-role',
@@ -167,7 +174,8 @@ const props = withDefaults(
 	defineProps<{
 		user: Labrinth.Users.v3.User
 		summary?: string | null
-		authUser?: Labrinth.Users.v3.User | null
+		authUser?: AuthUser | null
+		editProfileLink?: string | (() => void)
 		isModrinthUser?: boolean
 		isOfficialAccount?: boolean
 		showAffiliateBadge?: boolean
@@ -175,12 +183,15 @@ const props = withDefaults(
 		isSelf?: boolean
 		isAdmin?: boolean
 		isStaff?: boolean
+		showStaffActions?: boolean
+		isBlocked?: boolean
 		projectsCount?: number
 		downloads?: number
 	}>(),
 	{
 		summary: null,
 		authUser: null,
+		editProfileLink: '/settings/profile',
 		isModrinthUser: false,
 		isOfficialAccount: false,
 		showAffiliateBadge: false,
@@ -188,6 +199,8 @@ const props = withDefaults(
 		isSelf: false,
 		isAdmin: false,
 		isStaff: false,
+		showStaffActions: false,
+		isBlocked: false,
 		projectsCount: 0,
 		downloads: 0,
 	},
@@ -196,6 +209,7 @@ const props = withDefaults(
 const emit = defineEmits<{
 	manageProjects: []
 	report: []
+	block: []
 	copyId: []
 	copyPermalink: []
 	openBilling: []
@@ -206,7 +220,6 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-
 const formatNumber = useFormatNumber()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -236,6 +249,14 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		shown: props.authUser?.id !== props.user.id,
 	},
 	{
+		id: 'block',
+		label: formatMessage(props.isBlocked ? messages.unblockButton : messages.blockButton),
+		icon: BanIcon,
+		action: () => emit('block'),
+		color: 'red',
+		shown: props.authUser?.id !== props.user.id,
+	},
+	{
 		id: 'copy-id',
 		label: formatMessage(commonMessages.copyIdButton),
 		icon: ClipboardCopyIcon,
@@ -249,14 +270,14 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 	},
 	{
 		divider: true,
-		shown: props.isAdmin,
+		shown: props.showStaffActions && (props.isAdmin || props.isStaff),
 	},
 	{
 		id: 'open-billing',
 		label: formatMessage(messages.billingButton),
 		icon: CurrencyIcon,
 		action: () => emit('openBilling'),
-		shown: props.isStaff,
+		shown: props.showStaffActions && props.isStaff,
 	},
 	{
 		id: 'toggle-affiliate',
@@ -265,7 +286,7 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 			: formatMessage(messages.setAffiliateButton),
 		icon: AffiliateIcon,
 		action: () => emit('toggleAffiliate'),
-		shown: props.isAdmin,
+		shown: props.showStaffActions && props.isAdmin,
 		remainOnClick: true,
 		color: props.isAffiliate ? 'red' : 'orange',
 	},
@@ -274,21 +295,21 @@ const moreActions = computed<TeleportOverflowMenuItem[]>(() => [
 		label: formatMessage(messages.infoButton),
 		icon: InfoIcon,
 		action: () => emit('openInfo'),
-		shown: props.isStaff,
+		shown: props.showStaffActions && props.isStaff,
 	},
 	{
 		id: 'open-analytics',
 		label: formatMessage(messages.analyticsButton),
 		icon: ChartIcon,
 		action: () => emit('openAnalytics'),
-		shown: props.isAdmin,
+		shown: props.showStaffActions && props.isAdmin,
 	},
 	{
 		id: 'edit-role',
 		label: formatMessage(messages.editRoleButton),
 		icon: EditIcon,
 		action: () => emit('editRole'),
-		shown: props.isAdmin,
+		shown: props.showStaffActions && props.isAdmin,
 	},
 ])
 </script>

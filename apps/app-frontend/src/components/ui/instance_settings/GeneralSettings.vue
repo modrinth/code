@@ -109,9 +109,13 @@ watch(selectedReleaseChannel, async (channel, previousChannel) => {
 })
 
 async function resetIcon() {
-	icon.value = undefined
-	await edit_icon(instance.value.id, null).catch(handleError)
-	trackEvent('InstanceRemoveIcon')
+	try {
+		await edit_icon(instance.value.id, null)
+		icon.value = undefined
+		trackEvent('InstanceRemoveIcon')
+	} catch (error) {
+		handleError(error)
+	}
 }
 
 async function setIcon() {
@@ -127,10 +131,13 @@ async function setIcon() {
 
 	if (!value) return
 
-	icon.value = value
-	await edit_icon(instance.value.id, icon.value).catch(handleError)
-
-	trackEvent('InstanceSetIcon')
+	try {
+		await edit_icon(instance.value.id, value)
+		icon.value = value
+		trackEvent('InstanceSetIcon')
+	} catch (error) {
+		handleError(error)
+	}
 }
 
 const editInstanceObject = computed(() => ({

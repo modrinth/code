@@ -119,9 +119,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Natiivit koristukset"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Valitse vaihtoehto"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Näyttää, kuinka paljon aikaa olet käyttänyt instanssin pelaamiseen."
   },
@@ -172,9 +169,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Takaisin instanssiin"
-  },
-  "app.browse.discover-content": {
-    "message": "Löydä sisältöä"
   },
   "app.browse.discover-servers": {
     "message": "Löydä palvelimia"

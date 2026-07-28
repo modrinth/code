@@ -2870,9 +2870,6 @@
   "layout.nav.discover": {
     "message": "Дослідити"
   },
-  "layout.nav.discover-content": {
-    "message": "Дослідити вміст"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Установити Modrinth App"
   },
@@ -3298,117 +3295,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "Ця організація ще не має проєктів. Бажаєте <create-link>створити новий</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Творець Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Користувач Modrinth."
-  },
-  "profile.button.analytics": {
-    "message": "Переглянути аналітику користувача"
-  },
-  "profile.button.billing": {
-    "message": "Керувати розрахунками користувача"
-  },
-  "profile.button.edit-role": {
-    "message": "Редагувати роль"
-  },
-  "profile.button.info": {
-    "message": "Переглянути дані користувача"
-  },
-  "profile.button.manage-projects": {
-    "message": "Керувати проєктами"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Усунути як партнера"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Установити як партнера"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Провайдери автентифікації"
-  },
-  "profile.details.label.email": {
-    "message": "Електронна пошта"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Електронна адреса підтверджена"
-  },
-  "profile.details.label.has-password": {
-    "message": "Має пароль"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Має TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Способи оплати"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Електронна пошта не перевірена"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Електронна пошта перевірена"
-  },
-  "profile.error.not-found": {
-    "message": "Користувача не знайдено"
-  },
-  "profile.label.affiliate": {
-    "message": "Партнер"
-  },
-  "profile.label.badges": {
-    "message": "Значки"
-  },
-  "profile.label.collection": {
-    "message": "Добірка"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {завантаження} few {завантаження} many {завантажень} other {завантаження}}"
-  },
-  "profile.label.joined": {
-    "message": "Приєднався"
-  },
-  "profile.label.no-collections": {
-    "message": "У цього користувача немає добірок!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "У вас немає жодної добірки.\nБажаєте <create-link>створити її</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "У цього користувача немає проєктів!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "У вас немає жодного проєкту.\nБажаєте <create-link>створити якийсь</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Організації"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
-  },
-  "profile.label.saving": {
-    "message": "Збереження…"
-  },
-  "profile.meta.description": {
-    "message": "Завантажте проєкти {username} на Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Офіційний обліковий запис Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Офіційний обліковий запис Modrinth. Зв'язатися з підтримкою можна за <support-link></support-link> або через електронну пошту за <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> відстежує} few {<stat>{count}</stat> відстежує} other {<stat>{count}</stat> відстежують}}"
-  },
-  "profile.user-id": {
-    "message": "ID користувача: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Не вдалося відхилити запрошення до команди"
@@ -4835,14 +4721,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Про застосунок"
   },
-  "settings.authorizations.by": {
-    "message": "від"
-  },
   "settings.authorizations.description": {
     "message": "Коли ви авторизуєтеся у застосунку за допомогою Modrinth, ви надаєте йому доступ до вашого облікового запису. Ви завжди можете переглядати й керувати доступом до свого облікового запису тут."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Наразі ми не можемо показати ваші авторизовані застосунки, але ми працюємо, щоб виправити це. Будь ласка, завітайте на цю сторінку пізніше!"
   },
   "settings.authorizations.head-title": {
     "message": "Авторизації"
@@ -5200,27 +5080,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Не використовувався"
-  },
-  "settings.profile.bio.description": {
-    "message": "Короткий опис, щоб розповісти всім трохи про себе."
-  },
-  "settings.profile.bio.title": {
-    "message": "Про себе"
-  },
-  "settings.profile.description": {
-    "message": "Інформація з вашого профілю є загальнодоступною на Modrinth та через <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Налаштування профілю"
-  },
-  "settings.profile.profile-info": {
-    "message": "Інформація про профіль"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Зображення профілю"
-  },
-  "settings.profile.username.description": {
-    "message": "Унікальне ім’я без урахування регістру, для ідентифікації вашого профілю."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"

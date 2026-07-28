@@ -2879,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "发现"
   },
-  "layout.nav.discover-content": {
-    "message": "发现内容"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "获取 Modrinth App"
   },
@@ -3343,114 +3340,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "该组织还没有项目。想要<create-link>创建一个</create-link>吗？"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "一位 Modrinth 创作者。"
-  },
-  "profile.bio.fallback.user": {
-    "message": "一位 Modrinth 用户。"
-  },
-  "profile.button.analytics": {
-    "message": "查看用户分析"
-  },
-  "profile.button.billing": {
-    "message": "管理用户财务"
-  },
-  "profile.button.edit-role": {
-    "message": "编辑角色"
-  },
-  "profile.button.info": {
-    "message": "查看用户详情"
-  },
-  "profile.button.manage-projects": {
-    "message": "管理项目"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "解除作为联盟伙伴"
-  },
-  "profile.button.set-affiliate": {
-    "message": "设置为联盟伙伴"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "身份验证提供者"
-  },
-  "profile.details.label.email": {
-    "message": "电子邮箱"
-  },
-  "profile.details.label.email-verified": {
-    "message": "电子邮箱已验证"
-  },
-  "profile.details.label.has-password": {
-    "message": "已设置密码"
-  },
-  "profile.details.label.has-totp": {
-    "message": "已设置动态令牌"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "支付方式"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "电子邮箱未验证"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "电子邮箱验证成功"
-  },
-  "profile.error.not-found": {
-    "message": "未找到用户"
-  },
-  "profile.label.affiliate": {
-    "message": "联盟"
-  },
-  "profile.label.badges": {
-    "message": "徽章"
-  },
-  "profile.label.collection": {
-    "message": "收藏夹"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, other {下载量}}"
-  },
-  "profile.label.joined": {
-    "message": "加入于"
-  },
-  "profile.label.no-collections": {
-    "message": "该用户没有收藏夹！"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "你还没有收藏夹。\n想要<create-link>创建一个</create-link>吗？"
-  },
-  "profile.label.no-projects": {
-    "message": "该用户没有项目！"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "你还没有项目。\n想要<create-link>创建一个</create-link>吗？"
-  },
-  "profile.label.organizations": {
-    "message": "组织"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, other {项目}}"
-  },
-  "profile.label.saving": {
-    "message": "正在保存……"
-  },
-  "profile.meta.description": {
-    "message": "前往 Modrinth 下载 {username} 的项目"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - 前往 Modrinth 下载 {username} 的项目"
-  },
-  "profile.official-account": {
-    "message": "Modrinth 官方账户"
-  },
-  "profile.official-account.bio": {
-    "message": "Modrinth的官方用户账号。在<support-link></support-link>处获取支持或通过电子邮件<email></email>获取支持"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat>项目关注者}}"
-  },
-  "profile.user-id": {
-    "message": "用户ID：{id}"
   },
   "project-member-header.error-decline": {
     "message": "拒绝团队邀请时失败"
@@ -4910,14 +4799,8 @@
   "settings.authorizations.about-this-app": {
     "message": "关于此应用"
   },
-  "settings.authorizations.by": {
-    "message": "by"
-  },
   "settings.authorizations.description": {
     "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "我们目前无法显示您授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
   },
   "settings.authorizations.head-title": {
     "message": "授权"
@@ -5275,27 +5158,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "从未使用"
-  },
-  "settings.profile.bio.description": {
-    "message": "做个简短的自我介绍吧。"
-  },
-  "settings.profile.bio.title": {
-    "message": "个人简介"
-  },
-  "settings.profile.description": {
-    "message": "你的个人资料信息在 Modrinth 网站及<docs-link>其 API </docs-link>上均公开可见。"
-  },
-  "settings.profile.head-title": {
-    "message": "个人资料设置"
-  },
-  "settings.profile.profile-info": {
-    "message": "个人资料信息"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "头像"
-  },
-  "settings.profile.username.description": {
-    "message": "不区分大小写的唯一名称，用于识别你的个人资料。"
   },
   "settings.sessions.action.revoke-session": {
     "message": "登出设备"

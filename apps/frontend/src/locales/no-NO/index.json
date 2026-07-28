@@ -2285,9 +2285,6 @@
   "layout.nav.discover": {
     "message": "Utforsk"
   },
-  "layout.nav.discover-content": {
-    "message": "Utforsk innhold"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Skaff deg Modrinth App-en"
   },
@@ -2608,108 +2605,6 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Dobbeltsjekk lommeboksadressa di. Penger sendt til feil adresse kan ikke bli gjenoppretta."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "En Modrinth-skaper."
-  },
-  "profile.bio.fallback.user": {
-    "message": "En Modrinth-bruker."
-  },
-  "profile.button.analytics": {
-    "message": "Vis brukerstatistikk"
-  },
-  "profile.button.billing": {
-    "message": "Hold styr på brukerfakturering"
-  },
-  "profile.button.edit-role": {
-    "message": "Rediger rolle"
-  },
-  "profile.button.info": {
-    "message": "Vis brukerdetaljer"
-  },
-  "profile.button.manage-projects": {
-    "message": "Hold styr på prosjekt"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Fjern tilknyting"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Sett som tilknyting"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# prosjekt} other {# prosjekter}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Autoriseringsgivere"
-  },
-  "profile.details.label.email": {
-    "message": "Epost"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Epostbekreftelse"
-  },
-  "profile.details.label.has-password": {
-    "message": "Har passord"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Har TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Betalingsmetoder"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Epost ikke bekrefta"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Epost bekrefta"
-  },
-  "profile.error.not-found": {
-    "message": "Bruker ikke funnet"
-  },
-  "profile.label.affiliate": {
-    "message": "Tilknytt"
-  },
-  "profile.label.badges": {
-    "message": "Merker"
-  },
-  "profile.label.collection": {
-    "message": "Samling"
-  },
-  "profile.label.joined": {
-    "message": "Blei med"
-  },
-  "profile.label.no-collections": {
-    "message": "Denne brukeren har ingen samlinger!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Du har ikke noen samlinger.\nHar du lyst å <create-link>lage en</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Denne brukeren har ingen prosjekt!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Du har ikke noen prosjekt.\nHar du lyst å <create-link>lage en</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organisasjoner"
-  },
-  "profile.label.saving": {
-    "message": "Lagrer..."
-  },
-  "profile.meta.description": {
-    "message": "Last ned prosjekta til {username} på Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Last ned prosjekta til {username} på Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Offisiell Modrinth-bruker"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> prosjektfølger} other {<stat>{count}</stat> prosjektfølgere}}"
-  },
-  "profile.user-id": {
-    "message": "Bruker-ID: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Kunne ikke avslå laginvitasjonen"
@@ -3734,14 +3629,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Om denne appen"
   },
-  "settings.authorizations.by": {
-    "message": "fra"
-  },
   "settings.authorizations.description": {
     "message": "Når du autoriserer en applikasjon med Modrinth-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Vi kan ikke vise de autoriserte appene dine akkurat nå, vi jobber med å fikse det. Vær så snill å besøk denne sida seinere!"
   },
   "settings.authorizations.head-title": {
     "message": "Autoriseringer"
@@ -4084,27 +3973,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Aldri brukt"
-  },
-  "settings.profile.bio.description": {
-    "message": "En kort beskrivelse sånn at alle veit litt om deg."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
-  },
-  "settings.profile.head-title": {
-    "message": "Profilinnstillinger"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profilinformasjon"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilbilde"
-  },
-  "settings.profile.username.description": {
-    "message": "Et unikt navn (som ikke skiller mellom store og små bokstaver) for å identifisere profilen din."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Tilbakekall økta"

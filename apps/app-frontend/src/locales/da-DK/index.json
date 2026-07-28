@@ -173,9 +173,6 @@
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer launcher"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Vælg en mulighed"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Vis hvor meget tid du har brugt på at spille en instance."
   },
@@ -220,9 +217,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Tilbage til instance"
-  },
-  "app.browse.discover-content": {
-    "message": "Opdag indhold"
   },
   "app.browse.discover-servers": {
     "message": "Opdag servere"

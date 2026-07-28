@@ -28,6 +28,6 @@ const { data: report } = useQuery({
 
 <template>
 	<div class="flex flex-col gap-3">
-		<ModerationReportCard v-if="report" :report="report" />
+		<ModerationReportCard v-if="report" :report="report" :collapsed="false" />
 	</div>
 </template>

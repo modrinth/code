@@ -60,15 +60,12 @@ pub async fn report_create(
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
     count: u16,
-    #[serde(default = "default_all")]
+    #[serde(default)]
     all: bool,
 }
 
 fn default_count() -> u16 {
     100
-}
-fn default_all() -> bool {
-    true
 }
 
 /// Get open reports for the current user.  

@@ -1,5 +1,4 @@
 <template>
-	<KeybindsModal ref="keybindsModal" />
 	<ConfirmModal
 		v-if="isLockedByOther"
 		ref="takeOverModal"
@@ -13,7 +12,12 @@
 	<div
 		tabindex="0"
 		class="moderation-checklist flex max-h-[calc(100vh-2rem)] w-[600px] max-w-full flex-col overflow-hidden rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
-		:class="{ '!w-fit': collapsed, locked: isLockedByOther }"
+		:class="{
+			'!w-fit': collapsed,
+			locked: isLockedByOther,
+			'right-4': settings.get(moderationSettings.General.ChecklistPosition) === 'right',
+			'left-4': settings.get(moderationSettings.General.ChecklistPosition) === 'left',
+		}"
 	>
 		<div class="flex grow-0 flex-col gap-1">
 			<div class="flex items-center gap-2">
@@ -57,11 +61,6 @@
 						{{ checklistTitleText }}
 					</button>
 				</h1>
-				<ButtonStyled circular>
-					<button v-tooltip="`Keyboard shortcuts`" @click="keybindsModal?.show($event)">
-						<KeyboardIcon />
-					</button>
-				</ButtonStyled>
 				<ButtonStyled v-if="!isPseudoStage && currentStageObj._guidanceUrl" circular>
 					<a v-tooltip="`Stage guidance`" target="_blank" :href="currentStageObj._guidanceUrl">
 						<FileTextIcon />
@@ -377,7 +376,6 @@ import {
 	CheckIcon,
 	DropdownIcon,
 	FileTextIcon,
-	KeyboardIcon,
 	LeftArrowIcon,
 	LinkIcon,
 	ListBulletedIcon,
@@ -391,7 +389,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type { Priority } from '@modrinth/moderation'
-import { expandVariables, handleKeybind, kebabToTitleCase, useStages } from '@modrinth/moderation'
+import {
+	expandVariables,
+	kebabToTitleCase,
+	moderationSettings,
+	useStages,
+} from '@modrinth/moderation'
 import type { NodeState, StageNode } from '@modrinth/moderation/src/types/node'
 import {
 	CHECKLIST_META_KEY,
@@ -448,14 +451,13 @@ import type { LockAcquireResponse } from '~/services/moderation-queue.ts'
 import { useModerationQueue } from '~/services/moderation-queue.ts'
 
 import { type ActiveAction, type LiveNode, STATE_KEY } from './checklist-context'
-import KeybindsModal from './ChecklistKeybindsModal.vue'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
 const keybinds = useModerationKeybinds()
+const settings = useModerationSettings()
 
-const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
 
 const props = defineProps<{
@@ -1170,9 +1172,15 @@ function savePersistedState(open: boolean, resetReviewAnyway = false) {
 		currentStage.value !== findFirstValidStage() ? currentStageObj.value.id : undefined
 	const messageVal = message.value ?? undefined
 	const stateVal = Object.keys(rawState).length > 0 ? rawState : undefined
-	const activatedStagesVal =
-		activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
-	if (!openVal && !reviewAnywayVal && !stageVal && !messageVal && !stateVal && !activatedStagesVal) {
+	const activatedStagesVal = activatedStages.value.size > 0 ? [...activatedStages.value] : undefined
+	if (
+		!openVal &&
+		!reviewAnywayVal &&
+		!stageVal &&
+		!messageVal &&
+		!stateVal &&
+		!activatedStagesVal
+	) {
 		return clearChecklistState(checklistPersistenceProjectId)
 	}
 	return saveChecklistState(checklistPersistenceProjectId, {
@@ -1204,7 +1212,9 @@ watch(currentStage, persistState)
 watch(nodeStates, persistState, { deep: true })
 watch(activatedStages, persistState, { deep: true })
 watch(message, persistState)
-watch(currentStageObj, (stage) => markStageVisited(stage.id), { immediate: !needsInitialStageSettle })
+watch(currentStageObj, (stage) => markStageVisited(stage.id), {
+	immediate: !needsInitialStageSettle,
+})
 
 watch(
 	nodeStates,
@@ -1236,83 +1246,44 @@ watch(
 	{ deep: true, immediate: true },
 )
 
-function ignoreLegacyActionKeybind() {
-	return undefined
-}
-
 function handleKeybinds(event: KeyboardEvent) {
-	handleKeybind(
-		event,
-		{
-			project: projectV2.value,
-			state: {
-				currentStage: currentStage.value,
-				totalStages: resolvedStages.value.length,
-				currentStageId: currentStageObj.value.id,
-				currentStageTitle: currentStageObj.value.label,
+	keybinds.value.handle(event, {
+		project: projectV2.value,
+		scope: 'checklist',
+		state: {
+			currentStage: currentStage.value,
+			totalStages: resolvedStages.value.length,
+			currentStageId: currentStageObj.value.id,
+			currentStageTitle: currentStageObj.value.label,
 
-				isCollapsed: props.collapsed,
-				isDone: done.value,
-				hasGeneratedMessage: generatedMessage.value,
-				isLoadingMessage: loadingMessage.value,
+			isCollapsed: props.collapsed,
+			isDone: done.value,
+			hasGeneratedMessage: generatedMessage.value,
+			isLoadingMessage: loadingMessage.value,
+			isModpackPermissionsStage: false,
 
-				futureProjectCount: moderationQueue.queueLength,
-				visibleActionsCount: resolveChildren(
-					currentStageObj.value,
-					nodeStates.value[currentStageObj.value.id] ?? {},
-				).filter((c) => typeof c === 'object' && c !== null).length,
-
-				focusedActionIndex: null,
-				focusedActionType: null,
-			},
-			actions: {
-				tryGoNext: nextStage,
-				tryGoBack: previousStage,
-				tryGenerateMessage: generateMessage,
-				trySkipProject: skipCurrentProject,
-
-				tryToggleCollapse: () => emit('toggleCollapsed'),
-				tryResetProgress: resetProgress,
-				tryExitModeration: handleExit,
-
-				tryApprove: () => sendMessage(approveSendStatus.value),
-				tryReject: () => sendMessage('rejected'),
-				tryWithhold: () => sendMessage('withheld'),
-				tryEditMessage: previousStage,
-
-				tryCopyLink: async (permalink: boolean, relative: boolean, page: boolean) => {
-					let url = ``
-					if (relative) {
-						url += `${globalThis.location.origin}`
-					} else {
-						url += `https://modrinth.com`
-					}
-
-					if (permalink) {
-						url += `/project/${projectV2.value.id}`
-					} else {
-						url += `/${projectV2.value.project_type}/${projectV2.value.slug}`
-					}
-
-					if (page) {
-						url += `/${globalThis.location.pathname.split('/').slice(3).join('/')}`
-					}
-
-					await navigator.clipboard.writeText(url)
-				},
-
-				tryCopyId: async () => await navigator.clipboard.writeText(projectV2.value.id),
-
-				tryToggleAction: ignoreLegacyActionKeybind,
-				trySelectDropdownOption: ignoreLegacyActionKeybind,
-				tryToggleChip: ignoreLegacyActionKeybind,
-				tryFocusNextAction: ignoreLegacyActionKeybind,
-				tryFocusPreviousAction: ignoreLegacyActionKeybind,
-				tryActivateFocusedAction: ignoreLegacyActionKeybind,
-			},
+			futureProjectCount: moderationQueue.queueLength,
+			visibleActionsCount: resolveChildren(
+				currentStageObj.value,
+				nodeStates.value[currentStageObj.value.id] ?? {},
+			).filter((c) => typeof c === 'object' && c !== null).length,
 		},
-		Object.values(keybinds.value),
-	)
+		actions: {
+			tryGoNext: nextStage,
+			tryGoBack: previousStage,
+			tryGenerateMessage: generateMessage,
+			trySkipProject: skipCurrentProject,
+
+			tryToggleCollapse: () => emit('toggleCollapsed'),
+			tryResetProgress: resetProgress,
+			tryExitModeration: handleExit,
+
+			tryApprove: () => sendMessage(approveSendStatus.value),
+			tryReject: () => sendMessage('rejected'),
+			tryWithhold: () => sendMessage('withheld'),
+			tryEditMessage: previousStage,
+		},
+	})
 }
 
 watch(currentStage, () => {
@@ -1327,7 +1298,9 @@ onMounted(async () => {
 	window.addEventListener('keydown', handleKeybinds)
 	window.addEventListener('beforeunload', handleBeforeUnload)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
-	notifications.setNotificationLocation('left')
+	if (settings.value.get(moderationSettings.General.ChecklistPosition) === 'right') {
+		notifications.setNotificationLocation('left')
+	}
 
 	if (done.value || alreadyReviewed.value) return
 
@@ -1531,7 +1504,9 @@ const appComponentsByKey: Record<string, Component> = {
 	'game-version-picker': McVersionPicker,
 }
 
-const stageState = computed(() => (nodeStates.value[currentStageObj.value.id] ?? {}) as Record<string, NodeState>)
+const stageState = computed(
+	() => (nodeStates.value[currentStageObj.value.id] ?? {}) as Record<string, NodeState>,
+)
 const stageNodes = computed(() => resolveChildren(currentStageObj.value, stageState.value))
 
 const stageWriter: Writer = (id, value) => {
@@ -1726,7 +1701,9 @@ async function sendMessage(status: ProjectStatus) {
 			if (versions.value) {
 				const versionFixes = active.flatMap(({ node, state }) =>
 					'_fixes' in (node as object)
-						? (node as any)._fixes.filter((f: FixBuilder) => f._versionFn).map((f: FixBuilder) => ({ fix: f, state }))
+						? (node as any)._fixes
+								.filter((f: FixBuilder) => f._versionFn)
+								.map((f: FixBuilder) => ({ fix: f, state }))
 						: [],
 				)
 				if (versionFixes.length > 0) {
@@ -1944,6 +1921,12 @@ const stageOptions = computed<StageOption[]>(() => {
 
 <style scoped lang="scss">
 .moderation-checklist {
+	position: fixed;
+	bottom: 1rem;
+	overflow-y: auto;
+	z-index: 50;
+	transition: bottom 0.25s ease-in-out;
+
 	@media (prefers-reduced-motion) {
 		transition: none !important;
 	}

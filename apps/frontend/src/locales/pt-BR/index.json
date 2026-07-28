@@ -2879,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "Descubra"
   },
-  "layout.nav.discover-content": {
-    "message": "Descubra conteúdo"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Baixe o Modrinth App"
   },
@@ -3343,117 +3340,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "Esta organização ainda não tem nenhum projeto. Gostaria de <create-link>criar um</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Um criador Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Usuário comum."
-  },
-  "profile.button.analytics": {
-    "message": "Ver estatísticas do usuário"
-  },
-  "profile.button.billing": {
-    "message": "Gerenciar cobrança do usuário"
-  },
-  "profile.button.edit-role": {
-    "message": "Editar cargo"
-  },
-  "profile.button.info": {
-    "message": "Ver detalhes do usuário"
-  },
-  "profile.button.manage-projects": {
-    "message": "Gerenciar projetos"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remover como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Configurar como afiliado"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# projeto} other {# projetos}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Provedores de autenticação"
-  },
-  "profile.details.label.email": {
-    "message": "E-mail"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.details.label.has-password": {
-    "message": "Possui senha"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Possui TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Métodos de pagamento"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-mail não verificado"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-mail verificado"
-  },
-  "profile.error.not-found": {
-    "message": "Usuário não encontrado"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliado"
-  },
-  "profile.label.badges": {
-    "message": "Emblemas"
-  },
-  "profile.label.collection": {
-    "message": "Coleção"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Entrou"
-  },
-  "profile.label.no-collections": {
-    "message": "Este usuário não possui coleções!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Você não tem nenhuma coleção.\nGostaria de <create-link>criar uma</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Este usuário não tem projetos!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Você não tem nenhum projeto.\nGostaria de <create-link>criar um</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizações"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {projeto} other {projetos}}"
-  },
-  "profile.label.saving": {
-    "message": "Salvando..."
-  },
-  "profile.meta.description": {
-    "message": "Baixe os projetos de {username} no Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — Baixe os projetos de {username} no Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Conta oficial do Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Conta oficial do Modrinth. Obtenha suporte em<support-link></support-link> ou por e-mail via <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {{count} seguidores} one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
-  },
-  "profile.user-id": {
-    "message": "ID do usuário: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Falha ao recusar o convite da equipe"
@@ -4913,14 +4799,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Sobre este aplicativo"
   },
-  "settings.authorizations.by": {
-    "message": "por"
-  },
   "settings.authorizations.description": {
     "message": "Ao autorizar um aplicativo com sua conta do Modrinth, você concede acesso à sua conta. Você pode gerenciar e revisar o acesso à sua conta aqui a qualquer momento."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "No momento, não podemos exibir seus aplicativos autorizados. Estamos trabalhando para corrigir isso. Visite esta página novamente mais tarde!"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizações"
@@ -5278,27 +5158,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
-  },
-  "settings.profile.bio.description": {
-    "message": "Uma breve descrição para falar um pouco sobre você para todos."
-  },
-  "settings.profile.bio.title": {
-    "message": "Sobre"
-  },
-  "settings.profile.description": {
-    "message": "As informações do seu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>API do Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Configurações de perfil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Informação do perfil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Foto de perfil"
-  },
-  "settings.profile.username.description": {
-    "message": "Um nome único sem distinção de maiúsculas e minúsculas para identificar o seu perfil."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Encerrar sessão"

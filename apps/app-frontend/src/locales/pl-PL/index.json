@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Systemowe dekoracje"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Wybierz opcję"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Pokazuje czas gry spędzony w danej instancji."
   },
@@ -244,9 +241,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Powrót do instancji"
-  },
-  "app.browse.discover-content": {
-    "message": "Odkrywaj zawartość"
   },
   "app.browse.discover-servers": {
     "message": "Odkryj serwery"

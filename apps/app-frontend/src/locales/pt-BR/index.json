@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Decorações nativas"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Selecione uma opção"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Exibe a quantidade de tempo jogado de uma instância."
   },
@@ -244,9 +241,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Voltar à instância"
-  },
-  "app.browse.discover-content": {
-    "message": "Descobrir conteúdo"
   },
   "app.browse.discover-servers": {
     "message": "Descobrir servidores"

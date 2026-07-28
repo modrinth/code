@@ -2876,9 +2876,6 @@
   "layout.nav.discover": {
     "message": "Ontdek"
   },
-  "layout.nav.discover-content": {
-    "message": "Ontdek inhoud"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth-app downloaden"
   },
@@ -3340,117 +3337,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "Deze organisatie heeft nog geen projecten. Wil je er <create-link>een aanmaken</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Een Modrinth creator."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Een Modrinth gebruiker."
-  },
-  "profile.button.analytics": {
-    "message": "Gebruikersstatistieken bekijken"
-  },
-  "profile.button.billing": {
-    "message": "Gebruikers facturering beheren"
-  },
-  "profile.button.edit-role": {
-    "message": "Bewerk rol"
-  },
-  "profile.button.info": {
-    "message": "Bekijk gebruikersdetails"
-  },
-  "profile.button.manage-projects": {
-    "message": "Beheer projecten"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Verwijderen als partner"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Zet als partner"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# project} other {# projecten}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Beveiliging providers"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email geverifieerd"
-  },
-  "profile.details.label.has-password": {
-    "message": "Heeft wachtwoord"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Heeft TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Betaalmethodes"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email niet geverifieerd"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email geverifieerd"
-  },
-  "profile.error.not-found": {
-    "message": "Gebruiker niet gevonden"
-  },
-  "profile.label.affiliate": {
-    "message": "Partners"
-  },
-  "profile.label.badges": {
-    "message": "Badges"
-  },
-  "profile.label.collection": {
-    "message": "Collectie"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Lid geworden"
-  },
-  "profile.label.no-collections": {
-    "message": "Deze gebruiker heeft geen collecties!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Je hebt geen collecties.\n<create-link>Wil je er een aanmaken?</create-link>"
-  },
-  "profile.label.no-projects": {
-    "message": "Deze gebruiker heeft geen projecten!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Je hebt geen projecten.\n<create-link>Wil je er een aanmaken?</create-link>"
-  },
-  "profile.label.organizations": {
-    "message": "Organisaties"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {project} other {projecten}}"
-  },
-  "profile.label.saving": {
-    "message": "Opslaan..."
-  },
-  "profile.meta.description": {
-    "message": "Download {username} z'n projecten via Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Download {username}'s projecten op Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Officieel Modrinth-account"
-  },
-  "profile.official-account.bio": {
-    "message": "Het officiële gebruikersaccount van Modrinth. Neem contact op met het Helpcentrum via <support-link></support-link> of per e-mail via <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> project volger}other {<stat>{count}</stat> project volgers}}"
-  },
-  "profile.user-id": {
-    "message": "Gebruiker ID: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Team uitnodiging niet afgeslagen"
@@ -4910,14 +4796,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Over deze app"
   },
-  "settings.authorizations.by": {
-    "message": "door"
-  },
   "settings.authorizations.description": {
     "message": "Wanneer je een app via je Modrinth-account autoriseert, verleen je die app toegang tot je account. Je kunt de toegang tot je account hier op elk moment beheren en bekijken."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "We kunnen je geautoriseerde apps momenteel niet weergeven, maar we werken eraan om dit te verhelpen. Kom later nog eens terug op deze pagina!"
   },
   "settings.authorizations.head-title": {
     "message": "Toestemmingen"
@@ -5260,27 +5140,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Nooit gebruikt"
-  },
-  "settings.profile.bio.description": {
-    "message": "Een korte beschrijving om iedereen wat over jou te vertellen."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Je profielgegevens zijn openbaar op Modrinth en zichtbaar via de <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profielinstellingen"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profielgegevens"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profielfoto"
-  },
-  "settings.profile.username.description": {
-    "message": "Een unieke hoofdletterongevoelige naam om je profiel mee te identificeren."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Sessie beëindigen"

@@ -144,19 +144,19 @@
     "message": "Your privacy and how ads support Modrinth"
   },
   "app.appearance-settings.advanced-rendering.description": {
-    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+    "message": "Enable visual effects such as background blur. This may reduce performance without hardware acceleration."
   },
   "app.appearance-settings.advanced-rendering.title": {
     "message": "Advanced rendering"
   },
   "app.appearance-settings.color-theme.description": {
-    "message": "Select your preferred color theme for Modrinth App."
+    "message": "Choose the color theme used by Modrinth App."
   },
   "app.appearance-settings.color-theme.title": {
     "message": "Color theme"
   },
   "app.appearance-settings.default-landing-page.description": {
-    "message": "Change the page to which the launcher opens on."
+    "message": "Choose the page shown when Modrinth App opens."
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "Home"
@@ -168,52 +168,49 @@
     "message": "Default landing page"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Disables the nametag above your player on the skins page."
+    "message": "Hide your username above the player preview on the Skin selector page."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Hide nametag"
   },
   "app.appearance-settings.jump-back-into-worlds.description": {
-    "message": "Includes recent worlds in the \"Jump back in\" section on the Home page."
+    "message": "Show recently played worlds in the \"Jump back in\" section on the Home page."
   },
   "app.appearance-settings.jump-back-into-worlds.title": {
     "message": "Jump back into worlds"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minimize the launcher when a Minecraft process starts."
+    "message": "Minimize Modrinth App when Minecraft starts."
   },
   "app.appearance-settings.minimize-launcher.title": {
-    "message": "Minimize launcher"
+    "message": "Minimize app"
   },
   "app.appearance-settings.native-decorations.description": {
-    "message": "Use system window frame (app restart required)."
+    "message": "Use your operating system's title bar and window controls. Requires an app restart."
   },
   "app.appearance-settings.native-decorations.title": {
-    "message": "Native decorations"
-  },
-  "app.appearance-settings.select-option": {
-    "message": "Select an option"
+    "message": "System window frame"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Displays how much time you've spent playing an instance."
+    "message": "Show how long you've played each instance."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Show play time"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Automatically skips low-risk confirmations like duplicate modpack installs, normal content deletion, bulk updates, unlinking modpacks, and repair prompts. Dangerous warnings will still be shown."
+    "message": "Skip confirmations for low-risk actions such as duplicate installs, normal content deletion, bulk updates, unlinking, and repairs. Warnings for dangerous actions are always shown."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Skip non-essential warnings"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Enables the ability to toggle the sidebar."
+    "message": "Hide the right sidebar by default and add a button to show or hide it."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Toggle sidebar"
+    "message": "Hide right sidebar"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "If you attempt to install a Modrinth Pack file (.mrpack) that isn't hosted on Modrinth, we'll make sure you understand the risks before installing it."
+    "message": "Show a safety warning before installing a Modrinth Pack (.mrpack) that isn't hosted on Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Warn me before installing unknown modpacks"
@@ -223,6 +220,15 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Confirmations"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Home and content"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Startup and navigation"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Adding server to instance"
@@ -244,9 +250,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Back to instance"
-  },
-  "app.browse.discover-content": {
-    "message": "Discover content"
   },
   "app.browse.discover-servers": {
     "message": "Discover servers"
@@ -368,8 +371,17 @@
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Review changes"
   },
+  "app.instance.admonitions.shared-instance.review-update-button": {
+    "message": "Review update"
+  },
   "app.instance.admonitions.shared-instance.reviewing-button": {
     "message": "Reviewing..."
+  },
+  "app.instance.admonitions.shared-instance.update-available-body": {
+    "message": "An update is required to play {name}. Please update to latest version to launch the game."
+  },
+  "app.instance.admonitions.shared-instance.update-available-header": {
+    "message": "An update is available"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
@@ -437,6 +449,9 @@
   "app.instance.share.invite-modal.heading": {
     "message": "Share {name}"
   },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "This instance has reached the {limit}-user limit."
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "You need to sign in as"
   },
@@ -454,6 +469,12 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Wrong account"
+  },
+  "app.instance.share.members.empty": {
+    "message": "No users have joined yet"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "message": "No users match your filters."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "They will no longer receive updates for this shared instance"
@@ -484,6 +505,12 @@
   },
   "app.instance.share.sign-in.button": {
     "message": "Sign in"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "The shared instances service is not accessible at the moment, please try again later"
+  },
+  "app.instance.share.unable-to-connect.heading": {
+    "message": "Unable to connect"
   },
   "app.instance.share.unlink.body": {
     "message": "You must unlink this modpack to share your instance"
@@ -572,11 +599,59 @@
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count} worlds..."
   },
+  "app.java-detection.cancel": {
+    "message": "Cancel"
+  },
+  "app.java-detection.columns.actions": {
+    "message": "Actions"
+  },
+  "app.java-detection.columns.path": {
+    "message": "Path"
+  },
+  "app.java-detection.columns.version": {
+    "message": "Version"
+  },
+  "app.java-detection.no-installations-found": {
+    "message": "No Java installations found."
+  },
+  "app.java-detection.select": {
+    "message": "Select"
+  },
+  "app.java-detection.selected": {
+    "message": "Selected"
+  },
+  "app.java-detection.title": {
+    "message": "Select Java installation"
+  },
+  "app.java-selector.already-installed": {
+    "message": "Already installed"
+  },
+  "app.java-selector.browse": {
+    "message": "Browse"
+  },
+  "app.java-selector.detect": {
+    "message": "Detect"
+  },
+  "app.java-selector.install-recommended": {
+    "message": "Install recommended"
+  },
+  "app.java-selector.installing": {
+    "message": "Installing..."
+  },
+  "app.java-selector.path.placeholder": {
+    "message": "/path/to/java"
+  },
+  "app.java-selector.test-installation": {
+    "message": "Test Java installation"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Additional context"
   },
   "app.modal.install-to-play.additional-context-placeholder": {
     "message": "Include links and images if possible and relevant"
+  },
+  "app.modal.install-to-play.block-user": {
+    "message": "Block user"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
     "message": "Instance you’re reporting"
@@ -598,6 +673,9 @@
   },
   "app.modal.install-to-play.invite-warning": {
     "message": "This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust."
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
@@ -656,6 +734,9 @@
   "app.modal.install-to-play.unrecognized-files": {
     "message": "Unrecognized files"
   },
+  "app.modal.install-to-play.user-blocked": {
+    "message": "User blocked"
+  },
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
   },
@@ -683,6 +764,36 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to latest version to launch the game."
   },
+  "app.nav.create-new-instance": {
+    "message": "Create new instance"
+  },
+  "app.nav.home": {
+    "message": "Home"
+  },
+  "app.nav.library": {
+    "message": "Library"
+  },
+  "app.nav.modrinth-account": {
+    "message": "Modrinth account"
+  },
+  "app.nav.modrinth-hosting": {
+    "message": "Modrinth Hosting"
+  },
+  "app.nav.sign-in-to-modrinth-account": {
+    "message": "Sign in to a Modrinth account"
+  },
+  "app.nav.signed-in-as": {
+    "message": "Signed in as <user>{username}</user>"
+  },
+  "app.nav.upgrade-to-modrinth-plus": {
+    "message": "Upgrade to Modrinth+"
+  },
+  "app.news.title": {
+    "message": "News"
+  },
+  "app.news.view-all": {
+    "message": "View all news"
+  },
   "app.project.install-button.already-installed": {
     "message": "This project is already installed"
   },
@@ -704,11 +815,95 @@
   "app.project.versions.already-installed": {
     "message": "Already installed"
   },
-  "app.resource-management-settings.always-show-copy-details.description": {
-    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "Drag to show recent instances"
   },
-  "app.resource-management-settings.always-show-copy-details.title": {
-    "message": "Always show copy details"
+  "app.quick-instance-switcher.drag-tooltip": {
+    "message": "Drag to resize"
+  },
+  "app.restarting": {
+    "message": "Restarting..."
+  },
+  "app.settings.app-version": {
+    "message": "Modrinth App {version}"
+  },
+  "app.settings.default-instance-options.environment-variables.description": {
+    "message": "Environment variables set when launching an instance."
+  },
+  "app.settings.default-instance-options.environment-variables.placeholder": {
+    "message": "Enter environment variables..."
+  },
+  "app.settings.default-instance-options.environment-variables.title": {
+    "message": "Environment variables"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "Start instances in fullscreen by updating their options.txt file."
+  },
+  "app.settings.default-instance-options.fullscreen.title": {
+    "message": "Fullscreen"
+  },
+  "app.settings.default-instance-options.height.description": {
+    "message": "The height of the game window when launched."
+  },
+  "app.settings.default-instance-options.height.placeholder": {
+    "message": "Enter height..."
+  },
+  "app.settings.default-instance-options.height.title": {
+    "message": "Height"
+  },
+  "app.settings.default-instance-options.java-arguments.description": {
+    "message": "Arguments passed to Java when launching an instance."
+  },
+  "app.settings.default-instance-options.java-arguments.placeholder": {
+    "message": "Enter Java arguments..."
+  },
+  "app.settings.default-instance-options.java-arguments.title": {
+    "message": "Java arguments"
+  },
+  "app.settings.default-instance-options.memory-allocation.description": {
+    "message": "Maximum memory available to each instance."
+  },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Memory allocation"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Runs after the game closes."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Enter post-exit command..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Post-exit hook"
+  },
+  "app.settings.default-instance-options.pre-launch-hook.description": {
+    "message": "Runs before the instance starts."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Enter pre-launch command..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Pre-launch hook"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "The width of the game window when launched."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Enter width..."
+  },
+  "app.settings.default-instance-options.width.title": {
+    "message": "Width"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Command used to wrap the Minecraft launch process."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Enter wrapper command..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Wrapper hook"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Toggle developer mode"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
@@ -716,14 +911,92 @@
   "app.settings.downloading": {
     "message": "Downloading v{version}"
   },
+  "app.settings.java-installations.location.title": {
+    "message": "Java {version, number} location"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
   "app.settings.privacy.ads-consent.intro": {
     "message": "Ads make Modrinth possible and fund creator payouts. Our partners may store or access cookies in the app to personalize ads and measure performance. You can opt out or manage your preferences below."
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "Show Modrinth App as your current activity on Discord. This does not affect Rich Presence added to instances by mods. Requires an app restart."
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth collects anonymized analytics and usage data to improve our user experience and customize your experience. By disabling this option, you opt out and your data will no longer be collected."
+  },
+  "app.settings.privacy.telemetry.title": {
+    "message": "Telemetry"
+  },
+  "app.settings.resource-management.always-show-copy-details.description": {
+    "message": "Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs."
+  },
+  "app.settings.resource-management.always-show-copy-details.title": {
+    "message": "Always show copy details"
+  },
+  "app.settings.resource-management.app-cache.confirm.description": {
+    "message": "The app may load more slowly until the cache is rebuilt."
+  },
+  "app.settings.resource-management.app-cache.confirm.title": {
+    "message": "Purge the app cache?"
+  },
+  "app.settings.resource-management.app-cache.description": {
+    "message": "Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt."
+  },
+  "app.settings.resource-management.app-cache.purge": {
+    "message": "Purge cache"
+  },
+  "app.settings.resource-management.app-cache.title": {
+    "message": "App cache"
+  },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Backups of important app data are stored here in case you need to recover them later."
+  },
+  "app.settings.resource-management.app-database-backups.open-folder": {
+    "message": "Open backups folder"
+  },
+  "app.settings.resource-management.app-database-backups.title": {
+    "message": "App database backups"
+  },
+  "app.settings.resource-management.app-directory.browse": {
+    "message": "Browse for an app directory"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Where Modrinth App stores instances and other files. Changes take effect after restarting the app."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Select a new app directory"
+  },
+  "app.settings.resource-management.app-directory.title": {
+    "message": "App directory"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "Number of files the app can download at once. Lower this if downloads are unreliable on your connection. Requires an app restart."
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.title": {
+    "message": "Maximum concurrent downloads"
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.description": {
+    "message": "Number of files the app can write to disk at once. Lower this if you frequently encounter I/O errors. Requires an app restart."
+  },
+  "app.settings.resource-management.maximum-concurrent-writes.title": {
+    "message": "Maximum concurrent writes"
+  },
+  "app.settings.sidebar.label.instances": {
+    "message": "Instances"
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
   },
+  "app.settings.tabs.behavior": {
+    "message": "Behavior"
+  },
   "app.settings.tabs.default-instance-options": {
-    "message": "Default instance options"
+    "message": "Default game options"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
@@ -736,6 +1009,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
+  },
+  "app.sidebar.playing-as": {
+    "message": "Playing as"
   },
   "app.skins.add-button": {
     "message": "Add skin"
@@ -895,6 +1171,21 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "Toggle on"
+  },
+  "app.survey.body": {
+    "message": "Would you mind answering a few questions about your experience with Modrinth App?"
+  },
+  "app.survey.footer": {
+    "message": "This feedback will go directly to the Modrinth team and help guide future updates!"
+  },
+  "app.survey.no-thanks": {
+    "message": "No thanks"
+  },
+  "app.survey.take-survey": {
+    "message": "Take survey"
+  },
+  "app.survey.title": {
+    "message": "Hey there Modrinth user!"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
@@ -1172,6 +1463,45 @@
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
   },
+  "instance.settings.sharing.active-invites.actions": {
+    "message": "Actions"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "message": "Invite link"
+  },
+  "instance.settings.sharing.active-invites.description": {
+    "message": "Anyone with one of these invite links can join while it remains active."
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "message": "There are no active invites."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "message": "Expires"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "message": "Revoke invite"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "message": "Revoke invite {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "message": "Active invites"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "message": "Uses"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "message": "The invite link <monospace>{code}</monospace> will stop working immediately. People who already joined will keep access."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "message": "This action cannot be undone"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "message": "Revoke invite"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "message": "Revoke invite"
+  },
   "instance.settings.tabs.general": {
     "message": "General"
   },
@@ -1373,6 +1703,12 @@
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
   },
+  "instance.shared-instance.network-error.text": {
+    "message": "Unable to connect to shared instances API"
+  },
+  "instance.shared-instance.network-error.title": {
+    "message": "Network error"
+  },
   "instance.shared-instance.owner-tooltip": {
     "message": "This instance's content is being shared to other users."
   },
@@ -1564,5 +1900,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Account"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Display"
   }
 }

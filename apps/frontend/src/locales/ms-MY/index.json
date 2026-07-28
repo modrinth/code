@@ -2354,9 +2354,6 @@
   "layout.nav.discover": {
     "message": "Temui"
   },
-  "layout.nav.discover-content": {
-    "message": "Temui kandungan"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
   },
@@ -2683,105 +2680,6 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Semak semula alamat dompet anda. Dana yang dihantar ke alamat yang salah tidak boleh dipulihkan."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Seorang pencipta Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Seorang pengguna Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Urus pengebilan pengguna"
-  },
-  "profile.button.edit-role": {
-    "message": "Sunting peranan"
-  },
-  "profile.button.info": {
-    "message": "Lihat butiran pengguna"
-  },
-  "profile.button.manage-projects": {
-    "message": "Urus projek"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Alih keluar rakan afiliasi"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Tetapkan sebagai rakan afiliasi"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, other {# projek}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Penyedia pengesahan"
-  },
-  "profile.details.label.email": {
-    "message": "E-mel"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-mel disahkan"
-  },
-  "profile.details.label.has-password": {
-    "message": "Mempunyai kata laluan"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Mempunyai TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Kaedah pembayaran"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-mel tidak disahkan"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-mel disahkan"
-  },
-  "profile.error.not-found": {
-    "message": "Pengguna tidak dijumpai"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliasi"
-  },
-  "profile.label.badges": {
-    "message": "Lencana"
-  },
-  "profile.label.collection": {
-    "message": "Koleksi"
-  },
-  "profile.label.joined": {
-    "message": "Telah menyertai"
-  },
-  "profile.label.no-collections": {
-    "message": "Pengguna ini tidak memiliki sebarang koleksi!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Anda tidak memiliki sebarang koleksi.\nAdakah anda mahu <create-link>mencipta sebuah koleksi</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Pengguna ini tidak memiliki sebarang projek!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Anda tidak memiliki sebarang projek.\nAdakah anda mahu <create-link>mencipta sebuah projek</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organisasi"
-  },
-  "profile.label.saving": {
-    "message": "Sedang menyimpan..."
-  },
-  "profile.meta.description": {
-    "message": "Muat turun projek milik {username} di Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Muat turun projek milik {username} di Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "Akaun pengguna rasmi Modrinth. Dapatkan sokongan di <support-link></support-link> atau melalui e-mel di <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> pengikut projek}}"
-  },
-  "profile.user-id": {
-    "message": "ID Pengguna: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Gagal menolak jemputan pasukan"
@@ -3845,14 +3743,8 @@
   "settings.authorizations.about-this-app": {
     "message": "Mengenai aplikasi ini"
   },
-  "settings.authorizations.by": {
-    "message": "oleh"
-  },
   "settings.authorizations.description": {
     "message": "Apabila anda membenarkan aplikasi ini dengan akaun Modrinth anda, anda memberikannya akses kepada akaun anda. Anda boleh mengurus dan menyemak akses kepada akaun anda di sini pada bila-bila masa."
-  },
-  "settings.authorizations.empty-state": {
-    "message": "Kami tidak dapat memaparkan aplikasi yang dibenarkan oleh anda pada masa ini, kami sedang berusaha untuk memperbaikinya. Sila kunjungi laman ini pada tarikh yang akan datang!"
   },
   "settings.authorizations.head-title": {
     "message": "Kebenaran"
@@ -4210,27 +4102,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Tidak pernah digunakan"
-  },
-  "settings.profile.bio.description": {
-    "message": "Keterangan ringkas untuk memberitahu semua orang serba sedikit tentang anda."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Maklumat profil anda boleh dilihat secara terbuka pada Modrinth dan melalui <docs-link>API Modrinth</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Tetapan profil"
-  },
-  "settings.profile.profile-info": {
-    "message": "Maklumat profil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Gambar profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Nama unik (tidak sensitif huruf besar dan kecil) untuk mengenal pasti profil anda."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"

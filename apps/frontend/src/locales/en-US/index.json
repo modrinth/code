@@ -2879,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "Discover"
   },
-  "layout.nav.discover-content": {
-    "message": "Discover content"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Get Modrinth App"
   },
@@ -3343,117 +3340,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "A Modrinth creator."
-  },
-  "profile.bio.fallback.user": {
-    "message": "A Modrinth user."
-  },
-  "profile.button.analytics": {
-    "message": "View user analytics"
-  },
-  "profile.button.billing": {
-    "message": "Manage user billing"
-  },
-  "profile.button.edit-role": {
-    "message": "Edit role"
-  },
-  "profile.button.info": {
-    "message": "View user details"
-  },
-  "profile.button.manage-projects": {
-    "message": "Manage projects"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remove as affiliate"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Set as affiliate"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# project} other {# projects}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Auth providers"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email verified"
-  },
-  "profile.details.label.has-password": {
-    "message": "Has password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Has TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Payment methods"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email not verified"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email verified"
-  },
-  "profile.error.not-found": {
-    "message": "User not found"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Badges"
-  },
-  "profile.label.collection": {
-    "message": "Collection"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Joined"
-  },
-  "profile.label.no-collections": {
-    "message": "This user has no collections!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "You don't have any collections.\nWould you like to <create-link>create one</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "This user has no projects!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "You don't have any projects.\nWould you like to <create-link>create one</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizations"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {project} other {projects}}"
-  },
-  "profile.label.saving": {
-    "message": "Saving..."
-  },
-  "profile.meta.description": {
-    "message": "Download {username}'s projects on Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Download {username}'s projects on Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Official Modrinth account"
-  },
-  "profile.official-account.bio": {
-    "message": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
-  },
-  "profile.user-id": {
-    "message": "User ID: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Failed to decline team invitation"
@@ -4913,17 +4799,23 @@
   "settings.authorizations.about-this-app": {
     "message": "About this app"
   },
-  "settings.authorizations.by": {
-    "message": "by"
+  "settings.authorizations.created-by": {
+    "message": "Created by {user}"
   },
   "settings.authorizations.description": {
     "message": "When you authorize an application with your Modrinth account, you grant it access to your account. You can manage and review access to your account here at any time."
   },
-  "settings.authorizations.empty-state": {
-    "message": "We currently can't display your authorized apps, we're working to fix this. Please visit this page at a later date!"
+  "settings.authorizations.empty-state.description": {
+    "message": "Applications you authorize will appear here."
+  },
+  "settings.authorizations.empty-state.heading": {
+    "message": "No authorized apps"
   },
   "settings.authorizations.head-title": {
     "message": "Authorizations"
+  },
+  "settings.authorizations.official-tooltip": {
+    "message": "This app is created by an official Modrinth account."
   },
   "settings.authorizations.revoke.action": {
     "message": "Revoke"
@@ -4933,6 +4825,9 @@
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "Are you sure you want to revoke this application?"
+  },
+  "settings.authorizations.unofficial-disclosure": {
+    "message": "This app is not affiliated with Modrinth in any way, despite its name."
   },
   "settings.billing.charges.description": {
     "message": "All of your past charges to your Modrinth account will be listed here:"
@@ -5278,27 +5173,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Never used"
-  },
-  "settings.profile.bio.description": {
-    "message": "A short description to tell everyone a little bit about you."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.head-title": {
-    "message": "Profile settings"
-  },
-  "settings.profile.profile-info": {
-    "message": "Profile information"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profile picture"
-  },
-  "settings.profile.username.description": {
-    "message": "A unique case-insensitive name to identify your profile."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revoke session"

@@ -188,9 +188,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "OSのウィンドウUIを使用"
   },
-  "app.appearance-settings.select-option": {
-    "message": "オプションを選択してください"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "インスタンスのプレイ時間を表示します。"
   },
@@ -241,9 +238,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "インスタンスに戻る"
-  },
-  "app.browse.discover-content": {
-    "message": "コンテンツを探す"
   },
   "app.browse.discover-servers": {
     "message": "サーバーを探す"

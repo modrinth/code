@@ -21,14 +21,6 @@ export default new createRouter({
 			},
 		},
 		{
-			path: '/worlds',
-			name: 'Worlds',
-			component: Pages.Worlds,
-			meta: {
-				breadcrumb: [{ name: 'Worlds' }],
-			},
-		},
-		{
 			path: '/hosting/manage/',
 			name: 'Servers',
 			component: Pages.Servers,
@@ -98,6 +90,14 @@ export default new createRouter({
 			component: Pages.Skins,
 			meta: {
 				breadcrumb: [{ name: 'Skin selector' }],
+			},
+		},
+		{
+			path: '/user/:user/:projectType?',
+			name: 'User',
+			component: Pages.User,
+			meta: {
+				breadcrumb: [{ name: '?User' }],
 			},
 		},
 		{

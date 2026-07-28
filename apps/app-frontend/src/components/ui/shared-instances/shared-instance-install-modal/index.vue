@@ -64,7 +64,29 @@
 				</div>
 			</Admonition>
 			<p v-else class="m-0 text-primary">
-				{{ formatMessage(messages.inviteWarning) }}
+				<IntlFormatted
+					v-if="creator"
+					:message-id="messages.inviteWarningWithCreator"
+					:values="{ username: creator.username }"
+				>
+					<template #creator="{ children }">
+						<AutoLink :to="creatorProfileLink" class="font-medium text-contrast hover:underline">
+							<Avatar
+								:src="creator.avatarUrl"
+								:alt="creator.username"
+								:tint-by="creator.username"
+								size="24px"
+								circle
+								no-shadow
+								class="mr-1 inline-block align-middle"
+							/>
+							<span><component :is="() => children" /></span>
+						</AutoLink>
+					</template>
+				</IntlFormatted>
+				<template v-else>
+					{{ formatMessage(messages.inviteWarning) }}
+				</template>
 			</p>
 			<SharedInstanceInstallSummary
 				:preview="preview"
@@ -98,8 +120,17 @@
 							:max-height="240"
 						/>
 					</div>
-					<div v-if="reportOnly" class="flex flex-col gap-2">
-						<Checkbox v-model="deleteInstance" :label="formatMessage(messages.deleteInstance)" />
+					<div v-if="reportOnly || blockTargetUserId" class="flex flex-col gap-2">
+						<Checkbox
+							v-if="reportOnly"
+							v-model="deleteInstance"
+							:label="formatMessage(messages.deleteInstance)"
+						/>
+						<Checkbox
+							v-if="blockTargetUserId"
+							v-model="blockUser"
+							:label="formatMessage(messages.blockUser)"
+						/>
 					</div>
 				</div>
 			</Transition>
@@ -226,12 +257,15 @@ import { BanIcon, DownloadIcon, ReportIcon, SendIcon, SpinnerIcon, XIcon } from 
 import {
 	Admonition,
 	AutoLink,
+	Avatar,
+	blockedUsersQueryKey,
 	ButtonStyled,
 	Checkbox,
 	Combobox,
 	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
@@ -243,12 +277,16 @@ import {
 	useScrollIndicator,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, nextTick, ref } from 'vue'
 
+import { config } from '@/config'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { toError } from '@/helpers/errors'
 import type { SharedInstanceInstallPreview } from '@/helpers/install'
 import { create_report } from '@/helpers/reports'
+import { block_user } from '@/helpers/users'
 
 import SharedInstanceInstallSummary from './shared-instance-install-summary.vue'
 import { useSharedInstancePreviewContent } from './use-shared-instance-preview-content'
@@ -258,11 +296,17 @@ type ExternalFileRow = {
 	id: string
 	name: string
 }
+type SharedInstanceCreator = {
+	id: string | null
+	username: string
+	avatarUrl: string | null
+}
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const contentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)
+const creator = ref<SharedInstanceCreator | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
 const reportOnly = ref(false)
@@ -270,13 +314,17 @@ type ReportReason = 'malicious' | 'inappropriate' | 'spam'
 const reportReason = ref<ReportReason>('malicious')
 const additionalContext = ref('')
 const deleteInstance = ref(true)
+const blockUser = ref(true)
+const blockTargetUserId = ref<string | null>(null)
 const submitLoading = ref(false)
 const uploadedImageIDs = ref<string[]>([])
 const emit = defineEmits<{
 	reported: [deleteInstance: boolean]
 }>()
 const { formatMessage } = useVIntl()
+const auth = injectAuth()
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification, handleError } = injectNotificationManager()
 const { load } = useSharedInstancePreviewContent()
 const {
@@ -302,6 +350,12 @@ const reportReasonOptions = computed<ComboboxOption<ReportReason>[]>(() => [
 const canSubmitReport = computed(
 	() => Boolean(preview.value && additionalContext.value.trim()) && !submitLoading.value,
 )
+const creatorProfileLink = computed(() => {
+	const username = creator.value?.username
+	return username
+		? () => openUrl(`${config.siteUrl}/user/${encodeURIComponent(username)}`)
+		: undefined
+})
 
 async function accept() {
 	hide()
@@ -329,13 +383,39 @@ async function submitReport() {
 	submitLoading.value = true
 	try {
 		const uploadedImages = uploadedImageIDs.value.slice(-10)
-		await create_report({
-			report_type: reportReason.value,
-			item_type: 'shared-instance',
-			item_id: `${reportPreview.sharedInstanceId}/${reportPreview.version}`,
-			body,
-			uploaded_images: uploadedImages,
-		})
+		const blockTarget = blockUser.value ? blockTargetUserId.value : null
+		const [reportResult, blockResult] = await Promise.allSettled([
+			create_report({
+				report_type: reportReason.value,
+				item_type: 'shared-instance',
+				item_id: `${reportPreview.sharedInstanceId}/${reportPreview.version}`,
+				body,
+				uploaded_images: uploadedImages,
+			}),
+			blockTarget ? block_user(blockTarget) : Promise.resolve(),
+		])
+
+		if (blockTarget) {
+			if (blockResult.status === 'fulfilled') {
+				blockUser.value = false
+				const authUserId = auth.user.value?.id
+				if (authUserId) {
+					queryClient.setQueryData<Labrinth.BlockedUsers.v3.BlockedUserId[]>(
+						blockedUsersQueryKey(authUserId),
+						(blockedUsers = []) =>
+							blockedUsers.includes(blockTarget) ? blockedUsers : [...blockedUsers, blockTarget],
+					)
+				}
+				addNotification({
+					type: 'success',
+					title: formatMessage(messages.userBlocked),
+				})
+			} else {
+				handleError(toError(blockResult.reason))
+			}
+		}
+
+		if (reportResult.status === 'rejected') throw reportResult.reason
 
 		const shouldDeleteInstance = reportOnly.value && deleteInstance.value
 		hide()
@@ -381,6 +461,7 @@ function handleCancel() {
 }
 function handleHide() {
 	resetReportState()
+	creator.value = null
 	show_ads_window()
 }
 function resetReportState() {
@@ -389,20 +470,31 @@ function resetReportState() {
 	reportReason.value = 'malicious'
 	additionalContext.value = ''
 	deleteInstance.value = true
+	blockUser.value = true
+	blockTargetUserId.value = null
 	submitLoading.value = false
 	uploadedImageIDs.value = []
 }
 function show(
 	previewValue: SharedInstanceInstallPreview,
 	installValue: () => void | Promise<void>,
+	creatorValue?: SharedInstanceCreator,
 	event?: MouseEvent,
 ) {
 	resetReportState()
+	creator.value = creatorValue ?? null
+	blockTargetUserId.value = creatorValue?.id ?? null
 	install.value = installValue
 	showPreview(previewValue, event)
 }
-function showReport(previewValue: SharedInstanceInstallPreview, event?: MouseEvent) {
+function showReport(
+	previewValue: SharedInstanceInstallPreview,
+	blockTargetUserIdValue?: string | null,
+	event?: MouseEvent,
+) {
 	resetReportState()
+	creator.value = null
+	blockTargetUserId.value = blockTargetUserIdValue ?? null
 	reportMode.value = true
 	reportOnly.value = true
 	install.value = () => {}
@@ -436,6 +528,11 @@ const messages = defineMessages({
 		id: 'app.modal.install-to-play.invite-warning',
 		defaultMessage:
 			'This invite was created by another Modrinth user, not Modrinth. Only accept invites from people you trust.',
+	},
+	inviteWarningWithCreator: {
+		id: 'app.modal.install-to-play.invite-warning-with-creator',
+		defaultMessage:
+			'This invite was created by <creator>{username}</creator>, not Modrinth. Only accept invites from people you trust.',
 	},
 	reportDescription: {
 		id: 'app.modal.install-to-play.report-description',
@@ -491,6 +588,14 @@ const messages = defineMessages({
 	deleteInstance: {
 		id: 'app.modal.install-to-play.delete-instance',
 		defaultMessage: 'Delete instance',
+	},
+	blockUser: {
+		id: 'app.modal.install-to-play.block-user',
+		defaultMessage: 'Block user',
+	},
+	userBlocked: {
+		id: 'app.modal.install-to-play.user-blocked',
+		defaultMessage: 'User blocked',
 	},
 	unknownFilesWarning: {
 		id: 'app.modal.install-to-play.unknown-files-warning',

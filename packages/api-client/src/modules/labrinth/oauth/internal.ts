@@ -45,14 +45,15 @@ export class LabrinthOAuthInternalModule extends AbstractModule {
 	 * @returns Promise resolving to an array of OAuth clients
 	 */
 	public async getApps(ids: string[]): Promise<Labrinth.OAuth.Internal.OAuthClient[]> {
-		return this.client.request<Labrinth.OAuth.Internal.OAuthClient[]>(
-			`/oauth/apps?ids=${encodeURIComponent(JSON.stringify(ids))}`,
-			{
-				api: 'labrinth',
-				version: 'internal',
-				method: 'GET',
-			},
-		)
+		if (ids.length === 0) {
+			return []
+		}
+
+		// bulk `/oauth/apps` is broken on backend, fetch by id instead
+		// TODO: Remove this once the backend is fixed
+		const results = await Promise.all(ids.map((id) => this.getApp(id).catch(() => null)))
+
+		return results.filter((app): app is Labrinth.OAuth.Internal.OAuthClient => app !== null)
 	}
 
 	/**

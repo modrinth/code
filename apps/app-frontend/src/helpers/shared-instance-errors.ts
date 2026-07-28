@@ -1,6 +1,10 @@
 import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 
-import { getErrorMessage, type SharedInstanceUnavailableReason } from '@/helpers/install'
+import {
+	getErrorMessage,
+	isSharedInstancesApiError,
+	type SharedInstanceUnavailableReason,
+} from '@/helpers/install'
 
 export const sharedInstanceErrorMessages = defineMessages({
 	unavailableTitle: {
@@ -38,6 +42,14 @@ export const sharedInstanceErrorMessages = defineMessages({
 	errorTitle: {
 		id: 'instance.shared-instance.error.title',
 		defaultMessage: 'Something has gone wrong',
+	},
+	networkErrorTitle: {
+		id: 'instance.shared-instance.network-error.title',
+		defaultMessage: 'Network error',
+	},
+	networkErrorText: {
+		id: 'instance.shared-instance.network-error.text',
+		defaultMessage: 'Unable to connect to shared instances API',
 	},
 })
 
@@ -82,7 +94,20 @@ export function useSharedInstanceErrors() {
 		})
 	}
 
+	function notifySharedInstanceConnectionError() {
+		addNotification({
+			type: 'error',
+			title: formatMessage(sharedInstanceErrorMessages.networkErrorTitle),
+			text: formatMessage(sharedInstanceErrorMessages.networkErrorText),
+		})
+	}
+
 	function notifySharedInstanceError(error: unknown) {
+		if (isSharedInstancesApiError(error)) {
+			notifySharedInstanceConnectionError()
+			return
+		}
+
 		addNotification({
 			type: 'error',
 			title: formatMessage(sharedInstanceErrorMessages.errorTitle),
@@ -92,6 +117,7 @@ export function useSharedInstanceErrors() {
 
 	return {
 		formatSharedInstanceUnavailable,
+		notifySharedInstanceConnectionError,
 		notifySharedInstanceError,
 		notifySharedInstanceUnavailable,
 	}

@@ -1,6 +1,8 @@
 <template>
 	<div class="mx-auto flex flex-col items-center p-6 text-center">
-		<component :is="illustration" v-if="illustration" class="h-[200px] w-auto" />
+		<slot name="illustration">
+			<component :is="illustration" v-if="illustration" class="h-[200px] w-auto" />
+		</slot>
 		<div class="flex flex-col items-center gap-1.5">
 			<span class="text-2xl font-semibold text-contrast">
 				<slot name="heading">{{ heading }}</slot>

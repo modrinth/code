@@ -5015,9 +5015,6 @@
   "settings.pats.title": {
     "defaultMessage": "Kişisel erişim tokenleri"
   },
-  "settings.profile.title": {
-    "defaultMessage": "Herkese açık profil"
-  },
   "settings.sessions.title": {
     "defaultMessage": "Oturumlar"
   },

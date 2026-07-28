@@ -113,9 +113,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Systémové dekorace"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Vyberte možnost"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zobrazuje, kolik času jsi strávil hraním instance."
   },
@@ -166,9 +163,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Zpět k instanci"
-  },
-  "app.browse.discover-content": {
-    "message": "Objevit obsah"
   },
   "app.browse.discover-servers": {
     "message": "Objevit servery"

@@ -2879,9 +2879,6 @@
   "layout.nav.discover": {
     "message": "探索"
   },
-  "layout.nav.discover-content": {
-    "message": "探索內容"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "取得 Modrinth App"
   },
@@ -3343,117 +3340,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "這個組織還沒有任何專案。你想要<create-link>建立一個</create-link>嗎？"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "一位 Modrinth 創作者。"
-  },
-  "profile.bio.fallback.user": {
-    "message": "一位 Modrinth 使用者。"
-  },
-  "profile.button.analytics": {
-    "message": "檢視使用者數據分析"
-  },
-  "profile.button.billing": {
-    "message": "管理使用者帳務"
-  },
-  "profile.button.edit-role": {
-    "message": "編輯角色"
-  },
-  "profile.button.info": {
-    "message": "檢視使用者詳細資訊"
-  },
-  "profile.button.manage-projects": {
-    "message": "管理專案"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "移除聯盟行銷夥伴資格"
-  },
-  "profile.button.set-affiliate": {
-    "message": "設為聯盟行銷夥伴"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, other {# 個專案}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "驗證提供者"
-  },
-  "profile.details.label.email": {
-    "message": "電子郵件"
-  },
-  "profile.details.label.email-verified": {
-    "message": "電子郵件已驗證"
-  },
-  "profile.details.label.has-password": {
-    "message": "是否有密碼"
-  },
-  "profile.details.label.has-totp": {
-    "message": "是否有 TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "付款方式"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "電子郵件尚未驗證"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "電子郵件已驗證"
-  },
-  "profile.error.not-found": {
-    "message": "找不到使用者"
-  },
-  "profile.label.affiliate": {
-    "message": "聯盟行銷"
-  },
-  "profile.label.badges": {
-    "message": "徽章"
-  },
-  "profile.label.collection": {
-    "message": "收藏"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, other {次下載}}"
-  },
-  "profile.label.joined": {
-    "message": "加入時間："
-  },
-  "profile.label.no-collections": {
-    "message": "這個使用者沒有任何收藏！"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "你還沒有任何收藏。\n你想要<create-link>建立一個</create-link>嗎？"
-  },
-  "profile.label.no-projects": {
-    "message": "這個使用者沒有任何專案！"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "你還沒有任何專案。\n你想要<create-link>建立一個</create-link>嗎？"
-  },
-  "profile.label.organizations": {
-    "message": "組織"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, other {個專案}}"
-  },
-  "profile.label.saving": {
-    "message": "儲存中..."
-  },
-  "profile.meta.description": {
-    "message": "前往 Modrinth 下載 {username} 的專案"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} — 前往 Modrinth 下載 {username} 的專案"
-  },
-  "profile.official-account": {
-    "message": "Modrinth 官方帳號"
-  },
-  "profile.official-account.bio": {
-    "message": "Modrinth 的官方使用者帳號。請至 <support-link></support-link> 取得支援，或透過電子郵件 <email></email> 聯絡客服團隊"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> 位專案追蹤者}}"
-  },
-  "profile.user-id": {
-    "message": "使用者 ID：{id}"
   },
   "project-member-header.error-decline": {
     "message": "拒絕團隊邀請失敗"
@@ -4913,14 +4799,8 @@
   "settings.authorizations.about-this-app": {
     "message": "關於這個應用程式"
   },
-  "settings.authorizations.by": {
-    "message": "作者"
-  },
   "settings.authorizations.description": {
     "message": "當你使用 Modrinth 帳號授權應用程式時，即代表你授予該應用程式存取你帳戶的權限。你可以隨時在這裡管理並審查帳號的存取權。"
-  },
-  "settings.authorizations.empty-state": {
-    "message": "目前無法顯示你已授權的應用程式，我們正在努力修正這個問題。請稍後再回來查看！"
   },
   "settings.authorizations.head-title": {
     "message": "授權"
@@ -5278,27 +5158,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "從未使用"
-  },
-  "settings.profile.bio.description": {
-    "message": "簡單介紹一下你自己。"
-  },
-  "settings.profile.bio.title": {
-    "message": "關於我"
-  },
-  "settings.profile.description": {
-    "message": "你的個人檔案資訊會公開顯示在 Modrinth 上，並可透過 <docs-link>Modrinth API</docs-link> 查詢。"
-  },
-  "settings.profile.head-title": {
-    "message": "個人設定"
-  },
-  "settings.profile.profile-info": {
-    "message": "個人檔案資訊"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "頭貼"
-  },
-  "settings.profile.username.description": {
-    "message": "獨特且不區分大小寫的名稱，用於識別你的個人檔案。"
   },
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"

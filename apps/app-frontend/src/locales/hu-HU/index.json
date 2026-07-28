@@ -191,9 +191,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Rendszer ablakkeret használata"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Válassz egy lehetőséget"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Megmutatja, mennyi időt töltöttél egy játékpéldányban."
   },
@@ -244,9 +241,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Vissza a játékpéldányhoz"
-  },
-  "app.browse.discover-content": {
-    "message": "Tartalom böngészése"
   },
   "app.browse.discover-servers": {
     "message": "Szerverek böngészése"

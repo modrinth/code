@@ -24,7 +24,6 @@ pub struct LegacyUser {
     pub has_totp: Option<bool>,
     pub payout_data: Option<UserPayoutData>, // this was changed in v3, but not ones we want to keep out of v2
 
-    // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
 }
 
