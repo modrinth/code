@@ -300,6 +300,7 @@ type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 
 const props = defineProps<{
 	report: ExtendedReport
+	collapsed: boolean
 	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
 	sharedInstanceVersionContentLoader?: (
 		instanceId: string,
@@ -311,7 +312,7 @@ const reportThread = ref<{
 	setReplyContent: (content: string) => void
 	sendReply: (privateMessage?: boolean) => Promise<void>
 } | null>(null)
-const isThreadCollapsed = ref(true)
+const isThreadCollapsed = ref(props.collapsed)
 const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(null)
 const sharedInstanceLoading = ref(false)
 const sharedInstanceError = ref<string | null>(null)
