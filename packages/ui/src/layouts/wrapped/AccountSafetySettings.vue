@@ -1,128 +1,168 @@
 <template>
-	<section class="flex flex-col gap-4">
-		<div class="flex flex-col gap-1">
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.blockedUsersTitle) }}
-			</h2>
-			<p class="m-0 text-secondary">
-				{{ formatMessage(messages.blockedUsersDescription) }}
-			</p>
-			<ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-secondary">
-				<li>{{ formatMessage(messages.friendRequestsRestriction) }}</li>
-				<li>{{ formatMessage(messages.sharedInstancesRestriction) }}</li>
-				<li>{{ formatMessage(messages.hostingRestriction) }}</li>
-			</ul>
-		</div>
-
-		<div class="relative overflow-hidden rounded-2xl border border-solid border-surface-4">
-			<Transition
-				enter-active-class="transition-all duration-200 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-3"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-3"
-				leave-to-class="opacity-0 max-h-0"
-			>
-				<div
-					v-if="showTopFade"
-					class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-3 bg-gradient-to-b from-bg-raised to-transparent"
+	<div class="flex flex-col gap-8">
+		<section class="flex flex-col gap-6">
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.friendRequestsTitle) }}
+				</h2>
+				<Chips
+					v-model="friendRequestSource"
+					:items="friendRequestSourceOptions"
+					:format-label="formatInteractionSource"
+					:disabled-items="friendRequestSourceOptions"
+					:disabled-tooltip="formatMessage(messages.comingSoon)"
+					:capitalize="false"
+					:aria-label="formatMessage(messages.friendRequestsTitle)"
 				/>
-			</Transition>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.friendRequestsDescription) }}
+				</p>
+			</div>
 
-			<div
-				ref="blockedUsersTable"
-				class="max-h-[20.5rem] overflow-y-auto"
-				@scroll="checkScrollState"
-			>
-				<Table
-					class="!rounded-none !border-0"
-					:columns="columns"
-					:data="blockedUsers"
-					row-key="id"
+			<div class="flex flex-col gap-2.5">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.sharedInstanceInvitesTitle) }}
+				</h2>
+				<Chips
+					v-model="sharedInstanceInviteSource"
+					:items="sharedInstanceInviteSourceOptions"
+					:format-label="formatInteractionSource"
+					:disabled-items="sharedInstanceInviteSourceOptions"
+					:disabled-tooltip="formatMessage(messages.comingSoon)"
+					:capitalize="false"
+					:aria-label="formatMessage(messages.sharedInstanceInvitesTitle)"
+				/>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.sharedInstanceInvitesDescription) }}
+				</p>
+			</div>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.blockedUsersTitle) }}
+				</h2>
+				<p class="m-0 text-secondary">
+					{{ formatMessage(messages.blockedUsersDescription) }}
+				</p>
+				<ul class="m-0 flex list-disc flex-col gap-1 pl-5 text-secondary">
+					<li>{{ formatMessage(messages.friendRequestsRestriction) }}</li>
+					<li>{{ formatMessage(messages.sharedInstancesRestriction) }}</li>
+					<li>{{ formatMessage(messages.hostingRestriction) }}</li>
+				</ul>
+			</div>
+
+			<div class="relative overflow-hidden rounded-2xl border border-solid border-surface-4">
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-3"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-3"
+					leave-to-class="opacity-0 max-h-0"
 				>
-					<template #empty-state>
-						<div class="flex h-40 items-center justify-center px-4 text-center text-secondary">
-							<div v-if="isLoading" class="flex items-center gap-2">
-								<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
-								{{ formatMessage(messages.loadingBlockedUsers) }}
+					<div
+						v-if="showTopFade"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-3 bg-gradient-to-b from-bg-raised to-transparent"
+					/>
+				</Transition>
+
+				<div
+					ref="blockedUsersTable"
+					class="max-h-[20.5rem] overflow-y-auto"
+					@scroll="checkScrollState"
+				>
+					<Table
+						class="!rounded-none !border-0"
+						:columns="columns"
+						:data="blockedUsers"
+						row-key="id"
+					>
+						<template #empty-state>
+							<div class="flex h-40 items-center justify-center px-4 text-center text-secondary">
+								<div v-if="isLoading" class="flex items-center gap-2">
+									<SpinnerIcon class="size-5 animate-spin" aria-hidden="true" />
+									{{ formatMessage(messages.loadingBlockedUsers) }}
+								</div>
+								<div v-else-if="loadError" class="flex flex-col items-center gap-3">
+									<span>{{ formatMessage(messages.loadError) }}</span>
+									<ButtonStyled type="outlined">
+										<button type="button" @click="retry">
+											{{ formatMessage(commonMessages.retryButton) }}
+										</button>
+									</ButtonStyled>
+								</div>
+								<span v-else-if="!auth.user.value">
+									{{ formatMessage(messages.signInRequired) }}
+								</span>
+								<span v-else>{{ formatMessage(messages.noBlockedUsers) }}</span>
 							</div>
-							<div v-else-if="loadError" class="flex flex-col items-center gap-3">
-								<span>{{ formatMessage(messages.loadError) }}</span>
+						</template>
+
+						<template #cell-user="{ row }">
+							<div class="flex min-w-0 items-center gap-3">
+								<Avatar
+									:src="row.avatar_url"
+									:alt="formatMessage(messages.userAvatarAlt, { username: row.username })"
+									:tint-by="row.username"
+									size="32px"
+									circle
+									no-shadow
+								/>
+								<div class="flex min-w-0 flex-col">
+									<span class="truncate font-semibold text-contrast">
+										{{ row.name ?? row.username }}
+									</span>
+									<span v-if="row.name" class="truncate text-sm text-secondary">
+										{{ row.username }}
+									</span>
+								</div>
+							</div>
+						</template>
+
+						<template #cell-actions="{ row }">
+							<div class="flex justify-end">
 								<ButtonStyled type="outlined">
-									<button type="button" @click="retry">
-										{{ formatMessage(commonMessages.retryButton) }}
+									<button
+										type="button"
+										:disabled="unblockingUserId !== null"
+										:aria-label="
+											formatMessage(messages.unblockUserAriaLabel, {
+												username: row.username,
+											})
+										"
+										@click="unblock(row)"
+									>
+										<SpinnerIcon
+											v-if="unblockingUserId === row.id"
+											class="animate-spin"
+											aria-hidden="true"
+										/>
+										{{ formatMessage(messages.unblockButton) }}
 									</button>
 								</ButtonStyled>
 							</div>
-							<span v-else-if="!auth.user.value">
-								{{ formatMessage(messages.signInRequired) }}
-							</span>
-							<span v-else>{{ formatMessage(messages.noBlockedUsers) }}</span>
-						</div>
-					</template>
+						</template>
+					</Table>
+				</div>
 
-					<template #cell-user="{ row }">
-						<div class="flex min-w-0 items-center gap-3">
-							<Avatar
-								:src="row.avatar_url"
-								:alt="formatMessage(messages.userAvatarAlt, { username: row.username })"
-								:tint-by="row.username"
-								size="32px"
-								circle
-								no-shadow
-							/>
-							<div class="flex min-w-0 flex-col">
-								<span class="truncate font-semibold text-contrast">
-									{{ row.name ?? row.username }}
-								</span>
-								<span v-if="row.name" class="truncate text-sm text-secondary">
-									{{ row.username }}
-								</span>
-							</div>
-						</div>
-					</template>
-
-					<template #cell-actions="{ row }">
-						<div class="flex justify-end">
-							<ButtonStyled type="outlined">
-								<button
-									type="button"
-									:disabled="unblockingUserId !== null"
-									:aria-label="
-										formatMessage(messages.unblockUserAriaLabel, {
-											username: row.username,
-										})
-									"
-									@click="unblock(row)"
-								>
-									<SpinnerIcon
-										v-if="unblockingUserId === row.id"
-										class="animate-spin"
-										aria-hidden="true"
-									/>
-									{{ formatMessage(messages.unblockButton) }}
-								</button>
-							</ButtonStyled>
-						</div>
-					</template>
-				</Table>
+				<Transition
+					enter-active-class="transition-all duration-200 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-3"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-3"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="showBottomFade"
+						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-3 bg-gradient-to-t from-bg-raised to-transparent"
+					/>
+				</Transition>
 			</div>
-
-			<Transition
-				enter-active-class="transition-all duration-200 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-3"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-3"
-				leave-to-class="opacity-0 max-h-0"
-			>
-				<div
-					v-if="showBottomFade"
-					class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-3 bg-gradient-to-t from-bg-raised to-transparent"
-				/>
-			</Transition>
-		</div>
-	</section>
+		</section>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -134,6 +174,7 @@ import { computed, ref } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Chips from '#ui/components/base/Chips.vue'
 import Table, { type TableColumn } from '#ui/components/base/Table.vue'
 import { defineMessages, useScrollIndicator, useVIntl } from '#ui/composables'
 import { injectAuth, injectNotificationManager } from '#ui/providers'
@@ -143,6 +184,8 @@ import { blockedUsersQueryKey } from '../shared/user-profile/providers'
 
 type BlockedUserTableColumn = 'user' | 'actions'
 type BlockedUser = Labrinth.Users.v2.User & Record<BlockedUserTableColumn, unknown>
+type FriendRequestSource = 'everyone' | 'mutuals' | 'no-one'
+type SharedInstanceInviteSource = 'everyone' | 'friends' | 'no-one'
 
 const props = defineProps<{
 	getBlockedUsers: () => Promise<Labrinth.BlockedUsers.v3.BlockedUserId[]>
@@ -156,8 +199,28 @@ const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
 const blockedUsersTable = ref<HTMLElement | null>(null)
 const unblockingUserId = ref<string | null>(null)
-const { showTopFade, showBottomFade, checkScrollState } =
-	useScrollIndicator(blockedUsersTable)
+const friendRequestSource = ref<FriendRequestSource>('everyone')
+const sharedInstanceInviteSource = ref<SharedInstanceInviteSource>('everyone')
+const friendRequestSourceOptions: FriendRequestSource[] = ['everyone', 'mutuals', 'no-one']
+const sharedInstanceInviteSourceOptions: SharedInstanceInviteSource[] = [
+	'everyone',
+	'friends',
+	'no-one',
+]
+const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(blockedUsersTable)
+
+function formatInteractionSource(source: FriendRequestSource | SharedInstanceInviteSource): string {
+	switch (source) {
+		case 'everyone':
+			return formatMessage(messages.everyone)
+		case 'mutuals':
+			return formatMessage(messages.mutuals)
+		case 'friends':
+			return formatMessage(messages.friends)
+		case 'no-one':
+			return formatMessage(messages.noOne)
+	}
+}
 
 const columns = computed<TableColumn<BlockedUserTableColumn>[]>(() => [
 	{
@@ -255,6 +318,42 @@ async function unblock(user: BlockedUser): Promise<void> {
 }
 
 const messages = defineMessages({
+	friendRequestsTitle: {
+		id: 'settings.safety.friend-requests.title',
+		defaultMessage: 'Friend requests',
+	},
+	friendRequestsDescription: {
+		id: 'settings.safety.friend-requests.description',
+		defaultMessage: 'Control who can send you friend requests on Modrinth.',
+	},
+	sharedInstanceInvitesTitle: {
+		id: 'settings.safety.shared-instance-invites.title',
+		defaultMessage: 'Shared instance invites',
+	},
+	sharedInstanceInvitesDescription: {
+		id: 'settings.safety.shared-instance-invites.description',
+		defaultMessage: 'Control who can send you invites to shared instances on Modrinth.',
+	},
+	everyone: {
+		id: 'settings.safety.interaction-source.everyone',
+		defaultMessage: 'Everyone',
+	},
+	mutuals: {
+		id: 'settings.safety.interaction-source.mutuals',
+		defaultMessage: 'Mutuals',
+	},
+	friends: {
+		id: 'settings.safety.interaction-source.friends',
+		defaultMessage: 'Friends',
+	},
+	noOne: {
+		id: 'settings.safety.interaction-source.no-one',
+		defaultMessage: 'No one',
+	},
+	comingSoon: {
+		id: 'settings.safety.interaction-source.coming-soon',
+		defaultMessage: 'Coming soon!',
+	},
 	blockedUsersTitle: {
 		id: 'settings.safety.blocked-users.title',
 		defaultMessage: 'Blocked users',
