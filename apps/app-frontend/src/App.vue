@@ -47,6 +47,7 @@ import {
 	provideNotificationManager,
 	providePageContext,
 	providePopupNotificationManager,
+	TextLogo,
 	useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
@@ -64,7 +65,6 @@ import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
-import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import AppActionBar from '@/components/ui/AppActionBar.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
@@ -1640,26 +1640,32 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
 			<div data-tauri-drag-region class="flex min-w-0 flex-1 items-center overflow-hidden p-2">
-				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
-				<div data-tauri-drag-region class="ml-4 flex shrink-0 items-center gap-2">
+				<TextLogo class="h-7 w-auto shrink-0 text-contrast pointer-events-none" />
+				<div data-tauri-drag-region class="ml-2 flex shrink-0 items-center gap-2">
 					<ButtonStyled type="outlined" circular>
 						<button
-							class="!h-8 !min-w-8 !w-8 !border !border-surface-4 !p-0"
+							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 							:disabled="!canNavigateBack"
 							aria-label="Go back"
 							@click="router.back()"
 						>
-							<ChevronLeftIcon class="!size-4 !text-primary" />
+							<ChevronLeftIcon
+								class="!size-4 !text-primary"
+								:class="{ 'opacity-20': !canNavigateBack }"
+							/>
 						</button>
 					</ButtonStyled>
 					<ButtonStyled type="outlined" circular>
 						<button
-							class="!h-8 !min-w-8 !w-8 !border !border-surface-4 !p-0"
+							class="!h-7 !min-w-7 !w-7 !border !border-surface-4 !p-0 !opacity-100"
 							:disabled="!canNavigateForward"
 							aria-label="Go forward"
 							@click="router.forward()"
 						>
-							<ChevronRightIcon class="!size-4 !text-primary" />
+							<ChevronRightIcon
+								class="!size-4 !text-primary"
+								:class="{ 'opacity-20': !canNavigateForward }"
+							/>
 						</button>
 					</ButtonStyled>
 				</div>

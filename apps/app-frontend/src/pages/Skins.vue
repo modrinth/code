@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-	ChangeSkinIcon,
 	CheckIcon,
 	EditIcon,
 	ExcitedRinthbot,
