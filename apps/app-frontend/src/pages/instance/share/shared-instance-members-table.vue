@@ -11,9 +11,9 @@
 					clearable
 				/>
 				<template v-if="!actionsLocked">
-					<ButtonStyled>
+					<ButtonStyled type="outlined">
 						<button
-							class="flex !h-10 shrink-0 items-center gap-2"
+							class="flex !h-10 shrink-0 items-center gap-2 !border"
 							:disabled="pushUpdateDisabled"
 							@click="emit('push-update', $event)"
 						>
@@ -157,7 +157,6 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, ref } from 'vue'
 
 import {
@@ -294,9 +293,7 @@ const messages = defineMessages({
 	},
 })
 function userProfileLink(username: string) {
-	return !username || username.includes('@')
-		? undefined
-		: () => openUrl(`https://modrinth.com/user/${encodeURIComponent(username)}`)
+	return !username || username.includes('@') ? undefined : `/user/${encodeURIComponent(username)}`
 }
 function setUsernameRef(id: string, element: Element | null) {
 	usernameRefs.value[id] = element instanceof HTMLElement ? element : null

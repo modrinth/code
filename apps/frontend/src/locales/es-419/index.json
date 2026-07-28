@@ -2723,9 +2723,6 @@
   "modpack-scan-modal.scan-all-files": {
     "message": "Escanear todos los archivos"
   },
-  "modpack-scan-modal.scan-error": {
-    "message": "No se pudieron escanear algunos archivos: {error}"
-  },
   "modpack-scan-modal.scanning": {
     "message": "Escaneando..."
   },
@@ -2998,111 +2995,6 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Verifica dos veces la dirección de tu billetera. Los fondos enviados a una dirección incorrecta no se pueden recuperar."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Un creador de Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Un usuario de Modrinth."
-  },
-  "profile.button.analytics": {
-    "message": "Ver estadísticas de usuario"
-  },
-  "profile.button.billing": {
-    "message": "Gestionar la facturación de usuario"
-  },
-  "profile.button.edit-role": {
-    "message": "Editar rol"
-  },
-  "profile.button.info": {
-    "message": "Ver detalles de usuario"
-  },
-  "profile.button.manage-projects": {
-    "message": "Gestionar proyectos"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remover como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Configurar como afiliado"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# proyecto} other {# proyectos}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Proveedores de autenticación"
-  },
-  "profile.details.label.email": {
-    "message": "Correo electrónico"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Correo electrónico verificado"
-  },
-  "profile.details.label.has-password": {
-    "message": "Tiene contraseña"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Tiene TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Métodos de pago"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Correo electrónico no verificado"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Correo electrónico verificado"
-  },
-  "profile.error.not-found": {
-    "message": "Usuario no encontrado"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliado"
-  },
-  "profile.label.badges": {
-    "message": "Insignias"
-  },
-  "profile.label.collection": {
-    "message": "Colección"
-  },
-  "profile.label.joined": {
-    "message": "Se unió"
-  },
-  "profile.label.no-collections": {
-    "message": "¡Este usuario no tiene colecciones!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "No tienes ninguna colección.\n¿Te gustaría <create-link>crear una</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "¡Este usuario no tiene proyectos!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "No tienes ningún proyecto.\n¿Te gustaría <create-link>crear uno</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizaciones"
-  },
-  "profile.label.saving": {
-    "message": "Guardando..."
-  },
-  "profile.meta.description": {
-    "message": "Descarga proyectos de {username} en Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Descarga proyectos de {username} en Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Cuenta oficial de Modrinth"
-  },
-  "profile.official-account.bio": {
-    "message": "La cuenta de usuario oficial de Modrinth. Obtén soporte en <support-link></support-link> o vía correo en <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> seguidor del proyecto} other {<stat>{count}</stat> seguidores del proyecto}}"
-  },
-  "profile.user-id": {
-    "message": "ID de usuario: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Error al rechazar la invitación del equipo"
@@ -3442,9 +3334,6 @@
   },
   "project.moderation.admonition.under-review.body.3": {
     "message": "Aún puedes modificar tu proyecto, no afectará tu posición en la cola."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Nuestro objetivo es revisar envíos en un plazo de 24-48 horas, pero algunos proyectos pueden sufrir retrasos. Esto no indica que haya algún problema con tu envío."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>¡Apreciamos tu paciencia mientras nuestros moderadores trabajan duro para mantener Modrinth seguro, y estaremos encantados de poder ayudarte a compartir tu contenido! 💚</emphasis>"

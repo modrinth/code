@@ -288,7 +288,14 @@ fn main() {
             .plugin(
                 "users",
                 InlinedPlugin::new()
-                    .commands(&["search_user"])
+                    .commands(&[
+                        "search_user",
+                        "get_user_profile",
+                        "get_user_projects",
+                        "get_user_organizations",
+                        "get_user_collections",
+                        "patch_user",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

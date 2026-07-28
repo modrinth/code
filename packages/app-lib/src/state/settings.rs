@@ -63,6 +63,7 @@ pub enum FeatureFlag {
     ShowInstancePlayTime,
     SkipNonEssentialWarnings,
     AdvancedFiltersCollapsed,
+    AlwaysShowCopyDetails,
 }
 
 impl Settings {

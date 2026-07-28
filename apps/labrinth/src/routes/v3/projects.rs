@@ -85,7 +85,11 @@ pub async fn clear_project_cache_and_queue_search(
         redis,
     )
     .await?;
-    search_state.queue.push(project_id.into()).await;
+
+    search_state
+        .queue
+        .push_project_change(project_id.into())
+        .await;
 
     Ok(())
 }
@@ -1053,10 +1057,10 @@ pub async fn project_edit_internal(
         edit: Option<Option<E>>,
         mut component: &mut Option<E::Component>,
         perms: ProjectPermissions,
-    ) -> Result<(), ApiError> {
+    ) -> Result<bool, ApiError> {
         let Some(edit) = edit else {
             // component is not specified in the input JSON - leave alone
-            return Ok(());
+            return Ok(false);
         };
 
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -1095,10 +1099,13 @@ pub async fn project_edit_internal(
             }
         }
 
-        Ok(())
+        Ok(true)
     }
 
-    update(
+    let mut reindex_versions = new_project.categories.is_some()
+        || new_project.additional_categories.is_some();
+
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_server,
@@ -1106,7 +1113,7 @@ pub async fn project_edit_internal(
         perms,
     )
     .await?;
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_java_server,
@@ -1114,7 +1121,7 @@ pub async fn project_edit_internal(
         perms,
     )
     .await?;
-    update(
+    reindex_versions |= update(
         &mut transaction,
         id,
         new_project.minecraft_bedrock_server,
@@ -1167,14 +1174,31 @@ pub async fn project_edit_internal(
 
     transaction.commit().await?;
 
-    clear_project_cache_and_queue_search(
-        &redis,
-        &search_state,
-        project_item.inner.id,
-        project_item.inner.slug,
-        None,
-    )
-    .await?;
+    if reindex_versions {
+        db_models::DBProject::clear_cache(
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+            &redis,
+        )
+        .await?;
+        search_state
+            .queue
+            .push_version_changes(
+                project_item.inner.id.into(),
+                project_item.versions.iter().copied().map(VersionId::from),
+            )
+            .await;
+    } else {
+        clear_project_cache_and_queue_search(
+            &redis,
+            &search_state,
+            project_item.inner.id,
+            project_item.inner.slug,
+            None,
+        )
+        .await?;
+    }
 
     // Remove no longer searchable projects from search index
     if let (true, Some(false)) = (
@@ -1182,16 +1206,9 @@ pub async fn project_edit_internal(
         new_project.status.map(|status| status.is_searchable()),
     ) {
         search_state
-            .backend
-            .remove_documents(
-                &project_item
-                    .versions
-                    .into_iter()
-                    .map(|x| x.into())
-                    .collect::<Vec<_>>(),
-            )
-            .await
-            .wrap_internal_err("failed to remove documents")?;
+            .queue
+            .push_project_removal(project_item.inner.id.into())
+            .await;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1654,7 +1671,7 @@ pub async fn projects_edit(
             };
         }
 
-        bulk_edit_project_categories(
+        let mut reindex_versions = bulk_edit_project_categories(
             &categories,
             &project.categories,
             project.inner.id as db_ids::DBProjectId,
@@ -1669,7 +1686,7 @@ pub async fn projects_edit(
         )
         .await?;
 
-        bulk_edit_project_categories(
+        reindex_versions |= bulk_edit_project_categories(
             &categories,
             &project.additional_categories,
             project.inner.id as db_ids::DBProjectId,
@@ -1728,20 +1745,37 @@ pub async fn projects_edit(
             }
         }
 
-        changed_projects.push((project.inner.id, project.inner.slug));
+        changed_projects.push((
+            project.inner.id,
+            project.inner.slug,
+            project.versions,
+            reindex_versions,
+        ));
     }
 
     transaction.commit().await?;
 
-    for (project_id, slug) in changed_projects {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
-            project_id,
-            slug,
-            None,
-        )
-        .await?;
+    for (project_id, slug, versions, reindex_versions) in changed_projects {
+        if reindex_versions {
+            db_models::DBProject::clear_cache(project_id, slug, None, &redis)
+                .await?;
+            search_state
+                .queue
+                .push_version_changes(
+                    project_id.into(),
+                    versions.into_iter().map(VersionId::from),
+                )
+                .await;
+        } else {
+            clear_project_cache_and_queue_search(
+                &redis,
+                &search_state,
+                project_id,
+                slug,
+                None,
+            )
+            .await?;
+        }
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1755,7 +1789,7 @@ pub async fn bulk_edit_project_categories(
     max_num_categories: usize,
     is_additional: bool,
     transaction: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
+) -> Result<bool, ApiError> {
     let mut set_categories =
         if let Some(categories) = bulk_changes.categories.clone() {
             categories
@@ -1782,7 +1816,8 @@ pub async fn bulk_edit_project_categories(
         }
     }
 
-    if &set_categories != project_categories {
+    let changed = &set_categories != project_categories;
+    if changed {
         sqlx::query!(
             "
             DELETE FROM mods_categories
@@ -1815,7 +1850,7 @@ pub async fn bulk_edit_project_categories(
         DBModCategory::insert_many(mod_categories, &mut *transaction).await?;
     }
 
-    Ok(())
+    Ok(changed)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -2791,27 +2826,18 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
-    search_state
-        .backend
-        .remove_documents(
-            &project
-                .versions
-                .into_iter()
-                .map(|x| x.into())
-                .collect::<Vec<_>>(),
-        )
-        .await
-        .wrap_internal_err("failed to remove project version documents")?;
-
     if result.is_some() {
-        clear_project_cache_and_queue_search(
-            &redis,
-            &search_state,
+        db_models::DBProject::clear_cache(
             project.inner.id,
             project.inner.slug,
             None,
+            &redis,
         )
         .await?;
+        search_state
+            .queue
+            .push_project_removal(project.inner.id.into())
+            .await;
         Ok(())
     } else {
         Err(ApiError::NotFound)

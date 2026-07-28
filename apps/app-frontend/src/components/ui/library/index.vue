@@ -12,8 +12,8 @@ import {
 import { toRef } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
+import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
 import LibraryToolbar from '@/components/ui/library/library-toolbar/index.vue'
 import LibrarySelectionActionBar from '@/components/ui/library/LibrarySelectionActionBar.vue'
 import { provideLibrary } from '@/components/ui/library/use-library'

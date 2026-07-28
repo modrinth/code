@@ -43,7 +43,7 @@ macro_rules! vars {
                     )]
                     let $field: Option<$ty> = {
                         let mut default = None::<$ty>;
-                        $( default = Some({ $default }.into()); )?
+                        $( default = Some(<$ty>::from({ $default })); )?
 
                         match parse_value::<$ty>(stringify!($field), default) {
                             Ok(value) => Some(value),
@@ -208,9 +208,35 @@ vars! {
     // search
     SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
     SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
+    SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS: u64 = 5u64;
+    SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE: usize = 1000usize;
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
+    TYPESENSE_IMPORT_BATCH_SIZE: usize = 5000usize;
+    TYPESENSE_DELETE_BATCH_SIZE: usize = 10_000usize;
+    TYPESENSE_USE_CACHE: bool = true;
+    SEARCH_TYPESENSE_DEFAULT_QUERY_BY: StringCsv = StringCsv(vec![
+        "name".into(),
+        "indexed_name".into(),
+        "slug".into(),
+        "author".into(),
+        "indexed_author".into(),
+        "summary".into(),
+    ]);
+    SEARCH_TYPESENSE_DEFAULT_QUERY_BY_WEIGHTS: Json<Vec<u8>> =
+        Json(vec![15, 15, 10, 3, 3, 1]);
+    SEARCH_TYPESENSE_DEFAULT_PREFIX: Json<Vec<bool>> =
+        Json(vec![true, true, true, true, true, true]);
+    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_EXACT_MATCH: bool = true;
+    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_NUM_MATCHING_FIELDS: bool = false;
+    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_TOKEN_POSITIONS: bool = true;
+    SEARCH_TYPESENSE_DEFAULT_DROP_TOKENS_THRESHOLD: usize = 0usize;
+    SEARCH_TYPESENSE_DEFAULT_TEXT_MATCH_TYPE: crate::search::backend::typesense::TextMatchType =
+        crate::search::backend::typesense::TextMatchType::MaxWeight;
+    SEARCH_TYPESENSE_DEFAULT_BUCKETING: Json<crate::search::backend::typesense::Bucketing> =
+        Json(crate::search::backend::typesense::Bucketing::Buckets(5));
+    SEARCH_TYPESENSE_DEFAULT_MAX_CANDIDATES: usize = 24usize;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind = crate::file_hosting::FileHostKind::Local;

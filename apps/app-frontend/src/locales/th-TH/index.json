@@ -11,6 +11,21 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "ซ่อนอินสแตนซ์ที่ทำงานอยู่เพิ่มเติม"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "คัดลอก"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "คัดลอก รายระเอียด"
+  },
+  "app.action-bar.install.dismiss": {
+    "message": "ปิด"
+  },
+  "app.action-bar.install.retry": {
+    "message": "ลองอีกครั้ง"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "ยกเลิกสำเร็จ"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "กำหนดอินสแตนซ์หลัก"
   },
@@ -247,9 +262,6 @@
   },
   "app.modal.update-to-play.header": {
     "message": "อัปเดตเพื่อเล่น"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "จำเป็นต้องอัปเดตเพื่อเล่น {name} กรุณาอัปเดตเป็นเวอร์ชันล่าสุดเพื่อเปิดเกม"
   },
   "app.project.install-button.already-installed": {
     "message": "โปรเจคนี้ถูกติดตั้งแล้ว"

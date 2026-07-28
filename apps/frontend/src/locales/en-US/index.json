@@ -2928,13 +2928,13 @@
     "message": "Email verification required"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
-    "message": "Automatically install the required game and loader"
+    "message": "Automatically install everything they’re playing"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "Join the shared instance in one click"
+    "message": "Play the same content as your friends"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
-    "message": "Keep shared content updated when the instance changes"
+    "message": "Keep shared content up to date as it changes"
   },
   "modal.shared-instance.open-in-app.get-app": {
     "message": "Get Modrinth App"
@@ -2972,8 +2972,23 @@
   "moderation.page.technicalReview": {
     "message": "Tech review"
   },
-  "modpack-scan-modal.clear-all-groups": {
-    "message": "Clear All Groups"
+  "modpack-scan-modal.batch.label": {
+    "message": "{amount} per batch"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "Batch amount"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "This will permanently delete all attribution groups for this project and all files inside them. This action cannot be undone."
+  },
+  "modpack-scan-modal.delete-all-groups.error": {
+    "message": "Failed to clear all groups: {error}"
+  },
+  "modpack-scan-modal.delete-all-groups.proceed": {
+    "message": "Clear"
+  },
+  "modpack-scan-modal.delete-all-groups.success": {
+    "message": "All groups cleared successfully."
   },
   "modpack-scan-modal.failed": {
     "message": "Failed"
@@ -3006,10 +3021,13 @@
     "message": "Scan All Files"
   },
   "modpack-scan-modal.scan-error": {
-    "message": "Some files failed to scan: {error}"
+    "message": "Some files failed to scan: \n\n{error}"
   },
   "modpack-scan-modal.scanning": {
     "message": "Scanning..."
+  },
+  "modpack-scan-modal.success": {
+    "message": "Success"
   },
   "modpack-scan-modal.title": {
     "message": "Modpack Scan ({scanned}/{total} Files)"
@@ -3325,117 +3343,6 @@
   },
   "organization.projects.none-with-create-prompt": {
     "message": "This organization doesn't have any projects yet. Would you like to <create-link>create one</create-link>?"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "A Modrinth creator."
-  },
-  "profile.bio.fallback.user": {
-    "message": "A Modrinth user."
-  },
-  "profile.button.analytics": {
-    "message": "View user analytics"
-  },
-  "profile.button.billing": {
-    "message": "Manage user billing"
-  },
-  "profile.button.edit-role": {
-    "message": "Edit role"
-  },
-  "profile.button.info": {
-    "message": "View user details"
-  },
-  "profile.button.manage-projects": {
-    "message": "Manage projects"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Remove as affiliate"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Set as affiliate"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# project} other {# projects}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Auth providers"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Email verified"
-  },
-  "profile.details.label.has-password": {
-    "message": "Has password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Has TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Payment methods"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email not verified"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email verified"
-  },
-  "profile.error.not-found": {
-    "message": "User not found"
-  },
-  "profile.label.affiliate": {
-    "message": "Affiliate"
-  },
-  "profile.label.badges": {
-    "message": "Badges"
-  },
-  "profile.label.collection": {
-    "message": "Collection"
-  },
-  "profile.label.download-count": {
-    "message": "{count, plural, one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Joined"
-  },
-  "profile.label.no-collections": {
-    "message": "This user has no collections!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "You don't have any collections.\nWould you like to <create-link>create one</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "This user has no projects!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "You don't have any projects.\nWould you like to <create-link>create one</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizations"
-  },
-  "profile.label.project-count": {
-    "message": "{count, plural, one {project} other {projects}}"
-  },
-  "profile.label.saving": {
-    "message": "Saving..."
-  },
-  "profile.meta.description": {
-    "message": "Download {username}'s projects on Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Download {username}'s projects on Modrinth"
-  },
-  "profile.official-account": {
-    "message": "Official Modrinth account"
-  },
-  "profile.official-account.bio": {
-    "message": "The official user account of Modrinth. Get support at <support-link></support-link> or via email at <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
-  },
-  "profile.user-id": {
-    "message": "User ID: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Failed to decline team invitation"
@@ -3786,7 +3693,10 @@
     "message": "You can still modify your project, it won't affect your position in the queue."
   },
   "project.moderation.admonition.under-review.body.4": {
-    "message": "We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission."
+    "message": "We aim to review submissions in 24–48 hours, but some projects may face delays. This does not reflect an issue with your submission."
+  },
+  "project.moderation.admonition.under-review.body.4.alt-week": {
+    "message": "We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission."
   },
   "project.moderation.admonition.under-review.body.5": {
     "message": "<emphasis>We appreciate your patience while our moderators work hard to keep Modrinth safe, and look forward to helping you share your content! 💚</emphasis>"

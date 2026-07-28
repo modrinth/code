@@ -72,7 +72,7 @@
 					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
 						{{ formatMessage(messages.threadSectionTitle) }}
 					</h2>
-					<div v-if="isStaff(currentMember?.user)" class="flex items-center gap-2">
+					<div v-if="staff" class="flex items-center gap-2">
 						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
 						<label for="moderator-see-user-ui-toggle"> Show member UI </label>
 					</div>
@@ -218,7 +218,10 @@ const {
 } = injectProjectPageContext()
 
 const canAccess = computed(() => !!currentMember.value)
-const userFacingUiVisible = computed(() => !!currentMember.value && moderatorSeeUserUi.value)
+const staff = computed(() => isStaff(currentMember.value?.user))
+const userFacingUiVisible = computed(
+	() => !!currentMember.value && (!staff.value || moderatorSeeUserUi.value),
+)
 
 const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 	switch (project.value?.status) {
@@ -330,10 +333,11 @@ const moderationAdmonition = computed<{
 							defaultMessage:
 								"You can still modify your project, it won't affect your position in the queue.",
 						}),
+						// temp moved 24-48 hr below to keep old translation for future
 						defineMessage({
-							id: 'project.moderation.admonition.under-review.body.4',
+							id: 'project.moderation.admonition.under-review.body.4.alt-week',
 							defaultMessage:
-								'We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+								'We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission.',
 						}),
 					],
 				},
@@ -398,6 +402,13 @@ const moderationAdmonition = computed<{
 	}
 
 	return null
+})
+
+// unused 24-48hr message still defined here for later
+defineMessage({
+	id: 'project.moderation.admonition.under-review.body.4',
+	defaultMessage:
+		'We aim to review submissions in 24–48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
 })
 
 const moderatorSeeUserUi = computed<boolean>({

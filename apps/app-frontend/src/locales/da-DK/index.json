@@ -11,6 +11,12 @@
   "app.action-bar.hide-more-running-instances": {
     "message": "Gem flere kørende instances"
   },
+  "app.action-bar.install.copied-details": {
+    "message": "Kopiere"
+  },
+  "app.action-bar.install.copy-details": {
+    "message": "Kopier detaljer"
+  },
   "app.action-bar.install.dismiss": {
     "message": "Tilsidesæt"
   },
@@ -20,8 +26,68 @@
   "app.action-bar.install.retry": {
     "message": "Prøv igen"
   },
+  "app.action-bar.install.summary.app-closing": {
+    "message": "Annulleret på grund af appen blev lukket"
+  },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "Kunne ikke indlæse modpack"
+  },
+  "app.action-bar.install.summary.canceled": {
+    "message": "Annulleret"
+  },
+  "app.action-bar.install.summary.content-download-failed": {
+    "message": "Kunne ikke download filer"
+  },
+  "app.action-bar.install.summary.corrupt-download": {
+    "message": "Downloaded filer er korrupt"
+  },
+  "app.action-bar.install.summary.could-not-save-files": {
+    "message": "Kunne ikke gemme filer"
+  },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "Download kunne ikke blive fuldført"
+  },
+  "app.action-bar.install.summary.instance-not-found": {
+    "message": "Instance kunne ikke blive fundet"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "Fil sti er ugyldig"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "Modpack data ugyldig"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "Modpack har ugyldig metadata"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "Java setup kunne ikke færdiggøres"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "Loader setup fejlede"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "Kunne ikke opdatere lokal data"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "Minecraft setup fejlede"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "Kunne ikke få forbindelse til Modrinth"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "Ingen adgang til at skrive"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "Kunne ikke download pack"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "Noget gik galt"
+  },
   "app.action-bar.install.unknown-instance": {
     "message": "Ukendt instance"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "Opdatere delt indhold"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Gør til primære instance"
@@ -55,6 +121,15 @@
   },
   "app.action-bar.view-logs": {
     "message": "Vis logs"
+  },
+  "app.ads-consent.accept": {
+    "message": "Tillad alle"
+  },
+  "app.ads-consent.body": {
+    "message": "Reklamer gør Modrinth muligt og finansiere skaber udbetalinger. Vores partnere må gemme og tilgå cookies i appen for at personliggøre reklamer og måle effektivitet."
+  },
+  "app.ads-consent.reject": {
+    "message": "Afvis alle"
   },
   "app.appearance-settings.advanced-rendering.description": {
     "message": "Aktiverer avanceret gengivelse som sløringseffekter, der kan forårsage ydelsesproblemer uden hardwareaccelereret gengivelse."
@@ -182,6 +257,9 @@
   "app.install.phase.preparing_java.downloading": {
     "message": "Downloader Java {version}"
   },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Tilføjet"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
   },
@@ -227,11 +305,50 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Uploadet"
   },
+  "app.instance.share.locked.empty-description-suffix": {
+    "message": "for at tilgå denne side."
+  },
+  "app.instance.share.locked.signed-out-heading": {
+    "message": "Ikke logget ind"
+  },
+  "app.instance.share.locked.switch-account-button": {
+    "message": "Skift konto"
+  },
+  "app.instance.share.locked.wrong-account-heading": {
+    "message": "Forkert konto"
+  },
+  "app.instance.share.remove-user-modal.effects-label": {
+    "message": "Hvad vil der ske?"
+  },
+  "app.instance.share.remove-user-modal.user-avatar-alt": {
+    "message": "{username}'s avatar"
+  },
+  "app.instance.share.sign-in.button": {
+    "message": "Log ind"
+  },
+  "app.instance.shared-instance-already-installed.install-anyway": {
+    "message": "Installer alligevel"
+  },
+  "app.instance.shared-instance-already-installed.instance": {
+    "message": "Instans"
+  },
+  "app.instance.shared-instance-wrong-account.sign-in-as-label": {
+    "message": "Log ind som"
+  },
   "app.instance.worlds.add-server": {
     "message": "Tilføj server"
   },
   "app.instance.worlds.browse-servers": {
     "message": "Søg servere"
+  },
+  "app.instance.worlds.delete-world-modal.delete-button": {
+    "message": "Slet verden"
+  },
+  "app.instance.worlds.delete-world-modal.title": {
+    "message": "Slet verden"
+  },
+  "app.instance.worlds.delete-world-modal.warning-header": {
+    "message": "Sletter {name}"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddet"
@@ -251,17 +368,41 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "Ingen servere eller verdener tilføjet"
   },
+  "app.instance.worlds.remove-server-modal.remove-button": {
+    "message": "Fjern server"
+  },
+  "app.instance.worlds.remove-server-modal.title": {
+    "message": "Fjern server"
+  },
+  "app.instance.worlds.remove-server-modal.warning-header": {
+    "message": "Fjerner {name}"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Søg {count} verdener..."
   },
+  "app.modal.install-to-play.additional-context": {
+    "message": "Yderligere kontekst"
+  },
+  "app.modal.install-to-play.delete-instance": {
+    "message": "Slet instans"
+  },
   "app.modal.install-to-play.header": {
     "message": "Installer for at spille"
+  },
+  "app.modal.install-to-play.install-anyway": {
+    "message": "Installer alligevel"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Installer"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.report-image-too-large": {
+    "message": "Filen overskrider 1MiB størrelse begrænsning"
+  },
+  "app.modal.install-to-play.report-reason.spam": {
+    "message": "Spam"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delt instance"
@@ -272,14 +413,32 @@
   "app.modal.update-to-play.header": {
     "message": "Opdater for at spille"
   },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "En opdatering er krævet for at spille {name}. Venligst opdater til den seneste version for at køre spillet."
+  "app.modal.update-to-play.shared-instance-added-label": {
+    "message": "Tilføjede"
+  },
+  "app.modal.update-to-play.shared-instance-removed-label": {
+    "message": "Fjernede"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Opdatering krævet"
   },
   "app.project.install-button.already-installed": {
     "message": "Dette projekt er allerede installeret"
   },
+  "app.project.install-button.switch-version": {
+    "message": "Skift version"
+  },
   "app.project.install-context.back-to-browse": {
     "message": "Tilbage til udforsk"
+  },
+  "app.project.version.all-versions": {
+    "message": "Alle versioner"
+  },
+  "app.project.version.download-in-browser": {
+    "message": "Download i browser"
+  },
+  "app.project.version.installing": {
+    "message": "Installere"
   },
   "app.project.versions.already-installed": {
     "message": "Allerede installeret"
@@ -340,6 +499,9 @@
   },
   "app.skins.modal.add-title": {
     "message": "Tilføjer et skin"
+  },
+  "app.skins.modal.arm-style-section": {
+    "message": "Arm stil"
   },
   "app.skins.modal.arm-style-slim": {
     "message": "Slank"
@@ -443,6 +605,12 @@
   "app.skins.title": {
     "message": "Skin vælger"
   },
+  "app.skins.toggle-ears-features-off": {
+    "message": "Slå fra"
+  },
+  "app.skins.toggle-ears-features-on": {
+    "message": "Slå til"
+  },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
   },
@@ -490,6 +658,9 @@
   },
   "app.world.world-item.players-online": {
     "message": "{count} online"
+  },
+  "content.shared-instance.delete-button": {
+    "message": "Slet alligevel"
   },
   "friends.action.add-friend": {
     "message": "Tilføj en ven"
@@ -554,6 +725,27 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Log ind på en Modrinth konto</link> for at tilføje venner og se hvad de spiller!"
   },
+  "instance.action.create-shortcut": {
+    "message": "Opret genvej"
+  },
+  "instance.action.export-modpack": {
+    "message": "Eksporter modpack"
+  },
+  "instance.action.more-actions": {
+    "message": "Flere handlinger"
+  },
+  "instance.action.open-folder": {
+    "message": "Åbn mappe"
+  },
+  "instance.action.settings": {
+    "message": "Instans indstillinger"
+  },
+  "instance.action.starting": {
+    "message": "Starter..."
+  },
+  "instance.action.stopping": {
+    "message": "Stopper..."
+  },
   "instance.add-server.add-and-play": {
     "message": "Tilføj og spil"
   },
@@ -595,6 +787,15 @@
   },
   "instance.files.save-as": {
     "message": "Gem som..."
+  },
+  "instance.locked.delete-button": {
+    "message": "Slet instans"
+  },
+  "instance.locked.play-tooltip": {
+    "message": "Denne instans er blevet låst"
+  },
+  "instance.playtime.never-played": {
+    "message": "Aldrig spillet"
   },
   "instance.server-modal.address": {
     "message": "Adresse"
@@ -767,6 +968,33 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Indtast bredde..."
   },
+  "instance.shared-instance.error.title": {
+    "message": "Noget gik galt"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "message": "Tilføjede"
+  },
+  "instance.shared-instance.publish-review.admonition-header": {
+    "message": "Skub opdatering til spillere"
+  },
+  "instance.shared-instance.publish-review.config-title-v2": {
+    "message": "Vælg konfigurations filer"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Gennemså ændringer"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "message": "Skub opdatering"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "message": "Fjernede"
+  },
+  "instance.shared-instance.unavailable.locked-title": {
+    "message": "Instans låst"
+  },
+  "instance.shared-instance.unavailable.title": {
+    "message": "Delt instans er ikke længere tilgængelig"
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "En Minecraft server"
   },
@@ -775,6 +1003,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "Kopier adresse"
+  },
+  "instance.worlds.create_shortcut": {
+    "message": "Opret genvej"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Vis ikke på forsiden"
@@ -826,6 +1057,54 @@
   },
   "minecraft-account.sign-in": {
     "message": "Log ind på Minecraft"
+  },
+  "minecraft-required.description-header": {
+    "message": "Log ind med en Microsoft konto"
+  },
+  "minecraft-required.dont-have-account": {
+    "message": "Har du ikke en konto?"
+  },
+  "minecraft-required.get-minecraft": {
+    "message": "Få Minecraft"
+  },
+  "minecraft-required.get-support": {
+    "message": "Få hjælp"
+  },
+  "minecraft-required.header": {
+    "message": "Minecraft påkrævet"
+  },
+  "minecraft-required.sign-in": {
+    "message": "Log ind på Microsoft"
+  },
+  "modal.modrinth-account-required.cancel-button": {
+    "message": "Annuller"
+  },
+  "modal.modrinth-account-required.continue-in-browser-heading": {
+    "message": "Fortsæt i din browser"
+  },
+  "modal.modrinth-account-required.create-account-button": {
+    "message": "Opret en konto"
+  },
+  "modal.modrinth-account-required.header": {
+    "message": "Konto påkrævet"
+  },
+  "modal.modrinth-account-required.open-browser-again-button": {
+    "message": "Åbn browser igen"
+  },
+  "modal.modrinth-account-required.sign-in-button": {
+    "message": "Log ind på Modrinth"
+  },
+  "modal.modrinth-account-required.sign-in-heading": {
+    "message": "Log ind med en Modrinth konto"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "Logger ind"
+  },
+  "modal.modrinth-account-required.support-prompt": {
+    "message": "Har du problemer med at logge ind? <support>Få hjælp</support>"
+  },
+  "modal.modrinth-account-required.waiting-for-browser": {
+    "message": "Venter på browser bekræftigelse..."
   },
   "search.filter.locked.instance": {
     "message": "Givet af instanceen"
