@@ -24,7 +24,7 @@ import {
 	get_user_projects,
 	patch_user,
 } from '@/helpers/users'
-import { useRootBreadcrumb } from '@/providers/breadcrumbs'
+import { useBreadcrumb } from '@/providers/breadcrumbs'
 
 const route = useRoute()
 const queryClient = useQueryClient()
@@ -66,8 +66,8 @@ watch(
 	{ immediate: true, flush: 'sync' },
 )
 
-useRootBreadcrumb({
-	slot: 'root',
+useBreadcrumb({
+	slot: 'user',
 	id: () => `user:${breadcrumbUserId.value}`,
 	label: breadcrumbLabel,
 	to: breadcrumbTo,
