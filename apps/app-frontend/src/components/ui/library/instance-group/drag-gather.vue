@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import InstanceDragPreview from '@/components/ui/library/instance-group/instance-drag-preview.vue'
+import DragPreview from '@/components/ui/library/instance-group/drag-preview.vue'
 import type { InstanceDragGatherItem } from '@/components/ui/library/instance-group/use-instance-drag-gather'
 
 const props = defineProps<{
@@ -90,7 +90,7 @@ onBeforeUnmount(() => {
 					class="origin-center transition-transform ease-[cubic-bezier(0.2,0.8,0.2,1)]"
 					:style="itemStyles[index]"
 				>
-					<InstanceDragPreview :instance="item.instance" />
+					<DragPreview :instance="item.instance" />
 				</div>
 			</div>
 		</div>

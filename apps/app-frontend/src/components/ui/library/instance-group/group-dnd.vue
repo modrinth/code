@@ -9,8 +9,8 @@ import {
 } from '@dnd-kit/vue'
 import { computed, onBeforeUnmount, ref, toRef, watch } from 'vue'
 
-import InstanceDragGather from '@/components/ui/library/instance-group/instance-drag-gather.vue'
-import InstanceDragPreview from '@/components/ui/library/instance-group/instance-drag-preview.vue'
+import DragGather from '@/components/ui/library/instance-group/drag-gather.vue'
+import DragPreview from '@/components/ui/library/instance-group/drag-preview.vue'
 import { useInstanceDragGather } from '@/components/ui/library/instance-group/use-instance-drag-gather'
 import { useLibrary } from '@/components/ui/library/use-library'
 import type { GameInstance } from '@/helpers/types'
@@ -167,13 +167,13 @@ function handleDragEnd(event: DragEndEvent) {
 						class="w-full transition-all duration-150 ease-out"
 						:class="isGathering ? 'scale-[0.975]' : 'scale-100'"
 					>
-						<InstanceDragPreview :instance="draggedInstance" :count="draggedInstances.length" />
+						<DragPreview :instance="draggedInstance" :count="draggedInstances.length" />
 					</div>
 				</DragOverlay>
 			</div>
 		</Teleport>
 	</DragDropProvider>
-	<InstanceDragGather
+	<DragGather
 		v-if="gatherItems.length > 0"
 		:items="gatherItems"
 		:target="gatherTarget"
