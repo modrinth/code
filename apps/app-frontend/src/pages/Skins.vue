@@ -7,6 +7,7 @@ import {
 	EyeIcon,
 	LogInIcon,
 	RotateCounterClockwiseIcon,
+	ShirtIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import {
@@ -67,7 +68,7 @@ useRootBreadcrumb({
 	id: 'skins',
 	label: 'Skin selector',
 	to: '/skins',
-	visual: { type: 'icon', component: ChangeSkinIcon },
+	visual: { type: 'icon', component: ShirtIcon },
 })
 
 type UnlistenFn = () => void
