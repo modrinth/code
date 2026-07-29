@@ -35,6 +35,7 @@ use self::filter::{ElasticsearchFilter, serialize_filter};
 mod filter;
 
 const DELETE_FILTER_ID_BATCH_SIZE: usize = 1024;
+const MAX_RESULT_WINDOW: usize = 10_000;
 
 #[derive(Debug, Clone)]
 pub struct ElasticsearchConfig {
@@ -674,6 +675,56 @@ impl Elasticsearch {
 			.transpose()
 	}
 
+	async fn execute_search(
+		&self,
+		alias: &str,
+		body: &Value,
+		sort_only: bool,
+	) -> Result<Value, ApiError> {
+		let path = if sort_only {
+			format!(
+				"/{alias}/_search?filter_path=hits.total,hits.hits.sort"
+			)
+		} else {
+			format!("/{alias}/_search")
+		};
+		let response = self
+			.client
+			.request(Method::POST, &path)
+			.json(body)
+			.send()
+			.await
+			.wrap_internal_err("failed to execute Elasticsearch search")?;
+		response_json(response, "execute Elasticsearch search")
+			.await
+			.map_err(ApiError::Internal)
+	}
+
+	fn search_body(
+		query: &Value,
+		sort: &[Value],
+		from: usize,
+		size: usize,
+		track_total_hits: bool,
+		search_after: Option<&Value>,
+		include_source: bool,
+	) -> Value {
+		let mut body = json!({
+			"from": from,
+			"size": size,
+			"track_total_hits": track_total_hits,
+			"query": query,
+			"sort": sort
+		});
+		if let Some(search_after) = search_after {
+			body["search_after"] = search_after.clone();
+		}
+		if !include_source {
+			body["_source"] = Value::Bool(false);
+		}
+		body
+	}
+
 	async fn existing_write_indices(&self) -> Result<Vec<String>> {
 		let alias = self.config.alias_name();
 		let mut indices = self
@@ -783,25 +834,69 @@ impl SearchBackend for Elasticsearch {
 				"filter": filters
 			}
 		});
-		let body = json!({
-			"from": parsed.offset,
-			"size": parsed.hits_per_page,
-			"track_total_hits": true,
-			"query": query,
-			"sort": Self::sort(search_sort.index)
-		});
-
 		let alias = self.config.alias_name();
-		let response = self
-			.client
-			.request(Method::POST, &format!("/{alias}/_search"))
-			.json(&body)
-			.send()
-			.await
-			.wrap_internal_err("failed to execute Elasticsearch search")?;
-		let body = response_json(response, "execute Elasticsearch search")
-			.await
-			.map_err(ApiError::Internal)?;
+		let sort = Self::sort(search_sort.index);
+		let mut remaining_offset = parsed.offset;
+		let mut search_after = None;
+		let mut total_hits = None;
+		let deep_pagination = remaining_offset
+			.saturating_add(parsed.hits_per_page)
+			> MAX_RESULT_WINDOW;
+
+		while deep_pagination && remaining_offset > 0 {
+			let skipped = remaining_offset.min(MAX_RESULT_WINDOW);
+			let body = Self::search_body(
+				&query,
+				&sort,
+				0,
+				skipped,
+				total_hits.is_none(),
+				search_after.as_ref(),
+				false,
+			);
+			let body = self.execute_search(&alias, &body, true).await?;
+			if total_hits.is_none() {
+				let exact_total_hits = body["hits"]["total"]["value"]
+					.as_u64()
+					.unwrap_or_default()
+					as usize;
+				if parsed.offset >= exact_total_hits {
+					return Ok(SearchResults {
+						hits: Vec::new(),
+						page: parsed.page,
+						hits_per_page: parsed.hits_per_page,
+						total_hits: exact_total_hits,
+					});
+				}
+				total_hits = Some(exact_total_hits);
+			}
+			let Some(anchor) = body["hits"]["hits"]
+				.as_array()
+				.and_then(|hits| hits.last())
+				.and_then(|hit| hit.get("sort"))
+				.cloned()
+			else {
+				return Ok(SearchResults {
+					hits: Vec::new(),
+					page: parsed.page,
+					hits_per_page: parsed.hits_per_page,
+					total_hits: total_hits.unwrap_or_default(),
+				});
+			};
+			search_after = Some(anchor);
+			remaining_offset -= skipped;
+		}
+
+		let body = Self::search_body(
+			&query,
+			&sort,
+			remaining_offset,
+			parsed.hits_per_page,
+			true,
+			search_after.as_ref(),
+			true,
+		);
+		let body = self.execute_search(&alias, &body, false).await?;
 
 		let total_hits = body["hits"]["total"]["value"]
 			.as_u64()
