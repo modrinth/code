@@ -2,15 +2,20 @@
 import type { Component, CSSProperties } from 'vue'
 import { computed, ref } from 'vue'
 
-import type { ButtonSize, ButtonTone, ButtonVariant } from './types'
+import type { ButtonColor, ButtonNativeType, ButtonSize, ButtonType } from './types'
 
 const baseClasses = [
-	'relative inline-flex min-w-0 shrink-0 touch-manipulation items-center justify-center',
+	// Base
+	'relative inline-flex min-w-0 shrink-0 items-center justify-center',
 	'whitespace-nowrap border-0 no-underline',
-	'cursor-pointer select-none transition-[background-color,color,box-shadow,filter,opacity,transform] duration-150 ease-out',
-	'hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]',
-	'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow',
-	'enabled:active:scale-[0.97] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+	// Interactions
+	'touch-manipulation cursor-pointer select-none transition-[background-color,color,box-shadow,filter,opacity,transform] duration-150 ease-out',
+	'enabled:active:scale-[0.97]',
+	// Hovering
+	'hover:brightness-[--hover-brightness]',
+	// Accessibility
+	'focus-visible:brightness-[--hover-brightness] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow',
+	'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
 	'[&[aria-disabled=true]]:pointer-events-none [&[aria-disabled=true]]:cursor-not-allowed [&[aria-disabled=true]]:opacity-50',
 ].join(' ')
 
@@ -29,52 +34,54 @@ const iconOnlySizeClasses: Record<ButtonSize, string> = {
 	lg: 'w-12 px-0',
 }
 
-const variantClasses: Record<ButtonVariant, string> = {
+const typeClasses: Record<ButtonType, string> = {
 	base: 'button-frame--base bg-surface-4 text-contrast [&>svg]:text-primary',
-	colored: 'button-frame--colored bg-[--button-tone] text-[rgba(0,0,0,0.9)] [&>svg]:text-inherit',
+	colored: 'button-frame--colored bg-[--button-color] text-[rgba(0,0,0,0.9)] [&>svg]:text-inherit',
 	outlined: 'button-frame--outlined bg-transparent text-contrast [&>svg]:text-primary',
 	quiet:
 		'button-frame--quiet bg-transparent hover:bg-surface-4 focus-visible:bg-surface-4 [&>svg]:text-inherit',
 }
 
-const toneVariables: Record<ButtonTone, string> = {
+const colorVariables: Record<ButtonColor, string> = {
 	brand: 'var(--color-brand)',
 	red: 'var(--color-red)',
 	orange: 'var(--color-orange)',
 	green: 'var(--color-green)',
 	blue: 'var(--color-blue)',
 	purple: 'var(--color-purple)',
-	promotion: 'var(--medal-promotion-text-orange, var(--color-orange))',
+	medal_promotion: 'var(--medal-promotion-text-orange, var(--color-orange))',
 }
 
 const props = withDefaults(
 	defineProps<{
 		as: string | Component
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
 		iconOnly?: boolean
+		nativeType?: ButtonNativeType
 	}>(),
 	{
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 		iconOnly: false,
+		nativeType: undefined,
 	},
 )
 
 const element = ref<HTMLElement | null>(null)
 const classes = computed(() => [
 	baseClasses,
-	variantClasses[props.variant],
+	typeClasses[props.type],
 	sizeClasses[props.size],
 	props.iconOnly ? iconOnlySizeClasses[props.size] : '',
 ])
 const style = computed((): CSSProperties | undefined => {
-	if (props.variant === 'quiet' && !props.tone) return undefined
-	if (props.variant !== 'colored' && props.variant !== 'quiet') return undefined
+	if (props.type === 'quiet' && !props.color) return undefined
+	if (props.type !== 'colored' && props.type !== 'quiet') return undefined
 
 	return {
-		'--button-tone': toneVariables[props.tone ?? 'brand'],
+		'--button-color': colorVariables[props.color ?? 'brand'],
 	} as CSSProperties
 })
 
@@ -82,7 +89,14 @@ defineExpose({ element })
 </script>
 
 <template>
-	<component :is="as" ref="element" data-button :class="classes" :style="style">
+	<component
+		:is="as"
+		ref="element"
+		data-button
+		:type="props.nativeType"
+		:class="classes"
+		:style="style"
+	>
 		<slot />
 	</component>
 </template>
@@ -96,7 +110,7 @@ defineExpose({ element })
 
 .button-frame--colored {
 	box-shadow:
-		0 0 0 1px color-mix(in srgb, var(--button-tone) 30%, transparent),
+		0 0 0 1px color-mix(in srgb, var(--button-color) 30%, transparent),
 		0 2px 4px rgba(0, 0, 0, 0.04),
 		0 5px 8px rgba(0, 0, 0, 0.04),
 		0 10px 18px rgba(0, 0, 0, 0.03),
@@ -123,6 +137,6 @@ defineExpose({ element })
 }
 
 .button-frame--quiet {
-	color: var(--button-tone, var(--color-base));
+	color: var(--button-color, var(--color-base));
 }
 </style>

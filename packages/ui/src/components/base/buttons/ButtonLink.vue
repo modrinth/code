@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink, type RouteLocationRaw } from 'vue-router'
+import { type RouteLocationRaw, RouterLink } from 'vue-router'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonSize, ButtonTone, ButtonVariant } from './types'
+import type { ButtonColor, ButtonSize, ButtonType } from './types'
 
 const props = withDefaults(
 	defineProps<{
 		to?: RouteLocationRaw
 		href?: string
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
 		target?: string
 		rel?: string
@@ -20,7 +20,7 @@ const props = withDefaults(
 	{
 		to: undefined,
 		href: undefined,
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 		target: undefined,
 		rel: undefined,
@@ -46,8 +46,8 @@ function handleClick(event: MouseEvent) {
 <template>
 	<ButtonFrame
 		:as="component"
-		:variant="props.variant"
-		:tone="props.tone"
+		:type="props.type"
+		:color="props.color"
 		:size="props.size"
 		:to="usesRouter ? props.to : undefined"
 		:href="!usesRouter && !props.disabled ? props.href : undefined"

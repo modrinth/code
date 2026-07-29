@@ -6,10 +6,10 @@ import Button from './Button.vue'
 import ButtonGroup from './ButtonGroup.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 import type {
+	ButtonColor,
 	ButtonNativeType,
 	ButtonSize,
-	ButtonTone,
-	ButtonVariant,
+	ButtonType,
 	OverflowMenuAction,
 	OverflowMenuLink,
 	OverflowMenuOption,
@@ -21,10 +21,10 @@ const props = withDefaults(
 		menuLabel: string
 		options: OverflowMenuOption[]
 		groupLabel?: string
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
-		type?: ButtonNativeType
+		nativeType?: ButtonNativeType
 		disabled?: boolean
 		primaryDisabled?: boolean
 		menuDisabled?: boolean
@@ -32,9 +32,9 @@ const props = withDefaults(
 	}>(),
 	{
 		groupLabel: undefined,
-		variant: 'base',
+		type: 'base',
 		size: 'default',
-		type: 'button',
+		nativeType: 'button',
 		disabled: false,
 		primaryDisabled: false,
 		menuDisabled: false,
@@ -54,10 +54,10 @@ const forwardedSlots = computed(() => Object.keys(slots).filter((name) => name !
 <template>
 	<ButtonGroup :label="props.groupLabel">
 		<Button
-			:variant="props.variant"
-			:tone="props.tone"
-			:size="props.size"
 			:type="props.type"
+			:color="props.color"
+			:size="props.size"
+			:native-type="props.nativeType"
 			:disabled="props.disabled || props.primaryDisabled"
 			@click="emit('click', $event)"
 		>
@@ -67,8 +67,8 @@ const forwardedSlots = computed(() => Object.keys(slots).filter((name) => name !
 		<TeleportOverflowMenu
 			:label="props.menuLabel"
 			:options="props.options"
-			:variant="props.variant"
-			:tone="props.tone"
+			:type="props.type"
+			:color="props.color"
 			:size="props.size"
 			:disabled="props.disabled || props.menuDisabled"
 			:placement="props.placement"

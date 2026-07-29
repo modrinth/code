@@ -1,30 +1,40 @@
 import type { Component } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-export type ButtonVariant = 'base' | 'colored' | 'outlined' | 'quiet'
+import type { AnchoredTeleportPlacement } from '../../../utils/use-anchored-teleport'
+
+export type ButtonType = 'base' | 'colored' | 'outlined' | 'quiet'
 
 export type ButtonSize = 'sm' | 'default' | 'md' | 'lg'
 
-export type ButtonTone = 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'promotion'
+// TODO: Standardized color string enum props across @modrinth/ui
+export type ButtonColor =
+	| 'brand'
+	| 'red'
+	| 'orange'
+	| 'green'
+	| 'blue'
+	| 'purple'
+	| 'medal_promotion'
 
 export type ButtonVisualProps = {
 	size?: ButtonSize
 } & (
 	| {
-			variant?: 'base'
-			tone?: never
+			type?: 'base'
+			color?: never
 	  }
 	| {
-			variant: 'outlined'
-			tone?: never
+			type: 'outlined'
+			color?: never
 	  }
 	| {
-			variant: 'colored'
-			tone?: ButtonTone
+			type: 'colored'
+			color?: ButtonColor
 	  }
 	| {
-			variant: 'quiet'
-			tone?: ButtonTone
+			type: 'quiet'
+			color?: ButtonColor
 	  }
 )
 
@@ -40,7 +50,7 @@ export type ButtonLinkDestination =
 			to?: never
 	  }
 
-export type TeleportPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
+export type TeleportPlacement = AnchoredTeleportPlacement
 
 export interface OverflowMenuItemBase {
 	id: string

@@ -1,14 +1,14 @@
 import type { CSSProperties, Ref } from 'vue'
 import { nextTick, onUnmounted, ref, watch } from 'vue'
 
-import type { TeleportPlacement } from './types'
+export type AnchoredTeleportPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
 
 const viewportPadding = 8
 
 export function useAnchoredTeleport(
 	trigger: Readonly<Ref<HTMLElement | null>>,
 	panel: Readonly<Ref<HTMLElement | null>>,
-	placement: Readonly<Ref<TeleportPlacement>>,
+	placement: Readonly<Ref<AnchoredTeleportPlacement>>,
 ) {
 	const isOpen = ref(false)
 	const panelStyle = ref<CSSProperties>({
@@ -37,7 +37,10 @@ export function useAnchoredTeleport(
 			? triggerRect.top - panelRect.height - offset
 			: triggerRect.bottom + offset
 		const idealLeft = alignsEnd ? triggerRect.right - panelRect.width : triggerRect.left
-		const maxTop = Math.max(viewportPadding, window.innerHeight - panelRect.height - viewportPadding)
+		const maxTop = Math.max(
+			viewportPadding,
+			window.innerHeight - panelRect.height - viewportPadding,
+		)
 		const maxLeft = Math.max(viewportPadding, window.innerWidth - panelRect.width - viewportPadding)
 
 		panelStyle.value = {

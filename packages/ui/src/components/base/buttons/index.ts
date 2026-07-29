@@ -8,12 +8,12 @@ export { default as SplitButton } from './SplitButton.vue'
 export { default as TeleportOverflowMenu } from './TeleportOverflowMenu.vue'
 export { default as TeleportPopoutMenu } from './TeleportPopoutMenu.vue'
 export type {
+	ButtonColor,
 	ButtonElementHandle,
 	ButtonLinkDestination,
 	ButtonNativeType,
 	ButtonSize,
-	ButtonTone,
-	ButtonVariant,
+	ButtonType,
 	ButtonVisualProps,
 	OverflowMenuAction,
 	OverflowMenuDivider,

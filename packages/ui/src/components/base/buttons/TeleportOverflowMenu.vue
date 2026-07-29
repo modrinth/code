@@ -2,17 +2,17 @@
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
+import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
 import IconButton from './IconButton.vue'
 import type {
+	ButtonColor,
 	ButtonSize,
-	ButtonTone,
-	ButtonVariant,
+	ButtonType,
 	OverflowMenuAction,
 	OverflowMenuLink,
 	OverflowMenuOption,
 	TeleportPlacement,
 } from './types'
-import { useAnchoredTeleport } from './useAnchoredTeleport'
 
 defineOptions({ inheritAttrs: false })
 
@@ -20,14 +20,14 @@ const props = withDefaults(
 	defineProps<{
 		label: string
 		options: OverflowMenuOption[]
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
 		disabled?: boolean
 		placement?: TeleportPlacement
 	}>(),
 	{
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 		disabled: false,
 		placement: 'bottom-end',
@@ -196,8 +196,8 @@ defineExpose({ open: openMenu, close: closeMenu })
 		ref="triggerButton"
 		v-bind="$attrs"
 		:label="props.label"
-		:variant="props.variant"
-		:tone="props.tone"
+		:type="props.type"
+		:color="props.color"
 		:size="props.size"
 		:disabled="props.disabled"
 		:aria-expanded="isOpen"

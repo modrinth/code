@@ -3,7 +3,7 @@ import { fileIsValid } from '@modrinth/utils'
 
 import { useFormatBytes } from '../../../composables'
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonSize, ButtonTone, ButtonVariant } from './types'
+import type { ButtonColor, ButtonSize, ButtonType } from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -13,8 +13,8 @@ const props = withDefaults(
 		maxSize?: number | null
 		disabled?: boolean
 		allowDrop?: boolean
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
 	}>(),
 	{
@@ -24,7 +24,7 @@ const props = withDefaults(
 		maxSize: undefined,
 		disabled: false,
 		allowDrop: true,
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 	},
 )
@@ -61,8 +61,8 @@ function handleDrop(event: DragEvent) {
 <template>
 	<ButtonFrame
 		as="label"
-		:variant="props.variant"
-		:tone="props.tone"
+		:type="props.type"
+		:color="props.color"
 		:size="props.size"
 		:aria-disabled="props.disabled || undefined"
 		class="focus-within:outline-none focus-within:ring-4 focus-within:ring-brand-shadow"

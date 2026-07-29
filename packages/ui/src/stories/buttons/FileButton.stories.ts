@@ -7,7 +7,7 @@ const meta = {
 	title: 'Buttons/File Button',
 	component: FileButton,
 	argTypes: {
-		variant: {
+		type: {
 			control: 'select',
 			options: ['base', 'colored', 'outlined', 'quiet'],
 		},
@@ -15,14 +15,14 @@ const meta = {
 			control: 'select',
 			options: ['sm', 'default', 'md', 'lg'],
 		},
-		tone: {
+		color: {
 			control: 'select',
-			options: ['brand', 'red', 'orange', 'green', 'blue', 'purple', 'promotion'],
+			options: ['brand', 'red', 'orange', 'green', 'blue', 'purple', 'medal_promotion'],
 		},
 	},
 	args: {
 		prompt: 'Select file',
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 		multiple: false,
 		disabled: false,
@@ -50,7 +50,7 @@ export const MultipleImages: Story = {
 		prompt: 'Select images',
 		accept: 'image/*',
 		multiple: true,
-		variant: 'colored',
+		type: 'colored',
 	},
 }
 

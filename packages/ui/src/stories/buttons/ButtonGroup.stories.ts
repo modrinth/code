@@ -36,8 +36,8 @@ export const Joined: Story = {
 		components: { Button, ButtonGroup },
 		template: /*html*/ `
 			<ButtonGroup label="Pagination">
-				<Button variant="outlined">Previous</Button>
-				<Button variant="outlined">Next</Button>
+				<Button type="outlined">Previous</Button>
+				<Button type="outlined">Next</Button>
 			</ButtonGroup>
 		`,
 	}),
@@ -53,7 +53,7 @@ export const Split: Story = {
 			<SplitButton
 				menu-label="More server actions"
 				group-label="Server actions"
-				variant="colored"
+				type="colored"
 				:options="splitOptions"
 			>
 				<PlayIcon />Start server

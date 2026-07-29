@@ -5,28 +5,28 @@ import Button from '../../components/base/buttons/Button.vue'
 import ButtonLink from '../../components/base/buttons/ButtonLink.vue'
 import IconButton from '../../components/base/buttons/IconButton.vue'
 
-const variants = ['base', 'colored', 'outlined', 'quiet'] as const
+const types = ['base', 'colored', 'outlined', 'quiet'] as const
 const sizes = ['sm', 'default', 'md', 'lg'] as const
-const tones = ['brand', 'red', 'orange', 'green', 'blue', 'purple', 'promotion'] as const
+const colors = ['brand', 'red', 'orange', 'green', 'blue', 'purple', 'medal_promotion'] as const
 const sizeColumns = [
 	{ value: 'sm', label: 'Small' },
 	{ value: 'default', label: 'Default' },
 	{ value: 'md', label: 'Medium' },
 	{ value: 'lg', label: 'Large' },
 ] as const
-const variantRows = [
-	{ label: 'Base', variant: 'base' },
-	{ label: 'Outlined', variant: 'outlined' },
-	{ label: 'Quiet', variant: 'quiet' },
-	...tones.map((tone) => ({
-		label: `Colored / ${tone.charAt(0).toUpperCase()}${tone.slice(1)}`,
-		variant: 'colored' as const,
-		tone,
+const typeRows = [
+	{ label: 'Base', type: 'base' },
+	{ label: 'Outlined', type: 'outlined' },
+	{ label: 'Quiet', type: 'quiet' },
+	...colors.map((color) => ({
+		label: `Colored / ${color.charAt(0).toUpperCase()}${color.slice(1)}`,
+		type: 'colored' as const,
+		color,
 	})),
-	...tones.map((tone) => ({
-		label: `Quiet / ${tone.charAt(0).toUpperCase()}${tone.slice(1)}`,
-		variant: 'quiet' as const,
-		tone,
+	...colors.map((color) => ({
+		label: `Quiet / ${color.charAt(0).toUpperCase()}${color.slice(1)}`,
+		type: 'quiet' as const,
+		color,
 	})),
 ]
 
@@ -34,19 +34,19 @@ const meta = {
 	title: 'Buttons/Button',
 	component: Button,
 	argTypes: {
-		variant: {
+		type: {
 			control: 'select',
-			options: variants,
+			options: types,
 		},
 		size: {
 			control: 'select',
 			options: sizes,
 		},
-		tone: {
+		color: {
 			control: 'select',
-			options: tones,
+			options: colors,
 		},
-		type: {
+		nativeType: {
 			control: 'select',
 			options: ['button', 'submit', 'reset'],
 		},
@@ -54,10 +54,10 @@ const meta = {
 		loading: { control: 'boolean' },
 	},
 	args: {
-		variant: 'base',
+		type: 'base',
 		size: 'default',
-		tone: 'brand',
-		type: 'button',
+		color: 'brand',
+		nativeType: 'button',
 		disabled: false,
 		loading: false,
 	},
@@ -80,11 +80,11 @@ type Story = StoryObj<typeof meta>
 
 export const Playground: Story = {}
 
-export const AllVariants: Story = {
+export const AllTypes: Story = {
 	render: () => ({
 		components: { Button, DownloadIcon },
 		setup() {
-			return { sizeColumns, variantRows }
+			return { sizeColumns, typeRows }
 		},
 		template: /*html*/ `
 			<div class="grid grid-cols-[max-content_repeat(4,max-content)] items-center gap-4 overflow-x-auto p-1">
@@ -93,13 +93,13 @@ export const AllVariants: Story = {
 					{{ size.label }}
 				</div>
 
-				<template v-for="row in variantRows" :key="row.label">
+				<template v-for="row in typeRows" :key="row.label">
 					<div class="whitespace-nowrap font-semibold text-secondary">{{ row.label }}</div>
 					<Button
 						v-for="size in sizeColumns"
 						:key="size.value"
-						:variant="row.variant"
-						:tone="row.tone"
+						:type="row.type"
+						:color="row.color"
 						:size="size.value"
 					>
 						<DownloadIcon />Button
@@ -115,9 +115,9 @@ export const Quiet: Story = {
 		components: { Button, DownloadIcon, IconButton, SettingsIcon },
 		template: /*html*/ `
 			<div class="flex flex-wrap items-center gap-4">
-				<Button variant="quiet"><DownloadIcon />Quiet</Button>
-				<Button variant="quiet" tone="red"><DownloadIcon />Quiet destructive</Button>
-				<IconButton label="Settings" variant="quiet"><SettingsIcon /></IconButton>
+				<Button type="quiet"><DownloadIcon />Quiet</Button>
+				<Button type="quiet" color="red"><DownloadIcon />Quiet destructive</Button>
+				<IconButton label="Settings" type="quiet"><SettingsIcon /></IconButton>
 			</div>
 		`,
 	}),
@@ -140,16 +140,16 @@ export const Sizes: Story = {
 	}),
 }
 
-export const ColoredTones: Story = {
+export const Colors: Story = {
 	render: () => ({
 		components: { Button },
 		setup() {
-			return { tones }
+			return { colors }
 		},
 		template: /*html*/ `
 			<div class="flex flex-wrap items-center gap-4">
-				<Button v-for="tone in tones" :key="tone" variant="colored" :tone="tone">
-					{{ tone }}
+				<Button v-for="color in colors" :key="color" type="colored" :color="color">
+					{{ color }}
 				</Button>
 			</div>
 		`,
@@ -179,10 +179,10 @@ export const InteractionStates: Story = {
 				<Button>Enabled</Button>
 				<Button disabled>Disabled</Button>
 				<Button loading>Loading</Button>
-				<Button variant="colored">Colored</Button>
-				<Button variant="colored" disabled>Colored disabled</Button>
-				<Button variant="outlined">Outlined</Button>
-				<Button variant="quiet">Quiet</Button>
+				<Button type="colored">Colored</Button>
+				<Button type="colored" disabled>Colored disabled</Button>
+				<Button type="outlined">Outlined</Button>
+				<Button type="quiet">Quiet</Button>
 			</div>
 		`,
 	}),
@@ -194,14 +194,14 @@ export const LinksAndIconButton: Story = {
 		template: /*html*/ `
 			<div class="flex flex-wrap items-center gap-4">
 				<ButtonLink to="/library">Internal link</ButtonLink>
-				<ButtonLink href="https://modrinth.com" target="_blank" variant="outlined">
+				<ButtonLink href="https://modrinth.com" target="_blank" type="outlined">
 					Modrinth<ExternalIcon />
 				</ButtonLink>
 				<ButtonLink href="https://modrinth.com" disabled>Disabled link</ButtonLink>
 				<IconButton label="Favorite"><HeartIcon /></IconButton>
-				<IconButton label="Favorite" variant="colored"><HeartIcon /></IconButton>
-				<IconButton label="Favorite" variant="outlined"><HeartIcon /></IconButton>
-				<IconButton label="Favorite" variant="quiet"><HeartIcon /></IconButton>
+				<IconButton label="Favorite" type="colored"><HeartIcon /></IconButton>
+				<IconButton label="Favorite" type="outlined"><HeartIcon /></IconButton>
+				<IconButton label="Favorite" type="quiet"><HeartIcon /></IconButton>
 			</div>
 		`,
 	}),

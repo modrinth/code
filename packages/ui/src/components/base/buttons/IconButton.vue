@@ -2,22 +2,22 @@
 import { computed, ref } from 'vue'
 
 import ButtonFrame from './ButtonFrame.vue'
-import type { ButtonNativeType, ButtonSize, ButtonTone, ButtonVariant } from './types'
+import type { ButtonColor, ButtonNativeType, ButtonSize, ButtonType } from './types'
 
 const props = withDefaults(
 	defineProps<{
 		label: string
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
-		type?: ButtonNativeType
+		nativeType?: ButtonNativeType
 		disabled?: boolean
 		loading?: boolean
 	}>(),
 	{
-		variant: 'base',
+		type: 'base',
 		size: 'default',
-		type: 'button',
+		nativeType: 'button',
 		disabled: false,
 		loading: false,
 	},
@@ -34,10 +34,10 @@ defineExpose({ element })
 		ref="frame"
 		as="button"
 		icon-only
-		:variant="props.variant"
-		:tone="props.tone"
-		:size="props.size"
 		:type="props.type"
+		:color="props.color"
+		:size="props.size"
+		:native-type="props.nativeType"
 		:disabled="props.disabled || props.loading"
 		:aria-label="props.label"
 		:aria-busy="props.loading || undefined"

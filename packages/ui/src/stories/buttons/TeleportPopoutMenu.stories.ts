@@ -27,7 +27,7 @@ export const ArbitraryContent: Story = {
 							Version name
 							<input class="rounded-lg bg-surface-4 px-3 py-2 text-primary ring-1 ring-surface-5" value="1.21.8" />
 						</label>
-						<Button variant="colored" @click="close()">Apply</Button>
+						<Button type="colored" @click="close()">Apply</Button>
 					</div>
 				</template>
 			</TeleportPopoutMenu>
@@ -39,7 +39,7 @@ export const IconTrigger: Story = {
 	render: () => ({
 		components: { SettingsIcon, TeleportPopoutMenu },
 		template: /*html*/ `
-			<TeleportPopoutMenu label="Open settings" variant="quiet" icon-only>
+			<TeleportPopoutMenu label="Open settings" type="quiet" icon-only>
 				<template #trigger><SettingsIcon /></template>
 				<template #panel>
 					<p class="m-0 w-64">Arbitrary teleported content can live here.</p>

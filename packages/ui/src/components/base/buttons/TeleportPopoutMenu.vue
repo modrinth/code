@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 
+import { useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
 import Button from './Button.vue'
 import IconButton from './IconButton.vue'
 import type {
+	ButtonColor,
 	ButtonElementHandle,
 	ButtonSize,
-	ButtonTone,
-	ButtonVariant,
+	ButtonType,
 	TeleportPlacement,
 } from './types'
-import { useAnchoredTeleport } from './useAnchoredTeleport'
 
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
 	defineProps<{
 		label: string
-		variant?: ButtonVariant
-		tone?: ButtonTone
+		type?: ButtonType
+		color?: ButtonColor
 		size?: ButtonSize
 		disabled?: boolean
 		iconOnly?: boolean
@@ -27,7 +27,7 @@ const props = withDefaults(
 		focusOnOpen?: boolean
 	}>(),
 	{
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 		disabled: false,
 		iconOnly: false,
@@ -99,8 +99,8 @@ defineExpose({ open: openMenu, close: closeMenu })
 		v-bind="$attrs"
 		:label="props.iconOnly ? props.label : undefined"
 		:aria-label="props.iconOnly ? undefined : props.label"
-		:variant="props.variant"
-		:tone="props.tone"
+		:type="props.type"
+		:color="props.color"
 		:size="props.size"
 		:disabled="props.disabled"
 		:aria-expanded="isOpen"

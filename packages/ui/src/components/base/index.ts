@@ -11,11 +11,16 @@ export { default as BulletDivider } from './BulletDivider.vue'
 export { default as Button } from './Button.vue'
 export { default as ButtonGroup } from './buttons/ButtonGroup.vue'
 export { default as ButtonLink } from './buttons/ButtonLink.vue'
+export { default as FileButton } from './buttons/FileButton.vue'
+export { default as IconButton } from './buttons/IconButton.vue'
+export { default as SplitButton } from './buttons/SplitButton.vue'
+export { default as TeleportOverflowMenu } from './buttons/TeleportOverflowMenu.vue'
+export { default as TeleportPopoutMenu } from './buttons/TeleportPopoutMenu.vue'
 export type {
+	ButtonColor,
 	ButtonNativeType,
 	ButtonSize,
-	ButtonTone,
-	ButtonVariant,
+	ButtonType,
 	ButtonVisualProps,
 	OverflowMenuAction,
 	OverflowMenuDivider,
@@ -45,7 +50,6 @@ export { default as DropzoneFileInput } from './DropzoneFileInput.vue'
 export { default as EmptyState } from './EmptyState.vue'
 export { default as EnvironmentIndicator } from './EnvironmentIndicator.vue'
 export { default as ErrorInformationCard } from './ErrorInformationCard.vue'
-export { default as FileButton } from './buttons/FileButton.vue'
 export { default as FileInput } from './FileInput.vue'
 export type { FileTreeSelectItem } from './FileTreeSelect.vue'
 export { default as FileTreeSelect } from './FileTreeSelect.vue'
@@ -59,7 +63,6 @@ export { default as FormattedTag } from './FormattedTag.vue'
 export { default as HeadingLink } from './HeadingLink.vue'
 export { default as HorizontalRule } from './HorizontalRule.vue'
 export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
-export { default as IconButton } from './buttons/IconButton.vue'
 export { default as IconSelect } from './IconSelect.vue'
 export { default as IntlFormatted } from './IntlFormatted.vue'
 export type { JoinedButtonAction } from './JoinedButtons.vue'
@@ -95,7 +98,6 @@ export { default as SettingsLabel } from './SettingsLabel.vue'
 export { default as SimpleBadge } from './SimpleBadge.vue'
 export { default as Slider } from './Slider.vue'
 export { default as SmartClickable } from './SmartClickable.vue'
-export { default as SplitButton } from './buttons/SplitButton.vue'
 export type { StackedAdmonitionItem, StackedAdmonitionType } from './StackedAdmonitions.vue'
 export { default as StackedAdmonitions } from './StackedAdmonitions.vue'
 export { default as StatItem } from './StatItem.vue'
@@ -106,8 +108,6 @@ export type { TabsTab, TabsValue } from './Tabs.vue'
 export { default as Tabs } from './Tabs.vue'
 export { default as TagItem } from './TagItem.vue'
 export { default as TagTagItem } from './TagTagItem.vue'
-export { default as TeleportOverflowMenu } from './buttons/TeleportOverflowMenu.vue'
-export { default as TeleportPopoutMenu } from './buttons/TeleportPopoutMenu.vue'
 export type {
 	TimeFrameLastUnit,
 	TimeFrameLastUnitOption,

@@ -55,7 +55,7 @@ const meta = {
 	args: {
 		label: 'More actions',
 		options,
-		variant: 'base',
+		type: 'base',
 		size: 'default',
 		placement: 'bottom-end',
 		disabled: false,
@@ -80,18 +80,18 @@ export const Default: Story = {}
 
 export const ColoredTrigger: Story = {
 	args: {
-		variant: 'colored',
+		type: 'colored',
 	},
 }
 
 export const OutlinedTrigger: Story = {
 	args: {
-		variant: 'outlined',
+		type: 'outlined',
 	},
 }
 
 export const QuietTrigger: Story = {
 	args: {
-		variant: 'quiet',
+		type: 'quiet',
 	},
 }
