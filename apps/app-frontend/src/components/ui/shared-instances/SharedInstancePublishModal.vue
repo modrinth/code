@@ -26,12 +26,16 @@
 					</span>
 				</template>
 				<div class="flex min-w-0 flex-col gap-3 pt-4">
-					<div class="max-h-[292px] overflow-y-auto rounded-[20px]">
+					<div
+						ref="configFileTreeContainer"
+						class="max-h-[292px] overflow-y-auto rounded-[20px]"
+					>
 						<FileTreeSelect
 							v-model="selectedConfigPaths"
 							:items="configFileItems"
 							:show-size="false"
 							:show-modified="false"
+							@navigate="scrollConfigFileTreeToTop"
 						/>
 					</div>
 				</div>
@@ -75,6 +79,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const { notifySharedInstanceError, notifySharedInstanceUnavailable } = useSharedInstanceErrors()
 const publishReviewModal = ref<InstanceType<typeof ContentDiffModal>>()
+const configFileTreeContainer = ref<HTMLElement>()
 const publishDiffs = ref<ContentDiffItem[]>([])
 const configFilePaths = ref<string[]>([])
 const selectedConfigPaths = ref<string[]>([])
@@ -129,6 +134,12 @@ async function publishChanges() {
 		handlePublishError(error)
 	} finally {
 		setState('idle')
+	}
+}
+
+function scrollConfigFileTreeToTop() {
+	if (configFileTreeContainer.value) {
+		configFileTreeContainer.value.scrollTop = 0
 	}
 }
 
