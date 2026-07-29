@@ -16,49 +16,6 @@ pub(crate) async fn create(
     icon_path: Option<String>,
     link: InstanceLink,
 ) -> crate::Result<InstanceMetadata> {
-    create_inner(
-        name,
-        game_version,
-        modloader,
-        loader_version,
-        icon_path,
-        link,
-        false,
-    )
-    .await
-}
-
-#[allow(clippy::too_many_arguments)]
-pub(crate) async fn create_with_missing_icon_fallback(
-    name: String,
-    game_version: String,
-    modloader: ModLoader,
-    loader_version: Option<String>,
-    icon_path: Option<String>,
-    link: InstanceLink,
-) -> crate::Result<InstanceMetadata> {
-    create_inner(
-        name,
-        game_version,
-        modloader,
-        loader_version,
-        icon_path,
-        link,
-        true,
-    )
-    .await
-}
-
-#[allow(clippy::too_many_arguments)]
-async fn create_inner(
-    name: String,
-    game_version: String,
-    modloader: ModLoader,
-    loader_version: Option<String>,
-    icon_path: Option<String>,
-    link: InstanceLink,
-    ignore_missing_remote_icon: bool,
-) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
     let instance = crate::state::create_instance(
         CreateInstance {
@@ -70,7 +27,6 @@ async fn create_inner(
             icon_path,
             link,
         },
-        ignore_missing_remote_icon,
         &state,
     )
     .await?;

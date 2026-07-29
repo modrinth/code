@@ -28,7 +28,6 @@ pub struct CreateInstance {
 
 pub(crate) async fn create_instance(
     input: CreateInstance,
-    ignore_missing_remote_icon: bool,
     state: &State,
 ) -> crate::Result<Instance> {
     trace!("Creating new instance. {}", input.name);
@@ -58,7 +57,7 @@ pub(crate) async fn create_instance(
 
         let icon_path = resolve_icon_path(
             input.icon_path.as_deref(),
-            ignore_missing_remote_icon,
+            matches!(&input.link, InstanceLink::SharedInstance { .. }),
             state,
         )
         .await?;

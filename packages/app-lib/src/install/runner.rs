@@ -455,8 +455,7 @@ async fn prepare_initial_instance(
                         data.instance_icon_url.clone(),
                     )
                 };
-            let metadata =
-                crate::api::instance::create_with_missing_icon_fallback(
+            let metadata = crate::api::instance::create(
                 data.name.clone(),
                 game_version,
                 loader,
