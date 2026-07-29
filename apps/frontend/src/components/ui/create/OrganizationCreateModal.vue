@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)">
+	<Modal ref="modal" :header="formatMessage(messages.title)">
 		<div class="min-w-md flex max-w-md flex-col gap-3">
 			<CreateLimitAlert v-model="hasHitLimit" type="org" />
 			<div class="flex flex-col gap-2">
@@ -73,7 +73,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -83,7 +83,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
@@ -142,7 +142,7 @@ const slug = ref<string>('')
 const description = ref<string>('')
 const manualSlug = ref<boolean>(false)
 const hasHitLimit = ref<boolean>(false)
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 async function createOrganization(): Promise<void> {
 	startLoading()

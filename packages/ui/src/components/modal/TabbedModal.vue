@@ -6,7 +6,7 @@ import { type Component, computed, nextTick, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
-import NewModal from './NewModal.vue'
+import Modal from './Modal.vue'
 export interface Tab {
 	name: MessageDescriptor
 	category?: MessageDescriptor
@@ -60,7 +60,7 @@ const {
 	checkScrollState: checkSidebarScrollState,
 } = useScrollIndicator(sidebarScrollContainer)
 
-const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const modal = ref<InstanceType<typeof Modal> | null>(null)
 
 function setTab(index: number) {
 	if (index === selectedTab.value) return
@@ -85,7 +85,7 @@ function startsCategory(index: number) {
 defineExpose({ show, hide, selectedTab, setTab })
 </script>
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="header"
 		:max-width="maxWidth"
@@ -218,5 +218,5 @@ defineExpose({ show, hide, selectedTab, setTab })
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

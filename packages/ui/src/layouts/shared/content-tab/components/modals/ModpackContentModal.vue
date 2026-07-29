@@ -18,7 +18,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectPageContext } from '#ui/providers/page-context'
 import {
@@ -111,7 +111,7 @@ export interface ModpackContentModalState {
 	scrollTop: number
 }
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const scrollContainer = ref<HTMLElement | null>(null)
 const isOpen = ref(false)
 const items = ref<ContentItem[]>([])
@@ -456,7 +456,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 </script>
 
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
@@ -667,5 +667,5 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 			@enable="bulkEnable"
 			@disable="bulkDisable"
 		/>
-	</NewModal>
+	</Modal>
 </template>

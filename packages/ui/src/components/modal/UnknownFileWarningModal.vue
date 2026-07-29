@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.header)"
 		:on-hide="handleHide"
@@ -99,7 +99,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -112,7 +112,7 @@ import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
 import Table, { type TableColumn } from '../base/Table.vue'
-import NewModal from './NewModal.vue'
+import Modal from './Modal.vue'
 
 const props = withDefaults(
 	defineProps<{

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
-import NewModal from '../../components/modal/NewModal.vue'
+import Modal from '../../components/modal/Modal.vue'
 import ContentCardItem from '../../layouts/shared/content-tab/components/ContentCardItem.vue'
 import ContentModpackCard from '../../layouts/shared/content-tab/components/ContentModpackCard.vue'
 import type {
@@ -470,9 +470,9 @@ export const WithContentModal: Story = {
 		project: cobblemonProject,
 	},
 	render: () => ({
-		components: { ContentModpackCard, NewModal, ContentCardItem },
+		components: { ContentModpackCard, Modal, ContentCardItem },
 		setup() {
-			const modalRef = ref<InstanceType<typeof NewModal> | null>(null)
+			const modalRef = ref<InstanceType<typeof Modal> | null>(null)
 			const modpackContent = [
 				{
 					project: {
@@ -524,7 +524,7 @@ export const WithContentModal: Story = {
 					@content="modalRef?.show()"
 					@update="() => alert('Update clicked')"
 				/>
-				<NewModal ref="modalRef" header="Modpack Content">
+				<Modal ref="modalRef" header="Modpack Content">
 					<div class="flex flex-col gap-4">
 						<ContentCardItem
 							v-for="item in modpackContent"
@@ -533,7 +533,7 @@ export const WithContentModal: Story = {
 							:version="item.version"
 						/>
 					</div>
-				</NewModal>
+				</Modal>
 			</div>
 		`,
 	}),

@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="purchaseModal">
+	<Modal ref="purchaseModal">
 		<template #title>
 			<span class="text-contrast text-xl font-extrabold">
 				<template v-if="productType === 'midas'">Subscribe to Modrinth+!</template>
@@ -446,7 +446,7 @@
 				</button>
 			</template>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup>
@@ -479,7 +479,7 @@ import Combobox from '../base/Combobox.vue'
 import Slider from '../base/Slider.vue'
 import StyledInput from '../base/StyledInput.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
-import NewModal from '../modal/NewModal.vue'
+import Modal from '../modal/Modal.vue'
 import LoaderIcon from '../servers/icons/LoaderIcon.vue'
 
 const { formatMessage } = useVIntl()

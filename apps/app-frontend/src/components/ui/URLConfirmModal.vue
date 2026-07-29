@@ -1,8 +1,7 @@
 <script setup>
-import { ButtonStyled, injectNotificationManager, ProjectCard } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, Modal, ProjectCard } from '@modrinth/ui'
 import { ref } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_project_v3, get_version } from '@/helpers/cache.js'
 import { injectContentInstall } from '@/providers/content-install'
 
@@ -45,7 +44,7 @@ async function install() {
 </script>
 
 <template>
-	<ModalWrapper ref="confirmModal" :header="`Install ${project?.name}`">
+	<Modal ref="confirmModal" :header="`Install ${project?.name}`">
 		<div class="modal-body">
 			<ProjectCard
 				:title="project.name"
@@ -75,7 +74,7 @@ async function install() {
 				</div>
 			</div>
 		</div>
-	</ModalWrapper>
+	</Modal>
 </template>
 
 <style scoped lang="scss">

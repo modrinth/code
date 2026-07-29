@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" fade="warning" :header="formatMessage(messages.header)" max-width="560px">
+	<Modal ref="modal" fade="warning" :header="formatMessage(messages.header)" max-width="560px">
 		<div class="flex flex-col gap-6">
 			{{ formatMessage(messages.admonitionBody, { count }) }}
 		</div>
@@ -26,7 +26,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -34,7 +34,7 @@ import { PlusIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -67,7 +67,7 @@ defineProps<{
 
 type SelectedProjectsLeaveResult = 'cancel' | 'discard' | 'install'
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 let resolvePromise: ((value: SelectedProjectsLeaveResult) => void) | null = null
 
 function prompt(): Promise<SelectedProjectsLeaveResult> {

@@ -4631,23 +4631,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "리디렉션 URI 를 추가하세요"
   },
-  "settings.applications.button.cancel": {
-    "message": "취소"
-  },
   "settings.applications.button.create": {
     "message": "앱 만들기"
   },
   "settings.applications.button.delete": {
     "message": "지우기"
   },
-  "settings.applications.button.edit": {
-    "message": "편집"
-  },
   "settings.applications.button.new": {
     "message": "새 애플리케이션"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "변경사항 저장"
   },
   "settings.applications.button.upload-icon": {
     "message": "아이콘 업로드"

@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" max-width="544px" no-padding>
+	<Modal ref="modal" :header="formatMessage(messages.header)" max-width="544px" no-padding>
 		<div class="grid grid-cols-[1fr_auto] gap-2.5 h-[154px] px-7 pt-4 pb-1 pr-9">
 			<div class="flex flex-col gap-2.5 items-start justify-center h-min mt-5">
 				<div class="font-semibold text-xl text-contrast">
@@ -64,12 +64,12 @@
 				</a>
 			</p>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
 import { MessagesSquareIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, Modal, useVIntl } from '@modrinth/ui'
 import { inject, type Ref, ref } from 'vue'
 
 import steveImage from '@/assets/steve-look-up-left.webp'
@@ -113,7 +113,7 @@ const messages = defineMessages({
 	},
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const loadingSignIn = ref(false)
 
 function show() {

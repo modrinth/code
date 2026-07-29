@@ -9,11 +9,10 @@ import {
 	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Collapsible, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, Collapsible, injectNotificationManager, Modal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { install_existing_instance } from '@/helpers/install'
@@ -151,7 +150,7 @@ async function copyToClipboard(text) {
 </script>
 
 <template>
-	<ModalWrapper ref="errorModal" :header="title" :closable="closable">
+	<Modal ref="errorModal" :header="title" :closable="closable">
 		<div class="modal-body max-w-[550px]">
 			<div class="markdown-body">
 				<template v-if="errorType === 'minecraft_auth'">
@@ -323,7 +322,7 @@ async function copyToClipboard(text) {
 				</div>
 			</template>
 		</div>
-	</ModalWrapper>
+	</Modal>
 </template>
 
 <style>

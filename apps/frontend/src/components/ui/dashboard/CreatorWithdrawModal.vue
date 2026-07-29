@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="withdrawModal"
 		:closable="currentStage !== 'completion'"
 		:hide-header="currentStage === 'completion'"
@@ -93,7 +93,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 	<CreatorTaxFormModal
 		ref="taxFormModal"
 		:close-button-text="formatMessage(commonMessages.continueButton)"
@@ -118,7 +118,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
@@ -151,7 +151,7 @@ const emit = defineEmits<{
 	(e: 'refresh-data' | 'hide'): void
 }>()
 
-const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
+const withdrawModal = useTemplateRef<InstanceType<typeof Modal>>('withdrawModal')
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
 const isSubmitting = ref(false)
 

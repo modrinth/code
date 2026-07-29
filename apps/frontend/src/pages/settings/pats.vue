@@ -7,7 +7,7 @@
 			:proceed-label="formatMessage(deleteModalMessages.action)"
 			@proceed="removePat(deletePatIndex)"
 		/>
-		<NewModal
+		<Modal
 			ref="patModal"
 			:header="
 				editPatId !== null
@@ -86,7 +86,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 
 		<div class="header__row">
 			<div class="header__title">
@@ -211,7 +211,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	StyledInput,
 	useFormatDateTime,
 	useRelativeTime,

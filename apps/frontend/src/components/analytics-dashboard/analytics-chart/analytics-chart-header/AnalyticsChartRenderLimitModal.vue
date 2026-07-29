@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(analyticsChartMessages.renderLimitHeader, { count: tableProjectCount })"
 		fade="warning"
@@ -24,11 +24,11 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, Modal, useVIntl } from '@modrinth/ui'
 
 import { analyticsChartMessages } from '../../analytics-messages'
 
@@ -41,7 +41,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
-const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const modal = ref<InstanceType<typeof Modal> | null>(null)
 
 function show(event: MouseEvent) {
 	modal.value?.show(event)

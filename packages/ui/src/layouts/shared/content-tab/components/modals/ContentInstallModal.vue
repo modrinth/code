@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" no-padding scrollable max-width="560px" width="560px" :on-hide="handleHide">
+	<Modal ref="modal" no-padding scrollable max-width="560px" width="560px" :on-hide="handleHide">
 		<template #title>
 			<span class="text-2xl font-semibold text-contrast">
 				{{ formatMessage(messages.header) }}
@@ -241,7 +241,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -265,7 +265,7 @@ import Chips from '#ui/components/base/Chips.vue'
 import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectFilePicker } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -391,7 +391,7 @@ const emit = defineEmits<{
 	cancel: []
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 type Tab = 'existing' | 'new'
 const tabs = computed<Tab[]>(() =>

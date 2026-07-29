@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="
 			reportMode
@@ -242,7 +242,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 	<ModpackContentModal
 		ref="contentModal"
 		:header="formatMessage(messages.sharedInstanceContent)"
@@ -271,7 +271,7 @@ import {
 	IntlFormatted,
 	MarkdownEditor,
 	ModpackContentModal,
-	NewModal,
+	Modal,
 	Table,
 	type TableColumn,
 	useScrollIndicator,
@@ -302,7 +302,7 @@ type SharedInstanceCreator = {
 	avatarUrl: string | null
 }
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const contentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const externalFileTable = ref<HTMLElement | null>(null)
 const preview = ref<SharedInstanceInstallPreview | null>(null)

@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="
 			projectType === 'server'
@@ -125,7 +125,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -140,7 +140,7 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
@@ -264,7 +264,7 @@ const props = defineProps<{
 	organizationId?: string | null
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const hasHitLimit = ref(false)
 
 const name = ref('')

@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :on-hide="handleModalHide">
+	<Modal ref="modal" :on-hide="handleModalHide">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">
 				{{ formatMessage(mode === 'edit' ? messages.editSkinTitle : messages.addSkinTitle) }}
@@ -127,7 +127,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -139,7 +139,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	RadioButtons,
 	SkinPreviewRenderer,
 	useScrollIndicator,

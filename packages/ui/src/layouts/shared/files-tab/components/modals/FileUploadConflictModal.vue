@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="true" no-padding>
+	<Modal ref="modal" :header="formatMessage(messages.header)" :closable="true" no-padding>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition type="warning" :header="formatMessage(messages.warningHeader)">
@@ -70,7 +70,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -80,7 +80,7 @@ import { computed, ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -126,7 +126,7 @@ const emit = defineEmits<{
 	proceed: [path: string]
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const hasMany = computed(() => files.value.length > 100)
 

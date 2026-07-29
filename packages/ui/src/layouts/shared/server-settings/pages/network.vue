@@ -2,7 +2,7 @@
 	<div>
 		<Teleport to="body">
 			<div class="relative z-[100]">
-				<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
+				<Modal ref="editAllocationModal" header="Edit allocation" width="550px">
 					<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
 						<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
 						<StyledInput
@@ -30,7 +30,7 @@
 							</ButtonStyled>
 						</div>
 					</form>
-				</NewModal>
+				</Modal>
 
 				<ConfirmModal
 					ref="confirmDeleteModal"
@@ -223,7 +223,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, ConfirmModal, NewModal, StyledInput, Table, TagItem } from '#ui/components'
+import { ButtonStyled, ConfirmModal, Modal, StyledInput, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
 import { useServerPermissions } from '#ui/composables/server-permissions'
 import {
@@ -281,7 +281,7 @@ const dnsColumns: TableColumn[] = [
 	{ key: 'content', label: 'Content' },
 ]
 
-const editAllocationModal = ref<typeof NewModal>()
+const editAllocationModal = ref<typeof Modal>()
 const confirmDeleteModal = ref<typeof ConfirmModal>()
 const editAllocationInput = ref<HTMLInputElement | null>(null)
 const createAllocationName = ref('')

@@ -71,7 +71,7 @@
 		/>
 	</div>
 	<ShareModal ref="shareModal" header="Share Logs" link :social-buttons="false" />
-	<NewModal ref="deleteModal" header="Delete log file" :fade="'danger'" max-width="500px">
+	<Modal ref="deleteModal" header="Delete log file" :fade="'danger'" max-width="500px">
 		<div class="flex flex-col gap-6">
 			<Admonition type="critical" header="This is irreversible">
 				Deleting this log file cannot be undone. Are you sure you want to continue?
@@ -93,7 +93,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -108,7 +108,7 @@ import type { CollapsibleAdmonitionItem } from '#ui/components/base/CollapsibleA
 import CollapsibleAdmonition from '#ui/components/base/CollapsibleAdmonition.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModrinthClient } from '#ui/providers'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
@@ -151,7 +151,7 @@ const crashItems = computed<CollapsibleAdmonitionItem[]>(() => {
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const shareModal = ref<InstanceType<typeof ShareModal> | null>(null)
-const deleteModal = ref<InstanceType<typeof NewModal> | null>(null)
+const deleteModal = ref<InstanceType<typeof Modal> | null>(null)
 const isDeleting = ref(false)
 const searchQuery = ref('')
 const isFullscreen = ref(false)

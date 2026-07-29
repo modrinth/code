@@ -12,7 +12,7 @@
 			:proceed-label="formatMessage(commonMessages.deleteLabel)"
 			@proceed="deleteCollection()"
 		/>
-		<NewModal v-if="canEdit" ref="editModal" :header="formatMessage(messages.editingCollection)">
+		<Modal v-if="canEdit" ref="editModal" :header="formatMessage(messages.editingCollection)">
 			<div class="flex w-[30rem] flex-col gap-3">
 				<div class="flow-root">
 					<div class="group relative float-end ml-4">
@@ -136,7 +136,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 		<NormalPage :sidebar="cosmetics.leftContentLayout ? 'left' : 'right'">
 			<template #header>
 				<div class="flex flex-col gap-4">
@@ -414,7 +414,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	NavTabs,
-	NewModal,
+	Modal,
 	normalizeChildren,
 	NormalPage,
 	OverflowMenu,

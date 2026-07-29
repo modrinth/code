@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(authenticating ? messages.signingInHeader : messages.header)"
 		:on-hide="handleHide"
@@ -103,12 +103,12 @@
 				</p>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
 import { LogInIcon, RefreshCwIcon, SpinnerIcon, UserPlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, IntlFormatted, Modal, useVIntl } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ref } from 'vue'
 
@@ -119,7 +119,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const authenticating = ref<ModrinthAuthFlow | null>(null)
 const reopeningBrowser = ref(false)
 let resolveShow: ((signedIn: boolean) => void) | undefined

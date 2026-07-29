@@ -4709,23 +4709,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "添加重定向 URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "取消"
-  },
   "settings.applications.button.create": {
     "message": "新建 App"
   },
   "settings.applications.button.delete": {
     "message": "删除"
   },
-  "settings.applications.button.edit": {
-    "message": "编辑"
-  },
   "settings.applications.button.new": {
     "message": "新建应用程序"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "保存更改"
   },
   "settings.applications.button.upload-icon": {
     "message": "上传图标"

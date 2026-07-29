@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="danger" max-width="500px">
+	<Modal ref="modal" :header="formatMessage(messages.header)" fade="danger" max-width="500px">
 		<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
 			<IntlFormatted :message-id="messages.admonitionBody" :values="{ code: inviteCode }">
 				<template #monospace="{ children }">
@@ -24,7 +24,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -35,13 +35,13 @@ import {
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
 
 const { formatMessage } = useVIntl()
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const inviteCode = ref('')
 
 const emit = defineEmits<{

@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" max-width="550px">
+	<Modal ref="modal" max-width="550px">
 		<template #title>
 			<div class="text-2xl font-semibold text-contrast">{{ formatMessage(messages.title) }}</div>
 		</template>
@@ -92,7 +92,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -105,7 +105,7 @@ import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 import { useFormatDateTime, useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import IntlFormatted from '../base/IntlFormatted.vue'
-import { ButtonStyled, NewModal } from '../index'
+import { ButtonStyled, Modal } from '../index'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -148,7 +148,7 @@ const emit = defineEmits<{
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
 const formatPrice = useFormatPrice()
 
-const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
+const modal = useTemplateRef<InstanceType<typeof Modal>>('modal')
 
 const modalData = ref<ResubscribeModalState | null>(null)
 

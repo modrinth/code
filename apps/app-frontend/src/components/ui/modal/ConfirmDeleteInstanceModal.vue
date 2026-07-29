@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="danger" max-width="500px">
+	<Modal ref="modal" :header="formatMessage(messages.header)" fade="danger" max-width="500px">
 		<Admonition type="critical" :header="formatMessage(messages.admonitionHeader)">
 			{{ formatMessage(messages.admonitionBody) }}
 		</Admonition>
@@ -20,7 +20,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -30,7 +30,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -61,7 +61,7 @@ const emit = defineEmits<{
 	(e: 'delete'): void
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 function show() {
 	modal.value?.show()

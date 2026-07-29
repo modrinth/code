@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.createHeader)">
+	<Modal ref="modal" :header="formatMessage(messages.createHeader)">
 		<div class="flex flex-col">
 			<label v-if="showUserField" class="contents" for="create-affiliate-user-input">
 				<span class="text-lg font-semibold text-contrast mb-1">
@@ -55,7 +55,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 <script lang="ts"></script>
 <script setup lang="ts">
@@ -64,7 +64,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { AutoBrandIcon, ButtonStyled, NewModal, StyledInput } from '../index'
+import { AutoBrandIcon, ButtonStyled, Modal, StyledInput } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(
@@ -82,7 +82,7 @@ const emit = defineEmits<{
 	(e: 'create', data: CreateAffiliateProps): void
 }>()
 
-const modal = useTemplateRef<typeof NewModal>('modal')
+const modal = useTemplateRef<typeof Modal>('modal')
 const { formatMessage } = useVIntl()
 
 const affiliateLinkTitle = ref('')

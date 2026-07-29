@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, DownloadIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
+import { ButtonStyled, CopyCode, Modal, useDebugLogger } from '@modrinth/ui'
 import { ref, useTemplateRef } from 'vue'
 
 export type UnsafeFile = {
@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const debug = useDebugLogger('MaliciousSummaryModal')
 
-const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
+const modalRef = useTemplateRef<InstanceType<typeof Modal>>('modalRef')
 
 const versionDataCache = ref<
 	Map<
@@ -96,7 +96,7 @@ defineExpose({ show, hide })
 </script>
 
 <template>
-	<NewModal
+	<Modal
 		ref="modalRef"
 		header="Malicious file(s) summary"
 		:close-on-click-outside="false"
@@ -182,5 +182,5 @@ defineExpose({ show, hide })
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

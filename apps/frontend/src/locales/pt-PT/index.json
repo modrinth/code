@@ -3350,23 +3350,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Adicionar um endereço de redirecionamento"
   },
-  "settings.applications.button.cancel": {
-    "message": "Cancelar"
-  },
   "settings.applications.button.create": {
     "message": "Criar app"
   },
   "settings.applications.button.delete": {
     "message": "Apagar"
   },
-  "settings.applications.button.edit": {
-    "message": "Editar"
-  },
   "settings.applications.button.new": {
     "message": "Nova aplicação"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Guardar alterações"
   },
   "settings.applications.button.upload-icon": {
     "message": "Carregar ícone"

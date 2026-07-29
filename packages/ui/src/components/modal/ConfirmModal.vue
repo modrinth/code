@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide" max-width="550px">
+	<Modal ref="modal" :noblur="noblur" :danger="danger" :on-hide="onHide" max-width="550px">
 		<template #title>
 			<slot name="title">
 				<span class="font-extrabold text-contrast text-lg">{{ title }}</span>
@@ -45,7 +45,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup>
@@ -55,7 +55,7 @@ import { computed, ref } from 'vue'
 
 import ButtonStyled from '../base/ButtonStyled.vue'
 import StyledInput from '../base/StyledInput.vue'
-import NewModal from './NewModal.vue'
+import Modal from './Modal.vue'
 
 const props = defineProps({
 	confirmationText: {

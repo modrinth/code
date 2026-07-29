@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NewModal ref="editLinksModal" :header="formatMessage(messages.editLinksHeader)">
+		<Modal ref="editLinksModal" :header="formatMessage(messages.editLinksHeader)">
 			<div class="universal-modal links-modal !p-0">
 				<p>{{ formatMessage(messages.editLinksDescription) }}</p>
 				<section class="links">
@@ -155,7 +155,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />
 		<section class="relative overflow-hidden rounded-2xl">
 			<Table
@@ -366,7 +366,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	ProjectStatusBadge,
 	StyledInput,
 	Table,

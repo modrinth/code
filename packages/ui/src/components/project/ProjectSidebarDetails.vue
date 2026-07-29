@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<NewModal
+		<Modal
 			ref="modalLicense"
 			:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
 		>
@@ -11,7 +11,7 @@
 				</span>
 			</template>
 			<div class="markdown-body" v-html="licenseHtml" />
-		</NewModal>
+		</Modal>
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div class="flex flex-col gap-3 [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
 			<div v-if="!hideLicense">
@@ -104,7 +104,7 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import { commonMessages } from '../../utils/common-messages'
 import { Avatar, IntlFormatted } from '../base'
-import { NewModal } from '../modal'
+import { Modal } from '../modal'
 
 const LICENSE_STALE_TIME = 1000 * 60 * 10
 

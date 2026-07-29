@@ -10,7 +10,7 @@
 			:proceed-label="formatMessage(messages.proceedDeletion)"
 			@proceed="deleteVersion()"
 		/>
-		<NewModal
+		<Modal
 			v-if="auth.user && currentMember"
 			ref="packageModal"
 			:header="formatMessage(messages.packageDataPackHeader)"
@@ -79,7 +79,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 		<ProjectDownloadModal
 			ref="dependencyDownloadModal"
 			download-reason="dependency"
@@ -514,7 +514,7 @@ import {
 	injectProjectPageContext,
 	IntlFormatted,
 	MultiSelect,
-	NewModal,
+	Modal,
 	OverflowMenu,
 	useFormatBytes,
 	useFormatDateTime,

@@ -5,7 +5,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
@@ -59,7 +59,7 @@ const messages = defineMessages({
 	},
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const isServer = computed(() => props.world?.type === 'server')
 const isSingleplayer = computed(() => props.world?.type === 'singleplayer')
@@ -94,7 +94,7 @@ defineExpose({ show, hide })
 </script>
 
 <template>
-	<NewModal ref="modal" :header="formatMessage(titleMessage)" fade="danger" max-width="500px">
+	<Modal ref="modal" :header="formatMessage(titleMessage)" fade="danger" max-width="500px">
 		<div class="flex flex-col gap-4">
 			<Admonition
 				type="critical"
@@ -120,5 +120,5 @@ defineExpose({ show, hide })
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>

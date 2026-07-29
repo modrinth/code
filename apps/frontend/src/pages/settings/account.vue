@@ -9,7 +9,7 @@
 			:has-to-type="true"
 			@proceed="deleteAccount"
 		/>
-		<NewModal
+		<Modal
 			ref="changeEmailModal"
 			width="500px"
 			:header="`${auth.user.email ? formatMessage(messages.changeEmailHeaderChange) : formatMessage(messages.changeEmailHeaderAdd)}`"
@@ -48,8 +48,8 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
-		<NewModal
+		</Modal>
+		<Modal
 			ref="managePasswordModal"
 			width="600px"
 			:header="`${
@@ -169,8 +169,8 @@
 					</template>
 				</div>
 			</div>
-		</NewModal>
-		<NewModal
+		</Modal>
+		<Modal
 			ref="manageTwoFactorModal"
 			width="500px"
 			:header="
@@ -307,8 +307,8 @@
 					</div>
 				</template>
 			</div>
-		</NewModal>
-		<NewModal
+		</Modal>
+		<Modal
 			ref="manageProvidersModal"
 			width="500px"
 			:header="formatMessage(messages.manageProvidersModalHeader)"
@@ -343,7 +343,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(messages.accountSecurityTitle) }}</h2>
 
@@ -500,7 +500,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
-	NewModal,
+	Modal,
 	StyledInput,
 	Table,
 	useVIntl,

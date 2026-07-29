@@ -4706,23 +4706,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Voeg een URI toe"
   },
-  "settings.applications.button.cancel": {
-    "message": "Annuleren"
-  },
   "settings.applications.button.create": {
     "message": "Maak nieuwe"
   },
   "settings.applications.button.delete": {
     "message": "Verwijder"
   },
-  "settings.applications.button.edit": {
-    "message": "Bewerk"
-  },
   "settings.applications.button.new": {
     "message": "Nieuw project"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Wijzigingen opslaan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Pictogram uploaden"

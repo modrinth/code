@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" header="Restore backup" fade="danger" width="500px">
+	<Modal ref="modal" header="Restore backup" fade="danger" width="500px">
 		<div class="flex flex-col gap-6">
 			<Admonition v-if="ctx.isServerRunning.value" type="critical" header="Server is running">
 				Stop the server before restoring a backup.
@@ -36,7 +36,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -54,7 +54,7 @@ import {
 import { commonMessages } from '../../../utils'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 import BackupItem from './BackupItem.vue'
 
 const { addNotification } = injectNotificationManager()
@@ -87,7 +87,7 @@ const restoreMutation = useMutation({
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const currentBackup = ref<Archon.BackupsQueue.v1.BackupQueueBackup | null>(null)
 const isRestoring = ref(false)
 const restoreDisabled = computed(

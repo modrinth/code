@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)" width="420px" max-width="420px">
+	<Modal ref="modal" :header="formatMessage(messages.title)" width="420px" max-width="420px">
 		<div class="flex flex-col gap-6">
 			<div class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.expiryLabel) }}</span>
@@ -88,7 +88,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -102,7 +102,7 @@ import ButtonStyled from '../../base/ButtonStyled.vue'
 import Combobox, { type ComboboxOption } from '../../base/Combobox.vue'
 import DatePicker from '../../base/DatePicker.vue'
 import StyledInput from '../../base/StyledInput.vue'
-import NewModal from '../../modal/NewModal.vue'
+import Modal from '../../modal/Modal.vue'
 import type { InviteLinkSettings } from './types'
 
 const EXPIRY_PRESET_DURATIONS = {
@@ -132,7 +132,7 @@ const props = withDefaults(
 )
 const { formatMessage } = useVIntl()
 const notificationManager = injectNotificationManager(null)
-const modal = ref<InstanceType<typeof NewModal> | null>(null)
+const modal = ref<InstanceType<typeof Modal> | null>(null)
 const expiry = ref('')
 const expiryMode = ref<'preset' | 'custom'>('preset')
 const expiryPreset = ref<ExpiryPreset>('seven_days')

@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="
 			formatMessage(messages.header, {
@@ -28,7 +28,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -36,7 +36,7 @@ import { HammerIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -81,7 +81,7 @@ const emit = defineEmits<{
 	(e: 'repair'): void
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 function show() {
 	debug('show: called', { hasModalRef: !!modal.value })

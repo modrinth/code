@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal, StyledInput } from '@modrinth/ui'
+import { ButtonStyled, Modal, StyledInput } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
 import emails from '~/templates/emails'
@@ -126,7 +126,7 @@ onMounted(() => {
 <template>
 	<div class="normal-page no-sidebar">
 		<h1 class="mb-4 text-3xl font-extrabold text-heading">Email templates</h1>
-		<NewModal
+		<Modal
 			ref="previewModal"
 			header="Preview email"
 			width="min(92vw, 1000px)"
@@ -188,7 +188,7 @@ onMounted(() => {
 					</div>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 		<div class="normal-page__content">
 			<div class="flex flex-wrap items-center gap-3">
 				<StyledInput

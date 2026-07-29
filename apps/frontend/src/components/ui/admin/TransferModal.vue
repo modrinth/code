@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal">
+	<Modal ref="modal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Schedule transfer</span>
 		</template>
@@ -189,7 +189,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -200,7 +200,7 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	TagItem,
 	Toggle,
@@ -215,7 +215,7 @@ const emit = defineEmits<{
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const modeOptions = [
 	{ value: 'servers', label: 'Servers' },

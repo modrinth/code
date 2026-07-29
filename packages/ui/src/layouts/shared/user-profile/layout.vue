@@ -1,6 +1,6 @@
 <template>
 	<template v-if="user">
-		<NewModal
+		<Modal
 			ref="blockUserModal"
 			:header="formatMessage(messages.blockUserTitle, { username: user.username })"
 			:closable="!isBlockingUser"
@@ -28,9 +28,9 @@
 					</ButtonStyled>
 				</div>
 			</template>
-		</NewModal>
+		</Modal>
 
-		<NewModal
+		<Modal
 			v-if="variant === 'web'"
 			ref="editRoleModal"
 			:header="formatMessage(messages.editRoleButton)"
@@ -66,9 +66,9 @@
 					</ButtonStyled>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 
-		<NewModal
+		<Modal
 			v-if="variant === 'web' && isStaffViewing"
 			ref="userDetailsModal"
 			:header="formatMessage(messages.userDetailsTitle)"
@@ -164,7 +164,7 @@
 					</span>
 				</div>
 			</div>
-		</NewModal>
+		</Modal>
 
 		<NormalPage :sidebar="sidebarPosition">
 			<template #header>
@@ -453,7 +453,7 @@ import EmptyState from '#ui/components/base/EmptyState.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import SmartClickable from '#ui/components/base/SmartClickable.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import NormalPage from '#ui/components/page/NormalPage.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'

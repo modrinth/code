@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)">
+	<Modal ref="modal" :header="formatMessage(messages.title)">
 		<div class="min-w-md flex max-w-md flex-col gap-3">
 			<CreateLimitAlert v-model="hasHitLimit" type="collection" />
 			<div class="flex flex-col gap-2">
@@ -52,7 +52,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
@@ -61,7 +61,7 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'

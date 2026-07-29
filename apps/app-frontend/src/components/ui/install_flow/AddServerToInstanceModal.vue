@@ -5,13 +5,13 @@ import {
 	Avatar,
 	ButtonStyled,
 	injectNotificationManager,
+	Modal,
 	StyledInput,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { list } from '@/helpers/instance'
 import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
@@ -82,7 +82,7 @@ async function addServer(instance) {
 </script>
 
 <template>
-	<ModalWrapper ref="modal" header="Add server to instance">
+	<Modal ref="modal" header="Add server to instance">
 		<div class="flex flex-col gap-4 min-w-[350px]">
 			<Admonition type="warning" body="This server may not be compatible with all instances." />
 			<StyledInput
@@ -124,5 +124,5 @@ async function addServer(instance) {
 				</ButtonStyled>
 			</div>
 		</div>
-	</ModalWrapper>
+	</Modal>
 </template>

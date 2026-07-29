@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal">
+	<Modal ref="modal">
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Batch credit</span>
 		</template>
@@ -125,7 +125,7 @@
 				</ButtonStyled>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -135,7 +135,7 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
-	NewModal,
+	Modal,
 	StyledInput,
 	TagItem,
 	Toggle,
@@ -148,7 +148,7 @@ import { useBaseFetch } from '#imports'
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 
 const days = ref(1)
 const sendEmail = ref(true)

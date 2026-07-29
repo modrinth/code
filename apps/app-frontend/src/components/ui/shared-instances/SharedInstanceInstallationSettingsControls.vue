@@ -28,7 +28,7 @@
 		<span class="text-primary">{{ formatMessage(messages.unlinkDescription) }}</span>
 	</div>
 
-	<NewModal
+	<Modal
 		ref="unpublishModal"
 		:header="formatMessage(messages.unpublishModalHeader)"
 		fade="warning"
@@ -50,8 +50,8 @@
 				>
 			</div></template
 		>
-	</NewModal>
-	<NewModal
+	</Modal>
+	<Modal
 		ref="unlinkModal"
 		:header="formatMessage(messages.unlinkModalHeader)"
 		fade="warning"
@@ -81,7 +81,7 @@
 				>
 			</div></template
 		>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -92,7 +92,7 @@ import {
 	commonMessages,
 	defineMessages,
 	InlineBackupCreator,
-	NewModal,
+	Modal,
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
@@ -117,8 +117,8 @@ const props = withDefaults(
 	},
 )
 const { formatMessage } = useVIntl()
-const unpublishModal = ref<InstanceType<typeof NewModal>>()
-const unlinkModal = ref<InstanceType<typeof NewModal>>()
+const unpublishModal = ref<InstanceType<typeof Modal>>()
+const unlinkModal = ref<InstanceType<typeof Modal>>()
 const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const backupBusy = ref(false)
 

@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="cf ? formatMessage(messages.cfHeader) : formatMessage(messages.zipHeader)"
 	>
@@ -91,7 +91,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -107,7 +107,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
@@ -229,7 +229,7 @@ const steps = [
 
 const cf = ref(false)
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const url = ref('')
 const submitted = ref(false)
 const touched = ref(false)

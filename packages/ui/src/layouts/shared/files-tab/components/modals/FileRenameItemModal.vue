@@ -1,5 +1,5 @@
 <template>
-	<NewModal
+	<Modal
 		ref="modal"
 		:header="formatMessage(messages.header, { name: item?.name })"
 		max-width="500px"
@@ -27,7 +27,7 @@
 				</ButtonStyled>
 			</div>
 		</template>
-	</NewModal>
+	</Modal>
 </template>
 
 <script setup lang="ts">
@@ -36,7 +36,7 @@ import { computed, nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import NewModal from '#ui/components/modal/NewModal.vue'
+import Modal from '#ui/components/modal/Modal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -64,7 +64,7 @@ const emit = defineEmits<{
 	rename: [newName: string]
 }>()
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const renameInput = ref<HTMLInputElement | null>(null)
 const itemName = ref('')
 const submitted = ref(false)

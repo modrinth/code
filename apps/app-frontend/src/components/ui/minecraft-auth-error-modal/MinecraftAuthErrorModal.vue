@@ -7,7 +7,7 @@ import {
 	MessagesSquareIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Collapsible, NewModal } from '@modrinth/ui'
+import { Admonition, ButtonStyled, Collapsible, Modal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -16,7 +16,7 @@ import { handleSevereError } from '@/store/error.js'
 
 import { findMinecraftAuthError, type MinecraftAuthError } from './minecraft-auth-errors'
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const modal = ref<InstanceType<typeof Modal>>()
 const rawError = ref<string>('')
 const matchedError = ref<MinecraftAuthError | null>(null)
 const debugCollapsed = ref(true)
@@ -74,7 +74,7 @@ async function copyToClipboard(text: string) {
 </script>
 
 <template>
-	<NewModal ref="modal" header="Sign in Failed" :max-width="'548px'" @hide="onModalHide">
+	<Modal ref="modal" header="Sign in Failed" :max-width="'548px'" @hide="onModalHide">
 		<div class="flex flex-col gap-6">
 			<Admonition
 				type="warning"
@@ -191,5 +191,5 @@ async function copyToClipboard(text: string) {
 				</div>
 			</div>
 		</div>
-	</NewModal>
+	</Modal>
 </template>

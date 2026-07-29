@@ -6,12 +6,12 @@ import {
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
+	Modal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
 import type { GameInstance } from '@/helpers/types'
 import type { DisplayStatus, SingleplayerWorld } from '@/helpers/worlds.ts'
@@ -94,7 +94,7 @@ const messages = defineMessages({
 })
 </script>
 <template>
-	<ModalWrapper ref="modal">
+	<Modal ref="modal">
 		<template #title>
 			<Avatar :src="removeIcon || !icon ? undefined : icon" size="24px" />
 			{{ instance.name }} <ChevronRightIcon />
@@ -132,5 +132,5 @@ const messages = defineMessages({
 				</button>
 			</ButtonStyled>
 		</div>
-	</ModalWrapper>
+	</Modal>
 </template>
