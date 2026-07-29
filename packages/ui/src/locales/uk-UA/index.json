@@ -222,7 +222,7 @@
     "defaultMessage": "Відкрити теку"
   },
   "button.open-in-browser": {
-    "defaultMessage": "Відкрити в браузері"
+    "defaultMessage": "Відкрити в переглядачу"
   },
   "button.open-in-folder": {
     "defaultMessage": "Відкрити в теці"
@@ -529,15 +529,6 @@
   },
   "content.inline-backup.world-label": {
     "defaultMessage": "світ"
-  },
-  "content.modpack-card.content-hint-description": {
-    "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
-  },
-  "content.modpack-card.content-hint-title": {
-    "defaultMessage": "Уміст збірки перемістився"
-  },
-  "content.modpack-card.dismiss-hint": {
-    "defaultMessage": "Не показувати знову"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Додатковий уміст"
@@ -1095,7 +1086,7 @@
     "defaultMessage": "Ліцензія"
   },
   "external-files.permissions-card.reason.license.description": {
-    "defaultMessage": "Ліцензія цієї роботи дозволяє вам поширювати її у вашій збірці."
+    "defaultMessage": "Цю роботу можна поширювати у вашій збірці згідно з її ліцензією."
   },
   "external-files.permissions-card.reason.license.proof-images-description": {
     "defaultMessage": "Завантажте підтверджувальну документацію щодо цієї ліцензії."
@@ -1123,12 +1114,6 @@
   },
   "external-files.permissions-card.reason.special-permission.description": {
     "defaultMessage": "Ви отримали особливі дозволи для поширення цієї роботи у вашій збірці."
-  },
-  "external-files.permissions-card.remove-group": {
-    "defaultMessage": "Видалити групу"
-  },
-  "external-files.permissions-card.remove-group-error.title": {
-    "defaultMessage": "Групу не видалено"
   },
   "external-files.permissions-card.split-file": {
     "defaultMessage": "Видалити з групи"
@@ -1752,7 +1737,7 @@
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "Короткочасне посилення ЦП дозволяє вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
+    "defaultMessage": "Короткочасне посилення ЦП дає змогу вашому серверу використовувати додаткові потоки для пом’якшення стрибків TPS. Натисніть, щоб дізнатися більше."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} ГБ ОЗП"
@@ -3056,6 +3041,15 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {відстежує} few {відстежують} other {відстежують}}"
   },
+  "project.license.error": {
+    "defaultMessage": "Не вдалося отримати текст ліцензії."
+  },
+  "project.license.loading": {
+    "defaultMessage": "Завантажуємо текст ліцензії…"
+  },
+  "project.license.title": {
+    "defaultMessage": "Ліцензія"
+  },
   "project.online-player-count": {
     "defaultMessage": "{count, number} у мережі"
   },
@@ -3460,6 +3454,12 @@
   },
   "project.settings.view.title": {
     "defaultMessage": "Переглянути"
+  },
+  "project.stats.downloads-label": {
+    "defaultMessage": "{count, plural, one {завантаження} few {завантаження} many {завантажень} other {завантаження}}"
+  },
+  "project.stats.followers-label": {
+    "defaultMessage": "{count, plural, one {стежить} few {стежать} many {стежать} other {стежать}}"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -4996,9 +4996,6 @@
   },
   "settings.pats.title": {
     "defaultMessage": "Особистий токен доступу"
-  },
-  "settings.profile.title": {
-    "defaultMessage": "Публічний профіль"
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеанси"

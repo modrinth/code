@@ -92,9 +92,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Hiasan asli"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Pilih satu pilihan"
-  },
   "app.appearance-settings.skip-non-essential-warnings.description": {
     "message": "Melangkau pengesahan berisiko rendah secara automatik seperti pemasangan pek mod pendua, pemadaman kandungan biasa, kemas kini pukal, menyahpautkan pek mod dan gesaan pembaikan. Amaran berbahaya masih akan ditunjukkan."
   },
@@ -136,9 +133,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Kembali ke pemasangan"
-  },
-  "app.browse.discover-content": {
-    "message": "Temui kandungan"
   },
   "app.browse.discover-servers": {
     "message": "Temui pelayan"
@@ -277,9 +271,6 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Kemas kini untuk mainkan"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Kemas kini diperlukan untuk memainkan {name}. Sila kemas kini kepada versi terkini untuk melancarkan permainan."
   },
   "app.project.install-button.already-installed": {
     "message": "Projek ini sudah dipasang"

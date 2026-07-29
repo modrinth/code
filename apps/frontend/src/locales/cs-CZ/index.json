@@ -1949,9 +1949,6 @@
   "layout.nav.discover": {
     "message": "Objevit"
   },
-  "layout.nav.discover-content": {
-    "message": "Objevit obsah"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Získat Modrinth App"
   },
@@ -2104,111 +2101,6 @@
   },
   "muralpay.placeholder.account-number": {
     "message": "Zadejte číslo účtu"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Modrinth tvůrce."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Modrinth uživatel."
-  },
-  "profile.button.analytics": {
-    "message": "Zobrazit analytika uživatele"
-  },
-  "profile.button.billing": {
-    "message": "Spravujte fakturaci uživatele"
-  },
-  "profile.button.edit-role": {
-    "message": "Upravit roli"
-  },
-  "profile.button.info": {
-    "message": "Podívejte se na detaily uživatele"
-  },
-  "profile.button.manage-projects": {
-    "message": "Spravujte projekty"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Odebrat jako partnera"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Nastavit jako partnera"
-  },
-  "profile.collection.projects-count": {
-    "message": "{count, plural, one {# projekt} few {# projekty} other {# projektů}}"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Poskytovatelé přihlášení"
-  },
-  "profile.details.label.email": {
-    "message": "E-mail"
-  },
-  "profile.details.label.email-verified": {
-    "message": "E-mail ověřen"
-  },
-  "profile.details.label.has-password": {
-    "message": "Má heslo"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Má TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Platební metody"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "E-mail není ověřen"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "E-mail je ověřen"
-  },
-  "profile.error.not-found": {
-    "message": "Uživatel nenalezen"
-  },
-  "profile.label.affiliate": {
-    "message": "Partner"
-  },
-  "profile.label.badges": {
-    "message": "Odznaky"
-  },
-  "profile.label.collection": {
-    "message": "Kolekce"
-  },
-  "profile.label.joined": {
-    "message": "Členem od"
-  },
-  "profile.label.no-collections": {
-    "message": "Tento uživatel nemá žádné kolekce!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Nemáte žádné kolekce.\nChcete nějakou <create-link>vytvořit</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Tento uživatel nemá žádné projekty!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Nemáte žádné projekty.\nChcete nějaký <create-link>vytvořit</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizace"
-  },
-  "profile.label.saving": {
-    "message": "Ukládání..."
-  },
-  "profile.meta.description": {
-    "message": "Stáhněte si projekty od {username} na Modrinthu"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Stáhněte si projekty od {username} na Modrinthu"
-  },
-  "profile.official-account": {
-    "message": "Oficiální Modrinth účet"
-  },
-  "profile.official-account.bio": {
-    "message": "Oficiální uživatelský účet Modrinthu. Podporu získáte na <support-link></support-link> nebo e-mailem na <email></email>"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> sledující projektu} few {<stat>{count}</stat> sledující projektu} other {<stat>{count}</stat> sledujících projektu}}"
-  },
-  "profile.user-id": {
-    "message": "ID uživatele: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Nepodařilo se zamítnout pozvánku do týmu"
@@ -2852,23 +2744,14 @@
   "settings.applications.about": {
     "message": "O"
   },
-  "settings.applications.button.cancel": {
-    "message": "Zrušit"
-  },
   "settings.applications.button.create": {
     "message": "Vytvořit aplikaci"
   },
   "settings.applications.button.delete": {
     "message": "Smazat"
   },
-  "settings.applications.button.edit": {
-    "message": "Upravit"
-  },
   "settings.applications.button.new": {
     "message": "Nová aplikace"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Uložit změny"
   },
   "settings.applications.button.upload-icon": {
     "message": "Nahrát ikonu"
@@ -2935,9 +2818,6 @@
   },
   "settings.authorizations.about-this-app": {
     "message": "O této aplikaci"
-  },
-  "settings.authorizations.by": {
-    "message": "od"
   },
   "settings.authorizations.head-title": {
     "message": "Autorizace"
@@ -3082,12 +2962,6 @@
   },
   "settings.pats.modal.delete.description": {
     "message": "Toto vymaže tento token navždy (jako opravdu navždy)."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Profilový obrázek"
   },
   "settings.sidebar.label.developer": {
     "message": "Vývojář"

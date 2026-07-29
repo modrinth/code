@@ -14,10 +14,9 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use std::ffi::OsStr;
 use std::future::Future;
 use std::num::NonZeroU32;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::pin::Pin;
 use std::sync::{Arc, LazyLock};
 use std::time::{self, Duration, Instant, SystemTime};
@@ -429,6 +428,7 @@ pub async fn fetch_with_client_progress(
         sha1,
         None,
         None,
+        None,
         download_meta,
         None,
         uri_path,
@@ -494,6 +494,35 @@ pub async fn fetch_advanced(
     .await
 }
 
+#[tracing::instrument(skip(body, semaphore))]
+#[allow(clippy::too_many_arguments)]
+pub async fn fetch_advanced_bytes(
+    method: Method,
+    url: &str,
+    body: Bytes,
+    header: Option<(&str, &str)>,
+    uri_path: Option<&'static str>,
+    semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<Bytes> {
+    fetch_advanced_with_client_and_progress(
+        method,
+        url,
+        None,
+        None,
+        Some(body),
+        header,
+        None,
+        None,
+        uri_path,
+        semaphore,
+        exec,
+        &INSECURE_REQWEST_CLIENT,
+        None,
+    )
+    .await
+}
+
 #[tracing::instrument(skip(json_body, semaphore, progress))]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced_with_progress(
@@ -514,6 +543,7 @@ pub async fn fetch_advanced_with_progress(
         url,
         sha1,
         json_body,
+        None,
         header,
         download_meta,
         loading_bar,
@@ -547,6 +577,7 @@ pub async fn fetch_advanced_with_client(
         url,
         sha1,
         json_body,
+        None,
         header,
         download_meta,
         loading_bar,
@@ -559,13 +590,16 @@ pub async fn fetch_advanced_with_client(
     .await
 }
 
-#[tracing::instrument(skip(json_body, semaphore, client, progress))]
+#[tracing::instrument(skip(
+    json_body, bytes_body, semaphore, client, progress
+))]
 #[allow(clippy::too_many_arguments)]
 async fn fetch_advanced_with_client_and_progress(
     method: Method,
     url: &str,
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
+    bytes_body: Option<Bytes>,
     header: Option<(&str, &str)>,
     download_meta: Option<&DownloadMeta>,
     loading_bar: Option<(&LoadingBarId, f64)>,
@@ -612,6 +646,8 @@ async fn fetch_advanced_with_client_and_progress(
 
         if let Some(body) = json_body.clone() {
             req = req.json(&body);
+        } else if let Some(body) = bytes_body.clone() {
+            req = req.body(body);
         }
 
         if let Some(header) = header {
@@ -905,28 +941,6 @@ pub async fn copy(
         dest.display()
     );
     Ok(())
-}
-
-// Writes a icon to the cache and returns the absolute path of the icon within the cache directory
-#[tracing::instrument(skip(bytes, semaphore))]
-pub async fn write_cached_icon(
-    icon_path: &str,
-    cache_dir: &Path,
-    bytes: Bytes,
-    semaphore: &IoSemaphore,
-) -> crate::Result<PathBuf> {
-    let extension = Path::new(&icon_path).extension().and_then(OsStr::to_str);
-    let hash = sha1_async(bytes.clone()).await?;
-    let path = cache_dir.join("icons").join(if let Some(ext) = extension {
-        format!("{hash}.{ext}")
-    } else {
-        hash
-    });
-
-    write(&path, &bytes, semaphore).await?;
-
-    let path = io::canonicalize(path)?;
-    Ok(path)
 }
 
 pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {

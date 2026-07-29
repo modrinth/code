@@ -5,8 +5,6 @@ use crate::state::{
     CreateInstance, EditInstance, InstanceLink, InstanceMetadata, ModLoader,
     State,
 };
-use crate::util::io;
-use std::path::Path;
 
 #[tracing::instrument]
 #[allow(clippy::too_many_arguments)]
@@ -73,51 +71,17 @@ pub async fn edit(
     Ok(instance)
 }
 
-pub async fn edit_icon(
-    instance_id: &str,
-    icon_path: Option<&Path>,
-) -> crate::Result<()> {
-    let state = State::get().await?;
-    let instance =
-        instance_rows::get_instance_display_info(instance_id, &state.pool)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
-    let icon_path = if let Some(icon) = icon_path {
-        let bytes = io::read(icon).await?;
-        let file = crate::util::fetch::write_cached_icon(
-            &icon.to_string_lossy(),
-            &state.directories.caches_dir(),
-            bytes::Bytes::from(bytes),
-            &state.io_semaphore,
-        )
-        .await?;
-        Some(file.to_string_lossy().to_string())
-    } else {
-        None
-    };
-
-    crate::state::edit_instance(
-        instance_id,
-        EditInstance {
-            icon_path: Some(icon_path),
-            ..EditInstance::default()
-        },
-        &state.pool,
-    )
-    .await?;
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
-
-    Ok(())
-}
-
 #[tracing::instrument]
 pub async fn remove(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let instance =
         instance_rows::get_instance_display_info(instance_id, &state.pool)
             .await?;
+    crate::install::runner::cancel_jobs_for_instance_deletion(
+        instance_id,
+        &state,
+    )
+    .await?;
     crate::state::remove_instance(instance_id, &state).await?;
 
     if let Some(instance) = instance {

@@ -16,7 +16,6 @@ pub mod ip;
 pub mod kafka;
 pub mod neverbounce;
 pub mod ratelimit;
-pub mod redis;
 pub mod routes;
 pub mod sentry;
 pub mod tags;

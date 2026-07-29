@@ -3,13 +3,13 @@ use crate::database::models::session_item::DBSession;
 use crate::database::models::{
     DBOAuthAccessTokenId, DBPatId, DBSessionId, DBUserId, DatabaseError,
 };
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::routes::internal::session::SessionMetadata;
 use chrono::Utc;
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
+use xredis::RedisPool;
 
 pub struct AuthQueue {
     session_queue: Mutex<HashMap<DBSessionId, SessionMetadata>>,

@@ -1,265 +1,77 @@
 <template>
-	<div>
-		<section class="card">
-			<h2 class="text-2xl">{{ formatMessage(messages.title) }}</h2>
-			<p class="mb-4">
-				<IntlFormatted :message-id="messages.description">
-					<template #docs-link="{ children }">
-						<a href="https://docs.modrinth.com/" target="_blank" class="text-link">
-							<component :is="() => children" />
-						</a>
-					</template>
-				</IntlFormatted>
-			</p>
-			<label>
-				<span class="label__title">{{ formatMessage(messages.profilePicture) }}</span>
-			</label>
-			<div class="avatar-changer">
-				<Avatar
-					:src="previewImage ? previewImage : avatarUrl"
-					size="md"
-					circle
-					:alt="auth.user.username"
-				/>
-				<div class="flex flex-col gap-2">
-					<ButtonStyled>
-						<FileInput
-							:max-size="262144"
-							:show-icon="true"
-							class="button-like"
-							:prompt="formatMessage(commonMessages.uploadImageButton)"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							@change="showPreviewImage"
-						>
-							<UploadIcon />
-						</FileInput>
-					</ButtonStyled>
-					<ButtonStyled v-if="avatarUrl !== null">
-						<button @click="removePreviewImage">
-							<TrashIcon />
-							{{ formatMessage(commonMessages.removeImageButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="previewImage">
-						<button
-							@click="
-								() => {
-									icon = null
-									previewImage = null
-								}
-							"
-						>
-							<UndoIcon />
-							{{ formatMessage(commonMessages.resetButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-			<label for="username-field">
-				<span class="label__title">{{ formatMessage(commonMessages.usernameLabel) }}</span>
-				<span class="label__description">
-					{{ formatMessage(messages.usernameDescription) }}
-				</span>
-			</label>
-			<StyledInput id="username-field" v-model="current.username" />
-			<label for="bio-field">
-				<span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
-				<span class="label__description">
-					{{ formatMessage(messages.bioDescription) }}
-				</span>
-			</label>
-			<StyledInput id="bio-field" v-model="current.bio" multiline />
-			<div class="input-group mt-4">
-				<ButtonStyled>
-					<NuxtLink :to="`/user/${auth.user.username}`">
-						<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
-					</NuxtLink>
-				</ButtonStyled>
-			</div>
-		</section>
-		<UnsavedChangesPopup
-			:original="originalState"
-			:modified="modifiedState"
-			:saving="saving"
-			@reset="reset"
-			@save="save"
+	<section v-if="auth.user" class="universal-card">
+		<AccountProfileSettings
+			ref="profileSettings"
+			:patch-user="patchUser"
+			:change-avatar="changeAvatar"
+			:delete-avatar="deleteAvatar"
+			:get-authenticated-user="getAuthenticatedUser"
+			disclaimer-position="bottom"
 		/>
-	</div>
+		<UnsavedChangesPopup
+			:original="profileSettings?.originalState ?? emptyProfileState"
+			:modified="profileSettings?.modifiedState ?? emptyProfileState"
+			:saving="profileSettings?.saving ?? false"
+			@reset="resetProfileSettings"
+			@save="saveProfileSettings"
+		/>
+	</section>
 </template>
 
-<script setup>
-import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@modrinth/assets'
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
-	Avatar,
-	ButtonStyled,
-	commonMessages,
-	defineMessages,
-	FileInput,
-	injectNotificationManager,
-	IntlFormatted,
-	StyledInput,
+	AccountProfileSettings,
+	commonSettingsMessages,
+	injectModrinthClient,
 	UnsavedChangesPopup,
-	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
-
-const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
 
 definePageMeta({
 	middleware: 'auth',
 })
 
-const messages = defineMessages({
-	headTitle: {
-		id: 'settings.profile.head-title',
-		defaultMessage: 'Profile settings',
-	},
-	title: {
-		id: 'settings.profile.profile-info',
-		defaultMessage: 'Profile information',
-	},
-	description: {
-		id: 'settings.profile.description',
-		defaultMessage:
-			'Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>.',
-	},
-	profilePicture: {
-		id: 'settings.profile.profile-picture.title',
-		defaultMessage: 'Profile picture',
-	},
-	usernameDescription: {
-		id: 'settings.profile.username.description',
-		defaultMessage: 'A unique case-insensitive name to identify your profile.',
-	},
-	bioTitle: {
-		id: 'settings.profile.bio.title',
-		defaultMessage: 'Bio',
-	},
-	bioDescription: {
-		id: 'settings.profile.bio.description',
-		defaultMessage: 'A short description to tell everyone a little bit about you.',
-	},
-})
+const auth = await useAuth()
+const client = injectModrinthClient()
+const { formatMessage } = useVIntl()
+const profileSettings = ref<InstanceType<typeof AccountProfileSettings> | null>(null)
+const emptyProfileState = {
+	username: '',
+	bio: '',
+	avatarChanged: false,
+}
+
+function patchUser(
+	userId: string,
+	patch: Partial<Pick<Labrinth.Users.v2.User, 'bio' | 'username'>>,
+): Promise<void> {
+	return client.labrinth.users_v2.patch(userId, patch)
+}
+
+function changeAvatar(userId: string, file: Blob, extension: string): Promise<void> {
+	return client.labrinth.users_v2.changeIcon(userId, file, extension)
+}
+
+function deleteAvatar(userId: string): Promise<void> {
+	return client.labrinth.users_v2.deleteIcon(userId)
+}
+
+async function getAuthenticatedUser(): Promise<Labrinth.Users.v3.User> {
+	const user = await client.labrinth.users_v3.getAuthenticated()
+	auth.value.user = user
+	return user
+}
+
+function resetProfileSettings(): void {
+	profileSettings.value?.reset()
+}
+
+function saveProfileSettings(): void {
+	void profileSettings.value?.save()
+}
 
 useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+	title: () => `${formatMessage(commonSettingsMessages.profile)} - Modrinth`,
 })
-
-const auth = await useAuth()
-
-// Avatar state (separate from useSavable)
-const avatarUrl = ref(auth.value.user.avatar_url)
-const icon = shallowRef(null)
-const previewImage = shallowRef(null)
-const pendingAvatarDeletion = ref(false)
-const saving = ref(false)
-
-const {
-	saved,
-	current,
-	reset: resetFields,
-} = useSavable(
-	() => ({
-		username: auth.value.user.username,
-		bio: auth.value.user.bio ?? '',
-	}),
-	async () => {}, // Save is handled manually due to complex icon logic
-)
-
-// Combined state for UnsavedChangesPopup
-const originalState = computed(() => ({
-	...saved.value,
-	avatarChanged: false,
-}))
-
-const modifiedState = computed(() => ({
-	...current.value,
-	avatarChanged: !!(previewImage.value || pendingAvatarDeletion.value),
-}))
-
-const reset = () => {
-	resetFields()
-	icon.value = null
-	previewImage.value = null
-	pendingAvatarDeletion.value = false
-}
-
-function showPreviewImage(files) {
-	const reader = new FileReader()
-	icon.value = files[0]
-	reader.readAsDataURL(icon.value)
-	reader.onload = (event) => {
-		previewImage.value = event.target.result
-	}
-}
-
-function removePreviewImage() {
-	pendingAvatarDeletion.value = true
-	previewImage.value = 'https://cdn.modrinth.com/placeholder.png'
-}
-
-async function save() {
-	saving.value = true
-	try {
-		if (pendingAvatarDeletion.value) {
-			await useBaseFetch(`user/${auth.value.user.id}/icon`, {
-				method: 'DELETE',
-			})
-			pendingAvatarDeletion.value = false
-			previewImage.value = null
-		}
-
-		if (icon.value) {
-			await useBaseFetch(
-				`user/${auth.value.user.id}/icon?ext=${
-					icon.value.type.split('/')[icon.value.type.split('/').length - 1]
-				}`,
-				{
-					method: 'PATCH',
-					body: icon.value,
-				},
-			)
-			icon.value = null
-			previewImage.value = null
-		}
-
-		const body = {}
-
-		if (auth.value.user.username !== current.value.username) {
-			body.username = current.value.username
-		}
-
-		if (auth.value.user.bio !== current.value.bio) {
-			body.bio = current.value.bio
-		}
-
-		await useBaseFetch(`user/${auth.value.user.id}`, {
-			method: 'PATCH',
-			body,
-		})
-		await useAuth(auth.value.token)
-		avatarUrl.value = auth.value.user.avatar_url
-	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err
-				? err.data
-					? err.data.description
-						? err.data.description
-						: err.data
-					: err
-				: 'aaaaahhh',
-			type: 'error',
-		})
-	}
-	saving.value = false
-}
 </script>
-<style lang="scss" scoped>
-.avatar-changer {
-	display: flex;
-	gap: var(--gap-lg);
-	margin-top: var(--gap-md);
-}
-</style>

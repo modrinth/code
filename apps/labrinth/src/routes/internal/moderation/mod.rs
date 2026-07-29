@@ -4,7 +4,6 @@ use crate::database;
 use crate::database::PgPool;
 use crate::database::models::DBModerationLock;
 use crate::database::models::moderation_external_item;
-use crate::database::redis::RedisPool;
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
@@ -20,6 +19,7 @@ use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use xredis::RedisPool;
 
 pub mod external_license;
 mod ownership;

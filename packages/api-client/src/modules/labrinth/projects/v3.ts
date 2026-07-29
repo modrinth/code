@@ -74,6 +74,30 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Search projects (v3)
+	 *
+	 * @param params - Search parameters
+	 * @returns Promise resolving to v3 search results
+	 */
+	public async search(
+		params: Labrinth.Search.SearchParams,
+		options?: {
+			headers?: Record<string, string>
+		},
+	): Promise<Labrinth.Search.v3.SearchResults> {
+		return this.client.request<Labrinth.Search.v3.SearchResults>(`/search`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+			headers: options?.headers,
+			params: {
+				...params,
+				facets: params.facets ? JSON.stringify(params.facets) : undefined,
+			},
+		})
+	}
+
+	/**
 	 * Edit a project (v3)
 	 *
 	 * @param id - Project ID or slug

@@ -10,7 +10,6 @@ use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBModerationNote, DBOrganization, generate_organization_id, team_item,
 };
-use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
@@ -29,6 +28,7 @@ use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(organizations_get)

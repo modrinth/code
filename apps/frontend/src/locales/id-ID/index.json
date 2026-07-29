@@ -1841,9 +1841,6 @@
   "layout.nav.discover": {
     "message": "Temukan"
   },
-  "layout.nav.discover-content": {
-    "message": "Temukan konten"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
   },
@@ -2158,99 +2155,6 @@
   },
   "muralpay.warning.wallet-address": {
     "message": "Periksa ulang alamat dompet Anda. Dana yang terkirim ke alamat yang salah tidak dapat dipulihkan."
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Seorang kreator Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Seorang pengguna Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Kelola penagihan pengguna"
-  },
-  "profile.button.edit-role": {
-    "message": "Ubah peran"
-  },
-  "profile.button.info": {
-    "message": "Lihat perincian pengguna"
-  },
-  "profile.button.manage-projects": {
-    "message": "Kelola proyek"
-  },
-  "profile.button.remove-affiliate": {
-    "message": "Hapus sebagai afiliasi"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Tetapkan sebagai afiliasi"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Penyedia autentikasi"
-  },
-  "profile.details.label.email": {
-    "message": "Sur-el"
-  },
-  "profile.details.label.email-verified": {
-    "message": "Sur-el terverifikasi"
-  },
-  "profile.details.label.has-password": {
-    "message": "Memiliki kata sandi"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Memiliki TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Metode pembayaran"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Sur-el tidak terverifikasi"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Sur-el terverifikasi"
-  },
-  "profile.error.not-found": {
-    "message": "Pengguna tidak ditemukan"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliasi"
-  },
-  "profile.label.badges": {
-    "message": "Lencana"
-  },
-  "profile.label.collection": {
-    "message": "Koleksi"
-  },
-  "profile.label.joined": {
-    "message": "Telah bergabung"
-  },
-  "profile.label.no-collections": {
-    "message": "Pengguna ini tidak memiliki koleksi!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Anda tidak memiliki koleksi apa pun.\nApakah Anda ingin <create-link>membuatnya</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Pengguna ini tidak memiliki proyek!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Anda tidak memiliki proyek apa pun.\nApakah Anda ingin <create-link>membuatnya</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organisasi"
-  },
-  "profile.label.saving": {
-    "message": "Menyimpan..."
-  },
-  "profile.meta.description": {
-    "message": "Unduh proyek milik {username} di Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Unduh proyek milik {username} di Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, other {<stat>{count}</stat> pengikut proyek}}"
-  },
-  "profile.user-id": {
-    "message": "Pengenal Pengguna: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Gagal menolak undangan tim"
@@ -3014,23 +2918,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Tambah URI pengarahan ulang"
   },
-  "settings.applications.button.cancel": {
-    "message": "Batal"
-  },
   "settings.applications.button.create": {
     "message": "Buat aplikasi"
   },
   "settings.applications.button.delete": {
     "message": "Hapus"
   },
-  "settings.applications.button.edit": {
-    "message": "Sunting"
-  },
   "settings.applications.button.new": {
     "message": "Aplikasi baru"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Simpan perubahan"
   },
   "settings.applications.button.upload-icon": {
     "message": "Unggah ikon"
@@ -3280,24 +3175,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "Tidak pernah digunakan"
-  },
-  "settings.profile.bio.description": {
-    "message": "Keterangan singkat untuk mengenalkan sedikit tentang diri Anda."
-  },
-  "settings.profile.bio.title": {
-    "message": "Bio"
-  },
-  "settings.profile.description": {
-    "message": "Informasi profil Anda dapat dilihat secara publik di Modrinth dan melalui <docs-link>Modrinth API</docs-link>."
-  },
-  "settings.profile.profile-info": {
-    "message": "Informasi profil"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Foto profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Nama unik yang tidak peka huruf besar-kecil untuk mengidentifikasi profil Anda."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Cabut sesi"

@@ -55,11 +55,11 @@ core-foundation.workspace = true
 core-graphics.workspace = true
 objc2-app-kit = { workspace = true, features = ["NSWindow"] }
 
-[target.'cfg(windows)'.dependencies]
+[target."cfg(windows)".dependencies]
 webview2-com.workspace = true
 windows-core.workspace = true
 
-[target.'cfg(windows)'.dependencies.windows]
+[target."cfg(windows)".dependencies.windows]
 workspace = true
 features = [
   "Win32_Foundation",

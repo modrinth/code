@@ -1,5 +1,4 @@
 use crate::database::models::image_item;
-use crate::database::redis::RedisPool;
 use crate::database::{self, PgTransaction};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -14,6 +13,7 @@ use image::{
 use sha1::Digest;
 use std::io::Cursor;
 use webp::Encoder;
+use xredis::RedisPool;
 
 pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
     let image = image::load_from_memory(data)?

@@ -113,9 +113,6 @@
   "app.appearance-settings.native-decorations.title": {
     "message": "Systémové dekorace"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Vyberte možnost"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Zobrazuje, kolik času jsi strávil hraním instance."
   },
@@ -166,9 +163,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Zpět k instanci"
-  },
-  "app.browse.discover-content": {
-    "message": "Objevit obsah"
   },
   "app.browse.discover-servers": {
     "message": "Objevit servery"
@@ -379,9 +373,6 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Aktualizuj pro hraní"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Pro hraní {name} je vyžadována aktualizace. Prosím aktualizuj na nejnovější verzi, abys mohl hru spustit."
   },
   "app.project.install-button.already-installed": {
     "message": "Tento projekt je již nainstalován"

@@ -51,7 +51,7 @@ export interface ServerInstallModalHandle {
 	ctx?: CreationFlowContextValue | null
 }
 
-export interface ServerInstallSearchResult extends Labrinth.Search.v2.ResultSearchProject {
+export interface ServerInstallSearchResult extends Labrinth.Search.v3.ResultSearchProject {
 	installed?: boolean
 }
 
@@ -128,6 +128,11 @@ export function useServerInstallContent({
 	const { handleError } = injectNotificationManager()
 	let browseSearchState: ServerInstallBrowseSearchState | null = null
 
+	function getInstallProjectName(project: ServerInstallSearchResult) {
+		const legacyTitle = (project as ServerInstallSearchResult & { title?: string }).title
+		return project.name || legacyTitle || formatMessage(commonMessages.projectLabel)
+	}
+
 	const currentServerId = computed(() => queryAsString(route.query.sid) || null)
 	const fromContext = computed(() => queryAsString(route.query.from) || null)
 	const currentWorldId = computed(() => queryAsString(route.query.wid) || null)
@@ -177,7 +182,7 @@ export function useServerInstallContent({
 	const selectedServerInstallProjects = computed(() =>
 		Array.from(queuedServerInstalls.value.values()).map((plan) => ({
 			id: plan.projectId,
-			name: plan.project.title ?? formatMessage(commonMessages.projectLabel),
+			name: getInstallProjectName(plan.project),
 			iconUrl: plan.project.icon_url ?? null,
 		})),
 	)
@@ -261,7 +266,7 @@ export function useServerInstallContent({
 			projectId: plan.projectId,
 			versionId: plan.versionId,
 			contentType: plan.contentType as PendingServerContentInstallType,
-			title: plan.project.title ?? formatMessage(commonMessages.projectLabel),
+			title: getInstallProjectName(plan.project),
 			versionName: plan.versionName ?? null,
 			versionNumber: plan.versionNumber ?? null,
 			fileName: plan.fileName ?? null,
@@ -635,7 +640,7 @@ export function useServerInstallContent({
 					ctx.modpackSelection.value = {
 						projectId: plan.projectId,
 						versionId: plan.versionId,
-						name: plan.project.title,
+						name: getInstallProjectName(plan.project),
 						iconUrl: plan.project.icon_url ?? undefined,
 					}
 					ctx.modal.value?.setStage('final-config')

@@ -11,7 +11,6 @@ use crate::database::models::{
     DBAffiliateCodeId, charge_item, generate_charge_id, product_item,
     user_subscription_item,
 };
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::billing::{
@@ -42,6 +41,7 @@ use stripe::{
     Webhook,
 };
 use tracing::warn;
+use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(

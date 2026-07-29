@@ -1,6 +1,10 @@
 <template>
 	<div :class="rootClass" data-page-header-metadata-item v-bind="$attrs">
-		<BulletDivider class="page-header-metadata-item-divider shrink-0" />
+		<span
+			class="page-header-metadata-item-divider absolute right-full flex h-full w-[1.625rem] items-center justify-center"
+		>
+			<BulletDivider class="shrink-0" />
+		</span>
 		<AutoLink
 			v-if="to && !disabled"
 			v-tooltip="tooltip"
@@ -72,7 +76,7 @@ const props = withDefaults(defineProps<PageHeaderMetadataItemProps>(), {
 
 const defaultIconClass = 'block size-5 shrink-0 text-current'
 const baseClass =
-	'flex min-w-0 items-center gap-2 font-medium leading-none text-secondary text-nowrap'
+	'relative flex min-w-0 items-center font-medium leading-none text-secondary text-nowrap'
 const contentBaseClass = 'inline-flex min-w-0 items-center gap-2 text-inherit'
 const interactiveClass = 'm-0 cursor-pointer border-0 bg-transparent p-0 hover:underline'
 

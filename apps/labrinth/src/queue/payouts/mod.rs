@@ -1,6 +1,5 @@
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
-use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
 use crate::env::ENV;
 use crate::models::payouts::{
@@ -31,6 +30,7 @@ use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
+use xredis::RedisPool;
 
 mod affiliate;
 pub mod flow;

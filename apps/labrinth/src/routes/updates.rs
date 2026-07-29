@@ -10,10 +10,10 @@ use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
+use xredis::RedisPool;
 
 use super::ApiError;
 

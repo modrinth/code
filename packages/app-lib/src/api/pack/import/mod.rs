@@ -346,19 +346,10 @@ pub async fn recache_icon(
 ) -> crate::Result<Option<PathBuf>> {
     let state = crate::State::get().await?;
 
-    let bytes = tokio::fs::read(&icon_path).await;
-    if let Ok(bytes) = bytes {
-        let bytes = bytes::Bytes::from(bytes);
-        let cache_dir = &state.directories.caches_dir();
-        let semaphore = &state.io_semaphore;
+    if tokio::fs::try_exists(&icon_path).await.unwrap_or(false) {
         Ok(Some(
-            fetch::write_cached_icon(
-                &icon_path.to_string_lossy(),
-                cache_dir,
-                bytes,
-                semaphore,
-            )
-            .await?,
+            crate::api::instance::cache_icon_from_path(&icon_path, &state)
+                .await?,
         ))
     } else {
         // could not find icon (for instance, prism default icon, etc)

@@ -89,9 +89,6 @@
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer launcheren"
   },
-  "app.appearance-settings.select-option": {
-    "message": "Velg et alternativ"
-  },
   "app.appearance-settings.show-play-time.description": {
     "message": "Viser hvor lenge du har spilt et tilfelle."
   },
@@ -142,9 +139,6 @@
   },
   "app.browse.back-to-instance": {
     "message": "Tilbake til tilfelle"
-  },
-  "app.browse.discover-content": {
-    "message": "Oppdag innhold"
   },
   "app.browse.discover-servers": {
     "message": "Oppdag servere"
@@ -229,9 +223,6 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Oppdater for å spille"
-  },
-  "app.modal.update-to-play.update-required-description": {
-    "message": "Ei oppdatering er påkrevd for å spille {name}. Vær så snill å oppdater til den siste versjonen av spillet for å spille det."
   },
   "app.settings.developer-mode-enabled": {
     "message": "Utviklermodus aktivert."

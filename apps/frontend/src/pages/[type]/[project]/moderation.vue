@@ -72,7 +72,7 @@
 					<h2 id="messages" class="m-0 text-xl font-semibold text-contrast">
 						{{ formatMessage(messages.threadSectionTitle) }}
 					</h2>
-					<div v-if="isStaff(currentMember?.user)" class="flex items-center gap-2">
+					<div v-if="staff" class="flex items-center gap-2">
 						<Toggle id="moderator-see-user-ui-toggle" v-model="moderatorSeeUserUi" small />
 						<label for="moderator-see-user-ui-toggle"> Show member UI </label>
 					</div>
@@ -109,8 +109,8 @@
 				</template>
 			</div>
 			<ConversationThread
-				v-if="thread"
-				:thread="thread"
+				v-if="prefixedThread"
+				:thread="prefixedThread"
 				:project="project"
 				:set-status="setStatus"
 				:current-member="currentMember ?? undefined"
@@ -151,6 +151,7 @@ import {
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
+import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
@@ -217,8 +218,31 @@ const {
 	thread,
 } = injectProjectPageContext()
 
+const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
+
+const prefixedThread = computed(() => {
+	const projectDate = project.value?.queued ?? project.value?.approved ?? project.value?.published
+	if (thread.value && projectDate && dayjs(projectDate).isBefore(dayjs(THREADS_RELEASE_DATE))) {
+		const newThread = JSON.parse(JSON.stringify(thread.value))
+		newThread.messages.unshift({
+			id: '69',
+			author_id: null,
+			body: {
+				type: 'legacy_project_message',
+			},
+			created: THREADS_RELEASE_DATE,
+			hide_identity: false,
+		})
+		return newThread
+	}
+	return thread.value
+})
+
 const canAccess = computed(() => !!currentMember.value)
-const userFacingUiVisible = computed(() => !!currentMember.value && moderatorSeeUserUi.value)
+const staff = computed(() => isStaff(currentMember.value?.user))
+const userFacingUiVisible = computed(
+	() => !!currentMember.value && (!staff.value || moderatorSeeUserUi.value),
+)
 
 const approvedAdmonitionMessage = computed<MessageDescriptor | null>(() => {
 	switch (project.value?.status) {
@@ -330,10 +354,11 @@ const moderationAdmonition = computed<{
 							defaultMessage:
 								"You can still modify your project, it won't affect your position in the queue.",
 						}),
+						// temp moved 24-48 hr below to keep old translation for future
 						defineMessage({
-							id: 'project.moderation.admonition.under-review.body.4',
+							id: 'project.moderation.admonition.under-review.body.4.alt-week',
 							defaultMessage:
-								'We aim to review submissions in 24-48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
+								'We aim to review submissions within a week, but some projects may face delays. This does not reflect an issue with your submission.',
 						}),
 					],
 				},
@@ -398,6 +423,13 @@ const moderationAdmonition = computed<{
 	}
 
 	return null
+})
+
+// unused 24-48hr message still defined here for later
+defineMessage({
+	id: 'project.moderation.admonition.under-review.body.4',
+	defaultMessage:
+		'We aim to review submissions in 24–48 hours, but some projects may face delays. This does not reflect an issue with your submission.',
 })
 
 const moderatorSeeUserUi = computed<boolean>({

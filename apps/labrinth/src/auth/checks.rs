@@ -2,7 +2,6 @@ use crate::database;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
-use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::FileId;
@@ -14,6 +13,7 @@ use crate::queue::file_scan::get_files_missing_attribution;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
 use itertools::Itertools;
+use xredis::RedisPool;
 
 pub fn require_verified_email(user: &User) -> Result<(), ApiError> {
     if !user.email_verified.unwrap_or(false) {

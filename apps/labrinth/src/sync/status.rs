@@ -1,10 +1,11 @@
-use crate::database::redis::RedisPool;
 use crate::queue::socket::ActiveSockets;
 use ariadne::ids::UserId;
 use ariadne::users::UserStatus;
 use redis::AsyncCommands;
+use xredis::RedisPool;
 
 const EXPIRY_TIME_SECONDS: i64 = 60;
+const USER_STATUS_NAMESPACE: &str = "user_status:v3";
 
 pub async fn get_user_status(
     user: UserId,
@@ -15,10 +16,10 @@ pub async fn get_user_status(
         return Some(friend_status);
     }
 
-    if let Ok(mut conn) = redis.pool.get().await
-        && let Ok(mut statuses) =
-            conn.sscan::<_, Vec<u8>>(get_field_name(user)).await
-        && let Some(status) = statuses.next_item().await
+    let key = get_key(redis, user);
+    if let Ok(mut conn) = redis.connect().await
+        && let Ok(mut statuses) = conn.sscan::<_, Vec<u8>>(&key).await
+        && let Some(Ok(status)) = statuses.next_item().await
     {
         return postcard::from_bytes::<UserStatus>(&status).ok();
     }
@@ -35,18 +36,18 @@ pub async fn replace_user_status(
         return Ok(());
     };
 
-    if let Ok(mut conn) = redis.pool.get().await {
-        let field_name = get_field_name(user);
+    if let Ok(mut conn) = redis.connect().await {
+        let key = get_key(redis, user);
         let mut pipe = redis::pipe();
         pipe.atomic();
         if let Some(status) = old_status {
-            pipe.srem(&field_name, postcard::to_allocvec(status).unwrap())
+            pipe.srem(&key, postcard::to_allocvec(status).unwrap())
                 .ignore();
         }
         if let Some(status) = new_status {
-            pipe.sadd(&field_name, postcard::to_allocvec(status).unwrap())
+            pipe.sadd(&key, postcard::to_allocvec(status).unwrap())
                 .ignore();
-            pipe.expire(&field_name, EXPIRY_TIME_SECONDS).ignore();
+            pipe.expire(&key, EXPIRY_TIME_SECONDS).ignore();
         }
         return pipe.query_async(&mut conn).await;
     }
@@ -58,12 +59,13 @@ pub async fn push_back_user_expiry(
     user: UserId,
     redis: &RedisPool,
 ) -> Result<(), redis::RedisError> {
-    if let Ok(mut conn) = redis.pool.get().await {
-        return conn.expire(get_field_name(user), EXPIRY_TIME_SECONDS).await;
+    if let Ok(mut conn) = redis.connect().await {
+        let key = get_key(redis, user);
+        return conn.expire(&key, EXPIRY_TIME_SECONDS).await;
     }
     Ok(())
 }
 
-fn get_field_name(user: UserId) -> String {
-    format!("user_status:v1:{user}")
+fn get_key(redis: &RedisPool, user: UserId) -> String {
+    redis.key().entity(USER_STATUS_NAMESPACE, user)
 }

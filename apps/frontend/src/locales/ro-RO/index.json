@@ -1106,9 +1106,6 @@
   "layout.nav.discover": {
     "message": "Descoperă"
   },
-  "layout.nav.discover-content": {
-    "message": "Descoperă conținut"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Ia-ți Modrinth App"
   },
@@ -1213,60 +1210,6 @@
   },
   "muralpay.rail.fiat-usd.name": {
     "message": "Transfer bancar (USD)"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Un creator Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Un utilizator Modrinth."
-  },
-  "profile.button.billing": {
-    "message": "Administrează facturarea utilizatorului"
-  },
-  "profile.button.edit-role": {
-    "message": "Editează rolul"
-  },
-  "profile.button.info": {
-    "message": "Vizualizează detaliile utilizatorului"
-  },
-  "profile.button.manage-projects": {
-    "message": "Administrează proiectele"
-  },
-  "profile.error.not-found": {
-    "message": "Utilizatorul nu a fost găsit"
-  },
-  "profile.label.badges": {
-    "message": "Insigne"
-  },
-  "profile.label.no-collections": {
-    "message": "Acest utilizator nu are colecții!"
-  },
-  "profile.label.no-collections-auth": {
-    "message": "Nu ai nicio colecție.\nVrei să <create-link>creezi una</create-link>?"
-  },
-  "profile.label.no-projects": {
-    "message": "Acest utilizator nu are proiecte!"
-  },
-  "profile.label.no-projects-auth": {
-    "message": "Nu aveți proiecte.\nDoriți să <create-link>creați unul</create-link>?"
-  },
-  "profile.label.organizations": {
-    "message": "Organizații"
-  },
-  "profile.label.saving": {
-    "message": "Salvare..."
-  },
-  "profile.meta.description": {
-    "message": "Descarcă proiectele lui {username} pe Modrinth"
-  },
-  "profile.meta.description-with-bio": {
-    "message": "{bio} - Descarcă proiectele lui {username} pe Modrinth"
-  },
-  "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> urmăritor} other {<stat>{count}</stat> urmăritori}}"
-  },
-  "profile.user-id": {
-    "message": "ID-ul utilizatorului: {id}"
   },
   "project-member-header.error-decline": {
     "message": "Refuzarea invitației în echipă a eșuat"
@@ -1871,20 +1814,11 @@
   "settings.applications.about": {
     "message": "Despre"
   },
-  "settings.applications.button.cancel": {
-    "message": "Anuleaza"
-  },
   "settings.applications.button.create": {
     "message": "Creaza aplicația"
   },
   "settings.applications.button.delete": {
     "message": "Sterge"
-  },
-  "settings.applications.button.edit": {
-    "message": "Editeaza"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Salvează schimbările"
   },
   "settings.applications.client-id": {
     "message": "ID Client"
@@ -2095,24 +2029,6 @@
   },
   "settings.pats.token.never-used": {
     "message": "N-a fost folosit niciodată"
-  },
-  "settings.profile.bio.description": {
-    "message": "O scurtă descriere pentru a le spune tuturor câte ceva despre tine."
-  },
-  "settings.profile.bio.title": {
-    "message": "Biografie"
-  },
-  "settings.profile.description": {
-    "message": "Informațiile profilului tău sunt vizibile public pe Modrinth și prin intermediul <docs-link>API-ului Modrinth</docs-link>."
-  },
-  "settings.profile.profile-info": {
-    "message": "Informațiile profilului"
-  },
-  "settings.profile.profile-picture.title": {
-    "message": "Imagine de profil"
-  },
-  "settings.profile.username.description": {
-    "message": "Un nume unic care nu ține cont de majuscule, pentru a-ți identifica profilul."
   },
   "settings.sessions.action.revoke-session": {
     "message": "Anulează sesiunea"

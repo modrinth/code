@@ -16,8 +16,8 @@ export async function hide_ads_window(reset) {
 	return await invoke('plugin:ads|hide_ads_window', { reset })
 }
 
-export async function get_ads_consent_required() {
-	return await invoke('plugin:ads|get_ads_consent_required')
+export async function should_show_ads_consent_popup() {
+	return await invoke('plugin:ads|should_show_ads_consent_popup')
 }
 
 export async function perform_ads_consent_action(action) {

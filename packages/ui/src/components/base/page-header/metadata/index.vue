@@ -1,7 +1,7 @@
 <template>
 	<div
 		ref="metadata"
-		class="page-header-metadata flex min-w-0 flex-wrap items-center gap-x-2 gap-y-2"
+		class="page-header-metadata flex min-w-0 flex-wrap items-center gap-x-[1.625rem] gap-y-2"
 	>
 		<slot />
 	</div>

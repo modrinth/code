@@ -2,6 +2,7 @@ use actix_web::{HttpRequest, delete, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
+use xredis::RedisPool;
 
 use crate::{
     auth::get_user_from_headers,
@@ -10,7 +11,6 @@ use crate::{
         models::{
             DBAnalyticsEvent, DBAnalyticsEventId, generate_analytics_event_id,
         },
-        redis::RedisPool,
     },
     models::{
         ids::AnalyticsEventId,
