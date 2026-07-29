@@ -75,7 +75,11 @@
 				<ButtonStyled type="transparent" hover-color-fill="none">
 					<button :disabled="refreshingAll" @click="refreshAllWorlds">
 						<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
-						{{ formatMessage(commonMessages.refreshButton) }}
+						{{
+							formatMessage(
+								refreshingAll ? messages.refreshingButton : commonMessages.refreshButton,
+							)
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -242,6 +246,10 @@ const messages = defineMessages({
 		id: 'app.instance.worlds.filter-offline',
 		defaultMessage: 'Offline',
 	},
+	refreshingButton: {
+		id: 'app.instance.worlds.refreshing',
+		defaultMessage: 'Refreshing...',
+	},
 })
 
 const { formatMessage } = useVIntl()
@@ -343,12 +351,15 @@ watch(
 		if (data) {
 			worlds.value = [...data]
 			hadNoWorlds.value = worlds.value.length === 0
-			refreshServers(
-				worlds.value,
-				serverData.value,
-				protocolVersion.value,
-				protocolVersionReady.value,
-			)
+			// Manual refresh handles its own server pings to avoid double-pinging
+			if (!refreshingAll.value) {
+				void refreshServers(
+					worlds.value,
+					serverData.value,
+					protocolVersion.value,
+					protocolVersionReady.value,
+				)
+			}
 		}
 	},
 	{ immediate: true },
@@ -474,8 +485,28 @@ async function refreshAllWorlds() {
 	}
 
 	refreshingAll.value = true
-	await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.id] })
-	refreshingAll.value = false
+	try {
+		// Show loading on server rows immediately while the list refreshes
+		for (const world of worlds.value) {
+			if (world.type === 'server') {
+				if (!serverData.value[world.address]) {
+					serverData.value[world.address] = { refreshing: true }
+				} else {
+					serverData.value[world.address].refreshing = true
+				}
+			}
+		}
+
+		await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.id] })
+		await refreshServers(
+			worlds.value,
+			serverData.value,
+			protocolVersion.value,
+			protocolVersionReady.value,
+		)
+	} finally {
+		refreshingAll.value = false
+	}
 }
 
 async function addServer(server: ServerWorld) {
