@@ -4709,23 +4709,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "新增重新導向 URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "取消"
-  },
   "settings.applications.button.create": {
     "message": "建立應用程式"
   },
   "settings.applications.button.delete": {
     "message": "刪除"
   },
-  "settings.applications.button.edit": {
-    "message": "編輯"
-  },
   "settings.applications.button.new": {
     "message": "新的應用程式"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "儲存變更"
   },
   "settings.applications.button.upload-icon": {
     "message": "上傳圖示"

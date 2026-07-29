@@ -1814,20 +1814,11 @@
   "settings.applications.about": {
     "message": "Despre"
   },
-  "settings.applications.button.cancel": {
-    "message": "Anuleaza"
-  },
   "settings.applications.button.create": {
     "message": "Creaza aplicația"
   },
   "settings.applications.button.delete": {
     "message": "Sterge"
-  },
-  "settings.applications.button.edit": {
-    "message": "Editeaza"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Salvează schimbările"
   },
   "settings.applications.client-id": {
     "message": "ID Client"

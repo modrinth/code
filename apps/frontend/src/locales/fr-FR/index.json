@@ -4667,23 +4667,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Ajouter une URI de redirection"
   },
-  "settings.applications.button.cancel": {
-    "message": "Annuler"
-  },
   "settings.applications.button.create": {
     "message": "Créer une appli"
   },
   "settings.applications.button.delete": {
     "message": "Supprimer"
   },
-  "settings.applications.button.edit": {
-    "message": "Modifier"
-  },
   "settings.applications.button.new": {
     "message": "Nouvelle application"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Sauvegarder les changements"
   },
   "settings.applications.button.upload-icon": {
     "message": "Charger une icône"

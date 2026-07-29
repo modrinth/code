@@ -3713,23 +3713,14 @@
   "settings.applications.button.add-more": {
     "message": "Lägg till mer"
   },
-  "settings.applications.button.cancel": {
-    "message": "Avbryt"
-  },
   "settings.applications.button.create": {
     "message": "Skapa app"
   },
   "settings.applications.button.delete": {
     "message": "Ta bort"
   },
-  "settings.applications.button.edit": {
-    "message": "Redigera"
-  },
   "settings.applications.button.new": {
     "message": "Ny applikation"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Spara ändringar"
   },
   "settings.applications.button.upload-icon": {
     "message": "Ladda upp ikon"

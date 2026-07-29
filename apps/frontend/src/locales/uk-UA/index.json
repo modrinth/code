@@ -4631,23 +4631,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Додати переадресацію URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Скасувати"
-  },
   "settings.applications.button.create": {
     "message": "Створити застосунок"
   },
   "settings.applications.button.delete": {
     "message": "Видалити"
   },
-  "settings.applications.button.edit": {
-    "message": "Редагувати"
-  },
   "settings.applications.button.new": {
     "message": "Новий застосунок"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Зберегти зміни"
   },
   "settings.applications.button.upload-icon": {
     "message": "Завантажити значок"
