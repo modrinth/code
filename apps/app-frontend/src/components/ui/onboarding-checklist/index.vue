@@ -85,7 +85,7 @@ onUnmounted(() => clearTimeout(collapseTimer))
 <template>
 	<div
 		v-if="isReady && showChecklist"
-		class="border-0 border-b-[1px] border-solid border-[--brand-gradient-border] p-3"
+		class="border-0 border-b-[1px] border-solid border-[--brand-gradient-border] px-3 p-4"
 	>
 		<Accordion
 			open-by-default
