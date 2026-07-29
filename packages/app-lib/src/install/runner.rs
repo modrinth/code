@@ -295,6 +295,39 @@ pub async fn cancel_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     Ok(record.snapshot())
 }
 
+pub(crate) async fn cancel_jobs_for_instance_deletion(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    for mut job in store::list_active_for_instance(instance_id, state).await? {
+        let canceled_phase = job.state.progress.phase;
+        job.state.error = Some(InstallErrorView::from_message(
+            "canceled",
+            canceled_phase,
+            "Install canceled because the instance was deleted",
+        ));
+        job.state.record_event(InstallJobEventKind::JobCanceled {
+            phase: canceled_phase,
+        });
+
+        let Some(record) = store::finish_active(
+            job.id,
+            InstallJobStatus::Canceled,
+            &job.state,
+            state,
+        )
+        .await?
+        else {
+            continue;
+        };
+
+        store::dismiss(job.id, state).await?;
+        emit_install_job(&record.snapshot()).await?;
+    }
+
+    Ok(())
+}
+
 pub async fn dismiss_job(job_id: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     store::dismiss(job_id, &state).await
@@ -577,7 +610,11 @@ async fn run_job(job_id: Uuid) -> crate::Result<()> {
 
     let result = Box::pin(run_request(job_id, &mut job_state, &state)).await;
     if let Ok(record) = store::get_required(job_id, &state).await {
+        let status = record.status;
         job_state = record.state;
+        if status != InstallJobStatus::Running {
+            return Ok(());
+        }
     }
 
     let result = match result {

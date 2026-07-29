@@ -191,6 +191,9 @@
   "analytics.chart.tooltip.hide-entry": {
     "message": "Hide {name} in graph"
   },
+  "analytics.chart.tooltip.no-data": {
+    "message": "No data"
+  },
   "analytics.chart.tooltip.pinned": {
     "message": "Chart tooltip pinned"
   },
