@@ -74,10 +74,10 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
         with:
           rustflags: ''
-          target: ${{ contains(matrix.platform, 'macos') && 'x86_64-apple-darwin' || '' }}
+          target: ${{ contains(matrix.artifact-target-name, 'darwin') && 'x86_64-apple-darwin' || '' }}
 
       - name: Setup mold
-        if: contains(matrix.platform, 'ubuntu')
+        if: contains(matrix.artifact-target-name, 'linux')
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
 
       - name: Setup sccache
@@ -92,7 +92,7 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
-        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'macos')
+        if: contains(matrix.artifact-target-name, 'linux') || contains(matrix.artifact-target-name, 'darwin')
         uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
         with:
           cache: |
@@ -100,7 +100,7 @@ jobs:
             pnpm
 
       - name: Configure sccache
-        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'macos')
+        if: contains(matrix.artifact-target-name, 'linux') || contains(matrix.artifact-target-name, 'darwin')
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Generate tauri-dev.conf.json
@@ -119,7 +119,7 @@ jobs:
           EOF
 
       - name: Install Linux build dependencies
-        if: contains(matrix.platform, 'ubuntu')
+        if: contains(matrix.artifact-target-name, 'linux')
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
@@ -136,7 +136,7 @@ jobs:
           repo: TomWright/dasel
           tag: v2.8.1
           extension-matching: disable
-          rename-to: ${{ contains(matrix.platform, 'windows') && 'dasel.exe' || 'dasel' }}
+          rename-to: ${{ contains(matrix.artifact-target-name, 'windows') && 'dasel.exe' || 'dasel' }}
           chmod: 0755
 
       - name: Set application version and environment
@@ -159,7 +159,7 @@ jobs:
         run: pnpm install
 
       - name: Set up Windows code signing
-        if: contains(matrix.platform, 'windows')
+        if: contains(matrix.artifact-target-name, 'windows')
         shell: bash
         run: |
           if [ '${{ startsWith(github.ref, 'refs/tags/v') || inputs.sign-windows-binaries }}' = 'true' ]; then
@@ -170,7 +170,7 @@ jobs:
 
       - name: Build macOS app
         run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
-        if: contains(matrix.platform, 'macos')
+        if: contains(matrix.artifact-target-name, 'darwin')
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
@@ -185,7 +185,7 @@ jobs:
 
       - name: Build Linux app
         run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
-        if: contains(matrix.platform, 'ubuntu')
+        if: contains(matrix.artifact-target-name, 'linux')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -197,7 +197,7 @@ jobs:
           $env:JAVA_HOME = "$env:JAVA_HOME_17_X64"
           ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
-        if: contains(matrix.platform, 'windows')
+        if: contains(matrix.artifact-target-name, 'windows')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}

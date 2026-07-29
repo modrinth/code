@@ -4130,23 +4130,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Átírányítás URI hozzáadása"
   },
-  "settings.applications.button.cancel": {
-    "message": "Mégse"
-  },
   "settings.applications.button.create": {
     "message": "Alkalmazás létrehozása"
   },
   "settings.applications.button.delete": {
     "message": "Törlés"
   },
-  "settings.applications.button.edit": {
-    "message": "Szerkesztés"
-  },
   "settings.applications.button.new": {
     "message": "Új alkalmazás"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Módosítások mentése"
   },
   "settings.applications.button.upload-icon": {
     "message": "Ikon feltöltése"

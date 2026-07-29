@@ -1,5 +1,4 @@
 import { AbstractModule } from '../../../core/abstract-module'
-import type { UploadHandle } from '../../../types/upload'
 import type { Labrinth } from '../types'
 
 export class LabrinthOAuthInternalModule extends AbstractModule {
@@ -110,14 +109,14 @@ export class LabrinthOAuthInternalModule extends AbstractModule {
 	 * @param id - The OAuth client ID
 	 * @param file - The icon file
 	 * @param ext - The file extension (e.g. 'png', 'jpeg')
-	 * @returns UploadHandle for progress tracking and cancellation
 	 */
-	public uploadAppIcon(id: string, file: File | Blob, ext: string): UploadHandle<void> {
-		return this.client.upload<void>(`/oauth/app/${id}/icon`, {
+	public async uploadAppIcon(id: string, file: File | Blob, ext: string): Promise<void> {
+		return this.client.request(`/oauth/app/${id}/icon`, {
 			api: 'labrinth',
 			version: 'internal',
-			file,
+			method: 'PATCH',
 			params: { ext },
+			body: file,
 		})
 	}
 

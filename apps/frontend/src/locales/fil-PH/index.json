@@ -2840,23 +2840,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Magdagdag ng redirect URI"
   },
-  "settings.applications.button.cancel": {
-    "message": "Kanselahin"
-  },
   "settings.applications.button.create": {
     "message": "Lumikha ng app"
   },
   "settings.applications.button.delete": {
     "message": "Tanggalin"
   },
-  "settings.applications.button.edit": {
-    "message": "Baguhin"
-  },
   "settings.applications.button.new": {
     "message": "Bagong aplikasyon"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "I-save ang mga pagbabago"
   },
   "settings.applications.button.upload-icon": {
     "message": "I-upload ang ikono"

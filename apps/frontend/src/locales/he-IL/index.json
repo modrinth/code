@@ -2282,9 +2282,6 @@
   "settings.account.data-export.description": {
     "message": "תבקש עותק של כל הדאטה האישי שהעלית ל-Modrinth. זה יכול לקחת כמה דקות."
   },
-  "settings.applications.button.edit": {
-    "message": "ערוך"
-  },
   "settings.applications.field.name": {
     "message": "שם"
   },

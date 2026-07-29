@@ -2945,23 +2945,14 @@
   "settings.applications.button.add-more": {
     "message": "Tilføj mere"
   },
-  "settings.applications.button.cancel": {
-    "message": "Annuller"
-  },
   "settings.applications.button.create": {
     "message": "Opret app"
   },
   "settings.applications.button.delete": {
     "message": "Slet"
   },
-  "settings.applications.button.edit": {
-    "message": "Rediger"
-  },
   "settings.applications.button.new": {
     "message": "Ny applikation"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Gem ændringer"
   },
   "settings.applications.button.upload-icon": {
     "message": "Upload ikon"

@@ -1,6 +1,7 @@
 <script setup>
 import { SpinnerIcon } from '@modrinth/assets'
 import { Avatar, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -14,6 +15,7 @@ const APPROX_USED_VERTICAL_SPACE = 513 // doesn't need to be exact lol just clos
 const STORAGE_KEY = 'modrinth-quick-instance-count'
 
 const { handleError } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
 
@@ -119,6 +121,10 @@ const onDividerPointerUp = (event) => {
 
 const getInstances = async () => {
 	const instances = await list().catch(handleError)
+
+	for (const instance of instances) {
+		queryClient.setQueryData(['instances', 'summary', instance.id], instance)
+	}
 
 	allInstances.value = instances.sort((a, b) => {
 		const dateACreated = dayjs(a.created)

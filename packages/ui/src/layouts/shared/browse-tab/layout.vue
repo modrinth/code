@@ -107,7 +107,11 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 	</template>
 	<SelectedProjectsFloatingBar v-if="ctx.installContext?.value && ctx.variant !== 'web'" />
 
-	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
+	<NavTabs
+		v-if="ctx.showProjectTypeTabs.value"
+		:links="ctx.selectableProjectTypes.value"
+		:replace="ctx.variant === 'app'"
+	/>
 
 	<StyledInput
 		v-model="ctx.query.value"

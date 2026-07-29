@@ -3620,23 +3620,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "リダイレクトURIを追加"
   },
-  "settings.applications.button.cancel": {
-    "message": "キャンセル"
-  },
   "settings.applications.button.create": {
     "message": "アプリを作成する"
   },
   "settings.applications.button.delete": {
     "message": "削除"
   },
-  "settings.applications.button.edit": {
-    "message": "編集"
-  },
   "settings.applications.button.new": {
     "message": "新規アプリケーション"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "変更を保存する"
   },
   "settings.applications.button.upload-icon": {
     "message": "アイコンをアップロード"

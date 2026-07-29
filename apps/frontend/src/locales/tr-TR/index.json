@@ -4118,23 +4118,14 @@
   "settings.applications.button.add-redirect-uri": {
     "message": "Yönlendirme URI'ları ekle"
   },
-  "settings.applications.button.cancel": {
-    "message": "İptal"
-  },
   "settings.applications.button.create": {
     "message": "Uygulama oluştur"
   },
   "settings.applications.button.delete": {
     "message": "Sil"
   },
-  "settings.applications.button.edit": {
-    "message": "Düzenle"
-  },
   "settings.applications.button.new": {
     "message": "Yeni uygulama"
-  },
-  "settings.applications.button.save-changes": {
-    "message": "Değişiklikleri kaydet"
   },
   "settings.applications.button.upload-icon": {
     "message": "Simge yükle"
