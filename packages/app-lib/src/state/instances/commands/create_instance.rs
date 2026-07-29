@@ -192,8 +192,7 @@ async fn resolve_icon_path(
         {
             Ok(bytes) => bytes,
             Err(error)
-                if ignore_missing_remote_icon
-                    && is_not_found_error(&error) =>
+                if ignore_missing_remote_icon && is_not_found_error(&error) =>
             {
                 return Ok(None);
             }
